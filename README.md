@@ -1,5 +1,5 @@
 ![ico](SRAicon.ico)
-# StarRailAssisant
+# StarRailAssistant
 崩坏星穹铁道自动化助手
 ## 什么是SRA？
 一个基于图像识别的崩铁自动化程序，帮您完成从启动到退出的崩铁日常。
