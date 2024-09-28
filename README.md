@@ -40,7 +40,7 @@
 * 通过 **`Bilibili私信`** 反馈：https://space.bilibili.com/349682013
 * 通过 **`电子邮件`** 反馈：<yukikage@qq.com>
 * 或者加入测试群 **994571792** 在这里，你可以：
-  * 提取获取版本更新
+  * 提前获取版本更新
   * 反馈和意见得到及时回复
   * 与精通 `Python` , `Java` , `C/C++` , `SQL`, `C#` , `Go` , `Vue3` , `HTML` , `JavaScript` , `CSS` , `TypeScript` 的大佬交流。
   * 与 **`太卜司·符玄`** 交流
