@@ -37,7 +37,7 @@
 ## 你这代码保熟吗？
 我们无法保证代码能完美的运行，这便是 **`issues`** 存在的意义。
 * 通过 **`issues`** 反馈：https://github.com/Shasnow/StarRailAssisant/issues
-* 通过 **`biilibili私信`** 反馈：https://space.bilibili.com/349682013
+* 通过 **`Bilibili私信`** 反馈：https://space.bilibili.com/349682013
 * 通过 **`电子邮件`** 反馈：<yukikage@qq.com>
 * 或者加入测试群 **994571792** 在这里，你可以：
   * 提取获取版本更新
