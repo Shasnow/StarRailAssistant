@@ -32,6 +32,12 @@
   pip install subprogress
   pip install pywing32
   ```
+
+什么？你用的是`Python_v3.12`！请额外安装一个库。
+  ```bash
+  pip install Pillow
+  ```
+
   > 万事俱备，只欠东风
   
   在您最喜爱的**Python编译器**中运行带有 **`SRA`** 前缀的`.py`文件，然后就可以享受`SRA`为您带来的服务。
