@@ -99,7 +99,7 @@ class MainWindow(QMainWindow):
         # self.flag()
         central_widget = QWidget(self)
         self.setWindowTitle("SRA beta v0.6")  # 设置窗口标题
-        self.setWindowIcon(QIcon("SRAicon.ico"))
+        self.setWindowIcon(QIcon("res/SRAicon.ico"))
 
         # 创建垂直布局管理器
         vbox_layout_left = QVBoxLayout()
@@ -921,7 +921,7 @@ class MainWindow(QMainWindow):
             notification.notify(
                 title="SRA",
                 message="任务全部完成",
-                app_icon="SRAicon.ico",  # 可以指定一个图标路径
+                app_icon="res/SRAicon.ico",  # 可以指定一个图标路径
                 timeout=10,  # 通知持续时间，秒
             )
         except Exception as e:
