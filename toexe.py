@@ -8,5 +8,5 @@ beta v0.6
 import os
 
 os.system(
-    'pyinstaller -F --version-file res/info.txt -i="res/SRAicon.ico" --window -F SRAbeta_v_0_6.py --hidden-import plyer.platforms.win.notification'
+    'pyinstaller --version-file res/info.txt -i="res/SRAicon.ico" --window -F SRAbeta_v_0_6.py --hidden-import plyer.platforms.win.notification'
 )

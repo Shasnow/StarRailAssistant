@@ -269,19 +269,24 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：领取兑换码")
         time.sleep(2)
         pyautogui.press("esc")
-        for code in redeem_code_list:
-            if click("res/img/more.png") or click("res/img/more_with_something.png"):
-                if click("res/img/redeem_code.png"):
-                    time.sleep(2)
-                    pyautogui.click(get_screen_center())
-                    pyautogui.write(code)
-                    click("res/img/ensure.png")
-                    time.sleep(2)
-                    pyautogui.press("esc")
+        if len(redeem_code_list) == 0:
+            for code in redeem_code_list:
+                if click("res/img/more.png") or click(
+                    "res/img/more_with_something.png"
+                ):
+                    if click("res/img/redeem_code.png"):
+                        time.sleep(2)
+                        pyautogui.click(get_screen_center())
+                        pyautogui.write(code)
+                        click("res/img/ensure.png")
+                        time.sleep(2)
+                        pyautogui.press("esc")
+                    else:
+                        self.update_signal.emit("发生错误，错误编号16")
                 else:
-                    self.update_signal.emit("发生错误，错误编号16")
-            else:
-                self.update_signal.emit("发生错误，错误编号17")
+                    self.update_signal.emit("发生错误，错误编号17")
+        else:
+            self.update_signal.emit("未填写兑换码")
         time.sleep(2)
         pyautogui.press("esc")
         self.update_signal.emit("任务完成：领取兑换码\n")
