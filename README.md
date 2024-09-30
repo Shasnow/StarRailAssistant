@@ -29,7 +29,6 @@
   pip install pyautogui
   pip install pyqt5
   pip install plyer
-  pip install subprogress
   pip install pywing32
   ```
 
