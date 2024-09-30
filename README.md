@@ -29,7 +29,7 @@
   pip install pyautogui
   pip install pyqt5
   pip install plyer
-  pip install pywing32
+  pip install pywin32
   ```
 
 什么？你用的是`Python_v3.12`！请额外安装一个库。
