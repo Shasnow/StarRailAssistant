@@ -32,6 +32,12 @@
   pip install subprogress
   pip install pywing32
   ```
+
+什么？你用的是`Python_v3.12`！请额外安装一个库。
+  ```bash
+  pip install Pillow
+  ```
+
   > 万事俱备，只欠东风
   
   在您最喜爱的**Python编译器**中运行带有 **`SRA`** 前缀的`.py`文件，然后就可以享受`SRA`为您带来的服务。
@@ -88,7 +94,24 @@ beta v0.6 更新公告
 2. 账号切换
 3. 键位适应
    
-感谢您对SRA的支持！  
+感谢您对SRA的支持！
+
+----------------------------------------------------------------------------------------------
+## 贡献者
+
+感谢以下贡献者对本项目做出的贡献
+
+<a href="https://github.com/Shasnow/StarRailAssistant/graphs/contributors">
+
+  <img src="https://contrib.rocks/image?repo=Shasnow/StarRailAssistant" />
+
+</a>
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Shasnow/StarRailAssistant&type=Date)](https://star-history.com/#Shasnow/StarRailAssistant&Date)
+
+----------------------------------------------------------------------------------------------
 
 ## 过往的更新公告
 beta v0.5 更新公告  

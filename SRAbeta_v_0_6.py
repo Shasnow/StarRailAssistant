@@ -4,14 +4,30 @@ beta v0.6
 作者：雪影
 图形化
 """
+
 import sys  # 导入 sys 模块，用于与 Python 解释器交互
 import json
 import time
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QCheckBox, QHBoxLayout, QPushButton, \
-    QWidget, QVBoxLayout, QLineEdit, QFileDialog, QFormLayout, QTextEdit, QAction, QMessageBox, \
-    QComboBox, QSpinBox  # 从 PyQt5 中导入所需的类
+from PyQt5.QtWidgets import (
+    QApplication,
+    QLabel,
+    QMainWindow,
+    QCheckBox,
+    QHBoxLayout,
+    QPushButton,
+    QWidget,
+    QVBoxLayout,
+    QLineEdit,
+    QFileDialog,
+    QFormLayout,
+    QTextEdit,
+    QAction,
+    QMessageBox,
+    QComboBox,
+    QSpinBox,
+)  # 从 PyQt5 中导入所需的类
 from plyer import notification
 
 import StarRailAssistant
@@ -24,44 +40,44 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()  # 调用父类 QMainWindow 的初始化方法
 
-        with open('config.json', 'r', encoding='utf-8') as file:
+        with open("config.json", "r", encoding="utf-8") as file:
             config = json.load(file)
-        self.password_text = config['password']
-        self.account_text = config['account']
-        self.login_flag = config['loginFlag']
-        self.game_path = config['gamePath']
-        self.mission_star_game = config['starGame']
-        self.mission_trailblazer_profile = config['trailBlazerProfile']
+        self.password_text = config["password"]
+        self.account_text = config["account"]
+        self.login_flag = config["loginFlag"]
+        self.game_path = config["gamePath"]
+        self.mission_star_game = config["starGame"]
+        self.mission_trailblazer_profile = config["trailBlazerProfile"]
         self.mission_redeem_code = False
         self.redeem_code_list = None
         self.redeem_code = None
-        self.mission_assignments_reward = config['assignment']
-        self.mission_gift_of_odyssey = config['giftOfOdyssey']
-        self.mission_mail = config['mail']
-        self.mission_trail_blaze_power = config['trailBlazePower']
-        self.mission_daily_training = config['dailyTraining']
-        self.mission_nameless_honor = config['namelessHonor']
-        self.mission_quit_game = config['quitGame']
-        self.calyx_golden_run_time = config['calyx_golden_run_time']
-        self.calyx_golden_battle_time = config['calyx_golden_battle_time']
-        self.calyx_golden_level = config['calyx_golden_level']
-        self.battle_calyx_golden = config['calyx_golden']
-        self.calyx_crimson_run_time = config['calyx_crimson_run_time']
-        self.calyx_crimson_battle_time = config['calyx_crimson_battle_time']
-        self.calyx_crimson_level = config['calyx_crimson_level']
-        self.battle_crimson_golden = config['calyx_crimson']
-        self.stagnant_shadow_run_time = config['stagnant_shadow_run_time']
-        self.stagnant_shadow_level = config['stagnant_shadow_level']
-        self.battle_stagnant_shadow = config['stagnant_shadow']
-        self.caver_of_corrosion_run_time = config['caver_of_corrosion_run_time']
-        self.caver_of_corrosion_level = config['caver_of_corrosion_level']
-        self.battle_caver_of_corrosion = config['caver_of_corrosion']
-        self.echo_of_war_run_time = config['echo_of_war_run_time']
-        self.echo_of_war_level = config['echo_of_war_level']
-        self.battle_echo_of_war = config['echo_of_war']
-        self.battle_ornament_extraction = config['ornament_extraction']
-        self.ornament_extraction_level = config['ornament_extraction_level']
-        self.ornament_extraction_run_time = config['ornament_extraction_run_time']
+        self.mission_assignments_reward = config["assignment"]
+        self.mission_gift_of_odyssey = config["giftOfOdyssey"]
+        self.mission_mail = config["mail"]
+        self.mission_trail_blaze_power = config["trailBlazePower"]
+        self.mission_daily_training = config["dailyTraining"]
+        self.mission_nameless_honor = config["namelessHonor"]
+        self.mission_quit_game = config["quitGame"]
+        self.calyx_golden_run_time = config["calyx_golden_run_time"]
+        self.calyx_golden_battle_time = config["calyx_golden_battle_time"]
+        self.calyx_golden_level = config["calyx_golden_level"]
+        self.battle_calyx_golden = config["calyx_golden"]
+        self.calyx_crimson_run_time = config["calyx_crimson_run_time"]
+        self.calyx_crimson_battle_time = config["calyx_crimson_battle_time"]
+        self.calyx_crimson_level = config["calyx_crimson_level"]
+        self.battle_crimson_golden = config["calyx_crimson"]
+        self.stagnant_shadow_run_time = config["stagnant_shadow_run_time"]
+        self.stagnant_shadow_level = config["stagnant_shadow_level"]
+        self.battle_stagnant_shadow = config["stagnant_shadow"]
+        self.caver_of_corrosion_run_time = config["caver_of_corrosion_run_time"]
+        self.caver_of_corrosion_level = config["caver_of_corrosion_level"]
+        self.battle_caver_of_corrosion = config["caver_of_corrosion"]
+        self.echo_of_war_run_time = config["echo_of_war_run_time"]
+        self.echo_of_war_level = config["echo_of_war_level"]
+        self.battle_echo_of_war = config["echo_of_war"]
+        self.battle_ornament_extraction = config["ornament_extraction"]
+        self.ornament_extraction_level = config["ornament_extraction_level"]
+        self.ornament_extraction_run_time = config["ornament_extraction_run_time"]
         self.replenish_trail_blaze_power_run_time = 1
         self.replenish_way = 1
         self.replenish_trail_blaze_power = False
@@ -71,11 +87,11 @@ class MainWindow(QMainWindow):
 
         menu_bar = self.menuBar()
         help_menu = menu_bar.addMenu("帮助")
-        notice_action = QAction('更新公告', self)
+        notice_action = QAction("更新公告", self)
         notice_action.triggered.connect(self.notice)
-        problem_action = QAction('常见问题', self)
+        problem_action = QAction("常见问题", self)
         problem_action.triggered.connect(self.problem)
-        report_action = QAction('问题反馈', self)
+        report_action = QAction("问题反馈", self)
         report_action.triggered.connect(self.report)
         help_menu.addAction(notice_action)
         help_menu.addAction(problem_action)
@@ -83,7 +99,7 @@ class MainWindow(QMainWindow):
         # self.flag()
         central_widget = QWidget(self)
         self.setWindowTitle("SRA beta v0.6")  # 设置窗口标题
-        self.setWindowIcon(QIcon('SRAicon.ico'))
+        self.setWindowIcon(QIcon("SRAicon.ico"))
 
         # 创建垂直布局管理器
         vbox_layout_left = QVBoxLayout()
@@ -116,16 +132,16 @@ class MainWindow(QMainWindow):
         vbox_layout_right.addWidget(self.log)
 
         self.setCentralWidget(central_widget)  # 将标签作为窗口的中央控件
-        option1 = QCheckBox('启动游戏')
+        option1 = QCheckBox("启动游戏")
         option1.setChecked(self.mission_star_game)
         option1.stateChanged.connect(self.star_game_status)
-        button1 = QPushButton('设置')
+        button1 = QPushButton("设置")
         button1.clicked.connect(self.show_star_game_setting)
         opt1 = QHBoxLayout()
         opt1.addWidget(option1)
         opt1.addWidget(button1)
 
-        option2 = QCheckBox('漫游签证')
+        option2 = QCheckBox("漫游签证")
         option2.setChecked(self.mission_trailblazer_profile)
         option2.stateChanged.connect(self.trailblazer_profile_status)
         # button2 = QPushButton('设置')
@@ -133,16 +149,16 @@ class MainWindow(QMainWindow):
         opt2.addWidget(option2)
         # opt2.addWidget(button2)
 
-        option11 = QCheckBox('兑换码')
+        option11 = QCheckBox("兑换码")
         option11.setChecked(self.mission_redeem_code)
         option11.stateChanged.connect(self.redeem_code_status)
-        button11 = QPushButton('设置')
+        button11 = QPushButton("设置")
         button11.clicked.connect(self.show_redeem_code_setting)
         opt11 = QHBoxLayout()
         opt11.addWidget(option11)
         opt11.addWidget(button11)
 
-        option3 = QCheckBox('派遣')
+        option3 = QCheckBox("派遣")
         option3.setChecked(self.mission_assignments_reward)
         option3.stateChanged.connect(self.assignment_status)
         # button3 = QPushButton('设置')
@@ -150,7 +166,7 @@ class MainWindow(QMainWindow):
         opt3.addWidget(option3)
         # opt3.addWidget(button3)
 
-        option4 = QCheckBox('巡星之礼')
+        option4 = QCheckBox("巡星之礼")
         option4.setChecked(self.mission_gift_of_odyssey)
         option4.stateChanged.connect(self.gift_of_odyssey_status)
         # button4 = QPushButton('设置')
@@ -158,7 +174,7 @@ class MainWindow(QMainWindow):
         opt4.addWidget(option4)
         # opt4.addWidget(button4)
 
-        option5 = QCheckBox('邮件')
+        option5 = QCheckBox("邮件")
         option5.setChecked(self.mission_mail)
         option5.stateChanged.connect(self.mail_status)
         # button5 = QPushButton('设置')
@@ -166,16 +182,16 @@ class MainWindow(QMainWindow):
         opt5.addWidget(option5)
         # opt5.addWidget(button5)
 
-        option6 = QCheckBox('清开拓力')
+        option6 = QCheckBox("清开拓力")
         option6.setChecked(self.mission_trail_blaze_power)
         option6.stateChanged.connect(self.trail_blaze_power_status)
-        button6 = QPushButton('设置')
+        button6 = QPushButton("设置")
         button6.clicked.connect(self.show_trail_blaze_power_setting)
         opt6 = QHBoxLayout()
         opt6.addWidget(option6)
         opt6.addWidget(button6)
 
-        option7 = QCheckBox('每日实训')
+        option7 = QCheckBox("每日实训")
         option7.setChecked(self.mission_daily_training)
         option7.stateChanged.connect(self.daily_training_status)
         # button7 = QPushButton('设置')
@@ -183,7 +199,7 @@ class MainWindow(QMainWindow):
         opt7.addWidget(option7)
         # opt7.addWidget(button7)
 
-        option8 = QCheckBox('无名勋礼')
+        option8 = QCheckBox("无名勋礼")
         option8.setChecked(self.mission_nameless_honor)
         option8.stateChanged.connect(self.nameless_honor_status)
         # button8 = QPushButton('设置')
@@ -191,12 +207,12 @@ class MainWindow(QMainWindow):
         opt8.addWidget(option8)
         # opt8.addWidget(button8)
 
-        opt9 = QCheckBox('退出游戏')
+        opt9 = QCheckBox("退出游戏")
         opt9.setChecked(self.mission_quit_game)
         opt9.stateChanged.connect(self.quit_game_status)
-        self.button9 = QPushButton('执行')
+        self.button9 = QPushButton("执行")
         self.button9.clicked.connect(self.execute)
-        self.button10 = QPushButton('停止')
+        self.button10 = QPushButton("停止")
         self.button10.clicked.connect(self.kill)
         self.button10.setEnabled(False)
 
@@ -217,49 +233,55 @@ class MainWindow(QMainWindow):
         self.star_game_setting()
         self.trail_blaze_power_setting()
         self.redeem_code_setting()
-        QMessageBox.information(self, "使用说明", "SRA崩坏：星穹铁道助手beta v0.6 by雪影\n"
-                                                  "使用说明：\n"
-                                                  "重要！以管理员模式运行程序！\n"
-                                                  "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
-                                                  "重要！执行任务时不要进行其他操作！*请使用游戏默认键位！\n"
-                                                  "\n声明：本程序完全免费，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
-                                                  "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
-                                                  "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
-                                                  "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，相应的后果由您自行承担。\n\n"
-                                                  "请不要在崩坏：星穹铁道及米哈游在各平台（包括不限于：米游社、B 站、微博）的官方动态下讨论任何关于 SRA 内容。"
-                                                  "\n"
-                                                  "\n人话：不要跳脸官方～(∠・ω< )⌒☆")
-        self.update_log('在' + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) + '成功启动')
+        QMessageBox.information(
+            self,
+            "使用说明",
+            "SRA崩坏：星穹铁道助手beta v0.6 by雪影\n"
+            "使用说明：\n"
+            "重要！以管理员模式运行程序！\n"
+            "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
+            "重要！执行任务时不要进行其他操作！*请使用游戏默认键位！\n"
+            "\n声明：本程序完全免费，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
+            "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
+            "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
+            "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，相应的后果由您自行承担。\n\n"
+            "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B 站、微博）的官方动态下讨论任何关于 SRA 内容。"
+            "\n"
+            "\n人话：不要跳脸官方～(∠・ω< )⌒☆",
+        )
+        self.update_log(
+            "在" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "成功启动"
+        )
 
     def star_game_setting(self):
         game_path = QHBoxLayout()
         setting1 = QVBoxLayout()
 
-        text = QLabel('游戏路径：')
+        text = QLabel("游戏路径：")
         self.line_area = QLineEdit()
         self.line_area.setText(self.game_path)
         self.line_area.textChanged.connect(self.get_path)
-        button = QPushButton('浏览')
+        button = QPushButton("浏览")
         button.clicked.connect(self.open_file)
         game_path.addWidget(text)
         game_path.addWidget(self.line_area)
         game_path.addWidget(button)
         setting1.addLayout(game_path)
 
-        auto_launch_checkbox = QCheckBox('自动登录')
+        auto_launch_checkbox = QCheckBox("自动登录")
         auto_launch_checkbox.stateChanged.connect(self.auto_launch)
         setting1.addWidget(auto_launch_checkbox)
         form = QFormLayout()
-        acc = QLabel('账号：')
+        acc = QLabel("账号：")
         self.account = QLineEdit(self.account_text)
         self.account.setReadOnly(True)
         self.account.textChanged.connect(self.get_account)
-        psw = QLabel('密码：')
+        psw = QLabel("密码：")
         self.password = QLineEdit(self.password_text)
         self.password.setEchoMode(QLineEdit.Password)
         self.password.setReadOnly(True)
         self.password.textChanged.connect(self.get_password)
-        self.show_button = QPushButton('显示')
+        self.show_button = QPushButton("显示")
         self.show_button.clicked.connect(self.togglePasswordVisibility)
         form.addRow(acc, self.account)
         form.addRow(psw, self.password)
@@ -274,7 +296,9 @@ class MainWindow(QMainWindow):
         self.star_game_setting_container.setVisible(True)
 
     def open_file(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, "选择文件", "", "可执行文件 (*.exe)")
+        file_name, _ = QFileDialog.getOpenFileName(
+            self, "选择文件", "", "可执行文件 (*.exe)"
+        )
         if file_name:
             self.line_area.setText(file_name)
             self.game_path = file_name
@@ -290,12 +314,12 @@ class MainWindow(QMainWindow):
 
     def auto_launch(self, state):
         if state == Qt.Checked:
-            self.log.append('自动登录已启用')
+            self.log.append("自动登录已启用")
             self.login_flag = True
             self.account.setReadOnly(False)
             self.password.setReadOnly(False)
         else:
-            self.log.append('自动登录已禁用')
+            self.log.append("自动登录已禁用")
             self.login_flag = False
             self.account.setReadOnly(True)
             self.password.setReadOnly(True)
@@ -316,89 +340,89 @@ class MainWindow(QMainWindow):
 
     def star_game_status(self, state):
         if state == Qt.Checked:
-            self.log.append('启动游戏已启用')
+            self.log.append("启动游戏已启用")
             self.mission_star_game = True
         else:
-            self.log.append('启动游戏已禁用')
+            self.log.append("启动游戏已禁用")
             self.mission_star_game = False
 
     def trailblazer_profile_status(self, state):
         if state == Qt.Checked:
-            self.log.append('添加任务：领取签证奖励')
+            self.log.append("添加任务：领取签证奖励")
             self.mission_trailblazer_profile = True
         else:
-            self.log.append('取消任务：领取签证奖励')
+            self.log.append("取消任务：领取签证奖励")
             self.mission_trailblazer_profile = False
 
     def redeem_code_status(self, state):
         if state == Qt.Checked:
-            self.log.append('添加任务：领取兑换码奖励')
+            self.log.append("添加任务：领取兑换码奖励")
             self.mission_redeem_code = True
             self.mission_mail = True
         else:
-            self.log.append('取消任务：领取兑换码奖励')
+            self.log.append("取消任务：领取兑换码奖励")
             self.mission_redeem_code = False
 
     def assignment_status(self, state):
         if state == Qt.Checked:
-            self.log.append('添加任务：领取派遣奖励')
+            self.log.append("添加任务：领取派遣奖励")
             self.mission_assignments_reward = True
         else:
-            self.log.append('取消任务：领取派遣奖励')
+            self.log.append("取消任务：领取派遣奖励")
             self.mission_assignments_reward = False
 
     def gift_of_odyssey_status(self, state):
         if state == Qt.Checked:
-            self.log.append('添加任务：领取巡星之礼')
+            self.log.append("添加任务：领取巡星之礼")
             self.mission_gift_of_odyssey = True
         else:
-            self.log.append('取消任务：领取巡星之礼')
+            self.log.append("取消任务：领取巡星之礼")
             self.mission_gift_of_odyssey = False
 
     def mail_status(self, state):
         if state == Qt.Checked:
-            self.log.append('添加任务：领取邮件')
+            self.log.append("添加任务：领取邮件")
             self.mission_mail = True
         else:
-            self.log.append('取消任务：领取邮件')
+            self.log.append("取消任务：领取邮件")
             self.mission_mail = False
             self.mission_redeem_code = False
 
     def trail_blaze_power_status(self, state):
         if state == Qt.Checked:
-            self.log.append('添加任务：清开拓力')
+            self.log.append("添加任务：清开拓力")
             self.mission_trail_blaze_power = True
         else:
-            self.log.append('取消任务：清开拓力')
+            self.log.append("取消任务：清开拓力")
             self.mission_trail_blaze_power = False
 
     def daily_training_status(self, state):
         if state == Qt.Checked:
-            self.log.append('添加任务：领取每日实训')
+            self.log.append("添加任务：领取每日实训")
             self.mission_daily_training = True
         else:
-            self.log.append('取消任务：领取每日实训')
+            self.log.append("取消任务：领取每日实训")
             self.mission_daily_training = False
 
     def nameless_honor_status(self, state):
         if state == Qt.Checked:
-            self.log.append('添加任务：领取无名勋礼')
+            self.log.append("添加任务：领取无名勋礼")
             self.mission_nameless_honor = True
         else:
-            self.log.append('取消任务：领取无名勋礼')
+            self.log.append("取消任务：领取无名勋礼")
             self.mission_nameless_honor = False
 
     def quit_game_status(self, state):
         if state == Qt.Checked:
-            self.log.append('退出游戏已启用')
+            self.log.append("退出游戏已启用")
             self.mission_quit_game = True
         else:
-            self.log.append('退出游戏已禁用')
+            self.log.append("退出游戏已禁用")
             self.mission_quit_game = False
 
     def redeem_code_setting(self):
         setting = QVBoxLayout()
-        text = QLabel('兑换码')
+        text = QLabel("兑换码")
         text.setAlignment(Qt.AlignCenter)
         self.redeem_code = QTextEdit()
         self.redeem_code.textChanged.connect(self.redeem_code_change)
@@ -423,18 +447,18 @@ class MainWindow(QMainWindow):
 
         replenish_trail_blaze_power = QVBoxLayout()
         option0 = QHBoxLayout()
-        opt0 = QCheckBox('补充体力')
+        opt0 = QCheckBox("补充体力")
         opt0.setChecked(self.replenish_trail_blaze_power)
         opt0.stateChanged.connect(self.replenish_trail_blaze_power_status)
         combobox0 = QComboBox()
-        combobox0.addItems(['-----补充方式-----', '后备开拓力', '燃料', '星琼'])
+        combobox0.addItems(["-----补充方式-----", "后备开拓力", "燃料", "星琼"])
         combobox0.currentIndexChanged.connect(self.replenish_way_select)
         combobox0.setCurrentIndex(self.replenish_way)
         option0.addWidget(opt0)
         option0.addWidget(combobox0)
         replenish_trail_blaze_power.addLayout(option0)
         times_box0 = QHBoxLayout()
-        text0 = QLabel('次数：')
+        text0 = QLabel("次数：")
         times0 = QSpinBox()
         times0.setMinimum(1)
         times0.setValue(self.replenish_trail_blaze_power_run_time)
@@ -445,21 +469,31 @@ class MainWindow(QMainWindow):
 
         ornament_extraction = QVBoxLayout()
         option1 = QHBoxLayout()
-        opt1 = QCheckBox('饰品提取')
+        opt1 = QCheckBox("饰品提取")
         opt1.setChecked(self.battle_ornament_extraction)
         opt1.stateChanged.connect(self.ornament_extraction_status)
         combobox1 = QComboBox()
         combobox1.addItems(
-            ['-----选择副本-----', '蠹役饥肠（露莎卡/蕉乐园）', '永恒笑剧（都蓝/劫火）', '伴你入眠（茨冈尼亚/出云显世）',
-             '天剑如雨（格拉默/匹诺康尼）', '孽果盘生（繁星/龙骨）', '百年冻土（贝洛伯格/萨尔索图）', '温柔话语（公司/差分机）',
-             '浴火钢心（塔利亚/翁瓦克）', '坚城不倒（太空封印站/仙舟）'])
+            [
+                "-----选择副本-----",
+                "蠹役饥肠（露莎卡/蕉乐园）",
+                "永恒笑剧（都蓝/劫火）",
+                "伴你入眠（茨冈尼亚/出云显世）",
+                "天剑如雨（格拉默/匹诺康尼）",
+                "孽果盘生（繁星/龙骨）",
+                "百年冻土（贝洛伯格/萨尔索图）",
+                "温柔话语（公司/差分机）",
+                "浴火钢心（塔利亚/翁瓦克）",
+                "坚城不倒（太空封印站/仙舟）",
+            ]
+        )
         combobox1.currentIndexChanged.connect(self.ornament_extraction_level_select)
         combobox1.setCurrentIndex(self.ornament_extraction_level)
         option1.addWidget(opt1)
         option1.addWidget(combobox1)
         ornament_extraction.addLayout(option1)
         times_box = QHBoxLayout()
-        text = QLabel('次数：')
+        text = QLabel("次数：")
         times = QSpinBox()
         times.setMinimum(1)
         times.setValue(self.ornament_extraction_run_time)
@@ -470,26 +504,37 @@ class MainWindow(QMainWindow):
 
         calyx_golden = QVBoxLayout()
         option2 = QHBoxLayout()
-        opt2 = QCheckBox('拟造花萼（金）(10)')
+        opt2 = QCheckBox("拟造花萼（金）(10)")
         opt2.setChecked(self.battle_calyx_golden)
         opt2.stateChanged.connect(self.calyx_golden_status)
         combobox2 = QComboBox()
-        combobox2.addItems(['-----选择副本-----', '回忆之蕾（匹诺康尼）', '以太之蕾（匹诺康尼）', '珍藏之蕾（匹诺康尼）',
-                            '回忆之蕾（仙舟罗浮）', '以太之蕾（仙舟罗浮）', '珍藏之蕾（仙舟罗浮）',
-                            '回忆之蕾（雅利洛VI）', '以太之蕾（雅利洛VI）', '珍藏之蕾（雅利洛VI）'])
+        combobox2.addItems(
+            [
+                "-----选择副本-----",
+                "回忆之蕾（匹诺康尼）",
+                "以太之蕾（匹诺康尼）",
+                "珍藏之蕾（匹诺康尼）",
+                "回忆之蕾（仙舟罗浮）",
+                "以太之蕾（仙舟罗浮）",
+                "珍藏之蕾（仙舟罗浮）",
+                "回忆之蕾（雅利洛VI）",
+                "以太之蕾（雅利洛VI）",
+                "珍藏之蕾（雅利洛VI）",
+            ]
+        )
         combobox2.setCurrentIndex(self.calyx_golden_level)
         combobox2.currentIndexChanged.connect(self.calyx_golden_level_select)
         option2.addWidget(opt2)
         option2.addWidget(combobox2)
         calyx_golden.addLayout(option2)
         times_box2 = QHBoxLayout()
-        single_times2_text = QLabel('连续作战：')
+        single_times2_text = QLabel("连续作战：")
         single_times2 = QSpinBox()
         single_times2.setMinimum(1)
         single_times2.setValue(self.calyx_golden_battle_time)
         single_times2.setMaximum(6)
         single_times2.valueChanged.connect(self.calyx_golden_battle_time_change)
-        battle_times2_text = QLabel('执行次数：')
+        battle_times2_text = QLabel("执行次数：")
         battle_times2 = QSpinBox()
         battle_times2.setMinimum(1)
         battle_times2.setValue(self.calyx_golden_run_time)
@@ -502,27 +547,42 @@ class MainWindow(QMainWindow):
 
         calyx_crimson = QVBoxLayout()
         option3 = QHBoxLayout()
-        opt3 = QCheckBox('拟造花萼（赤）(10)')
+        opt3 = QCheckBox("拟造花萼（赤）(10)")
         opt3.setChecked(self.battle_crimson_golden)
         opt3.stateChanged.connect(self.calyx_crimson_status)
         combobox3 = QComboBox()
-        combobox3.addItems(['-----选择副本-----', '月狂獠牙（毁灭）', '净世残刃（毁灭）', '神体琥珀（存护）',
-                            '琥珀的坚守（存护）', '逆时一击（巡猎）', '逐星之矢（巡猎）',
-                            '万象果实（丰饶）', '永恒之花（丰饶）', '精致色稿（智识）', '智识之钥（智识）', '天外乐章（同谐）',
-                            '群星乐章（同谐）', '焚天之魔（虚无）', '沉沦黑曜（虚无）'])
+        combobox3.addItems(
+            [
+                "-----选择副本-----",
+                "月狂獠牙（毁灭）",
+                "净世残刃（毁灭）",
+                "神体琥珀（存护）",
+                "琥珀的坚守（存护）",
+                "逆时一击（巡猎）",
+                "逐星之矢（巡猎）",
+                "万象果实（丰饶）",
+                "永恒之花（丰饶）",
+                "精致色稿（智识）",
+                "智识之钥（智识）",
+                "天外乐章（同谐）",
+                "群星乐章（同谐）",
+                "焚天之魔（虚无）",
+                "沉沦黑曜（虚无）",
+            ]
+        )
         combobox3.setCurrentIndex(self.calyx_crimson_level)
         combobox3.currentIndexChanged.connect(self.calyx_crimson_level_select)
         option3.addWidget(opt3)
         option3.addWidget(combobox3)
         calyx_crimson.addLayout(option3)
         times_box3 = QHBoxLayout()
-        single_times3_text = QLabel('连续作战：')
+        single_times3_text = QLabel("连续作战：")
         single_times3 = QSpinBox()
         single_times3.setMinimum(1)
         single_times3.setValue(self.calyx_crimson_battle_time)
         single_times3.setMaximum(6)
         single_times3.valueChanged.connect(self.calyx_crimson_battle_time_change)
-        battle_times3_text = QLabel('执行次数：')
+        battle_times3_text = QLabel("执行次数：")
         battle_times3 = QSpinBox()
         battle_times3.setMinimum(1)
         battle_times3.setValue(self.calyx_crimson_run_time)
@@ -535,24 +595,42 @@ class MainWindow(QMainWindow):
 
         stagnant_shadow = QVBoxLayout()
         option4 = QHBoxLayout()
-        opt4 = QCheckBox('凝滞虚影(30)')
+        opt4 = QCheckBox("凝滞虚影(30)")
         opt4.setChecked(self.battle_stagnant_shadow)
         opt4.stateChanged.connect(self.stagnant_shadow_status)
         combobox4 = QComboBox()
-        combobox4.addItems(['-----选择副本-----', '星际和平工作证（物理）', '幽府通令（物理）', '铁狼碎齿（物理）',
-                            '忿火之心（火）', '过热钢刀（火）', '恒温晶壳（火）',
-                            '冷藏梦箱（冰）', '苦寒晶壳（冰）', '风雪之角（冰）',
-                            '兽馆之钉（雷）', '炼形者雷枝（雷）', '往日之影的雷冠（雷）',
-                            '一杯酩酊的时代（风）', '无人遗垢（风）', '暴风之眼（风）',
-                            '炙梦喷枪（量子）', '苍猿之钉（量子）', '虚幻铸铁（量子）',
-                            '镇灵敕符（虚数）', '往日之影的金饰（虚数）'])
+        combobox4.addItems(
+            [
+                "-----选择副本-----",
+                "星际和平工作证（物理）",
+                "幽府通令（物理）",
+                "铁狼碎齿（物理）",
+                "忿火之心（火）",
+                "过热钢刀（火）",
+                "恒温晶壳（火）",
+                "冷藏梦箱（冰）",
+                "苦寒晶壳（冰）",
+                "风雪之角（冰）",
+                "兽馆之钉（雷）",
+                "炼形者雷枝（雷）",
+                "往日之影的雷冠（雷）",
+                "一杯酩酊的时代（风）",
+                "无人遗垢（风）",
+                "暴风之眼（风）",
+                "炙梦喷枪（量子）",
+                "苍猿之钉（量子）",
+                "虚幻铸铁（量子）",
+                "镇灵敕符（虚数）",
+                "往日之影的金饰（虚数）",
+            ]
+        )
         combobox4.setCurrentIndex(self.stagnant_shadow_level)
         combobox4.currentIndexChanged.connect(self.stagnant_shadow_level_select)
         option4.addWidget(opt4)
         option4.addWidget(combobox4)
         stagnant_shadow.addLayout(option4)
         times_box4 = QHBoxLayout()
-        battle_times4_text = QLabel('执行次数：')
+        battle_times4_text = QLabel("执行次数：")
         battle_times4 = QSpinBox()
         battle_times4.setMinimum(1)
         battle_times4.setValue(self.stagnant_shadow_run_time)
@@ -563,20 +641,32 @@ class MainWindow(QMainWindow):
 
         caver_of_corrosion = QVBoxLayout()
         option5 = QHBoxLayout()
-        opt5 = QCheckBox('侵蚀隧洞(40)')
+        opt5 = QCheckBox("侵蚀隧洞(40)")
         opt5.setChecked(self.battle_caver_of_corrosion)
         opt5.stateChanged.connect(self.caver_of_corrosion_status)
         combobox5 = QComboBox()
-        combobox5.addItems(['-----选择副本-----', '勇骑之径', '梦潜之径', '幽冥之径',
-                            '药使之径', '野焰之径', '圣颂之径',
-                            '睿智之径', '漂泊之径', '迅拳之径', '霜风之径'])
+        combobox5.addItems(
+            [
+                "-----选择副本-----",
+                "勇骑之径",
+                "梦潜之径",
+                "幽冥之径",
+                "药使之径",
+                "野焰之径",
+                "圣颂之径",
+                "睿智之径",
+                "漂泊之径",
+                "迅拳之径",
+                "霜风之径",
+            ]
+        )
         combobox5.setCurrentIndex(self.caver_of_corrosion_level)
         combobox5.currentIndexChanged.connect(self.caver_of_corrosion_level_select)
         option5.addWidget(opt5)
         option5.addWidget(combobox5)
         caver_of_corrosion.addLayout(option5)
         times_box5 = QHBoxLayout()
-        battle_times5_text = QLabel('执行次数：')
+        battle_times5_text = QLabel("执行次数：")
         battle_times5 = QSpinBox()
         battle_times5.setMinimum(1)
         battle_times5.setValue(self.caver_of_corrosion_run_time)
@@ -587,19 +677,28 @@ class MainWindow(QMainWindow):
 
         echo_of_war = QVBoxLayout()
         option6 = QHBoxLayout()
-        opt6 = QCheckBox('历战余响(30)')
+        opt6 = QCheckBox("历战余响(30)")
         opt6.setChecked(self.battle_echo_of_war)
         opt6.stateChanged.connect(self.echo_of_war_status)
         combobox6 = QComboBox()
-        combobox6.addItems(['-----选择副本-----', '心兽的战场', '尘梦的赞礼', '蛀星的旧靥',
-                            '不死的神实', '寒潮的落幕', '毁灭的开端'])
+        combobox6.addItems(
+            [
+                "-----选择副本-----",
+                "心兽的战场",
+                "尘梦的赞礼",
+                "蛀星的旧靥",
+                "不死的神实",
+                "寒潮的落幕",
+                "毁灭的开端",
+            ]
+        )
         combobox6.setCurrentIndex(self.echo_of_war_level)
         combobox6.currentIndexChanged.connect(self.echo_of_war_level_select)
         option6.addWidget(opt6)
         option6.addWidget(combobox6)
         echo_of_war.addLayout(option6)
         times_box6 = QHBoxLayout()
-        battle_times6_text = QLabel('执行次数：')
+        battle_times6_text = QLabel("执行次数：")
         battle_times6 = QSpinBox()
         battle_times6.setMinimum(0)
         battle_times6.setMaximum(3)
@@ -747,22 +846,24 @@ class MainWindow(QMainWindow):
     def update_log(self, text):
         # 在主线程中更新QTextEdit
         self.log.append(text)
-        with open("log.txt", "a", encoding='utf-8') as logfile:
-            logfile.write(text + '\n')
+        with open("log.txt", "a", encoding="utf-8") as logfile:
+            logfile.write(text + "\n")
 
     def execute(self):
-        flags = [self.mission_star_game,
-                 self.mission_trailblazer_profile,
-                 self.mission_assignments_reward,
-                 self.mission_redeem_code,
-                 self.mission_gift_of_odyssey,
-                 self.mission_mail,
-                 self.mission_trail_blaze_power,
-                 self.mission_daily_training,
-                 self.mission_nameless_honor,
-                 self.mission_quit_game]
+        flags = [
+            self.mission_star_game,
+            self.mission_trailblazer_profile,
+            self.mission_assignments_reward,
+            self.mission_redeem_code,
+            self.mission_gift_of_odyssey,
+            self.mission_mail,
+            self.mission_trail_blaze_power,
+            self.mission_daily_training,
+            self.mission_nameless_honor,
+            self.mission_quit_game,
+        ]
         if all(not flag for flag in flags):
-            self.log.append('未选择任何任务')
+            self.log.append("未选择任何任务")
         else:
             self.button10.setEnabled(True)
             self.button9.setEnabled(False)
@@ -806,8 +907,8 @@ class MainWindow(QMainWindow):
                 "replenish_way": self.replenish_way,
                 "replenish_trail_blaze_power_run_time": self.replenish_trail_blaze_power_run_time,
             }
-            with open('config.json', 'w', encoding='utf-8') as json_file:
-                json.dump(configuration, json_file)
+            with open("config.json", "w", encoding="utf-8") as json_file:
+                json.dump(configuration, json_file, indent=4)
             self.son_thread = StarRailAssistant.Assistant()
             self.son_thread.update_signal.connect(self.update_log)
             self.son_thread.finished.connect(self.notification)
@@ -818,93 +919,112 @@ class MainWindow(QMainWindow):
         self.button10.setEnabled(False)
         try:
             notification.notify(
-                title='SRA',
-                message='任务全部完成',
-                app_icon='SRAicon.ico',  # 可以指定一个图标路径
+                title="SRA",
+                message="任务全部完成",
+                app_icon="SRAicon.ico",  # 可以指定一个图标路径
                 timeout=10,  # 通知持续时间，秒
             )
         except Exception as e:
-            with open('log.txt', 'a', encoding='utf-8') as log:
-                log.write(str(e) + '\n')
+            with open("log.txt", "a", encoding="utf-8") as log:
+                log.write(str(e) + "\n")
 
     def kill(self):
         self.son_thread.request_stop()
         self.button10.setEnabled(False)
         self.button9.setEnabled(True)
-        self.log.append('等待当前任务完成后停止')
+        self.log.append("等待当前任务完成后停止")
 
     def notice(self):
-        QMessageBox.information(self, "更新公告",
-                                "beta v0.6 更新公告\n"
-                                "新功能：\n"
-                                "1.体验优化，新增日志文件 log.txt 便于在程序闪退时定位问题。\n"
-                                "2.新增补充体力功能。\n"
-                                "3.新增领取兑换码功能。\n"
-                                "4.新增Windows消息提醒，在任务全部完成时会弹出消息。\n"
-                                "5.体验优化，现在SRA可以主动获取管理员权限。\n"
-                                "\n"
-                                "问题修复：\n"
-                                "1.修复了在特定情况下未正确移动鼠标导致无法跳转到“侵蚀隧洞”和“历战余响”的问题。\n"
-                                "2.修复了战斗遇到体力不足时无法处理的问题。\n"
-                                "3.修正了“执行”与“停止”按钮的行为。\n"
-                                "4.修复了游戏画面贴近或超出屏幕显示边缘时程序后台直接闪退的问题。\n"
-                                "\n感谢您对SRA的支持！")
+        QMessageBox.information(
+            self,
+            "更新公告",
+            "beta v0.6 更新公告\n"
+            "新功能：\n"
+            "1.体验优化，新增日志文件 log.txt 便于在程序闪退时定位问题。\n"
+            "2.新增补充体力功能。\n"
+            "3.新增领取兑换码功能。\n"
+            "4.新增Windows消息提醒，在任务全部完成时会弹出消息。\n"
+            "5.体验优化，现在SRA可以主动获取管理员权限。\n"
+            "\n"
+            "问题修复：\n"
+            "1.修复了在特定情况下未正确移动鼠标导致无法跳转到“侵蚀隧洞”和“历战余响”的问题。\n"
+            "2.修复了战斗遇到体力不足时无法处理的问题。\n"
+            "3.修正了“执行”与“停止”按钮的行为。\n"
+            "4.修复了游戏画面贴近或超出屏幕显示边缘时程序后台直接闪退的问题。\n"
+            "\n感谢您对SRA的支持！",
+        )
 
     def old_notice05(self):
-        QMessageBox.information(self, "更新公告",
-                                "beta v0.5 更新公告\n"
-                                "新功能：\n"
-                                "1.结束对饰品提取的维护，现在可以正常使用该功能\n"
-                                "2.新增停止按键，在执行任务后，你可以点击此按键来停止执行\n"
-                                "3.体验优化，在进入战斗时如果未启用自动战斗，程序会为你启用，除非你再一次取消\n"
-                                "4.外观更新，为程序添加了图标\n"
-                                "5.外观更新，调整字体大小，保护视力。\n"
-                                "6.在常见问题中更新了内容\n"
-                                "问题修复：\n"
-                                "1.修复了在勾选“启动游戏”时手动启动游戏后执行任务会导致程序闪退的问题\n"
-                                "2.修复了在未启动游戏且未勾选“启动游戏”时执行任务时会导致程序闪退的问题\n"
-                                "3.修复了存在回归任务时，领取巡星之礼异常失败的问题。\n"
-                                "4.修复了巡星之礼第7天奖励无法领取的问题")
+        QMessageBox.information(
+            self,
+            "更新公告",
+            "beta v0.5 更新公告\n"
+            "新功能：\n"
+            "1.结束对饰品提取的维护，现在可以正常使用该功能\n"
+            "2.新增停止按键，在执行任务后，你可以点击此按键来停止执行\n"
+            "3.体验优化，在进入战斗时如果未启用自动战斗，程序会为你启用，除非你再一次取消\n"
+            "4.外观更新，为程序添加了图标\n"
+            "5.外观更新，调整字体大小，保护视力。\n"
+            "6.在常见问题中更新了内容\n"
+            "问题修复：\n"
+            "1.修复了在勾选“启动游戏”时手动启动游戏后执行任务会导致程序闪退的问题\n"
+            "2.修复了在未启动游戏且未勾选“启动游戏”时执行任务时会导致程序闪退的问题\n"
+            "3.修复了存在回归任务时，领取巡星之礼异常失败的问题。\n"
+            "4.修复了巡星之礼第7天奖励无法领取的问题",
+        )
 
     def old_notice04(self):
-        QMessageBox.information(self, "更新公告",
-                                "beta v0.4 更新公告\n"
-                                "重磅更新：自定义清体力！\n"
-                                "新功能：\n"
-                                "1.体验优化，现在不需要保持窗口居中，但仍然需要窗口无遮挡。\n"
-                                "2.体验优化，现在可以记录上一次运行时的选择。\n"
-                                "3.在常见问题中更新了内容\n"
-                                "4.在问题反馈中更新了内容\n"
-                                "问题修复：\n"
-                                "1.修复了某些情况下任务结束未正确返回大世界，导致下一个任务无法执行的问题。\n"
-                                "2.修复了若干问题。\n")
+        QMessageBox.information(
+            self,
+            "更新公告",
+            "beta v0.4 更新公告\n"
+            "重磅更新：自定义清体力！\n"
+            "新功能：\n"
+            "1.体验优化，现在不需要保持窗口居中，但仍然需要窗口无遮挡。\n"
+            "2.体验优化，现在可以记录上一次运行时的选择。\n"
+            "3.在常见问题中更新了内容\n"
+            "4.在问题反馈中更新了内容\n"
+            "问题修复：\n"
+            "1.修复了某些情况下任务结束未正确返回大世界，导致下一个任务无法执行的问题。\n"
+            "2.修复了若干问题。\n",
+        )
 
     def old_notice03(self):
-        QMessageBox.information(self, "更新公告",
-                                "beta v0.3 更新公告\n"
-                                "重磅更新：新增图形化界面！\n"
-                                "新功能：\n"
-                                "1.新增账号登录功能，输入你的账号和密码后（本地），如果启动游戏时未登录，可以自动登录。\n"
-                                "2.新增领取巡星之礼功能，现在可以帮你领取巡星之礼。\n"
-                                "3.现在你可以对功能进行一些更加自由的自定义\n"
-                                "4.新增退出游戏功能，在任务结束后，可以选择为你关闭游戏\n"
-                                "问题修复：\n"
-                                "1.修复了某些情况下任务结束未正确返回大世界，导致下一个任务无法执行的问题。\n"
-                                "2.修复了若干问题。\n")
+        QMessageBox.information(
+            self,
+            "更新公告",
+            "beta v0.3 更新公告\n"
+            "重磅更新：新增图形化界面！\n"
+            "新功能：\n"
+            "1.新增账号登录功能，输入你的账号和密码后（本地），如果启动游戏时未登录，可以自动登录。\n"
+            "2.新增领取巡星之礼功能，现在可以帮你领取巡星之礼。\n"
+            "3.现在你可以对功能进行一些更加自由的自定义\n"
+            "4.新增退出游戏功能，在任务结束后，可以选择为你关闭游戏\n"
+            "问题修复：\n"
+            "1.修复了某些情况下任务结束未正确返回大世界，导致下一个任务无法执行的问题。\n"
+            "2.修复了若干问题。\n",
+        )
 
     def problem(self):
-        QMessageBox.information(self, "常见问题", "\n"
-                                                  "1. 在差分宇宙中因奇物“绝对失败处方(进入战斗时，我方全体有150%的基础概率陷入冻结状态，持续1回合)”"
-                                                  "冻结队伍会导致无法开启自动战斗，建议开启游戏的沿用自动战斗设置。"
-                                                  "\n2. 游戏画面贴近或超出屏幕显示边缘时功能无法正常执行。"
-                                                  "\n3. 在执行“历战余响”时若未选择关卡，会导致程序闪退。"
-                                                  "\n关于编队：SRA现在还不会编队，对于除饰品提取以外的战斗功能，使用的是当前出战队伍"
-                                                  "对于饰品提取，如果没有队伍或者队伍有空位，使用的是预设编队的队伍1（不要改名）\n"
-                                                  "此问题等待后续优化\n\n")
+        QMessageBox.information(
+            self,
+            "常见问题",
+            "\n"
+            "1. 在差分宇宙中因奇物“绝对失败处方(进入战斗时，我方全体有150%的基础概率陷入冻结状态，持续1回合)”"
+            "冻结队伍会导致无法开启自动战斗，建议开启游戏的沿用自动战斗设置。"
+            "\n2. 游戏画面贴近或超出屏幕显示边缘时功能无法正常执行。"
+            "\n3. 在执行“历战余响”时若未选择关卡，会导致程序闪退。"
+            "\n关于编队：SRA现在还不会编队，对于除饰品提取以外的战斗功能，使用的是当前出战队伍"
+            "对于饰品提取，如果没有队伍或者队伍有空位，使用的是预设编队的队伍1（不要改名）\n"
+            "此问题等待后续优化\n\n",
+        )
 
     def report(self):
-        QMessageBox.information(self, "问题反馈", "B站：https://space.bilibili.com/349682013\nQQ邮箱：yukikage@qq.com\nQQ"
-                                                  "群：994571792")
+        QMessageBox.information(
+            self,
+            "问题反馈",
+            "B站：https://space.bilibili.com/349682013\nQQ邮箱：yukikage@qq.com\nQQ群：994571792",
+        )
 
 
 def is_admin():
@@ -914,14 +1034,16 @@ def is_admin():
         return False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if is_admin():
         # 创建一个 PyQt5 应用程序对象
         app = QApplication(sys.argv)
 
         # 应用全局样式表
-        app.setStyleSheet("QPushButton, QLabel, QTextEdit, QCheckBox, QComboBox, QSpinBox, QLineEdit "
-                          "{ font-family: Microsoft YaHei; font-size: 12pt; }")
+        app.setStyleSheet(
+            "QPushButton, QLabel, QTextEdit, QCheckBox, QComboBox, QSpinBox, QLineEdit "
+            "{ font-family: Microsoft YaHei; font-size: 12pt; }"
+        )
 
         # 创建主窗口实例
         window = MainWindow()
@@ -932,6 +1054,8 @@ if __name__ == '__main__':
 
     else:
         # 重新以管理员权限运行脚本
-        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+        ctypes.windll.shell32.ShellExecuteW(
+            None, "runas", sys.executable, " ".join(sys.argv), None, 1
+        )
         # 退出当前进程
         sys.exit()
