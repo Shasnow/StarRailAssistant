@@ -6,4 +6,3 @@ PyQt5
 PyScreeze
 pywin32
 pywin32-ctypes
-subprocess
