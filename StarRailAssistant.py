@@ -173,10 +173,10 @@ class Assistant(QThread):
 
     def login(self, account, password):
         if not check(
-            "img/welcome.png", interrupt=0.1, max_time=10
+            "res/img/welcome.png", interrupt=0.1, max_time=10
         ):  # 进入登录界面的标志
-            if check("img/not_logged_in.png", max_time=4):
-                if click("img/login_with_account.png"):
+            if check("res/img/not_logged_in.png", max_time=4):
+                if click("res/img/login_with_account.png"):
                     self.update_signal.emit("登录到" + account)
                     time.sleep(1)
                     pyautogui.write(account)
@@ -185,8 +185,8 @@ class Assistant(QThread):
                     time.sleep(0.1)
                     pyautogui.write(password)
                     pyautogui.press("enter")
-                    click("img/agree.png", -158)
-                    if click("img/enter_game.png"):
+                    click("res/img/agree.png", -158)
+                    if click("res/img/enter_game.png"):
                         times = 0
                         while True:
                             time.sleep(0.2)
@@ -197,7 +197,7 @@ class Assistant(QThread):
                                 )
                                 break
                             else:
-                                if exist("img/welcome.png"):
+                                if exist("res/img/welcome.png"):
                                     self.update_signal.emit("登录成功")
                                     break
                     else:
@@ -217,9 +217,9 @@ class Assistant(QThread):
             time.sleep(2)
             if login_flag and account:
                 self.login(account, password)
-            if check("img/quit.png"):
+            if check("res/img/quit.png"):
                 x, y = get_screen_center()
-                if exist("img/12+.png"):
+                if exist("res/img/12+.png"):
                     pyautogui.click(x, y)
                     time.sleep(3)
                 self.update_signal.emit("开始游戏")
@@ -229,7 +229,7 @@ class Assistant(QThread):
                 times = 0
                 while True:
                     time.sleep(0.2)
-                    if exist("img/chat_enter.png"):
+                    if exist("res/img/chat_enter.png"):
                         return True
                     else:
                         times += 1
@@ -247,10 +247,10 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：签证奖励")
         time.sleep(2)
         pyautogui.press("esc")
-        if click("img/more_with_something.png"):
+        if click("res/img/more_with_something.png"):
             pyautogui.moveRel(20, 0)
-            if click("img/trailblazer_profile_finished.png"):
-                if click("img/assistance_reward.png"):
+            if click("res/img/trailblazer_profile_finished.png"):
+                if click("res/img/assistance_reward.png"):
                     time.sleep(2)
                     pyautogui.press("esc", presses=3, interval=2)
                 else:
@@ -270,12 +270,12 @@ class Assistant(QThread):
         time.sleep(2)
         pyautogui.press("esc")
         for code in redeem_code_list:
-            if click("img/more.png") or click("img/more_with_something.png"):
-                if click("img/redeem_code.png"):
+            if click("res/img/more.png") or click("res/img/more_with_something.png"):
+                if click("res/img/redeem_code.png"):
                     time.sleep(2)
                     pyautogui.click(get_screen_center())
                     pyautogui.write(code)
-                    click("img/ensure.png")
+                    click("res/img/ensure.png")
                     time.sleep(2)
                     pyautogui.press("esc")
                 else:
@@ -290,8 +290,8 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：领取邮件")
         time.sleep(2)
         pyautogui.press("esc")
-        if click("img/mailbox_mail.png"):
-            if click("img/claim_all_mail.png"):
+        if click("res/img/mailbox_mail.png"):
+            if click("res/img/claim_all_mail.png"):
                 time.sleep(2)
                 pyautogui.press("esc")
                 time.sleep(2)
@@ -311,9 +311,9 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：巡星之礼")
         time.sleep(2)
         pyautogui.press("f1")
-        if click("img/gift_of_odyssey.png"):
+        if click("res/img/gift_of_odyssey.png"):
             pass
-        if click("img/gift_receive.png"):
+        if click("res/img/gift_receive.png"):
             self.update_signal.emit("领取成功")
             time.sleep(2)
             pyautogui.press("esc")
@@ -327,14 +327,16 @@ class Assistant(QThread):
 
     def ornament_extraction(self, level_index, battle_time=1):
         self.update_signal.emit("执行任务：饰品提取")
-        level = "img/ornament_extraction (" + str(level_index) + ").png"
+        level = "res/img/ornament_extraction (" + str(level_index) + ").png"
         pyautogui.press("f4")
         time.sleep(3)
-        if click("img/survival_index.png") or exist("img/survival_index_onclick.png"):
-            if click("img/ornament_extraction.png") or exist(
-                "img/ornament_extraction_onclick.png"
+        if click("res/img/survival_index.png") or exist(
+            "res/img/survival_index_onclick.png"
+        ):
+            if click("res/img/ornament_extraction.png") or exist(
+                "res/img/ornament_extraction_onclick.png"
             ):
-                if exist("img/no_save.png"):
+                if exist("res/img/no_save.png"):
                     self.update_signal.emit(
                         "当前暂无可用存档，请前往[差分宇宙]获取存档"
                     )
@@ -344,19 +346,19 @@ class Assistant(QThread):
                 find_level(level)
                 if click(level, x_add=400):
                     time.sleep(5)  # 等待传送
-                    if click("img/nobody.png"):
-                        click("img/preset_formation.png")
-                        click("img/team1.png")
-                    if click("img/battle_star.png"):
-                        if exist("img/replenish.png"):
+                    if click("res/img/nobody.png"):
+                        click("res/img/preset_formation.png")
+                        click("res/img/team1.png")
+                    if click("res/img/battle_star.png"):
+                        if exist("res/img/replenish.png"):
                             if self.replenish_flag:
                                 self.replenish(self.replenish_way)
-                                click("img/battle_star.png")
+                                click("res/img/battle_star.png")
                             else:
                                 self.update_signal.emit("体力不足")
                                 pyautogui.press("esc", interval=1, presses=2)
                                 return
-                        while not exist("img/f3.png"):
+                        while not exist("res/img/f3.png"):
                             pass
                         pyautogui.keyDown("w")
                         time.sleep(3)
@@ -366,7 +368,7 @@ class Assistant(QThread):
                         self.update_signal.emit("请检查自动战斗和倍速是否开启")
                         times = 0
                         while times != 10:
-                            if exist("img/q.png", interrupt=1):
+                            if exist("res/img/q.png", interrupt=1):
                                 pyautogui.press("v")
                                 break
                             else:
@@ -374,15 +376,15 @@ class Assistant(QThread):
                         while battle_time > 1:
                             self.update_signal.emit("剩余次数" + str(battle_time))
                             if self.wait_battle_end():
-                                if click("img/again.png"):
-                                    if exist("img/replenish.png"):
+                                if click("res/img/again.png"):
+                                    if exist("res/img/replenish.png"):
                                         if self.replenish_flag and self.replenish_time:
                                             self.replenish(self.replenish_way)
-                                            click("img/again.png")
+                                            click("res/img/again.png")
                                         else:
                                             self.update_signal.emit("体力不足")
                                             pyautogui.press("esc")
-                                            if click("img/quit_battle.png"):
+                                            if click("res/img/quit_battle.png"):
                                                 self.update_signal.emit("退出战斗")
                                             else:
                                                 self.update_signal.emit(
@@ -395,7 +397,7 @@ class Assistant(QThread):
                                     self.update_signal.emit("发生错误，错误编号5")
                         else:
                             if self.wait_battle_end():
-                                if click("img/quit_battle.png"):
+                                if click("res/img/quit_battle.png"):
                                     self.update_signal.emit("退出战斗")
                                 else:
                                     self.update_signal.emit("发生错误，错误编号12")
@@ -410,32 +412,36 @@ class Assistant(QThread):
 
     def calyx_golden(self, level_index, single_time=1, battle_time=1):
         self.update_signal.emit("执行任务：拟造花萼（金）")
-        level = "img/calyx(golden) (" + str(level_index) + ").png"
+        level = "res/img/calyx(golden) (" + str(level_index) + ").png"
         pyautogui.press("f4")
         time.sleep(3)
-        if click("img/survival_index.png") or exist("img/survival_index_onclick.png"):
-            if click("img/calyx(golden).png") or exist("img/calyx(golden)_onclick.png"):
+        if click("res/img/survival_index.png") or exist(
+            "res/img/survival_index_onclick.png"
+        ):
+            if click("res/img/calyx(golden).png") or exist(
+                "res/img/calyx(golden)_onclick.png"
+            ):
                 find_level(level)
                 if click(level, x_add=600, y_add=10):
                     time.sleep(5)  # 等待传送
                     for i in range(single_time - 1):
-                        click("img/plus.png", interrupt=0.5)
+                        click("res/img/plus.png", interrupt=0.5)
                     time.sleep(2)
-                    if click("img/battle.png"):
-                        if exist("img/replenish.png"):
+                    if click("res/img/battle.png"):
+                        if exist("res/img/replenish.png"):
                             if self.replenish_flag:
                                 self.replenish(self.replenish_way)
-                                click("img/battle.png")
+                                click("res/img/battle.png")
                             else:
                                 self.update_signal.emit("体力不足")
                                 pyautogui.press("esc", interval=1, presses=2)
                                 return
-                        if click("img/battle_star.png"):
+                        if click("res/img/battle_star.png"):
                             self.update_signal.emit("开始战斗")
                             self.update_signal.emit("请检查自动战斗和倍速是否开启")
                             times = 0
                             while times != 10:
-                                if exist("img/q.png", interrupt=1):
+                                if exist("res/img/q.png", interrupt=1):
                                     pyautogui.press("v")
                                     break
                                 else:
@@ -445,18 +451,18 @@ class Assistant(QThread):
                                     "剩余次数" + str(battle_time - 1)
                                 )
                                 if self.wait_battle_end():
-                                    if click("img/again.png"):
-                                        if exist("img/replenish.png"):
+                                    if click("res/img/again.png"):
+                                        if exist("res/img/replenish.png"):
                                             if (
                                                 self.replenish_flag
                                                 and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
-                                                click("img/again.png")
+                                                click("res/img/again.png")
                                             else:
                                                 self.update_signal.emit("体力不足")
                                                 pyautogui.press("esc")
-                                                if click("img/quit_battle.png"):
+                                                if click("res/img/quit_battle.png"):
                                                     self.update_signal.emit("退出战斗")
                                                 else:
                                                     self.update_signal.emit(
@@ -469,7 +475,7 @@ class Assistant(QThread):
                                         self.update_signal.emit("发生错误，错误编号5")
                             else:
                                 if self.wait_battle_end():
-                                    if click("img/quit_battle.png"):
+                                    if click("res/img/quit_battle.png"):
                                         self.update_signal.emit("退出战斗")
                                     else:
                                         self.update_signal.emit("发生错误，错误编号12")
@@ -486,34 +492,36 @@ class Assistant(QThread):
 
     def calyx_crimson(self, level_index, single_time=1, battle_time=1):
         self.update_signal.emit("执行任务：拟造花萼（赤）")
-        level = "img/calyx(crimson) (" + str(level_index) + ").png"
+        level = "res/img/calyx(crimson) (" + str(level_index) + ").png"
         pyautogui.press("f4")
         time.sleep(3)
-        if click("img/survival_index.png") or exist("img/survival_index_onclick.png"):
-            if click("img/calyx(crimson).png") or exist(
-                "img/calyx(crimson)_onclick.png"
+        if click("res/img/survival_index.png") or exist(
+            "res/img/survival_index_onclick.png"
+        ):
+            if click("res/img/calyx(crimson).png") or exist(
+                "res/img/calyx(crimson)_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
                     time.sleep(5)  # 等待传送
                     for i in range(single_time - 1):
-                        click("img/plus.png", interrupt=0.5)
+                        click("res/img/plus.png", interrupt=0.5)
                     time.sleep(2)
-                    if click("img/battle.png"):
-                        if exist("img/replenish.png"):
+                    if click("res/img/battle.png"):
+                        if exist("res/img/replenish.png"):
                             if self.replenish_flag:
                                 self.replenish(self.replenish_way)
-                                click("img/battle.png")
+                                click("res/img/battle.png")
                             else:
                                 self.update_signal.emit("体力不足")
                                 pyautogui.press("esc", interval=1, presses=2)
                                 return
-                        if click("img/battle_star.png"):
+                        if click("res/img/battle_star.png"):
                             self.update_signal.emit("开始战斗")
                             self.update_signal.emit("请检查自动战斗和倍速是否开启")
                             times = 0
                             while times != 10:
-                                if exist("img/q.png", interrupt=1):
+                                if exist("res/img/q.png", interrupt=1):
                                     pyautogui.press("v")
                                     break
                                 else:
@@ -521,18 +529,18 @@ class Assistant(QThread):
                             while battle_time > 1:
                                 self.update_signal.emit("剩余次数" + str(battle_time))
                                 if self.wait_battle_end():
-                                    if click("img/again.png"):
-                                        if exist("img/replenish.png"):
+                                    if click("res/img/again.png"):
+                                        if exist("res/img/replenish.png"):
                                             if (
                                                 self.replenish_flag
                                                 and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
-                                                click("img/again.png")
+                                                click("res/img/again.png")
                                             else:
                                                 self.update_signal.emit("体力不足")
                                                 pyautogui.press("esc")
-                                                if click("img/quit_battle.png"):
+                                                if click("res/img/quit_battle.png"):
                                                     self.update_signal.emit("退出战斗")
                                                 else:
                                                     self.update_signal.emit(
@@ -545,7 +553,7 @@ class Assistant(QThread):
                                         self.update_signal.emit("发生错误，错误编号5")
                             else:
                                 if self.wait_battle_end():
-                                    if click("img/quit_battle.png"):
+                                    if click("res/img/quit_battle.png"):
                                         self.update_signal.emit("退出战斗")
                                     else:
                                         self.update_signal.emit("发生错误，错误编号12")
@@ -562,26 +570,28 @@ class Assistant(QThread):
 
     def stagnant_shadow(self, level_index, battle_time=1):
         self.update_signal.emit("执行任务：凝滞虚影")
-        level = "img/stagnant_shadow (" + str(level_index) + ").png"
+        level = "res/img/stagnant_shadow (" + str(level_index) + ").png"
         pyautogui.press("f4")
         time.sleep(3)
-        if click("img/survival_index.png") or exist("img/survival_index_onclick.png"):
-            if click("img/stagnant_shadow.png") or exist(
-                "img/stagnant_shadow_onclick.png"
+        if click("res/img/survival_index.png") or exist(
+            "res/img/survival_index_onclick.png"
+        ):
+            if click("res/img/stagnant_shadow.png") or exist(
+                "res/img/stagnant_shadow_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
                     time.sleep(5)  # 等待传送
-                    if click("img/battle.png"):
-                        if exist("img/replenish.png"):
+                    if click("res/img/battle.png"):
+                        if exist("res/img/replenish.png"):
                             if self.replenish_flag:
                                 self.replenish(self.replenish_way)
-                                click("img/battle.png")
+                                click("res/img/battle.png")
                             else:
                                 self.update_signal.emit("体力不足")
                                 pyautogui.press("esc", interval=1, presses=2)
                                 return
-                        if click("img/battle_star.png"):
+                        if click("res/img/battle_star.png"):
                             time.sleep(3)
                             pyautogui.keyDown("w")
                             time.sleep(2)
@@ -591,7 +601,7 @@ class Assistant(QThread):
                             self.update_signal.emit("请检查自动战斗和倍速是否开启")
                             times = 0
                             while times != 10:
-                                if exist("img/q.png", interrupt=1):
+                                if exist("res/img/q.png", interrupt=1):
                                     pyautogui.press("v")
                                     break
                                 else:
@@ -599,18 +609,18 @@ class Assistant(QThread):
                             while battle_time > 1:
                                 self.update_signal.emit("剩余次数" + str(battle_time))
                                 if self.wait_battle_end():
-                                    if click("img/again.png"):
-                                        if exist("img/replenish.png"):
+                                    if click("res/img/again.png"):
+                                        if exist("res/img/replenish.png"):
                                             if (
                                                 self.replenish_flag
                                                 and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
-                                                click("img/again.png")
+                                                click("res/img/again.png")
                                             else:
                                                 self.update_signal.emit("体力不足")
                                                 pyautogui.press("esc")
-                                                if click("img/quit_battle.png"):
+                                                if click("res/img/quit_battle.png"):
                                                     self.update_signal.emit("退出战斗")
                                                 else:
                                                     self.update_signal.emit(
@@ -623,7 +633,7 @@ class Assistant(QThread):
                                         self.update_signal.emit("发生错误，错误编号5")
                             else:
                                 if self.wait_battle_end():
-                                    if click("img/quit_battle.png"):
+                                    if click("res/img/quit_battle.png"):
                                         self.update_signal.emit("退出战斗")
                                     else:
                                         self.update_signal.emit("发生错误，错误编号12")
@@ -640,35 +650,37 @@ class Assistant(QThread):
 
     def caver_of_corrosion(self, level_index, battle_time=1):
         self.update_signal.emit("执行任务：侵蚀隧洞")
-        level = "img/caver_of_corrosion (" + str(level_index) + ").png"
+        level = "res/img/caver_of_corrosion (" + str(level_index) + ").png"
         pyautogui.press("f4")
         time.sleep(3)
-        if click("img/survival_index.png") or click("img/survival_index_onclick.png"):
+        if click("res/img/survival_index.png") or click(
+            "res/img/survival_index_onclick.png"
+        ):
             pyautogui.moveRel(0, 100)
             for i in range(6):
                 pyautogui.scroll(-1)
                 time.sleep(1)
-            if click("img/caver_of_corrosion.png") or exist(
-                "img/caver_of_corrosion_onclick.png"
+            if click("res/img/caver_of_corrosion.png") or exist(
+                "res/img/caver_of_corrosion_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
                     time.sleep(5)  # 等待传送
-                    if click("img/battle.png"):
-                        if exist("img/replenish.png"):
+                    if click("res/img/battle.png"):
+                        if exist("res/img/replenish.png"):
                             if self.replenish_flag:
                                 self.replenish(self.replenish_way)
-                                click("img/battle.png")
+                                click("res/img/battle.png")
                             else:
                                 self.update_signal.emit("体力不足")
                                 pyautogui.press("esc", interval=1, presses=2)
                                 return
-                        if click("img/battle_star.png"):
+                        if click("res/img/battle_star.png"):
                             self.update_signal.emit("开始战斗")
                             self.update_signal.emit("请检查自动战斗和倍速是否开启")
                             times = 0
                             while times != 10:
-                                if exist("img/q.png", interrupt=1):
+                                if exist("res/img/q.png", interrupt=1):
                                     pyautogui.press("v")
                                     break
                                 else:
@@ -676,18 +688,18 @@ class Assistant(QThread):
                             while battle_time > 1:
                                 self.update_signal.emit("剩余次数" + str(battle_time))
                                 if self.wait_battle_end():
-                                    if click("img/again.png"):
-                                        if exist("img/replenish.png"):
+                                    if click("res/img/again.png"):
+                                        if exist("res/img/replenish.png"):
                                             if (
                                                 self.replenish_flag
                                                 and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
-                                                click("img/again.png")
+                                                click("res/img/again.png")
                                             else:
                                                 self.update_signal.emit("体力不足")
                                                 pyautogui.press("esc")
-                                                if click("img/quit_battle.png"):
+                                                if click("res/img/quit_battle.png"):
                                                     self.update_signal.emit("退出战斗")
                                                 else:
                                                     self.update_signal.emit(
@@ -700,7 +712,7 @@ class Assistant(QThread):
                                         self.update_signal.emit("发生错误，错误编号5")
                             else:
                                 if self.wait_battle_end():
-                                    if click("img/quit_battle.png"):
+                                    if click("res/img/quit_battle.png"):
                                         self.update_signal.emit("退出战斗")
                                     else:
                                         self.update_signal.emit("发生错误，错误编号12")
@@ -717,33 +729,37 @@ class Assistant(QThread):
 
     def echo_of_war(self, level_index, battle_time=1):
         self.update_signal.emit("执行任务：历战余响")
-        level = "img/echo_of_war (" + str(level_index) + ").png"
+        level = "res/img/echo_of_war (" + str(level_index) + ").png"
         pyautogui.press("f4")
         time.sleep(3)
-        if click("img/survival_index.png") or click("img/survival_index_onclick.png"):
+        if click("res/img/survival_index.png") or click(
+            "res/img/survival_index_onclick.png"
+        ):
             pyautogui.moveRel(0, 100)
             for i in range(6):
                 pyautogui.scroll(-1)
                 time.sleep(1)
-            if click("img/echo_of_war.png") or exist("img/echo_of_war_onclick.png"):
+            if click("res/img/echo_of_war.png") or exist(
+                "res/img/echo_of_war_onclick.png"
+            ):
                 find_level(level)
                 if click(level, x_add=400):
                     time.sleep(5)  # 等待传送
-                    if click("img/battle.png"):
-                        if exist("img/replenish.png"):
+                    if click("res/img/battle.png"):
+                        if exist("res/img/replenish.png"):
                             if self.replenish_flag:
                                 self.replenish(self.replenish_way)
-                                click("img/battle.png")
+                                click("res/img/battle.png")
                             else:
                                 self.update_signal.emit("体力不足")
                                 pyautogui.press("esc", interval=1, presses=2)
                                 return
-                        if click("img/battle_star.png"):
+                        if click("res/img/battle_star.png"):
                             self.update_signal.emit("开始战斗")
                             self.update_signal.emit("请检查自动战斗和倍速是否开启")
                             times = 0
                             while times != 10:
-                                if exist("img/q.png", interrupt=1):
+                                if exist("res/img/q.png", interrupt=1):
                                     pyautogui.press("v")
                                     break
                                 else:
@@ -751,18 +767,18 @@ class Assistant(QThread):
                             while battle_time > 1:
                                 self.update_signal.emit("剩余次数" + str(battle_time))
                                 if self.wait_battle_end():
-                                    if click("img/again.png"):
-                                        if exist("img/replenish.png"):
+                                    if click("res/img/again.png"):
+                                        if exist("res/img/replenish.png"):
                                             if (
                                                 self.replenish_flag
                                                 and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
-                                                click("img/again.png")
+                                                click("res/img/again.png")
                                             else:
                                                 self.update_signal.emit("体力不足")
                                                 pyautogui.press("esc")
-                                                if click("img/quit_battle.png"):
+                                                if click("res/img/quit_battle.png"):
                                                     self.update_signal.emit("退出战斗")
                                                 else:
                                                     self.update_signal.emit(
@@ -775,7 +791,7 @@ class Assistant(QThread):
                                         self.update_signal.emit("发生错误，错误编号5")
                             else:
                                 if self.wait_battle_end():
-                                    if click("img/quit_battle.png"):
+                                    if click("res/img/quit_battle.png"):
                                         self.update_signal.emit("退出战斗")
                                     else:
                                         self.update_signal.emit("发生错误，错误编号12")
@@ -792,7 +808,7 @@ class Assistant(QThread):
 
     def wait_battle_end(self):
         self.update_signal.emit("等待战斗结束")
-        quit_battle = cv2.imread("img/quit_battle.png")
+        quit_battle = cv2.imread("res/img/quit_battle.png")
         while True:
             time.sleep(0.2)
             try:
@@ -808,9 +824,9 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：领取派遣奖励")
         time.sleep(2)
         pyautogui.press("esc")
-        if click("img/assignments_none.png"):
-            if click("img/assignments_reward.png"):
-                if click("img/assign_again.png"):
+        if click("res/img/assignments_none.png"):
+            if click("res/img/assignments_reward.png"):
+                if click("res/img/assign_again.png"):
                     self.update_signal.emit("再次派遣")
                     time.sleep(2)
                     pyautogui.press("esc")
@@ -833,16 +849,16 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：领取每日实训奖励")
         time.sleep(2)
         pyautogui.press("f4")
-        if exist("img/survival_index_onclick.png"):
+        if exist("res/img/survival_index_onclick.png"):
             self.update_signal.emit("没有可领取的奖励")
             pyautogui.press("esc")
         else:
             while True:
-                if click("img/daily_reward.png"):
+                if click("res/img/daily_reward.png"):
                     pyautogui.moveRel(0, -60)
                 else:
                     break
-            if click("img/daily_train_reward.png"):
+            if click("res/img/daily_train_reward.png"):
                 time.sleep(2)
                 pyautogui.press("esc")
                 time.sleep(2)
@@ -857,20 +873,20 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：领取无名勋礼奖励")
         time.sleep(2)
         pyautogui.press("f2")
-        if exist("img/nameless_honor_reward_exist.png"):
-            if click("img/nameless_honor_reward_receive.png"):
+        if exist("res/img/nameless_honor_reward_exist.png"):
+            if click("res/img/nameless_honor_reward_receive.png"):
                 self.update_signal.emit("领取了无名勋礼奖励")
                 time.sleep(2)
                 pyautogui.press("esc")
             else:
                 self.update_signal.emit("发生错误，错误编号7")
-        if click("img/nameless_honor_task.png"):
-            if click("img/nameless_honor_task_receive.png"):
+        if click("res/img/nameless_honor_task.png"):
+            if click("res/img/nameless_honor_task_receive.png"):
                 self.update_signal.emit("成功领取无名勋礼任务奖励")
                 time.sleep(1)
                 pyautogui.press("esc")
-                if click("img/nameless_honor_reward.png"):
-                    if click("img/nameless_honor_reward_receive.png"):
+                if click("res/img/nameless_honor_reward.png"):
+                    if click("res/img/nameless_honor_reward_receive.png"):
                         self.update_signal.emit("领取了无名勋礼奖励")
                         time.sleep(2)
                         pyautogui.press("esc")
@@ -892,29 +908,29 @@ class Assistant(QThread):
     def replenish(self, way):
         if self.replenish_time != 0:
             if way == 1 or way == 0:
-                if exist("img/reserved_trailblaze_power_onclick.png") or click(
-                    "img/reserved_trailblaze_power.png"
+                if exist("res/img/reserved_trailblaze_power_onclick.png") or click(
+                    "res/img/reserved_trailblaze_power.png"
                 ):
-                    click("img/ensure.png")
-                    click("img/ensure.png")
+                    click("res/img/ensure.png")
+                    click("res/img/ensure.png")
                     time.sleep(1)
                     pyautogui.click()
                 else:
                     self.update_signal.emit("发生错误，错误编号13")
                     return False
             elif way == 2:
-                if click("img/fuel.png"):
-                    click("img/ensure.png")
-                    click("img/ensure.png")
+                if click("res/img/fuel.png"):
+                    click("res/img/ensure.png")
+                    click("res/img/ensure.png")
                     time.sleep(1)
                     pyautogui.click()
                 else:
                     self.update_signal.emit("发生错误，错误编号14，可能没有燃料")
                     return False
             elif way == 3:
-                if click("img/stellar_jade.png"):
-                    click("img/ensure.png")
-                    click("img/ensure.png")
+                if click("res/img/stellar_jade.png"):
+                    click("res/img/ensure.png")
+                    click("res/img/ensure.png")
                     time.sleep(1)
                     pyautogui.click()
                 else:
@@ -1031,4 +1047,4 @@ def notice():
 
 
 if __name__ == "__main__":
-    click("img/echo_of_war (0).png")
+    click("res/img/echo_of_war (0).png")
