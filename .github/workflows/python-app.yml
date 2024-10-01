@@ -1,0 +1,136 @@
+#   <StarRailAssistant:An automated program that helps you complete daily tasks of StarRail.>
+#   Copyright © <2024> <Shasnow>
+
+#   This file is part of StarRailAssistant.
+
+#   StarRailAssistant is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the Free Software Foundation,
+#   either version 3 of the License, or (at your option) any later version.
+
+#   StarRailAssistant is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#   See the GNU General Public License for more details.
+
+#   You should have received a copy of the GNU General Public License along with StarRailAssistant.
+#   If not, see <https://www.gnu.org/licenses/>.
+
+#   yukikage@qq.com
+
+name: Build StarRailAssistant
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+
+permissions:
+  contents: read
+
+jobs:
+  pre_check:
+    name: Pre Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repo Check
+        run: |
+          if [[ "$GITHUB_REPOSITORY" != "Shasnow/StarRailAssistant" ]]; then
+            echo "When forking this repository to make your own builds, you have to adjust this check."
+            exit 1
+          fi
+          exit 0
+  build_StarRailAssistant:
+    runs-on: windows-latest
+    needs: pre_check
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          pip install -r requirements.txt
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Built with pyinstaller
+        run: |
+          pyinstaller --version-file res/info.txt -i="res/SRAicon.ico" --window -F SRA.py --hidden-import plyer.platforms.win.notification
+      - name: Read version
+        id: read_version
+        run: |
+          $VERSION=(Get-Content -Path "data/版本信息.txt" -TotalCount 1).Trim()
+          "version=$VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
+      - name: Create Zip
+        run: |
+          Compress-Archive -Path res/**/*,data/**/*,SRA.py,StarRailAssistant.py,dist/SRA.exe,requirements.txt,README.md,LICENSE -DestinationPath AUTO_MAA_${{ env.version }}.zip
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: StarRailAssistant_${{ env.version }}
+          path: StarRailAssistant_${{ env.version }}.zip
+  publish_release:
+    name: Publish release
+    needs: build_StarRailAssistant
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: StarRailAssistant_*
+          merge-multiple: true
+          path: artifacts
+      - name: Check if release exists
+        id: check_if_release_exists
+        run: |
+          release_id=$(gh release view $(head -n 1 data/版本信息.txt) --json id --jq .id || true)
+          if [[ -z $release_id ]]; then
+            echo "release_exists=false" >> $GITHUB_OUTPUT
+          else
+            echo "release_exists=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+      - name: Create release
+        id: create_release
+        if: steps.check_if_release_exists.outputs.release_exists == 'false'
+        run: |
+          set -xe
+          shopt -s nullglob
+          NAME="$(head -n 1 data/版本信息.txt)"
+          TAGNAME="$(head -n 1 data/版本信息.txt)"
+          NOTES_MAIN="$(tail -n +2 data/版本信息.txt)"
+          NOTES_TAIL="\`\`\`本release通过GitHub Actions自动构建\`\`\`"
+          NOTES="$NOTES_MAIN<br><br>$NOTES_TAIL"
+          gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" artifacts/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+      - name: Update release
+        if: steps.check_if_release_exists.outputs.release_exists == 'true'
+        run: |
+          set -xe
+          shopt -s nullglob
+          NAME="$(head -n 1 data/版本信息.txt)"
+          TAGNAME="$(head -n 1 data/版本信息.txt)"
+          NOTES_MAIN="$(tail -n +2 data/版本信息.txt)"
+          NOTES_TAIL="\`\`\`本release通过GitHub Actions自动构建\`\`\`"
+          NOTES="$NOTES_MAIN<br><br>$NOTES_TAIL"
+          gh release delete "$TAGNAME" --yes
+          gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" artifacts/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
