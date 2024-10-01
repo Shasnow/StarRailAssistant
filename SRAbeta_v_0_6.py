@@ -47,7 +47,7 @@ from PyQt5.QtWidgets import (
     QSpinBox,
 )  # 从 PyQt5 中导入所需的类
 from plyer import notification
-
+import encryption
 import StarRailAssistant
 import ctypes
 
@@ -57,11 +57,19 @@ ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改�
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()  # 调用父类 QMainWindow 的初始化方法
-
-        with open("data/config.json", "r", encoding="utf-8") as file:
+        encryption.init()
+        with open("config.json", "r", encoding="utf-8") as file:
             config = json.load(file)
-        self.password_text = config["password"]
-        self.account_text = config["account"]
+        with open("privacy.sra", "rb") as sra_file:
+            privacy = sra_file.readlines()
+            try:
+                pwd = privacy[1]
+                acc = privacy[0]
+                self.password_text = encryption.decrypt_word(pwd)
+                self.account_text = encryption.decrypt_word(acc)
+            except IndexError:
+                self.password_text = ""
+                self.account_text = ""
         self.login_flag = config["loginFlag"]
         self.game_path = config["gamePath"]
         self.mission_star_game = config["starGame"]
@@ -888,8 +896,6 @@ class MainWindow(QMainWindow):
             configuration = {
                 "gamePath": self.game_path,
                 "starGame": self.mission_star_game,
-                "account": self.account_text,
-                "password": self.password_text,
                 "loginFlag": self.login_flag,
                 "trailBlazerProfile": self.mission_trailblazer_profile,
                 "assignment": self.mission_assignments_reward,
@@ -925,6 +931,10 @@ class MainWindow(QMainWindow):
                 "replenish_way": self.replenish_way,
                 "replenish_trail_blaze_power_run_time": self.replenish_trail_blaze_power_run_time,
             }
+            acc = encryption.encrypt_word(self.account_text)
+            pwd = encryption.encrypt_word(self.password_text)
+            with open("privacy.sra", "wb") as sra_file:
+                sra_file.write(acc + b"\n" + pwd)
             with open("data/config.json", "w", encoding="utf-8") as json_file:
                 json.dump(configuration, json_file, indent=4)
             self.son_thread = StarRailAssistant.Assistant()
