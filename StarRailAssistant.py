@@ -48,7 +48,7 @@ class Assistant(QThread):
         self.stop_flag = True
 
     def run(self):
-        with open("config.json", "r", encoding="utf-8") as file:
+        with open("data/config.json", "r", encoding="utf-8") as file:
             config = json.load(file)
         if not self.stop_flag:
             if config["starGame"]:
