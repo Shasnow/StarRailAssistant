@@ -1,3 +1,21 @@
+#   <StarRailAssistant:An automated program that helps you complete daily tasks of StarRail.>
+#   Copyright © <2024> <Shasnow>
+
+#   This file is part of StarRailAssistant.
+
+#   StarRailAssistant is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the Free Software Foundation,
+#   either version 3 of the License, or (at your option) any later version.
+
+#   StarRailAssistant is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#   See the GNU General Public License for more details.
+
+#   You should have received a copy of the GNU General Public License along with StarRailAssistant.
+#   If not, see <https://www.gnu.org/licenses/>.
+
+#   yukikage@qq.com
+
 """
 崩坏：星穹铁道助手
 beta v0.6
@@ -40,7 +58,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()  # 调用父类 QMainWindow 的初始化方法
 
-        with open("config.json", "r", encoding="utf-8") as file:
+        with open("data/config.json", "r", encoding="utf-8") as file:
             config = json.load(file)
         self.password_text = config["password"]
         self.account_text = config["account"]
@@ -907,7 +925,7 @@ class MainWindow(QMainWindow):
                 "replenish_way": self.replenish_way,
                 "replenish_trail_blaze_power_run_time": self.replenish_trail_blaze_power_run_time,
             }
-            with open("config.json", "w", encoding="utf-8") as json_file:
+            with open("data/config.json", "w", encoding="utf-8") as json_file:
                 json.dump(configuration, json_file, indent=4)
             self.son_thread = StarRailAssistant.Assistant()
             self.son_thread.update_signal.connect(self.update_log)
@@ -938,71 +956,20 @@ class MainWindow(QMainWindow):
         QMessageBox.information(
             self,
             "更新公告",
-            "beta v0.6 更新公告\n"
+            "beta v0.7 更新公告\n"
             "新功能：\n"
-            "1.体验优化，新增日志文件 log.txt 便于在程序闪退时定位问题。\n"
-            "2.新增补充体力功能。\n"
-            "3.新增领取兑换码功能。\n"
-            "4.新增Windows消息提醒，在任务全部完成时会弹出消息。\n"
-            "5.体验优化，现在SRA可以主动获取管理员权限。\n"
+            "1.\n"
+            "2.\n"
+            "3.\n"
+            "4.\n"
+            "5.\n"
             "\n"
             "问题修复：\n"
-            "1.修复了在特定情况下未正确移动鼠标导致无法跳转到“侵蚀隧洞”和“历战余响”的问题。\n"
-            "2.修复了战斗遇到体力不足时无法处理的问题。\n"
-            "3.修正了“执行”与“停止”按钮的行为。\n"
-            "4.修复了游戏画面贴近或超出屏幕显示边缘时程序后台直接闪退的问题。\n"
+            "1.修复了在未填写兑换码时勾选此功能会导致程序崩溃的问题。\n"
+            "2.修复了无法正常传送到精致色稿副本和万象果实副本的问题。\n"
+            "3.\n"
+            "4.\n"
             "\n感谢您对SRA的支持！",
-        )
-
-    def old_notice05(self):
-        QMessageBox.information(
-            self,
-            "更新公告",
-            "beta v0.5 更新公告\n"
-            "新功能：\n"
-            "1.结束对饰品提取的维护，现在可以正常使用该功能\n"
-            "2.新增停止按键，在执行任务后，你可以点击此按键来停止执行\n"
-            "3.体验优化，在进入战斗时如果未启用自动战斗，程序会为你启用，除非你再一次取消\n"
-            "4.外观更新，为程序添加了图标\n"
-            "5.外观更新，调整字体大小，保护视力。\n"
-            "6.在常见问题中更新了内容\n"
-            "问题修复：\n"
-            "1.修复了在勾选“启动游戏”时手动启动游戏后执行任务会导致程序闪退的问题\n"
-            "2.修复了在未启动游戏且未勾选“启动游戏”时执行任务时会导致程序闪退的问题\n"
-            "3.修复了存在回归任务时，领取巡星之礼异常失败的问题。\n"
-            "4.修复了巡星之礼第7天奖励无法领取的问题",
-        )
-
-    def old_notice04(self):
-        QMessageBox.information(
-            self,
-            "更新公告",
-            "beta v0.4 更新公告\n"
-            "重磅更新：自定义清体力！\n"
-            "新功能：\n"
-            "1.体验优化，现在不需要保持窗口居中，但仍然需要窗口无遮挡。\n"
-            "2.体验优化，现在可以记录上一次运行时的选择。\n"
-            "3.在常见问题中更新了内容\n"
-            "4.在问题反馈中更新了内容\n"
-            "问题修复：\n"
-            "1.修复了某些情况下任务结束未正确返回大世界，导致下一个任务无法执行的问题。\n"
-            "2.修复了若干问题。\n",
-        )
-
-    def old_notice03(self):
-        QMessageBox.information(
-            self,
-            "更新公告",
-            "beta v0.3 更新公告\n"
-            "重磅更新：新增图形化界面！\n"
-            "新功能：\n"
-            "1.新增账号登录功能，输入你的账号和密码后（本地），如果启动游戏时未登录，可以自动登录。\n"
-            "2.新增领取巡星之礼功能，现在可以帮你领取巡星之礼。\n"
-            "3.现在你可以对功能进行一些更加自由的自定义\n"
-            "4.新增退出游戏功能，在任务结束后，可以选择为你关闭游戏\n"
-            "问题修复：\n"
-            "1.修复了某些情况下任务结束未正确返回大世界，导致下一个任务无法执行的问题。\n"
-            "2.修复了若干问题。\n",
         )
 
     def problem(self):
