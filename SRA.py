@@ -58,9 +58,9 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()  # 调用父类 QMainWindow 的初始化方法
         encryption.init()
-        with open("config.json", "r", encoding="utf-8") as file:
+        with open("data/config.json", "r", encoding="utf-8") as file:
             config = json.load(file)
-        with open("privacy.sra","rb") as sra_file:
+        with open("data/privacy.sra","rb") as sra_file:
             privacy=sra_file.readlines()
             try:
                 pwd=privacy[1]
@@ -929,9 +929,9 @@ class MainWindow(QMainWindow):
             }
             acc=encryption.encrypt_word(self.account_text)
             pwd=encryption.encrypt_word(self.password_text)
-            with open("privacy.sra","wb") as sra_file:
+            with open("data/privacy.sra","wb") as sra_file:
                 sra_file.write(acc+b'\n'+pwd)
-            with open("config.json", "w", encoding="utf-8") as json_file:
+            with open("data/config.json", "w", encoding="utf-8") as json_file:
                 json.dump(configuration, json_file, indent=4)
             self.son_thread = StarRailAssistant.Assistant()
             self.son_thread.update_signal.connect(self.update_log)
