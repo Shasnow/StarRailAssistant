@@ -1,4 +1,4 @@
-![ico](SRAicon.ico)
+![ico](/res/SRAico.jpg)
 # StarRailAssistant(SRA)
 崩坏星穹铁道自动化助手
 ## 什么是SRA？
@@ -23,7 +23,7 @@
 ## 我怎么才能使用SRA？急急急
 下载链接：[SRAv0.6](https://github.com/Shasnow/StarRailAssisant/releases)
 * 如果你是小白，只需要下载项目中的`rar`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`.exe`即可！
-* **我想挑战一下自己！** 当然没问题。下载项目中所有的`.py`文件，噢，别忘了 **`.json`与`img`**，如果不想程序失去图标，别忘了 **`.ico`** 。确保你的电脑中已经安装好了`Python`，并安装好了下面的库，如果没有，使用`pip`来安装它们。
+* **我想挑战一下自己！** 当然没问题。打包下载项目中所有文件，确保你的电脑中已经安装好了`Python`，并安装好了下面的库，如果没有，使用`pip`来安装它们。
   ```bash
   pip install opencv-python
   pip install pyautogui

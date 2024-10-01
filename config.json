@@ -1,8 +1,6 @@
 {
     "gamePath": "",
     "starGame": false,
-    "account": "",
-    "password": "",
     "loginFlag": false,
     "trailBlazerProfile": false,
     "assignment": false,
@@ -26,15 +24,15 @@
     "calyx_crimson_battle_time": 1,
     "calyx_crimson_run_time": 1,
     "stagnant_shadow_run_time": 1,
-    "stagnant_shadow_level": 13,
+    "stagnant_shadow_level": 0,
     "stagnant_shadow": false,
     "caver_of_corrosion": false,
     "caver_of_corrosion_run_time": 1,
-    "caver_of_corrosion_level": 10,
+    "caver_of_corrosion_level": 0,
     "echo_of_war": false,
     "echo_of_war_run_time": 1,
     "echo_of_war_level": 0,
     "replenish_trail_blaze_power": false,
-    "replenish_way": 0,
+    "replenish_way": 1,
     "replenish_trail_blaze_power_run_time": 1
 }
