@@ -27,20 +27,20 @@ import os
 
 
 # 生成密钥
-def generate_key(key_file='frperg.sra'):
+def generate_key(key_file="data/frperg.sra"):
     key = Fernet.generate_key()
-    with open(key_file, 'wb') as key_file:
+    with open(key_file, "wb") as key_file:
         key_file.write(key)
     return key
 
 
 # 从文件加载密钥
-def load_key(key_file='frperg.sra'):
-    return open(key_file, 'rb').read()
+def load_key(key_file="data/frperg.sra"):
+    return open(key_file, "rb").read()
 
 
 # 加密密码
-def encrypt_word(pwd, key_file='frperg.sra'):
+def encrypt_word(pwd, key_file="data/frperg.sra"):
     key = load_key(key_file)
     cipher_suite = Fernet(key)
     encrypted_password = cipher_suite.encrypt(pwd.encode())
@@ -48,25 +48,26 @@ def encrypt_word(pwd, key_file='frperg.sra'):
 
 
 # 解密密码
-def decrypt_word(encrypted_password, key_file='frperg.sra'):
+def decrypt_word(encrypted_password, key_file="data/frperg.sra"):
     key = load_key(key_file)
     cipher_suite = Fernet(key)
     decrypted_pwd = cipher_suite.decrypt(encrypted_password).decode()
     return decrypted_pwd
 
+
 def init():
-    if not os.path.exists('frperg.sra'):
+    if not os.path.exists("data/frperg.sra"):
         generate_key()
-    if not os.path.exists('privacy.sra'):
-        with open("privacy.sra",'wb') as sra_file:
-            sra_file.write(b'')
+    if not os.path.exists("data/privacy.sra"):
+        with open("data/privacy.sra", "wb") as sra_file:
+            sra_file.write(b"")
 
 
 if __name__ == "__main__":
-    if not os.path.exists('frperg.sra'):
+    if not os.path.exists("data/frperg.sra"):
         generate_key()
     password = input("请输入密码: ")
-    password=encrypt_word(password)
+    password = encrypt_word(password)
     print(password)
     decrypted_password = decrypt_word(password)
     print("解密后的密码是:", decrypted_password)
