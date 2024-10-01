@@ -44,7 +44,7 @@ from PyQt5.QtWidgets import (
     QAction,
     QMessageBox,
     QComboBox,
-    QSpinBox,
+    QSpinBox, QGroupBox,
 )  # 从 PyQt5 中导入所需的类
 from plyer import notification
 import encryption
@@ -58,18 +58,18 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()  # 调用父类 QMainWindow 的初始化方法
         encryption.init()
-        with open("data/config.json", "r", encoding="utf-8") as file:
+        with open("config.json", "r", encoding="utf-8") as file:
             config = json.load(file)
-        with open("data/privacy.sra", "rb") as sra_file:
-            privacy = sra_file.readlines()
+        with open("privacy.sra","rb") as sra_file:
+            privacy=sra_file.readlines()
             try:
-                pwd = privacy[1]
-                acc = privacy[0]
+                pwd=privacy[1]
+                acc=privacy[0]
                 self.password_text = encryption.decrypt_word(pwd)
                 self.account_text = encryption.decrypt_word(acc)
             except IndexError:
-                self.password_text = ""
-                self.account_text = ""
+                self.password_text=''
+                self.account_text=''
         self.login_flag = config["loginFlag"]
         self.game_path = config["gamePath"]
         self.mission_star_game = config["starGame"]
@@ -122,7 +122,6 @@ class MainWindow(QMainWindow):
         help_menu.addAction(notice_action)
         help_menu.addAction(problem_action)
         help_menu.addAction(report_action)
-        # self.flag()
         central_widget = QWidget(self)
         self.setWindowTitle("SRA beta v0.6")  # 设置窗口标题
         self.setWindowIcon(QIcon("res/SRAicon.ico"))
@@ -131,29 +130,26 @@ class MainWindow(QMainWindow):
         vbox_layout_left = QVBoxLayout()
         self.vbox_layout_middle = QVBoxLayout()
         vbox_layout_right = QVBoxLayout()
+        left=QGroupBox()
+        left.setTitle("功能选择")
+        left.setAlignment(Qt.AlignCenter)
+        left.setLayout(vbox_layout_left)
+        middle=QGroupBox()
+        middle.setTitle("任务设置")
+        middle.setAlignment(Qt.AlignCenter)
+        middle.setLayout(self.vbox_layout_middle)
+        right = QGroupBox()
+        right.setTitle("日志")
+        right.setAlignment(Qt.AlignCenter)
+        right.setLayout(vbox_layout_right)
 
         hbox_layout_center = QHBoxLayout()
-        hbox_layout_center.addLayout(vbox_layout_left)
-        hbox_layout_center.addLayout(self.vbox_layout_middle)
-        hbox_layout_center.addLayout(vbox_layout_right)
+        hbox_layout_center.addWidget(left)
+        hbox_layout_center.addWidget(middle)
+        hbox_layout_center.addWidget(right)
 
         # 创建标签控件并添加到布局中
-        label_left = QLabel("功能选择")
-        label_left.setFixedSize(200, 50)
-        label_left.setAlignment(Qt.AlignCenter)
-        vbox_layout_left.addWidget(label_left)
-
-        label_middle = QLabel("任务设置")
-        label_middle.setFixedSize(400, 50)
-        label_middle.setAlignment(Qt.AlignCenter)
-        self.vbox_layout_middle.addWidget(label_middle)
-
-        label_right = QLabel("日志")
-        label_right.setAlignment(Qt.AlignCenter)
-        label_right.setMinimumSize(300, 50)
-        vbox_layout_right.addWidget(label_right)
-
-        self.log = QTextEdit()
+        self.log = QTextEdit()  # 日志
         self.log.setReadOnly(True)
         vbox_layout_right.addWidget(self.log)
 
@@ -931,11 +927,11 @@ class MainWindow(QMainWindow):
                 "replenish_way": self.replenish_way,
                 "replenish_trail_blaze_power_run_time": self.replenish_trail_blaze_power_run_time,
             }
-            acc = encryption.encrypt_word(self.account_text)
-            pwd = encryption.encrypt_word(self.password_text)
-            with open("data/privacy.sra", "wb") as sra_file:
-                sra_file.write(acc + b"\n" + pwd)
-            with open("data/config.json", "w", encoding="utf-8") as json_file:
+            acc=encryption.encrypt_word(self.account_text)
+            pwd=encryption.encrypt_word(self.password_text)
+            with open("privacy.sra","wb") as sra_file:
+                sra_file.write(acc+b'\n'+pwd)
+            with open("config.json", "w", encoding="utf-8") as json_file:
                 json.dump(configuration, json_file, indent=4)
             self.son_thread = StarRailAssistant.Assistant()
             self.son_thread.update_signal.connect(self.update_log)
@@ -1018,8 +1014,9 @@ if __name__ == "__main__":
 
         # 应用全局样式表
         app.setStyleSheet(
-            "QPushButton, QLabel, QTextEdit, QCheckBox, QComboBox, QSpinBox, QLineEdit "
+            "QPushButton, QLabel, QTextEdit, QCheckBox, QComboBox, QSpinBox, QLineEdit, QGroupBox "
             "{ font-family: Microsoft YaHei; font-size: 12pt; }"
+            "QGroupBox{border: 1px solid black;border-radius: 10px;padding-top: 50px;margin-top: 10px;}"
         )
 
         # 创建主窗口实例
