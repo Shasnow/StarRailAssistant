@@ -832,7 +832,7 @@ class Main(QMainWindow):
             self.son_thread = StarRailAssistant.Assistant()
             self.son_thread.update_signal.connect(self.update_log)
             self.son_thread.finished.connect(self.notification)
-            self.son_thread.start()
+            self.son_thread.run()
 
     def notification(self):
         """Windows notify"""
