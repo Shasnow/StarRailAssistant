@@ -45,6 +45,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QComboBox,
     QSpinBox,
+    QGroupBox,
 )  # 从 PyQt5 中导入所需的类
 from plyer import notification
 import encryption
@@ -122,7 +123,6 @@ class MainWindow(QMainWindow):
         help_menu.addAction(notice_action)
         help_menu.addAction(problem_action)
         help_menu.addAction(report_action)
-        # self.flag()
         central_widget = QWidget(self)
         self.setWindowTitle("SRA beta v0.6")  # 设置窗口标题
         self.setWindowIcon(QIcon("res/SRAicon.ico"))
@@ -131,29 +131,26 @@ class MainWindow(QMainWindow):
         vbox_layout_left = QVBoxLayout()
         self.vbox_layout_middle = QVBoxLayout()
         vbox_layout_right = QVBoxLayout()
+        left = QGroupBox()
+        left.setTitle("功能选择")
+        left.setAlignment(Qt.AlignCenter)
+        left.setLayout(vbox_layout_left)
+        middle = QGroupBox()
+        middle.setTitle("任务设置")
+        middle.setAlignment(Qt.AlignCenter)
+        middle.setLayout(self.vbox_layout_middle)
+        right = QGroupBox()
+        right.setTitle("日志")
+        right.setAlignment(Qt.AlignCenter)
+        right.setLayout(vbox_layout_right)
 
         hbox_layout_center = QHBoxLayout()
-        hbox_layout_center.addLayout(vbox_layout_left)
-        hbox_layout_center.addLayout(self.vbox_layout_middle)
-        hbox_layout_center.addLayout(vbox_layout_right)
+        hbox_layout_center.addWidget(left)
+        hbox_layout_center.addWidget(middle)
+        hbox_layout_center.addWidget(right)
 
         # 创建标签控件并添加到布局中
-        label_left = QLabel("功能选择")
-        label_left.setFixedSize(200, 50)
-        label_left.setAlignment(Qt.AlignCenter)
-        vbox_layout_left.addWidget(label_left)
-
-        label_middle = QLabel("任务设置")
-        label_middle.setFixedSize(400, 50)
-        label_middle.setAlignment(Qt.AlignCenter)
-        self.vbox_layout_middle.addWidget(label_middle)
-
-        label_right = QLabel("日志")
-        label_right.setAlignment(Qt.AlignCenter)
-        label_right.setMinimumSize(300, 50)
-        vbox_layout_right.addWidget(label_right)
-
-        self.log = QTextEdit()
+        self.log = QTextEdit()  # 日志
         self.log.setReadOnly(True)
         vbox_layout_right.addWidget(self.log)
 
@@ -1018,8 +1015,9 @@ if __name__ == "__main__":
 
         # 应用全局样式表
         app.setStyleSheet(
-            "QPushButton, QLabel, QTextEdit, QCheckBox, QComboBox, QSpinBox, QLineEdit "
+            "QPushButton, QLabel, QTextEdit, QCheckBox, QComboBox, QSpinBox, QLineEdit, QGroupBox "
             "{ font-family: Microsoft YaHei; font-size: 12pt; }"
+            "QGroupBox{border: 1px solid black;border-radius: 10px;padding-top: 50px;margin-top: 10px;}"
         )
 
         # 创建主窗口实例
