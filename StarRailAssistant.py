@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-beta v0.6
+beta v0.7
 作者：雪影
 主功能
 """
@@ -31,7 +31,9 @@ import pyautogui
 import pyscreeze
 import win32con
 import win32gui
+import encryption
 from PyQt5.QtCore import QThread, pyqtSignal
+
 
 # noinspection PyUnresolvedReferences
 
@@ -52,11 +54,21 @@ class Assistant(QThread):
             config = json.load(file)
         if not self.stop_flag:
             if config["starGame"]:
+                with open("data/privacy.sra", "rb") as sra_file:
+                    privacy = sra_file.readlines()
+                    try:
+                        pwd = privacy[1]
+                        acc = privacy[0]
+                        password_text = encryption.decrypt_word(pwd)
+                        account_text = encryption.decrypt_word(acc)
+                    except IndexError:
+                        password_text = ''
+                        account_text = ''
                 self.star_game(
                     config["gamePath"],
                     config["loginFlag"],
-                    config["account"],
-                    config["password"],
+                    account_text,
+                    password_text,
                 )
         if not self.check_game():
             self.finished.emit()
@@ -135,7 +147,13 @@ class Assistant(QThread):
             self.finished.emit()
 
     def check_game(self):
-        #  激活游戏窗口
+        """Check that the game is running.
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Returns:
+            True if game is running,False if not.
+        """
         window_title = "崩坏：星穹铁道"
         hwnd = find_window(window_title)
         if hwnd:
@@ -149,6 +167,15 @@ class Assistant(QThread):
             return False
 
     def path_check(self, path):
+        """Check game path.
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            path (str): File path.
+        Returns:
+            True if path points to 'StraRail.exe', False otherwise.
+        """
         if path:
             if path.split("/")[-1].split(".")[0] != "StarRail":
                 self.update_signal.emit("你尝试输入一个其他应用的路径")
@@ -160,77 +187,119 @@ class Assistant(QThread):
             return False
 
     def kill_game(self):
+        """Kill the game"""
         command = f"taskkill /F /IM StarRail.exe"
         # 执行命令
         subprocess.run(command, shell=True, check=True)
         self.update_signal.emit("退出游戏")
 
     def launch_game(self, game_path):
-        # 启动游戏
-        if self.path_check(game_path):
-            try:
-                subprocess.Popen(game_path)
-            except OSError:
-                self.update_signal.emit("路径无效或权限不足")
-                return
-            self.update_signal.emit("等待游戏启动")
-            time.sleep(5)
-            times = 0
-            while True:
-                if find_window("崩坏：星穹铁道"):
-                    self.update_signal.emit("启动成功")
-                    return True
-                else:
-                    time.sleep(0.5)
-                    times += 1
-                    if times == 40:
-                        self.update_signal.emit("启动时间过长，请尝试手动启动")
-                        return False
-        else:
+        """Launch game
+
+        Try to run the file that game path points at.
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            game_path (str): File path.
+        Returns:
+            True if successfully launched, False otherwise.
+
+        """
+        if not self.path_check(game_path):
             self.update_signal.emit("路径无效")
+            return False
+        try:
+            subprocess.Popen(game_path)
+        except OSError:
+            self.update_signal.emit("路径无效或权限不足")
+            return False
+        self.update_signal.emit("等待游戏启动")
+        time.sleep(5)
+        times = 0
+        while True:
+            if find_window("崩坏：星穹铁道"):
+                self.update_signal.emit("启动成功")
+                return True
+            else:
+                time.sleep(0.5)
+                times += 1
+                if times == 40:
+                    self.update_signal.emit("启动时间过长，请尝试手动启动")
+                    return False
 
     def login(self, account, password):
-        if not check(
-            "res/img/welcome.png", interrupt=0.1, max_time=10
-        ):  # 进入登录界面的标志
-            if check("res/img/not_logged_in.png", max_time=4):
-                if click("res/img/login_with_account.png"):
-                    self.update_signal.emit("登录到" + account)
-                    time.sleep(1)
-                    pyautogui.write(account)
-                    time.sleep(1)
-                    pyautogui.press("tab")
-                    time.sleep(0.1)
-                    pyautogui.write(password)
-                    pyautogui.press("enter")
-                    click("res/img/agree.png", -158)
-                    if click("res/img/enter_game.png"):
-                        times = 0
-                        while True:
-                            time.sleep(0.2)
-                            times += 1
-                            if times == 10:
-                                self.update_signal.emit(
-                                    "长时间未成功登录，可能密码错误或需要新设备验证"
-                                )
-                                break
-                            else:
-                                if exist("res/img/welcome.png"):
-                                    self.update_signal.emit("登录成功")
-                                    break
-                    else:
-                        self.update_signal.emit("发生错误，错误编号9")
-                else:
-                    self.update_signal.emit("发生错误，错误编号10")
-            else:
-                self.update_signal.emit("发生错误，错误编号11")
-        else:
+        """Login game.
+
+        Try to log in game. If it is already logged in, skip this section.
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            account (str): user account
+            password (str): user password
+        Returns:
+            True if successfully logged in, False otherwise.
+
+        """
+        if check("res/img/welcome.png", interval=0.1, max_time=10):  # 进入登录界面的标志
             self.update_signal.emit("已登录")
+            return True
+        if check("res/img/not_logged_in.png", max_time=4):
+            if click("res/img/login_with_account.png"):
+                self.update_signal.emit("登录到" + account)
+                time.sleep(1)
+                pyautogui.write(account)
+                time.sleep(1)
+                pyautogui.press("tab")
+                time.sleep(0.1)
+                pyautogui.write(password)
+                pyautogui.press("enter")
+                click("res/img/agree.png", -158)
+                if click("res/img/enter_game.png"):
+                    times = 0
+                    while True:
+                        time.sleep(0.2)
+                        times += 1
+                        if times == 10:
+                            self.update_signal.emit(
+                                "长时间未成功登录，可能密码错误或需要新设备验证"
+                            )
+                            return False
+                        else:
+                            if exist("res/img/welcome.png"):
+                                self.update_signal.emit("登录成功")
+                                return True
+                else:
+                    self.update_signal.emit("发生错误，错误编号9")
+                    return False
+            else:
+                self.update_signal.emit("发生错误，错误编号10")
+                return False
+        else:
+            self.update_signal.emit("发生错误，错误编号11")
+            return False
 
     def star_game(self, game_path, login_flag=False, account="", password=""):
+        """Launch and enter game.
+
+        If the game is already star, skip this section.
+        If not, launch and enter game.
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            game_path (str): Path of game.
+            login_flag (bool): Whether to enable the launch game function.
+            account (str): User account.
+            password (str): User password.
+        Returns:
+            True if entered game successfully, False otherwise.
+
+        """
         if find_window("崩坏：星穹铁道"):
             self.update_signal.emit("游戏已经启动")
-            return True
+            if check('res/img/chat_enter.png', max_time=10):
+                return True
         if self.launch_game(game_path):
             time.sleep(2)
             if login_flag and account:
@@ -262,6 +331,7 @@ class Assistant(QThread):
             return False
 
     def trailblazer_profile(self):
+        """Mission trailblaze profile"""
         self.update_signal.emit("执行任务：签证奖励")
         time.sleep(2)
         pyautogui.press("esc")
@@ -284,13 +354,22 @@ class Assistant(QThread):
         time.sleep(3)
 
     def redeem_code(self, redeem_code_list):
+        """Fills in redeem code and redeems them.
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            redeem_code_list (list): The list thar stored redeem codes.
+        Returns:
+            None
+        """
         self.update_signal.emit("执行任务：领取兑换码")
         time.sleep(2)
         pyautogui.press("esc")
         if len(redeem_code_list) == 0:
             for code in redeem_code_list:
                 if click("res/img/more.png") or click(
-                    "res/img/more_with_something.png"
+                        "res/img/more_with_something.png"
                 ):
                     if click("res/img/redeem_code.png"):
                         time.sleep(2)
@@ -310,6 +389,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：领取兑换码\n")
 
     def mail(self):
+        """Open mailbox and pick up mails."""
         self.update_signal.emit("执行任务：领取邮件")
         time.sleep(2)
         pyautogui.press("esc")
@@ -331,6 +411,10 @@ class Assistant(QThread):
         time.sleep(3)
 
     def gift_of_odyssey(self):
+        """Open the activity screen to receive gift_of_odyssey.
+
+        Remember to update the gift_of_odyssey.png in each game version.
+        """
         self.update_signal.emit("执行任务：巡星之礼")
         time.sleep(2)
         pyautogui.press("f1")
@@ -349,15 +433,25 @@ class Assistant(QThread):
         time.sleep(3)
 
     def ornament_extraction(self, level_index, battle_time=1):
+        """Ornament extraction
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            level_index (int): The index of level in /res/img.
+            battle_time (int): The time of battle.
+        Returns:
+            None
+        """
         self.update_signal.emit("执行任务：饰品提取")
         level = "res/img/ornament_extraction (" + str(level_index) + ").png"
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or exist(
-            "res/img/survival_index_onclick.png"
+                "res/img/survival_index_onclick.png"
         ):
             if click("res/img/ornament_extraction.png") or exist(
-                "res/img/ornament_extraction_onclick.png"
+                    "res/img/ornament_extraction_onclick.png"
             ):
                 if exist("res/img/no_save.png"):
                     self.update_signal.emit(
@@ -391,7 +485,7 @@ class Assistant(QThread):
                         self.update_signal.emit("请检查自动战斗和倍速是否开启")
                         times = 0
                         while times != 10:
-                            if exist("res/img/q.png", interrupt=1):
+                            if exist("res/img/q.png", interval=1):
                                 pyautogui.press("v")
                                 break
                             else:
@@ -434,21 +528,32 @@ class Assistant(QThread):
         time.sleep(5)
 
     def calyx_golden(self, level_index, single_time=1, battle_time=1):
+        """Battle calyx(golden)
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            level_index (int): The index of level in /res/img.
+            single_time (int): The single battle times(1~6).
+            battle_time (int): Number of times the task was executed.
+        Returns:
+            None
+        """
         self.update_signal.emit("执行任务：拟造花萼（金）")
         level = "res/img/calyx(golden) (" + str(level_index) + ").png"
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or exist(
-            "res/img/survival_index_onclick.png"
+                "res/img/survival_index_onclick.png"
         ):
             if click("res/img/calyx(golden).png") or exist(
-                "res/img/calyx(golden)_onclick.png"
+                    "res/img/calyx(golden)_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=600, y_add=10):
                     time.sleep(5)  # 等待传送
                     for i in range(single_time - 1):
-                        click("res/img/plus.png", interrupt=0.5)
+                        click("res/img/plus.png", interval=0.5)
                     time.sleep(2)
                     if click("res/img/battle.png"):
                         if exist("res/img/replenish.png"):
@@ -464,7 +569,7 @@ class Assistant(QThread):
                             self.update_signal.emit("请检查自动战斗和倍速是否开启")
                             times = 0
                             while times != 10:
-                                if exist("res/img/q.png", interrupt=1):
+                                if exist("res/img/q.png", interval=1):
                                     pyautogui.press("v")
                                     break
                                 else:
@@ -477,8 +582,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                self.replenish_flag
-                                                and self.replenish_time
+                                                    self.replenish_flag
+                                                    and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -514,21 +619,32 @@ class Assistant(QThread):
         time.sleep(3)
 
     def calyx_crimson(self, level_index, single_time=1, battle_time=1):
+        """Battle calyx(crimson)
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            level_index (int): The index of level in /res/img.
+            single_time (int): The single battle times(1~6).
+            battle_time (int): Number of times the task was executed.
+        Returns:
+            None
+        """
         self.update_signal.emit("执行任务：拟造花萼（赤）")
         level = "res/img/calyx(crimson) (" + str(level_index) + ").png"
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or exist(
-            "res/img/survival_index_onclick.png"
+                "res/img/survival_index_onclick.png"
         ):
             if click("res/img/calyx(crimson).png") or exist(
-                "res/img/calyx(crimson)_onclick.png"
+                    "res/img/calyx(crimson)_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
                     time.sleep(5)  # 等待传送
                     for i in range(single_time - 1):
-                        click("res/img/plus.png", interrupt=0.5)
+                        click("res/img/plus.png", interval=0.5)
                     time.sleep(2)
                     if click("res/img/battle.png"):
                         if exist("res/img/replenish.png"):
@@ -544,7 +660,7 @@ class Assistant(QThread):
                             self.update_signal.emit("请检查自动战斗和倍速是否开启")
                             times = 0
                             while times != 10:
-                                if exist("res/img/q.png", interrupt=1):
+                                if exist("res/img/q.png", interval=1):
                                     pyautogui.press("v")
                                     break
                                 else:
@@ -555,8 +671,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                self.replenish_flag
-                                                and self.replenish_time
+                                                    self.replenish_flag
+                                                    and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -592,15 +708,25 @@ class Assistant(QThread):
         time.sleep(3)
 
     def stagnant_shadow(self, level_index, battle_time=1):
+        """Battle stagnant shadow
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            level_index (int): The index of level in /res/img.
+            battle_time (int): Number of times the task was executed.
+        Returns:
+            None
+        """
         self.update_signal.emit("执行任务：凝滞虚影")
         level = "res/img/stagnant_shadow (" + str(level_index) + ").png"
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or exist(
-            "res/img/survival_index_onclick.png"
+                "res/img/survival_index_onclick.png"
         ):
             if click("res/img/stagnant_shadow.png") or exist(
-                "res/img/stagnant_shadow_onclick.png"
+                    "res/img/stagnant_shadow_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
@@ -624,7 +750,7 @@ class Assistant(QThread):
                             self.update_signal.emit("请检查自动战斗和倍速是否开启")
                             times = 0
                             while times != 10:
-                                if exist("res/img/q.png", interrupt=1):
+                                if exist("res/img/q.png", interval=1):
                                     pyautogui.press("v")
                                     break
                                 else:
@@ -635,8 +761,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                self.replenish_flag
-                                                and self.replenish_time
+                                                    self.replenish_flag
+                                                    and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -672,19 +798,29 @@ class Assistant(QThread):
         time.sleep(3)
 
     def caver_of_corrosion(self, level_index, battle_time=1):
+        """Battle caver of corrosion
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            level_index (int): The index of level in /res/img.
+            battle_time (int): Number of times the task was executed.
+        Returns:
+            None
+        """
         self.update_signal.emit("执行任务：侵蚀隧洞")
         level = "res/img/caver_of_corrosion (" + str(level_index) + ").png"
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or click(
-            "res/img/survival_index_onclick.png"
+                "res/img/survival_index_onclick.png"
         ):
             pyautogui.moveRel(0, 100)
             for i in range(6):
                 pyautogui.scroll(-1)
                 time.sleep(1)
             if click("res/img/caver_of_corrosion.png") or exist(
-                "res/img/caver_of_corrosion_onclick.png"
+                    "res/img/caver_of_corrosion_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
@@ -703,7 +839,7 @@ class Assistant(QThread):
                             self.update_signal.emit("请检查自动战斗和倍速是否开启")
                             times = 0
                             while times != 10:
-                                if exist("res/img/q.png", interrupt=1):
+                                if exist("res/img/q.png", interval=1):
                                     pyautogui.press("v")
                                     break
                                 else:
@@ -714,8 +850,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                self.replenish_flag
-                                                and self.replenish_time
+                                                    self.replenish_flag
+                                                    and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -751,19 +887,29 @@ class Assistant(QThread):
         time.sleep(3)
 
     def echo_of_war(self, level_index, battle_time=1):
+        """Battle echo of war
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            level_index (int): The index of level in /res/img.
+            battle_time (int): Number of times the task was executed.
+        Returns:
+            None
+        """
         self.update_signal.emit("执行任务：历战余响")
         level = "res/img/echo_of_war (" + str(level_index) + ").png"
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or click(
-            "res/img/survival_index_onclick.png"
+                "res/img/survival_index_onclick.png"
         ):
             pyautogui.moveRel(0, 100)
             for i in range(6):
                 pyautogui.scroll(-1)
                 time.sleep(1)
             if click("res/img/echo_of_war.png") or exist(
-                "res/img/echo_of_war_onclick.png"
+                    "res/img/echo_of_war_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
@@ -782,7 +928,7 @@ class Assistant(QThread):
                             self.update_signal.emit("请检查自动战斗和倍速是否开启")
                             times = 0
                             while times != 10:
-                                if exist("res/img/q.png", interrupt=1):
+                                if exist("res/img/q.png", interval=1):
                                     pyautogui.press("v")
                                     break
                                 else:
@@ -793,8 +939,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                self.replenish_flag
-                                                and self.replenish_time
+                                                    self.replenish_flag
+                                                    and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -830,6 +976,11 @@ class Assistant(QThread):
         time.sleep(3)
 
     def wait_battle_end(self):
+        """Wait battle end
+
+        Returns:
+            True if battle end.
+        """
         self.update_signal.emit("等待战斗结束")
         quit_battle = cv2.imread("res/img/quit_battle.png")
         while True:
@@ -844,10 +995,13 @@ class Assistant(QThread):
                 continue
 
     def assignments_reward(self):
+        """Receive assignment reward"""
         self.update_signal.emit("执行任务：领取派遣奖励")
         time.sleep(2)
         pyautogui.press("esc")
         if click("res/img/assignments_none.png"):
+            while not exist('res/img/assignment_page.png'):
+                pass
             if click("res/img/assignments_reward.png"):
                 if click("res/img/assign_again.png"):
                     self.update_signal.emit("再次派遣")
@@ -869,6 +1023,7 @@ class Assistant(QThread):
         time.sleep(3)
 
     def daily_training_reward(self):
+        """Receive daily training reward"""
         self.update_signal.emit("执行任务：领取每日实训奖励")
         time.sleep(2)
         pyautogui.press("f4")
@@ -893,6 +1048,7 @@ class Assistant(QThread):
         time.sleep(3)
 
     def nameless_honor(self):
+        """Receive nameless honor reward"""
         self.update_signal.emit("执行任务：领取无名勋礼奖励")
         time.sleep(2)
         pyautogui.press("f2")
@@ -929,10 +1085,24 @@ class Assistant(QThread):
         time.sleep(3)
 
     def replenish(self, way):
+        """Replenish trailblaze power
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+
+            ``way``:
+             ``1``--replenishes by reserved trailblaze power.\n
+             ``2``--replenishes by fuel.\n
+             ``3``--replenishes by stellar jade.
+        Args:
+            way (int): Index of way in /res/img.
+        Returns:
+            True if replenished successfully, False otherwise.
+        """
         if self.replenish_time != 0:
             if way == 1 or way == 0:
                 if exist("res/img/reserved_trailblaze_power_onclick.png") or click(
-                    "res/img/reserved_trailblaze_power.png"
+                        "res/img/reserved_trailblaze_power.png"
                 ):
                     click("res/img/ensure.png")
                     click("res/img/ensure.png")
@@ -965,10 +1135,19 @@ class Assistant(QThread):
             return False
 
 
-def check(img_path, interrupt=0.5, max_time=40):
+def check(img_path, interval=0.5, max_time=40):
+    """Detects whether the object appears on the screen.
+
+    Args:
+        img_path (str): Img path of object.
+        interval (float): Interval between checks.
+        max_time (int): Maximum number of check times.
+    Returns:
+        True if obj appeared, False if reach maximum times.
+    """
     times = 0
     while True:
-        time.sleep(interrupt)
+        time.sleep(interval)
         if exist(img_path):
             return True
         else:
@@ -977,8 +1156,16 @@ def check(img_path, interrupt=0.5, max_time=40):
                 return False
 
 
-def exist(img_path, interrupt=2):
-    time.sleep(interrupt)  # 等待游戏加载
+def exist(img_path, interval=2):
+    """Determine if a situation exists.
+
+    Args:
+        img_path (str): Img path of the situation.
+        interval (int): Waiting time before run.
+    Returns:
+        True if existed, False otherwise.
+    """
+    time.sleep(interval)  # 等待游戏加载
     try:
         img = cv2.imread(img_path)
         if img is None:
@@ -990,14 +1177,18 @@ def exist(img_path, interrupt=2):
         # print('test:' + img_path, 'not exist')
         return False
     except FileNotFoundError as e:
-        with open("log.txt", "a", encoding="utf-8") as log:
+        with open("data/log.txt", "a", encoding="utf-8") as log:
             log.write(f"FileNotFoundError: {e}\n")
         return False
 
 
 def find_window(title):
-    """
-    根据窗口标题查找窗口句柄
+    """Find window handles based on the window title
+
+    Args:
+        title (str): Window title.
+    Returns:
+        list if found, None otherwise.
     """
 
     def enum_callback(hwnd, result):
@@ -1009,9 +1200,19 @@ def find_window(title):
     return windows[0] if windows else None
 
 
-def click(img_path, x_add=0, y_add=0, interrupt=2.0):
+def click(img_path, x_add=0, y_add=0, interval=2.0):
+    """Click the corresponding image on the screen
+
+    Args:
+        img_path (str): Img path.
+        x_add (int): X-axis offset(px).
+        y_add (int): Y-axis offset(px).
+        interval (float): Waiting time before run(s).
+    Returns:
+        True if clicked successfully, False otherwise.
+    """
     try:
-        time.sleep(interrupt)
+        time.sleep(interval)
         img = cv2.imread(img_path)
         if img is None:
             raise FileNotFoundError("无法找到或读取文件 " + img_path)
@@ -1022,20 +1223,25 @@ def click(img_path, x_add=0, y_add=0, interrupt=2.0):
         pyautogui.click(x, y)
         return True
     except pyautogui.ImageNotFoundException:
-        with open("log.txt", "a", encoding="utf-8") as log:
+        with open("data/log.txt", "a", encoding="utf-8") as log:
             log.write(f"ImageNotFoundException: {img_path}\n")
         return False
     except ValueError as e:
-        with open("log.txt", "a", encoding="utf-8") as log:
+        with open("data/log.txt", "a", encoding="utf-8") as log:
             log.write(f"ValueError: {e}\n")
         return False
     except FileNotFoundError as e:
-        with open("log.txt", "a", encoding="utf-8") as log:
+        with open("data/log.txt", "a", encoding="utf-8") as log:
             log.write(f"FileNotFoundError: {e}\n")
         return False
 
 
 def get_screen_center():
+    """Get the center of game window.
+
+    Returns:
+        tuple(x, y)
+    """
     x, y, screen_width, screen_height = (
         pyautogui.getActiveWindow().left,
         pyautogui.getActiveWindow().top,
@@ -1046,27 +1252,18 @@ def get_screen_center():
 
 
 def find_level(level: str):
+    """Fine battle level
+
+    Returns:
+        True if found.
+    """
     x, y = get_screen_center()
     pyautogui.moveTo(x - 200, y)
     while True:
-        if exist(level, interrupt=1):
+        if exist(level, interval=1):
             return True
         else:
             pyautogui.scroll(-1)
-
-
-def notice():
-    print(
-        "beta v0.2 更新公告\n"
-        "新功能：\n"
-        "1.新增账号登录功能，输入你的账号和密码后（本地），如果启动游戏时未登录，可以自动登录。\n"
-        "2.新增领取巡星之礼功能，现在可以帮你领取巡星之礼。\n"
-        "3.现在你可以对功能进行一些简单的自定义，选择跳过一些功能\n"
-        "问题修复：\n"
-        "1.修复了某些情况下任务结束未正确返回大世界，导致下一个任务无法执行的问题。\n"
-        "2.修复了若干问题。"
-    )
-    input("我已阅读")
 
 
 if __name__ == "__main__":
