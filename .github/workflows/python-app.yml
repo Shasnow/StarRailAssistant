@@ -51,10 +51,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set up Python 3.12
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.11"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -76,7 +76,7 @@ jobs:
           "version=$VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Create Zip
         run: |
-          Compress-Archive -Path res/**/*,data/**/*,SRA.py,StarRailAssistant.py,dist/SRA.exe,requirements.txt,README.md,LICENSE -DestinationPath StarRailAssistant_${{ env.version }}.zip
+          Compress-Archive -Path res,data,SRA.py,StarRailAssistant.py,dist/SRA.exe,requirements.txt,README.md,LICENSE -DestinationPath StarRailAssistant_${{ env.version }}.zip
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
