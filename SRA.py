@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-beta v0.6
+beta v0.7
 作者：雪影
 图形化
 """
@@ -26,6 +26,8 @@ beta v0.6
 import sys  # 导入 sys 模块，用于与 Python 解释器交互
 import json
 import time
+import ctypes
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
@@ -46,11 +48,12 @@ from PyQt5.QtWidgets import (
     QComboBox,
     QSpinBox,
     QGroupBox,
-)  # 从 PyQt5 中导入所需的类
+)
 from plyer import notification
+
 import encryption
 import StarRailAssistant
-import ctypes
+
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
 
@@ -124,7 +127,7 @@ class MainWindow(QMainWindow):
         help_menu.addAction(problem_action)
         help_menu.addAction(report_action)
         central_widget = QWidget(self)
-        self.setWindowTitle("SRA beta v0.6")  # 设置窗口标题
+        self.setWindowTitle("SRA beta v0.7")  # 设置窗口标题
         self.setWindowIcon(QIcon("res/SRAicon.ico"))
 
         # 创建垂直布局管理器
@@ -167,10 +170,8 @@ class MainWindow(QMainWindow):
         option2 = QCheckBox("漫游签证")
         option2.setChecked(self.mission_trailblazer_profile)
         option2.stateChanged.connect(self.trailblazer_profile_status)
-        # button2 = QPushButton('设置')
         opt2 = QHBoxLayout()
         opt2.addWidget(option2)
-        # opt2.addWidget(button2)
 
         option11 = QCheckBox("兑换码")
         option11.setChecked(self.mission_redeem_code)
@@ -184,26 +185,20 @@ class MainWindow(QMainWindow):
         option3 = QCheckBox("派遣")
         option3.setChecked(self.mission_assignments_reward)
         option3.stateChanged.connect(self.assignment_status)
-        # button3 = QPushButton('设置')
         opt3 = QHBoxLayout()
         opt3.addWidget(option3)
-        # opt3.addWidget(button3)
 
         option4 = QCheckBox("巡星之礼")
         option4.setChecked(self.mission_gift_of_odyssey)
         option4.stateChanged.connect(self.gift_of_odyssey_status)
-        # button4 = QPushButton('设置')
         opt4 = QHBoxLayout()
         opt4.addWidget(option4)
-        # opt4.addWidget(button4)
 
         option5 = QCheckBox("邮件")
         option5.setChecked(self.mission_mail)
         option5.stateChanged.connect(self.mail_status)
-        # button5 = QPushButton('设置')
         opt5 = QHBoxLayout()
         opt5.addWidget(option5)
-        # opt5.addWidget(button5)
 
         option6 = QCheckBox("清开拓力")
         option6.setChecked(self.mission_trail_blaze_power)
@@ -217,18 +212,14 @@ class MainWindow(QMainWindow):
         option7 = QCheckBox("每日实训")
         option7.setChecked(self.mission_daily_training)
         option7.stateChanged.connect(self.daily_training_status)
-        # button7 = QPushButton('设置')
         opt7 = QHBoxLayout()
         opt7.addWidget(option7)
-        # opt7.addWidget(button7)
 
         option8 = QCheckBox("无名勋礼")
         option8.setChecked(self.mission_nameless_honor)
         option8.stateChanged.connect(self.nameless_honor_status)
-        # button8 = QPushButton('设置')
         opt8 = QHBoxLayout()
         opt8.addWidget(option8)
-        # opt8.addWidget(button8)
 
         opt9 = QCheckBox("退出游戏")
         opt9.setChecked(self.mission_quit_game)
@@ -273,10 +264,11 @@ class MainWindow(QMainWindow):
             "\n人话：不要跳脸官方～(∠・ω< )⌒☆",
         )
         self.update_log(
-            "在" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "成功启动"
+            time.strftime("%Y-%m-%d %H:%M:%S ", time.localtime()) + "启动成功"
         )
 
     def star_game_setting(self):
+        """Create component in star game setting."""
         game_path = QHBoxLayout()
         setting1 = QVBoxLayout()
 
@@ -315,6 +307,7 @@ class MainWindow(QMainWindow):
         self.star_game_setting_container.setVisible(True)
 
     def show_star_game_setting(self):
+        """Set star game setting visible"""
         self.display_none()
         self.star_game_setting_container.setVisible(True)
 
@@ -336,6 +329,10 @@ class MainWindow(QMainWindow):
         self.password_text = text
 
     def auto_launch(self, state):
+        """
+        Change the state of mission auto launch,
+        update QLineEdit state.
+        """
         if state == Qt.Checked:
             self.log.append("自动登录已启用")
             self.login_flag = True
@@ -348,7 +345,7 @@ class MainWindow(QMainWindow):
             self.password.setReadOnly(True)
 
     def togglePasswordVisibility(self):
-        # 切换密码可见性
+        """Toggle password visibility"""
         if self.password.echoMode() == QLineEdit.Password:
             self.password.setEchoMode(QLineEdit.Normal)
             self.show_button.setText("隐藏")
@@ -357,11 +354,13 @@ class MainWindow(QMainWindow):
             self.show_button.setText("显示")
 
     def display_none(self):
+        """Sets the invisible state of the container."""
         self.star_game_setting_container.setVisible(False)
         self.trail_blaze_power_container.setVisible(False)
         self.redeem_code_setting_container.setVisible(False)
 
     def star_game_status(self, state):
+        """Change the state of mission star game."""
         if state == Qt.Checked:
             self.log.append("启动游戏已启用")
             self.mission_star_game = True
@@ -370,6 +369,7 @@ class MainWindow(QMainWindow):
             self.mission_star_game = False
 
     def trailblazer_profile_status(self, state):
+        """Change the state of mission trailblazer profile."""
         if state == Qt.Checked:
             self.log.append("添加任务：领取签证奖励")
             self.mission_trailblazer_profile = True
@@ -378,6 +378,7 @@ class MainWindow(QMainWindow):
             self.mission_trailblazer_profile = False
 
     def redeem_code_status(self, state):
+        """Change the state of mission redeem code."""
         if state == Qt.Checked:
             self.log.append("添加任务：领取兑换码奖励")
             self.mission_redeem_code = True
@@ -387,6 +388,7 @@ class MainWindow(QMainWindow):
             self.mission_redeem_code = False
 
     def assignment_status(self, state):
+        """Change the state of mission assignment."""
         if state == Qt.Checked:
             self.log.append("添加任务：领取派遣奖励")
             self.mission_assignments_reward = True
@@ -395,6 +397,7 @@ class MainWindow(QMainWindow):
             self.mission_assignments_reward = False
 
     def gift_of_odyssey_status(self, state):
+        """Change the state of mission gift of odyssey."""
         if state == Qt.Checked:
             self.log.append("添加任务：领取巡星之礼")
             self.mission_gift_of_odyssey = True
@@ -403,6 +406,7 @@ class MainWindow(QMainWindow):
             self.mission_gift_of_odyssey = False
 
     def mail_status(self, state):
+        """Change the state of mission mail."""
         if state == Qt.Checked:
             self.log.append("添加任务：领取邮件")
             self.mission_mail = True
@@ -412,6 +416,7 @@ class MainWindow(QMainWindow):
             self.mission_redeem_code = False
 
     def trail_blaze_power_status(self, state):
+        """Change the state of mission trailblaze power."""
         if state == Qt.Checked:
             self.log.append("添加任务：清开拓力")
             self.mission_trail_blaze_power = True
@@ -420,6 +425,7 @@ class MainWindow(QMainWindow):
             self.mission_trail_blaze_power = False
 
     def daily_training_status(self, state):
+        """Change the state of mission daily training."""
         if state == Qt.Checked:
             self.log.append("添加任务：领取每日实训")
             self.mission_daily_training = True
@@ -428,6 +434,7 @@ class MainWindow(QMainWindow):
             self.mission_daily_training = False
 
     def nameless_honor_status(self, state):
+        """Change the state of mission nameless honor."""
         if state == Qt.Checked:
             self.log.append("添加任务：领取无名勋礼")
             self.mission_nameless_honor = True
@@ -436,6 +443,7 @@ class MainWindow(QMainWindow):
             self.mission_nameless_honor = False
 
     def quit_game_status(self, state):
+        """Change the state of mission quit game."""
         if state == Qt.Checked:
             self.log.append("退出游戏已启用")
             self.mission_quit_game = True
@@ -444,6 +452,7 @@ class MainWindow(QMainWindow):
             self.mission_quit_game = False
 
     def redeem_code_setting(self):
+        """Create component in redeem code setting."""
         setting = QVBoxLayout()
         text = QLabel("兑换码")
         text.setAlignment(Qt.AlignCenter)
@@ -456,15 +465,18 @@ class MainWindow(QMainWindow):
         self.redeem_code_setting_container.setVisible(False)
 
     def redeem_code_change(self):
+        """Change the redeem code list while redeem code text changes."""
         redeem_code = self.redeem_code.toPlainText()
         # self.log.append(redeem_code)
         self.redeem_code_list = redeem_code.split()
 
     def show_redeem_code_setting(self):
+        """Set redeem code visible."""
         self.display_none()
         self.redeem_code_setting_container.setVisible(True)
 
     def trail_blaze_power_setting(self):
+        """Create component of trailblaze power."""
         self.trail_blaze_power_container = QWidget()
         setting = QVBoxLayout()
 
@@ -742,137 +754,109 @@ class MainWindow(QMainWindow):
         self.vbox_layout_middle.addWidget(self.trail_blaze_power_container)
         self.trail_blaze_power_container.setVisible(False)
 
+    # Change series state in mission trailblaze power.
     def replenish_trail_blaze_power_status(self, state):
         if state == Qt.Checked:
-            # self.log.append('ornament_extraction T')
             self.replenish_trail_blaze_power = True
         else:
-            # self.log.append('ornament_extraction F')
             self.replenish_trail_blaze_power = False
 
     def replenish_way_select(self, index):
         self.replenish_way = index
-        # self.log.append(str(index))
 
     def replenish_trail_blaze_power_run_time_change(self, value):
         self.replenish_trail_blaze_power_run_time = value
-        # self.log.append(str(value))
 
     def ornament_extraction_status(self, state):
         if state == Qt.Checked:
-            # self.log.append('ornament_extraction T')
             self.battle_ornament_extraction = True
         else:
-            # self.log.append('ornament_extraction F')
             self.battle_ornament_extraction = False
 
     def ornament_extraction_level_select(self, index):
         self.ornament_extraction_level = index
-        # self.log.append(str(index))
 
     def ornament_extraction_run_time_change(self, value):
         self.ornament_extraction_run_time = value
-        # self.log.append(str(value))
 
     def calyx_golden_status(self, state):
         if state == Qt.Checked:
-            # self.log.append('calyx_golden T')
             self.battle_calyx_golden = True
         else:
-            # self.log.append('calyx_golden F')
             self.battle_calyx_golden = False
 
     def calyx_golden_level_select(self, index):
         self.calyx_golden_level = index
-        # self.log.append(str(index))
 
     def calyx_golden_battle_time_change(self, value):
         self.calyx_golden_battle_time = value
-        # self.log.append(str(self.calyx_golden_battle_time))
 
     def calyx_golden_run_time_change(self, value):
         self.calyx_golden_run_time = value
-        # self.log.append(str(value))
 
     def calyx_crimson_status(self, state):
         if state == Qt.Checked:
-            # self.log.append('calyx_crimson T')
             self.battle_crimson_golden = True
         else:
-            # self.log.append('calyx_crimson F')
             self.battle_crimson_golden = False
 
     def calyx_crimson_level_select(self, index):
         self.calyx_crimson_level = index
-        # self.log.append(str(index))
 
     def calyx_crimson_battle_time_change(self, value):
         self.calyx_crimson_battle_time = value
-        # self.log.append(str(self.calyx_crimson_battle_time))
 
     def calyx_crimson_run_time_change(self, value):
         self.calyx_crimson_run_time = value
-        # self.log.append(str(value))
 
     def stagnant_shadow_status(self, state):
         if state == Qt.Checked:
-            # self.log.append('stagnant_shadow T')
             self.battle_stagnant_shadow = True
         else:
-            # self.log.append('stagnant_shadow F')
             self.battle_stagnant_shadow = False
 
     def stagnant_shadow_level_select(self, index):
         self.stagnant_shadow_level = index
-        # self.log.append(str(index))
 
     def stagnant_shadow_run_time_change(self, value):
         self.stagnant_shadow_run_time = value
-        # self.log.append(str(value))
 
     def caver_of_corrosion_status(self, state):
         if state == Qt.Checked:
-            # self.log.append('caver_of_corrosion T')
             self.battle_caver_of_corrosion = True
         else:
-            # self.log.append('caver_of_corrosion F')
             self.battle_caver_of_corrosion = False
 
     def caver_of_corrosion_level_select(self, index):
         self.caver_of_corrosion_level = index
-        # self.log.append(str(index))
 
     def caver_of_corrosion_run_time_change(self, value):
         self.caver_of_corrosion_run_time = value
-        # self.log.append(str(value))
 
     def echo_of_war_status(self, state):
         if state == Qt.Checked:
-            # self.log.append('echo_of_war T')
             self.battle_echo_of_war = True
         else:
-            # self.log.append('echo_of_war F')
             self.battle_echo_of_war = False
 
     def echo_of_war_level_select(self, index):
         self.echo_of_war_level = index
-        # self.log.append(str(index))
 
     def echo_of_war_run_time_change(self, value):
         self.echo_of_war_run_time = value
-        # self.log.append(str(value))
 
     def show_trail_blaze_power_setting(self):
         self.display_none()
         self.trail_blaze_power_container.setVisible(True)
 
     def update_log(self, text):
-        # 在主线程中更新QTextEdit
+        """Update the content in log area and store it in log.txt."""
         self.log.append(text)
-        with open("log.txt", "a", encoding="utf-8") as logfile:
+        with open("data/log.txt", "a", encoding="utf-8") as logfile:
             logfile.write(text + "\n")
 
     def execute(self):
+        """Save configuration, create work thread and monitor signal."""
         flags = [
             self.mission_star_game,
             self.mission_trailblazer_profile,
@@ -940,20 +924,22 @@ class MainWindow(QMainWindow):
             self.son_thread.start()
 
     def notification(self):
+        """Windows notify"""
         self.button9.setEnabled(True)
         self.button10.setEnabled(False)
         try:
             notification.notify(
                 title="SRA",
                 message="任务全部完成",
-                app_icon="res/SRAicon.ico",  # 可以指定一个图标路径
-                timeout=10,  # 通知持续时间，秒
+                app_icon="res/SRAicon.ico",
+                timeout=10,
             )
         except Exception as e:
-            with open("log.txt", "a", encoding="utf-8") as log:
+            with open("data/log.txt", "a", encoding="utf-8") as log:
                 log.write(str(e) + "\n")
 
     def kill(self):
+        """Kill the child thread"""
         self.son_thread.request_stop()
         self.button10.setEnabled(False)
         self.button9.setEnabled(True)
