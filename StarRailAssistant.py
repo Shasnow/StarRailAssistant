@@ -32,15 +32,15 @@ import pyscreeze
 import win32con
 import win32gui
 import encryption
-from PyQt5.QtCore import QThread, pyqtSignal
+from PySide6.QtCore import QThread, Signal
 
 
 # noinspection PyUnresolvedReferences
 
 
 class Assistant(QThread):
-    update_signal = pyqtSignal(str)
-    finished = pyqtSignal()
+    update_signal = Signal(str)
+    finished = Signal()
 
     def __init__(self):
         super().__init__()
@@ -62,8 +62,8 @@ class Assistant(QThread):
                         password_text = encryption.decrypt_word(pwd)
                         account_text = encryption.decrypt_word(acc)
                     except IndexError:
-                        password_text = ''
-                        account_text = ''
+                        password_text = ""
+                        account_text = ""
                 self.star_game(
                     config["gamePath"],
                     config["loginFlag"],
@@ -242,7 +242,9 @@ class Assistant(QThread):
             True if successfully logged in, False otherwise.
 
         """
-        if check("res/img/welcome.png", interval=0.1, max_time=10):  # 进入登录界面的标志
+        if check(
+            "res/img/welcome.png", interval=0.1, max_time=10
+        ):  # 进入登录界面的标志
             self.update_signal.emit("已登录")
             return True
         if check("res/img/not_logged_in.png", max_time=4):
@@ -298,7 +300,7 @@ class Assistant(QThread):
         """
         if find_window("崩坏：星穹铁道"):
             self.update_signal.emit("游戏已经启动")
-            if check('res/img/chat_enter.png', max_time=10):
+            if check("res/img/chat_enter.png", max_time=10):
                 return True
         if self.launch_game(game_path):
             time.sleep(2)
@@ -369,7 +371,7 @@ class Assistant(QThread):
         if len(redeem_code_list) == 0:
             for code in redeem_code_list:
                 if click("res/img/more.png") or click(
-                        "res/img/more_with_something.png"
+                    "res/img/more_with_something.png"
                 ):
                     if click("res/img/redeem_code.png"):
                         time.sleep(2)
@@ -448,10 +450,10 @@ class Assistant(QThread):
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or exist(
-                "res/img/survival_index_onclick.png"
+            "res/img/survival_index_onclick.png"
         ):
             if click("res/img/ornament_extraction.png") or exist(
-                    "res/img/ornament_extraction_onclick.png"
+                "res/img/ornament_extraction_onclick.png"
             ):
                 if exist("res/img/no_save.png"):
                     self.update_signal.emit(
@@ -544,10 +546,10 @@ class Assistant(QThread):
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or exist(
-                "res/img/survival_index_onclick.png"
+            "res/img/survival_index_onclick.png"
         ):
             if click("res/img/calyx(golden).png") or exist(
-                    "res/img/calyx(golden)_onclick.png"
+                "res/img/calyx(golden)_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=600, y_add=10):
@@ -582,8 +584,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                    self.replenish_flag
-                                                    and self.replenish_time
+                                                self.replenish_flag
+                                                and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -635,10 +637,10 @@ class Assistant(QThread):
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or exist(
-                "res/img/survival_index_onclick.png"
+            "res/img/survival_index_onclick.png"
         ):
             if click("res/img/calyx(crimson).png") or exist(
-                    "res/img/calyx(crimson)_onclick.png"
+                "res/img/calyx(crimson)_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
@@ -671,8 +673,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                    self.replenish_flag
-                                                    and self.replenish_time
+                                                self.replenish_flag
+                                                and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -723,10 +725,10 @@ class Assistant(QThread):
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or exist(
-                "res/img/survival_index_onclick.png"
+            "res/img/survival_index_onclick.png"
         ):
             if click("res/img/stagnant_shadow.png") or exist(
-                    "res/img/stagnant_shadow_onclick.png"
+                "res/img/stagnant_shadow_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
@@ -761,8 +763,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                    self.replenish_flag
-                                                    and self.replenish_time
+                                                self.replenish_flag
+                                                and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -813,14 +815,14 @@ class Assistant(QThread):
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or click(
-                "res/img/survival_index_onclick.png"
+            "res/img/survival_index_onclick.png"
         ):
             pyautogui.moveRel(0, 100)
             for i in range(6):
                 pyautogui.scroll(-1)
                 time.sleep(1)
             if click("res/img/caver_of_corrosion.png") or exist(
-                    "res/img/caver_of_corrosion_onclick.png"
+                "res/img/caver_of_corrosion_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
@@ -850,8 +852,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                    self.replenish_flag
-                                                    and self.replenish_time
+                                                self.replenish_flag
+                                                and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -902,14 +904,14 @@ class Assistant(QThread):
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or click(
-                "res/img/survival_index_onclick.png"
+            "res/img/survival_index_onclick.png"
         ):
             pyautogui.moveRel(0, 100)
             for i in range(6):
                 pyautogui.scroll(-1)
                 time.sleep(1)
             if click("res/img/echo_of_war.png") or exist(
-                    "res/img/echo_of_war_onclick.png"
+                "res/img/echo_of_war_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
@@ -939,8 +941,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                    self.replenish_flag
-                                                    and self.replenish_time
+                                                self.replenish_flag
+                                                and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -1000,7 +1002,7 @@ class Assistant(QThread):
         time.sleep(2)
         pyautogui.press("esc")
         if click("res/img/assignments_none.png"):
-            while not exist('res/img/assignment_page.png'):
+            while not exist("res/img/assignment_page.png"):
                 pass
             if click("res/img/assignments_reward.png"):
                 if click("res/img/assign_again.png"):
@@ -1102,7 +1104,7 @@ class Assistant(QThread):
         if self.replenish_time != 0:
             if way == 1 or way == 0:
                 if exist("res/img/reserved_trailblaze_power_onclick.png") or click(
-                        "res/img/reserved_trailblaze_power.png"
+                    "res/img/reserved_trailblaze_power.png"
                 ):
                     click("res/img/ensure.png")
                     click("res/img/ensure.png")
