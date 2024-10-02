@@ -46,7 +46,8 @@ from PyQt5.QtWidgets import (
     QAction,
     QMessageBox,
     QComboBox,
-    QSpinBox, QGroupBox,
+    QSpinBox,
+    QGroupBox,
 )
 from plyer import notification
 
@@ -63,16 +64,16 @@ class MainWindow(QMainWindow):
         encryption.init()
         with open("data/config.json", "r", encoding="utf-8") as file:
             config = json.load(file)
-        with open("data/privacy.sra","rb") as sra_file:
-            privacy=sra_file.readlines()
+        with open("data/privacy.sra", "rb") as sra_file:
+            privacy = sra_file.readlines()
             try:
-                pwd=privacy[1]
-                acc=privacy[0]
+                pwd = privacy[1]
+                acc = privacy[0]
                 self.password_text = encryption.decrypt_word(pwd)
                 self.account_text = encryption.decrypt_word(acc)
             except IndexError:
-                self.password_text=''
-                self.account_text=''
+                self.password_text = ""
+                self.account_text = ""
         self.login_flag = config["loginFlag"]
         self.game_path = config["gamePath"]
         self.mission_star_game = config["starGame"]
@@ -133,11 +134,11 @@ class MainWindow(QMainWindow):
         vbox_layout_left = QVBoxLayout()
         self.vbox_layout_middle = QVBoxLayout()
         vbox_layout_right = QVBoxLayout()
-        left=QGroupBox()
+        left = QGroupBox()
         left.setTitle("功能选择")
         left.setAlignment(Qt.AlignCenter)
         left.setLayout(vbox_layout_left)
-        middle=QGroupBox()
+        middle = QGroupBox()
         middle.setTitle("任务设置")
         middle.setAlignment(Qt.AlignCenter)
         middle.setLayout(self.vbox_layout_middle)
@@ -911,10 +912,10 @@ class MainWindow(QMainWindow):
                 "replenish_way": self.replenish_way,
                 "replenish_trail_blaze_power_run_time": self.replenish_trail_blaze_power_run_time,
             }
-            acc=encryption.encrypt_word(self.account_text)
-            pwd=encryption.encrypt_word(self.password_text)
-            with open("data/privacy.sra","wb") as sra_file:
-                sra_file.write(acc+b'\n'+pwd)
+            acc = encryption.encrypt_word(self.account_text)
+            pwd = encryption.encrypt_word(self.password_text)
+            with open("data/privacy.sra", "wb") as sra_file:
+                sra_file.write(acc + b"\n" + pwd)
             with open("data/config.json", "w", encoding="utf-8") as json_file:
                 json.dump(configuration, json_file, indent=4)
             self.son_thread = StarRailAssistant.Assistant()
