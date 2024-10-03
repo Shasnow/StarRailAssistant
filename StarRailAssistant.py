@@ -32,7 +32,7 @@ import pyscreeze
 import win32con
 import win32gui
 import encryption
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal, Slot
 
 
 # noinspection PyUnresolvedReferences
@@ -49,6 +49,7 @@ class Assistant(QThread):
     def request_stop(self):
         self.stop_flag = True
 
+    @Slot()
     def run(self):
         with open("data/config.json", "r", encoding="utf-8") as file:
             config = json.load(file)
@@ -64,7 +65,7 @@ class Assistant(QThread):
                     except IndexError:
                         password_text = ""
                         account_text = ""
-                self.star_game(
+                self.start_game(
                     config["gamePath"],
                     config["loginFlag"],
                     account_text,
@@ -146,6 +147,7 @@ class Assistant(QThread):
             self.update_signal.emit("任务全部完成\n")
             self.finished.emit()
 
+    @Slot()
     def check_game(self):
         """Check that the game is running.
 
@@ -166,6 +168,7 @@ class Assistant(QThread):
             )
             return False
 
+    @Slot()
     def path_check(self, path):
         """Check game path.
 
@@ -186,6 +189,7 @@ class Assistant(QThread):
             self.update_signal.emit("游戏路径为空")
             return False
 
+    @Slot()
     def kill_game(self):
         """Kill the game"""
         command = f"taskkill /F /IM StarRail.exe"
@@ -193,6 +197,7 @@ class Assistant(QThread):
         subprocess.run(command, shell=True, check=True)
         self.update_signal.emit("退出游戏")
 
+    @Slot()
     def launch_game(self, game_path):
         """Launch game
 
@@ -228,6 +233,7 @@ class Assistant(QThread):
                     self.update_signal.emit("启动时间过长，请尝试手动启动")
                     return False
 
+    @Slot()
     def login(self, account, password):
         """Login game.
 
@@ -282,7 +288,8 @@ class Assistant(QThread):
             self.update_signal.emit("发生错误，错误编号11")
             return False
 
-    def star_game(self, game_path, login_flag=False, account="", password=""):
+    @Slot()
+    def start_game(self, game_path, login_flag=False, account="", password=""):
         """Launch and enter game.
 
         If the game is already star, skip this section.
@@ -332,6 +339,7 @@ class Assistant(QThread):
             self.update_signal.emit("游戏启动失败")
             return False
 
+    @Slot()
     def trailblazer_profile(self):
         """Mission trailblaze profile"""
         self.update_signal.emit("执行任务：签证奖励")
@@ -355,6 +363,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：签证奖励\n")
         time.sleep(3)
 
+    @Slot()
     def redeem_code(self, redeem_code_list):
         """Fills in redeem code and redeems them.
 
@@ -390,6 +399,7 @@ class Assistant(QThread):
         pyautogui.press("esc")
         self.update_signal.emit("任务完成：领取兑换码\n")
 
+    @Slot()
     def mail(self):
         """Open mailbox and pick up mails."""
         self.update_signal.emit("执行任务：领取邮件")
@@ -412,6 +422,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：领取邮件\n")
         time.sleep(3)
 
+    @Slot()
     def gift_of_odyssey(self):
         """Open the activity screen to receive gift_of_odyssey.
 
@@ -434,6 +445,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：巡星之礼\n")
         time.sleep(3)
 
+    @Slot()
     def ornament_extraction(self, level_index, battle_time=1):
         """Ornament extraction
 
@@ -529,6 +541,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：饰品提取\n")
         time.sleep(5)
 
+    @Slot()
     def calyx_golden(self, level_index, single_time=1, battle_time=1):
         """Battle calyx(golden)
 
@@ -620,6 +633,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：拟造花萼（金）\n")
         time.sleep(3)
 
+    @Slot()
     def calyx_crimson(self, level_index, single_time=1, battle_time=1):
         """Battle calyx(crimson)
 
@@ -709,6 +723,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：拟造花萼（赤）\n")
         time.sleep(3)
 
+    @Slot()
     def stagnant_shadow(self, level_index, battle_time=1):
         """Battle stagnant shadow
 
@@ -799,6 +814,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：凝滞虚影\n")
         time.sleep(3)
 
+    @Slot()
     def caver_of_corrosion(self, level_index, battle_time=1):
         """Battle caver of corrosion
 
@@ -888,6 +904,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：侵蚀隧洞\n")
         time.sleep(3)
 
+    @Slot()
     def echo_of_war(self, level_index, battle_time=1):
         """Battle echo of war
 
@@ -977,6 +994,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：历战余响\n")
         time.sleep(3)
 
+    @Slot()
     def wait_battle_end(self):
         """Wait battle end
 
@@ -996,6 +1014,7 @@ class Assistant(QThread):
             except pyscreeze.PyScreezeException:
                 continue
 
+    @Slot()
     def assignments_reward(self):
         """Receive assignment reward"""
         self.update_signal.emit("执行任务：领取派遣奖励")
@@ -1024,6 +1043,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：领取派遣奖励\n")
         time.sleep(3)
 
+    @Slot()
     def daily_training_reward(self):
         """Receive daily training reward"""
         self.update_signal.emit("执行任务：领取每日实训奖励")
@@ -1049,6 +1069,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：领取每日实训奖励\n")
         time.sleep(3)
 
+    @Slot()
     def nameless_honor(self):
         """Receive nameless honor reward"""
         self.update_signal.emit("执行任务：领取无名勋礼奖励")
@@ -1086,6 +1107,7 @@ class Assistant(QThread):
         self.update_signal.emit("完成任务：领取无名勋礼奖励\n")
         time.sleep(3)
 
+    @Slot()
     def replenish(self, way):
         """Replenish trailblaze power
 

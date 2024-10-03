@@ -51,8 +51,6 @@ import ctypes
 
 uiLoader = QUiLoader()
 
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
-
 
 class Main(QMainWindow):
 
@@ -263,7 +261,7 @@ class Main(QMainWindow):
         self.start_game_setting_container.setVisible(True)
 
     def show_start_game_setting(self):
-        """Set star game setting visible"""
+        """Set start game setting visible"""
         self.display_none()
         self.start_game_setting_container.setVisible(True)
 
@@ -316,7 +314,7 @@ class Main(QMainWindow):
         self.redeem_code_setting_container.setVisible(False)
 
     def start_game_status(self):
-        """Change the state of mission star game."""
+        """Change the state of mission start game."""
         if self.option1.isChecked():
             self.log.append("启动游戏已启用")
             self.mission_start_game = True
@@ -832,7 +830,7 @@ class Main(QMainWindow):
             self.son_thread = StarRailAssistant.Assistant()
             self.son_thread.update_signal.connect(self.update_log)
             self.son_thread.finished.connect(self.notification)
-            self.son_thread.run()
+            self.son_thread.start()
 
     def notification(self):
         """Windows notify"""
