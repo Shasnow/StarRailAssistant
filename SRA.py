@@ -513,7 +513,7 @@ class Main(QMainWindow):
         battle_times3.valueChanged.connect(self.calyx_golden_run_time_change)
 
         self.opt4 = self.trail_blaze_power_container.findChild(
-            QCheckBox, "checkBox2_3_11"
+            QCheckBox, "checkBox2_4_11"
         )
         self.opt4.setChecked(self.battle_crimson_golden)
         self.opt4.stateChanged.connect(self.calyx_crimson_status)
