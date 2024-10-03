@@ -32,15 +32,15 @@ import pyscreeze
 import win32con
 import win32gui
 import encryption
-from PyQt5.QtCore import QThread, pyqtSignal
+from PySide6.QtCore import QThread, Signal, Slot
 
 
 # noinspection PyUnresolvedReferences
 
 
 class Assistant(QThread):
-    update_signal = pyqtSignal(str)
-    finished = pyqtSignal()
+    update_signal = Signal(str)
+    finished = Signal()
 
     def __init__(self):
         super().__init__()
@@ -49,6 +49,7 @@ class Assistant(QThread):
     def request_stop(self):
         self.stop_flag = True
 
+    @Slot()
     def run(self):
         with open("data/config.json", "r", encoding="utf-8") as file:
             config = json.load(file)
@@ -62,9 +63,9 @@ class Assistant(QThread):
                         password_text = encryption.decrypt_word(pwd)
                         account_text = encryption.decrypt_word(acc)
                     except IndexError:
-                        password_text = ''
-                        account_text = ''
-                self.star_game(
+                        password_text = ""
+                        account_text = ""
+                self.start_game(
                     config["gamePath"],
                     config["loginFlag"],
                     account_text,
@@ -146,6 +147,7 @@ class Assistant(QThread):
             self.update_signal.emit("任务全部完成\n")
             self.finished.emit()
 
+    @Slot()
     def check_game(self):
         """Check that the game is running.
 
@@ -166,6 +168,7 @@ class Assistant(QThread):
             )
             return False
 
+    @Slot()
     def path_check(self, path):
         """Check game path.
 
@@ -186,6 +189,7 @@ class Assistant(QThread):
             self.update_signal.emit("游戏路径为空")
             return False
 
+    @Slot()
     def kill_game(self):
         """Kill the game"""
         command = f"taskkill /F /IM StarRail.exe"
@@ -193,6 +197,7 @@ class Assistant(QThread):
         subprocess.run(command, shell=True, check=True)
         self.update_signal.emit("退出游戏")
 
+    @Slot()
     def launch_game(self, game_path):
         """Launch game
 
@@ -228,6 +233,7 @@ class Assistant(QThread):
                     self.update_signal.emit("启动时间过长，请尝试手动启动")
                     return False
 
+    @Slot()
     def login(self, account, password):
         """Login game.
 
@@ -242,7 +248,9 @@ class Assistant(QThread):
             True if successfully logged in, False otherwise.
 
         """
-        if check("res/img/welcome.png", interval=0.1, max_time=10):  # 进入登录界面的标志
+        if check(
+            "res/img/welcome.png", interval=0.1, max_time=10
+        ):  # 进入登录界面的标志
             self.update_signal.emit("已登录")
             return True
         if check("res/img/not_logged_in.png", max_time=4):
@@ -280,7 +288,8 @@ class Assistant(QThread):
             self.update_signal.emit("发生错误，错误编号11")
             return False
 
-    def star_game(self, game_path, login_flag=False, account="", password=""):
+    @Slot()
+    def start_game(self, game_path, login_flag=False, account="", password=""):
         """Launch and enter game.
 
         If the game is already star, skip this section.
@@ -298,7 +307,7 @@ class Assistant(QThread):
         """
         if find_window("崩坏：星穹铁道"):
             self.update_signal.emit("游戏已经启动")
-            if check('res/img/chat_enter.png', max_time=10):
+            if check("res/img/chat_enter.png", max_time=10):
                 return True
         if self.launch_game(game_path):
             time.sleep(2)
@@ -330,6 +339,7 @@ class Assistant(QThread):
             self.update_signal.emit("游戏启动失败")
             return False
 
+    @Slot()
     def trailblazer_profile(self):
         """Mission trailblaze profile"""
         self.update_signal.emit("执行任务：签证奖励")
@@ -353,6 +363,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：签证奖励\n")
         time.sleep(3)
 
+    @Slot()
     def redeem_code(self, redeem_code_list):
         """Fills in redeem code and redeems them.
 
@@ -369,7 +380,7 @@ class Assistant(QThread):
         if len(redeem_code_list) == 0:
             for code in redeem_code_list:
                 if click("res/img/more.png") or click(
-                        "res/img/more_with_something.png"
+                    "res/img/more_with_something.png"
                 ):
                     if click("res/img/redeem_code.png"):
                         time.sleep(2)
@@ -388,6 +399,7 @@ class Assistant(QThread):
         pyautogui.press("esc")
         self.update_signal.emit("任务完成：领取兑换码\n")
 
+    @Slot()
     def mail(self):
         """Open mailbox and pick up mails."""
         self.update_signal.emit("执行任务：领取邮件")
@@ -410,6 +422,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：领取邮件\n")
         time.sleep(3)
 
+    @Slot()
     def gift_of_odyssey(self):
         """Open the activity screen to receive gift_of_odyssey.
 
@@ -432,6 +445,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：巡星之礼\n")
         time.sleep(3)
 
+    @Slot()
     def ornament_extraction(self, level_index, battle_time=1):
         """Ornament extraction
 
@@ -448,10 +462,10 @@ class Assistant(QThread):
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or exist(
-                "res/img/survival_index_onclick.png"
+            "res/img/survival_index_onclick.png"
         ):
             if click("res/img/ornament_extraction.png") or exist(
-                    "res/img/ornament_extraction_onclick.png"
+                "res/img/ornament_extraction_onclick.png"
             ):
                 if exist("res/img/no_save.png"):
                     self.update_signal.emit(
@@ -527,6 +541,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：饰品提取\n")
         time.sleep(5)
 
+    @Slot()
     def calyx_golden(self, level_index, single_time=1, battle_time=1):
         """Battle calyx(golden)
 
@@ -544,10 +559,10 @@ class Assistant(QThread):
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or exist(
-                "res/img/survival_index_onclick.png"
+            "res/img/survival_index_onclick.png"
         ):
             if click("res/img/calyx(golden).png") or exist(
-                    "res/img/calyx(golden)_onclick.png"
+                "res/img/calyx(golden)_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=600, y_add=10):
@@ -582,8 +597,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                    self.replenish_flag
-                                                    and self.replenish_time
+                                                self.replenish_flag
+                                                and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -618,6 +633,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：拟造花萼（金）\n")
         time.sleep(3)
 
+    @Slot()
     def calyx_crimson(self, level_index, single_time=1, battle_time=1):
         """Battle calyx(crimson)
 
@@ -635,10 +651,10 @@ class Assistant(QThread):
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or exist(
-                "res/img/survival_index_onclick.png"
+            "res/img/survival_index_onclick.png"
         ):
             if click("res/img/calyx(crimson).png") or exist(
-                    "res/img/calyx(crimson)_onclick.png"
+                "res/img/calyx(crimson)_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
@@ -671,8 +687,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                    self.replenish_flag
-                                                    and self.replenish_time
+                                                self.replenish_flag
+                                                and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -707,6 +723,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：拟造花萼（赤）\n")
         time.sleep(3)
 
+    @Slot()
     def stagnant_shadow(self, level_index, battle_time=1):
         """Battle stagnant shadow
 
@@ -723,10 +740,10 @@ class Assistant(QThread):
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or exist(
-                "res/img/survival_index_onclick.png"
+            "res/img/survival_index_onclick.png"
         ):
             if click("res/img/stagnant_shadow.png") or exist(
-                    "res/img/stagnant_shadow_onclick.png"
+                "res/img/stagnant_shadow_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
@@ -761,8 +778,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                    self.replenish_flag
-                                                    and self.replenish_time
+                                                self.replenish_flag
+                                                and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -797,6 +814,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：凝滞虚影\n")
         time.sleep(3)
 
+    @Slot()
     def caver_of_corrosion(self, level_index, battle_time=1):
         """Battle caver of corrosion
 
@@ -813,14 +831,14 @@ class Assistant(QThread):
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or click(
-                "res/img/survival_index_onclick.png"
+            "res/img/survival_index_onclick.png"
         ):
             pyautogui.moveRel(0, 100)
             for i in range(6):
                 pyautogui.scroll(-1)
                 time.sleep(1)
             if click("res/img/caver_of_corrosion.png") or exist(
-                    "res/img/caver_of_corrosion_onclick.png"
+                "res/img/caver_of_corrosion_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
@@ -850,8 +868,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                    self.replenish_flag
-                                                    and self.replenish_time
+                                                self.replenish_flag
+                                                and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -886,6 +904,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：侵蚀隧洞\n")
         time.sleep(3)
 
+    @Slot()
     def echo_of_war(self, level_index, battle_time=1):
         """Battle echo of war
 
@@ -902,14 +921,14 @@ class Assistant(QThread):
         pyautogui.press("f4")
         time.sleep(3)
         if click("res/img/survival_index.png") or click(
-                "res/img/survival_index_onclick.png"
+            "res/img/survival_index_onclick.png"
         ):
             pyautogui.moveRel(0, 100)
             for i in range(6):
                 pyautogui.scroll(-1)
                 time.sleep(1)
             if click("res/img/echo_of_war.png") or exist(
-                    "res/img/echo_of_war_onclick.png"
+                "res/img/echo_of_war_onclick.png"
             ):
                 find_level(level)
                 if click(level, x_add=400):
@@ -939,8 +958,8 @@ class Assistant(QThread):
                                     if click("res/img/again.png"):
                                         if exist("res/img/replenish.png"):
                                             if (
-                                                    self.replenish_flag
-                                                    and self.replenish_time
+                                                self.replenish_flag
+                                                and self.replenish_time
                                             ):
                                                 self.replenish(self.replenish_way)
                                                 click("res/img/again.png")
@@ -975,6 +994,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：历战余响\n")
         time.sleep(3)
 
+    @Slot()
     def wait_battle_end(self):
         """Wait battle end
 
@@ -994,13 +1014,14 @@ class Assistant(QThread):
             except pyscreeze.PyScreezeException:
                 continue
 
+    @Slot()
     def assignments_reward(self):
         """Receive assignment reward"""
         self.update_signal.emit("执行任务：领取派遣奖励")
         time.sleep(2)
         pyautogui.press("esc")
         if click("res/img/assignments_none.png"):
-            while not exist('res/img/assignment_page.png'):
+            while not exist("res/img/assignment_page.png"):
                 pass
             if click("res/img/assignments_reward.png"):
                 if click("res/img/assign_again.png"):
@@ -1022,6 +1043,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：领取派遣奖励\n")
         time.sleep(3)
 
+    @Slot()
     def daily_training_reward(self):
         """Receive daily training reward"""
         self.update_signal.emit("执行任务：领取每日实训奖励")
@@ -1047,6 +1069,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：领取每日实训奖励\n")
         time.sleep(3)
 
+    @Slot()
     def nameless_honor(self):
         """Receive nameless honor reward"""
         self.update_signal.emit("执行任务：领取无名勋礼奖励")
@@ -1084,6 +1107,7 @@ class Assistant(QThread):
         self.update_signal.emit("完成任务：领取无名勋礼奖励\n")
         time.sleep(3)
 
+    @Slot()
     def replenish(self, way):
         """Replenish trailblaze power
 
@@ -1102,7 +1126,7 @@ class Assistant(QThread):
         if self.replenish_time != 0:
             if way == 1 or way == 0:
                 if exist("res/img/reserved_trailblaze_power_onclick.png") or click(
-                        "res/img/reserved_trailblaze_power.png"
+                    "res/img/reserved_trailblaze_power.png"
                 ):
                     click("res/img/ensure.png")
                     click("res/img/ensure.png")
