@@ -18,9 +18,9 @@
 
 """
 崩坏：星穹铁道助手
-beta v0.7
+v0.6.1_beta
 作者：雪影
-加密
+数据加密
 """
 from cryptography.fernet import Fernet
 import os
