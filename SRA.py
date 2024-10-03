@@ -25,8 +25,9 @@ beta v0.7
 
 import os
 import sys  # 导入 sys 模块，用于与 Python 解释器交互
-import json
 import time
+import ctypes
+
 from PySide6.QtGui import QIcon, QAction
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (
@@ -45,9 +46,11 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )  # 从 PySide6 中导入所需的类
 from plyer import notification
+
 import encryption
 import StarRailAssistant
-import ctypes
+import Configure
+
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
 
@@ -62,58 +65,11 @@ class Main(QMainWindow):
 
     def __init__(self):
         super().__init__()  # 调用父类 QMainWindow 的初始化方法
+        Configure.init()
         encryption.init()
-
-        with open(self.AppPath + "/data/config.json", "r", encoding="utf-8") as file:
-            config = json.load(file)
-        with open(self.AppPath + "/data/privacy.sra", "rb") as sra_file:
-            privacy = sra_file.readlines()
-            try:
-                pwd = privacy[1]
-                acc = privacy[0]
-                self.password_text = encryption.decrypt_word(pwd)
-                self.account_text = encryption.decrypt_word(acc)
-            except IndexError:
-                self.password_text = ""
-                self.account_text = ""
-        self.login_flag = config["loginFlag"]
-        self.game_path = config["gamePath"]
-        self.mission_start_game = config["starGame"]
-        self.mission_trailblazer_profile = config["trailBlazerProfile"]
-        self.mission_redeem_code = False
-        self.redeem_code_list = None
-        self.redeem_code = None
-        self.mission_assignments_reward = config["assignment"]
-        self.mission_gift_of_odyssey = config["giftOfOdyssey"]
-        self.mission_mail = config["mail"]
-        self.mission_trail_blaze_power = config["trailBlazePower"]
-        self.mission_daily_training = config["dailyTraining"]
-        self.mission_nameless_honor = config["namelessHonor"]
-        self.mission_quit_game = config["quitGame"]
-        self.calyx_golden_run_time = config["calyx_golden_run_time"]
-        self.calyx_golden_battle_time = config["calyx_golden_battle_time"]
-        self.calyx_golden_level = config["calyx_golden_level"]
-        self.battle_calyx_golden = config["calyx_golden"]
-        self.calyx_crimson_run_time = config["calyx_crimson_run_time"]
-        self.calyx_crimson_battle_time = config["calyx_crimson_battle_time"]
-        self.calyx_crimson_level = config["calyx_crimson_level"]
-        self.battle_crimson_golden = config["calyx_crimson"]
-        self.stagnant_shadow_run_time = config["stagnant_shadow_run_time"]
-        self.stagnant_shadow_level = config["stagnant_shadow_level"]
-        self.battle_stagnant_shadow = config["stagnant_shadow"]
-        self.caver_of_corrosion_run_time = config["caver_of_corrosion_run_time"]
-        self.caver_of_corrosion_level = config["caver_of_corrosion_level"]
-        self.battle_caver_of_corrosion = config["caver_of_corrosion"]
-        self.echo_of_war_run_time = config["echo_of_war_run_time"]
-        self.echo_of_war_level = config["echo_of_war_level"]
-        self.battle_echo_of_war = config["echo_of_war"]
-        self.battle_ornament_extraction = config["ornament_extraction"]
-        self.ornament_extraction_level = config["ornament_extraction_level"]
-        self.ornament_extraction_run_time = config["ornament_extraction_run_time"]
-        self.replenish_trail_blaze_power_run_time = 1
-        self.replenish_way = 1
-        self.replenish_trail_blaze_power = False
-
+        self.config=Configure.load()
+        self.account_text=encryption.load()
+        self.password_text = ""
         self.ui = uiLoader.load(self.AppPath + "/res/ui/main.ui")
         self.start_game_setting_container = uiLoader.load(
             self.AppPath + "/res/ui/set_01.ui"
@@ -144,55 +100,55 @@ class Main(QMainWindow):
         self.log = self.ui.findChild(QTextBrowser, "textBrowser_log")
 
         self.option1 = self.ui.findChild(QCheckBox, "checkBox1_1")
-        self.option1.setChecked(self.mission_start_game)
+        self.option1.setChecked(self.config["Mission"]["startGame"])
         self.option1.stateChanged.connect(self.start_game_status)
         button1 = self.ui.findChild(QPushButton, "pushButton1_1")
         button1.clicked.connect(self.show_start_game_setting)
 
         self.option2 = self.ui.findChild(QCheckBox, "checkBox1_2")
-        self.option2.setChecked(self.mission_trailblazer_profile)
+        self.option2.setChecked(self.config["Mission"]["trailBlazerProfile"])
         self.option2.stateChanged.connect(self.trailblazer_profile_status)
         # button2 = self.ui.findChild(QPushButton, "pushButton1_2")
 
         self.option3 = self.ui.findChild(QCheckBox, "checkBox1_3")
-        self.option3.setChecked(self.mission_redeem_code)
+        self.option3.setChecked(self.config["Mission"]["redeemCode"])
         self.option3.stateChanged.connect(self.redeem_code_status)
         button3 = self.ui.findChild(QPushButton, "pushButton1_3")
         button3.clicked.connect(self.show_redeem_code_setting)
 
         self.option4 = self.ui.findChild(QCheckBox, "checkBox1_4")
-        self.option4.setChecked(self.mission_assignments_reward)
+        self.option4.setChecked(self.config["Mission"]["assignment"])
         self.option4.stateChanged.connect(self.assignment_status)
         # button4 = self.ui.findChild(QPushButton, "pushButton1_4")
 
         self.option5 = self.ui.findChild(QCheckBox, "checkBox1_5")
-        self.option5.setChecked(self.mission_gift_of_odyssey)
+        self.option5.setChecked(self.config["Mission"]["giftOfOdyssey"])
         self.option5.stateChanged.connect(self.gift_of_odyssey_status)
         # button5 = self.ui.findChild(QPushButton, "pushButton1_5")
 
         self.option6 = self.ui.findChild(QCheckBox, "checkBox1_6")
-        self.option6.setChecked(self.mission_mail)
+        self.option6.setChecked(self.config["Mission"]["mail"])
         self.option6.stateChanged.connect(self.mail_status)
         # button6 = self.ui.findChild(QPushButton, "pushButton1_6")
 
         self.option7 = self.ui.findChild(QCheckBox, "checkBox1_7")
-        self.option7.setChecked(self.mission_trail_blaze_power)
+        self.option7.setChecked(self.config["Mission"]["trailBlazePower"])
         self.option7.stateChanged.connect(self.trail_blaze_power_status)
         button7 = self.ui.findChild(QPushButton, "pushButton1_7")
         button7.clicked.connect(self.show_trail_blaze_power_setting)
 
         self.option8 = self.ui.findChild(QCheckBox, "checkBox1_8")
-        self.option8.setChecked(self.mission_daily_training)
+        self.option8.setChecked(self.config["Mission"]["dailyTraining"])
         self.option8.stateChanged.connect(self.daily_training_status)
         # button8 = self.ui.findChild(QPushButton, "pushButton1_8")
 
         self.option9 = self.ui.findChild(QCheckBox, "checkBox1_9")
-        self.option9.setChecked(self.mission_nameless_honor)
+        self.option9.setChecked(self.config["Mission"]["namelessHonor"])
         self.option9.stateChanged.connect(self.nameless_honor_status)
         # button9 = self.ui.findChild(QPushButton, "pushButton1_9")
 
         self.option10 = self.ui.findChild(QCheckBox, "checkBox1_10")
-        self.option10.setChecked(self.mission_quit_game)
+        self.option10.setChecked(self.config["Mission"]["quitGame"])
         self.option10.stateChanged.connect(self.quit_game_status)
         # button10 = self.ui.findChild(QPushButton, "pushButton1_10")
 
@@ -215,7 +171,7 @@ class Main(QMainWindow):
         self.line_area = self.start_game_setting_container.findChild(
             QLineEdit, "lineEdit2_1"
         )
-        self.line_area.setText(self.game_path)
+        self.line_area.setText(self.config["StartGame"]["gamePath"])
         self.line_area.textChanged.connect(self.get_path)
         button = self.start_game_setting_container.findChild(
             QPushButton, "pushButton2_1"
@@ -235,7 +191,7 @@ class Main(QMainWindow):
         self.password = self.start_game_setting_container.findChild(
             QLineEdit, "lineEdit2_3_22"
         )
-        self.password.setText(self.password_text)
+        # self.password.setText(self.password_text)
         self.password.setEchoMode(QLineEdit.Password)
         self.password.setReadOnly(True)
         self.password.textChanged.connect(self.get_password)
@@ -257,10 +213,10 @@ class Main(QMainWindow):
         )
         if file_name:
             self.line_area.setText(file_name)
-            self.game_path = file_name
+            self.config["StartGame"]["gamePath"] = file_name
 
     def get_path(self, text):
-        self.game_path = text
+        self.config["StartGame"]["gamePath"] = text
 
     def get_account(self, text):
         self.account_text = text
@@ -275,12 +231,12 @@ class Main(QMainWindow):
         """
         if self.auto_launch_checkbox.isChecked():
             self.log.append("自动登录已启用")
-            self.login_flag = True
+            self.config["StartGame"]["autoLogin"] = True
             self.account.setReadOnly(False)
             self.password.setReadOnly(False)
         else:
             self.log.append("自动登录已禁用")
-            self.login_flag = False
+            self.config["StartGame"]["autoLogin"] = False
             self.account.setReadOnly(True)
             self.password.setReadOnly(True)
 
@@ -303,93 +259,93 @@ class Main(QMainWindow):
         """Change the state of mission start game."""
         if self.option1.isChecked():
             self.log.append("启动游戏已启用")
-            self.mission_start_game = True
+            self.config["Mission"]["startGame"] = True
         else:
             self.log.append("启动游戏已禁用")
-            self.mission_start_game = False
+            self.config["Mission"]["startGame"] = False
 
     def trailblazer_profile_status(self):
         """Change the state of mission trailblazer profile."""
         if self.option2.isChecked():
             self.log.append("添加任务：领取签证奖励")
-            self.mission_trailblazer_profile = True
+            self.config["Mission"]["trailBlazerProfile"] = True
         else:
             self.log.append("取消任务：领取签证奖励")
-            self.mission_trailblazer_profile = False
+            self.config["Mission"]["trailBlazerProfile"] = False
 
     def redeem_code_status(self):
         """Change the state of mission redeem code."""
         if self.option3.isChecked():
             self.log.append("添加任务：领取兑换码奖励")
-            self.mission_redeem_code = True
-            self.mission_mail = True
+            self.config["Mission"]["redeemCode"] = True
+            self.config["Mission"]["mail"] = True
         else:
             self.log.append("取消任务：领取兑换码奖励")
-            self.mission_redeem_code = False
+            self.config["Mission"]["redeemCode"] = False
 
     def assignment_status(self):
         """Change the state of mission assignment."""
         if self.option4.isChecked():
             self.log.append("添加任务：领取派遣奖励")
-            self.mission_assignments_reward = True
+            self.config["Mission"]["assignment"] = True
         else:
             self.log.append("取消任务：领取派遣奖励")
-            self.mission_assignments_reward = False
+            self.config["Mission"]["assignment"] = False
 
     def gift_of_odyssey_status(self):
         """Change the state of mission gift of odyssey."""
         if self.option5.isChecked():
             self.log.append("添加任务：领取巡星之礼")
-            self.mission_gift_of_odyssey = True
+            self.config["Mission"]["giftOfOdyssey"] = True
         else:
             self.log.append("取消任务：领取巡星之礼")
-            self.mission_gift_of_odyssey = False
+            self.config["Mission"]["giftOfOdyssey"] = False
 
     def mail_status(self):
         """Change the state of mission mail."""
         if self.option6.isChecked():
             self.log.append("添加任务：领取邮件")
-            self.mission_mail = True
+            self.config["Mission"]["mail"] = True
         else:
             self.log.append("取消任务：领取邮件")
-            self.mission_mail = False
-            self.mission_redeem_code = False
+            self.config["Mission"]["mail"] = False
+            self.config["Mission"]["redeemCode"] = False
 
     def trail_blaze_power_status(self):
         """Change the state of mission trailblaze power."""
         if self.option7.isChecked():
             self.log.append("添加任务：清开拓力")
-            self.mission_trail_blaze_power = True
+            self.config["Mission"]["trailBlazePower"] = True
         else:
             self.log.append("取消任务：清开拓力")
-            self.mission_trail_blaze_power = False
+            self.config["Mission"]["trailBlazePower"] = False
 
     def daily_training_status(self):
         """Change the state of mission daily training."""
         if self.option8.isChecked():
             self.log.append("添加任务：领取每日实训")
-            self.mission_daily_training = True
+            self.config["Mission"]["dailyTraining"] = True
         else:
             self.log.append("取消任务：领取每日实训")
-            self.mission_daily_training = False
+            self.config["Mission"]["dailyTraining"] = False
 
     def nameless_honor_status(self):
         """Change the state of mission nameless honor."""
         if self.option9.isChecked():
             self.log.append("添加任务：领取无名勋礼")
-            self.mission_nameless_honor = True
+            self.config["Mission"]["namelessHonor"] = True
         else:
             self.log.append("取消任务：领取无名勋礼")
-            self.mission_nameless_honor = False
+            self.config["Mission"]["namelessHonor"] = False
 
     def quit_game_status(self):
         """Change the state of mission quit game."""
         if self.option10.isChecked():
             self.log.append("退出游戏已启用")
-            self.mission_quit_game = True
+            self.config["Mission"]["quitGame"] = True
         else:
             self.log.append("退出游戏已禁用")
-            self.mission_quit_game = False
+            self.config["Mission"]["quitGame"] = False
 
     def redeem_code_setting(self):
         """Create component in redeem code setting."""
@@ -404,7 +360,7 @@ class Main(QMainWindow):
         """Change the redeem code list while redeem code text changes."""
         redeem_code = self.redeem_code.toPlainText()
         # self.log.append(redeem_code)
-        self.redeem_code_list = redeem_code.split()
+        self.config["RedeemCode"]["codeList"] = redeem_code.split()
 
     def show_redeem_code_setting(self):
         """Set redeem code visible."""
@@ -416,23 +372,23 @@ class Main(QMainWindow):
         self.opt1 = self.trail_blaze_power_container.findChild(
             QCheckBox, "checkBox2_1_11"
         )
-        self.opt1.setChecked(self.replenish_trail_blaze_power)
+        self.opt1.setChecked(self.config["Replenish"]["enable"])
         self.opt1.stateChanged.connect(self.replenish_trail_blaze_power_status)
         combobox1 = self.trail_blaze_power_container.findChild(
             QComboBox, "comboBox2_1_13"
         )
         combobox1.addItems(["-----补充方式-----", "后备开拓力", "燃料", "星琼"])
         combobox1.currentIndexChanged.connect(self.replenish_way_select)
-        combobox1.setCurrentIndex(self.replenish_way)
+        combobox1.setCurrentIndex(self.config["Replenish"]["way"])
         times1 = self.trail_blaze_power_container.findChild(QSpinBox, "spinBox2_1_23")
         times1.setMinimum(1)
-        times1.setValue(self.replenish_trail_blaze_power_run_time)
+        times1.setValue(self.config["Replenish"]["runTimes"])
         times1.valueChanged.connect(self.replenish_trail_blaze_power_run_time_change)
 
         self.opt2 = self.trail_blaze_power_container.findChild(
             QCheckBox, "checkBox2_2_11"
         )
-        self.opt2.setChecked(self.battle_ornament_extraction)
+        self.opt2.setChecked(self.config["OrnamentExtraction"]["enable"])
         self.opt2.stateChanged.connect(self.ornament_extraction_status)
         combobox2 = self.trail_blaze_power_container.findChild(
             QComboBox, "comboBox2_2_13"
@@ -452,18 +408,18 @@ class Main(QMainWindow):
             ]
         )
         combobox2.currentIndexChanged.connect(self.ornament_extraction_level_select)
-        combobox2.setCurrentIndex(self.ornament_extraction_level)
+        combobox2.setCurrentIndex(self.config["OrnamentExtraction"]["level"])
         battle_times2 = self.trail_blaze_power_container.findChild(
             QSpinBox, "spinBox2_2_23"
         )
         battle_times2.setMinimum(1)
-        battle_times2.setValue(self.ornament_extraction_run_time)
+        battle_times2.setValue(self.config["OrnamentExtraction"]["runTimes"])
         battle_times2.valueChanged.connect(self.ornament_extraction_run_time_change)
 
         self.opt3 = self.trail_blaze_power_container.findChild(
             QCheckBox, "checkBox2_3_11"
         )
-        self.opt3.setChecked(self.battle_calyx_golden)
+        self.opt3.setChecked(self.config["CalyxGolden"]["enable"])
         self.opt3.stateChanged.connect(self.calyx_golden_status)
         combobox3 = self.trail_blaze_power_container.findChild(
             QComboBox, "comboBox2_3_13"
@@ -482,26 +438,26 @@ class Main(QMainWindow):
                 "珍藏之蕾（雅利洛VI）",
             ]
         )
-        combobox3.setCurrentIndex(self.calyx_golden_level)
+        combobox3.setCurrentIndex(self.config["CalyxGolden"]["level"])
         combobox3.currentIndexChanged.connect(self.calyx_golden_level_select)
         single_times3 = self.trail_blaze_power_container.findChild(
             QSpinBox, "spinBox2_3_23"
         )
         single_times3.setMinimum(1)
-        single_times3.setValue(self.calyx_golden_battle_time)
+        single_times3.setValue(self.config["CalyxGolden"]["singleTimes"])
         single_times3.setMaximum(6)
         single_times3.valueChanged.connect(self.calyx_golden_battle_time_change)
         battle_times3 = self.trail_blaze_power_container.findChild(
             QSpinBox, "spinBox2_3_33"
         )
         battle_times3.setMinimum(1)
-        battle_times3.setValue(self.calyx_golden_run_time)
+        battle_times3.setValue(self.config["CalyxGolden"]["runTimes"])
         battle_times3.valueChanged.connect(self.calyx_golden_run_time_change)
 
         self.opt4 = self.trail_blaze_power_container.findChild(
             QCheckBox, "checkBox2_4_11"
         )
-        self.opt4.setChecked(self.battle_crimson_golden)
+        self.opt4.setChecked(self.config["CalyxCrimson"]["enable"])
         self.opt4.stateChanged.connect(self.calyx_crimson_status)
         combobox4 = self.trail_blaze_power_container.findChild(
             QComboBox, "comboBox2_4_13"
@@ -525,26 +481,26 @@ class Main(QMainWindow):
                 "沉沦黑曜（虚无）",
             ]
         )
-        combobox4.setCurrentIndex(self.calyx_crimson_level)
+        combobox4.setCurrentIndex(self.config["CalyxCrimson"]["level"])
         combobox4.currentIndexChanged.connect(self.calyx_crimson_level_select)
         single_times4 = self.trail_blaze_power_container.findChild(
             QSpinBox, "spinBox2_4_23"
         )
         single_times4.setMinimum(1)
-        single_times4.setValue(self.calyx_crimson_battle_time)
+        single_times4.setValue(self.config["CalyxCrimson"]["singleTimes"])
         single_times4.setMaximum(6)
         single_times4.valueChanged.connect(self.calyx_crimson_battle_time_change)
         battle_times4 = self.trail_blaze_power_container.findChild(
             QSpinBox, "spinBox2_4_33"
         )
         battle_times4.setMinimum(1)
-        battle_times4.setValue(self.calyx_crimson_run_time)
+        battle_times4.setValue(self.config["CalyxCrimson"]["runTimes"])
         battle_times4.valueChanged.connect(self.calyx_crimson_run_time_change)
 
         self.opt5 = self.trail_blaze_power_container.findChild(
             QCheckBox, "checkBox2_5_11"
         )
-        self.opt5.setChecked(self.battle_stagnant_shadow)
+        self.opt5.setChecked(self.config["StagnantShadow"]["enable"])
         self.opt5.stateChanged.connect(self.stagnant_shadow_status)
         combobox5 = self.trail_blaze_power_container.findChild(
             QComboBox, "comboBox2_5_13"
@@ -574,19 +530,19 @@ class Main(QMainWindow):
                 "往日之影的金饰（虚数）",
             ]
         )
-        combobox5.setCurrentIndex(self.stagnant_shadow_level)
+        combobox5.setCurrentIndex(self.config["StagnantShadow"]["level"])
         combobox5.currentIndexChanged.connect(self.stagnant_shadow_level_select)
         battle_times5 = self.trail_blaze_power_container.findChild(
             QSpinBox, "spinBox2_5_23"
         )
         battle_times5.setMinimum(1)
-        battle_times5.setValue(self.stagnant_shadow_run_time)
+        battle_times5.setValue(self.config["StagnantShadow"]["runTimes"])
         battle_times5.valueChanged.connect(self.stagnant_shadow_run_time_change)
 
         self.opt6 = self.trail_blaze_power_container.findChild(
             QCheckBox, "checkBox2_6_11"
         )
-        self.opt6.setChecked(self.battle_caver_of_corrosion)
+        self.opt6.setChecked(self.config["CaverOfCorrosion"]["enable"])
         self.opt6.stateChanged.connect(self.caver_of_corrosion_status)
         combobox6 = self.trail_blaze_power_container.findChild(
             QComboBox, "comboBox2_6_13"
@@ -606,19 +562,19 @@ class Main(QMainWindow):
                 "霜风之径",
             ]
         )
-        combobox6.setCurrentIndex(self.caver_of_corrosion_level)
+        combobox6.setCurrentIndex(self.config["CaverOfCorrosion"]["level"])
         combobox6.currentIndexChanged.connect(self.caver_of_corrosion_level_select)
         battle_times6 = self.trail_blaze_power_container.findChild(
             QSpinBox, "spinBox2_6_23"
         )
         battle_times6.setMinimum(1)
-        battle_times6.setValue(self.caver_of_corrosion_run_time)
+        battle_times6.setValue(self.config["CaverOfCorrosion"]["runTimes"])
         battle_times6.valueChanged.connect(self.caver_of_corrosion_run_time_change)
 
         self.opt7 = self.trail_blaze_power_container.findChild(
             QCheckBox, "checkBox2_7_11"
         )
-        self.opt7.setChecked(self.battle_echo_of_war)
+        self.opt7.setChecked(self.config["EchoOfWar"]["enable"])
         self.opt7.stateChanged.connect(self.echo_of_war_status)
         combobox7 = self.trail_blaze_power_container.findChild(
             QComboBox, "comboBox2_7_13"
@@ -634,14 +590,14 @@ class Main(QMainWindow):
                 "毁灭的开端",
             ]
         )
-        combobox7.setCurrentIndex(self.echo_of_war_level)
+        combobox7.setCurrentIndex(self.config["EchoOfWar"]["level"])
         combobox7.currentIndexChanged.connect(self.echo_of_war_level_select)
         battle_times7 = self.trail_blaze_power_container.findChild(
             QSpinBox, "spinBox2_7_23"
         )
         battle_times7.setMinimum(0)
         battle_times7.setMaximum(3)
-        battle_times7.setValue(self.echo_of_war_run_time)
+        battle_times7.setValue(self.config["EchoOfWar"]["runTimes"])
         battle_times7.valueChanged.connect(self.echo_of_war_run_time_change)
 
         self.task_set_vbox_layout.addWidget(self.trail_blaze_power_container)
@@ -650,93 +606,93 @@ class Main(QMainWindow):
     # Change series state in mission trailblaze power.
     def replenish_trail_blaze_power_status(self):
         if self.opt1.isChecked():
-            self.replenish_trail_blaze_power = True
+            self.config["Replenish"]["enable"] = True
         else:
-            self.replenish_trail_blaze_power = False
+            self.config["Replenish"]["enable"] = False
 
     def replenish_way_select(self, index):
-        self.replenish_way = index
+        self.config["Replenish"]["way"] = index
 
     def replenish_trail_blaze_power_run_time_change(self, value):
-        self.replenish_trail_blaze_power_run_time = value
+        self.config["Replenish"]["runTimes"] = value
 
     def ornament_extraction_status(self):
         if self.opt2.isChecked():
-            self.battle_ornament_extraction = True
+            self.config["OrnamentExtraction"]["enable"] = True
         else:
-            self.battle_ornament_extraction = False
+            self.config["OrnamentExtraction"]["enable"] = False
 
     def ornament_extraction_level_select(self, index):
-        self.ornament_extraction_level = index
+        self.config["OrnamentExtraction"]["level"] = index
 
     def ornament_extraction_run_time_change(self, value):
-        self.ornament_extraction_run_time = value
+        self.config["OrnamentExtraction"]["runTimes"] = value
 
     def calyx_golden_status(self):
         if self.opt3.isChecked():
-            self.battle_calyx_golden = True
+            self.config["CalyxGolden"]["enable"] = True
         else:
-            self.battle_calyx_golden = False
+            self.config["CalyxGolden"]["enable"] = False
 
     def calyx_golden_level_select(self, index):
-        self.calyx_golden_level = index
+        self.config["CalyxGolden"]["level"] = index
 
     def calyx_golden_battle_time_change(self, value):
-        self.calyx_golden_battle_time = value
+        self.config["CalyxGolden"]["singleTimes"] = value
 
     def calyx_golden_run_time_change(self, value):
-        self.calyx_golden_run_time = value
+        self.config["CalyxGolden"]["runTimes"] = value
 
     def calyx_crimson_status(self):
         if self.opt4.isChecked():
-            self.battle_crimson_golden = True
+            self.config["CalyxCrimson"]["enable"] = True
         else:
-            self.battle_crimson_golden = False
+            self.config["CalyxCrimson"]["enable"] = False
 
     def calyx_crimson_level_select(self, index):
-        self.calyx_crimson_level = index
+        self.config["CalyxCrimson"]["level"] = index
 
     def calyx_crimson_battle_time_change(self, value):
-        self.calyx_crimson_battle_time = value
+        self.config["CalyxCrimson"]["singleTimes"] = value
 
     def calyx_crimson_run_time_change(self, value):
-        self.calyx_crimson_run_time = value
+        self.config["CalyxCrimson"]["runTimes"] = value
 
     def stagnant_shadow_status(self):
         if self.opt5.isChecked():
-            self.battle_stagnant_shadow = True
+            self.config["StagnantShadow"]["enable"] = True
         else:
-            self.battle_stagnant_shadow = False
+            self.config["StagnantShadow"]["enable"] = False
 
     def stagnant_shadow_level_select(self, index):
-        self.stagnant_shadow_level = index
+        self.config["StagnantShadow"]["level"] = index
 
     def stagnant_shadow_run_time_change(self, value):
-        self.stagnant_shadow_run_time = value
+        self.config["StagnantShadow"]["runTimes"] = value
 
     def caver_of_corrosion_status(self):
         if self.opt6.isChecked():
-            self.battle_caver_of_corrosion = True
+            self.config["CaverOfCorrosion"]["enable"] = True
         else:
-            self.battle_caver_of_corrosion = False
+            self.config["CaverOfCorrosion"]["enable"] = False
 
     def caver_of_corrosion_level_select(self, index):
-        self.caver_of_corrosion_level = index
+        self.config["CaverOfCorrosion"]["level"] = index
 
     def caver_of_corrosion_run_time_change(self, value):
-        self.caver_of_corrosion_run_time = value
+        self.config["CaverOfCorrosion"]["runTimes"] = value
 
-    def echo_of_war_status(self, state):
+    def echo_of_war_status(self):
         if self.opt7.isChecked():
-            self.battle_echo_of_war = True
+            self.config["EchoOfWar"]["enable"] = True
         else:
-            self.battle_echo_of_war = False
+            self.config["EchoOfWar"]["enable"] = False
 
     def echo_of_war_level_select(self, index):
-        self.echo_of_war_level = index
+        self.config["EchoOfWar"]["level"] = index
 
     def echo_of_war_run_time_change(self, value):
-        self.echo_of_war_run_time = value
+        self.config["EchoOfWar"]["runTimes"] = value
 
     def show_trail_blaze_power_setting(self):
         self.display_none()
@@ -751,69 +707,26 @@ class Main(QMainWindow):
     def execute(self):
         """Save configuration, create work thread and monitor signal."""
         flags = [
-            self.mission_start_game,
-            self.mission_trailblazer_profile,
-            self.mission_assignments_reward,
-            self.mission_redeem_code,
-            self.mission_gift_of_odyssey,
-            self.mission_mail,
-            self.mission_trail_blaze_power,
-            self.mission_daily_training,
-            self.mission_nameless_honor,
-            self.mission_quit_game,
+            self.config["Mission"]["startGame"],
+            self.config["Mission"]["trailBlazerProfile"],
+            self.config["Mission"]["assignment"],
+            self.config["Mission"]["redeemCode"],
+            self.config["Mission"]["giftOfOdyssey"],
+            self.config["Mission"]["mail"],
+            self.config["Mission"]["trailBlazePower"],
+            self.config["Mission"]["dailyTraining"],
+            self.config["Mission"]["namelessHonor"],
+            self.config["Mission"]["quitGame"],
         ]
         if all(not flag for flag in flags):
             self.log.append("未选择任何任务")
         else:
             self.button0_2.setEnabled(True)
             self.button0_1.setEnabled(False)
-            configuration = {
-                "gamePath": self.game_path,
-                "starGame": self.mission_start_game,
-                "loginFlag": self.login_flag,
-                "trailBlazerProfile": self.mission_trailblazer_profile,
-                "assignment": self.mission_assignments_reward,
-                "redeemCode": self.mission_redeem_code,
-                "redeemCodeList": self.redeem_code_list,
-                "giftOfOdyssey": self.mission_gift_of_odyssey,
-                "mail": self.mission_mail,
-                "trailBlazePower": self.mission_trail_blaze_power,
-                "dailyTraining": self.mission_daily_training,
-                "namelessHonor": self.mission_nameless_honor,
-                "quitGame": self.mission_quit_game,
-                "ornament_extraction": self.battle_ornament_extraction,
-                "ornament_extraction_level": self.ornament_extraction_level,
-                "ornament_extraction_run_time": self.ornament_extraction_run_time,
-                "calyx_golden": self.battle_calyx_golden,
-                "calyx_golden_level": self.calyx_golden_level,
-                "calyx_golden_battle_time": self.calyx_golden_battle_time,
-                "calyx_golden_run_time": self.calyx_golden_run_time,
-                "calyx_crimson": self.battle_crimson_golden,
-                "calyx_crimson_level": self.calyx_crimson_level,
-                "calyx_crimson_battle_time": self.calyx_crimson_battle_time,
-                "calyx_crimson_run_time": self.calyx_crimson_run_time,
-                "stagnant_shadow_run_time": self.stagnant_shadow_run_time,
-                "stagnant_shadow_level": self.stagnant_shadow_level,
-                "stagnant_shadow": self.battle_stagnant_shadow,
-                "caver_of_corrosion": self.battle_caver_of_corrosion,
-                "caver_of_corrosion_run_time": self.caver_of_corrosion_run_time,
-                "caver_of_corrosion_level": self.caver_of_corrosion_level,
-                "echo_of_war": self.battle_echo_of_war,
-                "echo_of_war_run_time": self.echo_of_war_run_time,
-                "echo_of_war_level": self.echo_of_war_level,
-                "replenish_trail_blaze_power": self.replenish_trail_blaze_power,
-                "replenish_way": self.replenish_way,
-                "replenish_trail_blaze_power_run_time": self.replenish_trail_blaze_power_run_time,
-            }
-            acc = encryption.encrypt_word(self.account_text)
-            pwd = encryption.encrypt_word(self.password_text)
-            with open(self.AppPath + "/data/privacy.sra", "wb") as sra_file:
-                sra_file.write(acc + b"\n" + pwd)
-            with open(
-                self.AppPath + "/data/config.json", "w", encoding="utf-8"
-            ) as json_file:
-                json.dump(configuration, json_file, indent=4)
-            self.son_thread = StarRailAssistant.Assistant()
+            encryption.save(self.account_text)
+            if not Configure.save(self.config):
+                self.log.append("配置失败")
+            self.son_thread = StarRailAssistant.Assistant(self.password_text)
             self.son_thread.update_signal.connect(self.update_log)
             self.son_thread.finished.connect(self.notification)
             self.son_thread.start()
@@ -846,8 +759,8 @@ class Main(QMainWindow):
             "更新公告",
             "beta v0.7 更新公告\n"
             "新功能：\n"
-            "1.\n"
-            "2.\n"
+            "1.重置GUI\n"
+            "2.为了您的账号安全，SRA不再为你储存密码\n"
             "3.\n"
             "4.\n"
             "5.\n"
@@ -855,7 +768,7 @@ class Main(QMainWindow):
             "问题修复：\n"
             "1.修复了在未填写兑换码时勾选此功能会导致程序崩溃的问题。\n"
             "2.修复了无法正常传送到精致色稿副本和万象果实副本的问题。\n"
-            "3.\n"
+            "3.修复了无法正常传送到心兽的战场副本的问题\n"
             "4.\n"
             "\n感谢您对SRA的支持！",
         )
