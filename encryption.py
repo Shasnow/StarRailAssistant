@@ -63,6 +63,22 @@ def init():
             sra_file.write(b"")
 
 
+def load():
+    with open("data/privacy.sra", "rb") as sra_file:
+        privacy = sra_file.read()
+        try:
+            acc = privacy
+            account_text = decrypt_word(acc)
+        except IndexError:
+            account_text = ""
+    return account_text
+
+def save(account_text):
+    acc = encrypt_word(account_text)
+    with open("data/privacy.sra", "wb") as sra_file:
+        sra_file.write(acc)
+
+
 if __name__ == "__main__":
     if not os.path.exists("data/frperg.sra"):
         generate_key()

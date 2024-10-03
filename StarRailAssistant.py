@@ -23,16 +23,18 @@ v0.6.1_beta
 主功能
 """
 
-import json
-import time
 import subprocess
+import time
+
 import cv2
 import pyautogui
 import pyscreeze
 import win32con
 import win32gui
-import encryption
 from PySide6.QtCore import QThread, Signal, Slot
+
+import Configure
+import encryption
 
 
 # noinspection PyUnresolvedReferences
@@ -42,32 +44,24 @@ class Assistant(QThread):
     update_signal = Signal(str)
     finished = Signal()
 
-    def __init__(self):
+    def __init__(self,pwd):
         super().__init__()
         self.stop_flag = False
+        self.pwd=pwd
 
     def request_stop(self):
         self.stop_flag = True
 
     @Slot()
     def run(self):
-        with open("data/config.json", "r", encoding="utf-8") as file:
-            config = json.load(file)
+        config = Configure.load()
         if not self.stop_flag:
-            if config["starGame"]:
-                with open("data/privacy.sra", "rb") as sra_file:
-                    privacy = sra_file.readlines()
-                    try:
-                        pwd = privacy[1]
-                        acc = privacy[0]
-                        password_text = encryption.decrypt_word(pwd)
-                        account_text = encryption.decrypt_word(acc)
-                    except IndexError:
-                        password_text = ""
-                        account_text = ""
+            if config["Mission"]["startGame"]:
+                account_text = encryption.load()
+                password_text = self.pwd
                 self.start_game(
-                    config["gamePath"],
-                    config["loginFlag"],
+                    config["StartGame"]["gamePath"],
+                    config["StartGame"]["autoLogin"],
                     account_text,
                     password_text,
                 )
@@ -75,70 +69,71 @@ class Assistant(QThread):
             self.finished.emit()
             return
         if not self.stop_flag:
-            if config["trailBlazerProfile"]:
+            if config["Mission"]["trailBlazerProfile"]:
                 self.trailblazer_profile()
         if not self.stop_flag:
-            if config["redeemCode"]:
-                self.redeem_code(config["redeemCodeList"])
+            if config["Mission"]["redeemCode"]:
+                self.redeem_code(config["RedeemCode"]["codeList"])
         if not self.stop_flag:
-            if config["assignment"]:
+            if config["Mission"]["assignment"]:
                 self.assignments_reward()
         if not self.stop_flag:
-            if config["giftOfOdyssey"]:
+            if config["Mission"]["giftOfOdyssey"]:
                 self.gift_of_odyssey()
         if not self.stop_flag:
-            if config["mail"]:
+            if config["Mission"]["mail"]:
                 self.mail()
         if not self.stop_flag:
-            if config["trailBlazePower"]:
-                self.replenish_flag = config["replenish_trail_blaze_power"]
-                self.replenish_way = config["replenish_way"]
-                self.replenish_time = config["replenish_trail_blaze_power_run_time"]
+            if config["Mission"]["trailBlazePower"]:
+                self.replenish_flag = config["Replenish"]["enable"]
+                self.replenish_way = config["Replenish"]["way"]
+                self.replenish_time = config["Replenish"]["runTimes"]
                 if not self.stop_flag:
-                    if config["ornament_extraction"]:
+                    if config["OrnamentExtraction"]["enable"]:
                         self.ornament_extraction(
-                            config["ornament_extraction_level"],
-                            config["ornament_extraction_run_time"],
+                            config["OrnamentExtraction"]["level"],
+                            config["OrnamentExtraction"]["runTimes"],
                         )
                 if not self.stop_flag:
-                    if config["calyx_golden"]:
+                    if config["CalyxGolden"]["enable"]:
                         self.calyx_golden(
-                            config["calyx_golden_level"],
-                            config["calyx_golden_battle_time"],
-                            config["calyx_golden_run_time"],
+                            config["CalyxGolden"]["level"],
+                            config["CalyxGolden"]["singleTimes"],
+                            config["CalyxGolden"]["runTimes"],
                         )
                 if not self.stop_flag:
-                    if config["calyx_crimson"]:
+                    if config["CalyxCrimson"]["enable"]:
                         self.calyx_crimson(
-                            config["calyx_crimson_level"],
-                            config["calyx_crimson_battle_time"],
-                            config["calyx_crimson_run_time"],
+                            config["CalyxCrimson"]["level"],
+                            config["CalyxCrimson"]["singleTimes"],
+                            config["CalyxCrimson"]["runTimes"],
                         )
                 if not self.stop_flag:
-                    if config["stagnant_shadow"]:
+                    if config["StagnantShadow"]["enable"]:
                         self.stagnant_shadow(
-                            config["stagnant_shadow_level"],
-                            config["stagnant_shadow_run_time"],
+                            config["StagnantShadow"]["level"],
+                            config["StagnantShadow"]["runTimes"],
                         )
                 if not self.stop_flag:
-                    if config["caver_of_corrosion"]:
+                    if config["CaverOfCorrosion"]["enable"]:
                         self.caver_of_corrosion(
-                            config["caver_of_corrosion_level"],
-                            config["caver_of_corrosion_run_time"],
+                            config["CaverOfCorrosion"]["level"],
+                            config["CaverOfCorrosion"]["runTimes"]
                         )
                 if not self.stop_flag:
-                    if config["echo_of_war"]:
+                    if config["EchoOfWar"]["enable"]:
                         self.echo_of_war(
-                            config["echo_of_war_level"], config["echo_of_war_run_time"]
+                            config["EchoOfWar"]["level"],
+                            config["EchoOfWar"]["runTimes"]
                         )
         if not self.stop_flag:
-            if config["dailyTraining"]:
+            if config["Mission"]["dailyTraining"]:
                 self.daily_training_reward()
         if not self.stop_flag:
-            if config["namelessHonor"]:
+            if config["Mission"]["namelessHonor"]:
                 self.nameless_honor()
         if not self.stop_flag:
-            if config["quitGame"]:
+            if config["Mission"]["quitGame"]:
                 self.kill_game()
         if self.stop_flag:
             self.update_signal.emit("已停止")
