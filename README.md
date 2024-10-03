@@ -35,13 +35,9 @@ This software is open source, free of charge and for learning and exchange purpo
 ## 我怎么才能使用SRA？急急急
 下载链接：[SRAv0.6](https://github.com/Shasnow/StarRailAssisant/releases)
 * 如果你是小白，只需要下载项目中的`zip`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`.exe`即可！
-* **我想挑战一下自己！** 当然没问题。打包下载项目中所有文件，确保你的电脑中已经安装好了`Python`，并安装好了下面的库，如果没有，使用`pip`来安装它们。
+* **我想挑战一下自己！** 当然没问题。打包下载项目中所有文件，确保你的电脑中已经安装好了`Python`，并使用`pip`来安装依赖。请在项目根文件夹打开终端并运行以下指令：
   ```bash
-  pip install opencv-python
-  pip install pyautogui
-  pip install pyqt5
-  pip install plyer
-  pip install pywin32
+  pip install -r requirements.txt
   ```
 
 什么？你用的是`Python_v3.12`！请额外安装一个库。
@@ -73,7 +69,7 @@ This software is open source, free of charge and for learning and exchange purpo
 ## 想要为项目做出贡献！
 当然，我们不会拒绝，不过我们会对你提出一些要求：
 * 熟悉 `Python` ，这是必须的。
-  * 了解 `pyqt5`。 *或者——*
+  * 了解 `PySide6` 或其他 `PyQt`、`PySide` 系列库。 *或者——*
   * 了解 `图像识别` 和 `模拟操作` 相关内容。
 * 正在游玩并将长期游玩`崩坏：星穹铁道` 。
 
@@ -127,6 +123,7 @@ beta v0.6 更新公告
 # 项目优化方向
 
 - [ ] 与B服（世界树）的适配
+- [x] 本地账号信息加密
 - [ ] 通过全家桶启动器进行启动
 - [ ] 定时自启动、自更新等计划事件的添加
 - [ ] 优化GUI界面与交互逻辑
@@ -136,6 +133,7 @@ beta v0.6 更新公告
 - [ ] 拓展功能的添加（如由咱们可爱的 **`太卜司·符玄`** 的提供的占卜awa）
 - [ ] 功能解耦合
 - [ ] 实现后台有遮挡截图（x
+- [ ] 任务完成后退出程序/关机/睡眠
 
 ## 过往的更新公告
 beta v0.5 更新公告  
