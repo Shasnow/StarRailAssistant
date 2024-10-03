@@ -49,6 +49,8 @@ import encryption
 import StarRailAssistant
 import ctypes
 
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
+
 uiLoader = QUiLoader()
 
 
