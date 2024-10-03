@@ -2,7 +2,7 @@ opencv-python~=4.10.0.84
 plyer~=2.1.0
 PyAutoGUI~=0.9.54
 pyinstaller
-PyQt5~=5.15.11
+PySide6
 PyScreeze~=0.1.30
 pywin32
 pywin32-ctypes
