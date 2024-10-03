@@ -18,9 +18,9 @@
 
 """
 崩坏：星穹铁道助手
-beta v0.7
+v0.6.1_beta
 作者：雪影
-图形化
+图形化界面
 """
 
 import os
@@ -88,7 +88,7 @@ class Main(QMainWindow):
         report_action = self.ui.findChild(QAction, "action_3")
         report_action.triggered.connect(self.report)
         # central_widget = QWidget(self)
-        self.ui.setWindowTitle("SRA v0.7_beta")  # 设置窗口标题
+        self.ui.setWindowTitle("SRA v0.6.1_beta")  # 设置窗口标题
         self.ui.setWindowIcon(QIcon(self.AppPath + "/res/SRAicon.ico"))
 
         # 创建垂直布局管理器用于任务设置
@@ -757,11 +757,11 @@ class Main(QMainWindow):
         QMessageBox.information(
             self,
             "更新公告",
-            "beta v0.7 更新公告\n"
+            "v0.6.1_beta 更新公告\n"
             "新功能：\n"
             "1.重置GUI\n"
-            "2.为了您的账号安全，SRA不再为你储存密码\n"
-            "3.\n"
+            "2.本地账号信息加密\n"
+            "3.为了您的账号安全，SRA不再为你储存密码\n"
             "4.\n"
             "5.\n"
             "\n"
@@ -811,7 +811,7 @@ class SRA(QApplication):
         QMessageBox.information(
             self.main.ui,
             "使用说明",
-            "SRA崩坏：星穹铁道助手 v0.7_beta by雪影\n"
+            "SRA崩坏：星穹铁道助手 v0.6.1_beta by雪影\n"
             "使用说明：\n"
             "重要！以管理员模式运行程序！\n"
             "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
