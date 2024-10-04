@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-v0.6.1_beta
+v0.6.2 beta
 作者：雪影
 图形化界面
 """
@@ -88,7 +88,7 @@ class Main(QMainWindow):
         report_action = self.ui.findChild(QAction, "action_3")
         report_action.triggered.connect(self.report)
         # central_widget = QWidget(self)
-        self.ui.setWindowTitle("SRA v0.6.1_beta")  # 设置窗口标题
+        self.ui.setWindowTitle("SRA v0.6.2 beta")  # 设置窗口标题
         self.ui.setWindowIcon(QIcon(self.AppPath + "/res/SRAicon.ico"))
 
         # 创建垂直布局管理器用于任务设置
@@ -757,7 +757,7 @@ class Main(QMainWindow):
         QMessageBox.information(
             self,
             "更新公告",
-            "v0.6.1_beta 更新公告\n"
+            "v0.6.2 beta 更新公告\n"
             "新功能：\n"
             "1.重置GUI\n"
             "2.本地账号信息加密\n"
@@ -769,7 +769,8 @@ class Main(QMainWindow):
             "1.修复了在未填写兑换码时勾选此功能会导致程序崩溃的问题。\n"
             "2.修复了无法正常传送到精致色稿副本和万象果实副本的问题。\n"
             "3.修复了无法正常传送到心兽的战场副本的问题\n"
-            "4.\n"
+            "4.修复了因加载时间过长引发的错误编号1、3频发的问题。\n"
+            "5.修复了在执行饰品提取或侵蚀隧洞时由于指定了培养角色导致副本无法识别的问题。\n"
             "\n感谢您对SRA的支持！",
         )
 
@@ -811,7 +812,7 @@ class SRA(QApplication):
         QMessageBox.information(
             self.main.ui,
             "使用说明",
-            "SRA崩坏：星穹铁道助手 v0.6.1_beta by雪影\n"
+            "SRA崩坏：星穹铁道助手 v0.6.2 beta by雪影\n"
             "使用说明：\n"
             "重要！以管理员模式运行程序！\n"
             "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
