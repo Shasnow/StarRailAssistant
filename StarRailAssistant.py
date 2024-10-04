@@ -455,7 +455,9 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：饰品提取")
         level = "res/img/ornament_extraction (" + str(level_index) + ").png"
         pyautogui.press("f4")
-        time.sleep(3)
+        if not check("res/img/f4.png", max_time=20):
+            self.update_signal.emit("检测超时，编号1")
+            return
         if click("res/img/survival_index.png") or exist(
             "res/img/survival_index_onclick.png"
         ):
@@ -470,8 +472,10 @@ class Assistant(QThread):
                     time.sleep(1)
                     return
                 find_level(level)
-                if click(level, x_add=400):
-                    time.sleep(5)  # 等待传送
+                if click(level, x_add=700):
+                    if not check('res/img/ornament_extraction_page.png'):  # 等待传送
+                        self.update_signal.emit("检测超时，编号2")
+                        return
                     if click("res/img/nobody.png"):
                         click("res/img/preset_formation.png")
                         click("res/img/team1.png")
@@ -552,7 +556,9 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：拟造花萼（金）")
         level = "res/img/calyx(golden) (" + str(level_index) + ").png"
         pyautogui.press("f4")
-        time.sleep(3)
+        if not check("res/img/f4.png", max_time=20):
+            self.update_signal.emit("检测超时，编号1")
+            return
         if click("res/img/survival_index.png") or exist(
             "res/img/survival_index_onclick.png"
         ):
@@ -561,7 +567,9 @@ class Assistant(QThread):
             ):
                 find_level(level)
                 if click(level, x_add=600, y_add=10):
-                    time.sleep(5)  # 等待传送
+                    if not check('res/img/battle.png'):  # 等待传送
+                        self.update_signal.emit("检测超时，编号2")
+                        return
                     for i in range(single_time - 1):
                         click("res/img/plus.png", interval=0.5)
                     time.sleep(2)
@@ -644,7 +652,9 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：拟造花萼（赤）")
         level = "res/img/calyx(crimson) (" + str(level_index) + ").png"
         pyautogui.press("f4")
-        time.sleep(3)
+        if not check("res/img/f4.png", max_time=20):
+            self.update_signal.emit("检测超时，编号1")
+            return
         if click("res/img/survival_index.png") or exist(
             "res/img/survival_index_onclick.png"
         ):
@@ -653,7 +663,9 @@ class Assistant(QThread):
             ):
                 find_level(level)
                 if click(level, x_add=400):
-                    time.sleep(5)  # 等待传送
+                    if not check('res/img/battle.png'):  # 等待传送
+                        self.update_signal.emit("检测超时，编号2")
+                        return
                     for i in range(single_time - 1):
                         click("res/img/plus.png", interval=0.5)
                     time.sleep(2)
@@ -733,7 +745,9 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：凝滞虚影")
         level = "res/img/stagnant_shadow (" + str(level_index) + ").png"
         pyautogui.press("f4")
-        time.sleep(3)
+        if not check("res/img/f4.png", max_time=20):
+            self.update_signal.emit("检测超时，编号1")
+            return
         if click("res/img/survival_index.png") or exist(
             "res/img/survival_index_onclick.png"
         ):
@@ -742,7 +756,9 @@ class Assistant(QThread):
             ):
                 find_level(level)
                 if click(level, x_add=400):
-                    time.sleep(5)  # 等待传送
+                    if not check('res/img/battle.png'):  # 等待传送
+                        self.update_signal.emit("检测超时，编号2")
+                        return
                     if click("res/img/battle.png"):
                         if exist("res/img/replenish.png"):
                             if self.replenish_flag:
@@ -824,7 +840,9 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：侵蚀隧洞")
         level = "res/img/caver_of_corrosion (" + str(level_index) + ").png"
         pyautogui.press("f4")
-        time.sleep(3)
+        if not check("res/img/f4.png", max_time=20):
+            self.update_signal.emit("检测超时，编号1")
+            return
         if click("res/img/survival_index.png") or click(
             "res/img/survival_index_onclick.png"
         ):
@@ -836,8 +854,10 @@ class Assistant(QThread):
                 "res/img/caver_of_corrosion_onclick.png"
             ):
                 find_level(level)
-                if click(level, x_add=400):
-                    time.sleep(5)  # 等待传送
+                if click(level, x_add=700):
+                    if not check('res/img/battle.png'):  # 等待传送
+                        self.update_signal.emit("检测超时，编号2")
+                        return
                     if click("res/img/battle.png"):
                         if exist("res/img/replenish.png"):
                             if self.replenish_flag:
@@ -914,7 +934,9 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：历战余响")
         level = "res/img/echo_of_war (" + str(level_index) + ").png"
         pyautogui.press("f4")
-        time.sleep(3)
+        if not check("res/img/f4.png", max_time=20):
+            self.update_signal.emit("检测超时，编号1")
+            return
         if click("res/img/survival_index.png") or click(
             "res/img/survival_index_onclick.png"
         ):
@@ -927,7 +949,9 @@ class Assistant(QThread):
             ):
                 find_level(level)
                 if click(level, x_add=400):
-                    time.sleep(5)  # 等待传送
+                    if not check('res/img/battle.png'):  # 等待传送
+                        self.update_signal.emit("检测超时，编号2")
+                        return
                     if click("res/img/battle.png"):
                         if exist("res/img/replenish.png"):
                             if self.replenish_flag:
@@ -1042,8 +1066,10 @@ class Assistant(QThread):
     def daily_training_reward(self):
         """Receive daily training reward"""
         self.update_signal.emit("执行任务：领取每日实训奖励")
-        time.sleep(2)
         pyautogui.press("f4")
+        if not check("res/img/f4.png", max_time=20):
+            self.update_signal.emit("检测超时，编号1")
+            return
         if exist("res/img/survival_index_onclick.png"):
             self.update_signal.emit("没有可领取的奖励")
             pyautogui.press("esc")
@@ -1070,6 +1096,9 @@ class Assistant(QThread):
         self.update_signal.emit("执行任务：领取无名勋礼奖励")
         time.sleep(2)
         pyautogui.press("f2")
+        if not check("res/img/f2.png", max_time=20):
+            self.update_signal.emit("检测超时，编号1")
+            return
         if exist("res/img/nameless_honor_reward_exist.png"):
             if click("res/img/nameless_honor_reward_receive.png"):
                 self.update_signal.emit("领取了无名勋礼奖励")
