@@ -30,7 +30,7 @@ def init():
     if not os.path.exists("data/config.json"):
         config = {
             "Mission": {
-                "starGame": False,
+                "startGame": False,
                 "trailBlazerProfile": False,
                 "redeemCode": False,
                 "assignment": False,

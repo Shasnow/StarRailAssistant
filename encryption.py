@@ -60,7 +60,7 @@ def init():
         generate_key()
     if not os.path.exists("data/privacy.sra"):
         with open("data/privacy.sra", "wb") as sra_file:
-            sra_file.write(b"")
+            sra_file.write(encrypt_word(""))
 
 
 def load():
