@@ -3,6 +3,7 @@ from ..utils._types import TaskCall , MetaData
 from ..Exceptions import TaskNotExecuteException
 from ..utils.Logger import logger
 from ..utils.ComputerOperator import ComputerOperator
+import os
 
 class AssistantTask:
     """
@@ -11,9 +12,11 @@ class AssistantTask:
     ### 这个类还提供了如下工具方便进行日志记录或者其他操作:
     - self.logger: 日志记录器，用于记录任务执行过程中的日志信息。
     - self.computer_operator: 电脑操作类：用于执行一些电脑的操作，比如移动鼠标，按下键盘等...
+    - self.resourceFolder: 资源文件夹路径，用于存放一些资源文件，比如图片、音频、视频等。
 
     ### (⚠)警告:
     - 定义一个游戏中的任务必须实现execute方法，不然这个任务就是不可执行的, 会报错。
+    - 错误是抛出一个 TaskNotExecuteException 异常，请捕获这个异常并处理。
     """
     def __init__(self,
        task_name: str,
@@ -24,6 +27,7 @@ class AssistantTask:
         self.task_desc: MetaData = task_desc
         self.task_call: TaskCall = task_call
         self.logger = logger
+        self.resourceFolder = fr"{os.getcwd()}/res" if os.path.exists(fr"{os.getcwd()}/res") else fr"{os.getcwd()}/resources"
         self.computer_operator: ComputerOperator = ComputerOperator()
         self._completed: bool = False
 

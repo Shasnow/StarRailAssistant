@@ -23,10 +23,10 @@ class TrailblazerTask(AssistantTask):
     def execute(self) -> None:
         time.sleep(2) # 等待游戏加载完成
         self.computer_operator.press_key("esc")
-        if self.computer_operator.click_screen("resources/img/more_with_something.png"):
+        if self.computer_operator.click_screen(fr"{self.resourceFolder}/img/more_with_something.png"):
             self.computer_operator.move_by_offset(20, 0)
-            if self.computer_operator.click_screen("resources/img/trailblazer_profile_finished.png"):
-                if self.computer_operator.click_screen("resources/img/assistance_reward.png"):
+            if self.computer_operator.click_screen(fr"{self.resourceFolder}/img/trailblazer_profile_finished.png"):
+                if self.computer_operator.click_screen(fr"{self.resourceFolder}/img/assistance_reward.png"):
                     time.sleep(2) # 等待领取奖励完成
                     self.computer_operator.press_key("esc", 3, 2)
                 else:
