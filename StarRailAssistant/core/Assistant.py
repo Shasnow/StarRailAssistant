@@ -5,8 +5,12 @@ from .Task import AssistantTask
 from ..utils.Logger import logger
 import queue
 from .AssistantSignal import AssistantSignal
+from typing import Callable , Iterable
 
 class Assistant:
+    """
+    内核类，可以说整个程序的核心接口逻辑都在这里实现
+    """
 
     def __init__(self, name: str, resourcePath: str) -> None:
         self.name = name
@@ -15,9 +19,19 @@ class Assistant:
         self.game: StarRail = StarRail(self.config, self.resourcePath)
         self.task_queue: queue.Queue[AssistantTask] = queue.Queue()
         self.logger = logger
+        self.completedCallback = None
+        self.errorCallback = None
+        self.exitCallback = None
+        self.cleanCallback = None
 
-    def submit_task(self, task: AssistantTask):
-        self.task_queue.put(task)
+    def submit_task(self, task: AssistantTask | Iterable[AssistantTask]) -> None:
+        if isinstance(task, AssistantTask):
+            self.task_queue.put(task)
+        elif isinstance(task, Iterable):
+            for t in task:
+                self.task_queue.put(t)
+        else:
+            self.logger.warning(f"提交任务失败, 任务类型 {type(task)} 错误")
 
     def __execute_task(self, *args, **kwargs):
         """
@@ -39,21 +53,45 @@ class Assistant:
         else:
             self.logger.warning("没有找到可执行的任务")
             return AssistantSignal.EXIT_REQUIRE
+        
+    def setCompletedCallback(self, callback: Callable) -> None:
+        """ 设置任务执行完成的回调函数 """
+        self.completedCallback = callback
+
+    def setErrorCallback(self, callback: Callable) -> None:
+        """ 设置任务执行失败的回调函数 """
+        self.errorCallback = callback
+
+    def setExitCallback(self, callback: Callable) -> None:
+        """ 设置程序退出的回调函数 """
+        self.exitCallback = callback
+
+    def setCleanCallback(self, callback: Callable) -> None:
+        """ 设置清理资源的回调函数 """
+        self.cleanCallback = callback
 
     def run(self):
         while True:
             signal = self.__execute_task()
             match signal:
                 case AssistantSignal.TASK_COMPLETE:
+                    if self.completedCallback:
+                        self.completedCallback()
                     continue
                 case AssistantSignal.TASK_ERROR:
                     self.logger.warning("有指定的任务执行失败，请在后续检查日志信息来获取详细的错误信息")
+                    if self.errorCallback:
+                        self.errorCallback()
                     continue
                 case AssistantSignal.EXIT_REQUIRE:
                     self.logger.info("收到退出信号，退出程序!")
+                    if self.exitCallback:
+                        self.exitCallback()
                     break
                 case AssistantSignal.CLEAN_REQUIRE:
-                    continue # 这里可以执行一些清理工作
+                    if self.cleanCallback:
+                        self.cleanCallback()
+                    continue
                 case _:
                     self.logger.warning(f"未知的信号 {signal}")
                     continue
