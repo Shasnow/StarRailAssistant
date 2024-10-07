@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>405</width>
+    <width>447</width>
     <height>744</height>
    </rect>
   </property>
   <property name="font">
    <font>
-    <pointsize>12</pointsize>
+    <pointsize>13</pointsize>
    </font>
   </property>
   <property name="windowTitle">
@@ -77,21 +77,44 @@
            <property name="frameShadow">
             <enum>QFrame::Shadow::Raised</enum>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
              <widget class="QLabel" name="label2_1">
               <property name="text">
-               <string>游戏路径：</string>
+               <string>渠道：</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit2_1"/>
+             <widget class="QComboBox" name="comboBox2_1">
+              <item>
+               <property name="text">
+                <string>官服</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>bilibili</string>
+               </property>
+              </item>
+             </widget>
             </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="frame_3">
+           <property name="frameShape">
+            <enum>QFrame::Shape::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Shadow::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
-             <widget class="QPushButton" name="pushButton2_1">
+             <widget class="QCheckBox" name="checkBox2_4">
               <property name="text">
-               <string>浏览</string>
+               <string>使用启动器</string>
               </property>
              </widget>
             </item>
@@ -106,31 +129,21 @@
            <property name="frameShadow">
             <enum>QFrame::Shadow::Raised</enum>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QCheckBox" name="checkBox2_2">
+             <widget class="QLabel" name="label2_2">
               <property name="text">
-               <string>自动登录</string>
+               <string>游戏路径：</string>
               </property>
              </widget>
             </item>
             <item>
-             <spacer name="horizontalSpacer2_2">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>178</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
+             <widget class="QLineEdit" name="lineEdit2_2"/>
             </item>
             <item>
              <widget class="QPushButton" name="pushButton2_2">
               <property name="text">
-               <string>显示密码</string>
+               <string>浏览</string>
               </property>
              </widget>
             </item>
@@ -145,26 +158,65 @@
            <property name="frameShadow">
             <enum>QFrame::Shadow::Raised</enum>
            </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QCheckBox" name="checkBox2_3">
+              <property name="text">
+               <string>自动登录</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer2_3">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>178</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton2_3">
+              <property name="text">
+               <string>显示密码</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="frame2_4">
+           <property name="frameShape">
+            <enum>QFrame::Shape::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Shadow::Raised</enum>
+           </property>
            <layout class="QGridLayout" name="gridLayout">
             <item row="0" column="0">
-             <widget class="QLabel" name="label2_3_11">
+             <widget class="QLabel" name="label2_4_11">
               <property name="text">
                <string>账号：</string>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QLineEdit" name="lineEdit2_3_12"/>
+             <widget class="QLineEdit" name="lineEdit2_4_12"/>
             </item>
             <item row="1" column="0">
-             <widget class="QLabel" name="label2_3_21">
+             <widget class="QLabel" name="label2_4_21">
               <property name="text">
                <string>密码：</string>
               </property>
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QLineEdit" name="lineEdit2_3_22"/>
+             <widget class="QLineEdit" name="lineEdit2_4_22"/>
             </item>
            </layout>
           </widget>
