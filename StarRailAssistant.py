@@ -356,7 +356,7 @@ class Assistant(QThread):
             time.sleep(0.5)
             pyautogui.write(password)
         click('res/img/bilibili_remember.png')
-        click("res/img/bilibili_read.png")
+        click("res/img/bilibili_read.png",x_add=-30)
         click("res/img/bilibili_login.png")
         return True
 
