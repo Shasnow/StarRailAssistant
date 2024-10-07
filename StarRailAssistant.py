@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-v0.6.1_beta
+v0.6.3_beta
 作者：雪影
 主功能
 """
@@ -61,6 +61,8 @@ class Assistant(QThread):
                 password_text = self.pwd
                 self.start_game(
                     config["StartGame"]["gamePath"],
+                    config["StartGame"]["pathType"],
+                    config["StartGame"]["channel"],
                     config["StartGame"]["autoLogin"],
                     account_text,
                     password_text,
@@ -164,18 +166,19 @@ class Assistant(QThread):
             return False
 
     @Slot()
-    def path_check(self, path):
+    def path_check(self, path, path_type="StarRail"):
         """Check game path.
 
         Note:
             Do not include the `self` parameter in the ``Args`` section.
         Args:
             path (str): File path.
+            path_type (str): Use StarRail.exe or launcher.exe
         Returns:
-            True if path points to 'StraRail.exe', False otherwise.
+            True if path points to channel, False otherwise.
         """
         if path:
-            if path.split("/")[-1].split(".")[0] != "StarRail":
+            if path.split("/")[-1].split(".")[0] != path_type:
                 self.update_signal.emit("你尝试输入一个其他应用的路径")
                 return False
             else:
@@ -193,7 +196,7 @@ class Assistant(QThread):
         self.update_signal.emit("退出游戏")
 
     @Slot()
-    def launch_game(self, game_path):
+    def launch_game(self, game_path, path_type):
         """Launch game
 
         Try to run the file that game path points at.
@@ -202,11 +205,12 @@ class Assistant(QThread):
             Do not include the `self` parameter in the ``Args`` section.
         Args:
             game_path (str): File path.
+            path_type (str): Game or Launcher
         Returns:
             True if successfully launched, False otherwise.
 
         """
-        if not self.path_check(game_path):
+        if not self.path_check(game_path, path_type):
             self.update_signal.emit("路径无效")
             return False
         try:
@@ -220,6 +224,49 @@ class Assistant(QThread):
         while True:
             if find_window("崩坏：星穹铁道"):
                 self.update_signal.emit("启动成功")
+                return True
+            else:
+                time.sleep(0.5)
+                times += 1
+                if times == 40:
+                    self.update_signal.emit("启动时间过长，请尝试手动启动")
+                    return False
+
+    @Slot()
+    def launch_launcher(self, path, path_type):
+        """Launch game
+
+        Try to run the file that game path points at.
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            path (str): File path.
+            path_type (str): Launcher
+        Returns:
+            True if successfully launched, False otherwise.
+
+        """
+        if not self.path_check(path, path_type):
+            self.update_signal.emit("路径无效")
+            return False
+        try:
+            subprocess.Popen(path)
+        except OSError:
+            self.update_signal.emit("路径无效或权限不足")
+            return False
+        self.update_signal.emit("等待启动器启动")
+        time.sleep(5)
+        times = 0
+        while True:
+            if find_window("崩坏：星穹铁道") or find_window("米哈游启动器"):
+                time.sleep(2)
+                try:
+                    click('res/img/star_game.png')
+                except pyscreeze.PyScreezeException:
+                    click('res/img/star_game.png',title="米哈游启动器")
+                self.update_signal.emit("等待游戏启动")
+                time.sleep(8)
                 return True
             else:
                 time.sleep(0.5)
@@ -248,14 +295,14 @@ class Assistant(QThread):
         ):  # 进入登录界面的标志
             self.update_signal.emit("已登录")
             return True
-        if check("res/img/not_logged_in.png", max_time=4):
+        if check("res/img/not_logged_in.png", max_time=10):
             if click("res/img/login_with_account.png"):
                 self.update_signal.emit("登录到" + account)
                 time.sleep(1)
                 pyautogui.write(account)
                 time.sleep(1)
                 pyautogui.press("tab")
-                time.sleep(0.1)
+                time.sleep(0.2)
                 pyautogui.write(password)
                 pyautogui.press("enter")
                 click("res/img/agree.png", -158)
@@ -284,7 +331,37 @@ class Assistant(QThread):
             return False
 
     @Slot()
-    def start_game(self, game_path, login_flag=False, account="", password=""):
+    def login_bilibili(self, account, password):
+        """Login game.
+
+        Try to log in game with bilibili channel. If it is already logged in, skip this section.
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Args:
+            account (str): user account
+            password (str): user password
+        Returns:
+            True if successfully logged in, False otherwise.
+
+        """
+        if not check("res/img/bilibili_login.png", interval=0.2, max_time=20):  # 进入登录界面的标志
+            self.update_signal.emit("检测超时，编号3")
+            return False
+        if click('res/img/bilibili_account.png'):
+            self.update_signal.emit("登录到" + account)
+            time.sleep(0.5)
+            pyautogui.write(account)
+        if click('res/img/bilibili_pwd.png'):
+            time.sleep(0.5)
+            pyautogui.write(password)
+        click('res/img/bilibili_remember.png')
+        click("res/img/bilibili_read.png")
+        click("res/img/bilibili_login.png")
+        return True
+
+    @Slot()
+    def start_game(self, game_path,path_type, channel=0, login_flag=False, account="", password=""):
         """Launch and enter game.
 
         If the game is already star, skip this section.
@@ -293,6 +370,8 @@ class Assistant(QThread):
             Do not include the `self` parameter in the ``Args`` section.
         Args:
             game_path (str): Path of game.
+            path_type (str): Game or Launcher.
+            channel (int): 0->官服，1->bilibili
             login_flag (bool): Whether to enable the launch game function.
             account (str): User account.
             password (str): User password.
@@ -304,8 +383,17 @@ class Assistant(QThread):
             self.update_signal.emit("游戏已经启动")
             if check("res/img/chat_enter.png", max_time=10):
                 return True
-        if self.launch_game(game_path):
-            time.sleep(2)
+        if path_type=="StarRail":
+            if not self.launch_game(game_path,path_type):
+                time.sleep(2)
+                return False
+        elif path_type=="launcher":
+            if not self.launch_launcher(game_path,path_type):
+                return False
+        else:
+            self.update_signal.emit("游戏启动失败")
+            return False
+        if channel==0:
             if login_flag and account:
                 self.login(account, password)
             if check("res/img/quit.png"):
@@ -317,28 +405,42 @@ class Assistant(QThread):
                 pyautogui.click(x, y)
                 time.sleep(3)
                 pyautogui.click(x, y)
-                times = 0
-                while True:
-                    time.sleep(0.2)
-                    if exist("res/img/chat_enter.png"):
-                        return True
-                    else:
-                        times += 1
-                        if times == 50:
-                            self.update_signal.emit("发生错误，进入游戏但未处于大世界")
-                            return False
             else:
                 self.update_signal.emit("加载时间过长，请重试")
                 return False
-        else:
-            self.update_signal.emit("游戏启动失败")
-            return False
+        elif channel==1:
+            self.login_bilibili(account,password)
+            if check("res/img/quit.png"):
+                x, y = get_screen_center()
+                if exist("res/img/12+.png"):
+                    pyautogui.click(x, y)
+                    time.sleep(3)
+                self.update_signal.emit("开始游戏")
+                pyautogui.click(x, y)
+                time.sleep(3)
+                pyautogui.click(x, y)
+            else:
+                self.update_signal.emit("加载时间过长，请重试")
+                return False
+        times = 0
+        while True:
+            time.sleep(0.2)
+            if exist("res/img/chat_enter.png") or exist("res/img/phone.png",interval=0):
+                return True
+            else:
+                times += 1
+                if times == 50:
+                    self.update_signal.emit("发生错误，进入游戏但未处于大世界")
+                    return False
+
 
     @Slot()
     def trailblazer_profile(self):
         """Mission trailblaze profile"""
         self.update_signal.emit("执行任务：签证奖励")
-        time.sleep(2)
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         pyautogui.press("esc")
         if click("res/img/more_with_something.png"):
             pyautogui.moveRel(20, 0)
@@ -356,7 +458,6 @@ class Assistant(QThread):
             self.update_signal.emit("没有可领取的奖励3")
             pyautogui.press("esc")
         self.update_signal.emit("任务完成：签证奖励\n")
-        time.sleep(3)
 
     @Slot()
     def redeem_code(self, redeem_code_list):
@@ -370,7 +471,9 @@ class Assistant(QThread):
             None
         """
         self.update_signal.emit("执行任务：领取兑换码")
-        time.sleep(2)
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         pyautogui.press("esc")
         if len(redeem_code_list) == 0:
             for code in redeem_code_list:
@@ -398,7 +501,9 @@ class Assistant(QThread):
     def mail(self):
         """Open mailbox and pick up mails."""
         self.update_signal.emit("执行任务：领取邮件")
-        time.sleep(2)
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         pyautogui.press("esc")
         if click("res/img/mailbox_mail.png"):
             if click("res/img/claim_all_mail.png"):
@@ -415,7 +520,6 @@ class Assistant(QThread):
             self.update_signal.emit("没有可以领取的邮件")
             pyautogui.press("esc")
         self.update_signal.emit("任务完成：领取邮件\n")
-        time.sleep(3)
 
     @Slot()
     def gift_of_odyssey(self):
@@ -424,7 +528,9 @@ class Assistant(QThread):
         Remember to update the gift_of_odyssey.png in each game version.
         """
         self.update_signal.emit("执行任务：巡星之礼")
-        time.sleep(2)
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         pyautogui.press("f1")
         if click("res/img/gift_of_odyssey.png"):
             pass
@@ -438,7 +544,6 @@ class Assistant(QThread):
             self.update_signal.emit("没有可以领取的巡星之礼")
             pyautogui.press("esc")
         self.update_signal.emit("任务完成：巡星之礼\n")
-        time.sleep(3)
 
     @Slot()
     def ornament_extraction(self, level_index, battle_time=1):
@@ -454,6 +559,9 @@ class Assistant(QThread):
         """
         self.update_signal.emit("执行任务：饰品提取")
         level = "res/img/ornament_extraction (" + str(level_index) + ").png"
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         pyautogui.press("f4")
         if not check("res/img/f4.png", max_time=20):
             self.update_signal.emit("检测超时，编号1")
@@ -538,7 +646,6 @@ class Assistant(QThread):
         else:
             self.update_signal.emit("发生错误，错误编号1")
         self.update_signal.emit("任务完成：饰品提取\n")
-        time.sleep(5)
 
     @Slot()
     def calyx_golden(self, level_index, single_time=1, battle_time=1):
@@ -554,6 +661,9 @@ class Assistant(QThread):
             None
         """
         self.update_signal.emit("执行任务：拟造花萼（金）")
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         level = "res/img/calyx(golden) (" + str(level_index) + ").png"
         pyautogui.press("f4")
         if not check("res/img/f4.png", max_time=20):
@@ -634,7 +744,6 @@ class Assistant(QThread):
         else:
             self.update_signal.emit("发生错误，错误编号1")
         self.update_signal.emit("任务完成：拟造花萼（金）\n")
-        time.sleep(3)
 
     @Slot()
     def calyx_crimson(self, level_index, single_time=1, battle_time=1):
@@ -650,6 +759,9 @@ class Assistant(QThread):
             None
         """
         self.update_signal.emit("执行任务：拟造花萼（赤）")
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         level = "res/img/calyx(crimson) (" + str(level_index) + ").png"
         pyautogui.press("f4")
         if not check("res/img/f4.png", max_time=20):
@@ -728,7 +840,6 @@ class Assistant(QThread):
         else:
             self.update_signal.emit("发生错误，错误编号1")
         self.update_signal.emit("任务完成：拟造花萼（赤）\n")
-        time.sleep(3)
 
     @Slot()
     def stagnant_shadow(self, level_index, battle_time=1):
@@ -743,6 +854,9 @@ class Assistant(QThread):
             None
         """
         self.update_signal.emit("执行任务：凝滞虚影")
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         level = "res/img/stagnant_shadow (" + str(level_index) + ").png"
         pyautogui.press("f4")
         if not check("res/img/f4.png", max_time=20):
@@ -823,7 +937,6 @@ class Assistant(QThread):
         else:
             self.update_signal.emit("发生错误，错误编号1")
         self.update_signal.emit("任务完成：凝滞虚影\n")
-        time.sleep(3)
 
     @Slot()
     def caver_of_corrosion(self, level_index, battle_time=1):
@@ -838,6 +951,9 @@ class Assistant(QThread):
             None
         """
         self.update_signal.emit("执行任务：侵蚀隧洞")
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         level = "res/img/caver_of_corrosion (" + str(level_index) + ").png"
         pyautogui.press("f4")
         if not check("res/img/f4.png", max_time=20):
@@ -917,7 +1033,6 @@ class Assistant(QThread):
         else:
             self.update_signal.emit("发生错误，错误编号1")
         self.update_signal.emit("任务完成：侵蚀隧洞\n")
-        time.sleep(3)
 
     @Slot()
     def echo_of_war(self, level_index, battle_time=1):
@@ -932,6 +1047,9 @@ class Assistant(QThread):
             None
         """
         self.update_signal.emit("执行任务：历战余响")
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         level = "res/img/echo_of_war (" + str(level_index) + ").png"
         pyautogui.press("f4")
         if not check("res/img/f4.png", max_time=20):
@@ -1011,7 +1129,6 @@ class Assistant(QThread):
         else:
             self.update_signal.emit("发生错误，错误编号1")
         self.update_signal.emit("任务完成：历战余响\n")
-        time.sleep(3)
 
     @Slot()
     def wait_battle_end(self):
@@ -1037,7 +1154,9 @@ class Assistant(QThread):
     def assignments_reward(self):
         """Receive assignment reward"""
         self.update_signal.emit("执行任务：领取派遣奖励")
-        time.sleep(2)
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         pyautogui.press("esc")
         if click("res/img/assignments_none.png"):
             while not exist("res/img/assignment_page.png"):
@@ -1060,12 +1179,14 @@ class Assistant(QThread):
             self.update_signal.emit("没有可领取的奖励")
             pyautogui.press("esc")
         self.update_signal.emit("任务完成：领取派遣奖励\n")
-        time.sleep(3)
 
     @Slot()
     def daily_training_reward(self):
         """Receive daily training reward"""
         self.update_signal.emit("执行任务：领取每日实训奖励")
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         pyautogui.press("f4")
         if not check("res/img/f4.png", max_time=20):
             self.update_signal.emit("检测超时，编号1")
@@ -1088,13 +1209,14 @@ class Assistant(QThread):
                 self.update_signal.emit("没有可领取的奖励")
                 pyautogui.press("esc")
         self.update_signal.emit("任务完成：领取每日实训奖励\n")
-        time.sleep(3)
 
     @Slot()
     def nameless_honor(self):
         """Receive nameless honor reward"""
         self.update_signal.emit("执行任务：领取无名勋礼奖励")
-        time.sleep(2)
+        if not check("res/img/chat_enter.png", max_time=20):
+            self.update_signal.emit("检测超时，编号2")
+            return
         pyautogui.press("f2")
         if not check("res/img/f2.png", max_time=20):
             self.update_signal.emit("检测超时，编号1")
@@ -1129,7 +1251,6 @@ class Assistant(QThread):
             self.update_signal.emit("没有可领取的奖励")
             pyautogui.press("esc")
         self.update_signal.emit("完成任务：领取无名勋礼奖励\n")
-        time.sleep(3)
 
     @Slot()
     def replenish(self, way):
@@ -1228,6 +1349,11 @@ def exist(img_path, interval=2):
         with open("data/log.txt", "a", encoding="utf-8") as log:
             log.write(f"FileNotFoundError: {e}\n")
         return False
+    except pyscreeze.PyScreezeException as e:
+        with open("data/log.txt", "a", encoding="utf-8") as log:
+            log.write(f"FileNotFoundError: {e}\n")
+        return False
+
 
 
 def find_window(title):
@@ -1248,7 +1374,7 @@ def find_window(title):
     return windows[0] if windows else None
 
 
-def click(img_path, x_add=0, y_add=0, interval=2.0):
+def click(img_path, x_add=0, y_add=0, interval=2.0,title="崩坏：星穹铁道"):
     """Click the corresponding image on the screen
 
     Args:
@@ -1256,6 +1382,7 @@ def click(img_path, x_add=0, y_add=0, interval=2.0):
         x_add (int): X-axis offset(px).
         y_add (int): Y-axis offset(px).
         interval (float): Waiting time before run(s).
+        title (str): Window title.
     Returns:
         True if clicked successfully, False otherwise.
     """
@@ -1264,7 +1391,7 @@ def click(img_path, x_add=0, y_add=0, interval=2.0):
         img = cv2.imread(img_path)
         if img is None:
             raise FileNotFoundError("无法找到或读取文件 " + img_path)
-        location = pyautogui.locateOnWindow(img, "崩坏：星穹铁道", confidence=0.95)
+        location = pyautogui.locateOnWindow(img, title, confidence=0.95)
         x, y = pyautogui.center(location)
         x += x_add
         y += y_add
