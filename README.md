@@ -33,7 +33,7 @@ This software is open source, free of charge and for learning and exchange purpo
 * 退出游戏
   * *从不回头看`“爆炸”`*
 ## 我怎么才能使用SRA？急急急
-下载链接：[SRAv0.6](https://github.com/Shasnow/StarRailAssisant/releases)
+下载链接：[SRAv0.6.2](https://github.com/Shasnow/StarRailAssistant/releases/download/v0.6.2/StarRailAssistant_v0.6.2_beta.zip)
 * 如果你是小白，只需要下载项目中的`zip`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`.exe`即可！
 * **我想挑战一下自己！** 当然没问题。打包下载项目中所有文件，确保你的电脑中已经安装好了`Python`，并使用`pip`来安装依赖。请在项目根文件夹打开终端并运行以下指令：
   ```bash
@@ -59,6 +59,7 @@ This software is open source, free of charge and for learning and exchange purpo
 * 通过 **`Bilibili私信`** 反馈：https://space.bilibili.com/349682013
 * 通过 **`电子邮件`** 反馈：<yukikage@qq.com>
 * 或者加入测试群 **994571792** 在这里，你可以：
+  * 获得更快的下载速度
   * 提前获取版本更新
   * 反馈和意见得到及时回复
   * 与精通 `Python` , `Java` , `C/C++` , `SQL`, `C#` , `Go` , `Vue3` , `HTML` , `JavaScript` , `CSS` , `TypeScript` 的大佬交流。

@@ -1,0 +1,6 @@
+FuXLogger
+pyautogui
+opencv-python
+plyer
+pywin32
+pillow
