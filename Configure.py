@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-beta v0.7
+beta v0.6.3
 作者：雪影
 配置
 """
@@ -43,7 +43,10 @@ def init():
             },
             "StartGame": {
                 "autoLogin": False,
-                "gamePath": ""
+                "launcher": False,
+                "gamePath": "",
+                "pathType":"StarRail",
+                "channel": 0
             },
             "RedeemCode": {
                 "codeList": []
