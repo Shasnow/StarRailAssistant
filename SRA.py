@@ -48,7 +48,7 @@ from PySide6.QtWidgets import (
 from plyer import notification
 
 import encryption
-import StarRailAssistant
+import SRAssistant
 import Configure
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
@@ -81,7 +81,6 @@ class Main(QMainWindow):
         self.quit_game_setting_container = uiLoader.load(
             self.AppPath + "/res/ui/set_10.ui"
         )
-
         notice_action = self.ui.findChild(QAction, "action_1")
         notice_action.triggered.connect(self.notice)
         problem_action = self.ui.findChild(QAction, "action_2")
@@ -650,7 +649,7 @@ class Main(QMainWindow):
             encryption.save(self.account_text)
             if not Configure.save(self.config):
                 self.log.append("配置失败")
-            self.son_thread = StarRailAssistant.Assistant(self.password_text)
+            self.son_thread = SRAssistant.Assistant(self.password_text)
             self.son_thread.update_signal.connect(self.update_log)
             self.son_thread.finished.connect(self.notification)
             self.son_thread.start()
