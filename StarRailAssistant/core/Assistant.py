@@ -47,11 +47,13 @@ class Assistant:
             except TaskNotExecuteException:
                 self.logger.warning(f"任务 {task.task_name} 不可执行,因为没有实现execute方法")
                 return AssistantSignal.TASK_ERROR
+            except KeyboardInterrupt:
+                self.logger.warning("执行任务中途被用户中断，退出程序!")
+                return AssistantSignal.EXIT_REQUIRE
             finally:
                 self.task_queue.task_done()
                 return AssistantSignal.CLEAN_REQUIRE
         else:
-            self.logger.warning("没有找到可执行的任务")
             return AssistantSignal.EXIT_REQUIRE
         
     def setCompletedCallback(self, callback: Callable) -> None:

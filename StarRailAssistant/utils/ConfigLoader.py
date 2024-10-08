@@ -15,3 +15,22 @@ class ConfigLoader:
             self.config = json.load(f)
         self.log.debug(f"Config loaded: {self.config}")
         return self.config
+    
+    def update_config(self, key: str, value: str) -> bool:
+        if key in self.config:
+            self.config[key] = value
+            self.log.debug(f"Config updated: {self.config}")
+            return True
+        else:
+            self.log.warning(f"Key {key} not found in config")
+            return False
+        
+    def save(self) -> bool:
+        try:
+            with open(self.config_file_path, "w") as f:
+                json.dump(self.config, f, indent=4)
+            self.log.debug(f"Config saved to {self.config_file_path}")
+            return True
+        except Exception:
+            self.log.exception("Error while saving config")
+            return False
