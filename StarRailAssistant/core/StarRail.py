@@ -1,8 +1,8 @@
 from ..utils.Logger import logger
 from ..Exceptions import NotImplementException
 from ..utils.ComputerOperator import ComputerOperator
-from ..utils.ImgLocater import ImageLocater
-from ..utils.WindowLocater import WindowLocater
+from ..utils.ImgLocator import ImageLocator
+from ..utils.WindowLocator import WindowLocator
 from ..utils._types import Config
 from ..utils._const import GAME_IMG
 import subprocess
@@ -11,21 +11,21 @@ class StarRail:
     """
     和游戏核心的操作都在这里,这里就主要写游戏的一些启动，关闭，日志记录等逻辑，其他的游戏逻辑有额外的实现
     """
-    def __init__(self, config: Config, resouce_path: str) -> None:
+    def __init__(self, config: Config, resource_path: str) -> None:
         self.logger = logger
-        self.window_locater = WindowLocater("崩坏：星穹铁道")
+        self.window_locator = WindowLocator("崩坏：星穹铁道")
         self.config = config
-        self.resouce_path = resouce_path
+        self.resource_path = resource_path
         self.computer = ComputerOperator()
-        self.image_locater = ImageLocater()
+        self.image_locator = ImageLocator()
         try:
-            self.initilaize()
+            self.initialize()
         except NotImplementException:
             self.logger.warning("没有自定义的初始化,跳过自定义初始化")
             pass
         self.logger.info("默认初始化完成")
 
-    def initilaize(self):
+    def initialize(self):
         """
         自定义初始化方法, 子类可以重写该方法
         """
@@ -36,7 +36,7 @@ class StarRail:
         判断游戏是否在运行
         """
         self.logger.info("检测游戏状态")
-        hwnd = self.window_locater.find_window()
+        hwnd = self.window_locator.find_window()
         if hwnd:
             self.logger.info("游戏仍在运行")
             return True
@@ -85,16 +85,16 @@ class StarRail:
         登录游戏
         """
         try:
-            if self.image_locater.checkOnWindow(fr"{self.resouce_path}/{GAME_IMG['welcome']}", 2):
+            if self.image_locator.checkOnWindow(fr"{self.resource_path}/{GAME_IMG['welcome']}", 2):
                 self.logger.debug("用户已登录")
-            elif self.image_locater.checkOnWindow(fr"{self.resouce_path}/{GAME_IMG['not_logged_in']}", 2, 4):
+            elif self.image_locator.checkOnWindow(fr"{self.resource_path}/{GAME_IMG['not_logged_in']}", 2, 4):
                  self.logger.debug("用户未登录")
-                 if self.computer.click_screen(fr"{self.resouce_path}/{GAME_IMG['login_with_account']}"):
+                 if self.computer.click_screen(fr"{self.resource_path}/{GAME_IMG['login_with_account']}"):
                     self.logger.debug("开始登录")
-                    self.computer.write_on_screen(account,watting_time=1)
+                    self.computer.write_on_screen(account, waiting_time=1)
                     self.computer.press_key('tab',interval=0.1)
-                    self.computer.write_on_screen(password, watting_time=1)
-                    self.computer.click_screen(fr"{self.resouce_path}/{GAME_IMG['agree']}", -158)
+                    self.computer.write_on_screen(password, waiting_time=1)
+                    self.computer.click_screen(fr"{self.resource_path}/{GAME_IMG['agree']}", -158)
             else:
                 self.logger.warning("未知的登录状态, 请检查")
         except Exception:

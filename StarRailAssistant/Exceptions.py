@@ -6,8 +6,8 @@ class StarRailException(Exception):
 class NotImplementException(StarRailException):
     pass
 
-class StarRailAssitantException(Exception):
+class StarRailAssistantException(Exception):
     pass
 
-class TaskNotExecuteException(StarRailAssitantException): # 任务不可执行
+class TaskNotExecuteException(StarRailAssistantException): # 任务不可执行
     pass

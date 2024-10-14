@@ -10,7 +10,7 @@ from StarRailAssistant import Assistant
 from StarRailAssistant.core.StarRailTasks import ExampleTask
 
 if __name__ == '__main__':
-    ass = Assistant("崩坏: 星穹铁道", resourcePath=r"./res")
+    ass = Assistant("崩坏: 星穹铁道", resource_path=r"./res")
     ass.submit_task(ExampleTask())
     ass.run()
 ```
@@ -112,12 +112,12 @@ from StarRailAssistant import Assistant
 from StarRailAssistant.core.StarRailTasks import ExampleTask
 
 if __name__ == '__main__':
-    ass = Assistant("崩坏: 星穹铁道", resourcePath=r"./res")
-    ass.submit_task(ExampleTask()) # 你可以这样直接提交,也可以
+    ass = Assistant("崩坏: 星穹铁道", resource_path=r"./res")
+    ass.submit_task(ExampleTask())  # 你可以这样直接提交,也可以
     task1 = ExampleTask()
     task2 = ExampleTask()
-    ass.submit_task([task1, task2]) # 也可以提交一个包含可迭代对象(列表、元组、集合)的任务列表
-    ass.run() # run用来执行
+    ass.submit_task([task1, task2])  # 也可以提交一个包含可迭代对象(列表、元组、集合)的任务列表
+    ass.run()  # run用来执行
 ```
 
 - ***完成或中途错误或退出的时候想运行自己的逻辑怎么办？***:
@@ -130,10 +130,12 @@ if __name__ == '__main__':
 from StarRailAssistant import Assistant
 from StarRailAssistant.core.StarRailTasks import ExampleTask
 
+
 def my_callback():
     print("任务执行完成了")
 
-ass = Assistant("崩坏: 星穹铁道", resourcePath=r"./res")
+
+ass = Assistant("崩坏: 星穹铁道", resource_path=r"./res")
 # 当任务成功的时候
 ass.setCompletedCallback(my_callback)
 # 任务错误的时候

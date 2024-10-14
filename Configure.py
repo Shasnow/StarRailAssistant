@@ -18,15 +18,15 @@
 
 """
 崩坏：星穹铁道助手
-beta v0.6.3
+beta v0.6.4
 作者：雪影
-配置
+配置相关操作
 """
 import json
 import os
 
 
-def init():
+def init() -> None:
     if not os.path.exists("data/config.json"):
         config = {
             "Mission": {
@@ -87,6 +87,17 @@ def init():
                 "enable": False,
                 "runTimes": 1,
                 "level": 1
+            },
+            "QuitGame": {
+                "exitSRA": False,
+                "shutdown": False,
+                "sleep": False
+            },
+            "Settings": {
+                "F1":"f1",
+                "F2":"f2",
+                "F3":"f3",
+                "F4":"f4"
             }
         }
         with open("data/config.json", "w", encoding="utf-8") as json_file:
