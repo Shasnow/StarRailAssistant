@@ -1,4 +1,4 @@
-from FuXLogger import Handler, LogLevel, LogFormatter, Level
+from FuXLogger import Handler, LogFormatter, Level
 from FuXLogger.core.LogBody import LogRecord
 from typing import Callable
 
