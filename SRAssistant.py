@@ -50,7 +50,7 @@ class Assistant(QThread):
         self.f1 = settings["F1"]
         self.f2 = settings["F2"]
         self.f4 = settings["F4"]
-        if len(logger.handlers) == 2:
+        if len(logger.handlers) == 1:
             logger.addHandler(QTHandler(self.send_signal))
 
     def send_signal(self, text):
