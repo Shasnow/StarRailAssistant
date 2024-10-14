@@ -41,15 +41,15 @@ This software is open source, free of charge and for learning and exchange purpo
   * *最爱的`星琼`*
 * 领取无名勋礼
 * 退出游戏
-  * *从不回头看`“爆炸”`*
+  * *从不回头看`“爆炸”`*，退出SRA以及关闭计算机。
 
 ## 我怎么才能使用SRA？急急急
 
-下载链接：[SRAv0.6.2](https://github.com/Shasnow/StarRailAssistant/releases/download/v0.6.2/StarRailAssistant_v0.6.2_beta.zip)
+下载链接：[SRAv0.6.4](https://github.com/Shasnow/StarRailAssistant/releases/download/v0.6.4/StarRailAssistant_v0.6.4_beta.zip)
 
 * 如果你是小白，只需要下载项目中的`zip`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`.exe`即可！
 * **我想挑战一下自己！** 当然没问题。打包下载项目中所有文件，确保你的电脑中已经安装好了`Python`，并使用`pip`来安装依赖。请在项目根文件夹打开终端并运行以下指令：
-
+**注意：`FuXLogger`可能不再为Python3.12以下的版本提供支持。**
   ```bash
   pip install -r requirements.txt
   ```
@@ -67,7 +67,7 @@ This software is open source, free of charge and for learning and exchange purpo
 ### 注意事项
 
 * **调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，不要让游戏窗口超出屏幕**
-* **执行任务时不要进行其他键鼠操作！请使用游戏默认键位！**
+* **执行任务时不要进行其他键鼠操作！**
 * **还有一件事，菜单要用初始壁纸**
 
 ## 你这代码保熟吗？
