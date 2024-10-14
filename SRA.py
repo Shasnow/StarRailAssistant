@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-v0.6.3 beta
+v0.6.4 beta
 作者：雪影
 图形化界面
 """
@@ -26,7 +26,9 @@ v0.6.3 beta
 import os
 import sys  # 导入 sys 模块，用于与 Python 解释器交互
 import ctypes
+import time
 
+from PySide6.QtCore import QTimer
 from PySide6.QtGui import QIcon, QAction
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (
@@ -44,12 +46,16 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QVBoxLayout,
     QLabel,
+    QRadioButton,
+    QLCDNumber,
+    QTableWidget, QTableWidgetItem,
 )  # 从 PySide6 中导入所需的类
 from plyer import notification
 
 import encryption
 import SRAssistant
 import Configure
+import WindowsPower
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
 
@@ -63,6 +69,9 @@ class Main(QMainWindow):
 
     def __init__(self):
         super().__init__()  # 调用父类 QMainWindow 的初始化方法
+        self.exit_SRA = False
+        self.sleep = False
+        self.shutdown = False
         Configure.init()
         encryption.init()
         self.config = Configure.load()
@@ -163,8 +172,33 @@ class Main(QMainWindow):
         self.trail_blaze_power_setting()
         self.redeem_code_setting()
         self.quit_game_setting()
+        self.software_setting()
+        self.update_log(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) + " 程序启动成功")
 
-        self.update_log("程序启动成功")
+    def software_setting(self):
+        self.key_table = self.ui.findChild(QTableWidget, "tableWidget")
+        self.key_setting_show()
+        self.key_table.cellChanged.connect(self.key_setting_change)
+        save_button=self.ui.findChild(QPushButton, "pushButton_save")
+        save_button.clicked.connect(self.key_setting_save)
+        reset_button=self.ui.findChild(QPushButton, "pushButton_reset")
+        reset_button.clicked.connect(self.key_setting_reset)
+
+    def key_setting_save(self):
+        Configure.save(self.config)
+
+    def key_setting_show(self):
+        settings = self.config["Settings"]
+        for i in range(4):
+            self.key_table.item(0, i).setText(settings["F" + str(i + 1)])
+
+    def key_setting_reset(self):
+        for i in range(4):
+            self.key_table.item(0, i).setText("f" + str(i + 1))
+
+    def key_setting_change(self):
+        for i in range(4):
+            self.config["Settings"]["F" + str(i + 1)] = self.key_table.item(0, i).text()
 
     def start_game_setting(self):
         channel_combobox = self.start_game_setting_container.findChild(
@@ -614,18 +648,36 @@ class Main(QMainWindow):
         self.trail_blaze_power_container.setVisible(True)
 
     def update_log(self, text):
-        """Update the content in log area and store it in log.txt."""
+        """Update the content in log area."""
         self.log.append(text)
-        with open("data/log.txt", "a", encoding="utf-8") as logfile:
-            logfile.write(text + "\n")
 
     def quit_game_setting(self):
         self.quit_game_setting_container.setVisible(False)
+        exit_checkbox = self.quit_game_setting_container.findChild(
+            QCheckBox, "checkBox2_1_1"
+        )
+        exit_checkbox.stateChanged.connect(self.exit_SRA_status)
+        self.radio_button1 = self.quit_game_setting_container.findChild(QRadioButton, "radioButton2_1_2")
+        self.radio_button2 = self.quit_game_setting_container.findChild(QRadioButton, "radioButton2_1_3")
+        self.radio_button1.toggled.connect(self.shutdown_status)
+        self.radio_button2.toggled.connect(self.sleep_status)
         self.task_set_vbox_layout.addWidget(self.quit_game_setting_container)
 
     def show_quit_game_setting(self):
         self.display_none()
         self.quit_game_setting_container.setVisible(True)
+
+    def exit_SRA_status(self, state):
+        if state == 2:
+            self.exit_SRA = True
+        else:
+            self.exit_SRA = False
+
+    def shutdown_status(self, checked):
+        self.shutdown = checked
+
+    def sleep_status(self, checked):
+        self.sleep = checked
 
     def execute(self):
         """Save configuration, create work thread and monitor signal."""
@@ -651,8 +703,47 @@ class Main(QMainWindow):
                 self.log.append("配置失败")
             self.son_thread = SRAssistant.Assistant(self.password_text)
             self.son_thread.update_signal.connect(self.update_log)
-            self.son_thread.finished.connect(self.notification)
+            self.son_thread.finished.connect(self.missions_finished)
             self.son_thread.start()
+
+    def missions_finished(self):
+        """接收到任务完成信号后执行的工作"""
+        self.notification()
+        if not self.config["Mission"]["quitGame"]:
+            return
+        if self.shutdown:
+            WindowsPower.schedule_shutdown(61)
+            self.countdown()
+        elif self.sleep:
+            WindowsPower.hibernate()
+        if self.exit_SRA:
+            self.exitSRA()
+
+    def countdown(self):
+        """关机倒计时"""
+        self.shutdown_dialog = uiLoader.load("res/ui/shutdown_dialog.ui")
+        self.shutdown_dialog.setWindowTitle("关机")
+        self.shutdown_dialog.setWindowIcon(QIcon(self.AppPath + "/res/SRAicon.ico"))
+        cancel_button = self.shutdown_dialog.findChild(QPushButton, "pushButton")
+        cancel_button.clicked.connect(WindowsPower.shutdown_cancel)
+        cancel_button.clicked.connect(self.shutdown_dialog.close)
+        self.timer = QTimer(self)
+        cancel_button.clicked.connect(self.timer.stop)
+        self.lease_time = self.shutdown_dialog.findChild(QLCDNumber, "lcdNumber")
+        self.timer.timeout.connect(self.update_countdown)
+        self.time_left = 59
+        self.timer.start(1000)
+        self.shutdown_dialog.show()
+
+    def update_countdown(self):
+        """更新倒计时"""
+        self.time_left -= 1
+        if self.time_left < 0:
+            self.timer.stop()
+            self.lease_time.display(00)
+            self.shutdown_dialog.close()  # 显示00表示倒计时结束
+        else:
+            self.lease_time.display(self.time_left)
 
     def notification(self):
         """Windows notify"""
@@ -666,27 +757,31 @@ class Main(QMainWindow):
                 timeout=10,
             )
         except Exception as e:
-            with open("data/log.txt", "a", encoding="utf-8") as log:
+            with open("SRAlog.txt", "a", encoding="utf-8") as log:
                 log.write(str(e) + "\n")
 
     def kill(self):
         """Kill the child thread"""
         self.son_thread.request_stop()
         self.button0_2.setEnabled(False)
-        self.button0_1.setEnabled(True)
         self.log.append("等待当前任务完成后停止")
+
+    def exitSRA(self):
+        self.ui.close()
 
     def notice(self):
         QMessageBox.information(
             self,
             "更新公告",
-            "v0.6.2 beta 更新公告\n"
+            "v0.6.4 更新公告\n"
             "新功能：\n"
             "1.重置GUI\n"
             "2.本地账号信息加密\n"
             "3.为了您的账号安全，SRA不再为你储存密码\n"
-            "4.\n"
-            "5.\n"
+            "4.现在可以用米哈游启动器启动，兼容bilibili服。\n"
+            "5.接入符玄日志库`FuXLogger`，更改日志文件储存的位置，现在它位于与`SRA.exe`同级的目录下。\n"
+            "6.退出游戏的设置现在变为可用，您可以在任务结束后选择退出SRA，关机或者休眠。\n"
+            "7.键位设置现在变为可用，在`设置->键位设置`中，您可以更改键位，注意键位冲突。"
             "\n"
             "问题修复：\n"
             "1.修复了在未填写兑换码时勾选此功能会导致程序崩溃的问题。\n"
@@ -694,6 +789,10 @@ class Main(QMainWindow):
             "3.修复了无法正常传送到心兽的战场副本的问题\n"
             "4.修复了因加载时间过长引发的错误编号1、3 、11频发的问题。\n"
             "5.修复了在执行饰品提取或侵蚀隧洞时由于指定了培养角色导致副本无法识别的问题。\n"
+            "6.修复因屏幕分辨率较小导致的UI内容被压缩甚至不可见的问题。\n"
+            "7.修复特定情况下，错误编号14、15意外发生的问题。\n"
+            "8.修复处于特定场景时，超时编号1意外发生的问题。\n"
+            "9.修复当存在未领取的月卡时程序无动作的问题。"
             "\n感谢您对SRA的支持！",
         )
 
@@ -735,7 +834,7 @@ class SRA(QApplication):
         QMessageBox.information(
             self.main.ui,
             "使用说明",
-            "SRA崩坏：星穹铁道助手 v0.6.2 beta by雪影\n"
+            "SRA崩坏：星穹铁道助手 v0.6.4 beta by雪影\n"
             "使用说明：\n"
             "重要！以管理员模式运行程序！\n"
             "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"

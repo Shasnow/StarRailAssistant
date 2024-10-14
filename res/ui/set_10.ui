@@ -105,7 +105,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox2_1_2">
+             <widget class="QRadioButton" name="radioButton2_1_2">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -118,7 +118,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox2_1_3">
+             <widget class="QRadioButton" name="radioButton2_1_3">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -126,7 +126,7 @@
                </size>
               </property>
               <property name="text">
-               <string>睡眠</string>
+               <string>休眠</string>
               </property>
              </widget>
             </item>

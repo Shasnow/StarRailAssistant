@@ -5,16 +5,17 @@ from .Task import AssistantTask
 from ..utils.Logger import logger
 import queue
 from .AssistantSignal import AssistantSignal
-from typing import Callable , Iterable
+from typing import Callable, Iterable
+
 
 class Assistant:
     """
     内核类，可以说整个程序的核心接口逻辑都在这里实现
     """
 
-    def __init__(self, name: str, resourcePath: str) -> None:
+    def __init__(self, name: str, resource_path: str) -> None:
         self.name = name
-        self.resourcePath = resourcePath
+        self.resourcePath = resource_path
         self.config = ConfigLoader(config_file_path=fr"{self.resourcePath}/config.json").loading()
         self.game: StarRail = StarRail(self.config, self.resourcePath)
         self.task_queue: queue.Queue[AssistantTask] = queue.Queue()
@@ -38,8 +39,8 @@ class Assistant:
         每调用一次这个方法，就会从任务队列中取出一个任务，执行它，然后把它从队列中移除
         """
         if not self.task_queue.empty():
+            task = self.task_queue.get(timeout=1)
             try:
-                task = self.task_queue.get(timeout=1)
                 self.logger.info(f"开始执行任务 {task.task_name}")
                 task.execute(*args, **kwargs)
                 self.logger.info(f"任务 {task.task_name} 执行完成")
@@ -55,7 +56,7 @@ class Assistant:
                 return AssistantSignal.CLEAN_REQUIRE
         else:
             return AssistantSignal.EXIT_REQUIRE
-        
+
     def setCompletedCallback(self, callback: Callable) -> None:
         """ 设置任务执行完成的回调函数 """
         self.completedCallback = callback
@@ -106,5 +107,3 @@ class Assistant:
         :return: None
         """
         return self.game.login(account=account, password=password)
-    
-    

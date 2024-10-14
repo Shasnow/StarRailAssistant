@@ -1,12 +1,12 @@
 from .Logger import logger
-from .ImgLocater import ImageLocater
+from .ImgLocator import ImageLocator
 import pyautogui
 import time
 
 class ComputerOperator:
 
     def __init__(self) -> None:
-        self.image_locater = ImageLocater()
+        self.image_locator = ImageLocator()
         self.log = logger
 
     def _click(self, x: float, y: float) -> bool:
@@ -23,15 +23,18 @@ class ComputerOperator:
             self.log.exception("点击屏幕失败", is_fatal=False)
             return False
 
-    def click_screen(self, img_path: str, x_offset: int = 0, y_offset: int = 0, waitting_time: float = 0.5) -> bool:
+    def click_screen(self, img_path: str, x_offset: int = 0, y_offset: int = 0, waiting_time: float = 0.5) -> bool:
         """
         点击屏幕
+        :param x_offset: x轴偏移量
+        :param y_offset: y轴偏移量
+        :param waiting_time: 执行前等待时间
         :param img_path: 图片路径
         :return: 点击成功返回True，否则返回False
         """
-        time.sleep(waitting_time)
+        time.sleep(waiting_time)
         logger.debug(f"点击屏幕：{img_path}")
-        x , y = self.image_locater.GetLocation(img_path, x_offset, y_offset)
+        x , y = self.image_locator.GetLocation(img_path, x_offset, y_offset)
         logger.trace(f"坐标：{x}, {y}")
         if x == -1 or y == -1:
             logger.error(f"未找到图片：{img_path}")
@@ -74,7 +77,9 @@ class ComputerOperator:
     def press_key(self, key: str, presses: int = 1, interval: float = 0.1) -> bool:
         """
         按下按键
+
         :param key: 按键
+        :param presses: 按下次数
         :param interval: 按键间隔时间(如果填入,程序会等待interval秒再按下按键)
         :return: 按键成功返回True，否则返回False
         """
@@ -86,17 +91,19 @@ class ComputerOperator:
             self.log.exception("按下按键失败", is_fatal=False)
             return False
         
-    def write_on_screen(self, prompt: str, interval: float = 0.1, watting_time: float = 0.5) -> bool:
+    def write_on_screen(self, prompt: str, interval: float = 0.1, waiting_time: float = 0.5) -> bool:
         """
         在屏幕上输入文字
+
         :param prompt: 文字
+        :param waiting_time: 执行前等待时间
         :param interval: 按键间隔时间(如果填入,程序会等待interval秒再输入文字)
         :return: 输入成功返回True，否则返回False
         """
         logger.debug(f"在屏幕上输入文字：{prompt}")
         try:
             pyautogui.write(prompt, interval=interval)
-            time.sleep(watting_time)
+            time.sleep(waiting_time)
             return True
         except Exception:
             self.log.exception("在屏幕上输入文字失败", is_fatal=False)

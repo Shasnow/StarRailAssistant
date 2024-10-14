@@ -24,7 +24,7 @@ class LocateCalculator:
         """
         x_ratio = self.screen_size[0] / base_resolution[0]
         y_ratio = self.screen_size[1] / base_resolution[1]
-        return (int(x * x_ratio) + self.location[0], int(y * y_ratio) + self.location[1])
+        return int(x * x_ratio) + self.location[0], int(y * y_ratio) + self.location[1]
 
     def calculate_distance(self, x1: int, y1: int, x2: int, y2: int) -> float:
         """
