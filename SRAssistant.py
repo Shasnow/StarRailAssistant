@@ -151,6 +151,13 @@ class Assistant(QThread):
 
     @Slot()
     def check_game(self):
+        """Check that the game is running.
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+        Returns:
+            True if game is running,False if not.
+        """
         window_title = "崩坏：星穹铁道"
         if not WindowsProcess.check_window(window_title):
             logger.warning("未找到窗口:" + window_title + "或许你还没有运行游戏")
