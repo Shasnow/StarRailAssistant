@@ -1,10 +1,11 @@
 opencv-python
-plyer~=2.1.0
-PyAutoGUI~=0.9.54
+plyer
+PyAutoGUI
 pyinstaller
-PySide6~=6.7.3
-PyScreeze~=0.1.30
+PySide6
+PyScreeze
 pywin32
 pywin32-ctypes
-cryptography~=43.0.1
+cryptography
 FuXLogger
+psutil

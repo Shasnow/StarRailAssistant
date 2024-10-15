@@ -28,6 +28,7 @@ import sys
 
 from StarRailAssistant.utils.Logger import logger
 
+
 def hibernate():
     command = ["shutdown", "/h"]
     try:
@@ -51,15 +52,16 @@ def schedule_shutdown(delay_in_seconds):
         subprocess.run(command, check=True)
         logger.info(f"计算机将在{delay_in_seconds}秒后关机。")
     except subprocess.CalledProcessError as e:
-        logger.exception(f"设置关机时出错：{e}",is_fatal=True)
+        logger.exception(f"设置关机时出错：{e}", is_fatal=True)
+
 
 def shutdown_cancel():
     """
     取消关机
     """
-    command=["shutdown","/a"]
+    command = ["shutdown", "/a"]
     try:
-        subprocess.run(command,check=True)
+        subprocess.run(command, check=True)
         logger.info("关机已取消")
     except subprocess.CalledProcessError as e:
         logger.exception()
@@ -68,6 +70,6 @@ def shutdown_cancel():
 if __name__ == "__main__":
     delay = int(input("请输入延时关机的秒数（大于0）: "))
     schedule_shutdown(delay)
-    ans=input()
-    if ans=='0':
+    ans = input()
+    if ans == '0':
         shutdown_cancel()
