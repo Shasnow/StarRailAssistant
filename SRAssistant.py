@@ -29,14 +29,14 @@ import time
 import cv2
 import pyautogui
 import pyscreeze
-import win32con
-import win32gui
 from PySide6.QtCore import QThread, Signal, Slot
 
 import Configure
+import WindowsProcess
 import encryption
 from StarRailAssistant.extensions.QTHandler import QTHandler
-from StarRailAssistant.utils.Logger import logger
+from StarRailAssistant.utils.Logger import logger, console_handler
+from WindowsProcess import find_window, is_process_running
 
 
 class Assistant(QThread):
@@ -151,22 +151,11 @@ class Assistant(QThread):
 
     @Slot()
     def check_game(self):
-        """Check that the game is running.
-
-        Note:
-            Do not include the `self` parameter in the ``Args`` section.
-        Returns:
-            True if game is running,False if not.
-        """
         window_title = "崩坏：星穹铁道"
-        hwnd = find_window(window_title)
-        if hwnd:
-            win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)  # 确保窗口不是最小化状态
-            win32gui.SetForegroundWindow(hwnd)
-            return True
-        else:
+        if not WindowsProcess.check_window(window_title):
             logger.warning("未找到窗口:" + window_title + "或许你还没有运行游戏")
             return False
+        return True
 
     @Slot()
     def path_check(self, path, path_type="StarRail"):
@@ -195,8 +184,16 @@ class Assistant(QThread):
         """Kill the game"""
         command = f"taskkill /F /IM StarRail.exe"
         # 执行命令
-        subprocess.run(command, shell=True, check=True)
+        subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
         logger.info("退出游戏")
+
+    @Slot()
+    def kill_launcher(self):
+        """Kill the launcher"""
+        command = f"taskkill /F /IM HYP.exe"
+        # 执行命令
+        subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
+        logger.info("已为您关闭启动器")
 
     @Slot()
     def launch_game(self, game_path, path_type):
@@ -250,33 +247,38 @@ class Assistant(QThread):
             True if successfully launched, False otherwise.
 
         """
-        if not self.path_check(path, path_type):
-            logger.warning("路径无效")
-            return False
-        try:
-            subprocess.Popen(path)
-        except OSError:
-            logger.error("路径无效或权限不足")
-            return False
-        logger.info("等待启动器启动")
+        if not is_process_running("HYP.exe"):
+            if not self.path_check(path, path_type):
+                logger.warning("路径无效")
+                return False
+            try:
+                subprocess.Popen(path)
+            except OSError:
+                logger.error("路径无效或权限不足")
+                return False
+            logger.info("等待启动器启动")
         time.sleep(5)
         times = 0
-        while True:
-            if find_window("崩坏：星穹铁道") or find_window("米哈游启动器"):
+        while times<40:
+            if is_process_running("HYP.exe"):
                 time.sleep(2)
                 try:
                     click('res/img/star_game.png')
                 except pyscreeze.PyScreezeException:
                     click('res/img/star_game.png', title="米哈游启动器")
                 logger.info("等待游戏启动")
-                time.sleep(8)
-                return True
+                for i in range(10):
+                    time.sleep(1)
+                    if is_process_running("StarRail.exe"):
+                        logger.info("启动成功")
+                        self.kill_launcher()
+                        return True
             else:
                 time.sleep(0.5)
                 times += 1
-                if times == 40:
-                    logger.warning("启动时间过长，请尝试手动启动")
-                    return False
+        else:
+            logger.warning("启动时间过长，请尝试手动启动")
+            return False
 
     @Slot()
     def login(self, account, password):
@@ -384,13 +386,12 @@ class Assistant(QThread):
         if path_type == "StarRail":
             if not self.launch_game(game_path, path_type):
                 time.sleep(2)
+                logger.warning("游戏启动失败")
                 return False
         elif path_type == "launcher":
             if not self.launch_launcher(game_path, path_type):
+                logger.warning("游戏启动失败")
                 return False
-        else:
-            logger.warning("游戏启动失败")
-            return False
         if channel == 0:
             if login_flag and account:
                 self.login(account, password)
@@ -424,8 +425,9 @@ class Assistant(QThread):
         while True:
             time.sleep(0.2)
             if click("res/img/train_supply.png"):
-                time.sleep(2)
-                pyautogui.press("esc")
+                time.sleep(4)
+                pyautogui.moveRel(0, -400)
+                pyautogui.click()
             if exist("res/img/chat_enter.png") or exist("res/img/phone.png", wait_time=0):
                 return True
             else:
@@ -1067,24 +1069,6 @@ def exist(img_path, wait_time=2):
         return False
 
 
-def find_window(title):
-    """Find window handles based on the window title
-
-    Args:
-        title (str): Window title.
-    Returns:
-        list if found, None otherwise.
-    """
-
-    def enum_callback(hwnd, result):
-        if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) == title:
-            result.append(hwnd)
-
-    windows = []
-    win32gui.EnumWindows(enum_callback, windows)
-    return windows[0] if windows else None
-
-
 def click(img_path, x_add=0, y_add=0, wait_time=2.0, title="崩坏：星穹铁道"):
     """Click the corresponding image on the screen
 
@@ -1150,4 +1134,5 @@ def find_level(level: str):
 
 
 if __name__ == "__main__":
+    logger.addHandler(console_handler)
     click("res/img/echo_of_war (0).png")
