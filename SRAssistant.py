@@ -433,7 +433,7 @@ class Assistant(QThread):
             time.sleep(0.2)
             if click("res/img/train_supply.png"):
                 time.sleep(4)
-                pyautogui.moveRel(0, -400)
+                pyautogui.moveRel(0, +400)
                 pyautogui.click()
             if exist("res/img/chat_enter.png") or exist("res/img/phone.png", wait_time=0):
                 return True
