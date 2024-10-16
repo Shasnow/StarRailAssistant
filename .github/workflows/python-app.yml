@@ -117,7 +117,7 @@ jobs:
           NOTES_MAIN="$(tail -n +2 data/版本信息.txt)"
           NOTES_TAIL="\`\`\`本release通过GitHub Actions自动构建\`\`\`"
           NOTES="$NOTES_MAIN<br><br>$NOTES_TAIL"
-          gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" artifacts/*
+          gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" --prerelease artifacts/*
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
       - name: Update release
@@ -131,6 +131,6 @@ jobs:
           NOTES_TAIL="\`\`\`本release通过GitHub Actions自动构建\`\`\`"
           NOTES="$NOTES_MAIN<br><br>$NOTES_TAIL"
           gh release delete "$TAGNAME" --yes
-          gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" artifacts/*
+          gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" --prerelease artifacts/*
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
