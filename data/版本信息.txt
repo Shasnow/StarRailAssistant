@@ -12,5 +12,3 @@ v0.6.4_beta
 #### 特别鸣谢：[符玄日志库`FuXLogger`](https://github.com/KOKOMI12345/FuXLogger)
 
 感谢您对SRA的支持！
-
-`测试FuXLogger的post3修复`
