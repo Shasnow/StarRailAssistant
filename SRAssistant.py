@@ -240,7 +240,7 @@ class Assistant(QThread):
                     return False
 
     @Slot()
-    def launch_launcher(self, path, path_type):
+    def launch_launcher(self, path, path_type, channel):
         """Launch game
 
         Try to run the file that game path points at.
@@ -250,6 +250,7 @@ class Assistant(QThread):
         Args:
             path (str): File path.
             path_type (str): Launcher
+            channel: 0 -> official, 1 -> bilibili
         Returns:
             True if successfully launched, False otherwise.
 
@@ -269,10 +270,10 @@ class Assistant(QThread):
         while times<40:
             if is_process_running("HYP.exe"):
                 time.sleep(2)
-                try:
-                    click('res/img/star_game.png')
-                except pyscreeze.PyScreezeException:
+                if channel==0:
                     click('res/img/star_game.png', title="米哈游启动器")
+                else:
+                    click('res/img/star_game.png')
                 logger.info("等待游戏启动")
                 for i in range(10):
                     time.sleep(1)
@@ -396,7 +397,7 @@ class Assistant(QThread):
                 logger.warning("游戏启动失败")
                 return False
         elif path_type == "launcher":
-            if not self.launch_launcher(game_path, path_type):
+            if not self.launch_launcher(game_path, path_type, channel):
                 logger.warning("游戏启动失败")
                 return False
         if channel == 0:
