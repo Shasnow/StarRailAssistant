@@ -48,7 +48,8 @@ from PySide6.QtWidgets import (
     QLabel,
     QRadioButton,
     QLCDNumber,
-    QTableWidget, QTableWidgetItem,
+    QTableWidget,
+    QTableWidgetItem,
 )  # 从 PySide6 中导入所需的类
 from plyer import notification
 
@@ -173,15 +174,17 @@ class Main(QMainWindow):
         self.redeem_code_setting()
         self.quit_game_setting()
         self.software_setting()
-        self.update_log(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) + " 程序启动成功")
+        self.update_log(
+            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " 程序启动成功"
+        )
 
     def software_setting(self):
         self.key_table = self.ui.findChild(QTableWidget, "tableWidget")
         self.key_setting_show()
         self.key_table.cellChanged.connect(self.key_setting_change)
-        save_button=self.ui.findChild(QPushButton, "pushButton_save")
+        save_button = self.ui.findChild(QPushButton, "pushButton_save")
         save_button.clicked.connect(self.key_setting_save)
-        reset_button=self.ui.findChild(QPushButton, "pushButton_reset")
+        reset_button = self.ui.findChild(QPushButton, "pushButton_reset")
         reset_button.clicked.connect(self.key_setting_reset)
 
     def key_setting_save(self):
@@ -211,9 +214,7 @@ class Main(QMainWindow):
         )
         use_launcher_checkbox.setChecked(self.config["StartGame"]["launcher"])
         use_launcher_checkbox.stateChanged.connect(self.use_launcher)
-        self.path_text = self.start_game_setting_container.findChild(
-            QLabel, "label2_2"
-        )
+        self.path_text = self.start_game_setting_container.findChild(QLabel, "label2_2")
         self.line_area = self.start_game_setting_container.findChild(
             QLineEdit, "lineEdit2_2"
         )
@@ -657,8 +658,12 @@ class Main(QMainWindow):
             QCheckBox, "checkBox2_1_1"
         )
         exit_checkbox.stateChanged.connect(self.exit_SRA_status)
-        self.radio_button1 = self.quit_game_setting_container.findChild(QRadioButton, "radioButton2_1_2")
-        self.radio_button2 = self.quit_game_setting_container.findChild(QRadioButton, "radioButton2_1_3")
+        self.radio_button1 = self.quit_game_setting_container.findChild(
+            QRadioButton, "radioButton2_1_2"
+        )
+        self.radio_button2 = self.quit_game_setting_container.findChild(
+            QRadioButton, "radioButton2_1_3"
+        )
         self.radio_button1.toggled.connect(self.shutdown_status)
         self.radio_button2.toggled.connect(self.sleep_status)
         self.task_set_vbox_layout.addWidget(self.quit_game_setting_container)
@@ -800,21 +805,20 @@ class Main(QMainWindow):
         QMessageBox.information(
             self,
             "常见问题",
-            "\n"
             "1. 在差分宇宙中因奇物“绝对失败处方(进入战斗时，我方全体有150%的基础概率陷入冻结状态，持续1回合)”"
-            "冻结队伍会导致无法开启自动战斗，建议开启游戏的沿用自动战斗设置。"
-            "\n2. 游戏画面贴近或超出屏幕显示边缘时功能无法正常执行。"
-            "\n3. 在执行“历战余响”时若未选择关卡，会导致程序闪退。"
-            "\n关于编队：SRA现在还不会编队，对于除饰品提取以外的战斗功能，使用的是当前出战队伍"
+            "冻结队伍会导致无法开启自动战斗，建议开启游戏的沿用自动战斗设置。\n"
+            "2. 游戏画面贴近或超出屏幕显示边缘时功能无法正常执行。\n"
+            "3. 在执行“历战余响”时若未选择关卡，会导致程序闪退。\n"
+            "关于编队：SRA现在还不会编队，对于除饰品提取以外的战斗功能，使用的是当前出战队伍\n"
             "对于饰品提取，如果没有队伍或者队伍有空位，使用的是预设编队的队伍1（不要改名）\n"
-            "此问题等待后续优化\n\n",
+            "此问题等待后续优化\n",
         )
 
     def report(self):
         QMessageBox.information(
             self,
             "问题反馈",
-            "B站：https://space.bilibili.com/349682013\nQQ邮箱：yukikage@qq.com\nQQ群：994571792",
+            "反馈渠道：\n    B站：https://space.bilibili.com/349682013\n    QQ邮箱：yukikage@qq.com\n    QQ群：994571792\n反馈须知：\n    向开发者反馈问题时，除问题描述外，\n    请给出所使用软件的版本号以及日志文件",
         )
 
 
