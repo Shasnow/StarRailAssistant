@@ -23,9 +23,9 @@ v0.6.4 beta
 图形化界面
 """
 
+import ctypes
 import os
 import sys  # 导入 sys 模块，用于与 Python 解释器交互
-import ctypes
 import time
 
 from PySide6.QtCore import QTimer
@@ -49,14 +49,13 @@ from PySide6.QtWidgets import (
     QRadioButton,
     QLCDNumber,
     QTableWidget,
-    QTableWidgetItem,
 )  # 从 PySide6 中导入所需的类
 from plyer import notification
 
-import encryption
-import SRAssistant
 import Configure
+import SRAssistant
 import WindowsPower
+import encryption
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
 
