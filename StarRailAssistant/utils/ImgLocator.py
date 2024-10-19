@@ -13,7 +13,7 @@ class ImageLocator:
     def __init__(self):
         self.log = logger
 
-    def GetLocation(self, image_path, x_add: int = 0, y_add: int = 0) -> Point:
+    def getLocation(self, image_path, x_add: int = 0, y_add: int = 0) -> Point:
         """
         获取屏幕上图像的位置
         """
@@ -29,14 +29,14 @@ class ImageLocator:
             self.log.exception("在尝试获取图像位置时发生错误", is_fatal=True)
             return 0.0, 0.0
         
-    def checkOnWindow(self, image_path: str, waitting_time: float = 0.5, check_time: int = 1) -> bool:
+    def checkOnWindow(self, image_path: str, waiting_time: float = 0.5, check_times: int = 1) -> bool:
         """
         检查图像是否在屏幕上
         """
-        time.sleep(waitting_time)
+        time.sleep(waiting_time)
         result = set()
         while True:
-            if waitting_time > 0:
+            if waiting_time > 0:
                 try:
                     img = cv2.imread(image_path)
                     if img is None:
@@ -51,7 +51,7 @@ class ImageLocator:
                     self.log.exception("在尝试检查图像是否在屏幕上时发生错误", is_fatal=True)
                     return False
                 finally:
-                    waitting_time -= check_time
+                    waiting_time -= check_times
             else:
                 if False not in result:
                     return True

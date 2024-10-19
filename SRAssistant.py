@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-v0.6.4_beta
+v0.6.5 beta
 作者：雪影
 主功能
 """
@@ -61,7 +61,7 @@ class Assistant(QThread):
 
     @Slot()
     def run(self):
-        logger.info("SRAv0.6.4 创建任务")
+        logger.info("SRAv0.6.5 创建任务")
         config = Configure.load()
         if not self.stop_flag:
             if config["Mission"]["startGame"]:
@@ -1072,8 +1072,11 @@ def exist(img_path, wait_time=2):
     except FileNotFoundError as e:
         logger.exception(e, is_fatal=True)
         return False
-    except pyscreeze.PyScreezeException as e:
-        logger.exception(e, is_fatal=True)
+    except pyscreeze.PyScreezeException:
+        logger.exception("未能找到窗口", is_fatal=True)
+        return False
+    except ValueError:
+        logger.exception("窗口未激活", is_fatal=True)
         return False
 
 

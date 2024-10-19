@@ -56,6 +56,7 @@ import Configure
 import SRAssistant
 import WindowsPower
 import encryption
+import AutoPlot
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
 
@@ -69,6 +70,7 @@ class Main(QMainWindow):
 
     def __init__(self):
         super().__init__()  # 调用父类 QMainWindow 的初始化方法
+        self.autoplot = AutoPlot.Main()
         self.exit_SRA = False
         self.sleep = False
         self.shutdown = False
@@ -90,14 +92,29 @@ class Main(QMainWindow):
         self.quit_game_setting_container = uiLoader.load(
             self.AppPath + "/res/ui/set_10.ui"
         )
+
+        self.console()
+        self.start_game_setting()
+        self.trail_blaze_power_setting()
+        self.redeem_code_setting()
+        self.quit_game_setting()
+
+        self.extension()
+
+        self.software_setting()
+
+        self.update_log(
+            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " 程序启动成功"
+        )
+
+    def console(self):
         notice_action = self.ui.findChild(QAction, "action_1")
         notice_action.triggered.connect(self.notice)
         problem_action = self.ui.findChild(QAction, "action_2")
         problem_action.triggered.connect(self.problem)
         report_action = self.ui.findChild(QAction, "action_3")
         report_action.triggered.connect(self.report)
-        # central_widget = QWidget(self)
-        self.ui.setWindowTitle("SRA v0.6.4 beta")  # 设置窗口标题
+        self.ui.setWindowTitle("SRA v0.6.5 beta")  # 设置窗口标题
         self.ui.setWindowIcon(QIcon(self.AppPath + "/res/SRAicon.ico"))
 
         # 创建垂直布局管理器用于任务设置
@@ -168,14 +185,17 @@ class Main(QMainWindow):
         self.button0_2.clicked.connect(self.kill)
         self.button0_2.setEnabled(False)
 
-        self.start_game_setting()
-        self.trail_blaze_power_setting()
-        self.redeem_code_setting()
-        self.quit_game_setting()
-        self.software_setting()
-        self.update_log(
-            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " 程序启动成功"
+    def extension(self):
+        auto_plot_checkbox=self.ui.findChild(
+            QCheckBox, "autoplot_checkBox"
         )
+        auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
+
+    def auto_plot_status(self, state):
+        if state==2:
+            self.autoplot.run_application()
+        else:
+            self.autoplot.quit_application()
 
     def software_setting(self):
         self.key_table = self.ui.findChild(QTableWidget, "tableWidget")
@@ -810,14 +830,14 @@ class Main(QMainWindow):
             "3. 在执行“历战余响”时若未选择关卡，会导致程序闪退。\n"
             "关于编队：SRA现在还不会编队，对于除饰品提取以外的战斗功能，使用的是当前出战队伍\n"
             "对于饰品提取，如果没有队伍或者队伍有空位，使用的是预设编队的队伍1（不要改名）\n"
-            "此问题等待后续优化\n",
         )
 
     def report(self):
         QMessageBox.information(
             self,
             "问题反馈",
-            "反馈渠道：\n    B站：https://space.bilibili.com/349682013\n    QQ邮箱：yukikage@qq.com\n    QQ群：994571792\n反馈须知：\n    向开发者反馈问题时，除问题描述外，\n    请给出所使用软件的版本号以及日志文件",
+            "反馈渠道：\n    B站：https://space.bilibili.com/349682013\n    QQ邮箱：yukikage@qq.com\n    QQ群：994571792\n反馈须知：\n "
+            "   向开发者反馈问题时，除问题描述外，\n    请给出所使用软件的版本号以及日志文件",
         )
 
 
@@ -856,7 +876,6 @@ if __name__ == "__main__":
     if is_admin():
         app = SRA()
         app.exec()
-
     else:
         # 重新以管理员权限运行脚本
         ctypes.windll.shell32.ShellExecuteW(
