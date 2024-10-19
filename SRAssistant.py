@@ -255,26 +255,25 @@ class Assistant(QThread):
             True if successfully launched, False otherwise.
 
         """
-        if not is_process_running("HYP.exe"):
-            if not self.path_check(path, path_type):
-                logger.warning("路径无效")
-                return False
-            try:
-                subprocess.Popen(path)
-            except OSError:
-                logger.error("路径无效或权限不足")
-                return False
-            logger.info("等待启动器启动")
+        if not self.path_check(path, path_type):
+            logger.warning("路径无效")
+            return False
+        try:
+            subprocess.Popen(path)
+        except OSError:
+            logger.error("路径无效或权限不足")
+            return False
+        logger.info("等待启动器启动")
         time.sleep(5)
         times = 0
-        while times<40:
+        while times < 40:
             if is_process_running("HYP.exe"):
                 time.sleep(2)
-                if channel==0:
+                if channel == 0:
                     click('res/img/star_game.png', title="米哈游启动器")
                 else:
                     click('res/img/star_game.png')
-                logger.info("等待游戏启动")
+                logger.info("尝试启动游戏")
                 for i in range(10):
                     time.sleep(1)
                     if is_process_running("StarRail.exe"):
@@ -1103,6 +1102,9 @@ def click(img_path, x_add=0, y_add=0, wait_time=2.0, title="崩坏：星穹铁�
         y += y_add
         pyautogui.click(x, y)
         return True
+    except pyscreeze.PyScreezeException:
+        logger.exception("未能找到窗口：" + title, is_fatal=True)
+        raise
     except pyautogui.ImageNotFoundException as e:
         logger.exception(e, is_fatal=True)
         return False
