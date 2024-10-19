@@ -42,6 +42,7 @@ This software is open source, free of charge and for learning and exchange purpo
 * 领取无名勋礼
 * 退出游戏
   * *从不回头看`“爆炸”`*，退出SRA以及关闭计算机。
+* 自动剧情（实验性功能）
 
 ## 我怎么才能使用SRA？急急急
 

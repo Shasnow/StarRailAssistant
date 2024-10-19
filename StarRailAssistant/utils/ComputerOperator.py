@@ -34,7 +34,7 @@ class ComputerOperator:
         """
         time.sleep(waiting_time)
         logger.debug(f"点击屏幕：{img_path}")
-        x , y = self.image_locator.GetLocation(img_path, x_offset, y_offset)
+        x , y = self.image_locator.getLocation(img_path, x_offset, y_offset)
         logger.trace(f"坐标：{x}, {y}")
         if x == -1 or y == -1:
             logger.error(f"未找到图片：{img_path}")
