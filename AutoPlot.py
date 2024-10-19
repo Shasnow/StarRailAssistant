@@ -71,12 +71,12 @@ class PlotListener(QThread):
         super().__init__()
         self.running_flag = True
         self.in_plot_flag = False
-        logger.info("监听，启动！")
 
     def stop(self):
         self.running_flag = False
 
     def run(self):
+        logger.info("监听，启动！")
         while self.running_flag:
             try:
                 if exist("res/img/dialog.png", wait_time=self.wait_time):
