@@ -83,6 +83,13 @@ def is_process_running(process_name):
     return False
 
 
+def task_kill(process):
+    """Kill the launcher"""
+    command = f"taskkill /F /IM {process}"
+    # 执行命令
+    subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
+
+
 if __name__ == "__main__":
     # Example usage:
     processName = "HYP.exe"  # Replace with the name of the process you want to check

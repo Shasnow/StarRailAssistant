@@ -143,7 +143,8 @@ class Assistant(QThread):
                 self.nameless_honor()
         if not self.stop_flag:
             if config["Mission"]["quitGame"]:
-                self.kill_game()
+                WindowsProcess.task_kill("StarRail.exe")
+                logger.info("退出游戏")
         if self.stop_flag:
             logger.info("已停止")
         else:
@@ -185,22 +186,6 @@ class Assistant(QThread):
         else:
             logger.error("游戏路径为空")
             return False
-
-    @Slot()
-    def kill_game(self):
-        """Kill the game"""
-        command = f"taskkill /F /IM StarRail.exe"
-        # 执行命令
-        subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
-        logger.info("退出游戏")
-
-    @Slot()
-    def kill_launcher(self):
-        """Kill the launcher"""
-        command = f"taskkill /F /IM HYP.exe"
-        # 执行命令
-        subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
-        logger.info("已为您关闭启动器")
 
     @Slot()
     def launch_game(self, game_path, path_type):
@@ -272,7 +257,8 @@ class Assistant(QThread):
                     time.sleep(1)
                     if is_process_running("StarRail.exe"):
                         logger.info("启动成功")
-                        self.kill_launcher()
+                        WindowsProcess.task_kill("HYP.exe")
+                        logger.info("已为您关闭启动器")
                         return True
             else:
                 time.sleep(0.5)
