@@ -34,10 +34,9 @@ import WindowsProcess
 
 
 class Updater:
-    # APP_PATH = os.path.dirname(os.path.realpath(sys.argv[0])).replace(
-    #     "\\", "/"
-    # )  # 获取软件自身的路径
-    APP_PATH = "C:\\Users\\20114\\Downloads\\StarRailAssistant_v0.6.3_beta"
+    APP_PATH = os.path.dirname(os.path.realpath(sys.argv[0])).replace(
+        "\\", "/"
+    )  # 获取软件自身的路径
     # 远程版本信息文件的URL
     VERSION_INFO_URL = "https://ghp.ci/https://github.com/Shasnow/StarRailAssistant/blob/main/version.json"
 
@@ -56,7 +55,7 @@ class Updater:
             print("初始化版本信息")
             version_info = {
                 "version": "0.0.0",
-                "updater": "1.0.0"
+                "updater": "0.9.0"
             }
             with open(self.APP_PATH + "/version.json", "w", encoding="utf-8") as json_file:
                 json.dump(version_info, json_file, indent=4)
@@ -88,6 +87,7 @@ class Updater:
             self.download(version_info["download_url"])
             if remote_updater_version > current_updater_version:
                 print("存在SRA更新器更新，此次更新需要手动解压。请关闭SRA更新器后手动解压。")
+                os.system("pause")
                 return
             self.unzip()
         except Exception as e:
@@ -111,6 +111,7 @@ class Updater:
                     print(
                         f"\r已下载: {downloaded_size / 1000000:.2f}/{file_size / 1000000:.2f} MB ({downloaded_size / file_size * 100:.2f}%)",
                         end="")
+            print()
         except Exception as e:
             print(f"下载更新时出错: {e}")
             os.system("pause")
@@ -119,7 +120,7 @@ class Updater:
         if WindowsProcess.is_process_running("SRA.exe"):
             WindowsProcess.task_kill("SRA.exe")
         try:
-            print("\n解压更新文件")
+            print("解压更新文件")
             with zipfile.ZipFile(self.TEMP_DOWNLOAD_PATH, 'r') as zip_ref:
                 zip_ref.extractall(self.UPDATE_EXTRACT_DIR)
 
@@ -129,7 +130,7 @@ class Updater:
             os.system("pause")
 
         except Exception as e:
-            print(f"解压更新时出错: {e}")
+            print(f"解压更新时出错: {e}，SRA更新器运行中，请关闭后手动解压")
             os.system("pause")
 
 
