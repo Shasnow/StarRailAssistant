@@ -1,4 +1,5 @@
 {
-    "version": "0.6.4",
-    "download_url": "https://ghp.ci/https://github.com/Shasnow/StarRailAssistant/releases/download/v0.6.4/StarRailAssistant_v0.6.4_beta.zip"
+    "version": "0.6.5",
+    "download_url": "https://ghp.ci/https://github.com/Shasnow/StarRailAssistant/releases/download/v0.6.5_beta/StarRailAssistant_v0.6.5_beta.zip",
+    "updater": "1.0.0"
 }

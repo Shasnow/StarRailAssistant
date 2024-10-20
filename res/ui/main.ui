@@ -684,8 +684,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>811</width>
-             <height>214</height>
+             <width>312</width>
+             <height>89</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_16">
@@ -1274,7 +1274,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <item>
              <widget class="QGroupBox" name="groupBox_7">
               <property name="title">
-               <string>SRA设置（不可用）</string>
+               <string>SRA设置</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_5">
                <item row="0" column="0">
@@ -1288,8 +1288,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  <layout class="QHBoxLayout" name="horizontalLayout_24">
                   <item>
                    <widget class="QCheckBox" name="checkBox_ifselfstart">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
                     <property name="text">
                      <string>开机自启动</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
@@ -1319,7 +1325,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_25">
                   <item>
-                   <widget class="QCheckBox" name="checkBox_ifautoupdate">
+                   <widget class="QCheckBox" name="checkBox_ifAutoUpdate">
                     <property name="text">
                      <string>自动更新</string>
                     </property>

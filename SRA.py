@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-v0.6.4 beta
+v0.6.5
 作者：雪影
 图形化界面
 """
@@ -206,6 +206,12 @@ class Main(QMainWindow):
         reset_button = self.ui.findChild(QPushButton, "pushButton_reset")
         reset_button.clicked.connect(self.key_setting_reset)
 
+        auto_update_checkbox=self.ui.findChild(
+            QCheckBox, "checkBox_ifAutoUpdate"
+        )
+        auto_update_checkbox.stateChanged.connect(self.auto_update)
+        auto_update_checkbox.setChecked(self.config["Settings"]["autoUpdate"])
+
     def key_setting_save(self):
         Configure.save(self.config)
 
@@ -221,6 +227,14 @@ class Main(QMainWindow):
     def key_setting_change(self):
         for i in range(4):
             self.config["Settings"]["F" + str(i + 1)] = self.key_table.item(0, i).text()
+
+    def auto_update(self,state):
+        if state==2:
+            SRAssistant.Popen("SRAUpdater.exe")
+            self.config["Settings"]["autoUpdate"]=True
+        else:
+            self.config["Settings"]["autoUpdate"]=False
+        Configure.save(self.config)
 
     def start_game_setting(self):
         channel_combobox = self.start_game_setting_container.findChild(
@@ -866,7 +880,7 @@ class SRA(QApplication):
             "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
             "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
             "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，相应的后果由您自行承担。\n\n"
-            "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B 站、微博）的官方动态下讨论任何关于 SRA 内容。"
+            "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B 站、微博）的官方动态下讨论任何关于 SRA 的内容。"
             "\n"
             "\n人话：不要跳脸官方～(∠・ω< )⌒☆",
         )
