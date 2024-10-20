@@ -50,7 +50,6 @@ This software is open source, free of charge and for learning and exchange purpo
 
 * 如果你是小白，只需要下载项目中的`zip`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`.exe`即可！
 * **我想挑战一下自己！** 当然没问题。打包下载项目中所有文件，确保你的电脑中已经安装好了`Python`，并使用`pip`来安装依赖。请在项目根文件夹打开终端并运行以下指令：
-**注意：`FuXLogger`可能不再为Python3.12以下的版本提供支持。**
   ```bash
   pip install -r requirements.txt
   ```
