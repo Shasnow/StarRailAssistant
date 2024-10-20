@@ -1,0 +1,5 @@
+// 示例 version.json 文件内容  
+{  
+    "version": "0.6.4",  
+    "download_url": "https://github.com/Shasnow/StarRailAssistant/releases/download/v0.6.4/StarRailAssistant_v0.6.4_beta.zip"  
+}
