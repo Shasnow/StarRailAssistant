@@ -220,10 +220,7 @@ class Assistant(QThread):
         if not self.path_check(game_path, path_type):
             logger.warning("路径无效")
             return False
-        try:
-            subprocess.Popen(game_path)
-        except OSError:
-            logger.error("路径无效或权限不足")
+        if not Popen(game_path):
             return False
         logger.info("等待游戏启动")
         time.sleep(5)
@@ -258,10 +255,7 @@ class Assistant(QThread):
         if not self.path_check(path, path_type):
             logger.warning("路径无效")
             return False
-        try:
-            subprocess.Popen(path)
-        except OSError:
-            logger.error("路径无效或权限不足")
+        if not Popen(path):
             return False
         logger.info("等待启动器启动")
         time.sleep(5)
@@ -1027,6 +1021,18 @@ class Assistant(QThread):
             pyautogui.press("esc")
             return False
         return True
+
+
+def Popen(path: str):
+    try:
+        subprocess.Popen(path)
+        return True
+    except FileNotFoundError as e:
+        logger.error(e)
+        return False
+    except OSError:
+        logger.error("路径无效或权限不足")
+        return False
 
 
 def check(img_path, interval=0.5, max_time=40):

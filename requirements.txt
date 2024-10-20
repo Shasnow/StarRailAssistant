@@ -9,3 +9,6 @@ pywin32-ctypes
 cryptography
 FuXLogger
 psutil
+Pillow
+requests
+PyGetWindow

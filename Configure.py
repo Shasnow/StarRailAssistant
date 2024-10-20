@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-beta v0.6.4
+beta v0.6.5
 作者：雪影
 配置相关操作
 """
@@ -45,7 +45,7 @@ def init() -> None:
                 "autoLogin": False,
                 "launcher": False,
                 "gamePath": "",
-                "pathType":"StarRail",
+                "pathType": "StarRail",
                 "channel": 0
             },
             "RedeemCode": {
@@ -94,10 +94,11 @@ def init() -> None:
                 "sleep": False
             },
             "Settings": {
-                "F1":"f1",
-                "F2":"f2",
-                "F3":"f3",
-                "F4":"f4"
+                "F1": "f1",
+                "F2": "f2",
+                "F3": "f3",
+                "F4": "f4",
+                "autoUpdate": True
             }
         }
         with open("data/config.json", "w", encoding="utf-8") as json_file:

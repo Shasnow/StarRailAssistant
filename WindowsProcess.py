@@ -22,6 +22,8 @@ v0.6.4 beta
 作者：雪影
 Windows进程操作
 """
+import subprocess
+
 import psutil
 import win32con
 import win32gui
