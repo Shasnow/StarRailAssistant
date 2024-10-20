@@ -76,7 +76,7 @@ jobs:
           "version=$VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Create Zip
         run: |
-          Compress-Archive -Path res,data,dist/SRA.exe,README.md,HELP.md,LICENSE,version.json -DestinationPath StarRailAssistant_${{ env.version }}.zip
+          Compress-Archive -Path res,data,dist/SRA.exe,README.md,HELP.md,LICENSE,version.json,SRAUpdater.exe -DestinationPath StarRailAssistant_${{ env.version }}.zip
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
