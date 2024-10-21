@@ -1,7 +1,6 @@
 ![ico](/res/SRAico.jpg)  
 
-#### [帮助文档](https://github.com/Shasnow/StarRailAssistant/blob/main/HELP.md)
-
+#### [帮助文档](https://github.com/Shasnow/StarRailAssistant/blob/main/HELP.md) | [FAQ](https://github.com/Shasnow/StarRailAssistant/wiki/FAQ) | [下载和安装](https://github.com/Shasnow/StarRailAssistant/wiki/Install)
 # StarRailAssistant(SRA)
 
 崩坏星穹铁道自动化助手  
