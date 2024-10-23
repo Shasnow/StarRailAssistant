@@ -105,7 +105,7 @@ class Updater:
         if remote_resource_version > current_resource_version:
             print(f"发现资源更新：{remote_resource_version}")
             print(f"更新说明：\n{version_info['announcement']}")
-            return version_info["resource_download_url"], True
+            return version_info["resource_download_url"], False
         print("已经是最新版本")
         return "", updater_update
 
