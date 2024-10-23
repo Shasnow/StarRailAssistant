@@ -115,6 +115,7 @@ def init() -> None:
             ["F2", "f2"],
             ["F3", "f3"],
             ["F4", "f4"],
+            ["startup", False],
             ["autoUpdate", True],
         ],
     }

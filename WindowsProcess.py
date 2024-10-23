@@ -23,6 +23,7 @@ v0.6.4 beta
 Windows进程操作
 """
 import subprocess
+import winreg
 
 import psutil
 import win32con
@@ -90,10 +91,27 @@ def task_kill(process):
     subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
 
 
+def set_startup_item(program_name, program_path):
+    try:
+        key_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run'
+        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE)
+        winreg.SetValueEx(key, program_name, 0, winreg.REG_SZ, program_path)
+        winreg.CloseKey(key)
+        return True
+    except Exception:
+        return False
+
+
+def delete_startup_item(item_name):
+    try:
+        startup_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Run", 0,
+                                  winreg.KEY_SET_VALUE | winreg.KEY_WOW64_32KEY)
+        winreg.DeleteValue(startup_key, item_name)
+        winreg.CloseKey(startup_key)
+        return True
+    except Exception:
+        return False
+
 if __name__ == "__main__":
-    # Example usage:
-    processName = "HYP.exe"  # Replace with the name of the process you want to check
-    if is_process_running(processName):
-        print(f"The process {processName} is running.")
-    else:
-        print(f"The process {processName} is not running.")
+    set_startup_item("SRA", "C:\\Users\\20114\\Downloads\\SRA\\SRA.exe")
+    delete_startup_item("SRA")

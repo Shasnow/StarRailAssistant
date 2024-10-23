@@ -55,6 +55,7 @@ from plyer import notification
 import Configure
 import SRAssistant
 import WindowsPower
+import WindowsProcess
 import encryption
 import AutoPlot
 
@@ -186,13 +187,13 @@ class Main(QMainWindow):
         self.button0_2.setEnabled(False)
 
     def extension(self):
-        auto_plot_checkbox=self.ui.findChild(
+        auto_plot_checkbox = self.ui.findChild(
             QCheckBox, "autoplot_checkBox"
         )
         auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
 
     def auto_plot_status(self, state):
-        if state==2:
+        if state == 2:
             self.autoplot.run_application()
         else:
             self.autoplot.quit_application()
@@ -206,7 +207,11 @@ class Main(QMainWindow):
         reset_button = self.ui.findChild(QPushButton, "pushButton_reset")
         reset_button.clicked.connect(self.key_setting_reset)
 
-        auto_update_checkbox=self.ui.findChild(
+        startup_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifStartUp")
+        startup_checkbox.setChecked(self.config["Settings"]["startup"])
+        startup_checkbox.stateChanged.connect(self.startup)
+
+        auto_update_checkbox = self.ui.findChild(
             QCheckBox, "checkBox_ifAutoUpdate"
         )
         auto_update_checkbox.stateChanged.connect(self.auto_update)
@@ -228,12 +233,21 @@ class Main(QMainWindow):
         for i in range(4):
             self.config["Settings"]["F" + str(i + 1)] = self.key_table.item(0, i).text()
 
-    def auto_update(self,state):
-        if state==2:
-            SRAssistant.Popen("SRAUpdater.exe")
-            self.config["Settings"]["autoUpdate"]=True
+    def startup(self, state):
+        if state == 2:
+            WindowsProcess.set_startup_item("SRA", self.AppPath + "/SRA.exe")
+            self.config["Settings"]["startup"] = True
         else:
-            self.config["Settings"]["autoUpdate"]=False
+            WindowsProcess.delete_startup_item("SRA")
+            self.config["Settings"]["startup"] = False
+        Configure.save(self.config)
+
+    def auto_update(self, state):
+        if state == 2:
+            SRAssistant.Popen("SRAUpdater.exe")
+            self.config["Settings"]["autoUpdate"] = True
+        else:
+            self.config["Settings"]["autoUpdate"] = False
         Configure.save(self.config)
 
     def start_game_setting(self):
@@ -272,7 +286,7 @@ class Main(QMainWindow):
             QLineEdit, "lineEdit2_4_22"
         )
         # self.password.setText(self.password_text)
-        self.password.setEchoMode(QLineEdit.Password)
+        self.password.setEchoMode(QLineEdit.EchoMode.Password)
         self.password.setReadOnly(True)
         self.password.textChanged.connect(self.get_password)
         self.show_button = self.start_game_setting_container.findChild(
@@ -335,11 +349,11 @@ class Main(QMainWindow):
 
     def togglePasswordVisibility(self):
         """Toggle password visibility"""
-        if self.password.echoMode() == QLineEdit.Password:
-            self.password.setEchoMode(QLineEdit.Normal)
+        if self.password.echoMode() == QLineEdit.EchoMode.Password:
+            self.password.setEchoMode(QLineEdit.EchoMode.Normal)
             self.show_button.setText("隐藏")
         else:
-            self.password.setEchoMode(QLineEdit.Password)
+            self.password.setEchoMode(QLineEdit.EchoMode.Password)
             self.show_button.setText("显示")
 
     def display_none(self):
@@ -453,7 +467,6 @@ class Main(QMainWindow):
     def redeem_code_change(self):
         """Change the redeem code list while redeem code text changes."""
         redeem_code = self.redeem_code.toPlainText()
-        # self.log.append(redeem_code)
         self.config["RedeemCode"]["codeList"] = redeem_code.split()
 
     def show_redeem_code_setting(self):
@@ -811,7 +824,7 @@ class Main(QMainWindow):
         QMessageBox.information(
             self,
             "更新公告",
-            "v0.6.4 更新公告\n"
+            "v0.6.5 更新公告\n"
             "新功能：\n"
             "1.重置GUI\n"
             "2.本地账号信息加密\n"
@@ -874,7 +887,7 @@ class SRA(QApplication):
         QMessageBox.information(
             self.main.ui,
             "使用说明",
-            "SRA崩坏：星穹铁道助手 v0.6.4 beta by雪影\n"
+            "SRA崩坏：星穹铁道助手 v0.6.5 beta by雪影\n"
             "使用说明：\n"
             "重要！以管理员模式运行程序！\n"
             "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
