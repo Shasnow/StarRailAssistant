@@ -19,7 +19,7 @@
 """
 崩坏：星穹铁道助手
 SRA更新器
-v1.0.0
+v1.1.0
 作者：雪影
 """
 
@@ -94,19 +94,19 @@ class Updater:
         # 获取远程最新版本号
         remote_version = version_info["version"]
         remote_updater_version = version_info["updater"]
-        remote_resource_version = version_info["resource_version"] if "resource_version" in version_info else "0.0.0"
+        remote_resource_version = version_info["resource_version"]
         updater_update = False
         if remote_updater_version > current_updater_version:
             updater_update = True
         # 比较当前版本和远程版本
         if remote_version > current_version:
             print(f"发现新版本：{remote_version}")
-            print(f"更新说明：{version_info['announcement']}")
+            print(f"更新说明：\n{version_info['announcement']}")
             return version_info["download_url"], updater_update
         if remote_resource_version > current_resource_version:
             print(f"发现资源更新：{remote_resource_version}")
-            print(f"更新说明：{version_info['announcement']}")
-            return version_info["resource_download_url"], updater_update
+            print(f"更新说明：\n{version_info['announcement']}")
+            return version_info["resource_download_url"], True
         print("已经是最新版本")
         return "", updater_update
 
