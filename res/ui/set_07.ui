@@ -756,6 +756,11 @@
                </item>
                <item>
                 <property name="text">
+                 <string>一曲和弦的幻景（虚数）</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
                  <string>镇灵敕符（虚数）</string>
                 </property>
                </item>
