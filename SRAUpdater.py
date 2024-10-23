@@ -62,7 +62,7 @@ class Updater:
                 json.dump(version_info, json_file, indent=4)
 
     def get_current_version(self):
-        with open(self.APP_PATH + '/version.json', 'r') as jsonfile:
+        with open(self.APP_PATH + '/version.json', 'r', encoding="utf-8") as jsonfile:
             version_info = json.load(jsonfile)
             version = version_info["version"]
             updater_version = version_info["updater"]
@@ -75,7 +75,6 @@ class Updater:
         try:
             url, updater_update = self.version_check(current_version,current_updater_version, current_resource_version)
             if url == "":
-                os.system("pause")
                 return
             self.download(url)
             if updater_update:
