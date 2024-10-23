@@ -29,6 +29,7 @@ import time
 import cv2
 import pyautogui
 import pyscreeze
+import pygetwindow
 from PySide6.QtCore import QThread, Signal, Slot
 
 import Configure
@@ -1114,11 +1115,12 @@ def get_screen_center():
     Returns:
         tuple(x, y)
     """
+    active_window=pygetwindow.getActiveWindow()
     x, y, screen_width, screen_height = (
-        pyautogui.getActiveWindow().left,
-        pyautogui.getActiveWindow().top,
-        pyautogui.getActiveWindow().width,
-        pyautogui.getActiveWindow().height,
+        active_window.left,
+        active_window.top,
+        active_window.width,
+        active_window.height,
     )
     return x + screen_width // 2, y + screen_height // 2
 

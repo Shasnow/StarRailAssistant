@@ -25,8 +25,8 @@ v1.0.0
 
 import json
 import os
-import zipfile
 import sys
+import zipfile
 
 import requests
 
@@ -55,7 +55,8 @@ class Updater:
             print("初始化版本信息")
             version_info = {
                 "version": "0.0.0",
-                "updater": "0.9.0"
+                "updater": "0.9.0",
+                "resource_version": "0.0.0"
             }
             with open(self.APP_PATH + "/version.json", "w", encoding="utf-8") as json_file:
                 json.dump(version_info, json_file, indent=4)
@@ -63,36 +64,51 @@ class Updater:
     def get_current_version(self):
         with open(self.APP_PATH + '/version.json', 'r') as jsonfile:
             version_info = json.load(jsonfile)
-            version=version_info["version"]
+            version = version_info["version"]
             updater_version = version_info["updater"]
-        return version, updater_version
+            resource_version = version_info["resource_version"] if "resource_version" in version_info else "0.0.0"
+        return version, updater_version, resource_version
 
     def check_for_updates(self):
         print("检查版本信息")
-        current_version, current_updater_version = self.get_current_version()
+        current_version, current_updater_version, current_resource_version = self.get_current_version()
         try:
-            # 从远程服务器获取版本信息
-            response = requests.get(self.VERSION_INFO_URL)
-            version_info = response.json()
-
-            # 获取远程最新版本号
-            remote_version = version_info["version"]
-            remote_updater_version = version_info["updater"]
-
-            # 比较当前版本和远程版本
-            if remote_version <= current_version:
-                print("当前已经是最新版本。")
+            url, updater_update = self.version_check(current_version,current_updater_version, current_resource_version)
+            if url == "":
+                os.system("pause")
                 return
-            print(f"发现新版本: {remote_version}. 开始下载更新...")
-            self.download(version_info["download_url"])
-            if remote_updater_version > current_updater_version:
-                print("存在SRA更新器更新，此次更新需要手动解压。请关闭SRA更新器后手动解压。")
+            self.download(url)
+            if updater_update:
+                print("存在更新器更新，需要手动解压")
                 os.system("pause")
                 return
             self.unzip()
         except Exception as e:
             print(f"检查更新时出错: {e}")
             os.system("pause")
+
+    def version_check(self, current_version, current_updater_version, current_resource_version):
+        # 从远程服务器获取版本信息
+        response = requests.get(self.VERSION_INFO_URL)
+        version_info = response.json()
+        # 获取远程最新版本号
+        remote_version = version_info["version"]
+        remote_updater_version = version_info["updater"]
+        remote_resource_version = version_info["resource_version"] if "resource_version" in version_info else "0.0.0"
+        updater_update = False
+        if remote_updater_version > current_updater_version:
+            updater_update = True
+        # 比较当前版本和远程版本
+        if remote_version > current_version:
+            print(f"发现新版本：{remote_version}")
+            print(f"更新说明：{version_info['announcement']}")
+            return version_info["download_url"], updater_update
+        if remote_resource_version > current_resource_version:
+            print(f"发现资源更新：{remote_resource_version}")
+            print(f"更新说明：{version_info['announcement']}")
+            return version_info["resource_download_url"], updater_update
+        print("已经是最新版本")
+        return "", updater_update
 
     def download(self, download_url):
         try:

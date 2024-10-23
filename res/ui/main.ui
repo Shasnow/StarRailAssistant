@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>855</width>
-    <height>789</height>
+    <width>795</width>
+    <height>681</height>
    </rect>
   </property>
   <property name="font">
@@ -684,8 +684,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>312</width>
-             <height>89</height>
+             <width>751</width>
+             <height>172</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_16">
@@ -783,8 +783,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>811</width>
-             <height>658</height>
+             <width>751</width>
+             <height>550</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -1287,9 +1287,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_24">
                   <item>
-                   <widget class="QCheckBox" name="checkBox_ifselfstart">
+                   <widget class="QCheckBox" name="checkBox_ifStartUp">
                     <property name="enabled">
-                     <bool>false</bool>
+                     <bool>true</bool>
                     </property>
                     <property name="text">
                      <string>开机自启动</string>
@@ -1366,6 +1366,7 @@ hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Microsoft YaHei UI'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;如果在使用中遇到问题，请阅读HELP.md&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;SRA完全免费，如果您是通过付费渠道获取的该软件，请及时退款并举报商家。&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;GitHub上的SRA：https://github.com/Shasnow/StarRailAssistant&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
@@ -1389,7 +1390,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>855</width>
+     <width>795</width>
      <height>33</height>
     </rect>
    </property>
