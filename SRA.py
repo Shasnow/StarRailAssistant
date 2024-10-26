@@ -115,7 +115,7 @@ class Main(QMainWindow):
         problem_action.triggered.connect(self.problem)
         report_action = self.ui.findChild(QAction, "action_3")
         report_action.triggered.connect(self.report)
-        self.ui.setWindowTitle("SRA v0.6.5 beta")  # 设置窗口标题
+        self.ui.setWindowTitle("SRA v0.6.6")  # 设置窗口标题
         self.ui.setWindowIcon(QIcon(self.AppPath + "/res/SRAicon.ico"))
 
         # 创建垂直布局管理器用于任务设置

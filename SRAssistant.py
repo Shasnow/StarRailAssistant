@@ -62,7 +62,7 @@ class Assistant(QThread):
 
     @Slot()
     def run(self):
-        logger.info("SRAv0.6.5 创建任务")
+        logger.info("SRAv0.6.6 创建任务")
         config = Configure.load()
         if not self.stop_flag:
             if config["Mission"]["startGame"]:
