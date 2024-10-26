@@ -29,6 +29,7 @@ import os
 def init() -> None:
     if not os.path.exists("data/config.json"):
         config = {}
+        os.makedirs("data", exist_ok=True)
         with open("data/config.json", "w") as f:
             json.dump(config, f, indent=4)
     config_list_1 = [
