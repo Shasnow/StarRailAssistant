@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-v0.6.6
+v0.6.7
 作者：雪影
 主功能
 """
@@ -47,7 +47,8 @@ class Assistant(QThread):
         super().__init__()
         self.stop_flag = False
         self.pwd = pwd
-        settings = Configure.load()["Settings"]
+        self.config = Configure.load()
+        settings = self.config["Settings"]
         self.f1 = settings["F1"]
         self.f2 = settings["F2"]
         self.f4 = settings["F4"]
@@ -62,92 +63,35 @@ class Assistant(QThread):
 
     @Slot()
     def run(self):
-        logger.info("SRAv0.6.6 创建任务")
-        config = Configure.load()
-        if not self.stop_flag:
-            if config["Mission"]["startGame"]:
-                account_text = encryption.load()
-                password_text = self.pwd
-                self.start_game(
-                    config["StartGame"]["gamePath"],
-                    config["StartGame"]["pathType"],
-                    config["StartGame"]["channel"],
-                    config["StartGame"]["autoLogin"],
-                    account_text,
-                    password_text,
-                )
-        if not self.check_game():
-            return
-        if not self.stop_flag:
-            if config["Mission"]["trailBlazerProfile"]:
-                self.trailblazer_profile()
-        if not self.stop_flag:
-            if config["Mission"]["redeemCode"]:
-                self.redeem_code(config["RedeemCode"]["codeList"])
-        if not self.stop_flag:
-            if config["Mission"]["assignment"]:
-                self.assignments_reward()
-        if not self.stop_flag:
-            if config["Mission"]["giftOfOdyssey"]:
-                self.gift_of_odyssey()
-        if not self.stop_flag:
-            if config["Mission"]["mail"]:
-                self.mail()
-        if not self.stop_flag:
-            if config["Mission"]["trailBlazePower"]:
-                self.replenish_flag = config["Replenish"]["enable"]
-                self.replenish_way = config["Replenish"]["way"]
-                self.replenish_time = config["Replenish"]["runTimes"]
-                if not self.stop_flag:
-                    if config["OrnamentExtraction"]["enable"]:
-                        self.ornament_extraction(
-                            config["OrnamentExtraction"]["level"],
-                            config["OrnamentExtraction"]["runTimes"],
-                        )
-                if not self.stop_flag:
-                    if config["CalyxGolden"]["enable"]:
-                        self.calyx_golden(
-                            config["CalyxGolden"]["level"],
-                            config["CalyxGolden"]["singleTimes"],
-                            config["CalyxGolden"]["runTimes"],
-                        )
-                if not self.stop_flag:
-                    if config["CalyxCrimson"]["enable"]:
-                        self.calyx_crimson(
-                            config["CalyxCrimson"]["level"],
-                            config["CalyxCrimson"]["singleTimes"],
-                            config["CalyxCrimson"]["runTimes"],
-                        )
-                if not self.stop_flag:
-                    if config["StagnantShadow"]["enable"]:
-                        self.stagnant_shadow(
-                            config["StagnantShadow"]["level"],
-                            config["StagnantShadow"]["runTimes"],
-                        )
-                if not self.stop_flag:
-                    if config["CaverOfCorrosion"]["enable"]:
-                        self.caver_of_corrosion(
-                            config["CaverOfCorrosion"]["level"],
-                            config["CaverOfCorrosion"]["runTimes"]
-                        )
-                if not self.stop_flag:
-                    if config["EchoOfWar"]["enable"]:
-                        self.echo_of_war(
-                            config["EchoOfWar"]["level"],
-                            config["EchoOfWar"]["runTimes"]
-                        )
-        if not self.stop_flag:
-            if config["Mission"]["dailyTraining"]:
-                self.daily_training_reward()
-        if not self.stop_flag:
-            if config["Mission"]["namelessHonor"]:
-                self.nameless_honor()
-        if not self.stop_flag:
-            if config["Mission"]["quitGame"]:
-                WindowsProcess.task_kill("StarRail.exe")
-                logger.info("退出游戏")
-        if self.stop_flag:
-            logger.info("已停止")
+        logger.info("SRAv0.6.7 创建任务")
+        config = self.config
+        tasks = []
+        if config["Mission"]["startGame"]:
+            account_text = encryption.load()
+            password_text = self.pwd
+            tasks.append((self.start_game, (
+                config["StartGame"]["gamePath"],
+                config["StartGame"]["pathType"],
+                config["StartGame"]["channel"],
+                config["StartGame"]["autoLogin"],
+                account_text,
+                password_text,
+            )))
+        tasks.append((self.check_game, ()))
+        if config["Mission"]["trailBlazePower"]:
+            tasks.append((self.trailblazer_power, ()))
+        if config["ReceiveRewards"]["enable"]:
+            tasks.append((self.receive_rewards, ()))
+        if config["Mission"]["quitGame"]:
+            tasks.append((self.quit_game, ()))
+
+        for task, args in tasks:
+            if not self.stop_flag:
+                if not task(*args):
+                    logger.warning("任务由于异常而终止")
+                    break
+            else:
+                logger.info("已停止")
         else:
             logger.info("任务全部完成")
 
@@ -424,29 +368,110 @@ class Assistant(QThread):
                     logger.error("发生错误，进入游戏但未处于大世界")
                     return False
 
+    def trailblazer_power(self):
+        tasks = []
+        config = self.config
+        self.replenish_flag = config["Replenish"]["enable"]
+        self.replenish_way = config["Replenish"]["way"]
+        self.replenish_time = config["Replenish"]["runTimes"]
+        if config["OrnamentExtraction"]["enable"]:
+            tasks.append((self.ornament_extraction, (
+                config["OrnamentExtraction"]["level"],
+                config["OrnamentExtraction"]["runTimes"],
+            )))
+        if config["CalyxGolden"]["enable"]:
+            tasks.append((self.calyx_golden, (
+                config["CalyxGolden"]["level"],
+                config["CalyxGolden"]["singleTimes"],
+                config["CalyxGolden"]["runTimes"],
+            )))
+        if config["CalyxCrimson"]["enable"]:
+            tasks.append((self.calyx_crimson, (
+                config["CalyxCrimson"]["level"],
+                config["CalyxCrimson"]["singleTimes"],
+                config["CalyxCrimson"]["runTimes"],
+            )))
+        if config["StagnantShadow"]["enable"]:
+            tasks.append((self.stagnant_shadow, (
+                config["StagnantShadow"]["level"],
+                config["StagnantShadow"]["runTimes"],
+            )))
+        if config["CaverOfCorrosion"]["enable"]:
+            tasks.append((self.caver_of_corrosion, (
+                config["CaverOfCorrosion"]["level"],
+                config["CaverOfCorrosion"]["runTimes"]
+            )))
+        if config["EchoOfWar"]["enable"]:
+            tasks.append((self.echo_of_war, (
+                config["EchoOfWar"]["level"],
+                config["EchoOfWar"]["runTimes"]
+            )))
+        for task, args in tasks:
+            if self.stop_flag:
+                break
+            task(*args)
+        else:
+            return True
+        return False
+
+    def receive_rewards(self) -> bool:
+        tasks = []
+        config = self.config
+        if config["Mission"]["trailBlazerProfile"]:
+            tasks.append((self.trailblazer_profile, ()))
+        if config["Mission"]["assignment"]:
+            tasks.append((self.assignments_reward, ()))
+        if config["Mission"]["redeemCode"]:
+            tasks.append((self.redeem_code, (config["RedeemCode"]["codeList"],)))
+        if config["Mission"]["mail"]:
+            tasks.append((self.mail, ()))
+
+        tasks2 = []
+        if config["Mission"]["dailyTraining"]:
+            tasks2.append(self.daily_training_reward)
+        if config["Mission"]["namelessHonor"]:
+            tasks2.append(self.nameless_honor)
+        if config["Mission"]["giftOfOdyssey"]:
+            tasks2.append(self.gift_of_odyssey)
+
+        logger.info("领取奖励")
+        if not check("res/img/chat_enter.png", max_time=20):
+            logger.error("检测超时，编号2")
+            return False
+        if len(tasks)!=0:
+            pyautogui.press("esc")
+            for task, args in tasks:
+                if not self.stop_flag:
+                    task(*args)
+            else:
+                time.sleep(2)
+            pyautogui.press("esc")
+
+        for task in tasks2:
+            if self.stop_flag:
+                break
+            task()
+        else:
+            return True
+        return False
+
     @Slot()
     def trailblazer_profile(self):
         """Mission trailblaze profile"""
         logger.info("执行任务：签证奖励")
-        if not check("res/img/chat_enter.png", max_time=20):
-            logger.error("检测超时，编号2")
-            return
-        pyautogui.press("esc")
         if click("res/img/more_with_something.png"):
             pyautogui.moveRel(20, 0)
             if click("res/img/trailblazer_profile_finished.png"):
                 if click("res/img/assistance_reward.png"):
                     time.sleep(2)
-                    pyautogui.press("esc", presses=3, interval=2)
+                    pyautogui.press("esc", presses=2, interval=2)
                 else:
                     logger.info("没有可领取的奖励1")
-                    pyautogui.press("esc", presses=2, interval=2)
+                    pyautogui.press("esc")
             else:
                 logger.info("没有可领取的奖励2")
-                pyautogui.press("esc")
         else:
             logger.info("没有可领取的奖励3")
-            pyautogui.press("esc")
         logger.info("任务完成：签证奖励")
 
     @Slot()
@@ -461,10 +486,6 @@ class Assistant(QThread):
             None
         """
         logger.info("执行任务：领取兑换码")
-        if not check("res/img/chat_enter.png", max_time=20):
-            logger.error("检测超时，编号2")
-            return
-        pyautogui.press("esc")
         if len(redeem_code_list) == 0:
             logger.warning("未填写兑换码")
         for code in redeem_code_list:
@@ -480,28 +501,20 @@ class Assistant(QThread):
                     logger.error("发生错误，错误编号16")
             else:
                 logger.error("发生错误，错误编号17")
-        time.sleep(2)
-        pyautogui.press("esc")
         logger.info("任务完成：领取兑换码")
 
     @Slot()
     def mail(self):
         """Open mailbox and pick up mails."""
         logger.info("执行任务：领取邮件")
-        if not check("res/img/chat_enter.png", max_time=20):
-            logger.error("检测超时，编号2")
-            return
-        pyautogui.press("esc")
         if click("res/img/mailbox_mail.png"):
             if click("res/img/claim_all_mail.png"):
                 time.sleep(2)
-                pyautogui.press("esc", presses=3, interval=2)
+                pyautogui.press("esc", presses=2, interval=2)
             else:
                 logger.info("没有可以领取的邮件")
-                pyautogui.press("esc")
         else:
             logger.info("没有可以领取的邮件")
-            pyautogui.press("esc")
         logger.info("任务完成：领取邮件")
 
     @Slot()
@@ -517,7 +530,7 @@ class Assistant(QThread):
         pyautogui.press(self.f1)
         if click("res/img/gift_of_odyssey.png"):
             pass
-        if click("res/img/gift_receive.png"):
+        if click("res/img/gift_receive.png") or click("res/img/gift_receive2.png"):
             logger.info("领取成功")
             time.sleep(2)
             pyautogui.press("esc", presses=2, interval=2)
@@ -839,13 +852,8 @@ class Assistant(QThread):
     def assignments_reward(self):
         """Receive assignment reward"""
         logger.info("执行任务：领取派遣奖励")
-        if not check("res/img/chat_enter.png", max_time=20):
-            logger.error("检测超时，编号2")
-            return
-        pyautogui.press("esc")
         if not click("res/img/assignments_none.png"):
             logger.info("没有可领取的奖励")
-            pyautogui.press("esc")
             return
         while not exist("res/img/assignment_page.png"):
             pass
@@ -853,15 +861,13 @@ class Assistant(QThread):
             if click("res/img/assign_again.png"):
                 logger.info("再次派遣")
                 time.sleep(2)
-                pyautogui.press("esc", presses=2, interval=2)
+                pyautogui.press("esc")
             else:
                 logger.error("发生错误，错误编号6")
         else:
             logger.info("没有可以领取的派遣奖励")
             pyautogui.press("esc")
             time.sleep(2)
-            pyautogui.press("esc")
-
         logger.info("任务完成：领取派遣奖励")
 
     @Slot()
@@ -940,9 +946,9 @@ class Assistant(QThread):
             Do not include the `self` parameter in the ``Args`` section.
 
             ``way``:
-             ``1``->replenishes by reserved trailblaze power.\n
-             ``2``->replenishes by fuel.\n
-             ``3``->replenishes by stellar jade.
+             - ``1``->replenishes by reserved trailblaze power.\n
+             - ``2``->replenishes by fuel.\n
+             - ``3``->replenishes by stellar jade.
         Args:
             way (int): Index of way in /res/img.
         Returns:
@@ -1008,6 +1014,10 @@ class Assistant(QThread):
             pyautogui.press("esc")
             return False
         return True
+
+    def quit_game(self) -> bool:
+        logger.info("退出游戏")
+        return WindowsProcess.task_kill("StarRail.exe")
 
 
 def Popen(path: str):
@@ -1115,7 +1125,7 @@ def get_screen_center():
     Returns:
         tuple(x, y)
     """
-    active_window=pygetwindow.getActiveWindow()
+    active_window = pygetwindow.getActiveWindow()
     x, y, screen_width, screen_height = (
         active_window.left,
         active_window.top,
