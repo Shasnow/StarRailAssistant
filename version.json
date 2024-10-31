@@ -1,7 +1,7 @@
 {
     "version": "0.6.6",
     "download_url": "https://ghp.ci/https://github.com/Shasnow/StarRailAssistant/releases/download/v0.6.6/StarRailAssistant_v0.6.6.zip",
-    "resource_version": "0.6.6.2",
+    "resource_version": "0.6.6.3",
     "resource_download_url": "https://ghp.ci/https://github.com/Shasnow/SRAresource/releases/download/resource/resource.zip",
     "updater": "1.2.0",
     "announcement": "1. 修复巡星之礼可能无法领取的问题"

@@ -844,6 +844,11 @@
                </item>
                <item>
                 <property name="text">
+                 <string>迷识之径</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
                  <string>勇骑之径</string>
                 </property>
                </item>
