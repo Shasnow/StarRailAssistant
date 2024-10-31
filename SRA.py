@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-v0.6.6
+v0.6.7
 作者：雪影
 图形化界面
 """
@@ -84,7 +84,7 @@ class Main(QMainWindow):
         self.start_game_setting_container = uiLoader.load(
             self.AppPath + "/res/ui/set_01.ui"
         )
-        self.redeem_code_setting_container = uiLoader.load(
+        self.receive_rewards_setting_container = uiLoader.load(
             self.AppPath + "/res/ui/set_03.ui"
         )
         self.trail_blaze_power_container = uiLoader.load(
@@ -97,7 +97,7 @@ class Main(QMainWindow):
         self.console()
         self.start_game_setting()
         self.trail_blaze_power_setting()
-        self.redeem_code_setting()
+        self.receive_rewards_setting()
         self.quit_game_setting()
 
         self.extension()
@@ -115,7 +115,7 @@ class Main(QMainWindow):
         problem_action.triggered.connect(self.problem)
         report_action = self.ui.findChild(QAction, "action_3")
         report_action.triggered.connect(self.report)
-        self.ui.setWindowTitle("SRA v0.6.6")  # 设置窗口标题
+        self.ui.setWindowTitle("SRA v0.6.7")  # 设置窗口标题
         self.ui.setWindowIcon(QIcon(self.AppPath + "/res/SRAicon.ico"))
 
         # 创建垂直布局管理器用于任务设置
@@ -123,7 +123,6 @@ class Main(QMainWindow):
         task_set = self.ui.findChild(QGroupBox, "groupBox_2")
         task_set.setLayout(self.task_set_vbox_layout)
 
-        # 创建标签控件并添加到布局中
         self.log = self.ui.findChild(QTextBrowser, "textBrowser_log")
 
         self.option1 = self.ui.findChild(QCheckBox, "checkBox1_1")
@@ -132,52 +131,22 @@ class Main(QMainWindow):
         button1 = self.ui.findChild(QPushButton, "pushButton1_1")
         button1.clicked.connect(self.show_start_game_setting)
 
-        self.option2 = self.ui.findChild(QCheckBox, "checkBox1_2")
-        self.option2.setChecked(self.config["Mission"]["trailBlazerProfile"])
-        self.option2.stateChanged.connect(self.trailblazer_profile_status)
-        # button2 = self.ui.findChild(QPushButton, "pushButton1_2")
-
-        self.option3 = self.ui.findChild(QCheckBox, "checkBox1_3")
-        self.option3.setChecked(self.config["Mission"]["redeemCode"])
-        self.option3.stateChanged.connect(self.redeem_code_status)
-        button3 = self.ui.findChild(QPushButton, "pushButton1_3")
-        button3.clicked.connect(self.show_redeem_code_setting)
-
-        self.option4 = self.ui.findChild(QCheckBox, "checkBox1_4")
-        self.option4.setChecked(self.config["Mission"]["assignment"])
-        self.option4.stateChanged.connect(self.assignment_status)
-        # button4 = self.ui.findChild(QPushButton, "pushButton1_4")
-
-        self.option5 = self.ui.findChild(QCheckBox, "checkBox1_5")
-        self.option5.setChecked(self.config["Mission"]["giftOfOdyssey"])
-        self.option5.stateChanged.connect(self.gift_of_odyssey_status)
-        # button5 = self.ui.findChild(QPushButton, "pushButton1_5")
-
-        self.option6 = self.ui.findChild(QCheckBox, "checkBox1_6")
-        self.option6.setChecked(self.config["Mission"]["mail"])
-        self.option6.stateChanged.connect(self.mail_status)
-        # button6 = self.ui.findChild(QPushButton, "pushButton1_6")
-
-        self.option7 = self.ui.findChild(QCheckBox, "checkBox1_7")
+        self.option7 = self.ui.findChild(QCheckBox, "checkBox1_2")
         self.option7.setChecked(self.config["Mission"]["trailBlazePower"])
         self.option7.stateChanged.connect(self.trail_blaze_power_status)
-        button7 = self.ui.findChild(QPushButton, "pushButton1_7")
+        button7 = self.ui.findChild(QPushButton, "pushButton1_2")
         button7.clicked.connect(self.show_trail_blaze_power_setting)
 
-        self.option8 = self.ui.findChild(QCheckBox, "checkBox1_8")
-        self.option8.setChecked(self.config["Mission"]["dailyTraining"])
-        self.option8.stateChanged.connect(self.daily_training_status)
-        # button8 = self.ui.findChild(QPushButton, "pushButton1_8")
+        self.option3 = self.ui.findChild(QCheckBox, "checkBox1_3")
+        self.option3.setChecked(self.config["ReceiveRewards"]["enable"])
+        self.option3.stateChanged.connect(self.receive_rewards_status)
+        button3 = self.ui.findChild(QPushButton, "pushButton1_3")
+        button3.clicked.connect(self.show_receive_rewards_setting)
 
-        self.option9 = self.ui.findChild(QCheckBox, "checkBox1_9")
-        self.option9.setChecked(self.config["Mission"]["namelessHonor"])
-        self.option9.stateChanged.connect(self.nameless_honor_status)
-        # button9 = self.ui.findChild(QPushButton, "pushButton1_9")
-
-        self.option10 = self.ui.findChild(QCheckBox, "checkBox1_10")
+        self.option10 = self.ui.findChild(QCheckBox, "checkBox1_4")
         self.option10.setChecked(self.config["Mission"]["quitGame"])
         self.option10.stateChanged.connect(self.quit_game_status)
-        button10 = self.ui.findChild(QPushButton, "pushButton1_10")
+        button10 = self.ui.findChild(QPushButton, "pushButton1_4")
         button10.clicked.connect(self.show_quit_game_setting)
 
         self.button0_1 = self.ui.findChild(QPushButton, "pushButton1_0_1")
@@ -185,6 +154,42 @@ class Main(QMainWindow):
         self.button0_2 = self.ui.findChild(QPushButton, "pushButton1_0_2")
         self.button0_2.clicked.connect(self.kill)
         self.button0_2.setEnabled(False)
+
+    def receive_rewards_setting(self):
+        self.option2 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_1")
+        self.option2.setChecked(self.config["Mission"]["trailBlazerProfile"])
+        self.option2.stateChanged.connect(self.trailblazer_profile_status)
+
+        self.option4 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_2")
+        self.option4.setChecked(self.config["Mission"]["assignment"])
+        self.option4.stateChanged.connect(self.assignment_status)
+
+        self.option6 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_3")
+        self.option6.setChecked(self.config["Mission"]["mail"])
+        self.option6.stateChanged.connect(self.mail_status)
+
+        self.option8 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_4")
+        self.option8.setChecked(self.config["Mission"]["dailyTraining"])
+        self.option8.stateChanged.connect(self.daily_training_status)
+
+        self.option9 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_5")
+        self.option9.setChecked(self.config["Mission"]["namelessHonor"])
+        self.option9.stateChanged.connect(self.nameless_honor_status)
+
+        self.option5 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_6")
+        self.option5.setChecked(self.config["Mission"]["giftOfOdyssey"])
+        self.option5.stateChanged.connect(self.gift_of_odyssey_status)
+
+        self.option3 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_7")
+        self.option3.setChecked(self.config["Mission"]["redeemCode"])
+        self.option3.stateChanged.connect(self.redeem_code_status)
+
+        self.redeem_code = self.receive_rewards_setting_container.findChild(
+            QTextEdit, "textEdit"
+        )
+        self.redeem_code.textChanged.connect(self.redeem_code_change)
+        self.task_set_vbox_layout.addWidget(self.receive_rewards_setting_container)
+        self.receive_rewards_setting_container.setVisible(False)
 
     def extension(self):
         auto_plot_checkbox = self.ui.findChild(
@@ -197,6 +202,7 @@ class Main(QMainWindow):
             self.autoplot.run_application()
         else:
             self.autoplot.quit_application()
+
 
     def software_setting(self):
         self.key_table = self.ui.findChild(QTableWidget, "tableWidget")
@@ -360,7 +366,7 @@ class Main(QMainWindow):
         """Sets the invisible state of the container."""
         self.start_game_setting_container.setVisible(False)
         self.trail_blaze_power_container.setVisible(False)
-        self.redeem_code_setting_container.setVisible(False)
+        self.receive_rewards_setting_container.setVisible(False)
         self.quit_game_setting_container.setVisible(False)
 
     def start_game_status(self):
@@ -371,6 +377,12 @@ class Main(QMainWindow):
         else:
             self.log.append("启动游戏已禁用")
             self.config["Mission"]["startGame"] = False
+
+    def receive_rewards_status(self,state):
+        if state==2:
+            self.config["ReceiveRewards"]["enable"]=True
+        else:
+            self.config["ReceiveRewards"]["enable"]=False
 
     def trailblazer_profile_status(self):
         """Change the state of mission trailblazer profile."""
@@ -455,24 +467,15 @@ class Main(QMainWindow):
             self.log.append("退出游戏已禁用")
             self.config["Mission"]["quitGame"] = False
 
-    def redeem_code_setting(self):
-        """Create component in redeem code setting."""
-        self.redeem_code = self.redeem_code_setting_container.findChild(
-            QTextEdit, "textEdit"
-        )
-        self.redeem_code.textChanged.connect(self.redeem_code_change)
-        self.task_set_vbox_layout.addWidget(self.redeem_code_setting_container)
-        self.redeem_code_setting_container.setVisible(False)
-
     def redeem_code_change(self):
         """Change the redeem code list while redeem code text changes."""
         redeem_code = self.redeem_code.toPlainText()
         self.config["RedeemCode"]["codeList"] = redeem_code.split()
 
-    def show_redeem_code_setting(self):
+    def show_receive_rewards_setting(self):
         """Set redeem code visible."""
         self.display_none()
-        self.redeem_code_setting_container.setVisible(True)
+        self.receive_rewards_setting_container.setVisible(True)
 
     def trail_blaze_power_setting(self):
         """Create component of trailblaze power."""
@@ -887,7 +890,7 @@ class SRA(QApplication):
         QMessageBox.information(
             self.main.ui,
             "使用说明",
-            "SRA崩坏：星穹铁道助手 v0.6.5 beta by雪影\n"
+            "SRA崩坏：星穹铁道助手 v0.6.7 by雪影\n"
             "使用说明：\n"
             "重要！以管理员模式运行程序！\n"
             "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"

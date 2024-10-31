@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>795</width>
-    <height>681</height>
+    <width>864</width>
+    <height>671</height>
    </rect>
   </property>
   <property name="font">
@@ -58,8 +58,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>214</width>
-                <height>628</height>
+                <width>226</width>
+                <height>499</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -122,7 +122,7 @@
                  <property name="frameShadow">
                   <enum>QFrame::Shadow::Raised</enum>
                  </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <layout class="QHBoxLayout" name="horizontalLayout_7">
                   <item>
                    <widget class="QCheckBox" name="checkBox1_2">
                     <property name="minimumSize">
@@ -132,7 +132,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>漫游签证</string>
+                     <string>清开拓力</string>
                     </property>
                    </widget>
                   </item>
@@ -151,9 +151,6 @@
                   </item>
                   <item>
                    <widget class="QPushButton" name="pushButton1_2">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
                     <property name="minimumSize">
                      <size>
                       <width>70</width>
@@ -186,7 +183,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>兑换码</string>
+                     <string>领取奖励</string>
                     </property>
                    </widget>
                   </item>
@@ -227,330 +224,9 @@
                  <property name="frameShadow">
                   <enum>QFrame::Shadow::Raised</enum>
                  </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_4">
-                  <item>
-                   <widget class="QCheckBox" name="checkBox1_4">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>派遣</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer1_4">
-                    <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>219</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButton1_4">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>70</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>设置</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QFrame" name="frame1_5">
-                 <property name="frameShape">
-                  <enum>QFrame::Shape::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Shadow::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_5">
-                  <item>
-                   <widget class="QCheckBox" name="checkBox1_5">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>巡星之礼</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer1_5">
-                    <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>195</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButton1_5">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>70</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>设置</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QFrame" name="frame1_6">
-                 <property name="frameShape">
-                  <enum>QFrame::Shape::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Shadow::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_6">
-                  <item>
-                   <widget class="QCheckBox" name="checkBox1_6">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>邮件</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer1_6">
-                    <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>219</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButton1_6">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>70</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>设置</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QFrame" name="frame1_7">
-                 <property name="frameShape">
-                  <enum>QFrame::Shape::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Shadow::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_7">
-                  <item>
-                   <widget class="QCheckBox" name="checkBox1_7">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>清开拓力</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer1_7">
-                    <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>195</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButton1_7">
-                    <property name="minimumSize">
-                     <size>
-                      <width>70</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>设置</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QFrame" name="frame1_8">
-                 <property name="frameShape">
-                  <enum>QFrame::Shape::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Shadow::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_9">
-                  <item>
-                   <widget class="QCheckBox" name="checkBox1_8">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>每日实训</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer1_8">
-                    <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>195</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButton1_8">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>70</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>设置</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QFrame" name="frame1_9">
-                 <property name="frameShape">
-                  <enum>QFrame::Shape::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Shadow::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_8">
-                  <item>
-                   <widget class="QCheckBox" name="checkBox1_9">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>无名勋礼</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer1_9">
-                    <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>195</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButton1_9">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>70</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>设置</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QFrame" name="frame1_10">
-                 <property name="frameShape">
-                  <enum>QFrame::Shape::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Shadow::Raised</enum>
-                 </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_10">
                   <item>
-                   <widget class="QCheckBox" name="checkBox1_10">
+                   <widget class="QCheckBox" name="checkBox1_4">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -563,7 +239,7 @@
                    </widget>
                   </item>
                   <item>
-                   <spacer name="horizontalSpacer1_10">
+                   <spacer name="horizontalSpacer1_4">
                     <property name="orientation">
                      <enum>Qt::Orientation::Horizontal</enum>
                     </property>
@@ -576,7 +252,7 @@
                    </spacer>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="pushButton1_10">
+                   <widget class="QPushButton" name="pushButton1_4">
                     <property name="minimumSize">
                      <size>
                       <width>70</width>
@@ -684,8 +360,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>312</width>
-             <height>89</height>
+             <width>820</width>
+             <height>167</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_16">
@@ -783,8 +459,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>751</width>
-             <height>550</height>
+             <width>820</width>
+             <height>540</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -1390,7 +1066,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>795</width>
+     <width>864</width>
      <height>33</height>
     </rect>
    </property>
