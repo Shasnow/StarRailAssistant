@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-v0.6.5 beta
+v0.6.7
 作者：雪影
 自动剧情
 """
@@ -92,7 +92,7 @@ class PlotListener(QThread):
             except pyscreeze.PyScreezeException:
                 logger.exception("未能找到窗口", is_fatal=True)
                 self.stop()
-
+        logger.info("自动剧情已关闭")
 
 
 class AutoPlot(QThread):

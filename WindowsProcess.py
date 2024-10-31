@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-v0.6.6
+v0.6.7
 作者：雪影
 Windows进程操作
 """
@@ -30,7 +30,7 @@ import win32con
 import win32gui
 
 
-def find_window(title):
+def find_window(title) -> list | None:
     """Find window handles based on the window title
 
     Args:
@@ -48,11 +48,9 @@ def find_window(title):
     return windows[0] if windows else None
 
 
-def check_window(window_title):
+def check_window(window_title) -> bool:
     """Check that the game is running by window title.
 
-    Note:
-        Do not include the `self` parameter in the ``Args`` section.
     Returns:
         True if game is running, False if not.
     """
@@ -66,12 +64,14 @@ def check_window(window_title):
         return False
 
 
-def is_process_running(process_name):
+def is_process_running(process_name)  -> bool:
     """
     Check if there is any running process that contains the given name string.
 
-    :param process_name: Name of the process to be searched.
-    :return: True if the process is running, otherwise False.
+    Args:
+        process_name (str): Name of the process to be searched.
+    Returns:
+        True if the process is running, otherwise False.
     """
     # Iterate over all running processes
     for proc in psutil.process_iter(['name']):
@@ -84,14 +84,34 @@ def is_process_running(process_name):
     return False
 
 
-def task_kill(process):
-    """Kill the launcher"""
-    command = f"taskkill /F /IM {process}"
-    # 执行命令
-    subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
+def task_kill(process: str) -> bool:
+    """关闭指定进程
+
+    Args:
+        process (str): 进程名
+    Returns:
+        None
+    """
+    try:
+        command = f"taskkill /F /IM {process}"
+        # 执行命令
+        subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
+        return True
+    except Exception:
+        return False
 
 
-def set_startup_item(program_name, program_path):
+def set_startup_item(program_name, program_path) -> bool:
+    """
+    设置进程的开机启动
+
+    Args:
+        program_name (str): 启动项名称
+        program_path (str): 启动项路径
+
+    Returns:
+        True if successfully set, False otherwise.
+    """
     try:
         key_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run'
         key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE)
@@ -102,15 +122,24 @@ def set_startup_item(program_name, program_path):
         return False
 
 
-def delete_startup_item(item_name):
+def delete_startup_item(item_name:str) -> bool:
+    """
+    删除开机启动项
+    Args:
+        item_name: 启动项名称
+
+    Returns:
+        True if successfully delete, False otherwise.
+    """
     try:
         startup_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Run", 0,
-                                  winreg.KEY_SET_VALUE | winreg.KEY_WOW64_32KEY)
+                                     winreg.KEY_SET_VALUE | winreg.KEY_WOW64_32KEY)
         winreg.DeleteValue(startup_key, item_name)
         winreg.CloseKey(startup_key)
         return True
     except Exception:
         return False
+
 
 if __name__ == "__main__":
     set_startup_item("SRA", "C:\\Users\\20114\\Downloads\\SRA\\SRA.exe")

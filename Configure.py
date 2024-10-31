@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-beta v0.6.6
+beta v0.6.7
 作者：雪影
 配置相关操作
 """
@@ -35,6 +35,7 @@ def init() -> None:
     config_list_1 = [
         "Mission",
         "StartGame",
+        "ReceiveRewards",
         "RedeemCode",
         "Replenish",
         "OrnamentExtraction",
@@ -49,14 +50,14 @@ def init() -> None:
     config_list_2 = {
         "Mission": [
             ["startGame", False],
-            ["trailBlazerProfile", False],
-            ["redeemCode", False],
-            ["assignment", False],
-            ["giftOfOdyssey", False],
-            ["mail", False],
             ["trailBlazePower", False],
-            ["dailyTraining", False],
-            ["namelessHonor", False],
+            ["trailBlazerProfile", True],
+            ["assignment", True],
+            ["mail", True],
+            ["dailyTraining", True],
+            ["namelessHonor", True],
+            ["giftOfOdyssey", False],
+            ["redeemCode", False],
             ["quitGame", False],
         ],
         "StartGame": [
@@ -65,6 +66,9 @@ def init() -> None:
             ["gamePath", ""],
             ["pathType", "StarRail"],
             ["channel", 0],
+        ],
+        "ReceiveRewards": [
+            ["enable", False]
         ],
         "RedeemCode": [
             ["codeList", []],
@@ -135,8 +139,9 @@ def init() -> None:
 def load() -> dict:
     """
     Load configurations.
-    :return: config
-    :rtype: dict
+
+    Returns:
+        config dict
     """
     with open("data/config.json", "r", encoding="utf-8") as json_file:
         config = json.load(json_file)
