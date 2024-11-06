@@ -36,7 +36,7 @@ def find_window(title) -> list | None:
     Args:
         title (str): Window title.
     Returns:
-        list if found, None otherwise.
+        The first found window handle, None otherwise.
     """
 
     def enum_callback(hwnd, result):
@@ -142,5 +142,4 @@ def delete_startup_item(item_name:str) -> bool:
 
 
 if __name__ == "__main__":
-    set_startup_item("SRA", "C:\\Users\\20114\\Downloads\\SRA\\SRA.exe")
-    delete_startup_item("SRA")
+    print(find_window("Microsoft Edge"))
