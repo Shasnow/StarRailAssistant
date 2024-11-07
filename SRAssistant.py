@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-v0.6.7
+v0.7.0
 作者：雪影
 主功能
 """
@@ -26,15 +26,12 @@ v0.6.7
 import subprocess
 import time
 
-import cv2
-import pyautogui
-import pyscreeze
-import pygetwindow
 from PySide6.QtCore import QThread, Signal, Slot
 
 import Configure
 import WindowsProcess
 import encryption
+from SRAOperator import SRAOperator
 from StarRailAssistant.extensions.QTHandler import QTHandler
 from StarRailAssistant.utils.Logger import logger, console_handler
 from WindowsProcess import find_window, is_process_running
@@ -43,9 +40,13 @@ from WindowsProcess import find_window, is_process_running
 class Assistant(QThread):
     update_signal = Signal(str)
 
-    def __init__(self, pwd):
+    def __init__(self, pwd, cloud=False, driver= None):
         super().__init__()
+        self.cloud = cloud
+        self.driver = driver
         self.stop_flag = False
+        SRAOperator.cloud = cloud
+        SRAOperator.web_driver = driver
         self.pwd = pwd
         self.config = Configure.load()
         settings = self.config["Settings"]
@@ -66,18 +67,19 @@ class Assistant(QThread):
         logger.info("SRAv0.6.7 创建任务")
         config = self.config
         tasks = []
-        if config["Mission"]["startGame"]:
-            account_text = encryption.load()
-            password_text = self.pwd
-            tasks.append((self.start_game, (
-                config["StartGame"]["gamePath"],
-                config["StartGame"]["pathType"],
-                config["StartGame"]["channel"],
-                config["StartGame"]["autoLogin"],
-                account_text,
-                password_text,
-            )))
-        tasks.append((self.check_game, ()))
+        if not self.cloud:
+            if config["Mission"]["startGame"]:
+                account_text = encryption.load()
+                password_text = self.pwd
+                tasks.append((self.start_game, (
+                    config["StartGame"]["gamePath"],
+                    config["StartGame"]["pathType"],
+                    config["StartGame"]["channel"],
+                    config["StartGame"]["autoLogin"],
+                    account_text,
+                    password_text,
+                )))
+            tasks.append((self.check_game, ()))
         if config["Mission"]["trailBlazePower"]:
             tasks.append((self.trailblazer_power, ()))
         if config["ReceiveRewards"]["enable"]:
@@ -93,7 +95,7 @@ class Assistant(QThread):
             else:
                 logger.info("已停止")
         else:
-            logger.info("任务全部完成")
+            logger.info("任务全部完成\n")
 
     @Slot()
     def check_game(self):
@@ -240,12 +242,12 @@ class Assistant(QThread):
             return False
         logger.info("登录到" + account)
         time.sleep(1)
-        pyautogui.write(account)
+        write(account)
         time.sleep(1)
-        pyautogui.press("tab")
+        press_key("tab")
         time.sleep(0.2)
-        pyautogui.write(password)
-        pyautogui.press("enter")
+        write(password)
+        press_key("enter")
         click("res/img/agree.png", -158)
         if not click("res/img/enter_game.png"):
             logger.error("发生错误，错误编号9")
@@ -283,10 +285,10 @@ class Assistant(QThread):
         if click('res/img/bilibili_account.png'):
             logger.info("登录到" + account)
             time.sleep(0.5)
-            pyautogui.write(account)
+            write(account)
         if click('res/img/bilibili_pwd.png'):
             time.sleep(0.5)
-            pyautogui.write(password)
+            write(password)
         click('res/img/bilibili_remember.png')
         click("res/img/bilibili_read.png", x_add=-30)
         click("res/img/bilibili_login.png")
@@ -330,12 +332,12 @@ class Assistant(QThread):
             if check("res/img/quit.png"):
                 x, y = get_screen_center()
                 if exist("res/img/12+.png"):
-                    pyautogui.click(x, y)
+                    click_point(x, y)
                     time.sleep(3)
                 logger.info("开始游戏")
-                pyautogui.click(x, y)
+                click_point(x, y)
                 time.sleep(3)
-                pyautogui.click(x, y)
+                click_point(x, y)
             else:
                 logger.warning("加载时间过长，请重试")
                 return False
@@ -344,12 +346,12 @@ class Assistant(QThread):
             if check("res/img/quit.png"):
                 x, y = get_screen_center()
                 if exist("res/img/12+.png"):
-                    pyautogui.click(x, y)
+                    click_point(x, y)
                     time.sleep(3)
                 logger.info("开始游戏")
-                pyautogui.click(x, y)
+                click_point(x, y)
                 time.sleep(3)
-                pyautogui.click(x, y)
+                click_point(x, y)
             else:
                 logger.warning("加载时间过长，请重试")
                 return False
@@ -358,8 +360,8 @@ class Assistant(QThread):
             time.sleep(0.2)
             if click("res/img/train_supply.png"):
                 time.sleep(4)
-                pyautogui.moveRel(0, +400)
-                pyautogui.click()
+                moveRel(0, +400)
+                click_point()
             if exist("res/img/chat_enter.png") or exist("res/img/phone.png", wait_time=0):
                 return True
             else:
@@ -438,14 +440,14 @@ class Assistant(QThread):
         if not check("res/img/chat_enter.png", max_time=20):
             logger.error("检测超时，编号2")
             return False
-        if len(tasks)!=0:
-            pyautogui.press("esc")
+        if len(tasks) != 0:
+            press_key("esc")
             for task, args in tasks:
                 if not self.stop_flag:
                     task(*args)
             else:
                 time.sleep(2)
-            pyautogui.press("esc")
+            press_key("esc")
 
         for task in tasks2:
             if self.stop_flag:
@@ -460,14 +462,14 @@ class Assistant(QThread):
         """Mission trailblaze profile"""
         logger.info("执行任务：签证奖励")
         if click("res/img/more_with_something.png"):
-            pyautogui.moveRel(20, 0)
+            moveRel(20, 0)
             if click("res/img/trailblazer_profile_finished.png"):
                 if click("res/img/assistance_reward.png"):
                     time.sleep(2)
-                    pyautogui.press("esc", presses=2, interval=2)
+                    press_key("esc", presses=2, interval=2)
                 else:
                     logger.info("没有可领取的奖励1")
-                    pyautogui.press("esc")
+                    press_key("esc")
             else:
                 logger.info("没有可领取的奖励2")
         else:
@@ -492,11 +494,11 @@ class Assistant(QThread):
             if click("res/img/more.png") or click("res/img/more_with_something.png"):
                 if click("res/img/redeem_code.png"):
                     time.sleep(2)
-                    pyautogui.click(get_screen_center())
-                    pyautogui.write(code)
+                    click_point(get_screen_center())
+                    write(code)
                     click("res/img/ensure.png")
                     time.sleep(2)
-                    pyautogui.press("esc")
+                    press_key("esc")
                 else:
                     logger.error("发生错误，错误编号16")
             else:
@@ -510,7 +512,7 @@ class Assistant(QThread):
         if click("res/img/mailbox_mail.png"):
             if click("res/img/claim_all_mail.png"):
                 time.sleep(2)
-                pyautogui.press("esc", presses=2, interval=2)
+                press_key("esc", presses=2, interval=2)
             else:
                 logger.info("没有可以领取的邮件")
         else:
@@ -527,16 +529,16 @@ class Assistant(QThread):
         if not check("res/img/chat_enter.png", max_time=20):
             logger.error("检测超时，编号2")
             return
-        pyautogui.press(self.f1)
+        press_key(self.f1)
         if click("res/img/gift_of_odyssey.png"):
             pass
         if click("res/img/gift_receive.png") or click("res/img/gift_receive2.png"):
             logger.info("领取成功")
             time.sleep(2)
-            pyautogui.press("esc", presses=2, interval=2)
+            press_key("esc", presses=2, interval=2)
         else:
             logger.info("没有可以领取的巡星之礼")
-            pyautogui.press("esc")
+            press_key("esc")
         logger.info("任务完成：巡星之礼")
 
     @Slot()
@@ -557,7 +559,7 @@ class Assistant(QThread):
             return
         if exist("res/img/no_save.png"):
             logger.warning("当前暂无可用存档，请前往[差分宇宙]获取存档")
-            pyautogui.press("esc")
+            press_key("esc")
             return
         find_level(level)
         if not click(level, x_add=700):
@@ -576,14 +578,12 @@ class Assistant(QThread):
                     click("res/img/battle_star.png")
                 else:
                     self.update_signal.emit("体力不足")
-                    pyautogui.press("esc", interval=1, presses=2)
+                    press_key("esc", interval=1, presses=2)
                     return
             while not exist("res/img/f3.png"):
                 pass
-            pyautogui.keyDown("w")
-            time.sleep(2.5)
-            pyautogui.keyUp("w")
-            pyautogui.click()
+            press_key_for_a_while("w", 2.5)
+            click_point()
             self.battle_star(battle_time)
         self.update_signal.emit("任务完成：饰品提取")
 
@@ -605,7 +605,7 @@ class Assistant(QThread):
         if not self.find_session_name("calyx(golden)"):
             return
         find_level(level)
-        if click(level, x_add=600, y_add=10):
+        if click(level, x_add=600,y_add=-10):
             if not check('res/img/battle.png'):  # 等待传送
                 logger.error("检测超时，编号4")
                 return
@@ -621,7 +621,7 @@ class Assistant(QThread):
                     click("res/img/battle.png")
                 else:
                     logger.info("体力不足")
-                    pyautogui.press("esc", interval=1, presses=2)
+                    press_key("esc", interval=1, presses=2)
                     return
             if click("res/img/battle_star.png"):
                 self.battle_star(battle_time)
@@ -663,7 +663,7 @@ class Assistant(QThread):
                     click("res/img/battle.png")
                 else:
                     logger.info("体力不足")
-                    pyautogui.press("esc", interval=1, presses=2)
+                    press_key("esc", interval=1, presses=2)
                     return
             if click("res/img/battle_star.png"):
                 self.battle_star(battle_time)
@@ -701,14 +701,12 @@ class Assistant(QThread):
                     click("res/img/battle.png")
                 else:
                     logger.info("体力不足")
-                    pyautogui.press("esc", interval=1, presses=2)
+                    press_key("esc", interval=1, presses=2)
                     return
             if click("res/img/battle_star.png"):
                 time.sleep(3)
-                pyautogui.keyDown("w")
-                time.sleep(2)
-                pyautogui.keyUp("w")
-                pyautogui.click()
+                press_key_for_a_while("w", 2)
+                click_point()
                 self.battle_star(battle_time)
             else:
                 logger.error("发生错误，错误编号4")
@@ -744,7 +742,7 @@ class Assistant(QThread):
                     click("res/img/battle.png")
                 else:
                     logger.info("体力不足")
-                    pyautogui.press("esc", interval=1, presses=2)
+                    press_key("esc", interval=1, presses=2)
                     return
             if click("res/img/battle_star.png"):
                 self.battle_star(battle_time)
@@ -782,7 +780,7 @@ class Assistant(QThread):
                     click("res/img/battle.png")
                 else:
                     logger.info("体力不足")
-                    pyautogui.press("esc", interval=1, presses=2)
+                    press_key("esc", interval=1, presses=2)
                     return
             if click("res/img/battle_star.png"):
                 self.battle_star(battle_time)
@@ -795,9 +793,9 @@ class Assistant(QThread):
         logger.info("开始战斗")
         logger.info("请检查自动战斗和倍速是否开启")
         times = 0
-        while times != 10:
+        while times != 15:
             if exist("res/img/q.png", wait_time=1):
-                pyautogui.press("v")
+                press_key("v")
                 break
             else:
                 times += 1
@@ -813,7 +811,7 @@ class Assistant(QThread):
                     click("res/img/again.png")
                 else:
                     logger.info("体力不足")
-                    pyautogui.press("esc")
+                    press_key("esc")
                     if click("res/img/quit_battle.png"):
                         logger.info("退出战斗")
                     else:
@@ -830,23 +828,7 @@ class Assistant(QThread):
 
     @Slot()
     def wait_battle_end(self):
-        """Wait battle end
-
-        Returns:
-            True if battle end.
-        """
-        logger.info("等待战斗结束")
-        quit_battle = cv2.imread("res/img/quit_battle.png")
-        while True:
-            time.sleep(0.2)
-            try:
-                pyautogui.locateOnWindow(quit_battle, "崩坏：星穹铁道", confidence=0.9)
-                logger.info("战斗结束")
-                return True
-            except pyautogui.ImageNotFoundException:
-                continue
-            except pyscreeze.PyScreezeException:
-                continue
+        wait_battle_end()
 
     @Slot()
     def assignments_reward(self):
@@ -860,13 +842,13 @@ class Assistant(QThread):
         if click("res/img/assignments_reward.png"):
             if click("res/img/assign_again.png"):
                 logger.info("再次派遣")
-                time.sleep(2)
-                pyautogui.press("esc")
+                time.sleep(4)
+                press_key("esc")
             else:
                 logger.error("发生错误，错误编号6")
         else:
             logger.info("没有可以领取的派遣奖励")
-            pyautogui.press("esc")
+            press_key("esc")
             time.sleep(2)
         logger.info("任务完成：领取派遣奖励")
 
@@ -877,25 +859,25 @@ class Assistant(QThread):
         if not check("res/img/chat_enter.png", max_time=20):
             logger.error("检测超时，编号2")
             return
-        pyautogui.press(self.f4)
+        press_key(self.f4)
         if not check("res/img/f4.png", max_time=20):
             logger.error("检测超时，编号1")
             return
         if exist("res/img/survival_index_onclick.png"):
             logger.info("没有可领取的奖励")
-            pyautogui.press("esc")
+            press_key("esc")
         else:
             while True:
                 if click("res/img/daily_reward.png"):
-                    pyautogui.moveRel(0, -60)
+                    moveRel(0, -80)
                 else:
                     break
             if click("res/img/daily_train_reward.png"):
                 time.sleep(2)
-                pyautogui.press("esc", presses=2, interval=2)
+                press_key("esc", presses=2, interval=2)
             else:
                 logger.info("没有可领取的奖励")
-                pyautogui.press("esc")
+                press_key("esc")
         logger.info("任务完成：领取每日实训奖励")
 
     @Slot()
@@ -905,35 +887,32 @@ class Assistant(QThread):
         if not check("res/img/chat_enter.png", max_time=20):
             logger.error("检测超时，编号2")
             return
-        pyautogui.press(self.f2)
+        press_key(self.f2)
         if not check("res/img/f2.png", max_time=20):
             logger.error("检测超时，编号1")
             return
-        if exist("res/img/nameless_honor_reward_exist.png"):
-            if click("res/img/nameless_honor_reward_receive.png"):
-                logger.info("领取了无名勋礼奖励")
-                time.sleep(2)
-                pyautogui.press("esc")
-            else:
-                logger.error("发生错误，错误编号7")
+        if click("res/img/nameless_honor_reward_receive.png"):
+            logger.info("领取了无名勋礼奖励")
+            time.sleep(2)
+            press_key("esc")
         if not click("res/img/nameless_honor_task.png"):
             logger.info("没有可领取的奖励")
-            pyautogui.press("esc")
+            press_key("esc")
             return
         if not click("res/img/nameless_honor_task_receive.png"):
             logger.info("没有已完成的无名勋礼任务")
-            pyautogui.press("esc")
+            press_key("esc")
             return
         logger.info("成功领取无名勋礼任务奖励")
         time.sleep(1)
-        pyautogui.press("esc")
+        press_key("esc")
         if not click("res/img/nameless_honor_reward.png"):
             logger.info("没有可领取的奖励")
             return
         if click("res/img/nameless_honor_reward_receive.png"):
             logger.info("领取了无名勋礼奖励")
             time.sleep(2)
-            pyautogui.press("esc", presses=2, interval=2)
+            press_key("esc", presses=2, interval=2)
         else:
             logger.info("没有可领取的奖励")
         logger.info("完成任务：领取无名勋礼奖励")
@@ -961,7 +940,7 @@ class Assistant(QThread):
                     click("res/img/ensure.png")
                     click("res/img/ensure.png")
                     time.sleep(1)
-                    pyautogui.click()
+                    click_point()
                 else:
                     logger.error("发生错误，错误编号13")
                     return False
@@ -970,7 +949,7 @@ class Assistant(QThread):
                     click("res/img/ensure.png")
                     click("res/img/ensure.png")
                     time.sleep(1)
-                    pyautogui.click()
+                    click_point()
                 else:
                     logger.error("发生错误，错误编号14")
                     return False
@@ -979,7 +958,7 @@ class Assistant(QThread):
                     click("res/img/ensure.png")
                     click("res/img/ensure.png")
                     time.sleep(1)
-                    pyautogui.click()
+                    click_point()
                 else:
                     logger.error("发生错误，错误编号15")
                     return False
@@ -989,33 +968,34 @@ class Assistant(QThread):
             return False
 
     @Slot()
-    def find_session_name(self, name, scroll=False):
+    def find_session_name(self, name, scroll_flag=False):
         name1 = "res/img/" + name + ".png"
         name2 = "res/img/" + name + "_onclick.png"
         if not check("res/img/chat_enter.png", max_time=20):
             logger.error("检测超时，编号2")
             return False
-        pyautogui.press(self.f4)
+        press_key(self.f4)
         if not check("res/img/f4.png", max_time=20):
             logger.error("检测超时，编号1")
-            pyautogui.press("esc")
+            press_key("esc")
             return False
         if not (click("res/img/survival_index.png") or click("res/img/survival_index_onclick.png")):
             logger.error("发生错误，错误编号1")
-            pyautogui.press("esc")
+            press_key("esc")
             return False
-        if scroll:
-            pyautogui.moveRel(0, 100)
+        if scroll_flag:
+            moveRel(0, 100)
             for i in range(6):
-                pyautogui.scroll(-1)
+                scroll(-1)
                 time.sleep(1)
         if not (click(name1) or exist(name2)):
             logger.error("发生错误，错误编号2")
-            pyautogui.press("esc")
+            press_key("esc")
             return False
         return True
 
-    def quit_game(self) -> bool:
+    @staticmethod
+    def quit_game() -> bool:
         logger.info("退出游戏")
         return WindowsProcess.task_kill("StarRail.exe")
 
@@ -1053,101 +1033,45 @@ def check(img_path, interval=0.5, max_time=40):
                 return False
 
 
-def exist(img_path, wait_time=2):
-    """Determine if a situation exists.
+def click(img_path: str, x_add=0, y_add=0, wait_time=2.0, title="崩坏：星穹铁道") -> bool:
+    return SRAOperator.click_img(img_path, x_add, y_add, wait_time, title)
 
-    Args:
-        img_path (str): Img path of the situation.
-        wait_time (int): Waiting time before run.
-    Returns:
-        True if existed, False otherwise.
-    """
-    time.sleep(wait_time)  # 等待游戏加载
-    try:
-        img = cv2.imread(img_path)
-        if img is None:
-            raise FileNotFoundError("无法找到或读取文件 " + img_path + ".png")
-        pyautogui.locateOnWindow(img, "崩坏：星穹铁道", confidence=0.95)
-        return True
-    except pyautogui.ImageNotFoundException:
-        return False
-    except FileNotFoundError as e:
-        logger.exception(e, is_fatal=True)
-        return False
-    except pyscreeze.PyScreezeException:
-        logger.exception("未能找到窗口", is_fatal=True)
-        return False
-    except ValueError:
-        logger.exception("窗口未激活", is_fatal=True)
-        return False
+def click_point(x: int = None, y: int = None) -> bool:
+    return SRAOperator.click_point(x, y)
 
 
-def click(img_path, x_add=0, y_add=0, wait_time=2.0, title="崩坏：星穹铁道"):
-    """Click the corresponding image on the screen
-
-    Args:
-        img_path (str): Img path.
-        x_add (int): X-axis offset(px).
-        y_add (int): Y-axis offset(px).
-        wait_time (float): Waiting time before run(s).
-        title (str): Window title.
-    Returns:
-        True if clicked successfully, False otherwise.
-    """
-    try:
-        time.sleep(wait_time)
-        img = cv2.imread(img_path)
-        if img is None:
-            raise FileNotFoundError("无法找到或读取文件 " + img_path)
-        location = pyautogui.locateOnWindow(img, title, confidence=0.95)
-        x, y = pyautogui.center(location)
-        x += x_add
-        y += y_add
-        pyautogui.click(x, y)
-        return True
-    except pyscreeze.PyScreezeException:
-        logger.exception("未能找到窗口：" + title, is_fatal=True)
-        raise
-    except pyautogui.ImageNotFoundException as e:
-        logger.exception(e, is_fatal=True)
-        return False
-    except ValueError as e:
-        logger.exception(e, is_fatal=True)
-        return False
-    except FileNotFoundError as e:
-        logger.exception(e, is_fatal=True)
-        return False
+def write(content: str = "") -> bool:
+    return SRAOperator.write(content)
 
 
-def get_screen_center():
-    """Get the center of game window.
-
-    Returns:
-        tuple(x, y)
-    """
-    active_window = pygetwindow.getActiveWindow()
-    x, y, screen_width, screen_height = (
-        active_window.left,
-        active_window.top,
-        active_window.width,
-        active_window.height,
-    )
-    return x + screen_width // 2, y + screen_height // 2
+def press_key(key: str, presses: int = 1, interval: float = 2) -> bool:
+    return SRAOperator.press_key(key, presses, interval)
 
 
-def find_level(level: str):
-    """Fine battle level
+def exist(img_path, wait_time=2) -> bool:
+    return SRAOperator.exist(img_path, wait_time)
 
-    Returns:
-        True if found.
-    """
-    x, y = get_screen_center()
-    pyautogui.moveTo(x - 200, y)
-    while True:
-        if exist(level, wait_time=1):
-            return True
-        else:
-            pyautogui.scroll(-1)
+
+def get_screen_center() -> tuple[int, int]:
+    return SRAOperator.get_screen_center()
+
+
+def moveRel(x_offset: int, y_offset: int) -> bool:
+    return SRAOperator.moveRel(x_offset, y_offset)
+
+
+def find_level(level: str) -> bool:
+    return SRAOperator.find_level(level)
+
+
+def press_key_for_a_while(key: str, during: float = 0) -> bool:
+    return SRAOperator.press_key_for_a_while(key, during)
+
+def wait_battle_end() -> bool:
+    return SRAOperator.wait_battle_end()
+
+def scroll(distance: int) -> bool:
+    return SRAOperator.scroll(distance)
 
 
 if __name__ == "__main__":

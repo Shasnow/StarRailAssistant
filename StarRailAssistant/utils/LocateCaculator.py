@@ -1,10 +1,12 @@
 import math
 import pyautogui
 
+
 class LocateCalculator:
     """
     根据不同的分辨率计算坐标
     """
+
     def __init__(self, screen_size: tuple[int, int], location: tuple[int, int]) -> None:
         """
         初始化计算器

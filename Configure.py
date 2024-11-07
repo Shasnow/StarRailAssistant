@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-beta v0.6.7
+v0.7.0
 作者：雪影
 配置相关操作
 """
@@ -46,6 +46,7 @@ def init() -> None:
         "EchoOfWar",
         "QuitGame",
         "Settings",
+        "CloudGame"
     ]
     config_list_2 = {
         "Mission": [
@@ -123,6 +124,9 @@ def init() -> None:
             ["startup", False],
             ["autoUpdate", True],
         ],
+        "CloudGame": [
+            ["firstly", True]
+        ]
     }
     with open("data/config.json", "r") as f:
         config = json.load(f)

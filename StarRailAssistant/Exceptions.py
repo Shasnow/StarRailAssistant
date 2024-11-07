@@ -1,13 +1,30 @@
-
-
 class StarRailException(Exception):
     pass
+
 
 class NotImplementException(StarRailException):
     pass
 
-class StarRailAssistantException(Exception):
+
+class SRAException(Exception):
     pass
 
-class TaskNotExecuteException(StarRailAssistantException): # 任务不可执行
+
+class TaskNotExecuteException(SRAException):  # 任务不可执行
+    pass
+
+
+class WindowNoFoundException(SRAException):
+    pass
+
+
+class MultipleWindowsException(SRAException):
+    pass
+
+
+class MatchFailureError(SRAException):
+    pass
+
+
+class WindowInactiveException(SRAException):
     pass

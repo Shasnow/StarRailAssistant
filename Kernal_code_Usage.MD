@@ -1,5 +1,5 @@
 
-# StarRailAssistant Kernal Code (内核代码)
+# StarRailAssistant Kernal Code (内核代码)(未使用)
 
 ## 用法
 
