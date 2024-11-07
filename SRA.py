@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-v0.6.7
+v0.7.0
 作者：雪影
 图形化界面
 """
@@ -54,6 +54,7 @@ from plyer import notification
 
 import Configure
 import SRAssistant
+import SRACloud
 import WindowsPower
 import WindowsProcess
 import encryption
@@ -71,6 +72,7 @@ class Main(QMainWindow):
 
     def __init__(self):
         super().__init__()  # 调用父类 QMainWindow 的初始化方法
+        self.cloud = False
         self.autoplot = AutoPlot.Main()
         self.exit_SRA = False
         self.sleep = False
@@ -187,6 +189,7 @@ class Main(QMainWindow):
         self.redeem_code = self.receive_rewards_setting_container.findChild(
             QTextEdit, "textEdit"
         )
+        self.redeem_code.setText('\n'.join(self.config["RedeemCode"]["codeList"]))
         self.redeem_code.textChanged.connect(self.redeem_code_change)
         self.task_set_vbox_layout.addWidget(self.receive_rewards_setting_container)
         self.receive_rewards_setting_container.setVisible(False)
@@ -267,6 +270,11 @@ class Main(QMainWindow):
         )
         use_launcher_checkbox.setChecked(self.config["StartGame"]["launcher"])
         use_launcher_checkbox.stateChanged.connect(self.use_launcher)
+
+        cloud_game_checkbox=self.start_game_setting_container.findChild(
+            QCheckBox,"cloud_game"
+        )
+        cloud_game_checkbox.stateChanged.connect(self.use_cloud_game)
         self.path_text = self.start_game_setting_container.findChild(QLabel, "label2_2")
         self.line_area = self.start_game_setting_container.findChild(
             QLineEdit, "lineEdit2_2"
@@ -319,6 +327,12 @@ class Main(QMainWindow):
             self.path_text.setText("游戏路径：")
             self.config["StartGame"]["launcher"] = False
             self.config["StartGame"]["pathType"] = "StarRail"
+
+    def use_cloud_game(self, state):
+        if state:
+            self.cloud = True
+        else:
+            self.cloud= False
 
     def open_file(self):
         file_name, _ = QFileDialog.getOpenFileName(
@@ -737,28 +751,30 @@ class Main(QMainWindow):
         """Save configuration, create work thread and monitor signal."""
         flags = [
             self.config["Mission"]["startGame"],
-            self.config["Mission"]["trailBlazerProfile"],
-            self.config["Mission"]["assignment"],
-            self.config["Mission"]["redeemCode"],
-            self.config["Mission"]["giftOfOdyssey"],
-            self.config["Mission"]["mail"],
             self.config["Mission"]["trailBlazePower"],
-            self.config["Mission"]["dailyTraining"],
-            self.config["Mission"]["namelessHonor"],
+            self.config["ReceiveRewards"]["enable"],
             self.config["Mission"]["quitGame"],
         ]
         if all(not flag for flag in flags):
             self.log.append("未选择任何任务")
+            return
+        if self.config["CloudGame"]["firstly"]:
+            if self.account_text=="" or self.password_text=="":
+                self.log.append("首次使用云·星穹铁道，必须勾选自动登录并填入有效的账号密码")
+                return
+            self.config["CloudGame"]["firstly"]=False
+        encryption.save(self.account_text)
+        if not Configure.save(self.config):
+            self.log.append("配置失败")
+        if self.cloud:
+            self.son_thread=SRACloud.SRACloud(self.password_text)
         else:
-            self.button0_2.setEnabled(True)
-            self.button0_1.setEnabled(False)
-            encryption.save(self.account_text)
-            if not Configure.save(self.config):
-                self.log.append("配置失败")
             self.son_thread = SRAssistant.Assistant(self.password_text)
-            self.son_thread.update_signal.connect(self.update_log)
-            self.son_thread.finished.connect(self.missions_finished)
-            self.son_thread.start()
+        self.son_thread.update_signal.connect(self.update_log)
+        self.son_thread.finished.connect(self.missions_finished)
+        self.son_thread.start()
+        self.button0_2.setEnabled(True)
+        self.button0_1.setEnabled(False)
 
     def missions_finished(self):
         """接收到任务完成信号后执行的工作"""
@@ -827,7 +843,7 @@ class Main(QMainWindow):
         QMessageBox.information(
             self,
             "更新公告",
-            "v0.6.5 更新公告\n"
+            "v0.7.0 更新公告\n"
             "新功能：\n"
             "1.重置GUI\n"
             "2.本地账号信息加密\n"
@@ -890,7 +906,7 @@ class SRA(QApplication):
         QMessageBox.information(
             self.main.ui,
             "使用说明",
-            "SRA崩坏：星穹铁道助手 v0.6.7 by雪影\n"
+            "SRA崩坏：星穹铁道助手 v0.7.0 by雪影\n"
             "使用说明：\n"
             "重要！以管理员模式运行程序！\n"
             "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
