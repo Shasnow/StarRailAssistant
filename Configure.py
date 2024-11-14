@@ -46,7 +46,7 @@ def init() -> None:
         "EchoOfWar",
         "QuitGame",
         "Settings",
-        "CloudGame"
+        "CloudGame",
     ]
     config_list_2 = {
         "Mission": [
@@ -68,9 +68,7 @@ def init() -> None:
             ["pathType", "StarRail"],
             ["channel", 0],
         ],
-        "ReceiveRewards": [
-            ["enable", False]
-        ],
+        "ReceiveRewards": [["enable", False]],
         "RedeemCode": [
             ["codeList", []],
         ],
@@ -123,10 +121,10 @@ def init() -> None:
             ["F4", "f4"],
             ["startup", False],
             ["autoUpdate", True],
+            ["uiSize", "1200x800"],
+            ["uiLocation", "100x100"],
         ],
-        "CloudGame": [
-            ["firstly", True]
-        ]
+        "CloudGame": [["firstly", True]],
     }
     with open("data/config.json", "r") as f:
         config = json.load(f)
