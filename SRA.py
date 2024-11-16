@@ -34,6 +34,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (
     QMainWindow,
     QApplication,
+    QWidget,
     QGroupBox,
     QFileDialog,
     QMessageBox,
@@ -65,7 +66,7 @@ ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改�
 uiLoader = QUiLoader()
 
 
-class Main(QMainWindow):
+class Main(QWidget):
     AppPath = os.path.dirname(os.path.realpath(sys.argv[0])).replace(
         "\\", "/"
     )  # 获取软件自身的路径
@@ -158,46 +159,58 @@ class Main(QMainWindow):
         self.button0_2.setEnabled(False)
 
     def receive_rewards_setting(self):
-        self.option2 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_1")
+        self.option2 = self.receive_rewards_setting_container.findChild(
+            QCheckBox, "checkBox3_1"
+        )
         self.option2.setChecked(self.config["Mission"]["trailBlazerProfile"])
         self.option2.stateChanged.connect(self.trailblazer_profile_status)
 
-        self.option4 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_2")
+        self.option4 = self.receive_rewards_setting_container.findChild(
+            QCheckBox, "checkBox3_2"
+        )
         self.option4.setChecked(self.config["Mission"]["assignment"])
         self.option4.stateChanged.connect(self.assignment_status)
 
-        self.option6 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_3")
+        self.option6 = self.receive_rewards_setting_container.findChild(
+            QCheckBox, "checkBox3_3"
+        )
         self.option6.setChecked(self.config["Mission"]["mail"])
         self.option6.stateChanged.connect(self.mail_status)
 
-        self.option8 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_4")
+        self.option8 = self.receive_rewards_setting_container.findChild(
+            QCheckBox, "checkBox3_4"
+        )
         self.option8.setChecked(self.config["Mission"]["dailyTraining"])
         self.option8.stateChanged.connect(self.daily_training_status)
 
-        self.option9 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_5")
+        self.option9 = self.receive_rewards_setting_container.findChild(
+            QCheckBox, "checkBox3_5"
+        )
         self.option9.setChecked(self.config["Mission"]["namelessHonor"])
         self.option9.stateChanged.connect(self.nameless_honor_status)
 
-        self.option5 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_6")
+        self.option5 = self.receive_rewards_setting_container.findChild(
+            QCheckBox, "checkBox3_6"
+        )
         self.option5.setChecked(self.config["Mission"]["giftOfOdyssey"])
         self.option5.stateChanged.connect(self.gift_of_odyssey_status)
 
-        self.option3 = self.receive_rewards_setting_container.findChild(QCheckBox, "checkBox3_7")
+        self.option3 = self.receive_rewards_setting_container.findChild(
+            QCheckBox, "checkBox3_7"
+        )
         self.option3.setChecked(self.config["Mission"]["redeemCode"])
         self.option3.stateChanged.connect(self.redeem_code_status)
 
         self.redeem_code = self.receive_rewards_setting_container.findChild(
             QTextEdit, "textEdit"
         )
-        self.redeem_code.setText('\n'.join(self.config["RedeemCode"]["codeList"]))
+        self.redeem_code.setText("\n".join(self.config["RedeemCode"]["codeList"]))
         self.redeem_code.textChanged.connect(self.redeem_code_change)
         self.task_set_vbox_layout.addWidget(self.receive_rewards_setting_container)
         self.receive_rewards_setting_container.setVisible(False)
 
     def extension(self):
-        auto_plot_checkbox = self.ui.findChild(
-            QCheckBox, "autoplot_checkBox"
-        )
+        auto_plot_checkbox = self.ui.findChild(QCheckBox, "autoplot_checkBox")
         auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
 
     def auto_plot_status(self, state):
@@ -205,7 +218,6 @@ class Main(QMainWindow):
             self.autoplot.run_application()
         else:
             self.autoplot.quit_application()
-
 
     def software_setting(self):
         self.key_table = self.ui.findChild(QTableWidget, "tableWidget")
@@ -220,9 +232,7 @@ class Main(QMainWindow):
         startup_checkbox.setChecked(self.config["Settings"]["startup"])
         startup_checkbox.stateChanged.connect(self.startup)
 
-        auto_update_checkbox = self.ui.findChild(
-            QCheckBox, "checkBox_ifAutoUpdate"
-        )
+        auto_update_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifAutoUpdate")
         auto_update_checkbox.stateChanged.connect(self.auto_update)
         auto_update_checkbox.setChecked(self.config["Settings"]["autoUpdate"])
 
@@ -271,8 +281,8 @@ class Main(QMainWindow):
         use_launcher_checkbox.setChecked(self.config["StartGame"]["launcher"])
         use_launcher_checkbox.stateChanged.connect(self.use_launcher)
 
-        cloud_game_checkbox=self.start_game_setting_container.findChild(
-            QCheckBox,"cloud_game"
+        cloud_game_checkbox = self.start_game_setting_container.findChild(
+            QCheckBox, "cloud_game"
         )
         cloud_game_checkbox.stateChanged.connect(self.use_cloud_game)
         self.path_text = self.start_game_setting_container.findChild(QLabel, "label2_2")
@@ -332,7 +342,7 @@ class Main(QMainWindow):
         if state:
             self.cloud = True
         else:
-            self.cloud= False
+            self.cloud = False
 
     def open_file(self):
         file_name, _ = QFileDialog.getOpenFileName(
@@ -392,11 +402,11 @@ class Main(QMainWindow):
             self.log.append("启动游戏已禁用")
             self.config["Mission"]["startGame"] = False
 
-    def receive_rewards_status(self,state):
-        if state==2:
-            self.config["ReceiveRewards"]["enable"]=True
+    def receive_rewards_status(self, state):
+        if state == 2:
+            self.config["ReceiveRewards"]["enable"] = True
         else:
-            self.config["ReceiveRewards"]["enable"]=False
+            self.config["ReceiveRewards"]["enable"] = False
 
     def trailblazer_profile_status(self):
         """Change the state of mission trailblazer profile."""
@@ -758,16 +768,18 @@ class Main(QMainWindow):
         if all(not flag for flag in flags):
             self.log.append("未选择任何任务")
             return
-        if self.config["CloudGame"]["firstly"] and self.cloud:
-            if self.account_text=="" or self.password_text=="":
-                self.log.append("首次使用云·星穹铁道，必须勾选自动登录并填入有效的账号密码")
+        if self.config["CloudGame"]["firstly"]:
+            if self.account_text == "" or self.password_text == "":
+                self.log.append(
+                    "首次使用云·星穹铁道，必须勾选自动登录并填入有效的账号密码"
+                )
                 return
-            self.config["CloudGame"]["firstly"]=False
+            self.config["CloudGame"]["firstly"] = False
         encryption.save(self.account_text)
         if not Configure.save(self.config):
             self.log.append("配置失败")
         if self.cloud:
-            self.son_thread= SRACloud.SRACloud(self.password_text)
+            self.son_thread = SRACloud.SRACloud(self.password_text)
         else:
             self.son_thread = SRAssistant.Assistant(self.password_text)
         self.son_thread.update_signal.connect(self.update_log)
@@ -878,7 +890,7 @@ class Main(QMainWindow):
             "2. 游戏画面贴近或超出屏幕显示边缘时功能无法正常执行。\n"
             "3. 在执行“历战余响”时若未选择关卡，会导致程序闪退。\n"
             "关于编队：SRA现在还不会编队，对于除饰品提取以外的战斗功能，使用的是当前出战队伍\n"
-            "对于饰品提取，如果没有队伍或者队伍有空位，使用的是预设编队的队伍1（不要改名）\n"
+            "对于饰品提取，如果没有队伍或者队伍有空位，使用的是预设编队的队伍1（不要改名）\n",
         )
 
     def report(self):
@@ -897,18 +909,48 @@ def is_admin():
         return False
 
 
-class SRA(QApplication):
+class SRA(QMainWindow):
     def __init__(self):
         super().__init__()
 
         self.main = Main()
-        self.main.ui.show()
+        self.setCentralWidget(self.main.ui)
+        self.setWindowIcon(QIcon(self.main.AppPath + "/res/SRAicon.ico"))
+        self.setWindowTitle("SRA v0.7.0")
+        size = list(map(int, self.main.config["Settings"]["uiSize"].split("x")))
+        location = list(map(int, self.main.config["Settings"]["uiLocation"].split("x")))
+        self.setGeometry(
+            location[0], location[1], size[0], size[1]
+        )  # 设置窗口大小与位置
+
+    def closeEvent(self, event):
+        """Save the windows info"""
+        # 保存窗口大小与位置
+        self.main.config["Settings"][
+            "uiSize"
+        ] = f"{self.geometry().width()}x{self.geometry().height()}"
+        self.main.config["Settings"][
+            "uiLocation"
+        ] = f"{self.geometry().x()}x{self.geometry().y()}"
+        Configure.save(self.main.config)
+        # 结束残余进程
+        self.main.exitSRA()
+
+        event.accept()
+
+
+if __name__ == "__main__":
+    if is_admin():
+        app = QApplication(sys.argv)
+        window = SRA()
+        window.show()
+
         QMessageBox.information(
-            self.main.ui,
+            window.main.ui,
             "使用说明",
             "SRA崩坏：星穹铁道助手 v0.7.0 by雪影\n"
-            "SRA完全免费，如果您是通过付费渠道获取的该软件，请及时退款并举报商家。\n"
             "使用说明：\n"
+            "重要！以管理员模式运行程序！\n"
             "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
             "重要！执行任务时不要进行其他操作！\n"
             "\n声明：本程序完全免费，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
@@ -920,11 +962,7 @@ class SRA(QApplication):
             "\n人话：不要跳脸官方～(∠・ω< )⌒☆",
         )
 
-
-if __name__ == "__main__":
-    if is_admin():
-        app = SRA()
-        app.exec()
+        sys.exit(app.exec())
     else:
         # 重新以管理员权限运行脚本
         ctypes.windll.shell32.ShellExecuteW(
