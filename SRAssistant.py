@@ -40,7 +40,7 @@ from WindowsProcess import find_window, is_process_running
 class Assistant(QThread):
     update_signal = Signal(str)
 
-    def __init__(self, pwd, cloud=False, driver= None):
+    def __init__(self, pwd, cloud=False, driver=None):
         super().__init__()
         self.cloud = cloud
         self.driver = driver
@@ -80,6 +80,9 @@ class Assistant(QThread):
                     password_text,
                 )))
             tasks.append((self.check_game, ()))
+        else:
+            tasks.append((self.wait_game_load, ()))
+
         if config["Mission"]["trailBlazePower"]:
             tasks.append((self.trailblazer_power, ()))
         if config["ReceiveRewards"]["enable"]:
@@ -196,7 +199,7 @@ class Assistant(QThread):
             if is_process_running("HYP.exe"):
                 time.sleep(2)
                 if channel == 0:
-                    click('res/img/star_game.png', title="米哈游启动器")
+                    click('res/img/start_game.png', title="米哈游启动器")
                 else:
                     click('res/img/star_game.png')
                 logger.info("尝试启动游戏")
@@ -329,7 +332,7 @@ class Assistant(QThread):
         if channel == 0:
             if login_flag and account:
                 self.login(account, password)
-            if check("res/img/quit.png"):
+            if check("res/img/quit.png", max_time=120):
                 x, y = get_screen_center()
                 if exist("res/img/12+.png"):
                     click_point(x, y)
@@ -355,6 +358,10 @@ class Assistant(QThread):
             else:
                 logger.warning("加载时间过长，请重试")
                 return False
+        return self.wait_game_load()
+
+    @Slot()
+    def wait_game_load(self):
         times = 0
         while True:
             time.sleep(0.2)
@@ -494,7 +501,7 @@ class Assistant(QThread):
             if click("res/img/more.png") or click("res/img/more_with_something.png"):
                 if click("res/img/redeem_code.png"):
                     time.sleep(2)
-                    click_point(get_screen_center())
+                    click_point(*get_screen_center())
                     write(code)
                     click("res/img/ensure.png")
                     time.sleep(2)
@@ -605,7 +612,7 @@ class Assistant(QThread):
         if not self.find_session_name("calyx(golden)"):
             return
         find_level(level)
-        if click(level, x_add=600,y_add=-10):
+        if click(level, x_add=600, y_add=-10):
             if not check('res/img/battle.png'):  # 等待传送
                 logger.error("检测超时，编号4")
                 return
@@ -793,7 +800,7 @@ class Assistant(QThread):
         logger.info("开始战斗")
         logger.info("请检查自动战斗和倍速是否开启")
         times = 0
-        while times != 15:
+        while times != 20:
             if exist("res/img/q.png", wait_time=1):
                 press_key("v")
                 break
@@ -846,6 +853,7 @@ class Assistant(QThread):
                 press_key("esc")
             else:
                 logger.error("发生错误，错误编号6")
+                press_key("esc")
         else:
             logger.info("没有可以领取的派遣奖励")
             press_key("esc")
@@ -984,9 +992,10 @@ class Assistant(QThread):
             press_key("esc")
             return False
         if scroll_flag:
+            time.sleep(2)
             moveRel(0, 100)
             for i in range(6):
-                scroll(-1)
+                scroll(-5)
                 time.sleep(1)
         if not (click(name1) or exist(name2)):
             logger.error("发生错误，错误编号2")
@@ -1036,6 +1045,7 @@ def check(img_path, interval=0.5, max_time=40):
 def click(img_path: str, x_add=0, y_add=0, wait_time=2.0, title="崩坏：星穹铁道") -> bool:
     return SRAOperator.click_img(img_path, x_add, y_add, wait_time, title)
 
+
 def click_point(x: int = None, y: int = None) -> bool:
     return SRAOperator.click_point(x, y)
 
@@ -1067,8 +1077,10 @@ def find_level(level: str) -> bool:
 def press_key_for_a_while(key: str, during: float = 0) -> bool:
     return SRAOperator.press_key_for_a_while(key, during)
 
+
 def wait_battle_end() -> bool:
     return SRAOperator.wait_battle_end()
+
 
 def scroll(distance: int) -> bool:
     return SRAOperator.scroll(distance)

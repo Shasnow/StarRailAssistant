@@ -117,7 +117,7 @@ class Main(QMainWindow):
         problem_action.triggered.connect(self.problem)
         report_action = self.ui.findChild(QAction, "action_3")
         report_action.triggered.connect(self.report)
-        self.ui.setWindowTitle("SRA v0.6.7")  # 设置窗口标题
+        self.ui.setWindowTitle("SRA v0.7.0")  # 设置窗口标题
         self.ui.setWindowIcon(QIcon(self.AppPath + "/res/SRAicon.ico"))
 
         # 创建垂直布局管理器用于任务设置
@@ -758,7 +758,7 @@ class Main(QMainWindow):
         if all(not flag for flag in flags):
             self.log.append("未选择任何任务")
             return
-        if self.config["CloudGame"]["firstly"]:
+        if self.config["CloudGame"]["firstly"] and self.cloud:
             if self.account_text=="" or self.password_text=="":
                 self.log.append("首次使用云·星穹铁道，必须勾选自动登录并填入有效的账号密码")
                 return
@@ -767,7 +767,7 @@ class Main(QMainWindow):
         if not Configure.save(self.config):
             self.log.append("配置失败")
         if self.cloud:
-            self.son_thread=SRACloud.SRACloud(self.password_text)
+            self.son_thread= SRACloud.SRACloud(self.password_text)
         else:
             self.son_thread = SRAssistant.Assistant(self.password_text)
         self.son_thread.update_signal.connect(self.update_log)
@@ -907,8 +907,8 @@ class SRA(QApplication):
             self.main.ui,
             "使用说明",
             "SRA崩坏：星穹铁道助手 v0.7.0 by雪影\n"
+            "SRA完全免费，如果您是通过付费渠道获取的该软件，请及时退款并举报商家。\n"
             "使用说明：\n"
-            "重要！以管理员模式运行程序！\n"
             "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
             "重要！执行任务时不要进行其他操作！\n"
             "\n声明：本程序完全免费，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
