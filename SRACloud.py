@@ -42,14 +42,14 @@ from StarRailAssistant.utils.Logger import logger, console_handler
 
 
 class CloudGame:
-    def __init__(self, pwd):
+    def __init__(self, passwd):
         # 设置Edge选项
         self.edge_options = Options()
         # self.edge_options.add_argument("--headless")  # 无头模式，不显示浏览器界面
         self.edge_options.add_argument("--disable-gpu")  # 禁用GPU加速
         self.service = Service("res/edgedriver_win32/msedgedriver.exe")  # 指定EdgeDriver的路径
         self.driver = webdriver.Edge(service=self.service, options=self.edge_options) # 初始化driver
-        self.pwd = pwd
+        self.pwd = passwd
         self.account = encryption.load()
 
     def __enter__(self):
@@ -67,10 +67,6 @@ class CloudGame:
     def run(self):
         self._start_and_enter()
         self.confirm()
-        assistant = SRAssistant.Assistant('', True, self.driver)
-        # assistant.update_signal.connect(self.sent_signal)
-        assistant.start()
-        assistant.wait()
 
     def _start_and_enter(self):
         driver = self.driver
@@ -150,7 +146,8 @@ class CloudGame:
         with open("./data/cookies.json", "w") as file:
             json.dump(cookies, file, indent=4)
 
-    def load_cookies(self):
+    @staticmethod
+    def load_cookies():
         with open("./data/cookies.json", "r") as file:
             cookies = json.load(file)
         return cookies
@@ -175,13 +172,20 @@ class SRACloud(QThread):
     def sent_signal(self, text):
         self.update_signal.emit(text)
 
-    def __init__(self, pwd):
+    def request_stop(self):
+        self.assistant.stop_flag = True
+
+    def __init__(self, passwd):
         super().__init__()
-        self.pwd = pwd
+        self.pwd = passwd
 
     def run(self):
         with CloudGame(self.pwd) as cloud_game:
             cloud_game.run()
+            self.assistant = SRAssistant.Assistant('', True, cloud_game.driver)
+            self.assistant.update_signal.connect(self.sent_signal)
+            self.assistant.start()
+            self.assistant.wait()
 
 
 if __name__ == "__main__":
@@ -189,3 +193,4 @@ if __name__ == "__main__":
     pwd = input()
     _ = SRACloud(pwd)
     _.start()
+    _.wait()
