@@ -153,6 +153,9 @@
           </item>
           <item>
            <widget class="QFrame" name="frame_4">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="frameShape">
              <enum>QFrame::Shape::StyledPanel</enum>
             </property>
@@ -163,7 +166,7 @@
              <item>
               <widget class="QCheckBox" name="cloud_game">
                <property name="text">
-                <string>云·星穹铁道</string>
+                <string>云·星穹铁道（维护）</string>
                </property>
               </widget>
              </item>

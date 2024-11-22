@@ -36,6 +36,8 @@ from StarRailAssistant.extensions.QTHandler import QTHandler
 from StarRailAssistant.utils.Logger import logger, console_handler
 from WindowsProcess import find_window, is_process_running
 
+VERSION = "0.7.0"
+
 
 class Assistant(QThread):
     update_signal = Signal(str)
@@ -61,10 +63,11 @@ class Assistant(QThread):
 
     def request_stop(self):
         self.stop_flag = True
+        self.quit()
 
     @Slot()
     def run(self):
-        logger.info("SRAv0.6.7 创建任务")
+        logger.info("SRAv" + VERSION + " 创建任务")
         config = self.config
         tasks = []
         if not self.cloud:
@@ -568,7 +571,8 @@ class Assistant(QThread):
             logger.warning("当前暂无可用存档，请前往[差分宇宙]获取存档")
             press_key("esc")
             return
-        find_level(level)
+        if not find_level(level):
+            return
         if not click(level, x_add=700):
             logger.error("发生错误，错误编号3")
             return
@@ -611,7 +615,8 @@ class Assistant(QThread):
         level = "res/img/calyx(golden) (" + str(level_index) + ").png"
         if not self.find_session_name("calyx(golden)"):
             return
-        find_level(level)
+        if not find_level(level):
+            return
         if click(level, x_add=600, y_add=-10):
             if not check('res/img/battle.png'):  # 等待传送
                 logger.error("检测超时，编号4")
@@ -653,7 +658,8 @@ class Assistant(QThread):
         level = "res/img/calyx(crimson) (" + str(level_index) + ").png"
         if not self.find_session_name("calyx(crimson)"):
             return
-        find_level(level)
+        if not find_level(level):
+            return
         if click(level, x_add=400):
             if not check('res/img/battle.png'):  # 等待传送
                 logger.error("检测超时，编号4")
@@ -694,7 +700,8 @@ class Assistant(QThread):
         level = "res/img/stagnant_shadow (" + str(level_index) + ").png"
         if not self.find_session_name("stagnant_shadow"):
             return
-        find_level(level)
+        if find_level(level):
+            return
         if click(level, x_add=700):
             if not check('res/img/battle.png'):  # 等待传送
                 logger.error("检测超时，编号4")
@@ -735,7 +742,8 @@ class Assistant(QThread):
         level = "res/img/caver_of_corrosion (" + str(level_index) + ").png"
         if not self.find_session_name("caver_of_corrosion", True):
             return
-        find_level(level)
+        if find_level(level):
+            return
         if click(level, x_add=700):
             if not check('res/img/battle.png'):  # 等待传送
                 logger.error("检测超时，编号4")
@@ -773,7 +781,8 @@ class Assistant(QThread):
         level = "res/img/echo_of_war (" + str(level_index) + ").png"
         if not self.find_session_name("echo_of_war", True):
             return
-        find_level(level)
+        if find_level(level):
+            return
         if click(level, x_add=400):
             if not check('res/img/battle.png'):  # 等待传送
                 logger.error("检测超时，编号4")
@@ -1022,24 +1031,7 @@ def Popen(path: str):
 
 
 def check(img_path, interval=0.5, max_time=40):
-    """Detects whether the object appears on the screen.
-
-    Args:
-        img_path (str): Img path of object.
-        interval (float): Interval between checks.
-        max_time (int): Maximum number of check times.
-    Returns:
-        True if obj appeared, False if reach maximum times.
-    """
-    times = 0
-    while True:
-        time.sleep(interval)
-        if exist(img_path):
-            return True
-        else:
-            times += 1
-            if times == max_time:
-                return False
+    return SRAOperator.check(img_path, interval, max_time)
 
 
 def click(img_path: str, x_add=0, y_add=0, wait_time=2.0, title="崩坏：星穹铁道") -> bool:

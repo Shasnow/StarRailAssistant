@@ -143,6 +143,27 @@ class SRAOperator:
             return False
 
     @classmethod
+    def check(cls,img_path, interval=0.5, max_time=40):
+        """Detects whether the object appears on the screen.
+
+        Args:
+            img_path (str): Img path of object.
+            interval (float): Interval between checks.
+            max_time (int): Maximum number of check times.
+        Returns:
+            True if obj appeared, False if reach maximum times.
+        """
+        times = 0
+        while True:
+            time.sleep(interval)
+            if cls.exist(img_path):
+                return True
+            else:
+                times += 1
+                if times == max_time:
+                    return False
+
+    @classmethod
     def get_screen_center(cls):
         """Get the center of game window.
 
@@ -272,6 +293,14 @@ class SRAOperator:
                 return "\uE033"
             case "f4":
                 return "\uE034"
+            case "f5":
+                return "\uE035"
+            case "enter":
+                return "\uE006"
+            case "w":
+                return "w"
+            case "v":
+                return "v"
             case _:
                 raise ValueError("意料之外的按键")
 
@@ -314,7 +343,11 @@ class SRAOperator:
             action.perform()
         else:
             pyautogui.moveTo(x - 200, y)
+        times=0
         while True:
+            times+=1
+            if times==60:
+                return False
             if cls.exist(level, wait_time=0.5):
                 return True
             else:

@@ -55,7 +55,8 @@ from plyer import notification
 
 import Configure
 import SRAssistant
-import SRACloud
+from SRAssistant import VERSION
+# import SRACloud
 import WindowsPower
 import WindowsProcess
 import encryption
@@ -118,8 +119,6 @@ class Main(QWidget):
         problem_action.triggered.connect(self.problem)
         report_action = self.ui.findChild(QAction, "action_3")
         report_action.triggered.connect(self.report)
-        self.ui.setWindowTitle("SRA v0.7.0")  # 设置窗口标题
-        self.ui.setWindowIcon(QIcon(self.AppPath + "/res/SRAicon.ico"))
 
         # 创建垂直布局管理器用于任务设置
         self.task_set_vbox_layout = QVBoxLayout()
@@ -768,20 +767,21 @@ class Main(QWidget):
         if all(not flag for flag in flags):
             self.log.append("未选择任何任务")
             return
-        if self.config["CloudGame"]["firstly"]:
-            if self.account_text == "" or self.password_text == "":
-                self.log.append(
-                    "首次使用云·星穹铁道，必须勾选自动登录并填入有效的账号密码"
-                )
-                return
-            self.config["CloudGame"]["firstly"] = False
+        # if self.config["CloudGame"]["firstly"] and self.cloud:
+        #     if self.account_text == "" or self.password_text == "":
+        #         self.log.append(
+        #             "首次使用云·星穹铁道，必须勾选自动登录并填入有效的账号密码"
+        #         )
+        #         return
+        #     self.config["CloudGame"]["firstly"] = False
         encryption.save(self.account_text)
         if not Configure.save(self.config):
             self.log.append("配置失败")
-        if self.cloud:
-            self.son_thread = SRACloud.SRACloud(self.password_text)
-        else:
-            self.son_thread = SRAssistant.Assistant(self.password_text)
+            return
+        # if self.cloud:
+        #     self.son_thread = SRACloud.SRACloud(self.password_text)
+        # else:
+        self.son_thread = SRAssistant.Assistant(self.password_text)
         self.son_thread.update_signal.connect(self.update_log)
         self.son_thread.finished.connect(self.missions_finished)
         self.son_thread.start()
@@ -855,7 +855,7 @@ class Main(QWidget):
         QMessageBox.information(
             self,
             "更新公告",
-            "v0.7.0 更新公告\n"
+            "v0.6.0 -> 0.7.0\n"
             "新功能：\n"
             "1.重置GUI\n"
             "2.本地账号信息加密\n"
@@ -864,7 +864,7 @@ class Main(QWidget):
             "5.接入符玄日志库`FuXLogger`，更改日志文件储存的位置，现在它位于与`SRA.exe`同级的目录下。\n"
             "6.退出游戏的设置现在变为可用，您可以在任务结束后选择退出SRA，关机或者休眠。\n"
             "7.键位设置现在变为可用，在`设置->键位设置`中，您可以更改键位，注意键位冲突。\n"
-            "8.实验性功能：剧情自动播放。在`拓展功能`->`实验性功能`中。\n"
+            "8.剧情自动播放。在`拓展功能`->`实验性功能`中。\n"
             "9.SRA自动更新：在`设置`->`SRA设置`中，默认为启用。"
             "\n"
             "问题修复：\n"
@@ -877,7 +877,8 @@ class Main(QWidget):
             "7.修复特定情况下，错误编号14、15意外发生的问题。\n"
             "8.修复处于特定场景时，超时编号1意外发生的问题。\n"
             "9.修复当存在未领取的月卡时程序无动作的问题。\n"
-            "10.修复当启动器最小化到系统托盘时通过启动器启动游戏失败且任务直接完成的问题。"
+            "10.修复当启动器最小化到系统托盘时通过启动器启动游戏失败且任务直接完成的问题。\n"
+            "11.修复当程序查找关卡失败时无限控制鼠标滚轮滚动的问题。"
             "\n感谢您对SRA的支持！",
         )
 
@@ -897,8 +898,13 @@ class Main(QWidget):
         QMessageBox.information(
             self,
             "问题反馈",
-            "反馈渠道：\n    B站：https://space.bilibili.com/349682013\n    QQ邮箱：yukikage@qq.com\n    QQ群：994571792\n反馈须知：\n "
-            "   向开发者反馈问题时，除问题描述外，\n    请给出所使用软件的版本号以及日志文件",
+            "反馈渠道：\n"
+            "   B站：https://space.bilibili.com/349682013\n"
+            "   QQ邮箱：yukikage@qq.com\n"
+            "   QQ群：994571792\n"
+            "反馈须知：\n"
+            "    向开发者反馈问题时，除问题描述外，\n"
+            "    请给出所使用软件的版本号以及日志文件",
         )
 
 
@@ -916,7 +922,7 @@ class SRA(QMainWindow):
         self.main = Main()
         self.setCentralWidget(self.main.ui)
         self.setWindowIcon(QIcon(self.main.AppPath + "/res/SRAicon.ico"))
-        self.setWindowTitle("SRA v0.7.0")
+        self.setWindowTitle("SRA v"+VERSION)
         size = list(map(int, self.main.config["Settings"]["uiSize"].split("x")))
         location = list(map(int, self.main.config["Settings"]["uiLocation"].split("x")))
         self.setGeometry(
@@ -948,7 +954,7 @@ if __name__ == "__main__":
         QMessageBox.information(
             window.main.ui,
             "使用说明",
-            "SRA崩坏：星穹铁道助手 v0.7.0 by雪影\n"
+            "SRA崩坏：星穹铁道助手 v"+VERSION+" by雪影\n"
             "使用说明：\n"
             "重要！以管理员模式运行程序！\n"
             "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
