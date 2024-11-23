@@ -19,14 +19,14 @@
 """
 崩坏：星穹铁道助手
 SRA更新器
-v1.2.0
+v2.0.0
 作者：雪影
 """
 
 import json
 import os
 import sys
-import zipfile
+from time import sleep
 
 import requests
 
@@ -49,13 +49,15 @@ class Updater:
     def __init__(self):
         print("欢迎使用SRA更新器")
         self.init_version_file()
+        if os.path.exists(self.TEMP_DOWNLOAD_PATH):
+            os.remove(self.TEMP_DOWNLOAD_PATH)
 
     def init_version_file(self):
         if not os.path.exists(self.APP_PATH + "/version.json"):
             print("初始化版本信息")
             version_info = {
                 "version": "0.0.0",
-                "updater": "0.9.0",
+                "updater": "0.0.0",
                 "resource_version": "0.0.0"
             }
             with open(self.APP_PATH + "/version.json", "w", encoding="utf-8") as json_file:
@@ -73,14 +75,10 @@ class Updater:
         print("检查版本信息")
         current_version, current_updater_version, current_resource_version = self.get_current_version()
         try:
-            url, updater_update = self.version_check(current_version,current_updater_version, current_resource_version)
+            url, updater_update = self.version_check(current_version, current_updater_version, current_resource_version)
             if url == "":
                 return
             self.download(url)
-            if updater_update:
-                print("存在更新器更新，需要手动解压")
-                os.system("pause")
-                return
             self.unzip()
         except Exception as e:
             print(f"检查更新时出错: {e}")
@@ -104,7 +102,7 @@ class Updater:
             return version_info["download_url"], updater_update
         if remote_resource_version > current_resource_version:
             print(f"发现资源更新：{remote_resource_version}")
-            print(f"更新说明：\n{version_info['announcement']}")
+            print(f"更新说明：\n{version_info['resource_announcement']}")
             return version_info["resource_download_url"], updater_update
         print("已经是最新版本")
         return "", updater_update
@@ -134,18 +132,15 @@ class Updater:
     def unzip(self):
         if WindowsProcess.is_process_running("SRA.exe"):
             WindowsProcess.task_kill("SRA.exe")
+            sleep(2)
         try:
             print("解压更新文件")
-            with zipfile.ZipFile(self.TEMP_DOWNLOAD_PATH, 'r') as zip_ref:
-                zip_ref.extractall(self.UPDATE_EXTRACT_DIR)
-
-            print("删除临时下载文件")
-            os.remove(self.TEMP_DOWNLOAD_PATH)
-            print("更新安装完成！可以关闭SRA更新器。")
-            os.system("pause")
+            command=self.APP_PATH+"/tools/7z x "+self.TEMP_DOWNLOAD_PATH+" -y"
+            cmd = 'cmd.exe /c start "" '+command
+            WindowsProcess.popen(cmd, shell=True)
 
         except Exception as e:
-            print(f"解压更新时出错: {e}，SRA更新器运行中，请关闭后手动解压")
+            print(f"解压更新时出错: {e}")
             os.system("pause")
 
 

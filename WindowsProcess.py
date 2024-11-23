@@ -64,7 +64,7 @@ def check_window(window_title) -> bool:
         return False
 
 
-def is_process_running(process_name)  -> bool:
+def is_process_running(process_name) -> bool:
     """
     Check if there is any running process that contains the given name string.
 
@@ -101,9 +101,45 @@ def task_kill(process: str) -> bool:
         return False
 
 
-def set_startup_item(program_name, program_path) -> bool:
+def open_normal(path: str) -> bool:
+    """运行指定exe程序并等待
+
+        Args:
+            path: 程序路径
+
+        Returns:
+            True if opened successfully, False otherwise.
+        """
+    try:
+        subprocess.run(path)
+        return True
+    except FileNotFoundError:
+        return False
+    except OSError:
+        return False
+
+
+def popen(path: str, shell=False) -> bool:
+    """运行指定exe程序
+
+    Args:
+        shell: 通过shell运行
+        path: 程序路径
+
+    Returns:
+        True if opened successfully, False otherwise.
     """
-    设置进程的开机启动
+    try:
+        subprocess.Popen(path, shell=shell)
+        return True
+    except FileNotFoundError:
+        return False
+    except OSError:
+        return False
+
+
+def set_startup_item(program_name, program_path) -> bool:
+    """设置进程的开机启动
 
     Args:
         program_name (str): 启动项名称
@@ -122,7 +158,7 @@ def set_startup_item(program_name, program_path) -> bool:
         return False
 
 
-def delete_startup_item(item_name:str) -> bool:
+def delete_startup_item(item_name: str) -> bool:
     """
     删除开机启动项
     Args:
@@ -139,7 +175,3 @@ def delete_startup_item(item_name:str) -> bool:
         return True
     except Exception:
         return False
-
-
-if __name__ == "__main__":
-    print(find_window("Microsoft Edge"))
