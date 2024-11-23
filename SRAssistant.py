@@ -501,7 +501,7 @@ class Assistant(QThread):
         if len(redeem_code_list) == 0:
             logger.warning("未填写兑换码")
         for code in redeem_code_list:
-            if click("res/img/more.png") or click("res/img/more_with_something.png"):
+            if click("res/img/more.png",wait_time=1) or click("res/img/more_with_something.png",wait_time=1):
                 if click("res/img/redeem_code.png"):
                     time.sleep(2)
                     click_point(*get_screen_center())
@@ -700,7 +700,7 @@ class Assistant(QThread):
         level = "res/img/stagnant_shadow (" + str(level_index) + ").png"
         if not self.find_session_name("stagnant_shadow"):
             return
-        if find_level(level):
+        if not find_level(level):
             return
         if click(level, x_add=700):
             if not check('res/img/battle.png'):  # 等待传送
@@ -742,7 +742,7 @@ class Assistant(QThread):
         level = "res/img/caver_of_corrosion (" + str(level_index) + ").png"
         if not self.find_session_name("caver_of_corrosion", True):
             return
-        if find_level(level):
+        if not find_level(level):
             return
         if click(level, x_add=700):
             if not check('res/img/battle.png'):  # 等待传送
@@ -781,7 +781,7 @@ class Assistant(QThread):
         level = "res/img/echo_of_war (" + str(level_index) + ").png"
         if not self.find_session_name("echo_of_war", True):
             return
-        if find_level(level):
+        if not find_level(level):
             return
         if click(level, x_add=400):
             if not check('res/img/battle.png'):  # 等待传送
@@ -853,8 +853,11 @@ class Assistant(QThread):
         if not click("res/img/assignments_none.png"):
             logger.info("没有可领取的奖励")
             return
-        while not exist("res/img/assignment_page.png"):
-            pass
+        if not check("res/img/assignment_page.png",max_time=15):
+            if not click("res/img/assignment_page2.png"):
+                logger.error("检测超时，编号5")
+                press_key("esc")
+                return
         if click("res/img/assignments_reward.png"):
             if click("res/img/assign_again.png"):
                 logger.info("再次派遣")
