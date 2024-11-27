@@ -1,7 +1,7 @@
 {
     "version": "0.7.0",
     "download_url": "https://ghp.ci/https://github.com/Shasnow/StarRailAssistant/releases/download/v0.7.0/StarRailAssistant_v0.7.0.zip",
-    "resource_version": "0.7.0.3",
+    "resource_version": "0.7.0.4",
     "resource_download_url": "https://ghp.ci/https://github.com/Shasnow/SRAresource/releases/download/resource/resource.zip",
     "updater": "2.0.0",
     "updater_download_url": "",
