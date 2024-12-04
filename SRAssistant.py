@@ -204,7 +204,7 @@ class Assistant(QThread):
                 if channel == 0:
                     click('res/img/start_game.png', title="米哈游启动器")
                 else:
-                    click('res/img/star_game.png')
+                    click('res/img/start_game.png')
                 logger.info("尝试启动游戏")
                 for i in range(10):
                     time.sleep(1)

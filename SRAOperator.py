@@ -50,8 +50,8 @@ class SRAOperator:
         left, top, width, height = region
         area_width = width // 160 * 160
         area_height = height // 90 * 90
-        cls.area_top = top + 45
-        cls.area_left = left + 11
+        cls.area_top = (top + 45) if top!=0 else top
+        cls.area_left = (left + 11) if left!=0 else left
         return cls.area_left, cls.area_top, area_width, area_height
 
     @classmethod
