@@ -114,6 +114,7 @@ class SRAOperator:
             x += x_add
             y += y_add
             x, y = cls._location_calculator(x, y)
+            logger.debug(f"启动按钮坐标：{x}x{y}")
             return x, y
         except pyscreeze.PyScreezeException:
             raise WindowNoFoundException("未能找到窗口：" + title)
