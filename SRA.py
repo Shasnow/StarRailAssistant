@@ -235,6 +235,10 @@ class Main(QWidget):
         auto_update_checkbox.stateChanged.connect(self.auto_update)
         auto_update_checkbox.setChecked(self.config["Settings"]["autoUpdate"])
 
+        thread_safety_checkbox = self.ui.findChild(QCheckBox, "checkBox_threadSafety")
+        thread_safety_checkbox.setChecked(self.config["Settings"]["threadSafety"])
+        thread_safety_checkbox.stateChanged.connect(self.thread_safety)
+
     def key_setting_save(self):
         Configure.save(self.config)
 
@@ -266,6 +270,13 @@ class Main(QWidget):
             self.config["Settings"]["autoUpdate"] = True
         else:
             self.config["Settings"]["autoUpdate"] = False
+        Configure.save(self.config)
+
+    def thread_safety(self, state):
+        if state == 2:
+            self.config["Settings"]["threadSafety"] = True
+        else:
+            self.config["Settings"]["threadSafety"] = False
         Configure.save(self.config)
 
     def start_game_setting(self):
@@ -791,8 +802,8 @@ class Main(QWidget):
     def missions_finished(self):
         """接收到任务完成信号后执行的工作"""
         self.notification()
-        if not self.config["Mission"]["quitGame"]:
-            return
+        # if not self.config["Mission"]["quitGame"]:
+        #     return
         if self.shutdown:
             WindowsPower.schedule_shutdown(61)
             self.countdown()
@@ -846,7 +857,10 @@ class Main(QWidget):
         """Kill the child thread"""
         self.son_thread.request_stop()
         self.button0_2.setEnabled(False)
-        self.log.append("等待当前任务完成后停止")
+        if self.config["Settings"]["threadSafety"]:
+            self.log.append("等待当前任务完成后停止")
+        else:
+            self.log.append("已停止")
 
     def exitSRA(self):
         self.ui.close()

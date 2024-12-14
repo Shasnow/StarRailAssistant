@@ -36,7 +36,7 @@ from StarRailAssistant.extensions.QTHandler import QTHandler
 from StarRailAssistant.utils.Logger import logger, console_handler
 from WindowsProcess import find_window, is_process_running
 
-VERSION = "0.7.0"
+VERSION = "0.7.1"
 
 
 class Assistant(QThread):
@@ -63,11 +63,14 @@ class Assistant(QThread):
 
     def request_stop(self):
         self.stop_flag = True
-        self.quit()
+        if self.config["Settings"]["threadSafety"]:
+            self.quit()
+        else:
+            self.terminate()
 
     @Slot()
     def run(self):
-        logger.info("SRAv" + VERSION + " 创建任务")
+        logger.info("SRAv" + VERSION + " 创建任务喵")
         config = self.config
         tasks = []
         if not self.cloud:
@@ -198,9 +201,8 @@ class Assistant(QThread):
         logger.info("等待启动器启动")
         time.sleep(5)
         times = 0
-        while times < 40:
+        while times < 20:
             if is_process_running("HYP.exe"):
-                time.sleep(2)
                 if channel == 0:
                     click('res/img/start_game.png', title="米哈游启动器")
                 else:
@@ -321,8 +323,10 @@ class Assistant(QThread):
         """
         if find_window("崩坏：星穹铁道"):
             logger.info("游戏已经启动")
-            if check("res/img/chat_enter.png", max_time=10):
+            if check("res/img/chat_enter.png", max_time=40):
                 return True
+            else:
+                logger.warning("检测超时，尝试重新启动")
         if path_type == "StarRail":
             if not self.launch_game(game_path, path_type):
                 time.sleep(2)

@@ -1,10 +1,10 @@
 {
-    "version": "0.7.0",
-    "download_url": "https://ghp.ci/https://github.com/Shasnow/StarRailAssistant/releases/download/v0.7.0/StarRailAssistant_v0.7.0.zip",
+    "version": "0.7.1",
+    "download_url": "https://ghp.ci/https://github.com/Shasnow/StarRailAssistant/releases/download/v0.7.1/StarRailAssistant_v0.7.1.zip",
     "resource_version": "0.7.0.5",
     "resource_download_url": "https://ghp.ci/https://github.com/Shasnow/SRAresource/releases/download/resource/resource.zip",
     "updater": "2.0.0",
     "updater_download_url": "",
-    "announcement": "SRA更新器更新：相信我，这会是你最后一次需要手动解压\nSRA更新：1. 将各种领取各种奖励的功能合并，其中前5项默认启用。\n2. 适配 1600*900 分辨率\n3. 新增记忆窗口大小和位置的功能。\n1. 修复当程序查找关卡失败时无限控制鼠标滚轮滚动的问题。\n2. 修复清开拓力部分任务异常中断的问题。\n3. 修复领取派遣奖励时卡死的问题。",
+    "announcement": "1. 调整“停止”按钮的行为，现在按下该按钮后将立即终止任务，你也可以在SRA设置中打开“线程安全”设置，这将让程序像之前那样等待。\n2. 即使不勾选“退出游戏”功能也可以使用“退出SRA、关机、休眠”。\n3. 添加侵蚀隧洞的套装说明。\n1. 更正文本错误。",
     "resource_announcement": "巡星之礼资源更新"
 }

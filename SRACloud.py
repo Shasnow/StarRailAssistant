@@ -47,7 +47,7 @@ class CloudGame:
         self.edge_options = Options()
         # self.edge_options.add_argument("--headless")  # 无头模式，不显示浏览器界面
         self.edge_options.add_argument("--disable-gpu")  # 禁用GPU加速
-        self.service = Service("res/edgedriver_win32/msedgedriver.exe")  # 指定EdgeDriver的路径
+        self.service = Service("tools/msedgedriver.exe")  # 指定EdgeDriver的路径
         self.driver = webdriver.Edge(service=self.service, options=self.edge_options) # 初始化driver
         self.pwd = passwd
         self.account = encryption.load()

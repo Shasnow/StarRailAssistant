@@ -844,57 +844,57 @@
                </item>
                <item>
                 <property name="text">
-                 <string>迷识之径</string>
+                 <string>迷识之径（司铎套/学者套）</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>勇骑之径</string>
+                 <string>勇骑之径（铁骑套/勇烈套）</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>梦潜之径</string>
+                 <string>梦潜之径（死水/钟表匠）</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>幽冥之径</string>
+                 <string>幽冥之径（大公/幽囚）</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>药使之径</string>
+                 <string>药使之径（莳者/信使）</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>野焰之径</string>
+                 <string>野焰之径（火匠/废土客）</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>圣颂之径</string>
+                 <string>圣颂之径（圣骑/乐队）</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>睿智之径</string>
+                 <string>睿智之径（铁卫/量子套）</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>漂泊之径</string>
+                 <string>漂泊之径（过客/快枪手）</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>迅拳之径</string>
+                 <string>迅拳之径（拳皇/怪盗）</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>霜风之径</string>
+                 <string>霜风之径（冰/风套）</string>
                 </property>
                </item>
               </widget>

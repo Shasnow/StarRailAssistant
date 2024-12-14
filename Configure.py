@@ -121,6 +121,7 @@ def init() -> None:
             ["F4", "f4"],
             ["startup", False],
             ["autoUpdate", True],
+            ["threadSafety", False],
             ["uiSize", "1200x800"],
             ["uiLocation", "100x100"],
         ],
