@@ -87,7 +87,7 @@
                </size>
               </property>
               <property name="text">
-               <string>退出游戏后：</string>
+               <string>任务结束后：</string>
               </property>
              </widget>
             </item>

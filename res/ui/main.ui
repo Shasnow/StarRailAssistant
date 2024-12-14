@@ -360,8 +360,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>312</width>
-             <height>89</height>
+             <width>820</width>
+             <height>167</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_16">
@@ -459,8 +459,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>650</width>
-             <height>522</height>
+             <width>820</width>
+             <height>540</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -953,6 +953,32 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <string>SRA设置</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_5">
+               <item row="0" column="1">
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="3">
+                <spacer name="horizontalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
                <item row="0" column="0">
                 <widget class="QFrame" name="frame_routine_3">
                  <property name="frameShape">
@@ -978,19 +1004,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  </layout>
                 </widget>
                </item>
-               <item row="0" column="1">
-                <spacer name="horizontalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
                <item row="0" column="2">
                 <widget class="QFrame" name="frame_routine_4">
                  <property name="frameShape">
@@ -1010,18 +1023,43 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  </layout>
                 </widget>
                </item>
-               <item row="0" column="3">
-                <spacer name="horizontalSpacer_2">
+               <item row="0" column="5">
+                <spacer name="horizontalSpacer_3">
                  <property name="orientation">
                   <enum>Qt::Orientation::Horizontal</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>304</width>
+                   <width>40</width>
                    <height>20</height>
                   </size>
                  </property>
                 </spacer>
+               </item>
+               <item row="0" column="4">
+                <widget class="QFrame" name="frame_routine_5">
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_26">
+                  <item>
+                   <widget class="QCheckBox" name="checkBox_threadSafety">
+                    <property name="toolTip">
+                     <string>关闭此选项后，控制台的停止功能将不再等待任务结束。</string>
+                    </property>
+                    <property name="whatsThis">
+                     <string>关闭此选项后，控制台的停止功能将不再等待任务结束。</string>
+                    </property>
+                    <property name="text">
+                     <string>线程安全</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </widget>
