@@ -22,11 +22,11 @@ v0.7.0
 作者：雪影
 数据加密
 """
-from cryptography.fernet import Fernet
 import os
 
+from cryptography.fernet import Fernet
 
-# 生成密钥
+
 def generate_key(key_file="data/frperg.sra"):
     key = Fernet.generate_key()
     with open(key_file, "wb") as key_file:
@@ -34,12 +34,10 @@ def generate_key(key_file="data/frperg.sra"):
     return key
 
 
-# 从文件加载密钥
 def load_key(key_file="data/frperg.sra"):
     return open(key_file, "rb").read()
 
 
-# 加密密码
 def encrypt_word(pwd, key_file="data/frperg.sra"):
     key = load_key(key_file)
     cipher_suite = Fernet(key)
@@ -47,7 +45,6 @@ def encrypt_word(pwd, key_file="data/frperg.sra"):
     return encrypted_password
 
 
-# 解密密码
 def decrypt_word(encrypted_password, key_file="data/frperg.sra"):
     key = load_key(key_file)
     cipher_suite = Fernet(key)
@@ -73,17 +70,8 @@ def load():
             account_text = ""
     return account_text
 
+
 def save(account_text):
     acc = encrypt_word(account_text)
     with open("data/privacy.sra", "wb") as sra_file:
         sra_file.write(acc)
-
-
-if __name__ == "__main__":
-    if not os.path.exists("data/frperg.sra"):
-        generate_key()
-    password = input("请输入密码: ")
-    password = encrypt_word(password)
-    print(password)
-    decrypted_password = decrypt_word(password)
-    print("解密后的密码是:", decrypted_password)

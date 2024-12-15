@@ -165,5 +165,3 @@ def save(config: dict) -> bool:
         return False
 
 
-if __name__ == "__main__":
-    init()

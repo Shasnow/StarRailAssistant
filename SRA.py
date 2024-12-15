@@ -53,14 +53,10 @@ from PySide6.QtWidgets import (
 )  # 从 PySide6 中导入所需的类
 from plyer import notification
 
-import Configure
-import SRAssistant
-from SRAssistant import VERSION
+from StarRailAssistant.utils import Configure, WindowsPower, WindowsProcess, Encryption
+from StarRailAssistant.core import SRAssistant, AutoPlot
+from StarRailAssistant.core.SRAssistant import VERSION
 # import SRACloud
-import WindowsPower
-import WindowsProcess
-import encryption
-import AutoPlot
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
 
@@ -80,9 +76,9 @@ class Main(QWidget):
         self.sleep = False
         self.shutdown = False
         Configure.init()
-        encryption.init()
+        Encryption.init()
         self.config = Configure.load()
-        self.account_text = encryption.load()
+        self.account_text = Encryption.load()
         self.password_text = ""
         self.ui = uiLoader.load(self.AppPath + "/res/ui/main.ui")
         self.start_game_setting_container = uiLoader.load(
@@ -785,7 +781,7 @@ class Main(QWidget):
         #         )
         #         return
         #     self.config["CloudGame"]["firstly"] = False
-        encryption.save(self.account_text)
+        Encryption.save(self.account_text)
         if not Configure.save(self.config):
             self.log.append("配置失败")
             return

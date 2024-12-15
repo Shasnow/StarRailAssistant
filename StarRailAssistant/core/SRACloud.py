@@ -37,7 +37,7 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
 import SRAssistant
-import encryption
+from StarRailAssistant.utils import Encryption
 from StarRailAssistant.utils.Logger import logger, console_handler
 
 
@@ -50,7 +50,7 @@ class CloudGame:
         self.service = Service("tools/msedgedriver.exe")  # 指定EdgeDriver的路径
         self.driver = webdriver.Edge(service=self.service, options=self.edge_options) # 初始化driver
         self.pwd = passwd
-        self.account = encryption.load()
+        self.account = Encryption.load()
 
     def __enter__(self):
         return self
@@ -143,12 +143,12 @@ class CloudGame:
     def save_cookies(self):
         driver = self.driver
         cookies = driver.get_cookies()
-        with open("./data/cookies.json", "w") as file:
+        with open("data/cookies.json", "w") as file:
             json.dump(cookies, file, indent=4)
 
     @staticmethod
     def load_cookies():
-        with open("./data/cookies.json", "r") as file:
+        with open("data/cookies.json", "r") as file:
             cookies = json.load(file)
         return cookies
 
@@ -159,7 +159,7 @@ class CloudGame:
 
     @staticmethod
     def _save_screenshot(driver: WebDriver):
-        driver.save_screenshot("./res/temp.png")
+        driver.save_screenshot("res/temp.png")
 
     @staticmethod
     def get_window_handle(driver: WebDriver):
