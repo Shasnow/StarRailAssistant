@@ -32,7 +32,7 @@ from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.webdriver import WebDriver
 
-from StarRailAssistant.Exceptions import WindowNoFoundException, MultipleWindowsException, MatchFailureError, \
+from StarRailAssistant.utils.Exceptions import WindowNoFoundException, MultipleWindowsException, MatchFailureError, \
     WindowInactiveException
 from StarRailAssistant.utils.Logger import logger
 

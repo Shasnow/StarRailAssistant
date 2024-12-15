@@ -28,13 +28,11 @@ import time
 
 from PySide6.QtCore import QThread, Signal, Slot
 
-import Configure
-import WindowsProcess
-import encryption
-from SRAOperator import SRAOperator
+from StarRailAssistant.utils import Configure, WindowsProcess, Encryption
+from StarRailAssistant.utils.SRAOperator import SRAOperator
 from StarRailAssistant.extensions.QTHandler import QTHandler
 from StarRailAssistant.utils.Logger import logger, console_handler
-from WindowsProcess import find_window, is_process_running
+from StarRailAssistant.utils.WindowsProcess import find_window, is_process_running
 
 VERSION = "0.7.1"
 
@@ -75,7 +73,7 @@ class Assistant(QThread):
         tasks = []
         if not self.cloud:
             if config["Mission"]["startGame"]:
-                account_text = encryption.load()
+                account_text = Encryption.load()
                 password_text = self.pwd
                 tasks.append((self.start_game, (
                     config["StartGame"]["gamePath"],
@@ -505,7 +503,7 @@ class Assistant(QThread):
         if len(redeem_code_list) == 0:
             logger.warning("未填写兑换码")
         for code in redeem_code_list:
-            if click("res/img/more.png",wait_time=1) or click("res/img/more_with_something.png",wait_time=1):
+            if click("res/img/more.png", wait_time=1) or click("res/img/more_with_something.png", wait_time=1):
                 if click("res/img/redeem_code.png"):
                     time.sleep(2)
                     click_point(*get_screen_center())
@@ -857,7 +855,7 @@ class Assistant(QThread):
         if not click("res/img/assignments_none.png"):
             logger.info("没有可领取的奖励")
             return
-        if not check("res/img/assignment_page.png",max_time=15):
+        if not check("res/img/assignment_page.png", max_time=15):
             if not click("res/img/assignment_page2.png"):
                 logger.error("检测超时，编号5")
                 press_key("esc")

@@ -30,7 +30,7 @@ from time import sleep
 
 import requests
 
-import WindowsProcess
+from StarRailAssistant.utils import WindowsProcess
 
 
 class Updater:
