@@ -36,7 +36,7 @@ from selenium.webdriver.edge.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-import SRAssistant
+from StarRailAssistant.core import SRAssistant
 from StarRailAssistant.utils import Encryption
 from StarRailAssistant.utils.Logger import logger, console_handler
 
