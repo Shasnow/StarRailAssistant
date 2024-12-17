@@ -54,9 +54,8 @@ from PySide6.QtWidgets import (
 from plyer import notification
 
 from StarRailAssistant.utils import Configure, WindowsPower, WindowsProcess, Encryption
-from StarRailAssistant.core import SRAssistant, AutoPlot
+from StarRailAssistant.core import SRAssistant, AutoPlot, SRACloud
 from StarRailAssistant.core.SRAssistant import VERSION
-# import SRACloud
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
 
@@ -774,21 +773,21 @@ class Main(QWidget):
         if all(not flag for flag in flags):
             self.log.append("未选择任何任务")
             return
-        # if self.config["CloudGame"]["firstly"] and self.cloud:
-        #     if self.account_text == "" or self.password_text == "":
-        #         self.log.append(
-        #             "首次使用云·星穹铁道，必须勾选自动登录并填入有效的账号密码"
-        #         )
-        #         return
-        #     self.config["CloudGame"]["firstly"] = False
+        if self.config["CloudGame"]["firstly"] and self.cloud:
+            if self.account_text == "" or self.password_text == "":
+                self.log.append(
+                    "首次使用云·星穹铁道，必须勾选自动登录并填入有效的账号密码"
+                )
+                return
+            self.config["CloudGame"]["firstly"] = False
         Encryption.save(self.account_text)
         if not Configure.save(self.config):
             self.log.append("配置失败")
             return
-        # if self.cloud:
-        #     self.son_thread = SRACloud.SRACloud(self.password_text)
-        # else:
-        self.son_thread = SRAssistant.Assistant(self.password_text)
+        if self.cloud:
+            self.son_thread = SRACloud.SRACloud(self.password_text)
+        else:
+            self.son_thread = SRAssistant.Assistant(self.password_text)
         self.son_thread.update_signal.connect(self.update_log)
         self.son_thread.finished.connect(self.missions_finished)
         self.son_thread.start()

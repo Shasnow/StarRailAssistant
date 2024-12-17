@@ -1,4 +1,4 @@
-![ico](/res/SRAico.jpg)  
+![ico](/res/SRAico.png)  
 
 #### [帮助文档](https://github.com/Shasnow/StarRailAssistant/blob/main/HELP.md) | [FAQ](https://github.com/Shasnow/StarRailAssistant/wiki/FAQ) | [下载和安装](https://github.com/Shasnow/StarRailAssistant/wiki/Install) | [使用方法](https://github.com/Shasnow/StarRailAssistant/wiki/Usage)
 # StarRailAssistant(SRA)
@@ -43,6 +43,7 @@ This software is open source, free of charge and for learning and exchange purpo
 * 退出游戏
   * *从不回头看`“爆炸”`*，可选退出SRA以及关闭计算机。
 * 自动剧情
+  * 只包含点击对话
 
 ## 我怎么才能使用SRA？急急急
 
@@ -78,7 +79,8 @@ This software is open source, free of charge and for learning and exchange purpo
   * 提前获取版本更新
   * 反馈和意见得到及时回复
   * 与精通 `Python` , `Java` , `C/C++` , `SQL`, `C#` , `Go` , `Vue3` , `HTML` , `JavaScript` , `CSS` , `TypeScript` 的大佬交流。
-  * 与 **`太卜司·符玄`** 交流
+  * 与 **`太卜司·符玄`** 交流占卜术
+  * 与 **`暮光闪闪`** 交流友谊的魔法
   * 与*音乐制作人*交流
 * 欢迎通过上述渠道反馈问题和提交意见！
 
@@ -96,7 +98,7 @@ This software is open source, free of charge and for learning and exchange purpo
 * 尝试为SRA绘制软件图标。`没有稿费`
 
 # 更新公告
-v0.6 -> v0.7.0 pre-release  
+v0.6 -> v0.7.1  
 更新公告
 
 新功能：  
@@ -110,7 +112,9 @@ v0.6 -> v0.7.0 pre-release
 8. 实验性功能：剧情自动播放。在`拓展功能`->`实验性功能`中。
 9. SRA自动更新：在`设置`->`SRA设置`中，默认为启用。
 10. 适配 1600*900 分辨率
-11. 适配云·星穹铁道 (测试)
+11. 调整“停止”按钮的行为，现在按下该按钮后将立即终止任务，你也可以在SRA设置中打开“线程安全”设置，这将让程序像之前那样等待。
+12. 即使不勾选“退出游戏”功能也可以使用“退出SRA、关机、休眠”。
+13. 添加侵蚀隧洞的套装说明。
 
 问题修复：  
 1. 修复了在未填写兑换码时勾选此功能会导致程序崩溃的问题。

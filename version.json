@@ -1,10 +1,10 @@
 {
     "version": "0.7.1",
     "download_url": "https://ghp.ci/https://github.com/Shasnow/StarRailAssistant/releases/download/v0.7.1/StarRailAssistant_v0.7.1.zip",
-    "resource_version": "0.7.0.5",
+    "resource_version": "0.7.1.1",
     "resource_download_url": "https://ghp.ci/https://github.com/Shasnow/SRAresource/releases/download/resource/resource.zip",
     "updater": "2.0.0",
     "updater_download_url": "",
     "announcement": "1. 调整“停止”按钮的行为，现在按下该按钮后将立即终止任务，你也可以在SRA设置中打开“线程安全”设置，这将让程序像之前那样等待。\n2. 即使不勾选“退出游戏”功能也可以使用“退出SRA、关机、休眠”。\n3. 添加侵蚀隧洞的套装说明。\n1. 更正文本错误。",
-    "resource_announcement": "巡星之礼资源更新"
+    "resource_announcement": "SRA更新器更新：更换代理网站，添加更多备选网站。"
 }
