@@ -568,7 +568,7 @@ class Assistant(QThread):
         logger.info("执行任务：饰品提取")
         level = "res/img/ornament_extraction (" + str(level_index) + ").png"
         if not self.find_session_name("ornament_extraction"):
-            return
+            return False
         if exist("res/img/no_save.png"):
             logger.warning("当前暂无可用存档，请前往[差分宇宙]获取存档")
             press_key("esc")
@@ -616,7 +616,7 @@ class Assistant(QThread):
         logger.info("执行任务：拟造花萼（金）")
         level = "res/img/calyx(golden) (" + str(level_index) + ").png"
         if not self.find_session_name("calyx(golden)"):
-            return
+            return False
         if not find_level(level):
             return
         if click(level, x_add=600, y_add=-10):
@@ -659,7 +659,7 @@ class Assistant(QThread):
         logger.info("执行任务：拟造花萼（赤）")
         level = "res/img/calyx(crimson) (" + str(level_index) + ").png"
         if not self.find_session_name("calyx(crimson)"):
-            return
+            return False
         if not find_level(level):
             return
         if click(level, x_add=400):
@@ -701,7 +701,7 @@ class Assistant(QThread):
         logger.info("执行任务：凝滞虚影")
         level = "res/img/stagnant_shadow (" + str(level_index) + ").png"
         if not self.find_session_name("stagnant_shadow"):
-            return
+            return False
         if not find_level(level):
             return
         if click(level, x_add=700):
@@ -743,7 +743,7 @@ class Assistant(QThread):
         logger.info("执行任务：侵蚀隧洞")
         level = "res/img/caver_of_corrosion (" + str(level_index) + ").png"
         if not self.find_session_name("caver_of_corrosion", True):
-            return
+            return False
         if not find_level(level):
             return
         if click(level, x_add=700):
@@ -782,7 +782,7 @@ class Assistant(QThread):
         logger.info("执行任务：历战余响")
         level = "res/img/echo_of_war (" + str(level_index) + ").png"
         if not self.find_session_name("echo_of_war", True):
-            return
+            return False
         if not find_level(level):
             return
         if click(level, x_add=400):

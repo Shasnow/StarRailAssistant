@@ -76,6 +76,7 @@ class PlotListener(QThread):
         self.running_flag = False
 
     def run(self):
+        self.running_flag = True
         logger.info("监听，启动！")
         while self.running_flag:
             try:
