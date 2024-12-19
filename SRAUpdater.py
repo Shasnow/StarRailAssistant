@@ -26,7 +26,7 @@ v2.1
 import json
 import os
 import sys
-from time import sleep,time
+from time import sleep, time
 
 import requests
 from requests import RequestException
@@ -39,13 +39,17 @@ class Updater:
         "\\", "/"
     )  # 获取软件自身的路径
     # 远程版本信息文件的URL
-    VERSION_INFO_URL = "https://github.com/Shasnow/StarRailAssistant/blob/main/version.json"
-    PROXY = ["https://gitproxy.click/",
-             "https://cdn.moran233.xyz/",
-             "https://gh.llkk.cc/",
-             "https://github.akams.cn/",
-             "https://www.ghproxy.cn/",
-             ""]
+    VERSION_INFO_URL = (
+        "https://github.com/Shasnow/StarRailAssistant/blob/main/version.json"
+    )
+    PROXY = [
+        "https://gitproxy.click/",
+        "https://cdn.moran233.xyz/",
+        "https://gh.llkk.cc/",
+        "https://github.akams.cn/",
+        "https://www.ghproxy.cn/",
+        "",
+    ]
 
     # 临时下载文件的路径
     TEMP_DOWNLOAD_PATH = APP_PATH + "/SRAUpdate.zip"
@@ -62,15 +66,14 @@ class Updater:
     def init_version_file(self):
         if not os.path.exists(self.APP_PATH + "/version.json"):
             print("初始化版本信息...")
-            version_info = {
-                "version": "0.0.0",
-                "resource_version": "0.0.0"
-            }
-            with open(self.APP_PATH + "/version.json", "w", encoding="utf-8") as json_file:
+            version_info = {"version": "0.0.0", "resource_version": "0.0.0"}
+            with open(
+                self.APP_PATH + "/version.json", "w", encoding="utf-8"
+            ) as json_file:
                 json.dump(version_info, json_file, indent=4)
 
     def get_current_version(self):
-        with open(self.APP_PATH + '/version.json', 'r', encoding="utf-8") as jsonfile:
+        with open(self.APP_PATH + "/version.json", "r", encoding="utf-8") as jsonfile:
             version_info_local = json.load(jsonfile)
             version = version_info_local["version"]
             resource_version = version_info_local["resource_version"]
@@ -92,16 +95,18 @@ class Updater:
     def version_check(self, current_version, current_resource_version) -> str:
         # 从远程服务器获取版本信息
         i = 0
-        while i < 6:
+        while i < len(self.PROXY):
             try:
                 response = requests.get(self.PROXY[i] + self.VERSION_INFO_URL)
                 version_info = response.json()
                 break
             except RequestException:
                 i += 1
-                print(f"请求超时，重新尝试...({i}/6)")
+                print(f"请求超时，重新尝试...({i}/{len(self.PROXY)})")
         else:
-            raise Exception("服务器连接失败，已尝试 (6/6)")
+            raise Exception(
+                f"服务器连接失败，已尝试 ({len(self.PROXY)}/{len(self.PROXY)})"
+            )
         # 获取远程最新版本号
         remote_version = version_info["version"]
         remote_resource_version = version_info["resource_version"]
@@ -109,7 +114,7 @@ class Updater:
         if remote_version > current_version:
             print(f"发现新版本：{remote_version}")
             print(f"更新说明：\n{version_info['announcement']}")
-            return "https://github.com/Shasnow/StarRailAssistant/releases/download/v" + remote_version + "/StarRailAssistant_v" + remote_version + ".zip"
+            return f"https://github.com/Shasnow/StarRailAssistant/releases/download/v{remote_version}/StarRailAssistant_v{remote_version}.zip"
         if remote_resource_version > current_resource_version:
             print(f"发现资源更新：{remote_resource_version}")
             print(f"更新说明：\n{version_info['resource_announcement']}")
@@ -121,35 +126,57 @@ class Updater:
         try:
             print("下载更新文件")
             i = 0
-            while i < 6:
+            while i < len(self.PROXY):
                 try:
                     response = requests.get(self.PROXY[i] + download_url, stream=True)
-                    file_size = response.headers.get('Content-Length')
+                    file_size = response.headers.get("Content-Length")
                     break
                 except RequestException:
                     i += 1
-                    print(f"请求超时，重新尝试...({i}/6)")
+                    print(f"请求超时，重新尝试...({i}/{len(self.PROXY)})")
             else:
-                raise Exception("服务器连接失败，已尝试 (6/6)")
+                raise Exception(
+                    f"服务器连接失败，已尝试 ({len(self.PROXY)}/{len(self.PROXY)})"
+                )
 
             if file_size is None:
                 file_size = 1
             else:
                 file_size = int(file_size)
-            with open(self.TEMP_DOWNLOAD_PATH, 'wb') as f:
+            with open(self.TEMP_DOWNLOAD_PATH, "wb") as f:
+
                 downloaded_size = 0
-                start_time = time()
-                last_update_time = start_time
+                last_download_size = 0
+                speed = 0
+                last_time = time()
+
                 for chunk in response.iter_content(chunk_size=8192):
+
+                    # 写入已下载数据
                     f.write(chunk)
                     downloaded_size += len(chunk)
-                    current_time = time()
-                    if current_time - last_update_time >= 1.0:
-                        speed = downloaded_size / (current_time - start_time) / 1024
+
+                    # 计算下载速度
+                    if time() - last_time >= 1.0:
+                        speed = (
+                            (downloaded_size - last_download_size)
+                            / (time() - last_time)
+                            / 1024
+                        )
+                        last_download_size = downloaded_size
+                        last_time = time()
+
+                    # 更新下载进度
+                    if speed >= 1024:
+                        print(
+                            f"\r已下载: {downloaded_size / 1048576:.2f}/{file_size / 1048576:.2f} MB ({downloaded_size / file_size * 100:.2f}%), 速度{speed / 1024:.2f} MB/s",
+                            end="               ",
+                        )
+                    else:
                         print(
                             f"\r已下载: {downloaded_size / 1048576:.2f}/{file_size / 1048576:.2f} MB ({downloaded_size / file_size * 100:.2f}%), 速度{speed:.2f} KB/s",
-                            end="")
-                        last_update_time = current_time
+                            end="               ",
+                        )
             print("\n下载完成")
         except Exception as e:
             print(f"下载更新时出错: {e}")
@@ -162,10 +189,10 @@ class Updater:
         try:
             print("解压更新文件")
             if not os.path.exists(self.APP_PATH + "/tools/7z.exe"):
-                print("解压工具丢失，请手动解压" + self.TEMP_DOWNLOAD_PATH + "到当前文件夹")
+                print(f"解压工具丢失，请手动解压{self.TEMP_DOWNLOAD_PATH}到当前文件夹")
                 os.system("pause")
                 return
-            command = self.APP_PATH + "/tools/7z x " + self.TEMP_DOWNLOAD_PATH + " -y"
+            command = f"{self.APP_PATH}/tools/7z x {self.TEMP_DOWNLOAD_PATH} -y"
             cmd = 'cmd.exe /c start "" ' + command
             WindowsProcess.popen(cmd, shell=True)
 
