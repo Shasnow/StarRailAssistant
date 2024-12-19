@@ -50,7 +50,7 @@ class Updater:
         "https://www.ghproxy.cn/",
         "",
     ]
-
+    PROXY_LIST_LEN = len(PROXY)
     # 临时下载文件的路径
     TEMP_DOWNLOAD_PATH = APP_PATH + "/SRAUpdate.zip"
 
@@ -68,7 +68,7 @@ class Updater:
             print("初始化版本信息...")
             version_info = {"version": "0.0.0", "resource_version": "0.0.0"}
             with open(
-                self.APP_PATH + "/version.json", "w", encoding="utf-8"
+                    self.APP_PATH + "/version.json", "w", encoding="utf-8"
             ) as json_file:
                 json.dump(version_info, json_file, indent=4)
 
@@ -95,17 +95,17 @@ class Updater:
     def version_check(self, current_version, current_resource_version) -> str:
         # 从远程服务器获取版本信息
         i = 0
-        while i < len(self.PROXY):
+        while i < self.PROXY_LIST_LEN:
             try:
                 response = requests.get(self.PROXY[i] + self.VERSION_INFO_URL)
                 version_info = response.json()
                 break
             except RequestException:
                 i += 1
-                print(f"请求超时，重新尝试...({i}/{len(self.PROXY)})")
+                print(f"请求超时，重新尝试...({i}/{self.PROXY_LIST_LEN})")
         else:
             raise Exception(
-                f"服务器连接失败，已尝试 ({len(self.PROXY)}/{len(self.PROXY)})"
+                f"服务器连接失败，已尝试 ({self.PROXY_LIST_LEN}/{self.PROXY_LIST_LEN})"
             )
         # 获取远程最新版本号
         remote_version = version_info["version"]
@@ -126,17 +126,17 @@ class Updater:
         try:
             print("下载更新文件")
             i = 0
-            while i < len(self.PROXY):
+            while i < self.PROXY_LIST_LEN:
                 try:
                     response = requests.get(self.PROXY[i] + download_url, stream=True)
                     file_size = response.headers.get("Content-Length")
                     break
                 except RequestException:
                     i += 1
-                    print(f"请求超时，重新尝试...({i}/{len(self.PROXY)})")
+                    print(f"请求超时，重新尝试...({i}/{self.PROXY_LIST_LEN})")
             else:
                 raise Exception(
-                    f"服务器连接失败，已尝试 ({len(self.PROXY)}/{len(self.PROXY)})"
+                    f"服务器连接失败，已尝试 ({self.PROXY_LIST_LEN}/{self.PROXY_LIST_LEN})"
                 )
 
             if file_size is None:
@@ -144,14 +144,12 @@ class Updater:
             else:
                 file_size = int(file_size)
             with open(self.TEMP_DOWNLOAD_PATH, "wb") as f:
-
                 downloaded_size = 0
                 last_download_size = 0
                 speed = 0
                 last_time = time()
 
                 for chunk in response.iter_content(chunk_size=8192):
-
                     # 写入已下载数据
                     f.write(chunk)
                     downloaded_size += len(chunk)
@@ -159,9 +157,9 @@ class Updater:
                     # 计算下载速度
                     if time() - last_time >= 1.0:
                         speed = (
-                            (downloaded_size - last_download_size)
-                            / (time() - last_time)
-                            / 1024
+                                (downloaded_size - last_download_size)
+                                / (time() - last_time)
+                                / 1024
                         )
                         last_download_size = downloaded_size
                         last_time = time()
