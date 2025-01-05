@@ -32,7 +32,7 @@ from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.webdriver import WebDriver
 
-from StarRailAssistant.utils.Exceptions import WindowNoFoundException, MultipleWindowsException, MatchFailureError, \
+from StarRailAssistant.utils.Exceptions import WindowNoFoundException, MultipleWindowsException, MatchFailureException, \
     WindowInactiveException
 from StarRailAssistant.utils.Logger import logger
 
@@ -118,7 +118,7 @@ class SRAOperator:
         except pyscreeze.PyScreezeException:
             raise WindowNoFoundException("未能找到窗口：" + title)
         except pyautogui.ImageNotFoundException:
-            raise MatchFailureError(img_path + " 匹配失败")
+            raise MatchFailureException(img_path + " 匹配失败")
         except ValueError:
             raise WindowInactiveException("窗口未激活")
         except FileNotFoundError:

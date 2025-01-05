@@ -22,7 +22,7 @@ class MultipleWindowsException(SRAException):
     pass
 
 
-class MatchFailureError(SRAException):
+class MatchFailureException(SRAException):
     pass
 
 

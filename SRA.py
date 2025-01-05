@@ -18,7 +18,7 @@
 
 """
 崩坏：星穹铁道助手
-v0.7.0
+v0.7.2
 作者：雪影
 图形化界面
 """
@@ -53,9 +53,9 @@ from PySide6.QtWidgets import (
 )  # 从 PySide6 中导入所需的类
 from plyer import notification
 
-from StarRailAssistant.utils import Configure, WindowsPower, WindowsProcess, Encryption
 from StarRailAssistant.core import SRAssistant, AutoPlot, SRACloud
 from StarRailAssistant.core.SRAssistant import VERSION
+from StarRailAssistant.utils import Configure, WindowsPower, WindowsProcess, Encryption
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
 
@@ -67,8 +67,10 @@ class Main(QWidget):
         "\\", "/"
     )  # 获取软件自身的路径
 
-    def __init__(self):
-        super().__init__()  # 调用父类 QMainWindow 的初始化方法
+    def __init__(self, main_window: QMainWindow):
+        super().__init__()
+        start_time = time.time()
+        self.main_window = main_window
         self.cloud = False
         self.autoplot = AutoPlot.Main()
         self.exit_SRA = False
@@ -103,9 +105,11 @@ class Main(QWidget):
 
         self.software_setting()
 
+        end_time = time.time()
+        total_time = end_time - start_time
         self.update_log(
-            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " 程序启动成功"
-        )
+            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) +
+            " 程序启动成功，耗时" + f"{total_time:.2f}s")
 
     def console(self):
         notice_action = self.ui.findChild(QAction, "action_1")
@@ -280,7 +284,7 @@ class Main(QWidget):
         )
         channel_combobox.setCurrentIndex(self.config["StartGame"]["channel"])
         channel_combobox.currentIndexChanged.connect(self.channel_change)
-        use_launcher_checkbox = self.start_game_setting_container.findChild(
+        use_launcher_checkbox: QCheckBox = self.start_game_setting_container.findChild(
             QCheckBox, "checkBox2_4"
         )
         use_launcher_checkbox.setChecked(self.config["StartGame"]["launcher"])
@@ -290,7 +294,8 @@ class Main(QWidget):
             QCheckBox, "cloud_game"
         )
         cloud_game_checkbox.stateChanged.connect(self.use_cloud_game)
-        self.path_text = self.start_game_setting_container.findChild(QLabel, "label2_2")
+        self.path_text: QTextEdit = self.start_game_setting_container.findChild(QLabel, "label2_2")
+        self.path_text.setText("启动器路径：" if self.config["StartGame"]["launcher"] else "游戏路径：")
         self.line_area = self.start_game_setting_container.findChild(
             QLineEdit, "lineEdit2_2"
         )
@@ -842,7 +847,7 @@ class Main(QWidget):
                 title="SRA",
                 message="任务全部完成",
                 app_icon=self.AppPath + "/res/SRAicon.ico",
-                timeout=10,
+                timeout=5,
             )
         except Exception as e:
             with open("SRAlog.txt", "a", encoding="utf-8") as log:
@@ -859,6 +864,7 @@ class Main(QWidget):
 
     def exitSRA(self):
         self.ui.close()
+        self.main_window.close()
 
     def notice(self):
         QMessageBox.information(
@@ -928,10 +934,10 @@ class SRA(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.main = Main()
+        self.main = Main(self)
         self.setCentralWidget(self.main.ui)
         self.setWindowIcon(QIcon(self.main.AppPath + "/res/SRAicon.ico"))
-        self.setWindowTitle("SRA v"+VERSION)
+        self.setWindowTitle("SRA v" + VERSION)
         size = list(map(int, self.main.config["Settings"]["uiSize"].split("x")))
         location = list(map(int, self.main.config["Settings"]["uiLocation"].split("x")))
         self.setGeometry(
@@ -963,18 +969,18 @@ if __name__ == "__main__":
         QMessageBox.information(
             window.main.ui,
             "使用说明",
-            "SRA崩坏：星穹铁道助手 v"+VERSION+" by雪影\n"
-            "使用说明：\n"
-            "重要！以管理员模式运行程序！\n"
-            "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
-            "重要！执行任务时不要进行其他操作！\n"
-            "\n声明：本程序完全免费，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
-            "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
-            "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
-            "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，相应的后果由您自行承担。\n\n"
-            "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B 站、微博）的官方动态下讨论任何关于 SRA 的内容。"
-            "\n"
-            "\n人话：不要跳脸官方～(∠・ω< )⌒☆",
+            "SRA崩坏：星穹铁道助手 v" + VERSION + " by雪影\n"
+                                                 "使用说明：\n"
+                                                 "重要！以管理员模式运行程序！\n"
+                                                 "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
+                                                 "重要！执行任务时不要进行其他操作！\n"
+                                                 "\n声明：本程序完全免费，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
+                                                 "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
+                                                 "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
+                                                 "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，相应的后果由您自行承担。\n\n"
+                                                 "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B 站、微博）的官方动态下讨论任何关于 SRA 的内容。"
+                                                 "\n"
+                                                 "\n人话：不要跳脸官方～(∠・ω< )⌒☆",
         )
 
         sys.exit(app.exec())
