@@ -34,7 +34,7 @@ from StarRailAssistant.extensions.QTHandler import QTHandler
 from StarRailAssistant.utils.Logger import logger, console_handler
 from StarRailAssistant.utils.WindowsProcess import find_window, is_process_running
 
-VERSION = "0.7.1"
+VERSION = "0.7.2"
 
 
 class Assistant(QThread):
@@ -68,7 +68,7 @@ class Assistant(QThread):
 
     @Slot()
     def run(self):
-        logger.info("SRAv" + VERSION + " 创建任务喵")
+        logger.info("SRAv" + VERSION + " 创建任务喵~")
         config = self.config
         tasks = []
         if not self.cloud:
