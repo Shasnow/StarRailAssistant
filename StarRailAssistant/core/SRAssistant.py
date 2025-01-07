@@ -45,11 +45,12 @@ class Assistant(QThread):
         self.cloud = cloud
         self.driver = driver
         self.stop_flag = False
-        SRAOperator.cloud = cloud
-        SRAOperator.web_driver = driver
-        self.pwd = pwd
         self.config = Configure.load()
         settings = self.config["Settings"]
+        SRAOperator.cloud = cloud
+        SRAOperator.web_driver = driver
+        SRAOperator.confidence=settings["confidence"]
+        self.pwd = pwd
         self.f1 = settings["F1"]
         self.f2 = settings["F2"]
         self.f4 = settings["F4"]
@@ -785,7 +786,7 @@ class Assistant(QThread):
             return False
         if not find_level(level):
             return
-        if click(level, x_add=400):
+        if click(level, x_add=700):
             if not check('res/img/battle.png'):  # 等待传送
                 logger.error("检测超时，编号4")
                 return

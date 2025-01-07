@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>864</width>
+    <width>791</width>
     <height>671</height>
    </rect>
   </property>
@@ -32,9 +32,21 @@
        <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,0,0">
         <item>
          <widget class="QGroupBox" name="groupBox_1">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>230</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
-            <width>248</width>
+            <width>230</width>
             <height>16777215</height>
            </size>
           </property>
@@ -58,7 +70,7 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>226</width>
+                <width>208</width>
                 <height>499</height>
                </rect>
               </property>
@@ -84,19 +96,6 @@
                      <string>启动游戏</string>
                     </property>
                    </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer1_1">
-                    <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>195</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
                   </item>
                   <item>
                    <widget class="QPushButton" name="pushButton1_1">
@@ -137,19 +136,6 @@
                    </widget>
                   </item>
                   <item>
-                   <spacer name="horizontalSpacer1_2">
-                    <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>195</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
                    <widget class="QPushButton" name="pushButton1_2">
                     <property name="minimumSize">
                      <size>
@@ -188,19 +174,6 @@
                    </widget>
                   </item>
                   <item>
-                   <spacer name="horizontalSpacer1_3">
-                    <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>207</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
                    <widget class="QPushButton" name="pushButton1_3">
                     <property name="minimumSize">
                      <size>
@@ -237,19 +210,6 @@
                      <string>退出游戏</string>
                     </property>
                    </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer1_4">
-                    <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>195</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
                   </item>
                   <item>
                    <widget class="QPushButton" name="pushButton1_4">
@@ -360,7 +320,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>820</width>
+             <width>747</width>
              <height>167</height>
             </rect>
            </property>
@@ -377,7 +337,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="text">
-                  <string>自动剧情</string>
+                  <string>自动对话</string>
                  </property>
                 </widget>
                </item>
@@ -424,7 +384,7 @@ li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Microsoft YaHei UI'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;自动剧情：开启后在进入剧情时会自动播放对话、自动选择对话选项1。此功能不会控制鼠标，但是会让游戏处于前台。如果需要取消执行，尝试将游戏最小化后回到此页面取消勾选。&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;自动对话：开启后在进入剧情时会自动播放对话、自动选择对话选项1。此功能不会控制鼠标，但是会让游戏处于前台。如果需要取消执行，尝试将游戏最小化后回到此页面取消勾选。&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;注意：功能勾选后会立即执行，与其他任务独立，如果要取消执行请取消勾选。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
@@ -458,9 +418,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
-             <width>820</width>
-             <height>540</height>
+             <y>-36</y>
+             <width>735</width>
+             <height>576</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -966,18 +926,24 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  </property>
                 </spacer>
                </item>
-               <item row="0" column="3">
-                <spacer name="horizontalSpacer_2">
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
+               <item row="0" column="2">
+                <widget class="QFrame" name="frame_routine_4">
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::StyledPanel</enum>
                  </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Raised</enum>
                  </property>
-                </spacer>
+                 <layout class="QHBoxLayout" name="horizontalLayout_25">
+                  <item>
+                   <widget class="QCheckBox" name="checkBox_ifAutoUpdate">
+                    <property name="text">
+                     <string>自动更新</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
                <item row="0" column="0">
                 <widget class="QFrame" name="frame_routine_3">
@@ -1004,38 +970,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  </layout>
                 </widget>
                </item>
-               <item row="0" column="2">
-                <widget class="QFrame" name="frame_routine_4">
-                 <property name="frameShape">
-                  <enum>QFrame::Shape::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Shadow::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_25">
-                  <item>
-                   <widget class="QCheckBox" name="checkBox_ifAutoUpdate">
-                    <property name="text">
-                     <string>自动更新</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item row="0" column="5">
-                <spacer name="horizontalSpacer_3">
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
                <item row="0" column="4">
                 <widget class="QFrame" name="frame_routine_5">
                  <property name="frameShape">
@@ -1060,6 +994,98 @@ li.checked::marker { content: &quot;\2612&quot;; }
                   </item>
                  </layout>
                 </widget>
+               </item>
+               <item row="0" column="6">
+                <widget class="QPushButton" name="clearLog">
+                 <property name="minimumSize">
+                  <size>
+                   <width>114</width>
+                   <height>46</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>点击此按钮将清空SRAlog.txt中的内容</string>
+                 </property>
+                 <property name="whatsThis">
+                  <string>点击此按钮将清空SRAlog.txt中的内容</string>
+                 </property>
+                 <property name="text">
+                  <string>清空日志</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3">
+                <spacer name="horizontalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="0" colspan="2">
+                <widget class="QFrame" name="frame">
+                 <property name="minimumSize">
+                  <size>
+                   <width>224</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>置信度越大对图片精度要求越高</string>
+                 </property>
+                 <property name="whatsThis">
+                  <string>置信度越大对图片精度要求越高</string>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_2">
+                  <item>
+                   <widget class="QLabel" name="label">
+                    <property name="text">
+                     <string>识图置信度</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="confidenceSpinBox">
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>置信度越大对图片精度要求越高</string>
+                    </property>
+                    <property name="whatsThis">
+                     <string>置信度越大对图片精度要求越高</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item row="0" column="5">
+                <spacer name="horizontalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>
@@ -1104,7 +1130,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>864</width>
+     <width>791</width>
      <height>33</height>
     </rect>
    </property>

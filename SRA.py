@@ -20,12 +20,12 @@
 崩坏：星穹铁道助手
 v0.7.2
 作者：雪影
-图形化界面
+图形化界面及程序主入口
 """
 
 import ctypes
 import os
-import sys  # 导入 sys 模块，用于与 Python 解释器交互
+import sys
 import time
 
 from PySide6.QtCore import QTimer
@@ -49,7 +49,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QRadioButton,
     QLCDNumber,
-    QTableWidget,
+    QTableWidget, QDoubleSpinBox,
 )  # 从 PySide6 中导入所需的类
 from plyer import notification
 
@@ -69,7 +69,6 @@ class Main(QWidget):
 
     def __init__(self, main_window: QMainWindow):
         super().__init__()
-        start_time = time.time()
         self.main_window = main_window
         self.cloud = False
         self.autoplot = AutoPlot.Main()
@@ -105,13 +104,8 @@ class Main(QWidget):
 
         self.software_setting()
 
-        end_time = time.time()
-        total_time = end_time - start_time
-        self.update_log(
-            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) +
-            " 程序启动成功，耗时" + f"{total_time:.2f}s")
-
     def console(self):
+        """左侧控制台功能绑定"""
         notice_action = self.ui.findChild(QAction, "action_1")
         notice_action.triggered.connect(self.notice)
         problem_action = self.ui.findChild(QAction, "action_2")
@@ -238,6 +232,13 @@ class Main(QWidget):
         thread_safety_checkbox.setChecked(self.config["Settings"]["threadSafety"])
         thread_safety_checkbox.stateChanged.connect(self.thread_safety)
 
+        clear_log_button: QPushButton = self.ui.findChild(QPushButton, "clearLog")
+        clear_log_button.clicked.connect(self.clearLog)
+
+        confidence_spin_box: QDoubleSpinBox = self.ui.findChild(QDoubleSpinBox, "confidenceSpinBox")
+        confidence_spin_box.setValue(self.config["Settings"]["confidence"])
+        confidence_spin_box.valueChanged.connect(self.confidence_changed)
+
     def key_setting_save(self):
         Configure.save(self.config)
 
@@ -265,7 +266,10 @@ class Main(QWidget):
 
     def auto_update(self, state):
         if state == 2:
-            SRAssistant.Popen("SRAUpdater.exe")
+            if os.path.exists("SRAUpdater.exe"):
+                WindowsProcess.Popen("SRAUpdater.exe")
+            else:
+                self.update_log("缺少文件SRAUpdater.exe 无法自动更新")
             self.config["Settings"]["autoUpdate"] = True
         else:
             self.config["Settings"]["autoUpdate"] = False
@@ -276,6 +280,10 @@ class Main(QWidget):
             self.config["Settings"]["threadSafety"] = True
         else:
             self.config["Settings"]["threadSafety"] = False
+        Configure.save(self.config)
+
+    def confidence_changed(self, value):
+        self.config["Settings"]["confidence"] = value
         Configure.save(self.config)
 
     def start_game_setting(self):
@@ -294,6 +302,7 @@ class Main(QWidget):
             QCheckBox, "cloud_game"
         )
         cloud_game_checkbox.stateChanged.connect(self.use_cloud_game)
+
         self.path_text: QTextEdit = self.start_game_setting_container.findChild(QLabel, "label2_2")
         self.path_text.setText("启动器路径：" if self.config["StartGame"]["launcher"] else "游戏路径：")
         self.line_area = self.start_game_setting_container.findChild(
@@ -301,6 +310,7 @@ class Main(QWidget):
         )
         self.line_area.setText(self.config["StartGame"]["gamePath"])
         self.line_area.textChanged.connect(self.get_path)
+
         button = self.start_game_setting_container.findChild(
             QPushButton, "pushButton2_2"
         )
@@ -922,6 +932,11 @@ class Main(QWidget):
             "    请给出所使用软件的版本号以及日志文件",
         )
 
+    @staticmethod
+    def clearLog():
+        with open("SRAlog.txt", "w", encoding="utf-8"):
+            pass
+
 
 def is_admin():
     try:
@@ -934,6 +949,7 @@ class SRA(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        start_time = time.time()
         self.main = Main(self)
         self.setCentralWidget(self.main.ui)
         self.setWindowIcon(QIcon(self.main.AppPath + "/res/SRAicon.ico"))
@@ -943,6 +959,12 @@ class SRA(QMainWindow):
         self.setGeometry(
             location[0], location[1], size[0], size[1]
         )  # 设置窗口大小与位置
+
+        end_time = time.time()
+        total_time = end_time - start_time
+        self.main.update_log(
+            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) +
+            " 程序启动成功，耗时" + f"{total_time:.2f}s")
 
     def closeEvent(self, event):
         """Save the windows info"""
@@ -970,17 +992,17 @@ if __name__ == "__main__":
             window.main.ui,
             "使用说明",
             "SRA崩坏：星穹铁道助手 v" + VERSION + " by雪影\n"
-                                                 "使用说明：\n"
-                                                 "重要！以管理员模式运行程序！\n"
-                                                 "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
-                                                 "重要！执行任务时不要进行其他操作！\n"
-                                                 "\n声明：本程序完全免费，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
-                                                 "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
-                                                 "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
-                                                 "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，相应的后果由您自行承担。\n\n"
-                                                 "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B 站、微博）的官方动态下讨论任何关于 SRA 的内容。"
-                                                 "\n"
-                                                 "\n人话：不要跳脸官方～(∠・ω< )⌒☆",
+            "使用说明：\n"
+            "重要！以管理员模式运行程序！\n"
+            "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
+            "重要！执行任务时不要进行其他操作！\n"
+            "\n声明：本程序完全免费，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
+            "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
+            "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
+            "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，相应的后果由您自行承担。\n\n"
+            "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B 站、微博）的官方动态下讨论任何关于 SRA 的内容。"
+            "\n"
+            "\n人话：不要跳脸官方～(∠・ω< )⌒☆",
         )
 
         sys.exit(app.exec())
