@@ -122,6 +122,7 @@ def init() -> None:
             ["startup", False],
             ["autoUpdate", True],
             ["threadSafety", False],
+            ["confidence", 0.9],
             ["uiSize", "1200x800"],
             ["uiLocation", "100x100"],
         ],

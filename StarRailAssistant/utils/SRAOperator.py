@@ -44,6 +44,7 @@ class SRAOperator:
     screenshot_proportion = 1.0
     area_top = 0
     area_left = 0
+    confidence=0.9
 
     @classmethod
     def _screenshot_region_calculate(cls, region: tuple[int, int, int, int]):
@@ -107,9 +108,9 @@ class SRAOperator:
             if img is None:
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
             if cls.cloud:
-                location = pyautogui.locate(img, cls._get_screenshot(), confidence=0.9)
+                location = pyautogui.locate(img, cls._get_screenshot(), confidence=cls.confidence)
             else:
-                location = pyautogui.locate(img, cls._get_screenshot(title), confidence=0.9)
+                location = pyautogui.locate(img, cls._get_screenshot(title), confidence=cls.confidence)
             x, y = pyautogui.center(location)
             x += x_add
             y += y_add
@@ -383,9 +384,9 @@ class SRAOperator:
             time.sleep(0.2)
             try:
                 if cls.cloud:
-                    pyautogui.locate(quit_battle, cls._get_screenshot(), confidence=0.9)
+                    pyautogui.locate(quit_battle, cls._get_screenshot(), confidence=cls.confidence)
                 else:
-                    pyautogui.locate(quit_battle, cls._get_screenshot("崩坏：星穹铁道"), confidence=0.9)
+                    pyautogui.locate(quit_battle, cls._get_screenshot("崩坏：星穹铁道"), confidence=cls.confidence)
                 logger.info("战斗结束")
                 return True
             except pyautogui.ImageNotFoundException:

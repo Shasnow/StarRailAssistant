@@ -119,7 +119,7 @@ def open_normal(path: str) -> bool:
         return False
 
 
-def popen(path: str, shell=False) -> bool:
+def Popen(path: str, shell=False) -> bool:
     """运行指定exe程序
 
     Args:

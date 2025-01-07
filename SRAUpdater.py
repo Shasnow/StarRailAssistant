@@ -192,7 +192,7 @@ class Updater:
                 return
             command = f"{self.APP_PATH}/tools/7z x {self.TEMP_DOWNLOAD_PATH} -y"
             cmd = 'cmd.exe /c start "" ' + command
-            WindowsProcess.popen(cmd, shell=True)
+            WindowsProcess.Popen(cmd, shell=True)
 
         except Exception as e:
             print(f"解压更新时出错: {e}")
