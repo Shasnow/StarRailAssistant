@@ -88,7 +88,6 @@ class Updater:
     HEADERS = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
     }
-    FROZEN = FROZEN
     APP_PATH = Path(sys.executable).parent.absolute() if FROZEN else Path(__file__).parent.absolute()
     print(f"当前路径：{APP_PATH}")
     VERSION_INFO_URL = (
@@ -134,6 +133,7 @@ class Updater:
         return VersionInfo(version, resource_version, "", "")
 
     def check_for_updates(self):
+        """ 检查并更新 """
         print("检查版本信息...")
         version = self.get_current_version()
         try:
@@ -148,14 +148,12 @@ class Updater:
 
     def version_check(self, v: VersionInfo) -> str:
         # 从远程服务器获取版本信息
-        i = 0
-        while i < self.PROXY_LIST_LEN:
+        for i , proxy in enumerate(self.PROXY):
             try:
-                response = requests.get(self.PROXY[i] + self.VERSION_INFO_URL)
+                response = requests.get(f"{proxy}{self.VERSION_INFO_URL}", timeout=10)
                 version_info = response.json()
                 break
             except RequestException:
-                i += 1
                 print(f"请求超时，重新尝试...({i}/{self.PROXY_LIST_LEN})")
         else:
             raise Exception(
@@ -190,7 +188,7 @@ class Updater:
             raise RequestException(f"请求{_url}失败，状态码：{resp.status_code}")
         return session, _url
     
-    def _download(self, url: str, filepath: Path, proxy_url: str = "") -> None:
+    def _download(self, url: str, filepath: Path, proxy_url: str = "") -> bool:
         """
         下载文件
         :param url: 下载链接
@@ -241,19 +239,20 @@ class Updater:
                         progress.refresh()
 
                 progress.remove_task(task)
-        except RequestException as e:
-            raise e
+                return True
+        except RequestException:
+            return False
         finally:
             session.close() # 关闭会话
 
     def download(self, download_url: str) -> None:
         try:
             print("下载更新文件")
-            i = 0
-            while i < self.PROXY_LIST_LEN:
-                proxy_url = self.PROXY[i]
-                self._download(download_url, self.DOWNLOAD_FAT, proxy_url)
-                break
+            for proxy in self.PROXY:
+                if self._download(download_url, self.DOWNLOAD_FAT, proxy):
+                    break
+                else:
+                    continue
         except Exception as e:
             print(f"下载更新时出错: {e}")
             os.system("pause")
