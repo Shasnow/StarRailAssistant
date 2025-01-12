@@ -44,15 +44,15 @@ class SRAOperator:
     screenshot_proportion = 1.0
     area_top = 0
     area_left = 0
-    confidence=0.9
+    confidence = 0.9
 
     @classmethod
     def _screenshot_region_calculate(cls, region: tuple[int, int, int, int]):
         left, top, width, height = region
         area_width = width // 160 * 160
         area_height = height // 90 * 90
-        cls.area_top = (top + 45) if top!=0 else top
-        cls.area_left = (left + 11) if left!=0 else left
+        cls.area_top = (top + 45) if top != 0 else top
+        cls.area_left = (left + 11) if left != 0 else left
         return cls.area_left, cls.area_top, area_width, area_height
 
     @classmethod
@@ -73,10 +73,11 @@ class SRAOperator:
             win = matching_windows[0]
             win.activate()
             region = (win.left, win.top, win.width, win.height)
-            region = cls._screenshot_region_calculate(region)
+            # region = cls._screenshot_region_calculate(region)
             pillow_img = pyscreeze.screenshot(region=region)
             # pillow_img.show()
-            return cls._image_resize(pillow_img)
+            # return cls._image_resize(pillow_img)
+            return pillow_img
 
     @classmethod
     def _image_resize(cls, pillow_image: Image):
@@ -98,8 +99,9 @@ class SRAOperator:
             cls.location_proportion = width / 1920
             return x * cls.location_proportion, y * cls.location_proportion
         else:
-            cls.location_proportion = 1 / cls.screenshot_proportion
-            return x * cls.location_proportion + cls.area_left, y * cls.location_proportion + cls.area_top
+            # cls.location_proportion = 1 / cls.screenshot_proportion
+            # return x * cls.location_proportion + cls.area_left, y * cls.location_proportion + cls.area_top
+            return x, y
 
     @classmethod
     def _locator(cls, img_path, x_add=0, y_add=0, title="崩坏：星穹铁道") -> tuple[int, int]:
@@ -110,7 +112,7 @@ class SRAOperator:
             if cls.cloud:
                 location = pyautogui.locate(img, cls._get_screenshot(), confidence=cls.confidence)
             else:
-                location = pyautogui.locate(img, cls._get_screenshot(title), confidence=cls.confidence)
+                location = pyautogui.locateOnWindow(img, title, confidence=cls.confidence)
             x, y = pyautogui.center(location)
             x += x_add
             y += y_add
@@ -131,7 +133,7 @@ class SRAOperator:
 
         Args:
             img_path (str): Img path of the situation.
-            wait_time (float): Waiting time before run.
+            wait_time (float): Waiting time before run_flag.
         Returns:
             True if existed, False otherwise.
         """
@@ -140,11 +142,11 @@ class SRAOperator:
             cls._locator(img_path)
             return True
         except Exception as e:
-            logger.exception(e,is_fatal=True)
+            logger.exception(e, is_fatal=True)
             return False
 
     @classmethod
-    def check(cls,img_path, interval=0.5, max_time=40):
+    def check(cls, img_path, interval=0.5, max_time=40):
         """Detects whether the object appears on the screen.
 
         Args:
@@ -200,7 +202,7 @@ class SRAOperator:
             img_path (str): Img path.
             x_add (int): X-axis offset(px).
             y_add (int): Y-axis offset(px).
-            wait_time (float): Waiting time before run(s).
+            wait_time (float): Waiting time before run_flag(s).
             title (str): Window title.
         Returns:
             True if clicked successfully, False otherwise.
@@ -222,7 +224,7 @@ class SRAOperator:
             return False
 
     @classmethod
-    def click_point(cls, x: int = None, y: int = None) -> bool:
+    def click_point(cls, x: int | None, y: int | None) -> bool:
         try:
             if cls.cloud:
                 x, y = cls._location_calculator(x, y)
@@ -344,10 +346,10 @@ class SRAOperator:
             action.perform()
         else:
             pyautogui.moveTo(x - 200, y)
-        times=0
+        times = 0
         while True:
-            times+=1
-            if times==60:
+            times += 1
+            if times == 60:
                 return False
             if cls.exist(level, wait_time=0.5):
                 return True
@@ -362,7 +364,7 @@ class SRAOperator:
                 ActionChains(cls.web_driver).move_by_offset(0, -20).perform()
                 ActionChains(cls.web_driver).release().perform()
                 time.sleep(0.2)
-                ActionChains(cls.web_driver).move_by_offset(0,20).perform()
+                ActionChains(cls.web_driver).move_by_offset(0, 20).perform()
                 time.sleep(0.2)
             else:
                 pyautogui.scroll(distance)

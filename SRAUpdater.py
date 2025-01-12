@@ -94,7 +94,7 @@ class Updater:
         "https://github.com/Shasnow/StarRailAssistant/blob/main/version.json"
     )
     PROXY = [
-        "https://gitproxy.click/",
+        "https://ghproxy.cc/",
         "https://cdn.moran233.xyz/",
         "https://gh.llkk.cc/",
         "https://github.akams.cn/",
@@ -195,6 +195,7 @@ class Updater:
         :param filepath: 保存文件路径
         :param proxy_url: 代理链接前缀
         """
+        session=None
         try:
             session, download_url = self.get_download_session(url, proxy_url)
 
@@ -204,7 +205,6 @@ class Updater:
             start_byte = 0
 
             # 设置断点续传头
-            resume_header = {}
             if start_byte > 0:
                 resume_header = {"Range": f"bytes={start_byte}-"}
                 self.HEADERS.update(resume_header)
@@ -243,7 +243,8 @@ class Updater:
         except RequestException:
             return False
         finally:
-            session.close() # 关闭会话
+            if session is not None:
+                session.close() # 关闭会话
 
     def download(self, download_url: str) -> None:
         try:
@@ -253,6 +254,8 @@ class Updater:
                     break
                 else:
                     continue
+            else:
+                raise Exception("服务器连接失败，已尝试所有代理")
         except Exception as e:
             print(f"下载更新时出错: {e}")
             os.system("pause")

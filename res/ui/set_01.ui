@@ -152,28 +152,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QFrame" name="frame_4">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Shadow::Raised</enum>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <item>
-              <widget class="QCheckBox" name="cloud_game">
-               <property name="text">
-                <string>云·星穹铁道（维护）</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
            <widget class="QFrame" name="frame2_2">
             <property name="frameShape">
              <enum>QFrame::Shape::StyledPanel</enum>

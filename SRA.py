@@ -56,6 +56,7 @@ from plyer import notification
 from StarRailAssistant.core import SRAssistant, AutoPlot, SRACloud
 from StarRailAssistant.core.SRAssistant import VERSION
 from StarRailAssistant.utils import Configure, WindowsPower, WindowsProcess, Encryption
+# from ocr import SRAocr
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
 
@@ -70,6 +71,7 @@ class Main(QWidget):
     def __init__(self, main_window: QMainWindow):
         super().__init__()
         self.main_window = main_window
+        # self.ocr_window=None
         self.cloud = False
         self.autoplot = AutoPlot.Main()
         self.exit_SRA = False
@@ -93,12 +95,16 @@ class Main(QWidget):
         self.quit_game_setting_container = uiLoader.load(
             self.AppPath + "/res/ui/set_10.ui"
         )
+        self.simulated_universe_container = uiLoader.load(
+            self.AppPath + "/res/ui/simulated_universe.ui"
+        )
 
         self.console()
         self.start_game_setting()
         self.trail_blaze_power_setting()
         self.receive_rewards_setting()
         self.quit_game_setting()
+        self.simulated_universe_setting()
 
         self.extension()
 
@@ -143,6 +149,12 @@ class Main(QWidget):
         self.option10.stateChanged.connect(self.quit_game_status)
         button10 = self.ui.findChild(QPushButton, "pushButton1_4")
         button10.clicked.connect(self.show_quit_game_setting)
+
+        option11:QCheckBox =self.ui.findChild(QCheckBox,"checkBox1_5")
+        option11.setChecked(self.config["Mission"]["simulatedUniverse"])
+        option11.stateChanged.connect(self.simulated_universe_status)
+        button11:QPushButton= self.ui.findChild(QPushButton,"pushButton1_5")
+        button11.clicked.connect(self.show_simulated_universe_setting)
 
         self.button0_1 = self.ui.findChild(QPushButton, "pushButton1_0_1")
         self.button0_1.clicked.connect(self.execute)
@@ -204,12 +216,18 @@ class Main(QWidget):
     def extension(self):
         auto_plot_checkbox = self.ui.findChild(QCheckBox, "autoplot_checkBox")
         auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
+        # relics_identification_button:QPushButton=self.ui.findChild(QPushButton,"relicsIdentification")
+        # relics_identification_button.clicked.connect(self.relics_identification)
 
     def auto_plot_status(self, state):
         if state == 2:
             self.autoplot.run_application()
         else:
             self.autoplot.quit_application()
+
+    # def relics_identification(self):
+    #     self.ocr_window=SRAocr()
+    #     self.ocr_window.show()
 
     def software_setting(self):
         self.key_table = self.ui.findChild(QTableWidget, "tableWidget")
@@ -298,10 +316,10 @@ class Main(QWidget):
         use_launcher_checkbox.setChecked(self.config["StartGame"]["launcher"])
         use_launcher_checkbox.stateChanged.connect(self.use_launcher)
 
-        cloud_game_checkbox = self.start_game_setting_container.findChild(
-            QCheckBox, "cloud_game"
-        )
-        cloud_game_checkbox.stateChanged.connect(self.use_cloud_game)
+        # cloud_game_checkbox = self.start_game_setting_container.findChild(
+        #     QCheckBox, "cloud_game"
+        # )
+        # cloud_game_checkbox.stateChanged.connect(self.use_cloud_game)
 
         self.path_text: QTextEdit = self.start_game_setting_container.findChild(QLabel, "label2_2")
         self.path_text.setText("启动器路径：" if self.config["StartGame"]["launcher"] else "游戏路径：")
@@ -316,9 +334,10 @@ class Main(QWidget):
         )
         button.clicked.connect(self.open_file)
 
-        self.auto_launch_checkbox = self.start_game_setting_container.findChild(
+        self.auto_launch_checkbox:QCheckBox = self.start_game_setting_container.findChild(
             QCheckBox, "checkBox2_3"
         )
+        self.auto_launch_checkbox.setChecked(self.config["StartGame"]["autoLogin"])
         self.auto_launch_checkbox.stateChanged.connect(self.auto_launch)
         self.account = self.start_game_setting_container.findChild(
             QLineEdit, "lineEdit2_4_12"
@@ -412,6 +431,7 @@ class Main(QWidget):
         self.trail_blaze_power_container.setVisible(False)
         self.receive_rewards_setting_container.setVisible(False)
         self.quit_game_setting_container.setVisible(False)
+        self.simulated_universe_container.setVisible(False)
 
     def start_game_status(self):
         """Change the state of mission start game."""
@@ -510,6 +530,12 @@ class Main(QWidget):
         else:
             self.log.append("退出游戏已禁用")
             self.config["Mission"]["quitGame"] = False
+
+    def simulated_universe_status(self,state):
+        if state==2:
+            self.config["Mission"]["simulatedUniverse"]=True
+        else:
+            self.config["Mission"]["simulatedUniverse"]=False
 
     def redeem_code_change(self):
         """Change the redeem code list while redeem code text changes."""
@@ -777,6 +803,28 @@ class Main(QWidget):
     def sleep_status(self, checked):
         self.sleep = checked
 
+    def simulated_universe_setting(self):
+        mode_combobox:QComboBox=self.simulated_universe_container.findChild(QComboBox,"game_mode")
+        mode_combobox.setCurrentIndex(self.config["DivergentUniverse"]["mode"])
+        mode_combobox.currentIndexChanged.connect(self.mode_change)
+
+        times_spinbox:QSpinBox=self.simulated_universe_container.findChild(QSpinBox,"times")
+        times_spinbox.setValue(self.config["DivergentUniverse"]["times"])
+        times_spinbox.valueChanged.connect(self.times_change)
+
+        self.task_set_vbox_layout.addWidget(self.simulated_universe_container)
+        self.simulated_universe_container.setVisible(False)
+
+    def show_simulated_universe_setting(self):
+        self.display_none()
+        self.simulated_universe_container.show()
+
+    def mode_change(self,index):
+        self.config["DivergentUniverse"]["mode"]=index
+
+    def times_change(self,value):
+        self.config["DivergentUniverse"]["times"]=value
+
     def execute(self):
         """Save configuration, create work thread and monitor signal."""
         flags = [
@@ -784,6 +832,7 @@ class Main(QWidget):
             self.config["Mission"]["trailBlazePower"],
             self.config["ReceiveRewards"]["enable"],
             self.config["Mission"]["quitGame"],
+            self.config["Mission"]["simulatedUniverse"]
         ]
         if all(not flag for flag in flags):
             self.log.append("未选择任何任务")

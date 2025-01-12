@@ -28,10 +28,10 @@ import time
 
 from PySide6.QtCore import QThread, Signal, Slot
 
-from StarRailAssistant.utils import Configure, WindowsProcess, Encryption
-from StarRailAssistant.utils.SRAOperator import SRAOperator
 from StarRailAssistant.extensions.QTHandler import QTHandler
+from StarRailAssistant.utils import Configure, WindowsProcess, Encryption
 from StarRailAssistant.utils.Logger import logger, console_handler
+from StarRailAssistant.utils.SRAOperator import SRAOperator
 from StarRailAssistant.utils.WindowsProcess import find_window, is_process_running
 
 VERSION = "0.7.2"
@@ -49,7 +49,7 @@ class Assistant(QThread):
         settings = self.config["Settings"]
         SRAOperator.cloud = cloud
         SRAOperator.web_driver = driver
-        SRAOperator.confidence=settings["confidence"]
+        SRAOperator.confidence = settings["confidence"]
         self.pwd = pwd
         self.f1 = settings["F1"]
         self.f2 = settings["F2"]
@@ -94,6 +94,8 @@ class Assistant(QThread):
             tasks.append((self.receive_rewards, ()))
         if config["Mission"]["quitGame"]:
             tasks.append((self.quit_game, ()))
+        if config["Mission"]["simulatedUniverse"]:
+            tasks.append((self.divergent_universe, (config["DivergentUniverse"]["times"],)))
 
         for task, args in tasks:
             if not self.stop_flag:
@@ -146,7 +148,7 @@ class Assistant(QThread):
     def launch_game(self, game_path, path_type):
         """Launch game
 
-        Try to run the file that game path points at.
+        Try to run_flag the file that game path points at.
 
         Note:
             Do not include the `self` parameter in the ``Args`` section.
@@ -180,7 +182,7 @@ class Assistant(QThread):
     def launch_launcher(self, path, path_type, channel):
         """Launch game
 
-        Try to run the file that game path points at.
+        Try to run_flag the file that game path points at.
 
         Note:
             Do not include the `self` parameter in the ``Args`` section.
@@ -811,13 +813,8 @@ class Assistant(QThread):
     def battle_star(self, battle_time):
         logger.info("开始战斗")
         logger.info("请检查自动战斗和倍速是否开启")
-        times = 0
-        while times != 20:
-            if exist("res/img/q.png", wait_time=1):
-                press_key("v")
-                break
-            else:
-                times += 1
+        if check("res/img/q.png", max_time=10):
+            press_key("v")
         while battle_time > 1:
             logger.info("剩余次数" + str(battle_time))
             self.wait_battle_end()
@@ -1018,6 +1015,62 @@ class Assistant(QThread):
             return False
         return True
 
+    def divergent_universe(self, times: int):
+        # if not check("res/img/chat_enter.png", max_time=20):
+        #     logger.error("检测超时，编号2")
+        #     return False
+        # press_key(self.f4)
+        # if not check("res/img/f4.png", max_time=20):
+        #     logger.error("检测超时，编号1")
+        #     press_key("esc")
+        #     return False
+        # if not (click("res/img/simulated_universe.png") or click("res/img/simulated_universe_onclick.png")):
+        #     logger.error("发生错误，错误编号18")
+        #     press_key("esc")
+        #     return False
+        # if not click("res/img/goto.png"):
+        #     logger.error("发生错误，错误编号19")
+        #     return False
+
+        for _ in range(times):
+            if check("res/img/differential_universe_start.png", max_time=20):
+                click("res/img/differential_universe_start.png")
+            else:
+                logger.error("发生错误，错误编号20")
+                return False
+            if not click("res/img/periodic_calculus.png"):
+                logger.error("发生错误，错误编号21")
+                return False
+            if click("res/img/nobody.png"):
+                click("res/img/preset_formation.png")
+                click("res/img/team1.png")
+            if not click("res/img/launch_differential_universe.png"):
+                logger.error("发生错误，错误编号22")
+                return False
+            if check("res/img/equation_select.png", max_time=10):
+                click_point(*get_screen_center())
+                click("res/img/ensure2.png")
+            if check("res/img/blessing_select.png", max_time=5):
+                click_point(*get_screen_center())
+                click("res/img/ensure2.png")
+            time.sleep(2)
+            press_key("esc", presses=2)
+            press_key_for_a_while("w", during=3.2)
+            click_point(*get_screen_center())
+            if check("res/img/q.png", max_time=10):
+                press_key("v")
+            check("res/img/blessing_select.png")
+            while exist("res/img/blessing_select.png"):
+                click_point(*get_screen_center())
+                click("res/img/ensure2.png")
+            press_key("esc")
+            click("res/img/end_and_settle.png")
+            click("res/img/ensure2.png")
+            if check("res/img/return.png"):
+                click("res/img/return.png")
+        press_key("esc")
+        return True
+
     @staticmethod
     def quit_game() -> bool:
         logger.info("退出游戏")
@@ -1044,7 +1097,7 @@ def click(img_path: str, x_add=0, y_add=0, wait_time=2.0, title="崩坏：星穹
     return SRAOperator.click_img(img_path, x_add, y_add, wait_time, title)
 
 
-def click_point(x: int = None, y: int = None) -> bool:
+def click_point(x: int=None, y: int=None) -> bool:
     return SRAOperator.click_point(x, y)
 
 
