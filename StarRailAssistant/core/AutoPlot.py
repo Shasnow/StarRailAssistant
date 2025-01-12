@@ -41,7 +41,7 @@ def exist(img_path, wait_time=2):
 
     Args:
         img_path (str): Img path of the situation.
-        wait_time (int): Waiting time before run.
+        wait_time (int): Waiting time before run_flag.
     Returns:
         True if existed, False otherwise.
     """
@@ -50,7 +50,7 @@ def exist(img_path, wait_time=2):
         img = cv2.imread(img_path)
         if img is None:
             raise FileNotFoundError("无法找到或读取文件 " + img_path + ".png")
-        pyautogui.locateOnWindow(img, "崩坏：星穹铁道", confidence=0.95)
+        pyautogui.locateOnWindow(img, "崩坏：星穹铁道", confidence=0.90)
         return True
     except pyautogui.ImageNotFoundException:
         return False

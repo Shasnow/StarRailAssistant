@@ -81,7 +81,7 @@ This software is open source, free of charge and for learning and exchange purpo
   * 与精通 `Python` , `Java` , `C/C++` , `SQL`, `C#` , `Go` , `Vue3` , `HTML` , `JavaScript` , `CSS` , `TypeScript` 的大佬交流。
   * 与 **`太卜司·符玄`** 交流占卜术
   * 与 **`暮光闪闪`** 交流友谊的魔法
-  * 与*音乐制作人*交流
+  * 和 **`青雀`** 一起摸鱼
 * 欢迎通过上述渠道反馈问题和提交意见！
 
 ## 想要为项目做出贡献

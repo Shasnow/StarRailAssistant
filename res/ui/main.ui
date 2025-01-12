@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>Main</class>
+ <widget class="QMainWindow" name="Main">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>791</width>
-    <height>671</height>
+    <height>590</height>
    </rect>
   </property>
   <property name="font">
@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>SRA</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -70,8 +70,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>208</width>
-                <height>499</height>
+                <width>276</width>
+                <height>406</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -228,6 +228,47 @@
                 </widget>
                </item>
                <item>
+                <widget class="QFrame" name="frame1_5">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_20">
+                  <item>
+                   <widget class="QCheckBox" name="checkBox1_5">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>模拟宇宙（测试）</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton1_5">
+                    <property name="minimumSize">
+                     <size>
+                      <width>70</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>设置</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
                 <widget class="QFrame" name="frame1_0">
                  <property name="frameShape">
                   <enum>QFrame::Shape::StyledPanel</enum>
@@ -320,8 +361,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>747</width>
-             <height>167</height>
+             <width>312</width>
+             <height>121</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_16">
@@ -330,14 +371,24 @@
               <property name="title">
                <string>拓展功能</string>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_4">
-               <item>
+              <layout class="QGridLayout" name="gridLayout_8">
+               <item row="0" column="0">
                 <widget class="QCheckBox" name="autoplot_checkBox">
                  <property name="acceptDrops">
                   <bool>false</bool>
                  </property>
                  <property name="text">
                   <string>自动对话</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QPushButton" name="relicsIdentification">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>遗器识别</string>
                  </property>
                 </widget>
                </item>
@@ -418,8 +469,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-36</y>
-             <width>735</width>
+             <y>0</y>
+             <width>650</width>
              <height>576</height>
             </rect>
            </property>

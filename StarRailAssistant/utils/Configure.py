@@ -45,6 +45,7 @@ def init() -> None:
         "CaverOfCorrosion",
         "EchoOfWar",
         "QuitGame",
+        "DivergentUniverse",
         "Settings",
         "CloudGame",
     ]
@@ -60,6 +61,7 @@ def init() -> None:
             ["giftOfOdyssey", False],
             ["redeemCode", False],
             ["quitGame", False],
+            ["simulatedUniverse",False]
         ],
         "StartGame": [
             ["autoLogin", False],
@@ -113,6 +115,11 @@ def init() -> None:
             ["exitSRA", False],
             ["shutdown", False],
             ["sleep", False],
+        ],
+        "DivergentUniverse":[
+            ["enable", False],
+            ["mode", 0],
+            ["times",1],
         ],
         "Settings": [
             ["F1", "f1"],
