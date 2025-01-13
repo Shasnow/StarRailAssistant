@@ -73,11 +73,11 @@ class SRAOperator:
             win = matching_windows[0]
             win.activate()
             region = (win.left, win.top, win.width, win.height)
-            # region = cls._screenshot_region_calculate(region)
+            region = cls._screenshot_region_calculate(region)
             pillow_img = pyscreeze.screenshot(region=region)
             # pillow_img.show()
-            # return cls._image_resize(pillow_img)
-            return pillow_img
+            return cls._image_resize(pillow_img)
+            # return pillow_img
 
     @classmethod
     def _image_resize(cls, pillow_image: Image):
@@ -99,9 +99,9 @@ class SRAOperator:
             cls.location_proportion = width / 1920
             return x * cls.location_proportion, y * cls.location_proportion
         else:
-            # cls.location_proportion = 1 / cls.screenshot_proportion
-            # return x * cls.location_proportion + cls.area_left, y * cls.location_proportion + cls.area_top
-            return x, y
+            cls.location_proportion = 1 / cls.screenshot_proportion
+            return x * cls.location_proportion + cls.area_left, y * cls.location_proportion + cls.area_top
+            # return x, y
 
     @classmethod
     def _locator(cls, img_path, x_add=0, y_add=0, title="崩坏：星穹铁道") -> tuple[int, int]:
@@ -112,7 +112,8 @@ class SRAOperator:
             if cls.cloud:
                 location = pyautogui.locate(img, cls._get_screenshot(), confidence=cls.confidence)
             else:
-                location = pyautogui.locateOnWindow(img, title, confidence=cls.confidence)
+                # location = pyautogui.locateOnWindow(img, title, confidence=cls.confidence)
+                location = pyautogui.locate(img,cls._get_screenshot(title),confidence=cls.confidence)
             x, y = pyautogui.center(location)
             x += x_add
             y += y_add
@@ -395,3 +396,4 @@ class SRAOperator:
                 continue
             except pyscreeze.PyScreezeException:
                 continue
+
