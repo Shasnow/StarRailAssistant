@@ -1,10 +1,10 @@
 {
     "version": "0.7.2",
     "download_url": "https://ghp.ci/https://github.com/Shasnow/StarRailAssistant/releases/download/v0.7.2/StarRailAssistant_v0.7.2.zip",
-    "resource_version": "0.7.1.1",
+    "resource_version": "0.7.2.1",
     "resource_download_url": "https://ghp.ci/https://github.com/Shasnow/SRAresource/releases/download/resource/resource.zip",
     "updater": "2.2.0",
     "updater_download_url": "",
     "announcement": "1. 清空日志——在 设置->SRA设置 中。也许你的日志文件已经超过万行，但过于久远的日志并没有什么作用。按下此按钮来清空日志文件的内容。\n2. 识图置信度调整--在 设置->SRA设置 中。如果你发现SRA频繁出错，尝试降低置信度。然鹅很多问题并不是因为这个发生的。\n3. 模拟宇宙--开发测试阶段，仅可选差分宇宙周期演算刷单层。需要进入到差分宇宙主界面再执行此任务。\n4. SRA更新器更新--更漂亮的进度条。\n1. 修复部分已知问题。",
-    "resource_announcement": "SRA更新器更新：更换代理网站，添加更多备选网站。"
+    "resource_announcement": "1. 回调分辨率适配功能的更改。\n2. 修复模拟宇宙功能在进行本周周期演算时停在获得奇物界面的问题。"
 }
