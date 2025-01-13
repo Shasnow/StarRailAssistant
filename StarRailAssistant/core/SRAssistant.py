@@ -477,7 +477,6 @@ class Assistant(QThread):
         """Mission trailblaze profile"""
         logger.info("执行任务：签证奖励")
         if click("res/img/more_with_something.png"):
-            moveRel(20, 0)
             if click("res/img/trailblazer_profile_finished.png"):
                 if click("res/img/assistance_reward.png"):
                     time.sleep(2)
@@ -887,11 +886,8 @@ class Assistant(QThread):
             logger.info("没有可领取的奖励")
             press_key("esc")
         else:
-            while True:
-                if click("res/img/daily_reward.png"):
-                    moveRel(0, -80)
-                else:
-                    break
+            while click("res/img/daily_reward.png"):
+                moveRel(0,50)
             if click("res/img/daily_train_reward.png"):
                 time.sleep(2)
                 press_key("esc", presses=2, interval=2)
@@ -1047,6 +1043,8 @@ class Assistant(QThread):
             if not click("res/img/launch_differential_universe.png"):
                 logger.error("发生错误，错误编号22")
                 return False
+            if check("res/img/close.png",max_time=5):
+                press_key("esc")
             if check("res/img/equation_select.png", max_time=10):
                 click_point(*get_screen_center())
                 click("res/img/ensure2.png")
