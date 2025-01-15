@@ -94,11 +94,11 @@ class Updater:
         "https://github.com/Shasnow/StarRailAssistant/blob/main/version.json"
     )
     PROXY = [
-        "https://ghproxy.cc/",
         "https://cdn.moran233.xyz/",
         "https://gh.llkk.cc/",
         "https://github.akams.cn/",
         "https://www.ghproxy.cn/",
+        "https://ghproxy.cc/",
         "",
     ]
     PROXY_LIST_LEN = len(PROXY)
