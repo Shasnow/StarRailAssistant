@@ -592,8 +592,8 @@ class Assistant(QThread):
                     self.replenish(self.replenish_way)
                     click("res/img/battle_star.png")
                 else:
-                    self.update_signal.emit("体力不足")
-                    press_key("esc", interval=1, presses=2)
+                    logger.info("体力不足")
+                    press_key("esc", interval=1, presses=3)
                     return
             while not exist("res/img/f3.png"):
                 pass
@@ -604,193 +604,93 @@ class Assistant(QThread):
 
     @Slot()
     def calyx_golden(self, level_index, single_time=1, battle_time=1):
-        """Battle calyx(golden)
-
-        Note:
-            Do not include the `self` parameter in the ``Args`` section.
-        Args:
-            level_index (int): The index of level in /res/img.
-            single_time (int): The single battle times(1~6).
-            battle_time (int): Number of times the task was executed.
-        Returns:
-            None
-        """
-        logger.info("执行任务：拟造花萼（金）")
-        level = "res/img/calyx(golden) (" + str(level_index) + ").png"
-        if not self.find_session_name("calyx(golden)"):
-            return False
-        if not find_level(level):
-            return
-        if click(level, x_add=600, y_add=-10):
-            if not check('res/img/battle.png'):  # 等待传送
-                logger.error("检测超时，编号4")
-                return
-            for i in range(single_time - 1):
-                click("res/img/plus.png", wait_time=0.5)
-            time.sleep(2)
-            if not click("res/img/battle.png"):
-                logger.error("发生错误，错误编号3")
-                return
-            if exist("res/img/replenish.png"):
-                if self.replenish_flag:
-                    self.replenish(self.replenish_way)
-                    click("res/img/battle.png")
-                else:
-                    logger.info("体力不足")
-                    press_key("esc", interval=1, presses=2)
-                    return
-            if click("res/img/battle_star.png"):
-                self.battle_star(battle_time)
-            else:
-                logger.error("发生错误，错误编号4")
-        logger.info("任务完成：拟造花萼（金）")
+        self.battle("拟造花萼（金）",
+                    "calyx(golden)",
+                    level_index,
+                    battle_time,
+                    False,
+                    single_time)
 
     @Slot()
     def calyx_crimson(self, level_index, single_time=1, battle_time=1):
-        """Battle calyx(crimson)
-
-        Note:
-            Do not include the `self` parameter in the ``Args`` section.
-        Args:
-            level_index (int): The index of level in /res/img.
-            single_time (int): The single battle times(1~6).
-            battle_time (int): Number of times the task was executed.
-        Returns:
-            None
-        """
-        logger.info("执行任务：拟造花萼（赤）")
-        level = "res/img/calyx(crimson) (" + str(level_index) + ").png"
-        if not self.find_session_name("calyx(crimson)"):
-            return False
-        if not find_level(level):
-            return
-        if click(level, x_add=400):
-            if not check('res/img/battle.png'):  # 等待传送
-                logger.error("检测超时，编号4")
-                return
-            for i in range(single_time - 1):
-                click("res/img/plus.png", wait_time=0.5)
-            time.sleep(2)
-            if not click("res/img/battle.png"):
-                logger.error("发生错误，错误编号3")
-                return
-            if exist("res/img/replenish.png"):
-                if self.replenish_flag:
-                    self.replenish(self.replenish_way)
-                    click("res/img/battle.png")
-                else:
-                    logger.info("体力不足")
-                    press_key("esc", interval=1, presses=2)
-                    return
-            if click("res/img/battle_star.png"):
-                self.battle_star(battle_time)
-            else:
-                logger.error("发生错误，错误编号4")
-        logger.info("任务完成：拟造花萼（赤）")
+        self.battle("拟造花萼（赤）",
+                    "calyx(crimson)",
+                    level_index,
+                    battle_time,
+                    False,
+                    single_time,
+                    y_add=-30)
 
     @Slot()
     def stagnant_shadow(self, level_index, battle_time=1):
-        """Battle stagnant shadow
-
-        Note:
-            Do not include the `self` parameter in the ``Args`` section.
-        Args:
-            level_index (int): The index of level in /res/img.
-            battle_time (int): Number of times the task was executed.
-        Returns:
-            None
-        """
-        logger.info("执行任务：凝滞虚影")
-        level = "res/img/stagnant_shadow (" + str(level_index) + ").png"
-        if not self.find_session_name("stagnant_shadow"):
-            return False
-        if not find_level(level):
-            return
-        if click(level, x_add=700):
-            if not check('res/img/battle.png'):  # 等待传送
-                logger.error("检测超时，编号4")
-                return
-            if not click("res/img/battle.png"):
-                logger.error("发生错误，错误编号3")
-                return
-            if exist("res/img/replenish.png"):
-                if self.replenish_flag:
-                    self.replenish(self.replenish_way)
-                    click("res/img/battle.png")
-                else:
-                    logger.info("体力不足")
-                    press_key("esc", interval=1, presses=2)
-                    return
-            if click("res/img/battle_star.png"):
-                time.sleep(3)
-                press_key_for_a_while("w", 2)
-                click_point()
-                self.battle_star(battle_time)
-            else:
-                logger.error("发生错误，错误编号4")
-        logger.info("任务完成：凝滞虚影")
+        self.battle("凝滞虚影",
+                    "stagnant_shadow",
+                    level_index,
+                    battle_time,
+                    False,
+                    None)
 
     @Slot()
     def caver_of_corrosion(self, level_index, battle_time=1):
-        """Battle caver of corrosion
-
-        Note:
-            Do not include the `self` parameter in the ``Args`` section.
-        Args:
-            level_index (int): The index of level in /res/img.
-            battle_time (int): Number of times the task was executed.
-        Returns:
-            None
-        """
-        logger.info("执行任务：侵蚀隧洞")
-        level = "res/img/caver_of_corrosion (" + str(level_index) + ").png"
-        if not self.find_session_name("caver_of_corrosion", True):
-            return False
-        if not find_level(level):
-            return
-        if click(level, x_add=700):
-            if not check('res/img/battle.png'):  # 等待传送
-                logger.error("检测超时，编号4")
-                return
-            if not click("res/img/battle.png"):
-                logger.error("发生错误，错误编号3")
-                return
-            if exist("res/img/replenish.png"):
-                if self.replenish_flag:
-                    self.replenish(self.replenish_way)
-                    click("res/img/battle.png")
-                else:
-                    logger.info("体力不足")
-                    press_key("esc", interval=1, presses=2)
-                    return
-            if click("res/img/battle_star.png"):
-                self.battle_star(battle_time)
-            else:
-                logger.error("发生错误，错误编号4")
-        logger.info("任务完成：侵蚀隧洞")
+        self.battle("侵蚀隧洞",
+                    "caver_of_corrosion",
+                    level_index,
+                    battle_time,
+                    True,
+                    None)
 
     @Slot()
     def echo_of_war(self, level_index, battle_time=1):
-        """Battle echo of war
+        self.battle("历战余响",
+                    "echo_of_war",
+                    level_index,
+                    battle_time,
+                    True,
+                    None,
+                    x_add=770,
+                    y_add=25)
 
-        Note:
-            Do not include the `self` parameter in the ``Args`` section.
-        Args:
-            level_index (int): The index of level in /res/img.
-            battle_time (int): Number of times the task was executed.
-        Returns:
-            None
+    def battle(self,
+               mission_name: str,
+               level_belonging: str,
+               level_index: int,
+               battle_time: int,
+               scroll_flag: bool,
+               multi: None | int = None,
+               x_add: int = 650,
+               y_add: int = 0):
+        """Battle Any
+
+            Note:
+                Do not include the `self` parameter in the ``Args`` section.
+            Args:
+
+                mission_name (str): The name of this mission.
+                level_belonging (str): The series to which the level belongs.
+                level_index (int): The index of level in /res/img.
+                battle_time (int): Number of times the task was executed.
+                scroll_flag (bool): Whether scroll or not when finding session.
+                multi (None|int): If this mission can battle multiply at single time,
+                                    this arg must be an int, None otherwise.
+                x_add: int
+                y_add: int
+            Returns:
+                None
         """
-        logger.info("执行任务：历战余响")
-        level = "res/img/echo_of_war (" + str(level_index) + ").png"
-        if not self.find_session_name("echo_of_war", True):
+        logger.info(f"执行任务：{mission_name}")
+        level = f"res/img/{level_belonging} ({level_index}).png"
+        if not self.find_session_name(level_belonging, scroll_flag):
             return False
         if not find_level(level):
             return
-        if click(level, x_add=700):
+        if click(level, x_add=x_add, y_add=y_add):
             if not check('res/img/battle.png'):  # 等待传送
                 logger.error("检测超时，编号4")
                 return
+            if multi is not None:
+                for i in range(multi - 1):
+                    click("res/img/plus.png", wait_time=0.5)
+                time.sleep(2)
             if not click("res/img/battle.png"):
                 logger.error("发生错误，错误编号3")
                 return
@@ -800,22 +700,22 @@ class Assistant(QThread):
                     click("res/img/battle.png")
                 else:
                     logger.info("体力不足")
-                    press_key("esc", interval=1, presses=2)
+                    press_key("esc", interval=1, presses=3)
                     return
             if click("res/img/battle_star.png"):
                 self.battle_star(battle_time)
             else:
                 logger.error("发生错误，错误编号4")
-        logger.info("任务完成：历战余响")
+        logger.info(f"任务完成：{mission_name}")
 
     @Slot()
-    def battle_star(self, battle_time):
+    def battle_star(self, battle_time: int):
         logger.info("开始战斗")
         logger.info("请检查自动战斗和倍速是否开启")
         if check("res/img/q.png", max_time=10):
             press_key("v")
         while battle_time > 1:
-            logger.info("剩余次数" + str(battle_time))
+            logger.info(f"剩余次数{battle_time}")
             self.wait_battle_end()
             if not click("res/img/again.png"):
                 logger.error("发生错误，错误编号5")
@@ -827,19 +727,23 @@ class Assistant(QThread):
                 else:
                     logger.info("体力不足")
                     press_key("esc")
-                    if click("res/img/quit_battle.png"):
-                        logger.info("退出战斗")
-                    else:
+                    if not click("res/img/quit_battle.png"):
                         logger.error("发生错误，错误编号12")
+                    logger.info("退出战斗")
+                    if not check("res/img/battle.png"):
+                        logger.error("发生错误，错误编号23")
+                    press_key("esc")
                     break
             battle_time -= 1
             time.sleep(3)
         else:
             self.wait_battle_end()
-            if click("res/img/quit_battle.png"):
-                logger.info("退出战斗")
-            else:
+            if not click("res/img/quit_battle.png"):
                 logger.error("发生错误，错误编号12")
+            logger.info("退出战斗")
+            if not check("res/img/battle.png"):
+                logger.error("发生错误，错误编号23")
+            press_key("esc")
 
     @Slot()
     def wait_battle_end(self):
@@ -887,7 +791,7 @@ class Assistant(QThread):
             press_key("esc")
         else:
             while click("res/img/daily_reward.png"):
-                moveRel(0,50)
+                moveRel(0, 50)
             if click("res/img/daily_train_reward.png"):
                 time.sleep(2)
                 press_key("esc", presses=2, interval=2)
@@ -1012,22 +916,6 @@ class Assistant(QThread):
         return True
 
     def divergent_universe(self, times: int):
-        # if not check("res/img/chat_enter.png", max_time=20):
-        #     logger.error("检测超时，编号2")
-        #     return False
-        # press_key(self.f4)
-        # if not check("res/img/f4.png", max_time=20):
-        #     logger.error("检测超时，编号1")
-        #     press_key("esc")
-        #     return False
-        # if not (click("res/img/simulated_universe.png") or click("res/img/simulated_universe_onclick.png")):
-        #     logger.error("发生错误，错误编号18")
-        #     press_key("esc")
-        #     return False
-        # if not click("res/img/goto.png"):
-        #     logger.error("发生错误，错误编号19")
-        #     return False
-
         for _ in range(times):
             if check("res/img/differential_universe_start.png", max_time=20):
                 click("res/img/differential_universe_start.png")
@@ -1043,7 +931,7 @@ class Assistant(QThread):
             if not click("res/img/launch_differential_universe.png"):
                 logger.error("发生错误，错误编号22")
                 return False
-            if check("res/img/close.png",max_time=5):
+            if check("res/img/close.png", max_time=5):
                 press_key("esc")
             if check("res/img/equation_select.png", max_time=10):
                 click_point(*get_screen_center())
@@ -1095,7 +983,7 @@ def click(img_path: str, x_add=0, y_add=0, wait_time=2.0, title="崩坏：星穹
     return SRAOperator.click_img(img_path, x_add, y_add, wait_time, title)
 
 
-def click_point(x: int=None, y: int=None) -> bool:
+def click_point(x: int = None, y: int = None) -> bool:
     return SRAOperator.click_point(x, y)
 
 

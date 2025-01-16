@@ -19,7 +19,7 @@
 """
 崩坏：星穹铁道助手
 SRA更新器
-v2.1
+v2.2
 作者：雪影
 """
 
@@ -27,39 +27,21 @@ import json
 import os
 import sys
 from dataclasses import dataclass
-from time import sleep
-import requests
+from functools import lru_cache
 from pathlib import Path
+from time import sleep
+
+import requests
 from requests import RequestException
 from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn, DownloadColumn, TransferSpeedColumn
-from functools import lru_cache
-import psutil
+
+from StarRailAssistant.utils.WindowsProcess import is_process_running, task_kill, Popen
 
 FROZEN = getattr(sys, "frozen", False)
 """ 是否被打包成了可执行文件 """
 
 if FROZEN:
     from sys import exit
-
-try:
-    from StarRailAssistant.utils import WindowsProcess # type: ignore
-except ImportError:
-    class WindowsProcess:
-
-        @staticmethod
-        def task_kill(pid):
-            psutil.Process(pid).kill()
-
-        @staticmethod
-        def is_process_running(process_name: str):
-            for p in psutil.process_iter():
-                if p.name() == process_name:
-                    return True
-            return False
-        
-        @staticmethod
-        def Popen(*args, **kwargs) -> psutil.Process:
-            return psutil.Popen(*args, **kwargs)
 
 # 下载进度条
 download_progress_bar = Progress(
@@ -75,12 +57,14 @@ download_progress_bar = Progress(
     transient=True,
 )
 
+
 @dataclass
 class VersionInfo:
     version: str
     resource_version: str
     announcement: str
     resource_announcement: str
+
 
 class Updater:
     GITHUB_URL = "https://github.com/Shasnow/StarRailAssistant/releases/download/v{version}/StarRailAssistant_v{version}.zip"
@@ -148,7 +132,7 @@ class Updater:
 
     def version_check(self, v: VersionInfo) -> str:
         # 从远程服务器获取版本信息
-        for i , proxy in enumerate(self.PROXY):
+        for i, proxy in enumerate(self.PROXY):
             try:
                 response = requests.get(f"{proxy}{self.VERSION_INFO_URL}", timeout=10)
                 version_info = response.json()
@@ -177,8 +161,8 @@ class Updater:
             return self.RESOURCE_URL
         print("已经是最新版本")
         return ""
-    
-    def get_download_session(self,url: str, proxy_url: str = "") -> tuple[requests.Session, str]:
+
+    def get_download_session(self, url: str, proxy_url: str = "") -> tuple[requests.Session, str]:
         _url = f"{proxy_url}{url}"
         session = requests.session()
         session.headers.update(self.HEADERS)
@@ -187,7 +171,7 @@ class Updater:
         if resp.status_code != 200:
             raise RequestException(f"请求{_url}失败，状态码：{resp.status_code}")
         return session, _url
-    
+
     def _download(self, url: str, filepath: Path, proxy_url: str = "") -> bool:
         """
         下载文件
@@ -195,7 +179,7 @@ class Updater:
         :param filepath: 保存文件路径
         :param proxy_url: 代理链接前缀
         """
-        session=None
+        session = None
         try:
             session, download_url = self.get_download_session(url, proxy_url)
 
@@ -244,7 +228,7 @@ class Updater:
             return False
         finally:
             if session is not None:
-                session.close() # 关闭会话
+                session.close()  # 关闭会话
 
     def download(self, download_url: str) -> None:
         try:
@@ -267,8 +251,8 @@ class Updater:
             exit(1)
 
     def unzip(self):
-        if WindowsProcess.is_process_running("SRA.exe"):
-            WindowsProcess.task_kill("SRA.exe")
+        if is_process_running("SRA.exe"):
+            task_kill("SRA.exe")
             sleep(2)
         try:
             # 去掉 .downloaded的后缀
@@ -280,7 +264,7 @@ class Updater:
                 return
             command = f"{self.APP_PATH}/tools/7z x {self.TEMP_DOWNLOAD_PATH} -y"
             cmd = 'cmd.exe /c start "" ' + command
-            WindowsProcess.Popen(cmd, shell=True)
+            Popen(cmd, shell=True)
 
         except Exception as e:
             print(f"解压更新时出错: {e}")
