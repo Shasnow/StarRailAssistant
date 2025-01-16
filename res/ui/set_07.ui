@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>588</width>
+    <width>437</width>
     <height>787</height>
    </rect>
   </property>
@@ -554,6 +554,11 @@
                  <string>沉沦黑曜（虚无）</string>
                 </property>
                </item>
+               <item>
+                <property name="text">
+                 <string>阿赖耶华（记忆）</string>
+                </property>
+               </item>
               </widget>
              </item>
              <item row="1" column="2">
@@ -840,6 +845,11 @@
                <item>
                 <property name="text">
                  <string>-----选择副本-----</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>弦歌之径（英豪/诗人）</string>
                 </property>
                </item>
                <item>
