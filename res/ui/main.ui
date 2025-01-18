@@ -40,13 +40,13 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>230</width>
+            <width>300</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>230</width>
+            <width>300</width>
             <height>16777215</height>
            </size>
           </property>
@@ -58,7 +58,7 @@
             <widget class="QScrollArea" name="scrollArea">
              <property name="maximumSize">
               <size>
-               <width>228</width>
+               <width>300</width>
                <height>16777215</height>
               </size>
              </property>
@@ -70,8 +70,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>276</width>
-                <height>406</height>
+                <width>278</width>
+                <height>418</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -361,8 +361,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>312</width>
-             <height>121</height>
+             <width>747</width>
+             <height>127</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_16">
