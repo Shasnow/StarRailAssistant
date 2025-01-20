@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>791</width>
-    <height>590</height>
+    <height>598</height>
    </rect>
   </property>
   <property name="font">
@@ -40,13 +40,13 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>300</width>
+            <width>242</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>300</width>
+            <width>242</width>
             <height>16777215</height>
            </size>
           </property>
@@ -70,8 +70,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>278</width>
-                <height>418</height>
+                <width>220</width>
+                <height>426</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -248,7 +248,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>模拟宇宙（测试）</string>
+                     <string>模拟宇宙</string>
                     </property>
                    </widget>
                   </item>
@@ -362,7 +362,7 @@
              <x>0</x>
              <y>0</y>
              <width>747</width>
-             <height>127</height>
+             <height>135</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_16">
