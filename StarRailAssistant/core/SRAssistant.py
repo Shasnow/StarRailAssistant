@@ -741,9 +741,8 @@ class Assistant(QThread):
             if not click("res/img/quit_battle.png"):
                 logger.error("发生错误，错误编号12")
             logger.info("退出战斗")
-            if not check("res/img/battle.png"):
-                logger.error("发生错误，错误编号23")
-            press_key("esc")
+            if check("res/img/battle.png",max_time=10):
+                press_key("esc")
 
     @Slot()
     def wait_battle_end(self):
