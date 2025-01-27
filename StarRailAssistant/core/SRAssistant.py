@@ -931,17 +931,19 @@ class Assistant(QThread):
                 logger.error("发生错误，错误编号22")
                 return False
 
-            for _ in range(2):
-                if check("res/img/close.png", max_time=5):
-                    press_key("esc")
-            # if check("res/img/equation_select.png", max_time=5):
-            #     click_point(*get_screen_center())
-            #     click("res/img/ensure2.png")
+            # for _ in range(2):
+            #     if check("res/img/close.png", max_time=5):
+            #         press_key("esc")
+            if check("res/img/equation_select.png", max_time=5):
+                click_point(*get_screen_center())
+                click("res/img/ensure2.png")
             if check("res/img/blessing_select.png", max_time=5):
                 click_point(*get_screen_center())
                 click("res/img/ensure2.png")
+            while check("res/img/close.png", max_time=5):
+                press_key("esc")
             time.sleep(2)
-            press_key("esc", presses=1)
+            # press_key("esc", presses=1)
 
             press_key_for_a_while("w", during=3.2)
             click_point(*get_screen_center())
