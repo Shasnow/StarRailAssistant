@@ -26,6 +26,7 @@ v2.2
 import json
 import os
 import sys
+import argparse
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -75,9 +76,9 @@ class Updater:
     APP_PATH = Path(sys.executable).parent.absolute() if FROZEN else Path(__file__).parent.absolute()
     print(f"当前路径：{APP_PATH}")
     VERSION_INFO_URL = (
-        "https://github.com/Shasnow/StarRailAssistant/blob/main/version.json"
+        "https://gitee.com/yukikage/StarRailAssistant/releases/download/release/version.json"
     )
-    PROXY = [
+    PROXYS = [
         "https://cdn.moran233.xyz/",
         "https://gh.llkk.cc/",
         "https://github.akams.cn/",
@@ -85,10 +86,11 @@ class Updater:
         "https://ghproxy.cc/",
         "",
     ]
-    PROXY_LIST_LEN = len(PROXY)
+    VERIFY = True
     # 临时下载文件的路径
-    TEMP_DOWNLOAD_PATH = APP_PATH / "SRAUpdate.zip"
-    DOWNLOAD_FAT = Path(APP_PATH / "SRAUpdate.zip.downloaded")
+    TEMP_DOWNLOAD_DIR=APP_PATH
+    TEMP_DOWNLOAD_FILE = TEMP_DOWNLOAD_DIR / "SRAUpdate.zip"
+    DOWNLOADING_FILE = TEMP_DOWNLOAD_DIR / "SRAUpdate.zip.downloaded"
 
     # 更新提取后的目录（与安装目录相同）
     UPDATE_EXTRACT_DIR = APP_PATH
@@ -96,8 +98,8 @@ class Updater:
     def __init__(self):
         print("欢迎使用SRA更新器>_<")
         self.init_version_file()
-        if os.path.exists(self.TEMP_DOWNLOAD_PATH):
-            os.remove(self.TEMP_DOWNLOAD_PATH)
+        if os.path.exists(self.TEMP_DOWNLOAD_FILE):
+            os.remove(self.TEMP_DOWNLOAD_FILE)
 
     def init_version_file(self):
         if not os.path.exists(self.APP_PATH / "version.json"):
@@ -132,17 +134,13 @@ class Updater:
 
     def version_check(self, v: VersionInfo) -> str:
         # 从远程服务器获取版本信息
-        for i, proxy in enumerate(self.PROXY):
-            try:
-                response = requests.get(f"{proxy}{self.VERSION_INFO_URL}", timeout=10)
-                version_info = response.json()
-                break
-            except RequestException:
-                print(f"请求超时，重新尝试...({i}/{self.PROXY_LIST_LEN})")
-        else:
-            raise Exception(
-                f"服务器连接失败，已尝试 ({self.PROXY_LIST_LEN}/{self.PROXY_LIST_LEN})"
-            )
+        try:
+            response = requests.get(f"{self.VERSION_INFO_URL}", timeout=10)
+            version_info = response.json()
+        except RequestException as e:
+            print(e)
+            raise Exception(f"服务器连接失败")
+
         # 获取远程最新版本号
         remote_version = version_info["version"]
         remote_resource_version = version_info["resource_version"]
@@ -167,7 +165,7 @@ class Updater:
         session = requests.session()
         session.headers.update(self.HEADERS)
         # head confirm
-        resp = session.head(_url, allow_redirects=True)
+        resp = session.head(_url, allow_redirects=True, verify=self.VERIFY)
         if resp.status_code != 200:
             raise RequestException(f"请求{_url}失败，状态码：{resp.status_code}")
         return session, _url
@@ -184,7 +182,7 @@ class Updater:
             session, download_url = self.get_download_session(url, proxy_url)
 
             # 获取文件总大小
-            resp = session.head(download_url, allow_redirects=True)
+            resp = session.head(download_url, allow_redirects=True,verify=self.VERIFY)
             total_size = int(resp.headers.get("Content-Length", 0))
             start_byte = 0
 
@@ -195,14 +193,14 @@ class Updater:
                 print("服务器支持断点续传，开始继续下载...")
 
             # 发起请求
-            resp = session.get(download_url, headers=self.HEADERS, stream=True)
+            resp = session.get(download_url, headers=self.HEADERS, stream=True, verify=self.VERIFY)
 
             # 检查服务器是否支持断点续传
             if start_byte > 0 and resp.status_code != 206:
                 print("服务器不支持断点续传，重新下载整个文件")
                 start_byte = 0
                 self.HEADERS.pop("Range", None)  # 删除断点续传的header
-                resp = session.get(download_url, headers=self.HEADERS, stream=True)
+                resp = session.get(download_url, headers=self.HEADERS, stream=True,verify=self.VERIFY)
 
             # 初始化进度条
             with download_progress_bar as progress:
@@ -223,8 +221,12 @@ class Updater:
                         progress.refresh()
 
                 progress.remove_task(task)
+                # 去掉 .downloaded的后缀
+                self.DOWNLOADING_FILE.rename(self.TEMP_DOWNLOAD_FILE)
+                print("下载完成！")
                 return True
-        except RequestException:
+        except RequestException as e:
+            print(e)
             return False
         finally:
             if session is not None:
@@ -233,36 +235,36 @@ class Updater:
     def download(self, download_url: str) -> None:
         try:
             print("下载更新文件")
-            for proxy in self.PROXY:
-                if self._download(download_url, self.DOWNLOAD_FAT, proxy):
+            for proxy in self.PROXYS:
+                if self._download(download_url, self.DOWNLOADING_FILE, proxy):
                     break
                 else:
                     continue
             else:
-                raise Exception("服务器连接失败，已尝试所有代理")
+                raise Exception("服务器连接失败")
         except Exception as e:
             print(f"下载更新时出错: {e}")
             os.system("pause")
+            exit(1)
         except KeyboardInterrupt:
             print("下载更新已取消")
-            need_remove = input("是否删除下载的部分? (删除后，需要重新下载) (y/n)").strip().lower()
-            os.remove(self.DOWNLOAD_FAT) if need_remove == "y" else None
+            if os.path.exists(self.DOWNLOADING_FILE):
+                need_remove = input("是否删除下载的部分? (删除后，需要重新下载) (y/n)").strip().lower()
+                os.remove(self.DOWNLOADING_FILE) if need_remove == "y" else None
             os.system("pause")
-            exit(1)
+            exit(0)
 
     def unzip(self):
         if is_process_running("SRA.exe"):
             task_kill("SRA.exe")
             sleep(2)
         try:
-            # 去掉 .downloaded的后缀
-            self.DOWNLOAD_FAT.rename(self.TEMP_DOWNLOAD_PATH)
             print("解压更新文件")
             if not os.path.exists(self.APP_PATH / "tools/7z.exe"):
-                print(f"解压工具丢失，请手动解压{self.TEMP_DOWNLOAD_PATH}到当前文件夹")
+                print(f"解压工具丢失，请手动解压{self.TEMP_DOWNLOAD_FILE}到当前文件夹")
                 os.system("pause")
                 return
-            command = f"{self.APP_PATH}/tools/7z x {self.TEMP_DOWNLOAD_PATH} -y"
+            command = f"{self.APP_PATH}/tools/7z x {self.TEMP_DOWNLOAD_FILE} -y"
             cmd = 'cmd.exe /c start "" ' + command
             Popen(cmd, shell=True)
 
@@ -273,4 +275,24 @@ class Updater:
 
 if __name__ == "__main__":
     main = Updater()
-    main.check_for_updates()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-u", "--url", help="Download URL of file")
+    # parser.add_argument("-d","--directory", help="The directory where the file was downloaded")
+    parser.add_argument("-p", "--proxy", help="Proxy URL. If nothing, use default proxys.")
+    parser.add_argument("-np", "--no-proxy",action="store_true", help="Do not use proxy.")
+    parser.add_argument("-v","--verify", help="Whether to enable SSL certificate verification. Default: True")
+    args = parser.parse_args()
+
+    if args.proxy is not None:
+        main.PROXYS = [args.proxy]
+    if args.no_proxy:
+        main.PROXYS = [""]
+    if args.verify == "False":
+        main.VERIFY=False
+    # if args.directory is not None:
+    #     main.TEMP_DOWNLOAD_FILE=args.directory
+    if args.url is not None:
+        main.download(args.url)
+        main.unzip()
+    else:
+        main.check_for_updates()

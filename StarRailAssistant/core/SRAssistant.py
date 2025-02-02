@@ -85,6 +85,7 @@ class Assistant(QThread):
                     password_text,
                 )))
             tasks.append((self.check_game, ()))
+            tasks.append((self.wait_game_load, ()))
         else:
             tasks.append((self.wait_game_load, ()))
 
@@ -366,7 +367,7 @@ class Assistant(QThread):
             else:
                 logger.warning("加载时间过长，请重试")
                 return False
-        return self.wait_game_load()
+        return True
 
     @Slot()
     def wait_game_load(self):
@@ -919,16 +920,16 @@ class Assistant(QThread):
             if check("res/img/differential_universe_start.png", max_time=20):
                 click("res/img/differential_universe_start.png")
             else:
-                logger.error("发生错误，错误编号20")
+                logger.error("发生错误，错误编号18")
                 return False
             if not click("res/img/periodic_calculus.png"):
-                logger.error("发生错误，错误编号21")
+                logger.error("发生错误，错误编号19")
                 return False
             if click("res/img/nobody.png"):
                 click("res/img/preset_formation.png")
                 click("res/img/team1.png")
             if not click("res/img/launch_differential_universe.png"):
-                logger.error("发生错误，错误编号22")
+                logger.error("发生错误，错误编号20")
                 return False
 
             # for _ in range(2):
