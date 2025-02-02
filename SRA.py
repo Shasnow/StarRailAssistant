@@ -49,13 +49,14 @@ from PySide6.QtWidgets import (
     QLabel,
     QRadioButton,
     QLCDNumber,
-    QTableWidget, QDoubleSpinBox,
-)  # 从 PySide6 中导入所需的类
+    QTableWidget, QDoubleSpinBox, )  # 从 PySide6 中导入所需的类
 from plyer import notification
 
 from StarRailAssistant.core import SRAssistant, AutoPlot, SRACloud
 from StarRailAssistant.core.SRAssistant import VERSION
 from StarRailAssistant.utils import Configure, WindowsPower, WindowsProcess, Encryption
+from StarRailAssistant.utils.DownloadDialog import DownloadDialog
+
 # from ocr import SRAocr
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
@@ -218,6 +219,17 @@ class Main(QWidget):
         auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
         # relics_identification_button:QPushButton=self.ui.findChild(QPushButton,"relicsIdentification")
         # relics_identification_button.clicked.connect(self.relics_identification)
+        divination_button:QPushButton = self.ui.findChild(QPushButton, "pushButton_add_app_1")
+        divination_button.clicked.connect(self.divination)
+
+    def divination(self):
+        if os.path.exists("res/ui/divination.ui"):
+            from StarRailAssistant.utils.FuXuanDivination import FuXuanDivination
+            div=FuXuanDivination(self)
+            div.ui.show()
+        else:
+            download=DownloadDialog(self,"大衍穷观阵","https://gitee.com/yukikage/StarRailAssistant/releases/download/divination/divination.zip")
+            download.show()
 
     def auto_plot_status(self, state):
         if state == 2:

@@ -114,8 +114,10 @@ class AutoPlot(QThread):
             try:
                 if exist("res/img/continue.png", wait_time=1):
                     pyautogui.press("space")
-                if exist("res/img/1.png", wait_time=1):
-                    pyautogui.press("1")
+                for i in range(4,0,-1):
+                    if exist(f"res/img/{i}.png", wait_time=0):
+                        pyautogui.press(str(i))
+                        break
             except pygetwindow.PyGetWindowException:
                 logger.error("窗口未激活")
                 self.event_stop()
