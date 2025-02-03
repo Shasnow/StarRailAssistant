@@ -1,23 +1,8 @@
-v0.7.3
+v0.7.4_pre
 
+### 这不是一个正式版本，请前往下载v0.7.3
 ## 更新内容
-1. 自动对话优化，现在SRA倾向于选择序号最大的对话选项，希望能减少对话死循环。
-2. 拓展功能穷观阵上线，不妨在抽卡前为自己占卜一下？此功能为可选下载并依赖于最新版的SRA更新器。 
-如果需要使用此功能，请先前往[智谱AI开放平台](https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys)
-注册账号并获取模型api keys。首次使用此功能时要求输入api keys。
-3. SRA更新器更新：提供命令行调用的方式和可选参数。
-* -h, --help 显示帮助信息。
-* -u, --url 指定需要下载的文件的url。
-* -p, --proxy 指定下载所使用的代理网站。
-* -np, --no-proxy 不使用代理。
-* -v, --verify 启用或禁用SSL证书验证，默认值True。
-* 用例
-```commandline
-SRAUpdater -u https://github.com/---.zip -np
-```
 
 ## 问题修复
-1. 适配新一周的周期演算(2025.2.3)
 
-### 特别鸣谢：[符玄占卜`FuXuan Divination`](https://github.com/Fuxuan-CN/FuxuanDivination)
 感谢您对SRA的支持！
