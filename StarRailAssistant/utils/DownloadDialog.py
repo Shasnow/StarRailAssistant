@@ -7,7 +7,7 @@ class DownloadDialog(QDialog):
     def __init__(self,parent,name,url):
         super().__init__(parent)
         self.setFont(QFont("MicroSoft YaHei",13))
-        self.setWindowIcon(QIcon("res/img/SRAicon.ico"))
+        self.setWindowIcon(QIcon("res/SRAicon.ico"))
         self.setWindowTitle("确认下载")
         self.url=url
         layout = QVBoxLayout(self)

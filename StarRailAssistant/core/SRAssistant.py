@@ -85,7 +85,6 @@ class Assistant(QThread):
                     password_text,
                 )))
             tasks.append((self.check_game, ()))
-            tasks.append((self.wait_game_load, ()))
         else:
             tasks.append((self.wait_game_load, ()))
 
@@ -367,7 +366,7 @@ class Assistant(QThread):
             else:
                 logger.warning("加载时间过长，请重试")
                 return False
-        return True
+        return self.wait_game_load()
 
     @Slot()
     def wait_game_load(self):
@@ -916,6 +915,7 @@ class Assistant(QThread):
         return True
 
     def divergent_universe(self, times: int):
+        logger.info("执行任务：差分宇宙-周期演算")
         for _ in range(times):
             if check("res/img/differential_universe_start.png", max_time=20):
                 click("res/img/differential_universe_start.png")
@@ -932,9 +932,8 @@ class Assistant(QThread):
                 logger.error("发生错误，错误编号20")
                 return False
 
-            # for _ in range(2):
-            #     if check("res/img/close.png", max_time=5):
-            #         press_key("esc")
+            while check("res/img/close.png", max_time=5):
+                press_key("esc")
             if check("res/img/equation_select.png", max_time=5):
                 click_point(*get_screen_center())
                 click("res/img/ensure2.png")
@@ -960,6 +959,7 @@ class Assistant(QThread):
             if check("res/img/return.png"):
                 click("res/img/return.png")
         press_key("esc")
+        logger.info("Mission accomplished")
         return True
 
     @staticmethod
