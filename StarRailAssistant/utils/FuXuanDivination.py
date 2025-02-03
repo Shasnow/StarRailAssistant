@@ -1,5 +1,3 @@
-import os
-
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QWidget, QDialogButtonBox, QLineEdit, QComboBox, QSpinBox, QFrame
 from PySide6.QtUiTools import QUiLoader
