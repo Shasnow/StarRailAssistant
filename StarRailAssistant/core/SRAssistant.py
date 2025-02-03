@@ -34,7 +34,7 @@ from StarRailAssistant.utils.Logger import logger, console_handler
 from StarRailAssistant.utils.SRAOperator import SRAOperator
 from StarRailAssistant.utils.WindowsProcess import find_window, is_process_running
 
-VERSION = "0.7.2"
+VERSION = "0.7.3"
 
 
 class Assistant(QThread):
