@@ -50,6 +50,7 @@ class Assistant(QThread):
         SRAOperator.cloud = cloud
         SRAOperator.web_driver = driver
         SRAOperator.confidence = settings["confidence"]
+        SRAOperator.zoom=settings["zoom"]
         self.pwd = pwd
         self.f1 = settings["F1"]
         self.f2 = settings["F2"]

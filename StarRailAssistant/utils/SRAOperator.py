@@ -170,7 +170,7 @@ class SRAOperator:
         times = 0
         while True:
             time.sleep(interval)
-            if cls.exist(img_path, wait_time=0.5):
+            if cls.exist(img_path, wait_time=1):
                 return True
             else:
                 times += 1
