@@ -130,6 +130,7 @@ def init() -> None:
             ["autoUpdate", True],
             ["threadSafety", False],
             ["confidence", 0.9],
+            ["zoom",1.5],
             ["uiSize", "1200x800"],
             ["uiLocation", "100x100"],
         ],
@@ -147,27 +148,25 @@ def init() -> None:
         json.dump(config, f, indent=4)
 
 
-def load() -> dict:
+def load(path:str="data/config.json") -> dict:
     """
     Load configurations.
 
     Returns:
         config dict
     """
-    with open("data/config.json", "r", encoding="utf-8") as json_file:
+    with open(path, "r", encoding="utf-8") as json_file:
         config = json.load(json_file)
     return config
 
 
-def save(config: dict) -> bool:
+def save(config: dict, path:str="data/config.json") -> bool:
     """
-
-    :param config: Configurations dict.
-    :return: True if successfully saved, False otherwise.
+    Save configurations.
     """
     try:
-        with open("data/config.json", "w", encoding="utf-8") as json_file:
-            json.dump(config, json_file, indent=4)
+        with open(path, "w", encoding="utf-8") as json_file:
+            json.dump(config, json_file, indent=4, ensure_ascii=False)
         return True
     except Exception:
         return False

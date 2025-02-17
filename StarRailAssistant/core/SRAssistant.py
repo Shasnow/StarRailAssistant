@@ -34,7 +34,7 @@ from StarRailAssistant.utils.Logger import logger, console_handler
 from StarRailAssistant.utils.SRAOperator import SRAOperator
 from StarRailAssistant.utils.WindowsProcess import find_window, is_process_running
 
-VERSION = "0.7.3"
+VERSION = "0.7.4"
 
 
 class Assistant(QThread):
@@ -932,15 +932,15 @@ class Assistant(QThread):
                 logger.error("发生错误，错误编号20")
                 return False
 
-            while check("res/img/close.png", max_time=5):
+            while check("res/img/close.png", max_time=3):
                 press_key("esc")
-            if check("res/img/equation_select.png", max_time=5):
+            if check("res/img/equation_select.png", max_time=3):
                 click_point(*get_screen_center())
                 click("res/img/ensure2.png")
-            if check("res/img/blessing_select.png", max_time=5):
+            if check("res/img/blessing_select.png", max_time=4):
                 click_point(*get_screen_center())
                 click("res/img/ensure2.png")
-            while check("res/img/close.png", max_time=5):
+            while check("res/img/close.png", max_time=3):
                 press_key("esc")
             time.sleep(2)
             # press_key("esc", presses=1)

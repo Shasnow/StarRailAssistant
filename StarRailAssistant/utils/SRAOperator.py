@@ -15,7 +15,6 @@
 
 """
 崩坏：星穹铁道助手
-v0.7.0
 作者：雪影
 SRA操作
 """
@@ -44,6 +43,7 @@ class SRAOperator:
     screenshot_proportion = 1.0
     area_top = 0
     area_left = 0
+    zoom = 1.5
     confidence = 0.9
 
     @classmethod
@@ -51,36 +51,43 @@ class SRAOperator:
         left, top, width, height = region
         area_width = width // 160 * 160
         area_height = height // 90 * 90
-        cls.area_top = (top + 45) if top != 0 else top
-        cls.area_left = (left + 11) if left != 0 else left
+        cls.area_top = (top + int(30 * cls.zoom)) if top != 0 else top
+        cls.area_left = (left + int(8 * cls.zoom)) if left != 0 else left
         return cls.area_left, cls.area_top, area_width, area_height
 
     @classmethod
-    def _get_screenshot(cls, title: str = ""):
+    def get_screenshot_region(cls, title: str) -> tuple[int, int, int, int]:
+        matching_windows = pygetwindow.getWindowsWithTitle(title)
+        if len(matching_windows) == 0:
+            raise WindowNoFoundException('Could not find a window with %s in the title' % title)
+        elif len(matching_windows) > 1:
+            raise MultipleWindowsException(
+                'Found multiple windows with %s in the title: %s' % (
+                    title, [str(win) for win in matching_windows])
+            )
+        win = matching_windows[0]
+        win.activate()
+        region = (win.left, win.top, win.width, win.height)
+        region = cls._screenshot_region_calculate(region)
+        return region
+
+    @classmethod
+    def get_screenshot(cls, title: str = "", region: tuple[int, int, int, int] | None = None) -> Image.Image:
         if cls.cloud:
             bytes_png = cls.web_driver.get_screenshot_as_png()
             image_stream = io.BytesIO(bytes_png)
             pillow_img = Image.open(image_stream)
             return cls._image_resize(pillow_img)
         else:
-            matching_windows = pygetwindow.getWindowsWithTitle(title)
-            if len(matching_windows) == 0:
-                raise WindowNoFoundException('Could not find a window with %s in the title' % title)
-            elif len(matching_windows) > 1:
-                raise MultipleWindowsException(
-                    'Found multiple windows with %s in the title: %s' % (title, [str(win) for win in matching_windows])
-                )
-            win = matching_windows[0]
-            win.activate()
-            region = (win.left, win.top, win.width, win.height)
-            region = cls._screenshot_region_calculate(region)
+            if region is None:
+                region = cls.get_screenshot_region(title)
             pillow_img = pyscreeze.screenshot(region=region)
             # pillow_img.show()
             return cls._image_resize(pillow_img)
             # return pillow_img
 
     @classmethod
-    def _image_resize(cls, pillow_image: Image):
+    def _image_resize(cls, pillow_image: Image.Image) -> Image.Image:
         if pillow_image.width == 1920:
             return pillow_image
         cls.screenshot_proportion = 1920 / pillow_image.width
@@ -104,29 +111,32 @@ class SRAOperator:
             # return x, y
 
     @classmethod
-    def _locator(cls, img_path, x_add=0, y_add=0, title="崩坏：星穹铁道") -> tuple[int, int]:
+    def _locate(cls, img_path: str, title="崩坏：星穹铁道"):
         try:
             img = cv2.imread(img_path)
             if img is None:
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
             if cls.cloud:
-                location = pyautogui.locate(img, cls._get_screenshot(), confidence=cls.confidence)
+                location = pyscreeze.locate(img, cls.get_screenshot(), confidence=cls.confidence)
             else:
                 # location = pyautogui.locateOnWindow(img, title, confidence=cls.confidence)
-                location = pyautogui.locate(img,cls._get_screenshot(title),confidence=cls.confidence)
-            x, y = pyautogui.center(location)
-            x += x_add
-            y += y_add
-            x, y = cls._location_calculator(x, y)
-            return x, y
-        except pyscreeze.PyScreezeException:
-            raise WindowNoFoundException("未能找到窗口：" + title)
-        except pyautogui.ImageNotFoundException:
-            raise MatchFailureException(img_path + " 匹配失败")
+                location = pyscreeze.locate(img, cls.get_screenshot(title), confidence=cls.confidence)
+            return location
+        except pyscreeze.ImageNotFoundException as e:
+            raise MatchFailureException(f"{img_path}匹配失败 {e}")
         except ValueError:
             raise WindowInactiveException("窗口未激活")
         except FileNotFoundError:
             raise
+
+    @classmethod
+    def _locate_center(cls, img_path, x_add=0, y_add=0, title="崩坏：星穹铁道") -> tuple[int, int]:
+        location = cls._locate(img_path, title)
+        x, y = pyscreeze.center(location)
+        x += x_add
+        y += y_add
+        x, y = cls._location_calculator(x, y)
+        return x, y
 
     @classmethod
     def exist(cls, img_path, wait_time=2):
@@ -140,7 +150,7 @@ class SRAOperator:
         """
         time.sleep(wait_time)  # 等待游戏加载
         try:
-            cls._locator(img_path)
+            cls._locate(img_path)
             return True
         except Exception as e:
             logger.exception(e, is_fatal=True)
@@ -160,7 +170,7 @@ class SRAOperator:
         times = 0
         while True:
             time.sleep(interval)
-            if cls.exist(img_path, wait_time=1):
+            if cls.exist(img_path, wait_time=0.5):
                 return True
             else:
                 times += 1
@@ -211,7 +221,7 @@ class SRAOperator:
         try:
             time.sleep(wait_time)
             logger.debug("点击对象" + img_path)
-            x, y = cls._locator(img_path, x_add, y_add, title)
+            x, y = cls._locate_center(img_path, x_add, y_add, title)
             if cls.cloud:
                 action = ActionBuilder(cls.web_driver)
                 action.pointer_action.move_to_location(x, y).click()
@@ -375,7 +385,7 @@ class SRAOperator:
             return False
 
     @classmethod
-    def wait_battle_end(cls) -> bool:
+    def wait_battle_end(cls):
         """Wait battle end
 
         Returns:
@@ -387,13 +397,12 @@ class SRAOperator:
             time.sleep(0.2)
             try:
                 if cls.cloud:
-                    pyautogui.locate(quit_battle, cls._get_screenshot(), confidence=cls.confidence)
+                    pyautogui.locate(quit_battle, cls.get_screenshot(), confidence=cls.confidence)
                 else:
-                    pyautogui.locate(quit_battle, cls._get_screenshot("崩坏：星穹铁道"), confidence=cls.confidence)
+                    pyautogui.locate(quit_battle, cls.get_screenshot("崩坏：星穹铁道"), confidence=cls.confidence)
                 logger.info("战斗结束")
                 return True
             except pyautogui.ImageNotFoundException:
                 continue
             except pyscreeze.PyScreezeException:
                 continue
-
