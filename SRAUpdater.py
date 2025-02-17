@@ -19,14 +19,13 @@
 """
 崩坏：星穹铁道助手
 SRA更新器
-v2.3
 作者：雪影
 """
 
+import argparse
 import json
 import os
 import sys
-import argparse
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -88,7 +87,7 @@ class Updater:
     ]
     VERIFY = True
     # 临时下载文件的路径
-    TEMP_DOWNLOAD_DIR=APP_PATH
+    TEMP_DOWNLOAD_DIR = APP_PATH
     TEMP_DOWNLOAD_FILE = TEMP_DOWNLOAD_DIR / "SRAUpdate.zip"
     DOWNLOADING_FILE = TEMP_DOWNLOAD_DIR / "SRAUpdate.zip.downloaded"
 
@@ -116,7 +115,15 @@ class Updater:
             version_info_local = json.load(jsonfile)
             version = version_info_local["version"]
             resource_version = version_info_local["resource_version"]
-        return VersionInfo(version, resource_version, "", "")
+            announcement = version_info_local["Announcement"]
+        return VersionInfo(version, resource_version, announcement, "")
+
+    def announcement_change(self, text):
+        with open(self.APP_PATH / "version.json", "r+", encoding="utf-8") as json_file:
+            version = json.load(json_file)
+            version["Announcement"] = text
+            json_file.seek(0)
+            json.dump(version, json_file, indent=4, ensure_ascii=False)
 
     def check_for_updates(self):
         """ 检查并更新 """
@@ -144,6 +151,7 @@ class Updater:
         # 获取远程最新版本号
         remote_version = version_info["version"]
         remote_resource_version = version_info["resource_version"]
+        new_announcement = version_info["Announcement"]
         # 比较当前版本和远程版本
         print(f"当前版本：{v.version}")
         print(f"当前资源版本：{v.resource_version}")
@@ -157,6 +165,8 @@ class Updater:
             print(f"发现资源更新：{remote_resource_version}")
             print(f"更新说明：\n{version_info['resource_announcement']}")
             return self.RESOURCE_URL
+        if new_announcement != v.announcement:
+            self.announcement_change(new_announcement)
         print("已经是最新版本")
         return ""
 
@@ -182,7 +192,7 @@ class Updater:
             session, download_url = self.get_download_session(url, proxy_url)
 
             # 获取文件总大小
-            resp = session.head(download_url, allow_redirects=True,verify=self.VERIFY)
+            resp = session.head(download_url, allow_redirects=True, verify=self.VERIFY)
             total_size = int(resp.headers.get("Content-Length", 0))
             start_byte = 0
 
@@ -200,7 +210,7 @@ class Updater:
                 print("服务器不支持断点续传，重新下载整个文件")
                 start_byte = 0
                 self.HEADERS.pop("Range", None)  # 删除断点续传的header
-                resp = session.get(download_url, headers=self.HEADERS, stream=True,verify=self.VERIFY)
+                resp = session.get(download_url, headers=self.HEADERS, stream=True, verify=self.VERIFY)
 
             # 初始化进度条
             with download_progress_bar as progress:
@@ -279,8 +289,8 @@ if __name__ == "__main__":
     parser.add_argument("-u", "--url", help="Download URL of file")
     # parser.add_argument("-d","--directory", help="The directory where the file was downloaded")
     parser.add_argument("-p", "--proxy", help="Proxy URL. If nothing, use default proxys.")
-    parser.add_argument("-np", "--no-proxy",action="store_true", help="Do not use proxy.")
-    parser.add_argument("-v","--verify", help="Whether to enable SSL certificate verification. Default: True")
+    parser.add_argument("-np", "--no-proxy", action="store_true", help="Do not use proxy.")
+    parser.add_argument("-v", "--verify", help="Whether to enable SSL certificate verification. Default: True")
     args = parser.parse_args()
 
     if args.proxy is not None:
@@ -288,7 +298,7 @@ if __name__ == "__main__":
     if args.no_proxy:
         main.PROXYS = [""]
     if args.verify == "False":
-        main.VERIFY=False
+        main.VERIFY = False
     # if args.directory is not None:
     #     main.TEMP_DOWNLOAD_FILE=args.directory
     if args.url is not None:

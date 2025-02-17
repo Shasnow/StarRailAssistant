@@ -18,7 +18,6 @@
 
 """
 崩坏：星穹铁道助手
-v0.7.3
 作者：雪影
 图形化界面及程序主入口
 """
@@ -55,7 +54,7 @@ from plyer import notification
 from StarRailAssistant.core import SRAssistant, AutoPlot, SRACloud
 from StarRailAssistant.core.SRAssistant import VERSION
 from StarRailAssistant.utils import Configure, WindowsPower, WindowsProcess, Encryption
-from StarRailAssistant.utils.DownloadDialog import DownloadDialog
+from StarRailAssistant.utils.Dialog import DownloadDialog, AnnouncementDialog
 
 # from ocr import SRAocr
 
@@ -113,6 +112,7 @@ class Main(QWidget):
 
     def console(self):
         """左侧控制台功能绑定"""
+        # 工具栏
         notice_action = self.ui.findChild(QAction, "action_1")
         notice_action.triggered.connect(self.notice)
         problem_action = self.ui.findChild(QAction, "action_2")
@@ -151,10 +151,10 @@ class Main(QWidget):
         button10 = self.ui.findChild(QPushButton, "pushButton1_4")
         button10.clicked.connect(self.show_quit_game_setting)
 
-        option11:QCheckBox =self.ui.findChild(QCheckBox,"checkBox1_5")
+        option11: QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_5")
         option11.setChecked(self.config["Mission"]["simulatedUniverse"])
         option11.stateChanged.connect(self.simulated_universe_status)
-        button11:QPushButton= self.ui.findChild(QPushButton,"pushButton1_5")
+        button11: QPushButton = self.ui.findChild(QPushButton, "pushButton1_5")
         button11.clicked.connect(self.show_simulated_universe_setting)
 
         self.button0_1 = self.ui.findChild(QPushButton, "pushButton1_0_1")
@@ -219,16 +219,17 @@ class Main(QWidget):
         auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
         # relics_identification_button:QPushButton=self.ui.findChild(QPushButton,"relicsIdentification")
         # relics_identification_button.clicked.connect(self.relics_identification)
-        divination_button:QPushButton = self.ui.findChild(QPushButton, "pushButton_add_app_1")
+        divination_button: QPushButton = self.ui.findChild(QPushButton, "pushButton_add_app_1")
         divination_button.clicked.connect(self.divination)
 
     def divination(self):
         if os.path.exists("res/ui/divination.ui"):
             from StarRailAssistant.utils.FuXuanDivination import FuXuanDivination
-            div=FuXuanDivination(self)
+            div = FuXuanDivination(self)
             div.ui.show()
         else:
-            download=DownloadDialog(self,"大衍穷观阵","https://gitee.com/yukikage/StarRailAssistant/releases/download/divination/divination.zip")
+            download = DownloadDialog(self, "大衍穷观阵",
+                                      "https://gitee.com/yukikage/StarRailAssistant/releases/download/divination/divination.zip")
             download.show()
 
     def auto_plot_status(self, state):
@@ -268,6 +269,10 @@ class Main(QWidget):
         confidence_spin_box: QDoubleSpinBox = self.ui.findChild(QDoubleSpinBox, "confidenceSpinBox")
         confidence_spin_box.setValue(self.config["Settings"]["confidence"])
         confidence_spin_box.valueChanged.connect(self.confidence_changed)
+
+        zoom_spinbox: QDoubleSpinBox = self.ui.findChild(QDoubleSpinBox, "zoomSpinBox")
+        zoom_spinbox.setValue(self.config["Settings"]["zoom"])
+        zoom_spinbox.valueChanged.connect(self.zoom_changed)
 
     def key_setting_save(self):
         Configure.save(self.config)
@@ -316,6 +321,10 @@ class Main(QWidget):
         self.config["Settings"]["confidence"] = value
         Configure.save(self.config)
 
+    def zoom_changed(self, value):
+        self.config["Settings"]["zoom"] = value
+        Configure.save(self.config)
+
     def start_game_setting(self):
         channel_combobox = self.start_game_setting_container.findChild(
             QComboBox, "comboBox2_1"
@@ -346,7 +355,7 @@ class Main(QWidget):
         )
         button.clicked.connect(self.open_file)
 
-        self.auto_launch_checkbox:QCheckBox = self.start_game_setting_container.findChild(
+        self.auto_launch_checkbox: QCheckBox = self.start_game_setting_container.findChild(
             QCheckBox, "checkBox2_3"
         )
         self.auto_launch_checkbox.setChecked(self.config["StartGame"]["autoLogin"])
@@ -543,11 +552,11 @@ class Main(QWidget):
             self.log.append("退出游戏已禁用")
             self.config["Mission"]["quitGame"] = False
 
-    def simulated_universe_status(self,state):
-        if state==2:
-            self.config["Mission"]["simulatedUniverse"]=True
+    def simulated_universe_status(self, state):
+        if state == 2:
+            self.config["Mission"]["simulatedUniverse"] = True
         else:
-            self.config["Mission"]["simulatedUniverse"]=False
+            self.config["Mission"]["simulatedUniverse"] = False
 
     def redeem_code_change(self):
         """Change the redeem code list while redeem code text changes."""
@@ -816,11 +825,11 @@ class Main(QWidget):
         self.sleep = checked
 
     def simulated_universe_setting(self):
-        mode_combobox:QComboBox=self.simulated_universe_container.findChild(QComboBox,"game_mode")
+        mode_combobox: QComboBox = self.simulated_universe_container.findChild(QComboBox, "game_mode")
         mode_combobox.setCurrentIndex(self.config["DivergentUniverse"]["mode"])
         mode_combobox.currentIndexChanged.connect(self.mode_change)
 
-        times_spinbox:QSpinBox=self.simulated_universe_container.findChild(QSpinBox,"times")
+        times_spinbox: QSpinBox = self.simulated_universe_container.findChild(QSpinBox, "times")
         times_spinbox.setValue(self.config["DivergentUniverse"]["times"])
         times_spinbox.valueChanged.connect(self.times_change)
 
@@ -831,11 +840,11 @@ class Main(QWidget):
         self.display_none()
         self.simulated_universe_container.show()
 
-    def mode_change(self,index):
-        self.config["DivergentUniverse"]["mode"]=index
+    def mode_change(self, index):
+        self.config["DivergentUniverse"]["mode"] = index
 
-    def times_change(self,value):
-        self.config["DivergentUniverse"]["times"]=value
+    def times_change(self, value):
+        self.config["DivergentUniverse"]["times"] = value
 
     def execute(self):
         """Save configuration, create work thread and monitor signal."""
@@ -986,7 +995,7 @@ class SRA(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        start_time = time.time()
+
         self.main = Main(self)
         self.setCentralWidget(self.main.ui)
         self.setWindowIcon(QIcon(self.main.AppPath + "/res/SRAicon.ico"))
@@ -996,12 +1005,6 @@ class SRA(QMainWindow):
         self.setGeometry(
             location[0], location[1], size[0], size[1]
         )  # 设置窗口大小与位置
-
-        end_time = time.time()
-        total_time = end_time - start_time
-        self.main.update_log(
-            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) +
-            " 程序启动成功，耗时" + f"{total_time:.2f}s")
 
     def closeEvent(self, event):
         """Save the windows info"""
@@ -1022,27 +1025,39 @@ class SRA(QMainWindow):
 if __name__ == "__main__":
     if is_admin():
         app = QApplication(sys.argv)
+        start_time = time.time()
         window = SRA()
         window.show()
+        end_time = time.time()
+        total_time = end_time - start_time
+        window.main.update_log(
+            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) +
+            " 程序启动成功，耗时" + f"{total_time:.2f}s")
 
-        QMessageBox.information(
-            window.main.ui,
-            "使用说明",
-            "SRA崩坏：星穹铁道助手 v" + VERSION + " by雪影\n"
-            "使用说明：\n"
-            "重要！以管理员模式运行程序！\n"
-            "重要！调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕\n"
-            "重要！执行任务时不要进行其他操作！\n"
-            "\n声明：本程序完全免费，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
-            "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
-            "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
-            "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，相应的后果由您自行承担。\n\n"
-            "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B 站、微博）的官方动态下讨论任何关于 SRA 的内容。"
-            "\n"
-            "\n人话：不要跳脸官方～(∠・ω< )⌒☆",
-        )
+        version=Configure.load("version.json")
+        if not version["Announcement.DoNotShowAgain"]:
+            announcement = AnnouncementDialog(window.main.ui,
+                "公告",
+                f"<html><i>滚动至底部关闭此公告</i>{version['Announcement']}"
+                "<h4>长期公告</h4>"
+                f"<h2>SRA崩坏：星穹铁道助手 v{VERSION} by雪影</h2>"
+                "<h3>使用说明：</h3>"
+                "<b>重要！推荐调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕<br>"
+                "重要！执行任务时不要进行其他操作！<br></b>"
+                "<p>声明：本程序<font color='green'>完全免费</font>，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
+                "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
+                "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
+                "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，<b>相应的后果由您自行承担</b>。</p>"
+                "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B站、微博）的官方动态下讨论任何关于 SRA 的内容。<br>"
+                "人话：不要跳脸官方～(∠・ω&lt; )⌒☆</html>",
+                                              "Announcement")
+            announcement.show()
 
+        if not version["VersionUpdate.DoNotShowAgain"]:
+            version_update= AnnouncementDialog(window.main.ui, "更新公告", version["VersionUpdate"], "VersionUpdate")
+            version_update.show()
         sys.exit(app.exec())
+
     else:
         # 重新以管理员权限运行脚本
         ctypes.windll.shell32.ShellExecuteW(
