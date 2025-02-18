@@ -36,6 +36,7 @@ from requests import RequestException
 from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn, DownloadColumn, TransferSpeedColumn
 
 from StarRailAssistant.utils.WindowsProcess import is_process_running, task_kill, Popen
+from subprocess import DEVNULL  # 丢弃垃圾输出, 未遂. 想彻底解决还得再引入一个更新器,解决更新器自更新的覆盖问题
 
 FROZEN = getattr(sys, "frozen", False)
 """ 是否被打包成了可执行文件 """
@@ -246,7 +247,7 @@ class Updater:
         try:
             print("下载更新文件")
             for i, proxy in enumerate(self.PROXYS):
-                print(f"正在尝试第 {i + 1} 个下载源, 请稍后...(剩余 {len(self.PROXYS)-i-1} 个备选地址)")
+                print(f"正在尝试从第 {i + 1} 个下载线路下载, 请稍后...(剩余 {len(self.PROXYS)-i-1} 个备用线路待尝试)")
                 if self._download(download_url, self.DOWNLOADING_FILE, proxy):
                     break
             else:
@@ -275,9 +276,7 @@ class Updater:
                 return
             command = f"{self.APP_PATH}/tools/7z x {self.TEMP_DOWNLOAD_FILE} -y"
             cmd = 'cmd.exe /c start "" ' + command
-            Popen(cmd, shell=True)
-            if os.path.exists(self.TEMP_DOWNLOAD_FILE):
-                os.remove(self.TEMP_DOWNLOAD_FILE)
+            Popen(cmd, shell=True, stdout=DEVNULL, stderr=DEVNULL)
 
         except Exception as e:
             print(f"解压更新时出错: {e}")

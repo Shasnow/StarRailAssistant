@@ -119,19 +119,25 @@ def open_normal(path: str) -> bool:
         return False
 
 
-def Popen(path: str, shell=False) -> bool:
+def Popen(path: str, shell=False, wait=False, **args) -> bool:
     """运行指定exe程序
 
     Args:
         shell: 通过shell运行
         path: 程序路径
+        wait: 是否等待执行完
+        **args: 备选参数
 
     Returns:
         True if opened successfully, False otherwise.
     """
     try:
-        subprocess.Popen(path, shell=shell)
-        return True
+        work = subprocess.Popen(path, shell=shell, **args)
+        if wait:
+            flag = work.wait()
+            return flag == 0
+        else:
+            return True
     except FileNotFoundError:
         return False
     except OSError:
