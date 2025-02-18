@@ -1,0 +1,91 @@
+{
+    "Mission": {
+        "startGame": false,
+        "trailBlazePower": false,
+        "trailBlazerProfile": true,
+        "assignment": true,
+        "mail": true,
+        "dailyTraining": true,
+        "namelessHonor": true,
+        "giftOfOdyssey": false,
+        "redeemCode": false,
+        "quitGame": false,
+        "simulatedUniverse": false
+    },
+    "StartGame": {
+        "autoLogin": false,
+        "launcher": false,
+        "gamePath": "",
+        "pathType": "StarRail",
+        "channel": 0
+    },
+    "ReceiveRewards": {
+        "enable": false
+    },
+    "RedeemCode": {
+        "codeList": []
+    },
+    "Replenish": {
+        "enable": false,
+        "way": 1,
+        "runTimes": 1
+    },
+    "OrnamentExtraction": {
+        "enable": false,
+        "level": 1,
+        "runTimes": 1
+    },
+    "CalyxGolden": {
+        "enable": false,
+        "level": 1,
+        "singleTimes": 1,
+        "runTimes": 1
+    },
+    "CalyxCrimson": {
+        "enable": false,
+        "level": 1,
+        "singleTimes": 1,
+        "runTimes": 1
+    },
+    "StagnantShadow": {
+        "enable": false,
+        "level": 1,
+        "runTimes": 1
+    },
+    "CaverOfCorrosion": {
+        "enable": false,
+        "level": 1,
+        "runTimes": 1
+    },
+    "EchoOfWar": {
+        "enable": false,
+        "runTimes": 1,
+        "level": 1
+    },
+    "QuitGame": {
+        "exitSRA": false,
+        "shutdown": false,
+        "sleep": false
+    },
+    "DivergentUniverse": {
+        "enable": false,
+        "mode": 0,
+        "times": 1
+    },
+    "Settings": {
+        "F1": "f1",
+        "F2": "f2",
+        "F3": "f3",
+        "F4": "f4",
+        "startup": false,
+        "autoUpdate": true,
+        "threadSafety": false,
+        "confidence": 0.9,
+        "zoom": 1.5,
+        "uiSize": "1200x800",
+        "uiLocation": "154x42"
+    },
+    "CloudGame": {
+        "firstly": true
+    }
+}
