@@ -1,5 +1,5 @@
 {
-    "version": "0.7.2",
+    "version": "0.7.4",
     "resource_version": "0.7.4.1",
     "announcement": "1. 修改了裁剪截图区域的计算方法，因此您需要前往SRA设置中将“屏幕缩放”一项的值调整到实际的屏幕缩放，例如您的电脑是150%缩放，则在此项中填入1.50。\n2. 为启动时的公告添加了“不再提醒”按钮，点击后到下一次更新前不会再弹出公告。\n3. 适配本周周期演算(2025.2.17).\n**如果此次更新您的更新器出现以下错误：“检查更新时出错: '<' not supported between instances of 'str' and 'int'” 请关闭SRA后单独运行SRAUpdater",
     "resource_announcement": "1. 补充0.7.4更新中遗漏的部分\n**如果此次更新您的更新器出现以下错误：“检查更新时出错: '<' not supported between instances of 'str' and 'int'” 请关闭SRA后单独运行SRAUpdater",
