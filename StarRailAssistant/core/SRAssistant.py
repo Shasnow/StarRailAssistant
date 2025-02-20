@@ -933,30 +933,48 @@ class Assistant(QThread):
                 logger.error("发生错误，错误编号20")
                 return False
 
+            logger.info("等待进入差分宇宙")
+            if not check("res/img/close.png",max_time=20):
+                logger.error("超时")
+                return False
             while check("res/img/close.png", max_time=3):
                 press_key("esc")
-            if check("res/img/equation_select.png", max_time=3):
+            logger.info("选择方程")
+            if check("res/img/equation_select.png", max_time=4):
                 click_point(*get_screen_center())
                 click("res/img/ensure2.png")
+            else:
+                logger.error("失败/超时")
+                return False
+            logger.info("选择祝福")
             if check("res/img/blessing_select.png", max_time=4):
                 click_point(*get_screen_center())
                 click("res/img/ensure2.png")
-            while check("res/img/close.png", max_time=3):
+            else:
+                logger.error("失败/超时")
+                return False
+            while check("res/img/close.png", max_time=4):
                 press_key("esc")
             time.sleep(2)
             # press_key("esc", presses=1)
 
+            logger.info("移动")
             press_key_for_a_while("w", during=3.2)
+            logger.info("进入战斗")
             click_point(*get_screen_center())
             if check("res/img/q.png", max_time=10):
                 press_key("v")
+            logger.info("等待战斗结束")
             check("res/img/blessing_select.png")
+            logger.info("选择祝福")
             while exist("res/img/blessing_select.png"):
                 click_point(*get_screen_center())
                 click("res/img/ensure2.png")
+            logger.info("退出并结算")
             press_key("esc")
             click("res/img/end_and_settle.png")
             click("res/img/ensure2.png")
+            logger.info("返回主界面")
             if check("res/img/return.png"):
                 click("res/img/return.png")
         press_key("esc")
