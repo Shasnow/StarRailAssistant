@@ -77,14 +77,8 @@ class Updater:
     VERSION_INFO_URL = (
         "https://gitee.com/yukikage/StarRailAssistant/releases/download/release/version.json"
     )
-    PROXYS = [
-        "https://cdn.moran233.xyz/",
-        "https://gh.llkk.cc/",
-        "https://github.akams.cn/",
-        "https://www.ghproxy.cn/",
-        "https://ghproxy.cc/",
-        "",
-    ]
+    PROXYS = []
+    NO_PROXY=False
     VERIFY = True
     # 临时下载文件的路径
     TEMP_DOWNLOAD_DIR = APP_PATH
@@ -103,7 +97,7 @@ class Updater:
     def init_version_file(self):
         if not os.path.exists(self.APP_PATH / "version.json"):
             print("初始化版本信息...")
-            version_info = {"version": "0.0.0", "resource_version": "0.0.0"}
+            version_info = {"version": "0.0.0", "resource_version": "0.0.0", "Announcement": ""}
             with open(
                     self.APP_PATH / "version.json", "w", encoding="utf-8"
             ) as json_file:
@@ -152,6 +146,9 @@ class Updater:
         remote_version = version_info["version"]
         remote_resource_version = version_info["resource_version"]
         new_announcement = version_info["Announcement"]
+        # 获取代理
+        if not self.NO_PROXY and len(self.PROXYS)==0:
+            self.PROXYS=version_info["Proxys"]
         # 比较当前版本和远程版本
         print(f"当前版本：{v.version}")
         print(f"当前资源版本：{v.resource_version}")
@@ -234,7 +231,7 @@ class Updater:
                 # 去掉 .downloaded的后缀
                 self.DOWNLOADING_FILE.rename(self.TEMP_DOWNLOAD_FILE)
                 print("下载完成！")
-                return True
+            return True
         except RequestException as e:
             print(e)
             return False
@@ -284,7 +281,7 @@ class Updater:
 
 
 if __name__ == "__main__":
-    main = Updater()
+    updater = Updater()
     parser = argparse.ArgumentParser()
     parser.add_argument("-u", "--url", help="Download URL of file")
     # parser.add_argument("-d","--directory", help="The directory where the file was downloaded")
@@ -294,15 +291,15 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.proxy is not None:
-        main.PROXYS = [args.proxy]
+        updater.PROXYS = [args.proxy]
     if args.no_proxy:
-        main.PROXYS = [""]
+        updater.NO_PROXY = True
     if args.verify == "False":
-        main.VERIFY = False
+        updater.VERIFY = False
     # if args.directory is not None:
     #     main.TEMP_DOWNLOAD_FILE=args.directory
     if args.url is not None:
-        main.download(args.url)
-        main.unzip()
+        updater.download(args.url)
+        updater.unzip()
     else:
-        main.check_for_updates()
+        updater.check_for_updates()
