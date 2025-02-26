@@ -80,7 +80,17 @@
             <item row="0" column="0" colspan="2">
              <widget class="QLabel" name="label_2">
               <property name="text">
-               <string>差分宇宙</string>
+               <string>差分宇宙：千面英雄</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>次数：</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -100,10 +110,10 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_4">
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_3">
               <property name="text">
-               <string>次数：</string>
+               <string>模式：</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -119,14 +129,23 @@
               </item>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_3">
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_6">
               <property name="text">
-               <string>模式：</string>
+               <string>选择策略：</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QComboBox" name="comboBox">
+              <item>
+               <property name="text">
+                <string>图鉴优先</string>
+               </property>
+              </item>
              </widget>
             </item>
            </layout>
@@ -135,7 +154,7 @@
          <item>
           <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>需要进入到差分宇宙主界面再执行此任务。此任务应当单独执行</string>
+            <string>需要进入到差分宇宙主界面再执行此任务。此任务应当单独执行。请至少手动完成一次以清除所有新手提示。</string>
            </property>
            <property name="wordWrap">
             <bool>true</bool>

@@ -207,6 +207,11 @@
                </item>
                <item>
                 <property name="text">
+                 <string>纷争不休（拾骨地/巨树）</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
                  <string>蠹役饥肠（露莎卡/蕉乐园）</string>
                 </property>
                </item>
@@ -397,6 +402,21 @@
                <item>
                 <property name="text">
                  <string>-----选择副本-----</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>回忆之蕾（翁法罗斯）</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>以太之蕾（翁法罗斯）</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>珍藏之蕾（翁法罗斯）</string>
                 </property>
                </item>
                <item>
@@ -746,6 +766,11 @@
                </item>
                <item>
                 <property name="text">
+                 <string>暗帷月华（量子）</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
                  <string>炙梦喷枪（量子）</string>
                 </property>
                </item>
@@ -757,6 +782,11 @@
                <item>
                 <property name="text">
                  <string>虚幻铸铁（量子）</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>纷争前兆（虚数）</string>
                 </property>
                </item>
                <item>

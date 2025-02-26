@@ -136,7 +136,7 @@ def init() -> None:
         ],
         "CloudGame": [["firstly", True]],
     }
-    with open("data/config.json", "r") as f:
+    with open("data/config.json", "r",encoding="utf-8") as f:
         config = json.load(f)
     for index in config_list_1:
         if not index in config:
