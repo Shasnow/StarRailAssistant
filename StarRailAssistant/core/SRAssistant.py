@@ -934,18 +934,29 @@ class Assistant(QThread):
                 return False
 
             logger.info("等待进入差分宇宙")
-            if not check("res/img/close.png",max_time=20):
+            if not check("res/img/base_effect_select.png",max_time=25):
                 logger.error("超时")
                 return False
-            while check("res/img/close.png", max_time=3):
-                press_key("esc")
-            logger.info("选择方程")
-            if check("res/img/equation_select.png", max_time=4):
-                click_point(*get_screen_center())
-                click("res/img/ensure2.png")
-            else:
-                logger.error("失败/超时")
+            logger.info("选择基础效果")
+            if not click("res/img/collection.png"):
+                x,y=get_screen_center()
+                click_point(x-250,y)
+            click("res/img/ensure2.png",wait_time=1)
+            if not check("res/img/equation_select.png",max_time=25):
+                logger.error("超时")
                 return False
+            logger.info("选择方程")
+            while check("res/img/equation_select.png", max_time=3):
+                if not click("res/img/collection.png"):
+                    click_point(*get_screen_center())
+                click("res/img/ensure2.png",wait_time=1)
+                if check("res/img/close.png", max_time=4):
+                    press_key("esc")
+
+            logger.info("获得奇物")
+            if check("res/img/close.png"):
+                press_key("esc")
+
             logger.info("选择祝福")
             if check("res/img/blessing_select.png", max_time=4):
                 click_point(*get_screen_center())
@@ -955,7 +966,7 @@ class Assistant(QThread):
                 return False
             while check("res/img/close.png", max_time=4):
                 press_key("esc")
-            time.sleep(2)
+            time.sleep(1)
             # press_key("esc", presses=1)
 
             logger.info("移动")
@@ -968,7 +979,8 @@ class Assistant(QThread):
             check("res/img/blessing_select.png")
             logger.info("选择祝福")
             while exist("res/img/blessing_select.png"):
-                click_point(*get_screen_center())
+                if not click("res/img/collection.png"):
+                    click_point(*get_screen_center())
                 click("res/img/ensure2.png")
             logger.info("退出并结算")
             press_key("esc")
