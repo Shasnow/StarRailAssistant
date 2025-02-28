@@ -31,9 +31,9 @@ from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.webdriver import WebDriver
 
-from StarRailAssistant.utils.Exceptions import WindowNoFoundException, MultipleWindowsException, MatchFailureException, \
+from StarRailCore.utils.Exceptions import WindowNoFoundException, MultipleWindowsException, MatchFailureException, \
     WindowInactiveException
-from StarRailAssistant.utils.Logger import logger
+from StarRailCore.utils.Logger import logger
 
 
 class SRAOperator:

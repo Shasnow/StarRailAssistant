@@ -3,8 +3,8 @@ from PySide6.QtGui import QIcon, QFont
 from PySide6.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QScrollArea, QWidget, QGridLayout, \
     QSpacerItem, QSizePolicy, QFrame
 
-from StarRailAssistant.utils.Configure import load, save
-from StarRailAssistant.utils.WindowsProcess import Popen
+from StarRailCore.utils.Configure import load, save
+from StarRailCore.utils.WindowsProcess import Popen
 
 
 class DownloadDialog(QDialog):

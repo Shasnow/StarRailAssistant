@@ -51,10 +51,10 @@ from PySide6.QtWidgets import (
     QTableWidget, QDoubleSpinBox, )  # 从 PySide6 中导入所需的类
 from plyer import notification
 
-from StarRailAssistant.core import SRAssistant, AutoPlot, SRACloud
-from StarRailAssistant.core.SRAssistant import VERSION
-from StarRailAssistant.utils import Configure, WindowsPower, WindowsProcess, Encryption
-from StarRailAssistant.utils.Dialog import DownloadDialog, AnnouncementDialog
+from StarRailCore.core import SRAssistant, AutoPlot, SRACloud
+from StarRailCore.core.SRAssistant import VERSION
+from StarRailCore.utils import Configure, WindowsPower, WindowsProcess, Encryption
+from StarRailCore.utils.Dialog import DownloadDialog, AnnouncementDialog
 
 # from ocr import SRAocr
 
@@ -224,7 +224,7 @@ class Main(QWidget):
 
     def divination(self):
         if os.path.exists("res/ui/divination.ui"):
-            from StarRailAssistant.utils.FuXuanDivination import FuXuanDivination
+            from StarRailCore.utils.FuXuanDivination import FuXuanDivination
             div = FuXuanDivination(self)
             div.ui.show()
         else:
