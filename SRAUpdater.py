@@ -35,7 +35,7 @@ import requests
 from requests import RequestException
 from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn, DownloadColumn, TransferSpeedColumn
 
-from StarRailAssistant.utils.WindowsProcess import is_process_running, task_kill, Popen
+from StarRailCore.utils.WindowsProcess import is_process_running, task_kill, Popen
 
 FROZEN = getattr(sys, "frozen", False)
 """ 是否被打包成了可执行文件 """
@@ -140,7 +140,7 @@ class Updater:
             version_info = response.json()
         except RequestException as e:
             print(e)
-            raise Exception(f"服务器连接失败")
+            raise Exception("服务器连接失败")
 
         # 获取远程最新版本号
         remote_version = version_info["version"]
