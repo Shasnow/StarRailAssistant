@@ -26,7 +26,7 @@ Windows电源操作
 import subprocess
 import sys
 
-from StarRailAssistant.utils.Logger import logger
+from SRACore.utils.Logger import logger
 
 
 def hibernate():

@@ -28,11 +28,11 @@ import time
 
 from PySide6.QtCore import QThread, Signal, Slot
 
-from StarRailAssistant.extensions.QTHandler import QTHandler
-from StarRailAssistant.utils import Configure, WindowsProcess, Encryption
-from StarRailAssistant.utils.Logger import logger, console_handler
-from StarRailAssistant.utils.SRAOperator import SRAOperator
-from StarRailAssistant.utils.WindowsProcess import find_window, is_process_running
+from SRACore.extensions.QTHandler import QTHandler
+from SRACore.utils import Configure, WindowsProcess, Encryption
+from SRACore.utils.Logger import logger, console_handler
+from SRACore.utils.SRAOperator import SRAOperator
+from SRACore.utils.WindowsProcess import find_window, is_process_running
 
 VERSION = "0.7.4"
 

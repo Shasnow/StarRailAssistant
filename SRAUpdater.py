@@ -35,7 +35,7 @@ import requests
 from requests import RequestException
 from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn, DownloadColumn, TransferSpeedColumn
 
-from StarRailAssistant.utils.WindowsProcess import is_process_running, task_kill, Popen
+from SRACore.utils.WindowsProcess import is_process_running, task_kill, Popen
 
 FROZEN = getattr(sys, "frozen", False)
 """ 是否被打包成了可执行文件 """

@@ -1,10 +1,9 @@
 from PySide6.QtCore import Slot
-from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QWidget, QCheckBox, QTextEdit, QComboBox, QLineEdit, QPushButton, QLabel, QFileDialog, \
-    QSpinBox, QRadioButton, QTextBrowser
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QWidget, QCheckBox, QTextEdit, QComboBox, QLineEdit, QPushButton, QLabel, QFileDialog, \
+    QSpinBox, QRadioButton
 
-from StarRailAssistant.utils import Encryption
+from SRACore.utils import Encryption
 
 uiLoader=QUiLoader()
 
