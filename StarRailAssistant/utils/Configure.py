@@ -120,6 +120,7 @@ def init() -> None:
             ["enable", False],
             ["mode", 0],
             ["times",1],
+            ["policy",0],
         ],
         "Settings": [
             ["F1", "f1"],

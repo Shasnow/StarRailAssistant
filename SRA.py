@@ -27,7 +27,6 @@ import os
 import sys
 import time
 
-from PySide6.QtCore import QTimer
 from PySide6.QtGui import QIcon, QAction
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (
@@ -35,26 +34,19 @@ from PySide6.QtWidgets import (
     QApplication,
     QWidget,
     QGroupBox,
-    QFileDialog,
     QMessageBox,
-    QLineEdit,
-    QTextEdit,
     QTextBrowser,
-    QComboBox,
     QPushButton,
-    QSpinBox,
     QCheckBox,
     QVBoxLayout,
-    QLabel,
-    QRadioButton,
-    QLCDNumber,
     QTableWidget, QDoubleSpinBox, )  # 从 PySide6 中导入所需的类
 from plyer import notification
 
 from StarRailAssistant.core import SRAssistant, AutoPlot, SRACloud
 from StarRailAssistant.core.SRAssistant import VERSION
 from StarRailAssistant.utils import Configure, WindowsPower, WindowsProcess, Encryption
-from StarRailAssistant.utils.Dialog import DownloadDialog, AnnouncementDialog
+from StarRailAssistant.utils.Dialog import DownloadDialog, AnnouncementDialog, ShutdownDialog
+from StarRailAssistant.utils.SRAWidgets import ReceiveRewards, StartGame, TrailblazePower, QuitGame, SimulatedUniverse
 
 # from ocr import SRAocr
 
@@ -83,136 +75,84 @@ class Main(QWidget):
         self.account_text = Encryption.load()
         self.password_text = ""
         self.ui = uiLoader.load(self.AppPath + "/res/ui/main.ui")
-        self.start_game_setting_container = uiLoader.load(
-            self.AppPath + "/res/ui/set_01.ui"
-        )
-        self.receive_rewards_setting_container = uiLoader.load(
-            self.AppPath + "/res/ui/set_03.ui"
-        )
-        self.trail_blaze_power_container = uiLoader.load(
-            self.AppPath + "/res/ui/set_07.ui"
-        )
-        self.quit_game_setting_container = uiLoader.load(
-            self.AppPath + "/res/ui/set_10.ui"
-        )
-        self.simulated_universe_container = uiLoader.load(
-            self.AppPath + "/res/ui/simulated_universe.ui"
-        )
+        self.log = self.ui.findChild(QTextBrowser, "textBrowser_log")
 
-        self.console()
-        self.start_game_setting()
-        self.trail_blaze_power_setting()
-        self.receive_rewards_setting()
-        self.quit_game_setting()
-        self.simulated_universe_setting()
+        # 创建中间的垂直布局管理器用于任务设置
 
-        self.extension()
-
-        self.software_setting()
-
-    def console(self):
-        """左侧控制台功能绑定"""
-        # 工具栏
+        task_set = self.ui.findChild(QGroupBox, "groupBox_2")
+        self.task_set_vbox_layout = QVBoxLayout()
+        task_set.setLayout(self.task_set_vbox_layout)
+        # toolbar
         notice_action = self.ui.findChild(QAction, "action_1")
         notice_action.triggered.connect(self.notice)
         problem_action = self.ui.findChild(QAction, "action_2")
         problem_action.triggered.connect(self.problem)
         report_action = self.ui.findChild(QAction, "action_3")
         report_action.triggered.connect(self.report)
+        # end
+        # console
+        self.start_game_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_1")
+        self.start_game_checkbox.setChecked(self.config["Mission"]["startGame"])
+        self.setting1:QPushButton = self.ui.findChild(QPushButton, "pushButton1_1")
+        self.setting1.clicked.connect(self.show_start_game_setting)
 
-        # 创建垂直布局管理器用于任务设置
-        self.task_set_vbox_layout = QVBoxLayout()
-        task_set = self.ui.findChild(QGroupBox, "groupBox_2")
-        task_set.setLayout(self.task_set_vbox_layout)
+        self.trailBlazePower_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_2")
+        self.trailBlazePower_checkbox.setChecked(self.config["Mission"]["trailBlazePower"])
+        self.setting2:QPushButton = self.ui.findChild(QPushButton, "pushButton1_2")
+        self.setting2.clicked.connect(self.show_trail_blaze_power_setting)
 
-        self.log = self.ui.findChild(QTextBrowser, "textBrowser_log")
+        self.receive_rewards_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_3")
+        self.receive_rewards_checkbox.setChecked(self.config["ReceiveRewards"]["enable"])
+        self.setting3 = self.ui.findChild(QPushButton, "pushButton1_3")
+        self.setting3.clicked.connect(self.show_receive_rewards_setting)
 
-        self.option1 = self.ui.findChild(QCheckBox, "checkBox1_1")
-        self.option1.setChecked(self.config["Mission"]["startGame"])
-        self.option1.stateChanged.connect(self.start_game_status)
-        button1 = self.ui.findChild(QPushButton, "pushButton1_1")
-        button1.clicked.connect(self.show_start_game_setting)
+        self.quit_game_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_4")
+        self.quit_game_checkbox.setChecked(self.config["Mission"]["quitGame"])
+        self.setting4 = self.ui.findChild(QPushButton, "pushButton1_4")
+        self.setting4.clicked.connect(self.show_quit_game_setting)
 
-        self.option7 = self.ui.findChild(QCheckBox, "checkBox1_2")
-        self.option7.setChecked(self.config["Mission"]["trailBlazePower"])
-        self.option7.stateChanged.connect(self.trail_blaze_power_status)
-        button7 = self.ui.findChild(QPushButton, "pushButton1_2")
-        button7.clicked.connect(self.show_trail_blaze_power_setting)
-
-        self.option3 = self.ui.findChild(QCheckBox, "checkBox1_3")
-        self.option3.setChecked(self.config["ReceiveRewards"]["enable"])
-        self.option3.stateChanged.connect(self.receive_rewards_status)
-        button3 = self.ui.findChild(QPushButton, "pushButton1_3")
-        button3.clicked.connect(self.show_receive_rewards_setting)
-
-        self.option10 = self.ui.findChild(QCheckBox, "checkBox1_4")
-        self.option10.setChecked(self.config["Mission"]["quitGame"])
-        self.option10.stateChanged.connect(self.quit_game_status)
-        button10 = self.ui.findChild(QPushButton, "pushButton1_4")
-        button10.clicked.connect(self.show_quit_game_setting)
-
-        option11: QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_5")
-        option11.setChecked(self.config["Mission"]["simulatedUniverse"])
-        option11.stateChanged.connect(self.simulated_universe_status)
-        button11: QPushButton = self.ui.findChild(QPushButton, "pushButton1_5")
-        button11.clicked.connect(self.show_simulated_universe_setting)
+        self.simulatedUniverse_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_5")
+        self.simulatedUniverse_checkbox.setChecked(self.config["Mission"]["simulatedUniverse"])
+        self.setting5: QPushButton = self.ui.findChild(QPushButton, "pushButton1_5")
+        self.setting5.clicked.connect(self.show_simulated_universe_setting)
 
         self.button0_1 = self.ui.findChild(QPushButton, "pushButton1_0_1")
         self.button0_1.clicked.connect(self.execute)
         self.button0_2 = self.ui.findChild(QPushButton, "pushButton1_0_2")
         self.button0_2.clicked.connect(self.kill)
         self.button0_2.setEnabled(False)
+        # console end
 
-    def receive_rewards_setting(self):
-        self.option2 = self.receive_rewards_setting_container.findChild(
-            QCheckBox, "checkBox3_1"
-        )
-        self.option2.setChecked(self.config["Mission"]["trailBlazerProfile"])
-        self.option2.stateChanged.connect(self.trailblazer_profile_status)
+        self.start_game = StartGame(self, self.config)
+        self.task_set_vbox_layout.addWidget(self.start_game.ui)
+        self.start_game.ui.setVisible(True)
 
-        self.option4 = self.receive_rewards_setting_container.findChild(
-            QCheckBox, "checkBox3_2"
-        )
-        self.option4.setChecked(self.config["Mission"]["assignment"])
-        self.option4.stateChanged.connect(self.assignment_status)
+        self.receive_rewards = ReceiveRewards(self, self.config)
+        self.task_set_vbox_layout.addWidget(self.receive_rewards.ui)
+        self.receive_rewards.ui.setVisible(False)
 
-        self.option6 = self.receive_rewards_setting_container.findChild(
-            QCheckBox, "checkBox3_3"
-        )
-        self.option6.setChecked(self.config["Mission"]["mail"])
-        self.option6.stateChanged.connect(self.mail_status)
+        self.trailblaze_power = TrailblazePower(self, self.config)
+        self.task_set_vbox_layout.addWidget(self.trailblaze_power.ui)
+        self.trailblaze_power.ui.setVisible(False)
 
-        self.option8 = self.receive_rewards_setting_container.findChild(
-            QCheckBox, "checkBox3_4"
-        )
-        self.option8.setChecked(self.config["Mission"]["dailyTraining"])
-        self.option8.stateChanged.connect(self.daily_training_status)
+        self.quit_game = QuitGame(self, self.config)
+        self.task_set_vbox_layout.addWidget(self.quit_game.ui)
+        self.quit_game.ui.setVisible(False)
 
-        self.option9 = self.receive_rewards_setting_container.findChild(
-            QCheckBox, "checkBox3_5"
-        )
-        self.option9.setChecked(self.config["Mission"]["namelessHonor"])
-        self.option9.stateChanged.connect(self.nameless_honor_status)
+        self.simulated_universe = SimulatedUniverse(self, self.config)
+        self.task_set_vbox_layout.addWidget(self.simulated_universe.ui)
+        self.simulated_universe.ui.setVisible(False)
 
-        self.option5 = self.receive_rewards_setting_container.findChild(
-            QCheckBox, "checkBox3_6"
-        )
-        self.option5.setChecked(self.config["Mission"]["giftOfOdyssey"])
-        self.option5.stateChanged.connect(self.gift_of_odyssey_status)
+        self.extension()
 
-        self.option3 = self.receive_rewards_setting_container.findChild(
-            QCheckBox, "checkBox3_7"
-        )
-        self.option3.setChecked(self.config["Mission"]["redeemCode"])
-        self.option3.stateChanged.connect(self.redeem_code_status)
+        self.software_setting()
 
-        self.redeem_code = self.receive_rewards_setting_container.findChild(
-            QTextEdit, "textEdit"
-        )
-        self.redeem_code.setText("\n".join(self.config["RedeemCode"]["codeList"]))
-        self.redeem_code.textChanged.connect(self.redeem_code_change)
-        self.task_set_vbox_layout.addWidget(self.receive_rewards_setting_container)
-        self.receive_rewards_setting_container.setVisible(False)
+    def get_mission(self):
+        self.config["Mission"]["startGame"]=self.start_game_checkbox.isChecked()
+        self.config["Mission"]["trailBlazePower"]=self.trailBlazePower_checkbox.isChecked()
+        self.config["ReceiveRewards"]["enable"]=self.receive_rewards_checkbox.isChecked()
+        self.config["Mission"]["quitGame"]=self.quit_game_checkbox.isChecked()
+        self.config["Mission"]["simulatedUniverse"]=self.simulatedUniverse_checkbox.isChecked()
 
     def extension(self):
         auto_plot_checkbox = self.ui.findChild(QCheckBox, "autoplot_checkBox")
@@ -224,7 +164,7 @@ class Main(QWidget):
 
     def divination(self):
         if os.path.exists("res/ui/divination.ui"):
-            from StarRailAssistant.utils.FuXuanDivination import FuXuanDivination
+            from StarRailAssistant.extensions.FuXuanDivination import FuXuanDivination
             div = FuXuanDivination(self)
             div.ui.show()
         else:
@@ -325,529 +265,52 @@ class Main(QWidget):
         self.config["Settings"]["zoom"] = value
         Configure.save(self.config)
 
-    def start_game_setting(self):
-        channel_combobox = self.start_game_setting_container.findChild(
-            QComboBox, "comboBox2_1"
-        )
-        channel_combobox.setCurrentIndex(self.config["StartGame"]["channel"])
-        channel_combobox.currentIndexChanged.connect(self.channel_change)
-        use_launcher_checkbox: QCheckBox = self.start_game_setting_container.findChild(
-            QCheckBox, "checkBox2_4"
-        )
-        use_launcher_checkbox.setChecked(self.config["StartGame"]["launcher"])
-        use_launcher_checkbox.stateChanged.connect(self.use_launcher)
-
-        # cloud_game_checkbox = self.start_game_setting_container.findChild(
-        #     QCheckBox, "cloud_game"
-        # )
-        # cloud_game_checkbox.stateChanged.connect(self.use_cloud_game)
-
-        self.path_text: QTextEdit = self.start_game_setting_container.findChild(QLabel, "label2_2")
-        self.path_text.setText("启动器路径：" if self.config["StartGame"]["launcher"] else "游戏路径：")
-        self.line_area = self.start_game_setting_container.findChild(
-            QLineEdit, "lineEdit2_2"
-        )
-        self.line_area.setText(self.config["StartGame"]["gamePath"])
-        self.line_area.textChanged.connect(self.get_path)
-
-        button = self.start_game_setting_container.findChild(
-            QPushButton, "pushButton2_2"
-        )
-        button.clicked.connect(self.open_file)
-
-        self.auto_launch_checkbox: QCheckBox = self.start_game_setting_container.findChild(
-            QCheckBox, "checkBox2_3"
-        )
-        self.auto_launch_checkbox.setChecked(self.config["StartGame"]["autoLogin"])
-        self.auto_launch_checkbox.stateChanged.connect(self.auto_launch)
-        self.account = self.start_game_setting_container.findChild(
-            QLineEdit, "lineEdit2_4_12"
-        )
-        self.account.setText(self.account_text)
-        self.account.setReadOnly(True)
-        self.account.textChanged.connect(self.get_account)
-        self.password = self.start_game_setting_container.findChild(
-            QLineEdit, "lineEdit2_4_22"
-        )
-        # self.password.setText(self.password_text)
-        self.password.setEchoMode(QLineEdit.EchoMode.Password)
-        self.password.setReadOnly(True)
-        self.password.textChanged.connect(self.get_password)
-        self.show_button = self.start_game_setting_container.findChild(
-            QPushButton, "pushButton2_3"
-        )
-        self.show_button.clicked.connect(self.togglePasswordVisibility)
-        self.task_set_vbox_layout.addWidget(self.start_game_setting_container)
-        self.start_game_setting_container.setVisible(True)
-
     def show_start_game_setting(self):
         """Set start game setting visible"""
         self.display_none()
-        self.start_game_setting_container.setVisible(True)
-
-    def channel_change(self, index):
-        self.config["StartGame"]["channel"] = index
-
-    def use_launcher(self, state):
-        if state:
-            self.path_text.setText("启动器路径：")
-            self.config["StartGame"]["launcher"] = True
-            self.config["StartGame"]["pathType"] = "launcher"
-        else:
-            self.path_text.setText("游戏路径：")
-            self.config["StartGame"]["launcher"] = False
-            self.config["StartGame"]["pathType"] = "StarRail"
-
-    def use_cloud_game(self, state):
-        if state:
-            self.cloud = True
-        else:
-            self.cloud = False
-
-    def open_file(self):
-        file_name, _ = QFileDialog.getOpenFileName(
-            self, "选择文件", "", "可执行文件 (*.exe)"
-        )
-        if file_name:
-            self.line_area.setText(file_name)
-            self.config["StartGame"]["gamePath"] = file_name
-
-    def get_path(self, text):
-        self.config["StartGame"]["gamePath"] = text
-
-    def get_account(self, text):
-        self.account_text = text
-
-    def get_password(self, text):
-        self.password_text = text
-
-    def auto_launch(self):
-        """
-        Change the state of mission auto launch,
-        update QLineEdit state.
-        """
-        if self.auto_launch_checkbox.isChecked():
-            self.log.append("自动登录已启用")
-            self.config["StartGame"]["autoLogin"] = True
-            self.account.setReadOnly(False)
-            self.password.setReadOnly(False)
-        else:
-            self.log.append("自动登录已禁用")
-            self.config["StartGame"]["autoLogin"] = False
-            self.account.setReadOnly(True)
-            self.password.setReadOnly(True)
-
-    def togglePasswordVisibility(self):
-        """Toggle password visibility"""
-        if self.password.echoMode() == QLineEdit.EchoMode.Password:
-            self.password.setEchoMode(QLineEdit.EchoMode.Normal)
-            self.show_button.setText("隐藏")
-        else:
-            self.password.setEchoMode(QLineEdit.EchoMode.Password)
-            self.show_button.setText("显示")
+        self.start_game.ui.setVisible(True)
 
     def display_none(self):
         """Sets the invisible state of the container."""
-        self.start_game_setting_container.setVisible(False)
-        self.trail_blaze_power_container.setVisible(False)
-        self.receive_rewards_setting_container.setVisible(False)
-        self.quit_game_setting_container.setVisible(False)
-        self.simulated_universe_container.setVisible(False)
-
-    def start_game_status(self):
-        """Change the state of mission start game."""
-        if self.option1.isChecked():
-            self.log.append("启动游戏已启用")
-            self.config["Mission"]["startGame"] = True
-        else:
-            self.log.append("启动游戏已禁用")
-            self.config["Mission"]["startGame"] = False
-
-    def receive_rewards_status(self, state):
-        if state == 2:
-            self.config["ReceiveRewards"]["enable"] = True
-        else:
-            self.config["ReceiveRewards"]["enable"] = False
-
-    def trailblazer_profile_status(self):
-        """Change the state of mission trailblazer profile."""
-        if self.option2.isChecked():
-            self.log.append("添加任务：领取签证奖励")
-            self.config["Mission"]["trailBlazerProfile"] = True
-        else:
-            self.log.append("取消任务：领取签证奖励")
-            self.config["Mission"]["trailBlazerProfile"] = False
-
-    def redeem_code_status(self):
-        """Change the state of mission redeem code."""
-        if self.option3.isChecked():
-            self.log.append("添加任务：领取兑换码奖励")
-            self.config["Mission"]["redeemCode"] = True
-            self.config["Mission"]["mail"] = True
-        else:
-            self.log.append("取消任务：领取兑换码奖励")
-            self.config["Mission"]["redeemCode"] = False
-
-    def assignment_status(self):
-        """Change the state of mission assignment."""
-        if self.option4.isChecked():
-            self.log.append("添加任务：领取派遣奖励")
-            self.config["Mission"]["assignment"] = True
-        else:
-            self.log.append("取消任务：领取派遣奖励")
-            self.config["Mission"]["assignment"] = False
-
-    def gift_of_odyssey_status(self):
-        """Change the state of mission gift of odyssey."""
-        if self.option5.isChecked():
-            self.log.append("添加任务：领取巡星之礼")
-            self.config["Mission"]["giftOfOdyssey"] = True
-        else:
-            self.log.append("取消任务：领取巡星之礼")
-            self.config["Mission"]["giftOfOdyssey"] = False
-
-    def mail_status(self):
-        """Change the state of mission mail."""
-        if self.option6.isChecked():
-            self.log.append("添加任务：领取邮件")
-            self.config["Mission"]["mail"] = True
-        else:
-            self.log.append("取消任务：领取邮件")
-            self.config["Mission"]["mail"] = False
-            self.config["Mission"]["redeemCode"] = False
-
-    def trail_blaze_power_status(self):
-        """Change the state of mission trailblaze power."""
-        if self.option7.isChecked():
-            self.log.append("添加任务：清开拓力")
-            self.config["Mission"]["trailBlazePower"] = True
-        else:
-            self.log.append("取消任务：清开拓力")
-            self.config["Mission"]["trailBlazePower"] = False
-
-    def daily_training_status(self):
-        """Change the state of mission daily training."""
-        if self.option8.isChecked():
-            self.log.append("添加任务：领取每日实训")
-            self.config["Mission"]["dailyTraining"] = True
-        else:
-            self.log.append("取消任务：领取每日实训")
-            self.config["Mission"]["dailyTraining"] = False
-
-    def nameless_honor_status(self):
-        """Change the state of mission nameless honor."""
-        if self.option9.isChecked():
-            self.log.append("添加任务：领取无名勋礼")
-            self.config["Mission"]["namelessHonor"] = True
-        else:
-            self.log.append("取消任务：领取无名勋礼")
-            self.config["Mission"]["namelessHonor"] = False
-
-    def quit_game_status(self):
-        """Change the state of mission quit game."""
-        if self.option10.isChecked():
-            self.log.append("退出游戏已启用")
-            self.config["Mission"]["quitGame"] = True
-        else:
-            self.log.append("退出游戏已禁用")
-            self.config["Mission"]["quitGame"] = False
-
-    def simulated_universe_status(self, state):
-        if state == 2:
-            self.config["Mission"]["simulatedUniverse"] = True
-        else:
-            self.config["Mission"]["simulatedUniverse"] = False
-
-    def redeem_code_change(self):
-        """Change the redeem code list while redeem code text changes."""
-        redeem_code = self.redeem_code.toPlainText()
-        self.config["RedeemCode"]["codeList"] = redeem_code.split()
+        self.start_game.ui.setVisible(False)
+        self.trailblaze_power.ui.setVisible(False)
+        self.receive_rewards.ui.setVisible(False)
+        self.quit_game.ui.setVisible(False)
+        self.simulated_universe.ui.setVisible(False)
 
     def show_receive_rewards_setting(self):
         """Set redeem code visible."""
         self.display_none()
-        self.receive_rewards_setting_container.setVisible(True)
-
-    def trail_blaze_power_setting(self):
-        """Create component of trailblaze power."""
-        self.opt1 = self.trail_blaze_power_container.findChild(
-            QCheckBox, "checkBox2_1_11"
-        )
-        self.opt1.setChecked(self.config["Replenish"]["enable"])
-        self.opt1.stateChanged.connect(self.replenish_trail_blaze_power_status)
-        combobox1 = self.trail_blaze_power_container.findChild(
-            QComboBox, "comboBox2_1_13"
-        )
-        combobox1.setCurrentIndex(self.config["Replenish"]["way"])
-        combobox1.currentIndexChanged.connect(self.replenish_way_select)
-        times1 = self.trail_blaze_power_container.findChild(QSpinBox, "spinBox2_1_23")
-        times1.setValue(self.config["Replenish"]["runTimes"])
-        times1.valueChanged.connect(self.replenish_trail_blaze_power_run_time_change)
-
-        self.opt2 = self.trail_blaze_power_container.findChild(
-            QCheckBox, "checkBox2_2_11"
-        )
-        self.opt2.setChecked(self.config["OrnamentExtraction"]["enable"])
-        self.opt2.stateChanged.connect(self.ornament_extraction_status)
-        combobox2 = self.trail_blaze_power_container.findChild(
-            QComboBox, "comboBox2_2_13"
-        )
-        combobox2.currentIndexChanged.connect(self.ornament_extraction_level_select)
-        combobox2.setCurrentIndex(self.config["OrnamentExtraction"]["level"])
-        battle_times2 = self.trail_blaze_power_container.findChild(
-            QSpinBox, "spinBox2_2_23"
-        )
-        battle_times2.setValue(self.config["OrnamentExtraction"]["runTimes"])
-        battle_times2.valueChanged.connect(self.ornament_extraction_run_time_change)
-
-        self.opt3 = self.trail_blaze_power_container.findChild(
-            QCheckBox, "checkBox2_3_11"
-        )
-        self.opt3.setChecked(self.config["CalyxGolden"]["enable"])
-        self.opt3.stateChanged.connect(self.calyx_golden_status)
-        combobox3 = self.trail_blaze_power_container.findChild(
-            QComboBox, "comboBox2_3_13"
-        )
-        combobox3.setCurrentIndex(self.config["CalyxGolden"]["level"])
-        combobox3.currentIndexChanged.connect(self.calyx_golden_level_select)
-        single_times3 = self.trail_blaze_power_container.findChild(
-            QSpinBox, "spinBox2_3_23"
-        )
-        single_times3.setValue(self.config["CalyxGolden"]["singleTimes"])
-        single_times3.valueChanged.connect(self.calyx_golden_battle_time_change)
-        battle_times3 = self.trail_blaze_power_container.findChild(
-            QSpinBox, "spinBox2_3_33"
-        )
-        battle_times3.setValue(self.config["CalyxGolden"]["runTimes"])
-        battle_times3.valueChanged.connect(self.calyx_golden_run_time_change)
-
-        self.opt4 = self.trail_blaze_power_container.findChild(
-            QCheckBox, "checkBox2_4_11"
-        )
-        self.opt4.setChecked(self.config["CalyxCrimson"]["enable"])
-        self.opt4.stateChanged.connect(self.calyx_crimson_status)
-        combobox4 = self.trail_blaze_power_container.findChild(
-            QComboBox, "comboBox2_4_13"
-        )
-        combobox4.setCurrentIndex(self.config["CalyxCrimson"]["level"])
-        combobox4.currentIndexChanged.connect(self.calyx_crimson_level_select)
-        single_times4 = self.trail_blaze_power_container.findChild(
-            QSpinBox, "spinBox2_4_23"
-        )
-        single_times4.setValue(self.config["CalyxCrimson"]["singleTimes"])
-        single_times4.valueChanged.connect(self.calyx_crimson_battle_time_change)
-        battle_times4 = self.trail_blaze_power_container.findChild(
-            QSpinBox, "spinBox2_4_33"
-        )
-        battle_times4.setValue(self.config["CalyxCrimson"]["runTimes"])
-        battle_times4.valueChanged.connect(self.calyx_crimson_run_time_change)
-
-        self.opt5 = self.trail_blaze_power_container.findChild(
-            QCheckBox, "checkBox2_5_11"
-        )
-        self.opt5.setChecked(self.config["StagnantShadow"]["enable"])
-        self.opt5.stateChanged.connect(self.stagnant_shadow_status)
-        combobox5 = self.trail_blaze_power_container.findChild(
-            QComboBox, "comboBox2_5_13"
-        )
-        combobox5.setCurrentIndex(self.config["StagnantShadow"]["level"])
-        combobox5.currentIndexChanged.connect(self.stagnant_shadow_level_select)
-        battle_times5 = self.trail_blaze_power_container.findChild(
-            QSpinBox, "spinBox2_5_23"
-        )
-        battle_times5.setValue(self.config["StagnantShadow"]["runTimes"])
-        battle_times5.valueChanged.connect(self.stagnant_shadow_run_time_change)
-
-        self.opt6 = self.trail_blaze_power_container.findChild(
-            QCheckBox, "checkBox2_6_11"
-        )
-        self.opt6.setChecked(self.config["CaverOfCorrosion"]["enable"])
-        self.opt6.stateChanged.connect(self.caver_of_corrosion_status)
-        combobox6 = self.trail_blaze_power_container.findChild(
-            QComboBox, "comboBox2_6_13"
-        )
-        combobox6.setCurrentIndex(self.config["CaverOfCorrosion"]["level"])
-        combobox6.currentIndexChanged.connect(self.caver_of_corrosion_level_select)
-        battle_times6 = self.trail_blaze_power_container.findChild(
-            QSpinBox, "spinBox2_6_23"
-        )
-        battle_times6.setValue(self.config["CaverOfCorrosion"]["runTimes"])
-        battle_times6.valueChanged.connect(self.caver_of_corrosion_run_time_change)
-
-        self.opt7 = self.trail_blaze_power_container.findChild(
-            QCheckBox, "checkBox2_7_11"
-        )
-        self.opt7.setChecked(self.config["EchoOfWar"]["enable"])
-        self.opt7.stateChanged.connect(self.echo_of_war_status)
-        combobox7 = self.trail_blaze_power_container.findChild(
-            QComboBox, "comboBox2_7_13"
-        )
-        combobox7.setCurrentIndex(self.config["EchoOfWar"]["level"])
-        combobox7.currentIndexChanged.connect(self.echo_of_war_level_select)
-        battle_times7 = self.trail_blaze_power_container.findChild(
-            QSpinBox, "spinBox2_7_23"
-        )
-        battle_times7.setValue(self.config["EchoOfWar"]["runTimes"])
-        battle_times7.valueChanged.connect(self.echo_of_war_run_time_change)
-
-        self.task_set_vbox_layout.addWidget(self.trail_blaze_power_container)
-        self.trail_blaze_power_container.setVisible(False)
-
-    # Change series state in mission trailblaze power.
-    def replenish_trail_blaze_power_status(self):
-        if self.opt1.isChecked():
-            self.config["Replenish"]["enable"] = True
-        else:
-            self.config["Replenish"]["enable"] = False
-
-    def replenish_way_select(self, index):
-        self.config["Replenish"]["way"] = index
-
-    def replenish_trail_blaze_power_run_time_change(self, value):
-        self.config["Replenish"]["runTimes"] = value
-
-    def ornament_extraction_status(self):
-        if self.opt2.isChecked():
-            self.config["OrnamentExtraction"]["enable"] = True
-        else:
-            self.config["OrnamentExtraction"]["enable"] = False
-
-    def ornament_extraction_level_select(self, index):
-        self.config["OrnamentExtraction"]["level"] = index
-
-    def ornament_extraction_run_time_change(self, value):
-        self.config["OrnamentExtraction"]["runTimes"] = value
-
-    def calyx_golden_status(self):
-        if self.opt3.isChecked():
-            self.config["CalyxGolden"]["enable"] = True
-        else:
-            self.config["CalyxGolden"]["enable"] = False
-
-    def calyx_golden_level_select(self, index):
-        self.config["CalyxGolden"]["level"] = index
-
-    def calyx_golden_battle_time_change(self, value):
-        self.config["CalyxGolden"]["singleTimes"] = value
-
-    def calyx_golden_run_time_change(self, value):
-        self.config["CalyxGolden"]["runTimes"] = value
-
-    def calyx_crimson_status(self):
-        if self.opt4.isChecked():
-            self.config["CalyxCrimson"]["enable"] = True
-        else:
-            self.config["CalyxCrimson"]["enable"] = False
-
-    def calyx_crimson_level_select(self, index):
-        self.config["CalyxCrimson"]["level"] = index
-
-    def calyx_crimson_battle_time_change(self, value):
-        self.config["CalyxCrimson"]["singleTimes"] = value
-
-    def calyx_crimson_run_time_change(self, value):
-        self.config["CalyxCrimson"]["runTimes"] = value
-
-    def stagnant_shadow_status(self):
-        if self.opt5.isChecked():
-            self.config["StagnantShadow"]["enable"] = True
-        else:
-            self.config["StagnantShadow"]["enable"] = False
-
-    def stagnant_shadow_level_select(self, index):
-        self.config["StagnantShadow"]["level"] = index
-
-    def stagnant_shadow_run_time_change(self, value):
-        self.config["StagnantShadow"]["runTimes"] = value
-
-    def caver_of_corrosion_status(self):
-        if self.opt6.isChecked():
-            self.config["CaverOfCorrosion"]["enable"] = True
-        else:
-            self.config["CaverOfCorrosion"]["enable"] = False
-
-    def caver_of_corrosion_level_select(self, index):
-        self.config["CaverOfCorrosion"]["level"] = index
-
-    def caver_of_corrosion_run_time_change(self, value):
-        self.config["CaverOfCorrosion"]["runTimes"] = value
-
-    def echo_of_war_status(self):
-        if self.opt7.isChecked():
-            self.config["EchoOfWar"]["enable"] = True
-        else:
-            self.config["EchoOfWar"]["enable"] = False
-
-    def echo_of_war_level_select(self, index):
-        self.config["EchoOfWar"]["level"] = index
-
-    def echo_of_war_run_time_change(self, value):
-        self.config["EchoOfWar"]["runTimes"] = value
+        self.receive_rewards.ui.setVisible(True)
 
     def show_trail_blaze_power_setting(self):
         self.display_none()
-        self.trail_blaze_power_container.setVisible(True)
+        self.trailblaze_power.ui.setVisible(True)
 
     def update_log(self, text):
         """Update the content in log area."""
         self.log.append(text)
 
-    def quit_game_setting(self):
-        self.quit_game_setting_container.setVisible(False)
-        exit_checkbox = self.quit_game_setting_container.findChild(
-            QCheckBox, "checkBox2_1_1"
-        )
-        exit_checkbox.stateChanged.connect(self.exit_SRA_status)
-        self.radio_button1 = self.quit_game_setting_container.findChild(
-            QRadioButton, "radioButton2_1_2"
-        )
-        self.radio_button2 = self.quit_game_setting_container.findChild(
-            QRadioButton, "radioButton2_1_3"
-        )
-        self.radio_button1.toggled.connect(self.shutdown_status)
-        self.radio_button2.toggled.connect(self.sleep_status)
-        self.task_set_vbox_layout.addWidget(self.quit_game_setting_container)
-
     def show_quit_game_setting(self):
         self.display_none()
-        self.quit_game_setting_container.setVisible(True)
-
-    def exit_SRA_status(self, state):
-        if state == 2:
-            self.exit_SRA = True
-        else:
-            self.exit_SRA = False
-
-    def shutdown_status(self, checked):
-        self.shutdown = checked
-
-    def sleep_status(self, checked):
-        self.sleep = checked
-
-    def simulated_universe_setting(self):
-        mode_combobox: QComboBox = self.simulated_universe_container.findChild(QComboBox, "game_mode")
-        mode_combobox.setCurrentIndex(self.config["DivergentUniverse"]["mode"])
-        mode_combobox.currentIndexChanged.connect(self.mode_change)
-
-        times_spinbox: QSpinBox = self.simulated_universe_container.findChild(QSpinBox, "times")
-        times_spinbox.setValue(self.config["DivergentUniverse"]["times"])
-        times_spinbox.valueChanged.connect(self.times_change)
-
-        self.task_set_vbox_layout.addWidget(self.simulated_universe_container)
-        self.simulated_universe_container.setVisible(False)
+        self.quit_game.ui.setVisible(True)
 
     def show_simulated_universe_setting(self):
         self.display_none()
-        self.simulated_universe_container.show()
+        self.simulated_universe.ui.show()
 
-    def mode_change(self, index):
-        self.config["DivergentUniverse"]["mode"] = index
-
-    def times_change(self, value):
-        self.config["DivergentUniverse"]["times"] = value
+    def getAll(self):
+        self.get_mission()
+        self.start_game.getter()
+        self.password_text = self.start_game.getPassword()
+        self.receive_rewards.getter()
+        self.trailblaze_power.getter()
+        self.exit_SRA, self.shutdown, self.sleep = self.quit_game.getter()
+        self.simulated_universe.getter()
 
     def execute(self):
         """Save configuration, create work thread and monitor signal."""
+        self.getAll()
         flags = [
             self.config["Mission"]["startGame"],
             self.config["Mission"]["trailBlazePower"],
@@ -885,7 +348,7 @@ class Main(QWidget):
         # if not self.config["Mission"]["quitGame"]:
         #     return
         if self.shutdown:
-            WindowsPower.schedule_shutdown(61)
+            WindowsPower.schedule_shutdown(60)
             self.countdown()
         elif self.sleep:
             WindowsPower.hibernate()
@@ -894,29 +357,8 @@ class Main(QWidget):
 
     def countdown(self):
         """关机倒计时"""
-        self.shutdown_dialog = uiLoader.load("res/ui/shutdown_dialog.ui")
-        self.shutdown_dialog.setWindowTitle("关机")
-        self.shutdown_dialog.setWindowIcon(QIcon(self.AppPath + "/res/SRAicon.ico"))
-        cancel_button = self.shutdown_dialog.findChild(QPushButton, "pushButton")
-        cancel_button.clicked.connect(WindowsPower.shutdown_cancel)
-        cancel_button.clicked.connect(self.shutdown_dialog.close)
-        self.timer = QTimer(self)
-        cancel_button.clicked.connect(self.timer.stop)
-        self.lease_time = self.shutdown_dialog.findChild(QLCDNumber, "lcdNumber")
-        self.timer.timeout.connect(self.update_countdown)
-        self.time_left = 59
-        self.timer.start(1000)
-        self.shutdown_dialog.show()
-
-    def update_countdown(self):
-        """更新倒计时"""
-        self.time_left -= 1
-        if self.time_left < 0:
-            self.timer.stop()
-            self.lease_time.display(00)
-            self.shutdown_dialog.close()  # 显示00表示倒计时结束
-        else:
-            self.lease_time.display(self.time_left)
+        shutdown_dialog = ShutdownDialog(self)
+        shutdown_dialog.show()
 
     def notification(self):
         """Windows notify"""
@@ -995,7 +437,6 @@ class SRA(QMainWindow):
     def __init__(self):
         super().__init__()
 
-
         self.main = Main(self)
         self.setCentralWidget(self.main.ui)
         self.setWindowIcon(QIcon(self.main.AppPath + "/res/SRAicon.ico"))
@@ -1034,9 +475,10 @@ if __name__ == "__main__":
             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) +
             " 程序启动成功，耗时" + f"{total_time:.2f}s")
 
-        version=Configure.load("version.json")
+        version = Configure.load("version.json")
         if not version["Announcement.DoNotShowAgain"]:
-            announcement = AnnouncementDialog(window.main.ui,
+            announcement = AnnouncementDialog(
+                window.main.ui,
                 "公告",
                 f"<html><i>滚动至底部关闭此公告</i>{version['Announcement']}"
                 "<h4>长期公告</h4>"
@@ -1050,11 +492,15 @@ if __name__ == "__main__":
                 "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，<b>相应的后果由您自行承担</b>。</p>"
                 "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B站、微博）的官方动态下讨论任何关于 SRA 的内容。<br>"
                 "人话：不要跳脸官方～(∠・ω&lt; )⌒☆</html>",
-                                              "Announcement")
+                "Announcement",icon='res/Robin.gif')
             announcement.show()
 
         if not version["VersionUpdate.DoNotShowAgain"]:
-            version_update= AnnouncementDialog(window.main.ui, "更新公告", version["VersionUpdate"], "VersionUpdate")
+            version_update = AnnouncementDialog(
+                window.main.ui, "更新公告",
+                version["VersionUpdate"],
+                announcement_type="VersionUpdate",
+                icon='res/Robin2.gif')
             version_update.show()
         sys.exit(app.exec())
 

@@ -401,13 +401,12 @@ class Assistant(QThread):
             tasks.append((self.calyx_golden, (
                 config["CalyxGolden"]["level"],
                 config["CalyxGolden"]["singleTimes"],
-                config["CalyxGolden"]["runTimes"],
-            )))
+                config["CalyxGolden"]["runTimes"])))
         if config["CalyxCrimson"]["enable"]:
             tasks.append((self.calyx_crimson, (
                 config["CalyxCrimson"]["level"],
                 config["CalyxCrimson"]["singleTimes"],
-                config["CalyxCrimson"]["runTimes"],
+                config["CalyxCrimson"]["runTimes"]
             )))
         if config["StagnantShadow"]["enable"]:
             tasks.append((self.stagnant_shadow, (
@@ -417,8 +416,7 @@ class Assistant(QThread):
         if config["CaverOfCorrosion"]["enable"]:
             tasks.append((self.caver_of_corrosion, (
                 config["CaverOfCorrosion"]["level"],
-                config["CaverOfCorrosion"]["runTimes"]
-            )))
+                config["CaverOfCorrosion"]["runTimes"])))
         if config["EchoOfWar"]["enable"]:
             tasks.append((self.echo_of_war, (
                 config["EchoOfWar"]["level"],
@@ -509,8 +507,9 @@ class Assistant(QThread):
             if click("res/img/more.png", wait_time=1) or click("res/img/more_with_something.png", wait_time=1):
                 if click("res/img/redeem_code.png"):
                     time.sleep(2)
+                    SRAOperator.copy(code)
                     click_point(*get_screen_center())
-                    write(code)
+                    SRAOperator.paste()
                     click("res/img/ensure.png")
                     time.sleep(2)
                     press_key("esc")
@@ -857,6 +856,13 @@ class Assistant(QThread):
             if way == 1 or way == 0:
                 if exist("res/img/reserved_trailblaze_power_onclick.png") or click(
                         "res/img/reserved_trailblaze_power.png"):
+                    # click('res/img/count.png', x_add=200)
+                    # if self.replenish_time>300:
+                    #     write("300")
+                    #     self.replenish_time-=299
+                    # else:
+                    #     write(str(self.replenish_time))
+                    #     self.replenish_time=1
                     click("res/img/ensure.png")
                     click("res/img/ensure.png")
                     time.sleep(1)
@@ -970,18 +976,25 @@ class Assistant(QThread):
             # press_key("esc", presses=1)
 
             logger.info("移动")
-            press_key_for_a_while("w", during=3.2)
+            press_key_for_a_while("w", during=3)
             logger.info("进入战斗")
             click_point(*get_screen_center())
             if check("res/img/q.png", max_time=10):
                 press_key("v")
             logger.info("等待战斗结束")
-            check("res/img/blessing_select.png")
+            if not check("res/img/blessing_select.png", max_time=120):
+                logger.error("失败/超时")
+
             logger.info("选择祝福")
-            while exist("res/img/blessing_select.png"):
-                if not click("res/img/collection.png"):
-                    click_point(*get_screen_center())
-                click("res/img/ensure2.png")
+            while True:
+                if check("res/img/blessing_select.png", max_time=4):
+                    if not click("res/img/collection.png"):
+                        click_point(*get_screen_center())
+                    click("res/img/ensure2.png")
+                elif check("res/img/equation_expansion.png",max_time=4):
+                    press_key('esc')
+                else:
+                    break
             logger.info("退出并结算")
             press_key("esc")
             click("res/img/end_and_settle.png")

@@ -131,12 +131,18 @@
                <property name="minimum">
                 <number>1</number>
                </property>
+               <property name="maximum">
+                <number>300</number>
+               </property>
               </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="label2_1_21">
                <property name="text">
-                <string>      次数：</string>
+                <string>  次数：</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
               </widget>
              </item>

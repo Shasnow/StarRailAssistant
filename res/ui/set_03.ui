@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>377</width>
-    <height>668</height>
+    <height>683</height>
    </rect>
   </property>
   <property name="font">
@@ -30,7 +30,7 @@
         <x>0</x>
         <y>0</y>
         <width>357</width>
-        <height>600</height>
+        <height>615</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -208,6 +208,12 @@
           </item>
           <item>
            <widget class="QTextEdit" name="textEdit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="placeholderText">
              <string>兑换码填写处</string>
             </property>

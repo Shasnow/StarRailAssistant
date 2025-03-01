@@ -279,6 +279,10 @@ class Updater:
             print(f"解压更新时出错: {e}")
             os.system("pause")
 
+    @staticmethod
+    def version():
+        print("SRAUpdater 2.5.0 2025-03-01\nCopyright © <2024> <Shasnow>")
+
 
 if __name__ == "__main__":
     updater = Updater()
@@ -287,14 +291,18 @@ if __name__ == "__main__":
     # parser.add_argument("-d","--directory", help="The directory where the file was downloaded")
     parser.add_argument("-p", "--proxy", help="Proxy URL. If nothing, use default proxys.")
     parser.add_argument("-np", "--no-proxy", action="store_true", help="Do not use proxy.")
-    parser.add_argument("-v", "--verify", help="Whether to enable SSL certificate verification. Default: True")
+    parser.add_argument("-nv", "--no-verify", action="store_true", help="Disable SSL certificate verification.")
+    parser.add_argument("-v","--version", action="store_true", help="")
     args = parser.parse_args()
 
+    if args.version:
+        updater.version()
+        exit(0)
     if args.proxy is not None:
         updater.PROXYS = [args.proxy]
     if args.no_proxy:
         updater.NO_PROXY = True
-    if args.verify == "False":
+    if args.no_verify:
         updater.VERIFY = False
     # if args.directory is not None:
     #     main.TEMP_DOWNLOAD_FILE=args.directory
