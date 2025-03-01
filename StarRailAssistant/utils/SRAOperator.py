@@ -25,6 +25,7 @@ import cv2
 import pyautogui
 import pygetwindow
 import pyscreeze
+import pyperclip
 from PIL import Image
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
@@ -157,7 +158,7 @@ class SRAOperator:
             return False
 
     @classmethod
-    def check(cls, img_path, interval=0.5, max_time=40):
+    def check(cls, img_path: str, interval=0.5, max_time=40):
         """Detects whether the object appears on the screen.
 
         Args:
@@ -406,3 +407,23 @@ class SRAOperator:
                 continue
             except pyscreeze.PyScreezeException:
                 continue
+
+    @classmethod
+    def copy(cls, text:str):
+        """
+        Copy the text to clipboard
+
+        Args:
+            text:
+
+        Returns:
+            Any
+        """
+        return pyperclip.copy(text)
+
+    @classmethod
+    def paste(cls):
+        pyautogui.keyDown("ctrl")
+        pyautogui.keyDown("v")
+        pyautogui.keyUp("v")
+        pyautogui.keyUp("ctrl")

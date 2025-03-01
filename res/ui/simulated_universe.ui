@@ -140,10 +140,15 @@
              </widget>
             </item>
             <item row="3" column="1">
-             <widget class="QComboBox" name="comboBox">
+             <widget class="QComboBox" name="policy_comboBox">
               <item>
                <property name="text">
                 <string>图鉴优先</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>无</string>
                </property>
               </item>
              </widget>

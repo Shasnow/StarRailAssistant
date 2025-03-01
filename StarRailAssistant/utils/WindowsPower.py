@@ -64,7 +64,7 @@ def shutdown_cancel():
         subprocess.run(command, check=True)
         logger.info("关机已取消")
     except subprocess.CalledProcessError as e:
-        logger.exception()
+        logger.exception(e)
 
 
 if __name__ == "__main__":
