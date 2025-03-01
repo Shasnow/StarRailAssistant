@@ -33,7 +33,7 @@ import pyscreeze
 from PySide6.QtCore import QThread, Signal
 from PySide6.QtWidgets import QApplication
 
-from StarRailAssistant.utils.Logger import logger, console_handler
+from SRACore.utils.Logger import logger, console_handler
 
 
 def exist(img_path, wait_time=2):

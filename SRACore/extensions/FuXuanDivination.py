@@ -1,7 +1,7 @@
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QWidget, QDialogButtonBox, QLineEdit, QComboBox, QSpinBox, QFrame
 from PySide6.QtUiTools import QUiLoader
-from StarRailAssistant.utils.WindowsProcess import Popen
+from SRACore.utils.WindowsProcess import Popen
 
 class FuXuanDivination(QWidget):
     TYPE=["another","luck","item","love","weather","work","money","family","none"]

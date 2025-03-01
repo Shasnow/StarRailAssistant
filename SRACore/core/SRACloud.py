@@ -36,9 +36,9 @@ from selenium.webdriver.edge.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-from StarRailAssistant.core import SRAssistant
-from StarRailAssistant.utils import Encryption
-from StarRailAssistant.utils.Logger import logger, console_handler
+from SRACore.core import SRAssistant
+from SRACore.utils import Encryption
+from SRACore.utils.Logger import logger, console_handler
 
 
 class CloudGame:
