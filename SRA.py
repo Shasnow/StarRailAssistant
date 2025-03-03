@@ -43,7 +43,7 @@ from PySide6.QtWidgets import (
 from plyer import notification
 
 from SRACore.core import SRAssistant, AutoPlot, SRACloud
-from SRACore.core.SRAssistant import VERSION
+from SRACore.core.SRAssistant import VERSION,CORE
 from SRACore.utils import Configure, WindowsPower, WindowsProcess, Encryption
 from SRACore.utils.Dialog import DownloadDialog, AnnouncementDialog, ShutdownDialog
 from SRACore.utils.SRAWidgets import ReceiveRewards, StartGame, TrailblazePower, QuitGame, SimulatedUniverse
@@ -89,6 +89,8 @@ class Main(QWidget):
         problem_action.triggered.connect(self.problem)
         report_action = self.ui.findChild(QAction, "action_3")
         report_action.triggered.connect(self.report)
+        about_action=self.ui.findChild(QAction,"action_4")
+        about_action.triggered.connect(self.about)
         # end
         # console
         self.start_game_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_1")
@@ -392,6 +394,7 @@ class Main(QWidget):
         QMessageBox.information(
             self,
             "更新公告",
+            "更新公告已移动"
             "\n感谢您对SRA的支持！",
         )
 
@@ -420,6 +423,13 @@ class Main(QWidget):
             "    请给出所使用软件的版本号以及日志文件",
         )
 
+    def about(self):
+        QMessageBox.information(
+            self,
+            "关于",
+            f"版本：{VERSION}\n"
+            f"内核版本：{CORE}"
+        )
     @staticmethod
     def clearLog():
         with open("SRAlog.txt", "w", encoding="utf-8"):

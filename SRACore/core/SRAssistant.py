@@ -35,6 +35,7 @@ from SRACore.utils.SRAOperator import SRAOperator
 from SRACore.utils.WindowsProcess import find_window, is_process_running
 
 VERSION = "0.7.4"
+CORE="0.7.4.8"
 
 
 class Assistant(QThread):
@@ -944,20 +945,24 @@ class Assistant(QThread):
                 logger.error("超时")
                 return False
             logger.info("选择基础效果")
-            if not click("res/img/collection.png"):
-                x,y=get_screen_center()
-                click_point(x-250,y)
-            click("res/img/ensure2.png",wait_time=1)
-            if not check("res/img/equation_select.png",max_time=25):
-                logger.error("超时")
-                return False
-            logger.info("选择方程")
-            while check("res/img/equation_select.png", max_time=3):
-                if not click("res/img/collection.png"):
-                    click_point(*get_screen_center())
-                click("res/img/ensure2.png",wait_time=1)
-                if check("res/img/close.png", max_time=4):
-                    press_key("esc")
+            # if not click("res/img/collection.png"):
+            time.sleep(1)
+            x,y=get_screen_center()
+            click_point(x,y)
+            click("res/img/ensure2.png",wait_time=2)
+            # if not check("res/img/equation_select.png",max_time=25):
+            #     logger.error("超时")
+            #     return False
+            # logger.info("选择方程")
+            # while check("res/img/equation_select.png", max_time=3):
+            #     if not click("res/img/collection.png"):
+            #         click_point(*get_screen_center())
+            #     click("res/img/ensure2.png",wait_time=1)
+            #     if check("res/img/close.png", max_time=4):
+            #         press_key("esc")
+            logger.info("获得方程")
+            if check("res/img/close.png"):
+                press_key("esc")
 
             logger.info("获得奇物")
             if check("res/img/close.png"):
