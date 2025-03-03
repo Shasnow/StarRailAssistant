@@ -361,8 +361,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>329</width>
-             <height>121</height>
+             <width>665</width>
+             <height>131</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_16">
@@ -969,6 +969,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <addaction name="action_1"/>
     <addaction name="action_2"/>
     <addaction name="action_3"/>
+    <addaction name="action_4"/>
    </widget>
    <addaction name="menush_help"/>
   </widget>
@@ -986,6 +987,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <action name="action_3">
    <property name="text">
     <string>问题反馈</string>
+   </property>
+  </action>
+  <action name="action_4">
+   <property name="text">
+    <string>关于</string>
    </property>
   </action>
  </widget>
