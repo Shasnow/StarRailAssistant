@@ -293,6 +293,7 @@ if __name__ == "__main__":
     parser.add_argument("-np", "--no-proxy", action="store_true", help="Do not use proxy.")
     parser.add_argument("-nv", "--no-verify", action="store_true", help="Disable SSL certificate verification.")
     parser.add_argument("-v","--version", action="store_true", help="")
+    parser.add_argument("-f","--force", action="store_true", help="")
     args = parser.parse_args()
 
     if args.version:

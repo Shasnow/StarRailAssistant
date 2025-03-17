@@ -30,12 +30,12 @@ from PySide6.QtCore import QThread, Signal, Slot
 
 from SRACore.extensions.QTHandler import QTHandler
 from SRACore.utils import Configure, WindowsProcess, Encryption
-from SRACore.utils.Logger import logger, console_handler
+from SRACore.utils.Logger import logger
 from SRACore.utils.SRAOperator import SRAOperator
 from SRACore.utils.WindowsProcess import find_window, is_process_running
 
 VERSION = "0.7.4"
-CORE="0.7.4.8"
+CORE="0.7.4.9"
 
 
 class Assistant(QThread):
@@ -945,28 +945,32 @@ class Assistant(QThread):
                 logger.error("超时")
                 return False
             logger.info("选择基础效果")
-            # if not click("res/img/collection.png"):
             time.sleep(1)
-            x,y=get_screen_center()
-            click_point(x,y)
+            if not click("res/img/collection.png"):
+                x,y=get_screen_center()
+                click_point(x-250,y)
             click("res/img/ensure2.png",wait_time=2)
-            # if not check("res/img/equation_select.png",max_time=25):
-            #     logger.error("超时")
-            #     return False
-            # logger.info("选择方程")
-            # while check("res/img/equation_select.png", max_time=3):
-            #     if not click("res/img/collection.png"):
-            #         click_point(*get_screen_center())
-            #     click("res/img/ensure2.png",wait_time=1)
-            #     if check("res/img/close.png", max_time=4):
-            #         press_key("esc")
-            logger.info("获得方程")
-            if check("res/img/close.png"):
+            while check("res/img/close.png",max_time=4):
                 press_key("esc")
 
-            logger.info("获得奇物")
-            if check("res/img/close.png"):
-                press_key("esc")
+            logger.info("选择方程")
+            if not check("res/img/equation_select.png",max_time=25):
+                logger.error("超时")
+                return False
+
+            while check("res/img/equation_select.png", max_time=3):
+                if not click("res/img/collection.png"):
+                    click_point(*get_screen_center())
+                click("res/img/ensure2.png",wait_time=1)
+                if check("res/img/close.png", max_time=4):
+                    press_key("esc")
+            # logger.info("获得方程")
+            # if check("res/img/close.png"):
+            #     press_key("esc")
+            #
+            # logger.info("获得奇物")
+            # if check("res/img/close.png"):
+            #     press_key("esc")
 
             logger.info("选择祝福")
             if check("res/img/blessing_select.png", max_time=4):
@@ -975,10 +979,12 @@ class Assistant(QThread):
             else:
                 logger.error("失败/超时")
                 return False
-            while check("res/img/close.png", max_time=4):
+            while True:
+                result = check_any(["res/img/close.png", "res/img/divergent_universe_quit.png"], max_time=4)
+                if result == 1:
+                    break
                 press_key("esc")
             time.sleep(1)
-            # press_key("esc", presses=1)
 
             logger.info("移动")
             press_key_for_a_while("w", during=3)
@@ -992,11 +998,14 @@ class Assistant(QThread):
 
             logger.info("选择祝福")
             while True:
-                if check("res/img/blessing_select.png", max_time=4):
+                index = check_any(["res/img/blessing_select.png",
+                                   "res/img/equation_expansion.png",
+                                   "res/img/divergent_universe_quit.png"], max_time=6)
+                if index == 0:
                     if not click("res/img/collection.png"):
                         click_point(*get_screen_center())
                     click("res/img/ensure2.png")
-                elif check("res/img/equation_expansion.png",max_time=4):
+                elif index == 1:
                     press_key('esc')
                 else:
                     break
@@ -1031,6 +1040,10 @@ def Popen(path: str):
 
 def check(img_path, interval=0.5, max_time=40):
     return SRAOperator.check(img_path, interval, max_time)
+
+
+def check_any(img_list: list, interval=0.5, max_time=40):
+    return SRAOperator.check_any(img_list, interval, max_time)
 
 
 def click(img_path: str, x_add=0, y_add=0, wait_time=2.0, title="崩坏：星穹铁道") -> bool:
@@ -1076,7 +1089,3 @@ def wait_battle_end() -> bool:
 def scroll(distance: int) -> bool:
     return SRAOperator.scroll(distance)
 
-
-if __name__ == "__main__":
-    logger.addHandler(console_handler)
-    click("res/img/echo_of_war (0).png")

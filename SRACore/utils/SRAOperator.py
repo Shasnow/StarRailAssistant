@@ -27,6 +27,7 @@ import pygetwindow
 import pyscreeze
 import pyperclip
 from PIL import Image
+# from rapidocr_onnxruntime import RapidOCR
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.by import By
@@ -46,6 +47,7 @@ class SRAOperator:
     area_left = 0
     zoom = 1.5
     confidence = 0.9
+    # ocr_engine: RapidOCR = None
 
     @classmethod
     def _screenshot_region_calculate(cls, region: tuple[int, int, int, int]):
@@ -73,7 +75,8 @@ class SRAOperator:
         return region
 
     @classmethod
-    def get_screenshot(cls, title: str = "", region: tuple[int, int, int, int] | None = None) -> Image.Image:
+    def get_screenshot(cls, title: str = "崩坏：星穹铁道",
+                       region: tuple[int, int, int, int] | None = None) -> Image.Image:
         if cls.cloud:
             bytes_png = cls.web_driver.get_screenshot_as_png()
             image_stream = io.BytesIO(bytes_png)
@@ -131,6 +134,26 @@ class SRAOperator:
             raise
 
     @classmethod
+    def _locate_any(cls, img_list: list):
+        screenshot = cls.get_screenshot()
+        for index, img_path in enumerate(img_list):
+            try:
+                img = cv2.imread(img_path)
+                if img is None:
+                    raise FileNotFoundError("无法找到或读取文件 " + img_path)
+                # location = pyautogui.locateOnWindow(img, title, confidence=cls.confidence)
+                location = pyscreeze.locate(img, screenshot, confidence=cls.confidence)
+                return index, location
+            except pyscreeze.ImageNotFoundException:
+                continue
+            except ValueError:
+                continue
+            except FileNotFoundError:
+                continue
+        else:
+            raise MatchFailureException(f"{img_list}匹配失败")
+
+    @classmethod
     def _locate_center(cls, img_path, x_add=0, y_add=0, title="崩坏：星穹铁道") -> tuple[int, int]:
         location = cls._locate(img_path, title)
         x, y = pyscreeze.center(location)
@@ -140,7 +163,7 @@ class SRAOperator:
         return x, y
 
     @classmethod
-    def exist(cls, img_path, wait_time=2):
+    def exist(cls, img_path, wait_time=2) -> bool:
         """Determine if a situation exists.
 
         Args:
@@ -156,6 +179,25 @@ class SRAOperator:
         except Exception as e:
             logger.exception(e, is_fatal=True)
             return False
+
+    @classmethod
+    def exist_any(cls, img_list: list, wait_time: float = 2) -> int | None:
+        """Determine if any situation exists.
+
+        Args:
+            img_list: Img path list of the situation.
+            wait_time: Waiting time before run_flag.
+
+        Returns:
+            True if any one existed, False otherwise.
+        """
+        time.sleep(wait_time)  # 等待游戏加载
+        try:
+            result = cls._locate_any(img_list)[0]
+            return result
+        except Exception as e:
+            logger.exception(e, is_fatal=True)
+            return None
 
     @classmethod
     def check(cls, img_path: str, interval=0.5, max_time=40):
@@ -177,6 +219,29 @@ class SRAOperator:
                 times += 1
                 if times == max_time:
                     return False
+
+    @classmethod
+    def check_any(cls, img_list: list, interval=0.5, max_time=40):
+        """Check the images one after one.
+
+        Args:
+            img_list: A list who stored the img path.
+            interval: Interval between checks.
+            max_time: Maximum number of check times.
+
+        Returns:
+            True if any obj appeared, False if none of them appeared and reach maximum times.
+        """
+        times = 0
+        while True:
+            time.sleep(interval)
+            result = cls.exist_any(img_list, wait_time=1)
+            if result is not None:
+                return result
+            else:
+                times += 1
+                if times == max_time:
+                    return None
 
     @classmethod
     def get_screen_center(cls):
@@ -409,7 +474,7 @@ class SRAOperator:
                 continue
 
     @classmethod
-    def copy(cls, text:str):
+    def copy(cls, text: str):
         """
         Copy the text to clipboard
 
@@ -427,3 +492,12 @@ class SRAOperator:
         pyautogui.keyDown("v")
         pyautogui.keyUp("v")
         pyautogui.keyUp("ctrl")
+
+    @classmethod
+    def ocr_in_region(cls, area_left,area_top,width,height):
+        pass
+        # if cls.ocr_engine is None:
+        #     cls.ocr_engine = RapidOCR()
+        # img = pyscreeze.screenshot(region=(cls.area_left+area_left, cls.area_top+area_top, width, height))
+        # result, elapse = cls.ocr_engine(img, use_det=True, use_cls=False, use_rec=True)
+        # return result

@@ -1,11 +1,11 @@
 {
     "version": "0.7.4",
-    "resource_version": "0.7.4.9",
+    "resource_version": "0.7.4.91",
     "announcement": "1. 修改了裁剪截图区域的计算方法，因此您需要前往SRA设置中将“屏幕缩放”一项的值调整到实际的屏幕缩放，例如您的电脑是150%缩放，则在此项中填入1.50。\n2. 为启动时的公告添加了“不再提醒”按钮，点击后到下一次更新前不会再弹出公告。\n3. 适配本周周期演算(2025.2.17).\n**如果此次更新您的更新器出现以下错误：“检查更新时出错: '<' not supported between instances of 'str' and 'int'” 请关闭SRA后单独运行SRAUpdater",
-    "resource_announcement": "1. 帮助页新增“关于”，可查看当前版本信息。\n2. 适配本周差分宇宙（2025.3.3）\n**如果此次更新您的更新器出现以下错误：“检查更新时出错: '<' not supported between instances of 'str' and 'int'” 请关闭SRA后单独运行SRAUpdater",
+    "resource_announcement": "1. 适配本周差分宇宙（2025.3.17）\n**如果此次更新您的更新器出现以下错误：“检查更新时出错: '<' not supported between instances of 'str' and 'int'” 请关闭SRA后单独运行SRAUpdater",
     "Announcement": "<hr><p>噔噔——新的公告界面～(∠・ω&lt; )⌒☆</p><p>这里是临时公告喵</p><hr>",
     "Announcement.DoNotShowAgain": false,
-    "VersionUpdate": "<html><h2>版本已更新 0.7.4.9</h2><ol><li>帮助页新增“关于”，可查看当前版本信息。</li><li>适配本周差分宇宙（2025.3.3）</li><li>修复了中文路径引起的问题。</li><li>修复了中文输入法导致兑换码填写错误的问题。</li><li>修复了因方程展开导致差分宇宙刷单层功能异常中断的问题。</li><li>增加了一只知更鸟。</li></ol><p>为了避免将来出现所有代理全部失效而无法更新的情况，现传授SRA更新器的高级用法：在SRAUpdater所在目录下，通过命令行运行SRAUpdater并使用-np参数即可不使用代理更新。如果无法直连github则需开启加速器同时设置-v参数为False，即可通过加速器下载更新。<br>完整命令：SRAUpdater -np -v False<br>如果你有自己的可用的代理网站，可以使用-p参数指定它。<br>完整命令：SRAUpdater -p https://代理网站/  </p></html>",
+    "VersionUpdate": "<html><h2>版本已更新 0.7.4.91</h2><ol><li>适配本周差分宇宙（2025.3.17）</li></ol></html>",
     "VersionUpdate.DoNotShowAgain": false,
     "Proxys": [
         "https://github.7boe.top/",

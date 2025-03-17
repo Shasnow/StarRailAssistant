@@ -12,6 +12,5 @@ psutil
 Pillow
 requests
 PyGetWindow
-selenium
 rich
 pyperclip
