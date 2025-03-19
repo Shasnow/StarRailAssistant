@@ -35,7 +35,7 @@ from SRACore.utils.SRAOperator import SRAOperator
 from SRACore.utils.WindowsProcess import find_window, is_process_running
 
 VERSION = "0.7.4"
-CORE="0.7.4.9"
+CORE="0.7.4.93"
 
 
 class Assistant(QThread):
@@ -953,37 +953,30 @@ class Assistant(QThread):
             while check("res/img/close.png",max_time=4):
                 press_key("esc")
 
-            logger.info("选择方程")
+            logger.info("选择方程与祝福")
             if not check("res/img/equation_select.png",max_time=25):
                 logger.error("超时")
                 return False
 
-            while check("res/img/equation_select.png", max_time=3):
-                if not click("res/img/collection.png"):
-                    click_point(*get_screen_center())
-                click("res/img/ensure2.png",wait_time=1)
-                if check("res/img/close.png", max_time=4):
-                    press_key("esc")
-            # logger.info("获得方程")
-            # if check("res/img/close.png"):
-            #     press_key("esc")
-            #
-            # logger.info("获得奇物")
-            # if check("res/img/close.png"):
-            #     press_key("esc")
-
-            logger.info("选择祝福")
-            if check("res/img/blessing_select.png", max_time=4):
-                click_point(*get_screen_center())
-                click("res/img/ensure2.png")
-            else:
-                logger.error("失败/超时")
-                return False
             while True:
-                result = check_any(["res/img/close.png", "res/img/divergent_universe_quit.png"], max_time=4)
-                if result == 1:
+                index=check_any(["res/img/equation_select.png",
+                                 "res/img/blessing_select.png",
+                                 "res/img/close.png",
+                                 "res/img/divergent_universe_quit.png"], max_time=4)
+                if index==3:
                     break
-                press_key("esc")
+                elif index==2:
+                    press_key("esc")
+                elif index==1:
+                    click_point(*get_screen_center())
+                    click("res/img/ensure2.png",wait_time=1)
+                elif index==0:
+                    if not click("res/img/collection.png"):
+                        click_point(*get_screen_center())
+                    click("res/img/ensure2.png", wait_time=1)
+                else:
+                    logger.error("发生错误")
+                    break
             time.sleep(1)
 
             logger.info("移动")

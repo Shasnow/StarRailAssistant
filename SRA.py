@@ -42,7 +42,7 @@ from PySide6.QtWidgets import (
     QTableWidget, QDoubleSpinBox, )  # 从 PySide6 中导入所需的类
 from plyer import notification
 
-from SRACore.core import SRAssistant, AutoPlot, SRACloud
+from SRACore.core import SRAssistant, AutoPlot
 from SRACore.core.SRAssistant import VERSION,CORE
 from SRACore.utils import Configure, WindowsPower, WindowsProcess, Encryption
 from SRACore.utils.Dialog import DownloadDialog, AnnouncementDialog, ShutdownDialog
@@ -334,10 +334,7 @@ class Main(QWidget):
         if not Configure.save(self.config):
             self.log.append("配置失败")
             return
-        if self.cloud:
-            self.son_thread = SRACloud.SRACloud(self.password_text)
-        else:
-            self.son_thread = SRAssistant.Assistant(self.password_text)
+        self.son_thread = SRAssistant.Assistant(self.password_text)
         self.son_thread.update_signal.connect(self.update_log)
         self.son_thread.finished.connect(self.missions_finished)
         self.son_thread.start()
@@ -374,7 +371,7 @@ class Main(QWidget):
                 timeout=5,
             )
         except Exception as e:
-            with open("SRAlog.txt", "a", encoding="utf-8") as log:
+            with open("SRAlog.log", "a", encoding="utf-8") as log:
                 log.write(str(e) + "\n")
 
     def kill(self):
@@ -395,8 +392,7 @@ class Main(QWidget):
             self,
             "更新公告",
             "更新公告已移动"
-            "\n感谢您对SRA的支持！",
-        )
+            "\n感谢您对SRA的支持！")
 
     def problem(self):
         QMessageBox.information(
@@ -432,7 +428,7 @@ class Main(QWidget):
         )
     @staticmethod
     def clearLog():
-        with open("SRAlog.txt", "w", encoding="utf-8"):
+        with open("SRAlog.log", "w", encoding="utf-8"):
             pass
 
 

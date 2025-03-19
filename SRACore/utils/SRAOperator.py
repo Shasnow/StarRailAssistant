@@ -18,29 +18,22 @@
 作者：雪影
 SRA操作
 """
-import io
 import time
 
 import cv2
 import pyautogui
 import pygetwindow
-import pyscreeze
 import pyperclip
+import pyscreeze
 from PIL import Image
-# from rapidocr_onnxruntime import RapidOCR
-from selenium.webdriver import ActionChains
-from selenium.webdriver.common.actions.action_builder import ActionBuilder
-from selenium.webdriver.common.by import By
-from selenium.webdriver.edge.webdriver import WebDriver
 
 from SRACore.utils.Exceptions import WindowNoFoundException, MultipleWindowsException, MatchFailureException, \
     WindowInactiveException
 from SRACore.utils.Logger import logger
+# from rapidocr_onnxruntime import RapidOCR
 
 
 class SRAOperator:
-    cloud: bool = False
-    web_driver: WebDriver = None
     location_proportion = 1.0
     screenshot_proportion = 1.0
     area_top = 0
@@ -77,18 +70,12 @@ class SRAOperator:
     @classmethod
     def get_screenshot(cls, title: str = "崩坏：星穹铁道",
                        region: tuple[int, int, int, int] | None = None) -> Image.Image:
-        if cls.cloud:
-            bytes_png = cls.web_driver.get_screenshot_as_png()
-            image_stream = io.BytesIO(bytes_png)
-            pillow_img = Image.open(image_stream)
-            return cls._image_resize(pillow_img)
-        else:
-            if region is None:
-                region = cls.get_screenshot_region(title)
-            pillow_img = pyscreeze.screenshot(region=region)
-            # pillow_img.show()
-            return cls._image_resize(pillow_img)
-            # return pillow_img
+        if region is None:
+            region = cls.get_screenshot_region(title)
+        pillow_img = pyscreeze.screenshot(region=region)
+        # pillow_img.show()
+        return cls._image_resize(pillow_img)
+        # return pillow_img
 
     @classmethod
     def _image_resize(cls, pillow_image: Image.Image) -> Image.Image:
@@ -104,15 +91,9 @@ class SRAOperator:
 
     @classmethod
     def _location_calculator(cls, x, y):
-        if cls.cloud:
-            html = cls.web_driver.find_element(By.TAG_NAME, "html")
-            width = html.size["width"]
-            cls.location_proportion = width / 1920
-            return x * cls.location_proportion, y * cls.location_proportion
-        else:
-            cls.location_proportion = 1 / cls.screenshot_proportion
-            return x * cls.location_proportion + cls.area_left, y * cls.location_proportion + cls.area_top
-            # return x, y
+        cls.location_proportion = 1 / cls.screenshot_proportion
+        return x * cls.location_proportion + cls.area_left, y * cls.location_proportion + cls.area_top
+        # return x, y
 
     @classmethod
     def _locate(cls, img_path: str, title="崩坏：星穹铁道"):
@@ -120,11 +101,8 @@ class SRAOperator:
             img = cv2.imread(img_path)
             if img is None:
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
-            if cls.cloud:
-                location = pyscreeze.locate(img, cls.get_screenshot(), confidence=cls.confidence)
-            else:
-                # location = pyautogui.locateOnWindow(img, title, confidence=cls.confidence)
-                location = pyscreeze.locate(img, cls.get_screenshot(title), confidence=cls.confidence)
+            # location = pyautogui.locateOnWindow(img, title, confidence=cls.confidence)
+            location = pyscreeze.locate(img, cls.get_screenshot(title), confidence=cls.confidence)
             return location
         except pyscreeze.ImageNotFoundException as e:
             raise MatchFailureException(f"{img_path}匹配失败 {e}")
@@ -250,20 +228,14 @@ class SRAOperator:
         Returns:
             tuple(x, y)
         """
-        if cls.cloud:
-            window_size = cls.web_driver.get_window_size()
-            screen_width, screen_height = window_size.values()
-            x, y = cls.area_left + screen_width // 2, cls.area_top + screen_height // 2
-            return x, y
-        else:
-            active_window = pygetwindow.getActiveWindow()
-            x, y, screen_width, screen_height = (
-                active_window.left,
-                active_window.top,
-                active_window.width,
-                active_window.height,
-            )
-            return x + screen_width // 2, y + screen_height // 2
+        active_window = pygetwindow.getActiveWindow()
+        x, y, screen_width, screen_height = (
+            active_window.left,
+            active_window.top,
+            active_window.width,
+            active_window.height,
+        )
+        return x + screen_width // 2, y + screen_height // 2
 
     @classmethod
     def click_img(
@@ -288,13 +260,7 @@ class SRAOperator:
             time.sleep(wait_time)
             logger.debug("点击对象" + img_path)
             x, y = cls._locate_center(img_path, x_add, y_add, title)
-            if cls.cloud:
-                action = ActionBuilder(cls.web_driver)
-                action.pointer_action.move_to_location(x, y).click()
-                action.perform()
-                time.sleep(1)
-            else:
-                pyautogui.click(x, y)
+            pyautogui.click(x, y)
             return True
         except Exception:
             logger.exception("点击对象时出错", is_fatal=True)
@@ -303,14 +269,7 @@ class SRAOperator:
     @classmethod
     def click_point(cls, x: int | None, y: int | None) -> bool:
         try:
-            if cls.cloud:
-                x, y = cls._location_calculator(x, y)
-                action = ActionBuilder(cls.web_driver)
-                action.pointer_action.move_to_location(x, y).click()
-                action.perform()
-                time.sleep(1)
-            else:
-                pyautogui.click(x, y)
+            pyautogui.click(x, y)
             return True
         except Exception:
             logger.exception("点击坐标时出错", is_fatal=True)
@@ -329,14 +288,7 @@ class SRAOperator:
         """
         try:
             logger.debug("按下按键" + key)
-            if cls.cloud:
-                key = cls._key_in_utf8(key)
-                for i in range(presses):
-                    ActionChains(cls.web_driver).send_keys(key).perform()
-                    time.sleep(interval)
-                time.sleep(1)
-            else:
-                pyautogui.press(key, presses=presses, interval=interval)
+            pyautogui.press(key, presses=presses, interval=interval)
             return True
         except Exception:
             logger.exception("按下按键失败", is_fatal=True)
@@ -346,15 +298,9 @@ class SRAOperator:
     def press_key_for_a_while(cls, key: str, during: float = 0) -> bool:
         try:
             logger.debug("按下按键" + key)
-            if cls.cloud:
-                key = cls._key_in_utf8(key)
-                ActionChains(cls.web_driver).key_down(key).perform()
-                time.sleep(during)
-                ActionChains(cls.web_driver).key_up(key).perform()
-            else:
-                pyautogui.keyDown(key)
-                time.sleep(during)
-                pyautogui.keyUp(key)
+            pyautogui.keyDown(key)
+            time.sleep(during)
+            pyautogui.keyUp(key)
             return True
         except Exception:
             logger.exception("按下按键失败", is_fatal=True)
@@ -387,10 +333,7 @@ class SRAOperator:
     @classmethod
     def write(cls, content: str = "") -> bool:
         try:
-            if cls.cloud:
-                ActionChains(cls.web_driver).send_keys(content).perform()
-            else:
-                pyautogui.write(content)
+            pyautogui.write(content)
             return True
         except Exception:
             logger.exception("输入时发生错误", is_fatal=True)
@@ -399,11 +342,7 @@ class SRAOperator:
     @classmethod
     def moveRel(cls, x_offset: int, y_offset: int) -> bool:
         try:
-            if cls.cloud:
-                x_offset, y_offset = cls._location_calculator(x_offset, y_offset)
-                ActionChains(cls.web_driver).move_by_offset(x_offset, y_offset).perform()
-            else:
-                pyautogui.moveRel(x_offset, y_offset)
+            pyautogui.moveRel(x_offset, y_offset)
             return True
         except Exception:
             logger.exception("移动光标时出错", is_fatal=True)
@@ -417,12 +356,7 @@ class SRAOperator:
             True if found.
         """
         x, y = cls.get_screen_center()
-        if cls.cloud:
-            action = ActionBuilder(cls.web_driver)
-            action.pointer_action.move_to_location(x, y)
-            action.perform()
-        else:
-            pyautogui.moveTo(x - 200, y)
+        pyautogui.moveTo(x - 200, y)
         times = 0
         while True:
             times += 1
@@ -436,15 +370,7 @@ class SRAOperator:
     @classmethod
     def scroll(cls, distance: int) -> bool:
         try:
-            if cls.cloud:
-                ActionChains(cls.web_driver).click_and_hold().perform()
-                ActionChains(cls.web_driver).move_by_offset(0, -20).perform()
-                ActionChains(cls.web_driver).release().perform()
-                time.sleep(0.2)
-                ActionChains(cls.web_driver).move_by_offset(0, 20).perform()
-                time.sleep(0.2)
-            else:
-                pyautogui.scroll(distance)
+            pyautogui.scroll(distance)
             return True
         except Exception:
             logger.exception("指针滚动时发生错误", is_fatal=True)
@@ -462,10 +388,7 @@ class SRAOperator:
         while True:
             time.sleep(0.2)
             try:
-                if cls.cloud:
-                    pyautogui.locate(quit_battle, cls.get_screenshot(), confidence=cls.confidence)
-                else:
-                    pyautogui.locate(quit_battle, cls.get_screenshot("崩坏：星穹铁道"), confidence=cls.confidence)
+                pyautogui.locate(quit_battle, cls.get_screenshot("崩坏：星穹铁道"), confidence=cls.confidence)
                 logger.info("战斗结束")
                 return True
             except pyautogui.ImageNotFoundException:

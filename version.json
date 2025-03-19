@@ -1,9 +1,9 @@
 {
     "version": "0.7.4",
-    "resource_version": "0.7.4.91",
+    "resource_version": "0.7.4.92",
     "announcement": "1. 修改了裁剪截图区域的计算方法，因此您需要前往SRA设置中将“屏幕缩放”一项的值调整到实际的屏幕缩放，例如您的电脑是150%缩放，则在此项中填入1.50。\n2. 为启动时的公告添加了“不再提醒”按钮，点击后到下一次更新前不会再弹出公告。\n3. 适配本周周期演算(2025.2.17).\n**如果此次更新您的更新器出现以下错误：“检查更新时出错: '<' not supported between instances of 'str' and 'int'” 请关闭SRA后单独运行SRAUpdater",
     "resource_announcement": "1. 适配本周差分宇宙（2025.3.17）\n**如果此次更新您的更新器出现以下错误：“检查更新时出错: '<' not supported between instances of 'str' and 'int'” 请关闭SRA后单独运行SRAUpdater",
-    "Announcement": "<hr><p>噔噔——新的公告界面～(∠・ω&lt; )⌒☆</p><p>这里是临时公告喵</p><hr>",
+    "Announcement": "<hr><p>噔噔——新的公告界面～(∠・ω&lt; )⌒☆</p><p>SRA开发文档计划中~</p><hr>",
     "Announcement.DoNotShowAgain": false,
     "VersionUpdate": "<html><h2>版本已更新 0.7.4.91</h2><ol><li>适配本周差分宇宙（2025.3.17）</li></ol></html>",
     "VersionUpdate.DoNotShowAgain": false,
