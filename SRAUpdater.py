@@ -23,6 +23,7 @@ SRA更新器
 """
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -77,8 +78,11 @@ class Updater:
     VERSION_INFO_URL = (
         "https://gitee.com/yukikage/StarRailAssistant/releases/download/release/version.json"
     )
+    VERSION_FILE = APP_PATH / "version.json"
+    HASH_URL = "https://gitee.com/yukikage/sraresource/raw/main/SRA/hash.json"
+    HASH_FILE = APP_PATH / "data/hash.json"
     PROXYS = []
-    NO_PROXY=False
+    NO_PROXY = False
     VERIFY = True
     # 临时下载文件的路径
     TEMP_DOWNLOAD_DIR = APP_PATH
@@ -95,13 +99,76 @@ class Updater:
             os.remove(self.TEMP_DOWNLOAD_FILE)
 
     def init_version_file(self):
-        if not os.path.exists(self.APP_PATH / "version.json"):
+        if not os.path.exists(self.VERSION_FILE):
             print("初始化版本信息...")
             version_info = {"version": "0.0.0", "resource_version": "0.0.0", "Announcement": ""}
-            with open(
-                    self.APP_PATH / "version.json", "w", encoding="utf-8"
-            ) as json_file:
+            with open(self.VERSION_FILE, "w", encoding="utf-8") as json_file:
                 json.dump(version_info, json_file, indent=4)
+
+    def init_hash_file(self):
+        if not os.path.exists(self.HASH_FILE):
+            print("计算hash...")
+            include = ['res', 'dist\\SRA']
+            hashes = {}
+            for path in include:
+                for root, _, files in os.walk(path):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        file_hash = self.hash_calculate(file_path)
+                        hashes[file_path] = file_hash
+
+            with open(self.HASH_FILE, 'w') as f:
+                json.dump(hashes, f, indent=4)
+
+    @staticmethod
+    def hash_calculate(file_path, hash_algo=hashlib.sha256):
+        """计算文件的哈希值"""
+        with open(file_path, 'rb') as f:
+            data = f.read()
+            return hash_algo(data).hexdigest()
+
+    def hash_check(self):
+        try:
+            response = requests.get(f"{self.HASH_URL}", timeout=10)
+            saved_hashes = response.json()
+        except RequestException as e:
+            print(e)
+            raise Exception(f"服务器连接失败")
+
+        # 检查当前文件的哈希值
+        inconsistent_files = []
+        for file_path, saved_hash in saved_hashes.items():
+            if os.path.exists(file_path):  # 检查文件是否存在
+                current_hash = self.hash_calculate(file_path)
+                if current_hash != saved_hash:
+                    inconsistent_files.append(file_path)
+            else:
+                inconsistent_files.append(file_path)
+        return inconsistent_files
+
+    def integrity_check(self):
+        print("正在进行资源完整性检查...")
+        directory=['res/ui','res/img','tools','_internal']
+        for i in directory:
+            if not os.path.exists(i):
+                os.makedirs(i,exist_ok=True)
+        result = self.hash_check()
+        if len(result) != 0:
+            print(f"{len(result)}个文件丢失或不是最新的")
+            # self.download_all(result)
+        else:
+            print("所有文件均为最新")
+
+    def download_all(self, filelist: list):
+        print('下载所有文件...')
+        for file in filelist:
+            if os.path.exists(file):
+                os.remove(file)
+            self._download(f'https://github.com/yukikage/sraresource/raw/main/SRA/{file}', Path(file))
+
+    @staticmethod
+    def simple_download(url,path):
+        pass
 
     @lru_cache(maxsize=1)
     def get_current_version(self) -> VersionInfo:
@@ -147,8 +214,8 @@ class Updater:
         remote_resource_version = version_info["resource_version"]
         new_announcement = version_info["Announcement"]
         # 获取代理
-        if not self.NO_PROXY and len(self.PROXYS)==0:
-            self.PROXYS=version_info["Proxys"]
+        if not self.NO_PROXY and len(self.PROXYS) == 0:
+            self.PROXYS = version_info["Proxys"]
         # 比较当前版本和远程版本
         print(f"当前版本：{v.version}")
         print(f"当前资源版本：{v.resource_version}")
@@ -213,7 +280,7 @@ class Updater:
             with download_progress_bar as progress:
                 task = progress.add_task(
                     "[bold blue]下载中...",
-                    filename=filepath.name.strip(".downloaded"),
+                    filename=filepath.name,
                     start=True,
                     total=total_size,
                     completed=start_byte
@@ -228,9 +295,6 @@ class Updater:
                         progress.refresh()
 
                 progress.remove_task(task)
-                # 去掉 .downloaded的后缀
-                self.DOWNLOADING_FILE.rename(self.TEMP_DOWNLOAD_FILE)
-                print("下载完成！")
             return True
         except RequestException as e:
             print(e)
@@ -244,6 +308,8 @@ class Updater:
             print("下载更新文件")
             for proxy in self.PROXYS:
                 if self._download(download_url, self.DOWNLOADING_FILE, proxy):
+                    self.DOWNLOADING_FILE.rename(self.TEMP_DOWNLOAD_FILE)
+                    print("下载完成！")
                     break
                 else:
                     continue
@@ -292,12 +358,16 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--proxy", help="Proxy URL. If nothing, use default proxys.")
     parser.add_argument("-np", "--no-proxy", action="store_true", help="Do not use proxy.")
     parser.add_argument("-nv", "--no-verify", action="store_true", help="Disable SSL certificate verification.")
-    parser.add_argument("-v","--version", action="store_true", help="")
-    parser.add_argument("-f","--force", action="store_true", help="")
+    parser.add_argument("-v", "--version", action="store_true", help="")
+    parser.add_argument("-f", "--force", action="store_true", help="")
+    parser.add_argument("-i", "--integrity-check", action="store_true", help="")
     args = parser.parse_args()
 
     if args.version:
         updater.version()
+        exit(0)
+    if args.integrity_check:
+        updater.integrity_check()
         exit(0)
     if args.proxy is not None:
         updater.PROXYS = [args.proxy]
