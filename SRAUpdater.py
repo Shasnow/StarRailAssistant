@@ -55,7 +55,7 @@ download_progress_bar = Progress(
     TransferSpeedColumn(),
     "•",
     TimeRemainingColumn(),
-    transient=True,
+    transient=False,
 )
 
 
@@ -105,21 +105,6 @@ class Updater:
             with open(self.VERSION_FILE, "w", encoding="utf-8") as json_file:
                 json.dump(version_info, json_file, indent=4)
 
-    def init_hash_file(self):
-        if not os.path.exists(self.HASH_FILE):
-            print("计算hash...")
-            include = ['res', 'dist\\SRA']
-            hashes = {}
-            for path in include:
-                for root, _, files in os.walk(path):
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        file_hash = self.hash_calculate(file_path)
-                        hashes[file_path] = file_hash
-
-            with open(self.HASH_FILE, 'w') as f:
-                json.dump(hashes, f, indent=4)
-
     @staticmethod
     def hash_calculate(file_path, hash_algo=hashlib.sha256):
         """计算文件的哈希值"""
@@ -148,27 +133,52 @@ class Updater:
 
     def integrity_check(self):
         print("正在进行资源完整性检查...")
-        directory=['res/ui','res/img','tools','_internal']
-        for i in directory:
-            if not os.path.exists(i):
-                os.makedirs(i,exist_ok=True)
         result = self.hash_check()
         if len(result) != 0:
             print(f"{len(result)}个文件丢失或不是最新的")
-            # self.download_all(result)
+            self.download_all(result)
         else:
             print("所有文件均为最新")
 
     def download_all(self, filelist: list):
-        print('下载所有文件...')
+        print('下载所需文件...')
         for file in filelist:
             if os.path.exists(file):
                 os.remove(file)
-            self._download(f'https://github.com/yukikage/sraresource/raw/main/SRA/{file}', Path(file))
+            self.simple_download(f'https://pub-f5eb43d341f347bb9ab8712e19a5eb51.r2.dev/SRA.dist/{file}', file)
 
     @staticmethod
     def simple_download(url,path):
-        pass
+        try:
+            try:
+                response = requests.get(url, stream=True)
+                file_size = response.headers.get("Content-Length")
+            except RequestException:
+                print(f"请求超时")
+                return
+            if file_size is None:
+                file_size = 1
+            else:
+                file_size = int(file_size)
+            with download_progress_bar as progress:
+                task = progress.add_task(
+                    "[bold blue]下载中...",
+                    filename=path,
+                    start=True,
+                    total=file_size,
+                    completed=0
+                )
+                with open(path, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                        progress.update(task,advance=len(chunk))
+                        progress.refresh()
+
+                    progress.remove_task(task)
+            print(f"{path}下载完成")
+        except Exception as e:
+            print(f"下载更新时出错: {e}")
+            os.system("pause")
 
     @lru_cache(maxsize=1)
     def get_current_version(self) -> VersionInfo:
@@ -228,7 +238,8 @@ class Updater:
         if remote_resource_version > v.resource_version:
             print(f"发现资源更新：{remote_resource_version}")
             print(f"更新说明：\n{version_info['resource_announcement']}")
-            return self.RESOURCE_URL
+            self.hash_check()
+            return ""
         if new_announcement != v.announcement:
             self.announcement_change(new_announcement)
         print("已经是最新版本")
@@ -347,7 +358,7 @@ class Updater:
 
     @staticmethod
     def version():
-        print("SRAUpdater 2.5.0 2025-03-01\nCopyright © <2024> <Shasnow>")
+        print("SRAUpdater 2.6.0 2025-03-01\nCopyright © <2024> <Shasnow>")
 
 
 if __name__ == "__main__":
