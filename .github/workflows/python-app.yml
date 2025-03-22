@@ -68,7 +68,7 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Built with pyinstaller
         run: |
-          pyinstaller --version-file res/info.txt -i="res/SRAicon.ico" --window -F SRA.py --hidden-import plyer.platforms.win.notification
+          pyinstaller --version-file res/info.txt -i="res/SRAicon.ico" --window -D SRA.py --hidden-import plyer.platforms.win.notification
       - name: Read version
         id: read_version
         run: |
