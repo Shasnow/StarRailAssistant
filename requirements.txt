@@ -9,7 +9,7 @@ pywin32-ctypes
 cryptography
 FuXLogger
 psutil
-Pillow
+Pillow==10.1.0
 requests
 PyGetWindow
 rich
