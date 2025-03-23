@@ -216,6 +216,9 @@ class Main(QWidget):
         zoom_spinbox.setValue(self.config["Settings"]["zoom"])
         zoom_spinbox.valueChanged.connect(self.zoom_changed)
 
+        integrity_check_button:QPushButton=self.ui.findChild(QPushButton,"integrityCheck")
+        integrity_check_button.clicked.connect(self.integrity_check)
+
     def key_setting_save(self):
         Configure.save(self.config)
 
@@ -266,6 +269,11 @@ class Main(QWidget):
     def zoom_changed(self, value):
         self.config["Settings"]["zoom"] = value
         Configure.save(self.config)
+
+    @staticmethod
+    def integrity_check():
+        command="SRAUpdater -i"
+        WindowsProcess.Popen(command)
 
     def show_start_game_setting(self):
         """Set start game setting visible"""
