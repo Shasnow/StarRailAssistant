@@ -61,7 +61,7 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      - name: Built with pyinstaller
+      - name: Built with package.py
         run: |
           python package.py
       - name: Read version
@@ -100,7 +100,7 @@ jobs:
       - name: Check if release exists
         id: check_if_release_exists
         run: |
-          release_id=$(gh release view $(head -n 1 version_info.txt) --json id --jq .id || true)
+          release_id=$(gh release view $(sed 's/\r$//g' <(head -n 1 version_info.txt)) --json id --jq .id || true)
           if [[ -z $release_id ]]; then
             echo "release_exists=false" >> $GITHUB_OUTPUT
           else
@@ -114,9 +114,9 @@ jobs:
         run: |
           set -xe
           shopt -s nullglob
-          NAME="$(head -n 1 version_info.txt)"
-          TAGNAME="$(head -n 1 version_info.txt)"
-          NOTES_MAIN="$(tail -n +2 version_info.txt)"
+          NAME="$(sed 's/\r$//g' <(head -n 1 version_info.txt))"
+          TAGNAME="$(sed 's/\r$//g' <(head -n 1 version_info.txt))"
+          NOTES_MAIN="$(sed 's/\r$//g' <(tail -n +3 version_info.txt))"
           NOTES_TAIL="\`\`\`本release通过GitHub Actions自动构建\`\`\`"
           NOTES="$NOTES_MAIN<br><br>$NOTES_TAIL"
           gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" --prerelease artifacts/*
@@ -127,9 +127,9 @@ jobs:
         run: |
           set -xe
           shopt -s nullglob
-          NAME="$(head -n 1 version_info.txt)"
-          TAGNAME="$(head -n 1 version_info.txt)"
-          NOTES_MAIN="$(tail -n +2 version_info.txt)"
+          NAME="$(sed 's/\r$//g' <(head -n 1 version_info.txt))"
+          TAGNAME="$(sed 's/\r$//g' <(head -n 1 version_info.txt))"
+          NOTES_MAIN="$(sed 's/\r$//g' <(tail -n +3 version_info.txt))"
           NOTES_TAIL="\`\`\`本release通过GitHub Actions自动构建\`\`\`"
           NOTES="$NOTES_MAIN<br><br>$NOTES_TAIL"
           gh release delete "$TAGNAME" --yes
