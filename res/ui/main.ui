@@ -361,8 +361,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>665</width>
-             <height>131</height>
+             <width>329</width>
+             <height>121</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_16">
@@ -921,10 +921,10 @@ li.checked::marker { content: &quot;\2612&quot;; }
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>点击此按钮将清空SRAlog.txt中的内容</string>
+                  <string>点击此按钮将立即进行文件完整性检查</string>
                  </property>
                  <property name="whatsThis">
-                  <string>点击此按钮将清空SRAlog.txt中的内容</string>
+                  <string>点击此按钮将立即进行文件完整性检查</string>
                  </property>
                  <property name="text">
                   <string>文件完整性检查</string>
