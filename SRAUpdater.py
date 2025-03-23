@@ -143,9 +143,12 @@ class Updater:
     def download_all(self, filelist: list):
         print('下载所需文件...')
         for file in filelist:
-            if os.path.exists(file):
-                os.remove(file)
-            self.simple_download(f'https://pub-f5eb43d341f347bb9ab8712e19a5eb51.r2.dev/SRA.dist/{file}', file)
+            try:
+                if os.path.exists(file):
+                    os.remove(file)
+                self.simple_download(f'https://pub-f5eb43d341f347bb9ab8712e19a5eb51.r2.dev/SRA/{file}', file)
+            except Exception as e:
+                print("下载失败",e)
 
     @staticmethod
     def simple_download(url,path):

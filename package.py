@@ -71,14 +71,10 @@ if __name__ == "__main__":
     print("Start to copy rescourses ...")
 
     shutil.copytree(root_path / "res", root_path / "SRA.dist/res")
-    shutil.copytree(root_path / "SRACore", root_path / "SRA.dist/SRACore")
     shutil.copytree(root_path / "tools", root_path / "SRA.dist/tools")
     shutil.copy(root_path / "HELP.md", root_path / "SRA.dist/HELP.md")
     shutil.copy(root_path / "LICENSE", root_path / "SRA.dist/LICENSE")
     shutil.copy(root_path / "README.md", root_path / "SRA.dist/README.md")
-    shutil.copy(root_path / "requirements.txt", root_path / "SRA.dist/requirements.txt")
-    shutil.copy(root_path / "SRA.py", root_path / "SRA.dist/SRA.py")
-    shutil.copy(root_path / "SRAUpdater.py", root_path / "SRA.dist/SRAUpdater.py")
     shutil.copy(root_path / "version.json", root_path / "SRA.dist/version.json")
 
     print("Start to compress ...")
