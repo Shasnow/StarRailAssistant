@@ -24,11 +24,6 @@ on:
     paths-ignore:
       - '**.md'
       - 'LICENSE'
-  pull_request:
-    branches: [ "main" ]
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
 
 permissions:
   contents: read
@@ -68,20 +63,22 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Built with pyinstaller
         run: |
-          pyinstaller --version-file res/info.txt -i="res/SRAicon.ico" --window -D SRA.py --hidden-import plyer.platforms.win.notification
+          python package.py
       - name: Read version
         id: read_version
         run: |
-          $VERSION=(Get-Content -Path "data/版本信息.txt" -TotalCount 1).Trim()
+          $VERSION=(Get-Content -Path "version_info.txt" -TotalCount 1).Trim()
           "version=$VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
-      - name: Create Zip
-        run: |
-          Compress-Archive -Path res,data,tools,dist/SRA/SRA.exe,dist/SRA/_internal,README.md,HELP.md,LICENSE,version.json -DestinationPath StarRailAssistant_${{ env.version }}.zip
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: StarRailAssistant_${{ env.version }}
           path: StarRailAssistant_${{ env.version }}.zip
+      - name: Upload Version_Info Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: version_info
+          path: version_info.txt
   publish_release:
     name: Publish release
     needs: build_StarRailAssistant
@@ -95,10 +92,15 @@ jobs:
           pattern: StarRailAssistant_*
           merge-multiple: true
           path: artifacts
+      - name: Download Version_Info
+        uses: actions/download-artifact@v4
+        with:
+          name: version_info
+          path: ./
       - name: Check if release exists
         id: check_if_release_exists
         run: |
-          release_id=$(gh release view $(head -n 1 data/版本信息.txt) --json id --jq .id || true)
+          release_id=$(gh release view $(head -n 1 version_info.txt) --json id --jq .id || true)
           if [[ -z $release_id ]]; then
             echo "release_exists=false" >> $GITHUB_OUTPUT
           else
@@ -112,9 +114,9 @@ jobs:
         run: |
           set -xe
           shopt -s nullglob
-          NAME="$(head -n 1 data/版本信息.txt)"
-          TAGNAME="$(head -n 1 data/版本信息.txt)"
-          NOTES_MAIN="$(tail -n +2 data/版本信息.txt)"
+          NAME="$(head -n 1 version_info.txt)"
+          TAGNAME="$(head -n 1 version_info.txt)"
+          NOTES_MAIN="$(tail -n +2 version_info.txt)"
           NOTES_TAIL="\`\`\`本release通过GitHub Actions自动构建\`\`\`"
           NOTES="$NOTES_MAIN<br><br>$NOTES_TAIL"
           gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" --prerelease artifacts/*
@@ -125,9 +127,9 @@ jobs:
         run: |
           set -xe
           shopt -s nullglob
-          NAME="$(head -n 1 data/版本信息.txt)"
-          TAGNAME="$(head -n 1 data/版本信息.txt)"
-          NOTES_MAIN="$(tail -n +2 data/版本信息.txt)"
+          NAME="$(head -n 1 version_info.txt)"
+          TAGNAME="$(head -n 1 version_info.txt)"
+          NOTES_MAIN="$(tail -n +2 version_info.txt)"
           NOTES_TAIL="\`\`\`本release通过GitHub Actions自动构建\`\`\`"
           NOTES="$NOTES_MAIN<br><br>$NOTES_TAIL"
           gh release delete "$TAGNAME" --yes
