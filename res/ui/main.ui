@@ -471,7 +471,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <x>0</x>
              <y>0</y>
              <width>653</width>
-             <height>561</height>
+             <height>613</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -660,69 +660,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
               <property name="title">
                <string>SRA设置</string>
               </property>
-              <layout class="QGridLayout" name="gridLayout_5">
-               <item row="0" column="3">
-                <widget class="QFrame" name="frame_routine_5">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Shape::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Shadow::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_26">
-                  <item>
-                   <widget class="QCheckBox" name="checkBox_threadSafety">
-                    <property name="toolTip">
-                     <string>关闭此选项后，控制台的停止功能将不再等待任务结束。</string>
-                    </property>
-                    <property name="whatsThis">
-                     <string>关闭此选项后，控制台的停止功能将不再等待任务结束。</string>
-                    </property>
-                    <property name="text">
-                     <string>线程安全</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QFrame" name="frame_routine_3">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Shape::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Shadow::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_24">
-                  <item>
-                   <widget class="QCheckBox" name="checkBox_ifStartUp">
-                    <property name="enabled">
-                     <bool>true</bool>
-                    </property>
-                    <property name="text">
-                     <string>开机自启动</string>
-                    </property>
-                    <property name="checkable">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
+              <layout class="QGridLayout" name="gridLayout_2">
                <item row="0" column="1">
                 <widget class="QFrame" name="frame_routine_4">
                  <property name="sizePolicy">
@@ -813,7 +751,69 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  </layout>
                 </widget>
                </item>
-               <item row="0" column="4">
+               <item row="0" column="0">
+                <widget class="QFrame" name="frame_routine_3">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_24">
+                  <item>
+                   <widget class="QCheckBox" name="checkBox_ifStartUp">
+                    <property name="enabled">
+                     <bool>true</bool>
+                    </property>
+                    <property name="text">
+                     <string>开机自启动</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QFrame" name="frame_routine_5">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_26">
+                  <item>
+                   <widget class="QCheckBox" name="checkBox_threadSafety">
+                    <property name="toolTip">
+                     <string>关闭此选项后，控制台的停止功能将不再等待任务结束。</string>
+                    </property>
+                    <property name="whatsThis">
+                     <string>关闭此选项后，控制台的停止功能将不再等待任务结束。</string>
+                    </property>
+                    <property name="text">
+                     <string>线程安全</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item row="0" column="3">
                 <widget class="QPushButton" name="clearLog">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -838,7 +838,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  </property>
                 </widget>
                </item>
-               <item row="1" column="3" colspan="2">
+               <item row="1" column="2" colspan="2">
                 <widget class="QFrame" name="frame_2">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -904,6 +904,31 @@ li.checked::marker { content: &quot;\2612&quot;; }
                    </widget>
                   </item>
                  </layout>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QPushButton" name="integrityCheck">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>114</width>
+                   <height>46</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>点击此按钮将清空SRAlog.txt中的内容</string>
+                 </property>
+                 <property name="whatsThis">
+                  <string>点击此按钮将清空SRAlog.txt中的内容</string>
+                 </property>
+                 <property name="text">
+                  <string>文件完整性检查</string>
+                 </property>
                 </widget>
                </item>
               </layout>

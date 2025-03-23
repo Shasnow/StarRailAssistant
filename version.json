@@ -1,11 +1,11 @@
 {
-    "version": "0.7.4",
-    "resource_version": "0.7.4.92",
-    "announcement": "1. 修改了裁剪截图区域的计算方法，因此您需要前往SRA设置中将“屏幕缩放”一项的值调整到实际的屏幕缩放，例如您的电脑是150%缩放，则在此项中填入1.50。\n2. 为启动时的公告添加了“不再提醒”按钮，点击后到下一次更新前不会再弹出公告。\n3. 适配本周周期演算(2025.2.17).\n**如果此次更新您的更新器出现以下错误：“检查更新时出错: '<' not supported between instances of 'str' and 'int'” 请关闭SRA后单独运行SRAUpdater",
-    "resource_announcement": "1. 适配本周差分宇宙（2025.3.17）\n**如果此次更新您的更新器出现以下错误：“检查更新时出错: '<' not supported between instances of 'str' and 'int'” 请关闭SRA后单独运行SRAUpdater",
-    "Announcement": "<hr><p>噔噔——新的公告界面～(∠・ω&lt; )⌒☆</p><p>SRA开发文档计划中~</p><hr>",
+    "version": "0.7.5",
+    "resource_version": "0.7.5.0",
+    "announcement": "1. 打包方式改变：提高启动速度，为增量更新提供支持。\n2. SRA更新器更新：现在能够校验文件完整性并自动下载缺失文件，同时此后的资源更新将使用增量更新，您无需在每次更新时重新下载整个程序。\n3. SRA更新器更新：参数更新，-v参数现在用于查看更新器的版本，它原来的功能由-nv参数代替。新增-i参数，用于立即执行一次文件完整性检查。\n4. 新增设置项按钮: 文件完整性检查。\n5. SRA的图标被替换为与游戏更相关的角色-知更鸟。感谢小特长久以来的陪伴。\n**如果此次更新您的更新器出现以下错误：“检查更新时出错: '<' not supported between instances of 'str' and 'int'” 请关闭SRA后单独运行SRAUpdater",
+    "resource_announcement": "\n**如果此次更新您的更新器出现以下错误：“检查更新时出错: '<' not supported between instances of 'str' and 'int'” 请关闭SRA后单独运行SRAUpdater",
+    "Announcement": "<hr><p>噔噔——新的公告界面～(∠・ω&lt; )⌒☆</p><p>你知道吗：如果关闭SRA的自动更新服务，公告也不会再更新了</p><hr>",
     "Announcement.DoNotShowAgain": false,
-    "VersionUpdate": "<html><h2>版本已更新 0.7.4.91</h2><ol><li>适配本周差分宇宙（2025.3.17）</li></ol></html>",
+    "VersionUpdate": "<html><h2>版本已更新 0.7.5</h2><ol><li>打包方式改变：提高启动速度，为增量更新提供支持。</li><li>SRA更新器更新：现在能够校验文件完整性并自动下载缺失文件，同时此后的资源更新将使用增量更新，您无需在每次更新时重新下载整个程序。</li><li>SRA更新器更新：参数更新，-v参数现在用于查看更新器的版本，它原来的功能由-nv参数代替。新增-i参数，用于立即执行一次文件完整性检查。</li><li>新增设置项按钮: 文件完整性检查。</li><li>SRA的图标被替换为与游戏更相关的角色-知更鸟。感谢小特长久以来的陪伴。</li></ol></html>",
     "VersionUpdate.DoNotShowAgain": false,
     "Proxys": [
         "https://github.7boe.top/",

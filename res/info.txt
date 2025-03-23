@@ -4,7 +4,7 @@ VSVersionInfo(
   ffi=FixedFileInfo(
     # filevers and prodvers should be always a tuple with four items: (1, 2, 3, 4)
     # Set not needed items to zero 0.
-    filevers=(0, 7, 4, 0),
+    filevers=(0, 7, 5, 0),
     prodvers=(0, 0, 0, 0),
     # Contains a bitmask that specifies the valid bits 'flags'r
     mask=0x3f,
@@ -31,13 +31,13 @@ VSVersionInfo(
         [StringStruct('Comments', 'https://github.com/Shasnow/StarRailAssistant'),
         StringStruct('CompanyName', 'StarRailAssistant Team'),
         StringStruct('FileDescription', 'StarRailAssistant Component'),
-        StringStruct('FileVersion', '0.7.3.0'),
+        StringStruct('FileVersion', '0.7.5.0'),
         StringStruct('InternalName', 'StarRailAssistant'),
         StringStruct('LegalCopyright', 'Copyright © 2024 Shasnow'),
         StringStruct('OriginalFilename', 'SRA.py'),
         StringStruct('ProductName', 'StarRailAssistant'),
-        StringStruct('ProductVersion', 'v0.7.3.0'),
-        StringStruct('Assembly Version', 'v0.7.3.0')])
+        StringStruct('ProductVersion', 'v0.7.5.0'),
+        StringStruct('Assembly Version', 'v0.7.5.0')])
       ])
   ]
 )
