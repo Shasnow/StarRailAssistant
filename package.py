@@ -94,6 +94,6 @@ if __name__ == "__main__":
     print("SRA main program packaging completed !")
 
     (root_path / "version_info.txt").write_text(
-        f"{version_text(main_version_numb)}\n{version['announcement']}",
+        f"{version_text(main_version_numb)}\n\n{version['announcement']}",
         encoding="utf-8",
     )
