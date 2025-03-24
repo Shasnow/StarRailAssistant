@@ -946,23 +946,23 @@ class Assistant(QThread):
                 return False
             logger.info("选择基础效果")
             time.sleep(1)
-            if not click("res/img/collection.png"):
-                x,y=get_screen_center()
-                click_point(x-250,y)
+            # if not click("res/img/collection.png"):
+            x,y=get_screen_center()
+            click_point(x,y)
             click("res/img/ensure2.png",wait_time=2)
             while check("res/img/close.png",max_time=4):
                 press_key("esc")
 
-            logger.info("选择方程与祝福")
-            if not check("res/img/equation_select.png",max_time=25):
-                logger.error("超时")
-                return False
+            # logger.info("选择方程与祝福")
+            # if not check("res/img/equation_select.png",max_time=25):
+            #     logger.error("超时")
+            #     return False
 
             while True:
                 index=check_any(["res/img/equation_select.png",
                                  "res/img/blessing_select.png",
                                  "res/img/close.png",
-                                 "res/img/divergent_universe_quit.png"], max_time=4)
+                                 "res/img/divergent_universe_quit.png"], max_time=6)
                 if index==3:
                     break
                 elif index==2:
@@ -975,7 +975,7 @@ class Assistant(QThread):
                         click_point(*get_screen_center())
                     click("res/img/ensure2.png", wait_time=1)
                 else:
-                    logger.error("发生错误")
+                    logger.warning("发生错误")
                     break
             time.sleep(1)
 
