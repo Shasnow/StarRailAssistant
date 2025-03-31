@@ -77,7 +77,7 @@
            <x>0</x>
            <y>0</y>
            <width>404</width>
-           <height>728</height>
+           <height>792</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -120,39 +120,6 @@
                </item>
               </widget>
              </item>
-             <item row="1" column="2">
-              <widget class="QSpinBox" name="spinBox2_1_23">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="minimum">
-                <number>1</number>
-               </property>
-               <property name="maximum">
-                <number>300</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label2_1_21">
-               <property name="text">
-                <string>  次数：</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QCheckBox" name="checkBox2_1_11">
-               <property name="text">
-                <string>补充体力</string>
-               </property>
-              </widget>
-             </item>
              <item row="1" column="1">
               <spacer name="horizontalSpacer2_1_22">
                <property name="orientation">
@@ -178,6 +145,53 @@
                 </size>
                </property>
               </spacer>
+             </item>
+             <item row="2" column="0" colspan="3">
+              <widget class="QCheckBox" name="useAssist">
+               <property name="text">
+                <string>使用支援角色</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label2_1_21">
+               <property name="text">
+                <string>  次数：</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="checkBox2_1_11">
+               <property name="text">
+                <string>补充体力</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QSpinBox" name="spinBox2_1_23">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>300</number>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" colspan="3">
+              <widget class="QCheckBox" name="changeLineup">
+               <property name="text">
+                <string>重新编队</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>

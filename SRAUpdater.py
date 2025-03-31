@@ -82,7 +82,6 @@ class Updater:
     HASH_URL = "https://gitee.com/yukikage/sraresource/raw/main/SRA/hash.json"
     HASH_FILE = APP_PATH / "data/hash.json"
     PROXYS = []
-    NO_PROXY = False
     VERIFY = True
     # 临时下载文件的路径
     TEMP_DOWNLOAD_DIR = APP_PATH
@@ -95,8 +94,13 @@ class Updater:
     def __init__(self):
         print("欢迎使用SRA更新器>_<")
         self.init_version_file()
+        self.init_proxy()
         if os.path.exists(self.TEMP_DOWNLOAD_FILE):
             os.remove(self.TEMP_DOWNLOAD_FILE)
+
+    def init_proxy(self):
+        with open("version.json","r",encoding="utf-8") as file:
+            self.PROXYS=json.load(file)["Proxys"]
 
     def init_version_file(self):
         if not os.path.exists(self.VERSION_FILE):
@@ -196,7 +200,7 @@ class Updater:
         with open(self.APP_PATH / "version.json", "r+", encoding="utf-8") as json_file:
             version = json.load(json_file)
             version["Announcement"] = text
-            json_file.seek(0)
+        with open(self.APP_PATH / "version.json", "w", encoding="utf-8") as json_file:
             json.dump(version, json_file, indent=4, ensure_ascii=False)
 
     def check_for_updates(self):
@@ -212,6 +216,7 @@ class Updater:
         except Exception as e:
             print(f"检查更新时出错: {e}")
             os.system("pause")
+            raise
 
     def version_check(self, v: VersionInfo) -> str:
         # 从远程服务器获取版本信息
@@ -226,9 +231,7 @@ class Updater:
         remote_version = version_info["version"]
         remote_resource_version = version_info["resource_version"]
         new_announcement = version_info["Announcement"]
-        # 获取代理
-        if not self.NO_PROXY and len(self.PROXYS) == 0:
-            self.PROXYS = version_info["Proxys"]
+
         # 比较当前版本和远程版本
         print(f"当前版本：{v.version}")
         print(f"当前资源版本：{v.resource_version}")
@@ -386,7 +389,7 @@ if __name__ == "__main__":
     if args.proxy is not None:
         updater.PROXYS = [args.proxy]
     if args.no_proxy:
-        updater.NO_PROXY = True
+        updater.PROXYS = [""]
     if args.no_verify:
         updater.VERIFY = False
     # if args.directory is not None:

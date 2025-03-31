@@ -38,6 +38,7 @@ def init() -> None:
         "ReceiveRewards",
         "RedeemCode",
         "Replenish",
+        "Support",
         "OrnamentExtraction",
         "CalyxGolden",
         "CalyxCrimson",
@@ -78,6 +79,11 @@ def init() -> None:
             ["enable", False],
             ["way", 1],
             ["runTimes", 1],
+        ],
+        "Support":[
+            ["enable",False],
+            ["role",''],
+            ["changeLineup",False]
         ],
         "OrnamentExtraction": [
             ["enable", False],

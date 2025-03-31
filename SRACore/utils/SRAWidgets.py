@@ -172,6 +172,8 @@ class TrailblazePower(QWidget):
             QComboBox, "comboBox2_1_13"
         )
         self.times1: QSpinBox = self.ui.findChild(QSpinBox, "spinBox2_1_23")
+        self.use_assist_checkbox:QCheckBox=self.ui.findChild(QCheckBox, "useAssist")
+        self.change_lineup_checkbox:QCheckBox=self.ui.findChild(QCheckBox, "changeLineup")
         self.opt2: QCheckBox = self.ui.findChild(
             QCheckBox, "checkBox2_2_11"
         )
@@ -238,6 +240,8 @@ class TrailblazePower(QWidget):
         self.opt1.setChecked(self.config["Replenish"]["enable"])
         self.combobox1.setCurrentIndex(self.config["Replenish"]["way"])
         self.times1.setValue(self.config["Replenish"]["runTimes"])
+        self.use_assist_checkbox.setChecked(self.config["Support"]["enable"])
+        self.change_lineup_checkbox.setChecked(self.config["Support"]['changeLineup'])
         self.opt2.setChecked(self.config["OrnamentExtraction"]["enable"])
         self.combobox2.setCurrentIndex(self.config["OrnamentExtraction"]["level"])
         self.battle_times2.setValue(self.config["OrnamentExtraction"]["runTimes"])
@@ -263,6 +267,8 @@ class TrailblazePower(QWidget):
         self.config["Replenish"]["enable"] = self.opt1.isChecked()
         self.config["Replenish"]["way"] = self.combobox1.currentIndex()
         self.config["Replenish"]["runTimes"] = self.times1.value()
+        self.config["Support"]["enable"]=self.use_assist_checkbox.isChecked()
+        self.config["Support"]['changeLineup']=self.change_lineup_checkbox.isChecked()
         self.config["OrnamentExtraction"]["enable"] = self.opt2.isChecked()
         self.config["OrnamentExtraction"]["level"] = self.combobox2.currentIndex()
         self.config["OrnamentExtraction"]["runTimes"] = self.battle_times2.value()

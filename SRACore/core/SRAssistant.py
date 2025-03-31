@@ -703,21 +703,30 @@ class Assistant(QThread):
                     logger.info("体力不足")
                     press_key("esc", interval=1, presses=3)
                     return
-            if click("res/img/battle_star.png"):
-                self.battle_star(battle_time)
-            else:
+            if self.config["Support"]["enable"]:
+                self.support()
+            if not click("res/img/battle_star.png"):
                 logger.error("发生错误，错误编号4")
+            if exist("res/img/ensure.png"):
+                logger.info("编队中存在无法战斗的角色")
+                press_key("esc",presses=3,interval=1.5)
+                return
+            else:
+                self.battle_star(battle_time)
         logger.info(f"任务完成：{mission_name}")
 
     @Slot()
     def battle_star(self, battle_time: int):
         logger.info("开始战斗")
         logger.info("请检查自动战斗和倍速是否开启")
-        if check("res/img/q.png", max_time=10):
+        if check("res/img/q.png", max_time=8):
             press_key("v")
         while battle_time > 1:
             logger.info(f"剩余次数{battle_time}")
             self.wait_battle_end()
+
+            if self.config["Support"]["changeLineup"]:
+                click("res/img/change_lineup.png")
             if not click("res/img/again.png"):
                 logger.error("发生错误，错误编号5")
                 continue
@@ -735,6 +744,11 @@ class Assistant(QThread):
                         logger.error("发生错误，错误编号23")
                     press_key("esc")
                     break
+            if self.config["Support"]["enable"]:
+                self.support()
+            if self.config["Support"]["changeLineup"]:
+                click("res/img/battle_star.png")
+
             battle_time -= 1
             time.sleep(3)
         else:
@@ -748,6 +762,13 @@ class Assistant(QThread):
     @Slot()
     def wait_battle_end(self):
         wait_battle_end()
+
+    @staticmethod
+    def support():
+        if click("res/img/remove_support.png",wait_time=0):
+            moveRel(0,100)
+        if click("res/img/support.png"):
+            click("res/img/enter.png")
 
     @Slot()
     def assignments_reward(self):
@@ -911,7 +932,7 @@ class Assistant(QThread):
             press_key("esc")
             return False
         if scroll_flag:
-            time.sleep(2)
+            time.sleep(1)
             moveRel(0, 100)
             for i in range(6):
                 scroll(-5)
