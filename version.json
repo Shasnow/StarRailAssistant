@@ -1,11 +1,11 @@
 {
-    "version": "0.7.5",
+    "version": "0.7.6",
     "resource_version": "0.7.5.1",
-    "announcement": "1. 打包方式改变：提高启动速度，为增量更新提供支持。\n2. SRA更新器更新：现在能够校验文件完整性并自动下载缺失文件，同时此后的资源更新将使用增量更新，您无需在每次更新时重新下载整个程序。\n3. SRA更新器更新：参数更新，-v参数现在用于查看更新器的版本，它原来的功能由-nv参数代替。新增-i参数，用于立即执行一次文件完整性检查。\n4. 新增设置项按钮: 文件完整性检查。\n5. SRA的图标被替换为与游戏更相关的角色-知更鸟。感谢小特长久以来的陪伴。\n### 如果此次更新您的更新器出现以下错误：“检查更新时出错: '<' not supported between instances of 'str' and 'int'” 请关闭SRA后单独运行SRAUpdater",
-    "resource_announcement": "在清开拓力功能中增加了使用支援角色及重新编队功能，但在饰品提取中无效。",
+    "announcement": "非正式，占位",
+    "resource_announcement": "在清开拓力功能中增加了使用支援角色及重新编队功能，但在饰品提取中无效。\n* 请务必手动关闭SRA.exe后再进行更新，否则SRA.exe可能无法被正确更新！",
     "Announcement": "<hr><p>噔噔——新的公告界面～(∠・ω&lt; )⌒☆</p><p>你知道吗：如果关闭SRA的自动更新服务，公告也不会再更新了</p><hr>",
     "Announcement.DoNotShowAgain": false,
-    "VersionUpdate": "<html><h2>版本已更新 0.7.5</h2><ol><li>打包方式改变：提高启动速度，为增量更新提供支持。</li><li>SRA更新器更新：现在能够校验文件完整性并自动下载缺失文件，同时此后的资源更新将使用增量更新，您无需在每次更新时重新下载整个程序。</li><li>SRA更新器更新：参数更新，-v参数现在用于查看更新器的版本，它原来的功能由-nv参数代替。新增-i参数，用于立即执行一次文件完整性检查。</li><li>新增设置项按钮: 文件完整性检查。</li><li>SRA的图标被替换为与游戏更相关的角色-知更鸟。感谢小特长久以来的陪伴。</li></ol></html>",
+    "VersionUpdate": "<html><h2>版本已更新 0.7.5.1</h2><ol><li>在清开拓力功能中增加了使用支援角色及重新编队功能，但在饰品提取中无效。</li><li>适配周期演算</li></ol></html>",
     "VersionUpdate.DoNotShowAgain": false,
     "Proxys": [
         "https://github.tbedu.top/",

@@ -140,6 +140,9 @@ class Updater:
         result = self.hash_check()
         if len(result) != 0:
             print(f"{len(result)}个文件丢失或不是最新的")
+            if is_process_running("SRA.exe"):
+                task_kill("SRA.exe")
+                sleep(2)
             self.download_all(result)
         else:
             print("所有文件均为最新")
