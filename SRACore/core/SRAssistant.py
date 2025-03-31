@@ -768,7 +768,7 @@ class Assistant(QThread):
         if click("res/img/remove_support.png",wait_time=0):
             moveRel(0,100)
         if click("res/img/support.png"):
-            click("res/img/enter.png")
+            click("res/img/enter_line.png")
 
     @Slot()
     def assignments_reward(self):
