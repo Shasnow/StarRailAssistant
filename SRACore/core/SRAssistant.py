@@ -18,7 +18,6 @@
 
 """
 崩坏：星穹铁道助手
-v0.7.0
 作者：雪影
 主功能
 """
@@ -35,7 +34,7 @@ from SRACore.utils.SRAOperator import SRAOperator
 from SRACore.utils.WindowsProcess import find_window, is_process_running
 
 VERSION = "0.7.5"
-CORE="0.7.5.0"
+CORE="0.7.5.1"
 
 
 class Assistant(QThread):
