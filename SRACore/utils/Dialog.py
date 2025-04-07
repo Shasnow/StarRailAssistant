@@ -1,7 +1,7 @@
-from PySide6.QtCore import Slot, QTimer
+from PySide6.QtCore import Slot, QTimer, Qt, Signal
 from PySide6.QtGui import QIcon, QFont
 from PySide6.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QScrollArea, QWidget, QGridLayout, \
-    QSpacerItem, QSizePolicy, QFrame, QLCDNumber, QHBoxLayout, QPushButton
+    QSpacerItem, QSizePolicy, QFrame, QLCDNumber, QHBoxLayout, QPushButton, QListWidget, QStackedWidget, QTextBrowser
 
 from SRACore.utils import WindowsPower
 from SRACore.utils.Configure import load, save
@@ -34,14 +34,14 @@ class DownloadDialog(QDialog):
         Popen(command)
 
 
-class AnnouncementDialog(QDialog):
-
-    def __init__(self, parent, title, text, announcement_type, icon):
+class AnnouncementDialog(QWidget):
+    action=Signal(int)
+    def __init__(self, parent=None, title="title", text="text", announcement_type="Any", icon="res/SRAicon.ico"):
         super().__init__(parent)
         self.setFont(QFont("MicroSoft YaHei", 13))
         self.setWindowTitle(title)
-        self.type=announcement_type
-        self.setWindowIcon(QIcon("res/SRAicon.ico"))
+        self.type = announcement_type
+        # self.setWindowIcon(QIcon("res/SRAicon.ico"))
         # self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint,False)
         self.resize(500, 500)
         self.setLayout(QVBoxLayout())
@@ -66,13 +66,14 @@ class AnnouncementDialog(QDialog):
         button_box.addButton("不再提醒", QDialogButtonBox.ButtonRole.RejectRole)
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
-        button_box.rejected.connect(self.no_notice)
         self.gridLayout.addWidget(button_box, 1, 2, 1, 1)
 
-        self.label = QLabel(self.scrollAreaWidgetContents)
+        self.label = QTextBrowser(self.scrollAreaWidgetContents)
         self.label.setOpenExternalLinks(True)
         self.label.setAutoFillBackground(True)
-        self.label.setWordWrap(True)
+        # self.label.setWordWrap(True)
+
+        self.gridLayout.setContentsMargins(0,0,0,0)
         self.label.setText(text)
 
         self.gridLayout.addWidget(self.label, 0, 0, 1, 3)
@@ -81,10 +82,74 @@ class AnnouncementDialog(QDialog):
         self.layout().addWidget(self.scrollArea)
 
     @Slot()
-    def no_notice(self):
-        version=load("version.json")
-        version[f"{self.type}.DoNotShowAgain"]=True
-        save(version,"version.json")
+    def accept(self):
+        self.action.emit(1)
+
+    @Slot()
+    def reject(self):
+        self.action.emit(0)
+
+
+class AnnouncementBoard(QDialog):
+    def __init__(self, parent=None,title="announcements"):
+        super().__init__(parent)
+
+        # 主布局
+        self.main_layout = QHBoxLayout(self)
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.setLayout(self.main_layout)
+        self.resize(600,500)
+        self.setWindowTitle(title)
+        self.setFont(QFont("MicroSoft YaHei", 13))
+        self.setWindowIcon(QIcon("res/SRAicon.ico"))
+        self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
+
+        # 左侧标题栏
+        self.title_list = QListWidget()
+        self.title_list.setSpacing(10)
+        self.title_list.setFixedWidth(100)  # 固定宽度
+        self.title_list.currentRowChanged.connect(self.on_title_clicked)
+
+        # 右侧内容栏
+        self.content_stack = QStackedWidget()
+
+        # 添加到主布局
+        self.main_layout.addWidget(self.title_list)
+        self.main_layout.addWidget(self.content_stack)
+
+        # 存储标题和内容的映射
+        self.title_content_map = {}
+
+    def add(self, dialog:AnnouncementDialog):
+        """
+        添加一个公告条目
+        """
+        # 将标题添加到左侧标题栏
+        title=dialog.windowTitle()
+        dialog.setParent(self)
+        self.title_list.addItem(title)
+
+        # 将内容添加到右侧内容栏
+        self.content_stack.addWidget(dialog)
+
+        # 保存标题和内容的映射关系
+        self.title_content_map[title] = dialog
+        dialog.action.connect(self.action_handle)
+
+    def on_title_clicked(self, index):
+        """
+        当用户点击左侧标题栏时，切换右侧内容栏
+        """
+        self.content_stack.setCurrentIndex(index)
+
+    def action_handle(self,action):
+        self.close()
+        if action==0:
+            version = load("version.json")
+            version[f"Announcement.DoNotShowAgain"] = True
+            save(version, "version.json")
+
+
 
 
 class ShutdownDialog(QDialog):

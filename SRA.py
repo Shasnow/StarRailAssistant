@@ -45,7 +45,7 @@ from plyer import notification
 from SRACore.core import SRAssistant, AutoPlot
 from SRACore.core.SRAssistant import VERSION,CORE
 from SRACore.utils import Configure, WindowsPower, WindowsProcess, Encryption
-from SRACore.utils.Dialog import DownloadDialog, AnnouncementDialog, ShutdownDialog
+from SRACore.utils.Dialog import DownloadDialog, AnnouncementDialog, ShutdownDialog, AnnouncementBoard
 from SRACore.utils.SRAWidgets import ReceiveRewards, StartGame, TrailblazePower, QuitGame, SimulatedUniverse
 
 # from ocr import SRAocr
@@ -491,10 +491,11 @@ if __name__ == "__main__":
 
         version = Configure.load("version.json")
         if not version["Announcement.DoNotShowAgain"]:
-            announcement = AnnouncementDialog(
-                window.main.ui,
-                "公告",
-                f"<html><i>滚动至底部关闭此公告</i>{version['Announcement']}"
+            announcement_board=AnnouncementBoard(window.main.ui,"公告栏")
+            announcement_board.add(AnnouncementDialog(
+                None,
+                "长期公告",
+                f"<html><i>点击下方按钮关闭公告栏</i>{version['Announcement']}"
                 "<h4>长期公告</h4>"
                 f"<h2>SRA崩坏：星穹铁道助手 v{VERSION} by雪影</h2>"
                 "<h3>使用说明：</h3>"
@@ -506,16 +507,14 @@ if __name__ == "__main__":
                 "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，<b>相应的后果由您自行承担</b>。</p>"
                 "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B站、微博）的官方动态下讨论任何关于 SRA 的内容。<br>"
                 "人话：不要跳脸官方～(∠・ω&lt; )⌒☆</html>",
-                "Announcement",icon='res/Robin.gif')
-            announcement.show()
+                announcement_type="Announcement",icon='res/Robin.gif'))
 
-        if not version["VersionUpdate.DoNotShowAgain"]:
-            version_update = AnnouncementDialog(
-                window.main.ui, "更新公告",
+            announcement_board.add(AnnouncementDialog(
+                None, "更新公告",
                 version["VersionUpdate"],
                 announcement_type="VersionUpdate",
-                icon='res/Robin2.gif')
-            version_update.show()
+                icon='res/Robin2.gif'))
+            announcement_board.show()
         sys.exit(app.exec())
 
     else:

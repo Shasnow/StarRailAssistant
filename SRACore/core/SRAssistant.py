@@ -966,9 +966,9 @@ class Assistant(QThread):
                 return False
             logger.info("选择基础效果")
             time.sleep(1)
-            # if not click("res/img/collection.png"):
-            x,y=get_screen_center()
-            click_point(x,y)
+            if not click("res/img/collection.png"):
+                x,y=get_screen_center()
+                click_point(x-250,y)
             click("res/img/ensure2.png",wait_time=2)
             while check("res/img/close.png",max_time=4):
                 press_key("esc")
@@ -1013,12 +1013,14 @@ class Assistant(QThread):
             while True:
                 index = check_any(["res/img/blessing_select.png",
                                    "res/img/equation_expansion.png",
+                                   "res/img/close.png",
                                    "res/img/divergent_universe_quit.png"], max_time=6)
                 if index == 0:
                     if not click("res/img/collection.png"):
-                        click_point(*get_screen_center())
+                        x, y = get_screen_center()
+                        click_point(x - 50, y)
                     click("res/img/ensure2.png")
-                elif index == 1:
+                elif index == 1 or index==2:
                     press_key('esc')
                 else:
                     break
