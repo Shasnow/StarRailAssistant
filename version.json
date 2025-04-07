@@ -1,11 +1,11 @@
 {
     "version": "0.7.6",
-    "resource_version": "0.7.5.1",
-    "announcement": "非正式，占位",
-    "resource_announcement": "在清开拓力功能中增加了使用支援角色及重新编队功能，但在饰品提取中无效。\n* 请务必手动关闭SRA.exe后再进行更新，否则SRA.exe可能无法被正确更新！",
+    "resource_version": "0.7.6.0",
+    "announcement": "1. 在清开拓力功能中增加了使用支援角色及重新编队功能，但在饰品提取中无效。  2. 修复SRA更新器资源更新失效的问题。  3. 适配周期演算(2025.4.7)",
+    "resource_announcement": "\n* 请务必手动关闭SRA.exe后再进行更新，否则SRA.exe可能无法被正确更新！",
     "Announcement": "<hr><p>噔噔——新的公告界面～(∠・ω&lt; )⌒☆</p><p>你知道吗：如果关闭SRA的自动更新服务，公告也不会再更新了</p><hr>",
     "Announcement.DoNotShowAgain": false,
-    "VersionUpdate": "<html><h2>版本已更新 0.7.5.1</h2><ol><li>在清开拓力功能中增加了使用支援角色及重新编队功能，但在饰品提取中无效。</li><li>适配周期演算</li></ol></html>",
+    "VersionUpdate": "<html><h2>版本已更新 0.7.6</h2><ol><li>在清开拓力功能中增加了使用支援角色及重新编队功能，但在饰品提取中无效。</li><li>修复SRA更新器资源更新失效的问题。</li><li>适配周期演算(2025.4.7)</li></ol></html>",
     "VersionUpdate.DoNotShowAgain": false,
     "Proxys": [
         "https://github.tbedu.top/",
@@ -13,5 +13,6 @@
         "https://github.akams.cn/",
         "https://gh-proxy.ygxz.in/",
         "https://ghps.cc/",
-        ""]
+        ""
+    ]
 }

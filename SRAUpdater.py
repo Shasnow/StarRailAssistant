@@ -247,7 +247,7 @@ class Updater:
         if remote_resource_version > v.resource_version:
             print(f"发现资源更新：{remote_resource_version}")
             print(f"更新说明：\n{version_info['resource_announcement']}")
-            self.hash_check()
+            self.integrity_check()
             return ""
         if new_announcement != v.announcement:
             self.announcement_change(new_announcement)
@@ -357,7 +357,7 @@ class Updater:
                 print(f"解压工具丢失，请手动解压{self.TEMP_DOWNLOAD_FILE}到当前文件夹")
                 os.system("pause")
                 return
-            command = f"{self.APP_PATH}/tools/7z x {self.TEMP_DOWNLOAD_FILE} -y"
+            command = f"'{self.APP_PATH}/tools/7z' x {self.TEMP_DOWNLOAD_FILE} -y"
             cmd = 'cmd.exe /c start "" ' + command
             Popen(cmd, shell=True)
 
