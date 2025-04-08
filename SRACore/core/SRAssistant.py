@@ -33,8 +33,8 @@ from SRACore.utils.Logger import logger
 from SRACore.utils.SRAOperator import SRAOperator
 from SRACore.utils.WindowsProcess import find_window, is_process_running
 
-VERSION = "0.7.5"
-CORE="0.7.5.1"
+VERSION = "0.7.6"
+CORE="0.7.6.0"
 
 
 class Assistant(QThread):
