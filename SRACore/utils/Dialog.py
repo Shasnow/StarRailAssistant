@@ -142,6 +142,9 @@ class AnnouncementBoard(QDialog):
         """
         self.content_stack.setCurrentIndex(index)
 
+    def setDefault(self, index: int):
+        self.title_list.setCurrentRow(index)
+
     def action_handle(self,action):
         self.close()
         if action==0:

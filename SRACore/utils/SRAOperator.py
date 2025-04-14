@@ -87,7 +87,7 @@ class SRAOperator:
         resized_image = pillow_image.resize(
             (int(pillow_image.width * cls.screenshot_proportion),
              int(pillow_image.height * cls.screenshot_proportion)),
-            Image.BICUBIC)
+            Image.Resampling.BICUBIC)
         # resized_image.show()
         return resized_image
 
@@ -98,7 +98,7 @@ class SRAOperator:
         # return x, y
 
     @classmethod
-    def _locate(cls, img_path: str, title="崩坏：星穹铁道"):
+    def locate(cls, img_path: str, title="崩坏：星穹铁道"):
         try:
             img = cv2.imread(img_path)
             if img is None:
@@ -114,7 +114,7 @@ class SRAOperator:
             raise
 
     @classmethod
-    def _locate_any(cls, img_list: list):
+    def locateAny(cls, img_list: list):
         screenshot = cls.get_screenshot()
         for index, img_path in enumerate(img_list):
             try:
@@ -134,8 +134,8 @@ class SRAOperator:
             raise MatchFailureException(f"{img_list}匹配失败")
 
     @classmethod
-    def _locate_center(cls, img_path, x_add=0, y_add=0, title="崩坏：星穹铁道") -> tuple[int, int]:
-        location = cls._locate(img_path, title)
+    def locateCenter(cls, img_path, x_add=0, y_add=0, title="崩坏：星穹铁道") -> tuple[int, int]:
+        location = cls.locate(img_path, title)
         x, y = pyscreeze.center(location)
         x += x_add
         y += y_add
@@ -154,7 +154,7 @@ class SRAOperator:
         """
         time.sleep(wait_time)  # 等待游戏加载
         try:
-            cls._locate(img_path)
+            cls.locate(img_path)
             return True
         except Exception as e:
             logger.log(internal,e)
@@ -173,7 +173,7 @@ class SRAOperator:
         """
         time.sleep(wait_time)  # 等待游戏加载
         try:
-            result = cls._locate_any(img_list)[0]
+            result = cls.locateAny(img_list)[0]
             return result
         except Exception as e:
             logger.log(internal,e)
@@ -261,7 +261,7 @@ class SRAOperator:
         try:
             time.sleep(wait_time)
             logger.debug("点击对象" + img_path)
-            x, y = cls._locate_center(img_path, x_add, y_add, title)
+            x, y = cls.locateCenter(img_path, x_add, y_add, title)
             pyautogui.click(x, y)
             return True
         except Exception as e:
@@ -351,23 +351,8 @@ class SRAOperator:
             return False
 
     @classmethod
-    def find_level(cls, level: str) -> bool:
-        """Fine battle level
-
-        Returns:
-            True if found.
-        """
-        x, y = cls.get_screen_center()
-        pyautogui.moveTo(x - 200, y)
-        times = 0
-        while True:
-            times += 1
-            if times == 60:
-                return False
-            if cls.exist(level, wait_time=0.5):
-                return True
-            else:
-                cls.scroll(-5)
+    def moveTo(cls,*args):
+        return pyautogui.moveTo(args)
 
     @classmethod
     def scroll(cls, distance: int) -> bool:
@@ -377,26 +362,6 @@ class SRAOperator:
         except Exception as e:
             logger.log(internal,f"指针滚动时发生错误{e}")
             return False
-
-    @classmethod
-    def wait_battle_end(cls):
-        """Wait battle end
-
-        Returns:
-            True if battle end.
-        """
-        logger.info("等待战斗结束")
-        quit_battle = cv2.imread("res/img/quit_battle.png")
-        while True:
-            time.sleep(0.2)
-            try:
-                pyautogui.locate(quit_battle, cls.get_screenshot("崩坏：星穹铁道"), confidence=cls.confidence)
-                logger.info("战斗结束")
-                return True
-            except pyautogui.ImageNotFoundException:
-                continue
-            except pyscreeze.PyScreezeException:
-                continue
 
     @classmethod
     def copy(cls, text: str):
@@ -413,6 +378,10 @@ class SRAOperator:
 
     @classmethod
     def paste(cls):
+        """
+        Paste the latest content in clipboard.
+        :return: none
+        """
         pyautogui.keyDown("ctrl")
         pyautogui.keyDown("v")
         pyautogui.keyUp("v")

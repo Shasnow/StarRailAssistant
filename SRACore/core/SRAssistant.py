@@ -252,12 +252,13 @@ class Assistant(QThread):
             return False
         logger.info("登录到" + account)
         time.sleep(1)
-        write(account)
+        SRAOperator.copy(account)
+        SRAOperator.paste()
         time.sleep(1)
         press_key("tab")
         time.sleep(0.2)
-        write(password)
-        press_key("enter")
+        SRAOperator.copy(password)
+        SRAOperator.paste()
         click("res/img/agree.png", -158)
         if not click("res/img/enter_game.png"):
             logger.error("发生错误，错误编号9")
@@ -342,32 +343,29 @@ class Assistant(QThread):
             if login_flag and account:
                 self.login(account, password)
             if check("res/img/quit.png", max_time=120):
-                x, y = get_screen_center()
-                if exist("res/img/12+.png"):
-                    click_point(x, y)
-                    time.sleep(3)
-                logger.info("开始游戏")
-                click_point(x, y)
-                time.sleep(3)
-                click_point(x, y)
+                self.start_game_click()
             else:
                 logger.warning("加载时间过长，请重试")
                 return False
         elif channel == 1:
             self.login_bilibili(account, password)
             if check("res/img/quit.png"):
-                x, y = get_screen_center()
-                if exist("res/img/12+.png"):
-                    click_point(x, y)
-                    time.sleep(3)
-                logger.info("开始游戏")
-                click_point(x, y)
-                time.sleep(3)
-                click_point(x, y)
+                self.start_game_click()
             else:
                 logger.warning("加载时间过长，请重试")
                 return False
         return self.wait_game_load()
+
+    @staticmethod
+    def start_game_click():
+        x, y = get_screen_center()
+        if exist("res/img/12+.png"):
+            click_point(x, y)
+            time.sleep(3)
+        logger.info("开始游戏")
+        click_point(x, y)
+        time.sleep(3)
+        click_point(x, y)
 
     @Slot()
     def wait_game_load(self):
@@ -969,8 +967,10 @@ class Assistant(QThread):
             if not click("res/img/collection.png"):
                 x,y=get_screen_center()
                 click_point(x-250,y)
-            click("res/img/ensure2.png",wait_time=2)
-            while check("res/img/close.png",max_time=4):
+                if not exist("res/img/ensure2.png",wait_time=1):
+                    click_point(x, y)
+            click("res/img/ensure2.png",wait_time=1)
+            while check("res/img/close.png",max_time=3):
                 press_key("esc")
 
             # logger.info("选择方程与祝福")
@@ -989,7 +989,7 @@ class Assistant(QThread):
                     press_key("esc")
                 elif index==1:
                     click_point(*get_screen_center())
-                    click("res/img/ensure2.png",wait_time=1)
+                    click("res/img/ensure2.png",wait_time=0.5)
                 elif index==0:
                     if not click("res/img/collection.png"):
                         click_point(*get_screen_center())
@@ -1077,7 +1077,7 @@ def press_key(key: str, presses: int = 1, interval: float = 2) -> bool:
     return SRAOperator.press_key(key, presses, interval)
 
 
-def exist(img_path, wait_time=2) -> bool:
+def exist(img_path, wait_time:float=2.0) -> bool:
     return SRAOperator.exist(img_path, wait_time)
 
 
@@ -1090,15 +1090,43 @@ def moveRel(x_offset: int, y_offset: int) -> bool:
 
 
 def find_level(level: str) -> bool:
-    return SRAOperator.find_level(level)
+    """Fine battle level
+
+    Returns:
+        True if found.
+    """
+    x, y = get_screen_center()
+    SRAOperator.moveTo(x - 200, y)
+    times = 0
+    while True:
+        times += 1
+        if times == 60:
+            return False
+        if exist(level, wait_time=0.5):
+            return True
+        else:
+            scroll(-5)
 
 
 def press_key_for_a_while(key: str, during: float = 0) -> bool:
     return SRAOperator.press_key_for_a_while(key, during)
 
 
-def wait_battle_end() -> bool:
-    return SRAOperator.wait_battle_end()
+def wait_battle_end():
+    """Wait battle end
+
+    Returns:
+        True if battle end.
+    """
+    logger.info("等待战斗结束")
+    while True:
+        time.sleep(0.2)
+        try:
+            SRAOperator.locate("res/img/quit_battle.png")
+            logger.info("战斗结束")
+            return True
+        except Exception:
+            continue
 
 
 def scroll(distance: int) -> bool:
