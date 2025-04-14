@@ -396,11 +396,32 @@ class Main(QWidget):
         self.main_window.close()
 
     def notice(self):
-        QMessageBox.information(
-            self,
-            "更新公告",
-            "更新公告已移动"
-            "\n感谢您对SRA的支持！")
+        version = Configure.load("version.json")
+        announcement_board = AnnouncementBoard(self.ui, "公告栏")
+        announcement_board.add(AnnouncementDialog(
+            None,
+            "长期公告",
+            f"<html><i>点击下方按钮关闭公告栏</i>{version['Announcement']}"
+            "<h4>长期公告</h4>"
+            f"<h2>SRA崩坏：星穹铁道助手 v{VERSION} by雪影</h2>"
+            "<h3>使用说明：</h3>"
+            "<b>重要！推荐调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕<br>"
+            "重要！执行任务时不要进行其他操作！<br></b>"
+            "<p>声明：本程序<font color='green'>完全免费</font>，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
+            "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
+            "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
+            "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，<b>相应的后果由您自行承担</b>。</p>"
+            "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B站、微博）的官方动态下讨论任何关于 SRA 的内容。<br>"
+            "人话：不要跳脸官方～(∠・ω&lt; )⌒☆</html>",
+            announcement_type="Announcement", icon='res/Robin.gif'))
+
+        announcement_board.add(AnnouncementDialog(
+            None, "更新公告",
+            version["VersionUpdate"],
+            announcement_type="VersionUpdate",
+            icon='res/Robin2.gif'))
+        announcement_board.setDefault(1)
+        announcement_board.show()
 
     def problem(self):
         QMessageBox.information(
@@ -491,30 +512,8 @@ if __name__ == "__main__":
 
         version = Configure.load("version.json")
         if not version["Announcement.DoNotShowAgain"]:
-            announcement_board=AnnouncementBoard(window.main.ui,"公告栏")
-            announcement_board.add(AnnouncementDialog(
-                None,
-                "长期公告",
-                f"<html><i>点击下方按钮关闭公告栏</i>{version['Announcement']}"
-                "<h4>长期公告</h4>"
-                f"<h2>SRA崩坏：星穹铁道助手 v{VERSION} by雪影</h2>"
-                "<h3>使用说明：</h3>"
-                "<b>重要！推荐调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕<br>"
-                "重要！执行任务时不要进行其他操作！<br></b>"
-                "<p>声明：本程序<font color='green'>完全免费</font>，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
-                "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
-                "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
-                "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，<b>相应的后果由您自行承担</b>。</p>"
-                "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B站、微博）的官方动态下讨论任何关于 SRA 的内容。<br>"
-                "人话：不要跳脸官方～(∠・ω&lt; )⌒☆</html>",
-                announcement_type="Announcement",icon='res/Robin.gif'))
+            window.main.notice()
 
-            announcement_board.add(AnnouncementDialog(
-                None, "更新公告",
-                version["VersionUpdate"],
-                announcement_type="VersionUpdate",
-                icon='res/Robin2.gif'))
-            announcement_board.show()
         sys.exit(app.exec())
 
     else:
