@@ -1,0 +1,45 @@
+name: mirrorchyan_resource
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "version.json"
+      - "res/**"
+  workflow_dispatch:
+
+jobs:
+  mirrorchyan_resource:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version Name
+        id: version_name
+        run: |
+          data=$(cat version.json)
+
+          version=$(echo $data | jq -r .resource_version)
+          release_note=$(echo $data | jq -r .resource_announcement)
+
+          echo "version=$version" | tee -a "$GITHUB_OUTPUT"
+          echo "release_note=$release_note" | tee -a "$GITHUB_OUTPUT"
+
+      - uses: MirrorChyan/release-note-action@v1
+        with:
+          mirrorchyan_rid: StarRailAssistantResource
+
+          version_name: ${{ steps.version_name.outputs.version }}
+          release_note: ${{ steps.version_name.outputs.release_note }}
+          
+          upload_token: ${{ secrets.MirrorChyanUploadToken }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: MirrorChyan/uploading-action@v1
+        with:
+          filetype: local
+          mirrorchyan_rid: StarRailAssistantResource
+          pick_files: '["res", "version.json"]'
+          version_name: ${{ steps.version_name.outputs.version }}
+          upload_token: ${{ secrets.MirrorChyanUploadToken }}
