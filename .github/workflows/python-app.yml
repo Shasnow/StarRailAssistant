@@ -26,7 +26,8 @@ on:
       - 'LICENSE'
 
 permissions:
-  contents: read
+  contents: write
+  actions: write
 
 jobs:
   pre_check:
@@ -136,3 +137,11 @@ jobs:
           gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" --prerelease artifacts/*
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+
+      - name: Trigger MirrorChyanUploading
+        shell: bash
+        run: |
+          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan
+          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
