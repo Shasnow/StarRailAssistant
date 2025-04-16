@@ -19,7 +19,11 @@
 name: Build StarRailAssistant
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ "dev" ]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
 
 permissions:
   contents: write
@@ -66,6 +70,15 @@ jobs:
         run: |
           $VERSION=(Get-Content -Path "version_info.txt" -TotalCount 1).Trim()
           "version=$VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
+      - name: Add SRAUpdater
+        run: |
+          gh release download SRAUpdater --repo Shasnow/SRAUpdater --pattern "SRAUpdater.zip"
+          Expand-Archive -Path StarRailAssistant_${{ env.version }}.zip -DestinationPath StarRailAssistant
+          Expand-Archive -Path SRAUpdater.zip -DestinationPath SRAUpdater
+          Remove-Item -Path StarRailAssistant_${{ env.version }}.zip
+          Remove-Item -Path SRAUpdater.zip
+          Copy-Item -Path SRAUpdater\* -Destination StarRailAssistant -Recurse -Force
+          Compress-Archive -Path StarRailAssistant\* -DestinationPath StarRailAssistant_${{ env.version }}.zip
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -76,68 +89,3 @@ jobs:
         with:
           name: version_info
           path: version_info.txt
-  publish_release:
-    name: Publish release
-    needs: build_StarRailAssistant
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: StarRailAssistant_*
-          merge-multiple: true
-          path: artifacts
-      - name: Download Version_Info
-        uses: actions/download-artifact@v4
-        with:
-          name: version_info
-          path: ./
-      - name: Check if release exists
-        id: check_if_release_exists
-        run: |
-          release_id=$(gh release view $(sed 's/\r$//g' <(head -n 1 version_info.txt)) --json id --jq .id || true)
-          if [[ -z $release_id ]]; then
-            echo "release_exists=false" >> $GITHUB_OUTPUT
-          else
-            echo "release_exists=true" >> $GITHUB_OUTPUT
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-      - name: Create release
-        id: create_release
-        if: steps.check_if_release_exists.outputs.release_exists == 'false'
-        run: |
-          set -xe
-          shopt -s nullglob
-          NAME="$(sed 's/\r$//g' <(head -n 1 version_info.txt))"
-          TAGNAME="$(sed 's/\r$//g' <(head -n 1 version_info.txt))"
-          NOTES_MAIN="$(sed 's/\r$//g' <(tail -n +3 version_info.txt))"
-          NOTES_TAIL="\`\`\`本release通过GitHub Actions自动构建\`\`\`"
-          NOTES="$NOTES_MAIN<br><br>$NOTES_TAIL"
-          gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" --prerelease artifacts/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-      - name: Update release
-        if: steps.check_if_release_exists.outputs.release_exists == 'true'
-        run: |
-          set -xe
-          shopt -s nullglob
-          NAME="$(sed 's/\r$//g' <(head -n 1 version_info.txt))"
-          TAGNAME="$(sed 's/\r$//g' <(head -n 1 version_info.txt))"
-          NOTES_MAIN="$(sed 's/\r$//g' <(tail -n +3 version_info.txt))"
-          NOTES_TAIL="\`\`\`本release通过GitHub Actions自动构建\`\`\`"
-          NOTES="$NOTES_MAIN<br><br>$NOTES_TAIL"
-          gh release delete "$TAGNAME" --yes
-          gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" --prerelease artifacts/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-
-      - name: Trigger MirrorChyanUploading
-        shell: bash
-        run: |
-          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan
-          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
