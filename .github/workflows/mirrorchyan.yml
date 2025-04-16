@@ -5,6 +5,7 @@ on:
 
 jobs:
   mirrorchyan:
+    runs-on: macos-latest
     steps:
       - uses: MirrorChyan/uploading-action@v1
         with:
