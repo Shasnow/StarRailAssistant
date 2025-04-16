@@ -1,0 +1,18 @@
+name: mirrorchyan_release_note
+
+on:
+  workflow_dispatch:
+  release:
+    types: [edited]
+
+jobs:
+  mirrorchyan:
+    runs-on: macos-latest
+
+    steps:
+      - uses: MirrorChyan/release-note-action@v1
+        with:
+          mirrorchyan_rid: StarRailAssistant
+
+          upload_token: ${{ secrets.MirrorChyanUploadToken }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
