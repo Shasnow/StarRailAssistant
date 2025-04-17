@@ -942,7 +942,7 @@ class Assistant(QThread):
 
     def divergent_universe(self, times: int):
         logger.info("执行任务：差分宇宙-周期演算")
-        for _ in range(times):
+        for exe_time in range(times):
             if check("res/img/differential_universe_start.png", max_time=20):
                 click("res/img/differential_universe_start.png")
             else:
@@ -958,7 +958,7 @@ class Assistant(QThread):
                 logger.error("发生错误，错误编号20")
                 return False
 
-            logger.info("等待进入差分宇宙")
+            logger.info("f第{exe_time + 1}次进入差分宇宙，少女祈祷中…")
             if not check("res/img/base_effect_select.png",max_time=25):
                 logger.error("超时")
                 return False
