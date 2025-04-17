@@ -72,7 +72,7 @@ jobs:
           "version=$VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Add SRAUpdater
         run: |
-          gh release download SRAUpdater --repo Shasnow/SRAUpdater --pattern "SRAUpdater.zip"
+          Invoke-WebRequest -Uri https://github.com/Shasnow/SRAUpdater/releases/download/SRAUpdater/SRAUpdater.zip -OutFile SRAUpdater.zip
           Expand-Archive -Path StarRailAssistant_${{ env.version }}.zip -DestinationPath StarRailAssistant
           Expand-Archive -Path SRAUpdater.zip -DestinationPath SRAUpdater
           Remove-Item -Path StarRailAssistant_${{ env.version }}.zip
