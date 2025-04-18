@@ -1,10 +1,10 @@
 {
-    "version": "0.7.7",
+    "version": "0.7.7.1",
     "resource_version": "0.7.6.1",
     "announcement": ">_< 下载0.7.6谢谢配合喵",
     "resource_announcement": "1. 适配周期演算(2025.4.14)",
     "Announcement": "<hr><p>噔噔——新的公告界面～(∠・ω&lt; )⌒☆</p><p>你知道吗：如果关闭SRA的自动更新服务，公告也不会再更新了</p><hr>",
-    "Announcement.DoNotShowAgain": false,
+    "Announcement.DoNotShowAgain": true,
     "VersionUpdate": "<html><h2>版本已更新 0.7.6.1</h2><ol><li>适配周期演算(2025.4.14)</li></ol></html>",
     "Proxys": [
         "https://github.tbedu.top/",

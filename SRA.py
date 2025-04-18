@@ -39,14 +39,29 @@ from PySide6.QtWidgets import (
     QPushButton,
     QCheckBox,
     QVBoxLayout,
-    QTableWidget, QDoubleSpinBox, )  # 从 PySide6 中导入所需的类
+    QTableWidget,
+    QDoubleSpinBox,
+    QLineEdit,
+)  # 从 PySide6 中导入所需的类
+import shutil
 from plyer import notification
 
 from SRACore.core import SRAssistant, AutoPlot
-from SRACore.core.SRAssistant import VERSION,CORE
+from SRACore.core.SRAssistant import VERSION, CORE
 from SRACore.utils import Configure, WindowsPower, WindowsProcess, Encryption
-from SRACore.utils.Dialog import DownloadDialog, AnnouncementDialog, ShutdownDialog, AnnouncementBoard
-from SRACore.utils.SRAWidgets import ReceiveRewards, StartGame, TrailblazePower, QuitGame, SimulatedUniverse
+from SRACore.utils.Dialog import (
+    DownloadDialog,
+    AnnouncementDialog,
+    ShutdownDialog,
+    AnnouncementBoard,
+)
+from SRACore.utils.SRAWidgets import (
+    ReceiveRewards,
+    StartGame,
+    TrailblazePower,
+    QuitGame,
+    SimulatedUniverse,
+)
 
 # from ocr import SRAocr
 
@@ -89,32 +104,46 @@ class Main(QWidget):
         problem_action.triggered.connect(self.problem)
         report_action = self.ui.findChild(QAction, "action_3")
         report_action.triggered.connect(self.report)
-        about_action=self.ui.findChild(QAction,"action_4")
+        about_action = self.ui.findChild(QAction, "action_4")
         about_action.triggered.connect(self.about)
         # end
         # console
-        self.start_game_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_1")
+        self.start_game_checkbox: QCheckBox = self.ui.findChild(
+            QCheckBox, "checkBox1_1"
+        )
         self.start_game_checkbox.setChecked(self.config["Mission"]["startGame"])
-        self.setting1:QPushButton = self.ui.findChild(QPushButton, "pushButton1_1")
+        self.setting1: QPushButton = self.ui.findChild(QPushButton, "pushButton1_1")
         self.setting1.clicked.connect(self.show_start_game_setting)
 
-        self.trailBlazePower_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_2")
-        self.trailBlazePower_checkbox.setChecked(self.config["Mission"]["trailBlazePower"])
-        self.setting2:QPushButton = self.ui.findChild(QPushButton, "pushButton1_2")
+        self.trailBlazePower_checkbox: QCheckBox = self.ui.findChild(
+            QCheckBox, "checkBox1_2"
+        )
+        self.trailBlazePower_checkbox.setChecked(
+            self.config["Mission"]["trailBlazePower"]
+        )
+        self.setting2: QPushButton = self.ui.findChild(QPushButton, "pushButton1_2")
         self.setting2.clicked.connect(self.show_trail_blaze_power_setting)
 
-        self.receive_rewards_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_3")
-        self.receive_rewards_checkbox.setChecked(self.config["ReceiveRewards"]["enable"])
+        self.receive_rewards_checkbox: QCheckBox = self.ui.findChild(
+            QCheckBox, "checkBox1_3"
+        )
+        self.receive_rewards_checkbox.setChecked(
+            self.config["ReceiveRewards"]["enable"]
+        )
         self.setting3 = self.ui.findChild(QPushButton, "pushButton1_3")
         self.setting3.clicked.connect(self.show_receive_rewards_setting)
 
-        self.quit_game_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_4")
+        self.quit_game_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_4")
         self.quit_game_checkbox.setChecked(self.config["Mission"]["quitGame"])
         self.setting4 = self.ui.findChild(QPushButton, "pushButton1_4")
         self.setting4.clicked.connect(self.show_quit_game_setting)
 
-        self.simulatedUniverse_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_5")
-        self.simulatedUniverse_checkbox.setChecked(self.config["Mission"]["simulatedUniverse"])
+        self.simulatedUniverse_checkbox: QCheckBox = self.ui.findChild(
+            QCheckBox, "checkBox1_5"
+        )
+        self.simulatedUniverse_checkbox.setChecked(
+            self.config["Mission"]["simulatedUniverse"]
+        )
         self.setting5: QPushButton = self.ui.findChild(QPushButton, "pushButton1_5")
         self.setting5.clicked.connect(self.show_simulated_universe_setting)
 
@@ -150,28 +179,40 @@ class Main(QWidget):
         self.software_setting()
 
     def get_mission(self):
-        self.config["Mission"]["startGame"]=self.start_game_checkbox.isChecked()
-        self.config["Mission"]["trailBlazePower"]=self.trailBlazePower_checkbox.isChecked()
-        self.config["ReceiveRewards"]["enable"]=self.receive_rewards_checkbox.isChecked()
-        self.config["Mission"]["quitGame"]=self.quit_game_checkbox.isChecked()
-        self.config["Mission"]["simulatedUniverse"]=self.simulatedUniverse_checkbox.isChecked()
+        self.config["Mission"]["startGame"] = self.start_game_checkbox.isChecked()
+        self.config["Mission"][
+            "trailBlazePower"
+        ] = self.trailBlazePower_checkbox.isChecked()
+        self.config["ReceiveRewards"][
+            "enable"
+        ] = self.receive_rewards_checkbox.isChecked()
+        self.config["Mission"]["quitGame"] = self.quit_game_checkbox.isChecked()
+        self.config["Mission"][
+            "simulatedUniverse"
+        ] = self.simulatedUniverse_checkbox.isChecked()
 
     def extension(self):
         auto_plot_checkbox = self.ui.findChild(QCheckBox, "autoplot_checkBox")
         auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
         # relics_identification_button:QPushButton=self.ui.findChild(QPushButton,"relicsIdentification")
         # relics_identification_button.clicked.connect(self.relics_identification)
-        divination_button: QPushButton = self.ui.findChild(QPushButton, "pushButton_add_app_1")
+        divination_button: QPushButton = self.ui.findChild(
+            QPushButton, "pushButton_add_app_1"
+        )
         divination_button.clicked.connect(self.divination)
 
     def divination(self):
         if os.path.exists("res/ui/divination.ui"):
             from SRACore.extensions.FuXuanDivination import FuXuanDivination
+
             div = FuXuanDivination(self)
             div.ui.show()
         else:
-            download = DownloadDialog(self, "大衍穷观阵",
-                                      "https://gitee.com/yukikage/StarRailAssistant/releases/download/divination/divination.zip")
+            download = DownloadDialog(
+                self,
+                "大衍穷观阵",
+                "https://gitee.com/yukikage/StarRailAssistant/releases/download/divination/divination.zip",
+            )
             download.show()
 
     def auto_plot_status(self, state):
@@ -208,7 +249,9 @@ class Main(QWidget):
         clear_log_button: QPushButton = self.ui.findChild(QPushButton, "clearLog")
         clear_log_button.clicked.connect(self.clearLog)
 
-        confidence_spin_box: QDoubleSpinBox = self.ui.findChild(QDoubleSpinBox, "confidenceSpinBox")
+        confidence_spin_box: QDoubleSpinBox = self.ui.findChild(
+            QDoubleSpinBox, "confidenceSpinBox"
+        )
         confidence_spin_box.setValue(self.config["Settings"]["confidence"])
         confidence_spin_box.valueChanged.connect(self.confidence_changed)
 
@@ -216,7 +259,18 @@ class Main(QWidget):
         zoom_spinbox.setValue(self.config["Settings"]["zoom"])
         zoom_spinbox.valueChanged.connect(self.zoom_changed)
 
-        integrity_check_button:QPushButton=self.ui.findChild(QPushButton,"integrityCheck")
+        mirrorchyanCDK: QLineEdit = self.ui.findChild(
+            QLineEdit, "lineEdit_mirrorchyanCDK"
+        )
+        mirrorchyanCDK
+        mirrorchyanCDK.setText(
+            Encryption.win_decryptor(self.config["Settings"]["mirrorchyanCDK"])
+        )
+        mirrorchyanCDK.textChanged.connect(self.mirrorchyanCDK_changed)
+
+        integrity_check_button: QPushButton = self.ui.findChild(
+            QPushButton, "integrityCheck"
+        )
         integrity_check_button.clicked.connect(self.integrity_check)
 
     def key_setting_save(self):
@@ -247,7 +301,8 @@ class Main(QWidget):
     def auto_update(self, state):
         if state == 2:
             if os.path.exists("SRAUpdater.exe"):
-                WindowsProcess.Popen("SRAUpdater.exe")
+                shutil.copy("SRAUpdater.exe", "SRAUpdater.active.exe")
+                WindowsProcess.Popen("SRAUpdater.active.exe")
             else:
                 self.update_log("缺少文件SRAUpdater.exe 无法自动更新")
             self.config["Settings"]["autoUpdate"] = True
@@ -270,9 +325,14 @@ class Main(QWidget):
         self.config["Settings"]["zoom"] = value
         Configure.save(self.config)
 
+    def mirrorchyanCDK_changed(self, value):
+        self.config["Settings"]["mirrorchyanCDK"] = Encryption.win_encryptor(value)
+        Configure.save(self.config)
+
     @staticmethod
     def integrity_check():
-        command="SRAUpdater -i"
+        shutil.copy("SRAUpdater.exe", "SRAUpdater.active.exe")
+        command = "SRAUpdater.active -i"
         WindowsProcess.Popen(command)
 
     def show_start_game_setting(self):
@@ -326,7 +386,7 @@ class Main(QWidget):
             self.config["Mission"]["trailBlazePower"],
             self.config["ReceiveRewards"]["enable"],
             self.config["Mission"]["quitGame"],
-            self.config["Mission"]["simulatedUniverse"]
+            self.config["Mission"]["simulatedUniverse"],
         ]
         if all(not flag for flag in flags):
             self.log.append("未选择任何任务")
@@ -398,28 +458,36 @@ class Main(QWidget):
     def notice(self):
         version = Configure.load("version.json")
         announcement_board = AnnouncementBoard(self.ui, "公告栏")
-        announcement_board.add(AnnouncementDialog(
-            None,
-            "长期公告",
-            f"<html><i>点击下方按钮关闭公告栏</i>{version['Announcement']}"
-            "<h4>长期公告</h4>"
-            f"<h2>SRA崩坏：星穹铁道助手 v{VERSION} by雪影</h2>"
-            "<h3>使用说明：</h3>"
-            "<b>重要！推荐调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕<br>"
-            "重要！执行任务时不要进行其他操作！<br></b>"
-            "<p>声明：本程序<font color='green'>完全免费</font>，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
-            "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
-            "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
-            "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，<b>相应的后果由您自行承担</b>。</p>"
-            "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B站、微博）的官方动态下讨论任何关于 SRA 的内容。<br>"
-            "人话：不要跳脸官方～(∠・ω&lt; )⌒☆</html>",
-            announcement_type="Announcement", icon='res/Robin.gif'))
+        announcement_board.add(
+            AnnouncementDialog(
+                None,
+                "长期公告",
+                f"<html><i>点击下方按钮关闭公告栏</i>{version['Announcement']}"
+                "<h4>长期公告</h4>"
+                f"<h2>SRA崩坏：星穹铁道助手 v{VERSION} by雪影</h2>"
+                "<h3>使用说明：</h3>"
+                "<b>重要！推荐调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕<br>"
+                "重要！执行任务时不要进行其他操作！<br></b>"
+                "<p>声明：本程序<font color='green'>完全免费</font>，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
+                "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
+                "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
+                "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，<b>相应的后果由您自行承担</b>。</p>"
+                "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B站、微博）的官方动态下讨论任何关于 SRA 的内容。<br>"
+                "人话：不要跳脸官方～(∠・ω&lt; )⌒☆</html>",
+                announcement_type="Announcement",
+                icon="res/Robin.gif",
+            )
+        )
 
-        announcement_board.add(AnnouncementDialog(
-            None, "更新公告",
-            version["VersionUpdate"],
-            announcement_type="VersionUpdate",
-            icon='res/Robin2.gif'))
+        announcement_board.add(
+            AnnouncementDialog(
+                None,
+                "更新公告",
+                version["VersionUpdate"],
+                announcement_type="VersionUpdate",
+                icon="res/Robin2.gif",
+            )
+        )
         announcement_board.setDefault(1)
         announcement_board.show()
 
@@ -449,12 +517,8 @@ class Main(QWidget):
         )
 
     def about(self):
-        QMessageBox.information(
-            self,
-            "关于",
-            f"版本：{VERSION}\n"
-            f"内核版本：{CORE}"
-        )
+        QMessageBox.information(self, "关于", f"版本：{VERSION}\n" f"内核版本：{CORE}")
+
     @staticmethod
     def clearLog():
         with open("SRAlog.log", "w", encoding="utf-8"):
@@ -507,8 +571,10 @@ if __name__ == "__main__":
         end_time = time.time()
         total_time = end_time - start_time
         window.main.update_log(
-            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) +
-            " 程序启动成功，耗时" + f"{total_time:.2f}s")
+            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            + " 程序启动成功，耗时"
+            + f"{total_time:.2f}s"
+        )
 
         version = Configure.load("version.json")
         if not version["Announcement.DoNotShowAgain"]:

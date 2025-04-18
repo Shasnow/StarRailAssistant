@@ -23,6 +23,8 @@ v0.7.0
 数据加密
 """
 import os
+import base64
+import win32crypt
 
 from cryptography.fernet import Fernet
 
@@ -50,6 +52,30 @@ def decrypt_word(encrypted_password, key_file="data/frperg.sra"):
     cipher_suite = Fernet(key)
     decrypted_pwd = cipher_suite.decrypt(encrypted_password).decode()
     return decrypted_pwd
+
+
+def win_encryptor(note: str, description: str = None, entropy: bytes = None) -> str:
+    """使用Windows DPAPI加密数据"""
+
+    if note == "":
+        return ""
+
+    encrypted = win32crypt.CryptProtectData(
+        note.encode("utf-8"), description, entropy, None, None, 0
+    )
+    return base64.b64encode(encrypted).decode("utf-8")
+
+
+def win_decryptor(note: str, entropy: bytes = None) -> str:
+    """使用Windows DPAPI解密数据"""
+
+    if note == "":
+        return ""
+
+    decrypted = win32crypt.CryptUnprotectData(
+        base64.b64decode(note), entropy, None, None, 0
+    )
+    return decrypted[1].decode("utf-8")
 
 
 def init():
