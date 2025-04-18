@@ -29,29 +29,12 @@ import shutil
 from pathlib import Path
 
 
-def version_text(version_numb: list) -> str:
-    """将版本号列表转为可读的文本信息"""
-
-    while len(version_numb) < 4:
-        version_numb.append(0)
-
-    if version_numb[3] == 0:
-        version = f"v{'.'.join(str(_) for _ in version_numb[0:3])}"
-    else:
-        version = (
-            f"v{'.'.join(str(_) for _ in version_numb[0:3])}-beta.{version_numb[3]}"
-        )
-    return version
-
-
 if __name__ == "__main__":
 
     root_path = Path(sys.argv[0]).resolve().parent
 
     with (root_path / "version.json").open(mode="r", encoding="utf-8") as f:
         version = json.load(f)
-
-    main_version_numb = list(map(int, version["version"].split(".")))
 
     print("Packaging SRA main program ...")
 
@@ -80,7 +63,7 @@ if __name__ == "__main__":
     print("Start to compress ...")
 
     shutil.make_archive(
-        base_name=root_path / f"StarRailAssistant_{version_text(main_version_numb)}",
+        base_name=root_path / f"StarRailAssistant_v{version['version']}",
         format="zip",
         root_dir=root_path / "SRA.dist",
         base_dir=".",
@@ -90,6 +73,5 @@ if __name__ == "__main__":
     print("SRA main program packaging completed !")
 
     (root_path / "version_info.txt").write_text(
-        f"{version_text(main_version_numb)}\n\n{version['announcement']}",
-        encoding="utf-8",
+        f"v{version['version']}\n\n{version['announcement']}", encoding="utf-8"
     )
