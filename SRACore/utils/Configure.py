@@ -62,7 +62,7 @@ def init() -> None:
             ["giftOfOdyssey", False],
             ["redeemCode", False],
             ["quitGame", False],
-            ["simulatedUniverse",False]
+            ["simulatedUniverse", False],
         ],
         "StartGame": [
             ["autoLogin", False],
@@ -80,11 +80,7 @@ def init() -> None:
             ["way", 1],
             ["runTimes", 1],
         ],
-        "Support":[
-            ["enable",False],
-            ["role",''],
-            ["changeLineup",False]
-        ],
+        "Support": [["enable", False], ["role", ""], ["changeLineup", False]],
         "OrnamentExtraction": [
             ["enable", False],
             ["level", 1],
@@ -122,11 +118,11 @@ def init() -> None:
             ["shutdown", False],
             ["sleep", False],
         ],
-        "DivergentUniverse":[
+        "DivergentUniverse": [
             ["enable", False],
             ["mode", 0],
-            ["times",1],
-            ["policy",0],
+            ["times", 1],
+            ["policy", 0],
         ],
         "Settings": [
             ["F1", "f1"],
@@ -137,13 +133,14 @@ def init() -> None:
             ["autoUpdate", True],
             ["threadSafety", False],
             ["confidence", 0.9],
-            ["zoom",1.5],
+            ["zoom", 1.5],
+            ["mirrorchyanCDK", ""],
             ["uiSize", "1200x800"],
             ["uiLocation", "100x100"],
         ],
         "CloudGame": [["firstly", True]],
     }
-    with open("data/config.json", "r",encoding="utf-8") as f:
+    with open("data/config.json", "r", encoding="utf-8") as f:
         config = json.load(f)
     for index in config_list_1:
         if not index in config:
@@ -155,7 +152,7 @@ def init() -> None:
         json.dump(config, f, indent=4)
 
 
-def load(path:str="data/config.json") -> dict:
+def load(path: str = "data/config.json") -> dict:
     """
     Load configurations.
 
@@ -167,7 +164,7 @@ def load(path:str="data/config.json") -> dict:
     return config
 
 
-def save(config: dict, path:str="data/config.json") -> bool:
+def save(config: dict, path: str = "data/config.json") -> bool:
     """
     Save configurations.
     """
@@ -177,5 +174,3 @@ def save(config: dict, path:str="data/config.json") -> bool:
         return True
     except Exception:
         return False
-
-
