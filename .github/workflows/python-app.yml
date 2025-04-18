@@ -66,6 +66,15 @@ jobs:
         run: |
           $VERSION=(Get-Content -Path "version_info.txt" -TotalCount 1).Trim()
           "version=$VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
+      - name: Add SRAUpdater
+        run: |
+          Invoke-WebRequest -Uri https://github.com/Shasnow/SRAUpdater/releases/download/SRAUpdater/SRAUpdater.zip -OutFile SRAUpdater.zip
+          Expand-Archive -Path StarRailAssistant_${{ env.version }}.zip -DestinationPath StarRailAssistant
+          Expand-Archive -Path SRAUpdater.zip -DestinationPath SRAUpdater
+          Remove-Item -Path StarRailAssistant_${{ env.version }}.zip
+          Remove-Item -Path SRAUpdater.zip
+          Copy-Item -Path SRAUpdater\* -Destination StarRailAssistant -Recurse -Force
+          Compress-Archive -Path StarRailAssistant\* -DestinationPath StarRailAssistant_${{ env.version }}.zip
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
