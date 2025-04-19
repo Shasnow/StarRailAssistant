@@ -318,6 +318,7 @@ class AfterMission(SRAWidget):
         super().__init__(parent, config)
         self.ui = uiLoader.load("res/ui/set_10.ui")
         self.logout_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "log_out")
+        self.quit_game_checkbox:QCheckBox=self.ui.findChild(QCheckBox,"quit_game")
         self.exit_checkbox: QCheckBox = self.ui.findChild(
             QCheckBox, "checkBox2_1_1"
         )
@@ -331,12 +332,14 @@ class AfterMission(SRAWidget):
 
     def setter(self):
         self.logout_checkbox.setChecked(self.config["AfterMission"]["logout"])
+        self.quit_game_checkbox.setChecked(self.config["AfterMission"]["quitGame"])
 
     def connector(self):
         pass
 
     def getter(self):
         self.config["AfterMission"]["logout"] = self.logout_checkbox.isChecked()
+        self.config["AfterMission"]["quitGame"]=self.quit_game_checkbox.isChecked()
         return self.exit_checkbox.isChecked(), self.radio_button1.isChecked(), self.radio_button2.isChecked()
 
 

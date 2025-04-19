@@ -361,8 +361,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>417</width>
-             <height>267</height>
+             <width>663</width>
+             <height>501</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -575,9 +575,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
+             <y>-104</y>
              <width>667</width>
-             <height>746</height>
+             <height>613</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -1204,28 +1204,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
                   <bool>true</bool>
                  </property>
                 </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="groupBox_10">
-              <property name="title">
-               <string>赞助者</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_8">
-               <item>
-                <widget class="QLabel" name="label_4">
-                 <property name="text">
-                  <string>感谢下列用户对SRA的赞助</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QListWidget" name="listWidget"/>
                </item>
               </layout>
              </widget>

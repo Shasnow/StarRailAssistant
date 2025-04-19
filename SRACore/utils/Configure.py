@@ -64,8 +64,8 @@ config_list_2 = {
         ["gamePath", ""],
         ["pathType", "StarRail"],
         ["channel", 0],
-        ["user",''],
-        ["savePassword",False]
+        ["user", ''],
+        ["savePassword", False]
     ],
     "ReceiveRewards": [["enable", False]],
     "RedeemCode": [
@@ -114,11 +114,12 @@ config_list_2 = {
         ["level", 1],
     ],
     "AfterMission": [
-        ["logout",False],
+        ["logout", False],
+        ["quitGame", False],
         ["exitSRA", False],
         ["shutdown", False],
         ["sleep", False],
-        ["logout",False]
+        ["logout", False]
     ],
     "DivergentUniverse": [
         ["enable", False],
@@ -135,7 +136,7 @@ global_config_list2 = {
     "Config": [
         ["currentConfig", 0],
         ["configList", ["Default"]],
-        ["next",False]
+        ["next", False]
     ],
     "Settings": [
         ["F1", "f1"],
@@ -202,10 +203,9 @@ def addConfig(name: str):
         config[key] = {}
         for value in config_list_2[key]:
             config[key][value[0]] = value[1]
-    config["StartGame"]["user"]=Encryption.new()
+    config["StartGame"]["user"] = Encryption.new()
     with open(f"data/config-{name}.json", "w", encoding="utf-8") as f:
         json.dump(config, f, indent=4, ensure_ascii=False)
-
 
 
 def load(path: str) -> dict:
@@ -237,8 +237,10 @@ def save(config: dict, path: str) -> bool:
     except Exception:
         return False
 
-def remove(name:str):
+
+def remove(name: str):
     os.remove(f"data/config-{name}.json")
 
-def rename(old:str,new:str):
-    os.rename(f'data/config-{old}.json',f'data/config-{new}.json')
+
+def rename(old: str, new: str):
+    os.rename(f'data/config-{old}.json', f'data/config-{new}.json')
