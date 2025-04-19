@@ -44,12 +44,13 @@ This software is open source, free of charge and for learning and exchange purpo
   * *从不回头看`“爆炸”`*，可选退出SRA以及关闭计算机。
 * 自动剧情
   * 只包含点击对话
+* 多账号切换
 
 ## 我怎么才能使用SRA？急急急
 
 下载链接：  
 下载更新器，借助更新器下载：[SRA更新器](https://github.com/Shasnow/SRAUpdater/releases/download/SRAUpdater/SRAUpdater.zip)
-或者直接下载本体，里面包含了更新器：[SRAv0.7.1](https://github.com/Shasnow/StarRailAssistant/releases/download/v0.7.1/StarRailAssistant_v0.7.1.zip)
+或者直接下载本体，里面包含了更新器：[SRAv0.7.6](https://github.com/Shasnow/StarRailAssistant/releases/download/v0.7.6/StarRailAssistant_v0.7.6.zip)
 
 * 如果你是小白，只需要下载项目中的`zip`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`.exe`即可！
 * **我想挑战一下自己！** 当然没问题。打包下载项目中所有文件，确保你的电脑中已经安装好了`Python`，并使用`pip`来安装依赖。请在项目根文件夹打开终端并运行以下指令：
@@ -92,6 +93,7 @@ This software is open source, free of charge and for learning and exchange purpo
   * 了解 `PySide6` 或其他 `PyQt`、`PySide` 系列库。 *或者——*
   * 了解 `图像识别` 和 `模拟操作` 相关内容。
 * 正在游玩并将长期游玩`崩坏：星穹铁道` 。
+* 熟悉网页前端设计。
 
 或许，您可以`另辟蹊径`？
 
@@ -111,6 +113,20 @@ This software is open source, free of charge and for learning and exchange purpo
 
 </a>
 
+## 赞助者
+感谢以下用户对本项目的赞助
+<div>
+<div style="float:left">
+<img src="https://avatars.githubusercontent.com/u/79625207?v=4" height="50" width="50">
+&nbsp;
+</div>
+
+<div>
+<a href="https://github.com/sanhaQAQ">Sanha</a><br>
+<a href="https://www.miyoushe.com/sr/article/62787970">推荐链接</a>
+</div>
+</div>
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Shasnow/StarRailAssistant&type=Date)](https://star-history.com/#Shasnow/StarRailAssistant&Date)
@@ -119,7 +135,7 @@ This software is open source, free of charge and for learning and exchange purpo
 
 # 项目优化方向 ~~（画大饼环节）~~
 
-* [ ] 多账号托管和切换
+* [x] 多账号托管和切换
 * [ ] 战利品查漏补缺
 * [ ] 兼容云·星穹铁道
 * [x] 与B服（世界树）的适配

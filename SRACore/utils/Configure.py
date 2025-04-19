@@ -24,135 +24,191 @@ v0.7.0
 """
 import json
 import os
+from pathlib import Path
+
+from SRACore.utils import Encryption
+
+config_list_1 = [
+    "Mission",
+    "StartGame",
+    "ReceiveRewards",
+    "RedeemCode",
+    "Replenish",
+    "Support",
+    "OrnamentExtraction",
+    "CalyxGolden",
+    "CalyxCrimson",
+    "StagnantShadow",
+    "CaverOfCorrosion",
+    "EchoOfWar",
+    "AfterMission",
+    "DivergentUniverse",
+]
+config_list_2 = {
+    "Mission": [
+        ["startGame", False],
+        ["trailBlazePower", False],
+        ["trailBlazerProfile", True],
+        ["assignment", True],
+        ["mail", True],
+        ["dailyTraining", True],
+        ["namelessHonor", True],
+        ["giftOfOdyssey", False],
+        ["redeemCode", False],
+        ["afterMission", False],
+        ["simulatedUniverse", False]
+    ],
+    "StartGame": [
+        ["autoLogin", False],
+        ["launcher", False],
+        ["gamePath", ""],
+        ["pathType", "StarRail"],
+        ["channel", 0],
+        ["user",''],
+        ["savePassword",False]
+    ],
+    "ReceiveRewards": [["enable", False]],
+    "RedeemCode": [
+        ["codeList", []],
+    ],
+    "Replenish": [
+        ["enable", False],
+        ["way", 1],
+        ["runTimes", 1],
+    ],
+    "Support": [
+        ["enable", False],
+        ["role", ''],
+        ["changeLineup", False]
+    ],
+    "OrnamentExtraction": [
+        ["enable", False],
+        ["level", 1],
+        ["runTimes", 1],
+    ],
+    "CalyxGolden": [
+        ["enable", False],
+        ["level", 1],
+        ["singleTimes", 1],
+        ["runTimes", 1],
+    ],
+    "CalyxCrimson": [
+        ["enable", False],
+        ["level", 1],
+        ["singleTimes", 1],
+        ["runTimes", 1],
+    ],
+    "StagnantShadow": [
+        ["enable", False],
+        ["level", 1],
+        ["runTimes", 1],
+    ],
+    "CaverOfCorrosion": [
+        ["enable", False],
+        ["level", 1],
+        ["runTimes", 1],
+    ],
+    "EchoOfWar": [
+        ["enable", False],
+        ["runTimes", 1],
+        ["level", 1],
+    ],
+    "AfterMission": [
+        ["logout",False],
+        ["exitSRA", False],
+        ["shutdown", False],
+        ["sleep", False],
+        ["logout",False]
+    ],
+    "DivergentUniverse": [
+        ["enable", False],
+        ["mode", 0],
+        ["times", 1],
+        ["policy", 0],
+    ],
+}
+global_config_list1 = [
+    "Config",
+    "Settings"
+]
+global_config_list2 = {
+    "Config": [
+        ["currentConfig", 0],
+        ["configList", ["Default"]],
+        ["next",False]
+    ],
+    "Settings": [
+        ["F1", "f1"],
+        ["F2", "f2"],
+        ["F3", "f3"],
+        ["F4", "f4"],
+        ["startup", False],
+        ["autoUpdate", True],
+        ["threadSafety", False],
+        ["confidence", 0.9],
+        ["zoom", 1.5],
+        ["mirrorchyanCDK", ""],
+        ["uiSize", "1200x800"],
+        ["uiLocation", "100x100"],
+    ],
+}
 
 
 def init() -> None:
-    if not os.path.exists("data/config.json"):
-        config = {}
+    if not any(Path("data").glob("config-*")):
         os.makedirs("data", exist_ok=True)
-        with open("data/config.json", "w") as f:
-            json.dump(config, f, indent=4)
-    config_list_1 = [
-        "Mission",
-        "StartGame",
-        "ReceiveRewards",
-        "RedeemCode",
-        "Replenish",
-        "Support",
-        "OrnamentExtraction",
-        "CalyxGolden",
-        "CalyxCrimson",
-        "StagnantShadow",
-        "CaverOfCorrosion",
-        "EchoOfWar",
-        "QuitGame",
-        "DivergentUniverse",
-        "Settings",
-        "CloudGame",
-    ]
-    config_list_2 = {
-        "Mission": [
-            ["startGame", False],
-            ["trailBlazePower", False],
-            ["trailBlazerProfile", True],
-            ["assignment", True],
-            ["mail", True],
-            ["dailyTraining", True],
-            ["namelessHonor", True],
-            ["giftOfOdyssey", False],
-            ["redeemCode", False],
-            ["quitGame", False],
-            ["simulatedUniverse", False],
-        ],
-        "StartGame": [
-            ["autoLogin", False],
-            ["launcher", False],
-            ["gamePath", ""],
-            ["pathType", "StarRail"],
-            ["channel", 0],
-        ],
-        "ReceiveRewards": [["enable", False]],
-        "RedeemCode": [
-            ["codeList", []],
-        ],
-        "Replenish": [
-            ["enable", False],
-            ["way", 1],
-            ["runTimes", 1],
-        ],
-        "Support": [["enable", False], ["role", ""], ["changeLineup", False]],
-        "OrnamentExtraction": [
-            ["enable", False],
-            ["level", 1],
-            ["runTimes", 1],
-        ],
-        "CalyxGolden": [
-            ["enable", False],
-            ["level", 1],
-            ["singleTimes", 1],
-            ["runTimes", 1],
-        ],
-        "CalyxCrimson": [
-            ["enable", False],
-            ["level", 1],
-            ["singleTimes", 1],
-            ["runTimes", 1],
-        ],
-        "StagnantShadow": [
-            ["enable", False],
-            ["level", 1],
-            ["runTimes", 1],
-        ],
-        "CaverOfCorrosion": [
-            ["enable", False],
-            ["level", 1],
-            ["runTimes", 1],
-        ],
-        "EchoOfWar": [
-            ["enable", False],
-            ["runTimes", 1],
-            ["level", 1],
-        ],
-        "QuitGame": [
-            ["exitSRA", False],
-            ["shutdown", False],
-            ["sleep", False],
-        ],
-        "DivergentUniverse": [
-            ["enable", False],
-            ["mode", 0],
-            ["times", 1],
-            ["policy", 0],
-        ],
-        "Settings": [
-            ["F1", "f1"],
-            ["F2", "f2"],
-            ["F3", "f3"],
-            ["F4", "f4"],
-            ["startup", False],
-            ["autoUpdate", True],
-            ["threadSafety", False],
-            ["confidence", 0.9],
-            ["zoom", 1.5],
-            ["mirrorchyanCDK", ""],
-            ["uiSize", "1200x800"],
-            ["uiLocation", "100x100"],
-        ],
-        "CloudGame": [["firstly", True]],
-    }
-    with open("data/config.json", "r", encoding="utf-8") as f:
-        config = json.load(f)
-    for index in config_list_1:
-        if not index in config:
-            config[index] = {}
-        for config_list in config_list_2[index]:
-            if not config_list[0] in config[index]:
-                config[index][config_list[0]] = config_list[1]
-    with open("data/config.json", "w", encoding="utf-8") as f:
-        json.dump(config, f, indent=4)
+        addConfig("Default")
+    if not os.path.exists("data/globals.json"):
+        with open("data/globals.json", "w", encoding="utf-8") as f:
+            json.dump({}, f, indent=4)
+
+    is_changed = False
+    with open("data/globals.json", "r", encoding="utf-8") as f:
+        gbl: dict = json.load(f)
+        for item in global_config_list1:
+            if item not in gbl:
+                gbl[item] = {}
+                is_changed = True
+            for config_list in global_config_list2[item]:
+                if not config_list[0] in gbl[item]:
+                    gbl[item][config_list[0]] = config_list[1]
+                    is_changed = True
+        configs = gbl["Config"]["configList"]
+    if is_changed:
+        with open("data/globals.json", "w", encoding="utf-8") as f:
+            json.dump(gbl, f, indent=4, ensure_ascii=False)
+        is_changed = False
+
+    for name in configs:
+        with open(f"data/config-{name}.json", "r", encoding="utf-8") as f:
+            config = json.load(f)
+        for index in config_list_1:
+            if not index in config:
+                config[index] = {}
+                is_changed = True
+            for config_list in config_list_2[index]:
+                if not config_list[0] in config[index]:
+                    config[index][config_list[0]] = config_list[1]
+                    is_changed = True
+        if is_changed:
+            with open(f"data/config-{name}.json", "w", encoding="utf-8") as f:
+                json.dump(config, f, indent=4, ensure_ascii=False)
+            is_changed = False
 
 
-def load(path: str = "data/config.json") -> dict:
+def addConfig(name: str):
+    config = {}
+    for key in config_list_1:
+        config[key] = {}
+        for value in config_list_2[key]:
+            config[key][value[0]] = value[1]
+    config["StartGame"]["user"]=Encryption.new()
+    with open(f"data/config-{name}.json", "w", encoding="utf-8") as f:
+        json.dump(config, f, indent=4, ensure_ascii=False)
+
+
+
+def load(path: str) -> dict:
     """
     Load configurations.
 
@@ -164,7 +220,13 @@ def load(path: str = "data/config.json") -> dict:
     return config
 
 
-def save(config: dict, path: str = "data/config.json") -> bool:
+def loadConfigByName(name: str) -> dict:
+    with open(f"data/config-{name}.json", "r", encoding="utf-8") as json_file:
+        config = json.load(json_file)
+    return config
+
+
+def save(config: dict, path: str) -> bool:
     """
     Save configurations.
     """
@@ -174,3 +236,9 @@ def save(config: dict, path: str = "data/config.json") -> bool:
         return True
     except Exception:
         return False
+
+def remove(name:str):
+    os.remove(f"data/config-{name}.json")
+
+def rename(old:str,new:str):
+    os.rename(f'data/config-{old}.json',f'data/config-{new}.json')

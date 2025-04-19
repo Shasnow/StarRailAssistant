@@ -42,6 +42,7 @@ class SRAOperator:
     area_left = 0
     zoom = 1.5
     confidence = 0.9
+
     # ocr_engine: RapidOCR = None
 
     @classmethod
@@ -134,6 +135,27 @@ class SRAOperator:
             raise MatchFailureException(f"{img_list}匹配失败")
 
     @classmethod
+    def locateAll(cls, img_list: list):
+        screenshot = cls.get_screenshot()
+        result = []
+        for index, img_path in enumerate(img_list):
+            try:
+                img = cv2.imread(img_path)
+                if img is None:
+                    raise FileNotFoundError("无法找到或读取文件 " + img_path)
+                location = pyscreeze.locate(img, screenshot, confidence=cls.confidence)
+                result.append((index, location))
+            except pyscreeze.ImageNotFoundException:
+                continue
+            except ValueError:
+                continue
+            except FileNotFoundError:
+                continue
+        if len(result) == 0:
+            raise MatchFailureException(f"{img_list}匹配失败")
+        return result
+
+    @classmethod
     def locateCenter(cls, img_path, x_add=0, y_add=0, title="崩坏：星穹铁道") -> tuple[int, int]:
         location = cls.locate(img_path, title)
         x, y = pyscreeze.center(location)
@@ -157,7 +179,7 @@ class SRAOperator:
             cls.locate(img_path)
             return True
         except Exception as e:
-            logger.log(internal,e)
+            logger.log(internal, e)
             return False
 
     @classmethod
@@ -176,7 +198,7 @@ class SRAOperator:
             result = cls.locateAny(img_list)[0]
             return result
         except Exception as e:
-            logger.log(internal,e)
+            logger.log(internal, e)
             return None
 
     @classmethod
@@ -265,7 +287,7 @@ class SRAOperator:
             pyautogui.click(x, y)
             return True
         except Exception as e:
-            logger.log(internal,f"点击对象时出错{e}")
+            logger.log(internal, f"点击对象时出错{e}")
             return False
 
     @classmethod
@@ -274,7 +296,7 @@ class SRAOperator:
             pyautogui.click(x, y)
             return True
         except Exception as e:
-            logger.log(internal,f"点击坐标时出错{e}")
+            logger.log(internal, f"点击坐标时出错{e}")
             return False
 
     @classmethod
@@ -293,7 +315,7 @@ class SRAOperator:
             pyautogui.press(key, presses=presses, interval=interval)
             return True
         except Exception as e:
-            logger.log(internal,f"按下按键失败{e}")
+            logger.log(internal, f"按下按键失败{e}")
             return False
 
     @classmethod
@@ -305,7 +327,7 @@ class SRAOperator:
             pyautogui.keyUp(key)
             return True
         except Exception as e:
-            logger.log(internal,f"按下按键失败{e}")
+            logger.log(internal, f"按下按键失败{e}")
             return False
 
     @staticmethod
@@ -338,7 +360,7 @@ class SRAOperator:
             pyautogui.write(content)
             return True
         except Exception as e:
-            logger.log(internal,f"输入时发生错误{e}")
+            logger.log(internal, f"输入时发生错误{e}")
             return False
 
     @classmethod
@@ -347,11 +369,11 @@ class SRAOperator:
             pyautogui.moveRel(x_offset, y_offset)
             return True
         except Exception as e:
-            logger.log(internal,f"移动光标时出错{e}")
+            logger.log(internal, f"移动光标时出错{e}")
             return False
 
     @classmethod
-    def moveTo(cls,*args):
+    def moveTo(cls, *args):
         return pyautogui.moveTo(args)
 
     @classmethod
@@ -360,7 +382,7 @@ class SRAOperator:
             pyautogui.scroll(distance)
             return True
         except Exception as e:
-            logger.log(internal,f"指针滚动时发生错误{e}")
+            logger.log(internal, f"指针滚动时发生错误{e}")
             return False
 
     @classmethod
@@ -388,7 +410,7 @@ class SRAOperator:
         pyautogui.keyUp("ctrl")
 
     @classmethod
-    def ocr_in_region(cls, area_left,area_top,width,height):
+    def ocr_in_region(cls, area_left, area_top, width, height):
         pass
         # if cls.ocr_engine is None:
         #     cls.ocr_engine = RapidOCR()

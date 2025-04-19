@@ -16,43 +16,41 @@
 
 #   yukikage@qq.com
 
-"""
-崩坏：星穹铁道助手
-v0.7.0
-作者：雪影
-数据加密
-"""
-import os
+import base64
+import os.path
+import time
+from dataclasses import dataclass
+
+import win32crypt
 import base64
 import win32crypt
 
-from cryptography.fernet import Fernet
+from SRAFileType import SRAFileType
 
 
-def generate_key(key_file="data/frperg.sra"):
-    key = Fernet.generate_key()
-    with open(key_file, "wb") as key_file:
-        key_file.write(key)
-    return key
+@dataclass
+class User:
+    account: str
+    password: str
 
 
-def load_key(key_file="data/frperg.sra"):
-    return open(key_file, "rb").read()
+def win_encryptor(note: str, description: str = None, entropy: bytes = None) -> str:
+    """使用Windows DPAPI加密数据"""
+
+    if note == "":
+        return ""
+
+    encrypted = win32crypt.CryptProtectData(
+        note.encode("utf-8"), description, entropy, None, None, 0
+    )
+    return base64.b64encode(encrypted).decode("utf-8")
 
 
-def encrypt_word(pwd, key_file="data/frperg.sra"):
-    key = load_key(key_file)
-    cipher_suite = Fernet(key)
-    encrypted_password = cipher_suite.encrypt(pwd.encode())
-    return encrypted_password
+def win_decryptor(note: str, entropy: bytes = None) -> str:
+    """使用Windows DPAPI解密数据"""
 
-
-def decrypt_word(encrypted_password, key_file="data/frperg.sra"):
-    key = load_key(key_file)
-    cipher_suite = Fernet(key)
-    decrypted_pwd = cipher_suite.decrypt(encrypted_password).decode()
-    return decrypted_pwd
-
+    if note == "":
+        return ""
 
 def win_encryptor(note: str, description: str = None, entropy: bytes = None) -> str:
     """使用Windows DPAPI加密数据"""
@@ -78,26 +76,30 @@ def win_decryptor(note: str, entropy: bytes = None) -> str:
     return decrypted[1].decode("utf-8")
 
 
-def init():
-    if not os.path.exists("data/frperg.sra"):
-        generate_key()
-    if not os.path.exists("data/privacy.sra"):
-        with open("data/privacy.sra", "wb") as sra_file:
-            sra_file.write(encrypt_word(""))
+    decrypted = win32crypt.CryptUnprotectData(
+        base64.b64decode(note), entropy, None, None, 0
+    )
+    return decrypted[1].decode("utf-8")
 
 
-def load():
-    with open("data/privacy.sra", "rb") as sra_file:
-        privacy = sra_file.read()
-        try:
-            acc = privacy
-            account_text = decrypt_word(acc)
-        except IndexError:
-            account_text = ""
-    return account_text
+def save(account, password, path: str):
+    user = User(win_encryptor(account), win_encryptor(password))
+    SRAFileType.save(user, path)
 
 
-def save(account_text):
-    acc = encrypt_word(account_text)
-    with open("data/privacy.sra", "wb") as sra_file:
-        sra_file.write(acc)
+def load(path: str) -> User:
+    if os.path.exists(path):
+        user=SRAFileType.load(path)
+        return User(win_decryptor(user.account),win_decryptor(user.password))
+    else:
+        return User('','')
+
+def new():
+    integer_timestamp = int(time.time())
+    os.makedirs("data/user",exist_ok=True)
+    path=f"data/user/{integer_timestamp}.sra"
+    SRAFileType.save(User('',''),path)
+    return path
+
+def remove(path:str):
+    os.remove(path)
