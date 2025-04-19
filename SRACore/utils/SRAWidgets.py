@@ -5,13 +5,32 @@ from PySide6.QtWidgets import QWidget, QCheckBox, QTextEdit, QComboBox, QLineEdi
 
 from SRACore.utils import Encryption
 
-uiLoader=QUiLoader()
+uiLoader = QUiLoader()
 
-class ReceiveRewards(QWidget):
+
+class SRAWidget(QWidget):
     def __init__(self, parent, config: dict):
         super().__init__(parent)
-        self.ui = uiLoader.load("res/ui/set_03.ui")
         self.config = config
+
+    def setter(self):
+        raise NotImplementedError("Subclasses must implement setter method.")
+
+    def connector(self):
+        raise NotImplementedError("Subclasses must implement method.")
+
+    def getter(self):
+        raise NotImplementedError("Subclasses must implement getter method.")
+
+    def reload(self, config):
+        self.config = config
+        self.setter()
+
+
+class ReceiveRewards(SRAWidget):
+    def __init__(self, parent, config: dict):
+        super().__init__(parent, config)
+        self.ui = uiLoader.load("res/ui/set_03.ui")
         self.option1: QCheckBox = self.ui.findChild(
             QCheckBox, "checkBox3_1"
         )
@@ -48,6 +67,9 @@ class ReceiveRewards(QWidget):
         self.option7.setChecked(self.config["Mission"]["redeemCode"])
         self.redeem_code.setText("\n".join(self.config["RedeemCode"]["codeList"]))
 
+    def connector(self):
+        pass
+
     def getter(self):
         self.config["Mission"]["trailBlazerProfile"] = self.option1.isChecked()
         self.config["Mission"]["assignment"] = self.option2.isChecked()
@@ -59,12 +81,12 @@ class ReceiveRewards(QWidget):
         self.config["RedeemCode"]["codeList"] = self.redeem_code.toPlainText().split()
 
 
-class StartGame(QWidget):
+class StartGame(SRAWidget):
     def __init__(self, parent, config: dict):
-        super().__init__(parent)
+        super().__init__(parent, config)
         self.ui = uiLoader.load("res/ui/set_01.ui")
-        self.config = config
-        self.account_text = Encryption.load()
+        self.account_text = None
+        self.password_text = None
         self.channel_combobox: QComboBox = self.ui.findChild(
             QComboBox, "comboBox2_1"
         )
@@ -90,29 +112,43 @@ class StartGame(QWidget):
         self.show_button: QPushButton = self.ui.findChild(
             QPushButton, "pushButton2_3"
         )
+        self.save_pwd_checkbox: QCheckBox = self.ui.findChild(
+            QCheckBox, "save_pwd"
+        )
         self.setter()
+        self.connector()
 
     def setter(self):
+        if self.config["StartGame"]["user"]=='':
+            self.config["StartGame"]["user"]=Encryption.new()
+        user=Encryption.load(self.config['StartGame']['user'])
+        self.account_text = user.account
+        self.password_text = user.password
         self.channel_combobox.setCurrentIndex(self.config["StartGame"]["channel"])
         self.use_launcher_checkbox.setChecked(self.config["StartGame"]["launcher"])
-        self.use_launcher_checkbox.stateChanged.connect(self.use_launcher)
         self.path_text.setText("启动器路径：" if self.config["StartGame"]["launcher"] else "游戏路径：")
         self.line_area.setText(self.config["StartGame"]["gamePath"])
-        self.file_select_button.clicked.connect(self.open_file)
         self.auto_launch_checkbox.setChecked(self.config["StartGame"]["autoLogin"])
-        self.auto_launch_checkbox.stateChanged.connect(self.auto_launch)
         self.account.setText(self.account_text)
-        self.account.setReadOnly(True)
-        # self.password.setText(self.password_text)
+        self.password.setText(self.password_text)
         self.password.setEchoMode(QLineEdit.EchoMode.Password)
-        self.password.setReadOnly(True)
+        self.save_pwd_checkbox.setChecked(self.config["StartGame"]["savePassword"])
+
+    def connector(self):
+        self.use_launcher_checkbox.stateChanged.connect(self.use_launcher)
+        self.file_select_button.clicked.connect(self.open_file)
         self.show_button.clicked.connect(self.togglePasswordVisibility)
 
     def getter(self):
         self.config["StartGame"]["channel"] = self.channel_combobox.currentIndex()
         self.config["StartGame"]["autoLogin"] = self.auto_launch_checkbox.isChecked()
         self.config["StartGame"]["gamePath"] = self.line_area.text()
+        self.config["StartGame"]["savePassword"]=self.save_pwd_checkbox.isChecked()
         self.account_text = self.account.text()
+        self.password_text = self.password.text()
+        if not self.config["StartGame"]["savePassword"]:
+            self.password_text=''
+        Encryption.save(self.account_text,self.password_text,self.config["StartGame"]["user"])
 
     def getPassword(self):
         return self.password.text()
@@ -137,19 +173,6 @@ class StartGame(QWidget):
             self.line_area.setText(file_name)
 
     @Slot()
-    def auto_launch(self):
-        """
-        Change the state of mission auto launch,
-        update QLineEdit state.
-        """
-        if self.auto_launch_checkbox.isChecked():
-            self.account.setReadOnly(False)
-            self.password.setReadOnly(False)
-        else:
-            self.account.setReadOnly(True)
-            self.password.setReadOnly(True)
-
-    @Slot()
     def togglePasswordVisibility(self):
         """Toggle password visibility"""
         if self.password.echoMode() == QLineEdit.EchoMode.Password:
@@ -160,11 +183,10 @@ class StartGame(QWidget):
             self.show_button.setText("显示")
 
 
-class TrailblazePower(QWidget):
+class TrailblazePower(SRAWidget):
     def __init__(self, parent, config: dict):
-        super().__init__(parent)
+        super().__init__(parent, config)
         self.ui = uiLoader.load("res/ui/set_07.ui")
-        self.config = config
         self.opt1: QCheckBox = self.ui.findChild(
             QCheckBox, "checkBox2_1_11"
         )
@@ -172,8 +194,8 @@ class TrailblazePower(QWidget):
             QComboBox, "comboBox2_1_13"
         )
         self.times1: QSpinBox = self.ui.findChild(QSpinBox, "spinBox2_1_23")
-        self.use_assist_checkbox:QCheckBox=self.ui.findChild(QCheckBox, "useAssist")
-        self.change_lineup_checkbox:QCheckBox=self.ui.findChild(QCheckBox, "changeLineup")
+        self.use_assist_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "useAssist")
+        self.change_lineup_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "changeLineup")
         self.opt2: QCheckBox = self.ui.findChild(
             QCheckBox, "checkBox2_2_11"
         )
@@ -267,8 +289,8 @@ class TrailblazePower(QWidget):
         self.config["Replenish"]["enable"] = self.opt1.isChecked()
         self.config["Replenish"]["way"] = self.combobox1.currentIndex()
         self.config["Replenish"]["runTimes"] = self.times1.value()
-        self.config["Support"]["enable"]=self.use_assist_checkbox.isChecked()
-        self.config["Support"]['changeLineup']=self.change_lineup_checkbox.isChecked()
+        self.config["Support"]["enable"] = self.use_assist_checkbox.isChecked()
+        self.config["Support"]['changeLineup'] = self.change_lineup_checkbox.isChecked()
         self.config["OrnamentExtraction"]["enable"] = self.opt2.isChecked()
         self.config["OrnamentExtraction"]["level"] = self.combobox2.currentIndex()
         self.config["OrnamentExtraction"]["runTimes"] = self.battle_times2.value()
@@ -290,33 +312,41 @@ class TrailblazePower(QWidget):
         self.config["EchoOfWar"]["level"] = self.combobox7.currentIndex()
         self.config["EchoOfWar"]["runTimes"] = self.battle_times7.value()
 
-class QuitGame(QWidget):
+
+class AfterMission(SRAWidget):
     def __init__(self, parent, config: dict):
-        super().__init__(parent)
-        self.ui=uiLoader.load("res/ui/set_10.ui")
-        self.config=config
-        self.exit_checkbox:QCheckBox = self.ui.findChild(
+        super().__init__(parent, config)
+        self.ui = uiLoader.load("res/ui/set_10.ui")
+        self.logout_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "log_out")
+        self.exit_checkbox: QCheckBox = self.ui.findChild(
             QCheckBox, "checkBox2_1_1"
         )
-        self.radio_button1:QRadioButton = self.ui.findChild(
+        self.radio_button1: QRadioButton = self.ui.findChild(
             QRadioButton, "radioButton2_1_2"
         )
-        self.radio_button2:QRadioButton = self.ui.findChild(
+        self.radio_button2: QRadioButton = self.ui.findChild(
             QRadioButton, "radioButton2_1_3"
         )
+        self.setter()
+
+    def setter(self):
+        self.logout_checkbox.setChecked(self.config["AfterMission"]["logout"])
+
+    def connector(self):
+        pass
 
     def getter(self):
-        return self.exit_checkbox.isChecked(),self.radio_button1.isChecked(),self.radio_button2.isChecked()
-    
+        self.config["AfterMission"]["logout"] = self.logout_checkbox.isChecked()
+        return self.exit_checkbox.isChecked(), self.radio_button1.isChecked(), self.radio_button2.isChecked()
 
-class SimulatedUniverse(QWidget):
-    def __init__(self,parent, config:dict):
-        super().__init__(parent)
-        self.ui=uiLoader.load("res/ui/simulated_universe.ui")
-        self.config=config
+
+class SimulatedUniverse(SRAWidget):
+    def __init__(self, parent, config: dict):
+        super().__init__(parent, config)
+        self.ui = uiLoader.load("res/ui/simulated_universe.ui")
         self.mode_combobox: QComboBox = self.ui.findChild(QComboBox, "game_mode")
         self.times_spinbox: QSpinBox = self.ui.findChild(QSpinBox, "times")
-        self.policy_checkbox:QComboBox=self.ui.findChild(QComboBox,'policy_comboBox')
+        self.policy_checkbox: QComboBox = self.ui.findChild(QComboBox, 'policy_comboBox')
         self.setter()
 
     def setter(self):
@@ -325,6 +355,6 @@ class SimulatedUniverse(QWidget):
         self.policy_checkbox.setCurrentIndex(self.config["DivergentUniverse"]["policy"])
 
     def getter(self):
-        self.config["DivergentUniverse"]["mode"]=self.mode_combobox.currentIndex()
-        self.config["DivergentUniverse"]["times"]=self.times_spinbox.value()
-        self.config["DivergentUniverse"]["policy"]=self.policy_checkbox.currentIndex()
+        self.config["DivergentUniverse"]["mode"] = self.mode_combobox.currentIndex()
+        self.config["DivergentUniverse"]["times"] = self.times_spinbox.value()
+        self.config["DivergentUniverse"]["policy"] = self.policy_checkbox.currentIndex()

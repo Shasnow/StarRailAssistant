@@ -33,8 +33,8 @@ from SRACore.utils.Logger import logger
 from SRACore.utils.SRAOperator import SRAOperator
 from SRACore.utils.WindowsProcess import find_window, is_process_running
 
-VERSION = "0.7.6"
-CORE="0.7.6.0"
+VERSION = "0.8.0"
+CORE="0.8.0.0"
 
 
 class Assistant(QThread):
@@ -45,8 +45,10 @@ class Assistant(QThread):
         self.cloud = cloud
         self.driver = driver
         self.stop_flag = False
-        self.config = Configure.load()
-        settings = self.config["Settings"]
+        self.globals=Configure.load("data/globals.json")
+        self.config = None
+        self.config_list:list=self.globals['Config']['configList']
+        settings = self.globals["Settings"]
         SRAOperator.cloud = cloud
         SRAOperator.web_driver = driver
         SRAOperator.confidence = settings["confidence"]
@@ -63,40 +65,37 @@ class Assistant(QThread):
 
     def request_stop(self):
         self.stop_flag = True
-        if self.config["Settings"]["threadSafety"]:
+        if self.globals["Settings"]["threadSafety"]:
             self.quit()
         else:
             self.terminate()
 
-    @Slot()
-    def run(self):
-        logger.info("SRAv" + VERSION + " 创建任务喵~")
-        config = self.config
+    def assist_start(self,config):
+        logger.info(f"当前配置 {config}")
+        self.config=Configure.loadConfigByName(config)
+        config=self.config
         tasks = []
-        if not self.cloud:
-            if config["Mission"]["startGame"]:
-                account_text = Encryption.load()
-                password_text = self.pwd
-                tasks.append((self.start_game, (
-                    config["StartGame"]["gamePath"],
-                    config["StartGame"]["pathType"],
-                    config["StartGame"]["channel"],
-                    config["StartGame"]["autoLogin"],
-                    account_text,
-                    password_text,
-                )))
-            tasks.append((self.check_game, ()))
-        else:
-            tasks.append((self.wait_game_load, ()))
-
+        if config["Mission"]["startGame"]:
+            user=Encryption.load(config["StartGame"]["user"])
+            account_text = user.account
+            password_text = self.pwd if user.password=='' else user.password
+            tasks.append((self.start_game, (
+                config["StartGame"]["gamePath"],
+                config["StartGame"]["pathType"],
+                config["StartGame"]["channel"],
+                config["StartGame"]["autoLogin"],
+                account_text,
+                password_text,
+            )))
+        tasks.append((self.check_game, ()))
         if config["Mission"]["trailBlazePower"]:
             tasks.append((self.trailblazer_power, ()))
         if config["ReceiveRewards"]["enable"]:
             tasks.append((self.receive_rewards, ()))
-        if config["Mission"]["quitGame"]:
-            tasks.append((self.quit_game, ()))
         if config["Mission"]["simulatedUniverse"]:
             tasks.append((self.divergent_universe, (config["DivergentUniverse"]["times"],)))
+        if config["Mission"]["afterMission"]:
+            tasks.append((self.after_mission, ()))
 
         for task, args in tasks:
             if not self.stop_flag:
@@ -107,6 +106,17 @@ class Assistant(QThread):
                 logger.info("已停止")
         else:
             logger.info("任务全部完成\n")
+
+    @Slot()
+    def run(self):
+        logger.info("SRAv" + VERSION + " 创建任务喵~")
+        if self.globals["Config"]["next"]:
+            for config in self.config_list:
+                if self.stop_flag:
+                    break
+                self.assist_start(config)
+        else:
+            self.assist_start(self.config_list[self.globals["Config"]['currentConfig']])
 
     @Slot()
     def check_game(self):
@@ -160,6 +170,9 @@ class Assistant(QThread):
             True if successfully launched, False otherwise.
 
         """
+        if find_window("崩坏：星穹铁道"):
+            logger.info("游戏已经启动")
+            return True
         if not self.path_check(game_path, path_type):
             logger.warning("路径无效")
             return False
@@ -239,14 +252,13 @@ class Assistant(QThread):
             True if successfully logged in, False otherwise.
 
         """
-        if check(
-                "res/img/welcome.png", interval=0.1, max_time=10
-        ):  # 进入登录界面的标志
+        result=check_any(["res/img/welcome.png","res/img/login_page.png"])
+        if result==0:
+            # 进入登录界面的标志
             logger.info("已登录")
             return True
-        if not check("res/img/not_logged_in.png", max_time=10):
-            logger.error("发生错误，错误编号11")
-            return False
+        else:
+            click("res/img/login_other.png")
         if not click("res/img/login_with_account.png"):
             logger.error("发生错误，错误编号10")
             return False
@@ -324,21 +336,15 @@ class Assistant(QThread):
             True if entered game successfully, False otherwise.
 
         """
-        if find_window("崩坏：星穹铁道"):
-            logger.info("游戏已经启动")
-            if check("res/img/chat_enter.png", max_time=40):
-                return True
-            else:
-                logger.warning("检测超时，尝试重新启动")
         if path_type == "StarRail":
             if not self.launch_game(game_path, path_type):
-                time.sleep(2)
                 logger.warning("游戏启动失败")
                 return False
         elif path_type == "launcher":
             if not self.launch_launcher(game_path, path_type, channel):
                 logger.warning("游戏启动失败")
                 return False
+
         if channel == 0:
             if login_flag and account:
                 self.login(account, password)
@@ -365,13 +371,13 @@ class Assistant(QThread):
         logger.info("开始游戏")
         click_point(x, y)
         time.sleep(3)
-        click_point(x, y)
 
     @Slot()
     def wait_game_load(self):
         times = 0
         while True:
-            time.sleep(0.2)
+            time.sleep(1)
+            click_point(*get_screen_center())
             if click("res/img/train_supply.png"):
                 time.sleep(4)
                 moveRel(0, +400)
@@ -468,6 +474,10 @@ class Assistant(QThread):
         else:
             return True
         return False
+
+    def after_mission(self) :
+        if self.config["AfterMission"]["logout"]:
+            return self.logout()
 
     @Slot()
     def trailblazer_profile(self):
@@ -1035,11 +1045,22 @@ class Assistant(QThread):
         logger.info("Mission accomplished")
         return True
 
+    def logout(self):
+        logger.info("登出账号")
+        if not check("res/img/chat_enter.png"):
+            return False
+        press_key('esc')
+        click("res/img/power.png")
+        click("res/img/ensure.png")
+        if check("res/img/logout.png"):
+            click("res/img/logout.png")
+        click("res/img/quit2.png")
+        return True
+
     @staticmethod
-    def quit_game() -> bool:
+    def quit_game():
         logger.info("退出游戏")
         return WindowsProcess.task_kill("StarRail.exe")
-
 
 def Popen(path: str):
     try:

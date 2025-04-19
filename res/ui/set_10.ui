@@ -40,7 +40,7 @@
          <item>
           <widget class="QLabel" name="label">
            <property name="text">
-            <string>退出游戏</string>
+            <string>任务结束</string>
            </property>
           </widget>
          </item>
@@ -88,6 +88,20 @@
               </property>
               <property name="text">
                <string>任务结束后：</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="log_out">
+              <property name="text">
+               <string>登出当前账号</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="line">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
               </property>
              </widget>
             </item>

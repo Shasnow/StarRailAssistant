@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>937</width>
-    <height>598</height>
+    <width>707</width>
+    <height>632</height>
    </rect>
   </property>
   <property name="font">
@@ -23,7 +23,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -71,7 +71,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>220</width>
-                <height>426</height>
+                <height>460</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -190,44 +190,6 @@
                 </widget>
                </item>
                <item>
-                <widget class="QFrame" name="frame1_4">
-                 <property name="frameShape">
-                  <enum>QFrame::Shape::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Shadow::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_10">
-                  <item>
-                   <widget class="QCheckBox" name="checkBox1_4">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>退出游戏</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButton1_4">
-                    <property name="minimumSize">
-                     <size>
-                      <width>70</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>设置</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
                 <widget class="QFrame" name="frame1_5">
                  <property name="enabled">
                   <bool>true</bool>
@@ -254,6 +216,44 @@
                   </item>
                   <item>
                    <widget class="QPushButton" name="pushButton1_5">
+                    <property name="minimumSize">
+                     <size>
+                      <width>70</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>设置</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QFrame" name="frame1_4">
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_10">
+                  <item>
+                   <widget class="QCheckBox" name="checkBox1_4">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>结束后</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton1_4">
                     <property name="minimumSize">
                      <size>
                       <width>70</width>
@@ -346,6 +346,109 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_4">
+       <attribute name="title">
+        <string>多账号</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QScrollArea" name="scrollArea_4">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents_4">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>417</width>
+             <height>267</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QGroupBox" name="groupBox">
+              <property name="title">
+               <string>多账号配置</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_5">
+               <item row="4" column="0">
+                <widget class="QPushButton" name="new_plan">
+                 <property name="text">
+                  <string>新建方案</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QPushButton" name="save_as">
+                 <property name="text">
+                  <string>将当前配置另存为新方案</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QComboBox" name="current_config"/>
+               </item>
+               <item row="2" column="0">
+                <widget class="QPushButton" name="save_plan">
+                 <property name="text">
+                  <string>保存当前配置到此方案</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_3">
+                 <property name="text">
+                  <string>当前配置方案</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QPushButton" name="reload">
+                 <property name="text">
+                  <string>从方案重新加载</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QPushButton" name="rename_plan">
+                 <property name="text">
+                  <string>重命名方案</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QPushButton" name="delete_plan">
+                 <property name="text">
+                  <string>删除方案</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_9">
+              <property name="title">
+               <string>切换</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_7">
+               <item row="0" column="0">
+                <widget class="QCheckBox" name="switch2next">
+                 <property name="text">
+                  <string>当前方案结束时切换下一个方案</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
         <string>拓展功能</string>
@@ -361,8 +464,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>893</width>
-             <height>131</height>
+             <width>663</width>
+             <height>224</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_16">
@@ -445,6 +548,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <property name="orientation">
            <enum>Qt::Orientation::Vertical</enum>
           </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Policy::Fixed</enum>
+          </property>
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
@@ -469,9 +575,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-138</y>
-             <width>881</width>
-             <height>613</height>
+             <y>0</y>
+             <width>667</width>
+             <height>746</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -1032,6 +1138,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
                     <property name="echoMode">
                      <enum>QLineEdit::EchoMode::PasswordEchoOnEdit</enum>
                     </property>
+                    <property name="placeholderText">
+                     <string>CDK</string>
+                    </property>
                    </widget>
                   </item>
                  </layout>
@@ -1099,6 +1208,28 @@ li.checked::marker { content: &quot;\2612&quot;; }
               </layout>
              </widget>
             </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_10">
+              <property name="title">
+               <string>赞助者</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_8">
+               <item>
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>感谢下列用户对SRA的赞助</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QListWidget" name="listWidget"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
            </layout>
           </widget>
          </widget>
@@ -1114,7 +1245,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>937</width>
+     <width>707</width>
      <height>33</height>
     </rect>
    </property>

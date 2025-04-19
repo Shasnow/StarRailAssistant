@@ -256,15 +256,18 @@
                 <enum>QFrame::Shadow::Raised</enum>
                </property>
                <layout class="QGridLayout" name="gridLayout">
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label2_4_11">
-                  <property name="text">
-                   <string>账号：</string>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="lineEdit2_4_12">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>30</height>
+                   </size>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="1">
-                 <widget class="QLineEdit" name="lineEdit2_4_12">
+                <item row="1" column="1">
+                 <widget class="QLineEdit" name="lineEdit2_4_22">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -280,13 +283,17 @@
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="lineEdit2_4_22">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>30</height>
-                   </size>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label2_4_11">
+                  <property name="text">
+                   <string>账号：</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0" colspan="2">
+                 <widget class="QCheckBox" name="save_pwd">
+                  <property name="text">
+                   <string>在本地保存密码</string>
                   </property>
                  </widget>
                 </item>

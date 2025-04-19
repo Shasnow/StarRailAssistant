@@ -1,11 +1,11 @@
 {
-    "version": "0.7.7.3",
-    "resource_version": "0.7.6.1",
-    "announcement": ">_< 下载0.7.6谢谢配合喵",
+    "version": "0.8.0",
+    "resource_version": "0.8.0.0",
+    "announcement": "更新内容：\n1. 更多的配置--添加了配置列表，现在支持存储更多配置。\n2. 方案切换--允许你在当前配置方案结束后立即加载下一个方案并运行。\n3. 退出账号--现在可以选择在任务结束后登出当前账号。\n4. 本地保存密码--现在可以自由选择是否将密码保存在本地。\n5. 差分宇宙次数提醒\n调整:\n1. ‘退出游戏’功能更名为‘任务结束’\n2. 配置文件发生较大改变，原先的配置将全部丢失。\n问题修复：\n1. 修复了自动登录失效的问题",
     "resource_announcement": "1. 适配周期演算(2025.4.14)",
     "Announcement": "<hr><p>噔噔——新的公告界面～(∠・ω&lt; )⌒☆</p><p>你知道吗：如果关闭SRA的自动更新服务，公告也不会再更新了</p><hr>",
-    "Announcement.DoNotShowAgain": true,
-    "VersionUpdate": "<html><h2>版本已更新 0.7.6.1</h2><ol><li>适配周期演算(2025.4.14)</li></ol></html>",
+    "Announcement.DoNotShowAgain": false,
+    "VersionUpdate": "<html><b>版本已更新 0.8.0</b><ol>更新内容<li>更多的配置--添加了配置列表，现在支持存储更多配置。</li><li>方案切换--允许你在当前配置方案结束后立即加载下一个方案并运行。</li><li>退出账号--现在可以选择在任务结束后登出当前账号。</li><li>本地保存密码--现在可以自由选择是否将密码保存在本地。</li><li>差分宇宙次数提醒</li></ol><ol>调整<li>‘退出游戏’功能更名为‘任务结束’</li><li>配置文件发生较大改变，原先的配置将全部丢失。</li><li>移除了错误编号11</li></ol><ol>问题修复<li>修复了自动登录失效的问题</li></ol></html>",
     "Proxys": [
         "https://github.tbedu.top/",
         "https://gitproxy.click/",

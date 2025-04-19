@@ -1,7 +1,8 @@
 from PySide6.QtCore import Slot, QTimer, Qt, Signal
 from PySide6.QtGui import QIcon, QFont
 from PySide6.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QScrollArea, QWidget, QGridLayout, \
-    QSpacerItem, QSizePolicy, QFrame, QLCDNumber, QHBoxLayout, QPushButton, QListWidget, QStackedWidget, QTextBrowser
+    QSpacerItem, QSizePolicy, QFrame, QLCDNumber, QHBoxLayout, QPushButton, QListWidget, QStackedWidget, QTextBrowser, \
+    QMessageBox, QLineEdit
 
 from SRACore.utils import WindowsPower
 from SRACore.utils.Configure import load, save
@@ -35,7 +36,8 @@ class DownloadDialog(QDialog):
 
 
 class AnnouncementDialog(QWidget):
-    action=Signal(int)
+    action = Signal(int)
+
     def __init__(self, parent=None, title="title", text="text", announcement_type="Any", icon="res/SRAicon.ico"):
         super().__init__(parent)
         self.setFont(QFont("MicroSoft YaHei", 13))
@@ -73,7 +75,7 @@ class AnnouncementDialog(QWidget):
         self.label.setAutoFillBackground(True)
         # self.label.setWordWrap(True)
 
-        self.gridLayout.setContentsMargins(0,0,0,0)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.label.setText(text)
 
         self.gridLayout.addWidget(self.label, 0, 0, 1, 3)
@@ -91,14 +93,14 @@ class AnnouncementDialog(QWidget):
 
 
 class AnnouncementBoard(QDialog):
-    def __init__(self, parent=None,title="announcements"):
+    def __init__(self, parent=None, title="announcements"):
         super().__init__(parent)
 
         # 主布局
         self.main_layout = QHBoxLayout(self)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
-        self.resize(600,500)
+        self.resize(600, 500)
         self.setWindowTitle(title)
         self.setFont(QFont("MicroSoft YaHei", 13))
         self.setWindowIcon(QIcon("res/SRAicon.ico"))
@@ -120,12 +122,12 @@ class AnnouncementBoard(QDialog):
         # 存储标题和内容的映射
         self.title_content_map = {}
 
-    def add(self, dialog:AnnouncementDialog):
+    def add(self, dialog: AnnouncementDialog):
         """
         添加一个公告条目
         """
         # 将标题添加到左侧标题栏
-        title=dialog.windowTitle()
+        title = dialog.windowTitle()
         dialog.setParent(self)
         self.title_list.addItem(title)
 
@@ -145,14 +147,12 @@ class AnnouncementBoard(QDialog):
     def setDefault(self, index: int):
         self.title_list.setCurrentRow(index)
 
-    def action_handle(self,action):
+    def action_handle(self, action):
         self.close()
-        if action==0:
+        if action == 0:
             version = load("version.json")
             version[f"Announcement.DoNotShowAgain"] = True
             save(version, "version.json")
-
-
 
 
 class ShutdownDialog(QDialog):
@@ -218,3 +218,66 @@ class ShutdownDialog(QDialog):
             self.close()  # 显示00表示倒计时结束
         else:
             self.lcdNumber.display(self.time_left)
+
+
+class ExceptionMessageBox(QMessageBox):
+    def __init__(self, exception, value, traceback):
+        super().__init__()
+        self.setWindowTitle("喜报")
+        self.setWindowIcon(QIcon("res/SRAicon.ico"))
+        self.setIcon(QMessageBox.Icon.Critical)
+        self.setFont(QFont("MicroSoft YaHei", 12))
+        self.setText("SRA崩溃了! 由于以下未处理的异常: \n"
+                     f"    {exception}: {value} \n"
+                     "如果无法自行解决，请联系开发者！")
+        self.setDetailedText(traceback)
+        self.setStandardButtons(QMessageBox.StandardButton.Ok)
+
+
+class InputDialog(QDialog):
+    def __init__(self, parent,title:str,text:str):
+        super().__init__(parent)
+        self.isAccept = False
+        self.setWindowTitle(title)
+        self.setWindowIcon(QIcon("res/SRAicon.ico"))
+        self.setLayout(QVBoxLayout())
+        self.label = QLabel(self)
+        self.label.setText(text)
+        self.layout().addWidget(self.label)
+        self.line_edit = QLineEdit(self)
+        self.layout().addWidget(self.line_edit)
+        self.button_box = QDialogButtonBox()
+        self.button_box.addButton(QPushButton("确认"),QDialogButtonBox.ButtonRole.AcceptRole)
+        self.button_box.addButton(QPushButton("取消"),QDialogButtonBox.ButtonRole.RejectRole)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+        self.layout().addWidget(self.button_box)
+
+    def accept(self):
+        super().accept()
+        self.isAccept=True
+
+    @staticmethod
+    def getText(parent:QWidget,title:str,text:str):
+        dialog = InputDialog(parent,title,text)
+        dialog.exec()
+        return dialog.line_edit.text(),dialog.isAccept
+
+class MessageBox(QDialog):
+    def __init__(self,parent,title,text):
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.setWindowIcon(QIcon("res/SRAicon.ico"))
+        self.setLayout(QVBoxLayout())
+        self.label=QLabel(self)
+        self.label.setWordWrap(True)
+        self.label.setText(text)
+        self.layout().addWidget(self.label)
+        self.ok_button=QPushButton("确认")
+        self.ok_button.clicked.connect(self.accept)
+        self.layout().addWidget(self.ok_button)
+
+    @staticmethod
+    def info(parent:QWidget,title:str,text:str):
+        msg=MessageBox(parent,title,text)
+        msg.exec()
