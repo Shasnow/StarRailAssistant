@@ -99,6 +99,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QCheckBox" name="quit_game">
+              <property name="text">
+               <string>退出游戏</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="Line" name="line">
               <property name="orientation">
                <enum>Qt::Orientation::Horizontal</enum>
