@@ -18,14 +18,12 @@
 
 import base64
 import os.path
-import time
 from dataclasses import dataclass
 
-import win32crypt
-import base64
+import time
 import win32crypt
 
-from SRAFileType import SRAFileType
+from .SRAFileType import SRAFileType
 
 
 @dataclass
@@ -52,30 +50,6 @@ def win_decryptor(note: str, entropy: bytes = None) -> str:
     if note == "":
         return ""
 
-def win_encryptor(note: str, description: str = None, entropy: bytes = None) -> str:
-    """使用Windows DPAPI加密数据"""
-
-    if note == "":
-        return ""
-
-    encrypted = win32crypt.CryptProtectData(
-        note.encode("utf-8"), description, entropy, None, None, 0
-    )
-    return base64.b64encode(encrypted).decode("utf-8")
-
-
-def win_decryptor(note: str, entropy: bytes = None) -> str:
-    """使用Windows DPAPI解密数据"""
-
-    if note == "":
-        return ""
-
-    decrypted = win32crypt.CryptUnprotectData(
-        base64.b64decode(note), entropy, None, None, 0
-    )
-    return decrypted[1].decode("utf-8")
-
-
     decrypted = win32crypt.CryptUnprotectData(
         base64.b64decode(note), entropy, None, None, 0
     )
@@ -89,17 +63,19 @@ def save(account, password, path: str):
 
 def load(path: str) -> User:
     if os.path.exists(path):
-        user=SRAFileType.load(path)
-        return User(win_decryptor(user.account),win_decryptor(user.password))
+        user = SRAFileType.load(path)
+        return User(win_decryptor(user.account), win_decryptor(user.password))
     else:
-        return User('','')
+        return User('', '')
+
 
 def new():
     integer_timestamp = int(time.time())
-    os.makedirs("data/user",exist_ok=True)
-    path=f"data/user/{integer_timestamp}.sra"
-    SRAFileType.save(User('',''),path)
+    os.makedirs("data/user", exist_ok=True)
+    path = f"data/user/{integer_timestamp}.sra"
+    SRAFileType.save(User('', ''), path)
     return path
 
-def remove(path:str):
+
+def remove(path: str):
     os.remove(path)
