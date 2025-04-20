@@ -1,6 +1,13 @@
-![ico](/res/SRAico.png)  
+<p align="center"><img src="/res/SRAico.png"></p>
+<p align="center">
+    <img src="https://img.shields.io/badge/platform-Windows-blue" alt="platform">
+    <img alt="Static Badge" src="https://img.shields.io/badge/python-3.11.5%2B-skyblue">
+    <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/Shasnow/StarRailAssistant/total">
+    <img alt="GitHub Release" src="https://img.shields.io/github/v/release/Shasnow/StarRailAssistant">
+</p>
+<p align="center"><a href="https://shasnow.github.io/SRA"><b>主页</b></a></p>
 
-#### [帮助文档](https://github.com/Shasnow/StarRailAssistant/blob/main/HELP.md) | [FAQ](https://github.com/Shasnow/StarRailAssistant/wiki/FAQ) | [下载和安装](https://github.com/Shasnow/StarRailAssistant/wiki/Install) | [使用方法](https://github.com/Shasnow/StarRailAssistant/wiki/Usage)
+#### [帮助文档](https://docs.qq.com/doc/DWUFOUmJDc2xLRk1B) | [FAQ](https://github.com/Shasnow/StarRailAssistant/wiki/FAQ) | [下载和安装](https://shasnow.github.io/SRA/download.html) | [使用方法](https://shasnow.github.io/SRA/quickstart.html)
 # StarRailAssistant(SRA)
 
 崩坏星穹铁道自动化助手  
