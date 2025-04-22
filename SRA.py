@@ -52,7 +52,6 @@ from SRACore.core import SRAssistant, AutoPlot
 from SRACore.core.SRAssistant import VERSION, CORE
 from SRACore.utils import Configure, WindowsPower, WindowsProcess, Encryption
 from SRACore.utils.Dialog import (
-    DownloadDialog,
     AnnouncementDialog,
     ShutdownDialog,
     AnnouncementBoard,
@@ -60,12 +59,13 @@ from SRACore.utils.Dialog import (
     InputDialog,
     MessageBox
 )
+from SRACore.utils.Plugins import PluginManager
 from SRACore.utils.SRAWidgets import (
     ReceiveRewards,
     StartGame,
     TrailblazePower,
     AfterMission,
-    SimulatedUniverse,
+    SimulatedUniverse, Plugin,
 )
 
 # from ocr import SRAocr
@@ -160,7 +160,7 @@ class Main(QWidget):
         self.simulated_universe.ui.setVisible(False)
 
         self.extension()
-
+        self.plugins()
         self.multi_account()
 
         self.software_setting()
@@ -188,21 +188,17 @@ class Main(QWidget):
         auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
         # relics_identification_button:QPushButton=self.ui.findChild(QPushButton,"relicsIdentification")
         # relics_identification_button.clicked.connect(self.relics_identification)
-        divination_button: QPushButton = self.ui.findChild(QPushButton, "pushButton_add_app_1")
-        divination_button.clicked.connect(self.divination)
+        # divination_button: QPushButton = self.ui.findChild(QPushButton, "pushButton_add_app_1")
+        # divination_button.clicked.connect(self.divination)
 
-    def divination(self):
-        if os.path.exists("res/ui/divination.ui"):
-            from SRACore.extensions.FuXuanDivination import FuXuanDivination
-            div = FuXuanDivination(self)
-            div.ui.show()
-        else:
-            download = DownloadDialog(
-                self,
-                "大衍穷观阵",
-                "https://gitee.com/yukikage/StarRailAssistant/releases/download/divination/divination.zip",
-            )
-            download.show()
+    def plugins(self):
+        PluginManager.load_plugins()
+        plugin_groupbox:QGroupBox=self.ui.findChild(QGroupBox,'plugin_groupbox')
+        plugins_widget=Plugin(self)
+        for name,model in PluginManager.getPlugins().items():
+            model.PARENT=self.ui
+            plugins_widget.addPlugin(name, model.run)
+        plugin_groupbox.layout().addWidget(plugins_widget)
 
     def auto_plot_status(self, state):
         if state == 2:
