@@ -451,7 +451,7 @@
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
-        <string>拓展功能</string>
+        <string>拓展/插件</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_7">
         <item>
@@ -499,28 +499,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_4">
+             <widget class="QGroupBox" name="plugin_groupbox">
               <property name="title">
-               <string>拓展功能（需要下载）</string>
+               <string>插件</string>
               </property>
-              <layout class="QGridLayout" name="gridLayout_4">
-               <item row="0" column="0">
-                <widget class="QPushButton" name="pushButton_add_app_1">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>140</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>符卿的穷观阵</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+              <layout class="QGridLayout" name="gridLayout_4"/>
              </widget>
             </item>
            </layout>
@@ -575,7 +558,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-104</y>
+             <y>0</y>
              <width>667</width>
              <height>613</height>
             </rect>

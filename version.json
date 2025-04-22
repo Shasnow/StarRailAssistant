@@ -3,9 +3,9 @@
     "resource_version": "0.8.0.0",
     "announcement": "更新内容：\n1. 更多的配置--添加了配置列表，现在支持存储更多配置。\n2. 方案切换--允许你在当前配置方案结束后立即加载下一个方案并运行。\n3. 退出账号--现在可以选择在任务结束后登出当前账号。\n4. 本地保存密码--现在可以自由选择是否将密码保存在本地。\n5. 差分宇宙次数提醒\n7. 接入了mirror酱-在设置中填入mirror酱cdk后，可以使用mirror酱的更新服务。调整:\n1. ‘退出游戏’功能更名为‘任务结束’\n2. 配置文件发生较大改变，原先的配置将全部丢失。\n问题修复：\n1. 修复了自动登录失效的问题",
     "resource_announcement": "1. 适配周期演算(2025.4.14)",
-    "Announcement": "<hr><p>噔噔——新的公告界面～(∠・ω&lt; )⌒☆</p><p>SRA官网上线<a href='https://shasnow.github.io/SRA'>点击前往</a></p><hr>",
+    "Announcement": "<hr><p>噔噔——新的公告界面～(∠・ω&lt; )⌒☆</p><p>SRA官网上线<a href='https://shasnow.github.io/SRA'>点击前往</a></p><p>SRA已接入mirror酱--在设置中填入mirror酱cdk后，可以使用mirror酱的更新服务。<a href='https://mirrorchyan.com/zh/get-start'>没有CDK？立即订阅</a></p><hr>",
     "Announcement.DoNotShowAgain": false,
-    "VersionUpdate": "<html><b>版本已更新 0.8.0</b><ol>更新内容<li>SRA官网上线<a href='https://shasnow.github.io/SRA'>点击前往</a></li><li>更多的配置--添加了配置列表，现在支持存储更多配置。</li><li>方案切换--允许你在当前配置方案结束后立即加载下一个方案并运行。</li><li>退出账号--现在可以选择在任务结束后登出当前账号。</li><li>本地保存密码--现在可以自由选择是否将密码保存在本地。</li><li>差分宇宙次数提醒</li><li>接入了mirror酱--在设置中填入mirror酱cdk后，可以使用mirror酱的更新服务。</li></ol><a href='https://shasnow.github.io/SRA/quickstart.html#multi'>如何使用SRA的多账号功能？</a><ol>调整<li>‘退出游戏’功能更名为‘任务结束’</li><li>配置文件发生较大改变，原先的配置将全部丢失。</li><li>移除了错误编号11</li></ol><ol>问题修复<li>修复了自动登录失效的问题</li></ol></html>",
+    "VersionUpdate": "<html><b>版本已更新 0.8.0</b><ol>更新内容<li>SRA官网上线<a href='https://shasnow.github.io/SRA'>点击前往</a></li><li>更多的配置--添加了配置列表，现在支持存储更多配置。</li><li>方案切换--允许你在当前配置方案结束后立即加载下一个方案并运行。</li><li>退出账号--现在可以选择在任务结束后登出当前账号。</li><li>本地保存密码--现在可以自由选择是否将密码保存在本地。</li><li>差分宇宙次数提醒</li><li>接入了mirror酱--在设置中填入mirror酱cdk后，可以使用mirror酱的更新服务。<a href='https://mirrorchyan.com/zh/get-start'>没有CDK？立即订阅</a></li></ol><a href='https://shasnow.github.io/SRA/quickstart.html#multi'>如何使用SRA的多账号功能？</a><ol>调整<li>‘退出游戏’功能更名为‘任务结束’</li><li>配置文件发生较大改变，原先的配置将全部丢失。</li><li>移除了错误编号11</li></ol><ol>问题修复<li>修复了自动登录失效的问题</li></ol></html>",
     "Proxys": [
         "https://github.tbedu.top/",
         "https://gitproxy.click/",

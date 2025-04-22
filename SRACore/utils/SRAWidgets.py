@@ -1,7 +1,8 @@
 from PySide6.QtCore import Slot
+from PySide6.QtGui import QFont
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QWidget, QCheckBox, QTextEdit, QComboBox, QLineEdit, QPushButton, QLabel, QFileDialog, \
-    QSpinBox, QRadioButton
+    QSpinBox, QRadioButton, QVBoxLayout
 
 from SRACore.utils import Encryption
 
@@ -361,3 +362,14 @@ class SimulatedUniverse(SRAWidget):
         self.config["DivergentUniverse"]["mode"] = self.mode_combobox.currentIndex()
         self.config["DivergentUniverse"]["times"] = self.times_spinbox.value()
         self.config["DivergentUniverse"]["policy"] = self.policy_checkbox.currentIndex()
+
+class Plugin(QWidget):
+    def __init__(self,parent):
+        super().__init__(parent)
+        self.setLayout(QVBoxLayout(self))
+        self.setFont(QFont("MicroSoft YaHei", 13))
+
+    def addPlugin(self,name,slot):
+        button=QPushButton(name)
+        button.clicked.connect(slot)
+        self.layout().addWidget(button)
