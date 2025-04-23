@@ -18,6 +18,8 @@
 作者：雪影
 SRA操作
 """
+from os import PathLike
+
 import time
 
 import cv2
@@ -47,15 +49,45 @@ class SRAOperator:
 
     @classmethod
     def _screenshot_region_calculate(cls, region: tuple[int, int, int, int]):
+        """
+        计算截图区域的实际坐标和尺寸。
+
+        Args:
+            region (tuple[int, int, int, int]): 包含窗口左上角坐标和宽高的元组，格式为 (left, top, width, height)。
+
+        Returns:
+            tuple[int, int, int, int]: 计算后的截图区域，格式为 (area_left, area_top, area_width, area_height)。
+        """
         left, top, width, height = region
+        # 计算截图区域的宽度，将宽度调整为 160 的倍数
         area_width = width // 160 * 160
+        # 计算截图区域的高度，将高度调整为 90 的倍数
         area_height = height // 90 * 90
+        # 根据缩放比例调整顶部坐标，如果顶部坐标不为 0 则加上偏移量
         cls.area_top = (top + int(30 * cls.zoom)) if top != 0 else top
+        # 根据缩放比例调整左侧坐标，如果左侧坐标不为 0 则加上偏移量
         cls.area_left = (left + int(8 * cls.zoom)) if left != 0 else left
         return cls.area_left, cls.area_top, area_width, area_height
 
     @classmethod
     def get_screenshot_region(cls, title: str) -> tuple[int, int, int, int]:
+        """
+        根据给定的窗口标题获取截图区域。
+
+        该方法会查找包含指定标题的窗口，若未找到则抛出 WindowNoFoundException 异常，
+        若找到多个窗口则抛出 MultipleWindowsException 异常。找到唯一窗口后，会激活该窗口，
+        并计算其截图区域。
+
+        Args:
+            title (str): 用于查找窗口的标题。
+
+        Returns:
+            tuple[int, int, int, int]: 计算后的截图区域，格式为 (area_left, area_top, area_width, area_height)。
+
+        Raises:
+            WindowNoFoundException: 未找到包含指定标题的窗口。
+            MultipleWindowsException: 找到多个包含指定标题的窗口。
+        """
         matching_windows = pygetwindow.getWindowsWithTitle(title)
         if len(matching_windows) == 0:
             raise WindowNoFoundException('Could not find a window with %s in the title' % title)
@@ -73,6 +105,17 @@ class SRAOperator:
     @classmethod
     def get_screenshot(cls, title: str = "崩坏：星穹铁道",
                        region: tuple[int, int, int, int] | None = None) -> Image.Image:
+        """
+        根据指定的窗口标题和区域获取截图，并对截图进行尺寸调整。
+
+        Args:
+            title (str): 用于查找窗口的标题。
+            region (tuple[int, int, int, int] | None): 截图区域，格式为 (left, top, width, height)。
+                如果为 None，则通过 `get_screenshot_region` 方法根据标题自动计算截图区域。
+
+        Returns:
+            Image.Image: 调整尺寸后的 Pillow 图像对象。
+        """
         if region is None:
             region = cls.get_screenshot_region(title)
         pillow_img = pyscreeze.screenshot(region=region)
@@ -82,6 +125,16 @@ class SRAOperator:
 
     @classmethod
     def _image_resize(cls, pillow_image: Image.Image) -> Image.Image:
+        """
+        调整 Pillow 图像的尺寸，若图像宽度已经为 1920 则直接返回原图像，
+        否则将图像调整为宽度为 1920 的图像，并保持宽高比。
+
+        Args:
+            pillow_image (Image.Image): 待调整尺寸的 Pillow 图像对象。
+
+        Returns:
+            Image.Image: 调整尺寸后的 Pillow 图像对象。
+        """
         if pillow_image.width == 1920:
             return pillow_image
         cls.screenshot_proportion = 1920 / pillow_image.width
@@ -94,12 +147,41 @@ class SRAOperator:
 
     @classmethod
     def _location_calculator(cls, x, y):
+        """
+        根据截图缩放比例和截图区域偏移量，计算实际屏幕坐标。
+
+        Args:
+            x (int): 截图上的 x 坐标。
+            y (int): 截图上的 y 坐标。
+
+        Returns:
+            tuple[int, int]: 实际屏幕上的坐标 (x, y)。
+        """
         cls.location_proportion = 1 / cls.screenshot_proportion
         return x * cls.location_proportion + cls.area_left, y * cls.location_proportion + cls.area_top
         # return x, y
 
     @classmethod
     def locate(cls, img_path: str, title="崩坏：星穹铁道"):
+        """
+        在指定标题的窗口截图中定位指定图像的位置。
+
+        该方法会读取指定路径的图像文件，若文件无法找到或读取，会抛出 FileNotFoundError 异常。
+        接着会在指定标题的窗口截图中查找该图像，若未找到，会抛出 MatchFailureException 异常。
+        若在查找过程中出现 ValueError 异常，会抛出 WindowInactiveException 异常，提示窗口未激活。
+
+        Args:
+            img_path (str): 要定位的图像文件的路径。
+            title (str, optional): 用于查找窗口的标题，默认为 "崩坏：星穹铁道"。
+
+        Returns:
+            tuple: 图像在截图中的位置，格式为 (left, top, width, height)，若未找到则抛出异常。
+
+        Raises:
+            FileNotFoundError: 无法找到或读取指定路径的图像文件。
+            MatchFailureException: 在截图中未找到指定的图像。
+            WindowInactiveException: 查找过程中出现 ValueError，提示窗口未激活。
+        """
         try:
             img = cv2.imread(img_path)
             if img is None:
@@ -116,6 +198,18 @@ class SRAOperator:
 
     @classmethod
     def locateAny(cls, img_list: list):
+        """
+        在截图中依次定位图像列表中的图像，返回第一个匹配成功的图像的索引和位置。
+
+        Args:
+            img_list (list): 包含要定位的图像文件路径的列表。
+
+        Returns:
+            tuple: 第一个匹配成功的图像的索引和位置，格式为 (index, location)。
+
+        Raises:
+            MatchFailureException: 当图像列表中的所有图像都未匹配成功时抛出此异常。
+        """
         screenshot = cls.get_screenshot()
         for index, img_path in enumerate(img_list):
             try:
@@ -136,6 +230,18 @@ class SRAOperator:
 
     @classmethod
     def locateAll(cls, img_list: list):
+        """
+        在截图中依次定位图像列表中的所有图像，返回所有匹配成功的图像的索引和位置。
+
+        Args:
+            img_list (list): 包含要定位的图像文件路径的列表。
+
+        Returns:
+            list: 所有匹配成功的图像的索引和位置，格式为 [(index1, location1), (index2, location2), ...]。
+
+        Raises:
+            MatchFailureException: 当图像列表中的所有图像都未匹配成功时抛出此异常。
+        """
         screenshot = cls.get_screenshot()
         result = []
         for index, img_path in enumerate(img_list):
@@ -157,6 +263,23 @@ class SRAOperator:
 
     @classmethod
     def locateCenter(cls, img_path, x_add=0, y_add=0, title="崩坏：星穹铁道") -> tuple[int, int]:
+        """
+        在指定标题的窗口截图中定位指定图像的中心位置，并根据偏移量进行调整，最后计算出实际屏幕坐标。
+
+        Args:
+            img_path (str): 要定位的图像文件的路径。
+            x_add (int, optional): 图像中心位置在 x 轴上的偏移量，默认为 0。
+            y_add (int, optional): 图像中心位置在 y 轴上的偏移量，默认为 0。
+            title (str, optional): 用于查找窗口的标题，默认为 "崩坏：星穹铁道"。
+
+        Returns:
+            tuple[int, int]: 实际屏幕上的坐标 (x, y)。
+
+        Raises:
+            FileNotFoundError: 无法找到或读取指定路径的图像文件。
+            MatchFailureException: 在截图中未找到指定的图像。
+            WindowInactiveException: 查找过程中出现 ValueError，提示窗口未激活。
+        """
         location = cls.locate(img_path, title)
         x, y = pyscreeze.center(location)
         x += x_add
@@ -165,14 +288,19 @@ class SRAOperator:
         return x, y
 
     @classmethod
-    def exist(cls, img_path, wait_time=2) -> bool:
-        """Determine if a situation exists.
+    def exist(cls, img_path:str|PathLike, wait_time=2) -> bool:
+        """
+        检查指定路径的图像是否存在于截图中。
+
+        该方法会先等待指定的时间，等待游戏加载过程，然后尝试在截图中定位指定路径的图像。
+        如果定位成功，则返回 True；如果定位过程中出现异常，则记录异常信息并返回 False。
 
         Args:
-            img_path (str): Img path of the situation.
-            wait_time (float): Waiting time before run_flag.
+            img_path (str): 要定位的图像文件的路径。
+            wait_time (float, optional): 等待游戏加载的时间，默认为 2 秒。
+
         Returns:
-            True if existed, False otherwise.
+            bool: 如果图像存在则返回 True，否则返回 False。
         """
         time.sleep(wait_time)  # 等待游戏加载
         try:
@@ -183,15 +311,19 @@ class SRAOperator:
             return False
 
     @classmethod
-    def exist_any(cls, img_list: list, wait_time: float = 2) -> int | None:
-        """Determine if any situation exists.
+    def existAny(cls, img_list: list, wait_time: float = 2) -> int | None:
+        """
+        检查图像列表中是否有任何图像存在于截图中。
+
+        该方法会先等待指定的时间，等待游戏加载过程，然后尝试在截图中依次定位图像列表中的图像。
+        如果有任何图像定位成功，则返回该图像在列表中的索引；如果所有图像都未定位成功，则记录异常信息并返回 None。
 
         Args:
-            img_list: Img path list of the situation.
-            wait_time: Waiting time before run_flag.
+            img_list (list): 包含要定位的图像文件路径的列表。
+            wait_time (float, optional): 等待游戏加载的时间，默认为 2 秒。
 
         Returns:
-            True if any one existed, False otherwise.
+            int | None: 如果有图像存在则返回该图像在列表中的索引，否则返回 None。
         """
         time.sleep(wait_time)  # 等待游戏加载
         try:
@@ -203,14 +335,18 @@ class SRAOperator:
 
     @classmethod
     def check(cls, img_path: str, interval=0.5, max_time=40):
-        """Detects whether the object appears on the screen.
+        """
+        持续检查指定路径的图像是否出现在截图中。
+
+        该方法会按照指定的时间间隔持续检查图像，直到图像出现或者达到最大检查次数。
 
         Args:
-            img_path (str): Img path of object.
-            interval (float): Interval between checks.
-            max_time (int): Maximum number of check times.
+            img_path (str): 要检查的图像文件的路径。
+            interval (float, optional): 每次检查之间的时间间隔，默认为 0.5 秒。
+            max_time (int, optional): 最大检查次数，默认为 40 次。
+
         Returns:
-            True if obj appeared, False if reach maximum times.
+            bool: 如果在最大检查次数内找到图像，则返回 True；否则返回 False。
         """
         times = 0
         while True:
@@ -223,21 +359,21 @@ class SRAOperator:
                     return False
 
     @classmethod
-    def check_any(cls, img_list: list, interval=0.5, max_time=40):
-        """Check the images one after one.
+    def checkAny(cls, img_list: list, interval=0.5, max_time=40):
+        """依次检查图像列表中的图像是否出现。
 
         Args:
-            img_list: A list who stored the img path.
-            interval: Interval between checks.
-            max_time: Maximum number of check times.
+            img_list: 存储图像文件路径的列表。
+            interval: 每次检查之间的时间间隔。
+            max_time: 最大检查次数。
 
         Returns:
-            True if any obj appeared, False if none of them appeared and reach maximum times.
+            如果有任何图像出现，则返回该图像在列表中的索引；如果所有图像都未出现且达到最大检查次数，则返回 None。
         """
         times = 0
         while True:
             time.sleep(interval)
-            result = cls.exist_any(img_list, wait_time=1)
+            result = cls.existAny(img_list, wait_time=1)
             if result is not None:
                 return result
             else:
@@ -247,10 +383,11 @@ class SRAOperator:
 
     @classmethod
     def get_screen_center(cls):
-        """Get the center of game window.
+        """
+        获取当前活动窗口的中心点坐标。
 
         Returns:
-            tuple(x, y)
+            tuple: 中心点坐标 (x, y)。
         """
         active_window = pygetwindow.getActiveWindow()
         x, y, screen_width, screen_height = (
@@ -269,16 +406,16 @@ class SRAOperator:
             y_add=0,
             wait_time=2.0,
             title="崩坏：星穹铁道"):
-        """Click the corresponding image on the screen
+        """在屏幕上点击对应的图像
 
         Args:
-            img_path (str): Img path.
-            x_add (int): X-axis offset(px).
-            y_add (int): Y-axis offset(px).
-            wait_time (float): Waiting time before run_flag(s).
-            title (str): Window title.
+            img_path (str): 图像文件路径。
+            x_add (int): X 轴偏移量（像素）。
+            y_add (int): Y 轴偏移量（像素）。
+            wait_time (float): 执行点击前的等待时间（秒）。
+            title (str): 窗口标题。
         Returns:
-            True if clicked successfully, False otherwise.
+            若点击成功则返回 True，否则返回 False。
         """
         try:
             time.sleep(wait_time)
@@ -292,6 +429,20 @@ class SRAOperator:
 
     @classmethod
     def click_point(cls, x: int | None, y: int | None) -> bool:
+        """
+        在指定的坐标处点击。如果不填入参数，则点击当前光标所在的位置。
+
+        该方法会尝试在指定的坐标处执行点击操作。如果不填入参数，则会点击当前光标所在的位置。
+        如果点击成功，则返回 True；否则返回 False。
+        如果在点击过程中出现异常，则会记录异常信息并返回 False。
+
+        Args:
+            x (int | None): 横坐标。
+            y (int | None): 纵坐标。
+
+        Returns:
+            bool: 如果点击成功则返回 True，否则返回 False。
+        """
         try:
             pyautogui.click(x, y)
             return True
@@ -302,7 +453,7 @@ class SRAOperator:
     @classmethod
     def press_key(cls, key: str, presses: int = 1, interval: float = 2) -> bool:
         """按下按键
-
+        
         Args:
             key: 按键
             presses: 按下次数
@@ -320,6 +471,16 @@ class SRAOperator:
 
     @classmethod
     def press_key_for_a_while(cls, key: str, during: float = 0) -> bool:
+        """
+        按下按键一段时间
+
+        Args:
+            key: 按键
+            during: 按下时间
+
+        Returns:
+            按键成功返回True，否则返回False
+        """
         try:
             logger.debug("按下按键" + key)
             pyautogui.keyDown(key)
@@ -332,6 +493,18 @@ class SRAOperator:
 
     @staticmethod
     def _key_in_utf8(key):
+        """
+        将按键转换为 UTF-8 编码。
+
+        Args:
+            key (str): 要转换的按键。
+
+        Returns:
+            str: 转换后的 UTF-8 编码。
+
+        Raises:
+            ValueError: 如果输入的按键不在预定义的列表中。
+        """
         match key:
             case "esc":
                 return "\uE00C"
@@ -356,6 +529,15 @@ class SRAOperator:
 
     @classmethod
     def write(cls, content: str = "") -> bool:
+        """
+        输入文本内容。
+
+        Args:
+            content (str): 要输入的文本内容。
+
+        Returns:
+            bool: 如果输入成功则返回 True，否则返回 False。
+        """
         try:
             pyautogui.write(content)
             return True
@@ -365,6 +547,16 @@ class SRAOperator:
 
     @classmethod
     def moveRel(cls, x_offset: int, y_offset: int) -> bool:
+        """
+        相对当前位置移动光标。
+
+        Args:
+            x_offset (int): X 轴偏移量。
+            y_offset (int): Y 轴偏移量。
+
+        Returns:
+            bool: 如果移动成功则返回 True，否则返回 False。
+        """
         try:
             pyautogui.moveRel(x_offset, y_offset)
             return True
@@ -374,10 +566,28 @@ class SRAOperator:
 
     @classmethod
     def moveTo(cls, *args):
+        """
+        移动光标到指定位置。
+
+        Args:
+            *args: 参见 pyautogui.moveTo 的参数。
+
+        Returns:
+            bool: 如果移动成功则返回 True，否则返回 False。
+        """
         return pyautogui.moveTo(args)
 
     @classmethod
     def scroll(cls, distance: int) -> bool:
+        """
+        滚动鼠标滚轮。
+
+        Args:
+            distance (int): 滚动距离。
+
+        Returns:
+            bool: 如果滚动成功则返回 True，否则返回 False。
+        """
         try:
             pyautogui.scroll(distance)
             return True
@@ -388,13 +598,9 @@ class SRAOperator:
     @classmethod
     def copy(cls, text: str):
         """
-        Copy the text to clipboard
-
-        Args:
-            text:
-
-        Returns:
-            Any
+        Copy the text to clipboard.
+        :param text: The text to copy.
+        :return: none
         """
         return pyperclip.copy(text)
 
