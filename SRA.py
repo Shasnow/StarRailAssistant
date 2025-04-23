@@ -192,12 +192,12 @@ class Main(QWidget):
         # divination_button.clicked.connect(self.divination)
 
     def plugins(self):
+        PluginManager.public_ui=self.ui
         PluginManager.load_plugins()
         plugin_groupbox:QGroupBox=self.ui.findChild(QGroupBox,'plugin_groupbox')
         plugins_widget=Plugin(self)
-        for name,model in PluginManager.getPlugins().items():
-            model.PARENT=self.ui
-            plugins_widget.addPlugin(name, model.run)
+        for name,run in PluginManager.getPlugins().items():
+            plugins_widget.addPlugin(name, run)
         plugin_groupbox.layout().addWidget(plugins_widget)
 
     def auto_plot_status(self, state):

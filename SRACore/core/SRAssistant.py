@@ -970,7 +970,7 @@ class Assistant(QThread):
                 logger.error("发生错误，错误编号20")
                 return False
 
-            logger.info("f第{exe_time + 1}次进入差分宇宙，少女祈祷中…")
+            logger.info(f"第{exe_time + 1}次进入差分宇宙，少女祈祷中…")
             if not check("res/img/base_effect_select.png",max_time=25):
                 logger.error("超时")
                 return False
@@ -1081,7 +1081,7 @@ def check(img_path, interval=0.5, max_time=40):
 
 
 def check_any(img_list: list, interval=0.5, max_time=40):
-    return SRAOperator.check_any(img_list, interval, max_time)
+    return SRAOperator.checkAny(img_list, interval, max_time)
 
 
 def click(img_path: str, x_add=0, y_add=0, wait_time=2.0, title="崩坏：星穹铁道") -> bool:
