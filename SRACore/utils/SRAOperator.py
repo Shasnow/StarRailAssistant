@@ -20,21 +20,18 @@ SRA操作
 """
 from os import PathLike
 
-import time
-
 import cv2
 import pyautogui
 import pygetwindow
 import pyperclip
 import pyscreeze
+import time
 from PIL import Image
+from rapidocr_onnxruntime import RapidOCR
 
 from SRACore.utils.Exceptions import WindowNoFoundException, MultipleWindowsException, MatchFailureException, \
     WindowInactiveException
 from SRACore.utils.Logger import logger, internal
-
-
-# from rapidocr_onnxruntime import RapidOCR
 
 
 class SRAOperator:
@@ -44,8 +41,7 @@ class SRAOperator:
     area_left = 0
     zoom = 1.5
     confidence = 0.9
-
-    # ocr_engine: RapidOCR = None
+    ocr_engine: RapidOCR = None
 
     @classmethod
     def _screenshot_region_calculate(cls, region: tuple[int, int, int, int]):
@@ -288,7 +284,7 @@ class SRAOperator:
         return x, y
 
     @classmethod
-    def exist(cls, img_path:str|PathLike, wait_time=2) -> bool:
+    def exist(cls, img_path: str | PathLike, wait_time=2) -> bool:
         """
         检查指定路径的图像是否存在于截图中。
 
@@ -307,7 +303,7 @@ class SRAOperator:
             cls.locate(img_path)
             return True
         except Exception as e:
-            logger.log(internal, e)
+            logger.log(internal, e.__str__())
             return False
 
     @classmethod
@@ -334,7 +330,7 @@ class SRAOperator:
             return None
 
     @classmethod
-    def check(cls, img_path: str, interval=0.5, max_time=40):
+    def check(cls, img_path: str | PathLike, interval=0.5, max_time=40):
         """
         持续检查指定路径的图像是否出现在截图中。
 
@@ -401,7 +397,7 @@ class SRAOperator:
     @classmethod
     def click_img(
             cls,
-            img_path,
+            img_path: str | PathLike,
             x_add=0,
             y_add=0,
             wait_time=2.0,
@@ -419,7 +415,7 @@ class SRAOperator:
         """
         try:
             time.sleep(wait_time)
-            logger.debug("点击对象" + img_path)
+            logger.debug(f"点击对象{img_path}")
             x, y = cls.locateCenter(img_path, x_add, y_add, title)
             pyautogui.click(x, y)
             return True
@@ -575,7 +571,33 @@ class SRAOperator:
         Returns:
             bool: 如果移动成功则返回 True，否则返回 False。
         """
-        return pyautogui.moveTo(args)
+        return pyautogui.moveTo(*args)
+
+    @classmethod
+    def dragTo(cls, *args):
+        """
+        拖动光标到指定位置。
+
+        Args:
+            *args: 参见 pyautogui.dragTo 的参数。
+
+        Returns:
+            bool: 如果拖动成功则返回 True，否则返回 False。
+        """
+        return pyautogui.dragTo(*args)
+
+    @classmethod
+    def dragRel(cls, *args, **kwargs):
+        """
+        相对当前位置拖动光标。
+
+        Args:
+            *args: 参见 pyautogui.dragRel 的参数。
+
+        Returns:
+            bool: 如果拖动成功则返回 True，否则返回 False。
+        """
+        return pyautogui.dragRel(*args, **kwargs)
 
     @classmethod
     def scroll(cls, distance: int) -> bool:
@@ -616,10 +638,28 @@ class SRAOperator:
         pyautogui.keyUp("ctrl")
 
     @classmethod
-    def ocr_in_region(cls, area_left, area_top, width, height):
-        pass
-        # if cls.ocr_engine is None:
-        #     cls.ocr_engine = RapidOCR()
-        # img = pyscreeze.screenshot(region=(cls.area_left+area_left, cls.area_top+area_top, width, height))
-        # result, elapse = cls.ocr_engine(img, use_det=True, use_cls=False, use_rec=True)
-        # return result
+    def ocr_in_region(cls, area_left: int, area_top: int, width: int, height: int):
+        """
+        在指定区域内执行 OCR 识别。(相对于截图区域)
+
+        该方法会在指定的区域内进行截图，并使用 RapidOCR 引擎对截图进行 OCR 识别。
+        如果 OCR 引擎尚未初始化，则会先对其进行初始化。
+
+        Args:
+            area_left (int): 指定区域相对于截图区域的左侧偏移量。
+            area_top (int): 指定区域相对于截图区域的顶部偏移量。
+            width (int): 指定区域的宽度。
+            height (int): 指定区域的高度。
+
+        Returns:
+            list: OCR 识别的结果列表。
+        """
+        # 若 OCR 引擎未初始化，则进行初始化
+        if cls.ocr_engine is None:
+            cls.ocr_engine = RapidOCR()
+        # 在指定区域内进行截图
+        left, top = cls.get_screenshot_region("崩坏：星穹铁道")[0:2]
+        img = pyscreeze.screenshot(region=(left + area_left, top + area_top, width, height))
+        # 执行 OCR 识别
+        result, elapse = cls.ocr_engine(img, use_det=True, use_cls=False, use_rec=True)
+        return result
