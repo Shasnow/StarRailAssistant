@@ -4,6 +4,9 @@
     <img alt="Static Badge" src="https://img.shields.io/badge/python-3.11.5%2B-skyblue">
     <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/Shasnow/StarRailAssistant/total">
     <img alt="GitHub Release" src="https://img.shields.io/github/v/release/Shasnow/StarRailAssistant">
+    <a href="https://mirrorchyan.com/zh/projects">
+        <img alt="mirrorc" src="https://img.shields.io/badge/Mirror%E9%85%B1-%239af3f6?logo=countingworkspro&logoColor=4f46e5">
+    </a>
 </p>
 <p align="center"><a href="https://shasnow.github.io/SRA"><b>主页</b></a></p>
 
@@ -101,6 +104,8 @@ This software is open source, free of charge and for learning and exchange purpo
   * 了解 `图像识别` 和 `模拟操作` 相关内容。
 * 正在游玩并将长期游玩`崩坏：星穹铁道` 。
 * 熟悉网页前端设计。
+
+[点击了解SRA的开发计划](https://docs.qq.com/aio/DWUN3Qm54a2pkZ09x?nlc=1&p=FcrsSwXMOYoR5yq7bxjeLD)
 
 或许，您可以`另辟蹊径`？
 
