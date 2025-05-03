@@ -28,3 +28,6 @@ class MatchFailureException(SRAException):
 
 class WindowInactiveException(SRAException):
     pass
+
+class InvalidPluginException(SRAException):
+    pass

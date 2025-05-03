@@ -25,7 +25,7 @@
 import subprocess
 import time
 
-from PySide6.QtCore import QThread, Signal, Slot
+from PySide6.QtCore import QThread, Signal
 
 from SRACore.extensions.QTHandler import QTHandler
 from SRACore.utils import Configure, WindowsProcess, Encryption
@@ -33,24 +33,21 @@ from SRACore.utils.Logger import logger
 from SRACore.utils.SRAOperator import SRAOperator
 from SRACore.utils.WindowsProcess import find_window, is_process_running
 
-VERSION = "0.8.0"
-CORE="0.8.0.0"
+VERSION = "0.8.1"
+CORE="0.8.1.0"
 
 
 class Assistant(QThread):
     update_signal = Signal(str)
 
-    def __init__(self, pwd, cloud=False, driver=None):
+    def __init__(self, pwd):
         super().__init__()
-        self.cloud = cloud
-        self.driver = driver
         self.stop_flag = False
         self.globals=Configure.load("data/globals.json")
         self.config = None
         self.config_list:list=self.globals['Config']['configList']
         settings = self.globals["Settings"]
-        SRAOperator.cloud = cloud
-        SRAOperator.web_driver = driver
+        SRAOperator.reset()
         SRAOperator.confidence = settings["confidence"]
         SRAOperator.zoom=settings["zoom"]
         self.pwd = pwd
@@ -107,7 +104,6 @@ class Assistant(QThread):
         else:
             logger.info("任务全部完成\n")
 
-    @Slot()
     def run(self):
         logger.info("SRAv" + VERSION + " 创建任务喵~")
         if self.globals["Config"]["next"]:
@@ -118,7 +114,6 @@ class Assistant(QThread):
         else:
             self.assist_start(self.config_list[self.globals["Config"]['currentConfig']])
 
-    @Slot()
     def check_game(self):
         """Check that the game is running.
 
@@ -133,7 +128,6 @@ class Assistant(QThread):
             return False
         return True
 
-    @Slot()
     def path_check(self, path, path_type="StarRail"):
         """Check game path.
 
@@ -155,7 +149,6 @@ class Assistant(QThread):
             logger.error("游戏路径为空")
             return False
 
-    @Slot()
     def launch_game(self, game_path, path_type):
         """Launch game
 
@@ -192,7 +185,6 @@ class Assistant(QThread):
                     logger.warning("启动时间过长，请尝试手动启动")
                     return False
 
-    @Slot()
     def launch_launcher(self, path, path_type, channel):
         """Launch game
 
@@ -237,7 +229,6 @@ class Assistant(QThread):
             logger.warning("启动时间过长，请尝试手动启动")
             return False
 
-    @Slot()
     def login(self, account, password):
         """Login game.
 
@@ -252,16 +243,16 @@ class Assistant(QThread):
             True if successfully logged in, False otherwise.
 
         """
-        result=check_any(["res/img/welcome.png","res/img/login_page.png"])
-        if result==0:
+        result=check_any(["res/img/login_page.png", "res/img/welcome.png", "res/img/quit.png","res/img/chat_enter.png"])
+        if result is not None and result!=0:
             # 进入登录界面的标志
-            logger.info("已登录")
-            return True
+            logger.info(f"登录状态 {result}")
+            return result
         else:
             click("res/img/login_other.png")
         if not click("res/img/login_with_account.png"):
             logger.error("发生错误，错误编号10")
-            return False
+            return 0
         logger.info("登录到" + account)
         time.sleep(1)
         SRAOperator.copy(account)
@@ -274,20 +265,19 @@ class Assistant(QThread):
         click("res/img/agree.png", -158)
         if not click("res/img/enter_game.png"):
             logger.error("发生错误，错误编号9")
-            return False
+            return 0
         times = 0
         while True:
             time.sleep(0.2)
             times += 1
             if times == 10:
                 logger.warning("长时间未成功登录，可能密码错误或需要新设备验证")
-                return False
+                return 0
             else:
                 if exist("res/img/welcome.png"):
                     logger.info("登录成功")
-                    return True
+                    return 1
 
-    @Slot()
     def login_bilibili(self, account, password):
         """Login game.
 
@@ -317,7 +307,6 @@ class Assistant(QThread):
         click("res/img/bilibili_login.png")
         return True
 
-    @Slot()
     def start_game(self, game_path, path_type, channel=0, login_flag=False, account="", password=""):
         """Launch and enter game.
 
@@ -346,13 +335,24 @@ class Assistant(QThread):
                 return False
 
         if channel == 0:
-            if login_flag and account:
-                self.login(account, password)
-            if check("res/img/quit.png", max_time=120):
-                self.start_game_click()
-            else:
-                logger.warning("加载时间过长，请重试")
-                return False
+            if login_flag:
+                login_status = self.login(account, password)
+                match login_status:
+                    case 0:
+                        logger.warning("登录失败")
+                        return False
+                    case 1|2:
+                        logger.info("登录成功")
+                        time.sleep(2)
+                        if check("res/img/quit.png", max_time=120):
+                            self.start_game_click()
+                    case 3:
+                        logger.info("已进入游戏")
+                        return True
+                    case _:
+                        logger.error("未知登录状态")
+                        return False
+
         elif channel == 1:
             self.login_bilibili(account, password)
             if check("res/img/quit.png"):
@@ -372,12 +372,9 @@ class Assistant(QThread):
         click_point(x, y)
         time.sleep(3)
 
-    @Slot()
     def wait_game_load(self):
         times = 0
         while True:
-            time.sleep(1)
-            click_point(*get_screen_center())
             if click("res/img/train_supply.png"):
                 time.sleep(4)
                 moveRel(0, +400)
@@ -389,6 +386,8 @@ class Assistant(QThread):
                 if times == 50:
                     logger.error("发生错误，进入游戏但未处于大世界")
                     return False
+            time.sleep(1)
+            click_point(*get_screen_center())
 
     def trailblazer_power(self):
         tasks = []
@@ -480,8 +479,8 @@ class Assistant(QThread):
             return self.logout()
         if self.config["AfterMission"]["quitGame"]:
             return self.quit_game()
+        return None
 
-    @Slot()
     def trailblazer_profile(self):
         """Mission trailblaze profile"""
         logger.info("执行任务：签证奖励")
@@ -499,7 +498,6 @@ class Assistant(QThread):
             logger.info("没有可领取的奖励3")
         logger.info("任务完成：签证奖励")
 
-    @Slot()
     def redeem_code(self, redeem_code_list):
         """Fills in redeem code and redeems them.
 
@@ -529,7 +527,7 @@ class Assistant(QThread):
                 logger.error("发生错误，错误编号17")
         logger.info("任务完成：领取兑换码")
 
-    @Slot()
+
     def mail(self):
         """Open mailbox and pick up mails."""
         logger.info("执行任务：领取邮件")
@@ -543,7 +541,6 @@ class Assistant(QThread):
             logger.info("没有可以领取的邮件")
         logger.info("任务完成：领取邮件")
 
-    @Slot()
     def gift_of_odyssey(self):
         """Open the activity screen to receive gift_of_odyssey.
 
@@ -565,7 +562,7 @@ class Assistant(QThread):
             press_key("esc")
         logger.info("任务完成：巡星之礼")
 
-    @Slot()
+
     def ornament_extraction(self, level_index, battle_time=1):
         """Ornament extraction
 
@@ -578,21 +575,21 @@ class Assistant(QThread):
             None
         """
         logger.info("执行任务：饰品提取")
-        level = "res/img/ornament_extraction (" + str(level_index) + ").png"
+        level = f"res/img/ornament_extraction ({level_index}).png"
         if not self.find_session_name("ornament_extraction"):
             return False
         if exist("res/img/no_save.png"):
             logger.warning("当前暂无可用存档，请前往[差分宇宙]获取存档")
             press_key("esc")
-            return
+            return False
         if not find_level(level):
-            return
+            return False
         if not click(level, x_add=700):
             logger.error("发生错误，错误编号3")
-            return
+            return False
         if not check('res/img/ornament_extraction_page.png'):  # 等待传送
             logger.error("检测超时，编号4")
-            return
+            return False
         if click("res/img/nobody.png"):
             click("res/img/preset_formation.png")
             click("res/img/team1.png")
@@ -612,7 +609,7 @@ class Assistant(QThread):
             self.battle_star(battle_time)
         self.update_signal.emit("任务完成：饰品提取")
 
-    @Slot()
+
     def calyx_golden(self, level_index, single_time=1, battle_time=1):
         self.battle("拟造花萼（金）",
                     "calyx(golden)",
@@ -621,7 +618,6 @@ class Assistant(QThread):
                     False,
                     single_time)
 
-    @Slot()
     def calyx_crimson(self, level_index, single_time=1, battle_time=1):
         self.battle("拟造花萼（赤）",
                     "calyx(crimson)",
@@ -631,7 +627,6 @@ class Assistant(QThread):
                     single_time,
                     y_add=-30)
 
-    @Slot()
     def stagnant_shadow(self, level_index, battle_time=1):
         self.battle("凝滞虚影",
                     "stagnant_shadow",
@@ -640,7 +635,6 @@ class Assistant(QThread):
                     False,
                     None)
 
-    @Slot()
     def caver_of_corrosion(self, level_index, battle_time=1):
         self.battle("侵蚀隧洞",
                     "caver_of_corrosion",
@@ -649,7 +643,6 @@ class Assistant(QThread):
                     True,
                     None)
 
-    @Slot()
     def echo_of_war(self, level_index, battle_time=1):
         self.battle("历战余响",
                     "echo_of_war",
@@ -724,7 +717,7 @@ class Assistant(QThread):
                 self.battle_star(battle_time)
         logger.info(f"任务完成：{mission_name}")
 
-    @Slot()
+
     def battle_star(self, battle_time: int):
         logger.info("开始战斗")
         logger.info("请检查自动战斗和倍速是否开启")
@@ -768,7 +761,7 @@ class Assistant(QThread):
             if check("res/img/battle.png",max_time=10):
                 press_key("esc")
 
-    @Slot()
+
     def wait_battle_end(self):
         wait_battle_end()
 
@@ -779,7 +772,7 @@ class Assistant(QThread):
         if click("res/img/support.png"):
             click("res/img/enter_line.png")
 
-    @Slot()
+
     def assignments_reward(self):
         """Receive assignment reward"""
         logger.info("执行任务：领取派遣奖励")
@@ -805,7 +798,6 @@ class Assistant(QThread):
             time.sleep(2)
         logger.info("任务完成：领取派遣奖励")
 
-    @Slot()
     def daily_training_reward(self):
         """Receive daily training reward"""
         logger.info("执行任务：领取每日实训奖励")
@@ -830,7 +822,7 @@ class Assistant(QThread):
                 press_key("esc")
         logger.info("任务完成：领取每日实训奖励")
 
-    @Slot()
+
     def nameless_honor(self):
         """Receive nameless honor reward"""
         logger.info("执行任务：领取无名勋礼奖励")
@@ -867,7 +859,7 @@ class Assistant(QThread):
             logger.info("没有可领取的奖励")
         logger.info("完成任务：领取无名勋礼奖励")
 
-    @Slot()
+
     def replenish(self, way):
         """Replenish trailblaze power
 
@@ -924,7 +916,7 @@ class Assistant(QThread):
         else:
             return False
 
-    @Slot()
+
     def find_session_name(self, name, scroll_flag=False):
         name1 = "res/img/" + name + ".png"
         name2 = "res/img/" + name + "_onclick.png"
@@ -1104,7 +1096,7 @@ def exist(img_path, wait_time:float=2.0) -> bool:
     return SRAOperator.exist(img_path, wait_time)
 
 
-def get_screen_center() -> tuple[int, int]:
+def get_screen_center() -> tuple:
     return SRAOperator.get_screen_center()
 
 
@@ -1123,12 +1115,13 @@ def find_level(level: str) -> bool:
     times = 0
     while True:
         times += 1
-        if times == 60:
+        if times == 20:
             return False
         if exist(level, wait_time=0.5):
             return True
         else:
-            scroll(-5)
+            for _ in range(14):
+                scroll(-1)
 
 
 def press_key_for_a_while(key: str, during: float = 0) -> bool:

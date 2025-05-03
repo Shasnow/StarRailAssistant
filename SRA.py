@@ -23,8 +23,6 @@
 """
 
 import ctypes
-import os
-import shutil
 import traceback
 
 import sys
@@ -42,17 +40,15 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QVBoxLayout,
     QComboBox,
-    QTableWidget,
-    QDoubleSpinBox,
-    QLineEdit,
 )  # 从 PySide6 中导入所需的类
 from plyer import notification
 
+from SRACore.utils import const
 from SRACore.core import SRAssistant, AutoPlot
 from SRACore.core.SRAssistant import VERSION, CORE
-from SRACore.utils import Configure, WindowsPower, WindowsProcess, Encryption
+from SRACore.utils import Configure, WindowsPower, Encryption
 from SRACore.utils.Dialog import (
-    AnnouncementDialog,
+    Announcement,
     ShutdownDialog,
     AnnouncementBoard,
     ExceptionMessageBox,
@@ -65,7 +61,7 @@ from SRACore.utils.SRAWidgets import (
     StartGame,
     TrailblazePower,
     AfterMission,
-    SimulatedUniverse, Plugin,
+    SimulatedUniverse, Plugin, SystemTray, Hotkey, Settings,
 )
 
 # from ocr import SRAocr
@@ -76,18 +72,16 @@ uiLoader = QUiLoader()
 
 
 class Main(QWidget):
-    AppPath = os.path.dirname(os.path.realpath(sys.argv[0])).replace(
-        "\\", "/"
-    )  # 获取软件自身的路径
-
     def __init__(self, main_window: QMainWindow):
         super().__init__()
         self.main_window = main_window
+        self.AppPath=const.AppPath
         # self.ocr_window=None
         self.autoplot = AutoPlot.Main()
         self.exit_SRA = False
         self.sleep = False
         self.shutdown = False
+        self.isRunning = False
         Configure.init()
         self.globals = Configure.load("data/globals.json")
         current = self.globals['Config']['configList'][self.globals['Config']['currentConfig']]
@@ -188,8 +182,6 @@ class Main(QWidget):
         auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
         # relics_identification_button:QPushButton=self.ui.findChild(QPushButton,"relicsIdentification")
         # relics_identification_button.clicked.connect(self.relics_identification)
-        # divination_button: QPushButton = self.ui.findChild(QPushButton, "pushButton_add_app_1")
-        # divination_button.clicked.connect(self.divination)
 
     def plugins(self):
         PluginManager.public_ui=self.ui
@@ -217,8 +209,6 @@ class Main(QWidget):
         self.current_config_combobox.currentIndexChanged.connect(self.reloadAll)
         save_plan_button: QPushButton = self.ui.findChild(QPushButton, "save_plan")
         save_plan_button.clicked.connect(self.save_plan)
-        save_as_button: QPushButton = self.ui.findChild(QPushButton, "save_as")
-        save_as_button.clicked.connect(self.save_plan_as)
         reload_button: QPushButton = self.ui.findChild(QPushButton, "reload")
         reload_button.clicked.connect(self.reloadAll)
         new_plan_button: QPushButton = self.ui.findChild(QPushButton, "new_plan")
@@ -232,16 +222,6 @@ class Main(QWidget):
     def save_plan(self):
         self.getAll()
         Configure.save(self.config, f'data/config-{self.current_config_combobox.currentText()}.json')
-
-    def save_plan_as(self):
-        new_plan_name, confirm = InputDialog.getText(self.ui, "另存为新方案", "方案名称：")
-        if confirm and new_plan_name:
-            Configure.addConfig(new_plan_name)
-            self.globals["Config"]["configList"].append(new_plan_name)
-            Configure.save(self.globals, "data/globals.json")
-            self.current_config_combobox.addItem(new_plan_name)
-        self.getAll()
-        Configure.save(self.config, f'data/config-{new_plan_name}.json')
 
     @Slot()
     def reloadAll(self):
@@ -284,111 +264,9 @@ class Main(QWidget):
             self.current_config_combobox.setItemText(index, new)
 
     def software_setting(self):
-        self.key_table = self.ui.findChild(QTableWidget, "tableWidget")
-        self.key_setting_show()
-        self.key_table.cellChanged.connect(self.key_setting_change)
-        save_button = self.ui.findChild(QPushButton, "pushButton_save")
-        save_button.clicked.connect(self.key_setting_save)
-        reset_button = self.ui.findChild(QPushButton, "pushButton_reset")
-        reset_button.clicked.connect(self.key_setting_reset)
+        setting_area:QWidget=self.ui.findChild(QWidget,"tab_2")
+        setting_area.layout().addWidget(Settings(self,self.globals,self.update_log).main_ui)
 
-        startup_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifStartUp")
-        startup_checkbox.setChecked(self.globals["Settings"]["startup"])
-        startup_checkbox.stateChanged.connect(self.startup)
-
-        auto_update_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifAutoUpdate")
-        auto_update_checkbox.stateChanged.connect(self.auto_update)
-        auto_update_checkbox.setChecked(self.globals["Settings"]["autoUpdate"])
-
-        thread_safety_checkbox = self.ui.findChild(QCheckBox, "checkBox_threadSafety")
-        thread_safety_checkbox.setChecked(self.globals["Settings"]["threadSafety"])
-        thread_safety_checkbox.stateChanged.connect(self.thread_safety)
-
-        clear_log_button: QPushButton = self.ui.findChild(QPushButton, "clearLog")
-        clear_log_button.clicked.connect(self.clearLog)
-
-        confidence_spin_box: QDoubleSpinBox = self.ui.findChild(QDoubleSpinBox, "confidenceSpinBox")
-        confidence_spin_box.setValue(self.globals["Settings"]["confidence"])
-        confidence_spin_box.valueChanged.connect(self.confidence_changed)
-
-        zoom_spinbox: QDoubleSpinBox = self.ui.findChild(QDoubleSpinBox, "zoomSpinBox")
-        zoom_spinbox.setValue(self.globals["Settings"]["zoom"])
-        zoom_spinbox.valueChanged.connect(self.zoom_changed)
-
-        mirrorchyanCDK: QLineEdit = self.ui.findChild(
-            QLineEdit, "lineEdit_mirrorchyanCDK"
-        )
-        mirrorchyanCDK.setText(
-            Encryption.win_decryptor(self.globals["Settings"]["mirrorchyanCDK"])
-        )
-        mirrorchyanCDK.textChanged.connect(self.mirrorchyanCDK_changed)
-
-        integrity_check_button: QPushButton = self.ui.findChild(
-            QPushButton, "integrityCheck"
-        )
-        integrity_check_button.clicked.connect(self.integrity_check)
-
-    def key_setting_save(self):
-        Configure.save(self.globals,'data/globals.json')
-
-    def key_setting_show(self):
-        settings = self.globals["Settings"]
-        for i in range(4):
-            self.key_table.item(0, i).setText(settings["F" + str(i + 1)])
-
-    def key_setting_reset(self):
-        for i in range(4):
-            self.key_table.item(0, i).setText("f" + str(i + 1))
-
-    def key_setting_change(self):
-        for i in range(4):
-            self.globals["Settings"]["F" + str(i + 1)] = self.key_table.item(0, i).text()
-
-    def startup(self, state):
-        if state == 2:
-            WindowsProcess.set_startup_item("SRA", self.AppPath + "/SRA.exe")
-            self.globals["Settings"]["startup"] = True
-        else:
-            WindowsProcess.delete_startup_item("SRA")
-            self.globals["Settings"]["startup"] = False
-        Configure.save(self.globals, "data/globals.json")
-
-    def auto_update(self, state):
-        if state == 2:
-            if os.path.exists("SRAUpdater.exe"):
-                shutil.copy("SRAUpdater.exe", "SRAUpdater.active.exe")
-                WindowsProcess.Popen("SRAUpdater.active.exe")
-            else:
-                self.update_log("缺少文件SRAUpdater.exe 无法自动更新")
-            self.globals["Settings"]["autoUpdate"] = True
-        else:
-            self.globals["Settings"]["autoUpdate"] = False
-        Configure.save(self.globals, "data/globals.json")
-
-    def thread_safety(self, state):
-        if state == 2:
-            self.globals["Settings"]["threadSafety"] = True
-        else:
-            self.globals["Settings"]["threadSafety"] = False
-        Configure.save(self.globals, "data/globals.json")
-
-    def confidence_changed(self, value):
-        self.globals["Settings"]["confidence"] = value
-        Configure.save(self.globals, "data/globals.json")
-
-    def zoom_changed(self, value):
-        self.globals["Settings"]["zoom"] = value
-        Configure.save(self.globals, "data/globals.json")
-
-    def mirrorchyanCDK_changed(self, value):
-        self.globals["Settings"]["mirrorchyanCDK"] = Encryption.win_encryptor(value)
-        Configure.save(self.globals,"data/globals.json")
-
-    @staticmethod
-    def integrity_check():
-        shutil.copy("SRAUpdater.exe", "SRAUpdater.active.exe")
-        command = "SRAUpdater.active -i"
-        WindowsProcess.Popen(command)
 
     def display_none(self):
         """Sets the invisible state of the container."""
@@ -420,8 +298,9 @@ class Main(QWidget):
         self.display_none()
         self.simulated_universe.ui.show()
 
+    @Slot(str)
     def update_log(self, text):
-        """Update the content in log area."""
+        """Update the content in the log area."""
         self.log.append(text)
 
     def getAll(self):
@@ -434,7 +313,7 @@ class Main(QWidget):
         self.simulated_universe.getter()
 
     def execute(self):
-        """Save configuration, create work thread and monitor signal."""
+        """Save configuration, create a work thread and monitor signal."""
         self.getAll()
         flags = [
             self.config["Mission"]["startGame"],
@@ -458,12 +337,13 @@ class Main(QWidget):
         self.son_thread.start()
         self.button0_2.setEnabled(True)
         self.button0_1.setEnabled(False)
+        self.isRunning = True
 
     def missions_finished(self):
         """接收到任务完成信号后执行的工作"""
         self.notification()
-        # if not self.config["Mission"]["afterMission"]:
-        #     return
+        self.isRunning = False
+        del self.son_thread
         if self.shutdown:
             WindowsPower.schedule_shutdown(60)
             self.countdown()
@@ -509,7 +389,14 @@ class Main(QWidget):
         version = Configure.load("version.json")
         announcement_board = AnnouncementBoard(self.ui, "公告栏")
         announcement_board.add(
-            AnnouncementDialog(
+            Announcement(
+                None,
+                "更新公告",
+                version["VersionUpdate"],
+            )
+        )
+        announcement_board.add(
+            Announcement(
                 None,
                 "长期公告",
                 f"<html><i>点击下方按钮关闭公告栏</i>{version['Announcement']}"
@@ -524,22 +411,10 @@ class Main(QWidget):
                 "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，<b>相应的后果由您自行承担</b>。</p>"
                 "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B站、微博）的官方动态下讨论任何关于 SRA 的内容。<br>"
                 "人话：不要跳脸官方～(∠・ω&lt; )⌒☆</html>",
-                announcement_type="Announcement",
-                icon="res/Robin.gif",
             )
         )
-
-        announcement_board.add(
-            AnnouncementDialog(
-                None,
-                "更新公告",
-                version["VersionUpdate"],
-                announcement_type="VersionUpdate",
-                icon="res/Robin2.gif",
-            )
-        )
-        announcement_board.setDefault(1)
         announcement_board.show()
+        announcement_board.setDefault(0)
 
     def problem(self):
         MessageBox.info(
@@ -574,28 +449,46 @@ class Main(QWidget):
             f"内核版本：{CORE}"
         )
 
-    @staticmethod
-    def clearLog():
-        with open("SRAlog.log", "w", encoding="utf-8"):
-            pass
 
 
 class SRA(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.system_tray=SystemTray(self)
+        self.system_tray.show()
         self.main = Main(self)
         self.setCentralWidget(self.main.ui)
         self.setWindowIcon(QIcon(self.main.AppPath + "/res/SRAicon.ico"))
-        self.setWindowTitle("SRA v" + VERSION)
+        self.setWindowTitle(f"SRA v{VERSION} | {PluginManager.getPluginsCount()}个插件已加载")
         size = list(map(int, self.main.globals["Settings"]["uiSize"].split("x")))
         location = list(map(int, self.main.globals["Settings"]["uiLocation"].split("x")))
         self.setGeometry(
             location[0], location[1], size[0], size[1]
         )  # 设置窗口大小与位置
+        self.keyboard_listener()
+
+    def keyboard_listener(self):
+        self.hotkey=Hotkey(self.main.globals["Settings"]["hotkeys"])
+        self.hotkey.start()
+        self.hotkey.startOrStop.connect(self.start_status_switch)
+        self.hotkey.showOrHide.connect(self.show_or_hide)
+        QApplication.instance().aboutToQuit.connect(self.hotkey.stop)
+
+    def start_status_switch(self):
+        if self.main.isRunning:
+            self.main.kill()
+        else:
+            self.main.execute()
+
+    def show_or_hide(self):
+        if not self.isMinimized():
+            self.showMinimized()
+        else:
+            self.showNormal()
 
     def closeEvent(self, event):
-        """Save the windows info"""
+        """Save the window info"""
         # 保存窗口大小与位置
         self.main.globals["Settings"][
             "uiSize"
@@ -605,9 +498,9 @@ class SRA(QMainWindow):
         ] = f"{self.geometry().x()}x{self.geometry().y()}"
         Configure.save(self.main.globals, "data/globals.json")
         # 结束残余进程
-        self.main.exitSRA()
-
         event.accept()
+        if self.main.globals["Settings"]["exitWhenClose"]:
+            QApplication.quit()
 
 
 def is_admin():
@@ -633,6 +526,7 @@ def exception_hook(exc_type: type, value):
 def main():
     if is_admin():
         app = QApplication(sys.argv)
+        app.setQuitOnLastWindowClosed(False)
         start_time = time.time()
         window = SRA()
         window.show()
@@ -644,7 +538,6 @@ def main():
         version = Configure.load("version.json")
         if not version["Announcement.DoNotShowAgain"]:
             window.main.notice()
-
         sys.exit(app.exec())
 
     else:

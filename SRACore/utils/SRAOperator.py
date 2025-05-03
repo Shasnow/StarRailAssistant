@@ -29,7 +29,7 @@ import time
 from PIL import Image
 from rapidocr_onnxruntime import RapidOCR
 
-from SRACore.utils.Exceptions import WindowNoFoundException, MultipleWindowsException, MatchFailureException, \
+from SRACore.utils.Exceptions import WindowNoFoundException, MatchFailureException, \
     WindowInactiveException
 from SRACore.utils.Logger import logger, internal
 
@@ -42,6 +42,18 @@ class SRAOperator:
     zoom = 1.5
     confidence = 0.9
     ocr_engine: RapidOCR = None
+
+    @classmethod
+    def reset(cls):
+        """
+        重置截图区域的偏移量和缩放比例。
+
+        该方法会将截图区域的偏移量和缩放比例重置为默认值。
+        """
+        cls.area_top = 0
+        cls.area_left = 0
+        cls.screenshot_proportion = 1.0
+        cls.location_proportion = 1.0
 
     @classmethod
     def _screenshot_region_calculate(cls, region: tuple[int, int, int, int]):
@@ -82,16 +94,10 @@ class SRAOperator:
 
         Raises:
             WindowNoFoundException: 未找到包含指定标题的窗口。
-            MultipleWindowsException: 找到多个包含指定标题的窗口。
         """
         matching_windows = pygetwindow.getWindowsWithTitle(title)
         if len(matching_windows) == 0:
             raise WindowNoFoundException('Could not find a window with %s in the title' % title)
-        elif len(matching_windows) > 1:
-            raise MultipleWindowsException(
-                'Found multiple windows with %s in the title: %s' % (
-                    title, [str(win) for win in matching_windows])
-            )
         win = matching_windows[0]
         win.activate()
         region = (win.left, win.top, win.width, win.height)
@@ -622,7 +628,7 @@ class SRAOperator:
         """
         Copy the text to clipboard.
         :param text: The text to copy.
-        :return: none
+        :return: None
         """
         return pyperclip.copy(text)
 
@@ -630,7 +636,7 @@ class SRAOperator:
     def paste(cls):
         """
         Paste the latest content in clipboard.
-        :return: none
+        :return: None
         """
         pyautogui.keyDown("ctrl")
         pyautogui.keyDown("v")
