@@ -15,3 +15,4 @@ PyGetWindow
 rich==13.9.4
 pyperclip==1.9.0
 rapidocr_onnxruntime
+keyboard

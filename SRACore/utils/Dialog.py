@@ -1,6 +1,6 @@
-from PySide6.QtCore import Slot, QTimer, Qt, Signal
+from PySide6.QtCore import Slot, QTimer, Qt
 from PySide6.QtGui import QIcon, QFont
-from PySide6.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QScrollArea, QWidget, QGridLayout, \
+from PySide6.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QWidget, QGridLayout, \
     QSpacerItem, QSizePolicy, QFrame, QLCDNumber, QHBoxLayout, QPushButton, QListWidget, QStackedWidget, QTextBrowser, \
     QMessageBox, QLineEdit
 
@@ -35,61 +35,16 @@ class DownloadDialog(QDialog):
         Popen(command)
 
 
-class AnnouncementDialog(QWidget):
-    action = Signal(int)
-
-    def __init__(self, parent=None, title="title", text="text", announcement_type="Any", icon="res/SRAicon.ico"):
+class Announcement(QWidget):
+    def __init__(self, parent=None, title="title", text="text"):
         super().__init__(parent)
-        self.setFont(QFont("MicroSoft YaHei", 13))
-        self.setWindowTitle(title)
-        self.type = announcement_type
-        # self.setWindowIcon(QIcon("res/SRAicon.ico"))
-        # self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint,False)
-        self.resize(500, 500)
+        self.title = title
         self.setLayout(QVBoxLayout())
-        self.scrollArea = QScrollArea(self)
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollAreaWidgetContents = QWidget()
-        # self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 600, 600))
-        self.gridLayout = QGridLayout(self.scrollAreaWidgetContents)
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-        self.gridLayout.addItem(self.horizontalSpacer, 1, 0, 1, 1)
-
-        self.frame = QFrame(self.scrollAreaWidgetContents)
-        self.frame.setFixedSize(100, 100)
-        self.frame.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Shadow.Raised)
-        self.frame.setStyleSheet(f"border-image: url({icon}) 0 0 0 0 stretch stretch;")
-
-        self.gridLayout.addWidget(self.frame, 1, 1, 1, 1)
-
-        button_box = QDialogButtonBox(self.scrollAreaWidgetContents)
-        button_box.addButton("确认", QDialogButtonBox.ButtonRole.AcceptRole)
-        button_box.addButton("不再提醒", QDialogButtonBox.ButtonRole.RejectRole)
-        button_box.accepted.connect(self.accept)
-        button_box.rejected.connect(self.reject)
-        self.gridLayout.addWidget(button_box, 1, 2, 1, 1)
-
-        self.label = QTextBrowser(self.scrollAreaWidgetContents)
-        self.label.setOpenExternalLinks(True)
-        self.label.setAutoFillBackground(True)
-        # self.label.setWordWrap(True)
-
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.label.setText(text)
-
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 3)
-
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-        self.layout().addWidget(self.scrollArea)
-
-    @Slot()
-    def accept(self):
-        self.action.emit(1)
-
-    @Slot()
-    def reject(self):
-        self.action.emit(0)
+        self.content = QTextBrowser(self)
+        self.content.setOpenExternalLinks(True)
+        self.content.setAutoFillBackground(True)
+        self.content.setText(text)
+        self.layout().addWidget(self.content)
 
 
 class AnnouncementBoard(QDialog):
@@ -111,23 +66,44 @@ class AnnouncementBoard(QDialog):
         self.title_list.setSpacing(10)
         self.title_list.setFixedWidth(100)  # 固定宽度
         self.title_list.currentRowChanged.connect(self.on_title_clicked)
+        self.title_list.addItem("ALL")
 
         # 右侧内容栏
+        right_layout = QGridLayout()
         self.content_stack = QStackedWidget()
+        right_layout.addWidget(self.content_stack, 0, 0, 1, 3)
+        horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        right_layout.addItem(horizontalSpacer, 1, 0, 1, 1)
+        frame = QFrame(self)
+        frame.setFixedSize(100, 100)
+        frame.setFrameShape(QFrame.Shape.StyledPanel)
+        frame.setFrameShadow(QFrame.Shadow.Raised)
+        frame.setStyleSheet("border-image: url(res/Robin.gif) 0 0 0 0 stretch stretch;")
+
+        right_layout.addWidget(frame, 1, 1, 1, 1)
+
+        button_box = QDialogButtonBox(self)
+        button_box.addButton("确认", QDialogButtonBox.ButtonRole.AcceptRole)
+        button_box.addButton("不再提醒", QDialogButtonBox.ButtonRole.RejectRole)
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+        right_layout.addWidget(button_box, 1, 2, 1, 1)
+        self.all = Announcement(None, "ALL", "")
+        self.content_stack.addWidget(self.all)
 
         # 添加到主布局
         self.main_layout.addWidget(self.title_list)
-        self.main_layout.addWidget(self.content_stack)
+        self.main_layout.addLayout(right_layout)
 
         # 存储标题和内容的映射
-        self.title_content_map = {}
+        self.title_content_map = {"ALL": self.all}
 
-    def add(self, dialog: AnnouncementDialog):
+    def add(self, dialog: Announcement):
         """
         添加一个公告条目
         """
         # 将标题添加到左侧标题栏
-        title = dialog.windowTitle()
+        title = dialog.title
         dialog.setParent(self)
         self.title_list.addItem(title)
 
@@ -136,8 +112,9 @@ class AnnouncementBoard(QDialog):
 
         # 保存标题和内容的映射关系
         self.title_content_map[title] = dialog
-        dialog.action.connect(self.action_handle)
+        self.all.content.append(dialog.content.toHtml())
 
+    @Slot(int)
     def on_title_clicked(self, index):
         """
         当用户点击左侧标题栏时，切换右侧内容栏
@@ -146,13 +123,14 @@ class AnnouncementBoard(QDialog):
 
     def setDefault(self, index: int):
         self.title_list.setCurrentRow(index)
+        self.all.content.verticalScrollBar().setValue(0)
 
-    def action_handle(self, action):
-        self.close()
-        if action == 0:
-            version = load("version.json")
-            version[f"Announcement.DoNotShowAgain"] = True
-            save(version, "version.json")
+
+    def reject(self) -> None:
+        version = load("version.json")
+        version[f"Announcement.DoNotShowAgain"] = True
+        save(version, "version.json")
+        return super().reject()
 
 
 class ShutdownDialog(QDialog):
@@ -235,7 +213,7 @@ class ExceptionMessageBox(QMessageBox):
 
 
 class InputDialog(QDialog):
-    def __init__(self, parent,title:str,text:str):
+    def __init__(self, parent, title: str, text: str):
         super().__init__(parent)
         self.isAccept = False
         self.setWindowTitle(title)
@@ -247,37 +225,39 @@ class InputDialog(QDialog):
         self.line_edit = QLineEdit(self)
         self.layout().addWidget(self.line_edit)
         self.button_box = QDialogButtonBox()
-        self.button_box.addButton(QPushButton("确认"),QDialogButtonBox.ButtonRole.AcceptRole)
-        self.button_box.addButton(QPushButton("取消"),QDialogButtonBox.ButtonRole.RejectRole)
+        self.button_box.addButton(QPushButton("确认"), QDialogButtonBox.ButtonRole.AcceptRole)
+        self.button_box.addButton(QPushButton("取消"), QDialogButtonBox.ButtonRole.RejectRole)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
         self.layout().addWidget(self.button_box)
 
     def accept(self):
         super().accept()
-        self.isAccept=True
+        self.isAccept = True
 
     @staticmethod
-    def getText(parent:QWidget,title:str,text:str):
-        dialog = InputDialog(parent,title,text)
+    def getText(parent: QWidget, title: str, text: str):
+        dialog = InputDialog(parent, title, text)
         dialog.exec()
-        return dialog.line_edit.text(),dialog.isAccept
+        return dialog.line_edit.text(), dialog.isAccept
+
 
 class MessageBox(QDialog):
-    def __init__(self,parent,title,text):
+    def __init__(self, parent, title, text):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setWindowIcon(QIcon("res/SRAicon.ico"))
+        self.setFont(QFont("MicroSoft YaHei", 12))
         self.setLayout(QVBoxLayout())
-        self.label=QLabel(self)
+        self.label = QLabel(self)
         self.label.setWordWrap(True)
         self.label.setText(text)
         self.layout().addWidget(self.label)
-        self.ok_button=QPushButton("确认")
+        self.ok_button = QPushButton("确认")
         self.ok_button.clicked.connect(self.accept)
         self.layout().addWidget(self.ok_button)
 
     @staticmethod
-    def info(parent:QWidget,title:str,text:str):
-        msg=MessageBox(parent,title,text)
+    def info(parent: QWidget, title: str, text: str):
+        msg = MessageBox(parent, title, text)
         msg.exec()

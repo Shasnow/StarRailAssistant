@@ -4,14 +4,18 @@ import sys
 
 from PySide6.QtCore import QThread
 
+from SRACore.utils.Exceptions import InvalidPluginException
+
+
 class PluginBase(QThread):
-    def __init__(self,name):
+    def __init__(self, name):
         super().__init__()
-        self.name=name
+        self.name = name
+
 
 class PluginManager:
     plugin_dir = 'plugins'
-    public_ui=None
+    public_ui = None
     plugins = {}  # 用于存储所有插件的插件名和启动函数
     threads = {}  # 用于存储每个插件的线程实例
     data = {}  # 用于存储每个插件的共享数据
@@ -28,19 +32,19 @@ class PluginManager:
 
             if os.path.isdir(plugin_path):
                 try:
-                    sys.path.append(f"{os.getcwd()}\{plugin_path}")
-                    model=importlib.import_module(plugin_path.replace('\\','.'))
-                    if not hasattr(model,'run'):
-                        raise Exception('Plugin does not implement run method.')
-                    if hasattr(model,'NAME'):
-                        plugin_name=model.NAME
-                    if not hasattr(model,'VERSION'):
-                        raise Exception('Plugin does not implement VERSION.')
-                    if not hasattr(model,'DESCRIPTION'):
-                        raise Exception('Plugin does not implement DESCRIPTION.')
-                    if hasattr(model,'UI'):
-                        model.UI=cls.public_ui
-                    cls.plugins[plugin_name]=model.run
+                    sys.path.append(f"{os.getcwd()} \ {plugin_path}")
+                    model = importlib.import_module(plugin_path.replace('\\', '.'))
+                    if not hasattr(model, 'run'):
+                        raise InvalidPluginException("Plugin does not implement 'run' method.")
+                    if hasattr(model, 'NAME'):
+                        plugin_name = model.NAME
+                    if not hasattr(model, 'VERSION'):
+                        raise InvalidPluginException('Plugin does not has VERSION information.')
+                    if not hasattr(model, 'DESCRIPTION'):
+                        raise InvalidPluginException('Plugin does not has DESCRIPTION information.')
+                    if hasattr(model, 'UI'):
+                        model.UI = cls.public_ui
+                    cls.plugins[plugin_name] = model.run
                 except Exception as e:
                     print(f"Failed to load plugin '{plugin_name}': {e}")
 
@@ -49,17 +53,19 @@ class PluginManager:
         return cls.plugins
 
     @classmethod
-    def register(cls, thread:PluginBase):
+    def register(cls, thread: PluginBase):
         """注册插件线程"""
+        if thread.name in cls.threads:
+            raise Exception(f"Thread '{thread.name}' already registered.")
         cls.threads[thread.name] = thread
         thread.finished.connect(lambda: cls.unregister(thread))
 
     @classmethod
-    def unregister(cls, thread:PluginBase):
+    def unregister(cls, thread: PluginBase):
         """注销插件线程"""
         if thread.name in cls.threads:
             del cls.threads[thread.name]
 
-    def get_plugin(self, name):
-        """根据插件名称获取插件"""
-        return self.plugins.get(name)
+    @classmethod
+    def getPluginsCount(cls):
+        return len(cls.plugins)
