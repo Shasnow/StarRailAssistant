@@ -7,7 +7,7 @@ PyScreeze
 pywin32==306
 pywin32-ctypes
 cryptography
-FuXLogger
+loguru
 psutil
 Pillow==10.1.0
 requests==2.32.3

@@ -33,7 +33,7 @@ import pyscreeze
 from PySide6.QtCore import QThread, Signal
 from PySide6.QtWidgets import QApplication
 
-from SRACore.utils.Logger import logger, console_handler
+from SRACore.utils.Logger import logger
 
 
 def exist(img_path, wait_time=2):
@@ -55,10 +55,10 @@ def exist(img_path, wait_time=2):
     except pyautogui.ImageNotFoundException:
         return False
     except FileNotFoundError as e:
-        logger.exception(e, is_fatal=True)
+        logger.exception(e)
         return False
     except ValueError:
-        logger.exception("窗口未激活", is_fatal=True)
+        logger.exception("窗口未激活")
         return False
 
 
@@ -153,7 +153,6 @@ class Main:
         self.play_thread.event_stop()
 
 if __name__ == "__main__":
-    logger.addHandler(console_handler)
     app=QApplication(sys.argv)
     main=Main()
     main.run_application()

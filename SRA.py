@@ -41,9 +41,8 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QComboBox,
 )  # 从 PySide6 中导入所需的类
-from plyer import notification
 
-from SRACore.utils import const
+from SRACore.utils import Notification, const
 from SRACore.core import SRAssistant, AutoPlot
 from SRACore.core.SRAssistant import VERSION, CORE
 from SRACore.utils import Configure, WindowsPower, Encryption
@@ -358,19 +357,14 @@ class Main(QWidget):
         shutdown_dialog.show()
 
     def notification(self):
-        """Windows notify"""
         self.button0_1.setEnabled(True)
         self.button0_2.setEnabled(False)
-        try:
-            notification.notify(
-                title="SRA",
-                message="任务全部完成",
-                app_icon=self.AppPath + "/res/SRAicon.ico",
-                timeout=5,
-            )
-        except Exception as e:
-            with open("SRAlog.log", "a", encoding="utf-8") as log:
-                log.write(str(e) + "\n")
+        if not self.globals["Notification"]["enable"]:
+            return
+        if self.globals["Notification"]["system"]:
+            Notification.send_system_notification("SRA", "任务完成")
+        if self.globals["Notification"]["email"]:
+            Notification.send_mail_notification("SRA", "任务完成", self.globals["Notification"])
 
     def kill(self):
         """Kill the child thread"""

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
+    <width>716</width>
     <height>690</height>
    </rect>
   </property>
@@ -28,9 +28,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
-        <width>686</width>
-        <height>738</height>
+        <y>-297</y>
+        <width>684</width>
+        <height>1067</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -238,6 +238,147 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>通知</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="1" column="0">
+           <widget class="QFrame" name="frame_6">
+            <property name="frameShape">
+             <enum>QFrame::Shape::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <widget class="QCheckBox" name="system_notification">
+               <property name="text">
+                <string>系统通知</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QFrame" name="frame_5">
+            <property name="frameShape">
+             <enum>QFrame::Shape::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <item>
+              <widget class="QCheckBox" name="notification_allow">
+               <property name="text">
+                <string>允许通知</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QFrame" name="mail_notification_frame">
+            <property name="frameShape">
+             <enum>QFrame::Shape::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <item row="3" column="1">
+              <widget class="QLineEdit" name="receiver_email"/>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_6">
+               <property name="text">
+                <string>SMTP服务器地址：</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="authorization_code">
+               <property name="echoMode">
+                <enum>QLineEdit::EchoMode::Password</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>发件邮箱地址：</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="smtp_server"/>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="sender_email"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>授权码：</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>收件邮箱地址：</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QPushButton" name="email_check_button">
+               <property name="text">
+                <string>验证</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QFrame" name="frame_7">
+            <property name="frameShape">
+             <enum>QFrame::Shape::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <item>
+              <widget class="QCheckBox" name="mail_notification">
+               <property name="text">
+                <string>邮件通知</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox_7">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -249,50 +390,6 @@
           <string>SRA设置</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="2">
-           <widget class="QFrame" name="frame_routine_5">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Shadow::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_26">
-             <item>
-              <widget class="QCheckBox" name="checkBox_threadSafety">
-               <property name="toolTip">
-                <string>关闭此选项后，控制台的停止功能将不再等待任务结束。</string>
-               </property>
-               <property name="whatsThis">
-                <string>关闭此选项后，控制台的停止功能将不再等待任务结束。</string>
-               </property>
-               <property name="text">
-                <string>线程安全</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item row="1" column="0" colspan="2">
            <widget class="QFrame" name="frame">
             <property name="sizePolicy">
@@ -369,31 +466,6 @@
               </widget>
              </item>
             </layout>
-           </widget>
-          </item>
-          <item row="2" column="2" colspan="2">
-           <widget class="QPushButton" name="integrityCheck">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>114</width>
-              <height>46</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>点击此按钮将立即进行文件完整性检查</string>
-            </property>
-            <property name="whatsThis">
-             <string>点击此按钮将立即进行文件完整性检查</string>
-            </property>
-            <property name="text">
-             <string>文件完整性检查</string>
-            </property>
            </widget>
           </item>
           <item row="0" column="1">
@@ -628,31 +700,6 @@
             </layout>
            </widget>
           </item>
-          <item row="0" column="3">
-           <widget class="QPushButton" name="clearLog">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>114</width>
-              <height>46</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>点击此按钮将清空SRAlog.txt中的内容</string>
-            </property>
-            <property name="whatsThis">
-             <string>点击此按钮将清空SRAlog.txt中的内容</string>
-            </property>
-            <property name="text">
-             <string>清空日志</string>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="0" colspan="2">
            <widget class="QFrame" name="frame_4">
             <property name="frameShape">
@@ -670,6 +717,75 @@
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QFrame" name="frame_routine_5">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::Shape::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_26">
+             <item>
+              <widget class="QCheckBox" name="checkBox_threadSafety">
+               <property name="toolTip">
+                <string>关闭此选项后，控制台的停止功能将不再等待任务结束。</string>
+               </property>
+               <property name="whatsThis">
+                <string>关闭此选项后，控制台的停止功能将不再等待任务结束。</string>
+               </property>
+               <property name="text">
+                <string>线程安全</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QPushButton" name="integrityCheck">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>130</width>
+              <height>46</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>点击此按钮将立即进行文件完整性检查</string>
+            </property>
+            <property name="whatsThis">
+             <string>点击此按钮将立即进行文件完整性检查</string>
+            </property>
+            <property name="text">
+             <string>文件完整性检查</string>
+            </property>
            </widget>
           </item>
          </layout>
@@ -716,5 +832,22 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>mail_notification</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>mail_notification_frame</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>372</x>
+     <y>356</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>175</x>
+     <y>392</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
