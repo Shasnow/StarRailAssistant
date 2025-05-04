@@ -476,10 +476,7 @@ class SRA(QMainWindow):
             self.main.execute()
 
     def show_or_hide(self):
-        if not self.isMinimized():
-            self.showMinimized()
-        else:
-            self.showNormal()
+        self.system_tray.activated.emit(self.system_tray.ActivationReason.Trigger)
 
     def closeEvent(self, event):
         """Save the window info"""
