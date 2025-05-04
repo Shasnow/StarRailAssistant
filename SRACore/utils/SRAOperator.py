@@ -31,7 +31,7 @@ from rapidocr_onnxruntime import RapidOCR
 
 from SRACore.utils.Exceptions import WindowNoFoundException, MatchFailureException, \
     WindowInactiveException
-from SRACore.utils.Logger import logger, internal
+from SRACore.utils.Logger import logger
 
 
 class SRAOperator:
@@ -309,7 +309,7 @@ class SRAOperator:
             cls.locate(img_path)
             return True
         except Exception as e:
-            logger.log(internal, e.__str__())
+            logger.debug(e.__str__())
             return False
 
     @classmethod
@@ -332,7 +332,7 @@ class SRAOperator:
             result = cls.locateAny(img_list)[0]
             return result
         except Exception as e:
-            logger.log(internal, e)
+            logger.debug(e)
             return None
 
     @classmethod
@@ -426,7 +426,7 @@ class SRAOperator:
             pyautogui.click(x, y)
             return True
         except Exception as e:
-            logger.log(internal, f"点击对象时出错{e}")
+            logger.debug(f"点击对象时出错: {e}")
             return False
 
     @classmethod
@@ -449,7 +449,7 @@ class SRAOperator:
             pyautogui.click(x, y)
             return True
         except Exception as e:
-            logger.log(internal, f"点击坐标时出错{e}")
+            logger.debug(f"点击坐标时出错: {e}")
             return False
 
     @classmethod
@@ -468,7 +468,7 @@ class SRAOperator:
             pyautogui.press(key, presses=presses, interval=interval)
             return True
         except Exception as e:
-            logger.log(internal, f"按下按键失败{e}")
+            logger.debug(f"按下按键失败: {e}")
             return False
 
     @classmethod
@@ -484,13 +484,13 @@ class SRAOperator:
             按键成功返回True，否则返回False
         """
         try:
-            logger.debug("按下按键" + key)
+            logger.debug("按下按键 " + key)
             pyautogui.keyDown(key)
             time.sleep(during)
             pyautogui.keyUp(key)
             return True
         except Exception as e:
-            logger.log(internal, f"按下按键失败{e}")
+            logger.debug(f"按下按键失败: {e}")
             return False
 
     @staticmethod
@@ -544,7 +544,7 @@ class SRAOperator:
             pyautogui.write(content)
             return True
         except Exception as e:
-            logger.log(internal, f"输入时发生错误{e}")
+            logger.debug(f"输入时发生错误: {e}")
             return False
 
     @classmethod
@@ -563,7 +563,7 @@ class SRAOperator:
             pyautogui.moveRel(x_offset, y_offset)
             return True
         except Exception as e:
-            logger.log(internal, f"移动光标时出错{e}")
+            logger.debug(f"移动光标时出错{e}")
             return False
 
     @classmethod
@@ -620,7 +620,7 @@ class SRAOperator:
             pyautogui.scroll(distance)
             return True
         except Exception as e:
-            logger.log(internal, f"指针滚动时发生错误{e}")
+            logger.debug(f"指针滚动时发生错误{e}")
             return False
 
     @classmethod

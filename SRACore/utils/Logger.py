@@ -1,14 +1,11 @@
-from FuXLogger import LogManager, Level, StreamHandler, FileHandler, LogFormatter, LogLevel
-from FuXLogger.utils import Color, Font
+import os
+import sys
 
-my_log_fmt = LogFormatter("{time} | {levelName:<7} | {module}:{function} | {file}:{line:02} | {message}")
-logger = LogManager.getLogger("StarRailAssistant", Level.ON, my_log_fmt)
-
-console_handler = StreamHandler("console", Level.TRACE, my_log_fmt, colorize=True, enableXMLRender=True)
-file_handler = FileHandler("file", Level.INFO, my_log_fmt, "SRAlog.log")
-
-# logger.addHandler(console_handler)
-logger.addHandler(file_handler)
-internal= LogLevel("INTERNAL", 5, Color.GREY, Font.BOLD)
-
-__all__ = ["logger", "console_handler","internal"]
+from loguru import logger
+logger.remove(0)
+if sys.stdout.isatty():
+    logger.add(sys.stdout,level=0,format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level:8}</level> | <cyan>{module}.{function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>",colorize=True)
+if not os.path.exists("log"):
+    os.mkdir("log")
+logger.add("log/SRAlog{time:YYYYMMDDHHmmss}.log",level=0,format="{time:YYYY-MM-DD HH:mm:ss} | {level:8} | {module}.{function}:{line} | {message}",colorize=False,retention=7)
+__all__ = ["logger"]

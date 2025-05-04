@@ -23,11 +23,10 @@
 """
 
 import subprocess
-import time
 
+import time
 from PySide6.QtCore import QThread, Signal
 
-from SRACore.extensions.QTHandler import QTHandler
 from SRACore.utils import Configure, WindowsProcess, Encryption
 from SRACore.utils.Logger import logger
 from SRACore.utils.SRAOperator import SRAOperator
@@ -54,8 +53,7 @@ class Assistant(QThread):
         self.f1 = settings["F1"]
         self.f2 = settings["F2"]
         self.f4 = settings["F4"]
-        if len(logger.handlers) == 1:
-            logger.addHandler(QTHandler(self.send_signal))
+        logger.add(self.send_signal,level=20,format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",colorize=False)
 
     def send_signal(self, text):
         self.update_signal.emit(text)
@@ -390,45 +388,35 @@ class Assistant(QThread):
             click_point(*get_screen_center())
 
     def trailblazer_power(self):
+        def nameToTask(name):
+            match name:
+                case "饰品提取":
+                    return self.ornament_extraction
+                case "拟造花萼（金）":
+                    return self.calyx_golden
+                case "拟造花萼（赤）":
+                    return self.calyx_crimson
+                case "凝滞虚影":
+                    return self.stagnant_shadow
+                case "侵蚀隧洞":
+                    return self.caver_of_corrosion
+                case "历战余响":
+                    return self.echo_of_war
+                case _:
+                    return None
         tasks = []
         config = self.config
         self.replenish_flag = config["Replenish"]["enable"]
         self.replenish_way = config["Replenish"]["way"]
         self.replenish_time = config["Replenish"]["runTimes"]
-        if config["OrnamentExtraction"]["enable"]:
-            tasks.append((self.ornament_extraction, (
-                config["OrnamentExtraction"]["level"],
-                config["OrnamentExtraction"]["runTimes"],
-            )))
-        if config["CalyxGolden"]["enable"]:
-            tasks.append((self.calyx_golden, (
-                config["CalyxGolden"]["level"],
-                config["CalyxGolden"]["singleTimes"],
-                config["CalyxGolden"]["runTimes"])))
-        if config["CalyxCrimson"]["enable"]:
-            tasks.append((self.calyx_crimson, (
-                config["CalyxCrimson"]["level"],
-                config["CalyxCrimson"]["singleTimes"],
-                config["CalyxCrimson"]["runTimes"]
-            )))
-        if config["StagnantShadow"]["enable"]:
-            tasks.append((self.stagnant_shadow, (
-                config["StagnantShadow"]["level"],
-                config["StagnantShadow"]["runTimes"],
-            )))
-        if config["CaverOfCorrosion"]["enable"]:
-            tasks.append((self.caver_of_corrosion, (
-                config["CaverOfCorrosion"]["level"],
-                config["CaverOfCorrosion"]["runTimes"])))
-        if config["EchoOfWar"]["enable"]:
-            tasks.append((self.echo_of_war, (
-                config["EchoOfWar"]["level"],
-                config["EchoOfWar"]["runTimes"]
-            )))
+        tasklist=config["TrailBlazePower"]["taskList"]
+        logger.debug("任务列表：" + str(tasklist))
+        for task in tasklist:
+            tasks.append((nameToTask(task["name"]), (task["args"])))
         for task, args in tasks:
             if self.stop_flag:
                 break
-            task(*args)
+            task(**args)
         else:
             return True
         return False
@@ -563,19 +551,19 @@ class Assistant(QThread):
         logger.info("任务完成：巡星之礼")
 
 
-    def ornament_extraction(self, level_index, battle_time=1):
+    def ornament_extraction(self, level, runTimes=1, **_):
         """Ornament extraction
 
         Note:
             Do not include the `self` parameter in the ``Args`` section.
         Args:
-            level_index (int): The index of level in /res/img.
-            battle_time (int): The time of battle.
+            level (int): The index of level in /res/img.
+            runTimes (int): The time of battle.
         Returns:
             None
         """
         logger.info("执行任务：饰品提取")
-        level = f"res/img/ornament_extraction ({level_index}).png"
+        level = f"res/img/ornament_extraction ({level}).png"
         if not self.find_session_name("ornament_extraction"):
             return False
         if exist("res/img/no_save.png"):
@@ -606,48 +594,48 @@ class Assistant(QThread):
                 pass
             press_key_for_a_while("w", 2.5)
             click_point()
-            self.battle_star(battle_time)
+            self.battle_star(runTimes)
         self.update_signal.emit("任务完成：饰品提取")
 
 
-    def calyx_golden(self, level_index, single_time=1, battle_time=1):
+    def calyx_golden(self, level, singleTimes=1, runTimes=1):
         self.battle("拟造花萼（金）",
                     "calyx(golden)",
-                    level_index,
-                    battle_time,
+                    level,
+                    runTimes,
                     False,
-                    single_time)
+                    singleTimes)
 
-    def calyx_crimson(self, level_index, single_time=1, battle_time=1):
+    def calyx_crimson(self, level, singleTimes=1, runTimes=1):
         self.battle("拟造花萼（赤）",
                     "calyx(crimson)",
-                    level_index,
-                    battle_time,
+                    level,
+                    runTimes,
                     False,
-                    single_time,
+                    singleTimes,
                     y_add=-30)
 
-    def stagnant_shadow(self, level_index, battle_time=1):
+    def stagnant_shadow(self, level, runTimes=1,**_):
         self.battle("凝滞虚影",
                     "stagnant_shadow",
-                    level_index,
-                    battle_time,
+                    level,
+                    runTimes,
                     False,
                     None)
 
-    def caver_of_corrosion(self, level_index, battle_time=1):
+    def caver_of_corrosion(self, level, runTimes=1,**_):
         self.battle("侵蚀隧洞",
                     "caver_of_corrosion",
-                    level_index,
-                    battle_time,
+                    level,
+                    runTimes,
                     True,
                     None)
 
-    def echo_of_war(self, level_index, battle_time=1):
+    def echo_of_war(self, level, runTimes=1,**_):
         self.battle("历战余响",
                     "echo_of_war",
-                    level_index,
-                    battle_time,
+                    level,
+                    runTimes,
                     True,
                     None,
                     x_add=770,
@@ -656,8 +644,8 @@ class Assistant(QThread):
     def battle(self,
                mission_name: str,
                level_belonging: str,
-               level_index: int,
-               battle_time: int,
+               level: int,
+               runTimes: int,
                scroll_flag: bool,
                multi: None | int = None,
                x_add: int = 650,
@@ -670,8 +658,8 @@ class Assistant(QThread):
 
                 mission_name (str): The name of this mission.
                 level_belonging (str): The series to which the level belongs.
-                level_index (int): The index of level in /res/img.
-                battle_time (int): Number of times the task was executed.
+                level (int): The index of level in /res/img.
+                runTimes (int): Number of times the task was executed.
                 scroll_flag (bool): Whether scroll or not when finding session.
                 multi (None|int): If this mission can battle multiply at single time,
                                     this arg must be an int, None otherwise.
@@ -681,7 +669,7 @@ class Assistant(QThread):
                 None
         """
         logger.info(f"执行任务：{mission_name}")
-        level = f"res/img/{level_belonging} ({level_index}).png"
+        level = f"res/img/{level_belonging} ({level}).png"
         if not self.find_session_name(level_belonging, scroll_flag):
             return False
         if not find_level(level):
@@ -691,7 +679,7 @@ class Assistant(QThread):
                 logger.error("检测超时，编号4")
                 return
             if multi is not None:
-                for i in range(multi - 1):
+                for _ in range(multi - 1):
                     click("res/img/plus.png", wait_time=0.5)
                 time.sleep(2)
             if not click("res/img/battle.png"):
@@ -714,17 +702,17 @@ class Assistant(QThread):
                 press_key("esc",presses=3,interval=1.5)
                 return
             else:
-                self.battle_star(battle_time)
+                self.battle_star(runTimes)
         logger.info(f"任务完成：{mission_name}")
 
 
-    def battle_star(self, battle_time: int):
+    def battle_star(self, runTimes: int):
         logger.info("开始战斗")
         logger.info("请检查自动战斗和倍速是否开启")
         if check("res/img/q.png", max_time=8):
             press_key("v")
-        while battle_time > 1:
-            logger.info(f"剩余次数{battle_time}")
+        while runTimes > 1:
+            logger.info(f"剩余次数{runTimes}")
             self.wait_battle_end()
 
             if self.config["Support"]["changeLineup"]:
@@ -751,15 +739,18 @@ class Assistant(QThread):
             if self.config["Support"]["changeLineup"]:
                 click("res/img/battle_star.png")
 
-            battle_time -= 1
+            runTimes -= 1
             time.sleep(3)
         else:
             self.wait_battle_end()
             if not click("res/img/quit_battle.png"):
                 logger.error("发生错误，错误编号12")
             logger.info("退出战斗")
-            if check("res/img/battle.png",max_time=10):
+            res=check_any(["res/img/battle.png","res/img/chat_enter.png"])
+            if res==0:
                 press_key("esc")
+            elif res==1:
+                pass
 
 
     def wait_battle_end(self):

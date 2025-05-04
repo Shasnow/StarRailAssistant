@@ -31,6 +31,7 @@ from SRACore.utils import Encryption
 config_list_1 = [
     "Mission",
     "StartGame",
+    "TrailBlazePower",
     "ReceiveRewards",
     "RedeemCode",
     "Replenish",
@@ -67,6 +68,7 @@ config_list_2 = {
         ["user", ''],
         ["savePassword", False]
     ],
+    "TrailBlazePower": [["taskList", []]],
     "ReceiveRewards": [["enable", False]],
     "RedeemCode": [
         ["codeList", []],
@@ -82,34 +84,28 @@ config_list_2 = {
         ["changeLineup", False]
     ],
     "OrnamentExtraction": [
-        ["enable", False],
         ["level", 1],
         ["runTimes", 1],
     ],
     "CalyxGolden": [
-        ["enable", False],
         ["level", 1],
         ["singleTimes", 1],
         ["runTimes", 1],
     ],
     "CalyxCrimson": [
-        ["enable", False],
         ["level", 1],
         ["singleTimes", 1],
         ["runTimes", 1],
     ],
     "StagnantShadow": [
-        ["enable", False],
         ["level", 1],
         ["runTimes", 1],
     ],
     "CaverOfCorrosion": [
-        ["enable", False],
         ["level", 1],
         ["runTimes", 1],
     ],
     "EchoOfWar": [
-        ["enable", False],
         ["runTimes", 1],
         ["level", 1],
     ],
@@ -130,7 +126,8 @@ config_list_2 = {
 }
 global_config_list1 = [
     "Config",
-    "Settings"
+    "Settings",
+    "Notification",
 ]
 global_config_list2 = {
     "Config": [
@@ -154,6 +151,17 @@ global_config_list2 = {
         ["uiSize", "1200x800"],
         ["uiLocation", "100x100"],
     ],
+    "Notification": [
+        ["enable", True],
+        ["system", True],
+        ["email", False],
+        ["SMTP", ""],
+        ["port", 465],
+        ["sender", ""],
+        ["authorizationCode", ""],
+        ["receiver", ""],
+    ]
+        
 }
 
 

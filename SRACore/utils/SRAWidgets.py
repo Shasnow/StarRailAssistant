@@ -1,18 +1,19 @@
 import os
 import shutil
 
+import keyboard
 import time
 
 from PySide6.QtCore import Slot, QThread, Signal
 from PySide6.QtGui import QFont, QIcon, QAction
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QMenu, QWidget, QCheckBox, QTextEdit, QComboBox, QLineEdit, QPushButton, QLabel, \
+from PySide6.QtWidgets import QListWidget,QListWidgetItem, QMenu, QWidget, QCheckBox, QTextEdit, QComboBox, QLineEdit, QPushButton, QLabel, \
     QFileDialog, \
     QSpinBox, QRadioButton, QVBoxLayout, QSystemTrayIcon, QApplication, QTableWidget, QDoubleSpinBox, QScrollArea, \
-    QGroupBox
+    QGroupBox, QFrame
 
-from SRACore.utils import Encryption, Configure, WindowsProcess, const
-import keyboard
+from SRACore.utils import Encryption, Configure, WindowsProcess, const, Notification
+from SRACore.utils.Dialog import MessageBox
 
 uiLoader = QUiLoader()
 
@@ -193,6 +194,15 @@ class StartGame(SRAWidget):
 
 
 class TrailblazePower(SRAWidget):
+    class TaskItem(QListWidgetItem):
+        def __init__(self, parent, name, level, run_times, single_time):
+            super().__init__(parent)
+            self.name = name
+            self.level = level
+            self.run_times = run_times
+            self.single_time = single_time
+            self.setText(f"{name} 关卡：{level} 运行次数：{run_times} 单次次数：{single_time}")
+
     def __init__(self, parent, config: dict):
         super().__init__(parent, config)
         self.ui = uiLoader.load("res/ui/set_07.ui")
@@ -205,18 +215,14 @@ class TrailblazePower(SRAWidget):
         self.times1: QSpinBox = self.ui.findChild(QSpinBox, "spinBox2_1_23")
         self.use_assist_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "useAssist")
         self.change_lineup_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "changeLineup")
-        self.opt2: QCheckBox = self.ui.findChild(
-            QCheckBox, "checkBox2_2_11"
-        )
+        self.ornament_extraction_addbutton: QPushButton = self.ui.findChild(QPushButton, "ornamentExtractionAddButton")
         self.combobox2: QComboBox = self.ui.findChild(
             QComboBox, "comboBox2_2_13"
         )
         self.battle_times2: QSpinBox = self.ui.findChild(
             QSpinBox, "spinBox2_2_23"
         )
-        self.opt3: QCheckBox = self.ui.findChild(
-            QCheckBox, "checkBox2_3_11"
-        )
+        self.calyx_golden_addbutton: QPushButton = self.ui.findChild(QPushButton, "calyxGoldenAddButton")
         self.combobox3: QComboBox = self.ui.findChild(
             QComboBox, "comboBox2_3_13"
         )
@@ -226,9 +232,7 @@ class TrailblazePower(SRAWidget):
         self.battle_times3: QSpinBox = self.ui.findChild(
             QSpinBox, "spinBox2_3_33"
         )
-        self.opt4: QCheckBox = self.ui.findChild(
-            QCheckBox, "checkBox2_4_11"
-        )
+        self.calyx_crimson_addbutton: QPushButton = self.ui.findChild(QPushButton, "calyxCrimsonAddButton")
         self.combobox4: QComboBox = self.ui.findChild(
             QComboBox, "comboBox2_4_13"
         )
@@ -238,34 +242,30 @@ class TrailblazePower(SRAWidget):
         self.battle_times4: QSpinBox = self.ui.findChild(
             QSpinBox, "spinBox2_4_33"
         )
-        self.opt5: QCheckBox = self.ui.findChild(
-            QCheckBox, "checkBox2_5_11"
-        )
+        self.stagnant_shadow_addbutton: QPushButton = self.ui.findChild(QPushButton, "stagnantShadowAddButton")
         self.combobox5: QComboBox = self.ui.findChild(
             QComboBox, "comboBox2_5_13"
         )
         self.battle_times5: QSpinBox = self.ui.findChild(
             QSpinBox, "spinBox2_5_23"
         )
-        self.opt6: QCheckBox = self.ui.findChild(
-            QCheckBox, "checkBox2_6_11"
-        )
+        self.caver_of_corrosion_addbutton: QPushButton = self.ui.findChild(QPushButton, "caverOfCorrosionAddButton")
         self.combobox6: QComboBox = self.ui.findChild(
             QComboBox, "comboBox2_6_13"
         )
         self.battle_times6: QSpinBox = self.ui.findChild(
             QSpinBox, "spinBox2_6_23"
         )
-        self.opt7: QCheckBox = self.ui.findChild(
-            QCheckBox, "checkBox2_7_11"
-        )
+        self.echo_of_war_addbutton: QPushButton = self.ui.findChild(QPushButton, "echoOfWarAddButton")
         self.combobox7: QComboBox = self.ui.findChild(
             QComboBox, "comboBox2_7_13"
         )
         self.battle_times7: QSpinBox = self.ui.findChild(
             QSpinBox, "spinBox2_7_23"
         )
+        self.list_widget:QListWidget = self.ui.findChild(QListWidget, "listWidget")
         self.setter()
+        self.connector()
 
     def setter(self):
         self.opt1.setChecked(self.config["Replenish"]["enable"])
@@ -273,26 +273,23 @@ class TrailblazePower(SRAWidget):
         self.times1.setValue(self.config["Replenish"]["runTimes"])
         self.use_assist_checkbox.setChecked(self.config["Support"]["enable"])
         self.change_lineup_checkbox.setChecked(self.config["Support"]['changeLineup'])
-        self.opt2.setChecked(self.config["OrnamentExtraction"]["enable"])
         self.combobox2.setCurrentIndex(self.config["OrnamentExtraction"]["level"])
         self.battle_times2.setValue(self.config["OrnamentExtraction"]["runTimes"])
-        self.opt3.setChecked(self.config["CalyxGolden"]["enable"])
         self.combobox3.setCurrentIndex(self.config["CalyxGolden"]["level"])
         self.single_times3.setValue(self.config["CalyxGolden"]["singleTimes"])
         self.battle_times3.setValue(self.config["CalyxGolden"]["runTimes"])
-        self.opt4.setChecked(self.config["CalyxCrimson"]["enable"])
         self.combobox4.setCurrentIndex(self.config["CalyxCrimson"]["level"])
         self.single_times4.setValue(self.config["CalyxCrimson"]["singleTimes"])
         self.battle_times4.setValue(self.config["CalyxCrimson"]["runTimes"])
-        self.opt5.setChecked(self.config["StagnantShadow"]["enable"])
         self.combobox5.setCurrentIndex(self.config["StagnantShadow"]["level"])
         self.battle_times5.setValue(self.config["StagnantShadow"]["runTimes"])
-        self.opt6.setChecked(self.config["CaverOfCorrosion"]["enable"])
         self.combobox6.setCurrentIndex(self.config["CaverOfCorrosion"]["level"])
         self.battle_times6.setValue(self.config["CaverOfCorrosion"]["runTimes"])
-        self.opt7.setChecked(self.config["EchoOfWar"]["enable"])
         self.combobox7.setCurrentIndex(self.config["EchoOfWar"]["level"])
         self.battle_times7.setValue(self.config["EchoOfWar"]["runTimes"])
+        for task in self.config["TrailBlazePower"]["taskList"]:
+            task=self.TaskItem(self.list_widget,task["name"],task["args"]["level"],task["args"]["runTimes"],task["args"]["singleTimes"])
+            self.list_widget.addItem(task)
 
     def getter(self):
         self.config["Replenish"]["enable"] = self.opt1.isChecked()
@@ -300,26 +297,81 @@ class TrailblazePower(SRAWidget):
         self.config["Replenish"]["runTimes"] = self.times1.value()
         self.config["Support"]["enable"] = self.use_assist_checkbox.isChecked()
         self.config["Support"]['changeLineup'] = self.change_lineup_checkbox.isChecked()
-        self.config["OrnamentExtraction"]["enable"] = self.opt2.isChecked()
         self.config["OrnamentExtraction"]["level"] = self.combobox2.currentIndex()
         self.config["OrnamentExtraction"]["runTimes"] = self.battle_times2.value()
-        self.config["CalyxGolden"]["enable"] = self.opt3.isChecked()
         self.config["CalyxGolden"]["level"] = self.combobox3.currentIndex()
         self.config["CalyxGolden"]["singleTimes"] = self.single_times3.value()
         self.config["CalyxGolden"]["runTimes"] = self.battle_times3.value()
-        self.config["CalyxCrimson"]["enable"] = self.opt4.isChecked()
         self.config["CalyxCrimson"]["level"] = self.combobox4.currentIndex()
         self.config["CalyxCrimson"]["singleTimes"] = self.single_times4.value()
         self.config["CalyxCrimson"]["runTimes"] = self.battle_times4.value()
-        self.config["StagnantShadow"]["enable"] = self.opt5.isChecked()
         self.config["StagnantShadow"]["level"] = self.combobox5.currentIndex()
         self.config["StagnantShadow"]["runTimes"] = self.battle_times5.value()
-        self.config["CaverOfCorrosion"]["enable"] = self.opt6.isChecked()
         self.config["CaverOfCorrosion"]["level"] = self.combobox6.currentIndex()
         self.config["CaverOfCorrosion"]["runTimes"] = self.battle_times6.value()
-        self.config["EchoOfWar"]["enable"] = self.opt7.isChecked()
         self.config["EchoOfWar"]["level"] = self.combobox7.currentIndex()
         self.config["EchoOfWar"]["runTimes"] = self.battle_times7.value()
+
+    def connector(self):
+        self.ornament_extraction_addbutton.clicked.connect(self.add_ornament_extraction)
+        self.calyx_golden_addbutton.clicked.connect(self.add_calyx_golden)
+        self.calyx_crimson_addbutton.clicked.connect(self.add_calyx_crimson)
+        self.stagnant_shadow_addbutton.clicked.connect(self.add_stagnant_shadow)
+        self.caver_of_corrosion_addbutton.clicked.connect(self.add_caver_of_corrosion)
+        self.echo_of_war_addbutton.clicked.connect(self.add_echo_of_war)
+        self.list_widget.itemDoubleClicked.connect(self.remove_item)
+
+    def add_task(self,name,level,run_times,single_times=1):
+        task=self.TaskItem(self.list_widget,name,level,run_times,single_times)
+        self.list_widget.addItem(task)
+        self.config["TrailBlazePower"]["taskList"].append({
+            "name":name,
+            "args":{
+                "level":level,
+                "runTimes":run_times,
+                "singleTimes":single_times
+                }})
+        
+
+    def add_ornament_extraction(self):
+        level = self.combobox2.currentIndex()
+        run_times = self.battle_times2.value()
+        self.add_task("饰品提取",level,run_times)
+
+    def add_calyx_golden(self):
+        level = self.combobox3.currentIndex()
+        single_times = self.single_times3.value()
+        run_times = self.battle_times3.value()
+        self.add_task("拟造花萼（金）",level,run_times,single_times)
+
+    def add_calyx_crimson(self):
+        level = self.combobox4.currentIndex()
+        single_times = self.single_times4.value()
+        run_times = self.battle_times4.value()
+        self.add_task("拟造花萼（赤）",level,run_times,single_times)
+
+    def add_stagnant_shadow(self):
+        level = self.combobox5.currentIndex()
+        run_times = self.battle_times5.value()
+        self.add_task("凝滞虚影",level,run_times)
+
+    def add_caver_of_corrosion(self):
+        level = self.combobox6.currentIndex()
+        run_times = self.battle_times6.value()
+        self.add_task("侵蚀隧洞",level,run_times)
+
+    def add_echo_of_war(self):
+        level = self.combobox7.currentIndex()
+        run_times = self.battle_times7.value()
+        self.add_task("历战余响",level,run_times)
+
+    @Slot(QListWidgetItem)
+    def remove_item(self, item):
+        index=self.list_widget.row(item)
+        self.list_widget.takeItem(index)
+        del self.config["TrailBlazePower"]["taskList"][index]
+
+        
 
 
 class AfterMission(SRAWidget):
@@ -396,6 +448,15 @@ class Settings(SRAWidget):
         self.hotkey_setting_groupbox:QGroupBox=self.ui.findChild(QGroupBox,"hotkey_setting")
         self.hotkey_lineedit1: QLineEdit = self.ui.findChild(QLineEdit, "hotkey1")
         self.hotkey_lineedit2: QLineEdit = self.ui.findChild(QLineEdit, "hotkey2")
+        self.notification_allow_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "notification_allow")
+        self.system_notification_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "system_notification")
+        self.email_notification_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "mail_notification")
+        self.email_notification_frame:QFrame=self.ui.findChild(QFrame,"mail_notification_frame")
+        self.SMTP_server: QLineEdit = self.ui.findChild(QLineEdit, "smtp_server")
+        self.sender_email: QLineEdit = self.ui.findChild(QLineEdit, "sender_email")
+        self.authorization_code:QLineEdit = self.ui.findChild(QLineEdit, "authorization_code")
+        self.receiver_email: QLineEdit = self.ui.findChild(QLineEdit, "receiver_email")
+        self.email_check_cutton:QPushButton=self.ui.findChild(QPushButton, "email_check_button")
         self.startup_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifStartUp")
 
         auto_update_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifAutoUpdate")
@@ -403,7 +464,6 @@ class Settings(SRAWidget):
         auto_update_checkbox.setChecked(self.globals["Settings"]["autoUpdate"])
 
         self.thread_safety_checkbox = self.ui.findChild(QCheckBox, "checkBox_threadSafety")
-        self.clear_log_button: QPushButton = self.ui.findChild(QPushButton, "clearLog")
         self.confidence_spin_box: QDoubleSpinBox = self.ui.findChild(QDoubleSpinBox, "confidenceSpinBox")
         self.zoom_spinbox: QDoubleSpinBox = self.ui.findChild(QDoubleSpinBox, "zoomSpinBox")
         self.mirrorchyanCDK: QLineEdit = self.ui.findChild(
@@ -423,6 +483,18 @@ class Settings(SRAWidget):
             self.key_table.item(0, i).setText(settings["F" + str(i + 1)])
         self.hotkey_lineedit1.setText(self.globals["Settings"]["hotkeys"][0])
         self.hotkey_lineedit2.setText(self.globals["Settings"]["hotkeys"][1])
+        self.notification_allow_checkbox.setChecked(self.globals["Notification"]["enable"])
+        self.system_notification_checkbox.setChecked(self.globals["Notification"]["system"])
+        self.email_notification_checkbox.setChecked(self.globals["Notification"]["email"])
+        self.email_notification_frame.setVisible(self.globals["Notification"]["email"])
+        self.SMTP_server.setText(self.globals["Notification"]["SMTP"])
+        self.sender_email.setText(self.globals["Notification"]["sender"])
+        authorizeCode=self.globals["Notification"]["authorizationCode"]
+        if authorizeCode!='':
+            authorizeCode=Encryption.win_decryptor(authorizeCode)
+        self.authorization_code.setText(authorizeCode)
+        self.receiver_email.setText(self.globals["Notification"]["receiver"])
+
         self.startup_checkbox.setChecked(self.globals["Settings"]["startup"])
         self.thread_safety_checkbox.setChecked(self.globals["Settings"]["threadSafety"])
         self.confidence_spin_box.setValue(self.globals["Settings"]["confidence"])
@@ -435,12 +507,15 @@ class Settings(SRAWidget):
     def connector(self):
         self.key_table.cellChanged.connect(self.key_setting_change)
         self.save_button.clicked.connect(self.key_setting_save)
+        self.reset_button.clicked.connect(self.key_setting_reset)
         self.hotkey_lineedit1.editingFinished.connect(self.hotkey_change)
         self.hotkey_lineedit2.editingFinished.connect(self.hotkey_change)
-        self.reset_button.clicked.connect(self.key_setting_reset)
+        self.notification_allow_checkbox.stateChanged.connect(self.notification_status_change)
+        self.system_notification_checkbox.stateChanged.connect(self.notification_status_change)
+        self.email_notification_checkbox.stateChanged.connect(self.notification_status_change)
+        self.email_check_cutton.clicked.connect(self.email_check)
         self.startup_checkbox.stateChanged.connect(self.startup)
         self.thread_safety_checkbox.stateChanged.connect(self.thread_safety)
-        self.clear_log_button.clicked.connect(self.clear_log)
         self.confidence_spin_box.valueChanged.connect(self.confidence_changed)
         self.zoom_spinbox.valueChanged.connect(self.zoom_changed)
         self.mirrorchyanCDK.textChanged.connect(self.mirrorchyanCDK_changed)
@@ -468,6 +543,32 @@ class Settings(SRAWidget):
             self.hotkey_setting_groupbox.setTitle("热键设置（已修改，重启后生效）")
             Configure.save(self.globals, "data/globals.json")
 
+    @Slot()
+    def notification_status_change(self):
+        self.config["Notification"]["enable"]=self.notification_allow_checkbox.isChecked()
+        self.config["Notification"]["system"]=self.system_notification_checkbox.isChecked()
+        self.config["Notification"]["email"]=self.email_notification_checkbox.isChecked()
+        Configure.save(self.globals,"data/globals.json")
+
+    @Slot()
+    def email_check(self):
+        sender = self.sender_email.text()
+        SMTP = self.SMTP_server.text()
+        authorizationCode = self.authorization_code.text()
+        receiver = self.receiver_email.text()
+        if sender == "" or SMTP == "" or authorizationCode == "" or receiver == "":
+            MessageBox.info(self, "警告", "请填写完整的邮箱信息")
+            return
+        if Notification.send_mail(
+            title="SRA",
+            subject="邮箱测试",message="如果您能收到这封邮件，说明您的SRA邮件通知已经准备好。",
+            SMTP=SMTP, sender=sender, password=authorizationCode, receiver=receiver):
+            MessageBox.info(self,"邮箱测试","已发送测试消息，请注意查收。")
+            self.globals["Notification"]["SMTP"] = SMTP
+            self.globals["Notification"]["sender"] = sender
+            self.globals["Notification"]["authorizationCode"] = Encryption.win_encryptor(authorizationCode)
+            self.globals["Notification"]["receiver"] = receiver
+            Configure.save(self.globals, "data/globals.json")
 
     def startup(self, state):
         if state == 2:
@@ -518,10 +619,6 @@ class Settings(SRAWidget):
         command = "SRAUpdater -i"
         WindowsProcess.Popen(command)
 
-    @staticmethod
-    def clear_log():
-        with open("SRAlog.log", "w", encoding="utf-8"):
-            pass
 
 class SystemTray(QSystemTrayIcon):
     def __init__(self, parent: QWidget):
