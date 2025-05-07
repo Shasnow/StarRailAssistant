@@ -30,7 +30,7 @@
         <x>0</x>
         <y>0</y>
         <width>684</width>
-        <height>1067</height>
+        <height>1015</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -217,7 +217,7 @@
           <item>
            <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>显示/隐藏 SRA：</string>
+             <string>开始/停止 任务：:</string>
             </property>
            </widget>
           </item>
@@ -227,7 +227,7 @@
           <item>
            <widget class="QLabel" name="label_4">
             <property name="text">
-             <string>开始/停止 任务：</string>
+             <string>显示/隐藏 SRA：</string>
             </property>
            </widget>
           </item>
@@ -700,25 +700,6 @@
             </layout>
            </widget>
           </item>
-          <item row="3" column="0" colspan="2">
-           <widget class="QFrame" name="frame_4">
-            <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Shadow::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <item>
-              <widget class="QCheckBox" name="exit_when_close">
-               <property name="text">
-                <string>关闭窗口时直接退出</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item row="0" column="2">
            <widget class="QFrame" name="frame_routine_5">
             <property name="sizePolicy">
@@ -786,6 +767,25 @@
             <property name="text">
              <string>文件完整性检查</string>
             </property>
+           </widget>
+          </item>
+          <item row="2" column="2" colspan="2">
+           <widget class="QFrame" name="frame_4">
+            <property name="frameShape">
+             <enum>QFrame::Shape::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="QCheckBox" name="exit_when_close">
+               <property name="text">
+                <string>关闭窗口时直接退出</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
