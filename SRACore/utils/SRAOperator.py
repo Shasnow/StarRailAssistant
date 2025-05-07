@@ -29,7 +29,7 @@ import time
 from PIL import Image
 from rapidocr_onnxruntime import RapidOCR
 
-from SRACore.utils.Exceptions import WindowNoFoundException, MatchFailureException, \
+from SRACore.utils.exceptions import WindowNoFoundException, MatchFailureException, \
     WindowInactiveException
 from SRACore.utils.Logger import logger
 

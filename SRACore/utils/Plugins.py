@@ -3,8 +3,9 @@ import os
 import sys
 
 from PySide6.QtCore import QThread
+from SRACore.utils.Logger import logger
 
-from SRACore.utils.Exceptions import InvalidPluginException
+from SRACore.utils.exceptions import InvalidPluginException
 
 
 class PluginBase(QThread):
@@ -45,7 +46,7 @@ class PluginManager:
                         model.UI = cls.public_ui
                     cls.plugins[plugin_name] = model.run
                 except Exception as e:
-                    print(f"Failed to load plugin '{plugin_name}': {e}")
+                    logger.warning(f"Failed to load plugin '{plugin_name}': {e}")
 
     @classmethod
     def getPlugins(cls):
