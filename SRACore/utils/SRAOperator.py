@@ -82,9 +82,8 @@ class SRAOperator:
         """
         根据给定的窗口标题获取截图区域。
 
-        该方法会查找包含指定标题的窗口，若未找到则抛出 WindowNoFoundException 异常，
-        若找到多个窗口则抛出 MultipleWindowsException 异常。找到唯一窗口后，会激活该窗口，
-        并计算其截图区域。
+        该方法会查找包含指定标题的窗口，若未找到则抛出 WindowNoFoundException 异常。
+        找到唯一窗口后，会激活该窗口，并计算其截图区域。
 
         Args:
             title (str): 用于查找窗口的标题。
@@ -308,31 +307,44 @@ class SRAOperator:
         try:
             cls.locate(img_path)
             return True
+        except MatchFailureException:
+            logger.debug(f"图像不存在 {img_path} ")
+            return False
         except Exception as e:
-            logger.debug(e.__str__())
+            logger.debug(e)
             return False
 
     @classmethod
-    def existAny(cls, img_list: list, wait_time: float = 2) -> int | None:
+    def existAny(cls, img_list: list, wait_time: float = 2, need_location=False) -> int | None | tuple:
         """
         检查图像列表中是否有任何图像存在于截图中。
 
         该方法会先等待指定的时间，等待游戏加载过程，然后尝试在截图中依次定位图像列表中的图像。
-        如果有任何图像定位成功，则返回该图像在列表中的索引；如果所有图像都未定位成功，则记录异常信息并返回 None。
+        如果有任何图像定位成功，则根据 `need_location` 参数决定返回该图像在列表中的索引，或者索引和换算后中心位置；
+        如果所有图像都未定位成功，则记录异常信息并返回 None。
 
         Args:
             img_list (list): 包含要定位的图像文件路径的列表。
             wait_time (float, optional): 等待游戏加载的时间，默认为 2 秒。
+            need_location (bool, optional): 是否需要返回图像的位置，默认为 False。
 
         Returns:
-            int | None: 如果有图像存在则返回该图像在列表中的索引，否则返回 None。
+            int | None | tuple: 如果有图像存在且 `need_location` 为 False，则返回该图像在列表中的索引；
+                                如果有图像存在且 `need_location` 为 True，则返回该图像在列表中的索引和换算后中心位置；
+                                否则返回 None。
         """
         time.sleep(wait_time)  # 等待游戏加载
         try:
-            result = cls.locateAny(img_list)[0]
-            return result
+            index, location = cls.locateAny(img_list)
+            if need_location:
+                return index, cls._location_calculator(*pyscreeze.center(location))
+            else:
+                return index
+        except MatchFailureException:
+            logger.debug(f"图像列表中没有任何图像存在 {img_list}")
+            return None
         except Exception as e:
-            logger.debug(e)
+            logger.debug(f"在检查图像列表时失败: {e}")
             return None
 
     @classmethod
@@ -350,14 +362,17 @@ class SRAOperator:
         Returns:
             bool: 如果在最大检查次数内找到图像，则返回 True；否则返回 False。
         """
+        logger.debug(f"检测对象 {img_path}")
         times = 0
         while True:
             time.sleep(interval)
             if cls.exist(img_path, wait_time=1):
+                logger.debug("检测成功")
                 return True
             else:
                 times += 1
                 if times == max_time:
+                    logger.debug("检测失败, 超出最大次数")
                     return False
 
     @classmethod
@@ -372,15 +387,18 @@ class SRAOperator:
         Returns:
             如果有任何图像出现，则返回该图像在列表中的索引；如果所有图像都未出现且达到最大检查次数，则返回 None。
         """
+        logger.debug(f"检测对象列表 {img_list}")
         times = 0
         while True:
             time.sleep(interval)
-            result = cls.existAny(img_list, wait_time=1)
+            result:int|None = cls.existAny(img_list, wait_time=1)
             if result is not None:
+                logger.debug(f"检测成功, 索引 {result}")
                 return result
             else:
                 times += 1
                 if times == max_time:
+                    logger.debug("检测失败, 超出最大次数")
                     return None
 
     @classmethod
@@ -446,6 +464,7 @@ class SRAOperator:
             bool: 如果点击成功则返回 True，否则返回 False。
         """
         try:
+            logger.debug(f"点击坐标{x},{y}")
             pyautogui.click(x, y)
             return True
         except Exception as e:

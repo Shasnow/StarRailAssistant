@@ -42,10 +42,9 @@ from PySide6.QtWidgets import (
     QComboBox,
 )  # 从 PySide6 中导入所需的类
 
-from SRACore.utils import Notification, const
 from SRACore.core import SRAssistant, AutoPlot
 from SRACore.core.SRAssistant import VERSION, CORE
-from SRACore.utils import Configure, WindowsPower, Encryption
+from SRACore.utils import Configure, WindowsPower, Encryption, Notification, const
 from SRACore.utils.Dialog import (
     Announcement,
     ShutdownDialog,
