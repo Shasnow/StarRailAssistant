@@ -24,7 +24,6 @@ class PluginManager:
     def load_plugins(cls):
         """扫描插件目录并加载所有插件"""
         if not os.path.exists(cls.plugin_dir):
-            print(f"Plugin directory '{cls.plugin_dir}' does not exist.")
             return
 
         for plugin_name in os.listdir(cls.plugin_dir):

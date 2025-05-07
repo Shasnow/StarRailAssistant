@@ -287,6 +287,7 @@ class TrailblazePower(SRAWidget):
         self.battle_times6.setValue(self.config["CaverOfCorrosion"]["runTimes"])
         self.combobox7.setCurrentIndex(self.config["EchoOfWar"]["level"])
         self.battle_times7.setValue(self.config["EchoOfWar"]["runTimes"])
+        self.list_widget.clear()
         for task in self.config["TrailBlazePower"]["taskList"]:
             task=self.TaskItem(self.list_widget,task["name"],task["args"]["level"],task["args"]["runTimes"],task["args"]["singleTimes"])
             self.list_widget.addItem(task)

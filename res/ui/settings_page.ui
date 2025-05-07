@@ -28,7 +28,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-297</y>
+        <y>0</y>
         <width>684</width>
         <height>1067</height>
        </rect>
@@ -712,7 +712,7 @@
              <item>
               <widget class="QCheckBox" name="exit_when_close">
                <property name="text">
-                <string>点击关闭按钮时直接退出</string>
+                <string>关闭窗口时直接退出</string>
                </property>
               </widget>
              </item>
