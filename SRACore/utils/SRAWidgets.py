@@ -3,19 +3,61 @@ import shutil
 
 import keyboard
 import time
-
 from PySide6.QtCore import Slot, QThread, Signal
 from PySide6.QtGui import QFont, QIcon, QAction
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QListWidget,QListWidgetItem, QMenu, QWidget, QCheckBox, QTextEdit, QComboBox, QLineEdit, QPushButton, QLabel, \
-    QFileDialog, \
+from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMenu, QWidget, QCheckBox, QTextEdit, QComboBox, QLineEdit, \
+    QPushButton, QLabel, QFileDialog, \
     QSpinBox, QRadioButton, QVBoxLayout, QSystemTrayIcon, QApplication, QTableWidget, QDoubleSpinBox, QScrollArea, \
-    QGroupBox, QFrame
+    QGroupBox, QFrame, QMainWindow, QTextBrowser
 
-from SRACore.utils import Encryption, Configure, WindowsProcess, const, Notification
-from SRACore.utils.Dialog import MessageBox
+from SRACore.core import AutoPlot, SRAssistant
+from SRACore.core.SRAssistant import VERSION, CORE
+from SRACore.utils import Encryption, Configure, WindowsProcess, const, Notification, WindowsPower
+from SRACore.utils.Dialog import MessageBox, InputDialog, ShutdownDialog, AnnouncementBoard, Announcement
+from SRACore.utils.Plugins import PluginManager
 
 uiLoader = QUiLoader()
+
+
+def convert_to_html(text):
+    lines = text.split('\n')
+
+    html_content = []
+
+    for line in lines:
+        line = line.strip()
+        if not line:  # 跳过空行
+            continue
+        if line.endswith('：') or line.endswith(':'):
+            section_title = line.replace('：', '').replace(':', '')
+            html_content.append(f'<h3>{section_title}</h3>')
+            continue
+        if line.startswith(tuple(f'{i}.' for i in range(1, 100))):
+            item_content = line[line.find('.') + 1:].strip()
+            html_content.append(f'<li>{item_content}</li>')
+    if html_content:
+        final_html = []
+        i = 0
+        while i < len(html_content):
+            if html_content[i].startswith('<h3>'):
+                final_html.append(html_content[i])
+                ul_content = []
+                j = i + 1
+                while j < len(html_content) and not html_content[j].startswith('<h3>'):
+                    ul_content.append(html_content[j])
+                    j += 1
+                if ul_content:
+                    final_html.append('<ol>')
+                    final_html.extend(ul_content)
+                    final_html.append('</ol>')
+                i = j
+            else:
+                i += 1
+        final_html.append('<br>')
+        return ''.join(final_html)
+    else:
+        return "<p>没有可转换的内容</p>"
 
 
 class SRAWidget(QWidget):
@@ -35,6 +77,333 @@ class SRAWidget(QWidget):
     def reload(self, config):
         self.config = config
         self.setter()
+
+
+class Main(QWidget):
+    def __init__(self, main_window: QMainWindow):
+        super().__init__()
+        self.main_window = main_window
+        self.AppPath = const.AppPath
+        # self.ocr_window=None
+        self.autoplot = AutoPlot.Main()
+        self.exit_SRA = False
+        self.sleep = False
+        self.shutdown = False
+        self.isRunning = False
+        Configure.init()
+        self.globals = Configure.load("data/globals.json")
+        current = self.globals['Config']['configList'][self.globals['Config']['currentConfig']]
+        self.config = Configure.loadConfigByName(current)
+        self.password_text = ""
+        self.ui = uiLoader.load(self.AppPath + "/res/ui/main.ui")
+        self.log = self.ui.findChild(QTextBrowser, "textBrowser_log")
+
+        # 创建中间的垂直布局管理器用于任务设置
+
+        task_set = self.ui.findChild(QGroupBox, "groupBox_2")
+        self.task_set_vbox_layout = QVBoxLayout()
+        task_set.setLayout(self.task_set_vbox_layout)
+        # toolbar
+        notice_action = self.ui.findChild(QAction, "action_1")
+        notice_action.triggered.connect(self.notice)
+        problem_action = self.ui.findChild(QAction, "action_2")
+        problem_action.triggered.connect(self.problem)
+        report_action = self.ui.findChild(QAction, "action_3")
+        report_action.triggered.connect(self.report)
+        about_action = self.ui.findChild(QAction, "action_4")
+        about_action.triggered.connect(self.about)
+        # end
+        # console
+        self.start_game_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_1")
+        self.setting1: QPushButton = self.ui.findChild(QPushButton, "pushButton1_1")
+        self.setting1.clicked.connect(self.show_start_game_setting)
+
+        self.trailBlazePower_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_2")
+        self.setting2: QPushButton = self.ui.findChild(QPushButton, "pushButton1_2")
+        self.setting2.clicked.connect(self.show_trail_blaze_power_setting)
+
+        self.receive_rewards_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_3")
+        self.setting3 = self.ui.findChild(QPushButton, "pushButton1_3")
+        self.setting3.clicked.connect(self.show_receive_rewards_setting)
+
+        self.after_mission_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_4")
+        self.setting4 = self.ui.findChild(QPushButton, "pushButton1_4")
+        self.setting4.clicked.connect(self.show_quit_game_setting)
+
+        self.simulatedUniverse_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "checkBox1_5")
+        self.setting5: QPushButton = self.ui.findChild(QPushButton, "pushButton1_5")
+        self.setting5.clicked.connect(self.show_simulated_universe_setting)
+
+        self.button0_1 = self.ui.findChild(QPushButton, "pushButton1_0_1")
+        self.button0_1.clicked.connect(self.execute)
+        self.button0_2 = self.ui.findChild(QPushButton, "pushButton1_0_2")
+        self.button0_2.clicked.connect(self.kill)
+        self.button0_2.setEnabled(False)
+        # console end
+
+        self.start_game = StartGame(self, self.config)
+        self.task_set_vbox_layout.addWidget(self.start_game.ui)
+        self.start_game.ui.setVisible(True)
+
+        self.receive_rewards = ReceiveRewards(self, self.config)
+        self.task_set_vbox_layout.addWidget(self.receive_rewards.ui)
+        self.receive_rewards.ui.setVisible(False)
+
+        self.trailblaze_power = TrailblazePower(self, self.config)
+        self.task_set_vbox_layout.addWidget(self.trailblaze_power.ui)
+        self.trailblaze_power.ui.setVisible(False)
+
+        self.after_mission = AfterMission(self, self.config)
+        self.task_set_vbox_layout.addWidget(self.after_mission.ui)
+        self.after_mission.ui.setVisible(False)
+
+        self.simulated_universe = SimulatedUniverse(self, self.config)
+        self.task_set_vbox_layout.addWidget(self.simulated_universe.ui)
+        self.simulated_universe.ui.setVisible(False)
+
+        self.multi_account_widget = MultiAccount(self, self.globals)
+        multi_account_area: QWidget = self.ui.findChild(QWidget, "tab_4")
+        multi_account_area.layout().addWidget(self.multi_account_widget.main_ui)
+
+        self.extension()
+        self.plugins()
+
+        self.software_setting()
+
+        self.setter()
+
+    def setter(self):
+        self.start_game_checkbox.setChecked(self.config["Mission"]["startGame"])
+        self.trailBlazePower_checkbox.setChecked(self.config["Mission"]["trailBlazePower"])
+        self.receive_rewards_checkbox.setChecked(self.config["ReceiveRewards"]["enable"])
+        self.after_mission_checkbox.setChecked(self.config["Mission"]["afterMission"])
+        self.simulatedUniverse_checkbox.setChecked(self.config["Mission"]["simulatedUniverse"])
+
+    def getter(self):
+        self.config["Mission"]["startGame"] = self.start_game_checkbox.isChecked()
+        self.config["Mission"]["trailBlazePower"] = self.trailBlazePower_checkbox.isChecked()
+        self.config["ReceiveRewards"]["enable"] = self.receive_rewards_checkbox.isChecked()
+        self.config["Mission"]["afterMission"] = self.after_mission_checkbox.isChecked()
+        self.config["Mission"]["simulatedUniverse"] = self.simulatedUniverse_checkbox.isChecked()
+
+    def extension(self):
+        auto_plot_checkbox = self.ui.findChild(QCheckBox, "autoplot_checkBox")
+        auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
+        # relics_identification_button:QPushButton=self.ui.findChild(QPushButton,"relicsIdentification")
+        # relics_identification_button.clicked.connect(self.relics_identification)
+
+    def plugins(self):
+        PluginManager.public_ui = self.ui
+        PluginManager.load_plugins()
+        plugin_groupbox: QGroupBox = self.ui.findChild(QGroupBox, 'plugin_groupbox')
+        plugins_widget = Plugin(self)
+        for name, run in PluginManager.getPlugins().items():
+            plugins_widget.addPlugin(name, run)
+        plugin_groupbox.layout().addWidget(plugins_widget)
+
+    def auto_plot_status(self, state):
+        if state == 2:
+            self.autoplot.run_application()
+        else:
+            self.autoplot.quit_application()
+
+    # def relics_identification(self):
+    #     self.ocr_window=SRAocr()
+    #     self.ocr_window.show()
+
+    def software_setting(self):
+        setting_area: QWidget = self.ui.findChild(QWidget, "tab_2")
+        setting_area.layout().addWidget(Settings(self, self.globals, self.update_log).main_ui)
+
+    def display_none(self):
+        """Sets the invisible state of the container."""
+        self.start_game.ui.setVisible(False)
+        self.trailblaze_power.ui.setVisible(False)
+        self.receive_rewards.ui.setVisible(False)
+        self.after_mission.ui.setVisible(False)
+        self.simulated_universe.ui.setVisible(False)
+
+    def show_start_game_setting(self):
+        """Set start game setting visible"""
+        self.display_none()
+        self.start_game.ui.setVisible(True)
+
+    def show_receive_rewards_setting(self):
+        """Set redeem code visible."""
+        self.display_none()
+        self.receive_rewards.ui.setVisible(True)
+
+    def show_trail_blaze_power_setting(self):
+        self.display_none()
+        self.trailblaze_power.ui.setVisible(True)
+
+    def show_quit_game_setting(self):
+        self.display_none()
+        self.after_mission.ui.setVisible(True)
+
+    def show_simulated_universe_setting(self):
+        self.display_none()
+        self.simulated_universe.ui.show()
+
+    @Slot(str)
+    def update_log(self, text):
+        """Update the content in the log area."""
+        self.log.append(text)
+
+    def getAll(self):
+        self.getter()
+        self.start_game.getter()
+        self.password_text = self.start_game.getPassword()
+        self.receive_rewards.getter()
+        self.trailblaze_power.getter()
+        self.exit_SRA, self.shutdown, self.sleep = self.after_mission.getter()
+        self.simulated_universe.getter()
+        self.multi_account_widget.getter()
+
+    @Slot()
+    def reloadAll(self):
+        name, index = self.multi_account_widget.currentConfig()
+        self.config = Configure.loadConfigByName(name)
+        self.globals["Config"]["currentConfig"] = index
+        self.setter()
+        self.start_game.reload(self.config)
+        self.trailblaze_power.reload(self.config)
+        self.receive_rewards.reload(self.config)
+        self.simulated_universe.reload(self.config)
+        self.after_mission.reload(self.config)
+
+    def execute(self):
+        """Save configuration, create a work thread and monitor signal."""
+        self.getAll()
+        flags = [
+            self.config["Mission"]["startGame"],
+            self.config["Mission"]["trailBlazePower"],
+            self.config["ReceiveRewards"]["enable"],
+            self.config["Mission"]["afterMission"],
+            self.config["Mission"]["simulatedUniverse"]
+        ]
+        if all(not flag for flag in flags):
+            self.log.append("未选择任何任务")
+            return
+
+        current = self.globals['Config']['configList'][self.globals['Config']['currentConfig']]
+        Configure.save(self.globals, "data/globals.json")
+        if not Configure.save(self.config, f"data/config-{current}.json"):
+            self.log.append("配置失败")
+            return
+        self.son_thread = SRAssistant.Assistant(self.password_text)
+        self.son_thread.update_signal.connect(self.update_log)
+        self.son_thread.finished.connect(self.missions_finished)
+        self.son_thread.start()
+        self.button0_2.setEnabled(True)
+        self.button0_1.setEnabled(False)
+        self.isRunning = True
+
+    def missions_finished(self):
+        """接收到任务完成信号后执行的工作"""
+        self.notification()
+        self.isRunning = False
+        del self.son_thread
+        if self.shutdown:
+            WindowsPower.schedule_shutdown(60)
+            self.countdown()
+        elif self.sleep:
+            WindowsPower.hibernate()
+        if self.exit_SRA:
+            self.exitSRA()
+
+    def countdown(self):
+        """关机倒计时"""
+        shutdown_dialog = ShutdownDialog(self)
+        shutdown_dialog.show()
+
+    def notification(self):
+        self.button0_1.setEnabled(True)
+        self.button0_2.setEnabled(False)
+        if not self.globals["Notification"]["enable"]:
+            return
+        if self.globals["Notification"]["system"]:
+            Notification.send_system_notification("SRA", "任务完成")
+        if self.globals["Notification"]["email"]:
+            Notification.send_mail_notification("SRA", "任务完成", self.globals["Notification"])
+
+    def kill(self):
+        """Kill the child thread"""
+        self.son_thread.request_stop()
+        self.button0_2.setEnabled(False)
+        if self.globals["Settings"]["threadSafety"]:
+            self.log.append("等待当前任务完成后停止")
+        else:
+            self.log.append("已停止")
+
+    def exitSRA(self):
+        self.ui.close()
+        self.main_window.close()
+
+    def notice(self):
+        version = Configure.load("version.json")
+        announcement_board = AnnouncementBoard(self.ui, "公告栏")
+        announcement_board.add(
+            Announcement(
+                None,
+                "更新公告",
+                f"<b>版本已更新 v{version['version']}</b>"
+                f"{convert_to_html(version['announcement'])}"
+            )
+        )
+        announcement_board.add(
+            Announcement(
+                None,
+                "长期公告",
+                f"<html><i>点击下方按钮关闭公告栏</i>{version['Announcement']}"
+                "<h4>长期公告</h4>"
+                f"<h2>SRA崩坏：星穹铁道助手 v{VERSION} by雪影</h2>"
+                "<h3>使用说明：</h3>"
+                "<b>重要！推荐调整游戏分辨率为1920*1080并保持游戏窗口无遮挡，注意不要让游戏窗口超出屏幕<br>"
+                "重要！执行任务时不要进行其他操作！<br></b>"
+                "<p>声明：本程序<font color='green'>完全免费</font>，仅供学习交流使用。本程序依靠计算机图像识别和模拟操作运行，"
+                "不会做出任何修改游戏文件、读写游戏内存等任何危害游戏本体的行为。"
+                "如果您使用此程序，我们认为您充分了解《米哈游游戏使用许可及服务协议》第十条之规定，"
+                "您在使用此程序中产生的任何问题（除程序错误导致外）与此程序无关，<b>相应的后果由您自行承担</b>。</p>"
+                "请不要在崩坏：星穹铁道及米哈游在各平台（包括但不限于：米游社、B站、微博）的官方动态下讨论任何关于 SRA 的内容。<br>"
+                "人话：不要跳脸官方～(∠・ω&lt; )⌒☆</html>",
+            )
+        )
+        announcement_board.show()
+        announcement_board.setDefault(0)
+
+    def problem(self):
+        MessageBox.info(
+            self.ui,
+            "常见问题",
+            "1. 在差分宇宙中因奇物“绝对失败处方(进入战斗时，我方全体有150%的基础概率陷入冻结状态，持续1回合)”"
+            "冻结队伍会导致无法开启自动战斗，建议开启游戏的沿用自动战斗设置。\n"
+            "2. 游戏画面贴近或超出屏幕显示边缘时功能无法正常执行。\n"
+            "3. 在执行“历战余响”时若未选择关卡，会导致程序闪退。\n"
+            "关于编队：SRA现在还不会编队，对于除饰品提取以外的战斗功能，使用的是当前出战队伍\n"
+            "对于饰品提取，如果没有队伍或者队伍有空位，使用的是预设编队的队伍1（不要改名）\n",
+        )
+
+    def report(self):
+        MessageBox.info(
+            self.ui,
+            "问题反馈",
+            "反馈渠道：\n"
+            "   B站：https://space.bilibili.com/349682013\n"
+            "   QQ邮箱：yukikage@qq.com\n"
+            "   QQ群：994571792\n"
+            "反馈须知：\n"
+            "    向开发者反馈问题时，除问题描述外，\n"
+            "    请给出所使用软件的版本号以及日志文件",
+        )
+
+    def about(self):
+        MessageBox.info(
+            self.ui,
+            "关于",
+            f"版本：{VERSION}\n"
+            f"内核版本：{CORE}"
+        )
 
 
 class ReceiveRewards(SRAWidget):
@@ -200,8 +569,17 @@ class TrailblazePower(SRAWidget):
             self.name = name
             self.level = level
             self.run_times = run_times
-            self.single_time = single_time
-            self.setText(f"{name} 关卡：{level} 运行次数：{run_times} 单次次数：{single_time}")
+            self.single_times = single_time
+            self.setText(f"{name} \n关卡：{level} \n运行次数：{run_times} \n单次次数：{single_time}")
+
+        def tojson(self):
+            return {
+                "name": self.name,
+                "args": {
+                    "level": self.level,
+                    "runTimes": self.run_times,
+                    "singleTimes": self.single_times
+                }}
 
     def __init__(self, parent, config: dict):
         super().__init__(parent, config)
@@ -263,7 +641,7 @@ class TrailblazePower(SRAWidget):
         self.battle_times7: QSpinBox = self.ui.findChild(
             QSpinBox, "spinBox2_7_23"
         )
-        self.list_widget:QListWidget = self.ui.findChild(QListWidget, "listWidget")
+        self.list_widget: QListWidget = self.ui.findChild(QListWidget, "listWidget")
         self.setter()
         self.connector()
 
@@ -289,7 +667,8 @@ class TrailblazePower(SRAWidget):
         self.battle_times7.setValue(self.config["EchoOfWar"]["runTimes"])
         self.list_widget.clear()
         for task in self.config["TrailBlazePower"]["taskList"]:
-            task=self.TaskItem(self.list_widget,task["name"],task["args"]["level"],task["args"]["runTimes"],task["args"]["singleTimes"])
+            task = self.TaskItem(self.list_widget, task["name"], task["args"]["level"], task["args"]["runTimes"],
+                                 task["args"]["singleTimes"])
             self.list_widget.addItem(task)
 
     def getter(self):
@@ -313,6 +692,11 @@ class TrailblazePower(SRAWidget):
         self.config["EchoOfWar"]["level"] = self.combobox7.currentIndex()
         self.config["EchoOfWar"]["runTimes"] = self.battle_times7.value()
 
+        self.config["TrailBlazePower"]["taskList"].clear()
+        for i in range(self.list_widget.count()):
+            task: TrailblazePower.TaskItem | QListWidgetItem = self.list_widget.item(i)
+            self.config["TrailBlazePower"]["taskList"].append(task.tojson())
+
     def connector(self):
         self.ornament_extraction_addbutton.clicked.connect(self.add_ornament_extraction)
         self.calyx_golden_addbutton.clicked.connect(self.add_calyx_golden)
@@ -322,57 +706,46 @@ class TrailblazePower(SRAWidget):
         self.echo_of_war_addbutton.clicked.connect(self.add_echo_of_war)
         self.list_widget.itemDoubleClicked.connect(self.remove_item)
 
-    def add_task(self,name,level,run_times,single_times=1):
-        task=self.TaskItem(self.list_widget,name,level,run_times,single_times)
+    def add_task(self, name, level, run_times, single_times=1):
+        task = self.TaskItem(self.list_widget, name, level, run_times, single_times)
         self.list_widget.addItem(task)
-        self.config["TrailBlazePower"]["taskList"].append({
-            "name":name,
-            "args":{
-                "level":level,
-                "runTimes":run_times,
-                "singleTimes":single_times
-                }})
-        
 
     def add_ornament_extraction(self):
         level = self.combobox2.currentIndex()
         run_times = self.battle_times2.value()
-        self.add_task("饰品提取",level,run_times)
+        self.add_task("饰品提取", level, run_times)
 
     def add_calyx_golden(self):
         level = self.combobox3.currentIndex()
         single_times = self.single_times3.value()
         run_times = self.battle_times3.value()
-        self.add_task("拟造花萼（金）",level,run_times,single_times)
+        self.add_task("拟造花萼（金）", level, run_times, single_times)
 
     def add_calyx_crimson(self):
         level = self.combobox4.currentIndex()
         single_times = self.single_times4.value()
         run_times = self.battle_times4.value()
-        self.add_task("拟造花萼（赤）",level,run_times,single_times)
+        self.add_task("拟造花萼（赤）", level, run_times, single_times)
 
     def add_stagnant_shadow(self):
         level = self.combobox5.currentIndex()
         run_times = self.battle_times5.value()
-        self.add_task("凝滞虚影",level,run_times)
+        self.add_task("凝滞虚影", level, run_times)
 
     def add_caver_of_corrosion(self):
         level = self.combobox6.currentIndex()
         run_times = self.battle_times6.value()
-        self.add_task("侵蚀隧洞",level,run_times)
+        self.add_task("侵蚀隧洞", level, run_times)
 
     def add_echo_of_war(self):
         level = self.combobox7.currentIndex()
         run_times = self.battle_times7.value()
-        self.add_task("历战余响",level,run_times)
+        self.add_task("历战余响", level, run_times)
 
     @Slot(QListWidgetItem)
     def remove_item(self, item):
-        index=self.list_widget.row(item)
+        index = self.list_widget.row(item)
         self.list_widget.takeItem(index)
-        del self.config["TrailBlazePower"]["taskList"][index]
-
-        
 
 
 class AfterMission(SRAWidget):
@@ -425,6 +798,73 @@ class SimulatedUniverse(SRAWidget):
         self.config["DivergentUniverse"]["policy"] = self.policy_checkbox.currentIndex()
 
 
+class MultiAccount(SRAWidget):
+    def __init__(self, parent: Main, config: dict):
+        super().__init__(parent, config)
+        self.globals = self.config
+        self.parent = parent
+        self.ui = uiLoader.load("res/ui/multi_account.ui")
+        self.main_ui = self.ui.findChild(QScrollArea, "scrollArea")
+        self.current_config_combobox: QComboBox = self.ui.findChild(QComboBox, "current_config")
+        self.current_config_combobox.addItems(self.globals["Config"]["configList"])
+        self.current_config_combobox.setCurrentIndex(self.globals["Config"]["currentConfig"])
+        self.current_config_combobox.currentIndexChanged.connect(self.parent.reloadAll)
+        save_plan_button: QPushButton = self.ui.findChild(QPushButton, "save_plan")
+        save_plan_button.clicked.connect(self.save_plan)
+        reload_button: QPushButton = self.ui.findChild(QPushButton, "reload")
+        reload_button.clicked.connect(self.parent.reloadAll)
+        new_plan_button: QPushButton = self.ui.findChild(QPushButton, "new_plan")
+        new_plan_button.clicked.connect(self.new_plan)
+        delete_plan_button: QPushButton = self.ui.findChild(QPushButton, "delete_plan")
+        delete_plan_button.clicked.connect(self.delete_plan)
+        rename_plan_button: QPushButton = self.ui.findChild(QPushButton, "rename_plan")
+        rename_plan_button.clicked.connect(self.rename_plan)
+        self.switch2next_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "switch2next")
+        self.switch2next_checkbox.setChecked(self.globals["Config"]["next"])
+
+    def getter(self):
+        self.globals["Config"]["next"] = self.switch2next_checkbox.isChecked()
+
+    def save_plan(self):
+        self.parent.getAll()
+        Configure.save(self.parent.config, f'data/config-{self.current_config_combobox.currentText()}.json')
+
+    def new_plan(self):
+        if self.current_config_combobox.count() == self.current_config_combobox.maxCount():
+            MessageBox.info(self, "添加失败", "配置方案已达最大数量！")
+            return
+        plan_name, confirm = InputDialog.getText(self.ui, "创建方案", "方案名称：")
+        if confirm and plan_name:
+            Configure.addConfig(plan_name)
+            self.globals["Config"]["configList"].append(plan_name)
+            Configure.save(self.globals, "data/globals.json")
+            self.current_config_combobox.addItem(plan_name)
+
+    def delete_plan(self):
+        if len(self.globals["Config"]["configList"]) == 1:
+            MessageBox.info(self.ui, "删除失败", "至少保留一个方案")
+            return
+        index = self.current_config_combobox.currentIndex()
+        item = self.current_config_combobox.currentText()
+        Encryption.remove(self.parent.config["StartGame"]["user"])
+        self.current_config_combobox.removeItem(index)
+        self.globals["Config"]["configList"].remove(item)
+        self.globals["Config"]["currentConfig"] = self.current_config_combobox.currentIndex()
+        Configure.remove(item)
+
+    def rename_plan(self):
+        old = self.current_config_combobox.currentText()
+        index = self.current_config_combobox.currentIndex()
+        new, confirm = InputDialog.getText(self.ui, "重命名方案", "方案名称：")
+        if confirm and new:
+            Configure.rename(old, new)
+            self.globals["Config"]["configList"][index] = new
+            self.current_config_combobox.setItemText(index, new)
+
+    def currentConfig(self):
+        return self.current_config_combobox.currentText(), self.current_config_combobox.currentIndex()
+
+
 class Plugin(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
@@ -436,28 +876,29 @@ class Plugin(QWidget):
         button.clicked.connect(slot)
         self.layout().addWidget(button)
 
+
 class Settings(SRAWidget):
     def __init__(self, parent, config: dict, update_log):
         super().__init__(parent, config)
-        self.update_log=update_log
-        self.ui=uiLoader.load("res/ui/settings_page.ui")
-        self.main_ui=self.ui.findChild(QScrollArea,"scrollArea")
-        self.globals=self.config
+        self.update_log = update_log
+        self.ui = uiLoader.load("res/ui/settings_page.ui")
+        self.main_ui = self.ui.findChild(QScrollArea, "scrollArea")
+        self.globals = self.config
         self.key_table = self.ui.findChild(QTableWidget, "tableWidget")
         self.save_button = self.ui.findChild(QPushButton, "pushButton_save")
         self.reset_button = self.ui.findChild(QPushButton, "pushButton_reset")
-        self.hotkey_setting_groupbox:QGroupBox=self.ui.findChild(QGroupBox,"hotkey_setting")
+        self.hotkey_setting_groupbox: QGroupBox = self.ui.findChild(QGroupBox, "hotkey_setting")
         self.hotkey_lineedit1: QLineEdit = self.ui.findChild(QLineEdit, "hotkey1")
         self.hotkey_lineedit2: QLineEdit = self.ui.findChild(QLineEdit, "hotkey2")
         self.notification_allow_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "notification_allow")
         self.system_notification_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "system_notification")
         self.email_notification_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "mail_notification")
-        self.email_notification_frame:QFrame=self.ui.findChild(QFrame,"mail_notification_frame")
+        self.email_notification_frame: QFrame = self.ui.findChild(QFrame, "mail_notification_frame")
         self.SMTP_server: QLineEdit = self.ui.findChild(QLineEdit, "smtp_server")
         self.sender_email: QLineEdit = self.ui.findChild(QLineEdit, "sender_email")
-        self.authorization_code:QLineEdit = self.ui.findChild(QLineEdit, "authorization_code")
+        self.authorization_code: QLineEdit = self.ui.findChild(QLineEdit, "authorization_code")
         self.receiver_email: QLineEdit = self.ui.findChild(QLineEdit, "receiver_email")
-        self.email_check_cutton:QPushButton=self.ui.findChild(QPushButton, "email_check_button")
+        self.email_check_cutton: QPushButton = self.ui.findChild(QPushButton, "email_check_button")
         self.startup_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifStartUp")
 
         auto_update_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifAutoUpdate")
@@ -474,7 +915,7 @@ class Settings(SRAWidget):
         self.integrity_check_button: QPushButton = self.ui.findChild(
             QPushButton, "integrityCheck"
         )
-        self.exit_when_close_checkbox:QCheckBox=self.ui.findChild(QCheckBox,"exit_when_close")
+        self.exit_when_close_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "exit_when_close")
         self.setter()
         self.connector()
 
@@ -490,9 +931,9 @@ class Settings(SRAWidget):
         self.email_notification_frame.setVisible(self.globals["Notification"]["email"])
         self.SMTP_server.setText(self.globals["Notification"]["SMTP"])
         self.sender_email.setText(self.globals["Notification"]["sender"])
-        authorizeCode=self.globals["Notification"]["authorizationCode"]
-        if authorizeCode!='':
-            authorizeCode=Encryption.win_decryptor(authorizeCode)
+        authorizeCode = self.globals["Notification"]["authorizationCode"]
+        if authorizeCode != '':
+            authorizeCode = Encryption.win_decryptor(authorizeCode)
         self.authorization_code.setText(authorizeCode)
         self.receiver_email.setText(self.globals["Notification"]["receiver"])
 
@@ -524,7 +965,7 @@ class Settings(SRAWidget):
         self.exit_when_close_checkbox.stateChanged.connect(self.exit_when_close)
 
     def key_setting_save(self):
-        Configure.save(self.globals,'data/globals.json')
+        Configure.save(self.globals, 'data/globals.json')
 
     def key_setting_reset(self):
         for i in range(4):
@@ -536,20 +977,20 @@ class Settings(SRAWidget):
 
     @Slot()
     def hotkey_change(self):
-        text1=self.hotkey_lineedit1.text()
-        text2=self.hotkey_lineedit2.text()
-        if self.globals["Settings"]["hotkeys"][0]!=text1 or self.globals["Settings"]["hotkeys"][1]!=text2:
-            self.globals["Settings"]["hotkeys"][0]=text1
+        text1 = self.hotkey_lineedit1.text()
+        text2 = self.hotkey_lineedit2.text()
+        if self.globals["Settings"]["hotkeys"][0] != text1 or self.globals["Settings"]["hotkeys"][1] != text2:
+            self.globals["Settings"]["hotkeys"][0] = text1
             self.globals["Settings"]["hotkeys"][1] = text2
             self.hotkey_setting_groupbox.setTitle("热键设置（已修改，重启后生效）")
             Configure.save(self.globals, "data/globals.json")
 
     @Slot()
     def notification_status_change(self):
-        self.config["Notification"]["enable"]=self.notification_allow_checkbox.isChecked()
-        self.config["Notification"]["system"]=self.system_notification_checkbox.isChecked()
-        self.config["Notification"]["email"]=self.email_notification_checkbox.isChecked()
-        Configure.save(self.globals,"data/globals.json")
+        self.config["Notification"]["enable"] = self.notification_allow_checkbox.isChecked()
+        self.config["Notification"]["system"] = self.system_notification_checkbox.isChecked()
+        self.config["Notification"]["email"] = self.email_notification_checkbox.isChecked()
+        Configure.save(self.globals, "data/globals.json")
 
     @Slot()
     def email_check(self):
@@ -561,10 +1002,10 @@ class Settings(SRAWidget):
             MessageBox.info(self, "警告", "请填写完整的邮箱信息")
             return
         if Notification.send_mail(
-            title="SRA",
-            subject="邮箱测试",message="如果您能收到这封邮件，说明您的SRA邮件通知已经准备好。",
-            SMTP=SMTP, sender=sender, password=authorizationCode, receiver=receiver):
-            MessageBox.info(self,"邮箱测试","已发送测试消息，请注意查收。")
+                title="SRA",
+                subject="邮箱测试", message="如果您能收到这封邮件，说明您的SRA邮件通知已经准备好。",
+                SMTP=SMTP, sender=sender, password=authorizationCode, receiver=receiver):
+            MessageBox.info(self, "邮箱测试", "已发送测试消息，请注意查收。")
             self.globals["Notification"]["SMTP"] = SMTP
             self.globals["Notification"]["sender"] = sender
             self.globals["Notification"]["authorizationCode"] = Encryption.win_encryptor(authorizationCode)
@@ -609,10 +1050,10 @@ class Settings(SRAWidget):
 
     def mirrorchyanCDK_changed(self, value):
         self.globals["Settings"]["mirrorchyanCDK"] = Encryption.win_encryptor(value)
-        Configure.save(self.globals,"data/globals.json")
+        Configure.save(self.globals, "data/globals.json")
 
     def exit_when_close(self):
-        self.globals["Settings"]["exitWhenClose"]=self.exit_when_close_checkbox.isChecked()
+        self.globals["Settings"]["exitWhenClose"] = self.exit_when_close_checkbox.isChecked()
         Configure.save(self.globals, "data/globals.json")
 
     @staticmethod
@@ -651,7 +1092,7 @@ class Hotkey(QThread):
     startOrStop = Signal()
     showOrHide = Signal()
 
-    def __init__(self,hotkey_config:list[str]):
+    def __init__(self, hotkey_config: list[str]):
         super().__init__()
         self.running_flag = True
         keyboard.add_hotkey(hotkey_config[0], self.startOrStopCallback)

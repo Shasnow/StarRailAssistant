@@ -247,7 +247,7 @@ class MessageBox(QDialog):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setWindowIcon(QIcon("res/SRAicon.ico"))
-        self.setFont(QFont("MicroSoft YaHei", 12))
+        self.setFont(QFont("MicroSoft YaHei", 13))
         self.setLayout(QVBoxLayout())
         self.label = QLabel(self)
         self.label.setWordWrap(True)
