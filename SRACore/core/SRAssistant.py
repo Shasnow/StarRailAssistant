@@ -351,15 +351,15 @@ class Assistant(QThread):
                         return False
                     case 1 | 2:
                         logger.info("登录成功")
-                        time.sleep(2)
-                        if check("res/img/quit.png", max_time=120):
-                            self.start_game_click()
                     case 3:
                         logger.info("已进入游戏")
                         return True
                     case _:
                         logger.error("未知登录状态")
                         return False
+            time.sleep(2)
+            if check("res/img/quit.png", max_time=120):
+                self.start_game_click()
 
         elif channel == 1:
             self.login_bilibili(account, password)
@@ -836,12 +836,13 @@ class Assistant(QThread):
         else:
             while click("res/img/daily_reward.png"):
                 moveRel(0, 50)
-            if exist("res/img/daily_train_reward_notreach.png"):
-                logger.info("存在每日实训未达到要求")
-            if click("res/img/daily_train_reward.png"):
-                time.sleep(2)
-                press_key("esc", presses=2, interval=2)
 
+            if click("res/img/daily_train_reward.png"):
+                time.sleep(1.5)
+                press_key("esc")
+                if exist("res/img/daily_train_reward_notreach.png",0.5):
+                    logger.info("存在每日实训未达到要求")
+                press_key("esc")
             else:
                 logger.info("没有可领取的奖励")
                 press_key("esc")
