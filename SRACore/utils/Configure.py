@@ -133,7 +133,8 @@ global_config_list2 = {
     "Config": [
         ["currentConfig", 0],
         ["configList", ["Default"]],
-        ["next", False]
+        ["next", False],
+        ["max",3]
     ],
     "Settings": [
         ["F1", "f1"],
