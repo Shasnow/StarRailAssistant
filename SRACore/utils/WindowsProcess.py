@@ -83,7 +83,7 @@ def is_process_running(process_name) -> bool:
     return False
 
 
-def task_kill(process: str) -> bool:
+def task_kill(process: str) -> None:
     """关闭指定进程
 
     Args:
@@ -91,13 +91,9 @@ def task_kill(process: str) -> bool:
     Returns:
         None
     """
-    try:
-        command = f"taskkill /F /IM {process}"
-        # 执行命令
-        subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
-        return True
-    except Exception:
-        return False
+    command = f"taskkill /F /IM {process}"
+    # 执行命令
+    subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
 
 
 def open_normal(path: str) -> bool:

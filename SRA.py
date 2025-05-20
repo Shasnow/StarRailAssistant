@@ -28,7 +28,6 @@ import traceback
 import sys
 import time
 from PySide6.QtGui import QIcon
-from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (
     QMainWindow,
     QApplication,
@@ -46,8 +45,6 @@ from SRACore.utils.SRAWidgets import (
 # from ocr import SRAocr
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
-
-uiLoader = QUiLoader()
 
 class SRA(QMainWindow):
     def __init__(self):
@@ -114,8 +111,6 @@ def exception_hook(exc_type: type, value):
         # 如果连 GUI 都无法启动
         with open("error.log", "w", encoding="utf-8") as file:
             file.write(f"{exc_type}:{value}:{traceback.format_exc()}")
-    finally:
-        sys.exit(1)  # 确保程序退出
 
 
 def main():

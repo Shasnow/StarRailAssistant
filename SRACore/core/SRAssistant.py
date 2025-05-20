@@ -134,7 +134,7 @@ class Assistant(QThread):
         """
         window_title = "崩坏：星穹铁道"
         if not WindowsProcess.check_window(window_title):
-            logger.warning("未找到窗口:" + window_title + "或许你还没有运行游戏")
+            logger.warning(f"未找到窗口: {window_title} 或许你还没有运行游戏")
             return False
         return True
 
@@ -1087,7 +1087,12 @@ class Assistant(QThread):
     @staticmethod
     def quit_game():
         logger.info("退出游戏")
-        return WindowsProcess.task_kill("StarRail.exe")
+        try:
+            WindowsProcess.task_kill("StarRail.exe")
+            return True
+        except Exception:
+            logger.error("发生错误，错误编号7")
+            return False
 
 
 def Popen(path: str):
