@@ -166,11 +166,11 @@ class Main(QWidget):
         multi_account_area.layout().addWidget(self.multi_account_widget.main_ui)
 
         self.extension()
-        self.plugins()
 
         self.software_setting()
 
         self.setter()
+        self.plugins()
 
     def setter(self):
         self.start_game_checkbox.setChecked(self.config["Mission"]["startGame"])
@@ -194,6 +194,7 @@ class Main(QWidget):
 
     def plugins(self):
         PluginManager.public_ui = self.ui
+        PluginManager.public_instance = self
         PluginManager.load_plugins()
         plugin_groupbox: QGroupBox = self.ui.findChild(QGroupBox, 'plugin_groupbox')
         plugins_widget = Plugin(self)

@@ -7,9 +7,8 @@ from SRACore.utils.Logger import logger
 
 from SRACore.utils.exceptions import InvalidPluginException
 
-
 class PluginBase(QThread):
-    def __init__(self, name):
+    def __init__(self, name: str):
         super().__init__()
         self.name = name
 
@@ -17,12 +16,13 @@ class PluginBase(QThread):
 class PluginManager:
     plugin_dir = 'plugins'
     public_ui = None
+    public_instance = None
     plugins = {}  # 用于存储所有插件的插件名和启动函数
     threads = {}  # 用于存储每个插件的线程实例
     data = {}  # 用于存储每个插件的共享数据
 
     @classmethod
-    def load_plugins(cls):
+    def load_plugins(cls) -> None:
         """扫描插件目录并加载所有插件"""
         if not os.path.exists(cls.plugin_dir):
             return
@@ -49,11 +49,11 @@ class PluginManager:
                     logger.warning(f"Failed to load plugin '{plugin_name}': {e}")
 
     @classmethod
-    def getPlugins(cls):
+    def getPlugins(cls) -> dict[str, PluginBase]:
         return cls.plugins
 
     @classmethod
-    def register(cls, thread: PluginBase):
+    def register(cls, thread: PluginBase) -> None:
         """注册插件线程"""
         if thread.name in cls.threads:
             raise Exception(f"Thread '{thread.name}' already registered.")
@@ -61,11 +61,11 @@ class PluginManager:
         thread.finished.connect(lambda: cls.unregister(thread))
 
     @classmethod
-    def unregister(cls, thread: PluginBase):
+    def unregister(cls, thread: PluginBase) -> None:
         """注销插件线程"""
         if thread.name in cls.threads:
             del cls.threads[thread.name]
 
     @classmethod
-    def getPluginsCount(cls):
+    def getPluginsCount(cls) -> int:
         return len(cls.plugins)
