@@ -1,5 +1,5 @@
 from PySide6.QtCore import Slot, QTimer, Qt
-from PySide6.QtGui import QIcon, QFont
+from PySide6.QtGui import QIcon, QFont, QTextFormat
 from PySide6.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QWidget, QGridLayout, \
     QSpacerItem, QSizePolicy, QFrame, QLCDNumber, QHBoxLayout, QPushButton, QListWidget, QStackedWidget, QTextBrowser, \
     QMessageBox, QLineEdit
@@ -249,8 +249,8 @@ class MessageBox(QDialog):
         self.setWindowIcon(QIcon("res/SRAicon.ico"))
         self.setFont(QFont("MicroSoft YaHei", 13))
         self.setLayout(QVBoxLayout())
-        self.label = QLabel(self)
-        self.label.setWordWrap(True)
+        self.label = QTextBrowser(self)
+        self.label.setOpenExternalLinks(True)
         self.label.setText(text)
         self.layout().addWidget(self.label)
         self.ok_button = QPushButton("确认")
