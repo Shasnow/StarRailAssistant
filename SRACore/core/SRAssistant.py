@@ -34,7 +34,7 @@ from SRACore.utils.WindowsProcess import find_window, is_process_running
 from SRACore.utils.exceptions import MatchFailureException
 
 VERSION = "0.8.1"
-CORE = "0.8.1.0"
+CORE = "0.8.1.3"
 
 _callback_registered = False
 
@@ -638,7 +638,7 @@ class Assistant(QThread):
                     "stagnant_shadow",
                     level,
                     runTimes,
-                    False,
+                    True,
                     None)
 
     def caver_of_corrosion(self, level, runTimes=1, **_):

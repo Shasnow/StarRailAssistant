@@ -340,6 +340,7 @@ class Main(QWidget):
     def exitSRA(self):
         self.ui.close()
         self.main_window.close()
+        QApplication.instance().exit()
 
     def notice(self):
         version = Configure.load("version.json")
@@ -377,12 +378,13 @@ class Main(QWidget):
         MessageBox.info(
             self.ui,
             "常见问题",
+            "<a href='https://shasnow.github.io/SRA/faq.html'>常见问题自查</a><br><br>"
             "1. 在差分宇宙中因奇物“绝对失败处方(进入战斗时，我方全体有150%的基础概率陷入冻结状态，持续1回合)”"
             "冻结队伍会导致无法开启自动战斗，建议开启游戏的沿用自动战斗设置。\n"
             "2. 游戏画面贴近或超出屏幕显示边缘时功能无法正常执行。\n"
             "3. 在执行“历战余响”时若未选择关卡，会导致程序闪退。\n"
             "关于编队：SRA现在还不会编队，对于除饰品提取以外的战斗功能，使用的是当前出战队伍\n"
-            "对于饰品提取，如果没有队伍或者队伍有空位，使用的是预设编队的队伍1（不要改名）\n",
+            "对于饰品提取，如果没有队伍或者队伍有空位，使用的是预设编队的队伍1（不要改名）\n"
         )
 
     def report(self):
