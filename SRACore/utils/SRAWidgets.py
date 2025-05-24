@@ -1,6 +1,7 @@
 import os
 import shutil
 
+import SRACore.utils.Logger
 import keyboard
 import time
 from PySide6.QtCore import Slot, QThread, Signal
@@ -97,6 +98,8 @@ class Main(QWidget):
         self.password_text = ""
         self.ui = uiLoader.load(self.AppPath + "/res/ui/main.ui")
         self.log = self.ui.findChild(QTextBrowser, "textBrowser_log")
+        SRACore.utils.Logger.logger.add(self.update_log, level=20, format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
+                       colorize=False)
 
         # 创建中间的垂直布局管理器用于任务设置
 
