@@ -54,11 +54,12 @@ class PluginManager:
 
     @classmethod
     def register(cls, thread: PluginBase) -> None:
-        """注册插件线程"""
+        """注册插件线程，如果线程名已存在则抛出异常，防止线程反复启动。"""
         if thread.name in cls.threads:
             raise Exception(f"Thread '{thread.name}' already registered.")
         cls.threads[thread.name] = thread
         thread.finished.connect(lambda: cls.unregister(thread))
+        thread.finished.connect(thread.deleteLater)
 
     @classmethod
     def unregister(cls, thread: PluginBase) -> None:

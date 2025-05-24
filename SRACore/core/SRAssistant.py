@@ -36,8 +36,6 @@ from SRACore.utils.exceptions import MatchFailureException
 VERSION = "0.8.1"
 CORE = "0.8.1.3"
 
-_callback_registered = False
-
 
 class Assistant(QThread):
     update_signal = Signal(str)
@@ -60,10 +58,6 @@ class Assistant(QThread):
         self.f1 = settings["F1"]
         self.f2 = settings["F2"]
         self.f4 = settings["F4"]
-        if not _callback_registered:
-            logger.add(self.send_signal, level=20, format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
-                       colorize=False)
-            _callback_registered = True
 
     def send_signal(self, text):
         self.update_signal.emit(text)
@@ -479,7 +473,7 @@ class Assistant(QThread):
             return self.logout()
         if self.config["AfterMission"]["quitGame"]:
             return self.quit_game()
-        return None
+        return True
 
     @staticmethod
     def trailblazer_profile():
@@ -966,7 +960,7 @@ class Assistant(QThread):
             moveRel(0, 100)
             for i in range(10):
                 scroll(-5)
-        result = SRAOperator.existAny([name1, name2], wait_time=0.5, need_location=True)
+        result = SRAOperator.existAny([name1, name2], wait_time=1, need_location=True)
         if result:
             click_point(*result[1])
         else:
@@ -1090,7 +1084,8 @@ class Assistant(QThread):
         try:
             WindowsProcess.task_kill("StarRail.exe")
             return True
-        except Exception:
+        except Exception as e:
+            logger.debug(e)
             logger.error("发生错误，错误编号7")
             return False
 
