@@ -12,8 +12,9 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMenu, QWidget, QChe
     QSpinBox, QRadioButton, QVBoxLayout, QSystemTrayIcon, QApplication, QTableWidget, QDoubleSpinBox, QScrollArea, \
     QGroupBox, QFrame, QMainWindow, QTextBrowser
 
-from SRACore.core import AutoPlot, SRAssistant
-from SRACore.core.SRAssistant import VERSION, CORE
+# from SRACore.core import AutoPlot
+# from SRACore.core import SRAssistant
+from SRACore.utils.const import VERSION, CORE
 from SRACore.utils import Encryption, Configure, WindowsProcess, const, Notification, WindowsPower
 from SRACore.utils.Dialog import MessageBox, InputDialog, ShutdownDialog, AnnouncementBoard, Announcement
 from SRACore.utils.Plugins import PluginManager
@@ -85,8 +86,7 @@ class Main(QWidget):
         super().__init__()
         self.main_window = main_window
         self.AppPath = const.AppPath
-        # self.ocr_window=None
-        self.autoplot = AutoPlot.Main()
+        # self.autoplot = AutoPlot.Main()
         self.exit_SRA = False
         self.sleep = False
         self.shutdown = False
@@ -191,7 +191,7 @@ class Main(QWidget):
 
     def extension(self):
         auto_plot_checkbox = self.ui.findChild(QCheckBox, "autoplot_checkBox")
-        auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
+        # auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
         # relics_identification_button:QPushButton=self.ui.findChild(QPushButton,"relicsIdentification")
         # relics_identification_button.clicked.connect(self.relics_identification)
 

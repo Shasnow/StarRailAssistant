@@ -23,6 +23,7 @@
 """
 
 import subprocess
+import sys
 
 import time
 from PySide6.QtCore import QThread, Signal
@@ -32,10 +33,7 @@ from SRACore.utils.Logger import logger
 from SRACore.utils.SRAOperator import SRAOperator
 from SRACore.utils.WindowsProcess import find_window, is_process_running
 from SRACore.utils.exceptions import MatchFailureException
-
-VERSION = "0.8.1"
-CORE = "0.8.1.3"
-
+from SRACore.utils.const import VERSION
 
 class Assistant(QThread):
     update_signal = Signal(str)
@@ -45,7 +43,6 @@ class Assistant(QThread):
         self.replenish_time = None
         self.replenish_way = None
         self.replenish_flag = None
-        global _callback_registered
         self.stop_flag = False
         self.globals = Configure.load("data/globals.json")
         self.config = None
@@ -108,6 +105,9 @@ class Assistant(QThread):
             logger.info("任务全部完成\n")
 
     def run(self):
+        if sys.platform=="linux":
+            logger.error("敬请期待")
+            return
         logger.info("SRAv" + VERSION + " 创建任务喵~")
         if self.globals["Config"]["next"]:
             for i in range(self.globals["Config"]["max"]):

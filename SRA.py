@@ -33,7 +33,7 @@ from PySide6.QtWidgets import (
     QApplication,
 )  # 从 PySide6 中导入所需的类
 
-from SRACore.core.SRAssistant import VERSION
+from SRACore.utils.const import VERSION
 from SRACore.utils import Configure
 from SRACore.utils.Dialog import (
     ExceptionMessageBox
@@ -44,7 +44,7 @@ from SRACore.utils.SRAWidgets import (
 
 # from ocr import SRAocr
 
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
+# ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
 
 class SRA(QMainWindow):
     def __init__(self):
@@ -97,7 +97,10 @@ class SRA(QMainWindow):
 
 def is_admin():
     try:
-        return ctypes.windll.shell32.IsUserAnAdmin()
+        if sys.platform=="win32":
+            return ctypes.windll.shell32.IsUserAnAdmin()
+        else:
+            return True
     except:
         return False
 

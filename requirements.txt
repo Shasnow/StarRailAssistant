@@ -4,14 +4,12 @@ PyAutoGUI==0.9.54
 nuitka
 PySide6==6.7.3
 PyScreeze
-pywin32==306
-pywin32-ctypes
 cryptography
 loguru
 psutil
-Pillow==10.1.0
+Pillow==10.3.0
 requests==2.32.3
-PyGetWindow
+pywinctl
 rich==13.9.4
 pyperclip==1.9.0
 rapidocr_onnxruntime

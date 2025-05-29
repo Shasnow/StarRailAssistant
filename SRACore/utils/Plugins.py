@@ -32,7 +32,7 @@ class PluginManager:
 
             if os.path.isdir(plugin_path):
                 try:
-                    sys.path.append(f"{os.getcwd()} \ {plugin_path}")
+                    sys.path.append(f"{os.getcwd()} / {plugin_path}")
                     model = importlib.import_module(plugin_path.replace('\\', '.'))
                     if not hasattr(model, 'run'):
                         raise InvalidPluginException("Plugin does not implement 'run' method.")

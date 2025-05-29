@@ -21,15 +21,37 @@
 作者：雪影
 Windows进程操作
 """
+import os
 import subprocess
-import winreg
+import sys
 
 import psutil
-import win32con
-import win32gui
+
+if sys.platform == "win32":
+    import win32con
+    import win32gui
+    import winreg
+else:
+    import pywinctl
 
 
-def find_window(title) -> list | None:
+def find_window(title: str):
+    """Find window handles based on the window title
+
+    Args:
+        title (str): Window title.
+    Returns:
+        The first found window handle, None otherwise.
+    """
+    if sys.platform == "win32":
+        return find_window_on_win32(title)
+    elif sys.platform == "linux":
+        return find_window_on_linux(title)
+    else:
+        raise NotImplementedError("Unsupported platform")
+
+
+def find_window_on_win32(title):
     """Find window handles based on the window title
 
     Args:
@@ -47,6 +69,15 @@ def find_window(title) -> list | None:
     return windows[0] if windows else None
 
 
+def find_window_on_linux(title):
+    """Find window IDs based on the window title
+
+    Args:        title (str): Window title.
+    Returns:        The first found window ID, None otherwise.
+    """
+    return pywinctl.getWindowsWithTitle(title)[0]
+
+
 def check_window(window_title) -> bool:
     """Check that the game is running by window title.
 
@@ -56,8 +87,11 @@ def check_window(window_title) -> bool:
 
     hwnd = find_window(window_title)
     if hwnd:
-        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)  # 确保窗口不是最小化状态
-        win32gui.SetForegroundWindow(hwnd)
+        if sys.platform == "win32":
+            win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)  # 确保窗口不是最小化状态
+            win32gui.SetForegroundWindow(hwnd)
+        elif sys.platform == "linux":
+            hwnd.activate()
         return True
     else:
         return False
@@ -91,7 +125,7 @@ def task_kill(process: str) -> None:
     Returns:
         None
     """
-    command = f"taskkill /F /IM {process}"
+    command = f"taskkill /F /IM {process}" if sys.platform=="win32" else f"pkill -f {process}"
     # 执行命令
     subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
 
@@ -144,10 +178,15 @@ def set_startup_item(program_name, program_path) -> bool:
         True if successfully set, False otherwise.
     """
     try:
-        key_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run'
-        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE)
-        winreg.SetValueEx(key, program_name, 0, winreg.REG_SZ, program_path)
-        winreg.CloseKey(key)
+        if sys.platform=="win32":
+            key_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run'
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key, program_name, 0, winreg.REG_SZ, program_path)
+            winreg.CloseKey(key)
+        else:
+            with open(os.path.expanduser("~/.bashrc"), "a") as f:
+                f.write(f"\n# Startup command for {program_name}\n")
+                f.write(f"{program_path} &\n")
         return True
     except Exception:
         return False
@@ -163,10 +202,22 @@ def delete_startup_item(item_name: str) -> bool:
         True if successfully delete, False otherwise.
     """
     try:
-        startup_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Run", 0,
-                                     winreg.KEY_SET_VALUE | winreg.KEY_WOW64_32KEY)
-        winreg.DeleteValue(startup_key, item_name)
-        winreg.CloseKey(startup_key)
+        if sys.platform=="win32":
+            startup_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Run", 0,
+                                         winreg.KEY_SET_VALUE | winreg.KEY_WOW64_32KEY)
+            winreg.DeleteValue(startup_key, item_name)
+            winreg.CloseKey(startup_key)
+        else:
+            # 从.bashrc中删除启动项
+            with open(os.path.expanduser("~/.bashrc"), "r") as f:
+                lines = f.readlines()
+
+            with open(os.path.expanduser("~/.bashrc"), "w") as f:
+                for line in lines:
+                    if not line.startswith(f"# Startup command for {item_name}"):
+                        f.write(line)
         return True
     except Exception:
         return False
+
+
