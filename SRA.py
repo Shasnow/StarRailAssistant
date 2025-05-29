@@ -107,10 +107,11 @@ def exception_hook(exc_type: type, value):
     try:
         msg_box = ExceptionMessageBox(exc_type.__name__, value, traceback.format_exc())
         msg_box.exec()
-    except Exception:
+    except Exception as e:
         # 如果连 GUI 都无法启动
         with open("error.log", "w", encoding="utf-8") as file:
-            file.write(f"{exc_type}:{value}:{traceback.format_exc()}")
+            file.write(f"{exc_type}:{value}:{traceback.format_exc()}\n"
+                       f"During handle the exception, another exception occurred: {e}")
 
 
 def main():

@@ -1,7 +1,6 @@
 import os
 import shutil
 
-import SRACore.utils.Logger
 import keyboard
 import time
 from PySide6.QtCore import Slot, QThread, Signal
@@ -12,6 +11,7 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMenu, QWidget, QChe
     QSpinBox, QRadioButton, QVBoxLayout, QSystemTrayIcon, QApplication, QTableWidget, QDoubleSpinBox, QScrollArea, \
     QGroupBox, QFrame, QMainWindow, QTextBrowser
 
+import SRACore.utils.Logger
 from SRACore.core import AutoPlot, SRAssistant
 from SRACore.core.SRAssistant import VERSION, CORE
 from SRACore.utils import Encryption, Configure, WindowsProcess, const, Notification, WindowsPower
@@ -98,8 +98,9 @@ class Main(QWidget):
         self.password_text = ""
         self.ui = uiLoader.load(self.AppPath + "/res/ui/main.ui")
         self.log = self.ui.findChild(QTextBrowser, "textBrowser_log")
-        SRACore.utils.Logger.logger.add(self.update_log, level=20, format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
-                       colorize=False)
+        SRACore.utils.Logger.logger.add(self.update_log, level=20,
+                                        format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
+                                        colorize=False)
 
         # 创建中间的垂直布局管理器用于任务设置
 
@@ -478,7 +479,7 @@ class StartGame(SRAWidget):
         self.use_launcher_checkbox: QCheckBox = self.ui.findChild(
             QCheckBox, "checkBox2_4"
         )
-        self.path_text: QTextEdit = self.ui.findChild(QLabel, "label2_2")
+        self.path_text: QLabel = self.ui.findChild(QLabel, "label2_2")
         self.line_area: QLineEdit = self.ui.findChild(
             QLineEdit, "lineEdit2_2"
         )
@@ -570,13 +571,14 @@ class StartGame(SRAWidget):
 
 class TrailblazePower(SRAWidget):
     class TaskItem(QListWidgetItem):
-        def __init__(self, parent, name, level, run_times, single_time):
-            super().__init__(parent)
+        def __init__(self, name, level, level_text, run_times, single_time):
+            super().__init__()
             self.name = name
             self.level = level
+            self.level_text = level_text
             self.run_times = run_times
             self.single_times = single_time
-            self.setText(f"{name} \n关卡：{level} \n运行次数：{run_times} \n单次次数：{single_time}")
+            self.setText(f"{name} \n关卡：{level_text} \n运行次数：{run_times} \n单次次数：{single_time}")
 
         def tojson(self):
             return {
@@ -712,41 +714,47 @@ class TrailblazePower(SRAWidget):
         self.echo_of_war_addbutton.clicked.connect(self.add_echo_of_war)
         self.list_widget.itemDoubleClicked.connect(self.remove_item)
 
-    def add_task(self, name, level, run_times, single_times=1):
-        task = self.TaskItem(self.list_widget, name, level, run_times, single_times)
+    def add_task(self, name, level, level_text, run_times, single_times=1):
+        task = self.TaskItem(name, level, level_text, run_times, single_times)
         self.list_widget.addItem(task)
 
     def add_ornament_extraction(self):
-        level = self.combobox2.currentIndex()
-        run_times = self.battle_times2.value()
-        self.add_task("饰品提取", level, run_times)
+        self.add_task("饰品提取",
+                      self.combobox2.currentIndex(),
+                      self.combobox2.currentText(),
+                      self.battle_times2.value())
 
     def add_calyx_golden(self):
-        level = self.combobox3.currentIndex()
-        single_times = self.single_times3.value()
-        run_times = self.battle_times3.value()
-        self.add_task("拟造花萼（金）", level, run_times, single_times)
+        self.add_task("拟造花萼（金）",
+                      self.combobox3.currentIndex(),
+                      self.combobox3.currentText(),
+                      self.battle_times3.value(),
+                      self.single_times3.value())
 
     def add_calyx_crimson(self):
-        level = self.combobox4.currentIndex()
-        single_times = self.single_times4.value()
-        run_times = self.battle_times4.value()
-        self.add_task("拟造花萼（赤）", level, run_times, single_times)
+        self.add_task("拟造花萼（赤）",
+                      self.combobox4.currentIndex(),
+                      self.combobox4.currentText(),
+                      self.battle_times4.value(),
+                      self.single_times4.value())
 
     def add_stagnant_shadow(self):
-        level = self.combobox5.currentIndex()
-        run_times = self.battle_times5.value()
-        self.add_task("凝滞虚影", level, run_times)
+        self.add_task("凝滞虚影",
+                      self.combobox5.currentIndex(),
+                      self.combobox5.currentText(),
+                      self.battle_times5.value())
 
     def add_caver_of_corrosion(self):
-        level = self.combobox6.currentIndex()
-        run_times = self.battle_times6.value()
-        self.add_task("侵蚀隧洞", level, run_times)
+        self.add_task("侵蚀隧洞",
+                      self.combobox6.currentIndex(),
+                      self.combobox6.currentText(),
+                      self.battle_times6.value())
 
     def add_echo_of_war(self):
-        level = self.combobox7.currentIndex()
-        run_times = self.battle_times7.value()
-        self.add_task("历战余响", level, run_times)
+        self.add_task("历战余响",
+                      self.combobox7.currentIndex(),
+                      self.combobox7.currentText(),
+                      self.battle_times7.value())
 
     @Slot(QListWidgetItem)
     def remove_item(self, item):
