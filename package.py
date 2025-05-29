@@ -39,7 +39,7 @@ if __name__ == "__main__":
     print("Packaging SRA main program ...")
 
     os.system(
-        "powershell -Command python -m nuitka --standalone --mingw64"
+        ".venv/bin/python3 -m nuitka --standalone --mingw64"
         " --enable-plugins=pyside6 --windows-console-mode=attach --windows-uac-admin"
         " --windows-icon-from-ico=res\\SRAicon.ico"
         " --company-name='StarRailAssistant Team' --product-name=StarRailAssistant"

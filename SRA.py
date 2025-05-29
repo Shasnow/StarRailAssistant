@@ -23,6 +23,7 @@
 """
 
 import ctypes
+import os
 import traceback
 
 import sys
@@ -100,7 +101,7 @@ def is_admin():
         if sys.platform=="win32":
             return ctypes.windll.shell32.IsUserAnAdmin()
         else:
-            return True
+            return os.geteuid()==0
     except:
         return False
 

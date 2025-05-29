@@ -24,42 +24,13 @@ v0.7.0
 """
 
 import sys
-import time
 
-import cv2
 import pyautogui
-import pygetwindow
-import pyscreeze
 from PySide6.QtCore import QThread, Signal
 from PySide6.QtWidgets import QApplication
 
 from SRACore.utils.Logger import logger
-
-
-def exist(img_path, wait_time=2):
-    """Determine if a situation exists.
-
-    Args:
-        img_path (str): Img path of the situation.
-        wait_time (int): Waiting time before run_flag.
-    Returns:
-        True if existed, False otherwise.
-    """
-    time.sleep(wait_time)
-    try:
-        img = cv2.imread(img_path)
-        if img is None:
-            raise FileNotFoundError("无法找到或读取文件 " + img_path + ".png")
-        pyautogui.locateOnWindow(img, "崩坏：星穹铁道", confidence=0.90)
-        return True
-    except pyautogui.ImageNotFoundException:
-        return False
-    except FileNotFoundError as e:
-        logger.exception(e)
-        return False
-    except ValueError:
-        logger.exception("窗口未激活")
-        return False
+from SRACore.utils.SRAOperator import SRAOperator
 
 
 class PlotListener(QThread):
@@ -80,18 +51,15 @@ class PlotListener(QThread):
         logger.info("监听，启动！")
         while self.running_flag:
             try:
-                if exist("res/img/dialog.png", wait_time=self.wait_time):
+                if SRAOperator.exist("res/img/dialog.png", wait_time=self.wait_time):
                     self.in_plot_flag = True
                     self.plot_start.emit()
                 else:
                     if self.in_plot_flag:
                         self.in_plot_flag = False
                         self.plot_end.emit()
-            except pygetwindow.PyGetWindowException:
-                logger.error("窗口未激活")
-                self.stop()
-            except pyscreeze.PyScreezeException:
-                logger.exception("未能找到窗口", is_fatal=True)
+            except Exception as e:
+                logger.exception(f"发生异常{e}")
                 self.stop()
         logger.info("自动剧情已关闭")
 
@@ -112,17 +80,14 @@ class AutoPlot(QThread):
         logger.info("自动播放运行中")
         while self.running_flag:
             try:
-                if exist("res/img/continue.png", wait_time=1):
+                if SRAOperator.exist("res/img/continue.png", wait_time=1):
                     pyautogui.press("space")
                 for i in range(4,0,-1):
-                    if exist(f"res/img/{i}.png", wait_time=0):
+                    if SRAOperator.exist(f"res/img/{i}.png", wait_time=0):
                         pyautogui.press(str(i))
                         break
-            except pygetwindow.PyGetWindowException:
-                logger.error("窗口未激活")
-                self.event_stop()
-            except pyscreeze.PyScreezeException:
-                logger.exception("未能找到窗口", is_fatal=True)
+            except Exception as e:
+                logger.exception(f"发生异常{e}")
                 self.event_stop()
 
 

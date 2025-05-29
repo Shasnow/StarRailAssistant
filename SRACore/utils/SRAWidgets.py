@@ -12,8 +12,8 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMenu, QWidget, QChe
     QSpinBox, QRadioButton, QVBoxLayout, QSystemTrayIcon, QApplication, QTableWidget, QDoubleSpinBox, QScrollArea, \
     QGroupBox, QFrame, QMainWindow, QTextBrowser
 
-# from SRACore.core import AutoPlot
-# from SRACore.core import SRAssistant
+from SRACore.core import AutoPlot
+from SRACore.core import SRAssistant
 from SRACore.utils.const import VERSION, CORE
 from SRACore.utils import Encryption, Configure, WindowsProcess, const, Notification, WindowsPower
 from SRACore.utils.Dialog import MessageBox, InputDialog, ShutdownDialog, AnnouncementBoard, Announcement
@@ -86,7 +86,7 @@ class Main(QWidget):
         super().__init__()
         self.main_window = main_window
         self.AppPath = const.AppPath
-        # self.autoplot = AutoPlot.Main()
+        self.autoplot = AutoPlot.Main()
         self.exit_SRA = False
         self.sleep = False
         self.shutdown = False
@@ -478,7 +478,7 @@ class StartGame(SRAWidget):
         self.use_launcher_checkbox: QCheckBox = self.ui.findChild(
             QCheckBox, "checkBox2_4"
         )
-        self.path_text: QTextEdit = self.ui.findChild(QLabel, "label2_2")
+        self.path_text: QLabel = self.ui.findChild(QLabel, "label2_2")
         self.line_area: QLineEdit = self.ui.findChild(
             QLineEdit, "lineEdit2_2"
         )
@@ -892,7 +892,7 @@ class Settings(SRAWidget):
         self.globals = self.config
         self.key_table = self.ui.findChild(QTableWidget, "tableWidget")
         self.save_button = self.ui.findChild(QPushButton, "pushButton_save")
-        self.reset_button = self.ui.findChild(QPushButton, "pushButton_reset")
+        self.reset_button:QPushButton = self.ui.findChild(QPushButton, "pushButton_reset")
         self.hotkey_setting_groupbox: QGroupBox = self.ui.findChild(QGroupBox, "hotkey_setting")
         self.hotkey_lineedit1: QLineEdit = self.ui.findChild(QLineEdit, "hotkey1")
         self.hotkey_lineedit2: QLineEdit = self.ui.findChild(QLineEdit, "hotkey2")

@@ -22,7 +22,8 @@ from os import PathLike
 
 import cv2
 import pyautogui
-import pygetwindow
+import pywinctl
+import tkinter
 import pyperclip
 import pyscreeze
 import time
@@ -94,7 +95,7 @@ class SRAOperator:
         Raises:
             WindowNoFoundException: 未找到包含指定标题的窗口。
         """
-        matching_windows = pygetwindow.getWindowsWithTitle(title)
+        matching_windows = pywinctl.getWindowsWithTitle(title)
         if len(matching_windows) == 0:
             raise WindowNoFoundException('Could not find a window with %s in the title' % title)
         win = matching_windows[0]
@@ -409,7 +410,7 @@ class SRAOperator:
         Returns:
             tuple: 中心点坐标 (x, y)。
         """
-        active_window = pygetwindow.getActiveWindow()
+        active_window = pywinctl.getActiveWindow()
         x, y, screen_width, screen_height = (
             active_window.left,
             active_window.top,
