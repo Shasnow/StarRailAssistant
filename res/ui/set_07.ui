@@ -1163,6 +1163,11 @@
             </item>
             <item>
              <property name="text">
+              <string>晨昏的回眸</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>心兽的战场</string>
              </property>
             </item>

@@ -610,7 +610,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：饰品提取")
         return True
 
-    def calyx_golden(self, level, singleTimes=1, runTimes=1):
+    def calyx_golden(self, level, singleTimes=1, runTimes=1,**_):
         self.battle("拟造花萼（金）",
                     "calyx(golden)",
                     level,
@@ -618,7 +618,7 @@ class Assistant(QThread):
                     False,
                     singleTimes)
 
-    def calyx_crimson(self, level, singleTimes=1, runTimes=1):
+    def calyx_crimson(self, level, singleTimes=1, runTimes=1,**_):
         self.battle("拟造花萼（赤）",
                     "calyx(crimson)",
                     level,
