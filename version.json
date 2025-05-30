@@ -1,7 +1,7 @@
 {
     "version": "0.8.2",
     "resource_version": "0.8.2.0",
-    "announcement": "更新内容：\n1. 清体力的列表内现在显示关卡名称而不是编号。\n问题修复：\n1. 修复了当勾选‘退出SRA’任务且未设置‘关闭窗口时直接退出’时，仅关闭了SRA的UI而未退出程序的问题。\n",
+    "announcement": "更新内容：\n1. 清体力的列表内现在显示关卡名称而不是编号。\n2. 新增历战余响-晨昏的回眸。\n问题修复：\n1. 修复了当勾选‘退出SRA’任务且未设置‘关闭窗口时直接退出’时，仅关闭了SRA的UI而未退出程序的问题。\n",
     "resource_announcement": "",
     "Announcement": "<p>SRA官网上线<a href='https://shasnow.github.io/SRA'>点击前往</a></p><p>SRA接入了Mirror酱--在设置中填入Mirror酱cdk后，可以使用Mirror酱的高速下载服务。<a href='https://mirrorchyan.com/zh/get-start'>没有CDK？立即订阅</a></p>",
     "Announcement.DoNotShowAgain": false,

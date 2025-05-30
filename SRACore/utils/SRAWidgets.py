@@ -585,6 +585,7 @@ class TrailblazePower(SRAWidget):
                 "name": self.name,
                 "args": {
                     "level": self.level,
+                    "levelText": self.level_text,
                     "runTimes": self.run_times,
                     "singleTimes": self.single_times
                 }}
@@ -675,7 +676,7 @@ class TrailblazePower(SRAWidget):
         self.battle_times7.setValue(self.config["EchoOfWar"]["runTimes"])
         self.list_widget.clear()
         for task in self.config["TrailBlazePower"]["taskList"]:
-            task = self.TaskItem(self.list_widget, task["name"], task["args"]["level"], task["args"]["runTimes"],
+            task = self.TaskItem(task["name"], task["args"]["level"],task["args"]["levelText"], task["args"]["runTimes"],
                                  task["args"]["singleTimes"])
             self.list_widget.addItem(task)
 
