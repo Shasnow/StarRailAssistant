@@ -1,5 +1,5 @@
 from PySide6.QtCore import Slot, QTimer, Qt
-from PySide6.QtGui import QIcon, QFont, QTextFormat
+from PySide6.QtGui import QIcon, QFont
 from PySide6.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QWidget, QGridLayout, \
     QSpacerItem, QSizePolicy, QFrame, QLCDNumber, QHBoxLayout, QPushButton, QListWidget, QStackedWidget, QTextBrowser, \
     QMessageBox, QLineEdit

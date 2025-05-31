@@ -31,10 +31,8 @@ from SRACore.utils import Configure, WindowsProcess, Encryption
 from SRACore.utils.Logger import logger
 from SRACore.utils.SRAOperator import SRAOperator
 from SRACore.utils.WindowsProcess import find_window, is_process_running
+from SRACore.utils.const import VERSION
 from SRACore.utils.exceptions import MatchFailureException
-
-VERSION = "0.8.1"
-CORE = "0.8.1.3"
 
 
 class Assistant(QThread):
@@ -754,7 +752,7 @@ class Assistant(QThread):
                     logger.info("退出战斗")
                     res = check_any(["res/img/battle.png", "res/img/chat_enter.png"])
                     if res == 0:
-                        press_key("esc")
+                        press_key("esc",wait=1)
                     elif res == 1:
                         pass
                     break
@@ -776,7 +774,7 @@ class Assistant(QThread):
             logger.info("退出战斗")
             res = check_any(["res/img/battle.png", "res/img/chat_enter.png"])
             if res == 0:
-                press_key("esc")
+                press_key("esc",wait=1)
             elif res == 1:
                 pass
 
@@ -1122,8 +1120,8 @@ def write(content: str = "") -> bool:
     return SRAOperator.write(content)
 
 
-def press_key(key: str, presses: int = 1, interval: float = 2) -> bool:
-    return SRAOperator.press_key(key, presses, interval)
+def press_key(key: str, presses: int = 1, interval: float = 2,wait:float=0) -> bool:
+    return SRAOperator.press_key(key, presses, interval, wait)
 
 
 def exist(img_path, wait_time: float = 2.0) -> bool:

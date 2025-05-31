@@ -472,17 +472,19 @@ class SRAOperator:
             return False
 
     @classmethod
-    def press_key(cls, key: str, presses: int = 1, interval: float = 2) -> bool:
+    def press_key(cls, key: str, presses: int = 1, interval: float = 2,wait:float=0) -> bool:
         """按下按键
         
         Args:
             key: 按键
             presses: 按下次数
-            interval: 按键间隔时间(如果填入,程序会等待interval秒再按下按键)
+            interval: 按键间隔时间(如果填入,程序会间隔interval秒再按下按键)
+            wait: 首次按下按键前的等待时间
         Returns:
             按键成功返回True，否则返回False
         """
         try:
+            time.sleep(wait)
             logger.debug("按下按键" + key)
             pyautogui.press(key, presses=presses, interval=interval)
             return True
