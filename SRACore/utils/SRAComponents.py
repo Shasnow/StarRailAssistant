@@ -13,8 +13,8 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMenu, QWidget, QChe
 
 import SRACore.utils.Logger
 from SRACore.core import AutoPlot, SRAssistant
-from SRACore.core.SRAssistant import VERSION, CORE
-from SRACore.utils import Encryption, Configure, WindowsProcess, const, Notification, WindowsPower
+from SRACore.utils.const import *
+from SRACore.utils import Encryption, Configure, WindowsProcess, Notification, WindowsPower
 from SRACore.utils.Dialog import MessageBox, InputDialog, ShutdownDialog, AnnouncementBoard, Announcement
 from SRACore.utils.Plugins import PluginManager
 
@@ -84,7 +84,7 @@ class Main(QWidget):
     def __init__(self, main_window: QMainWindow):
         super().__init__()
         self.main_window = main_window
-        self.AppPath = const.AppPath
+        self.AppPath = AppPath
         # self.ocr_window=None
         self.autoplot = AutoPlot.Main()
         self.exit_SRA = False
@@ -590,6 +590,17 @@ class TrailblazePower(SRAWidget):
                     "singleTimes": self.single_times
                 }}
 
+        @staticmethod
+        def fromjson(data:dict):
+            return TrailblazePower.TaskItem(
+                data["name"],
+                data["args"]["level"],
+                data["args"]["levelText"],
+                data["args"]["runTimes"],
+                data["args"]["singleTimes"]
+            )
+
+
     def __init__(self, parent, config: dict):
         super().__init__(parent, config)
         self.ui = uiLoader.load("res/ui/set_07.ui")
@@ -676,9 +687,7 @@ class TrailblazePower(SRAWidget):
         self.battle_times7.setValue(self.config["EchoOfWar"]["runTimes"])
         self.list_widget.clear()
         for task in self.config["TrailBlazePower"]["taskList"]:
-            task = self.TaskItem(task["name"], task["args"]["level"],task["args"]["levelText"], task["args"]["runTimes"],
-                                 task["args"]["singleTimes"])
-            self.list_widget.addItem(task)
+            self.list_widget.addItem(TrailblazePower.TaskItem.fromjson(task))
 
     def getter(self):
         self.config["Replenish"]["enable"] = self.opt1.isChecked()
@@ -914,7 +923,7 @@ class Settings(SRAWidget):
         self.authorization_code: QLineEdit = self.ui.findChild(QLineEdit, "authorization_code")
         self.receiver_email: QLineEdit = self.ui.findChild(QLineEdit, "receiver_email")
         self.email_check_cutton: QPushButton = self.ui.findChild(QPushButton, "email_check_button")
-        self.startup_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifStartUp")
+        self.startup_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "checkBox_ifStartUp")
 
         auto_update_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifAutoUpdate")
         auto_update_checkbox.stateChanged.connect(self.auto_update)
@@ -1029,7 +1038,7 @@ class Settings(SRAWidget):
 
     def startup(self, state):
         if state == 2:
-            WindowsProcess.set_startup_item("SRA", const.AppPath + "/SRA.exe")
+            WindowsProcess.set_startup_item("SRA", AppPath + "/SRA.exe")
             self.globals["Settings"]["startup"] = True
         else:
             WindowsProcess.delete_startup_item("SRA")

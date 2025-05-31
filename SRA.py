@@ -39,7 +39,7 @@ from SRACore.utils.Dialog import (
     ExceptionMessageBox
 )
 from SRACore.utils.Plugins import PluginManager
-from SRACore.utils.SRAWidgets import (
+from SRACore.utils.SRAComponents import (
     SystemTray, Hotkey, Main, )
 
 # from ocr import SRAocr
