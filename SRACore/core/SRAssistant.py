@@ -38,20 +38,20 @@ from SRACore.utils.exceptions import MatchFailureException
 class Assistant(QThread):
     update_signal = Signal(str)
 
-    def __init__(self, pwd):
+    def __init__(self, pwd, config=None):
         super().__init__()
         self.replenish_time = None
         self.replenish_way = None
         self.replenish_flag = None
-        global _callback_registered
         self.stop_flag = False
         self.globals = Configure.load("data/globals.json")
-        self.config = None
+        self.config = config
         self.config_list: list = self.globals['Config']['configList']
         settings = self.globals["Settings"]
         SRAOperator.reset()
         SRAOperator.confidence = settings["confidence"]
         SRAOperator.zoom = settings["zoom"]
+        SRAOperator.performance = settings["performance"]
         self.pwd = pwd
         self.f1 = settings["F1"]
         self.f2 = settings["F2"]
@@ -106,14 +106,20 @@ class Assistant(QThread):
             logger.info("任务全部完成\n")
 
     def run(self):
-        logger.info("SRAv" + VERSION + " 创建任务喵~")
-        if self.globals["Config"]["next"]:
+        logger.info(f"SRAv{VERSION} 创建任务喵~")
+        if self.config is None:
+            if not self.globals["Config"]["next"]:
+                self.config = self.config_list[self.globals["Config"]['currentConfig']]
+
+        config_to_use = self.config if self.config != "全部" else None
+
+        if config_to_use is not None:
+            self.assist_start(config_to_use)
+        else:
             for i in range(self.globals["Config"]["max"]):
                 if self.stop_flag:
                     break
                 self.assist_start(self.config_list[i])
-        else:
-            self.assist_start(self.config_list[self.globals["Config"]['currentConfig']])
 
     @staticmethod
     def check_game():
@@ -369,7 +375,7 @@ class Assistant(QThread):
             click_point(x, y)
             time.sleep(3)
         logger.info("开始游戏")
-        if check("res/img/quit.png",interval=0.5):
+        if check("res/img/quit.png", interval=0.5):
             click_point(x, y)
 
     @staticmethod
@@ -446,7 +452,7 @@ class Assistant(QThread):
             tasks2.append(self.gift_of_odyssey)
 
         logger.info("领取奖励")
-        if not check("res/img/chat_enter.png", max_time=20):
+        if not check("res/img/chat_enter.png", max_time=30):
             logger.error("检测超时，编号2")
             return False
         if len(tasks) != 0:
@@ -478,10 +484,10 @@ class Assistant(QThread):
         """Mission trailblaze profile"""
         logger.info("执行任务：签证奖励")
         if click("res/img/more_with_something.png"):
-            if click("res/img/trailblazer_profile_finished.png"):
-                if click("res/img/assistance_reward.png"):
-                    time.sleep(2)
-                    press_key("esc", presses=2, interval=2)
+            if click("res/img/trailblazer_profile_finished.png", wait_time=1):
+                if click("res/img/assistance_reward.png", wait_time=1):
+                    time.sleep(SRAOperator.performance)
+                    press_key("esc", presses=2, interval=1.2)
                 else:
                     logger.info("没有可领取的奖励1")
                     press_key("esc")
@@ -525,10 +531,10 @@ class Assistant(QThread):
     def mail():
         """Open mailbox and pick up mails."""
         logger.info("执行任务：领取邮件")
-        if click("res/img/mailbox_mail.png"):
-            if click("res/img/claim_all_mail.png"):
+        if click("res/img/mailbox_mail.png", wait_time=SRAOperator.performance / 2):
+            if click("res/img/claim_all_mail.png", wait_time=1.5):
                 time.sleep(2)
-                press_key("esc", presses=2, interval=2)
+                press_key("esc", presses=2, interval=1.5)
             else:
                 logger.info("没有可以领取的邮件")
         else:
@@ -541,7 +547,7 @@ class Assistant(QThread):
         Remember to update the gift_of_odyssey.png in each game version.
         """
         logger.info("执行任务：巡星之礼")
-        if not check("res/img/chat_enter.png", max_time=20):
+        if not check("res/img/chat_enter.png", max_time=30):
             logger.error("检测超时，编号2")
             return
         press_key(self.f1)
@@ -608,7 +614,7 @@ class Assistant(QThread):
         self.update_signal.emit("任务完成：饰品提取")
         return True
 
-    def calyx_golden(self, level, singleTimes=1, runTimes=1,**_):
+    def calyx_golden(self, level, singleTimes=1, runTimes=1, **_):
         self.battle("拟造花萼（金）",
                     "calyx(golden)",
                     level,
@@ -616,7 +622,7 @@ class Assistant(QThread):
                     False,
                     singleTimes)
 
-    def calyx_crimson(self, level, singleTimes=1, runTimes=1,**_):
+    def calyx_crimson(self, level, singleTimes=1, runTimes=1, **_):
         self.battle("拟造花萼（赤）",
                     "calyx(crimson)",
                     level,
@@ -752,7 +758,7 @@ class Assistant(QThread):
                     logger.info("退出战斗")
                     res = check_any(["res/img/battle.png", "res/img/chat_enter.png"])
                     if res == 0:
-                        press_key("esc",wait=1)
+                        press_key("esc", wait=1)
                     elif res == 1:
                         pass
                     break
@@ -774,7 +780,7 @@ class Assistant(QThread):
             logger.info("退出战斗")
             res = check_any(["res/img/battle.png", "res/img/chat_enter.png"])
             if res == 0:
-                press_key("esc",wait=1)
+                press_key("esc", wait=1)
             elif res == 1:
                 pass
 
@@ -815,24 +821,24 @@ class Assistant(QThread):
     def daily_training_reward(self):
         """Receive daily training reward"""
         logger.info("执行任务：领取每日实训奖励")
-        if not check("res/img/chat_enter.png", max_time=20):
+        if not check("res/img/chat_enter.png"):
             logger.error("检测超时，编号2")
             return
         press_key(self.f4)
         if not check("res/img/f4.png", max_time=20):
             logger.error("检测超时，编号1")
             return
-        if exist("res/img/survival_index_onclick.png"):
+        if exist("res/img/survival_index_onclick.png",wait_time=0):
             logger.info("没有可领取的奖励")
             press_key("esc")
         else:
-            while click("res/img/daily_reward.png"):
+            while click("res/img/daily_reward.png",wait_time=SRAOperator.performance/2):
                 moveRel(0, 50)
 
-            if click("res/img/daily_train_reward.png"):
+            if click("res/img/daily_train_reward.png",wait_time=SRAOperator.performance/2):
                 time.sleep(1.5)
                 press_key("esc")
-                if exist("res/img/daily_train_reward_notreach.png",0.5):
+                if exist("res/img/daily_train_reward_notreach.png", 0.5):
                     logger.info("存在每日实训未达到要求")
                 press_key("esc")
             else:
@@ -844,7 +850,7 @@ class Assistant(QThread):
     def nameless_honor(self):
         """Receive nameless honor reward"""
         logger.info("执行任务：领取无名勋礼奖励")
-        if not check("res/img/chat_enter.png", max_time=20):
+        if not check("res/img/chat_enter.png"):
             logger.error("检测超时，编号2")
             return
         press_key(self.f2)
@@ -936,17 +942,17 @@ class Assistant(QThread):
     def find_session_name(self, name, scroll_flag=False):
         name1 = "res/img/" + name + ".png"
         name2 = "res/img/" + name + "_onclick.png"
-        if not check("res/img/chat_enter.png", max_time=20):
+        if not check("res/img/chat_enter.png"):
             logger.error("检测超时，编号2")
             return False
         press_key(self.f4)
-        if not check("res/img/f4.png", max_time=20):
+        if not check("res/img/f4.png", interval=0.2):
             logger.error("检测超时，编号1")
             press_key("esc")
             return False
 
         result = SRAOperator.existAny(["res/img/survival_index.png", "res/img/survival_index_onclick.png"],
-                                      wait_time=0.5, need_location=True)
+                                      wait_time=SRAOperator.performance / 4, need_location=True)
         if result:
             click_point(*result[1])
         else:
@@ -958,7 +964,7 @@ class Assistant(QThread):
             moveRel(0, 100)
             for i in range(10):
                 scroll(-5)
-        result = SRAOperator.existAny([name1, name2], wait_time=1, need_location=True)
+        result = SRAOperator.existAny([name1, name2], wait_time=SRAOperator.performance / 2, need_location=True)
         if result:
             click_point(*result[1])
         else:
@@ -1108,8 +1114,8 @@ def check_any(img_list: list, interval=0.5, max_time=40):
     return SRAOperator.checkAny(img_list, interval, max_time)
 
 
-def click(img_path: str, x_add=0, y_add=0, wait_time=2.0, title="崩坏：星穹铁道") -> bool:
-    return SRAOperator.click_img(img_path, x_add, y_add, wait_time, title)
+def click(*args, **kwargs) -> bool:
+    return SRAOperator.click_img(*args, **kwargs)
 
 
 def click_point(x: int = None, y: int = None) -> bool:
@@ -1120,12 +1126,12 @@ def write(content: str = "") -> bool:
     return SRAOperator.write(content)
 
 
-def press_key(key: str, presses: int = 1, interval: float = 2,wait:float=0) -> bool:
+def press_key(key: str, presses: int = 1, interval: float = 2, wait: float = 0) -> bool:
     return SRAOperator.press_key(key, presses, interval, wait)
 
 
-def exist(img_path, wait_time: float = 2.0) -> bool:
-    return SRAOperator.exist(img_path, wait_time)
+def exist(*args, **kwargs) -> bool:
+    return SRAOperator.exist(*args, **kwargs)
 
 
 def get_screen_center() -> tuple:
@@ -1170,7 +1176,7 @@ def wait_battle_end():
     while True:
         time.sleep(0.2)
         try:
-            index, _ = SRAOperator.locateAny(["res/img/quit_battle.png", "res/img/battle_failure.png"])
+            index, _ = SRAOperator.locateAny(["res/img/quit_battle.png", "res/img/battle_failure.png"],trace=False)
             logger.info("战斗结束")
             return index
         except MatchFailureException:

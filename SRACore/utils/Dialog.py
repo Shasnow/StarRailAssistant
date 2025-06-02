@@ -2,7 +2,7 @@ from PySide6.QtCore import Slot, QTimer, Qt
 from PySide6.QtGui import QIcon, QFont
 from PySide6.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QWidget, QGridLayout, \
     QSpacerItem, QSizePolicy, QFrame, QLCDNumber, QHBoxLayout, QPushButton, QListWidget, QStackedWidget, QTextBrowser, \
-    QMessageBox, QLineEdit
+    QMessageBox, QLineEdit, QTimeEdit, QComboBox
 
 from SRACore.utils import WindowsPower
 from SRACore.utils.Configure import load, save
@@ -261,3 +261,75 @@ class MessageBox(QDialog):
     def info(parent: QWidget, title: str, text: str):
         msg = MessageBox(parent, title, text)
         msg.exec()
+
+class ScheduleDialog(QDialog):
+    def __init__(self,parent,configs):
+        super().__init__(parent)
+        self.setWindowIcon(QIcon("res/SRAicon.ico"))
+        self.setWindowTitle("定时任务")
+        self.setFont(QFont("Microsoft YaHei", 13))
+        layout = QGridLayout(self)
+
+        # Time Widget
+        time_widget = QWidget()
+        time_layout = QHBoxLayout(time_widget)
+        time_layout.addWidget(QLabel("时间"))
+        self.time_edit = QTimeEdit()
+        time_layout.addWidget(self.time_edit)
+        layout.addWidget(time_widget, 3, 0, 1, 2)
+
+        # Button Box
+        accept_button = QPushButton("确定")
+        reject_button = QPushButton("取消")
+        button_box = QDialogButtonBox()
+        button_box.setOrientation(Qt.Orientation.Horizontal)
+        button_box.addButton(accept_button, QDialogButtonBox.ButtonRole.AcceptRole)
+        button_box.addButton(reject_button, QDialogButtonBox.ButtonRole.RejectRole)
+        layout.addWidget(button_box, 6, 0, 1, 2)
+
+        # Frequency Widget
+        freq_widget = QWidget()
+        freq_layout = QHBoxLayout(freq_widget)
+        freq_layout.addWidget(QLabel("频率"))
+        self.freq_combo = QComboBox()
+        self.freq_combo.addItems(["每天", "每周"])
+        self.freq_combo.currentTextChanged.connect(lambda text: self.week_widget.setVisible(text == "每周"))
+        freq_layout.addWidget(self.freq_combo)
+        layout.addWidget(freq_widget, 0, 0, 1, 2)
+
+        # Week Widget
+        self.week_widget = QWidget()
+        week_layout = QHBoxLayout(self.week_widget)
+        week_layout.addWidget(QLabel("星期"))
+        self.week_combo = QComboBox()
+        self.week_combo.addItems(["一", "二", "三", "四", "五", "六", "日", ""])
+        week_layout.addWidget(self.week_combo)
+        self.week_widget.setVisible(False)
+        layout.addWidget(self.week_widget, 2, 0, 1, 2)
+
+        # Configuration Widget
+        config_widget = QWidget()
+        config_layout = QHBoxLayout(config_widget)
+        config_layout.addWidget(QLabel("配置"))
+        self.config_combo = QComboBox()
+        self.config_combo.addItem("全部")
+        self.config_combo.addItems(configs)
+        config_layout.addWidget(self.config_combo)
+        layout.addWidget(config_widget, 5, 0, 1, 2)
+
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+
+    @staticmethod
+    def getSchedule(parent, configs):
+        dialog = ScheduleDialog(parent,configs)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            freq = dialog.freq_combo.currentText()
+            week = dialog.week_combo.currentText()
+            time = dialog.time_edit.time().toString("HH:mm")
+            config = dialog.config_combo.currentText()
+            if freq == "每天":
+                return freq, time, config
+            else:
+                return freq, week, time, config
+        return None
