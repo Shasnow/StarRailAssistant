@@ -41,6 +41,7 @@ class SRAOperator:
     area_left = 0
     zoom = 1.5
     confidence = 0.9
+    performance = 2  # 性能参数
     ocr_engine: RapidOCR = None
 
     @classmethod
@@ -198,12 +199,13 @@ class SRAOperator:
             raise
 
     @classmethod
-    def locateAny(cls, img_list: list):
+    def locateAny(cls, img_list: list,trace:bool=True):
         """
         在截图中依次定位图像列表中的图像，返回第一个匹配成功的图像的索引和位置。
 
         Args:
             img_list (list): 包含要定位的图像文件路径的列表。
+            trace: 是否记录调试信息，默认为 True。
 
         Returns:
             tuple: 第一个匹配成功的图像的索引和位置，格式为 (index, location)。
@@ -220,9 +222,11 @@ class SRAOperator:
                 # location = pyautogui.locateOnWindow(img, title, confidence=cls.confidence)
                 location = pyscreeze.locate(img, screenshot, confidence=cls.confidence)
                 return index, location
-            except pyscreeze.ImageNotFoundException:
+            except pyscreeze.ImageNotFoundException as e:
+                logger.trace(f"{img_path}: {e}") if trace else None
                 continue
-            except ValueError:
+            except ValueError as e:
+                logger.trace(f"{img_path}: ValueError-{e}") if trace else None
                 continue
             except FileNotFoundError:
                 continue
@@ -289,7 +293,7 @@ class SRAOperator:
         return x, y
 
     @classmethod
-    def exist(cls, img_path: str | PathLike, wait_time=2) -> bool:
+    def exist(cls, img_path: str | PathLike, wait_time=performance) -> bool:
         """
         检查指定路径的图像是否存在于截图中。
 
@@ -307,15 +311,15 @@ class SRAOperator:
         try:
             cls.locate(img_path)
             return True
-        except MatchFailureException:
-            logger.debug(f"图像不存在 {img_path} ")
+        except MatchFailureException as e:
+            logger.debug(f"图像不存在 {img_path} {e}")
             return False
         except Exception as e:
             logger.debug(e)
             return False
 
     @classmethod
-    def existAny(cls, img_list: list, wait_time: float = 2, need_location=False) -> int | None | tuple:
+    def existAny(cls, img_list: list, wait_time: float = performance, need_location: bool = False) -> int | None | tuple:
         """
         检查图像列表中是否有任何图像存在于截图中。
 
@@ -366,7 +370,7 @@ class SRAOperator:
         times = 0
         while True:
             time.sleep(interval)
-            if cls.exist(img_path, wait_time=1):
+            if cls.exist(img_path, wait_time=0.3):
                 logger.debug("检测成功")
                 return True
             else:
@@ -391,7 +395,7 @@ class SRAOperator:
         times = 0
         while True:
             time.sleep(interval)
-            result:int|None = cls.existAny(img_list, wait_time=1)
+            result: int | None = cls.existAny(img_list, wait_time=1)
             if result is not None:
                 logger.debug(f"检测成功, 索引 {result}")
                 return result
@@ -424,7 +428,7 @@ class SRAOperator:
             img_path: str | PathLike,
             x_add=0,
             y_add=0,
-            wait_time=2.0,
+            wait_time=performance,
             title="崩坏：星穹铁道"):
         """在屏幕上点击对应的图像
 
@@ -472,7 +476,7 @@ class SRAOperator:
             return False
 
     @classmethod
-    def press_key(cls, key: str, presses: int = 1, interval: float = 2,wait:float=0) -> bool:
+    def press_key(cls, key: str, presses: int = 1, interval: float = 2, wait: float = 0) -> bool:
         """按下按键
         
         Args:

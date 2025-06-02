@@ -1,9 +1,9 @@
 {
     "version": "0.8.2",
     "resource_version": "0.8.2.0",
-    "announcement": "更新内容：\n1. 清体力的列表内现在显示关卡名称而不是编号。\n2. 新增历战余响-晨昏的回眸。\n问题修复：\n1. \n",
+    "announcement": "更新内容：\n1. 清体力的列表内现在显示关卡名称而不是编号。\n2. 新增历战余响-晨昏的回眸。\n3. 命令行模式--在你最喜欢的终端中使用 'SRA --cli' 来启动SRA的命令行模式！有助于减少内存占用。此模式暂不支持配置操作。\n4. 命令行调用--在你最喜欢的终端中使用 'SRA --run [config1] [...]' 即可以立即按给出的配置执行任务且不会启动UI界面。如果不指定配置，则使用Default配置。这等价于使用 'SRA --no-gui' 随后输入 'run'。\n5. 定时执行--可以指定在每天的几点、每周的第几天、执行哪一个配置。使用此功能需要保持开机和保持SRA运行，修改后需重启生效。\n6. 新的设置项--性能参数。此参数将影响部分操作的等待和间隔时间，以秒为单位。如果你的电脑加载游戏足够快，可用减少此值来减少等待时间。如果你的电脑经常检测超时，考虑增加此值来等待游戏充分加载。任何时候都不建议这个值为0.\n",
     "resource_announcement": "",
-    "Announcement": "<p>SRA官网上线<a href='https://shasnow.github.io/SRA'>点击前往</a></p><p>SRA接入了Mirror酱--在设置中填入Mirror酱cdk后，可以使用Mirror酱的高速下载服务。<a href='https://mirrorchyan.com/zh/get-start'>没有CDK？立即订阅</a></p>",
+    "Announcement": "<p>SRA官网上线<a href='https://starrailassistant.top/SRA/'>点击前往</a></p><p>SRA接入了Mirror酱--在设置中填入Mirror酱cdk后，可以使用Mirror酱的高速下载服务。<a href='https://mirrorchyan.com/zh/get-start'>没有CDK？立即订阅</a></p>",
     "Announcement.DoNotShowAgain": false,
     "Proxys": [
         "https://github.tbedu.top/",

@@ -2,6 +2,7 @@ import os
 import shutil
 
 import keyboard
+import schedule
 import time
 from PySide6.QtCore import Slot, QThread, Signal
 from PySide6.QtGui import QFont, QIcon, QAction
@@ -13,10 +14,12 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMenu, QWidget, QChe
 
 import SRACore.utils.Logger
 from SRACore.core import AutoPlot, SRAssistant
-from SRACore.utils.const import *
 from SRACore.utils import Encryption, Configure, WindowsProcess, Notification, WindowsPower
-from SRACore.utils.Dialog import MessageBox, InputDialog, ShutdownDialog, AnnouncementBoard, Announcement
+from SRACore.utils.Dialog import MessageBox, InputDialog, ShutdownDialog, AnnouncementBoard, Announcement, \
+    ScheduleDialog
+from SRACore.utils.Logger import logger
 from SRACore.utils.Plugins import PluginManager
+from SRACore.utils.const import *
 
 uiLoader = QUiLoader()
 
@@ -61,6 +64,63 @@ def convert_to_html(text):
         return "<p>没有可转换的内容</p>"
 
 
+class SRA(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.main = Main(self)
+        self.setCentralWidget(self.main.ui)
+        self.setWindowIcon(QIcon(self.main.AppPath + "/res/SRAicon.ico"))
+        self.setWindowTitle(f"SRA v{VERSION} | {PluginManager.getPluginsCount()}个插件已加载")
+        size = list(map(int, self.main.globals["Settings"]["uiSize"].split("x")))
+        location = list(map(int, self.main.globals["Settings"]["uiLocation"].split("x")))
+        self.setGeometry(
+            location[0], location[1], size[0], size[1]
+        )  # 设置窗口大小与位置
+        self.system_tray = SystemTray(self)
+        self.system_tray.show()
+        self.keyboard_listener()
+
+    def keyboard_listener(self):
+        self.hotkey = BackgroundEvent(**self.main.globals["Settings"])
+        self.hotkey.start()
+        self.hotkey.startOrStop.connect(self.start_status_switch)
+        self.hotkey.showOrHide.connect(self.show_or_hide)
+        self.hotkey.isTimeToRun.connect(self.schedule_run)
+        QApplication.instance().aboutToQuit.connect(self.hotkey.stop)
+
+    @Slot(str)
+    def schedule_run(self, config):
+        logger.info("定时任务触发")
+        if not self.main.isRunning:
+            self.main.execute_with_config(config)
+
+    @Slot()
+    def start_status_switch(self):
+        if self.main.isRunning:
+            self.main.kill()
+        else:
+            self.main.execute()
+
+    @Slot()
+    def show_or_hide(self):
+        self.system_tray.activated.emit(self.system_tray.ActivationReason.Trigger)
+
+    def closeEvent(self, event):
+        """Save the window info"""
+        # 保存窗口大小与位置
+        self.main.globals["Settings"][
+            "uiSize"
+        ] = f"{self.geometry().width()}x{self.geometry().height()}"
+        self.main.globals["Settings"][
+            "uiLocation"
+        ] = f"{self.geometry().x()}x{self.geometry().y()}"
+        Configure.save(self.main.globals, "data/globals.json")
+        # 结束残余进程
+        event.accept()
+        if self.main.globals["Settings"]["exitWhenClose"]:
+            QApplication.quit()
+
+
 class SRAWidget(QWidget):
     def __init__(self, parent, config: dict):
         super().__init__(parent)
@@ -83,6 +143,7 @@ class SRAWidget(QWidget):
 class Main(QWidget):
     def __init__(self, main_window: QMainWindow):
         super().__init__()
+        self.son_thread = None
         self.main_window = main_window
         self.AppPath = AppPath
         # self.ocr_window=None
@@ -297,6 +358,15 @@ class Main(QWidget):
             self.log.append("配置失败")
             return
         self.son_thread = SRAssistant.Assistant(self.password_text)
+        self.son_thread.update_signal.connect(self.update_log)
+        self.son_thread.finished.connect(self.missions_finished)
+        self.son_thread.start()
+        self.button0_2.setEnabled(True)
+        self.button0_1.setEnabled(False)
+        self.isRunning = True
+
+    def execute_with_config(self, config: str):
+        self.son_thread = SRAssistant.Assistant(self.password_text, config)
         self.son_thread.update_signal.connect(self.update_log)
         self.son_thread.finished.connect(self.missions_finished)
         self.son_thread.start()
@@ -591,7 +661,7 @@ class TrailblazePower(SRAWidget):
                 }}
 
         @staticmethod
-        def fromjson(data:dict):
+        def fromjson(data: dict):
             return TrailblazePower.TaskItem(
                 data["name"],
                 data["args"]["level"],
@@ -599,7 +669,6 @@ class TrailblazePower(SRAWidget):
                 data["args"]["runTimes"],
                 data["args"]["singleTimes"]
             )
-
 
     def __init__(self, parent, config: dict):
         super().__init__(parent, config)
@@ -888,6 +957,11 @@ class MultiAccount(SRAWidget):
     def currentConfig(self):
         return self.current_config_combobox.currentText(), self.current_config_combobox.currentIndex()
 
+    @staticmethod
+    def getConfigs():
+        """获取所有配置方案"""
+        return Configure.load("data/globals.json")["Config"]["configList"]
+
 
 class Plugin(QWidget):
     def __init__(self, parent):
@@ -908,6 +982,8 @@ class Settings(SRAWidget):
         self.ui = uiLoader.load("res/ui/settings_page.ui")
         self.main_ui = self.ui.findChild(QScrollArea, "scrollArea")
         self.globals = self.config
+        self.schedule_list: QListWidget = self.ui.findChild(QListWidget, "schedule_list")
+        self.schedule_add_button: QPushButton = self.ui.findChild(QPushButton, "schedule_add_button")
         self.key_table = self.ui.findChild(QTableWidget, "tableWidget")
         self.save_button = self.ui.findChild(QPushButton, "pushButton_save")
         self.reset_button = self.ui.findChild(QPushButton, "pushButton_reset")
@@ -923,7 +999,7 @@ class Settings(SRAWidget):
         self.authorization_code: QLineEdit = self.ui.findChild(QLineEdit, "authorization_code")
         self.receiver_email: QLineEdit = self.ui.findChild(QLineEdit, "receiver_email")
         self.email_check_cutton: QPushButton = self.ui.findChild(QPushButton, "email_check_button")
-        self.startup_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "checkBox_ifStartUp")
+        self.startup_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "checkBox_ifStartUp")
 
         auto_update_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifAutoUpdate")
         auto_update_checkbox.stateChanged.connect(self.auto_update)
@@ -932,6 +1008,7 @@ class Settings(SRAWidget):
         self.thread_safety_checkbox = self.ui.findChild(QCheckBox, "checkBox_threadSafety")
         self.confidence_spin_box: QDoubleSpinBox = self.ui.findChild(QDoubleSpinBox, "confidenceSpinBox")
         self.zoom_spinbox: QDoubleSpinBox = self.ui.findChild(QDoubleSpinBox, "zoomSpinBox")
+        self.performance_spinbox: QDoubleSpinBox = self.ui.findChild(QDoubleSpinBox, "performanceSpinBox")
         self.mirrorchyanCDK: QLineEdit = self.ui.findChild(
             QLineEdit, "lineEdit_mirrorchyanCDK"
         )
@@ -945,6 +1022,8 @@ class Settings(SRAWidget):
 
     def setter(self):
         settings = self.globals["Settings"]
+        for sc in settings["scheduleList"]:
+            self.schedule_list.addItem("".join(sc))
         for i in range(4):
             self.key_table.item(0, i).setText(settings["F" + str(i + 1)])
         self.hotkey_lineedit1.setText(self.globals["Settings"]["hotkeys"][0])
@@ -965,12 +1044,15 @@ class Settings(SRAWidget):
         self.thread_safety_checkbox.setChecked(self.globals["Settings"]["threadSafety"])
         self.confidence_spin_box.setValue(self.globals["Settings"]["confidence"])
         self.zoom_spinbox.setValue(self.globals["Settings"]["zoom"])
+        self.performance_spinbox.setValue(self.globals["Settings"]["performance"])
         self.mirrorchyanCDK.setText(
             Encryption.win_decryptor(self.globals["Settings"]["mirrorchyanCDK"])
         )
         self.exit_when_close_checkbox.setChecked(self.globals["Settings"]["exitWhenClose"])
 
     def connector(self):
+        self.schedule_list.itemDoubleClicked.connect(self.remove_schedule)
+        self.schedule_add_button.clicked.connect(self.add_schedule)
         self.key_table.cellChanged.connect(self.key_setting_change)
         self.save_button.clicked.connect(self.key_setting_save)
         self.reset_button.clicked.connect(self.key_setting_reset)
@@ -984,9 +1066,22 @@ class Settings(SRAWidget):
         self.thread_safety_checkbox.stateChanged.connect(self.thread_safety)
         self.confidence_spin_box.valueChanged.connect(self.confidence_changed)
         self.zoom_spinbox.valueChanged.connect(self.zoom_changed)
+        self.performance_spinbox.valueChanged.connect(self.performance_changed)
         self.mirrorchyanCDK.textChanged.connect(self.mirrorchyanCDK_changed)
         self.integrity_check_button.clicked.connect(self.integrity_check)
         self.exit_when_close_checkbox.stateChanged.connect(self.exit_when_close)
+
+    def add_schedule(self):
+        sc = ScheduleDialog.getSchedule(self, MultiAccount.getConfigs())
+        if sc is not None:
+            self.globals["Settings"]["scheduleList"].append(sc)
+            self.schedule_list.addItem("".join(sc))
+
+    @Slot(QListWidgetItem)
+    def remove_schedule(self, item):
+        index = self.schedule_list.row(item)
+        self.schedule_list.takeItem(index)
+        del self.globals["Settings"]["scheduleList"][index]
 
     def key_setting_save(self):
         Configure.save(self.globals, 'data/globals.json')
@@ -1045,6 +1140,7 @@ class Settings(SRAWidget):
             self.globals["Settings"]["startup"] = False
         Configure.save(self.globals, "data/globals.json")
 
+    @Slot(int)
     def auto_update(self, state):
         if state == 2:
             if os.path.exists("SRAUpdater.exe"):
@@ -1057,6 +1153,7 @@ class Settings(SRAWidget):
             self.globals["Settings"]["autoUpdate"] = False
         Configure.save(self.globals, "data/globals.json")
 
+    @Slot(int)
     def thread_safety(self, state):
         if state == 2:
             self.globals["Settings"]["threadSafety"] = True
@@ -1064,14 +1161,22 @@ class Settings(SRAWidget):
             self.globals["Settings"]["threadSafety"] = False
         Configure.save(self.globals, "data/globals.json")
 
+    @Slot(float)
     def confidence_changed(self, value):
         self.globals["Settings"]["confidence"] = value
         Configure.save(self.globals, "data/globals.json")
 
+    @Slot(float)
     def zoom_changed(self, value):
         self.globals["Settings"]["zoom"] = value
         Configure.save(self.globals, "data/globals.json")
 
+    @Slot(float)
+    def performance_changed(self, value):
+        self.globals["Settings"]["performance"] = value
+        Configure.save(self.globals, "data/globals.json")
+
+    @Slot(str)
     def mirrorchyanCDK_changed(self, value):
         self.globals["Settings"]["mirrorchyanCDK"] = Encryption.win_encryptor(value)
         Configure.save(self.globals, "data/globals.json")
@@ -1087,7 +1192,7 @@ class Settings(SRAWidget):
 
 
 class SystemTray(QSystemTrayIcon):
-    def __init__(self, parent: QWidget):
+    def __init__(self, parent: SRA):
         super().__init__(QIcon("res/SRAico.png"), parent)
         self.parent_object = parent
         self.setToolTip("SRA")
@@ -1112,15 +1217,36 @@ class SystemTray(QSystemTrayIcon):
                 self.parent_object.show()
 
 
-class Hotkey(QThread):
+class BackgroundEvent(QThread):
     startOrStop = Signal()
     showOrHide = Signal()
+    isTimeToRun = Signal(str)
 
-    def __init__(self, hotkey_config: list[str]):
+    def __init__(self, hotkeys: list[str], scheduleList: list[str], **_):
         super().__init__()
         self.running_flag = True
-        keyboard.add_hotkey(hotkey_config[0], self.startOrStopCallback)
-        keyboard.add_hotkey(hotkey_config[1], self.showOrHideCallback)
+        self.has_scheduled = False
+        keyboard.add_hotkey(hotkeys[0], self.startOrStopCallback)
+        keyboard.add_hotkey(hotkeys[1], self.showOrHideCallback)
+        if len(scheduleList) == 0:
+            return
+        self.has_scheduled = True
+        for sc in scheduleList:
+            logger.debug(f'正在添加定时任务：{"".join(sc)}')
+            if sc[0] == "每天":
+                schedule.every().day.at(sc[1]).do(self.isTimeToRun.emit, sc[2])
+            elif sc[0] == "每周":
+                str_to_weekday = {
+                    "一": schedule.every().monday,
+                    "二": schedule.every().tuesday,
+                    "三": schedule.every().wednesday,
+                    "四": schedule.every().thursday,
+                    "五": schedule.every().friday,
+                    "六": schedule.every().saturday,
+                    "日": schedule.every().sunday
+                }
+                day_in_week = str_to_weekday[sc[1]]
+                day_in_week.at(sc[2]).do(self.isTimeToRun.emit, sc[3])
 
     def stop(self):
         self.running_flag = False
@@ -1130,6 +1256,8 @@ class Hotkey(QThread):
 
     def run(self):
         while self.running_flag:
+            if self.has_scheduled:
+                schedule.run_pending()
             time.sleep(0.02)
 
     def startOrStopCallback(self):
