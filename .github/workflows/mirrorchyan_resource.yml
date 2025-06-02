@@ -1,11 +1,6 @@
 name: mirrorchyan_resource
 
 on:
-  push:
-    branches:
-      - "main"
-    paths:
-      - "res/**"
   workflow_dispatch:
 
 jobs:
