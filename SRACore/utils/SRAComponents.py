@@ -19,6 +19,7 @@ from SRACore.utils.Dialog import MessageBox, InputDialog, ShutdownDialog, Announ
     ScheduleDialog
 from SRACore.utils.Logger import logger
 from SRACore.utils.Plugins import PluginManager
+from SRACore.utils.SRAWidgets import ToggleSwitch
 from SRACore.utils.const import *
 
 uiLoader = QUiLoader()
@@ -252,9 +253,11 @@ class Main(QWidget):
         self.config["Mission"]["simulatedUniverse"] = self.simulatedUniverse_checkbox.isChecked()
 
     def extension(self):
-        auto_plot_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "autoplot_checkBox")
-        auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
-        self.autoplot.interrupted.connect(lambda :auto_plot_checkbox.setChecked(False))
+        auto_plot_frame: QFrame = self.ui.findChild(QFrame, "frame_autoplot")
+        auto_plot_switch= ToggleSwitch(self.ui)
+        auto_plot_frame.layout().addWidget(auto_plot_switch)
+        auto_plot_switch.stateChanged.connect(self.auto_plot_status)
+        self.autoplot.interrupted.connect(lambda :auto_plot_switch.setOn(False))
         # relics_identification_button:QPushButton=self.ui.findChild(QPushButton,"relicsIdentification")
         # relics_identification_button.clicked.connect(self.relics_identification)
 
@@ -269,7 +272,7 @@ class Main(QWidget):
         plugin_groupbox.layout().addWidget(plugins_widget)
 
     def auto_plot_status(self, state):
-        if state == 2:
+        if state:
             self.autoplot.run_application()
         else:
             self.autoplot.quit_application()
