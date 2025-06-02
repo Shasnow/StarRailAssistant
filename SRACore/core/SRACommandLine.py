@@ -11,21 +11,48 @@ console = Console()
 print = console.print
 
 
-class CommandLine(cmd.Cmd):
-    intro = f"SRAv{CORE}\n欢迎使用 SRA 命令行模式！输入 help 或 ? 查看帮助信息。"
+class CommandLine:
+    intro = f"SRAv{CORE}\n欢迎使用 SRA 命令行模式！输入 help 查看帮助信息。"
     prompt = "SRA> "
 
-    def do_exit(self, _):
+    def cmdloop(self, intro=None):
+        """启动命令行循环"""
+        if intro:
+            print(intro)
+        while True:
+            try:
+                line = input(self.prompt)
+                if not line.strip():
+                    continue
+                self.handle(line)
+            except EOFError:
+                print("\n[red]已退出 SRA 命令行模式。[/red]")
+                break
+            except KeyboardInterrupt:
+                print("\n[red]已中断命令行输入。[/red]")
+
+    def handle(self, line):
+        """处理输入的命令行"""
+        command = line.split()
+        function = command[0]
+        args = command[1:]
+        method = getattr(self, f"do_{function}")
+        if method:
+            method(*args)
+        else:
+            self.default(line)
+
+    def do_exit(self):
         """退出命令行模式"""
         print("正在退出 SRA 命令行模式...", style="yellow")
-        return True
+        raise EOFError
 
     def default(self, line):
         """处理未识别的命令"""
         print(f"[red]未知命令: {line}[/red]")
         print("输入 help 或 ? 查看帮助信息。")
 
-    def do_help(self, arg):
+    def do_help(self, arg=None):
         """显示帮助信息"""
         if arg:
             # 如果指定了具体命令，显示该命令的帮助信息
@@ -46,7 +73,7 @@ class CommandLine(cmd.Cmd):
         if arg:
             print(arg, style="cyan")
 
-    def do_cls(self, _):
+    def do_cls(self):
         """清屏"""
         os.system("cls" if os.name == "nt" else "clear")
 
@@ -67,7 +94,7 @@ class CommandLine(cmd.Cmd):
         else:
             print("未找到配置文件或配置为空。")
 
-    def do_globals(self, _):
+    def do_globals(self):
         """显示全局配置"""
         from SRACore.utils.Configure import load
         try:
@@ -82,14 +109,14 @@ class CommandLine(cmd.Cmd):
         else:
             print("[red]全局配置为空。")
 
-    def do_run(self, args:str=None):
+    def do_run(self, args:str=''):
         """运行指定配置的任务"""
         global i
         args=args.split()
         if len(args) == 0:
             args.append("Default")
         try:
-            logger.warning(f"即将开始执行任务, 当前配置: {args} , 终端将被任务占用！")
+            logger.warning(f"即将开始执行任务, 配置列表: {args} , 终端将被任务占用！")
             from .SRAssistant import Assistant
             assistant = Assistant("")
             for i in args:
@@ -99,7 +126,7 @@ class CommandLine(cmd.Cmd):
         except KeyboardInterrupt:
             print("[red]已中断运行。[/red]")
 
-    def do_version(self, _):
+    def do_version(self):
         """显示当前 SRA 版本"""
         from SRACore.utils.Configure import load
         version = load("version.json")
