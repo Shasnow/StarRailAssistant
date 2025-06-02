@@ -1,5 +1,4 @@
 import cmd
-import os
 
 from rich.console import Console
 
@@ -45,10 +44,6 @@ class CommandLine(cmd.Cmd):
         """回显输入的内容"""
         if arg:
             print(arg, style="cyan")
-
-    def do_cls(self, _):
-        """清屏"""
-        os.system("cls" if os.name == "nt" else "clear")
 
     def do_config(self, arg):
         """显示指定配置"""
