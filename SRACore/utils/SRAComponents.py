@@ -252,8 +252,9 @@ class Main(QWidget):
         self.config["Mission"]["simulatedUniverse"] = self.simulatedUniverse_checkbox.isChecked()
 
     def extension(self):
-        auto_plot_checkbox = self.ui.findChild(QCheckBox, "autoplot_checkBox")
+        auto_plot_checkbox:QCheckBox = self.ui.findChild(QCheckBox, "autoplot_checkBox")
         auto_plot_checkbox.stateChanged.connect(self.auto_plot_status)
+        self.autoplot.interrupted.connect(lambda :auto_plot_checkbox.setChecked(False))
         # relics_identification_button:QPushButton=self.ui.findChild(QPushButton,"relicsIdentification")
         # relics_identification_button.clicked.connect(self.relics_identification)
 

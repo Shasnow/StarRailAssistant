@@ -30,7 +30,7 @@ import cv2
 import pyautogui
 import pygetwindow
 import pyscreeze
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal, QObject
 from PySide6.QtWidgets import QApplication
 
 from SRACore.utils.Logger import logger
@@ -65,6 +65,7 @@ def exist(img_path, wait_time=2):
 class PlotListener(QThread):
     plot_start = Signal()
     plot_end = Signal()
+    interrupted = Signal()
     wait_time=1
 
     def __init__(self):
@@ -91,8 +92,9 @@ class PlotListener(QThread):
                 logger.error("窗口未激活")
                 self.stop()
             except pyscreeze.PyScreezeException:
-                logger.exception("未能找到窗口", is_fatal=True)
+                logger.error("未能找到窗口")
                 self.stop()
+                self.interrupted.emit()
         logger.info("自动剧情已关闭")
 
 
@@ -122,17 +124,20 @@ class AutoPlot(QThread):
                 logger.error("窗口未激活")
                 self.event_stop()
             except pyscreeze.PyScreezeException:
-                logger.exception("未能找到窗口", is_fatal=True)
+                logger.error("未能找到窗口")
                 self.event_stop()
 
 
-class Main:
+class Main(QObject):
+    interrupted = Signal()
     def __init__(self):
+        super().__init__()
         try:
             self.listener_thread = PlotListener()
             self.play_thread = AutoPlot()
             self.listener_thread.plot_start.connect(self.play_thread_start)
             self.listener_thread.plot_end.connect(self.play_thread_stop)
+            self.listener_thread.interrupted.connect(lambda : self.interrupted.emit())
         except Exception as e:
             logger.exception(e)
 

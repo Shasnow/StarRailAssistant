@@ -57,39 +57,45 @@ def exception_hook(exc_type: type, value):
 
 
 def main():
-    if is_admin():
-        if len(sys.argv) > 1:
-            from SRACore.core.SRACommandLine import CommandLine
-            if sys.argv[1] == "--cli":
-                CommandLine().cmdloop()
-            elif sys.argv[1] == "--run":
-                CommandLine().do_run(" ".join(sys.argv[2:]))
-            else:
-                CommandLine().default(sys.argv[1])
+    if not is_admin():
+        if len(sys.argv)>1:
+            print("必须以管理员身份运行终端，才能使用SRA命令行。")
+            sys.exit()
         else:
-            from SRACore.utils.SRAComponents import SRA
-            app = QApplication(sys.argv)
-            app.setQuitOnLastWindowClosed(False)
-            start_time = time.time()
-            window = SRA()
-            window.show()
-            end_time = time.time()
-            total_time = end_time - start_time
-            window.main.update_log(
-                time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) +
-                " 程序启动成功，耗时" + f"{total_time:.2f}s")
-            version = Configure.load("version.json")
-            if not version["Announcement.DoNotShowAgain"]:
-                window.main.notice()
-            sys.exit(app.exec())
+            print("即将以管理员权限重新运行，请允许 UAC 提示。")
+            # 重新以管理员权限运行脚本
+            ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", sys.executable, " ".join(sys.argv), None, 1
+            )
+            # 退出当前进程
+            sys.exit()
 
+    if len(sys.argv) > 1:
+        from SRACore.core.SRACommandLine import CommandLine
+        if sys.argv[1] == "--cli":
+            CommandLine().cmdloop()
+        elif sys.argv[1] == "--run":
+            CommandLine().do_run(" ".join(sys.argv[2:]))
+        else:
+            CommandLine().default(sys.argv[1])
     else:
-        # 重新以管理员权限运行脚本
-        ctypes.windll.shell32.ShellExecuteW(
-            None, "runas", sys.executable, " ".join(sys.argv), None, 1
-        )
-        # 退出当前进程
-        sys.exit()
+        from SRACore.utils.SRAComponents import SRA
+        app = QApplication(sys.argv)
+        app.setQuitOnLastWindowClosed(False)
+        start_time = time.time()
+        window = SRA()
+        window.show()
+        end_time = time.time()
+        total_time = end_time - start_time
+        window.main.update_log(
+            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) +
+            " 程序启动成功，耗时" + f"{total_time:.2f}s")
+        version = Configure.load("version.json")
+        if not version["Announcement.DoNotShowAgain"]:
+            window.main.notice()
+        sys.exit(app.exec())
+
+
 
 
 if __name__ == "__main__":
