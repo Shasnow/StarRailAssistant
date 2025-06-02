@@ -146,7 +146,7 @@ global_config_list2 = {
         ["startup", False],
         ["autoUpdate", True],
         ["threadSafety", False],
-        ["exitWhenClose", False],
+        ["exitWhenClose", True],
         ["confidence", 0.9],
         ["zoom", 1.5],
         ["performance", 2.0],
