@@ -1148,8 +1148,7 @@ class Settings(SRAWidget):
     def auto_update(self, state):
         if state == 2:
             if os.path.exists("SRAUpdater.exe"):
-                shutil.copy("SRAUpdater.exe", "SRAUpdater.active.exe")
-                WindowsProcess.Popen("SRAUpdater.active.exe")
+                WindowsProcess.Popen("SRAUpdater.exe")
             else:
                 self.update_log("缺少文件SRAUpdater.exe 无法自动更新")
             self.globals["Settings"]["autoUpdate"] = True
