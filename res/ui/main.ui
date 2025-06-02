@@ -23,7 +23,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -378,16 +378,6 @@
                <string>拓展功能</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_8">
-               <item row="0" column="0">
-                <widget class="QCheckBox" name="autoplot_checkBox">
-                 <property name="acceptDrops">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>自动对话</string>
-                 </property>
-                </widget>
-               </item>
                <item row="1" column="0">
                 <widget class="QPushButton" name="relicsIdentification">
                  <property name="enabled">
@@ -396,6 +386,31 @@
                  <property name="text">
                   <string>遗器识别</string>
                  </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QFrame" name="frame_autoplot">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_2">
+                  <item>
+                   <widget class="QLabel" name="label">
+                    <property name="text">
+                     <string>自动对话</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
               </layout>
