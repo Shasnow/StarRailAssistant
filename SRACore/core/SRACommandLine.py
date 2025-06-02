@@ -1,4 +1,3 @@
-import cmd
 import os
 
 from rich.console import Console
@@ -26,10 +25,11 @@ class CommandLine:
                     continue
                 self.handle(line)
             except EOFError:
-                print("\n[red]已退出 SRA 命令行模式。[/red]")
+                print("已退出 SRA 命令行模式。")
                 break
             except KeyboardInterrupt:
-                print("\n[red]已中断命令行输入。[/red]")
+                print("已退出 SRA 命令行模式。")
+                break
 
     def handle(self, line):
         """处理输入的命令行"""
@@ -42,7 +42,7 @@ class CommandLine:
         else:
             self.default(line)
 
-    def do_exit(self):
+    def do_exit(self, *_):
         """退出命令行模式"""
         print("正在退出 SRA 命令行模式...", style="yellow")
         raise EOFError
@@ -73,7 +73,7 @@ class CommandLine:
         if arg:
             print(arg, style="cyan")
 
-    def do_cls(self):
+    def do_cls(self, *_):
         """清屏"""
         os.system("cls" if os.name == "nt" else "clear")
 
@@ -94,7 +94,7 @@ class CommandLine:
         else:
             print("未找到配置文件或配置为空。")
 
-    def do_globals(self):
+    def do_globals(self, *_):
         """显示全局配置"""
         from SRACore.utils.Configure import load
         try:
@@ -109,10 +109,10 @@ class CommandLine:
         else:
             print("[red]全局配置为空。")
 
-    def do_run(self, args:str=''):
+    def do_run(self, args: str = ''):
         """运行指定配置的任务"""
         global i
-        args=args.split()
+        args = args.split()
         if len(args) == 0:
             args.append("Default")
         try:
@@ -126,7 +126,7 @@ class CommandLine:
         except KeyboardInterrupt:
             print("[red]已中断运行。[/red]")
 
-    def do_version(self):
+    def do_version(self, *_):
         """显示当前 SRA 版本"""
         from SRACore.utils.Configure import load
         version = load("version.json")
