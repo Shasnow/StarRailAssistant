@@ -149,6 +149,7 @@ global_config_list2 = {
         ["exitWhenClose", False],
         ["confidence", 0.9],
         ["zoom", 1.5],
+        ["performance", 2.0],
         ["mirrorchyanCDK", ""],
         ["uiSize", "1200x800"],
         ["uiLocation", "100x100"],
