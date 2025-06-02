@@ -10,7 +10,7 @@
 </p>
 <p align="center"><a href="https://shasnow.github.io/SRA"><b>主页</b></a></p>
 
-#### [帮助文档](https://docs.qq.com/doc/DWUFOUmJDc2xLRk1B) | [FAQ](https://github.com/Shasnow/StarRailAssistant/wiki/FAQ) | [下载和安装](https://shasnow.github.io/SRA/download.html) | [使用方法](https://shasnow.github.io/SRA/quickstart.html)
+#### [帮助文档](https://docs.qq.com/doc/DWUFOUmJDc2xLRk1B) | [FAQ](https://starrailassistant.top/SRA/faq.html) | [下载和安装](https://shasnow.github.io/SRA/download.html) | [使用方法](https://shasnow.github.io/SRA/quickstart.html)
 # StarRailAssistant(SRA)
 
 崩坏星穹铁道自动化助手  
