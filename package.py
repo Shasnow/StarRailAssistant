@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     os.system(
         "powershell -Command python -m nuitka --standalone --mingw64"
-        " --enable-plugins=pyside6 --windows-console-mode=hide --windows-uac-admin"
+        " --enable-plugins=pyside6 --windows-console-mode=hide"
         " --windows-icon-from-ico=res\\SRAicon.ico"
         " --company-name='StarRailAssistant Team' --product-name=StarRailAssistant"
         f" --file-version={version['version']}"
