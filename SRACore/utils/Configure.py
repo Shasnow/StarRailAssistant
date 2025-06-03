@@ -134,20 +134,22 @@ global_config_list2 = {
         ["currentConfig", 0],
         ["configList", ["Default"]],
         ["next", False],
-        ["max",3]
+        ["max", 3]
     ],
     "Settings": [
+        ["scheduleList", []],
         ["F1", "f1"],
         ["F2", "f2"],
         ["F3", "f3"],
         ["F4", "f4"],
-        ["hotkeys",["ctrl+shift+alt+s","ctrl+shift+alt+h"]],
+        ["hotkeys", ["ctrl+shift+alt+s", "ctrl+shift+alt+h"]],
         ["startup", False],
         ["autoUpdate", True],
         ["threadSafety", False],
-        ["exitWhenClose",False],
+        ["exitWhenClose", True],
         ["confidence", 0.9],
         ["zoom", 1.5],
+        ["performance", 2.0],
         ["mirrorchyanCDK", ""],
         ["uiSize", "1200x800"],
         ["uiLocation", "100x100"],
@@ -162,7 +164,7 @@ global_config_list2 = {
         ["authorizationCode", ""],
         ["receiver", ""],
     ]
-        
+
 }
 
 

@@ -10,11 +10,11 @@
 </p>
 <p align="center"><a href="https://shasnow.github.io/SRA"><b>主页</b></a></p>
 
-#### [帮助文档](https://docs.qq.com/doc/DWUFOUmJDc2xLRk1B) | [FAQ](https://github.com/Shasnow/StarRailAssistant/wiki/FAQ) | [下载和安装](https://shasnow.github.io/SRA/download.html) | [使用方法](https://shasnow.github.io/SRA/quickstart.html)
+#### [帮助文档](https://docs.qq.com/doc/DWUFOUmJDc2xLRk1B) | [FAQ](https://starrailassistant.top/SRA/faq.html) | [下载和安装](https://shasnow.github.io/SRA/download.html) | [使用方法](https://shasnow.github.io/SRA/quickstart.html)
 # StarRailAssistant(SRA)
 
 崩坏星穹铁道自动化助手  
-如果您在使用的过程中遇到问题，请先阅读帮助文档。
+如果您在使用的过程中遇到问题，请先阅读[常见问题](https://starrailassistant.top/SRA/faq.html)。
 
 ## 什么是SRA？
 
@@ -86,13 +86,13 @@ This software is open source, free of charge and for learning and exchange purpo
 * 通过 **`Bilibili私信`** 反馈：<https://space.bilibili.com/349682013>
 * 通过 **`电子邮件`** 反馈：<yukikage@qq.com>
 * 或者加入测试群 **994571792** 在这里，你可以：
-  * 获得更快的下载速度
+  * ~~获得更快的下载速度~~
   * 提前获取版本更新
   * 反馈和意见得到及时回复
   * 与精通 `Python` , `Java` , `C/C++` , `SQL`, `C#` , `Go` , `Vue3` , `HTML` , `JavaScript` , `CSS` , `TypeScript` 的大佬交流。
-  * 与 **`太卜司·符玄`** 交流占卜术
   * 与 **`暮光闪闪`** 交流友谊的魔法
   * 和 **`青雀`** 一起摸鱼
+  * 体验 **`柔情猫娘`** 的温柔
 * 欢迎通过上述渠道反馈问题和提交意见！
 
 ## 想要为项目做出贡献

@@ -27,72 +27,12 @@ import traceback
 
 import sys
 import time
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QMainWindow,
-    QApplication,
-)  # 从 PySide6 中导入所需的类
+from PySide6.QtWidgets import QApplication
 
-from SRACore.core.SRAssistant import VERSION
 from SRACore.utils import Configure
-from SRACore.utils.Dialog import (
-    ExceptionMessageBox
-)
-from SRACore.utils.Plugins import PluginManager
-from SRACore.utils.SRAWidgets import (
-    SystemTray, Hotkey, Main, )
-
-# from ocr import SRAocr
+from SRACore.utils.Dialog import ExceptionMessageBox
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
-
-class SRA(QMainWindow):
-    def __init__(self):
-        super().__init__()
-
-        self.system_tray=SystemTray(self)
-        self.system_tray.show()
-        self.main = Main(self)
-        self.setCentralWidget(self.main.ui)
-        self.setWindowIcon(QIcon(self.main.AppPath + "/res/SRAicon.ico"))
-        self.setWindowTitle(f"SRA v{VERSION} | {PluginManager.getPluginsCount()}个插件已加载")
-        size = list(map(int, self.main.globals["Settings"]["uiSize"].split("x")))
-        location = list(map(int, self.main.globals["Settings"]["uiLocation"].split("x")))
-        self.setGeometry(
-            location[0], location[1], size[0], size[1]
-        )  # 设置窗口大小与位置
-        self.keyboard_listener()
-
-    def keyboard_listener(self):
-        self.hotkey=Hotkey(self.main.globals["Settings"]["hotkeys"])
-        self.hotkey.start()
-        self.hotkey.startOrStop.connect(self.start_status_switch)
-        self.hotkey.showOrHide.connect(self.show_or_hide)
-        QApplication.instance().aboutToQuit.connect(self.hotkey.stop)
-
-    def start_status_switch(self):
-        if self.main.isRunning:
-            self.main.kill()
-        else:
-            self.main.execute()
-
-    def show_or_hide(self):
-        self.system_tray.activated.emit(self.system_tray.ActivationReason.Trigger)
-
-    def closeEvent(self, event):
-        """Save the window info"""
-        # 保存窗口大小与位置
-        self.main.globals["Settings"][
-            "uiSize"
-        ] = f"{self.geometry().width()}x{self.geometry().height()}"
-        self.main.globals["Settings"][
-            "uiLocation"
-        ] = f"{self.geometry().x()}x{self.geometry().y()}"
-        Configure.save(self.main.globals, "data/globals.json")
-        # 结束残余进程
-        event.accept()
-        if self.main.globals["Settings"]["exitWhenClose"]:
-            QApplication.quit()
 
 
 def is_admin():
@@ -105,6 +45,8 @@ def is_admin():
 def exception_hook(exc_type: type, value):
     """全局异常捕获钩子"""
     try:
+        if QApplication.instance() is None:
+            QApplication(sys.argv)
         msg_box = ExceptionMessageBox(exc_type.__name__, value, traceback.format_exc())
         msg_box.exec()
     except Exception as e:
@@ -115,7 +57,29 @@ def exception_hook(exc_type: type, value):
 
 
 def main():
-    if is_admin():
+    if not is_admin():
+        if len(sys.argv)>1:
+            print("必须以管理员身份运行终端，才能使用SRA命令行。")
+            sys.exit()
+        else:
+            print("即将以管理员权限重新运行，请允许 UAC 提示。")
+            # 重新以管理员权限运行脚本
+            ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", sys.executable, " ".join(sys.argv), None, 1
+            )
+            # 退出当前进程
+            sys.exit()
+
+    if len(sys.argv) > 1:
+        from SRACore.core.SRACommandLine import CommandLine
+        if sys.argv[1] == "--cli":
+            CommandLine().cmdloop()
+        elif sys.argv[1] == "--run":
+            CommandLine().do_run(" ".join(sys.argv[2:]))
+        else:
+            CommandLine().default(sys.argv[1])
+    else:
+        from SRACore.utils.SRAComponents import SRA
         app = QApplication(sys.argv)
         app.setQuitOnLastWindowClosed(False)
         start_time = time.time()
@@ -131,13 +95,7 @@ def main():
             window.main.notice()
         sys.exit(app.exec())
 
-    else:
-        # 重新以管理员权限运行脚本
-        ctypes.windll.shell32.ShellExecuteW(
-            None, "runas", sys.executable, " ".join(sys.argv), None, 1
-        )
-        # 退出当前进程
-        sys.exit()
+
 
 
 if __name__ == "__main__":
