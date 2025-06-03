@@ -20,7 +20,7 @@
 崩坏：星穹铁道助手
 v0.7.0
 作者：雪影
-自动剧情
+自动对话
 """
 
 import sys
@@ -30,10 +30,11 @@ import cv2
 import pyautogui
 import pygetwindow
 import pyscreeze
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal, QObject
 from PySide6.QtWidgets import QApplication
 
 from SRACore.utils.Logger import logger
+from SRACore.utils.SRAOperator import SRAOperator
 
 
 def exist(img_path, wait_time=2):
@@ -50,21 +51,21 @@ def exist(img_path, wait_time=2):
         img = cv2.imread(img_path)
         if img is None:
             raise FileNotFoundError("无法找到或读取文件 " + img_path + ".png")
-        pyautogui.locateOnWindow(img, "崩坏：星穹铁道", confidence=0.90)
+        pyscreeze.locateOnWindow(img, "崩坏：星穹铁道", confidence=SRAOperator.confidence)
         return True
-    except pyautogui.ImageNotFoundException:
+    except pyscreeze.ImageNotFoundException:
         return False
     except FileNotFoundError as e:
         logger.exception(e)
         return False
     except ValueError:
-        logger.exception("窗口未激活")
         return False
 
 
 class PlotListener(QThread):
     plot_start = Signal()
     plot_end = Signal()
+    interrupted = Signal()
     wait_time=1
 
     def __init__(self):
@@ -80,9 +81,10 @@ class PlotListener(QThread):
         logger.info("监听，启动！")
         while self.running_flag:
             try:
-                if exist("res/img/dialog.png", wait_time=self.wait_time):
-                    self.in_plot_flag = True
-                    self.plot_start.emit()
+                if exist("res/img/dialog.png", wait_time=self.wait_time) or exist("res/img/m.png", wait_time=0):
+                    if not self.in_plot_flag:
+                        self.in_plot_flag = True
+                        self.plot_start.emit()
                 else:
                     if self.in_plot_flag:
                         self.in_plot_flag = False
@@ -90,10 +92,12 @@ class PlotListener(QThread):
             except pygetwindow.PyGetWindowException:
                 logger.error("窗口未激活")
                 self.stop()
+                self.interrupted.emit()
             except pyscreeze.PyScreezeException:
-                logger.exception("未能找到窗口", is_fatal=True)
+                logger.error("未能找到窗口")
                 self.stop()
-        logger.info("自动剧情已关闭")
+                self.interrupted.emit()
+        logger.info("对话监听已关闭")
 
 
 class AutoPlot(QThread):
@@ -112,9 +116,9 @@ class AutoPlot(QThread):
         logger.info("自动播放运行中")
         while self.running_flag:
             try:
-                if exist("res/img/continue.png", wait_time=1):
-                    pyautogui.press("space")
-                for i in range(4,0,-1):
+                time.sleep(0.5)
+                pyautogui.press("space")
+                for i in range(5,0,-1):
                     if exist(f"res/img/{i}.png", wait_time=0):
                         pyautogui.press(str(i))
                         break
@@ -122,17 +126,20 @@ class AutoPlot(QThread):
                 logger.error("窗口未激活")
                 self.event_stop()
             except pyscreeze.PyScreezeException:
-                logger.exception("未能找到窗口", is_fatal=True)
+                logger.error("未能找到窗口")
                 self.event_stop()
 
 
-class Main:
+class Main(QObject):
+    interrupted = Signal()
     def __init__(self):
+        super().__init__()
         try:
             self.listener_thread = PlotListener()
             self.play_thread = AutoPlot()
             self.listener_thread.plot_start.connect(self.play_thread_start)
             self.listener_thread.plot_end.connect(self.play_thread_stop)
+            self.listener_thread.interrupted.connect(lambda : self.interrupted.emit())
         except Exception as e:
             logger.exception(e)
 
@@ -146,11 +153,13 @@ class Main:
     def play_thread_start(self):
         self.listener_thread.wait_time=4
         self.play_thread.event_start()
+        logger.info("对话状态开始")
 
     def play_thread_stop(self):
-        logger.info("自动剧情停止")
         self.listener_thread.wait_time=1
         self.play_thread.event_stop()
+        logger.info("对话状态结束")
+
 
 if __name__ == "__main__":
     app=QApplication(sys.argv)
