@@ -4,7 +4,7 @@
     <img alt="Static Badge" src="https://img.shields.io/badge/python-3.11.5%2B-skyblue">
     <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/Shasnow/StarRailAssistant/total">
     <img alt="GitHub Release" src="https://img.shields.io/github/v/release/Shasnow/StarRailAssistant">
-    <a href="https://mirrorchyan.com/zh/projects">
+    <a href="https://mirrorchyan.com/zh/projects?rid=StarRailAssistant">
         <img alt="mirrorc" src="https://img.shields.io/badge/Mirror%E9%85%B1-%239af3f6?logo=countingworkspro&logoColor=4f46e5">
     </a>
 </p>
