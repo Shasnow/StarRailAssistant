@@ -1,5 +1,4 @@
 import os
-import shutil
 
 import keyboard
 import schedule
@@ -74,12 +73,21 @@ class SRA(QMainWindow):
         self.setWindowTitle(f"SRA v{VERSION} | {PluginManager.getPluginsCount()}个插件已加载")
         size = list(map(int, self.main.globals["Settings"]["uiSize"].split("x")))
         location = list(map(int, self.main.globals["Settings"]["uiLocation"].split("x")))
+        x,y=self.location_check(*location)
         self.setGeometry(
-            location[0], location[1], size[0], size[1]
+            x, y, size[0], size[1]
         )  # 设置窗口大小与位置
+
         self.system_tray = SystemTray(self)
         self.system_tray.show()
         self.keyboard_listener()
+
+    @staticmethod
+    def location_check(x, y):
+        for screen in QApplication.screens():
+            if screen.geometry().contains(x, y):
+                return x,y
+        return 100,100
 
     def keyboard_listener(self):
         self.hotkey = BackgroundEvent(**self.main.globals["Settings"])

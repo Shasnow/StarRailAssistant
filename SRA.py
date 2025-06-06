@@ -58,7 +58,7 @@ def exception_hook(exc_type: type, value):
 
 def main():
     if not is_admin():
-        if len(sys.argv)>1:
+        if len(sys.argv) > 1:
             print("必须以管理员身份运行终端，才能使用SRA命令行。")
             sys.exit()
         else:
@@ -94,8 +94,6 @@ def main():
         if not version["Announcement.DoNotShowAgain"]:
             window.main.notice()
         sys.exit(app.exec())
-
-
 
 
 if __name__ == "__main__":
