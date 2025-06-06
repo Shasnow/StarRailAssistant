@@ -669,7 +669,7 @@ class TrailblazePower(SRAWidget):
             return TrailblazePower.TaskItem(
                 data["name"],
                 data["args"]["level"],
-                data["args"]["levelText"],
+                data["args"].get("levelText", ""),
                 data["args"]["runTimes"],
                 data["args"]["singleTimes"]
             )
