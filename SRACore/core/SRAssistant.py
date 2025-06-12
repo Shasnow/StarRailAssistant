@@ -1004,13 +1004,6 @@ class Assistant(QThread):
                 if not exist("res/img/ensure2.png", wait_time=1):
                     click_point(x, y)
             click("res/img/ensure2.png", wait_time=1)
-            while check("res/img/close.png", max_time=3):
-                press_key("esc")
-
-            # logger.info("选择方程与祝福")
-            # if not check("res/img/equation_select.png",max_time=25):
-            #     logger.error("超时")
-            #     return False
 
             while True:
                 index = check_any(["res/img/equation_select.png",
@@ -1019,9 +1012,10 @@ class Assistant(QThread):
                                    "res/img/divergent_universe_quit.png",
                                    "res/img/curiosity_select.png"], max_time=8)
                 if index == 4:
-                    if not click("res/img/collection.png"):
+                    if not click("res/img/collection.png",wait_time=SRAOperator.performance/4):
                         click_point(*get_screen_center())
                     click("res/img/ensure2.png", wait_time=SRAOperator.performance/2)
+                    time.sleep(SRAOperator.performance / 2)
                 elif index == 3:
                     break
                 elif index == 2:
@@ -1029,10 +1023,12 @@ class Assistant(QThread):
                 elif index == 1:
                     click_point(*get_screen_center())
                     click("res/img/ensure2.png", wait_time=0.5)
+                    time.sleep(SRAOperator.performance / 2)
                 elif index == 0:
-                    if not click("res/img/collection.png"):
+                    if not click("res/img/collection.png",wait_time=SRAOperator.performance/4):
                         click_point(*get_screen_center())
                     click("res/img/ensure2.png", wait_time=SRAOperator.performance/2)
+                    time.sleep(SRAOperator.performance / 2)
                 else:
                     logger.warning("发生错误")
                     break
@@ -1045,7 +1041,7 @@ class Assistant(QThread):
             if check("res/img/q.png", max_time=10):
                 press_key("v")
             logger.info("等待战斗结束")
-            if not check("res/img/blessing_select.png", max_time=120):
+            if not check("res/img/blessing_select.png", max_time=120, interval=SRAOperator.performance/2):
                 logger.error("失败/超时")
 
             logger.info("选择祝福")
@@ -1057,8 +1053,9 @@ class Assistant(QThread):
                 if index == 0:
                     if not click("res/img/collection.png"):
                         x, y = get_screen_center()
-                        click_point(x - 50, y)
+                        click_point(x - 100, y)
                     click("res/img/ensure2.png")
+                    time.sleep(SRAOperator.performance / 2)
                 elif index == 1 or index == 2:
                     press_key('esc')
                 else:
