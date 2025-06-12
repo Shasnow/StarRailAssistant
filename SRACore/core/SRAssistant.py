@@ -1016,8 +1016,13 @@ class Assistant(QThread):
                 index = check_any(["res/img/equation_select.png",
                                    "res/img/blessing_select.png",
                                    "res/img/close.png",
-                                   "res/img/divergent_universe_quit.png"], max_time=6)
-                if index == 3:
+                                   "res/img/divergent_universe_quit.png",
+                                   "res/img/curiosity_select.png"], max_time=8)
+                if index == 4:
+                    if not click("res/img/collection.png"):
+                        click_point(*get_screen_center())
+                    click("res/img/ensure2.png", wait_time=SRAOperator.performance/2)
+                elif index == 3:
                     break
                 elif index == 2:
                     press_key("esc")
@@ -1027,14 +1032,14 @@ class Assistant(QThread):
                 elif index == 0:
                     if not click("res/img/collection.png"):
                         click_point(*get_screen_center())
-                    click("res/img/ensure2.png", wait_time=1)
+                    click("res/img/ensure2.png", wait_time=SRAOperator.performance/2)
                 else:
                     logger.warning("发生错误")
                     break
             time.sleep(1)
 
             logger.info("移动")
-            press_key_for_a_while("w", during=3)
+            press_key_for_a_while("w", during=2.8)
             logger.info("进入战斗")
             click_point(*get_screen_center())
             if check("res/img/q.png", max_time=10):
@@ -1048,7 +1053,7 @@ class Assistant(QThread):
                 index = check_any(["res/img/blessing_select.png",
                                    "res/img/equation_expansion.png",
                                    "res/img/close.png",
-                                   "res/img/divergent_universe_quit.png"], max_time=6)
+                                   "res/img/divergent_universe_quit.png"], max_time=8)
                 if index == 0:
                     if not click("res/img/collection.png"):
                         x, y = get_screen_center()
