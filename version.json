@@ -3,7 +3,7 @@
     "resource_version": "0.8.2.4",
     "announcement": "更新内容：\n1.适配周期演算。",
     "resource_announcement": "",
-    "Announcement": "<p>SRA官网上线<a href='https://starrailassistant.top/SRA/'>点击前往</a></p><p>SRA接入了Mirror酱--在设置中填入Mirror酱cdk后，可以使用Mirror酱的高速下载服务。<a href='https://mirrorchyan.com/zh/get-start'>没有CDK？立即订阅</a></p>",
+    "Announcement": "<p>SRA官网上线<a href='https://starrailassistant.top/SRA/'>点击前往</a></p><p>SRA接入了Mirror酱--在设置中填入Mirror酱cdk后，可以使用Mirror酱的高速下载服务。<a href='https://mirrorchyan.com/zh/get-start?source=sra-app'>没有CDK？立即订阅</a></p>",
     "Announcement.DoNotShowAgain": false,
     "Proxys": [
         "https://tvv.tw/",
