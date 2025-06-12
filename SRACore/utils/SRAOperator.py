@@ -192,7 +192,7 @@ class SRAOperator:
             location = pyscreeze.locate(img, cls.get_screenshot(title), confidence=cls.confidence)
             return location
         except pyscreeze.ImageNotFoundException as e:
-            raise MatchFailureException(f"{img_path}匹配失败 {e}")
+            raise MatchFailureException(f"{img_path}: {e}")
         except ValueError:
             raise WindowInactiveException("窗口未激活")
         except FileNotFoundError:
@@ -229,6 +229,7 @@ class SRAOperator:
                 logger.trace(f"{img_path}: ValueError-{e}") if trace else None
                 continue
             except FileNotFoundError:
+                logger.trace(f"{img_path}: FileNotFoundError-请检查文件完整性") if trace else None
                 continue
         else:
             raise MatchFailureException(f"{img_list}匹配失败")
@@ -312,7 +313,7 @@ class SRAOperator:
             cls.locate(img_path)
             return True
         except MatchFailureException as e:
-            logger.debug(f"图像不存在 {img_path} {e}")
+            logger.debug(f"图像不存在 {e}")
             return False
         except Exception as e:
             logger.debug(e)
@@ -395,7 +396,7 @@ class SRAOperator:
         times = 0
         while True:
             time.sleep(interval)
-            result: int | None = cls.existAny(img_list, wait_time=1)
+            result: int | None = cls.existAny(img_list, wait_time=cls.performance/4)
             if result is not None:
                 logger.debug(f"检测成功, 索引 {result}")
                 return result
@@ -692,5 +693,32 @@ class SRAOperator:
         left, top = cls.get_screenshot_region("崩坏：星穹铁道")[0:2]
         img = pyscreeze.screenshot(region=(left + area_left, top + area_top, width, height))
         # 执行 OCR 识别
+        result, elapse = cls.ocr_engine(img, use_det=True, use_cls=False, use_rec=True)
+        return result
+
+    @classmethod
+    def ocr_on_image(cls, img: Image,region:tuple[int,int,int,int]=None):
+        """
+        在指定图像上执行 OCR 识别。(相对于截图区域)
+
+        该方法会在指定的图像上进行 OCR 识别。
+        如果 OCR 引擎尚未初始化，则会先对其进行初始化。
+
+        Args:
+            img (Image): 指定图像。
+            region (tuple[int,int,int,int]): 指定区域。
+
+        Returns:
+            list: OCR 识别的结果列表。
+        """
+        # 若 OCR 引擎未初始化，则进行初始化
+        if cls.ocr_engine is None:
+            cls.ocr_engine = RapidOCR()
+        # 执行 OCR 识别
+        if region is not None:
+            x,y,width,height=region
+            right,bottom=x+width,y+height
+            img=img.crop((x,y,right,bottom))
+            img.show()
         result, elapse = cls.ocr_engine(img, use_det=True, use_cls=False, use_rec=True)
         return result
