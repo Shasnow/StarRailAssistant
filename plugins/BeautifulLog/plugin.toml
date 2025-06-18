@@ -1,0 +1,6 @@
+displayName = "更漂亮的日志"
+version = "1.0.0"
+author = "雪影、幽幽子"
+description = "这个插件提供了一个现代化的终端日志显示，支持多种日志级别的高亮显示。"
+SRAversion = "0.8.2"
+loadPeriod = "normal"

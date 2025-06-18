@@ -421,7 +421,7 @@
               <property name="title">
                <string>插件</string>
               </property>
-              <layout class="QGridLayout" name="gridLayout_4"/>
+              <layout class="QVBoxLayout" name="verticalLayout"/>
              </widget>
             </item>
            </layout>

@@ -125,7 +125,6 @@ class AnnouncementBoard(QDialog):
         self.title_list.setCurrentRow(index)
         self.all.content.verticalScrollBar().setValue(0)
 
-
     def reject(self) -> None:
         version = load("version.json")
         version[f"Announcement.DoNotShowAgain"] = True
@@ -258,12 +257,13 @@ class MessageBox(QDialog):
         self.layout().addWidget(self.ok_button)
 
     @staticmethod
-    def info(parent: QWidget, title: str, text: str):
+    def info(parent: QWidget | None, title: str, text: str):
         msg = MessageBox(parent, title, text)
         msg.exec()
 
+
 class ScheduleDialog(QDialog):
-    def __init__(self,parent,configs):
+    def __init__(self, parent, configs):
         super().__init__(parent)
         self.setWindowIcon(QIcon("res/SRAicon.ico"))
         self.setWindowTitle("定时任务")
@@ -322,7 +322,7 @@ class ScheduleDialog(QDialog):
 
     @staticmethod
     def getSchedule(parent, configs):
-        dialog = ScheduleDialog(parent,configs)
+        dialog = ScheduleDialog(parent, configs)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             freq = dialog.freq_combo.currentText()
             week = dialog.week_combo.currentText()

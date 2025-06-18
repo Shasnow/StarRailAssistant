@@ -39,10 +39,30 @@ class SRAOperator:
     screenshot_proportion = 1.0
     area_top = 0
     area_left = 0
+    area_width = 0
+    area_height = 0
     zoom = 1.5
     confidence = 0.9
     performance = 2  # 性能参数
     ocr_engine: RapidOCR = None
+
+    @classmethod
+    def resolution_detect(cls):
+        """
+        检测分辨率。
+
+        通过截取游戏窗口的屏幕区域来检测游戏画面的分辨率。
+
+        Returns:
+            tuple: 返回检测到的分辨率，包括宽度和高度。
+        """
+        # 调用类方法get_screenshot_region来获取指定游戏窗口的屏幕区域
+        try:
+            cls.get_screenshot_region("崩坏：星穹铁道")
+        except WindowNoFoundException:
+            logger.trace("检测分辨率时未找到游戏窗口")
+        # 返回游戏画面的宽度和高度
+        return cls.area_width, cls.area_height
 
     @classmethod
     def reset(cls):
@@ -59,7 +79,7 @@ class SRAOperator:
     @classmethod
     def _screenshot_region_calculate(cls, region: tuple[int, int, int, int]):
         """
-        计算截图区域的实际坐标和尺寸。
+        计算截图区域的实际坐标和尺寸, 更新类变量。
 
         Args:
             region (tuple[int, int, int, int]): 包含窗口左上角坐标和宽高的元组，格式为 (left, top, width, height)。
@@ -69,14 +89,14 @@ class SRAOperator:
         """
         left, top, width, height = region
         # 计算截图区域的宽度，将宽度调整为 160 的倍数
-        area_width = width // 160 * 160
+        cls.area_width = width // 160 * 160
         # 计算截图区域的高度，将高度调整为 90 的倍数
-        area_height = height // 90 * 90
+        cls.area_height = height // 90 * 90
         # 根据缩放比例调整顶部坐标，如果顶部坐标不为 0 则加上偏移量
         cls.area_top = (top + int(30 * cls.zoom)) if top != 0 else top
         # 根据缩放比例调整左侧坐标，如果左侧坐标不为 0 则加上偏移量
         cls.area_left = (left + int(8 * cls.zoom)) if left != 0 else left
-        return cls.area_left, cls.area_top, area_width, area_height
+        return cls.area_left, cls.area_top, cls.area_width, cls.area_height
 
     @classmethod
     def get_screenshot_region(cls, title: str) -> tuple[int, int, int, int]:
@@ -90,7 +110,7 @@ class SRAOperator:
             title (str): 用于查找窗口的标题。
 
         Returns:
-            tuple[int, int, int, int]: 计算后的截图区域，格式为 (area_left, area_top, area_width, area_height)。
+            tuple[int, int, int, int]: 计算后的截图区域，格式为 (left, top, width, height)。
 
         Raises:
             WindowNoFoundException: 未找到包含指定标题的窗口。
@@ -199,7 +219,7 @@ class SRAOperator:
             raise
 
     @classmethod
-    def locateAny(cls, img_list: list,trace:bool=True):
+    def locateAny(cls, img_list: list, trace: bool = True):
         """
         在截图中依次定位图像列表中的图像，返回第一个匹配成功的图像的索引和位置。
 
@@ -320,7 +340,8 @@ class SRAOperator:
             return False
 
     @classmethod
-    def existAny(cls, img_list: list, wait_time: float = performance, need_location: bool = False) -> int | None | tuple:
+    def existAny(cls, img_list: list, wait_time: float = performance,
+                 need_location: bool = False) -> int | None | tuple:
         """
         检查图像列表中是否有任何图像存在于截图中。
 
@@ -396,7 +417,7 @@ class SRAOperator:
         times = 0
         while True:
             time.sleep(interval)
-            result: int | None = cls.existAny(img_list, wait_time=cls.performance/4)
+            result: int | None = cls.existAny(img_list, wait_time=cls.performance / 4)
             if result is not None:
                 logger.debug(f"检测成功, 索引 {result}")
                 return result
@@ -697,7 +718,7 @@ class SRAOperator:
         return result
 
     @classmethod
-    def ocr_on_image(cls, img: Image,region:tuple[int,int,int,int]=None):
+    def ocr_on_image(cls, img: Image, region: tuple[int, int, int, int] = None):
         """
         在指定图像上执行 OCR 识别。(相对于截图区域)
 
@@ -716,9 +737,9 @@ class SRAOperator:
             cls.ocr_engine = RapidOCR()
         # 执行 OCR 识别
         if region is not None:
-            x,y,width,height=region
-            right,bottom=x+width,y+height
-            img=img.crop((x,y,right,bottom))
+            x, y, width, height = region
+            right, bottom = x + width, y + height
+            img = img.crop((x, y, right, bottom))
             img.show()
         result, elapse = cls.ocr_engine(img, use_det=True, use_cls=False, use_rec=True)
         return result

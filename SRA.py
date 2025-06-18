@@ -32,6 +32,9 @@ from PySide6.QtWidgets import QApplication
 from SRACore.utils import Configure
 from SRACore.utils.Dialog import ExceptionMessageBox
 
+import faulthandler
+faulthandler.enable()
+
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
 
 
@@ -80,6 +83,8 @@ def main():
             CommandLine().default(sys.argv[1])
     else:
         from SRACore.utils.SRAComponents import SRA
+        from SRACore.utils.Plugins import PluginManager
+        PluginManager.scan_plugins()
         app = QApplication(sys.argv)
         app.setQuitOnLastWindowClosed(False)
         start_time = time.time()
@@ -93,6 +98,7 @@ def main():
         version = Configure.load("version.json")
         if not version["Announcement.DoNotShowAgain"]:
             window.main.notice()
+        PluginManager.load_plugins("late")
         sys.exit(app.exec())
 
 
