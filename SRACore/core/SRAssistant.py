@@ -1159,7 +1159,7 @@ def find_level(level: str) -> bool:
         True if found.
     """
     x, y = get_screen_center()
-    SRAOperator.moveTo(x - 200, y)
+    SRAOperator.moveTo(x-80, y)
     times = 0
     while True:
         times += 1
