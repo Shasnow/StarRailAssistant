@@ -27,6 +27,7 @@ import subprocess
 import time
 from PySide6.QtCore import QThread, Signal
 
+from SRACore.utils.Notification import send_system_notification
 from SRACore.utils import Configure, WindowsProcess, Encryption
 from SRACore.utils.Logger import logger
 from SRACore.utils.SRAOperator import SRAOperator
@@ -134,6 +135,9 @@ class Assistant(QThread):
         if not WindowsProcess.check_window(window_title):
             logger.warning(f"未找到窗口: {window_title} 或许你还没有运行游戏")
             return False
+        resolution=SRAOperator.resolution_detect()
+        if resolution[1]/resolution[0]!=9/16:
+            send_system_notification(message="检测到游戏分辨率不为16:9, SRA可能无法按预期运行", timeout=5)
         return True
 
     @staticmethod
@@ -215,12 +219,13 @@ class Assistant(QThread):
         if not Popen(path):
             return False
         logger.info("等待启动器启动")
-        time.sleep(5)
         times = 0
         while times < 20:
             if is_process_running("HYP.exe"):
                 if channel == 0:
-                    click('res/img/start_game.png', title="米哈游启动器")
+                    if click('res/img/game.png', title="米哈游启动器"):
+                        time.sleep(1)
+                    click('res/img/start_game.png', title="米哈游启动器",wait_time=0)
                 else:
                     click('res/img/start_game.png')
                 logger.info("尝试启动游戏")
@@ -232,7 +237,7 @@ class Assistant(QThread):
                         logger.info("已为您关闭启动器")
                         return True
             else:
-                time.sleep(0.5)
+                time.sleep(2)
                 times += 1
         else:
             logger.warning("启动时间过长，请尝试手动启动")
@@ -256,6 +261,9 @@ class Assistant(QThread):
         logger.info("登录中")
         result = check_any(
             ["res/img/login_page.png", "res/img/welcome.png", "res/img/quit.png", "res/img/chat_enter.png"])
+        resolution=SRAOperator.resolution_detect()
+        if resolution[1]/resolution[0]!=9/16:
+            send_system_notification(message="检测到游戏分辨率不为16:9, SRA可能无法按预期运行", timeout=5)
         if result is not None and result != 0:
             logger.info(f"登录状态 {result}")
             return result
@@ -355,7 +363,7 @@ class Assistant(QThread):
                     case _:
                         logger.error("未知登录状态")
                         return False
-            time.sleep(2)
+            time.sleep(1)
             if check("res/img/quit.png", max_time=120):
                 self.start_game_click()
 
@@ -397,7 +405,7 @@ class Assistant(QThread):
             time.sleep(1)
 
     def trailblazer_power(self):
-        def nameToTask(name):
+        def name2task(name:str):
             match name:
                 case "饰品提取":
                     return self.ornament_extraction
@@ -422,7 +430,7 @@ class Assistant(QThread):
         tasklist = config["TrailBlazePower"]["taskList"]
         logger.debug("任务列表：" + str(tasklist))
         for task in tasklist:
-            tasks.append((nameToTask(task["name"]), (task["args"])))
+            tasks.append((name2task(task["name"]), (task["args"])))
         for task, args in tasks:
             if self.stop_flag:
                 break
@@ -1151,7 +1159,7 @@ def find_level(level: str) -> bool:
         True if found.
     """
     x, y = get_screen_center()
-    SRAOperator.moveTo(x - 200, y)
+    SRAOperator.moveTo(x-80, y)
     times = 0
     while True:
         times += 1

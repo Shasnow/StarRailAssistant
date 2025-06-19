@@ -1,4 +1,5 @@
 import os
+import random
 
 import keyboard
 import schedule
@@ -9,7 +10,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMenu, QWidget, QCheckBox, QTextEdit, QComboBox, QLineEdit, \
     QPushButton, QLabel, QFileDialog, \
     QSpinBox, QRadioButton, QVBoxLayout, QSystemTrayIcon, QApplication, QTableWidget, QDoubleSpinBox, QScrollArea, \
-    QGroupBox, QFrame, QMainWindow, QTextBrowser
+    QGroupBox, QFrame, QMainWindow, QTextBrowser, QHBoxLayout
 
 import SRACore.utils.Logger
 from SRACore.core import AutoPlot, SRAssistant
@@ -70,7 +71,7 @@ class SRA(QMainWindow):
         self.main = Main(self)
         self.setCentralWidget(self.main.ui)
         self.setWindowIcon(QIcon(self.main.AppPath + "/res/SRAicon.ico"))
-        self.setWindowTitle(f"SRA v{VERSION} | {PluginManager.getPluginsCount()}个插件已加载")
+        self.setWindowTitle(f"SRA v{VERSION} | {PluginManager.getPluginsCount()}个插件已加载 {random.choice(RANDOM_TITLE)}")
         size = list(map(int, self.main.globals["Settings"]["uiSize"].split("x")))
         location = list(map(int, self.main.globals["Settings"]["uiLocation"].split("x")))
         x,y=self.location_check(*location)
@@ -274,7 +275,7 @@ class Main(QWidget):
         PluginManager.public_instance = self
         PluginManager.load_plugins()
         plugin_groupbox: QGroupBox = self.ui.findChild(QGroupBox, 'plugin_groupbox')
-        plugins_widget = Plugin(self)
+        plugins_widget = PluginWidget(self)
         for name, run in PluginManager.getPlugins().items():
             plugins_widget.addPlugin(name, run)
         plugin_groupbox.layout().addWidget(plugins_widget)
@@ -975,7 +976,7 @@ class MultiAccount(SRAWidget):
         return Configure.load("data/globals.json")["Config"]["configList"]
 
 
-class Plugin(QWidget):
+class PluginWidget(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.setLayout(QVBoxLayout(self))
