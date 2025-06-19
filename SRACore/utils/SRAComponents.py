@@ -941,6 +941,9 @@ class MultiAccount(SRAWidget):
             return
         plan_name, confirm = InputDialog.getText(self.ui, "创建方案", "方案名称：")
         if confirm and plan_name:
+            if plan_name in self.globals["Config"]["configList"]:
+                MessageBox.info(self, "添加失败", "方案已存在！")
+                return
             Configure.addConfig(plan_name)
             self.globals["Config"]["configList"].append(plan_name)
             Configure.save(self.globals, "data/globals.json")
@@ -963,6 +966,9 @@ class MultiAccount(SRAWidget):
         index = self.current_config_combobox.currentIndex()
         new, confirm = InputDialog.getText(self.ui, "重命名方案", "方案名称：")
         if confirm and new:
+            if new in self.globals["Config"]["configList"]:
+                MessageBox.info(self.ui, "重命名失败", "方案已存在！")
+                return
             Configure.rename(old, new)
             self.globals["Config"]["configList"][index] = new
             self.current_config_combobox.setItemText(index, new)
@@ -1011,7 +1017,7 @@ class Settings(SRAWidget):
         self.sender_email: QLineEdit = self.ui.findChild(QLineEdit, "sender_email")
         self.authorization_code: QLineEdit = self.ui.findChild(QLineEdit, "authorization_code")
         self.receiver_email: QLineEdit = self.ui.findChild(QLineEdit, "receiver_email")
-        self.email_check_cutton: QPushButton = self.ui.findChild(QPushButton, "email_check_button")
+        self.email_check_button: QPushButton = self.ui.findChild(QPushButton, "email_check_button")
         self.startup_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "checkBox_ifStartUp")
 
         auto_update_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifAutoUpdate")
@@ -1074,7 +1080,7 @@ class Settings(SRAWidget):
         self.notification_allow_checkbox.stateChanged.connect(self.notification_status_change)
         self.system_notification_checkbox.stateChanged.connect(self.notification_status_change)
         self.email_notification_checkbox.stateChanged.connect(self.notification_status_change)
-        self.email_check_cutton.clicked.connect(self.email_check)
+        self.email_check_button.clicked.connect(self.email_check)
         self.startup_checkbox.stateChanged.connect(self.startup)
         self.thread_safety_checkbox.stateChanged.connect(self.thread_safety)
         self.confidence_spin_box.valueChanged.connect(self.confidence_changed)
