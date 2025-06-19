@@ -216,16 +216,14 @@ class Assistant(QThread):
         if not self.path_check(path, path_type):
             logger.warning("路径无效")
             return False
-        if not Popen(path):
+        if not Popen(path+" --game=hkrpg_cn"):
             return False
         logger.info("等待启动器启动")
         times = 0
         while times < 20:
             if is_process_running("HYP.exe"):
                 if channel == 0:
-                    if click('res/img/game.png', title="米哈游启动器"):
-                        time.sleep(1)
-                    click('res/img/start_game.png', title="米哈游启动器",wait_time=0)
+                    click('res/img/start_game.png', title="米哈游启动器")
                 else:
                     click('res/img/start_game.png')
                 logger.info("尝试启动游戏")
