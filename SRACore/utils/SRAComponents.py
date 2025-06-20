@@ -465,7 +465,7 @@ class Main(QWidget):
         MessageBox.info(
             self.ui,
             "常见问题",
-            "<a href='https://shasnow.github.io/SRA/faq.html'>常见问题自查</a><br><br>"
+            "<a href='https://starrailassistant.top/faq.html'>常见问题自查</a><br><br>"
             "1. 在差分宇宙中因奇物“绝对失败处方(进入战斗时，我方全体有150%的基础概率陷入冻结状态，持续1回合)”"
             "冻结队伍会导致无法开启自动战斗，建议开启游戏的沿用自动战斗设置。\n"
             "2. 游戏画面贴近或超出屏幕显示边缘时功能无法正常执行。\n"
