@@ -480,9 +480,9 @@ class Assistant(QThread):
 
     def after_mission(self):
         if self.config["AfterMission"]["logout"]:
-            return self.logout()
+            self.logout()
         if self.config["AfterMission"]["quitGame"]:
-            return self.quit_game()
+            self.quit_game()
         return True
 
     @staticmethod
