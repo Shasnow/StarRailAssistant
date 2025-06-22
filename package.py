@@ -54,7 +54,7 @@ if __name__ == "__main__":
     print("Start to copy rescourses ...")
 
     shutil.copytree(root_path / "res", root_path / "SRA.dist/res")
-    shutil.copytree(root_path / "plugins", root_path / "SRA.dist/plugins")
+    # shutil.copytree(root_path / "plugins", root_path / "SRA.dist/plugins")
     shutil.copytree(root_path / "tools", root_path / "SRA.dist/tools")
     shutil.copy(root_path / "HELP.md", root_path / "SRA.dist/HELP.md")
     shutil.copy(root_path / "LICENSE", root_path / "SRA.dist/LICENSE")
