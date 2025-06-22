@@ -31,7 +31,7 @@ from SRACore.utils.Notification import send_system_notification
 from SRACore.utils import Configure, WindowsProcess, Encryption
 from SRACore.utils.Logger import logger
 from SRACore.utils.SRAOperator import SRAOperator
-from SRACore.utils.WindowsProcess import find_window, is_process_running
+from SRACore.utils.WindowsProcess import find_window, is_process_running, Popen
 from SRACore.utils.const import VERSION
 from SRACore.utils.exceptions import MatchFailureException
 
@@ -183,6 +183,7 @@ class Assistant(QThread):
             logger.warning("路径无效")
             return False
         if not Popen(game_path):
+            logger.error("启动失败")
             return False
         logger.info("等待游戏启动")
         time.sleep(5)
@@ -216,7 +217,8 @@ class Assistant(QThread):
         if not self.path_check(path, path_type):
             logger.warning("路径无效")
             return False
-        if not Popen(path+" --game=hkrpg_cn"):
+        if not Popen([path,"--game=hkrpg_cn"]):
+            logger.error("启动失败")
             return False
         logger.info("等待启动器启动")
         times = 0
@@ -1100,18 +1102,6 @@ class Assistant(QThread):
             logger.debug(e)
             logger.error("发生错误，错误编号7")
             return False
-
-
-def Popen(path: str):
-    try:
-        subprocess.Popen(path)
-        return True
-    except FileNotFoundError as e:
-        logger.error(e)
-        return False
-    except OSError:
-        logger.error("路径无效或权限不足")
-        return False
 
 
 def check(img_path, interval=0.5, max_time=40):

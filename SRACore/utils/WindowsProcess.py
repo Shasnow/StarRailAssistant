@@ -119,7 +119,7 @@ def open_normal(path: str) -> bool:
         return False
 
 
-def Popen(path: str, shell=False) -> bool:
+def Popen(path: str|list[str], shell=False) -> bool:
     """运行指定exe程序
 
     Args:
@@ -130,7 +130,7 @@ def Popen(path: str, shell=False) -> bool:
         True if opened successfully, False otherwise.
     """
     try:
-        subprocess.Popen(path, shell=shell)
+        psutil.Popen(path, shell=shell)
         return True
     except FileNotFoundError:
         return False
