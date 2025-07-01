@@ -1,10 +1,9 @@
 import os
 import sys
+from pathlib import Path
 
 # 基础的常量定义
-AppPath = os.path.dirname(os.path.realpath(sys.argv[0])).replace(
-    "\\", "/"
-)
+AppPath = Path(os.path.dirname(os.path.realpath(sys.argv[0])))
 PLATFORM = "Windows" if sys.platform == "win32" else "Linux"
 VERSION = "0.8.3"
 CORE = "0.8.3 for " + PLATFORM
