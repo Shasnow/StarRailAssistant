@@ -70,7 +70,7 @@ class SRA(QMainWindow):
         super().__init__()
         self.main = Main(self)
         self.setCentralWidget(self.main.ui)
-        self.setWindowIcon(QIcon(self.main.AppPath + "/res/SRAicon.ico"))
+        self.setWindowIcon(QIcon("res/SRAicon.ico"))
         self.setWindowTitle(f"SRA v{VERSION} | {PluginManager.getPluginsCount()}个插件已加载 {random.choice(RANDOM_TITLE)}")
         size = list(map(int, self.main.globals["Settings"]["uiSize"].split("x")))
         location = list(map(int, self.main.globals["Settings"]["uiLocation"].split("x")))
@@ -167,7 +167,7 @@ class Main(QWidget):
         current = self.globals['Config']['configList'][self.globals['Config']['currentConfig']]
         self.config = Configure.loadConfigByName(current)
         self.password_text = ""
-        self.ui = uiLoader.load(self.AppPath + "/res/ui/main.ui")
+        self.ui = uiLoader.load(self.AppPath / "res/ui/main.ui")
         self.log = self.ui.findChild(QTextBrowser, "textBrowser_log")
         SRACore.utils.Logger.logger.add(self.update_log, level=20,
                                         format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
@@ -1152,7 +1152,7 @@ class Settings(SRAWidget):
 
     def startup(self, state):
         if state == 2:
-            WindowsProcess.set_startup_item("SRA", AppPath + "/SRA.exe")
+            WindowsProcess.set_startup_item("SRA", str(AppPath / "SRA.exe"))
             self.globals["Settings"]["startup"] = True
         else:
             WindowsProcess.delete_startup_item("SRA")
