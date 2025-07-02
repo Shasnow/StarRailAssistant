@@ -22,14 +22,13 @@
 主功能
 """
 
-import subprocess
-
 import time
+
 from PySide6.QtCore import QThread, Signal
 
-from SRACore.utils.Notification import send_system_notification
 from SRACore.utils import Configure, WindowsProcess, Encryption
 from SRACore.utils.Logger import logger
+from SRACore.utils.Notification import send_system_notification
 from SRACore.utils.SRAOperator import SRAOperator
 from SRACore.utils.WindowsProcess import find_window, is_process_running, Popen
 from SRACore.utils.const import VERSION
