@@ -60,7 +60,7 @@ This software is open source, free of charge and for learning and exchange purpo
 
 下载链接：  
 下载更新器，借助更新器下载：[SRA更新器](https://github.com/Shasnow/SRAUpdater/releases/download/SRAUpdater/SRAUpdater.zip)
-或者直接下载本体，里面包含了更新器：[SRAv0.7.6](https://github.com/Shasnow/StarRailAssistant/releases/download/v0.7.6/StarRailAssistant_v0.7.6.zip)
+或者直接下载本体，里面包含了更新器：[SRA](https://github.com/Shasnow/StarRailAssistant/releases/latest)
 
 * 如果你是小白，只需要下载项目中的`zip`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`.exe`即可！
 * **我想挑战一下自己！** 当然没问题。打包下载项目中所有文件，确保你的电脑中已经安装好了`Python`，并使用`pip`来安装依赖。请在项目根文件夹打开终端并运行以下指令：

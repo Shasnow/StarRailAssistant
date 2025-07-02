@@ -43,8 +43,8 @@ if __name__ == "__main__":
         " --enable-plugins=pyside6 --windows-console-mode=attach --windows-uac-admin"
         " --windows-icon-from-ico=res\\SRAicon.ico"
         " --company-name='StarRailAssistant Team' --product-name=StarRailAssistant"
-        f" --file-version={version['version']}"
-        f" --product-version={version['version']}"
+        f" --file-version={version['version'].split('-')[0]}"
+        f" --product-version={version['version'].split('-')[0]}"
         " --file-description='StarRailAssistant Component'"
         " --copyright='Copyright © 2024 Shasnow'"
         " --assume-yes-for-downloads --output-filename=SRA"
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     print("Start to copy rescourses ...")
 
     shutil.copytree(root_path / "res", root_path / "SRA.dist/res")
-    shutil.copytree(root_path / "plugins", root_path / "SRA.dist/plugins")
+    # shutil.copytree(root_path / "plugins", root_path / "SRA.dist/plugins")
     shutil.copytree(root_path / "tools", root_path / "SRA.dist/tools")
     shutil.copy(root_path / "HELP.md", root_path / "SRA.dist/HELP.md")
     shutil.copy(root_path / "LICENSE", root_path / "SRA.dist/LICENSE")

@@ -28,7 +28,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-887</y>
         <width>575</width>
         <height>1557</height>
        </rect>
@@ -847,10 +847,10 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>置信度越大对图片精度要求越高</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="whatsThis">
-             <string>置信度越大对图片精度要求越高</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="frameShape">
              <enum>QFrame::Shape::StyledPanel</enum>
@@ -926,10 +926,11 @@ hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Microsoft YaHei UI'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;如果在使用中遇到问题，请阅读HELP.md&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;如果在使用中遇到问题，请阅读&lt;a href=&quot;https://starrailassistant.top/faq.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0078d4;&quot;&gt;常见问题&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;SRA完全免费，如果您是通过付费渠道获取的该软件，请及时退款并举报商家。&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;GitHub上的SRA：&lt;a href=&quot;https://github.com/Shasnow/StarRailAssistant&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0078d4;&quot;&gt;https://github.com/Shasnow/StarRailAssistant&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;获取MirrorChyanCDK-&amp;gt;:&lt;a href=&quot;https://mirrorchyan.com/zh/get-start&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0078d4;&quot;&gt;Mirror酱&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://starrailassistant.top&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0078d4;&quot;&gt;SRA官网&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;获取MirrorChyanCDK-&amp;gt;:&lt;a href=&quot;https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&amp;amp;source=sra-app&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0078d4;&quot;&gt;Mirror酱&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="openExternalLinks">
              <bool>true</bool>

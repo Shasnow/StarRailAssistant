@@ -29,7 +29,7 @@ import win32con
 import win32gui
 
 
-def find_window(title) -> list | None:
+def find_window(title) -> int | None:
     """Find window handles based on the window title
 
     Args:
@@ -83,17 +83,22 @@ def is_process_running(process_name) -> bool:
     return False
 
 
-def task_kill(process: str) -> None:
+def task_kill(process: str) -> bool:
     """关闭指定进程
 
     Args:
         process (str): 进程名
     Returns:
-        None
+        bool
     """
-    command = f"taskkill /F /IM {process}"
-    # 执行命令
-    subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
+    for proc in psutil.process_iter(['name']):
+        try:
+            if process.lower() in proc.info['name'].lower():
+                proc.kill()
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    return False
 
 
 def open_normal(path: str) -> bool:
@@ -114,7 +119,7 @@ def open_normal(path: str) -> bool:
         return False
 
 
-def Popen(path: str, shell=False) -> bool:
+def Popen(path: str|list[str], shell=False) -> bool:
     """运行指定exe程序
 
     Args:
@@ -125,7 +130,7 @@ def Popen(path: str, shell=False) -> bool:
         True if opened successfully, False otherwise.
     """
     try:
-        subprocess.Popen(path, shell=shell)
+        psutil.Popen(path, shell=shell)
         return True
     except FileNotFoundError:
         return False

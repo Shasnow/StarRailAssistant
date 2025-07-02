@@ -1,4 +1,5 @@
 import os
+import random
 
 import keyboard
 import schedule
@@ -9,7 +10,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMenu, QWidget, QCheckBox, QTextEdit, QComboBox, QLineEdit, \
     QPushButton, QLabel, QFileDialog, \
     QSpinBox, QRadioButton, QVBoxLayout, QSystemTrayIcon, QApplication, QTableWidget, QDoubleSpinBox, QScrollArea, \
-    QGroupBox, QFrame, QMainWindow, QTextBrowser
+    QGroupBox, QFrame, QMainWindow, QTextBrowser, QHBoxLayout
 
 import SRACore.utils.Logger
 from SRACore.core import AutoPlot, SRAssistant
@@ -69,8 +70,8 @@ class SRA(QMainWindow):
         super().__init__()
         self.main = Main(self)
         self.setCentralWidget(self.main.ui)
-        self.setWindowIcon(QIcon(self.main.AppPath + "/res/SRAicon.ico"))
-        self.setWindowTitle(f"SRA v{VERSION} | {PluginManager.getPluginsCount()}个插件已加载")
+        self.setWindowIcon(QIcon("res/SRAicon.ico"))
+        self.setWindowTitle(f"SRA v{VERSION} | {PluginManager.getPluginsCount()}个插件已加载 {random.choice(RANDOM_TITLE)}")
         size = list(map(int, self.main.globals["Settings"]["uiSize"].split("x")))
         location = list(map(int, self.main.globals["Settings"]["uiLocation"].split("x")))
         x,y=self.location_check(*location)
@@ -150,6 +151,7 @@ class SRAWidget(QWidget):
 
 
 class Main(QWidget):
+    logChanged = Signal(str)
     def __init__(self, main_window: QMainWindow):
         super().__init__()
         self.son_thread = None
@@ -166,11 +168,12 @@ class Main(QWidget):
         current = self.globals['Config']['configList'][self.globals['Config']['currentConfig']]
         self.config = Configure.loadConfigByName(current)
         self.password_text = ""
-        self.ui = uiLoader.load(self.AppPath + "/res/ui/main.ui")
-        self.log = self.ui.findChild(QTextBrowser, "textBrowser_log")
+        self.ui = uiLoader.load(self.AppPath / "res/ui/main.ui")
+        self.log:QTextBrowser = self.ui.findChild(QTextBrowser, "textBrowser_log")
         SRACore.utils.Logger.logger.add(self.update_log, level=20,
                                         format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
-                                        colorize=False)
+                                        colorize=False,
+                                        enqueue=True)
 
         # 创建中间的垂直布局管理器用于任务设置
 
@@ -274,7 +277,7 @@ class Main(QWidget):
         PluginManager.public_instance = self
         PluginManager.load_plugins()
         plugin_groupbox: QGroupBox = self.ui.findChild(QGroupBox, 'plugin_groupbox')
-        plugins_widget = Plugin(self)
+        plugins_widget = PluginWidget(self)
         for name, run in PluginManager.getPlugins().items():
             plugins_widget.addPlugin(name, run)
         plugin_groupbox.layout().addWidget(plugins_widget)
@@ -327,6 +330,7 @@ class Main(QWidget):
     def update_log(self, text):
         """Update the content in the log area."""
         self.log.append(text)
+        self.logChanged.emit(text)
 
     def getAll(self):
         self.getter()
@@ -464,7 +468,7 @@ class Main(QWidget):
         MessageBox.info(
             self.ui,
             "常见问题",
-            "<a href='https://shasnow.github.io/SRA/faq.html'>常见问题自查</a><br><br>"
+            "<a href='https://starrailassistant.top/faq.html'>常见问题自查</a><br><br>"
             "1. 在差分宇宙中因奇物“绝对失败处方(进入战斗时，我方全体有150%的基础概率陷入冻结状态，持续1回合)”"
             "冻结队伍会导致无法开启自动战斗，建议开启游戏的沿用自动战斗设置。\n"
             "2. 游戏画面贴近或超出屏幕显示边缘时功能无法正常执行。\n"
@@ -940,6 +944,9 @@ class MultiAccount(SRAWidget):
             return
         plan_name, confirm = InputDialog.getText(self.ui, "创建方案", "方案名称：")
         if confirm and plan_name:
+            if plan_name in self.globals["Config"]["configList"]:
+                MessageBox.info(self, "添加失败", "方案已存在！")
+                return
             Configure.addConfig(plan_name)
             self.globals["Config"]["configList"].append(plan_name)
             Configure.save(self.globals, "data/globals.json")
@@ -962,6 +969,9 @@ class MultiAccount(SRAWidget):
         index = self.current_config_combobox.currentIndex()
         new, confirm = InputDialog.getText(self.ui, "重命名方案", "方案名称：")
         if confirm and new:
+            if new in self.globals["Config"]["configList"]:
+                MessageBox.info(self.ui, "重命名失败", "方案已存在！")
+                return
             Configure.rename(old, new)
             self.globals["Config"]["configList"][index] = new
             self.current_config_combobox.setItemText(index, new)
@@ -975,7 +985,7 @@ class MultiAccount(SRAWidget):
         return Configure.load("data/globals.json")["Config"]["configList"]
 
 
-class Plugin(QWidget):
+class PluginWidget(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.setLayout(QVBoxLayout(self))
@@ -1010,7 +1020,7 @@ class Settings(SRAWidget):
         self.sender_email: QLineEdit = self.ui.findChild(QLineEdit, "sender_email")
         self.authorization_code: QLineEdit = self.ui.findChild(QLineEdit, "authorization_code")
         self.receiver_email: QLineEdit = self.ui.findChild(QLineEdit, "receiver_email")
-        self.email_check_cutton: QPushButton = self.ui.findChild(QPushButton, "email_check_button")
+        self.email_check_button: QPushButton = self.ui.findChild(QPushButton, "email_check_button")
         self.startup_checkbox: QCheckBox = self.ui.findChild(QCheckBox, "checkBox_ifStartUp")
 
         auto_update_checkbox = self.ui.findChild(QCheckBox, "checkBox_ifAutoUpdate")
@@ -1073,7 +1083,7 @@ class Settings(SRAWidget):
         self.notification_allow_checkbox.stateChanged.connect(self.notification_status_change)
         self.system_notification_checkbox.stateChanged.connect(self.notification_status_change)
         self.email_notification_checkbox.stateChanged.connect(self.notification_status_change)
-        self.email_check_cutton.clicked.connect(self.email_check)
+        self.email_check_button.clicked.connect(self.email_check)
         self.startup_checkbox.stateChanged.connect(self.startup)
         self.thread_safety_checkbox.stateChanged.connect(self.thread_safety)
         self.confidence_spin_box.valueChanged.connect(self.confidence_changed)
@@ -1145,7 +1155,7 @@ class Settings(SRAWidget):
 
     def startup(self, state):
         if state == 2:
-            WindowsProcess.set_startup_item("SRA", AppPath + "/SRA.exe")
+            WindowsProcess.set_startup_item("SRA", str(AppPath / "SRA.exe"))
             self.globals["Settings"]["startup"] = True
         else:
             WindowsProcess.delete_startup_item("SRA")
