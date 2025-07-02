@@ -23,6 +23,7 @@
 """
 
 import ctypes
+import os
 import traceback
 
 import sys
@@ -32,6 +33,8 @@ from PySide6.QtWidgets import QApplication
 from SRACore.utils import Configure
 
 import faulthandler
+if not os.path.exists("log"):
+    os.mkdir("log")
 faulthandler.enable(open("log/crash.log","w",encoding="utf-8"))
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
