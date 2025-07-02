@@ -14,7 +14,7 @@ def send_system_notification(title="SRA", message="", timeout=3):
         notification.notify(
             title=title,
             message=message,
-            app_icon=AppPath / "res/SRAicon.ico",
+            app_icon=str(AppPath / "res/SRAicon.ico"),
             timeout=timeout,
         )
     except Exception as e:

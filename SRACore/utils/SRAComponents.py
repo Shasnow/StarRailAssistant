@@ -151,6 +151,7 @@ class SRAWidget(QWidget):
 
 
 class Main(QWidget):
+    logChanged = Signal(str)
     def __init__(self, main_window: QMainWindow):
         super().__init__()
         self.son_thread = None
@@ -168,10 +169,11 @@ class Main(QWidget):
         self.config = Configure.loadConfigByName(current)
         self.password_text = ""
         self.ui = uiLoader.load(self.AppPath / "res/ui/main.ui")
-        self.log = self.ui.findChild(QTextBrowser, "textBrowser_log")
+        self.log:QTextBrowser = self.ui.findChild(QTextBrowser, "textBrowser_log")
         SRACore.utils.Logger.logger.add(self.update_log, level=20,
                                         format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
-                                        colorize=False)
+                                        colorize=False,
+                                        enqueue=True)
 
         # 创建中间的垂直布局管理器用于任务设置
 
@@ -328,6 +330,7 @@ class Main(QWidget):
     def update_log(self, text):
         """Update the content in the log area."""
         self.log.append(text)
+        self.logChanged.emit(text)
 
     def getAll(self):
         self.getter()

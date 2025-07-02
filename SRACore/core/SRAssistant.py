@@ -835,6 +835,7 @@ class Assistant(QThread):
         press_key(self.f4)
         if not check("res/img/f4.png", max_time=20):
             logger.error("检测超时，编号1")
+            press_key("esc")
             return
         if exist("res/img/survival_index_onclick.png",wait_time=0):
             logger.info("没有可领取的奖励")
@@ -864,6 +865,7 @@ class Assistant(QThread):
         press_key(self.f2)
         if not check("res/img/f2.png", max_time=20):
             logger.error("检测超时，编号1")
+            press_key("esc")
             return
         if click("res/img/nameless_honor_reward_receive.png"):
             logger.info("领取了无名勋礼奖励")
