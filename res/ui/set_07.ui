@@ -34,7 +34,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-253</y>
+        <y>0</y>
         <width>309</width>
         <height>960</height>
        </rect>
@@ -239,6 +239,11 @@
             <item>
              <property name="text">
               <string>-----选择副本-----</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>月下朱殷（妖精/海隅）</string>
              </property>
             </item>
             <item>
@@ -846,6 +851,11 @@
             <item>
              <property name="text">
               <string>往日之影的雷冠（雷）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>暮辉烬蕾（风）</string>
              </property>
             </item>
             <item>

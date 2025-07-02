@@ -23,6 +23,7 @@
 """
 
 import ctypes
+import os
 import traceback
 
 import sys
@@ -30,7 +31,11 @@ import time
 from PySide6.QtWidgets import QApplication
 
 from SRACore.utils import Configure
-from SRACore.utils.Dialog import ExceptionMessageBox
+
+import faulthandler
+if not os.path.exists("log"):
+    os.mkdir("log")
+faulthandler.enable(open("log/crash.log","w",encoding="utf-8"))
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SRA")  # 修改任务栏图标
 
@@ -45,13 +50,14 @@ def is_admin():
 def exception_hook(exc_type: type, value):
     """全局异常捕获钩子"""
     try:
+        from SRACore.utils.Dialog import ExceptionMessageBox
         if QApplication.instance() is None:
             QApplication(sys.argv)
         msg_box = ExceptionMessageBox(exc_type.__name__, value, traceback.format_exc())
         msg_box.exec()
     except Exception as e:
         # 如果连 GUI 都无法启动
-        with open("error.log", "w", encoding="utf-8") as file:
+        with open("log/error.log", "w", encoding="utf-8") as file:
             file.write(f"{exc_type}:{value}:{traceback.format_exc()}\n"
                        f"During handle the exception, another exception occurred: {e}")
 
@@ -80,6 +86,8 @@ def main():
             CommandLine().default(sys.argv[1])
     else:
         from SRACore.utils.SRAComponents import SRA
+        from SRACore.utils.Plugins import PluginManager
+        PluginManager.scan_plugins()
         app = QApplication(sys.argv)
         app.setQuitOnLastWindowClosed(False)
         start_time = time.time()
@@ -93,6 +101,7 @@ def main():
         version = Configure.load("version.json")
         if not version["Announcement.DoNotShowAgain"]:
             window.main.notice()
+        PluginManager.load_plugins("late")
         sys.exit(app.exec())
 
 

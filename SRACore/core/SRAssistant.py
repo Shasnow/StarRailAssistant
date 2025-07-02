@@ -22,15 +22,15 @@
 主功能
 """
 
-import subprocess
-
 import time
+
 from PySide6.QtCore import QThread, Signal
 
 from SRACore.utils import Configure, WindowsProcess, Encryption
 from SRACore.utils.Logger import logger
+from SRACore.utils.Notification import send_system_notification
 from SRACore.utils.SRAOperator import SRAOperator
-from SRACore.utils.WindowsProcess import find_window, is_process_running
+from SRACore.utils.WindowsProcess import find_window, is_process_running, Popen
 from SRACore.utils.const import VERSION
 from SRACore.utils.exceptions import MatchFailureException
 
@@ -134,6 +134,9 @@ class Assistant(QThread):
         if not WindowsProcess.check_window(window_title):
             logger.warning(f"未找到窗口: {window_title} 或许你还没有运行游戏")
             return False
+        resolution=SRAOperator.resolution_detect()
+        if resolution[1]/resolution[0]!=9/16:
+            send_system_notification(message="检测到游戏分辨率不为16:9, SRA可能无法按预期运行", timeout=5)
         return True
 
     @staticmethod
@@ -179,6 +182,7 @@ class Assistant(QThread):
             logger.warning("路径无效")
             return False
         if not Popen(game_path):
+            logger.error("启动失败")
             return False
         logger.info("等待游戏启动")
         time.sleep(5)
@@ -212,10 +216,12 @@ class Assistant(QThread):
         if not self.path_check(path, path_type):
             logger.warning("路径无效")
             return False
-        if not Popen(path):
+        if is_process_running("StarRail.exe"):
+            return True
+        if not Popen([path,"--game=hkrpg_cn"]):
+            logger.error("启动失败")
             return False
         logger.info("等待启动器启动")
-        time.sleep(5)
         times = 0
         while times < 20:
             if is_process_running("HYP.exe"):
@@ -232,7 +238,7 @@ class Assistant(QThread):
                         logger.info("已为您关闭启动器")
                         return True
             else:
-                time.sleep(0.5)
+                time.sleep(2)
                 times += 1
         else:
             logger.warning("启动时间过长，请尝试手动启动")
@@ -256,6 +262,9 @@ class Assistant(QThread):
         logger.info("登录中")
         result = check_any(
             ["res/img/login_page.png", "res/img/welcome.png", "res/img/quit.png", "res/img/chat_enter.png"])
+        resolution=SRAOperator.resolution_detect()
+        if resolution[1]/resolution[0]!=9/16:
+            send_system_notification(message="检测到游戏分辨率不为16:9, SRA可能无法按预期运行", timeout=5)
         if result is not None and result != 0:
             logger.info(f"登录状态 {result}")
             return result
@@ -355,7 +364,7 @@ class Assistant(QThread):
                     case _:
                         logger.error("未知登录状态")
                         return False
-            time.sleep(2)
+            time.sleep(1)
             if check("res/img/quit.png", max_time=120):
                 self.start_game_click()
 
@@ -397,7 +406,7 @@ class Assistant(QThread):
             time.sleep(1)
 
     def trailblazer_power(self):
-        def nameToTask(name):
+        def name2task(name:str):
             match name:
                 case "饰品提取":
                     return self.ornament_extraction
@@ -422,7 +431,7 @@ class Assistant(QThread):
         tasklist = config["TrailBlazePower"]["taskList"]
         logger.debug("任务列表：" + str(tasklist))
         for task in tasklist:
-            tasks.append((nameToTask(task["name"]), (task["args"])))
+            tasks.append((name2task(task["name"]), (task["args"])))
         for task, args in tasks:
             if self.stop_flag:
                 break
@@ -474,9 +483,9 @@ class Assistant(QThread):
 
     def after_mission(self):
         if self.config["AfterMission"]["logout"]:
-            return self.logout()
+            self.logout()
         if self.config["AfterMission"]["quitGame"]:
-            return self.quit_game()
+            self.quit_game()
         return True
 
     @staticmethod
@@ -611,7 +620,7 @@ class Assistant(QThread):
             press_key_for_a_while("w", 2.5)
             click_point()
             self.battle_star(runTimes)
-        self.update_signal.emit("任务完成：饰品提取")
+        logger.info("任务完成：饰品提取")
         return True
 
     def calyx_golden(self, level, singleTimes=1, runTimes=1, **_):
@@ -827,6 +836,7 @@ class Assistant(QThread):
         press_key(self.f4)
         if not check("res/img/f4.png", max_time=20):
             logger.error("检测超时，编号1")
+            press_key("esc")
             return
         if exist("res/img/survival_index_onclick.png",wait_time=0):
             logger.info("没有可领取的奖励")
@@ -856,6 +866,7 @@ class Assistant(QThread):
         press_key(self.f2)
         if not check("res/img/f2.png", max_time=20):
             logger.error("检测超时，编号1")
+            press_key("esc")
             return
         if click("res/img/nameless_honor_reward_receive.png"):
             logger.info("领取了无名勋礼奖励")
@@ -1096,18 +1107,6 @@ class Assistant(QThread):
             return False
 
 
-def Popen(path: str):
-    try:
-        subprocess.Popen(path)
-        return True
-    except FileNotFoundError as e:
-        logger.error(e)
-        return False
-    except OSError:
-        logger.error("路径无效或权限不足")
-        return False
-
-
 def check(img_path, interval=0.5, max_time=40):
     return SRAOperator.check(img_path, interval, max_time)
 
@@ -1151,7 +1150,7 @@ def find_level(level: str) -> bool:
         True if found.
     """
     x, y = get_screen_center()
-    SRAOperator.moveTo(x - 200, y)
+    SRAOperator.moveTo(x-80, y)
     times = 0
     while True:
         times += 1
