@@ -620,7 +620,7 @@ class Assistant(QThread):
             press_key_for_a_while("w", 2.5)
             click_point()
             self.battle_star(runTimes)
-        self.update_signal.emit("任务完成：饰品提取")
+        logger.info("任务完成：饰品提取")
         return True
 
     def calyx_golden(self, level, singleTimes=1, runTimes=1, **_):
