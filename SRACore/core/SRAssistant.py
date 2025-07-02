@@ -217,6 +217,8 @@ class Assistant(QThread):
         if not self.path_check(path, path_type):
             logger.warning("路径无效")
             return False
+        if is_process_running("StarRail.exe"):
+            return True
         if not Popen([path,"--game=hkrpg_cn"]):
             logger.error("启动失败")
             return False
