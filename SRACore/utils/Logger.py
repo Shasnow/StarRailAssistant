@@ -1,12 +1,36 @@
-import sys
+class Logger:
+    """日志记录器类"""
 
-from loguru import logger
+    def info(self, message=""):
+        """记录信息级别日志"""
+        print(message)
 
-logger.remove(0)
-if sys.stdout.isatty():
-    logger.add(sys.stdout,level=0,format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level:7}</level> | <cyan>{module}.{function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>",colorize=True,enqueue=True)
-    logger.success("已连接终端")
-    logger.debug(f'启动参数: {sys.argv[1:]}')
+    def warning(self, message=""):
+        """记录警告级别日志"""
+        print(message)
 
-logger.add("log/SRAlog{time:YYYYMMDDHHmmss}.log",level=0,format="{time:YYYY-MM-DD HH:mm:ss} | {level:7} | {module}.{function}:{line} | {message}",colorize=False,retention=7,enqueue=True)
+    def error(self, message=""):
+        """记录错误级别日志"""
+        print(message)
+
+    def success(self, message=""):
+        """记录成功级别日志"""
+        print(message)
+
+    def debug(self, message=""):
+        """记录调试级别日志"""
+        print(message)
+
+    def trace(self, message=""):
+        """记录追踪级别日志"""
+        print(message)
+
+    def exception(self, message=""):
+        """记录异常级别日志"""
+        print(message)
+
+
+# 实例化日志记录器
+
+logger = Logger()
 __all__ = ["logger"]

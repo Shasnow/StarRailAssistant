@@ -21,10 +21,9 @@
 作者：雪影
 主功能
 """
-
 import time
 
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import Signal, QThread
 
 from SRACore.utils import Configure, WindowsProcess, Encryption
 from SRACore.utils.Logger import logger
@@ -35,7 +34,7 @@ from SRACore.utils.const import VERSION
 from SRACore.utils.exceptions import MatchFailureException
 
 
-class Assistant(QThread):
+class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的方式来创建线程，否则无法控制中断
     update_signal = Signal(str)
 
     def __init__(self, pwd, config=None):
