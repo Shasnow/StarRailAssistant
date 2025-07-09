@@ -1,18 +1,16 @@
-import os
 import random
+import time
 
 import keyboard
 import schedule
-import time
-from PySide6.QtCore import Slot, QThread, Signal
+from PySide6.QtCore import Slot, QThread, Signal, QObject
 from PySide6.QtGui import QFont, QIcon, QAction
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMenu, QWidget, QCheckBox, QTextEdit, QComboBox, QLineEdit, \
     QPushButton, QLabel, QFileDialog, \
     QSpinBox, QRadioButton, QVBoxLayout, QSystemTrayIcon, QApplication, QTableWidget, QDoubleSpinBox, QScrollArea, \
-    QGroupBox, QFrame, QMainWindow, QTextBrowser, QHBoxLayout
+    QGroupBox, QFrame, QMainWindow, QTextBrowser
 
-import SRACore.utils.Logger
 from SRACore.core import AutoPlot, SRAssistant
 from SRACore.utils import Encryption, Configure, WindowsProcess, Notification, WindowsPower
 from SRACore.utils.Dialog import MessageBox, InputDialog, ShutdownDialog, AnnouncementBoard, Announcement, \
@@ -68,35 +66,44 @@ def convert_to_html(text):
 class SRA(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.background_thread: QThread = QThread(self)
+        self.background_thread_worker: BackgroundEvent | None = None
         self.main = Main(self)
         self.setCentralWidget(self.main.ui)
         self.setWindowIcon(QIcon("res/SRAicon.ico"))
-        self.setWindowTitle(f"SRA v{VERSION} | {PluginManager.getPluginsCount()}个插件已加载 {random.choice(RANDOM_TITLE)}")
+        self.setWindowTitle(
+            f"SRA v{VERSION} | {PluginManager.getPluginsCount()}个插件已加载 {random.choice(RANDOM_TITLE)}")
         size = list(map(int, self.main.globals["Settings"]["uiSize"].split("x")))
         location = list(map(int, self.main.globals["Settings"]["uiLocation"].split("x")))
-        x,y=self.location_check(*location)
+        x, y = self.location_check(*location)
         self.setGeometry(
             x, y, size[0], size[1]
         )  # 设置窗口大小与位置
 
         self.system_tray = SystemTray(self)
         self.system_tray.show()
-        self.keyboard_listener()
+        self.add_background_thread()
 
     @staticmethod
     def location_check(x, y):
         for screen in QApplication.screens():
             if screen.geometry().contains(x, y):
-                return x,y
-        return 100,100
+                return x, y
+        return 100, 100
 
-    def keyboard_listener(self):
-        self.hotkey = BackgroundEvent(**self.main.globals["Settings"])
-        self.hotkey.start()
-        self.hotkey.startOrStop.connect(self.start_status_switch)
-        self.hotkey.showOrHide.connect(self.show_or_hide)
-        self.hotkey.isTimeToRun.connect(self.schedule_run)
-        QApplication.instance().aboutToQuit.connect(self.hotkey.stop)
+    def add_background_thread(self):
+        self.background_thread_worker = BackgroundEvent(**self.main.globals["Settings"])
+        self.background_thread_worker.moveToThread(self.background_thread)
+        self.background_thread.started.connect(self.background_thread_worker.run)
+        self.background_thread_worker.finish.connect(self.background_thread.quit)
+        self.background_thread_worker.startOrStop.connect(self.start_status_switch)
+        self.background_thread_worker.showOrHide.connect(self.show_or_hide)
+        self.background_thread_worker.isTimeToRun.connect(self.schedule_run)
+        self.background_thread.start()
+
+    def q(self):
+        self.background_thread.quit()
+        print("线程已退出")
 
     @Slot(str)
     def schedule_run(self, config):
@@ -128,6 +135,8 @@ class SRA(QMainWindow):
         # 结束残余进程
         event.accept()
         if self.main.globals["Settings"]["exitWhenClose"]:
+            self.background_thread_worker.stop()
+            self.background_thread.wait()
             QApplication.quit()
 
 
@@ -152,9 +161,10 @@ class SRAWidget(QWidget):
 
 class Main(QWidget):
     logChanged = Signal(str)
+
     def __init__(self, main_window: QMainWindow):
         super().__init__()
-        self.son_thread = None
+        self.son_thread: SRAssistant.Assistant | None = None
         self.main_window = main_window
         self.AppPath = AppPath
         # self.ocr_window=None
@@ -169,11 +179,7 @@ class Main(QWidget):
         self.config = Configure.loadConfigByName(current)
         self.password_text = ""
         self.ui = uiLoader.load(self.AppPath / "res/ui/main.ui")
-        self.log:QTextBrowser = self.ui.findChild(QTextBrowser, "textBrowser_log")
-        SRACore.utils.Logger.logger.add(self.update_log, level=20,
-                                        format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
-                                        colorize=False,
-                                        enqueue=True)
+        self.log: QTextBrowser = self.ui.findChild(QTextBrowser, "textBrowser_log")
 
         # 创建中间的垂直布局管理器用于任务设置
 
@@ -265,10 +271,10 @@ class Main(QWidget):
 
     def extension(self):
         auto_plot_frame: QFrame = self.ui.findChild(QFrame, "frame_autoplot")
-        auto_plot_switch= ToggleSwitch(self.ui)
+        auto_plot_switch = ToggleSwitch(self.ui)
         auto_plot_frame.layout().addWidget(auto_plot_switch)
         auto_plot_switch.stateChanged.connect(self.auto_plot_status)
-        self.autoplot.interrupted.connect(lambda :auto_plot_switch.setOn(False))
+        self.autoplot.interrupted.connect(lambda: auto_plot_switch.setOn(False))
         # relics_identification_button:QPushButton=self.ui.findChild(QPushButton,"relicsIdentification")
         # relics_identification_button.clicked.connect(self.relics_identification)
 
@@ -287,10 +293,6 @@ class Main(QWidget):
             self.autoplot.run_application()
         else:
             self.autoplot.quit_application()
-
-    # def relics_identification(self):
-    #     self.ocr_window=SRAocr()
-    #     self.ocr_window.show()
 
     def software_setting(self):
         setting_area: QWidget = self.ui.findChild(QWidget, "tab_2")
@@ -381,20 +383,12 @@ class Main(QWidget):
         self.button0_1.setEnabled(False)
         self.isRunning = True
 
-    def execute_with_config(self, config: str):
-        self.son_thread = SRAssistant.Assistant(self.password_text, config)
-        self.son_thread.update_signal.connect(self.update_log)
-        self.son_thread.finished.connect(self.missions_finished)
-        self.son_thread.start()
-        self.button0_2.setEnabled(True)
-        self.button0_1.setEnabled(False)
-        self.isRunning = True
-
+    @Slot()
     def missions_finished(self):
         """接收到任务完成信号后执行的工作"""
         self.notification()
         self.isRunning = False
-        del self.son_thread
+        self.son_thread = None
         if self.shutdown:
             WindowsPower.schedule_shutdown(60)
             self.countdown()
@@ -1238,10 +1232,11 @@ class SystemTray(QSystemTrayIcon):
                 self.parent_object.show()
 
 
-class BackgroundEvent(QThread):
+class BackgroundEvent(QObject):
     startOrStop = Signal()
     showOrHide = Signal()
     isTimeToRun = Signal(str)
+    finish = Signal()  # 使用finished作为变量名时无法正常发送
 
     def __init__(self, hotkeys: list[str], scheduleList: list[str], **_):
         super().__init__()
@@ -1271,15 +1266,14 @@ class BackgroundEvent(QThread):
 
     def stop(self):
         self.running_flag = False
-        keyboard.unhook_all()
-        self.quit()
-        self.wait()
+        self.finish.emit()
 
     def run(self):
         while self.running_flag:
             if self.has_scheduled:
                 schedule.run_pending()
             time.sleep(0.02)
+        self.finish.emit()
 
     def startOrStopCallback(self):
         self.startOrStop.emit()
