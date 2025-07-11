@@ -133,8 +133,8 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
         if not WindowsProcess.check_window(window_title):
             logger.warning(f"未找到窗口: {window_title} 或许你还没有运行游戏")
             return False
-        resolution=SRAOperator.resolution_detect()
-        if resolution[1]/resolution[0]!=9/16:
+        resolution = SRAOperator.resolution_detect()
+        if resolution[1] / resolution[0] != 9 / 16:
             send_system_notification(message="检测到游戏分辨率不为16:9, SRA可能无法按预期运行", timeout=5)
         return True
 
@@ -217,28 +217,52 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
             return False
         if is_process_running("StarRail.exe"):
             return True
-        if not Popen([path,"--game=hkrpg_cn"]):
+        if not Popen([path, "--game=hkrpg_cn"]):
             logger.error("启动失败")
             return False
         logger.info("等待启动器启动")
-        times = 0
-        while times < 20:
-            if is_process_running("HYP.exe"):
+
+        for i in range(30):
+            if not (is_process_running("HYP.exe") or is_process_running("HYUpdater.exe")):
+                logger.debug("未检测到启动器进程")
+                time.sleep(1)
+                continue
+            try:
                 if channel == 0:
-                    click('res/img/start_game.png', title="米哈游启动器")
+                    region = SRAOperator.get_screenshot_region(title="米哈游启动器")
                 else:
-                    click('res/img/start_game.png')
-                logger.info("尝试启动游戏")
-                for i in range(10):
-                    time.sleep(1)
-                    if is_process_running("StarRail.exe"):
+                    region = SRAOperator.get_screenshot_region(title="崩坏：星穹铁道")
+            except Exception:
+                logger.debug("获取OCR区域失败")
+                time.sleep(1)
+                continue
+            result = SRAOperator.ocr_in_region_anywhere(*region)
+            for r in result:
+                point = SRAOperator.point_at_screen(*SRAOperator.center(*r[0]))
+                text = r[1]
+                if text == "立即更新":
+                    click_point(*point)
+                    logger.info("启动器更新")
+                    break
+                elif text == "开始游戏":
+                    click_point(*point)
+                    logger.info("点击开始游戏")
+                    for j in range(10):
+                        logger.info("等待游戏启动")
+                        time.sleep(1)
+                        if not is_process_running("StarRail.exe"):
+                            continue
                         logger.info("启动成功")
                         WindowsProcess.task_kill("HYP.exe")
                         logger.info("已为您关闭启动器")
                         return True
-            else:
-                time.sleep(2)
-                times += 1
+                elif "资源下载中" in text:
+                    logger.info("资源下载中...")
+                    time.sleep(5)
+                elif "文件解压中" in text:
+                    logger.info("文件解压中...")
+                    time.sleep(5)
+
         else:
             logger.warning("启动时间过长，请尝试手动启动")
             return False
@@ -261,8 +285,8 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
         logger.info("登录中")
         result = check_any(
             ["res/img/login_page.png", "res/img/welcome.png", "res/img/quit.png", "res/img/chat_enter.png"])
-        resolution=SRAOperator.resolution_detect()
-        if resolution[1]/resolution[0]!=9/16:
+        resolution = SRAOperator.resolution_detect()
+        if resolution[1] / resolution[0] != 9 / 16:
             send_system_notification(message="检测到游戏分辨率不为16:9, SRA可能无法按预期运行", timeout=5)
         if result is not None and result != 0:
             logger.info(f"登录状态 {result}")
@@ -405,7 +429,7 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
             time.sleep(1)
 
     def trailblazer_power(self):
-        def name2task(name:str):
+        def name2task(name: str):
             match name:
                 case "饰品提取":
                     return self.ornament_extraction
@@ -837,14 +861,14 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
             logger.error("检测超时，编号1")
             press_key("esc")
             return
-        if exist("res/img/survival_index_onclick.png",wait_time=0):
+        if exist("res/img/survival_index_onclick.png", wait_time=0):
             logger.info("没有可领取的奖励")
             press_key("esc")
         else:
-            while click("res/img/daily_reward.png",wait_time=SRAOperator.performance/2):
+            while click("res/img/daily_reward.png", wait_time=SRAOperator.performance / 2):
                 moveRel(0, 50)
 
-            if click("res/img/daily_train_reward.png",wait_time=SRAOperator.performance/2):
+            if click("res/img/daily_train_reward.png", wait_time=SRAOperator.performance / 2):
                 time.sleep(1.5)
                 press_key("esc")
                 if exist("res/img/daily_train_reward_notreach.png", 0.5):
@@ -1022,9 +1046,9 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
                                    "res/img/divergent_universe_quit.png",
                                    "res/img/curiosity_select.png"], max_time=8)
                 if index == 4:
-                    if not click("res/img/collection.png",wait_time=SRAOperator.performance/4):
+                    if not click("res/img/collection.png", wait_time=SRAOperator.performance / 4):
                         click_point(*get_screen_center())
-                    click("res/img/ensure2.png", wait_time=SRAOperator.performance/2)
+                    click("res/img/ensure2.png", wait_time=SRAOperator.performance / 2)
                     time.sleep(SRAOperator.performance / 2)
                 elif index == 3:
                     break
@@ -1035,9 +1059,9 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
                     click("res/img/ensure2.png", wait_time=0.5)
                     time.sleep(SRAOperator.performance / 2)
                 elif index == 0:
-                    if not click("res/img/collection.png",wait_time=SRAOperator.performance/4):
+                    if not click("res/img/collection.png", wait_time=SRAOperator.performance / 4):
                         click_point(*get_screen_center())
-                    click("res/img/ensure2.png", wait_time=SRAOperator.performance/2)
+                    click("res/img/ensure2.png", wait_time=SRAOperator.performance / 2)
                     time.sleep(SRAOperator.performance / 2)
                 else:
                     logger.warning("发生错误")
@@ -1051,7 +1075,7 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
             if check("res/img/q.png", max_time=10):
                 press_key("v")
             logger.info("等待战斗结束")
-            if not check("res/img/blessing_select.png", max_time=120, interval=SRAOperator.performance/2):
+            if not check("res/img/blessing_select.png", max_time=120, interval=SRAOperator.performance / 2):
                 logger.error("失败/超时")
 
             logger.info("选择祝福")
@@ -1149,7 +1173,7 @@ def find_level(level: str) -> bool:
         True if found.
     """
     x, y = get_screen_center()
-    SRAOperator.moveTo(x-80, y)
+    SRAOperator.moveTo(x - 80, y)
     times = 0
     while True:
         times += 1
@@ -1176,7 +1200,7 @@ def wait_battle_end():
     while True:
         time.sleep(0.2)
         try:
-            index, _ = SRAOperator.locateAny(["res/img/quit_battle.png", "res/img/battle_failure.png"],trace=False)
+            index, _ = SRAOperator.locateAny(["res/img/quit_battle.png", "res/img/battle_failure.png"], trace=False)
             logger.info("战斗结束")
             return index
         except MatchFailureException:
