@@ -136,7 +136,7 @@ class SRA(QMainWindow):
         event.accept()
         if self.main.globals["Settings"]["exitWhenClose"]:
             self.background_thread_worker.stop()
-            self.background_thread.wait()
+            self.background_thread.wait()  
             QApplication.quit()
 
 
@@ -375,7 +375,10 @@ class Main(QWidget):
         if not Configure.save(self.config, f"data/config-{current}.json"):
             self.log.append("配置失败")
             return
-        self.son_thread = SRAssistant.Assistant(self.password_text)
+        self.execute_with_config(None)
+
+    def execute_with_config(self, config):
+        self.son_thread = SRAssistant.Assistant(self.password_text, config)
         self.son_thread.update_signal.connect(self.update_log)
         self.son_thread.finished.connect(self.missions_finished)
         self.son_thread.start()

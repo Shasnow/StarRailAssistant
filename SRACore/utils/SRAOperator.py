@@ -18,20 +18,21 @@
 作者：雪影
 SRA操作
 """
+import time
 from os import PathLike
+from typing import Any
 
 import cv2
 import pyautogui
 import pygetwindow
 import pyperclip
 import pyscreeze
-import time
 from PIL import Image
 from rapidocr_onnxruntime import RapidOCR
 
+from SRACore.utils.Logger import logger
 from SRACore.utils.exceptions import WindowNoFoundException, MatchFailureException, \
     WindowInactiveException
-from SRACore.utils.Logger import logger
 
 
 class SRAOperator:
@@ -718,6 +719,17 @@ class SRAOperator:
         return result
 
     @classmethod
+    def ocr_in_region_anywhere(cls, area_left: int, area_top: int, width: int, height: int) -> list[list[
+        str | Any]] | None:
+        if cls.ocr_engine is None:
+            cls.ocr_engine = RapidOCR()
+        logger.debug("正在执行OCR")
+        img = pyscreeze.screenshot(region=(area_left, area_top, width, height))
+        # 执行 OCR 识别
+        result, elapse = cls.ocr_engine(img, use_det=True, use_cls=False, use_rec=True)
+        return result
+
+    @classmethod
     def ocr_on_image(cls, img: Image, region: tuple[int, int, int, int] = None):
         """
         在指定图像上执行 OCR 识别。(相对于截图区域)
@@ -743,3 +755,26 @@ class SRAOperator:
             img.show()
         result, elapse = cls.ocr_engine(img, use_det=True, use_cls=False, use_rec=True)
         return result
+
+    @classmethod
+    def center(cls, left_top: tuple[int, int], right_top: tuple[int, int], left_bottom: tuple[int, int],
+               right_bottom: tuple[int, int]) -> tuple[int, int]:
+        """
+        计算四个点的中心点坐标。
+
+        Args:
+            left_top (tuple[int, int]): 左上角坐标。
+            right_top (tuple[int, int]): 右上角坐标。
+            left_bottom (tuple[int, int]): 左下角坐标。
+            right_bottom (tuple[int, int]): 右下角坐标。
+
+        Returns:
+            tuple[int, int]: 中心点坐标。
+        """
+        x = (left_top[0] + right_top[0] + left_bottom[0] + right_bottom[0]) // 4
+        y = (left_top[1] + right_top[1] + left_bottom[1] + right_bottom[1]) // 4
+        return x, y
+
+    @classmethod
+    def point_at_screen(cls, x: int, y: int) -> tuple[int, int]:
+        return x + cls.area_left, y + cls.area_top
