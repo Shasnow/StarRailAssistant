@@ -23,7 +23,7 @@
 """
 import time
 
-from PySide6.QtCore import Signal, QThread
+from PySide6.QtCore import QThread
 
 from SRACore.utils import Configure, WindowsProcess, Encryption
 from SRACore.utils.Logger import logger
@@ -35,7 +35,6 @@ from SRACore.utils.exceptions import MatchFailureException
 
 
 class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的方式来创建线程，否则无法控制中断
-    update_signal = Signal(str)
 
     def __init__(self, pwd, config=None):
         super().__init__()
@@ -55,9 +54,6 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
         self.f1 = settings["F1"]
         self.f2 = settings["F2"]
         self.f4 = settings["F4"]
-
-    def send_signal(self, text):
-        self.update_signal.emit(text)
 
     def request_stop(self):
         logger.warning("用户请求停止")
@@ -105,6 +101,7 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
             logger.info("任务全部完成\n")
 
     def run(self):
+        logger.debug("<=========== 日志开始 ===========>")
         logger.info(f"SRAv{VERSION} 创建任务喵~")
         if self.config is None:
             if not self.globals["Config"]["next"]:
@@ -119,6 +116,7 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
                 if self.stop_flag:
                     break
                 self.assist_start(self.config_list[i])
+        logger.debug("<=========== 日志结束 ===========>")
 
     @staticmethod
     def check_game():

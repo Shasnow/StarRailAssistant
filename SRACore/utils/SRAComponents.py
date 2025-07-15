@@ -15,7 +15,7 @@ from SRACore.core import AutoPlot, SRAssistant
 from SRACore.utils import Encryption, Configure, WindowsProcess, Notification, WindowsPower
 from SRACore.utils.Dialog import MessageBox, InputDialog, ShutdownDialog, AnnouncementBoard, Announcement, \
     ScheduleDialog
-from SRACore.utils.Logger import logger
+from SRACore.utils.Logger import logger, log_emitter
 from SRACore.utils.Plugins import PluginManager
 from SRACore.utils.SRAWidgets import ToggleSwitch
 from SRACore.utils.const import *
@@ -180,6 +180,7 @@ class Main(QWidget):
         self.password_text = ""
         self.ui = uiLoader.load(self.AppPath / "res/ui/main.ui")
         self.log: QTextBrowser = self.ui.findChild(QTextBrowser, "textBrowser_log")
+        log_emitter.log_signal.connect(self.update_log)
 
         # 创建中间的垂直布局管理器用于任务设置
 
@@ -332,7 +333,6 @@ class Main(QWidget):
     def update_log(self, text):
         """Update the content in the log area."""
         self.log.append(text)
-        self.logChanged.emit(text)
 
     def getAll(self):
         self.getter()
@@ -379,7 +379,6 @@ class Main(QWidget):
 
     def execute_with_config(self, config):
         self.son_thread = SRAssistant.Assistant(self.password_text, config)
-        self.son_thread.update_signal.connect(self.update_log)
         self.son_thread.finished.connect(self.missions_finished)
         self.son_thread.start()
         self.button0_2.setEnabled(True)
