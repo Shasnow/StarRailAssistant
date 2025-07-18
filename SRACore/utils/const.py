@@ -5,8 +5,8 @@ from pathlib import Path
 # 基础的常量定义
 AppPath = Path(os.path.dirname(os.path.realpath(sys.argv[0])))
 PLATFORM = "Windows" if sys.platform == "win32" else "Linux"
-VERSION = "0.8.3"
-CORE = "0.8.3 for " + PLATFORM
+VERSION = "0.8.4"
+CORE = f"{VERSION} for {PLATFORM}"
 
 RANDOM_TITLE = [
     "--cli !",
