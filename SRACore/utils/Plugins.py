@@ -4,10 +4,11 @@ import sys
 import tomllib
 
 from PySide6.QtCore import QThread
-from SRACore.utils.Logger import logger
 
-from SRACore.utils.exceptions import InvalidPluginException
+from SRACore.utils.Logger import logger
 from SRACore.utils.const import VERSION
+from SRACore.utils.exceptions import InvalidPluginException
+
 
 class PluginBase(QThread):
     def __init__(self, name: str):
@@ -58,12 +59,16 @@ class PluginManager:
             # 检查插件的加载时期是否与当前传入的period参数匹配
             if plugin_info.get("loadPeriod", "normal") != period:
                 continue
+            if plugin_info.get("SRAversion", "0.0.0") != VERSION:
+                logger.warning(
+                    f"版本不匹配：插件 '{plugin_name}' 需要 {plugin_info.get('SRAversion', '0.0.0')}, 但实际为 {VERSION}")
+                continue
             try:
                 # 构建插件的完整路径
                 plugin_path = os.path.join(cls.plugin_dir, plugin_name)
                 # 导入插件模块
                 model = importlib.import_module(plugin_path.replace('\\', '.'))
-                # 检查插件是否实现了'run'方法
+                # 检查插件是否实现了 'run' 方法
                 if not hasattr(model, 'run') and plugin_info.get("loadPeriod")!="late":
                     raise InvalidPluginException("Plugin does not implement 'run' method and is not a late-load type.")
                 # 如果插件定义了UI属性，将其设置为公共UI
