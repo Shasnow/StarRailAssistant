@@ -101,7 +101,7 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
             logger.info("任务全部完成\n")
 
     def run(self):
-        logger.debug("<=========== 日志开始 ===========>")
+        logger.debug("<============= 日志开始 =============>")
         logger.info(f"SRAv{VERSION} 创建任务喵~")
         if self.config is None:
             if not self.globals["Config"]["next"]:
@@ -116,7 +116,7 @@ class Assistant(QThread):  # 只能采用继承 QThread 并重写run 方法的�
                 if self.stop_flag:
                     break
                 self.assist_start(self.config_list[i])
-        logger.debug("<=========== 日志结束 ===========>")
+        logger.debug("<============= 日志结束 =============>")
 
     @staticmethod
     def check_game():

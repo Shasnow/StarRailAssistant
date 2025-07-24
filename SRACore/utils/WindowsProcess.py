@@ -47,6 +47,19 @@ def find_window(title) -> int | None:
     return windows[0] if windows else None
 
 
+def is_window_active(window_title) -> bool:
+    """Check if the specified window is active.
+
+    Args:
+        window_title (str): The title of the window to check.
+    Returns:
+        True if the window is active, False otherwise.
+    """
+    hwnd = find_window(window_title)
+    if hwnd:
+        return win32gui.GetForegroundWindow() == hwnd
+    return False
+
 def check_window(window_title) -> bool:
     """Check that the game is running by window title.
 
