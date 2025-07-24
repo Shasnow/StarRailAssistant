@@ -26,12 +26,14 @@ import json
 import os.path
 import time
 
+import keyboard
 from PySide6.QtCore import QThread, Signal
+from SRACore.utils.SRAWebOperator import SRAWebOperator
 from selenium import webdriver
-from selenium.webdriver import ActionChains
 from selenium.common.exceptions import (NoSuchElementException,
                                         StaleElementReferenceException,
                                         TimeoutException)
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options
 from selenium.webdriver.edge.service import Service
@@ -39,9 +41,7 @@ from selenium.webdriver.edge.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-from SRACore.utils.SRAWebOperator import SRAWebOperator
 from SRACore.utils.Logger import logger
-import keyboard
 
 
 class CloudGame:
@@ -237,7 +237,7 @@ class SRACloud(QThread):
             cloud_game.run()
 
             # self.assistant = SRAssistant.Assistant('', True, cloud_game.driver)
-            # self.assistant.update_signal.connect(self.sent_signal)
+            # self.assistant.log_signal.connect(self.sent_signal)
             # self.assistant.start()
             # self.assistant.wait()
 
