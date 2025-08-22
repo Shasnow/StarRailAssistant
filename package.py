@@ -40,7 +40,7 @@ if __name__ == "__main__":
     os.system(
         "powershell -Command python -m nuitka --standalone --mingw64"
         " --enable-plugins=pyside6 --windows-console-mode=attach --windows-uac-admin"
-        " --windows-icon-from-ico=res\\SRAicon.ico"
+        " --windows-icon-from-ico=resources\\SRAicon.ico"
         " --company-name='StarRailAssistant Team' --product-name=StarRailAssistant"
         f" --file-version={version['version'].split('-')[0]}"
         f" --product-version={version['version'].split('-')[0]}"
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         " --remove-output main.py"
     )
 
-    print("Start to copy rescourses ...")
+    print("Start to copy resources ...")
 
     shutil.copytree(root_path / "resources", root_path / "SRA.dist/resources")
     # shutil.copytree(root_path / "plugins", root_path / "SRA.dist/plugins")
