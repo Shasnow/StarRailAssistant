@@ -35,7 +35,7 @@ if __name__ == "__main__":
     with (root_path / "version.json").open(mode="r", encoding="utf-8") as f:
         version = json.load(f)
 
-    print("Packaging SRA main program ...")
+    print("Packaging main main program ...")
 
     os.system(
         "powershell -Command python -m nuitka --standalone --mingw64"
@@ -52,25 +52,25 @@ if __name__ == "__main__":
 
     print("Start to copy resources ...")
 
-    shutil.copytree(root_path / "resources", root_path / "SRA.dist/resources")
-    # shutil.copytree(root_path / "plugins", root_path / "SRA.dist/plugins")
-    shutil.copytree(root_path / "tools", root_path / "SRA.dist/tools")
-    # shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "SRA.dist/rapidocr_onnxruntime")
-    shutil.copy(root_path / "LICENSE", root_path / "SRA.dist/LICENSE")
-    shutil.copy(root_path / "README.md", root_path / "SRA.dist/README.md")
-    shutil.copy(root_path / "version.json", root_path / "SRA.dist/version.json")
+    shutil.copytree(root_path / "resources", root_path / "main.dist/resources")
+    # shutil.copytree(root_path / "plugins", root_path / "main.dist/plugins")
+    shutil.copytree(root_path / "tools", root_path / "main.dist/tools")
+    # shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "main.dist/rapidocr_onnxruntime")
+    shutil.copy(root_path / "LICENSE", root_path / "main.dist/LICENSE")
+    shutil.copy(root_path / "README.md", root_path / "main.dist/README.md")
+    shutil.copy(root_path / "version.json", root_path / "main.dist/version.json")
 
     print("Start to compress ...")
 
     shutil.make_archive(
         base_name=root_path / f"StarRailAssistant_v{version['version']}",
         format="zip",
-        root_dir=root_path / "SRA.dist",
+        root_dir=root_path / "main.dist",
         base_dir=".",
     )
-    shutil.rmtree(root_path / "SRA.dist")
+    shutil.rmtree(root_path / "main.dist")
 
-    print("SRA main program packaging completed !")
+    print("main main program packaging completed !")
 
     (root_path / "version_info.txt").write_text(
         f"v{version['version']}\n\n{version['Announcement'][0]['content']}", encoding="utf-8"
