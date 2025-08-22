@@ -22,12 +22,11 @@
 打包
 """
 
-import os
-import sys
 import json
+import os
 import shutil
+import sys
 from pathlib import Path
-
 
 if __name__ == "__main__":
 
@@ -53,10 +52,10 @@ if __name__ == "__main__":
 
     print("Start to copy rescourses ...")
 
-    shutil.copytree(root_path / "res", root_path / "SRA.dist/res")
+    shutil.copytree(root_path / "resources", root_path / "SRA.dist/resources")
     # shutil.copytree(root_path / "plugins", root_path / "SRA.dist/plugins")
     shutil.copytree(root_path / "tools", root_path / "SRA.dist/tools")
-    shutil.copy(root_path / "HELP.md", root_path / "SRA.dist/HELP.md")
+    # shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "SRA.dist/rapidocr_onnxruntime")
     shutil.copy(root_path / "LICENSE", root_path / "SRA.dist/LICENSE")
     shutil.copy(root_path / "README.md", root_path / "SRA.dist/README.md")
     shutil.copy(root_path / "version.json", root_path / "SRA.dist/version.json")
@@ -74,5 +73,5 @@ if __name__ == "__main__":
     print("SRA main program packaging completed !")
 
     (root_path / "version_info.txt").write_text(
-        f"v{version['version']}\n\n{version['announcement']}", encoding="utf-8"
+        f"v{version['version']}\n\n{version['Announcement'][0]['content']}", encoding="utf-8"
     )
