@@ -47,7 +47,7 @@ if __name__ == "__main__":
         " --file-description='StarRailAssistant Component'"
         " --copyright='Copyright © 2024 Shasnow'"
         " --assume-yes-for-downloads --output-filename=SRA"
-        " --remove-output SRA.py"
+        " --remove-output main.py"
     )
 
     print("Start to copy rescourses ...")
