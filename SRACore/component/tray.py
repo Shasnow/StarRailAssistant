@@ -5,7 +5,6 @@ from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication
 
 class SystemTray(QSystemTrayIcon):
     """系统托盘图标组件，提供快速访问主界面和退出应用的功能。"""
-
     def __init__(self, parent):
         super().__init__(QIcon("resources/SRAico.png"), parent)
         self.parent_object = parent

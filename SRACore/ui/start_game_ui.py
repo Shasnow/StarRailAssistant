@@ -16,7 +16,6 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame,
                                QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
                                QVBoxLayout, QWidget)
 
-
 class Ui_StartGameWidget(object):
     def setupUi(self, StartGameWidget):
         if not StartGameWidget.objectName():
@@ -45,6 +44,7 @@ class Ui_StartGameWidget(object):
         self.horizontalSpacer = QSpacerItem(329, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
+
 
         self.gridLayout_2.addWidget(self.frame_1, 0, 0, 1, 1)
 
@@ -75,6 +75,7 @@ class Ui_StartGameWidget(object):
 
         self.horizontalLayout_4.addWidget(self.channel_comboBox)
 
+
         self.verticalLayout_3.addWidget(self.frame2_1)
 
         self.frame_3 = QFrame(self.scrollAreaWidgetContents)
@@ -91,6 +92,7 @@ class Ui_StartGameWidget(object):
         self.use_launcher_checkbox.setChecked(False)
 
         self.horizontalLayout_5.addWidget(self.use_launcher_checkbox)
+
 
         self.verticalLayout_3.addWidget(self.frame_3)
 
@@ -197,7 +199,6 @@ class Ui_StartGameWidget(object):
         self.retranslateUi(StartGameWidget)
 
         QMetaObject.connectSlotsByName(StartGameWidget)
-
     # setupUi
 
     def retranslateUi(self, StartGameWidget):
@@ -224,3 +225,4 @@ class Ui_StartGameWidget(object):
         self.label2_4_11.setText(QCoreApplication.translate("StartGameWidget", u"\u8d26\u53f7\uff1a", None))
         self.label2_4_21.setText(QCoreApplication.translate("StartGameWidget", u"\u5bc6\u7801\uff1a", None))
     # retranslateUi
+

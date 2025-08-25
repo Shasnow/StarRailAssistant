@@ -9,17 +9,18 @@ class AutoPlotTrigger(BaseTrigger):
             '跳过对话': False,
         }
         self.can_skip = True  # 是否可以跳过对话, 默认可以跳过
+        self.active_window = False
 
     def run(self):
         if not self.plot_status_check():
             self.can_skip = True
             return
-        self.press_key("space")
+        self.press_key("space", trace=False)
         if self.config['跳过对话'] and self.can_skip:
             self.skip_check()
         for i in range(5, 0, -1):
             if self.locate(f"resources/img/{i}.png", 0.63, 0.375, 0.67, 0.72, trace=False):
-                self.press_key(str(i))
+                self.press_key(str(i), trace=False)
                 break
 
     def plot_status_check(self):

@@ -11,7 +11,6 @@ class SimulateUniverseComponent(SRAComponent):
         mode: int = 0
         times: int = 1
         policy: int = 0
-
         def __init__(self, mode=0, times=1, policy=0, **_):
             self.mode = mode
             self.times = times
@@ -28,12 +27,10 @@ class SimulateUniverseComponent(SRAComponent):
         self.ui.game_mode.setCurrentIndex(self.config.mode)
         self.ui.times.setValue(self.config.times)
         self.ui.policy_comboBox.setCurrentIndex(self.config.policy)
-
     def getter(self):
         self.config.mode = self.ui.game_mode.currentIndex()
         self.config.times = self.ui.times.value()
         self.config.policy = self.ui.policy_comboBox.currentIndex()
         self.config_manager.set('simulated_universe', dataclasses.asdict(self.config))
-
     def connector(self):
         pass

@@ -5,7 +5,6 @@ class SRAComponent(QWidget):
     """
     SRA组件基类，所有组件都应继承自此类。
     """
-
     def __init__(self, parent, config_manager):
         super().__init__(parent)
         self.config_manager = config_manager

@@ -18,7 +18,6 @@ from PySide6.QtWidgets import (QAbstractSpinBox, QCheckBox, QDoubleSpinBox,
                                QSpacerItem, QTableWidget, QTableWidgetItem, QTextBrowser,
                                QVBoxLayout, QWidget)
 
-
 class Ui_SettingWidget(object):
     def setupUi(self, SettingWidget):
         if not SettingWidget.objectName():
@@ -56,6 +55,7 @@ class Ui_SettingWidget(object):
         self.schedule_add_button.setObjectName(u"schedule_add_button")
 
         self.gridLayout_7.addWidget(self.schedule_add_button, 1, 0, 1, 1)
+
 
         self.verticalLayout.addWidget(self.groupBox_2)
 
@@ -123,6 +123,7 @@ class Ui_SettingWidget(object):
 
         self.gridLayout_6.addWidget(self.reset_pushButton, 2, 1, 1, 1)
 
+
         self.verticalLayout.addWidget(self.groupBox_6)
 
         self.hotkey_setting = QGroupBox(self.scrollAreaWidgetContents)
@@ -149,6 +150,7 @@ class Ui_SettingWidget(object):
 
         self.horizontalLayout_6.addWidget(self.hotkey2)
 
+
         self.verticalLayout.addWidget(self.hotkey_setting)
 
         self.groupBox = QGroupBox(self.scrollAreaWidgetContents)
@@ -166,6 +168,7 @@ class Ui_SettingWidget(object):
 
         self.horizontalLayout_8.addWidget(self.system_notification_checkbox)
 
+
         self.gridLayout.addWidget(self.frame_6, 1, 0, 1, 1)
 
         self.frame_5 = QFrame(self.groupBox)
@@ -178,6 +181,7 @@ class Ui_SettingWidget(object):
         self.notification_allow_checkbox.setObjectName(u"notification_allow_checkbox")
 
         self.horizontalLayout_7.addWidget(self.notification_allow_checkbox)
+
 
         self.gridLayout.addWidget(self.frame_5, 0, 0, 1, 1)
 
@@ -241,6 +245,7 @@ class Ui_SettingWidget(object):
 
         self.gridLayout_4.addWidget(self.email_check_button, 4, 0, 1, 1)
 
+
         self.gridLayout.addWidget(self.mail_notification_frame, 3, 0, 1, 2)
 
         self.frame_7 = QFrame(self.groupBox)
@@ -254,7 +259,9 @@ class Ui_SettingWidget(object):
 
         self.horizontalLayout_9.addWidget(self.mail_notification_checkbox)
 
+
         self.gridLayout.addWidget(self.frame_7, 1, 1, 1, 1)
+
 
         self.verticalLayout.addWidget(self.groupBox)
 
@@ -290,6 +297,7 @@ class Ui_SettingWidget(object):
 
         self.horizontalLayout_10.addWidget(self.integrityCheckButton)
 
+
         self.verticalLayout_2.addWidget(self.frame_8)
 
         self.frame_routine_5 = QFrame(self.groupBox_7)
@@ -312,6 +320,7 @@ class Ui_SettingWidget(object):
 
         self.horizontalLayout_26.addItem(self.horizontalSpacer_3)
 
+
         self.verticalLayout_2.addWidget(self.frame_routine_5)
 
         self.frame_routine_3 = QFrame(self.groupBox_7)
@@ -333,6 +342,7 @@ class Ui_SettingWidget(object):
 
         self.horizontalLayout_24.addItem(self.horizontalSpacer)
 
+
         self.verticalLayout_2.addWidget(self.frame_routine_3)
 
         self.frame_routine_4 = QFrame(self.groupBox_7)
@@ -351,6 +361,7 @@ class Ui_SettingWidget(object):
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_25.addItem(self.horizontalSpacer_2)
+
 
         self.verticalLayout_2.addWidget(self.frame_routine_4)
 
@@ -505,7 +516,6 @@ class Ui_SettingWidget(object):
         self.mail_notification_checkbox.toggled.connect(self.mail_notification_frame.setVisible)
 
         QMetaObject.connectSlotsByName(SettingWidget)
-
     # setupUi
 
     def retranslateUi(self, SettingWidget):
@@ -588,7 +598,7 @@ class Ui_SettingWidget(object):
         self.frame_2.setWhatsThis(QCoreApplication.translate("SettingWidget",
                                                              u"\u8bf7\u6839\u636e\u5b9e\u9645\u5c4f\u5e55\u7f29\u653e\u8c03\u6574\u6b64\u503c",
                                                              None))
-        # endif // QT_CONFIG(whatsthis)
+        #endif // QT_CONFIG(whatsthis)
         self.label_2.setText(QCoreApplication.translate("SettingWidget", u"\u5c4f\u5e55\u7f29\u653e", None))
         # if QT_CONFIG(tooltip)
         self.zoomSpinBox.setToolTip(QCoreApplication.translate("SettingWidget",
@@ -609,7 +619,7 @@ class Ui_SettingWidget(object):
         self.frame.setWhatsThis(QCoreApplication.translate("SettingWidget",
                                                            u"\u7f6e\u4fe1\u5ea6\u8d8a\u5927\u5bf9\u56fe\u7247\u7cbe\u5ea6\u8981\u6c42\u8d8a\u9ad8",
                                                            None))
-        # endif // QT_CONFIG(whatsthis)
+        #endif // QT_CONFIG(whatsthis)
         self.label.setText(QCoreApplication.translate("SettingWidget", u"\u8bc6\u56fe\u7f6e\u4fe1\u5ea6", None))
         # if QT_CONFIG(tooltip)
         self.confidenceSpinBox.setToolTip(QCoreApplication.translate("SettingWidget",
@@ -625,7 +635,7 @@ class Ui_SettingWidget(object):
         self.frame_9.setToolTip(QCoreApplication.translate("SettingWidget",
                                                            u"<html><head/><body><p>\u6b64\u53c2\u6570\u63a7\u5236\u90e8\u5206\u64cd\u4f5c\u7684\u7b49\u5f85\u65f6\u95f4\u6216\u6267\u884c\u95f4\u9694\uff0c\u4ee5\u79d2\u4e3a\u5355\u4f4d\u3002\u5982\u679c\u4f60\u7684\u7535\u8111\u52a0\u8f7d\u6e38\u620f\u8db3\u591f\u5feb\uff0c\u53ef\u7528\u51cf\u5c11\u6b64\u503c\u6765\u51cf\u5c11\u7b49\u5f85\u65f6\u95f4\u3002\u5982\u679c\u4f60\u7684\u7535\u8111\u7ecf\u5e38\u68c0\u6d4b\u8d85\u65f6\uff0c\u8003\u8651\u589e\u52a0\u6b64\u503c\u6765\u8ba9\u6e38\u620f\u5145\u5206\u52a0\u8f7d\u3002\u4efb\u4f55\u65f6\u5019\u90fd\u4e0d\u5efa\u8bae\u8fd9\u4e2a\u503c\u4e3a0.</p></body></html>",
                                                            None))
-        # endif // QT_CONFIG(tooltip)
+        #endif // QT_CONFIG(tooltip)
         self.label_11.setText(QCoreApplication.translate("SettingWidget", u"\u6027\u80fd\u53c2\u6570", None))
         self.exit_when_close_checkBox.setText(
             QCoreApplication.translate("SettingWidget", u"\u5173\u95ed\u7a97\u53e3\u65f6\u76f4\u63a5\u9000\u51fa",
@@ -637,7 +647,7 @@ class Ui_SettingWidget(object):
         # if QT_CONFIG(whatsthis)
         self.frame_3.setWhatsThis(
             QCoreApplication.translate("SettingWidget", u"<html><head/><body><p><br/></p></body></html>", None))
-        # endif // QT_CONFIG(whatsthis)
+        #endif // QT_CONFIG(whatsthis)
         self.label_3.setText(QCoreApplication.translate("SettingWidget", u"MirrorChyanCDK", None))
         # if QT_CONFIG(tooltip)
         self.mirrorchyanCDK_lineEdit.setToolTip(QCoreApplication.translate("SettingWidget",
@@ -648,7 +658,7 @@ class Ui_SettingWidget(object):
         self.mirrorchyanCDK_lineEdit.setWhatsThis(QCoreApplication.translate("SettingWidget",
                                                                              u"\u586b\u5199\u540e\u542f\u7528MirrorChyan\u63d0\u4f9b\u7684\u9ad8\u901f\u4e0b\u8f7d\u670d\u52a1",
                                                                              None))
-        # endif // QT_CONFIG(whatsthis)
+        #endif // QT_CONFIG(whatsthis)
         self.mirrorchyanCDK_lineEdit.setPlaceholderText(QCoreApplication.translate("SettingWidget", u"CDK", None))
         self.groupBox_5.setTitle(QCoreApplication.translate("SettingWidget", u"tips", None))
         self.textBrowser_tips.setHtml(QCoreApplication.translate("SettingWidget",
@@ -665,6 +675,6 @@ class Ui_SettingWidget(object):
                                                                  "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">GitHub\u4e0a\u7684SRA\uff1a<a href=\"https://github.com/Shasnow/StarRailAssistant\"><span style=\" text-decoration: underline; color:#0078d4;\">https://github.com/Shasnow/StarRailAssistant</span></a></p>\n"
                                                                  "<p align=\"center\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"https://starrailassistant.top\"><span style=\" text-decoration: underline; color:#0078d4;\">SRA\u5b98\u7f51</span></a></p>\n"
                                                                  "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u83b7\u53d6MirrorChyanCDK-&gt;:<a href=\"https://mir"
-                                                                 "rorchyan.com/zh/projects?rid=StarRailAssistant&amp;source=sra-app\"><span style=\" text-decoration: underline; color:#0078d4;\">Mirror\u9171</span></a></p></body></html>",
-                                                                 None))
+                                                                 "rorchyan.com/zh/projects?rid=StarRailAssistant&amp;source=sra-app\"><span style=\" text-decoration: underline; color:#0078d4;\">Mirror\u9171</span></a></p></body></html>", None))
     # retranslateUi
+

@@ -40,9 +40,9 @@ class MainWindowComponent(QMainWindow):
             self.gcm.get('config_list', ['default'])[self.gcm.get('current_config', 0)])
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowTitle(f"SRA v{VERSION} | {random.choice(RANDOM_TITLE)}")
+        self.setWindowTitle(f"SRA {VERSION} | {random.choice(RANDOM_TITLE)}")
         self.setWindowIcon(QIcon("resources\\SRAicon.ico"))
-        self.setGeometry(*self.gcm.get('geometry', (100, 100, 800, 600)))  # NOQA
+        self.setGeometry(*self.gcm.get('geometry', (100, 100, 800, 800)))  # NOQA
         self.start_game = StartGameComponent(self, self.config_manager)
         self.trailblaze_power = TrailblazePowerComponent(self, self.config_manager)
         self.receive_reward = ReceiveRewardComponent(self, self.config_manager)
@@ -101,6 +101,12 @@ class MainWindowComponent(QMainWindow):
         trigger_manager = TriggerManager.get_instance()
         for i in trigger_manager.trigger_widgets:
             self.ui.extension_groupBox.layout().addWidget(i)
+        from SRACore.util.plugin import PluginManager, PluginWidget
+        PluginManager.load_plugins()
+        plugins_widget = PluginWidget(self)
+        for name, run in PluginManager.getPlugins().items():
+            plugins_widget.addPlugin(name, run)
+        self.ui.plugin_groupBox.layout().addWidget(plugins_widget)
 
     def connector(self):
         """连接信号和槽函数"""

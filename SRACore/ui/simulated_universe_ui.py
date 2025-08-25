@@ -14,7 +14,6 @@ from PySide6.QtWidgets import (QComboBox, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QSizePolicy, QSpacerItem,
                                QSpinBox, QVBoxLayout)
 
-
 class Ui_SimulateUniverseWidget(object):
     def setupUi(self, SimulateUniverseWidget):
         if not SimulateUniverseWidget.objectName():
@@ -45,6 +44,7 @@ class Ui_SimulateUniverseWidget(object):
         self.label.setObjectName(u"label")
 
         self.horizontalLayout_2.addWidget(self.label)
+
 
         self.verticalLayout_2.addWidget(self.frame_2)
 
@@ -105,6 +105,7 @@ class Ui_SimulateUniverseWidget(object):
 
         self.gridLayout.addWidget(self.policy_comboBox, 3, 1, 1, 1)
 
+
         self.verticalLayout_3.addWidget(self.frame_4)
 
         self.label_5 = QLabel(self.frame_3)
@@ -117,12 +118,12 @@ class Ui_SimulateUniverseWidget(object):
 
         self.verticalLayout_3.addItem(self.verticalSpacer)
 
+
         self.verticalLayout_2.addWidget(self.frame_3)
 
         self.retranslateUi(SimulateUniverseWidget)
 
         QMetaObject.connectSlotsByName(SimulateUniverseWidget)
-
     # setupUi
 
     def retranslateUi(self, SimulateUniverseWidget):
@@ -145,3 +146,4 @@ class Ui_SimulateUniverseWidget(object):
                                                         u"\u9700\u8981\u8fdb\u5165\u5230\u5dee\u5206\u5b87\u5b99\u4e3b\u754c\u9762\u518d\u6267\u884c\u6b64\u4efb\u52a1\u3002\u6b64\u4efb\u52a1\u5e94\u5f53\u5355\u72ec\u6267\u884c\u3002\u8bf7\u81f3\u5c11\u624b\u52a8\u5b8c\u6210\u4e00\u6b21\u4ee5\u6e05\u9664\u6240\u6709\u65b0\u624b\u63d0\u793a\u3002",
                                                         None))
     # retranslateUi
+

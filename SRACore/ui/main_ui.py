@@ -16,7 +16,6 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QCheckBox, QFrame,
                                QSizePolicy, QSpacerItem, QStatusBar, QTabWidget,
                                QTextBrowser, QVBoxLayout, QWidget)
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -88,6 +87,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.start_game_pushButton)
 
+
         self.verticalLayout_6.addWidget(self.frame1_1)
 
         self.frame1_2 = QFrame(self.scrollAreaWidgetContents_2)
@@ -108,6 +108,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_7.addWidget(self.trailblaze_power_pushButton)
 
+
         self.verticalLayout_6.addWidget(self.frame1_2)
 
         self.frame1_3 = QFrame(self.scrollAreaWidgetContents_2)
@@ -127,6 +128,7 @@ class Ui_MainWindow(object):
         self.receive_reward_pushButton.setMinimumSize(QSize(70, 30))
 
         self.horizontalLayout_3.addWidget(self.receive_reward_pushButton)
+
 
         self.verticalLayout_6.addWidget(self.frame1_3)
 
@@ -149,6 +151,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_20.addWidget(self.simulate_universe_pushButton)
 
+
         self.verticalLayout_6.addWidget(self.frame1_5)
 
         self.frame1_4 = QFrame(self.scrollAreaWidgetContents_2)
@@ -168,6 +171,7 @@ class Ui_MainWindow(object):
         self.mission_accomplish_pushButton.setMinimumSize(QSize(70, 30))
 
         self.horizontalLayout_10.addWidget(self.mission_accomplish_pushButton)
+
 
         self.verticalLayout_6.addWidget(self.frame1_4)
 
@@ -294,7 +298,6 @@ class Ui_MainWindow(object):
         self.tabWidget.setCurrentIndex(0)
 
         QMetaObject.connectSlotsByName(MainWindow)
-
     # setupUi
 
     def retranslateUi(self, MainWindow):
@@ -345,3 +348,4 @@ class Ui_MainWindow(object):
                                   QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
         self.menush_help.setTitle(QCoreApplication.translate("MainWindow", u"\u5e2e\u52a9", None))
     # retranslateUi
+
