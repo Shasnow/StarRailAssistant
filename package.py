@@ -53,7 +53,7 @@ if __name__ == "__main__":
     print("Start to copy resources ...")
 
     shutil.copytree(root_path / "resources", root_path / "main.dist/resources")
-    # shutil.copytree(root_path / "plugins", root_path / "main.dist/plugins")
+    shutil.copytree(root_path / "plugins", root_path / "main.dist/plugins")
     shutil.copytree(root_path / "tools", root_path / "main.dist/tools")
     # shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "main.dist/rapidocr_onnxruntime")
     shutil.copy(root_path / "LICENSE", root_path / "main.dist/LICENSE")
