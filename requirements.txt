@@ -8,3 +8,5 @@ PySide6
 rich
 psutil
 nuitka
+pywin32
+pywin32-ctypes
