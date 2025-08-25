@@ -14,7 +14,6 @@ from PySide6.QtWidgets import (QCheckBox, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QRadioButton, QSizePolicy,
                                QSpacerItem, QVBoxLayout)
 
-
 class Ui_MissionAccomplishWidget(object):
     def setupUi(self, MissionAccomplishWidget):
         if not MissionAccomplishWidget.objectName():
@@ -39,6 +38,7 @@ class Ui_MissionAccomplishWidget(object):
         self.horizontalSpacer = QSpacerItem(329, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
+
 
         self.gridLayout.addWidget(self.title_frame, 0, 0, 1, 1)
 
@@ -111,7 +111,6 @@ class Ui_MissionAccomplishWidget(object):
         self.retranslateUi(MissionAccomplishWidget)
 
         QMetaObject.connectSlotsByName(MissionAccomplishWidget)
-
     # setupUi
 
     def retranslateUi(self, MissionAccomplishWidget):
@@ -129,3 +128,4 @@ class Ui_MissionAccomplishWidget(object):
         self.hibernate_button.setText(QCoreApplication.translate("MissionAccomplishWidget", u"\u4f11\u7720", None))
         self.radioButton.setText(QCoreApplication.translate("MissionAccomplishWidget", u"\u65e0\u52a8\u4f5c", None))
     # retranslateUi
+

@@ -14,7 +14,6 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QGridLayout,
                                QGroupBox, QLabel, QPushButton, QScrollArea,
                                QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
-
 class Ui_MultiAccountWidget(object):
     def setupUi(self, MultiAccountWidget):
         if not MultiAccountWidget.objectName():
@@ -73,6 +72,7 @@ class Ui_MultiAccountWidget(object):
 
         self.gridLayout_5.addWidget(self.switch2next_checkbox, 2, 0, 1, 3)
 
+
         self.verticalLayout_4.addWidget(self.groupBox)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents_4)
@@ -86,7 +86,6 @@ class Ui_MultiAccountWidget(object):
         self.retranslateUi(MultiAccountWidget)
 
         QMetaObject.connectSlotsByName(MultiAccountWidget)
-
     # setupUi
 
     def retranslateUi(self, MultiAccountWidget):
@@ -104,3 +103,4 @@ class Ui_MultiAccountWidget(object):
                                                                      u"\u5f53\u524d\u65b9\u6848\u7ed3\u675f\u65f6\u5207\u6362\u4e0b\u4e00\u4e2a\u65b9\u6848",
                                                                      None))
     # retranslateUi
+

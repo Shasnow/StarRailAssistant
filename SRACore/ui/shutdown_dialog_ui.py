@@ -14,7 +14,6 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout,
                                QLCDNumber, QLabel, QPushButton, QSizePolicy,
                                QSpacerItem, QVBoxLayout)
 
-
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
@@ -61,6 +60,7 @@ class Ui_Dialog(object):
 
         self.horizontalLayout.addItem(self.horizontalSpacer_2)
 
+
         self.verticalLayout_2.addLayout(self.horizontalLayout)
 
         self.verticalLayout.addWidget(self.frame)
@@ -68,7 +68,6 @@ class Ui_Dialog(object):
         self.retranslateUi(Dialog)
 
         QMetaObject.connectSlotsByName(Dialog)
-
     # setupUi
 
     def retranslateUi(self, Dialog):
@@ -79,3 +78,4 @@ class Ui_Dialog(object):
                                                       None))
         self.cancel_buttion.setText(QCoreApplication.translate("Dialog", u"\u53d6\u6d88", None))
     # retranslateUi
+

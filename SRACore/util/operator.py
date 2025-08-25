@@ -37,24 +37,43 @@ class Operator:
         self.left = 0
         self.width = 0
         self.height = 0
+        self.active_window: bool = True
 
-    def get_win_region(self):
+    @property
+    def is_window_active(self) -> bool:
+        try:
+            win = pygetwindow.getWindowsWithTitle(self.window_title)[0]
+            return win.isActive
+        except IndexError:
+            return False
+        except pygetwindow.PyGetWindowException:
+            return False
+
+    def get_win_region(self, active_window: bool | None = None, raise_exception: bool = True) -> Region | None:
         """
         获取崩坏：星穹铁道窗口区域
         :return: Region - 窗口区域
         :raises Exception: 如果未找到窗口或窗口未激活
         """
+        if active_window is None:
+            active_window = self.active_window
         try:
             win = pygetwindow.getWindowsWithTitle(self.window_title)[0]
-            if not win.isActive:
+            if not win.isActive and active_window:
                 win.activate()
             return self._major_win_region(win.left, win.top, win.width, win.height)
         except IndexError:
-            raise Exception("未找到崩坏：星穹铁道窗口")
+            if raise_exception:
+                raise Exception("未找到崩坏：星穹铁道窗口")
+            return None
         except pygetwindow.PyGetWindowException as e:
-            raise Exception("窗口未激活") from e
+            if raise_exception:
+                raise Exception("窗口未激活") from e
+            return None
         except Exception as e:
-            raise Exception(f"获取窗口区域失败: {e}") from e
+            if raise_exception:
+                raise Exception(f"获取窗口区域失败: {e}") from e
+            return None
 
     def _major_win_region(self, left, top, width, height):
         """获取主要操作区域"""
@@ -304,7 +323,7 @@ class Operator:
         return -1
 
     @staticmethod
-    def press_key(key: str, presses: int = 1, interval: float = 0, wait: float = 0) -> bool:
+    def press_key(key: str, presses: int = 1, interval: float = 0, wait: float = 0, trace: bool = True) -> bool:
         """按下按键
 
         Args:
@@ -312,16 +331,19 @@ class Operator:
             presses: 按下次数
             interval: 按键间隔时间(如果填入,程序会间隔interval秒再按下按键)
             wait: 首次按下按键前的等待时间
+            trace: 是否打印调试信息
         Returns:
             按键成功返回True，否则返回False
         """
         try:
             time.sleep(wait)
-            logger.debug("按下按键" + key)
+            if trace:
+                logger.debug("按下按键" + key)
             pyautogui.press(key, presses=presses, interval=interval)
             return True
         except Exception as e:
-            logger.debug(f"按下按键失败: {e}")
+            if trace:
+                logger.debug(f"按下按键失败: {e}")
             return False
 
     @staticmethod

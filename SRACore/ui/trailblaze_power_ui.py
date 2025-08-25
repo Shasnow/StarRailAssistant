@@ -17,7 +17,6 @@ from PySide6.QtWidgets import (QAbstractItemView, QCheckBox, QComboBox,
                                QSizePolicy, QSpacerItem, QSpinBox, QVBoxLayout,
                                QWidget)
 
-
 class Ui_TrailblazePowerWidget(object):
     def setupUi(self, TrailblazePowerWidget):
         if not TrailblazePowerWidget.objectName():
@@ -86,6 +85,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.gridLayout.addWidget(self.replenish_way_comboBox, 0, 1, 1, 2)
 
+
         self.verticalLayout_3.addWidget(self.frame2_1)
 
         self.frame2_2 = QFrame(self.scrollAreaWidgetContents_7)
@@ -150,6 +150,7 @@ class Ui_TrailblazePowerWidget(object):
         self.label_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_2.addWidget(self.label_2, 0, 0, 1, 4)
+
 
         self.verticalLayout_3.addWidget(self.frame2_2)
 
@@ -225,6 +226,7 @@ class Ui_TrailblazePowerWidget(object):
         self.label_3.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_3.addWidget(self.label_3, 0, 0, 1, 4)
+
 
         self.verticalLayout_3.addWidget(self.frame2_3)
 
@@ -304,6 +306,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.gridLayout_4.addWidget(self.label_4, 0, 0, 1, 4)
 
+
         self.verticalLayout_3.addWidget(self.frame2_4)
 
         self.frame2_5 = QFrame(self.scrollAreaWidgetContents_7)
@@ -375,6 +378,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.gridLayout_5.addWidget(self.label_5, 0, 0, 1, 4)
 
+
         self.verticalLayout_3.addWidget(self.frame2_5)
 
         self.frame2_6 = QFrame(self.scrollAreaWidgetContents_7)
@@ -434,6 +438,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.gridLayout_6.addWidget(self.caverOfCorrosion_comboBox, 1, 0, 1, 4)
 
+
         self.verticalLayout_3.addWidget(self.frame2_6)
 
         self.frame2_7 = QFrame(self.scrollAreaWidgetContents_7)
@@ -488,6 +493,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.gridLayout_7.addWidget(self.label_7, 0, 0, 1, 4)
 
+
         self.verticalLayout_3.addWidget(self.frame2_7)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents_7)
@@ -508,6 +514,7 @@ class Ui_TrailblazePowerWidget(object):
         self.horizontalSpacer = QSpacerItem(329, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
+
 
         self.gridLayout_8.addWidget(self.frame_1, 0, 0, 1, 2)
 
@@ -533,10 +540,10 @@ class Ui_TrailblazePowerWidget(object):
 
         self.gridLayout_8.addWidget(self.task_listWidget, 1, 1, 1, 1)
 
+
         self.retranslateUi(TrailblazePowerWidget)
 
         QMetaObject.connectSlotsByName(TrailblazePowerWidget)
-
     # setupUi
 
     def retranslateUi(self, TrailblazePowerWidget):
@@ -864,3 +871,4 @@ class Ui_TrailblazePowerWidget(object):
         self.task_listWidget.setSortingEnabled(__sortingEnabled)
 
     # retranslateUi
+

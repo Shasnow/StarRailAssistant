@@ -11,7 +11,6 @@ class ReceiveRewardComponent(SRAComponent):
         """Configuration for the ReceiveRewardComponent."""
         item_select: tuple = (True, True, True, True, True, False, False)
         redeem_code_list: list = dataclasses.field(default_factory=list)
-
         def __init__(self, item_select=None, redeem_code_list=None, **_):
             if item_select is None:
                 item_select = (True, True, True, True, True, False, False)

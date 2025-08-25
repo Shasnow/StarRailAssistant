@@ -19,3 +19,4 @@ class BaseTrigger(Executable, ABC):
 
     def set(self, key, v):
         self.config[key] = v
+

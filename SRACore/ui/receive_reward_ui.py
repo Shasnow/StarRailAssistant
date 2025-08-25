@@ -15,7 +15,6 @@ from PySide6.QtWidgets import (QCheckBox, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QScrollArea, QSizePolicy,
                                QTextEdit, QVBoxLayout, QWidget)
 
-
 class Ui_ReceiveRewardWidget(object):
     def setupUi(self, ReceiveRewardWidget):
         if not ReceiveRewardWidget.objectName():
@@ -46,6 +45,7 @@ class Ui_ReceiveRewardWidget(object):
 
         self.horizontalLayout_2.addWidget(self.trailblaze_profile_checkbox)
 
+
         self.verticalLayout_3.addWidget(self.frame3_1)
 
         self.frame3_2 = QFrame(self.scrollAreaWidgetContents)
@@ -59,6 +59,7 @@ class Ui_ReceiveRewardWidget(object):
         self.assignment_checkbox.setMinimumSize(QSize(0, 30))
 
         self.horizontalLayout_4.addWidget(self.assignment_checkbox)
+
 
         self.verticalLayout_3.addWidget(self.frame3_2)
 
@@ -162,7 +163,6 @@ class Ui_ReceiveRewardWidget(object):
         self.retranslateUi(ReceiveRewardWidget)
 
         QMetaObject.connectSlotsByName(ReceiveRewardWidget)
-
     # setupUi
 
     def retranslateUi(self, ReceiveRewardWidget):
@@ -183,3 +183,4 @@ class Ui_ReceiveRewardWidget(object):
             QCoreApplication.translate("ReceiveRewardWidget", u"\u5151\u6362\u7801\u586b\u5199\u5904", None))
         self.label.setText(QCoreApplication.translate("ReceiveRewardWidget", u"\u9886\u53d6\u5956\u52b1", None))
     # retranslateUi
+
