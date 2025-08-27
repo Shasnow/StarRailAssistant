@@ -118,7 +118,7 @@ class Operator:
             return self.screenshot_tuple(*args)
         else:
             raise ValueError(
-                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{' '.join([arg.__class__.__name__ for arg in args])}'")
+                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{" ".join([arg.__class__.__name__ for arg in args])}'")
 
     def locate_in_region(self,
                          img_path: str,
@@ -220,7 +220,7 @@ class Operator:
             return self.locate_any_in_tuple(img_paths, *args, **kwargs)
         else:
             raise ValueError(
-                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{' '.join([arg.__class__.__name__ for arg in args])}'")
+                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{" ".join([arg.__class__.__name__ for arg in args])}'")
 
     @overload
     def locate(self, img_path: str, region: Region | None = None, trace=True) -> pyscreeze.Box | None:
@@ -241,7 +241,7 @@ class Operator:
             return self.locate_in_tuple(img_path, *args, **kwargs)
         else:
             raise ValueError(
-                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{' '.join([arg.__class__.__name__ for arg in args])}'")
+                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{" ".join([arg.__class__.__name__ for arg in args])}'")
 
     def click_point(self, x: int | float, y: int | float, x_offset: int = 0, y_offset: int = 0,
                     after_sleep: float = 0) -> bool:

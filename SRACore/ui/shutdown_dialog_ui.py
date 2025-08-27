@@ -63,6 +63,7 @@ class Ui_Dialog(object):
 
         self.verticalLayout_2.addLayout(self.horizontalLayout)
 
+
         self.verticalLayout.addWidget(self.frame)
 
         self.retranslateUi(Dialog)

@@ -8,6 +8,7 @@ from SRACore.util.config import GlobalConfigManager, ConfigManager
 
 class MultiAccountComponent(SRAComponent):
     config_switched = Signal(str)
+
     def __init__(self, parent, gcm: GlobalConfigManager):
         super().__init__(parent, None)
         self.gcm = gcm

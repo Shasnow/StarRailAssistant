@@ -30,7 +30,7 @@
                                 <x>0</x>
                                 <y>0</y>
                                 <width>575</width>
-                                <height>1557</height>
+                                <height>1503</height>
                             </rect>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout">
@@ -98,13 +98,6 @@
                                                     <property name="text">
                                                         <string>键位</string>
                                                     </property>
-                                                    <property name="background">
-                                                        <color>
-                                                            <red>255</red>
-                                                            <green>255</green>
-                                                            <blue>255</blue>
-                                                        </color>
-                                                    </property>
                                                 </row>
                                                 <column>
                                                     <property name="text">
@@ -114,13 +107,6 @@
                                                         <font>
                                                             <pointsize>13</pointsize>
                                                         </font>
-                                                    </property>
-                                                    <property name="background">
-                                                        <color>
-                                                            <red>255</red>
-                                                            <green>255</green>
-                                                            <blue>255</blue>
-                                                        </color>
                                                     </property>
                                                 </column>
                                                 <column>
@@ -132,13 +118,6 @@
                                                             <pointsize>13</pointsize>
                                                         </font>
                                                     </property>
-                                                    <property name="background">
-                                                        <color>
-                                                            <red>255</red>
-                                                            <green>255</green>
-                                                            <blue>255</blue>
-                                                        </color>
-                                                    </property>
                                                 </column>
                                                 <column>
                                                     <property name="text">
@@ -148,13 +127,6 @@
                                                         <font>
                                                             <pointsize>13</pointsize>
                                                         </font>
-                                                    </property>
-                                                    <property name="background">
-                                                        <color>
-                                                            <red>255</red>
-                                                            <green>255</green>
-                                                            <blue>255</blue>
-                                                        </color>
                                                     </property>
                                                 </column>
                                                 <column>
@@ -166,26 +138,10 @@
                                                             <pointsize>13</pointsize>
                                                         </font>
                                                     </property>
-                                                    <property name="background">
-                                                        <color>
-                                                            <red>255</red>
-                                                            <green>255</green>
-                                                            <blue>255</blue>
-                                                        </color>
-                                                    </property>
                                                 </column>
                                                 <item row="0" column="0">
                                                     <property name="text">
                                                         <string/>
-                                                    </property>
-                                                    <property name="background">
-                                                        <brush brushstyle="SolidPattern">
-                                                            <color alpha="255">
-                                                                <red>255</red>
-                                                                <green>255</green>
-                                                                <blue>255</blue>
-                                                            </color>
-                                                        </brush>
                                                     </property>
                                                     <property name="foreground">
                                                         <brush brushstyle="NoBrush">
@@ -201,42 +157,15 @@
                                                     <property name="text">
                                                         <string/>
                                                     </property>
-                                                    <property name="background">
-                                                        <brush brushstyle="SolidPattern">
-                                                            <color alpha="255">
-                                                                <red>255</red>
-                                                                <green>255</green>
-                                                                <blue>255</blue>
-                                                            </color>
-                                                        </brush>
-                                                    </property>
                                                 </item>
                                                 <item row="0" column="2">
                                                     <property name="text">
                                                         <string/>
                                                     </property>
-                                                    <property name="background">
-                                                        <brush brushstyle="SolidPattern">
-                                                            <color alpha="255">
-                                                                <red>255</red>
-                                                                <green>255</green>
-                                                                <blue>255</blue>
-                                                            </color>
-                                                        </brush>
-                                                    </property>
                                                 </item>
                                                 <item row="0" column="3">
                                                     <property name="text">
                                                         <string/>
-                                                    </property>
-                                                    <property name="background">
-                                                        <brush brushstyle="SolidPattern">
-                                                            <color alpha="255">
-                                                                <red>255</red>
-                                                                <green>255</green>
-                                                                <blue>255</blue>
-                                                            </color>
-                                                        </brush>
                                                     </property>
                                                 </item>
                                             </widget>
@@ -814,44 +743,6 @@
                                                                 <double>0.900000000000000</double>
                                                             </property>
                                                         </widget>
-                                                    </item>
-                                                </layout>
-                                            </widget>
-                                        </item>
-                                        <item>
-                                            <widget class="QFrame" name="frame_9">
-                                                <property name="toolTip">
-                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;此参数控制部分操作的等待时间或执行间隔，以秒为单位。如果你的电脑加载游戏足够快，可用减少此值来减少等待时间。如果你的电脑经常检测超时，考虑增加此值来让游戏充分加载。任何时候都不建议这个值为0.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                                                </property>
-                                                <property name="frameShape">
-                                                    <enum>QFrame::Shape::StyledPanel</enum>
-                                                </property>
-                                                <property name="frameShadow">
-                                                    <enum>QFrame::Shadow::Raised</enum>
-                                                </property>
-                                                <layout class="QHBoxLayout" name="horizontalLayout_11">
-                                                    <item>
-                                                        <widget class="QLabel" name="label_11">
-                                                            <property name="text">
-                                                                <string>性能参数</string>
-                                                            </property>
-                                                        </widget>
-                                                    </item>
-                                                    <item>
-                                                        <spacer name="horizontalSpacer_9">
-                                                            <property name="orientation">
-                                                                <enum>Qt::Orientation::Horizontal</enum>
-                                                            </property>
-                                                            <property name="sizeHint" stdset="0">
-                                                                <size>
-                                                                    <width>40</width>
-                                                                    <height>20</height>
-                                                                </size>
-                                                            </property>
-                                                        </spacer>
-                                                    </item>
-                                                    <item>
-                                                        <widget class="QDoubleSpinBox" name="performanceSpinBox"/>
                                                     </item>
                                                 </layout>
                                             </widget>

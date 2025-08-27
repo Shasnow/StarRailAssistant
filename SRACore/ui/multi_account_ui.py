@@ -34,7 +34,7 @@ class Ui_MultiAccountWidget(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents_4 = QWidget()
         self.scrollAreaWidgetContents_4.setObjectName(u"scrollAreaWidgetContents_4")
-        self.scrollAreaWidgetContents_4.setGeometry(QRect(0, 0, 506, 203))
+        self.scrollAreaWidgetContents_4.setGeometry(QRect(0, 0, 506, 157))
         self.verticalLayout_4 = QVBoxLayout(self.scrollAreaWidgetContents_4)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.groupBox = QGroupBox(self.scrollAreaWidgetContents_4)
@@ -45,11 +45,6 @@ class Ui_MultiAccountWidget(object):
         self.new_plan_button.setObjectName(u"new_plan_button")
 
         self.gridLayout_5.addWidget(self.new_plan_button, 1, 0, 1, 1)
-
-        self.delete_plan_button = QPushButton(self.groupBox)
-        self.delete_plan_button.setObjectName(u"delete_plan_button")
-
-        self.gridLayout_5.addWidget(self.delete_plan_button, 1, 1, 1, 1)
 
         self.label = QLabel(self.groupBox)
         self.label.setObjectName(u"label")
@@ -62,15 +57,15 @@ class Ui_MultiAccountWidget(object):
 
         self.gridLayout_5.addWidget(self.current_config_combobox, 0, 1, 1, 2)
 
-        self.rename_plan_button = QPushButton(self.groupBox)
-        self.rename_plan_button.setObjectName(u"rename_plan_button")
-
-        self.gridLayout_5.addWidget(self.rename_plan_button, 1, 2, 1, 1)
-
         self.switch2next_checkbox = QCheckBox(self.groupBox)
         self.switch2next_checkbox.setObjectName(u"switch2next_checkbox")
 
         self.gridLayout_5.addWidget(self.switch2next_checkbox, 2, 0, 1, 3)
+
+        self.delete_plan_button = QPushButton(self.groupBox)
+        self.delete_plan_button.setObjectName(u"delete_plan_button")
+
+        self.gridLayout_5.addWidget(self.delete_plan_button, 1, 1, 1, 1)
 
 
         self.verticalLayout_4.addWidget(self.groupBox)
@@ -83,6 +78,7 @@ class Ui_MultiAccountWidget(object):
 
         self.verticalLayout.addItem(self.verticalSpacer)
 
+
         self.retranslateUi(MultiAccountWidget)
 
         QMetaObject.connectSlotsByName(MultiAccountWidget)
@@ -93,14 +89,12 @@ class Ui_MultiAccountWidget(object):
         self.groupBox.setTitle(QCoreApplication.translate("MultiAccountWidget", u"\u914d\u7f6e\u65b9\u6848", None))
         self.new_plan_button.setText(
             QCoreApplication.translate("MultiAccountWidget", u"\u65b0\u5efa\u65b9\u6848", None))
-        self.delete_plan_button.setText(
-            QCoreApplication.translate("MultiAccountWidget", u"\u5220\u9664\u65b9\u6848", None))
         self.label.setText(
             QCoreApplication.translate("MultiAccountWidget", u"\u5f53\u524d\u914d\u7f6e\u65b9\u6848", None))
-        self.rename_plan_button.setText(
-            QCoreApplication.translate("MultiAccountWidget", u"\u91cd\u547d\u540d\u65b9\u6848", None))
         self.switch2next_checkbox.setText(QCoreApplication.translate("MultiAccountWidget",
                                                                      u"\u5f53\u524d\u65b9\u6848\u7ed3\u675f\u65f6\u5207\u6362\u4e0b\u4e00\u4e2a\u65b9\u6848",
                                                                      None))
+        self.delete_plan_button.setText(
+            QCoreApplication.translate("MultiAccountWidget", u"\u5220\u9664\u65b9\u6848", None))
     # retranslateUi
 

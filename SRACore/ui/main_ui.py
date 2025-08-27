@@ -193,11 +193,13 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_12.addWidget(self.stop_pushButton)
 
+
         self.verticalLayout_6.addWidget(self.frame1_0)
 
         self.task_select_scrollArea.setWidget(self.scrollAreaWidgetContents_2)
 
         self.horizontalLayout_23.addWidget(self.task_select_scrollArea)
+
 
         self.gridLayout_2.addWidget(self.task_select_groupBox, 0, 0, 1, 1)
 
@@ -296,6 +298,7 @@ class Ui_MainWindow(object):
         self.stop_pushButton.clicked["bool"].connect(self.stop_pushButton.setEnabled)
 
         self.tabWidget.setCurrentIndex(0)
+
 
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi

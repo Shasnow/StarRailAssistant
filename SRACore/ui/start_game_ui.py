@@ -86,6 +86,7 @@ class Ui_StartGameWidget(object):
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.use_launcher_checkbox = QCheckBox(self.frame_3)
         self.use_launcher_checkbox.setObjectName(u"use_launcher_checkbox")
+        self.use_launcher_checkbox.setEnabled(False)
         self.use_launcher_checkbox.setMinimumSize(QSize(0, 30))
         self.use_launcher_checkbox.setAutoFillBackground(False)
         self.use_launcher_checkbox.setCheckable(True)
@@ -118,6 +119,7 @@ class Ui_StartGameWidget(object):
         self.file_pushButton.setMinimumSize(QSize(0, 30))
 
         self.horizontalLayout_2.addWidget(self.file_pushButton)
+
 
         self.verticalLayout_3.addWidget(self.frame2_2)
 
@@ -157,6 +159,7 @@ class Ui_StartGameWidget(object):
 
         self.gridLayout_3.addWidget(self.label_2, 1, 1, 1, 3)
 
+
         self.verticalLayout.addWidget(self.frame2_3)
 
         self.frame2_4 = QFrame(self.frame_2)
@@ -187,6 +190,7 @@ class Ui_StartGameWidget(object):
         self.account_lineEdit.setMinimumSize(QSize(0, 30))
 
         self.gridLayout.addWidget(self.account_lineEdit, 0, 1, 1, 1)
+
 
         self.verticalLayout.addWidget(self.frame2_4)
 

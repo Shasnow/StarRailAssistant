@@ -36,7 +36,7 @@
                                 <x>0</x>
                                 <y>0</y>
                                 <width>506</width>
-                                <height>203</height>
+                                <height>157</height>
                             </rect>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -50,13 +50,6 @@
                                             <widget class="QPushButton" name="new_plan_button">
                                                 <property name="text">
                                                     <string>新建方案</string>
-                                                </property>
-                                            </widget>
-                                        </item>
-                                        <item row="1" column="1">
-                                            <widget class="QPushButton" name="delete_plan_button">
-                                                <property name="text">
-                                                    <string>删除方案</string>
                                                 </property>
                                             </widget>
                                         </item>
@@ -74,17 +67,17 @@
                                                 </property>
                                             </widget>
                                         </item>
-                                        <item row="1" column="2">
-                                            <widget class="QPushButton" name="rename_plan_button">
-                                                <property name="text">
-                                                    <string>重命名方案</string>
-                                                </property>
-                                            </widget>
-                                        </item>
                                         <item row="2" column="0" colspan="3">
                                             <widget class="QCheckBox" name="switch2next_checkbox">
                                                 <property name="text">
                                                     <string>当前方案结束时切换下一个方案</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item row="1" column="1">
+                                            <widget class="QPushButton" name="delete_plan_button">
+                                                <property name="text">
+                                                    <string>删除方案</string>
                                                 </property>
                                             </widget>
                                         </item>
