@@ -75,6 +75,7 @@ class Ui_ReceiveRewardWidget(object):
 
         self.horizontalLayout_7.addWidget(self.mail_checkbox)
 
+
         self.verticalLayout_3.addWidget(self.frame3_3)
 
         self.frame3_4 = QFrame(self.scrollAreaWidgetContents)
@@ -88,6 +89,7 @@ class Ui_ReceiveRewardWidget(object):
         self.daily_reward_checkbox.setMinimumSize(QSize(0, 30))
 
         self.horizontalLayout_9.addWidget(self.daily_reward_checkbox)
+
 
         self.verticalLayout_3.addWidget(self.frame3_4)
 

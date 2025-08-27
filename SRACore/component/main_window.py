@@ -17,6 +17,7 @@ from SRACore.component.trailblaze_power import TrailblazePowerComponent
 from SRACore.thread.background_thread import BackgroundThreadWorker
 from SRACore.thread.trigger_thread import TriggerManager
 from SRACore.ui.main_ui import Ui_MainWindow
+from SRACore.util import notify, encryption
 from SRACore.util.config import ConfigManager, GlobalConfigManager
 from SRACore.util.const import VERSION, RANDOM_TITLE, CORE
 from SRACore.util.logger import log_emitter, logger
@@ -29,6 +30,7 @@ class MainWindowComponent(QMainWindow):
 
     def __init__(self, parent, global_config_manager: GlobalConfigManager):
         super().__init__(parent)
+        self.tray = None
         self.trigger_thread: TriggerManager | None = None
         logger.debug("Initializing MainWindowComponent")
         self.is_running = False
@@ -42,7 +44,7 @@ class MainWindowComponent(QMainWindow):
         self.ui.setupUi(self)
         self.setWindowTitle(f"SRA {VERSION} | {random.choice(RANDOM_TITLE)}")
         self.setWindowIcon(QIcon("resources\\SRAicon.ico"))
-        self.setGeometry(*self.gcm.get('geometry', (100, 100, 800, 800)))  # NOQA
+        self.setGeometry(*self.gcm.get('geometry', (100, 100, 600, 800)))  # NOQA
         self.start_game = StartGameComponent(self, self.config_manager)
         self.trailblaze_power = TrailblazePowerComponent(self, self.config_manager)
         self.receive_reward = ReceiveRewardComponent(self, self.config_manager)
@@ -243,6 +245,16 @@ class MainWindowComponent(QMainWindow):
     def finish(self):
         self.ui.start_pushButton.setEnabled(True)
         self.ui.stop_pushButton.setEnabled(False)
+        if self.gcm.get("notification_allow"):
+            if self.gcm.get("notification_system"):
+                self.tray.show_finish_message()
+            if self.gcm.get("notification_mail"):
+                notify.send_mail("SRA", "SRA通知", "任务执行完成！",
+                                 SMTP=self.gcm.get("smtp_server"),
+                                 sender=self.gcm.get("sender_email"),
+                                 password=encryption.win_decryptor(self.gcm.get("authorization_code")),
+                                 receiver=self.gcm.get("receiver_email"))
+        self.is_running = False
 
     def closeEvent(self, event):
         """关闭窗口事件处理，保存配置和窗口状态。"""
@@ -264,3 +276,6 @@ class MainWindowComponent(QMainWindow):
         else:
             event.ignore()
             self.hide()
+
+    def set_tray(self, tray):
+        self.tray = tray

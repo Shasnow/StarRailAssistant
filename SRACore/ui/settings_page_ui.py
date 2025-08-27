@@ -33,7 +33,7 @@ class Ui_SettingWidget(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 575, 1557))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 575, 1503))
         self.verticalLayout = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.groupBox_2 = QGroupBox(self.scrollAreaWidgetContents)
@@ -68,41 +68,30 @@ class Ui_SettingWidget(object):
             self.key_tableWidget.setColumnCount(4)
         __qtablewidgetitem = QTableWidgetItem()
         __qtablewidgetitem.setFont(font);
-        __qtablewidgetitem.setBackground(QColor(255, 255, 255));
         self.key_tableWidget.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
         __qtablewidgetitem1.setFont(font);
-        __qtablewidgetitem1.setBackground(QColor(255, 255, 255));
         self.key_tableWidget.setHorizontalHeaderItem(1, __qtablewidgetitem1)
         __qtablewidgetitem2 = QTableWidgetItem()
         __qtablewidgetitem2.setFont(font);
-        __qtablewidgetitem2.setBackground(QColor(255, 255, 255));
         self.key_tableWidget.setHorizontalHeaderItem(2, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
         __qtablewidgetitem3.setFont(font);
-        __qtablewidgetitem3.setBackground(QColor(255, 255, 255));
         self.key_tableWidget.setHorizontalHeaderItem(3, __qtablewidgetitem3)
         if (self.key_tableWidget.rowCount() < 1):
             self.key_tableWidget.setRowCount(1)
         __qtablewidgetitem4 = QTableWidgetItem()
-        __qtablewidgetitem4.setBackground(QColor(255, 255, 255));
         self.key_tableWidget.setVerticalHeaderItem(0, __qtablewidgetitem4)
         brush = QBrush(QColor(0, 0, 0, 255))
         brush.setStyle(Qt.BrushStyle.NoBrush)
-        brush1 = QBrush(QColor(255, 255, 255, 255))
-        brush1.setStyle(Qt.BrushStyle.SolidPattern)
         __qtablewidgetitem5 = QTableWidgetItem()
-        __qtablewidgetitem5.setBackground(brush1);
         __qtablewidgetitem5.setForeground(brush);
         self.key_tableWidget.setItem(0, 0, __qtablewidgetitem5)
         __qtablewidgetitem6 = QTableWidgetItem()
-        __qtablewidgetitem6.setBackground(brush1);
         self.key_tableWidget.setItem(0, 1, __qtablewidgetitem6)
         __qtablewidgetitem7 = QTableWidgetItem()
-        __qtablewidgetitem7.setBackground(brush1);
         self.key_tableWidget.setItem(0, 2, __qtablewidgetitem7)
         __qtablewidgetitem8 = QTableWidgetItem()
-        __qtablewidgetitem8.setBackground(brush1);
         self.key_tableWidget.setItem(0, 3, __qtablewidgetitem8)
         self.key_tableWidget.setObjectName(u"key_tableWidget")
         self.key_tableWidget.setMinimumSize(QSize(0, 80))
@@ -396,6 +385,7 @@ class Ui_SettingWidget(object):
 
         self.horizontalLayout_4.addWidget(self.zoomSpinBox)
 
+
         self.verticalLayout_2.addWidget(self.frame_2)
 
         self.frame = QFrame(self.groupBox_7)
@@ -428,29 +418,8 @@ class Ui_SettingWidget(object):
 
         self.horizontalLayout_2.addWidget(self.confidenceSpinBox)
 
+
         self.verticalLayout_2.addWidget(self.frame)
-
-        self.frame_9 = QFrame(self.groupBox_7)
-        self.frame_9.setObjectName(u"frame_9")
-        self.frame_9.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame_9.setFrameShadow(QFrame.Shadow.Raised)
-        self.horizontalLayout_11 = QHBoxLayout(self.frame_9)
-        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.label_11 = QLabel(self.frame_9)
-        self.label_11.setObjectName(u"label_11")
-
-        self.horizontalLayout_11.addWidget(self.label_11)
-
-        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_11.addItem(self.horizontalSpacer_9)
-
-        self.performanceSpinBox = QDoubleSpinBox(self.frame_9)
-        self.performanceSpinBox.setObjectName(u"performanceSpinBox")
-
-        self.horizontalLayout_11.addWidget(self.performanceSpinBox)
-
-        self.verticalLayout_2.addWidget(self.frame_9)
 
         self.frame_4 = QFrame(self.groupBox_7)
         self.frame_4.setObjectName(u"frame_4")
@@ -462,6 +431,7 @@ class Ui_SettingWidget(object):
         self.exit_when_close_checkBox.setObjectName(u"exit_when_close_checkBox")
 
         self.horizontalLayout_3.addWidget(self.exit_when_close_checkBox)
+
 
         self.verticalLayout_2.addWidget(self.frame_4)
 
@@ -490,7 +460,9 @@ class Ui_SettingWidget(object):
 
         self.horizontalLayout_5.addWidget(self.mirrorchyanCDK_lineEdit)
 
+
         self.verticalLayout_2.addWidget(self.frame_3)
+
 
         self.verticalLayout.addWidget(self.groupBox_7)
 
@@ -506,11 +478,13 @@ class Ui_SettingWidget(object):
 
         self.gridLayout_3.addWidget(self.textBrowser_tips, 0, 0, 1, 1)
 
+
         self.verticalLayout.addWidget(self.groupBox_5)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.horizontalLayout.addWidget(self.scrollArea)
+
 
         self.retranslateUi(SettingWidget)
         self.mail_notification_checkbox.toggled.connect(self.mail_notification_frame.setVisible)
@@ -631,12 +605,6 @@ class Ui_SettingWidget(object):
                                                                        u"\u7f6e\u4fe1\u5ea6\u8d8a\u5927\u5bf9\u56fe\u7247\u7cbe\u5ea6\u8981\u6c42\u8d8a\u9ad8",
                                                                        None))
         # endif // QT_CONFIG(whatsthis)
-        # if QT_CONFIG(tooltip)
-        self.frame_9.setToolTip(QCoreApplication.translate("SettingWidget",
-                                                           u"<html><head/><body><p>\u6b64\u53c2\u6570\u63a7\u5236\u90e8\u5206\u64cd\u4f5c\u7684\u7b49\u5f85\u65f6\u95f4\u6216\u6267\u884c\u95f4\u9694\uff0c\u4ee5\u79d2\u4e3a\u5355\u4f4d\u3002\u5982\u679c\u4f60\u7684\u7535\u8111\u52a0\u8f7d\u6e38\u620f\u8db3\u591f\u5feb\uff0c\u53ef\u7528\u51cf\u5c11\u6b64\u503c\u6765\u51cf\u5c11\u7b49\u5f85\u65f6\u95f4\u3002\u5982\u679c\u4f60\u7684\u7535\u8111\u7ecf\u5e38\u68c0\u6d4b\u8d85\u65f6\uff0c\u8003\u8651\u589e\u52a0\u6b64\u503c\u6765\u8ba9\u6e38\u620f\u5145\u5206\u52a0\u8f7d\u3002\u4efb\u4f55\u65f6\u5019\u90fd\u4e0d\u5efa\u8bae\u8fd9\u4e2a\u503c\u4e3a0.</p></body></html>",
-                                                           None))
-        #endif // QT_CONFIG(tooltip)
-        self.label_11.setText(QCoreApplication.translate("SettingWidget", u"\u6027\u80fd\u53c2\u6570", None))
         self.exit_when_close_checkBox.setText(
             QCoreApplication.translate("SettingWidget", u"\u5173\u95ed\u7a97\u53e3\u65f6\u76f4\u63a5\u9000\u51fa",
                                        None))

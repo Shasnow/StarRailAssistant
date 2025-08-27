@@ -121,6 +121,7 @@ class Ui_SimulateUniverseWidget(object):
 
         self.verticalLayout_2.addWidget(self.frame_3)
 
+
         self.retranslateUi(SimulateUniverseWidget)
 
         QMetaObject.connectSlotsByName(SimulateUniverseWidget)

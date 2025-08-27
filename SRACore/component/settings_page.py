@@ -7,6 +7,7 @@ import SRACore.util.system as system
 from SRACore.component.common import SRAComponent
 from SRACore.component.dialog import ScheduleDialog
 from SRACore.ui.settings_page_ui import Ui_SettingWidget
+from SRACore.util import encryption
 from SRACore.util.config import GlobalConfigManager
 from SRACore.util.logger import logger
 
@@ -40,16 +41,15 @@ class SettingsPageComponent(SRAComponent):
         self.ui.mail_notification_frame.setVisible(self.ui.mail_notification_checkbox.isChecked())
         self.ui.smtp_server.setText(self.gcm.get('smtp_server', ''))
         self.ui.sender_email.setText(self.gcm.get('sender_email', ''))
-        self.ui.authorization_code.setText(self.gcm.get('authorization_code', ''))
+        self.ui.authorization_code.setText(encryption.win_decryptor(self.gcm.get('authorization_code', '')))
         self.ui.receiver_email.setText(self.gcm.get('receiver_email', ''))
         self.ui.threadSafety_checkBox.setChecked(self.gcm.get('thread_safety', False))
         self.ui.startup_checkBox.setChecked(self.gcm.get('startup', False))
         self.ui.autoUpdate_checkBox.setChecked(self.gcm.get('autoupdate', True))
         self.ui.zoomSpinBox.setValue(self.gcm.get('zoom', 1.50))
         self.ui.confidenceSpinBox.setValue(self.gcm.get('confidence', 0.90))
-        self.ui.performanceSpinBox.setValue(self.gcm.get('performance', 2.0))
         self.ui.exit_when_close_checkBox.setChecked(self.gcm.get('exit_when_close', True))
-        self.ui.mirrorchyanCDK_lineEdit.setText(self.gcm.get('mirrorchyanCDK', ''))  # NOQA
+        self.ui.mirrorchyanCDK_lineEdit.setText(encryption.win_decryptor(self.gcm.get('mirrorchyanCDK', '')))  # NOQA
 
     def getter(self):
         for i in range(4):
@@ -59,7 +59,7 @@ class SettingsPageComponent(SRAComponent):
         self.gcm.set('notification_allow', self.ui.notification_allow_checkbox.isChecked())
         self.gcm.set('notification_system', self.ui.system_notification_checkbox.isChecked())
         self.gcm.set('notification_mail', self.ui.mail_notification_checkbox.isChecked())
-        self.gcm.set('smtp_server', self.ui.smtp_server.text())
+        self.gcm.set('smtp_server', encryption.win_encryptor(self.ui.smtp_server.text()))
         self.gcm.set('sender_email', self.ui.sender_email.text())
         self.gcm.set('authorization_code', self.ui.authorization_code.text())
         self.gcm.set('receiver_email', self.ui.receiver_email.text())
@@ -67,9 +67,8 @@ class SettingsPageComponent(SRAComponent):
         self.gcm.set('startup', self.ui.startup_checkBox.isChecked())
         self.gcm.set('zoom', float(self.ui.zoomSpinBox.value()))
         self.gcm.set('confidence', float(self.ui.confidenceSpinBox.value()))
-        self.gcm.set('performance', float(self.ui.performanceSpinBox.value()))
         self.gcm.set('exit_when_close', self.ui.exit_when_close_checkBox.isChecked())
-        self.gcm.set('mirrorchyanCDK', str(self.ui.mirrorchyanCDK_lineEdit.text()))  # NOQA
+        self.gcm.set('mirrorchyanCDK', encryption.win_encryptor(self.ui.mirrorchyanCDK_lineEdit.text()))  # NOQA
 
     def pre_connector(self):
         """预连接函数，用于连接信号和槽，在setter之前执行"""

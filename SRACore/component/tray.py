@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication
 
 class SystemTray(QSystemTrayIcon):
     """系统托盘图标组件，提供快速访问主界面和退出应用的功能。"""
+
     def __init__(self, parent):
         super().__init__(QIcon("resources/SRAico.png"), parent)
         self.parent_object = parent
@@ -29,3 +30,12 @@ class SystemTray(QSystemTrayIcon):
                     self.parent_object.showMinimized()
             else:
                 self.parent_object.show()
+
+    def show_message(self, title: str = "SRA", message: str = "", msecs: int = 5000):
+        """显示系统托盘消息通知。"""
+        self.showMessage(title, message, QIcon("resources/SRAicon.ico"), msecs)
+
+    @Slot()
+    def show_finish_message(self):
+        """显示任务完成消息通知。"""
+        self.show_message("SRA", "所有任务已完成")

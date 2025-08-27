@@ -100,6 +100,7 @@ class Ui_MissionAccomplishWidget(object):
 
         self.verticalLayout.addWidget(self.radioButton)
 
+
         self.verticalLayout_3.addWidget(self.frame2_1)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)

@@ -5,6 +5,8 @@ from typing import Any
 from SRACore.util.logger import logger
 
 version = 1
+
+
 class ConfigManager:
     """
     管理单个账号的配置文件，支持加载、保存、切换配置。
@@ -148,6 +150,7 @@ class GlobalConfigManager:
     管理全局配置文件 globals.json，支持加载、保存、获取和设置配置项。
     """
     __instance = None
+
     def __init__(self):
         self._global_config = {}
         self.load()
