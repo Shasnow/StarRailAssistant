@@ -66,6 +66,7 @@ class Ui_Dialog(object):
 
         self.verticalLayout.addWidget(self.frame)
 
+
         self.retranslateUi(Dialog)
 
         QMetaObject.connectSlotsByName(Dialog)

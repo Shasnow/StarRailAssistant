@@ -6,6 +6,8 @@ from PySide6.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QW
     QSpacerItem, QSizePolicy, QFrame, QLCDNumber, QHBoxLayout, QPushButton, QListWidget, QStackedWidget, QTextBrowser, \
     QMessageBox, QLineEdit, QTimeEdit, QComboBox
 
+from SRACore.util import system
+
 
 class Announcement(QWidget):
     def __init__(self, parent=None, title="title", content="text", content_type="text"):
@@ -115,10 +117,11 @@ class AnnouncementBoard(QDialog):
 
 
 class ShutdownDialog(QDialog):
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("关机")
         self.setWindowIcon(QIcon("resources/SRAicon.ico"))
+        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, True)
         self.resize(342, 246)
         self.verticalLayout = QVBoxLayout()
         self.setLayout(self.verticalLayout)
@@ -149,7 +152,7 @@ class ShutdownDialog(QDialog):
         self.pushButton = QPushButton(self.frame)
         self.pushButton.setFont(font)
         self.pushButton.setText("取消")
-        # self.pushButton.clicked.connect(WindowsPower.shutdown_cancel)
+        self.pushButton.clicked.connect(system.shutdown_cancel)
         self.pushButton.clicked.connect(self.close)
 
         self.horizontalLayout.addWidget(self.pushButton)
@@ -177,6 +180,10 @@ class ShutdownDialog(QDialog):
             self.close()  # 显示00表示倒计时结束
         else:
             self.lcdNumber.display(self.time_left)
+
+    def show(self, /):
+        system.shutdown(60)
+        super().show()
 
 
 class ExceptionMessageBox(QMessageBox):

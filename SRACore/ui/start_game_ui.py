@@ -194,11 +194,13 @@ class Ui_StartGameWidget(object):
 
         self.verticalLayout.addWidget(self.frame2_4)
 
+
         self.verticalLayout_3.addWidget(self.frame_2)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.gridLayout_2.addWidget(self.scrollArea, 1, 0, 1, 1)
+
 
         self.retranslateUi(StartGameWidget)
 

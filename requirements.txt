@@ -1,11 +1,12 @@
-keyboard
 opencv-python
 pillow
+PySide6
 pyscreeze
 pygetwindow
 pyautogui
-PySide6
-rich
-psutil
-nuitka
+keyboard
 pywin32
+psutil
+rich
+loguru
+nuitka
