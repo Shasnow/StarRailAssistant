@@ -16,8 +16,8 @@ from SRACore.util.logger import logger
 
 @dataclasses.dataclass
 class Region:
-    top: int
     left: int
+    top: int
     width: int
     height: int
 
@@ -26,6 +26,20 @@ class Region:
         """将Region转换为元组"""
         return self.left, self.top, self.width, self.height
 
+
+@dataclasses.dataclass
+class Box:
+    left: int
+    top: int
+    width: int
+    height: int
+
+    @property
+    def center(self):
+        """获取Box的中心点坐标"""
+        center_x = self.left + self.width // 2
+        center_y = self.top + self.height // 2
+        return center_x, center_y
 
 class Operator:
     def __init__(self):
@@ -81,7 +95,7 @@ class Operator:
         self.height = height // 90 * 90
         self.top = (top + int(30 * self.zoom)) if top != 0 else top
         self.left = (left + int(8 * self.zoom)) if left != 0 else left
-        return Region(self.top, self.left, self.width, self.height)
+        return Region(self.left, self.top, self.width, self.height)
 
     def screenshot_region(self, region: Region | None = None):
         """截图"""
@@ -118,13 +132,13 @@ class Operator:
             return self.screenshot_tuple(*args)
         else:
             raise ValueError(
-                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{" ".join([arg.__class__.__name__ for arg in args])}'")
+                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{' '.join([arg.__class__.__name__ for arg in args])}'")
 
     def locate_in_region(self,
                          img_path: str,
                          region: Region | None = None,
                          trace: bool = True,
-                         **_) -> pyscreeze.Box | None:
+                         **_) -> Box | None:
         """在窗口内查找图片位置"""
         try:
             if region is None:
@@ -133,7 +147,8 @@ class Operator:
             if not Path(img_path).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
             img = cv2.imread(img_path)
-            return pyscreeze.locate(img, self.screenshot(region), confidence=self.confidence)
+            box = pyscreeze.locate(img, self.screenshot(region), confidence=self.confidence)
+            return Box(box.left, box.top, box.width, box.height)
         except Exception as e:
             if trace:
                 logger.trace(f"ImageNotFound: {img_path} -> {e}")
@@ -146,7 +161,7 @@ class Operator:
                         to_x: float,
                         to_y: float,
                         trace: bool = True,
-                        **_) -> pyscreeze.Box | None:
+                        **_) -> Box | None:
         """
         在窗口内查找图片位置，使用比例坐标
         :param img_path: 模板图片路径
@@ -166,7 +181,7 @@ class Operator:
         top = int(region.top + region.height * from_y)
         width = int(region.width * (to_x - from_x))
         height = int(region.height * (to_y - from_y))
-        return self.locate_in_region(img_path, Region(top, left, width, height), trace)
+        return self.locate_in_region(img_path, Region(left, top, width, height), trace)
 
     def locate_any_in_region(self, img_paths: list[str], region: Region | None = None, trace: bool = True) -> tuple[
         int, pyscreeze.Box | None]:
@@ -220,28 +235,28 @@ class Operator:
             return self.locate_any_in_tuple(img_paths, *args, **kwargs)
         else:
             raise ValueError(
-                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{" ".join([arg.__class__.__name__ for arg in args])}'")
+                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{' '.join([arg.__class__.__name__ for arg in args])}'")
 
     @overload
-    def locate(self, img_path: str, region: Region | None = None, trace=True) -> pyscreeze.Box | None:
+    def locate(self, template: str, region: Region | None = None, trace: bool = True) -> Box | None:
         ...
 
     @overload
-    def locate(self, img_path: str, from_x: float, from_y: float, to_x: float, to_y: float,
-               trace=True) -> pyscreeze.Box | None:
+    def locate(self, template: str, from_x: float, from_y: float, to_x: float, to_y: float,
+               trace: bool = True) -> Box | None:
         ...
 
-    def locate(self, img_path: str, *args, **kwargs):
+    def locate(self, template: str, *args, **kwargs):
         """在窗口内查找图片位置"""
         if len(args) == 0:
-            return self.locate_in_region(img_path, **kwargs)
+            return self.locate_in_region(template, **kwargs)
         elif len(args) == 1 and (args[0] is None or isinstance(args[0], Region)):
-            return self.locate_in_region(img_path, args[0], **kwargs)
+            return self.locate_in_region(template, args[0], **kwargs)
         elif len(args) == 4 and all(isinstance(arg, (int, float)) for arg in args):
-            return self.locate_in_tuple(img_path, *args, **kwargs)
+            return self.locate_in_tuple(template, *args, **kwargs)
         else:
             raise ValueError(
-                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{" ".join([arg.__class__.__name__ for arg in args])}'")
+                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{' '.join([arg.__class__.__name__ for arg in args])}'")
 
     def click_point(self, x: int | float, y: int | float, x_offset: int = 0, y_offset: int = 0,
                     after_sleep: float = 0) -> bool:
@@ -272,12 +287,12 @@ class Operator:
             raise ValueError(
                 f"Invalid arguments: expected 'int, int' or 'float, float', got '{type(x).__name__}, {type(y).__name__}'")
 
-    def click_box(self, box: pyscreeze.Box, x_offset: int = 0, y_offset: int = 0, after_sleep: float = 0) -> bool:
+    def click_box(self, box: Box, x_offset: int = 0, y_offset: int = 0, after_sleep: float = 0) -> bool:
         """点击图片位置"""
         if box is None:
             logger.trace("Could not click a Empty Box")
             return False
-        x, y = pyscreeze.center(box)  # NOQA
+        x, y = box.center
         return self.click_point(int(x), int(y), x_offset, y_offset, after_sleep)
 
     def click_img(self, img_path: str, x_offset: int = 0, y_offset: int = 0, after_sleep: float = 0) -> bool:
@@ -303,7 +318,7 @@ class Operator:
         logger.debug(f"Timeout: {img_path} -> Not found in {timeout} seconds")
         return False
 
-    def wait_any_img(self, img_paths: list[str], timeout: int = 10, interval: float | None = None) -> int:
+    def wait_any_img(self, img_paths: list[str], timeout: int = 10, interval: float = 0.5) -> int:
         """
         等待任意一张图片出现
         :param img_paths: 模板图片路径列表
@@ -311,8 +326,6 @@ class Operator:
         :param interval: 检查间隔时间，单位秒，默认为0.2秒
         :return: int - 找到的图片索引，如果未找到则返回-1
         """
-        if interval is None:
-            interval = 0.5
         start_time = time.time()
         while time.time() - start_time < timeout:
             for img_path in img_paths:
@@ -347,13 +360,13 @@ class Operator:
             return False
 
     @staticmethod
-    def hold_key(key: str, during: float = 0) -> bool:
+    def hold_key(key: str, duration: float = 0) -> bool:
         """
         按下按键一段时间
 
         Args:
             key: 按键
-            during: 按下时间
+            duration: 按下时间
 
         Returns:
             按键成功返回True，否则返回False
@@ -361,7 +374,7 @@ class Operator:
         try:
             logger.debug("按下按键 " + key)
             pyautogui.keyDown(key)
-            time.sleep(during)
+            time.sleep(duration)
             pyautogui.keyUp(key)
             return True
         except Exception as e:

@@ -6,7 +6,7 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QMainWindow
 
 from SRACore.component.common import SRAComponent
-from SRACore.component.dialog import AnnouncementBoard, Announcement, MessageBox
+from SRACore.component.dialog import AnnouncementBoard, Announcement, MessageBox, ShutdownDialog
 from SRACore.component.mission_accomplish_component import MissionAccomplishComponent
 from SRACore.component.multi_account import MultiAccountComponent
 from SRACore.component.receive_reward import ReceiveRewardComponent
@@ -255,6 +255,12 @@ class MainWindowComponent(QMainWindow):
                                  password=encryption.win_decryptor(self.gcm.get("authorization_code")),
                                  receiver=self.gcm.get("receiver_email"))
         self.is_running = False
+        if self.config_manager.get("mission_accomplish")["shutdown"]:
+            ShutdownDialog(self).show()
+        else:
+            if self.config_manager.get("mission_accomplish")["exit_sra"]:
+                self.close()
+
 
     def closeEvent(self, event):
         """关闭窗口事件处理，保存配置和窗口状态。"""

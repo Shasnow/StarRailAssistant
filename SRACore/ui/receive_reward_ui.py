@@ -105,6 +105,7 @@ class Ui_ReceiveRewardWidget(object):
 
         self.horizontalLayout_8.addWidget(self.nameless_honour_checkbox)
 
+
         self.verticalLayout_3.addWidget(self.frame3_5)
 
         self.frame3_6 = QFrame(self.scrollAreaWidgetContents)
@@ -118,6 +119,7 @@ class Ui_ReceiveRewardWidget(object):
         self.gift_of_odyssey_checkbox.setMinimumSize(QSize(0, 30))
 
         self.horizontalLayout_6.addWidget(self.gift_of_odyssey_checkbox)
+
 
         self.verticalLayout_3.addWidget(self.frame3_6)
 

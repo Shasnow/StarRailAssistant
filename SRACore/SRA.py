@@ -1,7 +1,6 @@
 import sys
 import time
 
-from PySide6.QtGui import Qt
 from PySide6.QtWidgets import QApplication
 
 from SRACore.component.main_window import MainWindowComponent
@@ -16,6 +15,7 @@ from SRACore.util.plugin import PluginManager
 
 class SRA:
     """应用程序的主类，负责初始化和运行应用程序。"""
+
     def __init__(self):
         PluginManager.scan_plugins()
         self.global_manager = GlobalConfigManager()
@@ -37,7 +37,6 @@ class SRA:
         """启动应用程序的静态方法。"""
         start_time = time.time()
         app = QApplication(sys.argv)
-        app.styleHints().setColorScheme(Qt.ColorScheme.Dark)
         sra = SRA()
         sra.main_window.show()
         sra.tray.show()

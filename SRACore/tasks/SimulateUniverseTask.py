@@ -78,7 +78,7 @@ class SimulateUniverseTask(BaseTask):
     def _navigate_and_fight(self):
         """导航和战斗处理"""
         logger.info("移动")
-        self.hold_key("w", during=2.6)
+        self.hold_key("w", duration=2.6)
 
         logger.info("进入战斗")
         self.click_point(0.5, 0.5)
@@ -103,10 +103,11 @@ class SimulateUniverseTask(BaseTask):
                 "resources/img/blessing_select.png",
                 "resources/img/equation_expansion.png",
                 "resources/img/close.png",
+                "resources/img/equation_select.png",
                 "resources/img/divergent_universe_quit.png"
             ])
 
-            if index == 0:  # 祝福选择
+            if index == 0 or index == 3:  # 祝福选择或方程式选择
                 if not self.click_img("resources/img/collection.png"):
                     self.click_point(0.5, 0.5, x_offset=-100)
                 self.click_img("resources/img/ensure2.png", after_sleep=1)

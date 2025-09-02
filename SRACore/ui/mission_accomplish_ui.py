@@ -107,6 +107,7 @@ class Ui_MissionAccomplishWidget(object):
 
         self.verticalLayout_3.addItem(self.verticalSpacer)
 
+
         self.gridLayout.addWidget(self.body_frame, 1, 0, 1, 1)
 
         self.retranslateUi(MissionAccomplishWidget)

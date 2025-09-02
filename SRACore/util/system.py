@@ -59,3 +59,19 @@ def task_kill(process: str) -> bool:
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
     return False
+
+
+def shutdown(time: int):
+    """关机
+
+    Args:
+        time (int): 延时关机时间，单位秒
+    """
+    if time < 0:
+        time = 0
+    Popen(f"shutdown -s -t {time}", shell=True)
+
+
+def shutdown_cancel():
+    """取消关机"""
+    Popen("shutdown -a", shell=True)

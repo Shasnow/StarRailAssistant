@@ -5,9 +5,9 @@ from PySide6.QtWidgets import QListWidgetItem
 
 import SRACore.util.system as system
 from SRACore.component.common import SRAComponent
-from SRACore.component.dialog import ScheduleDialog
+from SRACore.component.dialog import ScheduleDialog, MessageBox
 from SRACore.ui.settings_page_ui import Ui_SettingWidget
-from SRACore.util import encryption
+from SRACore.util import encryption, notify
 from SRACore.util.config import GlobalConfigManager
 from SRACore.util.logger import logger
 
@@ -77,6 +77,7 @@ class SettingsPageComponent(SRAComponent):
         self.ui.schedule_add_button.clicked.connect(self.add_schedule)
         self.ui.schedule_list.itemDoubleClicked.connect(self.remove_schedule)
         self.ui.reset_pushButton.clicked.connect(self.reset_keys)
+        self.ui.email_check_button.clicked.connect(self.email_check)
 
     @Slot()
     def add_schedule(self):
@@ -117,3 +118,18 @@ class SettingsPageComponent(SRAComponent):
                 logger.info("SRAUpdater.exe文件不存在，无法启动更新程序")
         else:
             self.gcm.set('autoupdate', False)
+
+    @Slot()
+    def email_check(self):
+        sender = self.ui.sender_email.text()
+        SMTP = self.ui.smtp_server.text()
+        authorizationCode = self.ui.authorization_code.text()
+        receiver = self.ui.receiver_email.text()
+        if sender == "" or SMTP == "" or authorizationCode == "" or receiver == "":
+            MessageBox.info(self, "警告", "请填写完整的邮箱信息")
+            return
+        if notify.send_mail(
+                title="SRA",
+                subject="邮箱测试", message="如果您能收到这封邮件，说明您的SRA邮件通知已经准备好。",
+                SMTP=SMTP, sender=sender, password=authorizationCode, receiver=receiver):
+            MessageBox.info(self, "邮箱测试", "已发送测试消息，请注意查收。")
