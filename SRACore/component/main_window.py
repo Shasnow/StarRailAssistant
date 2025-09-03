@@ -44,7 +44,7 @@ class MainWindowComponent(QMainWindow):
         self.ui.setupUi(self)
         self.setWindowTitle(f"SRA {VERSION} | {random.choice(RANDOM_TITLE)}")
         self.setWindowIcon(QIcon("resources\\SRAicon.ico"))
-        self.setGeometry(*self.gcm.get('geometry', (100, 100, 600, 800)))  # NOQA
+        self.setGeometry(*self.gcm.get('geometry', (200, 200, 800, 600)))  # NOQA
         self.start_game = StartGameComponent(self, self.config_manager)
         self.trailblaze_power = TrailblazePowerComponent(self, self.config_manager)
         self.receive_reward = ReceiveRewardComponent(self, self.config_manager)
