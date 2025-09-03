@@ -65,7 +65,7 @@ class TransparentLogWindow(QWidget):
             "SUCCESS": "green",
             # "DEBUG": "lightblue" 测试可用
         }
-        _, time, level, *message = msg.split(" ")
+        time, level, *message = msg.split(" ")
         if level.upper() not in ["INFO", "WARNING", "ERROR", "SUCCESS"]:
             return
 
