@@ -85,7 +85,7 @@ class TaskManager(QThread):
             logger.info("All tasks completed.")
         except Exception as e:
             # 捕获线程主循环中的异常（如配置加载失败）
-            logger.error(f"TaskManager crashed: {str(e)}")
+            logger.exception(f"TaskManager crashed: {str(e)}")
         finally:
             # 确保标志位被重置，避免僵尸线程
             self.running_flag = False
@@ -104,7 +104,8 @@ class TaskManager(QThread):
             Exception: 如果配置加载或任务实例化失败（异常会被上层捕获）
         """
         # 加载指定配置（注意：可能修改全局状态）
-        self.config_manager.load(config_name)
+        if self.config_manager.current_name!=config_name:
+            self.config_manager.load(config_name)
         # 从配置中读取任务选择列表（如 [True, False, True]）
         task_select = self.config_manager.get('main_window')['task_select']
         tasks = []
