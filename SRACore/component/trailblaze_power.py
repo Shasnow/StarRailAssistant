@@ -45,18 +45,18 @@ class TrailblazePowerComponent(SRAComponent):
                 "args": {
                     "level": self.level,
                     "level_text": self.level_text,
-                    "run_times": self.run_times,
-                    "single_times": self.single_times
+                    "run_time": self.run_times,
+                    "single_time": self.single_times
                 }}
 
         @staticmethod
         def fromjson(data: dict):
             return TrailblazePowerComponent.TaskItem(
                 data["name"],
-                data["args"]["level"],
+                data["args"].get("level",1),
                 data["args"].get("level_text", ""),
-                data["args"]["run_times"],
-                data["args"]["single_times"]
+                data["args"].get("run_time",1),
+                data["args"].get("single_time",1)
             )
 
     def __init__(self, parent, config_manager: ConfigManager):
@@ -88,6 +88,7 @@ class TrailblazePowerComponent(SRAComponent):
     def getter(self):
         self.config.replenish = self.ui.replenish_checkBox.isChecked()
         self.config.replenish_way = self.ui.replenish_way_comboBox.currentIndex()
+        self.config.replenish_time = self.ui.replenish_time_spinBox.value()
         self.config.use_assistant = self.ui.useAssist_checkBox.isChecked()
         self.config.change_lineup = self.ui.changeLineup_checkBox.isChecked()
         self.config.task_list.clear()
