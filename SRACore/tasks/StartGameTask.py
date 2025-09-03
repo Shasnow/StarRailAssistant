@@ -82,14 +82,24 @@ class StartGameTask(BaseTask):
         else:
             return self.login_bl()  # 登录B站服
 
+    def logout_outside(self):
+        logger.info("登出账号")
+        if self.wait_img("resources/img/logout.png", timeout=60):
+            self.click_img("resources/img/logout.png")
+        self.click_img("resources/img/quit2.png")
+        return True
+
     def login_bl(self):
         result = self.wait_any_img(['resources/img/bilibili_login.png', 'resources/img/bilibili_welcome.png'],
                                    timeout=60)
         if result != 0:
             logger.info(f"登录状态 {result}")
-            return result
-        else:
-            self.click_img("resources/img/bilibili_login_other.png", after_sleep=0.5)
+            enable = True
+            if enable and result != 3:  # 是否启用退出账号
+                self.logout_outside()  # 执行退出账号后执行下面的登录操作
+            else:
+                return result  # 直接返回登录状态
+        self.click_img("resources/img/bilibili_login_other.png", after_sleep=0.5)
 
         self.click_point(0.5, 0.69)  # 点击账号密码登录
         if self.config['auto_login']:
@@ -122,9 +132,12 @@ class StartGameTask(BaseTask):
              "resources/img/quit.png", "resources/img/enter.png"], timeout=60)
         if result != 0:
             logger.info(f"登录状态 {result}")
-            return result
-        else:
-            self.click_img("resources/img/login_other.png")
+            enable = True
+            if enable and result != 3:  # 是否启用退出账号
+                self.logout_outside()  # 执行退出账号后执行下面的登录操作
+            else:
+                return result  # 直接返回登录状态
+        self.click_img("resources/img/login_other.png")
 
         if not self.click_img("resources/img/login_with_account.png"):
             logger.error("发生错误，错误编号10")
