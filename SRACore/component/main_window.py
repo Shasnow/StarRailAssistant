@@ -17,7 +17,7 @@ from SRACore.component.trailblaze_power import TrailblazePowerComponent
 from SRACore.thread.background_thread import BackgroundThreadWorker
 from SRACore.thread.trigger_thread import TriggerManager
 from SRACore.ui.main_ui import Ui_MainWindow
-from SRACore.util import notify, encryption
+from SRACore.util import notify, encryption, system
 from SRACore.util.config import ConfigManager, GlobalConfigManager
 from SRACore.util.const import VERSION, RANDOM_TITLE, CORE
 from SRACore.util.logger import log_emitter, logger
@@ -255,10 +255,13 @@ class MainWindowComponent(QMainWindow):
                                  password=encryption.win_decryptor(self.gcm.get("authorization_code")),
                                  receiver=self.gcm.get("receiver_email"))
         self.is_running = False
-        if self.config_manager.get("mission_accomplish")["shutdown"]:
+        after=self.config_manager.get("mission_accomplish")
+        if after is None:
+            return
+        if after["shutdown"]:
             ShutdownDialog(self).show()
         else:
-            if self.config_manager.get("mission_accomplish")["exit_sra"]:
+            if after["exit_sra"]:
                 self.close()
 
 
