@@ -3,19 +3,23 @@
 ################################################################################
 ## Form generated from reading UI file 'trailblaze_power.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.7.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect,
-                            QSize, Qt)
-from PySide6.QtGui import (QFont)
-from PySide6.QtWidgets import (QAbstractItemView, QCheckBox, QComboBox,
-                               QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QListWidget, QListWidgetItem, QPushButton, QScrollArea,
-                               QSizePolicy, QSpacerItem, QSpinBox, QVBoxLayout,
-                               QWidget)
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox,
+    QFrame, QGridLayout, QHBoxLayout, QLabel,
+    QListWidget, QListWidgetItem, QPushButton, QScrollArea,
+    QSizePolicy, QSpacerItem, QSpinBox, QVBoxLayout,
+    QWidget)
 
 class Ui_TrailblazePowerWidget(object):
     def setupUi(self, TrailblazePowerWidget):
@@ -548,311 +552,128 @@ class Ui_TrailblazePowerWidget(object):
 
     def retranslateUi(self, TrailblazePowerWidget):
         TrailblazePowerWidget.setWindowTitle(QCoreApplication.translate("TrailblazePowerWidget", u"Form", None))
-        self.useAssist_checkBox.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"\u4f7f\u7528\u652f\u63f4\u89d2\u8272", None))
-        self.label2_1_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"  \u6b21\u6570\uff1a", None))
-        self.replenish_checkBox.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"\u8865\u5145\u4f53\u529b", None))
-        self.changeLineup_checkBox.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"\u91cd\u65b0\u7f16\u961f", None))
-        self.replenish_way_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                              u"---\u65b9\u5f0f---", None))
-        self.replenish_way_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u540e\u5907",
-                                                                              None))
-        self.replenish_way_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u71c3\u6599",
-                                                                              None))
-        self.replenish_way_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget", u"\u661f\u743c",
-                                                                              None))
+        self.useAssist_checkBox.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u4f7f\u7528\u652f\u63f4\u89d2\u8272", None))
+        self.label2_1_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
+        self.replenish_checkBox.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u8865\u5145\u4f53\u529b", None))
+        self.changeLineup_checkBox.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u91cd\u65b0\u7f16\u961f", None))
+        self.replenish_way_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"---\u65b9\u5f0f---", None))
+        self.replenish_way_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u540e\u5907", None))
+        self.replenish_way_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u71c3\u6599", None))
+        self.replenish_way_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget", u"\u661f\u743c", None))
 
-        self.label2_2_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
+        self.label2_2_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
         self.ornamentExtractionAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
-        self.ornamentExtraction_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                   u"-----\u9009\u62e9\u526f\u672c-----",
-                                                                                   None))
-        self.ornamentExtraction_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                   u"\u6708\u4e0b\u6731\u6bb7\uff08\u5996\u7cbe/\u6d77\u9685\uff09",
-                                                                                   None))
-        self.ornamentExtraction_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                   u"\u7eb7\u4e89\u4e0d\u4f11\uff08\u62fe\u9aa8\u5730/\u5de8\u6811\uff09",
-                                                                                   None))
-        self.ornamentExtraction_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                   u"\u8839\u5f79\u9965\u80a0\uff08\u9732\u838e\u5361/\u8549\u4e50\u56ed\uff09",
-                                                                                   None))
-        self.ornamentExtraction_comboBox.setItemText(4, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                   u"\u6c38\u6052\u7b11\u5267\uff08\u90fd\u84dd/\u52ab\u706b\uff09",
-                                                                                   None))
-        self.ornamentExtraction_comboBox.setItemText(5, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                   u"\u4f34\u4f60\u5165\u7720\uff08\u8328\u5188\u5c3c\u4e9a/\u51fa\u4e91\u663e\u4e16\uff09",
-                                                                                   None))
-        self.ornamentExtraction_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                   u"\u5929\u5251\u5982\u96e8\uff08\u683c\u62c9\u9ed8/\u5339\u8bfa\u5eb7\u5c3c\uff09",
-                                                                                   None))
-        self.ornamentExtraction_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                   u"\u5b7d\u679c\u76d8\u751f\uff08\u7e41\u661f/\u9f99\u9aa8\uff09",
-                                                                                   None))
-        self.ornamentExtraction_comboBox.setItemText(8, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                   u"\u767e\u5e74\u51bb\u571f\uff08\u8d1d\u6d1b\u4f2f\u683c/\u8428\u5c14\u7d22\u56fe\uff09",
-                                                                                   None))
-        self.ornamentExtraction_comboBox.setItemText(9, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                   u"\u6e29\u67d4\u8bdd\u8bed\uff08\u516c\u53f8/\u5dee\u5206\u673a\uff09",
-                                                                                   None))
-        self.ornamentExtraction_comboBox.setItemText(10, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                    u"\u6d74\u706b\u94a2\u5fc3\uff08\u5854\u5229\u4e9a/\u7fc1\u74e6\u514b\uff09",
-                                                                                    None))
-        self.ornamentExtraction_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                    u"\u575a\u57ce\u4e0d\u5012\uff08\u592a\u7a7a\u5c01\u5370\u7ad9/\u4ed9\u821f\uff09",
-                                                                                    None))
+        self.ornamentExtraction_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
+        self.ornamentExtraction_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u6708\u4e0b\u6731\u6bb7\uff08\u5996\u7cbe/\u6d77\u9685\uff09", None))
+        self.ornamentExtraction_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u7eb7\u4e89\u4e0d\u4f11\uff08\u62fe\u9aa8\u5730/\u5de8\u6811\uff09", None))
+        self.ornamentExtraction_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget", u"\u8839\u5f79\u9965\u80a0\uff08\u9732\u838e\u5361/\u8549\u4e50\u56ed\uff09", None))
+        self.ornamentExtraction_comboBox.setItemText(4, QCoreApplication.translate("TrailblazePowerWidget", u"\u6c38\u6052\u7b11\u5267\uff08\u90fd\u84dd/\u52ab\u706b\uff09", None))
+        self.ornamentExtraction_comboBox.setItemText(5, QCoreApplication.translate("TrailblazePowerWidget", u"\u4f34\u4f60\u5165\u7720\uff08\u8328\u5188\u5c3c\u4e9a/\u51fa\u4e91\u663e\u4e16\uff09", None))
+        self.ornamentExtraction_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget", u"\u5929\u5251\u5982\u96e8\uff08\u683c\u62c9\u9ed8/\u5339\u8bfa\u5eb7\u5c3c\uff09", None))
+        self.ornamentExtraction_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget", u"\u5b7d\u679c\u76d8\u751f\uff08\u7e41\u661f/\u9f99\u9aa8\uff09", None))
+        self.ornamentExtraction_comboBox.setItemText(8, QCoreApplication.translate("TrailblazePowerWidget", u"\u767e\u5e74\u51bb\u571f\uff08\u8d1d\u6d1b\u4f2f\u683c/\u8428\u5c14\u7d22\u56fe\uff09", None))
+        self.ornamentExtraction_comboBox.setItemText(9, QCoreApplication.translate("TrailblazePowerWidget", u"\u6e29\u67d4\u8bdd\u8bed\uff08\u516c\u53f8/\u5dee\u5206\u673a\uff09", None))
+        self.ornamentExtraction_comboBox.setItemText(10, QCoreApplication.translate("TrailblazePowerWidget", u"\u6d74\u706b\u94a2\u5fc3\uff08\u5854\u5229\u4e9a/\u7fc1\u74e6\u514b\uff09", None))
+        self.ornamentExtraction_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget", u"\u575a\u57ce\u4e0d\u5012\uff08\u592a\u7a7a\u5c01\u5370\u7ad9/\u4ed9\u821f\uff09", None))
 
         self.label_2.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u9970\u54c1\u63d0\u53d6", None))
-        self.label2_3_21.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"      \u8fde\u7eed\u4f5c\u6218\uff1a", None))
+        self.label2_3_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u8fde\u7eed\u4f5c\u6218\uff1a", None))
         self.calyxGoldenAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
-        self.label2_3_31.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"      \u6267\u884c\u6b21\u6570\uff1a", None))
-        self.calyxGolden_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                            u"-----\u9009\u62e9\u526f\u672c-----",
-                                                                            None))
-        self.calyxGolden_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                            u"\u56de\u5fc6\u4e4b\u857e\uff08\u7fc1\u6cd5\u7f57\u65af\uff09",
-                                                                            None))
-        self.calyxGolden_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                            u"\u4ee5\u592a\u4e4b\u857e\uff08\u7fc1\u6cd5\u7f57\u65af\uff09",
-                                                                            None))
-        self.calyxGolden_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                            u"\u73cd\u85cf\u4e4b\u857e\uff08\u7fc1\u6cd5\u7f57\u65af\uff09",
-                                                                            None))
-        self.calyxGolden_comboBox.setItemText(4, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                            u"\u56de\u5fc6\u4e4b\u857e\uff08\u5339\u8bfa\u5eb7\u5c3c\uff09",
-                                                                            None))
-        self.calyxGolden_comboBox.setItemText(5, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                            u"\u4ee5\u592a\u4e4b\u857e\uff08\u5339\u8bfa\u5eb7\u5c3c\uff09",
-                                                                            None))
-        self.calyxGolden_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                            u"\u73cd\u85cf\u4e4b\u857e\uff08\u5339\u8bfa\u5eb7\u5c3c\uff09",
-                                                                            None))
-        self.calyxGolden_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                            u"\u56de\u5fc6\u4e4b\u857e\uff08\u4ed9\u821f\u7f57\u6d6e\uff09",
-                                                                            None))
-        self.calyxGolden_comboBox.setItemText(8, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                            u"\u4ee5\u592a\u4e4b\u857e\uff08\u4ed9\u821f\u7f57\u6d6e\uff09",
-                                                                            None))
-        self.calyxGolden_comboBox.setItemText(9, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                            u"\u73cd\u85cf\u4e4b\u857e\uff08\u4ed9\u821f\u7f57\u6d6e\uff09",
-                                                                            None))
-        self.calyxGolden_comboBox.setItemText(10, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"\u56de\u5fc6\u4e4b\u857e\uff08\u96c5\u5229\u6d1bVI\uff09",
-                                                                             None))
-        self.calyxGolden_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"\u4ee5\u592a\u4e4b\u857e\uff08\u96c5\u5229\u6d1bVI\uff09",
-                                                                             None))
-        self.calyxGolden_comboBox.setItemText(12, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"\u73cd\u85cf\u4e4b\u857e\uff08\u96c5\u5229\u6d1bVI\uff09",
-                                                                             None))
+        self.label2_3_31.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6267\u884c\u6b21\u6570\uff1a", None))
+        self.calyxGolden_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
+        self.calyxGolden_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u56de\u5fc6\u4e4b\u857e\uff08\u7fc1\u6cd5\u7f57\u65af\uff09", None))
+        self.calyxGolden_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u4ee5\u592a\u4e4b\u857e\uff08\u7fc1\u6cd5\u7f57\u65af\uff09", None))
+        self.calyxGolden_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget", u"\u73cd\u85cf\u4e4b\u857e\uff08\u7fc1\u6cd5\u7f57\u65af\uff09", None))
+        self.calyxGolden_comboBox.setItemText(4, QCoreApplication.translate("TrailblazePowerWidget", u"\u56de\u5fc6\u4e4b\u857e\uff08\u5339\u8bfa\u5eb7\u5c3c\uff09", None))
+        self.calyxGolden_comboBox.setItemText(5, QCoreApplication.translate("TrailblazePowerWidget", u"\u4ee5\u592a\u4e4b\u857e\uff08\u5339\u8bfa\u5eb7\u5c3c\uff09", None))
+        self.calyxGolden_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget", u"\u73cd\u85cf\u4e4b\u857e\uff08\u5339\u8bfa\u5eb7\u5c3c\uff09", None))
+        self.calyxGolden_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget", u"\u56de\u5fc6\u4e4b\u857e\uff08\u4ed9\u821f\u7f57\u6d6e\uff09", None))
+        self.calyxGolden_comboBox.setItemText(8, QCoreApplication.translate("TrailblazePowerWidget", u"\u4ee5\u592a\u4e4b\u857e\uff08\u4ed9\u821f\u7f57\u6d6e\uff09", None))
+        self.calyxGolden_comboBox.setItemText(9, QCoreApplication.translate("TrailblazePowerWidget", u"\u73cd\u85cf\u4e4b\u857e\uff08\u4ed9\u821f\u7f57\u6d6e\uff09", None))
+        self.calyxGolden_comboBox.setItemText(10, QCoreApplication.translate("TrailblazePowerWidget", u"\u56de\u5fc6\u4e4b\u857e\uff08\u96c5\u5229\u6d1bVI\uff09", None))
+        self.calyxGolden_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget", u"\u4ee5\u592a\u4e4b\u857e\uff08\u96c5\u5229\u6d1bVI\uff09", None))
+        self.calyxGolden_comboBox.setItemText(12, QCoreApplication.translate("TrailblazePowerWidget", u"\u73cd\u85cf\u4e4b\u857e\uff08\u96c5\u5229\u6d1bVI\uff09", None))
 
-        self.label_3.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"\u62df\u9020\u82b1\u843c\uff08\u91d1\uff09", None))
+        self.label_3.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u62df\u9020\u82b1\u843c\uff08\u91d1\uff09", None))
         self.calyxCrimsonAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
-        self.label2_4_21.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"      \u8fde\u7eed\u4f5c\u6218\uff1a", None))
-        self.label2_4_31.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"      \u6267\u884c\u6b21\u6570\uff1a", None))
-        self.calyxCrimson_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"-----\u9009\u62e9\u526f\u672c-----",
-                                                                             None))
-        self.calyxCrimson_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"\u6708\u72c2\u7360\u7259\uff08\u6bc1\u706d\uff09",
-                                                                             None))
-        self.calyxCrimson_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"\u51c0\u4e16\u6b8b\u5203\uff08\u6bc1\u706d\uff09",
-                                                                             None))
-        self.calyxCrimson_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"\u795e\u4f53\u7425\u73c0\uff08\u5b58\u62a4\uff09",
-                                                                             None))
-        self.calyxCrimson_comboBox.setItemText(4, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"\u7425\u73c0\u7684\u575a\u5b88\uff08\u5b58\u62a4\uff09",
-                                                                             None))
-        self.calyxCrimson_comboBox.setItemText(5, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"\u9006\u65f6\u4e00\u51fb\uff08\u5de1\u730e\uff09",
-                                                                             None))
-        self.calyxCrimson_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"\u9010\u661f\u4e4b\u77e2\uff08\u5de1\u730e\uff09",
-                                                                             None))
-        self.calyxCrimson_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"\u4e07\u8c61\u679c\u5b9e\uff08\u4e30\u9976\uff09",
-                                                                             None))
-        self.calyxCrimson_comboBox.setItemText(8, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"\u6c38\u6052\u4e4b\u82b1\uff08\u4e30\u9976\uff09",
-                                                                             None))
-        self.calyxCrimson_comboBox.setItemText(9, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                             u"\u7cbe\u81f4\u8272\u7a3f\uff08\u667a\u8bc6\uff09",
-                                                                             None))
-        self.calyxCrimson_comboBox.setItemText(10, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                              u"\u667a\u8bc6\u4e4b\u94a5\uff08\u667a\u8bc6\uff09",
-                                                                              None))
-        self.calyxCrimson_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                              u"\u5929\u5916\u4e50\u7ae0\uff08\u540c\u8c10\uff09",
-                                                                              None))
-        self.calyxCrimson_comboBox.setItemText(12, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                              u"\u7fa4\u661f\u4e50\u7ae0\uff08\u540c\u8c10\uff09",
-                                                                              None))
-        self.calyxCrimson_comboBox.setItemText(13, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                              u"\u711a\u5929\u4e4b\u9b54\uff08\u865a\u65e0\uff09",
-                                                                              None))
-        self.calyxCrimson_comboBox.setItemText(14, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                              u"\u6c89\u6ca6\u9ed1\u66dc\uff08\u865a\u65e0\uff09",
-                                                                              None))
-        self.calyxCrimson_comboBox.setItemText(15, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                              u"\u963f\u8d56\u8036\u534e\uff08\u8bb0\u5fc6\uff09",
-                                                                              None))
+        self.label2_4_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u8fde\u7eed\u4f5c\u6218\uff1a", None))
+        self.label2_4_31.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6267\u884c\u6b21\u6570\uff1a", None))
+        self.calyxCrimson_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
+        self.calyxCrimson_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u6708\u72c2\u7360\u7259\uff08\u6bc1\u706d\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u51c0\u4e16\u6b8b\u5203\uff08\u6bc1\u706d\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget", u"\u795e\u4f53\u7425\u73c0\uff08\u5b58\u62a4\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(4, QCoreApplication.translate("TrailblazePowerWidget", u"\u7425\u73c0\u7684\u575a\u5b88\uff08\u5b58\u62a4\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(5, QCoreApplication.translate("TrailblazePowerWidget", u"\u9006\u65f6\u4e00\u51fb\uff08\u5de1\u730e\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget", u"\u9010\u661f\u4e4b\u77e2\uff08\u5de1\u730e\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget", u"\u4e07\u8c61\u679c\u5b9e\uff08\u4e30\u9976\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(8, QCoreApplication.translate("TrailblazePowerWidget", u"\u6c38\u6052\u4e4b\u82b1\uff08\u4e30\u9976\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(9, QCoreApplication.translate("TrailblazePowerWidget", u"\u7cbe\u81f4\u8272\u7a3f\uff08\u667a\u8bc6\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(10, QCoreApplication.translate("TrailblazePowerWidget", u"\u667a\u8bc6\u4e4b\u94a5\uff08\u667a\u8bc6\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget", u"\u5929\u5916\u4e50\u7ae0\uff08\u540c\u8c10\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(12, QCoreApplication.translate("TrailblazePowerWidget", u"\u7fa4\u661f\u4e50\u7ae0\uff08\u540c\u8c10\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(13, QCoreApplication.translate("TrailblazePowerWidget", u"\u711a\u5929\u4e4b\u9b54\uff08\u865a\u65e0\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(14, QCoreApplication.translate("TrailblazePowerWidget", u"\u6c89\u6ca6\u9ed1\u66dc\uff08\u865a\u65e0\uff09", None))
+        self.calyxCrimson_comboBox.setItemText(15, QCoreApplication.translate("TrailblazePowerWidget", u"\u963f\u8d56\u8036\u534e\uff08\u8bb0\u5fc6\uff09", None))
 
-        self.label_4.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"\u62df\u9020\u82b1\u843c\uff08\u8d64\uff09", None))
-        self.label2_5_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
+        self.label_4.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u62df\u9020\u82b1\u843c\uff08\u8d64\uff09", None))
+        self.label2_5_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
         self.stagnantShadowAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
-        self.stagnantShadow_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                               u"-----\u9009\u62e9\u526f\u672c-----",
-                                                                               None))
-        self.stagnantShadow_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                               u"\u4fb5\u7565\u51dd\u5757\uff08\u7269\u7406\uff09",
-                                                                               None))
-        self.stagnantShadow_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                               u"\u661f\u9645\u548c\u5e73\u5de5\u4f5c\u8bc1\uff08\u7269\u7406\uff09",
-                                                                               None))
-        self.stagnantShadow_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                               u"\u5e7d\u5e9c\u901a\u4ee4\uff08\u7269\u7406\uff09",
-                                                                               None))
-        self.stagnantShadow_comboBox.setItemText(4, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                               u"\u94c1\u72fc\u788e\u9f7f\uff08\u7269\u7406\uff09",
-                                                                               None))
-        self.stagnantShadow_comboBox.setItemText(5, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                               u"\u5fff\u706b\u4e4b\u5fc3\uff08\u706b\uff09",
-                                                                               None))
-        self.stagnantShadow_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                               u"\u8fc7\u70ed\u94a2\u5200\uff08\u706b\uff09",
-                                                                               None))
-        self.stagnantShadow_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                               u"\u6052\u6e29\u6676\u58f3\uff08\u706b\uff09",
-                                                                               None))
-        self.stagnantShadow_comboBox.setItemText(8, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                               u"\u51b7\u85cf\u68a6\u7bb1\uff08\u51b0\uff09",
-                                                                               None))
-        self.stagnantShadow_comboBox.setItemText(9, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                               u"\u82e6\u5bd2\u6676\u58f3\uff08\u51b0\uff09",
-                                                                               None))
-        self.stagnantShadow_comboBox.setItemText(10, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u98ce\u96ea\u4e4b\u89d2\uff08\u51b0\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u517d\u9986\u4e4b\u9489\uff08\u96f7\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(12, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u70bc\u5f62\u8005\u96f7\u679d\uff08\u96f7\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(13, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u5f80\u65e5\u4e4b\u5f71\u7684\u96f7\u51a0\uff08\u96f7\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(14, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u66ae\u8f89\u70ec\u857e\uff08\u98ce\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(15, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u4e00\u676f\u9169\u914a\u7684\u65f6\u4ee3\uff08\u98ce\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(16, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u65e0\u4eba\u9057\u57a2\uff08\u98ce\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(17, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u66b4\u98ce\u4e4b\u773c\uff08\u98ce\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(18, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u6697\u5e37\u6708\u534e\uff08\u91cf\u5b50\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(19, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u7099\u68a6\u55b7\u67aa\uff08\u91cf\u5b50\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(20, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u82cd\u733f\u4e4b\u9489\uff08\u91cf\u5b50\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(21, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u865a\u5e7b\u94f8\u94c1\uff08\u91cf\u5b50\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(22, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u7eb7\u4e89\u524d\u5146\uff08\u865a\u6570\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(23, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u4e00\u66f2\u548c\u5f26\u7684\u5e7b\u666f\uff08\u865a\u6570\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(24, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u9547\u7075\u6555\u7b26\uff08\u865a\u6570\uff09",
-                                                                                None))
-        self.stagnantShadow_comboBox.setItemText(25, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                u"\u5f80\u65e5\u4e4b\u5f71\u7684\u91d1\u9970\uff08\u865a\u6570\uff09",
-                                                                                None))
+        self.stagnantShadow_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
+        self.stagnantShadow_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u4fb5\u7565\u51dd\u5757\uff08\u7269\u7406\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u661f\u9645\u548c\u5e73\u5de5\u4f5c\u8bc1\uff08\u7269\u7406\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget", u"\u5e7d\u5e9c\u901a\u4ee4\uff08\u7269\u7406\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(4, QCoreApplication.translate("TrailblazePowerWidget", u"\u94c1\u72fc\u788e\u9f7f\uff08\u7269\u7406\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(5, QCoreApplication.translate("TrailblazePowerWidget", u"\u5fff\u706b\u4e4b\u5fc3\uff08\u706b\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget", u"\u8fc7\u70ed\u94a2\u5200\uff08\u706b\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget", u"\u6052\u6e29\u6676\u58f3\uff08\u706b\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(8, QCoreApplication.translate("TrailblazePowerWidget", u"\u51b7\u85cf\u68a6\u7bb1\uff08\u51b0\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(9, QCoreApplication.translate("TrailblazePowerWidget", u"\u82e6\u5bd2\u6676\u58f3\uff08\u51b0\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(10, QCoreApplication.translate("TrailblazePowerWidget", u"\u98ce\u96ea\u4e4b\u89d2\uff08\u51b0\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget", u"\u517d\u9986\u4e4b\u9489\uff08\u96f7\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(12, QCoreApplication.translate("TrailblazePowerWidget", u"\u70bc\u5f62\u8005\u96f7\u679d\uff08\u96f7\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(13, QCoreApplication.translate("TrailblazePowerWidget", u"\u5f80\u65e5\u4e4b\u5f71\u7684\u96f7\u51a0\uff08\u96f7\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(14, QCoreApplication.translate("TrailblazePowerWidget", u"\u66ae\u8f89\u70ec\u857e\uff08\u98ce\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(15, QCoreApplication.translate("TrailblazePowerWidget", u"\u4e00\u676f\u9169\u914a\u7684\u65f6\u4ee3\uff08\u98ce\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(16, QCoreApplication.translate("TrailblazePowerWidget", u"\u65e0\u4eba\u9057\u57a2\uff08\u98ce\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(17, QCoreApplication.translate("TrailblazePowerWidget", u"\u66b4\u98ce\u4e4b\u773c\uff08\u98ce\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(18, QCoreApplication.translate("TrailblazePowerWidget", u"\u6697\u5e37\u6708\u534e\uff08\u91cf\u5b50\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(19, QCoreApplication.translate("TrailblazePowerWidget", u"\u7099\u68a6\u55b7\u67aa\uff08\u91cf\u5b50\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(20, QCoreApplication.translate("TrailblazePowerWidget", u"\u82cd\u733f\u4e4b\u9489\uff08\u91cf\u5b50\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(21, QCoreApplication.translate("TrailblazePowerWidget", u"\u865a\u5e7b\u94f8\u94c1\uff08\u91cf\u5b50\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(22, QCoreApplication.translate("TrailblazePowerWidget", u"\u7eb7\u4e89\u524d\u5146\uff08\u865a\u6570\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(23, QCoreApplication.translate("TrailblazePowerWidget", u"\u4e00\u66f2\u548c\u5f26\u7684\u5e7b\u666f\uff08\u865a\u6570\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(24, QCoreApplication.translate("TrailblazePowerWidget", u"\u9547\u7075\u6555\u7b26\uff08\u865a\u6570\uff09", None))
+        self.stagnantShadow_comboBox.setItemText(25, QCoreApplication.translate("TrailblazePowerWidget", u"\u5f80\u65e5\u4e4b\u5f71\u7684\u91d1\u9970\uff08\u865a\u6570\uff09", None))
 
         self.label_5.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u51dd\u6ede\u865a\u5f71", None))
-        self.label2_6_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
+        self.label2_6_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
         self.caverOfCorrosionAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.label_6.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u4fb5\u8680\u96a7\u6d1e", None))
-        self.caverOfCorrosion_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                 u"-----\u9009\u62e9\u526f\u672c-----",
-                                                                                 None))
-        self.caverOfCorrosion_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                 u"\u96f3\u52c7\u4e4b\u5f84\uff08\u5973\u6b66\u795e/\u8239\u957f\uff09",
-                                                                                 None))
-        self.caverOfCorrosion_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                 u"\u5f26\u6b4c\u4e4b\u5f84\uff08\u82f1\u8c6a/\u8bd7\u4eba\uff09",
-                                                                                 None))
-        self.caverOfCorrosion_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                 u"\u8ff7\u8bc6\u4e4b\u5f84\uff08\u53f8\u94ce\u5957/\u5b66\u8005\u5957\uff09",
-                                                                                 None))
-        self.caverOfCorrosion_comboBox.setItemText(4, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                 u"\u52c7\u9a91\u4e4b\u5f84\uff08\u94c1\u9a91\u5957/\u52c7\u70c8\u5957\uff09",
-                                                                                 None))
-        self.caverOfCorrosion_comboBox.setItemText(5, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                 u"\u68a6\u6f5c\u4e4b\u5f84\uff08\u6b7b\u6c34/\u949f\u8868\u5320\uff09",
-                                                                                 None))
-        self.caverOfCorrosion_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                 u"\u5e7d\u51a5\u4e4b\u5f84\uff08\u5927\u516c/\u5e7d\u56da\uff09",
-                                                                                 None))
-        self.caverOfCorrosion_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                 u"\u836f\u4f7f\u4e4b\u5f84\uff08\u83b3\u8005/\u4fe1\u4f7f\uff09",
-                                                                                 None))
-        self.caverOfCorrosion_comboBox.setItemText(8, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                 u"\u91ce\u7130\u4e4b\u5f84\uff08\u706b\u5320/\u5e9f\u571f\u5ba2\uff09",
-                                                                                 None))
-        self.caverOfCorrosion_comboBox.setItemText(9, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                 u"\u5723\u9882\u4e4b\u5f84\uff08\u5723\u9a91/\u4e50\u961f\uff09",
-                                                                                 None))
-        self.caverOfCorrosion_comboBox.setItemText(10, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                  u"\u777f\u667a\u4e4b\u5f84\uff08\u94c1\u536b/\u91cf\u5b50\u5957\uff09",
-                                                                                  None))
-        self.caverOfCorrosion_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                  u"\u6f02\u6cca\u4e4b\u5f84\uff08\u8fc7\u5ba2/\u5feb\u67aa\u624b\uff09",
-                                                                                  None))
-        self.caverOfCorrosion_comboBox.setItemText(12, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                  u"\u8fc5\u62f3\u4e4b\u5f84\uff08\u62f3\u7687/\u602a\u76d7\uff09",
-                                                                                  None))
-        self.caverOfCorrosion_comboBox.setItemText(13, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                                  u"\u971c\u98ce\u4e4b\u5f84\uff08\u51b0/\u98ce\u5957\uff09",
-                                                                                  None))
+        self.caverOfCorrosion_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
+        self.caverOfCorrosion_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u96f3\u52c7\u4e4b\u5f84\uff08\u5973\u6b66\u795e/\u8239\u957f\uff09", None))
+        self.caverOfCorrosion_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u5f26\u6b4c\u4e4b\u5f84\uff08\u82f1\u8c6a/\u8bd7\u4eba\uff09", None))
+        self.caverOfCorrosion_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget", u"\u8ff7\u8bc6\u4e4b\u5f84\uff08\u53f8\u94ce\u5957/\u5b66\u8005\u5957\uff09", None))
+        self.caverOfCorrosion_comboBox.setItemText(4, QCoreApplication.translate("TrailblazePowerWidget", u"\u52c7\u9a91\u4e4b\u5f84\uff08\u94c1\u9a91\u5957/\u52c7\u70c8\u5957\uff09", None))
+        self.caverOfCorrosion_comboBox.setItemText(5, QCoreApplication.translate("TrailblazePowerWidget", u"\u68a6\u6f5c\u4e4b\u5f84\uff08\u6b7b\u6c34/\u949f\u8868\u5320\uff09", None))
+        self.caverOfCorrosion_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget", u"\u5e7d\u51a5\u4e4b\u5f84\uff08\u5927\u516c/\u5e7d\u56da\uff09", None))
+        self.caverOfCorrosion_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget", u"\u836f\u4f7f\u4e4b\u5f84\uff08\u83b3\u8005/\u4fe1\u4f7f\uff09", None))
+        self.caverOfCorrosion_comboBox.setItemText(8, QCoreApplication.translate("TrailblazePowerWidget", u"\u91ce\u7130\u4e4b\u5f84\uff08\u706b\u5320/\u5e9f\u571f\u5ba2\uff09", None))
+        self.caverOfCorrosion_comboBox.setItemText(9, QCoreApplication.translate("TrailblazePowerWidget", u"\u5723\u9882\u4e4b\u5f84\uff08\u5723\u9a91/\u4e50\u961f\uff09", None))
+        self.caverOfCorrosion_comboBox.setItemText(10, QCoreApplication.translate("TrailblazePowerWidget", u"\u777f\u667a\u4e4b\u5f84\uff08\u94c1\u536b/\u91cf\u5b50\u5957\uff09", None))
+        self.caverOfCorrosion_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget", u"\u6f02\u6cca\u4e4b\u5f84\uff08\u8fc7\u5ba2/\u5feb\u67aa\u624b\uff09", None))
+        self.caverOfCorrosion_comboBox.setItemText(12, QCoreApplication.translate("TrailblazePowerWidget", u"\u8fc5\u62f3\u4e4b\u5f84\uff08\u62f3\u7687/\u602a\u76d7\uff09", None))
+        self.caverOfCorrosion_comboBox.setItemText(13, QCoreApplication.translate("TrailblazePowerWidget", u"\u971c\u98ce\u4e4b\u5f84\uff08\u51b0/\u98ce\u5957\uff09", None))
 
-        self.label2_7_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
+        self.label2_7_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
         self.echoOfWarAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
-        self.echoOfWar_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                          u"-----\u9009\u62e9\u526f\u672c-----", None))
-        self.echoOfWar_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                          u"\u6668\u660f\u7684\u56de\u7738", None))
-        self.echoOfWar_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                          u"\u5fc3\u517d\u7684\u6218\u573a", None))
-        self.echoOfWar_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                          u"\u5c18\u68a6\u7684\u8d5e\u793c", None))
-        self.echoOfWar_comboBox.setItemText(4, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                          u"\u86c0\u661f\u7684\u65e7\u9765", None))
-        self.echoOfWar_comboBox.setItemText(5, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                          u"\u4e0d\u6b7b\u7684\u795e\u5b9e", None))
-        self.echoOfWar_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                          u"\u5bd2\u6f6e\u7684\u843d\u5e55", None))
-        self.echoOfWar_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget",
-                                                                          u"\u6bc1\u706d\u7684\u5f00\u7aef", None))
+        self.echoOfWar_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
+        self.echoOfWar_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u6668\u660f\u7684\u56de\u7738", None))
+        self.echoOfWar_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u5fc3\u517d\u7684\u6218\u573a", None))
+        self.echoOfWar_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget", u"\u5c18\u68a6\u7684\u8d5e\u793c", None))
+        self.echoOfWar_comboBox.setItemText(4, QCoreApplication.translate("TrailblazePowerWidget", u"\u86c0\u661f\u7684\u65e7\u9765", None))
+        self.echoOfWar_comboBox.setItemText(5, QCoreApplication.translate("TrailblazePowerWidget", u"\u4e0d\u6b7b\u7684\u795e\u5b9e", None))
+        self.echoOfWar_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget", u"\u5bd2\u6f6e\u7684\u843d\u5e55", None))
+        self.echoOfWar_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget", u"\u6bc1\u706d\u7684\u5f00\u7aef", None))
 
         self.label_7.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u5386\u6218\u4f59\u54cd", None))
         self.label.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6e05\u5f00\u62d3\u529b", None))
@@ -860,14 +681,11 @@ class Ui_TrailblazePowerWidget(object):
         __sortingEnabled = self.task_listWidget.isSortingEnabled()
         self.task_listWidget.setSortingEnabled(False)
         ___qlistwidgetitem = self.task_listWidget.item(0)
-        ___qlistwidgetitem.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"\u65b0\u5efa\u9879\u76ee", None));
+        ___qlistwidgetitem.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u65b0\u5efa\u9879\u76ee", None));
         ___qlistwidgetitem1 = self.task_listWidget.item(1)
-        ___qlistwidgetitem1.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"\u65b0\u5efa\u9879\u76ee", None));
+        ___qlistwidgetitem1.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u65b0\u5efa\u9879\u76ee", None));
         ___qlistwidgetitem2 = self.task_listWidget.item(2)
-        ___qlistwidgetitem2.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"\u65b0\u5efa\u9879\u76ee", None));
+        ___qlistwidgetitem2.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u65b0\u5efa\u9879\u76ee", None));
         self.task_listWidget.setSortingEnabled(__sortingEnabled)
 
     # retranslateUi

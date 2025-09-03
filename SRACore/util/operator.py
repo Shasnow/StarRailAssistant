@@ -307,7 +307,7 @@ class Operator:
         等待图片出现
         :param img_path: 模板图片路径
         :param timeout: 超时时间，单位秒
-        :param interval: 检查间隔时间，单位秒，默认为0.2秒
+        :param interval: 检查间隔时间，单位秒，默认为0.5秒
         :return: bool - 是否找到图片
         """
         start_time = time.time()
@@ -323,7 +323,7 @@ class Operator:
         等待任意一张图片出现
         :param img_paths: 模板图片路径列表
         :param timeout: 超时时间，单位秒
-        :param interval: 检查间隔时间，单位秒，默认为0.2秒
+        :param interval: 检查间隔时间，单位秒，默认为0.5秒
         :return: int - 找到的图片索引，如果未找到则返回-1
         """
         start_time = time.time()

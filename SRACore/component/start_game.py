@@ -24,14 +24,16 @@ class StartGameComponent(SRAComponent):
         channel: int = 0
         user: str = ""
         passwd: str = ""
+        always_logout: bool = False
 
-        def __init__(self, auto_login=True, launcher=False, path="", channel=0, user="", passwd="", **_):
+        def __init__(self, auto_login=True, launcher=False, path="", channel=0, user="", passwd="",always_logout=False, **_):
             self.passwd = passwd
             self.auto_login = auto_login
             self.launcher = launcher
             self.path = path
             self.channel = channel
             self.user = user
+            self.always_logout = always_logout
 
     def __init__(self, parent, config_manager):
         super().__init__(parent, config_manager)
@@ -51,6 +53,7 @@ class StartGameComponent(SRAComponent):
         self.ui.channel_comboBox.setCurrentIndex(self.config.channel)
         self.ui.account_lineEdit.setText(encryption.win_decryptor(self.config.user))
         self.ui.password_lineEdit.setText(encryption.win_decryptor(self.config.passwd))
+        self.ui.always_logout_checkBox.setChecked(self.config.always_logout)
 
     def connector(self):
         self.ui.file_pushButton.clicked.connect(self.open_file)
@@ -63,6 +66,7 @@ class StartGameComponent(SRAComponent):
         self.config.channel = self.ui.channel_comboBox.currentIndex()
         self.config.user = encryption.win_encryptor(self.ui.account_lineEdit.text())
         self.config.passwd = encryption.win_encryptor(self.ui.password_lineEdit.text())
+        self.config.always_logout = self.ui.always_logout_checkBox.isChecked()
         self.config_manager.set('start_game', dataclasses.asdict(self.config))
 
     @Slot()
