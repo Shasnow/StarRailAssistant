@@ -3,17 +3,21 @@
 ################################################################################
 ## Form generated from reading UI file 'receive_reward.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.7.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect,
-                            QSize)
-from PySide6.QtGui import (QFont)
-from PySide6.QtWidgets import (QCheckBox, QFrame, QGridLayout,
-                               QHBoxLayout, QLabel, QScrollArea, QSizePolicy,
-                               QTextEdit, QVBoxLayout, QWidget)
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QGridLayout,
+    QHBoxLayout, QLabel, QScrollArea, QSizePolicy,
+    QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_ReceiveRewardWidget(object):
     def setupUi(self, ReceiveRewardWidget):
@@ -145,6 +149,7 @@ class Ui_ReceiveRewardWidget(object):
 
         self.verticalLayout.addWidget(self.redeem_code_textEdit)
 
+
         self.verticalLayout_3.addWidget(self.frame3_7)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
@@ -162,7 +167,9 @@ class Ui_ReceiveRewardWidget(object):
 
         self.verticalLayout_2.addWidget(self.label)
 
+
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
+
 
         self.retranslateUi(ReceiveRewardWidget)
 
@@ -171,20 +178,14 @@ class Ui_ReceiveRewardWidget(object):
 
     def retranslateUi(self, ReceiveRewardWidget):
         ReceiveRewardWidget.setWindowTitle(QCoreApplication.translate("ReceiveRewardWidget", u"Form", None))
-        self.trailblaze_profile_checkbox.setText(
-            QCoreApplication.translate("ReceiveRewardWidget", u"\u6f2b\u6e38\u7b7e\u8bc1", None))
+        self.trailblaze_profile_checkbox.setText(QCoreApplication.translate("ReceiveRewardWidget", u"\u6f2b\u6e38\u7b7e\u8bc1", None))
         self.assignment_checkbox.setText(QCoreApplication.translate("ReceiveRewardWidget", u"\u6d3e\u9063", None))
         self.mail_checkbox.setText(QCoreApplication.translate("ReceiveRewardWidget", u"\u90ae\u4ef6", None))
-        self.daily_reward_checkbox.setText(
-            QCoreApplication.translate("ReceiveRewardWidget", u"\u6bcf\u65e5\u5b9e\u8bad", None))
-        self.nameless_honour_checkbox.setText(
-            QCoreApplication.translate("ReceiveRewardWidget", u"\u65e0\u540d\u52cb\u793c", None))
-        self.gift_of_odyssey_checkbox.setText(
-            QCoreApplication.translate("ReceiveRewardWidget", u"\u5de1\u661f\u4e4b\u793c", None))
-        self.redeem_code_checkbox.setText(
-            QCoreApplication.translate("ReceiveRewardWidget", u"\u5151\u6362\u7801", None))
-        self.redeem_code_textEdit.setPlaceholderText(
-            QCoreApplication.translate("ReceiveRewardWidget", u"\u5151\u6362\u7801\u586b\u5199\u5904", None))
+        self.daily_reward_checkbox.setText(QCoreApplication.translate("ReceiveRewardWidget", u"\u6bcf\u65e5\u5b9e\u8bad", None))
+        self.nameless_honour_checkbox.setText(QCoreApplication.translate("ReceiveRewardWidget", u"\u65e0\u540d\u52cb\u793c", None))
+        self.gift_of_odyssey_checkbox.setText(QCoreApplication.translate("ReceiveRewardWidget", u"\u5de1\u661f\u4e4b\u793c", None))
+        self.redeem_code_checkbox.setText(QCoreApplication.translate("ReceiveRewardWidget", u"\u5151\u6362\u7801", None))
+        self.redeem_code_textEdit.setPlaceholderText(QCoreApplication.translate("ReceiveRewardWidget", u"\u5151\u6362\u7801\u586b\u5199\u5904", None))
         self.label.setText(QCoreApplication.translate("ReceiveRewardWidget", u"\u9886\u53d6\u5956\u52b1", None))
     # retranslateUi
 
