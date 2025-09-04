@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>MultiAccountWidget</class>
+    <widget class="QWidget" name="MultiAccountWidget">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>526</width>
+                <height>586</height>
+            </rect>
+        </property>
+        <property name="font">
+            <font>
+                <pointsize>13</pointsize>
+            </font>
+        </property>
+        <property name="windowTitle">
+            <string>Form</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+                <widget class="QScrollArea" name="scrollArea">
+                    <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="widgetResizable">
+                        <bool>true</bool>
+                    </property>
+                    <widget class="QWidget" name="scrollAreaWidgetContents_4">
+                        <property name="geometry">
+                            <rect>
+                                <x>0</x>
+                                <y>0</y>
+                                <width>506</width>
+                                <height>157</height>
+                            </rect>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_4">
+                            <item>
+                                <widget class="QGroupBox" name="groupBox">
+                                    <property name="title">
+                                        <string>配置方案</string>
+                                    </property>
+                                    <layout class="QGridLayout" name="gridLayout_5">
+                                        <item row="1" column="0">
+                                            <widget class="QPushButton" name="new_plan_button">
+                                                <property name="text">
+                                                    <string>新建方案</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item row="0" column="0">
+                                            <widget class="QLabel" name="label">
+                                                <property name="text">
+                                                    <string>当前配置方案</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item row="0" column="1" colspan="2">
+                                            <widget class="QComboBox" name="current_config_combobox">
+                                                <property name="maxCount">
+                                                    <number>5</number>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item row="2" column="0" colspan="3">
+                                            <widget class="QCheckBox" name="switch2next_checkbox">
+                                                <property name="text">
+                                                    <string>当前方案结束时切换下一个方案</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item row="1" column="1">
+                                            <widget class="QPushButton" name="delete_plan_button">
+                                                <property name="text">
+                                                    <string>删除方案</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                        </layout>
+                    </widget>
+                </widget>
+            </item>
+            <item>
+                <spacer name="verticalSpacer">
+                    <property name="orientation">
+                        <enum>Qt::Orientation::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                        <size>
+                            <width>20</width>
+                            <height>40</height>
+                        </size>
+                    </property>
+                </spacer>
+            </item>
+        </layout>
+    </widget>
+    <resources/>
+    <connections/>
+</ui>
