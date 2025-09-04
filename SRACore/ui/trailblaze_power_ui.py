@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'trailblaze_power.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.3
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -553,7 +553,7 @@ class Ui_TrailblazePowerWidget(object):
     def retranslateUi(self, TrailblazePowerWidget):
         TrailblazePowerWidget.setWindowTitle(QCoreApplication.translate("TrailblazePowerWidget", u"Form", None))
         self.useAssist_checkBox.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u4f7f\u7528\u652f\u63f4\u89d2\u8272", None))
-        self.label2_1_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
+        self.label2_1_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"  \u6b21\u6570\uff1a", None))
         self.replenish_checkBox.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u8865\u5145\u4f53\u529b", None))
         self.changeLineup_checkBox.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u91cd\u65b0\u7f16\u961f", None))
         self.replenish_way_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"---\u65b9\u5f0f---", None))
@@ -561,7 +561,7 @@ class Ui_TrailblazePowerWidget(object):
         self.replenish_way_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u71c3\u6599", None))
         self.replenish_way_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget", u"\u661f\u743c", None))
 
-        self.label2_2_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
+        self.label2_2_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
         self.ornamentExtractionAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.ornamentExtraction_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
         self.ornamentExtraction_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u6708\u4e0b\u6731\u6bb7\uff08\u5996\u7cbe/\u6d77\u9685\uff09", None))
@@ -577,9 +577,9 @@ class Ui_TrailblazePowerWidget(object):
         self.ornamentExtraction_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget", u"\u575a\u57ce\u4e0d\u5012\uff08\u592a\u7a7a\u5c01\u5370\u7ad9/\u4ed9\u821f\uff09", None))
 
         self.label_2.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u9970\u54c1\u63d0\u53d6", None))
-        self.label2_3_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u8fde\u7eed\u4f5c\u6218\uff1a", None))
+        self.label2_3_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u8fde\u7eed\u4f5c\u6218\uff1a", None))
         self.calyxGoldenAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
-        self.label2_3_31.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6267\u884c\u6b21\u6570\uff1a", None))
+        self.label2_3_31.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6267\u884c\u6b21\u6570\uff1a", None))
         self.calyxGolden_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
         self.calyxGolden_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u56de\u5fc6\u4e4b\u857e\uff08\u7fc1\u6cd5\u7f57\u65af\uff09", None))
         self.calyxGolden_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u4ee5\u592a\u4e4b\u857e\uff08\u7fc1\u6cd5\u7f57\u65af\uff09", None))
@@ -596,8 +596,8 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label_3.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u62df\u9020\u82b1\u843c\uff08\u91d1\uff09", None))
         self.calyxCrimsonAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
-        self.label2_4_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u8fde\u7eed\u4f5c\u6218\uff1a", None))
-        self.label2_4_31.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6267\u884c\u6b21\u6570\uff1a", None))
+        self.label2_4_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u8fde\u7eed\u4f5c\u6218\uff1a", None))
+        self.label2_4_31.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6267\u884c\u6b21\u6570\uff1a", None))
         self.calyxCrimson_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
         self.calyxCrimson_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u6708\u72c2\u7360\u7259\uff08\u6bc1\u706d\uff09", None))
         self.calyxCrimson_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u51c0\u4e16\u6b8b\u5203\uff08\u6bc1\u706d\uff09", None))
@@ -616,7 +616,7 @@ class Ui_TrailblazePowerWidget(object):
         self.calyxCrimson_comboBox.setItemText(15, QCoreApplication.translate("TrailblazePowerWidget", u"\u963f\u8d56\u8036\u534e\uff08\u8bb0\u5fc6\uff09", None))
 
         self.label_4.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u62df\u9020\u82b1\u843c\uff08\u8d64\uff09", None))
-        self.label2_5_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
+        self.label2_5_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
         self.stagnantShadowAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.stagnantShadow_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
         self.stagnantShadow_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u4fb5\u7565\u51dd\u5757\uff08\u7269\u7406\uff09", None))
@@ -646,7 +646,7 @@ class Ui_TrailblazePowerWidget(object):
         self.stagnantShadow_comboBox.setItemText(25, QCoreApplication.translate("TrailblazePowerWidget", u"\u5f80\u65e5\u4e4b\u5f71\u7684\u91d1\u9970\uff08\u865a\u6570\uff09", None))
 
         self.label_5.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u51dd\u6ede\u865a\u5f71", None))
-        self.label2_6_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
+        self.label2_6_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
         self.caverOfCorrosionAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.label_6.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u4fb5\u8680\u96a7\u6d1e", None))
         self.caverOfCorrosion_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
@@ -664,7 +664,7 @@ class Ui_TrailblazePowerWidget(object):
         self.caverOfCorrosion_comboBox.setItemText(12, QCoreApplication.translate("TrailblazePowerWidget", u"\u8fc5\u62f3\u4e4b\u5f84\uff08\u62f3\u7687/\u602a\u76d7\uff09", None))
         self.caverOfCorrosion_comboBox.setItemText(13, QCoreApplication.translate("TrailblazePowerWidget", u"\u971c\u98ce\u4e4b\u5f84\uff08\u51b0/\u98ce\u5957\uff09", None))
 
-        self.label2_7_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
+        self.label2_7_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
         self.echoOfWarAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.echoOfWar_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
         self.echoOfWar_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u6668\u660f\u7684\u56de\u7738", None))
