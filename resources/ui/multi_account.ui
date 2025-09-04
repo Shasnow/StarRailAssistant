@@ -18,6 +18,12 @@
         <property name="windowTitle">
             <string>Form</string>
         </property>
+        <property name="styleSheet">
+            <string notr="true">background-repeat: no-repeat;
+                background-position: center;
+                background-color: rgba(255, 255, 255, 0.1);
+            </string>
+        </property>
         <layout class="QVBoxLayout" name="verticalLayout">
             <item>
                 <widget class="QScrollArea" name="scrollArea">
@@ -26,6 +32,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="styleSheet">
+                        <string notr="true">background-color: transparent</string>
                     </property>
                     <property name="widgetResizable">
                         <bool>true</bool>
@@ -36,18 +45,30 @@
                                 <x>0</x>
                                 <y>0</y>
                                 <width>506</width>
-                                <height>157</height>
+                                <height>110</height>
                             </rect>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout_4">
                             <item>
                                 <widget class="QGroupBox" name="groupBox">
+                                    <property name="styleSheet">
+                                        <string notr="true">border-radius: 8px;
+                                            border: 1px solid black;
+                                            background-color: rgba(255, 255, 255, 0.8);
+                                            font-size: 14px;
+                                        </string>
+                                    </property>
                                     <property name="title">
-                                        <string>配置方案</string>
+                                        <string/>
                                     </property>
                                     <layout class="QGridLayout" name="gridLayout_5">
                                         <item row="1" column="0">
                                             <widget class="QPushButton" name="new_plan_button">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border-radius: 8px;
+                                                        border: 0.5px solid black;
+                                                    </string>
+                                                </property>
                                                 <property name="text">
                                                     <string>新建方案</string>
                                                 </property>
@@ -55,6 +76,9 @@
                                         </item>
                                         <item row="0" column="0">
                                             <widget class="QLabel" name="label">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>当前配置方案</string>
                                                 </property>
@@ -62,6 +86,11 @@
                                         </item>
                                         <item row="0" column="1" colspan="2">
                                             <widget class="QComboBox" name="current_config_combobox">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border-radius: 8px;
+                                                        border: 0.5px solid black;
+                                                    </string>
+                                                </property>
                                                 <property name="maxCount">
                                                     <number>5</number>
                                                 </property>
@@ -69,6 +98,9 @@
                                         </item>
                                         <item row="2" column="0" colspan="3">
                                             <widget class="QCheckBox" name="switch2next_checkbox">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>当前方案结束时切换下一个方案</string>
                                                 </property>
@@ -76,6 +108,11 @@
                                         </item>
                                         <item row="1" column="1">
                                             <widget class="QPushButton" name="delete_plan_button">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border-radius: 8px;
+                                                        border: 0.5px solid black;
+                                                    </string>
+                                                </property>
                                                 <property name="text">
                                                     <string>删除方案</string>
                                                 </property>

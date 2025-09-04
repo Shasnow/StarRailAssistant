@@ -18,6 +18,12 @@
         <property name="windowTitle">
             <string>Form</string>
         </property>
+        <property name="styleSheet">
+            <string notr="true">background-repeat: no-repeat;
+                background-position: center;
+                background-color: rgba(255, 255, 255, 0.1);
+            </string>
+        </property>
         <layout class="QGridLayout" name="gridLayout_8">
             <item row="1" column="0">
                 <widget class="QScrollArea" name="scrollArea">
@@ -36,12 +42,18 @@
                                 <x>0</x>
                                 <y>0</y>
                                 <width>313</width>
-                                <height>960</height>
+                                <height>908</height>
                             </rect>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout_3">
                             <item>
                                 <widget class="QFrame" name="frame2_1">
+                                    <property name="styleSheet">
+                                        <string notr="true">border-radius: 8px;
+                                            border: 1px solid black;
+                                            background-color: rgba(255, 255, 255, 0.8);
+                                        </string>
+                                    </property>
                                     <property name="frameShape">
                                         <enum>QFrame::Shape::StyledPanel</enum>
                                     </property>
@@ -64,6 +76,9 @@
                                         </item>
                                         <item row="2" column="0" colspan="3">
                                             <widget class="QCheckBox" name="useAssist_checkBox">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>使用支援角色</string>
                                                 </property>
@@ -71,6 +86,9 @@
                                         </item>
                                         <item row="1" column="0">
                                             <widget class="QLabel" name="label2_1_21">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>次数：</string>
                                                 </property>
@@ -81,6 +99,9 @@
                                         </item>
                                         <item row="0" column="0">
                                             <widget class="QCheckBox" name="replenish_checkBox">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>补充体力</string>
                                                 </property>
@@ -104,6 +125,9 @@
                                         </item>
                                         <item row="3" column="0" colspan="3">
                                             <widget class="QCheckBox" name="changeLineup_checkBox">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>重新编队</string>
                                                 </property>
@@ -144,6 +168,12 @@
                             </item>
                             <item>
                                 <widget class="QFrame" name="frame2_2">
+                                    <property name="styleSheet">
+                                        <string notr="true">border-radius: 8px;
+                                            border: 1px solid black;
+                                            background-color: rgba(255, 255, 255, 0.8);
+                                        </string>
+                                    </property>
                                     <property name="frameShape">
                                         <enum>QFrame::Shape::StyledPanel</enum>
                                     </property>
@@ -166,6 +196,9 @@
                                         </item>
                                         <item row="2" column="0">
                                             <widget class="QLabel" name="label2_2_21">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>次数：</string>
                                                 </property>
@@ -287,6 +320,9 @@
                                         </item>
                                         <item row="0" column="0" colspan="4">
                                             <widget class="QLabel" name="label_2">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>饰品提取</string>
                                                 </property>
@@ -300,6 +336,12 @@
                             </item>
                             <item>
                                 <widget class="QFrame" name="frame2_3">
+                                    <property name="styleSheet">
+                                        <string notr="true">border-radius: 8px;
+                                            border: 1px solid black;
+                                            background-color: rgba(255, 255, 255, 0.8);
+                                        </string>
+                                    </property>
                                     <property name="frameShape">
                                         <enum>QFrame::Shape::StyledPanel</enum>
                                     </property>
@@ -325,6 +367,9 @@
                                         </item>
                                         <item row="2" column="0">
                                             <widget class="QLabel" name="label2_3_21">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>连续作战：</string>
                                                 </property>
@@ -370,6 +415,9 @@
                                         </item>
                                         <item row="3" column="0">
                                             <widget class="QLabel" name="label2_3_31">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>执行次数：</string>
                                                 </property>
@@ -478,6 +526,9 @@
                                         </item>
                                         <item row="0" column="0" colspan="4">
                                             <widget class="QLabel" name="label_3">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>拟造花萼（金）</string>
                                                 </property>
@@ -491,6 +542,12 @@
                             </item>
                             <item>
                                 <widget class="QFrame" name="frame2_4">
+                                    <property name="styleSheet">
+                                        <string notr="true">border-radius: 8px;
+                                            border: 1px solid black;
+                                            background-color: rgba(255, 255, 255, 0.8);
+                                        </string>
+                                    </property>
                                     <property name="frameShape">
                                         <enum>QFrame::Shape::StyledPanel</enum>
                                     </property>
@@ -580,6 +637,9 @@
                                         </item>
                                         <item row="3" column="0">
                                             <widget class="QLabel" name="label2_4_21">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>连续作战：</string>
                                                 </property>
@@ -587,6 +647,9 @@
                                         </item>
                                         <item row="4" column="0">
                                             <widget class="QLabel" name="label2_4_31">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>执行次数：</string>
                                                 </property>
@@ -684,6 +747,9 @@
                                         </item>
                                         <item row="0" column="0" colspan="4">
                                             <widget class="QLabel" name="label_4">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>拟造花萼（赤）</string>
                                                 </property>
@@ -697,6 +763,12 @@
                             </item>
                             <item>
                                 <widget class="QFrame" name="frame2_5">
+                                    <property name="styleSheet">
+                                        <string notr="true">border-radius: 8px;
+                                            border: 1px solid black;
+                                            background-color: rgba(255, 255, 255, 0.8);
+                                        </string>
+                                    </property>
                                     <property name="frameShape">
                                         <enum>QFrame::Shape::StyledPanel</enum>
                                     </property>
@@ -719,6 +791,9 @@
                                         </item>
                                         <item row="3" column="0">
                                             <widget class="QLabel" name="label2_5_21">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>次数：</string>
                                                 </property>
@@ -904,6 +979,9 @@
                                         </item>
                                         <item row="0" column="0" colspan="4">
                                             <widget class="QLabel" name="label_5">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>凝滞虚影</string>
                                                 </property>
@@ -917,6 +995,13 @@
                             </item>
                             <item>
                                 <widget class="QFrame" name="frame2_6">
+                                    <property name="styleSheet">
+                                        <string notr="true">border-radius: 8px;
+                                            border: 0.5px solid black;
+                                            background-color: rgba(255, 255, 255, 0.8);
+                                            font-size: 14px;
+                                        </string>
+                                    </property>
                                     <property name="frameShape">
                                         <enum>QFrame::Shape::StyledPanel</enum>
                                     </property>
@@ -926,6 +1011,9 @@
                                     <layout class="QGridLayout" name="gridLayout_6">
                                         <item row="2" column="0">
                                             <widget class="QLabel" name="label2_6_21">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>次数：</string>
                                                 </property>
@@ -984,6 +1072,11 @@
                                         </item>
                                         <item row="0" column="0" colspan="4">
                                             <widget class="QLabel" name="label_6">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;
+                                                        background-color: rgba(255, 255, 255, 0.8);
+                                                    </string>
+                                                </property>
                                                 <property name="text">
                                                     <string>侵蚀隧洞</string>
                                                 </property>
@@ -1077,6 +1170,13 @@
                             </item>
                             <item>
                                 <widget class="QFrame" name="frame2_7">
+                                    <property name="styleSheet">
+                                        <string notr="true">border-radius: 8px;
+                                            border: 0.5px solid black;
+                                            background-color: rgba(255, 255, 255, 0.8);
+                                            font-size: 14px;
+                                        </string>
+                                    </property>
                                     <property name="frameShape">
                                         <enum>QFrame::Shape::StyledPanel</enum>
                                     </property>
@@ -1115,6 +1215,9 @@
                                         </item>
                                         <item row="2" column="0">
                                             <widget class="QLabel" name="label2_7_21">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>次数：</string>
                                                 </property>
@@ -1197,6 +1300,9 @@
                                         </item>
                                         <item row="0" column="0" colspan="4">
                                             <widget class="QLabel" name="label_7">
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>历战余响</string>
                                                 </property>
@@ -1214,6 +1320,12 @@
             </item>
             <item row="0" column="0" colspan="2">
                 <widget class="QFrame" name="frame_1">
+                    <property name="styleSheet">
+                        <string notr="true">border-radius: 8px;
+                            border: 1px solid black;
+                            background-color: rgba(255, 255, 255, 0.8);
+                        </string>
+                    </property>
                     <property name="frameShape">
                         <enum>QFrame::Shape::StyledPanel</enum>
                     </property>
@@ -1223,6 +1335,9 @@
                     <layout class="QHBoxLayout" name="horizontalLayout">
                         <item>
                             <widget class="QLabel" name="label">
+                                <property name="styleSheet">
+                                    <string notr="true">border: none;</string>
+                                </property>
                                 <property name="text">
                                     <string>清开拓力</string>
                                 </property>

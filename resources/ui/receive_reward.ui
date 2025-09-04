@@ -18,6 +18,12 @@
         <property name="windowTitle">
             <string>Form</string>
         </property>
+        <property name="styleSheet">
+            <string notr="true">background-repeat: no-repeat;
+                background-position: center;
+                background-color: rgba(255, 255, 255, 0.1);
+            </string>
+        </property>
         <layout class="QGridLayout" name="gridLayout">
             <item row="1" column="0">
                 <widget class="QScrollArea" name="scrollArea">
@@ -30,7 +36,7 @@
                                 <x>0</x>
                                 <y>0</y>
                                 <width>357</width>
-                                <height>615</height>
+                                <height>619</height>
                             </rect>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -50,6 +56,12 @@
                                                         <width>0</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;
+                                                        background-color: rgba(255, 255, 255, 0.8);
+                                                        font-size: 14px;
+                                                    </string>
                                                 </property>
                                                 <property name="text">
                                                     <string>漫游签证</string>
@@ -76,6 +88,12 @@
                                                         <height>30</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;
+                                                        background-color: rgba(255, 255, 255, 0.8);
+                                                        font-size: 14px;
+                                                    </string>
+                                                </property>
                                                 <property name="text">
                                                     <string>派遣</string>
                                                 </property>
@@ -100,6 +118,12 @@
                                                         <width>0</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;
+                                                        background-color: rgba(255, 255, 255, 0.8);
+                                                        font-size: 14px;
+                                                    </string>
                                                 </property>
                                                 <property name="text">
                                                     <string>邮件</string>
@@ -126,6 +150,12 @@
                                                         <height>30</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;
+                                                        background-color: rgba(255, 255, 255, 0.8);
+                                                        font-size: 14px;
+                                                    </string>
+                                                </property>
                                                 <property name="text">
                                                     <string>每日实训</string>
                                                 </property>
@@ -150,6 +180,12 @@
                                                         <width>0</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;
+                                                        background-color: rgba(255, 255, 255, 0.8);
+                                                        font-size: 14px;
+                                                    </string>
                                                 </property>
                                                 <property name="text">
                                                     <string>无名勋礼</string>
@@ -176,6 +212,12 @@
                                                         <height>30</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;
+                                                        background-color: rgba(255, 255, 255, 0.8);
+                                                        font-size: 14px;
+                                                    </string>
+                                                </property>
                                                 <property name="text">
                                                     <string>巡星之礼</string>
                                                 </property>
@@ -186,6 +228,13 @@
                             </item>
                             <item>
                                 <widget class="QFrame" name="frame3_7">
+                                    <property name="styleSheet">
+                                        <string notr="true">border-radius: 8px;
+                                            border: 1px solid black;
+                                            background-color: rgba(255, 255, 255, 0.8);
+                                            font-size: 14px;
+                                        </string>
+                                    </property>
                                     <property name="frameShape">
                                         <enum>QFrame::Shape::StyledPanel</enum>
                                     </property>
@@ -201,6 +250,9 @@
                                                         <height>30</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
+                                                </property>
                                                 <property name="text">
                                                     <string>兑换码</string>
                                                 </property>
@@ -213,6 +265,9 @@
                                                         <horstretch>0</horstretch>
                                                         <verstretch>0</verstretch>
                                                     </sizepolicy>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: none;</string>
                                                 </property>
                                                 <property name="placeholderText">
                                                     <string>兑换码填写处</string>
@@ -228,6 +283,13 @@
             </item>
             <item row="0" column="0">
                 <widget class="QFrame" name="frame">
+                    <property name="styleSheet">
+                        <string notr="true">border-radius: 8px;
+                            border: 1px solid black;
+                            background-color: rgba(255, 255, 255, 0.8);
+                            font-size: 14px;
+                        </string>
+                    </property>
                     <property name="frameShape">
                         <enum>QFrame::Shape::StyledPanel</enum>
                     </property>
@@ -237,6 +299,11 @@
                     <layout class="QVBoxLayout" name="verticalLayout_2">
                         <item>
                             <widget class="QLabel" name="label">
+                                <property name="styleSheet">
+                                    <string notr="true">border-radius: 8px;
+                                        border: 0.3px solid black;
+                                    </string>
+                                </property>
                                 <property name="text">
                                     <string>领取奖励</string>
                                 </property>

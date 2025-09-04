@@ -18,9 +18,22 @@
         <property name="windowTitle">
             <string>Form</string>
         </property>
+        <property name="styleSheet">
+            <string notr="true">background-repeat: no-repeat;
+                background-position: center;
+                background-color: rgba(255, 255, 255, 0.1);
+            </string>
+        </property>
         <layout class="QGridLayout" name="gridLayout">
             <item row="0" column="0">
                 <widget class="QFrame" name="title_frame">
+                    <property name="styleSheet">
+                        <string notr="true">border-radius: 8px;
+                            border: 1px solid black;
+                            background-color: rgba(255, 255, 255, 0.8);
+                            font-size: 14px;
+                        </string>
+                    </property>
                     <property name="frameShape">
                         <enum>QFrame::Shape::StyledPanel</enum>
                     </property>
@@ -30,6 +43,9 @@
                     <layout class="QHBoxLayout" name="horizontalLayout">
                         <item>
                             <widget class="QLabel" name="title_label">
+                                <property name="styleSheet">
+                                    <string notr="true">border: none;</string>
+                                </property>
                                 <property name="text">
                                     <string>任务结束</string>
                                 </property>
@@ -62,6 +78,13 @@
                     <layout class="QVBoxLayout" name="verticalLayout_3">
                         <item>
                             <widget class="QFrame" name="frame2_1">
+                                <property name="styleSheet">
+                                    <string notr="true">border-radius: 8px;
+                                        border: 1px solid black;
+                                        background-color: rgba(255, 255, 255, 0.8);
+                                        font-size: 14px;
+                                    </string>
+                                </property>
                                 <property name="frameShape">
                                     <enum>QFrame::Shape::StyledPanel</enum>
                                 </property>
@@ -77,6 +100,11 @@
                                                     <height>25</height>
                                                 </size>
                                             </property>
+                                            <property name="styleSheet">
+                                                <string notr="true">border-radius: 8px;
+                                                    border: 0.5px solid black;
+                                                </string>
+                                            </property>
                                             <property name="text">
                                                 <string>任务结束后：</string>
                                             </property>
@@ -84,6 +112,9 @@
                                     </item>
                                     <item>
                                         <widget class="QCheckBox" name="log_out_checkbox">
+                                            <property name="styleSheet">
+                                                <string notr="true">border: none;</string>
+                                            </property>
                                             <property name="text">
                                                 <string>登出当前账号</string>
                                             </property>
@@ -91,15 +122,11 @@
                                     </item>
                                     <item>
                                         <widget class="QCheckBox" name="quit_game_checkbox">
+                                            <property name="styleSheet">
+                                                <string notr="true">border: none;</string>
+                                            </property>
                                             <property name="text">
                                                 <string>退出游戏</string>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item>
-                                        <widget class="Line" name="line">
-                                            <property name="orientation">
-                                                <enum>Qt::Orientation::Horizontal</enum>
                                             </property>
                                         </widget>
                                     </item>
@@ -110,6 +137,9 @@
                                                     <width>0</width>
                                                     <height>30</height>
                                                 </size>
+                                            </property>
+                                            <property name="styleSheet">
+                                                <string notr="true">border: none;</string>
                                             </property>
                                             <property name="text">
                                                 <string>退出SRA</string>
@@ -124,6 +154,9 @@
                                                     <height>30</height>
                                                 </size>
                                             </property>
+                                            <property name="styleSheet">
+                                                <string notr="true">border: none;</string>
+                                            </property>
                                             <property name="text">
                                                 <string>关机</string>
                                             </property>
@@ -137,6 +170,9 @@
                                                     <height>30</height>
                                                 </size>
                                             </property>
+                                            <property name="styleSheet">
+                                                <string notr="true">border: none;</string>
+                                            </property>
                                             <property name="text">
                                                 <string>休眠</string>
                                             </property>
@@ -144,6 +180,9 @@
                                     </item>
                                     <item>
                                         <widget class="QRadioButton" name="radioButton">
+                                            <property name="styleSheet">
+                                                <string notr="true">border: none;</string>
+                                            </property>
                                             <property name="text">
                                                 <string>无动作</string>
                                             </property>

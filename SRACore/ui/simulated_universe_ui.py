@@ -3,16 +3,16 @@
 ################################################################################
 ## Form generated from reading UI file 'simulated_universe.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QMetaObject, Qt)
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QSize, Qt)
 from PySide6.QtGui import (QFont)
 from PySide6.QtWidgets import (QComboBox, QFrame, QGridLayout,
-                               QHBoxLayout, QLabel, QSizePolicy, QSpacerItem,
-                               QSpinBox, QVBoxLayout)
+                               QHBoxLayout, QLabel, QSizePolicy, QSpinBox,
+                               QVBoxLayout)
 
 class Ui_SimulateUniverseWidget(object):
     def setupUi(self, SimulateUniverseWidget):
@@ -27,6 +27,9 @@ class Ui_SimulateUniverseWidget(object):
         font = QFont()
         font.setPointSize(13)
         SimulateUniverseWidget.setFont(font)
+        SimulateUniverseWidget.setStyleSheet(u"    background-repeat: no-repeat;\n"
+                                             "    background-position: center;\n"
+                                             "    background-color: rgba(255, 255, 255, 0.1);")
         self.verticalLayout_2 = QVBoxLayout(SimulateUniverseWidget)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.frame_2 = QFrame(SimulateUniverseWidget)
@@ -36,12 +39,18 @@ class Ui_SimulateUniverseWidget(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.frame_2.sizePolicy().hasHeightForWidth())
         self.frame_2.setSizePolicy(sizePolicy1)
+        self.frame_2.setStyleSheet(u"border-radius: 8px;\n"
+                                   "border: 1px solid black;\n"
+                                   "background-color: rgba(255, 255, 255, 0.8);\n"
+                                   "font-size: 14px;")
         self.frame_2.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame_2.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout_2 = QHBoxLayout(self.frame_2)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.label = QLabel(self.frame_2)
         self.label.setObjectName(u"label")
+        self.label.setStyleSheet(u"border-radius: 8px;\n"
+                                 "border: 0.3px solid black;")
 
         self.horizontalLayout_2.addWidget(self.label)
 
@@ -56,6 +65,10 @@ class Ui_SimulateUniverseWidget(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.frame_4 = QFrame(self.frame_3)
         self.frame_4.setObjectName(u"frame_4")
+        self.frame_4.setStyleSheet(u"border-radius: 8px;\n"
+                                   "border: 1px solid black;\n"
+                                   "background-color: rgba(255, 255, 255, 0.8);\n"
+                                   "font-size: 14px;")
         self.frame_4.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame_4.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout = QGridLayout(self.frame_4)
@@ -68,6 +81,7 @@ class Ui_SimulateUniverseWidget(object):
 
         self.label_4 = QLabel(self.frame_4)
         self.label_4.setObjectName(u"label_4")
+        self.label_4.setMaximumSize(QSize(16777215, 59))
         self.label_4.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout.addWidget(self.label_4, 2, 0, 1, 1)
@@ -110,13 +124,12 @@ class Ui_SimulateUniverseWidget(object):
 
         self.label_5 = QLabel(self.frame_3)
         self.label_5.setObjectName(u"label_5")
+        self.label_5.setStyleSheet(u"border: none;\n"
+                                   "background-color: rgba(255, 255, 255, 0.8);\n"
+                                   "font-size: 14px;")
         self.label_5.setWordWrap(True)
 
         self.verticalLayout_3.addWidget(self.label_5)
-
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_3.addItem(self.verticalSpacer)
 
 
         self.verticalLayout_2.addWidget(self.frame_3)
@@ -144,7 +157,7 @@ class Ui_SimulateUniverseWidget(object):
         self.policy_comboBox.setItemText(1, QCoreApplication.translate("SimulateUniverseWidget", u"\u65e0", None))
 
         self.label_5.setText(QCoreApplication.translate("SimulateUniverseWidget",
-                                                        u"\u9700\u8981\u8fdb\u5165\u5230\u5dee\u5206\u5b87\u5b99\u4e3b\u754c\u9762\u518d\u6267\u884c\u6b64\u4efb\u52a1\u3002\u6b64\u4efb\u52a1\u5e94\u5f53\u5355\u72ec\u6267\u884c\u3002\u8bf7\u81f3\u5c11\u624b\u52a8\u5b8c\u6210\u4e00\u6b21\u4ee5\u6e05\u9664\u6240\u6709\u65b0\u624b\u63d0\u793a\u3002",
+                                                        u"<html><head/><body><p><br/></p><p><span style=\" font-size:11pt;\">\u9700\u8981\u8fdb\u5165\u5230\u5dee\u5206\u5b87\u5b99\u4e3b\u754c\u9762\u518d\u6267\u884c\u6b64\u4efb\u52a1\u3002\u6b64\u4efb\u52a1\u5e94\u5f53\u5355\u72ec\u6267\u884c\u3002\u8bf7\u81f3\u5c11\u624b\u52a8\u5b8c\u6210\u4e00\u6b21\u4ee5\u6e05\u9664\u6240\u6709\u65b0\u624b\u63d0\u793a\u3002</span></p><p><span style=\" font-size:11pt;\"/></p></body></html>",
                                                         None))
     # retranslateUi
 

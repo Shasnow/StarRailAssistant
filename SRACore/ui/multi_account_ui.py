@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'multi_account.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -22,6 +22,9 @@ class Ui_MultiAccountWidget(object):
         font = QFont()
         font.setPointSize(13)
         MultiAccountWidget.setFont(font)
+        MultiAccountWidget.setStyleSheet(u"    background-repeat: no-repeat;\n"
+                                         "    background-position: center;\n"
+                                         "    background-color: rgba(255, 255, 255, 0.1);")
         self.verticalLayout = QVBoxLayout(MultiAccountWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.scrollArea = QScrollArea(MultiAccountWidget)
@@ -31,39 +34,52 @@ class Ui_MultiAccountWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.scrollArea.sizePolicy().hasHeightForWidth())
         self.scrollArea.setSizePolicy(sizePolicy)
+        self.scrollArea.setStyleSheet(u" background-color: transparent")
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents_4 = QWidget()
         self.scrollAreaWidgetContents_4.setObjectName(u"scrollAreaWidgetContents_4")
-        self.scrollAreaWidgetContents_4.setGeometry(QRect(0, 0, 506, 157))
+        self.scrollAreaWidgetContents_4.setGeometry(QRect(0, 0, 506, 110))
         self.verticalLayout_4 = QVBoxLayout(self.scrollAreaWidgetContents_4)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.groupBox = QGroupBox(self.scrollAreaWidgetContents_4)
         self.groupBox.setObjectName(u"groupBox")
+        self.groupBox.setStyleSheet(u"border-radius: 8px;\n"
+                                    "border: 1px solid black;\n"
+                                    "background-color: rgba(255, 255, 255, 0.8);\n"
+                                    "font-size: 14px;")
         self.gridLayout_5 = QGridLayout(self.groupBox)
         self.gridLayout_5.setObjectName(u"gridLayout_5")
         self.new_plan_button = QPushButton(self.groupBox)
         self.new_plan_button.setObjectName(u"new_plan_button")
+        self.new_plan_button.setStyleSheet(u"border-radius: 8px;\n"
+                                           "border: 0.5px solid black;")
 
         self.gridLayout_5.addWidget(self.new_plan_button, 1, 0, 1, 1)
 
         self.label = QLabel(self.groupBox)
         self.label.setObjectName(u"label")
+        self.label.setStyleSheet(u"border: none;")
 
         self.gridLayout_5.addWidget(self.label, 0, 0, 1, 1)
 
         self.current_config_combobox = QComboBox(self.groupBox)
         self.current_config_combobox.setObjectName(u"current_config_combobox")
+        self.current_config_combobox.setStyleSheet(u"border-radius: 8px;\n"
+                                                   "border: 0.5px solid black;")
         self.current_config_combobox.setMaxCount(5)
 
         self.gridLayout_5.addWidget(self.current_config_combobox, 0, 1, 1, 2)
 
         self.switch2next_checkbox = QCheckBox(self.groupBox)
         self.switch2next_checkbox.setObjectName(u"switch2next_checkbox")
+        self.switch2next_checkbox.setStyleSheet(u"border: none;")
 
         self.gridLayout_5.addWidget(self.switch2next_checkbox, 2, 0, 1, 3)
 
         self.delete_plan_button = QPushButton(self.groupBox)
         self.delete_plan_button.setObjectName(u"delete_plan_button")
+        self.delete_plan_button.setStyleSheet(u"border-radius: 8px;\n"
+                                              "border: 0.5px solid black;")
 
         self.gridLayout_5.addWidget(self.delete_plan_button, 1, 1, 1, 1)
 
@@ -86,7 +102,7 @@ class Ui_MultiAccountWidget(object):
 
     def retranslateUi(self, MultiAccountWidget):
         MultiAccountWidget.setWindowTitle(QCoreApplication.translate("MultiAccountWidget", u"Form", None))
-        self.groupBox.setTitle(QCoreApplication.translate("MultiAccountWidget", u"\u914d\u7f6e\u65b9\u6848", None))
+        self.groupBox.setTitle("")
         self.new_plan_button.setText(
             QCoreApplication.translate("MultiAccountWidget", u"\u65b0\u5efa\u65b9\u6848", None))
         self.label.setText(

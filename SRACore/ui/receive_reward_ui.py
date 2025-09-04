@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'receive_reward.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -23,6 +23,9 @@ class Ui_ReceiveRewardWidget(object):
         font = QFont()
         font.setPointSize(13)
         ReceiveRewardWidget.setFont(font)
+        ReceiveRewardWidget.setStyleSheet(u"    background-repeat: no-repeat;\n"
+                                          "    background-position: center;\n"
+                                          "    background-color: rgba(255, 255, 255, 0.1);")
         self.gridLayout = QGridLayout(ReceiveRewardWidget)
         self.gridLayout.setObjectName(u"gridLayout")
         self.scrollArea = QScrollArea(ReceiveRewardWidget)
@@ -30,7 +33,7 @@ class Ui_ReceiveRewardWidget(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 357, 615))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 357, 619))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.frame3_1 = QFrame(self.scrollAreaWidgetContents)
@@ -42,6 +45,9 @@ class Ui_ReceiveRewardWidget(object):
         self.trailblaze_profile_checkbox = QCheckBox(self.frame3_1)
         self.trailblaze_profile_checkbox.setObjectName(u"trailblaze_profile_checkbox")
         self.trailblaze_profile_checkbox.setMinimumSize(QSize(0, 30))
+        self.trailblaze_profile_checkbox.setStyleSheet(u"border: none;\n"
+                                                       "background-color: rgba(255, 255, 255, 0.8);\n"
+                                                       "font-size: 14px;")
 
         self.horizontalLayout_2.addWidget(self.trailblaze_profile_checkbox)
 
@@ -57,6 +63,9 @@ class Ui_ReceiveRewardWidget(object):
         self.assignment_checkbox = QCheckBox(self.frame3_2)
         self.assignment_checkbox.setObjectName(u"assignment_checkbox")
         self.assignment_checkbox.setMinimumSize(QSize(0, 30))
+        self.assignment_checkbox.setStyleSheet(u"border: none;\n"
+                                               "background-color: rgba(255, 255, 255, 0.8);\n"
+                                               "font-size: 14px;")
 
         self.horizontalLayout_4.addWidget(self.assignment_checkbox)
 
@@ -72,6 +81,9 @@ class Ui_ReceiveRewardWidget(object):
         self.mail_checkbox = QCheckBox(self.frame3_3)
         self.mail_checkbox.setObjectName(u"mail_checkbox")
         self.mail_checkbox.setMinimumSize(QSize(0, 30))
+        self.mail_checkbox.setStyleSheet(u"border: none;\n"
+                                         "background-color: rgba(255, 255, 255, 0.8);\n"
+                                         "font-size: 14px;")
 
         self.horizontalLayout_7.addWidget(self.mail_checkbox)
 
@@ -87,6 +99,9 @@ class Ui_ReceiveRewardWidget(object):
         self.daily_reward_checkbox = QCheckBox(self.frame3_4)
         self.daily_reward_checkbox.setObjectName(u"daily_reward_checkbox")
         self.daily_reward_checkbox.setMinimumSize(QSize(0, 30))
+        self.daily_reward_checkbox.setStyleSheet(u"border: none;\n"
+                                                 "background-color: rgba(255, 255, 255, 0.8);\n"
+                                                 "font-size: 14px;")
 
         self.horizontalLayout_9.addWidget(self.daily_reward_checkbox)
 
@@ -102,6 +117,9 @@ class Ui_ReceiveRewardWidget(object):
         self.nameless_honour_checkbox = QCheckBox(self.frame3_5)
         self.nameless_honour_checkbox.setObjectName(u"nameless_honour_checkbox")
         self.nameless_honour_checkbox.setMinimumSize(QSize(0, 30))
+        self.nameless_honour_checkbox.setStyleSheet(u"border: none;\n"
+                                                    "background-color: rgba(255, 255, 255, 0.8);\n"
+                                                    "font-size: 14px;")
 
         self.horizontalLayout_8.addWidget(self.nameless_honour_checkbox)
 
@@ -117,6 +135,9 @@ class Ui_ReceiveRewardWidget(object):
         self.gift_of_odyssey_checkbox = QCheckBox(self.frame3_6)
         self.gift_of_odyssey_checkbox.setObjectName(u"gift_of_odyssey_checkbox")
         self.gift_of_odyssey_checkbox.setMinimumSize(QSize(0, 30))
+        self.gift_of_odyssey_checkbox.setStyleSheet(u"border: none;\n"
+                                                    "background-color: rgba(255, 255, 255, 0.8);\n"
+                                                    "font-size: 14px;")
 
         self.horizontalLayout_6.addWidget(self.gift_of_odyssey_checkbox)
 
@@ -125,6 +146,10 @@ class Ui_ReceiveRewardWidget(object):
 
         self.frame3_7 = QFrame(self.scrollAreaWidgetContents)
         self.frame3_7.setObjectName(u"frame3_7")
+        self.frame3_7.setStyleSheet(u"border-radius: 8px;\n"
+                                    "border: 1px solid black;\n"
+                                    "background-color: rgba(255, 255, 255, 0.8);\n"
+                                    "font-size: 14px;")
         self.frame3_7.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame3_7.setFrameShadow(QFrame.Shadow.Raised)
         self.verticalLayout = QVBoxLayout(self.frame3_7)
@@ -132,6 +157,7 @@ class Ui_ReceiveRewardWidget(object):
         self.redeem_code_checkbox = QCheckBox(self.frame3_7)
         self.redeem_code_checkbox.setObjectName(u"redeem_code_checkbox")
         self.redeem_code_checkbox.setMinimumSize(QSize(0, 30))
+        self.redeem_code_checkbox.setStyleSheet(u"border: none;")
 
         self.verticalLayout.addWidget(self.redeem_code_checkbox)
 
@@ -142,8 +168,10 @@ class Ui_ReceiveRewardWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.redeem_code_textEdit.sizePolicy().hasHeightForWidth())
         self.redeem_code_textEdit.setSizePolicy(sizePolicy)
+        self.redeem_code_textEdit.setStyleSheet(u"border: none;")
 
         self.verticalLayout.addWidget(self.redeem_code_textEdit)
+
 
         self.verticalLayout_3.addWidget(self.frame3_7)
 
@@ -153,14 +181,21 @@ class Ui_ReceiveRewardWidget(object):
 
         self.frame = QFrame(ReceiveRewardWidget)
         self.frame.setObjectName(u"frame")
+        self.frame.setStyleSheet(u"border-radius: 8px;\n"
+                                 "border: 1px solid black;\n"
+                                 "background-color: rgba(255, 255, 255, 0.8);\n"
+                                 "font-size: 14px;")
         self.frame.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame.setFrameShadow(QFrame.Shadow.Raised)
         self.verticalLayout_2 = QVBoxLayout(self.frame)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.label = QLabel(self.frame)
         self.label.setObjectName(u"label")
+        self.label.setStyleSheet(u"border-radius: 8px;\n"
+                                 "border: 0.3px solid black;")
 
         self.verticalLayout_2.addWidget(self.label)
+
 
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
 

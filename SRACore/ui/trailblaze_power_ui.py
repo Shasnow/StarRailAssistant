@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'trailblaze_power.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -25,6 +25,9 @@ class Ui_TrailblazePowerWidget(object):
         font = QFont()
         font.setPointSize(13)
         TrailblazePowerWidget.setFont(font)
+        TrailblazePowerWidget.setStyleSheet(u"    background-repeat: no-repeat;\n"
+                                            "    background-position: center;\n"
+                                            "    background-color: rgba(255, 255, 255, 0.1);")
         self.gridLayout_8 = QGridLayout(TrailblazePowerWidget)
         self.gridLayout_8.setObjectName(u"gridLayout_8")
         self.scrollArea = QScrollArea(TrailblazePowerWidget)
@@ -33,11 +36,14 @@ class Ui_TrailblazePowerWidget(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents_7 = QWidget()
         self.scrollAreaWidgetContents_7.setObjectName(u"scrollAreaWidgetContents_7")
-        self.scrollAreaWidgetContents_7.setGeometry(QRect(0, 0, 313, 960))
+        self.scrollAreaWidgetContents_7.setGeometry(QRect(0, 0, 313, 908))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_7)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.frame2_1 = QFrame(self.scrollAreaWidgetContents_7)
         self.frame2_1.setObjectName(u"frame2_1")
+        self.frame2_1.setStyleSheet(u"border-radius: 8px;\n"
+                                    "border: 1px solid black;\n"
+                                    "background-color: rgba(255, 255, 255, 0.8);")
         self.frame2_1.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame2_1.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout = QGridLayout(self.frame2_1)
@@ -48,17 +54,20 @@ class Ui_TrailblazePowerWidget(object):
 
         self.useAssist_checkBox = QCheckBox(self.frame2_1)
         self.useAssist_checkBox.setObjectName(u"useAssist_checkBox")
+        self.useAssist_checkBox.setStyleSheet(u"border: none;")
 
         self.gridLayout.addWidget(self.useAssist_checkBox, 2, 0, 1, 3)
 
         self.label2_1_21 = QLabel(self.frame2_1)
         self.label2_1_21.setObjectName(u"label2_1_21")
+        self.label2_1_21.setStyleSheet(u"border: none;")
         self.label2_1_21.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout.addWidget(self.label2_1_21, 1, 0, 1, 1)
 
         self.replenish_checkBox = QCheckBox(self.frame2_1)
         self.replenish_checkBox.setObjectName(u"replenish_checkBox")
+        self.replenish_checkBox.setStyleSheet(u"border: none;")
 
         self.gridLayout.addWidget(self.replenish_checkBox, 0, 0, 1, 1)
 
@@ -72,6 +81,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.changeLineup_checkBox = QCheckBox(self.frame2_1)
         self.changeLineup_checkBox.setObjectName(u"changeLineup_checkBox")
+        self.changeLineup_checkBox.setStyleSheet(u"border: none;")
 
         self.gridLayout.addWidget(self.changeLineup_checkBox, 3, 0, 1, 3)
 
@@ -90,6 +100,9 @@ class Ui_TrailblazePowerWidget(object):
 
         self.frame2_2 = QFrame(self.scrollAreaWidgetContents_7)
         self.frame2_2.setObjectName(u"frame2_2")
+        self.frame2_2.setStyleSheet(u"border-radius: 8px;\n"
+                                    "border: 1px solid black;\n"
+                                    "background-color: rgba(255, 255, 255, 0.8);")
         self.frame2_2.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame2_2.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_2 = QGridLayout(self.frame2_2)
@@ -100,6 +113,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label2_2_21 = QLabel(self.frame2_2)
         self.label2_2_21.setObjectName(u"label2_2_21")
+        self.label2_2_21.setStyleSheet(u"border: none;")
 
         self.gridLayout_2.addWidget(self.label2_2_21, 2, 0, 1, 1)
 
@@ -147,6 +161,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label_2 = QLabel(self.frame2_2)
         self.label_2.setObjectName(u"label_2")
+        self.label_2.setStyleSheet(u"border: none;")
         self.label_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_2.addWidget(self.label_2, 0, 0, 1, 4)
@@ -156,6 +171,9 @@ class Ui_TrailblazePowerWidget(object):
 
         self.frame2_3 = QFrame(self.scrollAreaWidgetContents_7)
         self.frame2_3.setObjectName(u"frame2_3")
+        self.frame2_3.setStyleSheet(u"border-radius: 8px;\n"
+                                    "border: 1px solid black;\n"
+                                    "background-color: rgba(255, 255, 255, 0.8);")
         self.frame2_3.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame2_3.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_3 = QGridLayout(self.frame2_3)
@@ -170,6 +188,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label2_3_21 = QLabel(self.frame2_3)
         self.label2_3_21.setObjectName(u"label2_3_21")
+        self.label2_3_21.setStyleSheet(u"border: none;")
 
         self.gridLayout_3.addWidget(self.label2_3_21, 2, 0, 1, 1)
 
@@ -191,6 +210,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label2_3_31 = QLabel(self.frame2_3)
         self.label2_3_31.setObjectName(u"label2_3_31")
+        self.label2_3_31.setStyleSheet(u"border: none;")
 
         self.gridLayout_3.addWidget(self.label2_3_31, 3, 0, 1, 1)
 
@@ -223,6 +243,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label_3 = QLabel(self.frame2_3)
         self.label_3.setObjectName(u"label_3")
+        self.label_3.setStyleSheet(u"border: none;")
         self.label_3.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_3.addWidget(self.label_3, 0, 0, 1, 4)
@@ -232,6 +253,9 @@ class Ui_TrailblazePowerWidget(object):
 
         self.frame2_4 = QFrame(self.scrollAreaWidgetContents_7)
         self.frame2_4.setObjectName(u"frame2_4")
+        self.frame2_4.setStyleSheet(u"border-radius: 8px;\n"
+                                    "border: 1px solid black;\n"
+                                    "background-color: rgba(255, 255, 255, 0.8);")
         self.frame2_4.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame2_4.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_4 = QGridLayout(self.frame2_4)
@@ -270,11 +294,13 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label2_4_21 = QLabel(self.frame2_4)
         self.label2_4_21.setObjectName(u"label2_4_21")
+        self.label2_4_21.setStyleSheet(u"border: none;")
 
         self.gridLayout_4.addWidget(self.label2_4_21, 3, 0, 1, 1)
 
         self.label2_4_31 = QLabel(self.frame2_4)
         self.label2_4_31.setObjectName(u"label2_4_31")
+        self.label2_4_31.setStyleSheet(u"border: none;")
 
         self.gridLayout_4.addWidget(self.label2_4_31, 4, 0, 1, 1)
 
@@ -302,6 +328,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label_4 = QLabel(self.frame2_4)
         self.label_4.setObjectName(u"label_4")
+        self.label_4.setStyleSheet(u"border: none;")
         self.label_4.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_4.addWidget(self.label_4, 0, 0, 1, 4)
@@ -311,6 +338,9 @@ class Ui_TrailblazePowerWidget(object):
 
         self.frame2_5 = QFrame(self.scrollAreaWidgetContents_7)
         self.frame2_5.setObjectName(u"frame2_5")
+        self.frame2_5.setStyleSheet(u"border-radius: 8px;\n"
+                                    "border: 1px solid black;\n"
+                                    "background-color: rgba(255, 255, 255, 0.8);")
         self.frame2_5.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame2_5.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_5 = QGridLayout(self.frame2_5)
@@ -324,6 +354,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label2_5_21 = QLabel(self.frame2_5)
         self.label2_5_21.setObjectName(u"label2_5_21")
+        self.label2_5_21.setStyleSheet(u"border: none;")
 
         self.gridLayout_5.addWidget(self.label2_5_21, 3, 0, 1, 1)
 
@@ -374,6 +405,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label_5 = QLabel(self.frame2_5)
         self.label_5.setObjectName(u"label_5")
+        self.label_5.setStyleSheet(u"border: none;")
         self.label_5.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_5.addWidget(self.label_5, 0, 0, 1, 4)
@@ -383,12 +415,17 @@ class Ui_TrailblazePowerWidget(object):
 
         self.frame2_6 = QFrame(self.scrollAreaWidgetContents_7)
         self.frame2_6.setObjectName(u"frame2_6")
+        self.frame2_6.setStyleSheet(u"border-radius: 8px;\n"
+                                    "border: 0.5px solid black;\n"
+                                    "background-color: rgba(255, 255, 255, 0.8);\n"
+                                    "font-size: 14px;")
         self.frame2_6.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame2_6.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_6 = QGridLayout(self.frame2_6)
         self.gridLayout_6.setObjectName(u"gridLayout_6")
         self.label2_6_21 = QLabel(self.frame2_6)
         self.label2_6_21.setObjectName(u"label2_6_21")
+        self.label2_6_21.setStyleSheet(u"border: none;")
 
         self.gridLayout_6.addWidget(self.label2_6_21, 2, 0, 1, 1)
 
@@ -414,6 +451,8 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label_6 = QLabel(self.frame2_6)
         self.label_6.setObjectName(u"label_6")
+        self.label_6.setStyleSheet(u"border: none;\n"
+                                   "background-color: rgba(255, 255, 255, 0.8);")
         self.label_6.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_6.addWidget(self.label_6, 0, 0, 1, 4)
@@ -443,6 +482,10 @@ class Ui_TrailblazePowerWidget(object):
 
         self.frame2_7 = QFrame(self.scrollAreaWidgetContents_7)
         self.frame2_7.setObjectName(u"frame2_7")
+        self.frame2_7.setStyleSheet(u"border-radius: 8px;\n"
+                                    "border: 0.5px solid black;\n"
+                                    "background-color: rgba(255, 255, 255, 0.8);\n"
+                                    "font-size: 14px;")
         self.frame2_7.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame2_7.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_7 = QGridLayout(self.frame2_7)
@@ -461,6 +504,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label2_7_21 = QLabel(self.frame2_7)
         self.label2_7_21.setObjectName(u"label2_7_21")
+        self.label2_7_21.setStyleSheet(u"border: none;")
 
         self.gridLayout_7.addWidget(self.label2_7_21, 2, 0, 1, 1)
 
@@ -489,6 +533,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label_7 = QLabel(self.frame2_7)
         self.label_7.setObjectName(u"label_7")
+        self.label_7.setStyleSheet(u"border: none;")
         self.label_7.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_7.addWidget(self.label_7, 0, 0, 1, 4)
@@ -502,12 +547,16 @@ class Ui_TrailblazePowerWidget(object):
 
         self.frame_1 = QFrame(TrailblazePowerWidget)
         self.frame_1.setObjectName(u"frame_1")
+        self.frame_1.setStyleSheet(u"border-radius: 8px;\n"
+                                   "border: 1px solid black;\n"
+                                   "background-color: rgba(255, 255, 255, 0.8);")
         self.frame_1.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame_1.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame_1)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.label = QLabel(self.frame_1)
         self.label.setObjectName(u"label")
+        self.label.setStyleSheet(u"border: none;")
 
         self.horizontalLayout.addWidget(self.label)
 
@@ -550,7 +599,7 @@ class Ui_TrailblazePowerWidget(object):
         TrailblazePowerWidget.setWindowTitle(QCoreApplication.translate("TrailblazePowerWidget", u"Form", None))
         self.useAssist_checkBox.setText(
             QCoreApplication.translate("TrailblazePowerWidget", u"\u4f7f\u7528\u652f\u63f4\u89d2\u8272", None))
-        self.label2_1_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"  \u6b21\u6570\uff1a", None))
+        self.label2_1_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
         self.replenish_checkBox.setText(
             QCoreApplication.translate("TrailblazePowerWidget", u"\u8865\u5145\u4f53\u529b", None))
         self.changeLineup_checkBox.setText(
@@ -564,7 +613,7 @@ class Ui_TrailblazePowerWidget(object):
         self.replenish_way_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget", u"\u661f\u743c",
                                                                               None))
 
-        self.label2_2_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
+        self.label2_2_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
         self.ornamentExtractionAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.ornamentExtraction_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
                                                                                    u"-----\u9009\u62e9\u526f\u672c-----",
@@ -605,10 +654,10 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label_2.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u9970\u54c1\u63d0\u53d6", None))
         self.label2_3_21.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"      \u8fde\u7eed\u4f5c\u6218\uff1a", None))
+            QCoreApplication.translate("TrailblazePowerWidget", u"\u8fde\u7eed\u4f5c\u6218\uff1a", None))
         self.calyxGoldenAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.label2_3_31.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"      \u6267\u884c\u6b21\u6570\uff1a", None))
+            QCoreApplication.translate("TrailblazePowerWidget", u"\u6267\u884c\u6b21\u6570\uff1a", None))
         self.calyxGolden_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
                                                                             u"-----\u9009\u62e9\u526f\u672c-----",
                                                                             None))
@@ -653,9 +702,9 @@ class Ui_TrailblazePowerWidget(object):
             QCoreApplication.translate("TrailblazePowerWidget", u"\u62df\u9020\u82b1\u843c\uff08\u91d1\uff09", None))
         self.calyxCrimsonAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.label2_4_21.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"      \u8fde\u7eed\u4f5c\u6218\uff1a", None))
+            QCoreApplication.translate("TrailblazePowerWidget", u"\u8fde\u7eed\u4f5c\u6218\uff1a", None))
         self.label2_4_31.setText(
-            QCoreApplication.translate("TrailblazePowerWidget", u"      \u6267\u884c\u6b21\u6570\uff1a", None))
+            QCoreApplication.translate("TrailblazePowerWidget", u"\u6267\u884c\u6b21\u6570\uff1a", None))
         self.calyxCrimson_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
                                                                              u"-----\u9009\u62e9\u526f\u672c-----",
                                                                              None))
@@ -707,7 +756,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label_4.setText(
             QCoreApplication.translate("TrailblazePowerWidget", u"\u62df\u9020\u82b1\u843c\uff08\u8d64\uff09", None))
-        self.label2_5_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
+        self.label2_5_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
         self.stagnantShadowAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.stagnantShadow_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
                                                                                u"-----\u9009\u62e9\u526f\u672c-----",
@@ -789,7 +838,7 @@ class Ui_TrailblazePowerWidget(object):
                                                                                 None))
 
         self.label_5.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u51dd\u6ede\u865a\u5f71", None))
-        self.label2_6_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
+        self.label2_6_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
         self.caverOfCorrosionAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.label_6.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u4fb5\u8680\u96a7\u6d1e", None))
         self.caverOfCorrosion_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
@@ -835,7 +884,7 @@ class Ui_TrailblazePowerWidget(object):
                                                                                   u"\u971c\u98ce\u4e4b\u5f84\uff08\u51b0/\u98ce\u5957\uff09",
                                                                                   None))
 
-        self.label2_7_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
+        self.label2_7_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6b21\u6570\uff1a", None))
         self.echoOfWarAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.echoOfWar_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget",
                                                                           u"-----\u9009\u62e9\u526f\u672c-----", None))
