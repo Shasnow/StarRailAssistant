@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'simulated_universe.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.3
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -144,8 +144,6 @@ class Ui_SimulateUniverseWidget(object):
         self.policy_comboBox.setItemText(0, QCoreApplication.translate("SimulateUniverseWidget", u"\u56fe\u9274\u4f18\u5148", None))
         self.policy_comboBox.setItemText(1, QCoreApplication.translate("SimulateUniverseWidget", u"\u65e0", None))
 
-        self.label_5.setText(QCoreApplication.translate("SimulateUniverseWidget", u"\n"
-"                                        \u9700\u8981\u8fdb\u5165\u5230\u5dee\u5206\u5b87\u5b99\u4e3b\u754c\u9762\u518d\u6267\u884c\u6b64\u4efb\u52a1\u3002\u6b64\u4efb\u52a1\u5e94\u5f53\u5355\u72ec\u6267\u884c\u3002\u8bf7\u81f3\u5c11\u624b\u52a8\u5b8c\u6210\u4e00\u6b21\u4ee5\u6e05\u9664\u6240\u6709\u65b0\u624b\u63d0\u793a\u3002\n"
-"                                    ", None))
+        self.label_5.setText(QCoreApplication.translate("SimulateUniverseWidget", u"\u9700\u8981\u8fdb\u5165\u5230\u5dee\u5206\u5b87\u5b99\u4e3b\u754c\u9762\u518d\u6267\u884c\u6b64\u4efb\u52a1\u3002\u6b64\u4efb\u52a1\u5e94\u5f53\u5355\u72ec\u6267\u884c\u3002\u8bf7\u81f3\u5c11\u624b\u52a8\u5b8c\u6210\u4e00\u6b21\u4ee5\u6e05\u9664\u6240\u6709\u65b0\u624b\u63d0\u793a\u3002", None))
     # retranslateUi
 

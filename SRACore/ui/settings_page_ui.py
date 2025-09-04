@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'settings_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.3
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -87,7 +87,7 @@ class Ui_SettingWidget(object):
         __qtablewidgetitem4 = QTableWidgetItem()
         self.key_tableWidget.setVerticalHeaderItem(0, __qtablewidgetitem4)
         brush = QBrush(QColor(0, 0, 0, 255))
-        brush.setStyle(Qt.NoBrush)
+        brush.setStyle(Qt.BrushStyle.NoBrush)
         __qtablewidgetitem5 = QTableWidgetItem()
         __qtablewidgetitem5.setForeground(brush);
         self.key_tableWidget.setItem(0, 0, __qtablewidgetitem5)
@@ -191,6 +191,7 @@ class Ui_SettingWidget(object):
 
         self.label_6 = QLabel(self.mail_notification_frame)
         self.label_6.setObjectName(u"label_6")
+        self.label_6.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout_4.addWidget(self.label_6, 0, 0, 1, 1)
 
@@ -202,6 +203,7 @@ class Ui_SettingWidget(object):
 
         self.label_7 = QLabel(self.mail_notification_frame)
         self.label_7.setObjectName(u"label_7")
+        self.label_7.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout_4.addWidget(self.label_7, 1, 0, 1, 1)
 
@@ -217,11 +219,13 @@ class Ui_SettingWidget(object):
 
         self.label_8 = QLabel(self.mail_notification_frame)
         self.label_8.setObjectName(u"label_8")
+        self.label_8.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout_4.addWidget(self.label_8, 2, 0, 1, 1)
 
         self.label_9 = QLabel(self.mail_notification_frame)
         self.label_9.setObjectName(u"label_9")
+        self.label_9.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout_4.addWidget(self.label_9, 3, 0, 1, 1)
 
@@ -531,14 +535,10 @@ class Ui_SettingWidget(object):
 #endif // QT_CONFIG(whatsthis)
         self.integrityCheckButton.setText(QCoreApplication.translate("SettingWidget", u"\u7acb\u5373\u68c0\u67e5", None))
 #if QT_CONFIG(tooltip)
-        self.threadSafety_checkBox.setToolTip(QCoreApplication.translate("SettingWidget", u"\n"
-"                                                                    \u5173\u95ed\u6b64\u9009\u9879\u540e\uff0c\u63a7\u5236\u53f0\u7684\u505c\u6b62\u529f\u80fd\u5c06\u4e0d\u518d\u7b49\u5f85\u4efb\u52a1\u7ed3\u675f\u3002\n"
-"                                                                ", None))
+        self.threadSafety_checkBox.setToolTip(QCoreApplication.translate("SettingWidget", u"\u5173\u95ed\u6b64\u9009\u9879\u540e\uff0c\u63a7\u5236\u53f0\u7684\u505c\u6b62\u529f\u80fd\u5c06\u4e0d\u518d\u7b49\u5f85\u4efb\u52a1\u7ed3\u675f\u3002", None))
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(whatsthis)
-        self.threadSafety_checkBox.setWhatsThis(QCoreApplication.translate("SettingWidget", u"\n"
-"                                                                    \u5173\u95ed\u6b64\u9009\u9879\u540e\uff0c\u63a7\u5236\u53f0\u7684\u505c\u6b62\u529f\u80fd\u5c06\u4e0d\u518d\u7b49\u5f85\u4efb\u52a1\u7ed3\u675f\u3002\n"
-"                                                                ", None))
+        self.threadSafety_checkBox.setWhatsThis(QCoreApplication.translate("SettingWidget", u"\u5173\u95ed\u6b64\u9009\u9879\u540e\uff0c\u63a7\u5236\u53f0\u7684\u505c\u6b62\u529f\u80fd\u5c06\u4e0d\u518d\u7b49\u5f85\u4efb\u52a1\u7ed3\u675f\u3002", None))
 #endif // QT_CONFIG(whatsthis)
         self.threadSafety_checkBox.setText(QCoreApplication.translate("SettingWidget", u"\u7ebf\u7a0b\u5b89\u5168", None))
         self.startup_checkBox.setText(QCoreApplication.translate("SettingWidget", u"\u5f00\u673a\u81ea\u542f\u52a8", None))
@@ -585,44 +585,19 @@ class Ui_SettingWidget(object):
 #endif // QT_CONFIG(whatsthis)
         self.mirrorchyanCDK_lineEdit.setPlaceholderText(QCoreApplication.translate("SettingWidget", u"CDK", None))
         self.groupBox_5.setTitle(QCoreApplication.translate("SettingWidget", u"tips", None))
-        self.textBrowser_tips.setHtml(QCoreApplication.translate("SettingWidget", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\"\n"
-"                                                        \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"                                                        <html><head><meta name=\"qrichtext\"\n"
-"                                                        content=\"1\" /><meta charset=\"utf-8\" /><style\n"
-"                                                        type=\"text/css\">\n"
-"                                                        p, li { white-space: pre-wrap; }\n"
-"                                                        hr { height: 1px; border-width: 0; }\n"
-"                                                        li.unchecked::marker { content: \"\\2610\"; }\n"
-"                                                        li.checked::marker { content: \"\\2612\"; }\n"
-"                                                        </style></head><body style=\"\n"
-"                                                        font-family:'Microsoft YaHei UI"
-                        "'; font-size:13pt;\n"
-"                                                        font-weight:400; font-style:normal;\">\n"
-"                                                        <p align=\"center\" style=\" margin-top:0px;\n"
-"                                                        margin-bottom:0px; margin-left:0px; margin-right:0px;\n"
-"                                                        -qt-block-indent:0; text-indent:0px;\">\u5982\u679c\u5728\u4f7f\u7528\u4e2d\u9047\u5230\u95ee\u9898\uff0c\u8bf7\u9605\u8bfb<a\n"
-"                                                        href=\"https://starrailassistant.top/faq.html\"><span\n"
-"                                                        style=\" text-decoration: underline; color:#0078d4;\">\u5e38\u89c1\u95ee\u9898</span></a></p>\n"
-"                                                        <p align=\"center\" style=\" margin-top:0px;\n"
-"                                                        margin-bottom:0px; margin-left:0px; margin-right:0px;\n"
-"           "
-                        "                                             -qt-block-indent:0; text-indent:0px;\">SRA\u5b8c\u5168\u514d\u8d39\uff0c\u5982\u679c\u60a8\u662f\u901a\u8fc7\u4ed8\u8d39\u6e20\u9053\u83b7\u53d6\u7684\u8be5\u8f6f\u4ef6\uff0c\u8bf7\u53ca\u65f6\u9000\u6b3e\u5e76\u4e3e\u62a5\u5546\u5bb6\u3002</p>\n"
-"                                                        <p align=\"center\" style=\" margin-top:0px;\n"
-"                                                        margin-bottom:0px; margin-left:0px; margin-right:0px;\n"
-"                                                        -qt-block-indent:0; text-indent:0px;\">GitHub\u4e0a\u7684SRA\uff1a<a\n"
-"                                                        href=\"https://github.com/Shasnow/StarRailAssistant\"><span\n"
-"                                                        style=\" text-decoration: underline; color:#0078d4;\">https://github.com/Shasnow/StarRailAssistant</span></a></p>\n"
-"                                                        <p align=\"center\" style=\" marg"
-                        "in-top:12px;\n"
-"                                                        margin-bottom:12px; margin-left:0px; margin-right:0px;\n"
-"                                                        -qt-block-indent:0; text-indent:0px;\"><a href=\"https://starrailassistant.top\"><span\n"
-"                                                        style=\" text-decoration: underline; color:#0078d4;\">SRA\u5b98\u7f51</span></a></p>\n"
-"                                                        <p align=\"center\" style=\" margin-top:0px;\n"
-"                                                        margin-bottom:0px; margin-left:0px; margin-right:0px;\n"
-"                                                        -qt-block-indent:0; text-indent:0px;\">\u83b7\u53d6MirrorChyanCDK-&gt;:<a\n"
-"                                                        href=\"https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&amp;source=sra-app\"><span\n"
-"                                                        style=\" text-decoration: underline; col"
-                        "or:#0078d4;\">Mirror\u9171</span></a></p></body></html>\n"
-"                                                    ", None))
+        self.textBrowser_tips.setHtml(QCoreApplication.translate("SettingWidget", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:'Microsoft YaHei UI'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u5982\u679c\u5728\u4f7f\u7528\u4e2d\u9047\u5230\u95ee\u9898\uff0c\u8bf7\u9605\u8bfb<a href=\"https://starrailassistant.top/faq.html\"><span style=\" text-decoration: underline; color:#0078d4;\">\u5e38\u89c1\u95ee\u9898</span></a></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\""
+                        ">SRA\u5b8c\u5168\u514d\u8d39\uff0c\u5982\u679c\u60a8\u662f\u901a\u8fc7\u4ed8\u8d39\u6e20\u9053\u83b7\u53d6\u7684\u8be5\u8f6f\u4ef6\uff0c\u8bf7\u53ca\u65f6\u9000\u6b3e\u5e76\u4e3e\u62a5\u5546\u5bb6\u3002</p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">GitHub\u4e0a\u7684SRA\uff1a<a href=\"https://github.com/Shasnow/StarRailAssistant\"><span style=\" text-decoration: underline; color:#0078d4;\">https://github.com/Shasnow/StarRailAssistant</span></a></p>\n"
+"<p align=\"center\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"https://starrailassistant.top\"><span style=\" text-decoration: underline; color:#0078d4;\">SRA\u5b98\u7f51</span></a></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u83b7\u53d6MirrorChyanCDK-&gt;:<a href=\"https://mir"
+                        "rorchyan.com/zh/projects?rid=StarRailAssistant&amp;source=sra-app\"><span style=\" text-decoration: underline; color:#0078d4;\">Mirror\u9171</span></a></p></body></html>", None))
     # retranslateUi
 
