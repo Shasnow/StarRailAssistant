@@ -29,7 +29,7 @@ class ReceiveRewardTask(BaseTask):
         tasks = []
         item_select = self.config['item_select']
 
-        # 主任务列表（需要传参的任务）
+        # 主任务列表（需要传参的任务）esc界面完成的
         if item_select[0]:
             tasks.append((self.trailblazer_profile, ()))
         if item_select[1]:
@@ -56,15 +56,15 @@ class ReceiveRewardTask(BaseTask):
         if not self.wait_img("resources/img/enter.png", timeout=30):
             logger.error("检测超时，编号2")
             return False
-
-        # 打开ESC菜单
-        self.press_key("esc")
-        if not self.wait_img('resources/img/esc_page.png', timeout=20):
-            return False
         return True
 
     def _execute_tasks_with_args(self, tasks):
         """执行需要传参的任务列表"""
+        # 打开ESC菜单
+        self.press_key("esc")
+        if not self.wait_img('resources/img/esc_page.png', timeout=20):
+            return False
+
         for task, args in tasks:
             if self.stop_flag:
                 break
@@ -154,7 +154,7 @@ class ReceiveRewardTask(BaseTask):
         if not self.wait_img("resources/img/enter.png", timeout=30):
             logger.error("检测超时，编号2")
             return
-        self.press_key(self.config['key_f1'])
+        self.press_key(self.config.get('key_f1','f1'))
         if self.click_img("resources/img/gift_of_odyssey.png"):
             pass
         if self.click_img("resources/img/gift_receive.png") or self.click_img("resources/img/gift_receive2.png"):
