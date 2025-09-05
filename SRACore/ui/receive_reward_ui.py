@@ -23,9 +23,10 @@ class Ui_ReceiveRewardWidget(object):
         font = QFont()
         font.setPointSize(13)
         ReceiveRewardWidget.setFont(font)
-        ReceiveRewardWidget.setStyleSheet(u"    background-repeat: no-repeat;\n"
-                                          "    background-position: center;\n"
-                                          "    background-color: rgba(255, 255, 255, 0.1);")
+        ReceiveRewardWidget.setStyleSheet(u"background-repeat: no-repeat;\n"
+                                          "                background-position: center;\n"
+                                          "                background-color: rgba(255, 255, 255, 0.1);\n"
+                                          "            ")
         self.gridLayout = QGridLayout(ReceiveRewardWidget)
         self.gridLayout.setObjectName(u"gridLayout")
         self.scrollArea = QScrollArea(ReceiveRewardWidget)
@@ -33,7 +34,7 @@ class Ui_ReceiveRewardWidget(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 357, 619))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 357, 618))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.frame3_1 = QFrame(self.scrollAreaWidgetContents)
@@ -45,9 +46,16 @@ class Ui_ReceiveRewardWidget(object):
         self.trailblaze_profile_checkbox = QCheckBox(self.frame3_1)
         self.trailblaze_profile_checkbox.setObjectName(u"trailblaze_profile_checkbox")
         self.trailblaze_profile_checkbox.setMinimumSize(QSize(0, 30))
-        self.trailblaze_profile_checkbox.setStyleSheet(u"border: none;\n"
-                                                       "background-color: rgba(255, 255, 255, 0.8);\n"
-                                                       "font-size: 14px;")
+        self.trailblaze_profile_checkbox.setStyleSheet(
+            u"QCheckBox{border: none;background-color: rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}\n"
+            "QCheckBox:hover {\n"
+            "    background-color: #f0f0f0;\n"
+            "}\n"
+            "\n"
+            "/* \u52fe\u9009\u6846\u60ac\u505c\u65f6\u8fb9\u6846\u53d8\u8272 */\n"
+            "QCheckBox::indicator:hover {\n"
+            "    border-color: #666;\n"
+            "}")
 
         self.horizontalLayout_2.addWidget(self.trailblaze_profile_checkbox)
 
@@ -63,9 +71,16 @@ class Ui_ReceiveRewardWidget(object):
         self.assignment_checkbox = QCheckBox(self.frame3_2)
         self.assignment_checkbox.setObjectName(u"assignment_checkbox")
         self.assignment_checkbox.setMinimumSize(QSize(0, 30))
-        self.assignment_checkbox.setStyleSheet(u"border: none;\n"
-                                               "background-color: rgba(255, 255, 255, 0.8);\n"
-                                               "font-size: 14px;")
+        self.assignment_checkbox.setStyleSheet(
+            u"QCheckBox{border: none;background-color: rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}\n"
+            "QCheckBox:hover {\n"
+            "    background-color: #f0f0f0;\n"
+            "}\n"
+            "\n"
+            "/* \u52fe\u9009\u6846\u60ac\u505c\u65f6\u8fb9\u6846\u53d8\u8272 */\n"
+            "QCheckBox::indicator:hover {\n"
+            "    border-color: #666;\n"
+            "}")
 
         self.horizontalLayout_4.addWidget(self.assignment_checkbox)
 
@@ -81,9 +96,16 @@ class Ui_ReceiveRewardWidget(object):
         self.mail_checkbox = QCheckBox(self.frame3_3)
         self.mail_checkbox.setObjectName(u"mail_checkbox")
         self.mail_checkbox.setMinimumSize(QSize(0, 30))
-        self.mail_checkbox.setStyleSheet(u"border: none;\n"
-                                         "background-color: rgba(255, 255, 255, 0.8);\n"
-                                         "font-size: 14px;")
+        self.mail_checkbox.setStyleSheet(
+            u"QCheckBox{border: none;background-color: rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}\n"
+            "QCheckBox:hover {\n"
+            "    background-color: #f0f0f0;\n"
+            "}\n"
+            "\n"
+            "/* \u52fe\u9009\u6846\u60ac\u505c\u65f6\u8fb9\u6846\u53d8\u8272 */\n"
+            "QCheckBox::indicator:hover {\n"
+            "    border-color: #666;\n"
+            "}")
 
         self.horizontalLayout_7.addWidget(self.mail_checkbox)
 
@@ -99,9 +121,16 @@ class Ui_ReceiveRewardWidget(object):
         self.daily_reward_checkbox = QCheckBox(self.frame3_4)
         self.daily_reward_checkbox.setObjectName(u"daily_reward_checkbox")
         self.daily_reward_checkbox.setMinimumSize(QSize(0, 30))
-        self.daily_reward_checkbox.setStyleSheet(u"border: none;\n"
-                                                 "background-color: rgba(255, 255, 255, 0.8);\n"
-                                                 "font-size: 14px;")
+        self.daily_reward_checkbox.setStyleSheet(
+            u"QCheckBox{border: none;background-color: rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}\n"
+            "QCheckBox:hover {\n"
+            "    background-color: #f0f0f0;\n"
+            "}\n"
+            "\n"
+            "/* \u52fe\u9009\u6846\u60ac\u505c\u65f6\u8fb9\u6846\u53d8\u8272 */\n"
+            "QCheckBox::indicator:hover {\n"
+            "    border-color: #666;\n"
+            "}")
 
         self.horizontalLayout_9.addWidget(self.daily_reward_checkbox)
 
@@ -117,9 +146,16 @@ class Ui_ReceiveRewardWidget(object):
         self.nameless_honour_checkbox = QCheckBox(self.frame3_5)
         self.nameless_honour_checkbox.setObjectName(u"nameless_honour_checkbox")
         self.nameless_honour_checkbox.setMinimumSize(QSize(0, 30))
-        self.nameless_honour_checkbox.setStyleSheet(u"border: none;\n"
-                                                    "background-color: rgba(255, 255, 255, 0.8);\n"
-                                                    "font-size: 14px;")
+        self.nameless_honour_checkbox.setStyleSheet(
+            u"QCheckBox{border: none;background-color: rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}\n"
+            "QCheckBox:hover {\n"
+            "    background-color: #f0f0f0;\n"
+            "}\n"
+            "\n"
+            "/* \u52fe\u9009\u6846\u60ac\u505c\u65f6\u8fb9\u6846\u53d8\u8272 */\n"
+            "QCheckBox::indicator:hover {\n"
+            "    border-color: #666;\n"
+            "}")
 
         self.horizontalLayout_8.addWidget(self.nameless_honour_checkbox)
 
@@ -135,9 +171,16 @@ class Ui_ReceiveRewardWidget(object):
         self.gift_of_odyssey_checkbox = QCheckBox(self.frame3_6)
         self.gift_of_odyssey_checkbox.setObjectName(u"gift_of_odyssey_checkbox")
         self.gift_of_odyssey_checkbox.setMinimumSize(QSize(0, 30))
-        self.gift_of_odyssey_checkbox.setStyleSheet(u"border: none;\n"
-                                                    "background-color: rgba(255, 255, 255, 0.8);\n"
-                                                    "font-size: 14px;")
+        self.gift_of_odyssey_checkbox.setStyleSheet(
+            u"QCheckBox{border: none;background-color: rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}\n"
+            "QCheckBox:hover {\n"
+            "    background-color: #f0f0f0;\n"
+            "}\n"
+            "\n"
+            "/* \u52fe\u9009\u6846\u60ac\u505c\u65f6\u8fb9\u6846\u53d8\u8272 */\n"
+            "QCheckBox::indicator:hover {\n"
+            "    border-color: #666;\n"
+            "}")
 
         self.horizontalLayout_6.addWidget(self.gift_of_odyssey_checkbox)
 
@@ -147,9 +190,10 @@ class Ui_ReceiveRewardWidget(object):
         self.frame3_7 = QFrame(self.scrollAreaWidgetContents)
         self.frame3_7.setObjectName(u"frame3_7")
         self.frame3_7.setStyleSheet(u"border-radius: 8px;\n"
-                                    "border: 1px solid black;\n"
-                                    "background-color: rgba(255, 255, 255, 0.8);\n"
-                                    "font-size: 14px;")
+                                    "                                            border: 1.5px solid black;\n"
+                                    "                                            background-color: rgba(255, 255, 255, 0.8);\n"
+                                    "                                            font-size: 14px;\n"
+                                    "                                        ")
         self.frame3_7.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame3_7.setFrameShadow(QFrame.Shadow.Raised)
         self.verticalLayout = QVBoxLayout(self.frame3_7)
@@ -157,7 +201,7 @@ class Ui_ReceiveRewardWidget(object):
         self.redeem_code_checkbox = QCheckBox(self.frame3_7)
         self.redeem_code_checkbox.setObjectName(u"redeem_code_checkbox")
         self.redeem_code_checkbox.setMinimumSize(QSize(0, 30))
-        self.redeem_code_checkbox.setStyleSheet(u"border: none;")
+        self.redeem_code_checkbox.setStyleSheet(u"border: none;font-weight: bold;")
 
         self.verticalLayout.addWidget(self.redeem_code_checkbox)
 
@@ -181,10 +225,10 @@ class Ui_ReceiveRewardWidget(object):
 
         self.frame = QFrame(ReceiveRewardWidget)
         self.frame.setObjectName(u"frame")
-        self.frame.setStyleSheet(u"border-radius: 8px;\n"
-                                 "border: 1px solid black;\n"
-                                 "background-color: rgba(255, 255, 255, 0.8);\n"
-                                 "font-size: 14px;")
+        self.frame.setStyleSheet(u"border: none;\n"
+                                 "                            background-color: rgba(255, 255, 255, 0.8);\n"
+                                 "                            font-size: 14px;\n"
+                                 "                        ")
         self.frame.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame.setFrameShadow(QFrame.Shadow.Raised)
         self.verticalLayout_2 = QVBoxLayout(self.frame)
@@ -192,12 +236,14 @@ class Ui_ReceiveRewardWidget(object):
         self.label = QLabel(self.frame)
         self.label.setObjectName(u"label")
         self.label.setStyleSheet(u"border-radius: 8px;\n"
-                                 "border: 0.3px solid black;")
+                                 "                                        border: 0.3px solid black;\n"
+                                 "                                    ")
 
         self.verticalLayout_2.addWidget(self.label)
 
 
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
+
 
         self.retranslateUi(ReceiveRewardWidget)
 
@@ -220,6 +266,8 @@ class Ui_ReceiveRewardWidget(object):
             QCoreApplication.translate("ReceiveRewardWidget", u"\u5151\u6362\u7801", None))
         self.redeem_code_textEdit.setPlaceholderText(
             QCoreApplication.translate("ReceiveRewardWidget", u"\u5151\u6362\u7801\u586b\u5199\u5904", None))
-        self.label.setText(QCoreApplication.translate("ReceiveRewardWidget", u"\u9886\u53d6\u5956\u52b1", None))
+        self.label.setText(QCoreApplication.translate("ReceiveRewardWidget",
+                                                      u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u9886\u53d6\u5956\u52b1</span></p></body></html>",
+                                                      None))
     # retranslateUi
 

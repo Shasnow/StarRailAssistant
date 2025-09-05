@@ -22,9 +22,10 @@ class Ui_MultiAccountWidget(object):
         font = QFont()
         font.setPointSize(13)
         MultiAccountWidget.setFont(font)
-        MultiAccountWidget.setStyleSheet(u"    background-repeat: no-repeat;\n"
-                                         "    background-position: center;\n"
-                                         "    background-color: rgba(255, 255, 255, 0.1);")
+        MultiAccountWidget.setStyleSheet(u"background-repeat: no-repeat;\n"
+                                         "                background-position: center;\n"
+                                         "                background-color: rgba(255, 255, 255, 0.1);\n"
+                                         "            ")
         self.verticalLayout = QVBoxLayout(MultiAccountWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.scrollArea = QScrollArea(MultiAccountWidget)
@@ -34,7 +35,7 @@ class Ui_MultiAccountWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.scrollArea.sizePolicy().hasHeightForWidth())
         self.scrollArea.setSizePolicy(sizePolicy)
-        self.scrollArea.setStyleSheet(u" background-color: transparent")
+        self.scrollArea.setStyleSheet(u"background-color: transparent")
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents_4 = QWidget()
         self.scrollAreaWidgetContents_4.setObjectName(u"scrollAreaWidgetContents_4")
@@ -44,15 +45,22 @@ class Ui_MultiAccountWidget(object):
         self.groupBox = QGroupBox(self.scrollAreaWidgetContents_4)
         self.groupBox.setObjectName(u"groupBox")
         self.groupBox.setStyleSheet(u"border-radius: 8px;\n"
-                                    "border: 1px solid black;\n"
-                                    "background-color: rgba(255, 255, 255, 0.8);\n"
-                                    "font-size: 14px;")
+                                    "                                            border: 1.3px solid black;\n"
+                                    "                                            background-color: rgba(255, 255, 255, 0.8);\n"
+                                    "                                            font-size: 14px;font-weight: bold;\n"
+                                    "                                        ")
         self.gridLayout_5 = QGridLayout(self.groupBox)
         self.gridLayout_5.setObjectName(u"gridLayout_5")
         self.new_plan_button = QPushButton(self.groupBox)
         self.new_plan_button.setObjectName(u"new_plan_button")
-        self.new_plan_button.setStyleSheet(u"border-radius: 8px;\n"
-                                           "border: 0.5px solid black;")
+        self.new_plan_button.setStyleSheet(u"\n"
+                                           "                                                    QPushButton {\n"
+                                           " font-size:14px;border-radius: 8px;\n"
+                                           "                                                        border: 1px solid black;font-weight: bold;\n"
+                                           "}\n"
+                                           "QPushButton:hover {\n"
+                                           "    background-color: #f0f0f0;      border-color: #ccc;  \n"
+                                           "}")
 
         self.gridLayout_5.addWidget(self.new_plan_button, 1, 0, 1, 1)
 
@@ -65,21 +73,37 @@ class Ui_MultiAccountWidget(object):
         self.current_config_combobox = QComboBox(self.groupBox)
         self.current_config_combobox.setObjectName(u"current_config_combobox")
         self.current_config_combobox.setStyleSheet(u"border-radius: 8px;\n"
-                                                   "border: 0.5px solid black;")
+                                                   "                                                        border: 0.5px solid black;\n"
+                                                   "                                                    ")
         self.current_config_combobox.setMaxCount(5)
 
         self.gridLayout_5.addWidget(self.current_config_combobox, 0, 1, 1, 2)
 
         self.switch2next_checkbox = QCheckBox(self.groupBox)
         self.switch2next_checkbox.setObjectName(u"switch2next_checkbox")
-        self.switch2next_checkbox.setStyleSheet(u"border: none;")
+        self.switch2next_checkbox.setStyleSheet(
+            u"QCheckBox{border: none;background-color: rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}\n"
+            "QCheckBox:hover {\n"
+            "    background-color: #f0f0f0;\n"
+            "}\n"
+            "\n"
+            "/* \u52fe\u9009\u6846\u60ac\u505c\u65f6\u8fb9\u6846\u53d8\u8272 */\n"
+            "QCheckBox::indicator:hover {\n"
+            "    border-color: #666;\n"
+            "}")
 
         self.gridLayout_5.addWidget(self.switch2next_checkbox, 2, 0, 1, 3)
 
         self.delete_plan_button = QPushButton(self.groupBox)
         self.delete_plan_button.setObjectName(u"delete_plan_button")
-        self.delete_plan_button.setStyleSheet(u"border-radius: 8px;\n"
-                                              "border: 0.5px solid black;")
+        self.delete_plan_button.setStyleSheet(u"\n"
+                                              "                                                    QPushButton {\n"
+                                              " font-size:14px;border-radius: 8px;\n"
+                                              "                                                        border: 1px solid black;font-weight: bold;\n"
+                                              "}\n"
+                                              "QPushButton:hover {\n"
+                                              "    background-color: #f0f0f0;      border-color: #ccc;  \n"
+                                              "}")
 
         self.gridLayout_5.addWidget(self.delete_plan_button, 1, 1, 1, 1)
 
@@ -105,8 +129,9 @@ class Ui_MultiAccountWidget(object):
         self.groupBox.setTitle("")
         self.new_plan_button.setText(
             QCoreApplication.translate("MultiAccountWidget", u"\u65b0\u5efa\u65b9\u6848", None))
-        self.label.setText(
-            QCoreApplication.translate("MultiAccountWidget", u"\u5f53\u524d\u914d\u7f6e\u65b9\u6848", None))
+        self.label.setText(QCoreApplication.translate("MultiAccountWidget",
+                                                      u"<html><head/><body><p align=\"center\"><span style=\" font-size:11pt;\">\u5f53\u524d\u914d\u7f6e\u65b9\u6848</span></p></body></html>",
+                                                      None))
         self.switch2next_checkbox.setText(QCoreApplication.translate("MultiAccountWidget",
                                                                      u"\u5f53\u524d\u65b9\u6848\u7ed3\u675f\u65f6\u5207\u6362\u4e0b\u4e00\u4e2a\u65b9\u6848",
                                                                      None))

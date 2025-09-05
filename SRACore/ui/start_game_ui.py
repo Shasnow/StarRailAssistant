@@ -24,25 +24,27 @@ class Ui_StartGameWidget(object):
         font = QFont()
         font.setPointSize(13)
         StartGameWidget.setFont(font)
-        StartGameWidget.setStyleSheet(u" background-color: transparent")
+        StartGameWidget.setStyleSheet(u"background-color: transparent")
         self.gridLayout_2 = QGridLayout(StartGameWidget)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.scrollArea = QScrollArea(StartGameWidget)
         self.scrollArea.setObjectName(u"scrollArea")
         self.scrollArea.setStyleSheet(u"border-radius: 8px;\n"
-                                      "border:0.5 px solid black;")
+                                      "                            border:0.5 px solid black;\n"
+                                      "                        ")
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 429, 552))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 429, 549))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.frame2_1 = QFrame(self.scrollAreaWidgetContents)
         self.frame2_1.setObjectName(u"frame2_1")
         self.frame2_1.setStyleSheet(u"border-radius: 8px;\n"
-                                    "border:0.5px solid black;\n"
-                                    "background-color: rgba(255, 255, 255, 0.8);\n"
-                                    "font-size: 14px;")
+                                    "                                            border:1.1px solid black;\n"
+                                    "                                            background-color: rgba(255, 255, 255, 0.8);\n"
+                                    "                                            font-size: 14px;\n"
+                                    "                                        ")
         self.frame2_1.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame2_1.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout_4 = QHBoxLayout(self.frame2_1)
@@ -58,6 +60,15 @@ class Ui_StartGameWidget(object):
         self.channel_comboBox.addItem("")
         self.channel_comboBox.setObjectName(u"channel_comboBox")
         self.channel_comboBox.setMinimumSize(QSize(0, 30))
+        self.channel_comboBox.setStyleSheet(u"font-weight: bold;\n"
+                                            "QCombox{border: 0.85px solid black;}\n"
+                                            "QComboBox:hover {\n"
+                                            "    background-color: #f0f0f0;  \n"
+                                            "    border-color: #bbb;         \n"
+                                            "}\n"
+                                            "QComboBox QAbstractItemView {\n"
+                                            "    selection-background-color: #f0f0f0; background-color: white;\n"
+                                            "}")
 
         self.horizontalLayout_4.addWidget(self.channel_comboBox)
 
@@ -67,9 +78,10 @@ class Ui_StartGameWidget(object):
         self.frame_3 = QFrame(self.scrollAreaWidgetContents)
         self.frame_3.setObjectName(u"frame_3")
         self.frame_3.setStyleSheet(u"border-radius: 8px;\n"
-                                   "border:0.5px solid black;\n"
-                                   "background-color: rgba(255, 255, 255, 0.8);\n"
-                                   "font-size: 14px;")
+                                   "                                            border:1.1px solid black;\n"
+                                   "                                            background-color: rgba(255, 255, 255, 0.8);\n"
+                                   "                                            font-size: 14px;\n"
+                                   "                                        ")
         self.frame_3.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame_3.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout_5 = QHBoxLayout(self.frame_3)
@@ -90,9 +102,10 @@ class Ui_StartGameWidget(object):
         self.frame2_2 = QFrame(self.scrollAreaWidgetContents)
         self.frame2_2.setObjectName(u"frame2_2")
         self.frame2_2.setStyleSheet(u"border-radius: 8px;\n"
-                                    "border:0.5px solid black;\n"
-                                    "background-color: rgba(255, 255, 255, 0.8);\n"
-                                    "font-size: 14px;")
+                                    "                                            border:1.1px solid black;\n"
+                                    "                                            background-color: rgba(255, 255, 255, 0.8);\n"
+                                    "                                            font-size: 14px;\n"
+                                    "                                        ")
         self.frame2_2.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame2_2.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout_2 = QHBoxLayout(self.frame2_2)
@@ -106,12 +119,21 @@ class Ui_StartGameWidget(object):
         self.path_lineEdit = QLineEdit(self.frame2_2)
         self.path_lineEdit.setObjectName(u"path_lineEdit")
         self.path_lineEdit.setMinimumSize(QSize(0, 30))
+        self.path_lineEdit.setStyleSheet(u"border: 0.5px solid black;")
 
         self.horizontalLayout_2.addWidget(self.path_lineEdit)
 
         self.file_pushButton = QPushButton(self.frame2_2)
         self.file_pushButton.setObjectName(u"file_pushButton")
         self.file_pushButton.setMinimumSize(QSize(0, 30))
+        self.file_pushButton.setStyleSheet(u"\n"
+                                           "                                                    QPushButton {\n"
+                                           " font-size:14px;border-radius: 8px;\n"
+                                           "                                                        border: 1px solid black;font-weight: bold;background-color: rgba(255, 255, 255, 0.8);\n"
+                                           "}\n"
+                                           "QPushButton:hover {\n"
+                                           "    background-color: #f0f0f0;      border-color: #ccc;  \n"
+                                           "}")
 
         self.horizontalLayout_2.addWidget(self.file_pushButton)
 
@@ -127,16 +149,26 @@ class Ui_StartGameWidget(object):
         self.frame2_3 = QFrame(self.frame_2)
         self.frame2_3.setObjectName(u"frame2_3")
         self.frame2_3.setStyleSheet(u"border-radius: 8px;\n"
-                                    "border:0.5px solid black;\n"
-                                    "background-color: rgba(255, 255, 255, 0.8);\n"
-                                    "font-size: 14px;")
+                                    "                                                        border:1.1px solid black;\n"
+                                    "                                                        background-color: rgba(255, 255, 255, 0.8);\n"
+                                    "                                                        font-size: 14px;font-weight: bold;\n"
+                                    "                                                    ")
         self.frame2_3.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame2_3.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_3 = QGridLayout(self.frame2_3)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.auto_login_checkBox = QCheckBox(self.frame2_3)
         self.auto_login_checkBox.setObjectName(u"auto_login_checkBox")
-        self.auto_login_checkBox.setStyleSheet(u"border: none;")
+        self.auto_login_checkBox.setStyleSheet(
+            u"QCheckBox{border: none;background-color: rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}\n"
+            "QCheckBox:hover {\n"
+            "    background-color: #f0f0f0;\n"
+            "}\n"
+            "\n"
+            "/* \u52fe\u9009\u6846\u60ac\u505c\u65f6\u8fb9\u6846\u53d8\u8272 */\n"
+            "QCheckBox::indicator:hover {\n"
+            "    border-color: #666;\n"
+            "}")
 
         self.gridLayout_3.addWidget(self.auto_login_checkBox, 0, 1, 1, 1)
 
@@ -147,12 +179,21 @@ class Ui_StartGameWidget(object):
         self.password_toggle_button = QPushButton(self.frame2_3)
         self.password_toggle_button.setObjectName(u"password_toggle_button")
         self.password_toggle_button.setMinimumSize(QSize(100, 30))
+        self.password_toggle_button.setStyleSheet(u"\n"
+                                                  "                                                    QPushButton {\n"
+                                                  " font-size:14px;border-radius: 8px;\n"
+                                                  "                                                        border: 1px solid black;font-weight: bold;background-color: rgba(255, 255, 255, 0.8);\n"
+                                                  "}\n"
+                                                  "QPushButton:hover {\n"
+                                                  "    background-color: #f0f0f0;      border-color: #ccc;  \n"
+                                                  "}")
 
         self.gridLayout_3.addWidget(self.password_toggle_button, 0, 3, 1, 1)
 
         self.label_2 = QLabel(self.frame2_3)
         self.label_2.setObjectName(u"label_2")
         font1 = QFont()
+        font1.setBold(True)
         self.label_2.setFont(font1)
         self.label_2.setStyleSheet(u"border: none;")
         self.label_2.setWordWrap(True)
@@ -165,9 +206,10 @@ class Ui_StartGameWidget(object):
         self.frame2_4 = QFrame(self.frame_2)
         self.frame2_4.setObjectName(u"frame2_4")
         self.frame2_4.setStyleSheet(u"border-radius: 8px;\n"
-                                    "border:0.5px solid black;\n"
-                                    "background-color: rgba(255, 255, 255, 0.8);\n"
-                                    "font-size: 14px;")
+                                    "                                                        border:1.1px solid black;\n"
+                                    "                                                        background-color: rgba(255, 255, 255, 0.8);\n"
+                                    "                                                        font-size: 14px;\n"
+                                    "                                                    ")
         self.frame2_4.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame2_4.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout = QGridLayout(self.frame2_4)
@@ -181,6 +223,7 @@ class Ui_StartGameWidget(object):
         self.password_lineEdit = QLineEdit(self.frame2_4)
         self.password_lineEdit.setObjectName(u"password_lineEdit")
         self.password_lineEdit.setMinimumSize(QSize(0, 30))
+        self.password_lineEdit.setStyleSheet(u"border: 0.5px solid black;")
         self.password_lineEdit.setEchoMode(QLineEdit.EchoMode.Password)
 
         self.gridLayout.addWidget(self.password_lineEdit, 1, 1, 1, 1)
@@ -194,6 +237,7 @@ class Ui_StartGameWidget(object):
         self.account_lineEdit = QLineEdit(self.frame2_4)
         self.account_lineEdit.setObjectName(u"account_lineEdit")
         self.account_lineEdit.setMinimumSize(QSize(0, 30))
+        self.account_lineEdit.setStyleSheet(u"border: 0.5px solid black;")
 
         self.gridLayout.addWidget(self.account_lineEdit, 0, 1, 1, 1)
 
@@ -209,19 +253,20 @@ class Ui_StartGameWidget(object):
 
         self.frame_1 = QFrame(StartGameWidget)
         self.frame_1.setObjectName(u"frame_1")
-        self.frame_1.setStyleSheet(u"border: none;   background-color: transparent")
+        self.frame_1.setStyleSheet(u"border: none; background-color: transparent")
         self.frame_1.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame_1.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame_1)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.label = QLabel(self.frame_1)
         self.label.setObjectName(u"label")
-        self.label.setStyleSheet(u"border-radius: 8px;\n"
-                                 "border: 1px solid black;\n"
-                                 "background-color: rgba(255, 255, 255, 0.8);\n"
-                                 "font-size: 14px;")
+        self.label.setStyleSheet(u"border: none;\n"
+                                 "                                        background-color: rgba(255, 255, 255, 0.8);\n"
+                                 "                                       \n"
+                                 "                                    ")
 
         self.horizontalLayout.addWidget(self.label)
+
 
         self.gridLayout_2.addWidget(self.frame_1, 0, 0, 1, 1)
 
@@ -234,7 +279,7 @@ class Ui_StartGameWidget(object):
     def retranslateUi(self, StartGameWidget):
         StartGameWidget.setWindowTitle(QCoreApplication.translate("StartGameWidget", u"Form", None))
         self.label2_1.setText(QCoreApplication.translate("StartGameWidget",
-                                                         u"<html><head/><body><p align=\"center\"><span style=\" font-size:11pt;\">\u6e20\u9053\uff1a</span></p></body></html>",
+                                                         u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u6e20\u9053\uff1a</span><span style=\" font-size:12pt; font-weight:700;\"/></p></body></html>",
                                                          None))
         self.channel_comboBox.setItemText(0, QCoreApplication.translate("StartGameWidget", u"\u5b98\u670d", None))
         self.channel_comboBox.setItemText(1, QCoreApplication.translate("StartGameWidget", u"bilibili", None))
@@ -244,19 +289,28 @@ class Ui_StartGameWidget(object):
         # endif // QT_CONFIG(tooltip)
         self.use_launcher_checkbox.setText(
             QCoreApplication.translate("StartGameWidget", u"\u4f7f\u7528\u542f\u52a8\u5668", None))
-        self.path_label.setText(QCoreApplication.translate("StartGameWidget", u"\u6e38\u620f\u8def\u5f84\uff1a", None))
+        self.path_label.setText(QCoreApplication.translate("StartGameWidget",
+                                                           u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">\u6e38\u620f\u8def\u5f84\uff1a</span></p></body></html>",
+                                                           None))
         self.file_pushButton.setText(QCoreApplication.translate("StartGameWidget", u"\u6d4f\u89c8", None))
         self.auto_login_checkBox.setText(
             QCoreApplication.translate("StartGameWidget", u"\u81ea\u52a8\u767b\u5f55", None))
         self.password_toggle_button.setText(
             QCoreApplication.translate("StartGameWidget", u"\u663e\u793a\u5bc6\u7801", None))
-        self.label_2.setText(QCoreApplication.translate("StartGameWidget",
-                                                        u"<html><head/><body><p align=\"justify\"><span style=\" font-size:11pt;\">\u52fe\u9009\u81ea\u52a8\u767b\u5f55\u8868\u660e\u60a8\u5df2\u9605\u8bfb\u5e76\u540c\u610f\u300a\u7528\u6237\u534f\u8bae\u300b\u548c\u300a\u9690\u79c1\u653f\u7b56\u300b</span></p><p align=\"center\"><br/></p></body></html>",
+        self.label_2.setText(QCoreApplication.translate("StartGameWidget", u"<html><head/><body><p\n"
+                                                                           "                                                                    align=\"justify\"><span style=\"\n"
+                                                                           "                                                                    font-size:11pt;\">\u52fe\u9009\u81ea\u52a8\u767b\u5f55\u8868\u660e\u60a8\u5df2\u9605\u8bfb\u5e76\u540c\u610f\u300a\u7528\u6237\u534f\u8bae\u300b\u548c\u300a\u9690\u79c1\u653f\u7b56\u300b</span></p><p\n"
+                                                                           "                                                                    align=\"center\"><br/></p></body></html>\n"
+                                                                           "                                                                ",
                                                         None))
-        self.label2_4_11.setText(QCoreApplication.translate("StartGameWidget", u"\u8d26\u53f7\uff1a", None))
-        self.label2_4_21.setText(QCoreApplication.translate("StartGameWidget", u"\u5bc6\u7801\uff1a", None))
+        self.label2_4_11.setText(QCoreApplication.translate("StartGameWidget",
+                                                            u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">\u8d26\u53f7\uff1a</span></p></body></html>",
+                                                            None))
+        self.label2_4_21.setText(QCoreApplication.translate("StartGameWidget",
+                                                            u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">\u5bc6\u7801\uff1a</span></p></body></html>",
+                                                            None))
         self.label.setText(QCoreApplication.translate("StartGameWidget",
-                                                      u"<html><head/><body><p align=\"center\"><span style=\" font-size:11pt;\">\u542f\u52a8\u6e38\u620f</span></p></body></html>",
+                                                      u"<html><head/><body><p align=\"center\"><span style=\" font-size:14pt; font-weight:700;\">\u542f\u52a8\u6e38\u620f</span><span style=\" font-size:14pt; font-weight:700;\"/></p></body></html>",
                                                       None))
     # retranslateUi
 

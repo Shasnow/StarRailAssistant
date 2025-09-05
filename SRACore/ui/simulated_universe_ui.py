@@ -27,9 +27,10 @@ class Ui_SimulateUniverseWidget(object):
         font = QFont()
         font.setPointSize(13)
         SimulateUniverseWidget.setFont(font)
-        SimulateUniverseWidget.setStyleSheet(u"    background-repeat: no-repeat;\n"
-                                             "    background-position: center;\n"
-                                             "    background-color: rgba(255, 255, 255, 0.1);")
+        SimulateUniverseWidget.setStyleSheet(u"background-repeat: no-repeat;\n"
+                                             "                background-position: center;\n"
+                                             "                background-color: rgba(255, 255, 255, 0.1);\n"
+                                             "            ")
         self.verticalLayout_2 = QVBoxLayout(SimulateUniverseWidget)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.frame_2 = QFrame(SimulateUniverseWidget)
@@ -40,9 +41,10 @@ class Ui_SimulateUniverseWidget(object):
         sizePolicy1.setHeightForWidth(self.frame_2.sizePolicy().hasHeightForWidth())
         self.frame_2.setSizePolicy(sizePolicy1)
         self.frame_2.setStyleSheet(u"border-radius: 8px;\n"
-                                   "border: 1px solid black;\n"
-                                   "background-color: rgba(255, 255, 255, 0.8);\n"
-                                   "font-size: 14px;")
+                                   "                            border: 1px solid black;\n"
+                                   "                            background-color: rgba(255, 255, 255, 0.8);\n"
+                                   "                            font-size: 14px;\n"
+                                   "                        ")
         self.frame_2.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame_2.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout_2 = QHBoxLayout(self.frame_2)
@@ -50,7 +52,8 @@ class Ui_SimulateUniverseWidget(object):
         self.label = QLabel(self.frame_2)
         self.label.setObjectName(u"label")
         self.label.setStyleSheet(u"border-radius: 8px;\n"
-                                 "border: 0.3px solid black;")
+                                 "                                        border: 0.3px solid black;\n"
+                                 "                                    ")
 
         self.horizontalLayout_2.addWidget(self.label)
 
@@ -66,15 +69,17 @@ class Ui_SimulateUniverseWidget(object):
         self.frame_4 = QFrame(self.frame_3)
         self.frame_4.setObjectName(u"frame_4")
         self.frame_4.setStyleSheet(u"border-radius: 8px;\n"
-                                   "border: 1px solid black;\n"
-                                   "background-color: rgba(255, 255, 255, 0.8);\n"
-                                   "font-size: 14px;")
+                                   "                                        border: 1px solid black;\n"
+                                   "                                        background-color: rgba(255, 255, 255, 0.8);\n"
+                                   "                                        font-size: 14px;\n"
+                                   "                                    ")
         self.frame_4.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame_4.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout = QGridLayout(self.frame_4)
         self.gridLayout.setObjectName(u"gridLayout")
         self.label_2 = QLabel(self.frame_4)
         self.label_2.setObjectName(u"label_2")
+        self.label_2.setStyleSheet(u"border: none;")
         self.label_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout.addWidget(self.label_2, 0, 0, 1, 2)
@@ -82,6 +87,7 @@ class Ui_SimulateUniverseWidget(object):
         self.label_4 = QLabel(self.frame_4)
         self.label_4.setObjectName(u"label_4")
         self.label_4.setMaximumSize(QSize(16777215, 59))
+        self.label_4.setStyleSheet(u"border: none;")
         self.label_4.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout.addWidget(self.label_4, 2, 0, 1, 1)
@@ -90,12 +96,14 @@ class Ui_SimulateUniverseWidget(object):
         self.times.setObjectName(u"times")
         sizePolicy.setHeightForWidth(self.times.sizePolicy().hasHeightForWidth())
         self.times.setSizePolicy(sizePolicy)
+        self.times.setStyleSheet(u"font-weight: bold;")
         self.times.setMaximum(9999)
 
         self.gridLayout.addWidget(self.times, 2, 1, 1, 1)
 
         self.label_3 = QLabel(self.frame_4)
         self.label_3.setObjectName(u"label_3")
+        self.label_3.setStyleSheet(u"border: none;")
         self.label_3.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout.addWidget(self.label_3, 1, 0, 1, 1)
@@ -103,11 +111,21 @@ class Ui_SimulateUniverseWidget(object):
         self.game_mode = QComboBox(self.frame_4)
         self.game_mode.addItem("")
         self.game_mode.setObjectName(u"game_mode")
+        self.game_mode.setStyleSheet(u"font-weight: bold;\n"
+                                     "QCombox{border: solid black;border-radius: 0;font-weight: bold;}\n"
+                                     "QComboBox:hover {\n"
+                                     "    background-color: #f0f0f0;  \n"
+                                     "    border-color: #bbb;         \n"
+                                     "}\n"
+                                     "QComboBox QAbstractItemView {\n"
+                                     "    selection-background-color: #f0f0f0; background-color: white;\n"
+                                     "}")
 
         self.gridLayout.addWidget(self.game_mode, 1, 1, 1, 1)
 
         self.label_6 = QLabel(self.frame_4)
         self.label_6.setObjectName(u"label_6")
+        self.label_6.setStyleSheet(u"font-weight: bold;border: none;")
         self.label_6.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout.addWidget(self.label_6, 3, 0, 1, 1)
@@ -116,6 +134,15 @@ class Ui_SimulateUniverseWidget(object):
         self.policy_comboBox.addItem("")
         self.policy_comboBox.addItem("")
         self.policy_comboBox.setObjectName(u"policy_comboBox")
+        self.policy_comboBox.setStyleSheet(u"\n"
+                                           "font-weight: bold;QCombox{border: 0 solid black;font-weight: bold;}\n"
+                                           "QComboBox:hover {\n"
+                                           "    background-color: #f0f0f0;  \n"
+                                           "    border-color: #bbb;         \n"
+                                           "}\n"
+                                           "QComboBox QAbstractItemView {\n"
+                                           "    selection-background-color: #f0f0f0; background-color: white;\n"
+                                           "}")
 
         self.gridLayout.addWidget(self.policy_comboBox, 3, 1, 1, 1)
 
@@ -125,8 +152,9 @@ class Ui_SimulateUniverseWidget(object):
         self.label_5 = QLabel(self.frame_3)
         self.label_5.setObjectName(u"label_5")
         self.label_5.setStyleSheet(u"border: none;\n"
-                                   "background-color: rgba(255, 255, 255, 0.8);\n"
-                                   "font-size: 14px;")
+                                   "                                        background-color: rgba(255, 255, 255, 0.8);\n"
+                                   "                                        font-size: 14px;\n"
+                                   "                                    ")
         self.label_5.setWordWrap(True)
 
         self.verticalLayout_3.addWidget(self.label_5)
@@ -142,22 +170,31 @@ class Ui_SimulateUniverseWidget(object):
 
     def retranslateUi(self, SimulateUniverseWidget):
         SimulateUniverseWidget.setWindowTitle(QCoreApplication.translate("SimulateUniverseWidget", u"Form", None))
-        self.label.setText(QCoreApplication.translate("SimulateUniverseWidget", u"\u6a21\u62df\u5b87\u5b99", None))
+        self.label.setText(QCoreApplication.translate("SimulateUniverseWidget",
+                                                      u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u6a21\u62df\u5b87\u5b99</span></p></body></html>",
+                                                      None))
         self.label_2.setText(QCoreApplication.translate("SimulateUniverseWidget",
-                                                        u"\u5dee\u5206\u5b87\u5b99\uff1a\u5343\u9762\u82f1\u96c4",
+                                                        u"<html><head/><body><p align=\"center\"><span style=\" font-size:26pt; font-weight:700;\">\u5dee\u5206\u5b87\u5b99\uff1a\u5343\u9762\u82f1\u96c4</span></p></body></html>",
                                                         None))
-        self.label_4.setText(QCoreApplication.translate("SimulateUniverseWidget", u"\u6b21\u6570\uff1a", None))
-        self.label_3.setText(QCoreApplication.translate("SimulateUniverseWidget", u"\u6a21\u5f0f\uff1a", None))
+        self.label_4.setText(QCoreApplication.translate("SimulateUniverseWidget",
+                                                        u"<html><head/><body><p align=\"center\"><span style=\" font-size:16pt; font-weight:700;\">\u6b21\u6570\uff1a</span></p></body></html>",
+                                                        None))
+        self.label_3.setText(QCoreApplication.translate("SimulateUniverseWidget",
+                                                        u"<html><head/><body><p align=\"center\"><span style=\" font-size:16pt; font-weight:700;\">\u6a21\u5f0f\uff1a</span></p></body></html>",
+                                                        None))
         self.game_mode.setItemText(0, QCoreApplication.translate("SimulateUniverseWidget", u"\u5237\u5355\u5c42", None))
 
-        self.label_6.setText(
-            QCoreApplication.translate("SimulateUniverseWidget", u"\u9009\u62e9\u7b56\u7565\uff1a", None))
+        self.label_6.setText(QCoreApplication.translate("SimulateUniverseWidget",
+                                                        u"<html><head/><body><p align=\"center\"><span style=\" font-size:16pt;\">\u9009\u62e9\u7b56\u7565\uff1a</span></p></body></html>",
+                                                        None))
         self.policy_comboBox.setItemText(0, QCoreApplication.translate("SimulateUniverseWidget",
                                                                        u"\u56fe\u9274\u4f18\u5148", None))
         self.policy_comboBox.setItemText(1, QCoreApplication.translate("SimulateUniverseWidget", u"\u65e0", None))
 
-        self.label_5.setText(QCoreApplication.translate("SimulateUniverseWidget",
-                                                        u"<html><head/><body><p><br/></p><p><span style=\" font-size:11pt;\">\u9700\u8981\u8fdb\u5165\u5230\u5dee\u5206\u5b87\u5b99\u4e3b\u754c\u9762\u518d\u6267\u884c\u6b64\u4efb\u52a1\u3002\u6b64\u4efb\u52a1\u5e94\u5f53\u5355\u72ec\u6267\u884c\u3002\u8bf7\u81f3\u5c11\u624b\u52a8\u5b8c\u6210\u4e00\u6b21\u4ee5\u6e05\u9664\u6240\u6709\u65b0\u624b\u63d0\u793a\u3002</span></p><p><span style=\" font-size:11pt;\"/></p></body></html>",
-                                                        None))
+        self.label_5.setText(
+            QCoreApplication.translate("SimulateUniverseWidget", u"<html><head/><body><p><br/></p><p><span\n"
+                                                                 "                                        style=\" font-size:11pt;\">\u9700\u8981\u8fdb\u5165\u5230\u5dee\u5206\u5b87\u5b99\u4e3b\u754c\u9762\u518d\u6267\u884c\u6b64\u4efb\u52a1\u3002\u6b64\u4efb\u52a1\u5e94\u5f53\u5355\u72ec\u6267\u884c\u3002\u8bf7\u81f3\u5c11\u624b\u52a8\u5b8c\u6210\u4e00\u6b21\u4ee5\u6e05\u9664\u6240\u6709\u65b0\u624b\u63d0\u793a\u3002</span></p><p><span\n"
+                                                                 "                                        style=\" font-size:11pt;\"/></p></body></html>\n"
+                                                                 "                                    ", None))
     # retranslateUi
 

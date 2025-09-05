@@ -29,7 +29,7 @@
                 <widget class="QFrame" name="title_frame">
                     <property name="styleSheet">
                         <string notr="true">border-radius: 8px;
-                            border: 1px solid black;
+                            border: 1.5px solid black;
                             background-color: rgba(255, 255, 255, 0.8);
                             font-size: 14px;
                         </string>
@@ -44,7 +44,7 @@
                         <item>
                             <widget class="QLabel" name="title_label">
                                 <property name="styleSheet">
-                                    <string notr="true">border: none;</string>
+                                    <string notr="true">border: none;font-weight: bold;</string>
                                 </property>
                                 <property name="text">
                                     <string>任务结束</string>
@@ -80,7 +80,7 @@
                             <widget class="QFrame" name="frame2_1">
                                 <property name="styleSheet">
                                     <string notr="true">border-radius: 8px;
-                                        border: 1px solid black;
+                                        border: 1.5px solid black;
                                         background-color: rgba(255, 255, 255, 0.8);
                                         font-size: 14px;
                                     </string>
@@ -101,19 +101,30 @@
                                                 </size>
                                             </property>
                                             <property name="styleSheet">
-                                                <string notr="true">border-radius: 8px;
-                                                    border: 0.5px solid black;
+                                                <string notr="true">border: none;font-weight: bold;font-size: 14px;
                                                 </string>
                                             </property>
                                             <property name="text">
-                                                <string>任务结束后：</string>
+                                                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;
+                                                    font-size:12pt;&quot;&gt;任务结束后：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                </string>
                                             </property>
                                         </widget>
                                     </item>
                                     <item>
                                         <widget class="QCheckBox" name="log_out_checkbox">
                                             <property name="styleSheet">
-                                                <string notr="true">border: none;</string>
+                                                <string notr="true">QCheckBox{border: none;background-color: rgba(255,
+                                                    255, 255, 0.8);font-size: 14px;font-weight: bold;}
+                                                    QCheckBox:hover {
+                                                    background-color: #f0f0f0;
+                                                    }
+
+                                                    /* 勾选框悬停时边框变色 */
+                                                    QCheckBox::indicator:hover {
+                                                    border-color: #666;
+                                                    }
+                                                </string>
                                             </property>
                                             <property name="text">
                                                 <string>登出当前账号</string>
@@ -123,7 +134,17 @@
                                     <item>
                                         <widget class="QCheckBox" name="quit_game_checkbox">
                                             <property name="styleSheet">
-                                                <string notr="true">border: none;</string>
+                                                <string notr="true">QCheckBox{border: none;background-color: rgba(255,
+                                                    255, 255, 0.8);font-size: 14px;font-weight: bold;}
+                                                    QCheckBox:hover {
+                                                    background-color: #f0f0f0;
+                                                    }
+
+                                                    /* 勾选框悬停时边框变色 */
+                                                    QCheckBox::indicator:hover {
+                                                    border-color: #666;
+                                                    }
+                                                </string>
                                             </property>
                                             <property name="text">
                                                 <string>退出游戏</string>
@@ -139,7 +160,17 @@
                                                 </size>
                                             </property>
                                             <property name="styleSheet">
-                                                <string notr="true">border: none;</string>
+                                                <string notr="true">QCheckBox{border: none;background-color: rgba(255,
+                                                    255, 255, 0.8);font-size: 14px;font-weight: bold;}
+                                                    QCheckBox:hover {
+                                                    background-color: #f0f0f0;
+                                                    }
+
+                                                    /* 勾选框悬停时边框变色 */
+                                                    QCheckBox::indicator:hover {
+                                                    border-color: #666;
+                                                    }
+                                                </string>
                                             </property>
                                             <property name="text">
                                                 <string>退出SRA</string>
@@ -155,7 +186,7 @@
                                                 </size>
                                             </property>
                                             <property name="styleSheet">
-                                                <string notr="true">border: none;</string>
+                                                <string notr="true">border: none;font-weight: bold;</string>
                                             </property>
                                             <property name="text">
                                                 <string>关机</string>
@@ -171,7 +202,7 @@
                                                 </size>
                                             </property>
                                             <property name="styleSheet">
-                                                <string notr="true">border: none;</string>
+                                                <string notr="true">border: none;font-weight: bold;</string>
                                             </property>
                                             <property name="text">
                                                 <string>休眠</string>
@@ -181,7 +212,7 @@
                                     <item>
                                         <widget class="QRadioButton" name="radioButton">
                                             <property name="styleSheet">
-                                                <string notr="true">border: none;</string>
+                                                <string notr="true">border: none;font-weight: bold;</string>
                                             </property>
                                             <property name="text">
                                                 <string>无动作</string>

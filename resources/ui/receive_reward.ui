@@ -36,7 +36,7 @@
                                 <x>0</x>
                                 <y>0</y>
                                 <width>357</width>
-                                <height>619</height>
+                                <height>618</height>
                             </rect>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -58,9 +58,16 @@
                                                     </size>
                                                 </property>
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;
-                                                        background-color: rgba(255, 255, 255, 0.8);
-                                                        font-size: 14px;
+                                                    <string notr="true">QCheckBox{border: none;background-color:
+                                                        rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}
+                                                        QCheckBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        }
+
+                                                        /* 勾选框悬停时边框变色 */
+                                                        QCheckBox::indicator:hover {
+                                                        border-color: #666;
+                                                        }
                                                     </string>
                                                 </property>
                                                 <property name="text">
@@ -89,9 +96,16 @@
                                                     </size>
                                                 </property>
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;
-                                                        background-color: rgba(255, 255, 255, 0.8);
-                                                        font-size: 14px;
+                                                    <string notr="true">QCheckBox{border: none;background-color:
+                                                        rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}
+                                                        QCheckBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        }
+
+                                                        /* 勾选框悬停时边框变色 */
+                                                        QCheckBox::indicator:hover {
+                                                        border-color: #666;
+                                                        }
                                                     </string>
                                                 </property>
                                                 <property name="text">
@@ -120,9 +134,16 @@
                                                     </size>
                                                 </property>
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;
-                                                        background-color: rgba(255, 255, 255, 0.8);
-                                                        font-size: 14px;
+                                                    <string notr="true">QCheckBox{border: none;background-color:
+                                                        rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}
+                                                        QCheckBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        }
+
+                                                        /* 勾选框悬停时边框变色 */
+                                                        QCheckBox::indicator:hover {
+                                                        border-color: #666;
+                                                        }
                                                     </string>
                                                 </property>
                                                 <property name="text">
@@ -151,9 +172,16 @@
                                                     </size>
                                                 </property>
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;
-                                                        background-color: rgba(255, 255, 255, 0.8);
-                                                        font-size: 14px;
+                                                    <string notr="true">QCheckBox{border: none;background-color:
+                                                        rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}
+                                                        QCheckBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        }
+
+                                                        /* 勾选框悬停时边框变色 */
+                                                        QCheckBox::indicator:hover {
+                                                        border-color: #666;
+                                                        }
                                                     </string>
                                                 </property>
                                                 <property name="text">
@@ -182,9 +210,16 @@
                                                     </size>
                                                 </property>
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;
-                                                        background-color: rgba(255, 255, 255, 0.8);
-                                                        font-size: 14px;
+                                                    <string notr="true">QCheckBox{border: none;background-color:
+                                                        rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}
+                                                        QCheckBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        }
+
+                                                        /* 勾选框悬停时边框变色 */
+                                                        QCheckBox::indicator:hover {
+                                                        border-color: #666;
+                                                        }
                                                     </string>
                                                 </property>
                                                 <property name="text">
@@ -213,9 +248,16 @@
                                                     </size>
                                                 </property>
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;
-                                                        background-color: rgba(255, 255, 255, 0.8);
-                                                        font-size: 14px;
+                                                    <string notr="true">QCheckBox{border: none;background-color:
+                                                        rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}
+                                                        QCheckBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        }
+
+                                                        /* 勾选框悬停时边框变色 */
+                                                        QCheckBox::indicator:hover {
+                                                        border-color: #666;
+                                                        }
                                                     </string>
                                                 </property>
                                                 <property name="text">
@@ -230,7 +272,7 @@
                                 <widget class="QFrame" name="frame3_7">
                                     <property name="styleSheet">
                                         <string notr="true">border-radius: 8px;
-                                            border: 1px solid black;
+                                            border: 1.5px solid black;
                                             background-color: rgba(255, 255, 255, 0.8);
                                             font-size: 14px;
                                         </string>
@@ -251,7 +293,7 @@
                                                     </size>
                                                 </property>
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;</string>
+                                                    <string notr="true">border: none;font-weight: bold;</string>
                                                 </property>
                                                 <property name="text">
                                                     <string>兑换码</string>
@@ -284,8 +326,7 @@
             <item row="0" column="0">
                 <widget class="QFrame" name="frame">
                     <property name="styleSheet">
-                        <string notr="true">border-radius: 8px;
-                            border: 1px solid black;
+                        <string notr="true">border: none;
                             background-color: rgba(255, 255, 255, 0.8);
                             font-size: 14px;
                         </string>
@@ -305,7 +346,9 @@
                                     </string>
                                 </property>
                                 <property name="text">
-                                    <string>领取奖励</string>
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span
+                                        style=&quot; font-size:12pt; font-weight:700;&quot;&gt;领取奖励&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                    </string>
                                 </property>
                             </widget>
                         </item>

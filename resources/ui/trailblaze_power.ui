@@ -25,6 +25,90 @@
             </string>
         </property>
         <layout class="QGridLayout" name="gridLayout_8">
+            <item row="0" column="0" colspan="2">
+                <widget class="QFrame" name="frame_1">
+                    <property name="styleSheet">
+                        <string notr="true">border-radius: 8px;
+                            border: 1px solid black;
+                            background-color: rgba(255, 255, 255, 0.8);font-weight: bold;
+                        </string>
+                    </property>
+                    <property name="frameShape">
+                        <enum>QFrame::Shape::StyledPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>QFrame::Shadow::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout">
+                        <item>
+                            <widget class="QLabel" name="label">
+                                <property name="styleSheet">
+                                    <string notr="true">border: none;</string>
+                                </property>
+                                <property name="text">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span
+                                        style=&quot; font-size:12pt;&quot;&gt;清开拓力&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                    </string>
+                                </property>
+                            </widget>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+            <item row="1" column="1">
+                <widget class="QListWidget" name="task_listWidget">
+                    <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <pointsize>13</pointsize>
+                        </font>
+                    </property>
+                    <property name="styleSheet">
+                        <string notr="true"/>
+                    </property>
+                    <property name="tabKeyNavigation">
+                        <bool>false</bool>
+                    </property>
+                    <property name="dragEnabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="dragDropOverwriteMode">
+                        <bool>true</bool>
+                    </property>
+                    <property name="dragDropMode">
+                        <enum>QAbstractItemView::DragDropMode::InternalMove</enum>
+                    </property>
+                    <property name="defaultDropAction">
+                        <enum>Qt::DropAction::MoveAction</enum>
+                    </property>
+                    <property name="alternatingRowColors">
+                        <bool>false</bool>
+                    </property>
+                    <property name="wordWrap">
+                        <bool>true</bool>
+                    </property>
+                    <item>
+                        <property name="text">
+                            <string>新建项目</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>新建项目</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>新建项目</string>
+                        </property>
+                    </item>
+                </widget>
+            </item>
             <item row="1" column="0">
                 <widget class="QScrollArea" name="scrollArea">
                     <property name="maximumSize">
@@ -42,7 +126,7 @@
                                 <x>0</x>
                                 <y>0</y>
                                 <width>313</width>
-                                <height>908</height>
+                                <height>932</height>
                             </rect>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -77,7 +161,17 @@
                                         <item row="2" column="0" colspan="3">
                                             <widget class="QCheckBox" name="useAssist_checkBox">
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;</string>
+                                                    <string notr="true">QCheckBox{border: none;background-color:
+                                                        rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}
+                                                        QCheckBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        }
+
+                                                        /* 勾选框悬停时边框变色 */
+                                                        QCheckBox::indicator:hover {
+                                                        border-color: #666;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <property name="text">
                                                     <string>使用支援角色</string>
@@ -87,10 +181,12 @@
                                         <item row="1" column="0">
                                             <widget class="QLabel" name="label2_1_21">
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;</string>
+                                                    <string notr="true">border: none;font-weight: bold;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>次数：</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:11pt;&quot;&gt;次数：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                                 <property name="alignment">
                                                     <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -100,7 +196,17 @@
                                         <item row="0" column="0">
                                             <widget class="QCheckBox" name="replenish_checkBox">
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;</string>
+                                                    <string notr="true">QCheckBox{border: none;background-color:
+                                                        rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}
+                                                        QCheckBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        }
+
+                                                        /* 勾选框悬停时边框变色 */
+                                                        QCheckBox::indicator:hover {
+                                                        border-color: #666;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <property name="text">
                                                     <string>补充体力</string>
@@ -115,6 +221,23 @@
                                                         <height>30</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">QSpinBox {font-weight: bold;
+                                                        border: 1.2px solid black;
+                                                        border-radius: 0; /* 直角 */
+                                                        padding: 2px;
+                                                        }
+
+                                                        QSpinBox:hover {
+                                                        background-color: #f0f0f0; /* 悬停浅灰 */
+                                                        }
+
+                                                        /* 调节按钮悬停 */
+                                                        QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+                                                        background-color: #e8e8e8;
+                                                        }
+                                                    </string>
+                                                </property>
                                                 <property name="minimum">
                                                     <number>1</number>
                                                 </property>
@@ -126,7 +249,17 @@
                                         <item row="3" column="0" colspan="3">
                                             <widget class="QCheckBox" name="changeLineup_checkBox">
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;</string>
+                                                    <string notr="true">QCheckBox{border: none;background-color:
+                                                        rgba(255, 255, 255, 0.8);font-size: 14px;font-weight: bold;}
+                                                        QCheckBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        }
+
+                                                        /* 勾选框悬停时边框变色 */
+                                                        QCheckBox::indicator:hover {
+                                                        border-color: #666;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <property name="text">
                                                     <string>重新编队</string>
@@ -140,6 +273,18 @@
                                                         <width>0</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">font-weight: bold;
+                                                        QCombox{border: 0.85px solid black;}
+                                                        QComboBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        border-color: #bbb;
+                                                        }
+                                                        QComboBox QAbstractItemView {
+                                                        selection-background-color: #f0f0f0; background-color: white;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <item>
                                                     <property name="text">
@@ -197,10 +342,12 @@
                                         <item row="2" column="0">
                                             <widget class="QLabel" name="label2_2_21">
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;</string>
+                                                    <string notr="true">border: none;font-weight: bold;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>次数：</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:12pt;&quot;&gt;次数：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                             </widget>
                                         </item>
@@ -211,6 +358,23 @@
                                                         <width>0</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">QSpinBox {font-weight: bold;
+                                                        border: 1.2px solid black;
+                                                        border-radius: 0; /* 直角 */
+                                                        padding: 2px;
+                                                        }
+
+                                                        QSpinBox:hover {
+                                                        background-color: #f0f0f0; /* 悬停浅灰 */
+                                                        }
+
+                                                        /* 调节按钮悬停 */
+                                                        QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+                                                        background-color: #e8e8e8;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <property name="minimum">
                                                     <number>1</number>
@@ -237,6 +401,18 @@
                                                         <height>16777215</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">
+                                                        QPushButton {
+                                                        font-size:14px;border-radius: 8px;
+                                                        border: 1px solid black;font-weight: bold;background-color:
+                                                        rgba(255, 255, 255, 0.8);
+                                                        }
+                                                        QPushButton:hover {
+                                                        background-color: #f0f0f0; border-color: #ccc;
+                                                        }
+                                                    </string>
+                                                </property>
                                                 <property name="text">
                                                     <string>+</string>
                                                 </property>
@@ -255,6 +431,18 @@
                                                         <width>0</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">font-weight: bold;
+                                                        QCombox{border: 0.85px solid black;}
+                                                        QComboBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        border-color: #bbb;
+                                                        }
+                                                        QComboBox QAbstractItemView {
+                                                        selection-background-color: #f0f0f0; background-color: white;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <item>
                                                     <property name="text">
@@ -321,10 +509,12 @@
                                         <item row="0" column="0" colspan="4">
                                             <widget class="QLabel" name="label_2">
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;</string>
+                                                    <string notr="true">border: none;font-weight: bold;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>饰品提取</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:11pt;&quot;&gt;饰品提取&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                                 <property name="alignment">
                                                     <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -357,6 +547,23 @@
                                                         <height>30</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">QSpinBox {font-weight: bold;
+                                                        border: 1.2px solid black;
+                                                        border-radius: 0; /* 直角 */
+                                                        padding: 2px;
+                                                        }
+
+                                                        QSpinBox:hover {
+                                                        background-color: #f0f0f0; /* 悬停浅灰 */
+                                                        }
+
+                                                        /* 调节按钮悬停 */
+                                                        QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+                                                        background-color: #e8e8e8;
+                                                        }
+                                                    </string>
+                                                </property>
                                                 <property name="minimum">
                                                     <number>1</number>
                                                 </property>
@@ -371,7 +578,9 @@
                                                     <string notr="true">border: none;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>连续作战：</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:12pt; font-weight:700;&quot;&gt;连续作战：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                             </widget>
                                         </item>
@@ -382,6 +591,23 @@
                                                         <width>0</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">QSpinBox {font-weight: bold;
+                                                        border: 1.2px solid black;
+                                                        border-radius: 0; /* 直角 */
+                                                        padding: 2px;
+                                                        }
+
+                                                        QSpinBox:hover {
+                                                        background-color: #f0f0f0; /* 悬停浅灰 */
+                                                        }
+
+                                                        /* 调节按钮悬停 */
+                                                        QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+                                                        background-color: #e8e8e8;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <property name="minimum">
                                                     <number>1</number>
@@ -408,6 +634,18 @@
                                                         <height>16777215</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">
+                                                        QPushButton {
+                                                        font-size:14px;border-radius: 8px;
+                                                        border: 1px solid black;font-weight: bold;background-color:
+                                                        rgba(255, 255, 255, 0.8);
+                                                        }
+                                                        QPushButton:hover {
+                                                        background-color: #f0f0f0; border-color: #ccc;
+                                                        }
+                                                    </string>
+                                                </property>
                                                 <property name="text">
                                                     <string>+</string>
                                                 </property>
@@ -419,7 +657,9 @@
                                                     <string notr="true">border: none;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>执行次数：</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:12pt; font-weight:700;&quot;&gt;执行次数：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                             </widget>
                                         </item>
@@ -456,6 +696,18 @@
                                                         <width>200</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">font-weight: bold;
+                                                        QCombox{border: 0.85px solid black;}
+                                                        QComboBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        border-color: #bbb;
+                                                        }
+                                                        QComboBox QAbstractItemView {
+                                                        selection-background-color: #f0f0f0; background-color: white;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <item>
                                                     <property name="text">
@@ -527,10 +779,12 @@
                                         <item row="0" column="0" colspan="4">
                                             <widget class="QLabel" name="label_3">
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;</string>
+                                                    <string notr="true">border: none;font-weight: bold;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>拟造花萼（金）</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:11pt;&quot;&gt;拟造花萼（金）&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                                 <property name="alignment">
                                                     <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -576,6 +830,23 @@
                                                         <height>30</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">QSpinBox {font-weight: bold;
+                                                        border: 1.2px solid black;
+                                                        border-radius: 0; /* 直角 */
+                                                        padding: 2px;
+                                                        }
+
+                                                        QSpinBox:hover {
+                                                        background-color: #f0f0f0; /* 悬停浅灰 */
+                                                        }
+
+                                                        /* 调节按钮悬停 */
+                                                        QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+                                                        background-color: #e8e8e8;
+                                                        }
+                                                    </string>
+                                                </property>
                                                 <property name="minimum">
                                                     <number>1</number>
                                                 </property>
@@ -604,6 +875,18 @@
                                                         <height>16777215</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">
+                                                        QPushButton {
+                                                        font-size:14px;border-radius: 8px;
+                                                        border: 1px solid black;font-weight: bold;background-color:
+                                                        rgba(255, 255, 255, 0.8);
+                                                        }
+                                                        QPushButton:hover {
+                                                        background-color: #f0f0f0; border-color: #ccc;
+                                                        }
+                                                    </string>
+                                                </property>
                                                 <property name="text">
                                                     <string>+</string>
                                                 </property>
@@ -630,6 +913,23 @@
                                                         <height>30</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">QSpinBox {font-weight: bold;
+                                                        border: 1.2px solid black;
+                                                        border-radius: 0; /* 直角 */
+                                                        padding: 2px;
+                                                        }
+
+                                                        QSpinBox:hover {
+                                                        background-color: #f0f0f0; /* 悬停浅灰 */
+                                                        }
+
+                                                        /* 调节按钮悬停 */
+                                                        QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+                                                        background-color: #e8e8e8;
+                                                        }
+                                                    </string>
+                                                </property>
                                                 <property name="minimum">
                                                     <number>1</number>
                                                 </property>
@@ -641,7 +941,9 @@
                                                     <string notr="true">border: none;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>连续作战：</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:12pt; font-weight:700;&quot;&gt;连续作战：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                             </widget>
                                         </item>
@@ -651,7 +953,9 @@
                                                     <string notr="true">border: none;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>执行次数：</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:12pt; font-weight:700;&quot;&gt;执行次数：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                             </widget>
                                         </item>
@@ -662,6 +966,18 @@
                                                         <width>200</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">font-weight: bold;
+                                                        QCombox{border: 0.85px solid black;}
+                                                        QComboBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        border-color: #bbb;
+                                                        }
+                                                        QComboBox QAbstractItemView {
+                                                        selection-background-color: #f0f0f0; background-color: white;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <item>
                                                     <property name="text">
@@ -748,10 +1064,12 @@
                                         <item row="0" column="0" colspan="4">
                                             <widget class="QLabel" name="label_4">
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;</string>
+                                                    <string notr="true">border: none;font-weight: bold;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>拟造花萼（赤）</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span
+                                                        style=&quot; font-size:11pt;&quot;&gt;拟造花萼（赤）&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                                 <property name="alignment">
                                                     <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -784,6 +1102,23 @@
                                                         <height>30</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">QSpinBox {font-weight: bold;
+                                                        border: 1.2px solid black;
+                                                        border-radius: 0; /* 直角 */
+                                                        padding: 2px;
+                                                        }
+
+                                                        QSpinBox:hover {
+                                                        background-color: #f0f0f0; /* 悬停浅灰 */
+                                                        }
+
+                                                        /* 调节按钮悬停 */
+                                                        QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+                                                        background-color: #e8e8e8;
+                                                        }
+                                                    </string>
+                                                </property>
                                                 <property name="minimum">
                                                     <number>1</number>
                                                 </property>
@@ -792,10 +1127,12 @@
                                         <item row="3" column="0">
                                             <widget class="QLabel" name="label2_5_21">
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;</string>
+                                                    <string notr="true">border: none;font-weight: bold;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>次数：</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:12pt;&quot;&gt;次数：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                             </widget>
                                         </item>
@@ -832,6 +1169,18 @@
                                                         <height>16777215</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">
+                                                        QPushButton {
+                                                        font-size:14px;border-radius: 8px;
+                                                        border: 1px solid black;font-weight: bold;background-color:
+                                                        rgba(255, 255, 255, 0.8);
+                                                        }
+                                                        QPushButton:hover {
+                                                        background-color: #f0f0f0; border-color: #ccc;
+                                                        }
+                                                    </string>
+                                                </property>
                                                 <property name="text">
                                                     <string>+</string>
                                                 </property>
@@ -844,6 +1193,18 @@
                                                         <width>220</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">font-weight: bold;
+                                                        QCombox{border: 0.85px solid black;}
+                                                        QComboBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        border-color: #bbb;
+                                                        }
+                                                        QComboBox QAbstractItemView {
+                                                        selection-background-color: #f0f0f0; background-color: white;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <item>
                                                     <property name="text">
@@ -983,7 +1344,9 @@
                                                     <string notr="true">border: none;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>凝滞虚影</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span
+                                                        style=&quot; font-size:11pt; font-weight:700;&quot;&gt;凝滞虚影&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                                 <property name="alignment">
                                                     <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -1015,7 +1378,9 @@
                                                     <string notr="true">border: none;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>次数：</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:12pt; font-weight:700;&quot;&gt;次数：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                             </widget>
                                         </item>
@@ -1026,6 +1391,23 @@
                                                         <width>0</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">QSpinBox {font-weight: bold;
+                                                        border: 1.2px solid black;
+                                                        border-radius: 0; /* 直角 */
+                                                        padding: 2px;
+                                                        }
+
+                                                        QSpinBox:hover {
+                                                        background-color: #f0f0f0; /* 悬停浅灰 */
+                                                        }
+
+                                                        /* 调节按钮悬停 */
+                                                        QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+                                                        background-color: #e8e8e8;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <property name="minimum">
                                                     <number>1</number>
@@ -1065,6 +1447,18 @@
                                                         <height>16777215</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">
+                                                        QPushButton {
+                                                        font-size:14px;border-radius: 8px;
+                                                        border: 1px solid black;font-weight: bold;background-color:
+                                                        rgba(255, 255, 255, 0.8);
+                                                        }
+                                                        QPushButton:hover {
+                                                        background-color: #f0f0f0; border-color: #ccc;
+                                                        }
+                                                    </string>
+                                                </property>
                                                 <property name="text">
                                                     <string>+</string>
                                                 </property>
@@ -1074,11 +1468,13 @@
                                             <widget class="QLabel" name="label_6">
                                                 <property name="styleSheet">
                                                     <string notr="true">border: none;
-                                                        background-color: rgba(255, 255, 255, 0.8);
+                                                        background-color: rgba(255, 255, 255, 0.8);font-weight: bold;
                                                     </string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>侵蚀隧洞</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:11pt;&quot;&gt;侵蚀隧洞&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                                 <property name="alignment">
                                                     <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -1092,6 +1488,18 @@
                                                         <width>0</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">font-weight: bold;
+                                                        QCombox{border: 0.85px solid black;}
+                                                        QComboBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        border-color: #bbb;
+                                                        }
+                                                        QComboBox QAbstractItemView {
+                                                        selection-background-color: #f0f0f0; background-color: white;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <item>
                                                     <property name="text">
@@ -1192,6 +1600,23 @@
                                                         <height>30</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">QSpinBox {font-weight: bold;
+                                                        border: 1.2px solid black;
+                                                        border-radius: 0; /* 直角 */
+                                                        padding: 2px;
+                                                        }
+
+                                                        QSpinBox:hover {
+                                                        background-color: #f0f0f0; /* 悬停浅灰 */
+                                                        }
+
+                                                        /* 调节按钮悬停 */
+                                                        QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+                                                        background-color: #e8e8e8;
+                                                        }
+                                                    </string>
+                                                </property>
                                                 <property name="minimum">
                                                     <number>1</number>
                                                 </property>
@@ -1216,10 +1641,12 @@
                                         <item row="2" column="0">
                                             <widget class="QLabel" name="label2_7_21">
                                                 <property name="styleSheet">
-                                                    <string notr="true">border: none;</string>
+                                                    <string notr="true">border: none;font-weight: bold;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>次数：</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:12pt;&quot;&gt;次数：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                             </widget>
                                         </item>
@@ -1243,6 +1670,18 @@
                                                         <height>16777215</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">
+                                                        QPushButton {
+                                                        font-size:14px;border-radius: 8px;
+                                                        border: 1px solid black;font-weight: bold;background-color:
+                                                        rgba(255, 255, 255, 0.8);
+                                                        }
+                                                        QPushButton:hover {
+                                                        background-color: #f0f0f0; border-color: #ccc;
+                                                        }
+                                                    </string>
+                                                </property>
                                                 <property name="text">
                                                     <string>+</string>
                                                 </property>
@@ -1255,6 +1694,18 @@
                                                         <width>0</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">font-weight: bold;
+                                                        QCombox{border: 0.85px solid black;}
+                                                        QComboBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        border-color: #bbb;
+                                                        }
+                                                        QComboBox QAbstractItemView {
+                                                        selection-background-color: #f0f0f0; background-color: white;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <item>
                                                     <property name="text">
@@ -1304,7 +1755,9 @@
                                                     <string notr="true">border: none;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>历战余响</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:11pt; font-weight:700;&quot;&gt;历战余响&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                                 <property name="alignment">
                                                     <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -1316,101 +1769,6 @@
                             </item>
                         </layout>
                     </widget>
-                </widget>
-            </item>
-            <item row="0" column="0" colspan="2">
-                <widget class="QFrame" name="frame_1">
-                    <property name="styleSheet">
-                        <string notr="true">border-radius: 8px;
-                            border: 1px solid black;
-                            background-color: rgba(255, 255, 255, 0.8);
-                        </string>
-                    </property>
-                    <property name="frameShape">
-                        <enum>QFrame::Shape::StyledPanel</enum>
-                    </property>
-                    <property name="frameShadow">
-                        <enum>QFrame::Shadow::Raised</enum>
-                    </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout">
-                        <item>
-                            <widget class="QLabel" name="label">
-                                <property name="styleSheet">
-                                    <string notr="true">border: none;</string>
-                                </property>
-                                <property name="text">
-                                    <string>清开拓力</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item>
-                            <spacer name="horizontalSpacer">
-                                <property name="orientation">
-                                    <enum>Qt::Orientation::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>329</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                    </layout>
-                </widget>
-            </item>
-            <item row="1" column="1">
-                <widget class="QListWidget" name="task_listWidget">
-                    <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <pointsize>13</pointsize>
-                        </font>
-                    </property>
-                    <property name="styleSheet">
-                        <string notr="true"/>
-                    </property>
-                    <property name="tabKeyNavigation">
-                        <bool>false</bool>
-                    </property>
-                    <property name="dragEnabled">
-                        <bool>true</bool>
-                    </property>
-                    <property name="dragDropOverwriteMode">
-                        <bool>true</bool>
-                    </property>
-                    <property name="dragDropMode">
-                        <enum>QAbstractItemView::DragDropMode::InternalMove</enum>
-                    </property>
-                    <property name="defaultDropAction">
-                        <enum>Qt::DropAction::MoveAction</enum>
-                    </property>
-                    <property name="alternatingRowColors">
-                        <bool>false</bool>
-                    </property>
-                    <property name="wordWrap">
-                        <bool>true</bool>
-                    </property>
-                    <item>
-                        <property name="text">
-                            <string>新建项目</string>
-                        </property>
-                    </item>
-                    <item>
-                        <property name="text">
-                            <string>新建项目</string>
-                        </property>
-                    </item>
-                    <item>
-                        <property name="text">
-                            <string>新建项目</string>
-                        </property>
-                    </item>
                 </widget>
             </item>
         </layout>

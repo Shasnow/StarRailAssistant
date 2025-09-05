@@ -38,7 +38,7 @@
                                 <x>0</x>
                                 <y>0</y>
                                 <width>429</width>
-                                <height>552</height>
+                                <height>549</height>
                             </rect>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -46,7 +46,7 @@
                                 <widget class="QFrame" name="frame2_1">
                                     <property name="styleSheet">
                                         <string notr="true">border-radius: 8px;
-                                            border:0.5px solid black;
+                                            border:1.1px solid black;
                                             background-color: rgba(255, 255, 255, 0.8);
                                             font-size: 14px;
                                         </string>
@@ -65,7 +65,8 @@
                                                 </property>
                                                 <property name="text">
                                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span
-                                                        style=&quot; font-size:11pt;&quot;&gt;渠道：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                        style=&quot; font-size:12pt; font-weight:700;&quot;&gt;渠道：&lt;/span&gt;&lt;span
+                                                        style=&quot; font-size:12pt; font-weight:700;&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                                                     </string>
                                                 </property>
                                             </widget>
@@ -77,6 +78,18 @@
                                                         <width>0</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">font-weight: bold;
+                                                        QCombox{border: 0.85px solid black;}
+                                                        QComboBox:hover {
+                                                        background-color: #f0f0f0;
+                                                        border-color: #bbb;
+                                                        }
+                                                        QComboBox QAbstractItemView {
+                                                        selection-background-color: #f0f0f0; background-color: white;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <item>
                                                     <property name="text">
@@ -97,7 +110,7 @@
                                 <widget class="QFrame" name="frame_3">
                                     <property name="styleSheet">
                                         <string notr="true">border-radius: 8px;
-                                            border:0.5px solid black;
+                                            border:1.1px solid black;
                                             background-color: rgba(255, 255, 255, 0.8);
                                             font-size: 14px;
                                         </string>
@@ -144,7 +157,7 @@
                                 <widget class="QFrame" name="frame2_2">
                                     <property name="styleSheet">
                                         <string notr="true">border-radius: 8px;
-                                            border:0.5px solid black;
+                                            border:1.1px solid black;
                                             background-color: rgba(255, 255, 255, 0.8);
                                             font-size: 14px;
                                         </string>
@@ -162,7 +175,9 @@
                                                     <string notr="true">border: none;</string>
                                                 </property>
                                                 <property name="text">
-                                                    <string>游戏路径：</string>
+                                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                        style=&quot; font-size:12pt; font-weight:700;&quot;&gt;游戏路径：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                    </string>
                                                 </property>
                                             </widget>
                                         </item>
@@ -174,6 +189,9 @@
                                                         <height>30</height>
                                                     </size>
                                                 </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">border: 0.5px solid black;</string>
+                                                </property>
                                             </widget>
                                         </item>
                                         <item>
@@ -183,6 +201,18 @@
                                                         <width>0</width>
                                                         <height>30</height>
                                                     </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">
+                                                        QPushButton {
+                                                        font-size:14px;border-radius: 8px;
+                                                        border: 1px solid black;font-weight: bold;background-color:
+                                                        rgba(255, 255, 255, 0.8);
+                                                        }
+                                                        QPushButton:hover {
+                                                        background-color: #f0f0f0; border-color: #ccc;
+                                                        }
+                                                    </string>
                                                 </property>
                                                 <property name="text">
                                                     <string>浏览</string>
@@ -205,9 +235,9 @@
                                             <widget class="QFrame" name="frame2_3">
                                                 <property name="styleSheet">
                                                     <string notr="true">border-radius: 8px;
-                                                        border:0.5px solid black;
+                                                        border:1.1px solid black;
                                                         background-color: rgba(255, 255, 255, 0.8);
-                                                        font-size: 14px;
+                                                        font-size: 14px;font-weight: bold;
                                                     </string>
                                                 </property>
                                                 <property name="frameShape">
@@ -220,7 +250,18 @@
                                                     <item row="0" column="1">
                                                         <widget class="QCheckBox" name="auto_login_checkBox">
                                                             <property name="styleSheet">
-                                                                <string notr="true">border: none;</string>
+                                                                <string notr="true">QCheckBox{border:
+                                                                    none;background-color: rgba(255, 255, 255,
+                                                                    0.8);font-size: 14px;font-weight: bold;}
+                                                                    QCheckBox:hover {
+                                                                    background-color: #f0f0f0;
+                                                                    }
+
+                                                                    /* 勾选框悬停时边框变色 */
+                                                                    QCheckBox::indicator:hover {
+                                                                    border-color: #666;
+                                                                    }
+                                                                </string>
                                                             </property>
                                                             <property name="text">
                                                                 <string>自动登录</string>
@@ -248,6 +289,18 @@
                                                                     <height>30</height>
                                                                 </size>
                                                             </property>
+                                                            <property name="styleSheet">
+                                                                <string notr="true">
+                                                                    QPushButton {
+                                                                    font-size:14px;border-radius: 8px;
+                                                                    border: 1px solid black;font-weight:
+                                                                    bold;background-color: rgba(255, 255, 255, 0.8);
+                                                                    }
+                                                                    QPushButton:hover {
+                                                                    background-color: #f0f0f0; border-color: #ccc;
+                                                                    }
+                                                                </string>
+                                                            </property>
                                                             <property name="text">
                                                                 <string>显示密码</string>
                                                             </property>
@@ -258,6 +311,7 @@
                                                             <property name="font">
                                                                 <font>
                                                                     <pointsize>-1</pointsize>
+                                                                    <bold>true</bold>
                                                                 </font>
                                                             </property>
                                                             <property name="styleSheet">
@@ -282,7 +336,7 @@
                                             <widget class="QFrame" name="frame2_4">
                                                 <property name="styleSheet">
                                                     <string notr="true">border-radius: 8px;
-                                                        border:0.5px solid black;
+                                                        border:1.1px solid black;
                                                         background-color: rgba(255, 255, 255, 0.8);
                                                         font-size: 14px;
                                                     </string>
@@ -300,7 +354,9 @@
                                                                 <string notr="true">border: none;</string>
                                                             </property>
                                                             <property name="text">
-                                                                <string>账号：</string>
+                                                                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                                    style=&quot; font-size:12pt; font-weight:700;&quot;&gt;账号：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                                </string>
                                                             </property>
                                                         </widget>
                                                     </item>
@@ -311,6 +367,9 @@
                                                                     <width>0</width>
                                                                     <height>30</height>
                                                                 </size>
+                                                            </property>
+                                                            <property name="styleSheet">
+                                                                <string notr="true">border: 0.5px solid black;</string>
                                                             </property>
                                                             <property name="echoMode">
                                                                 <enum>QLineEdit::EchoMode::Password</enum>
@@ -323,7 +382,9 @@
                                                                 <string notr="true">border: none;</string>
                                                             </property>
                                                             <property name="text">
-                                                                <string>密码：</string>
+                                                                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span
+                                                                    style=&quot; font-size:12pt; font-weight:700;&quot;&gt;密码：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                                </string>
                                                             </property>
                                                         </widget>
                                                     </item>
@@ -334,6 +395,9 @@
                                                                     <width>0</width>
                                                                     <height>30</height>
                                                                 </size>
+                                                            </property>
+                                                            <property name="styleSheet">
+                                                                <string notr="true">border: 0.5px solid black;</string>
                                                             </property>
                                                         </widget>
                                                     </item>
@@ -362,15 +426,15 @@
                         <item>
                             <widget class="QLabel" name="label">
                                 <property name="styleSheet">
-                                    <string notr="true">border-radius: 8px;
-                                        border: 1px solid black;
+                                    <string notr="true">border: none;
                                         background-color: rgba(255, 255, 255, 0.8);
-                                        font-size: 14px;
+
                                     </string>
                                 </property>
                                 <property name="text">
                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span
-                                        style=&quot; font-size:11pt;&quot;&gt;启动游戏&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                        style=&quot; font-size:14pt; font-weight:700;&quot;&gt;启动游戏&lt;/span&gt;&lt;span
+                                        style=&quot; font-size:14pt; font-weight:700;&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                                     </string>
                                 </property>
                             </widget>
