@@ -24,6 +24,11 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-repeat: no-repeat;
+                background-position: center;
+                background-color: rgba(255, 255, 255, 0.1);</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QFrame" name="frame_2">
@@ -32,6 +37,11 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-repeat: no-repeat;
+                background-position: center;
+                background-color: rgba(255, 255, 255, 0.6);</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::Shape::StyledPanel</enum>
@@ -43,7 +53,7 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>模拟宇宙</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:700;&quot;&gt;模拟宇宙&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -61,6 +71,12 @@
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <widget class="QFrame" name="frame_4">
+        <property name="styleSheet">
+         <string notr="true">
+border: 1.4px solid black;  font-size: 16px;background-repeat: no-repeat;
+                background-position: center;
+                background-color: rgba(255, 255, 255, 0.6);</string>
+        </property>
         <property name="frameShape">
          <enum>QFrame::Shape::StyledPanel</enum>
         </property>
@@ -70,8 +86,11 @@
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="0" colspan="2">
           <widget class="QLabel" name="label_2">
+           <property name="styleSheet">
+            <string notr="true">border: none;</string>
+           </property>
            <property name="text">
-            <string>差分宇宙：千面英雄</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:700;&quot;&gt;差分宇宙：千面英雄&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -80,8 +99,11 @@
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="label_4">
+           <property name="styleSheet">
+            <string notr="true">border: none;</string>
+           </property>
            <property name="text">
-            <string>次数：</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:700;&quot;&gt;次数：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -103,8 +125,11 @@
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_3">
+           <property name="styleSheet">
+            <string notr="true">border: none;</string>
+           </property>
            <property name="text">
-            <string>模式：</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:700;&quot;&gt;模式：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -113,6 +138,17 @@
          </item>
          <item row="1" column="1">
           <widget class="QComboBox" name="game_mode">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;
+                                                    QCombox{border: solid black;border-radius: 0;font-weight: bold;}
+                                                    QComboBox:hover {
+                                                    background-color: #f0f0f0;
+                                                    border-color: #bbb;
+                                                    }
+                                                    QComboBox QAbstractItemView {
+                                                    selection-background-color: #f0f0f0; background-color: white;
+                                                    }</string>
+           </property>
            <item>
             <property name="text">
              <string>刷单层</string>
@@ -122,8 +158,11 @@
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="label_6">
+           <property name="styleSheet">
+            <string notr="true">border: none;</string>
+           </property>
            <property name="text">
-            <string>选择策略：</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:700;&quot;&gt;选择策略：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -132,6 +171,17 @@
          </item>
          <item row="3" column="1">
           <widget class="QComboBox" name="policy_comboBox">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;
+                                                    QCombox{border: solid black;border-radius: 0;font-weight: bold;}
+                                                    QComboBox:hover {
+                                                    background-color: #f0f0f0;
+                                                    border-color: #bbb;
+                                                    }
+                                                    QComboBox QAbstractItemView {
+                                                    selection-background-color: #f0f0f0; background-color: white;
+                                                    }</string>
+           </property>
            <item>
             <property name="text">
              <string>图鉴优先</string>

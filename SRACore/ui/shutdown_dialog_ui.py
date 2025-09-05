@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'shutdown_dialog.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -80,7 +80,8 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
         self.label.setText(QCoreApplication.translate("Dialog", u"\u60a8\u7684\u8ba1\u7b97\u673a\u5c06\u5728\u5012\u8ba1\u65f6\u7ed3\u675f\u540e\u5173\u673a\uff0c\n"
-"\u5982\u679c\u8981\u53d6\u6d88\u5173\u673a\uff0c\u8bf7\u6309\u201c\u53d6\u6d88\u201d", None))
+"                                        \u5982\u679c\u8981\u53d6\u6d88\u5173\u673a\uff0c\u8bf7\u6309\u201c\u53d6\u6d88\u201d\n"
+"                                    ", None))
         self.cancel_buttion.setText(QCoreApplication.translate("Dialog", u"\u53d6\u6d88", None))
     # retranslateUi
 

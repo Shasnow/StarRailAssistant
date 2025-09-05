@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'trailblaze_power.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -29,15 +29,17 @@ class Ui_TrailblazePowerWidget(object):
         font = QFont()
         font.setPointSize(13)
         TrailblazePowerWidget.setFont(font)
+        TrailblazePowerWidget.setStyleSheet(u"")
         self.gridLayout_8 = QGridLayout(TrailblazePowerWidget)
         self.gridLayout_8.setObjectName(u"gridLayout_8")
         self.scrollArea = QScrollArea(TrailblazePowerWidget)
         self.scrollArea.setObjectName(u"scrollArea")
         self.scrollArea.setMaximumSize(QSize(408, 16777215))
+        self.scrollArea.setStyleSheet(u"border: 1.4px solid black;  font-size: 16px;")
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents_7 = QWidget()
         self.scrollAreaWidgetContents_7.setObjectName(u"scrollAreaWidgetContents_7")
-        self.scrollAreaWidgetContents_7.setGeometry(QRect(0, 0, 313, 960))
+        self.scrollAreaWidgetContents_7.setGeometry(QRect(0, -230, 313, 944))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_7)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.frame2_1 = QFrame(self.scrollAreaWidgetContents_7)
@@ -50,22 +52,6 @@ class Ui_TrailblazePowerWidget(object):
 
         self.gridLayout.addItem(self.horizontalSpacer2_1_22, 1, 1, 1, 1)
 
-        self.useAssist_checkBox = QCheckBox(self.frame2_1)
-        self.useAssist_checkBox.setObjectName(u"useAssist_checkBox")
-
-        self.gridLayout.addWidget(self.useAssist_checkBox, 2, 0, 1, 3)
-
-        self.label2_1_21 = QLabel(self.frame2_1)
-        self.label2_1_21.setObjectName(u"label2_1_21")
-        self.label2_1_21.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.gridLayout.addWidget(self.label2_1_21, 1, 0, 1, 1)
-
-        self.replenish_checkBox = QCheckBox(self.frame2_1)
-        self.replenish_checkBox.setObjectName(u"replenish_checkBox")
-
-        self.gridLayout.addWidget(self.replenish_checkBox, 0, 0, 1, 1)
-
         self.replenish_time_spinBox = QSpinBox(self.frame2_1)
         self.replenish_time_spinBox.setObjectName(u"replenish_time_spinBox")
         self.replenish_time_spinBox.setMinimumSize(QSize(0, 30))
@@ -74,10 +60,12 @@ class Ui_TrailblazePowerWidget(object):
 
         self.gridLayout.addWidget(self.replenish_time_spinBox, 1, 2, 1, 1)
 
-        self.changeLineup_checkBox = QCheckBox(self.frame2_1)
-        self.changeLineup_checkBox.setObjectName(u"changeLineup_checkBox")
+        self.label2_1_21 = QLabel(self.frame2_1)
+        self.label2_1_21.setObjectName(u"label2_1_21")
+        self.label2_1_21.setStyleSheet(u"border:none")
+        self.label2_1_21.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.gridLayout.addWidget(self.changeLineup_checkBox, 3, 0, 1, 3)
+        self.gridLayout.addWidget(self.label2_1_21, 1, 0, 1, 1)
 
         self.replenish_way_comboBox = QComboBox(self.frame2_1)
         self.replenish_way_comboBox.addItem("")
@@ -86,8 +74,35 @@ class Ui_TrailblazePowerWidget(object):
         self.replenish_way_comboBox.addItem("")
         self.replenish_way_comboBox.setObjectName(u"replenish_way_comboBox")
         self.replenish_way_comboBox.setMinimumSize(QSize(0, 30))
+        self.replenish_way_comboBox.setStyleSheet(u"\n"
+"                                                    QCombox{border: solid black;border-radius: 0;font-weight: bold;}\n"
+"                                                    QComboBox:hover {\n"
+"                                                    background-color: #f0f0f0;\n"
+"                                                    border-color: #bbb;\n"
+"                                                    }\n"
+"                                                    QComboBox QAbstractItemView {\n"
+"                                                    selection-background-color: #f0f0f0; background-color: white;\n"
+"                                                    }")
 
         self.gridLayout.addWidget(self.replenish_way_comboBox, 0, 1, 1, 2)
+
+        self.replenish_checkBox = QCheckBox(self.frame2_1)
+        self.replenish_checkBox.setObjectName(u"replenish_checkBox")
+        self.replenish_checkBox.setStyleSheet(u"border:none")
+
+        self.gridLayout.addWidget(self.replenish_checkBox, 0, 0, 1, 1)
+
+        self.useAssist_checkBox = QCheckBox(self.frame2_1)
+        self.useAssist_checkBox.setObjectName(u"useAssist_checkBox")
+        self.useAssist_checkBox.setStyleSheet(u"border:none")
+
+        self.gridLayout.addWidget(self.useAssist_checkBox, 2, 0, 1, 3)
+
+        self.changeLineup_checkBox = QCheckBox(self.frame2_1)
+        self.changeLineup_checkBox.setObjectName(u"changeLineup_checkBox")
+        self.changeLineup_checkBox.setStyleSheet(u"border:none")
+
+        self.gridLayout.addWidget(self.changeLineup_checkBox, 3, 0, 1, 3)
 
 
         self.verticalLayout_3.addWidget(self.frame2_1)
@@ -104,6 +119,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label2_2_21 = QLabel(self.frame2_2)
         self.label2_2_21.setObjectName(u"label2_2_21")
+        self.label2_2_21.setStyleSheet(u"border:none")
 
         self.gridLayout_2.addWidget(self.label2_2_21, 2, 0, 1, 1)
 
@@ -146,11 +162,21 @@ class Ui_TrailblazePowerWidget(object):
         sizePolicy1.setHeightForWidth(self.ornamentExtraction_comboBox.sizePolicy().hasHeightForWidth())
         self.ornamentExtraction_comboBox.setSizePolicy(sizePolicy1)
         self.ornamentExtraction_comboBox.setMinimumSize(QSize(0, 30))
+        self.ornamentExtraction_comboBox.setStyleSheet(u"\n"
+"                                                    QCombox{border: solid black;border-radius: 0;font-weight: bold;}\n"
+"                                                    QComboBox:hover {\n"
+"                                                    background-color: #f0f0f0;\n"
+"                                                    border-color: #bbb;\n"
+"                                                    }\n"
+"                                                    QComboBox QAbstractItemView {\n"
+"                                                    selection-background-color: #f0f0f0; background-color: white;\n"
+"                                                    }")
 
         self.gridLayout_2.addWidget(self.ornamentExtraction_comboBox, 1, 0, 1, 4)
 
         self.label_2 = QLabel(self.frame2_2)
         self.label_2.setObjectName(u"label_2")
+        self.label_2.setStyleSheet(u"border:none")
         self.label_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_2.addWidget(self.label_2, 0, 0, 1, 4)
@@ -174,6 +200,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label2_3_21 = QLabel(self.frame2_3)
         self.label2_3_21.setObjectName(u"label2_3_21")
+        self.label2_3_21.setStyleSheet(u"border:none")
 
         self.gridLayout_3.addWidget(self.label2_3_21, 2, 0, 1, 1)
 
@@ -195,6 +222,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label2_3_31 = QLabel(self.frame2_3)
         self.label2_3_31.setObjectName(u"label2_3_31")
+        self.label2_3_31.setStyleSheet(u"border:none")
 
         self.gridLayout_3.addWidget(self.label2_3_31, 3, 0, 1, 1)
 
@@ -222,11 +250,21 @@ class Ui_TrailblazePowerWidget(object):
         self.calyxGolden_comboBox.addItem("")
         self.calyxGolden_comboBox.setObjectName(u"calyxGolden_comboBox")
         self.calyxGolden_comboBox.setMinimumSize(QSize(200, 30))
+        self.calyxGolden_comboBox.setStyleSheet(u"\n"
+"                                                    QCombox{border: solid black;border-radius: 0;font-weight: bold;}\n"
+"                                                    QComboBox:hover {\n"
+"                                                    background-color: #f0f0f0;\n"
+"                                                    border-color: #bbb;\n"
+"                                                    }\n"
+"                                                    QComboBox QAbstractItemView {\n"
+"                                                    selection-background-color: #f0f0f0; background-color: white;\n"
+"                                                    }")
 
         self.gridLayout_3.addWidget(self.calyxGolden_comboBox, 1, 0, 1, 4)
 
         self.label_3 = QLabel(self.frame2_3)
         self.label_3.setObjectName(u"label_3")
+        self.label_3.setStyleSheet(u"border:none")
         self.label_3.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_3.addWidget(self.label_3, 0, 0, 1, 4)
@@ -274,11 +312,13 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label2_4_21 = QLabel(self.frame2_4)
         self.label2_4_21.setObjectName(u"label2_4_21")
+        self.label2_4_21.setStyleSheet(u"border:none")
 
         self.gridLayout_4.addWidget(self.label2_4_21, 3, 0, 1, 1)
 
         self.label2_4_31 = QLabel(self.frame2_4)
         self.label2_4_31.setObjectName(u"label2_4_31")
+        self.label2_4_31.setStyleSheet(u"border:none")
 
         self.gridLayout_4.addWidget(self.label2_4_31, 4, 0, 1, 1)
 
@@ -301,11 +341,21 @@ class Ui_TrailblazePowerWidget(object):
         self.calyxCrimson_comboBox.addItem("")
         self.calyxCrimson_comboBox.setObjectName(u"calyxCrimson_comboBox")
         self.calyxCrimson_comboBox.setMinimumSize(QSize(200, 30))
+        self.calyxCrimson_comboBox.setStyleSheet(u"\n"
+"                                                    QCombox{border: solid black;border-radius: 0;font-weight: bold;}\n"
+"                                                    QComboBox:hover {\n"
+"                                                    background-color: #f0f0f0;\n"
+"                                                    border-color: #bbb;\n"
+"                                                    }\n"
+"                                                    QComboBox QAbstractItemView {\n"
+"                                                    selection-background-color: #f0f0f0; background-color: white;\n"
+"                                                    }")
 
         self.gridLayout_4.addWidget(self.calyxCrimson_comboBox, 1, 0, 1, 4)
 
         self.label_4 = QLabel(self.frame2_4)
         self.label_4.setObjectName(u"label_4")
+        self.label_4.setStyleSheet(u"border:none")
         self.label_4.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_4.addWidget(self.label_4, 0, 0, 1, 4)
@@ -328,6 +378,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label2_5_21 = QLabel(self.frame2_5)
         self.label2_5_21.setObjectName(u"label2_5_21")
+        self.label2_5_21.setStyleSheet(u"border:none")
 
         self.gridLayout_5.addWidget(self.label2_5_21, 3, 0, 1, 1)
 
@@ -373,11 +424,21 @@ class Ui_TrailblazePowerWidget(object):
         self.stagnantShadow_comboBox.addItem("")
         self.stagnantShadow_comboBox.setObjectName(u"stagnantShadow_comboBox")
         self.stagnantShadow_comboBox.setMinimumSize(QSize(220, 30))
+        self.stagnantShadow_comboBox.setStyleSheet(u"\n"
+"                                                    QCombox{border: solid black;border-radius: 0;font-weight: bold;}\n"
+"                                                    QComboBox:hover {\n"
+"                                                    background-color: #f0f0f0;\n"
+"                                                    border-color: #bbb;\n"
+"                                                    }\n"
+"                                                    QComboBox QAbstractItemView {\n"
+"                                                    selection-background-color: #f0f0f0; background-color: white;\n"
+"                                                    }")
 
         self.gridLayout_5.addWidget(self.stagnantShadow_comboBox, 1, 0, 1, 4)
 
         self.label_5 = QLabel(self.frame2_5)
         self.label_5.setObjectName(u"label_5")
+        self.label_5.setStyleSheet(u"border:none")
         self.label_5.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_5.addWidget(self.label_5, 0, 0, 1, 4)
@@ -393,6 +454,7 @@ class Ui_TrailblazePowerWidget(object):
         self.gridLayout_6.setObjectName(u"gridLayout_6")
         self.label2_6_21 = QLabel(self.frame2_6)
         self.label2_6_21.setObjectName(u"label2_6_21")
+        self.label2_6_21.setStyleSheet(u"border:none")
 
         self.gridLayout_6.addWidget(self.label2_6_21, 2, 0, 1, 1)
 
@@ -418,6 +480,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label_6 = QLabel(self.frame2_6)
         self.label_6.setObjectName(u"label_6")
+        self.label_6.setStyleSheet(u"border:none")
         self.label_6.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_6.addWidget(self.label_6, 0, 0, 1, 4)
@@ -439,6 +502,15 @@ class Ui_TrailblazePowerWidget(object):
         self.caverOfCorrosion_comboBox.addItem("")
         self.caverOfCorrosion_comboBox.setObjectName(u"caverOfCorrosion_comboBox")
         self.caverOfCorrosion_comboBox.setMinimumSize(QSize(0, 30))
+        self.caverOfCorrosion_comboBox.setStyleSheet(u"\n"
+"                                                    QCombox{border: solid black;border-radius: 0;font-weight: bold;}\n"
+"                                                    QComboBox:hover {\n"
+"                                                    background-color: #f0f0f0;\n"
+"                                                    border-color: #bbb;\n"
+"                                                    }\n"
+"                                                    QComboBox QAbstractItemView {\n"
+"                                                    selection-background-color: #f0f0f0; background-color: white;\n"
+"                                                    }")
 
         self.gridLayout_6.addWidget(self.caverOfCorrosion_comboBox, 1, 0, 1, 4)
 
@@ -465,6 +537,7 @@ class Ui_TrailblazePowerWidget(object):
 
         self.label2_7_21 = QLabel(self.frame2_7)
         self.label2_7_21.setObjectName(u"label2_7_21")
+        self.label2_7_21.setStyleSheet(u"border:none")
 
         self.gridLayout_7.addWidget(self.label2_7_21, 2, 0, 1, 1)
 
@@ -488,11 +561,21 @@ class Ui_TrailblazePowerWidget(object):
         self.echoOfWar_comboBox.addItem("")
         self.echoOfWar_comboBox.setObjectName(u"echoOfWar_comboBox")
         self.echoOfWar_comboBox.setMinimumSize(QSize(0, 30))
+        self.echoOfWar_comboBox.setStyleSheet(u"\n"
+"                                                    QCombox{border: solid black;border-radius: 0;font-weight: bold;}\n"
+"                                                    QComboBox:hover {\n"
+"                                                    background-color: #f0f0f0;\n"
+"                                                    border-color: #bbb;\n"
+"                                                    }\n"
+"                                                    QComboBox QAbstractItemView {\n"
+"                                                    selection-background-color: #f0f0f0; background-color: white;\n"
+"                                                    }")
 
         self.gridLayout_7.addWidget(self.echoOfWar_comboBox, 1, 0, 1, 4)
 
         self.label_7 = QLabel(self.frame2_7)
         self.label_7.setObjectName(u"label_7")
+        self.label_7.setStyleSheet(u"border:none")
         self.label_7.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout_7.addWidget(self.label_7, 0, 0, 1, 4)
@@ -506,18 +589,16 @@ class Ui_TrailblazePowerWidget(object):
 
         self.frame_1 = QFrame(TrailblazePowerWidget)
         self.frame_1.setObjectName(u"frame_1")
+        self.frame_1.setStyleSheet(u"border: 1.4px solid black;  font-size: 16px;background-color: rgba(255, 255, 255, 0.4);")
         self.frame_1.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame_1.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame_1)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.label = QLabel(self.frame_1)
         self.label.setObjectName(u"label")
+        self.label.setStyleSheet(u"border:none")
 
         self.horizontalLayout.addWidget(self.label)
-
-        self.horizontalSpacer = QSpacerItem(329, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontalSpacer)
 
 
         self.gridLayout_8.addWidget(self.frame_1, 0, 0, 1, 2)
@@ -552,16 +633,16 @@ class Ui_TrailblazePowerWidget(object):
 
     def retranslateUi(self, TrailblazePowerWidget):
         TrailblazePowerWidget.setWindowTitle(QCoreApplication.translate("TrailblazePowerWidget", u"Form", None))
-        self.useAssist_checkBox.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u4f7f\u7528\u652f\u63f4\u89d2\u8272", None))
-        self.label2_1_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"  \u6b21\u6570\uff1a", None))
-        self.replenish_checkBox.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u8865\u5145\u4f53\u529b", None))
-        self.changeLineup_checkBox.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u91cd\u65b0\u7f16\u961f", None))
+        self.label2_1_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">\u6b21\u6570\uff1a</span></p></body></html>", None))
         self.replenish_way_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"---\u65b9\u5f0f---", None))
         self.replenish_way_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u540e\u5907", None))
         self.replenish_way_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u71c3\u6599", None))
         self.replenish_way_comboBox.setItemText(3, QCoreApplication.translate("TrailblazePowerWidget", u"\u661f\u743c", None))
 
-        self.label2_2_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
+        self.replenish_checkBox.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u8865\u5145\u4f53\u529b", None))
+        self.useAssist_checkBox.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u4f7f\u7528\u652f\u63f4\u89d2\u8272", None))
+        self.changeLineup_checkBox.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u91cd\u65b0\u7f16\u961f", None))
+        self.label2_2_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u6b21\u6570\uff1a</span></p></body></html>", None))
         self.ornamentExtractionAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.ornamentExtraction_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
         self.ornamentExtraction_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u6708\u4e0b\u6731\u6bb7\uff08\u5996\u7cbe/\u6d77\u9685\uff09", None))
@@ -576,10 +657,10 @@ class Ui_TrailblazePowerWidget(object):
         self.ornamentExtraction_comboBox.setItemText(10, QCoreApplication.translate("TrailblazePowerWidget", u"\u6d74\u706b\u94a2\u5fc3\uff08\u5854\u5229\u4e9a/\u7fc1\u74e6\u514b\uff09", None))
         self.ornamentExtraction_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget", u"\u575a\u57ce\u4e0d\u5012\uff08\u592a\u7a7a\u5c01\u5370\u7ad9/\u4ed9\u821f\uff09", None))
 
-        self.label_2.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u9970\u54c1\u63d0\u53d6", None))
-        self.label2_3_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u8fde\u7eed\u4f5c\u6218\uff1a", None))
+        self.label_2.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">\u9970\u54c1\u63d0\u53d6</span></p></body></html>", None))
+        self.label2_3_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u8fde\u7eed\u4f5c\u6218\uff1a</span></p></body></html>", None))
         self.calyxGoldenAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
-        self.label2_3_31.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6267\u884c\u6b21\u6570\uff1a", None))
+        self.label2_3_31.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u6267\u884c\u6b21\u6570\uff1a</span></p></body></html>", None))
         self.calyxGolden_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
         self.calyxGolden_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u56de\u5fc6\u4e4b\u857e\uff08\u7fc1\u6cd5\u7f57\u65af\uff09", None))
         self.calyxGolden_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u4ee5\u592a\u4e4b\u857e\uff08\u7fc1\u6cd5\u7f57\u65af\uff09", None))
@@ -594,10 +675,10 @@ class Ui_TrailblazePowerWidget(object):
         self.calyxGolden_comboBox.setItemText(11, QCoreApplication.translate("TrailblazePowerWidget", u"\u4ee5\u592a\u4e4b\u857e\uff08\u96c5\u5229\u6d1bVI\uff09", None))
         self.calyxGolden_comboBox.setItemText(12, QCoreApplication.translate("TrailblazePowerWidget", u"\u73cd\u85cf\u4e4b\u857e\uff08\u96c5\u5229\u6d1bVI\uff09", None))
 
-        self.label_3.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u62df\u9020\u82b1\u843c\uff08\u91d1\uff09", None))
+        self.label_3.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">\u62df\u9020\u82b1\u843c\uff08\u91d1\uff09</span></p></body></html>", None))
         self.calyxCrimsonAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
-        self.label2_4_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u8fde\u7eed\u4f5c\u6218\uff1a", None))
-        self.label2_4_31.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6267\u884c\u6b21\u6570\uff1a", None))
+        self.label2_4_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u8fde\u7eed\u4f5c\u6218\uff1a</span></p></body></html>", None))
+        self.label2_4_31.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u6267\u884c\u6b21\u6570\uff1a</span></p></body></html>", None))
         self.calyxCrimson_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
         self.calyxCrimson_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u6708\u72c2\u7360\u7259\uff08\u6bc1\u706d\uff09", None))
         self.calyxCrimson_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u51c0\u4e16\u6b8b\u5203\uff08\u6bc1\u706d\uff09", None))
@@ -615,8 +696,8 @@ class Ui_TrailblazePowerWidget(object):
         self.calyxCrimson_comboBox.setItemText(14, QCoreApplication.translate("TrailblazePowerWidget", u"\u6c89\u6ca6\u9ed1\u66dc\uff08\u865a\u65e0\uff09", None))
         self.calyxCrimson_comboBox.setItemText(15, QCoreApplication.translate("TrailblazePowerWidget", u"\u963f\u8d56\u8036\u534e\uff08\u8bb0\u5fc6\uff09", None))
 
-        self.label_4.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u62df\u9020\u82b1\u843c\uff08\u8d64\uff09", None))
-        self.label2_5_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
+        self.label_4.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">\u62df\u9020\u82b1\u843c\uff08\u8d64\uff09</span></p></body></html>", None))
+        self.label2_5_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u6b21\u6570\uff1a</span></p></body></html>", None))
         self.stagnantShadowAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.stagnantShadow_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
         self.stagnantShadow_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u4fb5\u7565\u51dd\u5757\uff08\u7269\u7406\uff09", None))
@@ -645,10 +726,10 @@ class Ui_TrailblazePowerWidget(object):
         self.stagnantShadow_comboBox.setItemText(24, QCoreApplication.translate("TrailblazePowerWidget", u"\u9547\u7075\u6555\u7b26\uff08\u865a\u6570\uff09", None))
         self.stagnantShadow_comboBox.setItemText(25, QCoreApplication.translate("TrailblazePowerWidget", u"\u5f80\u65e5\u4e4b\u5f71\u7684\u91d1\u9970\uff08\u865a\u6570\uff09", None))
 
-        self.label_5.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u51dd\u6ede\u865a\u5f71", None))
-        self.label2_6_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
+        self.label_5.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u51dd\u6ede\u865a\u5f71</span></p></body></html>", None))
+        self.label2_6_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u6b21\u6570\uff1a</span></p></body></html>", None))
         self.caverOfCorrosionAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
-        self.label_6.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u4fb5\u8680\u96a7\u6d1e", None))
+        self.label_6.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u4fb5\u8680\u96a7\u6d1e</span></p></body></html>", None))
         self.caverOfCorrosion_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
         self.caverOfCorrosion_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u96f3\u52c7\u4e4b\u5f84\uff08\u5973\u6b66\u795e/\u8239\u957f\uff09", None))
         self.caverOfCorrosion_comboBox.setItemText(2, QCoreApplication.translate("TrailblazePowerWidget", u"\u5f26\u6b4c\u4e4b\u5f84\uff08\u82f1\u8c6a/\u8bd7\u4eba\uff09", None))
@@ -664,7 +745,7 @@ class Ui_TrailblazePowerWidget(object):
         self.caverOfCorrosion_comboBox.setItemText(12, QCoreApplication.translate("TrailblazePowerWidget", u"\u8fc5\u62f3\u4e4b\u5f84\uff08\u62f3\u7687/\u602a\u76d7\uff09", None))
         self.caverOfCorrosion_comboBox.setItemText(13, QCoreApplication.translate("TrailblazePowerWidget", u"\u971c\u98ce\u4e4b\u5f84\uff08\u51b0/\u98ce\u5957\uff09", None))
 
-        self.label2_7_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"      \u6b21\u6570\uff1a", None))
+        self.label2_7_21.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u6b21\u6570\uff1a</span></p></body></html>", None))
         self.echoOfWarAddButton.setText(QCoreApplication.translate("TrailblazePowerWidget", u"+", None))
         self.echoOfWar_comboBox.setItemText(0, QCoreApplication.translate("TrailblazePowerWidget", u"-----\u9009\u62e9\u526f\u672c-----", None))
         self.echoOfWar_comboBox.setItemText(1, QCoreApplication.translate("TrailblazePowerWidget", u"\u6668\u660f\u7684\u56de\u7738", None))
@@ -675,8 +756,8 @@ class Ui_TrailblazePowerWidget(object):
         self.echoOfWar_comboBox.setItemText(6, QCoreApplication.translate("TrailblazePowerWidget", u"\u5bd2\u6f6e\u7684\u843d\u5e55", None))
         self.echoOfWar_comboBox.setItemText(7, QCoreApplication.translate("TrailblazePowerWidget", u"\u6bc1\u706d\u7684\u5f00\u7aef", None))
 
-        self.label_7.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u5386\u6218\u4f59\u54cd", None))
-        self.label.setText(QCoreApplication.translate("TrailblazePowerWidget", u"\u6e05\u5f00\u62d3\u529b", None))
+        self.label_7.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:700;\">\u5386\u6218\u4f59\u54cd</span></p></body></html>", None))
+        self.label.setText(QCoreApplication.translate("TrailblazePowerWidget", u"<html><head/><body><p align=\"center\"><span style=\" font-size:16pt; font-weight:700;\">\u6e05\u5f00\u62d3\u529b</span></p></body></html>", None))
 
         __sortingEnabled = self.task_listWidget.isSortingEnabled()
         self.task_listWidget.setSortingEnabled(False)

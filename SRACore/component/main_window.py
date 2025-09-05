@@ -1,8 +1,8 @@
 import json
 import random
 
-from PySide6.QtCore import Slot, QThread, Signal
-from PySide6.QtGui import QIcon
+from PySide6.QtCore import Slot, QThread, Signal, Qt
+from PySide6.QtGui import QIcon, QPixmap, QPalette, QBrush
 from PySide6.QtWidgets import QMainWindow
 
 from SRACore.component.common import SRAComponent
@@ -288,3 +288,22 @@ class MainWindowComponent(QMainWindow):
 
     def set_tray(self, tray):
         self.tray = tray
+
+        self.set_background_image("resources/background_image.png")
+
+    def set_background_image(self, image_path):
+        pixmap = QPixmap(image_path)
+
+        scaled_pixmap = pixmap.scaled(
+            self.size(),
+            Qt.KeepAspectRatioByExpanding,
+            Qt.SmoothTransformation
+        )
+
+        palette = self.palette()
+        palette.setBrush(QPalette.Window, QBrush(scaled_pixmap))
+        self.setPalette(palette)
+
+    def resizeEvent(self, event):
+        self.set_background_image("resources/background_image.png")
+        super().resizeEvent(event)
