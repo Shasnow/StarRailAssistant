@@ -79,7 +79,7 @@ class TaskManager(QThread):
                             return  # 终止当前配置的执行
                     except Exception as e:
                         # 捕获任务执行中的异常（如未处理的错误）
-                        logger.error(f"Task '{task.__class__.__name__}' crashed: {str(e)}")
+                        logger.exception(f"Task '{task.__class__.__name__}' crashed: {str(e)}")
                         break
 
             logger.info("All tasks completed.")
