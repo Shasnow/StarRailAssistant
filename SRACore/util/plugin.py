@@ -88,7 +88,7 @@ class PluginManager:
                 continue
 
     @classmethod
-    def getPlugins(cls) -> dict[str, PluginBase]:
+    def getPlugins(cls) -> dict:
         return cls.plugins
 
     @classmethod

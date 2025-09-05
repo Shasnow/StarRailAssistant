@@ -8,11 +8,16 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect)
-from PySide6.QtGui import (QFont)
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QGridLayout,
-                               QGroupBox, QLabel, QPushButton, QScrollArea,
-                               QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QGridLayout,
+    QGroupBox, QLabel, QPushButton, QScrollArea,
+    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
 class Ui_MultiAccountWidget(object):
     def setupUi(self, MultiAccountWidget):
@@ -126,16 +131,6 @@ class Ui_MultiAccountWidget(object):
 
     def retranslateUi(self, MultiAccountWidget):
         MultiAccountWidget.setWindowTitle(QCoreApplication.translate("MultiAccountWidget", u"Form", None))
-        self.groupBox.setTitle("")
-        self.new_plan_button.setText(
-            QCoreApplication.translate("MultiAccountWidget", u"\u65b0\u5efa\u65b9\u6848", None))
-        self.label.setText(QCoreApplication.translate("MultiAccountWidget",
-                                                      u"<html><head/><body><p align=\"center\"><span style=\" font-size:11pt;\">\u5f53\u524d\u914d\u7f6e\u65b9\u6848</span></p></body></html>",
-                                                      None))
-        self.switch2next_checkbox.setText(QCoreApplication.translate("MultiAccountWidget",
-                                                                     u"\u5f53\u524d\u65b9\u6848\u7ed3\u675f\u65f6\u5207\u6362\u4e0b\u4e00\u4e2a\u65b9\u6848",
-                                                                     None))
-        self.delete_plan_button.setText(
-            QCoreApplication.translate("MultiAccountWidget", u"\u5220\u9664\u65b9\u6848", None))
+
     # retranslateUi
 

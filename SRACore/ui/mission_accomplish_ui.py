@@ -8,11 +8,16 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QMetaObject, QSize)
-from PySide6.QtGui import (QFont)
-from PySide6.QtWidgets import (QCheckBox, QFrame, QGridLayout,
-                               QHBoxLayout, QLabel, QRadioButton, QSizePolicy,
-                               QSpacerItem, QVBoxLayout)
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QGridLayout,
+    QHBoxLayout, QLabel, QRadioButton, QSizePolicy,
+    QSpacerItem, QVBoxLayout, QWidget)
 
 class Ui_MissionAccomplishWidget(object):
     def setupUi(self, MissionAccomplishWidget):
@@ -161,15 +166,7 @@ class Ui_MissionAccomplishWidget(object):
 
     def retranslateUi(self, MissionAccomplishWidget):
         MissionAccomplishWidget.setWindowTitle(QCoreApplication.translate("MissionAccomplishWidget", u"Form", None))
-        self.title_label.setText(
-            QCoreApplication.translate("MissionAccomplishWidget", u"\u4efb\u52a1\u7ed3\u675f", None))
-        self.label.setText(QCoreApplication.translate("MissionAccomplishWidget",
-                                                      u"<html><head/><body><p><span style=\" font-size:12pt;\">\u4efb\u52a1\u7ed3\u675f\u540e\uff1a</span></p></body></html>",
-                                                      None))
-        self.log_out_checkbox.setText(
-            QCoreApplication.translate("MissionAccomplishWidget", u"\u767b\u51fa\u5f53\u524d\u8d26\u53f7", None))
-        self.quit_game_checkbox.setText(
-            QCoreApplication.translate("MissionAccomplishWidget", u"\u9000\u51fa\u6e38\u620f", None))
+
         self.quit_sra_checkbox.setText(QCoreApplication.translate("MissionAccomplishWidget", u"\u9000\u51faSRA", None))
         self.shutdown_button.setText(QCoreApplication.translate("MissionAccomplishWidget", u"\u5173\u673a", None))
         self.hibernate_button.setText(QCoreApplication.translate("MissionAccomplishWidget", u"\u4f11\u7720", None))

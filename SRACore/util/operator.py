@@ -6,6 +6,8 @@ from typing import overload
 import cv2
 import pyautogui
 import pygetwindow
+# noinspection PyPackageRequirements
+# (pyperclip is in pyautogui requirements)
 import pyperclip
 import pyscreeze
 from PIL.Image import Image
@@ -25,7 +27,6 @@ class Region:
     def tuple(self):
         """将Region转换为元组"""
         return self.left, self.top, self.width, self.height
-
 
 @dataclasses.dataclass
 class Box:
@@ -100,7 +101,7 @@ class Operator:
     def screenshot_region(self, region: Region | None = None):
         """截图"""
         if region is None:
-            region = self.get_win_region()
+            region = self.get_win_region(active_window=True)
             time.sleep(0.5)
         return pyscreeze.screenshot(region=region.tuple)
 
@@ -122,7 +123,7 @@ class Operator:
     def screenshot(self, from_x: float, from_y: float, to_x: float, to_y: float) -> Image:
         ...
 
-    def screenshot(self, *args, **kwargs):
+    def screenshot(self, *args, **_):
         """截图"""
         if len(args) == 0:
             return self.screenshot_region()
@@ -147,7 +148,7 @@ class Operator:
             if not Path(img_path).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
             img = cv2.imread(img_path)
-            box = pyscreeze.locate(img, self.screenshot(region), confidence=self.confidence)
+            box=pyscreeze.locate(img, self.screenshot(region), confidence=self.confidence)
             return Box(box.left, box.top, box.width, box.height)
         except Exception as e:
             if trace:
@@ -186,10 +187,19 @@ class Operator:
     def locate_any_in_region(self, img_paths: list[str], region: Region | None = None, trace: bool = True) -> tuple[
         int, pyscreeze.Box | None]:
         """在窗口内查找任意一张图片位置"""
+        screenshot = self.screenshot(region=region)
         for img_path in img_paths:
-            box = self.locate_in_region(img_path, region, trace)
+            if not Path(img_path).exists():
+                raise FileNotFoundError("无法找到或读取文件 " + img_path)
+            img=cv2.imread(img_path)
+            try:
+                box = pyscreeze.locate(img, screenshot, confidence=self.confidence)
+            except pyscreeze.ImageNotFoundException as e:
+                if trace:
+                    logger.trace(f"ImageNotFound: {img_path} -> {e}")
+                continue
             if box is not None:
-                return img_paths.index(img_path), box
+                return img_paths.index(img_path), Box(box.left, box.top, box.width, box.height)
         return -1, None
 
     def locate_any_in_tuple(self,
@@ -209,11 +219,11 @@ class Operator:
         :param trace: 是否打印调试信息
         :return: tuple[int, Box | None] - 找到的图片索引和位置，如果未找到则返回-1和None
         """
-        for img_path in img_paths:
-            box = self.locate_in_tuple(img_path, from_x, from_y, to_x, to_y, trace)
-            if box is not None:
-                return img_paths.index(img_path), box
-        return -1, None
+        left= int(self.left + self.width * from_x)
+        top= int(self.top + self.height * from_y)
+        width= int(self.width * (to_x - from_x))
+        height= int(self.height * (to_y - from_y))
+        return self.locate_any_in_region(img_paths, Region(left, top, width, height), trace)
 
     @overload
     def locate_any(self, img_paths: list[str], region: Region | None = None, trace: bool = True) -> tuple[
@@ -302,35 +312,36 @@ class Operator:
             return False
         return self.click_box(box, x_offset, y_offset, after_sleep)
 
-    def wait_img(self, img_path: str, timeout: int = 10, interval: float = 0.5) -> bool:
+    def wait_img(self, img_path: str, timeout: int = 10, interval: float = 0.5) -> Box | None:
         """
         等待图片出现
         :param img_path: 模板图片路径
         :param timeout: 超时时间，单位秒
-        :param interval: 检查间隔时间，单位秒，默认为0.2秒
+        :param interval: 检查间隔时间，单位秒，默认为0.5秒
         :return: bool - 是否找到图片
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
-            if self.locate(img_path) is not None:
-                return True
+            box= self.locate(img_path)
+            if box is not None:
+                return box
             time.sleep(interval)
         logger.debug(f"Timeout: {img_path} -> Not found in {timeout} seconds")
-        return False
+        return None
 
     def wait_any_img(self, img_paths: list[str], timeout: int = 10, interval: float = 0.5) -> int:
         """
         等待任意一张图片出现
         :param img_paths: 模板图片路径列表
         :param timeout: 超时时间，单位秒
-        :param interval: 检查间隔时间，单位秒，默认为0.2秒
+        :param interval: 检查间隔时间，单位秒，默认为0.5秒
         :return: int - 找到的图片索引，如果未找到则返回-1
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
-            for img_path in img_paths:
-                if self.locate(img_path) is not None:
-                    return img_paths.index(img_path)
+            index, _ = self.locate_any(img_paths)
+            if index != -1:
+                return index
             time.sleep(interval)
         logger.debug(f"Timeout: {img_paths} -> Not found in {timeout} seconds")
         return -1

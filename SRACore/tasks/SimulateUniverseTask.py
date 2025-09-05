@@ -33,9 +33,9 @@ class SimulateUniverseTask(BaseTask):
     def _start_differential_universe(self, exe_time):
         """开始差分宇宙任务"""
         logger.info(f"第{exe_time + 1}次进入差分宇宙，少女祈祷中…")
-
+        box = self.wait_img("resources/img/differential_universe_start.png")
         # 点击开始按钮
-        if not self.click_img("resources/img/differential_universe_start.png"):
+        if not self.click_box(box):
             logger.error("发生错误，错误编号18")
             return False
 
@@ -101,17 +101,18 @@ class SimulateUniverseTask(BaseTask):
         while True:
             index = self.wait_any_img([
                 "resources/img/blessing_select.png",
+                "resources/img/equation_select.png",
+                "resources/img/curiosity_select.png",
                 "resources/img/equation_expansion.png",
                 "resources/img/close.png",
-                "resources/img/equation_select.png",
                 "resources/img/divergent_universe_quit.png"
-            ])
+            ],interval=0)
 
-            if index == 0 or index == 3:  # 祝福选择或方程式选择
+            if index == 0 or index == 1 or index==2:  # 祝福选择或方程式选择或奇物选择
                 if not self.click_img("resources/img/collection.png"):
                     self.click_point(0.5, 0.5, x_offset=-100)
                 self.click_img("resources/img/ensure2.png", after_sleep=1)
-            elif index == 1 or index == 2:  # 方程式扩展或关闭
+            elif index == 3 or index == 4:  # 方程式扩展或关闭
                 self.press_key('esc')
             else:  # 退出
                 break
@@ -144,7 +145,7 @@ class SimulateUniverseTask(BaseTask):
         定位到差分宇宙页面。
         :return: None
         """
-        page = self.wait_any_img(["resources/img/enter.png", "resources/img/differential_universe_start.png"])
+        page = self.wait_any_img(["resources/img/enter.png", "resources/img/differential_universe_start.png","resources/img/bonus points.png"])
         if page == 0:
             self.press_key(self.gcm.get('key_f4', 'f4'))
             if not self.wait_img("resources/img/f4.png", timeout=20):
@@ -152,9 +153,11 @@ class SimulateUniverseTask(BaseTask):
                 self.press_key("esc")
             self.click_point(0.3125, 0.20, after_sleep=0.5)  # 差分宇宙
             self.click_point(0.7786, 0.8194, after_sleep=1)  # 周期演算
-            self.wait_img("resources/img/differential_universe_start.png", timeout=10, interval=0.2)
             return True
         elif page == 1:
+            return True
+        elif page == 2:
+            self.press_key('esc')
             return True
         else:
             logger.error("检测超时")

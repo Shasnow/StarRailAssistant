@@ -1,6 +1,5 @@
 from SRACore.tasks.BaseTask import BaseTask
 from SRACore.util.logger import logger
-from SRACore.util.operator import Executable
 
 
 class TrailblazePowerTask(BaseTask):
@@ -169,41 +168,42 @@ class TrailblazePowerTask(BaseTask):
         if not self.find_session_name(level_belonging, scroll_flag):
             return False
         if not self.find_level(level):
-            return None
+            return False
         if self.click_img(level, x_offset=x_add, y_offset=y_add):
             if not self.wait_img('resources/img/battle.png', timeout=20):  # 等待传送
                 logger.error("检测超时，编号4")
-                return None
+                return False
             if multi is not None:
                 for _ in range(multi - 1):
-                    self.sleep(0.5)
+                    self.sleep(0.2)
                     self.click_img("resources/img/plus.png")
-                self.sleep(2)
+                self.sleep(1)
             if not self.click_img("resources/img/battle.png", after_sleep=1):
                 logger.error("发生错误，错误编号3")
-                return None
+                return False
             if self.locate("resources/img/replenish.png"):
-                if self.replenish_flag:
+                if self.replenish_flag and self.replenish_time!=0:
                     self.replenish(self.replenish_way)
                     self.click_img("resources/img/battle.png")
                 else:
                     logger.info("体力不足")
                     self.press_key("esc", interval=1, presses=3)
-                    return None
+                    return False
             if self.config["use_assistant"]:
                 self.support()
             if not self.click_img("resources/img/battle_star.png", after_sleep=1):
                 logger.error("发生错误，错误编号4")
-
+                self.press_key("esc", interval=1, presses=3)
+                return False
             if self.locate("resources/img/limit.png"):
                 logger.warning("背包内遗器已达上限，请先清理")
                 self.sleep(3)
                 self.press_key("esc", interval=1, presses=3)
-                return None
+                return False
             if self.locate("resources/img/ensure.png"):
                 logger.info("编队中存在无法战斗的角色")
                 self.press_key("esc", presses=3, interval=1.5)
-                return None
+                return False
             else:
                 self.battle_star(run_time)
         logger.info(f"任务完成：{mission_name}")
@@ -237,10 +237,10 @@ class TrailblazePowerTask(BaseTask):
                     if not self.click_img("resources/img/quit_battle.png"):
                         logger.error("发生错误，错误编号12")
                     logger.info("退出战斗")
-                    resources, _ = self.locate_any(["resources/img/battle.png", "resources/img/enter.png"])
-                    if resources == 0:
+                    result = self.wait_any_img(["resources/img/battle.png", "resources/img/enter.png"], timeout=10)
+                    if result == 0:
                         self.press_key("esc", wait=1)
-                    elif resources == 1:
+                    elif result == 1:
                         pass
                     break
             if self.config["use_assistant"]:
@@ -303,10 +303,10 @@ class TrailblazePowerTask(BaseTask):
                     self.scroll(-1)
 
     def support(self):
-        if self.click_img("resources/img/remove_support.png", after_sleep=2):
+        if self.click_img("resources/img/remove_support.png", after_sleep=1):
             self.move_rel(0, 100)
-        if self.click_img("resources/img/support.png", after_sleep=2):
-            self.click_img("resources/img/enter_line.png", after_sleep=2)
+        if self.click_img("resources/img/support.png", after_sleep=1):
+            self.click_img("resources/img/enter_line.png", after_sleep=1)
 
     def find_session_name(self, name, scroll_flag=False):
         name1 = "resources/img/" + name + ".png"
@@ -331,7 +331,7 @@ class TrailblazePowerTask(BaseTask):
             self.move_rel(0, 100)
             for i in range(10):
                 self.scroll(-5)
-        self.sleep(1)
+        self.sleep(0.5)
         _, result = self.locate_any([name1, name2])
         if result:
             self.click_box(result)
@@ -357,6 +357,7 @@ class TrailblazePowerTask(BaseTask):
             True if replenished successfully, False otherwise.
         """
         if self.replenish_time != 0:
+            logger.info("补充体力")
             if way == 1 or way == 0:
                 if self.locate("resources/img/reserved_trailblaze_power_onclick.png") or self.click_img(
                         "resources/img/reserved_trailblaze_power.png"):
@@ -367,8 +368,8 @@ class TrailblazePowerTask(BaseTask):
                     # else:
                     #     write(str(self.replenish_time))
                     #     self.replenish_time=1
-                    self.click_img("resources/img/ensure.png", after_sleep=2)
-                    self.click_img("resources/img/ensure.png", after_sleep=3)
+                    self.click_img("resources/img/ensure.png", after_sleep=1)
+                    self.click_img("resources/img/ensure.png", after_sleep=1)
                     self.click_point(0.5, 0.7)  # 点击屏幕中心
                 else:
                     logger.error("发生错误，错误编号13")
@@ -376,7 +377,7 @@ class TrailblazePowerTask(BaseTask):
             elif way == 2:
                 if self.click_img("resources/img/fuel.png") or self.locate("resources/img/fuel_onclick.png"):
                     self.click_img("resources/img/ensure.png", after_sleep=1.5)
-                    self.click_img("resources/img/ensure.png", after_sleep=2.5)
+                    self.click_img("resources/img/ensure.png", after_sleep=1.5)
                     self.click_point(0.5, 0.7)  # 点击屏幕中心
                 else:
                     logger.error("发生错误，错误编号14")
@@ -395,10 +396,3 @@ class TrailblazePowerTask(BaseTask):
         else:
             return False
 
-
-class BaseTrailblazePowerTask(Executable):
-    def __init__(self):
-        super().__init__()
-
-    def run(self):
-        pass  # 实现具体的任务逻辑

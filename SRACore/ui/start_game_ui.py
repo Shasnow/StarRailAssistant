@@ -8,13 +8,17 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect,
-                            QSize)
-from PySide6.QtGui import (QFont)
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame,
-                               QGridLayout, QHBoxLayout, QLabel, QLineEdit,
-                               QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
-                               QVBoxLayout, QWidget)
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
+    QGridLayout, QHBoxLayout, QLabel, QLineEdit,
+    QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
+    QVBoxLayout, QWidget)
 
 class Ui_StartGameWidget(object):
     def setupUi(self, StartGameWidget):
@@ -200,6 +204,11 @@ class Ui_StartGameWidget(object):
 
         self.gridLayout_3.addWidget(self.label_2, 1, 1, 1, 3)
 
+        self.always_logout_checkBox = QCheckBox(self.frame2_3)
+        self.always_logout_checkBox.setObjectName(u"always_logout_checkBox")
+
+        self.gridLayout_3.addWidget(self.always_logout_checkBox, 2, 1, 1, 1)
+
 
         self.verticalLayout.addWidget(self.frame2_3)
 
@@ -284,33 +293,8 @@ class Ui_StartGameWidget(object):
         self.channel_comboBox.setItemText(0, QCoreApplication.translate("StartGameWidget", u"\u5b98\u670d", None))
         self.channel_comboBox.setItemText(1, QCoreApplication.translate("StartGameWidget", u"bilibili", None))
 
-        # if QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
         self.use_launcher_checkbox.setToolTip("")
-        # endif // QT_CONFIG(tooltip)
-        self.use_launcher_checkbox.setText(
-            QCoreApplication.translate("StartGameWidget", u"\u4f7f\u7528\u542f\u52a8\u5668", None))
-        self.path_label.setText(QCoreApplication.translate("StartGameWidget",
-                                                           u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">\u6e38\u620f\u8def\u5f84\uff1a</span></p></body></html>",
-                                                           None))
-        self.file_pushButton.setText(QCoreApplication.translate("StartGameWidget", u"\u6d4f\u89c8", None))
-        self.auto_login_checkBox.setText(
-            QCoreApplication.translate("StartGameWidget", u"\u81ea\u52a8\u767b\u5f55", None))
-        self.password_toggle_button.setText(
-            QCoreApplication.translate("StartGameWidget", u"\u663e\u793a\u5bc6\u7801", None))
-        self.label_2.setText(QCoreApplication.translate("StartGameWidget", u"<html><head/><body><p\n"
-                                                                           "                                                                    align=\"justify\"><span style=\"\n"
-                                                                           "                                                                    font-size:11pt;\">\u52fe\u9009\u81ea\u52a8\u767b\u5f55\u8868\u660e\u60a8\u5df2\u9605\u8bfb\u5e76\u540c\u610f\u300a\u7528\u6237\u534f\u8bae\u300b\u548c\u300a\u9690\u79c1\u653f\u7b56\u300b</span></p><p\n"
-                                                                           "                                                                    align=\"center\"><br/></p></body></html>\n"
-                                                                           "                                                                ",
-                                                        None))
-        self.label2_4_11.setText(QCoreApplication.translate("StartGameWidget",
-                                                            u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">\u8d26\u53f7\uff1a</span></p></body></html>",
-                                                            None))
-        self.label2_4_21.setText(QCoreApplication.translate("StartGameWidget",
-                                                            u"<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">\u5bc6\u7801\uff1a</span></p></body></html>",
-                                                            None))
-        self.label.setText(QCoreApplication.translate("StartGameWidget",
-                                                      u"<html><head/><body><p align=\"center\"><span style=\" font-size:14pt; font-weight:700;\">\u542f\u52a8\u6e38\u620f</span><span style=\" font-size:14pt; font-weight:700;\"/></p></body></html>",
-                                                      None))
+
     # retranslateUi
 

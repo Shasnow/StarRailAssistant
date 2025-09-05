@@ -90,11 +90,12 @@ class StartGameTask(BaseTask):
         return True
 
     def login_bl(self):
-        result = self.wait_any_img(['resources/img/bilibili_login.png', 'resources/img/bilibili_welcome.png'],
+        result = self.wait_any_img(['resources/img/bilibili_login.png', 'resources/img/bilibili_welcome.png',
+                                    "resources/img/quit.png", "resources/img/enter.png"],
                                    timeout=60)
         if result != 0:
             logger.info(f"登录状态 {result}")
-            enable = True
+            enable = self.config['always_logout']
             if enable and result != 3:  # 是否启用退出账号
                 self.logout_outside()  # 执行退出账号后执行下面的登录操作
             else:
@@ -132,7 +133,7 @@ class StartGameTask(BaseTask):
              "resources/img/quit.png", "resources/img/enter.png"], timeout=60)
         if result != 0:
             logger.info(f"登录状态 {result}")
-            enable = True
+            enable = self.config['always_logout']
             if enable and result != 3:  # 是否启用退出账号
                 self.logout_outside()  # 执行退出账号后执行下面的登录操作
             else:
