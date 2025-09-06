@@ -1,10 +1,10 @@
 {
-    "version": "1.0.1",
+    "version": "1.0.2",
     "resource_version": "1.0.0",
     "Announcement": [
         {
             "title": "问题修复",
-            "content": "<h3>1.0.1更新内容：</h3>\n问题修复：\n1. 修复了启动游戏时任务异常中断的问题。",
+            "content": "<h3>1.0.2更新内容：</h3><br>问题修复：<br>1. 修复了启动游戏时任务异常中断的问题。<br>2. 修复了定时执行无法识别配置列表的问题。",
             "contentType": "html"
         },
         {

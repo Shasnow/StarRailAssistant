@@ -81,7 +81,7 @@ class SettingsPageComponent(SRAComponent):
 
     @Slot()
     def add_schedule(self):
-        sc = ScheduleDialog.getSchedule(self, self.gcm.get('configList', []))
+        sc = ScheduleDialog.getSchedule(self, self.gcm.get('config_list', []))
         if sc is not None:
             self.ui.schedule_list.addItem(''.join(sc))
             self.gcm.get('schedule_list').append(sc)
