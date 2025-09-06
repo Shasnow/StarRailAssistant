@@ -10,3 +10,4 @@ psutil
 rich
 loguru
 nuitka
+schedule
