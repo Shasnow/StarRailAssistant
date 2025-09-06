@@ -187,7 +187,11 @@ class Operator:
     def locate_any_in_region(self, img_paths: list[str], region: Region | None = None, trace: bool = True) -> tuple[
         int, pyscreeze.Box | None]:
         """在窗口内查找任意一张图片位置"""
-        screenshot = self.screenshot(region=region)
+        try:
+            screenshot = self.screenshot(region=region)
+        except Exception as e:
+            logger.trace(f"Error taking screenshot: {e}")
+            return -1, None
         for img_path in img_paths:
             if not Path(img_path).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
