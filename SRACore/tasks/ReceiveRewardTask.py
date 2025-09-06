@@ -183,7 +183,7 @@ class ReceiveRewardTask(BaseTask):
                 self.press_key("esc")
                 return
 
-        if self.click_img("resources/img/assignments_reward.png"):
+        if self.click_img("resources/img/assignments_reward.png", after_sleep=1):
             if self.click_img("resources/img/assign_again.png"):
                 logger.info("再次派遣")
                 self.sleep(4)
