@@ -42,12 +42,37 @@ class ConfigManager:
                 logger.debug(f"Config file config_{name}.json version mismatch, using empty config.")
             logger.debug(f"Successfully loaded config file: config_{name}.json")
         except FileNotFoundError:
-            self._config = {}
+            self._config = {'version': version}
             logger.debug(f"Config file config_{name}.json not found, using empty config.")
         except json.JSONDecodeError:
-            self._config = {}
+            self._config = {'version': version}
             logger.debug(f"Error decoding JSON from config_{name}.json")
         self.current_name = name
+
+    @staticmethod
+    def read(name: str) -> dict:
+        """
+        读取指定名称的配置文件内容并返回。(不改变当前配置)
+        失败时返回空配置。
+        :param name: 配置名称
+        例如，如果name为"Default"，则读取文件data/config_Default.json。
+        如果文件不存在或无法解析，将返回空配置。
+        :return: 配置内容的副本
+        """
+        try:
+            with open(f'data/config_{name}.json', 'r', encoding='utf-8') as f:
+                config = json.load(f)
+            if config.get("version", 0) != version:
+                logger.debug(f"Config file config_{name}.json version mismatch, returning empty config.")
+                return {"version": version}
+            logger.debug(f"Successfully read config file: config_{name}.json")
+            return config
+        except FileNotFoundError:
+            logger.debug(f"Config file config_{name}.json not found, returning empty config.")
+            return {'version': version}
+        except json.JSONDecodeError:
+            logger.debug(f"Error decoding JSON from config_{name}.json, returning empty config.")
+            return {'version': version}
 
     def set(self, key: str, value) -> None:
         """
@@ -212,6 +237,7 @@ class GlobalConfigManager:
         """
         with open('data/globals.json', 'w', encoding='utf-8') as f:
             json.dump(self._global_config, f, indent=4, ensure_ascii=False)
+        logger.debug("Successfully saved global config file: globals.json")
 
     @classmethod
     def get_instance(cls):

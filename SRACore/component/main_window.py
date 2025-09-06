@@ -71,9 +71,21 @@ class MainWindowComponent(QMainWindow):
                 else:
                     self.start()
 
+        def schedule_listener(config: str):
+            if self.is_running:
+                logger.info(f"收到定时任务触发信号，当前正在运行任务，跳过执行计划：{config}")
+                return
+            logger.info(f"收到定时任务触发信号，开始执行计划：{config}")
+            if config == "全部":
+                self.gcm.set('switch2next', True)
+            else:
+                self.config_switch(config)
+            self.start_exec()
+
         self.background_thread = thread
         self.background_thread_worker = worker
         self.background_thread_worker.hotkey_triggered.connect(hotkey_listener)
+        self.background_thread_worker.schedule_triggered.connect(schedule_listener)
         self.background_thread.start()
 
     def set_trigger_thread(self, thread):
@@ -177,7 +189,7 @@ class MainWindowComponent(QMainWindow):
     @Slot(str)
     def update_log(self, message: str):
         """更新日志文本框，添加新日志消息。"""
-        self.ui.log_textBrowser.append(message)
+        self.ui.log_textBrowser.append(message.strip())
         self.ui.log_textBrowser.verticalScrollBar().setValue(self.ui.log_textBrowser.verticalScrollBar().maximum())
 
     @Slot()
@@ -227,13 +239,20 @@ class MainWindowComponent(QMainWindow):
             "对于饰品提取，如果没有队伍或者队伍有空位，使用的是预设编队的队伍1（不要改名）\n"
         )
 
-    @Slot()
-    def start(self):
+    def save_all(self):
+        """保存所有子组件的状态"""
         self.get_all()
         self.config_manager.sync()
         self.gcm.sync()
+
+    def start_exec(self):
         self.started.emit()
         self.is_running = True
+
+    @Slot()
+    def start(self):
+        self.save_all()
+        self.start_exec()
 
     @Slot()
     def stop(self):
@@ -255,7 +274,7 @@ class MainWindowComponent(QMainWindow):
                                  password=encryption.win_decryptor(self.gcm.get("authorization_code")),
                                  receiver=self.gcm.get("receiver_email"))
         self.is_running = False
-        after=self.config_manager.get("mission_accomplish")
+        after = self.config_manager.get("mission_accomplish")
         if after is None:
             return
         if after["shutdown"]:
@@ -263,7 +282,6 @@ class MainWindowComponent(QMainWindow):
         else:
             if after["exit_sra"]:
                 self.close()
-
 
     def closeEvent(self, event):
         """关闭窗口事件处理，保存配置和窗口状态。"""

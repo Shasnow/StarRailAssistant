@@ -3,8 +3,8 @@ from SRACore.util.logger import logger
 
 
 class TrailblazePowerTask(BaseTask):
-    def __init__(self):
-        super().__init__('trailblaze_power')
+    def __init__(self,config: dict):
+        super().__init__('trailblaze_power',config)
         self.f4 = self.gcm.get('key_f4', 'f4')
         self.replenish_time = self.config.get('replenish_time')
         self.replenish_way = self.config.get('replenish_way')

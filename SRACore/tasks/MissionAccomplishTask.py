@@ -4,8 +4,8 @@ from SRACore.util.logger import logger
 
 
 class MissionAccomplishTask(BaseTask):
-    def __init__(self):
-        super().__init__("mission_accomplish")
+    def __init__(self, config: dict):
+        super().__init__("mission_accomplish", config)
 
     def run(self):
         if self.config["logout"]:

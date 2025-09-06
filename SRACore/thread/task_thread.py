@@ -16,15 +16,12 @@ class TaskManager(QThread):
     支持通过配置动态加载任务列表，并处理任务的中断和错误。
     """
 
-    def __init__(self, gcm: GlobalConfigManager):
+    def __init__(self):
         """
         初始化任务管理器。
-
-        Args:
-            gcm (GlobalConfigManager): 全局配置管理器，用于读取任务配置列表。
         """
         super().__init__()
-        self.gcm = gcm  # 全局配置管理器
+        self.gcm = GlobalConfigManager.get_instance()  # 全局配置管理器
         self.config_manager = ConfigManager.get_instance()  # 单例配置管理器
         self.running_flag = False
         # 预定义的任务类列表，索引对应配置中的 task_select 下标
@@ -104,10 +101,9 @@ class TaskManager(QThread):
             Exception: 如果配置加载或任务实例化失败（异常会被上层捕获）
         """
         # 加载指定配置（注意：可能修改全局状态）
-        if self.config_manager.current_name!=config_name:
-            self.config_manager.load(config_name)
+        config=self.config_manager.read(config_name)
         # 从配置中读取任务选择列表（如 [True, False, True]）
-        task_select = self.config_manager.get('main_window')['task_select']
+        task_select = config.get('main_window')['task_select']
         tasks = []
 
         # 遍历 task_select，根据选择状态实例化对应任务
@@ -116,7 +112,7 @@ class TaskManager(QThread):
             if is_select and index < len(self.task_list) and self.task_list[index] is not None:
                 try:
                     # 实例化任务类（假设所有任务类都有无参构造函数）
-                    tasks.append(self.task_list[index]())
+                    tasks.append(self.task_list[index](config))
                 except Exception as e:
                     logger.error(f"Failed to instantiate task at index {index}: {str(e)}")
         return tasks

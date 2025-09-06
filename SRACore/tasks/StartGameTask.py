@@ -6,8 +6,8 @@ from SRACore.util.logger import logger
 
 
 class StartGameTask(BaseTask):
-    def __init__(self):
-        super().__init__('start_game')
+    def __init__(self,config: dict):
+        super().__init__('start_game',config)
 
     def run(self):
         self.launch_game()

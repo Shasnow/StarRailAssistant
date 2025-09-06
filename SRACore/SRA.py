@@ -26,7 +26,7 @@ class SRA:
         self.tray = SystemTray(self.main_window)
         self.main_window.set_tray(self.tray)
         self.main_window.set_background_thread(*BackgroundThreadWorker.create(self.global_manager))
-        self.task_thread = TaskManager(self.global_manager)
+        self.task_thread = TaskManager()
         self.main_window.started.connect(self.task_thread.start)
         self.main_window.require_stop.connect(self.task_thread.stop)
         self.task_thread.finished.connect(self.main_window.finish)
