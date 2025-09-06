@@ -3,8 +3,8 @@ from SRACore.util.logger import logger
 
 
 class ReceiveRewardTask(BaseTask):
-    def __init__(self):
-        super().__init__("receive_reward")
+    def __init__(self,config: dict):
+        super().__init__("receive_reward",config)
 
     def run(self):
         # 初始化任务
@@ -183,7 +183,7 @@ class ReceiveRewardTask(BaseTask):
                 self.press_key("esc")
                 return
 
-        if self.click_img("resources/img/assignments_reward.png", after_sleep=1):
+        if self.click_img("resources/img/assignments_reward.png", after_sleep=2):
             if self.click_img("resources/img/assign_again.png"):
                 logger.info("再次派遣")
                 self.sleep(4)

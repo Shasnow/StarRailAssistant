@@ -5,14 +5,13 @@ from SRACore.util.operator import Executable
 
 
 class BaseTask(Executable, ABC):
-    def __init__(self, name: str):
+    def __init__(self, name: str, config: dict):
         """
         基础任务类，所有任务类都应继承自此类。
         :param name: 名称，用于配置文件字段的标识
         """
         super().__init__()
-        self.cm = ConfigManager.get_instance()
-        self.config = self.cm.get(name)
+        self.config = config.get(name)
         self.stop_flag = False
 
     @abstractmethod

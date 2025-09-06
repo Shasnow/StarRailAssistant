@@ -3,8 +3,8 @@ from SRACore.util.logger import logger
 
 
 class SimulateUniverseTask(BaseTask):
-    def __init__(self):
-        super().__init__("simulated_universe")
+    def __init__(self,config: dict):
+        super().__init__("simulated_universe",config)
         self.times = self.config.get("times", 1)
 
     def run(self):
