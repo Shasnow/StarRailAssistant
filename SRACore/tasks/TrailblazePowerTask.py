@@ -71,7 +71,7 @@ class TrailblazePowerTask(BaseTask):
         if self.click_img("resources/img/nobody.png", after_sleep=2):
             self.click_img("resources/img/preset_formation.png", after_sleep=2)
             self.click_img("resources/img/team1.png", after_sleep=2)
-        if self.click_img("resources/img/battle_star.png", after_sleep=2):
+        if self.click_img("resources/img/battle_star.png", after_sleep=1):
             if self.locate("resources/img/limit.png"):
                 logger.warning("背包内遗器持有数量已达上限，请先清理")
                 self.sleep(2)

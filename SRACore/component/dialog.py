@@ -94,7 +94,7 @@ class AnnouncementBoard(QDialog):
 
         # 保存标题和内容的映射关系
         self.title_content_map[title] = dialog
-        self.all.content.append(dialog.content.toHtml())
+        self.all.content.append(dialog.content.toMarkdown())
 
     @Slot(int)
     def on_title_clicked(self, index):
