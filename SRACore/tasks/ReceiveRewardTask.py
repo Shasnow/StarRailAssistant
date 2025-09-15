@@ -3,8 +3,8 @@ from SRACore.util.logger import logger
 
 
 class ReceiveRewardTask(BaseTask):
-    def __init__(self,config: dict):
-        super().__init__("receive_reward",config)
+    def __init__(self, config: dict):
+        super().__init__("receive_reward", config)
 
     def run(self):
         # 初始化任务
@@ -62,7 +62,7 @@ class ReceiveRewardTask(BaseTask):
         """执行需要传参的任务列表"""
         # 打开ESC菜单
         self.press_key("esc")
-        if not self.wait_img('resources/img/esc_page.png', timeout=20):
+        if not self.wait_ocr("开拓", timeout=20, from_x=0.656,from_y=0.222, to_x=0.740, to_y=0.278):
             return False
 
         for task, args in tasks:
@@ -88,8 +88,8 @@ class ReceiveRewardTask(BaseTask):
     def trailblazer_profile(self):
         """Mission trailblaze profile"""
         logger.info("执行任务：签证奖励")
-        if self.click_img("resources/img/more_with_something.png", after_sleep=1):
-            if self.click_img("resources/img/trailblazer_profile_finished.png", after_sleep=1):
+        if self.click_point(0.92,0.10, after_sleep=1):
+            if self.click_point(0.82,0.13, after_sleep=1):
                 if self.click_img("resources/img/assistance_reward.png"):
                     self.sleep(1)
                     self.press_key("esc", presses=2, interval=1.2)
@@ -117,7 +117,7 @@ class ReceiveRewardTask(BaseTask):
             logger.warning("未填写兑换码")
         for code in redeem_code_list:
             self.sleep(1)
-            if self.click_img("resources/img/more.png") or self.click_img("resources/img/more_with_something.png"):
+            if self.click_point(0.92, 0.10):
                 if self.click_img("resources/img/redeem_code.png"):
                     self.sleep(2)
                     self.copy(code)
@@ -135,12 +135,13 @@ class ReceiveRewardTask(BaseTask):
     def mail(self):
         """Open mailbox and pick up mails."""
         logger.info("执行任务：领取邮件")
-        if self.click_img("resources/img/mailbox_mail.png", after_sleep=1.5):
+        if self.click_point(0.97,0.25, after_sleep=1.5):
             if self.click_img("resources/img/claim_all_mail.png"):
                 self.sleep(2)
-                self.press_key("esc", presses=2, interval=1.5)
+                self.press_key("esc", presses=2, interval=1)
             else:
                 logger.info("没有可以领取的邮件")
+                self.press_key("esc")
         else:
             logger.info("没有可以领取的邮件")
         logger.info("任务完成：领取邮件")
@@ -154,9 +155,12 @@ class ReceiveRewardTask(BaseTask):
         if not self.wait_img("resources/img/enter.png", timeout=30):
             logger.error("检测超时，编号2")
             return
-        self.press_key(self.config.get('key_f1','f1'))
-        if self.click_img("resources/img/gift_of_odyssey.png"):
-            pass
+        self.press_key(self.config.get('key_f1', 'f1'))
+        target=self.ocr_match("巡星之礼", timeout=10)
+        if target is None:
+            logger.info("没有巡星之礼活动")
+            self.press_key("esc")
+            return
         if self.click_img("resources/img/gift_receive.png") or self.click_img("resources/img/gift_receive2.png"):
             logger.info("领取成功")
             self.sleep(2)
@@ -210,7 +214,6 @@ class ReceiveRewardTask(BaseTask):
             return
         if self.locate("resources/img/survival_index_onclick.png"):
             logger.info("没有可领取的奖励")
-            self.press_key("esc")
         else:
             while self.click_img("resources/img/daily_reward.png", after_sleep=0.5):
                 self.move_rel(0, 50)
@@ -220,11 +223,10 @@ class ReceiveRewardTask(BaseTask):
                 self.sleep(0.5)
                 if self.locate("resources/img/daily_train_reward_notreach.png"):  # NOQA
                     logger.info("存在每日实训未达到要求")
-                self.press_key("esc")
             else:
                 logger.info("没有可领取的奖励")
-                self.press_key("esc")
-
+        self.screenshot().save("log/daily_training_reward.png")
+        self.press_key("esc")
         logger.info("任务完成：领取每日实训奖励")
 
     def nameless_honor(self):

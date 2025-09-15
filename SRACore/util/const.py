@@ -19,7 +19,7 @@ from pathlib import Path
 # 基础的常量定义
 AppPath = Path(os.path.dirname(os.path.realpath(sys.argv[0])))
 PLATFORM = "Windows" if sys.platform == "win32" else "Linux"  # 平台标识符
-VERSION = "1.0.0"  # 版本号
+VERSION = "1.1.0"  # 版本号
 CORE = f"{VERSION} for {PLATFORM}"  # 核心版本信息
 
 # 随机标题列表
@@ -29,6 +29,7 @@ RANDOM_TITLE = [
     "启动器启动启动器",
     "你知道吗：定时执行需要重启SRA后生效",
     "-1073741819",
-    "英雄未死之前",
+    "于长夜重返大地",
     "跨越寰宇终抵黯淡星外",
+    "立志成为崩铁糕手",
 ]
