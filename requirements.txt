@@ -1,3 +1,4 @@
+rapidocr-onnxruntime
 opencv-python
 pillow
 PySide6

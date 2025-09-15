@@ -10,9 +10,9 @@ class SimulateUniverseTask(BaseTask):
     def run(self):
         """主任务执行函数"""
         logger.info("执行任务：差分宇宙-周期演算")
-        self.page_locate()
 
         for exe_time in range(self.times):
+            self.page_locate()
             if not self._start_differential_universe(exe_time):
                 return False
             if not self._select_base_effect():
