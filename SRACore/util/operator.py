@@ -517,7 +517,7 @@ class Operator:
                 return Box(left, top, width, height)
         return None
 
-    def wait_ocr(self, text: str, timeout: int = 10, interval: float = 0.2, confidence=0.9, *args, **kwargs) -> Box | None:
+    def wait_ocr(self, text: str, timeout: float = 10, interval: float = 0.2, confidence=0.9, *args, **kwargs) -> Box | None:
         """
         等待OCR识别到指定文本
         :param text: 要识别的文本
