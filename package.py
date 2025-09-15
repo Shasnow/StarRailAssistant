@@ -55,7 +55,7 @@ if __name__ == "__main__":
     shutil.copytree(root_path / "resources", root_path / "main.dist/resources")
     shutil.copytree(root_path / "plugins", root_path / "main.dist/plugins")
     shutil.copytree(root_path / "tools", root_path / "main.dist/tools")
-    # shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "main.dist/rapidocr_onnxruntime")
+    shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "main.dist/rapidocr_onnxruntime")
     shutil.copy(root_path / "LICENSE", root_path / "main.dist/LICENSE")
     shutil.copy(root_path / "README.md", root_path / "main.dist/README.md")
     shutil.copy(root_path / "version.json", root_path / "main.dist/version.json")
