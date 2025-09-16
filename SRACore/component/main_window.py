@@ -58,8 +58,8 @@ class MainWindowComponent(QMainWindow):
 
         with open('version.json', 'r', encoding='utf-8') as f:
             version = json.load(f)
-        if not version['Announcement.DoNotShowAgain']:
-            self.announcement()
+            if not version['Announcement.DoNotShowAgain']:
+                self.announcement()
 
     def set_background_thread(self, thread: QThread, worker: BackgroundThreadWorker):
         """设置后台线程和工作类"""
