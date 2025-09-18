@@ -231,9 +231,7 @@ class Ui_StartGameWidget(object):
         self.file_pushButton.setText(QCoreApplication.translate("StartGameWidget", u"\u6d4f\u89c8", None))
         self.auto_login_checkBox.setText(QCoreApplication.translate("StartGameWidget", u"\u81ea\u52a8\u767b\u5f55", None))
         self.password_toggle_button.setText(QCoreApplication.translate("StartGameWidget", u"\u663e\u793a\u5bc6\u7801", None))
-        self.label_2.setText(QCoreApplication.translate("StartGameWidget", u"\n"
-"                                                                    \u52fe\u9009\u81ea\u52a8\u767b\u5f55\u8868\u660e\u60a8\u5df2\u9605\u8bfb\u5e76\u540c\u610f\u300a\u7528\u6237\u534f\u8bae\u300b\u548c\u300a\u9690\u79c1\u653f\u7b56\u300b\n"
-"                                                                ", None))
+        self.label_2.setText(QCoreApplication.translate("StartGameWidget", u"\u52fe\u9009\u81ea\u52a8\u767b\u5f55\u8868\u660e\u60a8\u5df2\u9605\u8bfb\u5e76\u540c\u610f\u300a\u7528\u6237\u534f\u8bae\u300b\u548c\u300a\u9690\u79c1\u653f\u7b56\u300b", None))
 #if QT_CONFIG(whatsthis)
         self.always_logout_checkBox.setWhatsThis(QCoreApplication.translate("StartGameWidget", u"\u5982\u679c\u542f\u7528\uff0c\u767b\u5f55\u65f6\u4f1a\u767b\u51fa\u5df2\u7ecf\u767b\u5f55\u7684\u8d26\u53f7\u91cd\u65b0\u767b\u5f55\n"
 "                                                                ", None))
