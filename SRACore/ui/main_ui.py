@@ -16,17 +16,17 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFrame,
-    QGridLayout, QGroupBox, QHBoxLayout, QMainWindow,
-    QMenu, QMenuBar, QPushButton, QScrollArea,
-    QSizePolicy, QSpacerItem, QStatusBar, QTabWidget,
-    QTextBrowser, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QFrame, QGridLayout,
+    QGroupBox, QHBoxLayout, QMainWindow, QMenu,
+    QMenuBar, QPushButton, QScrollArea, QSizePolicy,
+    QSpacerItem, QStatusBar, QTabWidget, QTextBrowser,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(660, 665)
+        MainWindow.resize(660, 650)
         font = QFont()
         font.setPointSize(13)
         MainWindow.setFont(font)
@@ -48,141 +48,62 @@ class Ui_MainWindow(object):
         self.console_tab.setObjectName(u"console_tab")
         self.gridLayout_2 = QGridLayout(self.console_tab)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.task_select_groupBox = QGroupBox(self.console_tab)
-        self.task_select_groupBox.setObjectName(u"task_select_groupBox")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
+        self.task_setting_groupBox = QGroupBox(self.console_tab)
+        self.task_setting_groupBox.setObjectName(u"task_setting_groupBox")
+        self.verticalLayout_2 = QVBoxLayout(self.task_setting_groupBox)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+
+        self.gridLayout_2.addWidget(self.task_setting_groupBox, 0, 1, 1, 2)
+
+        self.log_textBrowser = QTextBrowser(self.console_tab)
+        self.log_textBrowser.setObjectName(u"log_textBrowser")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.task_select_groupBox.sizePolicy().hasHeightForWidth())
-        self.task_select_groupBox.setSizePolicy(sizePolicy)
-        self.task_select_groupBox.setMinimumSize(QSize(0, 0))
-        self.task_select_groupBox.setMaximumSize(QSize(16777215, 16777215))
-        self.horizontalLayout_23 = QHBoxLayout(self.task_select_groupBox)
-        self.horizontalLayout_23.setObjectName(u"horizontalLayout_23")
-        self.task_select_scrollArea = QScrollArea(self.task_select_groupBox)
-        self.task_select_scrollArea.setObjectName(u"task_select_scrollArea")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        sizePolicy.setHeightForWidth(self.log_textBrowser.sizePolicy().hasHeightForWidth())
+        self.log_textBrowser.setSizePolicy(sizePolicy)
+        self.log_textBrowser.setMaximumSize(QSize(16777215, 100))
+
+        self.gridLayout_2.addWidget(self.log_textBrowser, 1, 0, 1, 3)
+
+        self.task_select_groupBox = QGroupBox(self.console_tab)
+        self.task_select_groupBox.setObjectName(u"task_select_groupBox")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.task_select_scrollArea.sizePolicy().hasHeightForWidth())
-        self.task_select_scrollArea.setSizePolicy(sizePolicy1)
+        sizePolicy1.setHeightForWidth(self.task_select_groupBox.sizePolicy().hasHeightForWidth())
+        self.task_select_groupBox.setSizePolicy(sizePolicy1)
+        self.task_select_groupBox.setMinimumSize(QSize(0, 0))
+        self.task_select_groupBox.setMaximumSize(QSize(16777215, 16777215))
+        self.verticalLayout_3 = QVBoxLayout(self.task_select_groupBox)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.task_select_scrollArea = QScrollArea(self.task_select_groupBox)
+        self.task_select_scrollArea.setObjectName(u"task_select_scrollArea")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.task_select_scrollArea.sizePolicy().hasHeightForWidth())
+        self.task_select_scrollArea.setSizePolicy(sizePolicy2)
         self.task_select_scrollArea.setMinimumSize(QSize(225, 0))
         self.task_select_scrollArea.setMaximumSize(QSize(225, 16777215))
         self.task_select_scrollArea.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.task_select_scrollArea.setWidgetResizable(True)
-        self.scrollAreaWidgetContents_2 = QWidget()
-        self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 223, 387))
-        self.verticalLayout_6 = QVBoxLayout(self.scrollAreaWidgetContents_2)
+        self.taskSelectScrollAreaWidgetContents = QWidget()
+        self.taskSelectScrollAreaWidgetContents.setObjectName(u"taskSelectScrollAreaWidgetContents")
+        self.taskSelectScrollAreaWidgetContents.setGeometry(QRect(0, 0, 223, 316))
+        self.verticalLayout_6 = QVBoxLayout(self.taskSelectScrollAreaWidgetContents)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.frame1_1 = QFrame(self.scrollAreaWidgetContents_2)
-        self.frame1_1.setObjectName(u"frame1_1")
-        self.frame1_1.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame1_1.setFrameShadow(QFrame.Shadow.Raised)
-        self.horizontalLayout = QHBoxLayout(self.frame1_1)
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.start_game_checkBox = QCheckBox(self.frame1_1)
-        self.start_game_checkBox.setObjectName(u"start_game_checkBox")
-        self.start_game_checkBox.setMinimumSize(QSize(0, 30))
+        self.task_select_scrollArea.setWidget(self.taskSelectScrollAreaWidgetContents)
 
-        self.horizontalLayout.addWidget(self.start_game_checkBox)
+        self.verticalLayout_3.addWidget(self.task_select_scrollArea)
 
-        self.start_game_pushButton = QPushButton(self.frame1_1)
-        self.start_game_pushButton.setObjectName(u"start_game_pushButton")
-        self.start_game_pushButton.setMinimumSize(QSize(70, 30))
-
-        self.horizontalLayout.addWidget(self.start_game_pushButton)
-
-
-        self.verticalLayout_6.addWidget(self.frame1_1)
-
-        self.frame1_2 = QFrame(self.scrollAreaWidgetContents_2)
-        self.frame1_2.setObjectName(u"frame1_2")
-        self.frame1_2.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame1_2.setFrameShadow(QFrame.Shadow.Raised)
-        self.horizontalLayout_7 = QHBoxLayout(self.frame1_2)
-        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.trailblaze_power_checkBox = QCheckBox(self.frame1_2)
-        self.trailblaze_power_checkBox.setObjectName(u"trailblaze_power_checkBox")
-        self.trailblaze_power_checkBox.setMinimumSize(QSize(0, 30))
-
-        self.horizontalLayout_7.addWidget(self.trailblaze_power_checkBox)
-
-        self.trailblaze_power_pushButton = QPushButton(self.frame1_2)
-        self.trailblaze_power_pushButton.setObjectName(u"trailblaze_power_pushButton")
-        self.trailblaze_power_pushButton.setMinimumSize(QSize(70, 30))
-
-        self.horizontalLayout_7.addWidget(self.trailblaze_power_pushButton)
-
-
-        self.verticalLayout_6.addWidget(self.frame1_2)
-
-        self.frame1_3 = QFrame(self.scrollAreaWidgetContents_2)
-        self.frame1_3.setObjectName(u"frame1_3")
-        self.frame1_3.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame1_3.setFrameShadow(QFrame.Shadow.Raised)
-        self.horizontalLayout_3 = QHBoxLayout(self.frame1_3)
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.receive_reward_checkBox = QCheckBox(self.frame1_3)
-        self.receive_reward_checkBox.setObjectName(u"receive_reward_checkBox")
-        self.receive_reward_checkBox.setMinimumSize(QSize(0, 30))
-
-        self.horizontalLayout_3.addWidget(self.receive_reward_checkBox)
-
-        self.receive_reward_pushButton = QPushButton(self.frame1_3)
-        self.receive_reward_pushButton.setObjectName(u"receive_reward_pushButton")
-        self.receive_reward_pushButton.setMinimumSize(QSize(70, 30))
-
-        self.horizontalLayout_3.addWidget(self.receive_reward_pushButton)
-
-
-        self.verticalLayout_6.addWidget(self.frame1_3)
-
-        self.frame1_5 = QFrame(self.scrollAreaWidgetContents_2)
-        self.frame1_5.setObjectName(u"frame1_5")
-        self.frame1_5.setEnabled(True)
-        self.frame1_5.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame1_5.setFrameShadow(QFrame.Shadow.Raised)
-        self.horizontalLayout_20 = QHBoxLayout(self.frame1_5)
-        self.horizontalLayout_20.setObjectName(u"horizontalLayout_20")
-        self.simulate_universe_checkBox = QCheckBox(self.frame1_5)
-        self.simulate_universe_checkBox.setObjectName(u"simulate_universe_checkBox")
-        self.simulate_universe_checkBox.setMinimumSize(QSize(0, 30))
-
-        self.horizontalLayout_20.addWidget(self.simulate_universe_checkBox)
-
-        self.simulate_universe_pushButton = QPushButton(self.frame1_5)
-        self.simulate_universe_pushButton.setObjectName(u"simulate_universe_pushButton")
-        self.simulate_universe_pushButton.setMinimumSize(QSize(70, 30))
-
-        self.horizontalLayout_20.addWidget(self.simulate_universe_pushButton)
-
-
-        self.verticalLayout_6.addWidget(self.frame1_5)
-
-        self.frame1_4 = QFrame(self.scrollAreaWidgetContents_2)
-        self.frame1_4.setObjectName(u"frame1_4")
-        self.frame1_4.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame1_4.setFrameShadow(QFrame.Shadow.Raised)
-        self.horizontalLayout_10 = QHBoxLayout(self.frame1_4)
-        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
-        self.mission_accomplish_checkBox = QCheckBox(self.frame1_4)
-        self.mission_accomplish_checkBox.setObjectName(u"mission_accomplish_checkBox")
-        self.mission_accomplish_checkBox.setMinimumSize(QSize(0, 30))
-
-        self.horizontalLayout_10.addWidget(self.mission_accomplish_checkBox)
-
-        self.mission_accomplish_pushButton = QPushButton(self.frame1_4)
-        self.mission_accomplish_pushButton.setObjectName(u"mission_accomplish_pushButton")
-        self.mission_accomplish_pushButton.setMinimumSize(QSize(70, 30))
-
-        self.horizontalLayout_10.addWidget(self.mission_accomplish_pushButton)
-
-
-        self.verticalLayout_6.addWidget(self.frame1_4)
-
-        self.frame1_0 = QFrame(self.scrollAreaWidgetContents_2)
+        self.frame1_0 = QFrame(self.task_select_groupBox)
         self.frame1_0.setObjectName(u"frame1_0")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.frame1_0.sizePolicy().hasHeightForWidth())
+        self.frame1_0.setSizePolicy(sizePolicy3)
         self.frame1_0.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame1_0.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout_12 = QHBoxLayout(self.frame1_0)
@@ -200,32 +121,10 @@ class Ui_MainWindow(object):
         self.horizontalLayout_12.addWidget(self.stop_pushButton)
 
 
-        self.verticalLayout_6.addWidget(self.frame1_0)
-
-        self.task_select_scrollArea.setWidget(self.scrollAreaWidgetContents_2)
-
-        self.horizontalLayout_23.addWidget(self.task_select_scrollArea)
+        self.verticalLayout_3.addWidget(self.frame1_0)
 
 
         self.gridLayout_2.addWidget(self.task_select_groupBox, 0, 0, 1, 1)
-
-        self.log_textBrowser = QTextBrowser(self.console_tab)
-        self.log_textBrowser.setObjectName(u"log_textBrowser")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.log_textBrowser.sizePolicy().hasHeightForWidth())
-        self.log_textBrowser.setSizePolicy(sizePolicy2)
-        self.log_textBrowser.setMaximumSize(QSize(16777215, 100))
-
-        self.gridLayout_2.addWidget(self.log_textBrowser, 1, 0, 1, 3)
-
-        self.task_setting_groupBox = QGroupBox(self.console_tab)
-        self.task_setting_groupBox.setObjectName(u"task_setting_groupBox")
-        self.verticalLayout_2 = QVBoxLayout(self.task_setting_groupBox)
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-
-        self.gridLayout_2.addWidget(self.task_setting_groupBox, 0, 1, 1, 2)
 
         self.tabWidget.addTab(self.console_tab, "")
         self.multi_account_tab = QWidget()
@@ -315,20 +214,10 @@ class Ui_MainWindow(object):
         self.faq_action.setText(QCoreApplication.translate("MainWindow", u"\u5e38\u89c1\u95ee\u9898", None))
         self.feedback_action.setText(QCoreApplication.translate("MainWindow", u"\u95ee\u9898\u53cd\u9988", None))
         self.about_action.setText(QCoreApplication.translate("MainWindow", u"\u5173\u4e8e", None))
+        self.task_setting_groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u4efb\u52a1\u8bbe\u7f6e", None))
         self.task_select_groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u4efb\u52a1\u914d\u7f6e", None))
-        self.start_game_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u542f\u52a8\u6e38\u620f", None))
-        self.start_game_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
-        self.trailblaze_power_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u6e05\u5f00\u62d3\u529b", None))
-        self.trailblaze_power_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
-        self.receive_reward_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9886\u53d6\u5956\u52b1", None))
-        self.receive_reward_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
-        self.simulate_universe_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u6a21\u62df\u5b87\u5b99", None))
-        self.simulate_universe_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
-        self.mission_accomplish_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u7ed3\u675f\u540e", None))
-        self.mission_accomplish_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
         self.start_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u5f00\u59cb", None))
         self.stop_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u505c\u6b62", None))
-        self.task_setting_groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u4efb\u52a1\u8bbe\u7f6e", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.console_tab), QCoreApplication.translate("MainWindow", u"\u63a7\u5236\u53f0", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.multi_account_tab), QCoreApplication.translate("MainWindow", u"\u914d\u7f6e\u65b9\u6848", None))
         self.extension_groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u62d3\u5c55\u529f\u80fd", None))

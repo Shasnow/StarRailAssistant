@@ -1,11 +1,9 @@
+import importlib
+import tomllib
+
 from PySide6.QtCore import QThread
 
 from SRACore.tasks.BaseTask import BaseTask
-from SRACore.tasks.MissionAccomplishTask import MissionAccomplishTask
-from SRACore.tasks.ReceiveRewardTask import ReceiveRewardTask
-from SRACore.tasks.SimulateUniverseTask import SimulateUniverseTask
-from SRACore.tasks.StartGameTask import StartGameTask
-from SRACore.tasks.TrailblazePowerTask import TrailblazePowerTask
 from SRACore.util.config import GlobalConfigManager, ConfigManager
 from SRACore.util.logger import logger
 
@@ -24,10 +22,21 @@ class TaskManager(QThread):
         self.gcm = GlobalConfigManager.get_instance()  # 全局配置管理器
         self.config_manager = ConfigManager.get_instance()  # 单例配置管理器
         self.running_flag = False
-        # 预定义的任务类列表，索引对应配置中的 task_select 下标
-        # None 表示保留位，暂未分配任务
-        self.task_list = [StartGameTask, TrailblazePowerTask, ReceiveRewardTask, SimulateUniverseTask,
-                          MissionAccomplishTask]
+
+        self.task_list = []
+        with open("SRACore/config.toml", "rb") as f:
+            tasks = tomllib.load(f).get("tasks")
+            for task in tasks:
+                main_class = task.get("main")
+                module = task.get("module")
+                _module = importlib.import_module(module)
+                _class = getattr(_module, main_class)
+                if not issubclass(_class, BaseTask):
+                    raise TypeError(f"Task class {main_class} does not inherit from BaseTask")
+                if not callable(getattr(_class, "run", None)):
+                    raise TypeError(f"Task class {main_class} does not implement a callable 'run' method")
+                self.task_list.append(_class)
+        logger.debug("Successfully load tasks: " + str(self.task_list))
 
     def stop(self):
         """
@@ -101,7 +110,7 @@ class TaskManager(QThread):
             Exception: 如果配置加载或任务实例化失败（异常会被上层捕获）
         """
         # 加载指定配置（注意：可能修改全局状态）
-        config=self.config_manager.read(config_name)
+        config = self.config_manager.read(config_name)
         # 从配置中读取任务选择列表（如 [True, False, True]）
         task_select = config.get('main_window')['task_select']
         tasks = []

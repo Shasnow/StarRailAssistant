@@ -1,23 +1,20 @@
+import importlib
 import json
 import random
+import tomllib
 
 from PySide6.QtCore import Slot, QThread, Signal
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QMainWindow, QFrame, QHBoxLayout, QCheckBox, QPushButton
 
 from SRACore.component.common import SRAComponent
 from SRACore.component.dialog import AnnouncementBoard, Announcement, MessageBox, ShutdownDialog
-from SRACore.component.mission_accomplish_component import MissionAccomplishComponent
 from SRACore.component.multi_account import MultiAccountComponent
-from SRACore.component.receive_reward import ReceiveRewardComponent
 from SRACore.component.settings_page import SettingsPageComponent
-from SRACore.component.simulate_universe import SimulateUniverseComponent
-from SRACore.component.start_game import StartGameComponent
-from SRACore.component.trailblaze_power import TrailblazePowerComponent
 from SRACore.thread.background_thread import BackgroundThreadWorker
 from SRACore.thread.trigger_thread import TriggerManager
 from SRACore.ui.main_ui import Ui_MainWindow
-from SRACore.util import notify, encryption, system
+from SRACore.util import notify, encryption
 from SRACore.util.config import ConfigManager, GlobalConfigManager
 from SRACore.util.const import VERSION, RANDOM_TITLE, CORE
 from SRACore.util.logger import log_emitter, logger
@@ -45,11 +42,8 @@ class MainWindowComponent(QMainWindow):
         self.setWindowTitle(f"SRA {VERSION} | {random.choice(RANDOM_TITLE)}")
         self.setWindowIcon(QIcon("resources\\SRAicon.ico"))
         self.setGeometry(*self.gcm.get('geometry', (200, 200, 800, 600)))  # NOQA
-        self.start_game = StartGameComponent(self, self.config_manager)
-        self.trailblaze_power = TrailblazePowerComponent(self, self.config_manager)
-        self.receive_reward = ReceiveRewardComponent(self, self.config_manager)
-        self.mission_accomplish = MissionAccomplishComponent(self, self.config_manager)
-        self.simulate_universe = SimulateUniverseComponent(self, self.config_manager)
+        self.components: list[SRAComponent] = list()
+        self.frames: list[TaskSelectFrame] = list()
         self.multi_account = MultiAccountComponent(self, self.gcm)
         self.settings = SettingsPageComponent(self, self.gcm)
         self.add_component()
@@ -95,18 +89,24 @@ class MainWindowComponent(QMainWindow):
     def add_component(self):
         """添加子组件到主窗口的布局中"""
         self.ui.task_setting_groupBox.layout().setContentsMargins(0, 0, 0, 0)
-        self.ui.task_setting_groupBox.layout().addWidget(self.start_game)
-        self.ui.task_setting_groupBox.layout().addWidget(self.trailblaze_power)
-        self.ui.task_setting_groupBox.layout().addWidget(self.receive_reward)
-        self.ui.task_setting_groupBox.layout().addWidget(self.simulate_universe)
-        self.ui.task_setting_groupBox.layout().addWidget(self.mission_accomplish)
-        self.display_none()
-        self.ui.start_game_pushButton.clicked.connect(lambda: self.display(self.start_game))
-        self.ui.trailblaze_power_pushButton.clicked.connect(lambda: self.display(self.trailblaze_power))
-        self.ui.receive_reward_pushButton.clicked.connect(lambda: self.display(self.receive_reward))
-        self.ui.simulate_universe_pushButton.clicked.connect(lambda: self.display(self.simulate_universe))
-        self.ui.mission_accomplish_pushButton.clicked.connect(lambda: self.display(self.mission_accomplish))
-        self.ui.start_game_pushButton.click()
+        with open("SRACore/config.toml", "rb") as f:
+            tasks = tomllib.load(f).get("tasks")
+            for task in tasks:
+                component = task.get("component")
+                component_module = task.get("component_module")
+                _module = importlib.import_module(component_module)
+                _class = getattr(_module, component)
+                if not issubclass(_class, SRAComponent):
+                    raise TypeError(f"Component class {component} does not inherit from SRAComponent")
+                _instance = _class(self, self.config_manager)
+                _frame = TaskSelectFrame(self, meta=task)
+                _frame.button.clicked.connect(lambda _, x=len(self.components): self.display(x))
+                self.frames.append(_frame)
+                self.components.append(_instance)
+                self.ui.taskSelectScrollAreaWidgetContents.layout().addWidget(_frame)
+                self.ui.task_setting_groupBox.layout().addWidget(_instance)
+
+        self.display(0)
         self.ui.multi_account_tab.layout().setContentsMargins(0, 0, 0, 0)
         self.ui.multi_account_tab.layout().addWidget(self.multi_account)
         self.ui.setting_tab.layout().setContentsMargins(0, 0, 0, 0)
@@ -134,31 +134,20 @@ class MainWindowComponent(QMainWindow):
     def setter(self):
         """设置UI状态"""
         config = self.config_manager.get('main_window', {'task_select': (False, False, False, False, False)})
-        self.ui.start_game_checkBox.setChecked(config['task_select'][0])
-        self.ui.trailblaze_power_checkBox.setChecked(config['task_select'][1])
-        self.ui.receive_reward_checkBox.setChecked(config['task_select'][2])
-        self.ui.simulate_universe_checkBox.setChecked(config['task_select'][3])
-        self.ui.mission_accomplish_checkBox.setChecked(config['task_select'][4])
+        for index, frame in enumerate(self.frames):
+            frame.checkbox.setChecked(config['task_select'][index])
 
     def getter(self):
         """获取UI状态并保存到配置中"""
-        config = {'task_select': (
-            self.ui.start_game_checkBox.isChecked(),
-            self.ui.trailblaze_power_checkBox.isChecked(),
-            self.ui.receive_reward_checkBox.isChecked(),
-            self.ui.simulate_universe_checkBox.isChecked(),
-            self.ui.mission_accomplish_checkBox.isChecked()
-        )}
+
+        config = {'task_select': [frame.checkbox.isChecked() for frame in self.frames]}
         self.config_manager.set('main_window', config)
 
     def get_all(self):
         """获取所有子组件的状态"""
         self.getter()
-        self.start_game.getter()
-        self.trailblaze_power.getter()
-        self.receive_reward.getter()
-        self.simulate_universe.getter()
-        self.mission_accomplish.getter()
+        for component in self.components:
+            component.getter()
         self.multi_account.getter()
         self.settings.getter()
 
@@ -169,22 +158,17 @@ class MainWindowComponent(QMainWindow):
         self.get_all()
         self.config_manager.switch(name)
         self.setter()
-        self.start_game.setter()
-        self.trailblaze_power.setter()
-        self.receive_reward.setter()
-        self.simulate_universe.setter()
-        self.mission_accomplish.setter()
+        for component in self.components:
+            component.setter()
 
     def display_none(self):
-        self.start_game.hide()
-        self.trailblaze_power.hide()
-        self.receive_reward.hide()
-        self.simulate_universe.hide()
-        self.mission_accomplish.hide()
+        for component in self.components:
+            component.hide()
 
-    def display(self, component: SRAComponent):
+    def display(self, index: int):
+        """显示指定的子组件，隐藏其他组件"""
         self.display_none()
-        component.show()
+        self.components[index].show()
 
     @Slot(str)
     def update_log(self, message: str):
@@ -306,3 +290,16 @@ class MainWindowComponent(QMainWindow):
 
     def set_tray(self, tray):
         self.tray = tray
+
+
+class TaskSelectFrame(QFrame):
+    def __init__(self, parent=None, meta: dict[str, str] = None):
+        super().__init__(parent)
+        self.setFrameShape(QFrame.Shape.StyledPanel)
+        self.setFrameShadow(QFrame.Shadow.Raised)
+        self.layout = QHBoxLayout(self)
+        self.setLayout(self.layout)
+        self.checkbox = QCheckBox(meta.get("name", "Unnamed Task"))
+        self.layout.addWidget(self.checkbox)
+        self.button = QPushButton("设置")
+        self.layout.addWidget(self.button)
