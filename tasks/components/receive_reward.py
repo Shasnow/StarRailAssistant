@@ -1,7 +1,7 @@
 import dataclasses
 
 from SRACore.component.common import SRAComponent
-from SRACore.ui.receive_reward_ui import Ui_ReceiveRewardWidget
+from tasks.components.ui.receive_reward_ui import Ui_ReceiveRewardWidget
 from SRACore.util.config import ConfigManager
 
 

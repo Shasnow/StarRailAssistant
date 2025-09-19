@@ -6,7 +6,7 @@ from rich.progress import Progress
 from rich.console import Console
 
 ui_dir = Path('resources/ui')  # .ui 文件目录
-generated_result_dir = Path('SRACore/ui')  # 生成的 Python 文件目录
+generated_result_dir = Path('tasks/components/ui')  # 生成的 Python 文件目录
 hash_cache_file = Path('.ui_hash_cache.json')  # 哈希缓存文件
 console = Console()
 

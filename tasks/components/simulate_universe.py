@@ -1,7 +1,7 @@
 import dataclasses
 
 from SRACore.component.common import SRAComponent
-from SRACore.ui.simulated_universe_ui import Ui_SimulateUniverseWidget
+from tasks.components.ui.simulated_universe_ui import Ui_SimulateUniverseWidget
 from SRACore.util.config import ConfigManager
 
 

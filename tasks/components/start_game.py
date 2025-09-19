@@ -4,7 +4,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QLineEdit, QFileDialog
 
 from SRACore.component.common import SRAComponent
-from SRACore.ui.start_game_ui import Ui_StartGameWidget
+from tasks.components.ui.start_game_ui import Ui_StartGameWidget
 from SRACore.util import encryption
 
 

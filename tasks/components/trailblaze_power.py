@@ -4,7 +4,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QListWidgetItem
 
 from SRACore.component.common import SRAComponent
-from SRACore.ui.trailblaze_power_ui import Ui_TrailblazePowerWidget
+from tasks.components.ui.trailblaze_power_ui import Ui_TrailblazePowerWidget
 from SRACore.util.config import ConfigManager
 
 

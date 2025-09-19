@@ -1,7 +1,7 @@
 import dataclasses
 
 from SRACore.component.common import SRAComponent
-from SRACore.ui.mission_accomplish_ui import Ui_MissionAccomplishWidget
+from tasks.components.ui.mission_accomplish_ui import Ui_MissionAccomplishWidget
 from SRACore.util.config import ConfigManager
 
 
