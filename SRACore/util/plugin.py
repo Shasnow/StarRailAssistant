@@ -38,7 +38,7 @@ class PluginManager:
             if not os.path.isdir(plugin_path):
                 continue
             try:
-                sys.path.append(f"{os.getcwd()} \\ {plugin_path}")
+                sys.path.append(f"{os.getcwd()}\\{plugin_path}")
                 with open(f"{plugin_path}\\plugin.toml", 'rb') as toml_file:
                     plugin_info = tomllib.load(toml_file)
                     if plugin_info.get('enable', True):
@@ -71,6 +71,7 @@ class PluginManager:
                 # 构建插件的完整路径
                 plugin_path = os.path.join(cls.plugin_dir, plugin_name)
                 # 导入插件模块
+                logger.info("Importing plugin module from path: " + plugin_path.replace('\\', '.'))
                 model = importlib.import_module(plugin_path.replace('\\', '.'))
                 # 检查插件是否实现了 'run' 方法
                 if not hasattr(model, 'run') and plugin_info.get("loadPeriod") != "late":

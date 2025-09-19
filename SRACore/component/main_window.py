@@ -1,6 +1,7 @@
 import importlib
 import json
 import random
+import sys
 import tomllib
 
 from PySide6.QtCore import Slot, QThread, Signal
@@ -91,6 +92,7 @@ class MainWindowComponent(QMainWindow):
         self.ui.task_setting_groupBox.layout().setContentsMargins(0, 0, 0, 0)
         with open("SRACore/config.toml", "rb") as f:
             tasks = tomllib.load(f).get("tasks")
+            sys.path.append(sys.path[0]+"\\SRACore")
             for task in tasks:
                 component = task.get("component")
                 component_module = task.get("component_module")
