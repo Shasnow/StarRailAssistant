@@ -101,7 +101,7 @@ class SettingsPageComponent(SRAComponent):
     @Slot()
     def integrity_check(self):
         """调用工具进行完整性检查"""
-        command = "SRAUpdater -i"
+        command = "SRAUpdater check -r"
         system.Popen(command)
 
     @Slot(int)
@@ -113,7 +113,7 @@ class SettingsPageComponent(SRAComponent):
         if state == 2:  # Qt.Checked
             self.gcm.set('autoupdate', True)
             if os.path.exists("SRAUpdater.exe"):
-                system.Popen("SRAUpdater.exe")
+                system.Popen("SRAUpdater.exe update")
             else:
                 logger.info("SRAUpdater.exe文件不存在，无法启动更新程序")
         else:
