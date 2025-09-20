@@ -23,6 +23,7 @@ class ConfigManager:
         # 确保配置目录存在
         os.makedirs('data', exist_ok=True)
         self.load(current_name)
+        self._config.setdefault('name', current_name)
         ConfigManager.instance = self
 
     def load(self, name: str) -> None:
