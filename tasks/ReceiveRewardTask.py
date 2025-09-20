@@ -191,7 +191,7 @@ class ReceiveRewardTask(BaseTask):
         if self.click_img("resources/img/assignments_reward.png", after_sleep=2):
             if self.click_img("resources/img/assign_again.png"):
                 logger.info("再次派遣")
-                while not self.ocr_match("开拓", timeout=20, from_x=0.656,from_y=0.222, to_x=0.740, to_y=0.278):
+                while not self.ocr_match("开拓", from_x=0.656,from_y=0.222, to_x=0.740, to_y=0.278):
                     self.press_key("esc")
                     self.sleep(1)
             else:
