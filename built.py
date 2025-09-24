@@ -5,8 +5,11 @@ import os
 from rich.progress import Progress
 from rich.console import Console
 
-ui_dir = Path('resources/ui')  # .ui 文件目录
-generated_result_dir = Path('tasks/components/ui')  # 生成的 Python 文件目录
+# 定义目录路径
+inner_ui_dir = Path('resources/ui/inner')  # 内置 .ui 文件目录
+ui_dir = Path('resources/ui')  # 普通 .ui 文件目录
+inner_result_dir = Path('SRACore/ui')  # 内置ui编译结果目录
+generated_result_dir = Path('tasks/components/ui')  # 普通ui编译结果目录
 hash_cache_file = Path('.ui_hash_cache.json')  # 哈希缓存文件
 console = Console()
 
@@ -42,16 +45,25 @@ def save_hash_cache(cache: dict):
 
 def compile_ui_file(ui_file: Path, output_file: Path) -> bool:
     """编译单个.ui文件"""
+    # 确保输出目录存在
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+
     command = f"pyside6-uic {ui_file} > {output_file}"
     exit_code = os.system(command)
     return exit_code == 0
 
 
-def compile_ui_files():
-    """编译.ui文件为Python代码，带哈希检测和进度条"""
-    # 确保输出目录存在
-    generated_result_dir.mkdir(parents=True, exist_ok=True)
+def process_ui_files(ui_source_dir: Path, output_dir: Path, cache_prefix: str = "") -> tuple[int, int]:
+    """处理指定目录下的.ui文件
 
+    Args:
+        ui_source_dir: .ui文件源目录
+        output_dir: 编译结果输出目录
+        cache_prefix: 哈希缓存中使用的键前缀，用于区分不同目录的文件
+
+    Returns:
+        tuple: (编译文件数, 跳过文件数)
+    """
     # 加载哈希缓存
     hash_cache = load_hash_cache()
     current_hashes = {}
@@ -59,24 +71,27 @@ def compile_ui_files():
     skipped_files = 0
 
     # 获取所有.ui文件
-    ui_files = list(ui_dir.glob('*.ui'))
+    ui_files = list(ui_source_dir.glob('*.ui'))
     total_files = len(ui_files)
 
     if not ui_files:
-        console.print("[bold yellow]警告:[/bold yellow] 没有找到任何.ui文件！")
-        return
+        console.print(f"[bold yellow]警告:[/bold yellow] 在 {ui_source_dir} 中没有找到任何.ui文件！")
+        return 0, 0
 
     with Progress() as progress:
-        task = progress.add_task("[green]编译.ui文件...", total=total_files)
+        task = progress.add_task(f"[green]编译 {ui_source_dir.name} 中的.ui文件...", total=total_files)
 
         for ui_file in ui_files:
+            # 使用带前缀的键来区分不同目录的相同文件名
+            cache_key = f"{cache_prefix}{ui_file.name}"
             # 计算当前哈希
             current_hash = calculate_md5(ui_file)
-            current_hashes[ui_file.name] = current_hash
-            output_file = generated_result_dir / ui_file.name.replace('.ui', '_ui.py')
+            current_hashes[cache_key] = current_hash
+            # 确定输出文件路径
+            output_file = output_dir / ui_file.name.replace('.ui', '_ui.py')
 
             # 检查是否需要重新编译
-            if ui_file.name in hash_cache and hash_cache[ui_file.name] == current_hash:
+            if cache_key in hash_cache and hash_cache[cache_key] == current_hash:
                 if output_file.exists():
                     progress.console.print(f"[blue]跳过:[/blue] {ui_file.name} (未修改)")
                     skipped_files += 1
@@ -85,21 +100,46 @@ def compile_ui_files():
 
             # 编译文件
             if compile_ui_file(ui_file, output_file):
-                progress.console.print(f"[green]已编译:[/green] {ui_file.name} -> {output_file.name}")
+                progress.console.print(
+                    f"[green]已编译:[/green] {ui_file.name} -> {output_file}")
                 compiled_files += 1
             else:
                 progress.console.print(f"[bold red]错误:[/bold red] 编译 {ui_file.name} 失败")
 
             progress.update(task, advance=1)
 
-    # 保存新的哈希缓存
-    save_hash_cache(current_hashes)
+    # 更新哈希缓存（只更新当前处理的文件）
+    full_cache = load_hash_cache()
+    full_cache.update(current_hashes)
+    save_hash_cache(full_cache)
+
+    return compiled_files, skipped_files
+
+
+def compile_ui_files():
+    """编译所有.ui文件为Python代码，带哈希检测和进度条"""
+    # 处理内置ui文件
+    inner_compiled, inner_skipped = process_ui_files(
+        ui_source_dir=inner_ui_dir,
+        output_dir=inner_result_dir,
+        cache_prefix="inner_"
+    )
+
+    # 处理普通ui文件
+    general_compiled, general_skipped = process_ui_files(
+        ui_source_dir=ui_dir,
+        output_dir=generated_result_dir
+    )
 
     # 打印汇总信息
     console.print("\n[bold]编译完成:[/bold]")
-    console.print(f"  - 总文件数: {total_files}")
-    console.print(f"  - 编译文件: [green]{compiled_files}[/green]")
-    console.print(f"  - 跳过文件: [blue]{skipped_files}[/blue]")
+    console.print(f"[bold]内置UI文件 ({inner_ui_dir} -> {inner_result_dir}):[/bold]")
+    console.print(f"  - 编译文件: [green]{inner_compiled}[/green]")
+    console.print(f"  - 跳过文件: [blue]{inner_skipped}[/blue]")
+
+    console.print(f"\n[bold]普通UI文件 ({ui_dir} -> {generated_result_dir}):[/bold]")
+    console.print(f"  - 编译文件: [green]{general_compiled}[/green]")
+    console.print(f"  - 跳过文件: [blue]{general_skipped}[/blue]")
 
 
 if __name__ == '__main__':
