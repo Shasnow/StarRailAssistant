@@ -3,8 +3,8 @@ from SRACore.util.logger import logger
 
 
 class TrailblazePowerTask(BaseTask):
-    def __init__(self,config: dict):
-        super().__init__('trailblaze_power',config)
+    def __init__(self, config: dict):
+        super().__init__('trailblaze_power', config)
         self.f4 = self.gcm.get('key_f4', 'f4')
         self.replenish_time = self.config.get('replenish_time')
         self.replenish_way = self.config.get('replenish_way')
@@ -94,16 +94,30 @@ class TrailblazePowerTask(BaseTask):
         return True
 
     def calyx_golden(self, level, single_time=1, run_time=1, **_):
+        levels = ["神谕圣地", "纷争荒墟", "呓语密林",
+                  "筑梦边境", "稚子的梦", "白日梦",
+                  "流云渡", "太卜司", "工造司",
+                  "城郊雪原", "边缘通路", "大矿区"]
         self.battle("拟造花萼（金）",
                     "calyx(golden)",
+                    levels,
                     level,
                     run_time,
                     False,
                     single_time)
 
     def calyx_crimson(self, level, single_time=1, run_time=1, **_):
+        levels=["鳞渊境", "收容舱段",
+                "克劳克", "支援舱段",
+                "苏乐达", "城郊雪原",
+                "绥园", "边缘通路",
+                "匹诺", "铆钉镇",
+                "白日梦", "机械聚落",
+                "丹鼎司", "大矿区",
+                "纷争"]
         self.battle("拟造花萼（赤）",
                     "calyx(crimson)",
+                    levels,
                     level,
                     run_time,
                     False,
@@ -111,24 +125,40 @@ class TrailblazePowerTask(BaseTask):
                     y_add=-30)
 
     def stagnant_shadow(self, level, run_time=1, **_):
+        levels=["溟簇之形",'职司之形','幽府之形','锋芒之形',
+                "嗔怒之形",'燔灼之形','炎华之形',
+                "塞壬之形",'冰酿之形','冰棱之形','霜晶之形',
+                "机狼之形",'震厄之形','鸣雷之形',
+                '烬日之形','今宵之形','天人之形','风之形',
+                '凛月之形','焦炙之形','孽兽之形','空海之形',
+                '役轮之形','弦音之形','偃偶之形','幻光之形']
         self.battle("凝滞虚影",
                     "stagnant_shadow",
+                    levels,
                     level,
                     run_time,
                     True,
                     None)
 
     def caver_of_corrosion(self, level, run_time=1, **_):
+        levels=['隐救之径','雳涌之径', '弦歌之径', '迷识之径', '勇骑之径', '梦潜之径',
+                '幽冥之径', '药使之径', '野焰之径', '圣颂之径', '睿治之径',
+                '漂泊之径', '迅拳之径', '霜风之径']
         self.battle("侵蚀隧洞",
                     "caver_of_corrosion",
+                    levels,
                     level,
                     run_time,
                     True,
-                    None)
+                    None,
+                    x_add=700)
 
     def echo_of_war(self, level, run_time=1, **_):
+        levels=['晨昏','心兽','尘梦','蛀星',
+                '不死','寒潮','毁灭']
         self.battle("历战余响",
                     "echo_of_war",
+                    levels,
                     level,
                     run_time,
                     True,
@@ -139,6 +169,7 @@ class TrailblazePowerTask(BaseTask):
     def battle(self,
                mission_name: str,
                level_belonging: str,
+               levels: list,
                level: int,
                run_time: int,
                scroll_flag: bool,
@@ -153,6 +184,7 @@ class TrailblazePowerTask(BaseTask):
 
                 mission_name (str): The name of this mission.
                 level_belonging (str): The series to which the level belongs.
+                levels (list): The list of levels in this series.
                 level (int): The index of level in /resources/img.
                 run_time (int): Number of times the task was executed.
                 scroll_flag (bool): Whether scroll or not when finding session.
@@ -182,7 +214,7 @@ class TrailblazePowerTask(BaseTask):
                 logger.error("发生错误，错误编号3")
                 return False
             if self.locate("resources/img/replenish.png"):
-                if self.replenish_flag and self.replenish_time!=0:
+                if self.replenish_flag and self.replenish_time != 0:
                     self.replenish(self.replenish_way)
                     self.click_img("resources/img/battle.png")
                 else:
@@ -395,4 +427,3 @@ class TrailblazePowerTask(BaseTask):
             return True
         else:
             return False
-

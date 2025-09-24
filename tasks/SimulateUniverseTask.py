@@ -109,11 +109,13 @@ class SimulateUniverseTask(BaseTask):
             ],interval=0)
 
             if index == 0 or index == 1 or index==2:  # 祝福选择或方程式选择或奇物选择
+                self.sleep(0.5)
                 if not self.click_img("resources/img/collection.png"):
                     self.click_point(0.5, 0.5, x_offset=-100)
                 self.click_img("resources/img/ensure2.png", after_sleep=1)
             elif index == 3 or index == 4:  # 方程式扩展或关闭
                 self.press_key('esc')
+                self.sleep(0.5)
             else:  # 退出
                 break
 
