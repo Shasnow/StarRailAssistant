@@ -34,7 +34,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-241</y>
+        <y>-220</y>
         <width>313</width>
         <height>960</height>
        </rect>
@@ -1008,6 +1008,11 @@
             <item>
              <property name="text">
               <string>-----选择副本-----</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>隐救之径（救世主/隐士）</string>
              </property>
             </item>
             <item>
