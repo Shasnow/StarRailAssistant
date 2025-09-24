@@ -19,6 +19,10 @@ from SRACore.util.logger import logger
 
 @dataclasses.dataclass
 class Region:
+    """表示屏幕上的一个矩形区域
+
+    例如，Region(0,0,0,0) 表示屏幕左上角的一个点
+    """
     left: int
     top: int
     width: int
@@ -32,6 +36,10 @@ class Region:
 
 @dataclasses.dataclass
 class Box:
+    """表示窗口内的一个矩形区域
+
+    例如，Box(0,0,0,0) 表示窗口左上角的一个点
+    """
     left: int
     top: int
     width: int
@@ -46,6 +54,14 @@ class Box:
 
 
 class Operator:
+    ocr_engine = None
+
+    @classmethod
+    def get_ocr_instance(cls):
+        if cls.ocr_engine is None:
+            cls.ocr_engine = RapidOCR()
+        return cls.ocr_engine
+
     def __init__(self):
         self.gcm = GlobalConfigManager.get_instance()
         self.confidence = self.gcm.get('confidence', 0.9)
@@ -56,7 +72,6 @@ class Operator:
         self.width = 0
         self.height = 0
         self.active_window: bool = True
-        self.ocr_engine = None
 
     @property
     def is_window_active(self) -> bool:
@@ -120,7 +135,7 @@ class Operator:
         return pyscreeze.screenshot(region=region.tuple)
 
     def screenshot_tuple(self, from_x: float, from_y: float, to_x: float, to_y: float):
-        """根据相对坐标比例截取屏幕区域
+        """根据相对坐标比例截取窗口内区域
 
         Args:
             from_x (float): 起始点X坐标比例 (0-1)，相对于窗口左上角
@@ -373,7 +388,7 @@ class Operator:
                 region = self.get_win_region()
                 time.sleep(0.5)  # 等待窗口稳定
             if self.ocr_engine is None:
-                self.ocr_engine = RapidOCR()  # 懒加载 OCR 引擎
+                self.ocr_engine = Operator.get_ocr_instance()
             screenshot = self.screenshot(region)
             result,_ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA
             logger.debug("OCR Result: " + str(result))
@@ -517,7 +532,8 @@ class Operator:
                 return Box(left, top, width, height)
         return None
 
-    def wait_ocr(self, text: str, timeout: float = 10, interval: float = 0.2, confidence=0.9, *args, **kwargs) -> Box | None:
+    def wait_ocr(self, text: str, timeout: float = 10, interval: float = 0.2, confidence=0.9, *args,
+                 **kwargs) -> Box | None:
         """
         等待OCR识别到指定文本
         :param text: 要识别的文本
