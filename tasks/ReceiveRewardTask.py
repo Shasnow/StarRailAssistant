@@ -5,6 +5,7 @@ from SRACore.util.logger import logger
 class ReceiveRewardTask(BaseTask):
     def __init__(self, config: dict):
         super().__init__("receive_reward", config)
+        self.config_name=config['name']
 
     def run(self):
         # 初始化任务
@@ -190,9 +191,9 @@ class ReceiveRewardTask(BaseTask):
         if self.click_img("resources/img/assignments_reward.png", after_sleep=2):
             if self.click_img("resources/img/assign_again.png"):
                 logger.info("再次派遣")
-                while not self.ocr_match("开拓", timeout=20, from_x=0.656,from_y=0.222, to_x=0.740, to_y=0.278):
+                while not self.ocr_match("开拓", from_x=0.656,from_y=0.222, to_x=0.740, to_y=0.278):
                     self.press_key("esc")
-                    self.sleep(0.2)
+                    self.sleep(1)
             else:
                 logger.error("发生错误，错误编号6")
                 self.press_key("esc")
@@ -226,7 +227,7 @@ class ReceiveRewardTask(BaseTask):
                     logger.info("存在每日实训未达到要求")
             else:
                 logger.info("没有可领取的奖励")
-        self.screenshot().save("log/daily_training_reward.png")
+        self.screenshot().save(f"log/daily_training_reward-{self.config_name}.png")
         self.press_key("esc")
         logger.info("任务完成：领取每日实训奖励")
 

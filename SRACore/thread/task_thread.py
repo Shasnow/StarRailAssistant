@@ -120,7 +120,7 @@ class TaskManager(QThread):
             # 检查：1. 任务被选中 2. 索引在 task_list 范围内 3. 任务类不为 None
             if is_select and index < len(self.task_list) and self.task_list[index] is not None:
                 try:
-                    # 实例化任务类（假设所有任务类都有无参构造函数）
+                    # 实例化任务类
                     tasks.append(self.task_list[index](config))
                 except Exception as e:
                     logger.error(f"Failed to instantiate task at index {index}: {str(e)}")
