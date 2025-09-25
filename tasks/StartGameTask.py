@@ -93,6 +93,9 @@ class StartGameTask(BaseTask):
         result = self.wait_any_img(['resources/img/bilibili_login.png', 'resources/img/bilibili_welcome.png',
                                     "resources/img/quit.png", "resources/img/enter.png"],
                                    timeout=60)
+        if result == -1:
+            logger.error("等待登录界面超时")
+            return -1
         if result != 0:
             logger.info(f"登录状态 {result}")
             enable = self.config['always_logout']
@@ -131,6 +134,9 @@ class StartGameTask(BaseTask):
         result = self.wait_any_img(
             ["resources/img/login_page.png", "resources/img/welcome.png",
              "resources/img/quit.png", "resources/img/enter.png"], timeout=60)
+        if result == -1:
+            logger.error("等待登录界面超时")
+            return -1
         if result != 0:
             logger.info(f"登录状态 {result}")
             enable = self.config['always_logout']

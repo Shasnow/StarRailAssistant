@@ -184,7 +184,7 @@ class MainWindowComponent(QMainWindow):
             version = json.load(f)
         announcement_board = AnnouncementBoard(self, "公告栏")
         for anno in version['Announcement']:
-            announcement_board.add(Announcement(None, anno['title'], anno['content'], anno['contentType']))
+            announcement_board.add(Announcement(None, anno['title'], anno['content'], anno.get('contentType','markdown')))
         announcement_board.add(
             Announcement(None, "长期公告", f"<html><i>点击下方按钮关闭公告栏</i>"
                                            "<h4>长期公告</h4>"

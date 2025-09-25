@@ -64,26 +64,87 @@ class AnnouncementBoard(QDialog):
 
         right_layout.addWidget(frame, 1, 1, 1, 1)
 
-        button_box = QDialogButtonBox(self)
-        button_box.addButton("确认", QDialogButtonBox.ButtonRole.AcceptRole)
-        button_box.addButton("不再提醒", QDialogButtonBox.ButtonRole.RejectRole)
-        button_box.accepted.connect(self.accept)
-        button_box.rejected.connect(self.reject)
-        right_layout.addWidget(button_box, 1, 2, 1, 1)
+        # 按钮箱 - 初始禁用按钮
+        self.button_box = QDialogButtonBox(self)
+        self.confirm_btn = self.button_box.addButton("确认", QDialogButtonBox.ButtonRole.AcceptRole)
+        self.dont_show_btn = self.button_box.addButton("不再提醒", QDialogButtonBox.ButtonRole.RejectRole)
+        self.confirm_btn.setEnabled(False)
+        self.dont_show_btn.setEnabled(False)
+
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+        right_layout.addWidget(self.button_box, 1, 2, 1, 1)
+
+        # 创建ALL公告页面
         self.all = Announcement(None, "ALL", "")
         self.content_stack.addWidget(self.all)
+
+        # 存储标题和内容的映射
+        self.title_content_map = {"ALL": self.all}
 
         # 添加到主布局
         self.main_layout.addWidget(self.title_list)
         self.main_layout.addLayout(right_layout)
 
-        # 存储标题和内容的映射
-        self.title_content_map = {"ALL": self.all}
+        # 跟踪当前活动的滚动区域
+        self.current_scroll_area = None
+
+        # 连接滚动事件
+        self.setup_scroll_handlers()
+
+    def setup_scroll_handlers(self):
+        """设置滚动事件处理"""
+        # 为ALL页面设置滚动监听
+        if hasattr(self.all.content, 'verticalScrollBar'):
+            scroll_bar = self.all.content.verticalScrollBar()
+            scroll_bar.valueChanged.connect(lambda: self.check_scroll_position("ALL"))
+
+        # 监听内容栈切换事件，以便为新显示的页面设置滚动监听
+        self.content_stack.currentChanged.connect(self.on_stack_changed)
+
+    def on_stack_changed(self, index):
+        """当切换到新的内容页面时，设置滚动监听"""
+        # 移除之前页面的滚动监听
+        if self.current_scroll_area and hasattr(self.current_scroll_area, 'verticalScrollBar'):
+            scroll_bar = self.current_scroll_area.verticalScrollBar()
+            try:
+                scroll_bar.valueChanged.disconnect(self.check_current_scroll_position)
+            except TypeError:
+                pass  # 如果没有连接过，忽略错误
+
+        # 获取当前页面并设置新的滚动监听
+        current_widget = self.content_stack.widget(index)
+        if current_widget and hasattr(current_widget, 'content') and hasattr(current_widget.content,
+                                                                             'verticalScrollBar'):
+            self.current_scroll_area = current_widget.content
+            scroll_bar = self.current_scroll_area.verticalScrollBar()
+            scroll_bar.valueChanged.connect(self.check_current_scroll_position)
+            # 检查当前滚动位置
+            self.check_current_scroll_position(scroll_bar.value())
+
+    def check_current_scroll_position(self, value):
+        """检查当前活动页面的滚动位置"""
+        if not self.current_scroll_area:
+            return
+
+        current_title = self.title_list.currentItem().text()
+        self.check_scroll_position(current_title)
+
+    def check_scroll_position(self, title):
+        """检查指定页面是否滚动到底部"""
+        # 获取对应页面的内容部件
+        if title in self.title_content_map:
+            widget = self.title_content_map[title]
+            if hasattr(widget.content, 'verticalScrollBar'):
+                scroll_bar = widget.content.verticalScrollBar()
+                # 检查是否滚动到底部（考虑一定的容差，例如10像素）
+                is_at_bottom = (scroll_bar.value() + 10 >= scroll_bar.maximum())
+                # 更新按钮状态
+                self.confirm_btn.setEnabled(is_at_bottom)
+                self.dont_show_btn.setEnabled(is_at_bottom)
 
     def add(self, dialog: Announcement):
-        """
-        添加一个公告条目
-        """
+        """添加一个公告条目"""
         # 将标题添加到左侧标题栏
         title = dialog.title
         dialog.setParent(self)
@@ -96,16 +157,25 @@ class AnnouncementBoard(QDialog):
         self.title_content_map[title] = dialog
         self.all.content.append(dialog.content.toMarkdown())
 
+        # 为新添加的公告设置滚动监听
+        if hasattr(dialog.content, 'verticalScrollBar'):
+            scroll_bar = dialog.content.verticalScrollBar()
+            scroll_bar.valueChanged.connect(lambda: self.check_scroll_position(title))
+
+        # 重新检查ALL页面的滚动状态，因为内容已更新
+        # self.check_scroll_position("ALL")
+
     @Slot(int)
     def on_title_clicked(self, index):
-        """
-        当用户点击左侧标题栏时，切换右侧内容栏
-        """
+        """当用户点击左侧标题栏时，切换右侧内容栏"""
         self.content_stack.setCurrentIndex(index)
 
     def setDefault(self, index: int):
         self.title_list.setCurrentRow(index)
         self.all.content.verticalScrollBar().setValue(0)
+        # 确保按钮初始为禁用状态
+        self.confirm_btn.setEnabled(False)
+        self.dont_show_btn.setEnabled(False)
 
     def reject(self) -> None:
         with open('version.json', 'r', encoding='utf-8') as f:
