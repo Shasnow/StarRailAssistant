@@ -66,7 +66,10 @@ jobs:
         run: |
           $VERSION=(Get-Content -Path "version_info.txt" -TotalCount 1).Trim()
           "version=$VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
-      - name: Add SRAUpdater
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup --no-progress --yes
+      - name: Add SRAUpdater & Build Installer
         run: |
           Invoke-WebRequest -Uri https://github.com/Shasnow/SRAUpdater/releases/download/SRAUpdater/SRAUpdater.zip -OutFile SRAUpdater.zip
           Expand-Archive -Path StarRailAssistant_${{ env.version }}.zip -DestinationPath StarRailAssistant
@@ -74,12 +77,16 @@ jobs:
           Remove-Item -Path StarRailAssistant_${{ env.version }}.zip
           Remove-Item -Path SRAUpdater.zip
           Copy-Item -Path SRAUpdater\* -Destination StarRailAssistant -Recurse -Force
-          Compress-Archive -Path StarRailAssistant\* -DestinationPath StarRailAssistant_${{ env.version }}.zip
+          Copy-Item version_info.txt -Destination setup\install_info.txt -Force
+          Move-Item -Path StarRailAssistant\* -Destination setup\SRA -Force
+          (Get-Content setup\srasetup.iss) -replace '^(#define MyAppVersion ).*', ('`$1"' + "${{ env.version }}" + '"') | Set-Content setup\srasetup.iss
+          iscc setup\setup.iss
+          Move-Item -Path setup\output\* -Destination . -Force
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: StarRailAssistant_${{ env.version }}
-          path: StarRailAssistant_${{ env.version }}.zip
+          path: StarRailAssistant_${{ env.version }}_Setup.exe
       - name: Upload Version_Info Artifact
         uses: actions/upload-artifact@v4
         with:
