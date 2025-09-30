@@ -76,7 +76,7 @@ class AnnouncementBoard(QDialog):
         right_layout.addWidget(self.button_box, 1, 2, 1, 1)
 
         # 创建ALL公告页面
-        self.all = Announcement(None, "ALL", "")
+        self.all = Announcement(None, "ALL", "滚动至底部可关闭公告\n")
         self.content_stack.addWidget(self.all)
 
         # 存储标题和内容的映射
