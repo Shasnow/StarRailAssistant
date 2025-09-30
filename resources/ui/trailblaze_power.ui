@@ -1,0 +1,1315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TrailblazePowerWidget</class>
+ <widget class="QWidget" name="TrailblazePowerWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>526</width>
+    <height>787</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>13</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_8">
+   <item row="1" column="0">
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="maximumSize">
+      <size>
+       <width>408</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents_7">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>-220</y>
+        <width>313</width>
+        <height>960</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QFrame" name="frame2_1">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="1" column="1">
+           <spacer name="horizontalSpacer2_1_22">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>315</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="0" colspan="3">
+           <widget class="QCheckBox" name="useAssist_checkBox">
+            <property name="text">
+             <string>使用支援角色</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label2_1_21">
+            <property name="text">
+             <string>次数：</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="replenish_checkBox">
+            <property name="text">
+             <string>补充体力</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QSpinBox" name="replenish_time_spinBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>300</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="3">
+           <widget class="QCheckBox" name="changeLineup_checkBox">
+            <property name="text">
+             <string>重新编队</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="2">
+           <widget class="QComboBox" name="replenish_way_comboBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <item>
+             <property name="text">
+              <string>---方式---</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>后备</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>燃料</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>星琼</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame2_2">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="2" column="1">
+           <spacer name="horizontalSpacer2_2_22">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label2_2_21">
+            <property name="text">
+             <string>次数：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QSpinBox" name="ornamentExtraction_spinBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QPushButton" name="ornamentExtractionAddButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="4">
+           <widget class="QComboBox" name="ornamentExtraction_comboBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <item>
+             <property name="text">
+              <string>-----选择副本-----</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>月下朱殷（妖精/海隅）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>纷争不休（拾骨地/巨树）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>蠹役饥肠（露莎卡/蕉乐园）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>永恒笑剧（都蓝/劫火）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>伴你入眠（茨冈尼亚/出云显世）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>天剑如雨（格拉默/匹诺康尼）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>孽果盘生（繁星/龙骨）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>百年冻土（贝洛伯格/萨尔索图）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>温柔话语（公司/差分机）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>浴火钢心（塔利亚/翁瓦克）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>坚城不倒（太空封印站/仙舟）</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="4">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>饰品提取</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame2_3">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="2" column="2">
+           <widget class="QSpinBox" name="calyxGoldenSingleTime_spinBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>6</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label2_3_21">
+            <property name="text">
+             <string>连续作战：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QSpinBox" name="calyxGoldenRunTime_spinBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QPushButton" name="calyxGoldenAddButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label2_3_31">
+            <property name="text">
+             <string>执行次数：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <spacer name="horizontalSpacer2_3_32">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>95</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="1">
+           <spacer name="horizontalSpacer2_3_22">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="0" colspan="4">
+           <widget class="QComboBox" name="calyxGolden_comboBox">
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>30</height>
+             </size>
+            </property>
+            <item>
+             <property name="text">
+              <string>-----选择副本-----</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>回忆之蕾（翁法罗斯）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>以太之蕾（翁法罗斯）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>珍藏之蕾（翁法罗斯）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>回忆之蕾（匹诺康尼）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>以太之蕾（匹诺康尼）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>珍藏之蕾（匹诺康尼）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>回忆之蕾（仙舟罗浮）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>以太之蕾（仙舟罗浮）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>珍藏之蕾（仙舟罗浮）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>回忆之蕾（雅利洛VI）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>以太之蕾（雅利洛VI）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>珍藏之蕾（雅利洛VI）</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="4">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>拟造花萼（金）</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame2_4">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="3" column="1">
+           <spacer name="horizontalSpacer2_4_22">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="3" column="2">
+           <widget class="QSpinBox" name="calyxCrimsonSingleTime_spinBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>6</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QPushButton" name="calyxCrimsonAddButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <spacer name="horizontalSpacer2_4_32">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>29</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="4" column="2">
+           <widget class="QSpinBox" name="calyxCrimsonRunTime_spinBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label2_4_21">
+            <property name="text">
+             <string>连续作战：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label2_4_31">
+            <property name="text">
+             <string>执行次数：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="4">
+           <widget class="QComboBox" name="calyxCrimson_comboBox">
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>30</height>
+             </size>
+            </property>
+            <item>
+             <property name="text">
+              <string>-----选择副本-----</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>月狂獠牙（毁灭）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>净世残刃（毁灭）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>神体琥珀（存护）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>琥珀的坚守（存护）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>逆时一击（巡猎）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>逐星之矢（巡猎）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>万象果实（丰饶）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>永恒之花（丰饶）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>精致色稿（智识）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>智识之钥（智识）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>天外乐章（同谐）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>群星乐章（同谐）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>焚天之魔（虚无）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>沉沦黑曜（虚无）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>阿赖耶华（记忆）</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="4">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>拟造花萼（赤）</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame2_5">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="3" column="2">
+           <widget class="QSpinBox" name="stagnantShadowRunTime_spinBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label2_5_21">
+            <property name="text">
+             <string>次数：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <spacer name="horizontalSpacer2_5_22">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="3" column="3">
+           <widget class="QPushButton" name="stagnantShadowAddButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="4">
+           <widget class="QComboBox" name="stagnantShadow_comboBox">
+            <property name="minimumSize">
+             <size>
+              <width>220</width>
+              <height>30</height>
+             </size>
+            </property>
+            <item>
+             <property name="text">
+              <string>-----选择副本-----</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>侵略凝块（物理）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>星际和平工作证（物理）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>幽府通令（物理）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>铁狼碎齿（物理）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>忿火之心（火）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>过热钢刀（火）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>恒温晶壳（火）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>海妖残鳍（冰）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>冷藏梦箱（冰）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>苦寒晶壳（冰）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>风雪之角（冰）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>兽馆之钉（雷）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>炼形者雷枝（雷）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>往日之影的雷冠（雷）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>暮辉烬蕾（风）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>一杯酩酊的时代（风）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>无人遗垢（风）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>暴风之眼（风）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>暗帷月华（量子）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>炙梦喷枪（量子）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>苍猿之钉（量子）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>虚幻铸铁（量子）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>纷争前兆（虚数）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>一曲和弦的幻景（虚数）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>镇灵敕符（虚数）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>往日之影的金饰（虚数）</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="4">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>凝滞虚影</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame2_6">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label2_6_21">
+            <property name="text">
+             <string>次数：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QSpinBox" name="caverOfCorrosionRunTime_spinBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <spacer name="horizontalSpacer2_6_22">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="3">
+           <widget class="QPushButton" name="caverOfCorrosionAddButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="4">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>侵蚀隧洞</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="4">
+           <widget class="QComboBox" name="caverOfCorrosion_comboBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <item>
+             <property name="text">
+              <string>-----选择副本-----</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>隐救之径（救世主/隐士）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>雳勇之径（女武神/船长）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>弦歌之径（英豪/诗人）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>迷识之径（司铎套/学者套）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>勇骑之径（铁骑套/勇烈套）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>梦潜之径（死水/钟表匠）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>幽冥之径（大公/幽囚）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>药使之径（莳者/信使）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>野焰之径（火匠/废土客）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>圣颂之径（圣骑/乐队）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>睿智之径（铁卫/量子套）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>漂泊之径（过客/快枪手）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>迅拳之径（拳皇/怪盗）</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>霜风之径（冰/风套）</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame2_7">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_7">
+          <item row="2" column="2">
+           <widget class="QSpinBox" name="echoOfWarRunTime_spinBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <spacer name="horizontalSpacer2_7_22">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label2_7_21">
+            <property name="text">
+             <string>次数：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QPushButton" name="echoOfWarAddButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>+</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="4">
+           <widget class="QComboBox" name="echoOfWar_comboBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <item>
+             <property name="text">
+              <string>-----选择副本-----</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>晨昏的回眸</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>心兽的战场</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>尘梦的赞礼</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>蛀星的旧靥</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>不死的神实</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>寒潮的落幕</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>毁灭的开端</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="4">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>历战余响</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QFrame" name="frame_1">
+     <property name="frameShape">
+      <enum>QFrame::Shape::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>清开拓力</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>329</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QListWidget" name="task_listWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>13</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="tabKeyNavigation">
+      <bool>false</bool>
+     </property>
+     <property name="dragEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="dragDropOverwriteMode">
+      <bool>true</bool>
+     </property>
+     <property name="dragDropMode">
+      <enum>QAbstractItemView::DragDropMode::InternalMove</enum>
+     </property>
+     <property name="defaultDropAction">
+      <enum>Qt::DropAction::MoveAction</enum>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>false</bool>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>新建项目</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>新建项目</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>新建项目</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

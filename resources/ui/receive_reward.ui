@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>ReceiveRewardWidget</class>
+    <widget class="QWidget" name="ReceiveRewardWidget">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>377</width>
+                <height>683</height>
+            </rect>
+        </property>
+        <property name="font">
+            <font>
+                <pointsize>13</pointsize>
+            </font>
+        </property>
+        <property name="windowTitle">
+            <string>Form</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+            <item row="1" column="0">
+                <widget class="QScrollArea" name="scrollArea">
+                    <property name="widgetResizable">
+                        <bool>true</bool>
+                    </property>
+                    <widget class="QWidget" name="scrollAreaWidgetContents">
+                        <property name="geometry">
+                            <rect>
+                                <x>0</x>
+                                <y>0</y>
+                                <width>357</width>
+                                <height>615</height>
+                            </rect>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_3">
+                            <item>
+                                <widget class="QFrame" name="frame3_1">
+                                    <property name="frameShape">
+                                        <enum>QFrame::Shape::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>QFrame::Shadow::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_2">
+                                        <item>
+                                            <widget class="QCheckBox" name="trailblaze_profile_checkbox">
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>0</width>
+                                                        <height>30</height>
+                                                    </size>
+                                                </property>
+                                                <property name="text">
+                                                    <string>漫游签证</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QFrame" name="frame3_2">
+                                    <property name="frameShape">
+                                        <enum>QFrame::Shape::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>QFrame::Shadow::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_4">
+                                        <item>
+                                            <widget class="QCheckBox" name="assignment_checkbox">
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>0</width>
+                                                        <height>30</height>
+                                                    </size>
+                                                </property>
+                                                <property name="text">
+                                                    <string>派遣</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QFrame" name="frame3_3">
+                                    <property name="frameShape">
+                                        <enum>QFrame::Shape::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>QFrame::Shadow::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_7">
+                                        <item>
+                                            <widget class="QCheckBox" name="mail_checkbox">
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>0</width>
+                                                        <height>30</height>
+                                                    </size>
+                                                </property>
+                                                <property name="text">
+                                                    <string>邮件</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QFrame" name="frame3_4">
+                                    <property name="frameShape">
+                                        <enum>QFrame::Shape::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>QFrame::Shadow::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_9">
+                                        <item>
+                                            <widget class="QCheckBox" name="daily_reward_checkbox">
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>0</width>
+                                                        <height>30</height>
+                                                    </size>
+                                                </property>
+                                                <property name="text">
+                                                    <string>每日实训</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QFrame" name="frame3_5">
+                                    <property name="frameShape">
+                                        <enum>QFrame::Shape::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>QFrame::Shadow::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_8">
+                                        <item>
+                                            <widget class="QCheckBox" name="nameless_honour_checkbox">
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>0</width>
+                                                        <height>30</height>
+                                                    </size>
+                                                </property>
+                                                <property name="text">
+                                                    <string>无名勋礼</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QFrame" name="frame3_6">
+                                    <property name="frameShape">
+                                        <enum>QFrame::Shape::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>QFrame::Shadow::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_6">
+                                        <item>
+                                            <widget class="QCheckBox" name="gift_of_odyssey_checkbox">
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>0</width>
+                                                        <height>30</height>
+                                                    </size>
+                                                </property>
+                                                <property name="text">
+                                                    <string>巡星之礼</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QFrame" name="frame3_7">
+                                    <property name="frameShape">
+                                        <enum>QFrame::Shape::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>QFrame::Shadow::Raised</enum>
+                                    </property>
+                                    <layout class="QVBoxLayout" name="verticalLayout">
+                                        <item>
+                                            <widget class="QCheckBox" name="redeem_code_checkbox">
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>0</width>
+                                                        <height>30</height>
+                                                    </size>
+                                                </property>
+                                                <property name="text">
+                                                    <string>兑换码</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <widget class="QTextEdit" name="redeem_code_textEdit">
+                                                <property name="sizePolicy">
+                                                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                                                        <horstretch>0</horstretch>
+                                                        <verstretch>0</verstretch>
+                                                    </sizepolicy>
+                                                </property>
+                                                <property name="placeholderText">
+                                                    <string>兑换码填写处</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                        </layout>
+                    </widget>
+                </widget>
+            </item>
+            <item row="0" column="0">
+                <widget class="QFrame" name="frame">
+                    <property name="frameShape">
+                        <enum>QFrame::Shape::StyledPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>QFrame::Shadow::Raised</enum>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_2">
+                        <item>
+                            <widget class="QLabel" name="label">
+                                <property name="text">
+                                    <string>领取奖励</string>
+                                </property>
+                            </widget>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+        </layout>
+    </widget>
+    <resources/>
+    <connections/>
+</ui>
