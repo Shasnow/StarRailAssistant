@@ -78,15 +78,21 @@ jobs:
           Remove-Item -Path SRAUpdater.zip
           Copy-Item -Path SRAUpdater\* -Destination StarRailAssistant -Recurse -Force
           Copy-Item version_info.txt -Destination setup\install_info.txt -Force
+          Compress-Archive -Path StarRailAssistant\* -DestinationPath StarRailAssistant_${{ env.version }}.zip
           Move-Item -Path StarRailAssistant\* -Destination setup\SRA -Force
           (Get-Content setup\srasetup.iss) -replace '^(#define MyAppVersion ).*', ('`$1"' + "${{ env.version }}" + '"') | Set-Content setup\srasetup.iss
           iscc setup\setup.iss
           Move-Item -Path setup\output\* -Destination . -Force
-      - name: Upload Artifact
+      - name: Upload Setup Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: StarRailAssistant_${{ env.version }}_setup
+          path: StarRailAssistant_${{ env.version }}_Setup.exe
+      - name: Upload Zip Artifact
         uses: actions/upload-artifact@v4
         with:
           name: StarRailAssistant_${{ env.version }}
-          path: StarRailAssistant_${{ env.version }}_Setup.exe
+          path: StarRailAssistant_${{ env.version }}.zip
       - name: Upload Version_Info Artifact
         uses: actions/upload-artifact@v4
         with:
