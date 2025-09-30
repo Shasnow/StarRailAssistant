@@ -1,0 +1,7 @@
+displayName = "Project RAX"
+version = "0.4"
+author = "EveGlowLuna, Shasnow"
+description = "添加更多功能"
+SRAversion = "1.0.0"
+loadPeriod = "normal"
+enable = false

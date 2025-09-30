@@ -1,4 +1,4 @@
-<p align="center"><img src="/res/SRAico.png"></p>
+<p align="center"><img src="/resources/SRAico.png" alt="icon"></p>
 <p align="center">
     <img src="https://img.shields.io/badge/platform-Windows-blue" alt="platform">
     <img alt="Static Badge" src="https://img.shields.io/badge/python-3.11.5%2B-skyblue">
@@ -37,7 +37,6 @@ This software is open source, free of charge and for learning and exchange purpo
 
 * 启动游戏
   * 在这里选择好游戏路径，输入账号与密码，`坐和放宽`程序会帮你解决好一切。已经适配b服。
-  * 或直接使用云·星穹铁道。（测试）
 * 领取助战奖励
 * 领取兑换码奖励
   * 可以一次性输入多个`兑换码`，确保每个`兑换码`分隔开。
@@ -53,14 +52,14 @@ This software is open source, free of charge and for learning and exchange purpo
 * 退出游戏
   * *从不回头看`“爆炸”`*，可选退出SRA以及关闭计算机。
 * 自动剧情
-  * 只包含点击对话
+  * 解放双手，享受剧情，支持`跳过`
 * 多账号切换
 
 ## 我怎么才能使用SRA？急急急
 
 下载链接：  
 下载更新器，借助更新器下载：[SRA更新器](https://github.com/Shasnow/SRAUpdater/releases/download/SRAUpdater/SRAUpdater.zip)
-或者直接下载本体，里面包含了更新器：[SRAv0.7.6](https://github.com/Shasnow/StarRailAssistant/releases/download/v0.7.6/StarRailAssistant_v0.7.6.zip)
+或者直接下载本体，里面包含了更新器：[SRA](https://github.com/Shasnow/StarRailAssistant/releases/latest)
 
 * 如果你是小白，只需要下载项目中的`zip`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`.exe`即可！
 * **我想挑战一下自己！** 当然没问题。打包下载项目中所有文件，确保你的电脑中已经安装好了`Python`，并使用`pip`来安装依赖。请在项目根文件夹打开终端并运行以下指令：
@@ -121,7 +120,7 @@ This software is open source, free of charge and for learning and exchange purpo
 
 <a href="https://github.com/Shasnow/StarRailAssistant/graphs/contributors">
 
-  <img src="https://contrib.rocks/image?repo=Shasnow/StarRailAssistant" />
+  <img src="https://contrib.rocks/image?repo=Shasnow/StarRailAssistant"  alt="contrib"/>
 
 </a>
 
@@ -129,7 +128,7 @@ This software is open source, free of charge and for learning and exchange purpo
 感谢以下用户对本项目的赞助
 <div>
 <div style="float:left">
-<img src="https://avatars.githubusercontent.com/u/79625207?v=4" height="50" width="50">
+<img src="https://avatars.githubusercontent.com/u/79625207?v=4" height="50" width="50" alt="avatars">
 &nbsp;
 </div>
 
