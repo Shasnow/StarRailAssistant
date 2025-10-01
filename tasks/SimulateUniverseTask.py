@@ -59,11 +59,20 @@ class SimulateUniverseTask(BaseTask):
 
     def _select_base_effect(self):
         """选择基础效果"""
-        if not self.wait_img("resources/img/base_effect_select.png", timeout=25):
-            logger.error("超时")
-            return False
-
         logger.info("选择基础效果")
+        index = self.wait_any_img(["resources/img/base_effect_select.png",
+                                   "resources/img/curiosity_select.png"])
+        if index == 0:
+            pass
+        elif index == 1:
+            self.click_point(0.5, 0.5, after_sleep=0.2)
+            self.click_img("resources/img/ensure2.png")
+            if not self.wait_img("resources/img/base_effect_select.png"):
+                logger.error("检测选择基础效果页面超时")
+                return False
+        else:
+            logger.error("检测选择基础效果页面超时")
+
         self.sleep(1)
 
         # 尝试点击收集按钮，否则点击中心点
