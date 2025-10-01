@@ -13,20 +13,35 @@ class Announcement(QWidget):
     def __init__(self, parent=None, title="title", content="text", content_type="text"):
         super().__init__(parent)
         self.title = title
+        # 保存原始内容（raw_content）以便合并到 ALL 页面时使用
+        self.raw_content = content
+        self.content_type = content_type
+
         self.setLayout(QVBoxLayout())
         self.content = QTextBrowser(self)
         self.content.setOpenExternalLinks(True)
         self.content.setAutoFillBackground(True)
-        match content_type:
-            case "html":
-                self.content.setHtml(content)
-            case "text":
-                self.content.setText(content)
-            case "markdown":
+
+        # 根据 content_type 渲染内容
+        if content_type == "html":
+            self.content.setHtml(content)
+        elif content_type == "markdown":
+            try:
                 self.content.setMarkdown(content)
-            case _:
+            except Exception:
+                # 兼容性回退：若不支持 setMarkdown 则设置为纯文本
                 self.content.setText(content)
+        else:
+            # 默认为纯文本
+            self.content.setText(content)
+
         self.layout().addWidget(self.content)
+
+    def get_markdown(self) -> str:
+        """返回可用于合并到 ALL 页的 markdown 文本。
+        若原始为 HTML 或纯文本，会直接返回原始内容（调用方可根据需要转换）。
+        """
+        return self.raw_content
 
 
 class AnnouncementBoard(QDialog):
@@ -76,11 +91,14 @@ class AnnouncementBoard(QDialog):
         right_layout.addWidget(self.button_box, 1, 2, 1, 1)
 
         # 创建ALL公告页面
-        self.all = Announcement(None, "ALL", "")
+        # ALL 页面使用 markdown 内容合并显示，初始化为空 markdown
+        self.all = Announcement(None, "ALL", "", content_type="markdown")
         self.content_stack.addWidget(self.all)
 
         # 存储标题和内容的映射
         self.title_content_map = {"ALL": self.all}
+        # 存储 ALL 页的合并 markdown 文本
+        self.all_markdown = ""
 
         # 添加到主布局
         self.main_layout.addWidget(self.title_list)
@@ -155,12 +173,28 @@ class AnnouncementBoard(QDialog):
 
         # 保存标题和内容的映射关系
         self.title_content_map[title] = dialog
-        self.all.content.append(dialog.content.toMarkdown())
+        # 使用 Announcement.raw_content（通过 get_markdown）合并到 ALL 页面
+        # 为避免 QTextBrowser.append 在 markdown 渲染上产生问题，使用 setMarkdown
+        new_md = dialog.get_markdown()
+        if new_md:
+            # 用分隔符分隔不同公告，保留原始 markdown
+            if self.all_markdown:
+                self.all_markdown += '\n\n---\n\n' + new_md
+            else:
+                self.all_markdown = new_md
+            try:
+                # 尝试直接以 markdown 设置 ALL 页内容
+                self.all.content.setMarkdown(self.all_markdown)
+            except Exception:
+                # 兼容性回退：若 setMarkdown 不可用，则设置为纯文本
+                self.all.content.setText(self.all_markdown)
 
         # 为新添加的公告设置滚动监听
         if hasattr(dialog.content, 'verticalScrollBar'):
             scroll_bar = dialog.content.verticalScrollBar()
-            scroll_bar.valueChanged.connect(lambda: self.check_scroll_position(title))
+            def _on_value_changed(val, t=title):
+                self.check_scroll_position(t)
+            scroll_bar.valueChanged.connect(_on_value_changed)
 
         # 重新检查ALL页面的滚动状态，因为内容已更新
         # self.check_scroll_position("ALL")
