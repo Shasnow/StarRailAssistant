@@ -157,6 +157,7 @@ class ReceiveRewardTask(BaseTask):
             logger.error("检测超时，编号2")
             return
         self.press_key(self.config.get('key_f1', 'f1'))
+        self.sleep(0.2)
         target=self.ocr_match("巡星之礼")
         if target is None:
             logger.info("没有巡星之礼活动")
