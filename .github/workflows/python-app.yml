@@ -81,7 +81,9 @@ jobs:
           Compress-Archive -Path StarRailAssistant\* -DestinationPath StarRailAssistant_${{ env.version }}.zip
           Move-Item -Path StarRailAssistant\* -Destination setup\SRA -Force
           (Get-Content setup\srasetup.iss) -replace '^(#define MyAppVersion ).*', ('`$1"' + "${{ env.version }}" + '"') | Set-Content setup\srasetup.iss
+          Push-Location setup
           iscc setup\setup.iss
+          Pop-Location
           Move-Item -Path setup\output\* -Destination . -Force
       - name: Upload Setup Artifact
         uses: actions/upload-artifact@v4
