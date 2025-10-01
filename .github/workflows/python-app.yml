@@ -69,7 +69,7 @@ jobs:
       - name: Install Inno Setup
         run: |
           choco install innosetup --no-progress --yes
-      - name: Add SRAUpdater, Package & Build Installer
+      - name: Add SRAUpdater
         run: |
           Invoke-WebRequest -Uri https://github.com/Shasnow/SRAUpdater/releases/download/SRAUpdater/SRAUpdater.zip -OutFile SRAUpdater.zip
           Expand-Archive -Path StarRailAssistant_${{ env.version }}.zip -DestinationPath StarRailAssistant
@@ -78,13 +78,16 @@ jobs:
           Remove-Item -Path SRAUpdater.zip
           Copy-Item -Path SRAUpdater\* -Destination StarRailAssistant -Recurse -Force
           Copy-Item version_info.txt -Destination setup\install_info.txt -Force
+      - name: Package
+        run: |
           Compress-Archive -Path StarRailAssistant\* -DestinationPath StarRailAssistant_${{ env.version }}.zip
           Move-Item -Path StarRailAssistant\* -Destination setup\SRA -Force
+      - name: Build Installer
+        run: |
           (Get-Content setup\srasetup.iss) -replace '^(#define MyAppVersion ).*', ('`$1"' + "${{ env.version }}" + '"') | Set-Content setup\srasetup.iss
-          Push-Location setup
-          iscc setup\setup.iss
-          Pop-Location
+          iscc setup\srasetup.iss
           Move-Item -Path setup\output\* -Destination . -Force
+        working-directory: setup 
       - name: Upload Setup Artifact
         uses: actions/upload-artifact@v4
         with:
