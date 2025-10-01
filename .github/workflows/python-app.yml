@@ -87,7 +87,6 @@ jobs:
           (Get-Content setup\srasetup.iss) -replace '^(#define MyAppVersion ).*', ('`$1"' + "${{ env.version }}" + '"') | Set-Content setup\srasetup.iss
           iscc setup\srasetup.iss
           Move-Item -Path setup\output\* -Destination . -Force
-        working-directory: setup 
       - name: Upload Setup Artifact
         uses: actions/upload-artifact@v4
         with:
