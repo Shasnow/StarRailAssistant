@@ -91,8 +91,7 @@ class AnnouncementBoard(QDialog):
         right_layout.addWidget(self.button_box, 1, 2, 1, 1)
 
         # 创建ALL公告页面
-        # ALL 页面使用 markdown 内容合并显示，初始化为空 markdown
-        self.all = Announcement(None, "ALL", "", content_type="markdown")
+        self.all = Announcement(None, "ALL", "滚动至底部可关闭公告\n", content_type="markdown")
         self.content_stack.addWidget(self.all)
 
         # 存储标题和内容的映射
