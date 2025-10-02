@@ -19,7 +19,7 @@ from pathlib import Path
 # 基础的常量定义
 AppPath = Path(os.path.dirname(os.path.realpath(sys.argv[0])))
 PLATFORM = "Windows" if sys.platform == "win32" else "Linux"  # 平台标识符
-VERSION = "1.1.2"  # 版本号
+VERSION = "1.1.3"  # 版本号
 CORE = f"{VERSION} for {PLATFORM}"  # 核心版本信息
 
 # 随机标题列表
