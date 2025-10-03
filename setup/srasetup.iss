@@ -1,5 +1,5 @@
 #define MyAppName "StarRailAssistant"
-#define MyAppVersion "v1.1.1"
+#define MyAppVersion "unknown"
 #define MyAppPublisher "Shasnow"
 #define MyAppURL "https://starrailassistant.top/"
 #define MyAppExeName "SRA.exe"
