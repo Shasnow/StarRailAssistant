@@ -84,7 +84,8 @@ jobs:
           Move-Item -Path StarRailAssistant\* -Destination setup\SRA -Force
       - name: Build Installer
         run: |
-          (Get-Content setup\srasetup.iss) -replace '^(#define MyAppVersion ).*', ('`$1"' + "${{ env.version }}" + '"') | Set-Content setup\srasetup.iss
+          New-Item -ItemType Directory -Path setup\output -Force
+          python setup/version_modifier.py --version "${{ env.version }}""
           iscc setup\srasetup.iss
           Move-Item -Path setup\output\* -Destination . -Force
       - name: Upload Setup Artifact
