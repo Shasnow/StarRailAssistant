@@ -300,10 +300,15 @@ class Operator:
         :param trace: 是否打印调试信息
         :return: tuple[int, Box | None] - 找到的图片索引和位置，如果未找到则返回-1和None
         """
-        left = int(self.left + self.width * from_x)
-        top = int(self.top + self.height * from_y)
-        width = int(self.width * (to_x - from_x))
-        height = int(self.height * (to_y - from_y))
+        try:
+            region = self.get_win_region()
+        except Exception as e:
+            logger.trace(f"UnexceptedInterrupt: {img_paths} -> {e}")
+            return -1, None
+        left = int(region.left + region.width * from_x)
+        top = int(region.top + region.height * from_y)
+        width = int(region.width * (to_x - from_x))
+        height = int(region.height * (to_y - from_y))
         return self.locate_any_in_region(img_paths, Region(left, top, width, height), trace)
 
     @overload

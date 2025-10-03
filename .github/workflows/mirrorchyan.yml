@@ -6,6 +6,7 @@ on:
 jobs:
   mirrorchyan:
     runs-on: macos-latest
+    if: ${{ github.repository_owner == 'Shasnow' }}
     steps:
       - uses: MirrorChyan/uploading-action@v1
         with:
