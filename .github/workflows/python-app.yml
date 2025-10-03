@@ -93,7 +93,7 @@ jobs:
         with:
           name: StarRailAssistant_${{ env.version }}_setup
           path: StarRailAssistant_${{ env.version }}_Setup.exe
-      - name:   
+      - name: Upload zip Artifact
         uses: actions/upload-artifact@v4
         with:
           name: StarRailAssistant_${{ env.version }}
