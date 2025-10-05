@@ -38,15 +38,16 @@ class ConfigManager:
         try:
             with open(f'data/config_{name}.json', 'r', encoding='utf-8') as f:
                 self._config = json.load(f)
+                self._config['name'] = name
             if self._config.get("version", 0) != version:
-                self._config = {"version": version}
+                self._config = {"version": version, 'name': name}
                 logger.debug(f"Config file config_{name}.json version mismatch, using empty config.")
             logger.debug(f"Successfully loaded config file: config_{name}.json")
         except FileNotFoundError:
-            self._config = {'version': version}
+            self._config = {'version': version, 'name': name}
             logger.debug(f"Config file config_{name}.json not found, using empty config.")
         except json.JSONDecodeError:
-            self._config = {'version': version}
+            self._config = {'version': version, 'name': name}
             logger.debug(f"Error decoding JSON from config_{name}.json")
         self.current_name = name
 
@@ -63,17 +64,18 @@ class ConfigManager:
         try:
             with open(f'data/config_{name}.json', 'r', encoding='utf-8') as f:
                 config = json.load(f)
+                config['name'] = name
             if config.get("version", 0) != version:
                 logger.debug(f"Config file config_{name}.json version mismatch, returning empty config.")
-                return {"version": version}
+                return {"version": version, 'name': name}
             logger.debug(f"Successfully read config file: config_{name}.json")
             return config
         except FileNotFoundError:
             logger.debug(f"Config file config_{name}.json not found, returning empty config.")
-            return {'version': version}
+            return {'version': version, 'name': name}
         except json.JSONDecodeError:
             logger.debug(f"Error decoding JSON from config_{name}.json, returning empty config.")
-            return {'version': version}
+            return {'version': version, 'name': name}
 
     def set(self, key: str, value) -> None:
         """
