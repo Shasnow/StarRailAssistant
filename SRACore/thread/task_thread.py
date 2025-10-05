@@ -1,5 +1,6 @@
 import importlib
 import tomllib
+from typing import ClassVar
 
 from PySide6.QtCore import QThread
 
@@ -64,6 +65,7 @@ class TaskManager(QThread):
                 self.config_manager.current_name]
 
             for config_name in config_list:
+                logger.info(f"当前配置: {config_name}")
                 # 每次循环检查中断标志
                 if not self.running_flag:
                     break
@@ -123,5 +125,5 @@ class TaskManager(QThread):
                     # 实例化任务类
                     tasks.append(self.task_list[index](config))
                 except Exception as e:
-                    logger.error(f"Failed to instantiate task at index {index}: {str(e)}")
+                    logger.exception(f"Failed to instantiate task at index {index}: {str(e)}")
         return tasks
