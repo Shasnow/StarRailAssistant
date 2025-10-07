@@ -2,6 +2,8 @@ import argparse
 import re
 import sys
 from pathlib import Path
+import locale
+import codecs
 
 
 def modify_version(file_path, new_version):
@@ -26,29 +28,33 @@ def modify_version(file_path, new_version):
                 break
         
         if not modified:
-            print(f"警告: 未找到 '#define MyAppVersion' 定义")
+            print(f"Warning: Could not find '#define MyAppVersion' definition")
             return False
         
         # 写入修改后的内容
         with open(file_path, 'w', encoding='utf-8') as file:
             file.writelines(content)
         
-        print(f"成功将版本号更新为: {new_version}")
+        print(f"Successfully updated version to: {new_version}")
         return True
         
     except FileNotFoundError:
-        print(f"错误: 找不到文件 {file_path}")
+        print(f"Error: Cannot find file {file_path}")
         return False
     except Exception as e:
-        print(f"错误: {e}")
+        print(f"Error: {e}")
         return False
 
 
 def main():
-    parser = argparse.ArgumentParser(description='修改Inno Setup脚本中的版本号')
-    parser.add_argument('--version', '-v', required=True, help='新版本号')
+    # 设置标准输出编码为UTF-8，避免Windows环境下中文输出错误
+    if sys.stdout.encoding != 'utf-8':
+        sys.stdout.reconfigure(encoding='utf-8')
+    
+    parser = argparse.ArgumentParser(description='Modify version number in Inno Setup script')
+    parser.add_argument('--version', '-v', required=True, help='New version number')
     parser.add_argument('--file', '-f', default='setup/srasetup.iss', 
-                       help='Inno Setup脚本路径 (默认: setup/srasetup.iss)')
+                       help='Inno Setup script path (default: setup/srasetup.iss)')
     
     args = parser.parse_args()
     
