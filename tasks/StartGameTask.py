@@ -144,13 +144,18 @@ class StartGameTask(BaseTask):
                 self.logout_outside()  # 执行退出账号后执行下面的登录操作
             else:
                 return result  # 直接返回登录状态
-        self.click_img("resources/img/login_other.png")
+        target=self.ocr_match("登录其他")
+        if target is not None:
+            self.click_box(target)
 
         if not self.click_img("resources/img/login_with_account.png"):
             logger.error("发生错误，错误编号10")
             return -1
         if self.config['auto_login']:
             user = encryption.win_decryptor(self.config['user'])
+            if user == "":
+                logger.error("未填写账号")
+                return -1
             logger.info(f"登录账号：{user}")
             self.sleep(1)
             self.copy(user)
