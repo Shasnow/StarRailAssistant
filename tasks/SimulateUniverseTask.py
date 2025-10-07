@@ -15,13 +15,11 @@ class SimulateUniverseTask(BaseTask):
             self.page_locate()
             if not self._start_differential_universe(exe_time):
                 return False
-            if not self._select_base_effect():
-                return False
-            if not self._select_blessings():
+            if not self._select():
                 return False
             if not self._navigate_and_fight():
                 return False
-            if not self._select_blessings():
+            if not self._select():
                 return False
             if not self._complete_mission():
                 return False
@@ -57,33 +55,6 @@ class SimulateUniverseTask(BaseTask):
 
         return True
 
-    def _select_base_effect(self):
-        """选择基础效果"""
-        logger.info("选择基础效果")
-        index = self.wait_any_img(["resources/img/base_effect_select.png",
-                                   "resources/img/curiosity_select.png"])
-        if index == 0:
-            pass
-        elif index == 1:
-            self.click_point(0.5, 0.5, after_sleep=0.2)
-            self.click_img("resources/img/ensure2.png")
-            if not self.wait_img("resources/img/base_effect_select.png"):
-                logger.error("检测选择基础效果页面超时")
-                return False
-        else:
-            logger.error("检测选择基础效果页面超时")
-
-        self.sleep(1)
-
-        # 尝试点击收集按钮，否则点击中心点
-        if not self.click_img("resources/img/collection.png"):
-            self.click_point(0.5, 0.5, x_offset=-250, after_sleep=0.5)
-            if not self.locate("resources/img/ensure2.png"):
-                self.click_point(0.5, 0.5)
-
-        self.sleep(0.5)
-        return self.click_img("resources/img/ensure2.png")
-
     def _navigate_and_fight(self):
         """导航和战斗处理"""
         logger.info("移动")
@@ -103,12 +74,13 @@ class SimulateUniverseTask(BaseTask):
 
         return True
 
-    def _select_blessings(self):
+    def _select(self):
         """选择祝福"""
-        logger.info("选择祝福")
+        var = ["选择基础效果", "选择祝福", "选择方程", "选择奇物"]
 
         while True:
             index = self.wait_any_img([
+                "resources/img/base_effect_select.png",
                 "resources/img/blessing_select.png",
                 "resources/img/equation_select.png",
                 "resources/img/curiosity_select.png",
@@ -117,12 +89,13 @@ class SimulateUniverseTask(BaseTask):
                 "resources/img/divergent_universe_quit.png"
             ],interval=0)
 
-            if index == 0 or index == 1 or index==2:  # 祝福选择或方程式选择或奇物选择
+            if index==0 or index == 1 or index == 2 or index==3:  # 祝福选择或方程式选择或奇物选择
+                logger.info(var[index])
                 self.sleep(0.5)
                 if not self.click_img("resources/img/collection.png"):
                     self.click_point(0.5, 0.5, x_offset=-100)
                 self.click_img("resources/img/ensure2.png", after_sleep=1)
-            elif index == 3 or index == 4:  # 方程式扩展或关闭
+            elif index == 4 or index == 5:  # 方程式扩展或关闭
                 self.press_key('esc')
                 self.sleep(0.5)
             else:  # 退出
@@ -168,6 +141,7 @@ class SimulateUniverseTask(BaseTask):
         elif page == 1:
             return True
         elif page == 2:
+            self.sleep(4)
             self.press_key('esc')
             return True
         else:
