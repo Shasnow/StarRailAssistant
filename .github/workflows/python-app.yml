@@ -81,13 +81,13 @@ jobs:
       - name: Package
         run: |
           Compress-Archive -Path StarRailAssistant\* -DestinationPath StarRailAssistant_${{ env.version }}.zip
-          Move-Item -Path StarRailAssistant\* -Destination setup\SRA -Force
+          Copy-Item -Path StarRailAssistant\* -Destination setup\SRA -Force
       - name: Build Installer
         run: |
           New-Item -ItemType Directory -Path setup\output -Force
           python setup/version_modifier.py --version "${{ env.version }}"
           iscc setup\srasetup.iss
-          Move-Item -Path setup\output\* -Destination . -Force
+          Copy-Item -Path setup\output\* -Destination . -Force
       - name: Upload Setup Artifact
         uses: actions/upload-artifact@v4
         with:
