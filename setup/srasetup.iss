@@ -1,5 +1,5 @@
 #define MyAppName "StarRailAssistant"
-#define MyAppVersion "v1.1.1"
+#define MyAppVersion "unknown"
 #define MyAppPublisher "Shasnow"
 #define MyAppURL "https://starrailassistant.top/"
 #define MyAppExeName "SRA.exe"
@@ -25,6 +25,8 @@ ArchitecturesAllowed=x64compatible
 ; the 64-bit view of the registry.
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
+Compression=lzma2/ultra
+SolidCompression=yes
 LicenseFile=SRA\LICENSE
 InfoBeforeFile=install_info.txt
 PrivilegesRequired=admin
@@ -32,7 +34,6 @@ OutputDir=output\
 OutputBaseFilename=StarRailAssistant_{#MyAppVersion}_Setup
 SetupIconFile=SRAicon.ico
 WizardSmallImageFile=SRAbmp.bmp
-SolidCompression=yes
 WizardStyle=modern
 
 [Languages]
@@ -43,6 +44,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "SRA\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Source: "SRA\cv2\*"; DestDir: "{app}\cv2"; Flags: ignoreversion nocompression recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

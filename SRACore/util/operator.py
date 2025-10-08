@@ -166,58 +166,40 @@ class Operator:
         """重载2: 根据相对坐标比例截取区域"""
         ...
 
-    def screenshot(self, *args, **kwargs):
-        """多功能截图方法，支持多种调用方式
-
-        Usage:
-            # 方式1: 截取活动窗口
-            screenshot()
-
-            # 方式2: 截取指定区域
-            screenshot(region)  # region为Region对象
-
-            # 方式3: 使用相对坐标比例截取
-            screenshot(0.1, 0.1, 0.9, 0.9)  # 从10%到90%的区域
-
-        Arg:
-            可接受以下任意一种参数组合:
-            1. 无参数 - 截取活动窗口
-            2. 单个Region对象或None - 截取指定区域
-            3. 四个float/int数值 - 使用相对坐标比例截取(from_x, from_y, to_x, to_y)
-
+    def screenshot(self, region: Region | None = None,
+                   *,
+                   from_x: float | None = None,
+                   from_y: float | None = None,
+                   to_x: float | None = None,
+                   to_y: float | None = None) -> Image:
+        """截取屏幕截图
+        Args:
+            region (Region | None, optional): 要截取的区域对象，包含left, top, width, height属性。
+                如果为None，则默认截取当前活动窗口的区域。默认为None。
+            from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
+            from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
+            to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
+            to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
         Returns:
             PIL.Image.Image: 返回截取的屏幕区域图像对象
-
+        Note:
+            - 当region为None时，会自动获取活动窗口区域
+            - 坐标比例是基于当前窗口区域计算的
+            - 当传入完整的比例坐标时，region参数会被忽略
         Raises:
-            ValueError: 当参数类型或数量不符合上述任何一种方式时抛出
-
-        Examples:
-            >>> # 截取活动窗口
-            >>> img = self.screenshot()
-
-            >>> # 截取指定区域
-            >>> region = Region(left=100, top=100, width=200, height=200)
-            >>> img = self.screenshot(region)
-
-            >>> # 使用比例截取窗口中间50%的区域
-            >>> img = self.screenshot(0.25, 0.25, 0.75, 0.75)
+            ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        if len(args) == 0:
-            return self.screenshot_region(**kwargs)
-        elif len(args) == 1 and (args[0] is None or isinstance(args[0], Region)):
-            return self.screenshot_region(args[0])
-        elif len(args) == 4 and all(isinstance(arg, (int, float)) for arg in args):
-            return self.screenshot_tuple(*args)
+        if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+            return self.screenshot_tuple(from_x, from_y, to_x, to_y)
         else:
-            raise ValueError(
-                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{' '.join([arg.__class__.__name__ for arg in args])}'")
+            return self.screenshot_region(region)
 
     def locate_in_region(self,
                          img_path: str,
                          region: Region | None = None,
                          trace: bool = True,
                          **_) -> Box | None:
-        """在窗口内查找图片位置"""
+        """在屏幕上查找图片位置"""
         try:
             if region is None:
                 region = self.get_win_region()
@@ -261,8 +243,10 @@ class Operator:
         height = int(region.height * (to_y - from_y))
         return self.locate_in_region(img_path, Region(left, top, width, height), trace)
 
-    def locate_any_in_region(self, img_paths: list[str], region: Region | None = None, trace: bool = True) -> tuple[
-        int, pyscreeze.Box | None]:
+    def locate_any_in_region(self,
+                             img_paths: list[str],
+                             region: Region | None = None,
+                             trace: bool = True) -> tuple[int, pyscreeze.Box | None]:
         """在窗口内查找任意一张图片位置"""
         try:
             screenshot = self.screenshot(region=region)
@@ -300,10 +284,15 @@ class Operator:
         :param trace: 是否打印调试信息
         :return: tuple[int, Box | None] - 找到的图片索引和位置，如果未找到则返回-1和None
         """
-        left = int(self.left + self.width * from_x)
-        top = int(self.top + self.height * from_y)
-        width = int(self.width * (to_x - from_x))
-        height = int(self.height * (to_y - from_y))
+        try:
+            region = self.get_win_region()
+        except Exception as e:
+            logger.trace(f"UnexceptedInterrupt: {img_paths} -> {e}")
+            return -1, None
+        left = int(region.left + region.width * from_x)
+        top = int(region.top + region.height * from_y)
+        width = int(region.width * (to_x - from_x))
+        height = int(region.height * (to_y - from_y))
         return self.locate_any_in_region(img_paths, Region(left, top, width, height), trace)
 
     @overload
@@ -312,48 +301,82 @@ class Operator:
         ...
 
     @overload
-    def locate_any(self, img_paths: list[str], from_x: float, from_y: float, to_x: float, to_y: float,
+    def locate_any(self, img_paths: list[str], *, from_x: float, from_y: float, to_x: float, to_y: float,
                    trace: bool = True) -> tuple[int, pyscreeze.Box | None]:
         ...
 
-    def locate_any(self, img_paths: list[str], *args, **kwargs) -> tuple[int, pyscreeze.Box | None]:
-        """在窗口内查找任意一张图片位置"""
-        if len(args) == 0:
-            return self.locate_any_in_region(img_paths, **kwargs)
-        elif len(args) == 1 and (args[0] is None or isinstance(args[0], Region)):
-            return self.locate_any_in_region(img_paths, args[0], **kwargs)
-        elif len(args) == 4 and all(isinstance(arg, (int, float)) for arg in args):
-            return self.locate_any_in_tuple(img_paths, *args, **kwargs)
+    def locate_any(self,
+                   img_paths: list[str],
+                   region: Region | None = None,
+                   *,
+                   from_x: float | None = None,
+                   from_y: float | None = None,
+                   to_x: float | None = None,
+                   to_y: float | None = None,
+                   trace: bool = True) -> tuple[int, pyscreeze.Box | None]:
+        """在窗口内查找任意一张图片位置
+        Args:
+            img_paths (list[str]): 模板图片路径列表
+            region (Region | None, optional): 要查找的区域对象，包含left, top, width, height属性。
+                如果为None，则默认查找当前活动窗口的区域。默认为None。
+            from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
+            from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
+            to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
+            to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
+            trace (bool, optional): 是否打印调试信息。默认为True。
+        Returns:
+            tuple[int, Box | None]: 找到的图片索引和位置，如果未找到则返回-1和None
+        Raises:
+            ValueError: 如果坐标比例参数不完整或不在0-1范围内
+        """
+        if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+            return self.locate_any_in_tuple(img_paths, from_x, from_y, to_x, to_y, trace)
         else:
-            raise ValueError(
-                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{' '.join([arg.__class__.__name__ for arg in args])}'")
+            return self.locate_any_in_region(img_paths, region, trace)
 
     @overload
     def locate(self, template: str, region: Region | None = None, trace: bool = True) -> Box | None:
         ...
 
     @overload
-    def locate(self, template: str, from_x: float, from_y: float, to_x: float, to_y: float,
+    def locate(self, template: str, *, from_x: float, from_y: float, to_x: float, to_y: float,
                trace: bool = True) -> Box | None:
         ...
 
-    def locate(self, template: str, *args, **kwargs):
-        """在窗口内查找图片位置"""
-        if len(args) == 0:
-            return self.locate_in_region(template, **kwargs)
-        elif len(args) == 1 and (args[0] is None or isinstance(args[0], Region)):
-            return self.locate_in_region(template, args[0], **kwargs)
-        elif len(args) == 4 and all(isinstance(arg, (int, float)) for arg in args):
-            return self.locate_in_tuple(template, *args, **kwargs)
+    def locate(self,
+               template: str,
+               region: Region | None = None,
+               *,
+               from_x: float | None = None,
+               from_y: float | None = None,
+               to_x: float | None = None,
+               to_y: float | None = None,
+               trace: bool = True) -> Box | None:
+        """在窗口内查找图片位置
+
+        Args:
+            template (str): 模板图片路径
+            region (Region | None, optional): 要查找的区域对象，包含left, top, width, height属性。
+                如果为None，则默认查找当前活动窗口的区域。默认为None。
+            from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
+            from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
+            to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
+            to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
+            trace (bool, optional): 是否打印调试信息。默认为True。
+        Returns:
+            Box | None: 找到的图片位置，如果未找到则返回None
+        Raises:
+            ValueError: 如果坐标比例参数不完整或不在0-1范围内
+        """
+        if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+            return self.locate_in_tuple(template, from_x, from_y, to_x, to_y, trace)
         else:
-            raise ValueError(
-                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{' '.join([arg.__class__.__name__ for arg in args])}'")
+            return self.locate_in_region(template, region, trace)
 
     def ocr_in_region(
             self,
             region: Region = None,
-            trace: bool = True
-    ) -> list[Any] | None:
+            trace: bool = True) -> list[Any] | None:
         """
         在窗口的指定区域内执行 OCR 文字识别，返回原始 OCR 结果（包含文本、坐标、置信度等）。
 
@@ -390,7 +413,7 @@ class Operator:
             if self.ocr_engine is None:
                 self.ocr_engine = Operator.get_ocr_instance()
             screenshot = self.screenshot(region)
-            result,_ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA
+            result, _ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA
             logger.debug("OCR Result: " + str(result))
             return result
         except Exception as e:
@@ -404,8 +427,7 @@ class Operator:
             from_y: float,
             to_x: float,
             to_y: float,
-            trace: bool = True
-    ) -> list[Any] | None:
+            trace: bool = True) -> list[Any] | None:
         """
         在窗口内通过比例坐标指定区域，并执行 OCR 文字识别。
 
@@ -447,89 +469,58 @@ class Operator:
 
         return self.ocr_in_region(Region(left, top, width, height), trace)
 
-    @overload
-    def ocr(self, region: Region = None, trace: bool = True) -> list[Any] | None:
-        """Overload for `ocr_in_region`."""
-        ...
-
-    @overload
-    def ocr(
-            self,
-            from_x: float,
-            from_y: float,
-            to_x: float,
-            to_y: float,
-            trace: bool = True
-    ) -> list[Any] | None:
-        """Overload for `ocr_in_tuple`."""
-        ...
-
-    def ocr(self, *args, **kwargs) -> list[Any] | None:
-        """
-        在窗口内执行 OCR 文字识别，支持直接传入区域坐标或比例坐标。
+    def ocr(self,
+            region: Region = None,
+            *,
+            from_x: float | None = None,
+            from_y: float | None = None,
+            to_x: float | None = None,
+            to_y: float | None = None,
+            trace: bool = True) -> list[Any] | None:
+        """执行 OCR 文字识别
 
         Args:
-            *args:
-                - 无参数：识别整个窗口（调用 `ocr_in_region()`）。
-                - 1 个 `Region` 参数：识别指定区域（调用 `ocr_in_region(region)`）。
-                - 4 个 `float` 参数：通过比例坐标指定区域（调用 `ocr_in_tuple(from_x, from_y, to_x, to_y)`）。
-            **kwargs:
-                - region (Region | None)：要识别的区域对象，传入时等同于 `ocr(region=...)`。
-                - from_x, from_y, to_x, to_y (float)：比例坐标，传入时等同于 `ocr(from_x=..., from_y=..., to_x=..., to_y=...)`。
-                - trace (bool)：是否打印调试信息，默认为 `True`。
-
+            region (Region | None, optional): 要识别的区域对象，包含left, top, width, height属性。
+                如果为None，则默认识别当前活动窗口的区域。默认为None。如果传入完整的比例坐标时，region参数会被忽略
+            from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
+            from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
+            to_x (float, optional): 结束点X坐标比例 (0-1
+            to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
+            trace (bool, optional): 是否打印调试信息。默认为True。
         Returns:
-            list[Any] | None:
-                OCR 引擎返回的原始结果。如果发生错误，返回 `None`。
-
+            list[Any] | None: OCR 引擎返回的原始结果。如果发生错误，返回None。
         Raises:
-            ValueError: 如果参数数量或类型不匹配。
-
-        Examples:
-            >>> # 方式1：识别整个窗口
-            >>> result1 = self.ocr()
-            >>>
-            >>> # 方式2：识别指定区域
-            >>> region = Region(100, 100, 200, 50)
-            >>> result2 = self.ocr(region)
-            >>>
-            >>> # 方式3：通过比例坐标识别
-            >>> result3 = self.ocr(0.1, 0.2, 0.5, 0.8)
+            ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        # 处理关键字参数（如 `ocr(region=...)` 或 `ocr(from_x=0.1, ...)`）
-        if "region" in kwargs:
-            return self.ocr_in_region(kwargs["region"], kwargs.get("trace", True))
-        elif "from_x" in kwargs:
-            return self.ocr_in_tuple(
-                kwargs["from_x"], kwargs["from_y"],
-                kwargs["to_x"], kwargs["to_y"],
-                kwargs.get("trace", True)
-            )
-        # 处理位置参数
-        elif len(args) == 0:
-            return self.ocr_in_region(**kwargs)
-        elif len(args) == 1 and (args[0] is None or isinstance(args[0], Region)):
-            return self.ocr_in_region(args[0], **kwargs)
-        elif len(args) == 4 and all(isinstance(arg, (int, float)) for arg in args):
-            return self.ocr_in_tuple(*args, **kwargs)
+        if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+            return self.ocr_in_tuple(from_x, from_y, to_x, to_y, trace)
         else:
-            raise ValueError(
-                f"Invalid arguments: expected 'Region' or 'float, float, float, float', got '{' '.join([arg.__class__.__name__ for arg in args])}'"
-            )
+            return self.ocr_in_region(region, trace)
 
-    def ocr_match(self, text: str, confidence=0.9, *args, **kwargs) -> Box | None:
+    def ocr_match(self,
+                  text: str,
+                  confidence=0.9,
+                  region: Region = None,
+                  *,
+                  from_x: float | None = None,
+                  from_y: float | None = None,
+                  to_x: float | None = None,
+                  to_y: float | None = None,
+                  trace: bool = True) -> Box | None:
         """
         OCR识别并匹配文本
         """
-        results = self.ocr(*args, **kwargs)
+        results = self.ocr(region, from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
         if results is None:
+            logger.debug("OCR Result is None")
             return None
         for result in results:
             if result[2] >= confidence and text in result[1]:
                 left, top = result[0][0]
                 width = result[0][2][0] - left
-                height= result[0][2][1] - top
+                height = result[0][2][1] - top
                 return Box(left, top, width, height)
+        logger.debug("OCR Result not match text: " + text)
         return None
 
     def wait_ocr(self, text: str, timeout: float = 10, interval: float = 0.2, confidence=0.9, *args,

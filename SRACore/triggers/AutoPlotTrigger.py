@@ -9,18 +9,18 @@ class AutoPlotTrigger(BaseTrigger):
             '跳过对话': False,
         }
         self.can_skip = True  # 是否可以跳过对话, 默认可以跳过
-        self.active_window=False
+        self.active_window = False
 
     def run(self):
         if not self.plot_status_check():
             self.can_skip = True
             return
-        self.press_key("space",trace=False)
+        self.press_key("space", trace=False)
         if self.config['跳过对话'] and self.can_skip:
             self.skip_check()
         for i in range(5, 0, -1):
-            if self.locate(f"resources/img/{i}.png", 0.63, 0.375, 0.67, 0.72, trace=False):
-                self.press_key(str(i),trace=False)
+            if self.locate(f"resources/img/{i}.png", from_x=0.63, from_y=0.375, to_x=0.67, to_y=0.72, trace=False):
+                self.press_key(str(i), trace=False)
                 break
 
     def plot_status_check(self):
@@ -28,8 +28,12 @@ class AutoPlotTrigger(BaseTrigger):
         检测是否处于对话状态
         """
         self.sleep(1)
-        return self.locate_any_in_tuple(["resources/img/dialog.png", "resources/img/m.png"], 0.067, 0.033, 0.156, 0.076,
-                                        trace=False)[0] != -1
+        return self.locate_any(["resources/img/dialog.png", "resources/img/m.png"],
+                               from_x=0.067,
+                               from_y=0.033,
+                               to_x=0.156,
+                               to_y=0.076,
+                               trace=False)[0] != -1
 
     def skip_check(self):
         """

@@ -5,7 +5,7 @@ from SRACore.util.logger import logger
 class ReceiveRewardTask(BaseTask):
     def __init__(self, config: dict):
         super().__init__("receive_reward", config)
-        self.config_name=config['name']
+        self.config_name=config.get('name', 'unknown')
 
     def run(self):
         # 初始化任务
