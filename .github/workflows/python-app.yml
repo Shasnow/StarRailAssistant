@@ -81,7 +81,8 @@ jobs:
       - name: Package
         run: |
           Compress-Archive -Path StarRailAssistant\* -DestinationPath StarRailAssistant_${{ env.version }}.zip
-          Copy-Item -Path StarRailAssistant\* -Destination setup\SRA -Force
+          New-Item -ItemType Directory -Path setup\SRA -Force
+          Copy-Item -Path StarRailAssistant\* -Destination setup\SRA -Force -Recurse
       - name: Build Installer
         run: |
           New-Item -ItemType Directory -Path setup\output -Force
