@@ -288,9 +288,9 @@ class ReceiveRewardTask(BaseTask):
             logger.info("合成完毕，返回领取奖励")
             self.press_key("esc",presses=2, interval=1.5)
             self.sleep(1.5)
-            if self.click_img("resources/img/daily_reward.png", after_sleep=0.5):
-                logger.info("领取奖励")
-                self.click_img("resources/img/daily_train_reward.png", after_sleep=1.5)
+            self.click_img("resources/img/daily_reward.png", after_sleep=0.5)
+            logger.info("领取奖励")
+            self.click_img("resources/img/daily_train_reward.png", after_sleep=1.5)
 
     def relic(self):
         if self.click_img("resources/img/relic.png", y_offset=330):
