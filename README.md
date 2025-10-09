@@ -8,13 +8,13 @@
         <img alt="mirrorc" src="https://img.shields.io/badge/Mirror%E9%85%B1-%239af3f6?logo=countingworkspro&logoColor=4f46e5">
     </a>
 </p>
-<p align="center"><a href="https://shasnow.github.io/SRA"><b>主页</b></a></p>
+<p align="center"><a href="https://starrailassistant.top"><b>主页</b></a></p>
 
-#### [帮助文档](https://docs.qq.com/doc/DWUFOUmJDc2xLRk1B) | [FAQ](https://starrailassistant.top/SRA/faq.html) | [下载和安装](https://shasnow.github.io/SRA/download.html) | [使用方法](https://shasnow.github.io/SRA/quickstart.html)
+#### [帮助文档](https://docs.qq.com/doc/DWUFOUmJDc2xLRk1B) | [FAQ](https://starrailassistant.top/faq.html) | [下载和安装](https://starrailassistant.top/download.html) | [使用方法](https://starrailassistant.top/getstarted/getstarted.html)
 # StarRailAssistant(SRA)
 
 崩坏星穹铁道自动化助手  
-如果您在使用的过程中遇到问题，请先阅读[常见问题](https://starrailassistant.top/SRA/faq.html)。
+如果您在使用的过程中遇到问题，请先阅读[常见问题](https://starrailassistant.top/faq.html)。
 
 ## 什么是SRA？
 
@@ -82,7 +82,6 @@ This software is open source, free of charge and for learning and exchange purpo
 我们无法保证代码能完美的运行，这便是 **`issues`** 存在的意义。
 
 * 通过 **`issues`** 反馈：<https://github.com/Shasnow/StarRailAssisant/issues>
-* 通过 **`Bilibili私信`** 反馈：<https://space.bilibili.com/349682013>
 * 通过 **`电子邮件`** 反馈：<yukikage@qq.com>
 * 或者加入测试群 **994571792** 在这里，你可以：
   * ~~获得更快的下载速度~~

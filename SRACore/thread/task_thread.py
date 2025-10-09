@@ -1,6 +1,5 @@
 import importlib
 import tomllib
-from typing import ClassVar
 
 from PySide6.QtCore import QThread
 
