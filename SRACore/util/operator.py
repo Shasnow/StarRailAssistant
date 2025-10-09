@@ -512,7 +512,6 @@ class Operator:
         """
         results = self.ocr(region, from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
         if results is None:
-            logger.debug("OCR Result is None")
             return None
         for result in results:
             if result[2] >= confidence and text in result[1]:
@@ -522,6 +521,34 @@ class Operator:
                 return Box(left, top, width, height)
         logger.debug("OCR Result not match text: " + text)
         return None
+
+    def ocr_match_any(self,
+                      texts: list[str],
+                      confidence=0.9,
+                      region: Region = None,
+                      *,
+                      from_x: float | None = None,
+                      from_y: float | None = None,
+                      to_x: float | None = None,
+                      to_y: float | None = None,
+                      trace: bool = True) -> tuple[int, Box | None]:
+        """
+        OCR识别并匹配任意文本，返回第一个找到的文本索引和位置
+        :returns tuple[int, Box | None] - 找到的文本索引和位置，如果未找到则返回-1和None
+        """
+        results = self.ocr(region, from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
+        if results is None:
+            return -1, None
+        for index, text in enumerate(texts):
+            for result in results:
+                if result[2] >= confidence and text in result[1]:
+                    left, top = result[0][0]
+                    width = result[0][2][0] - left
+                    height = result[0][2][1] - top
+                    return index, Box(left, top, width, height)
+        logger.debug("OCR Result not match any text: " + str(texts))
+        return -1, None
+
 
     def wait_ocr(self, text: str, timeout: float = 10, interval: float = 0.2, confidence=0.9, *args,
                  **kwargs) -> Box | None:
@@ -542,7 +569,26 @@ class Operator:
         logger.debug(f"Timeout: '{text}' -> Not found in {timeout} seconds")
         return None
 
-    def click_point(self, x: int | float, y: int | float, x_offset: int = 0, y_offset: int = 0,
+    def wait_ocr_any(self, texts: list[str], timeout: float = 10, interval: float = 0.2, confidence=0.9, *args,
+                     **kwargs) -> tuple[int, Box | None]:
+        """
+        等待OCR识别到任意指定文本
+        :param texts: 要识别的文本列表
+        :param timeout: 超时时间，单位秒
+        :param interval: 检查间隔时间，单位秒，默认为0.2秒
+        :param confidence: 识别置信度，默认为0.9
+        :return: tuple[int, Box | None] - 找到的文本索引和位置，如果未找到则返回-1和None
+        """
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            index, box = self.ocr_match_any(texts, confidence, *args, **kwargs)
+            if index != -1:
+                return index, box
+            time.sleep(interval)
+        logger.debug(f"Timeout: '{texts}' -> Not found in {timeout} seconds")
+        return -1, None
+
+    def click_point(self, x: int | float, y: int | float, x_offset: int | float= 0, y_offset: int | float= 0,
                     after_sleep: float = 0) -> bool:
         """
         点击指定位置
@@ -550,12 +596,15 @@ class Operator:
         如果x和y是浮点数，则将其转换为相对于窗口区域的坐标
         :param x: int或float类型，表示点击位置的x坐标
         :param y: int或float类型，表示点击位置的y坐标
-        :param x_offset: x偏移量(px)
-        :param y_offset: y偏移量(px)
+        :param x_offset: x偏移量(px)或百分比(float)
+        :param y_offset: y偏移量(px)或百分比(float)
         :param after_sleep: 点击后等待时间，单位秒
         :return: None
         """
         logger.debug(f"点击位置: ({x}, {y}), 偏移: ({x_offset}, {y_offset}), 等待时间: {after_sleep}秒")
+        if isinstance(x_offset, float) and isinstance(y_offset, float):
+            x_offset = int(self.width * x_offset)
+            y_offset = int(self.height * y_offset)
         if isinstance(x, int) and isinstance(y, int):
             pyautogui.click(x + self.left + x_offset, y + self.top + y_offset)
             self.sleep(after_sleep)
@@ -571,7 +620,7 @@ class Operator:
             raise ValueError(
                 f"Invalid arguments: expected 'int, int' or 'float, float', got '{type(x).__name__}, {type(y).__name__}'")
 
-    def click_box(self, box: Box, x_offset: int = 0, y_offset: int = 0, after_sleep: float = 0) -> bool:
+    def click_box(self, box: Box, x_offset: int | float = 0, y_offset: int | float= 0, after_sleep: float = 0) -> bool:
         """点击图片位置"""
         if box is None:
             logger.trace("Could not click a Empty Box")
@@ -579,7 +628,7 @@ class Operator:
         x, y = box.center
         return self.click_point(int(x), int(y), x_offset, y_offset, after_sleep)
 
-    def click_img(self, img_path: str, x_offset: int = 0, y_offset: int = 0, after_sleep: float = 0) -> bool:
+    def click_img(self, img_path: str, x_offset: int | float = 0, y_offset: int | float = 0, after_sleep: float = 0) -> bool:
         """点击图片中心"""
         box = self.locate(img_path)
         if box is None:

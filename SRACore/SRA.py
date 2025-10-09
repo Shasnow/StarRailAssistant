@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QApplication
 from SRACore.component.main_window import MainWindowComponent
 from SRACore.component.tray import SystemTray
 from SRACore.thread.background_thread import BackgroundThreadWorker
-from SRACore.thread.task_thread import TaskManager
+from SRACore.thread.task_thread import TaskThread
 from SRACore.thread.trigger_thread import TriggerManager
 from SRACore.util.config import GlobalConfigManager
 from SRACore.util.logger import logger
@@ -26,7 +26,7 @@ class SRA:
         self.tray = SystemTray(self.main_window)
         self.main_window.set_tray(self.tray)
         self.main_window.set_background_thread(*BackgroundThreadWorker.create(self.global_manager))
-        self.task_thread = TaskManager()
+        self.task_thread = TaskThread()
         self.main_window.started.connect(self.task_thread.start)
         self.main_window.require_stop.connect(self.task_thread.stop)
         self.task_thread.finished.connect(self.main_window.finish)

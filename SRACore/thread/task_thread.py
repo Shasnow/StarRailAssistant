@@ -7,8 +7,24 @@ from SRACore.tasks.BaseTask import BaseTask
 from SRACore.util.config import GlobalConfigManager, ConfigManager
 from SRACore.util.logger import logger
 
+class TaskThread(QThread):
+    def __init__(self):
+        super().__init__()
+        self.task_manager = TaskManager()
+        self.gcm = GlobalConfigManager.get_instance()  # 全局配置管理器
+        self.config_manager = ConfigManager.get_instance()  # 单例配置管理器
 
-class TaskManager(QThread):
+    def run(self):
+        self.task_manager.run()
+
+    def stop(self):
+        self.task_manager.stop()
+        if self.gcm.get('thread_safety'):
+            self.quit()
+        else:
+            self.terminate()
+
+class TaskManager:
     """
     任务管理器线程，负责按顺序执行多个任务（如启动游戏、体力刷取等）。
     支持通过配置动态加载任务列表，并处理任务的中断和错误。
@@ -18,7 +34,6 @@ class TaskManager(QThread):
         """
         初始化任务管理器。
         """
-        super().__init__()
         self.gcm = GlobalConfigManager.get_instance()  # 全局配置管理器
         self.config_manager = ConfigManager.get_instance()  # 单例配置管理器
         self.running_flag = False
@@ -45,10 +60,6 @@ class TaskManager(QThread):
         """
         logger.warning("Task execution interrupted by user.")
         self.running_flag = False
-        if self.gcm.get('thread_safety'):
-            self.quit()
-        else:
-            self.terminate()
 
     def run(self):
         """
