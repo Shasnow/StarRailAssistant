@@ -226,6 +226,11 @@ class ReceiveRewardTask(BaseTask):
                 self.sleep(0.5)
                 if self.locate("resources/img/daily_train_reward_notreach.png"):  # NOQA
                     logger.info("存在每日实训未达到要求")
+
+            if self.locate("resources/img/daily_train_reward_notreach.png"):
+                self.synthesis()
+                self.relic()
+
             else:
                 logger.info("没有可领取的奖励")
         self.screenshot().save(f"log/daily_training_reward-{self.config_name}.png")
@@ -266,3 +271,58 @@ class ReceiveRewardTask(BaseTask):
         else:
             logger.info("没有可领取的奖励")
         logger.info("完成任务：领取无名勋礼奖励")
+
+    def synthesis(self):
+        if self.click_img("resources/img/synthesis.png",y_offset=330):
+            self.sleep(2)
+            self.click_img("resources/img/material _replacement.png")
+            logger.info("材料合成")
+            self.sleep(2)
+            self.click_point(0.220, 0.176, after_sleep=1)
+            self.click_img("resources/img/automatic _placement.png")
+            self.sleep(2)
+            self.click_img("resources/img/synthesis2.png")
+            self.sleep(2)
+            self.click_img("resources/img/ensure.png")
+            self.sleep(3)
+            logger.info("合成完毕，返回领取奖励")
+            self.press_key("esc",presses=2, interval=1.5)
+            self.sleep(1.5)
+            self.click_img("resources/img/daily_reward.png", after_sleep=0.5)
+            logger.info("领取奖励")
+            self.click_img("resources/img/daily_train_reward.png", after_sleep=1.5)
+
+    def relic(self):
+        if self.click_img("resources/img/relic.png", y_offset=330):
+            self.sleep(2)
+            self.click_img("resources/img/order.png",x_offset=114)
+            self.click_img("resources/img/order.png", x_offset=114,y_offset=-155)
+            self.sleep(0.5)
+            self.click_img("resources/img/reverse_order.png")
+            self.sleep(1)
+            self.click_point(0.097, 0.220, after_sleep=1)
+            self.click_img("resources/img/enhance.png")
+            self.sleep(1)
+            self.click_img("resources/img/upgrade_materials.png")
+            logger.info("更换升级材料为四星及以下")
+            self.sleep(1)
+            self.click_img("resources/img/four_star.png")
+            self.click_img("resources/img/next_code.png")
+            self.click_img("resources/img/ensure.png")
+            self.sleep(1)
+            self.click_img("resources/img/automatic_placement2.png")
+            self.sleep(1)
+            self.click_img("resources/img/enhance.png")
+            self.sleep(2)
+            self.press_key("esc",presses=3, interval=1.5)
+            self.sleep(1)
+            logger.info("升级完毕，准备返回领取奖励")
+            self.click_img("resources/img/daily_reward.png", after_sleep=0.5)
+            logger.info("领取奖励")
+            self.click_img("resources/img/daily_train_reward.png", after_sleep=1.5)
+
+
+
+
+
+
