@@ -106,9 +106,14 @@ class SimulateUniverseTask(BaseTask):
     def _complete_mission(self):
         """完成任务结算"""
         logger.info("退出并结算")
-        self.press_key("esc")
-
-        if not self.wait_img("resources/img/end_and_settle.png"):
+        for i in range(30):
+            if not self.locate("resources/img/end_and_settle.png"):
+                self.press_key("esc")
+                self.sleep(1)
+            else:
+                break
+        else:
+            logger.error("无法退出，错误编号21")
             return False
 
         self.click_point(0.8, 0.9, after_sleep=0.5)
