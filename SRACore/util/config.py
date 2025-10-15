@@ -150,10 +150,9 @@ class ConfigManager:
         """
         获取当前配置管理器实例。
         如果实例不存在，则创建一个新的实例。
-        :return: ConfigManager实例
         """
         if cls.instance is None:
-            raise RuntimeError("ConfigManager instance is not initialized. Please create an instance first.")
+            cls.instance = ConfigManager("default")
         # 如果实例已存在，直接返回
         return cls.instance
 
@@ -245,10 +244,8 @@ class GlobalConfigManager:
     @classmethod
     def get_instance(cls):
         """
-        获取当前全局配置管理器实例。
-        如果实例不存在，抛出异常。
-        :return: GlobalConfigManager实例
+        获取当前全局配置管理器实例。如果不存在，则创建一个新的实例。
         """
         if cls.__instance is None:
-            raise RuntimeError("GlobalConfigManager instance is not initialized. Please create an instance first.")
+            cls.__instance = GlobalConfigManager()
         return cls.__instance

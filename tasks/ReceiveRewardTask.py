@@ -224,8 +224,6 @@ class ReceiveRewardTask(BaseTask):
             if self.click_img("resources/img/daily_train_reward.png", after_sleep=1.5):
                 self.press_key("esc")
                 self.sleep(0.5)
-                if self.locate("resources/img/daily_train_reward_notreach.png"):  # NOQA
-                    logger.info("存在每日实训未达到要求")
 
             if self.locate("resources/img/daily_train_reward_notreach.png"):
                 self.synthesis()

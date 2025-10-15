@@ -10,6 +10,7 @@ class StartGameTask(BaseTask):
         super().__init__('start_game', config)
 
     def run(self):
+        logger.info("启动游戏任务开始")
         self.launch_game()
         match self.login():
             case -1 | 0:
@@ -178,10 +179,10 @@ class StartGameTask(BaseTask):
             return -1
 
     def start_game_click(self):
-        result = self.wait_any_img(["resources/img/12+.png", "resources/img/quit.png"], timeout=60, interval=0.5)
+        result,_ = self.wait_ocr_any(["开始游戏", "点击进入"], timeout=60, interval=1, from_x=0.44, from_y=0.74, to_x=0.57, to_y=0.97)
         if result == 0:
             self.click_point(0.5, 0.6, after_sleep=1.5)
-            self.wait_img("resources/img/quit.png", timeout=20)
+            self.wait_ocr("点击进入", timeout=20, interval=1, from_x=0.44, from_y=0.74, to_x=0.57, to_y=0.97)
             self.click_point(0.5, 0.5)
             return True
         elif result == 1:
