@@ -2,11 +2,15 @@ import sys
 
 if __name__ == '__main__':
     args=sys.argv[1:]
-    if '--no-gui' in args:
+    if 'run' in args:
         from SRACore.thread.task_thread import TaskManager
 
         task_manager = TaskManager()
-        task_manager.run()
+        try:
+            task_manager.run()
+        except KeyboardInterrupt:
+            task_manager.stop()
+            exit(0)
     else:
         from SRACore.SRA import SRA
         SRA.run()

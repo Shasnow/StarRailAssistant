@@ -7,6 +7,7 @@ from SRACore.tasks.BaseTask import BaseTask
 from SRACore.util.config import GlobalConfigManager, ConfigManager
 from SRACore.util.logger import logger
 
+
 class TaskThread(QThread):
     def __init__(self):
         super().__init__()
@@ -23,6 +24,7 @@ class TaskThread(QThread):
             self.quit()
         else:
             self.terminate()
+
 
 class TaskManager:
     """
