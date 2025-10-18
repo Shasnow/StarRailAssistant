@@ -223,6 +223,7 @@ class TrailblazePowerTask(BaseTask):
                     return False
             if self.config["use_assistant"]:
                 self.support()
+            self.sleep(1)
             if not self.click_img("resources/img/battle_star.png", after_sleep=1):
                 logger.error("发生错误，错误编号4")
                 self.press_key("esc", interval=1, presses=3)
