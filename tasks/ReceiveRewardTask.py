@@ -272,6 +272,7 @@ class ReceiveRewardTask(BaseTask):
 
     def synthesis(self):
         if self.click_img("resources/img/synthesis.png",y_offset=330):
+            logger.info("找到合成任务")
             self.sleep(2)
             self.click_img("resources/img/material _replacement.png")
             logger.info("材料合成")
@@ -279,46 +280,68 @@ class ReceiveRewardTask(BaseTask):
             self.click_point(0.220, 0.176, after_sleep=1)
             self.click_img("resources/img/automatic _placement.png")
             self.sleep(2)
-            self.click_img("resources/img/synthesis2.png")
+            if not self.click_img("resources/img/synthesis2.png"):
+                logger.info("未能找到合适的材料进行合成")
+                return
             self.sleep(2)
             self.click_img("resources/img/ensure.png")
             self.sleep(3)
-            logger.info("合成完毕，返回领取奖励")
-            self.press_key("esc",presses=2, interval=1.5)
+            if self.click_img("resources/img/close.png"):
+                logger.info("合成完毕，返回领取奖励")
             self.sleep(1.5)
+            self.press_key("esc",presses=1, interval=1.5)
+            self.sleep(1)
             self.click_img("resources/img/daily_reward.png", after_sleep=0.5)
             logger.info("领取奖励")
             self.click_img("resources/img/daily_train_reward.png", after_sleep=1.5)
 
+        else:
+            logger.info("未能找到合成任务")
+
     def relic(self):
-        if self.click_img("resources/img/relic.png", y_offset=330):
+        if  self.click_img("resources/img/relic.png", y_offset=330):
+            logger.info("找到升级遗器任务")
+            for _ in range(5):
+                if not self.click_img("resources/img/enhance.png"):
+                    self.click_img("resources/img/order.png", x_offset=114)
+                    self.click_img("resources/img/order.png", x_offset=114, y_offset=-155)
+                    self.sleep(0.5)
+                    self.click_img("resources/img/reverse_order.png")
+                    self.sleep(1)
+                    self.click_point(0.097, 0.220, after_sleep=1)
+                else:
+                    break
+            else:
+                logger.info("未能找到合适的遗物进行升级")
+                return False
+            self.sleep(1)
+            for _ in range(5):
+                if not self.click_img("resources/img/close.png"):
+                    self.click_img("resources/img/upgrade_materials.png")
+                    logger.info("更换升级材料为四星及以下")
+                    self.sleep(1)
+                    self.click_img("resources/img/four_star.png")
+                    self.click_img("resources/img/next_code.png")
+                    self.click_img("resources/img/ensure.png")
+                    self.sleep(1)
+                    self.click_img("resources/img/automatic_placement2.png")
+                    self.sleep(1)
+                    self.click_img("resources/img/enhance.png")
+                    self.sleep(1.5)
+                else:
+                    break
+            else:
+                logger.info("未能找到升级材料")
+                return False
             self.sleep(2)
-            self.click_img("resources/img/order.png",x_offset=114)
-            self.click_img("resources/img/order.png", x_offset=114,y_offset=-155)
-            self.sleep(0.5)
-            self.click_img("resources/img/reverse_order.png")
-            self.sleep(1)
-            self.click_point(0.097, 0.220, after_sleep=1)
-            self.click_img("resources/img/enhance.png")
-            self.sleep(1)
-            self.click_img("resources/img/upgrade_materials.png")
-            logger.info("更换升级材料为四星及以下")
-            self.sleep(1)
-            self.click_img("resources/img/four_star.png")
-            self.click_img("resources/img/next_code.png")
-            self.click_img("resources/img/ensure.png")
-            self.sleep(1)
-            self.click_img("resources/img/automatic_placement2.png")
-            self.sleep(1)
-            self.click_img("resources/img/enhance.png")
-            self.sleep(2)
-            self.press_key("esc",presses=3, interval=1.5)
+            self.press_key("esc",presses=2, interval=1.5)
             self.sleep(1)
             logger.info("升级完毕，准备返回领取奖励")
             self.click_img("resources/img/daily_reward.png", after_sleep=0.5)
             logger.info("领取奖励")
             self.click_img("resources/img/daily_train_reward.png", after_sleep=1.5)
-
+        else:
+            logger.info("未能找到升级遗器任务")
 
 
 
