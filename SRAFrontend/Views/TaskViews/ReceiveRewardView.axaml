@@ -1,0 +1,24 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SRAFrontend.Views.TaskViews.ReceiveRewardView">
+    <suki:GlassCard>
+        <suki:GroupBox Header="领取奖励">
+            <ScrollViewer>
+                <StackPanel Margin="10" Spacing="20">
+                    <CheckBox>漫游签证</CheckBox>
+                    <CheckBox>派遣</CheckBox>
+                    <CheckBox>右键</CheckBox>
+                    <CheckBox>每日实训</CheckBox>
+                    <CheckBox>无名勋礼</CheckBox>
+                    <CheckBox>巡星之礼</CheckBox>
+                    <CheckBox>兑换码</CheckBox>
+                    <TextBox Watermark="兑换码填写处"></TextBox>
+                </StackPanel>
+            </ScrollViewer>
+        </suki:GroupBox>
+    </suki:GlassCard>
+</UserControl>

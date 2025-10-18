@@ -1,0 +1,33 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SRAFrontend.Views.TaskViews.SimulatedUniverse">
+    <suki:GlassCard>
+        <suki:GroupBox Header="模拟宇宙">
+            <ScrollViewer>
+                <StackPanel Margin="10">
+                    <suki:GlassCard>
+                        <StackPanel>
+                            <Label>差分宇宙 - 千面英雄</Label>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Label>模式</Label>
+                                <ComboBox SelectedIndex="0">
+                                    <ComboBoxItem>普通模式</ComboBoxItem>
+                                    <ComboBoxItem>困难模式</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Label>次数</Label>
+                                <NumericUpDown FormatString="0" Value="1" Minimum="1" Maximum="99999" />
+                            </StackPanel>
+                        </StackPanel>
+                    </suki:GlassCard>
+                    <TextBlock>请先手动完成一次以清除所有新手提示</TextBlock>
+                </StackPanel>
+            </ScrollViewer>
+        </suki:GroupBox>
+    </suki:GlassCard>
+</UserControl>
