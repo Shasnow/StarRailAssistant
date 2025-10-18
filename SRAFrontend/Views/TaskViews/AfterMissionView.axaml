@@ -1,0 +1,22 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SRAFrontend.Views.TaskViews.AfterMissionView">
+    <suki:GlassCard>
+        <suki:GroupBox Header="任务完成后">
+            <ScrollViewer>
+                <StackPanel Margin="10" Spacing="20">
+                    <CheckBox>登出当前账号</CheckBox>
+                    <CheckBox>退出游戏</CheckBox>
+                    <CheckBox>关闭程序</CheckBox>
+                    <RadioButton>关机</RadioButton>
+                    <RadioButton>休眠</RadioButton>
+                    <RadioButton>无动作</RadioButton>
+                </StackPanel>
+            </ScrollViewer>
+        </suki:GroupBox>
+    </suki:GlassCard>
+</UserControl>
