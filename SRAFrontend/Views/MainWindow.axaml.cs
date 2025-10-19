@@ -15,4 +15,5 @@ public partial class MainWindow : SukiWindow
     {
         (DataContext as MainWindowViewModel)?.SwitchLightMode();
     }
+    
 }

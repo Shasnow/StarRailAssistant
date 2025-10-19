@@ -205,7 +205,7 @@ public partial class TaskPageViewModel : PageViewModel
     public string EnableContextMenu => SelectedTaskItem is not null ? "True" : "False";
 
     public string TogglePasswordVisibilityButtonContent =>
-        PasswordMask == "*" ? "\uE220" : "\uE224";
+        PasswordMask == "*" ? "\uE224" : "\uE220";
 
     [RelayCommand]
     private void DeleteSelectedTaskItem()
