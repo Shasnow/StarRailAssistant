@@ -23,6 +23,7 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+        <PackageReference Include="Markdown.Avalonia.Tight" Version="11.0.2" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-rc.2.25502.107" />
         <PackageReference Include="SukiUI" Version="6.0.3" />
     </ItemGroup>

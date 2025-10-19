@@ -1,10 +1,12 @@
 using System.Linq;
+using System.Net.Http;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using SRAFrontend.Controls;
+using SRAFrontend.Services;
 using SRAFrontend.ViewModels;
 using SRAFrontend.Views;
 using SukiUI.Toasts;
@@ -53,7 +55,8 @@ public partial class App : Application
                 provider.GetRequiredService<SettingPageViewModel>()
             };
             var toastManager = provider.GetRequiredService<ISukiToastManager>();
-            return new MainWindowViewModel(pages, toastManager);
+            var announcementService = provider.GetRequiredService<AnnouncementService>();
+            return new MainWindowViewModel(pages, toastManager, announcementService);
         });
         services.AddTransient<HomePageViewModel>();
         services.AddTransient<TaskPageViewModel>();
@@ -62,6 +65,8 @@ public partial class App : Application
         services.AddTransient<SettingPageViewModel>();
         services.AddSingleton<ControlPanelViewModel>();
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
+        services.AddTransient<AnnouncementService>();
+        services.AddTransient<HttpClient>();
     }
 
     private void DisableAvaloniaDataAnnotationValidation()

@@ -5,6 +5,7 @@
         xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
         xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
         xmlns:lang="clr-namespace:SRAFrontend.Localization"
+        xmlns:controls="clr-namespace:SRAFrontend.Controls"
         mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
         Width="1024" Height="600"
         x:Class="SRAFrontend.Views.MainWindow"
@@ -26,6 +27,10 @@
         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
         <Button Classes="WindowControlsButton" Click="SwitchLightModeButton_OnClick">
             <Label Classes="icon" Content="{Binding LightModeText}" />
+        </Button>
+        <!-- ReSharper disable once Xaml.StyleClassNotFound -->
+        <Button Classes="WindowControlsButton" Command="{Binding ShowAnnouncementBoardCommand}">
+            <Label Classes="icon" Content="&#xE324;" />
         </Button>
     </suki:SukiWindow.RightWindowTitleBarControls>
 
