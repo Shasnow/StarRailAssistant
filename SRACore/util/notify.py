@@ -17,6 +17,8 @@ def send_mail_notification(title="SRA", message="", config: dict = None):
 
 def send_mail(title="SRA", subject="SRA通知", message="", SMTP="", port=465, sender="", password="", receiver=""):
     """发送邮件"""
+    if SMTP=="" or sender=="" or password=="" or receiver=="":
+        return False
     try:
         msg = MIMEText(message, 'plain', 'utf-8')
         msg['From'] = formataddr((title, sender))
