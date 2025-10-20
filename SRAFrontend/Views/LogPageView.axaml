@@ -4,13 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
              xmlns:lang="clr-namespace:SRAFrontend.Localization"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SRAFrontend.Views.LogPageView">
+             x:Class="SRAFrontend.Views.LogPageView"
+             x:DataType="viewModels:LogPageViewModel">
+    <Design.DataContext>
+        <viewModels:LogPageViewModel />
+    </Design.DataContext>
     <suki:GlassCard>
         <suki:GroupBox Header="{x:Static lang:Resources.LogText}">
-            <TextBlock>
-                2024-06-01 12:00:00 [信息] 应用程序启动成功。
-            </TextBlock>
+            <TextBlock Text="{Binding Log}" />
         </suki:GroupBox>
     </suki:GlassCard>
 </UserControl>
