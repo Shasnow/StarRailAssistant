@@ -145,6 +145,7 @@ jobs:
           NOTES="$NOTES_MAIN
           
           [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
+          下载说明: zip包-免安装版; setup-免解压一键安装版
 
           \`\`\`本release通过GitHub Actions自动构建\`\`\`"
           gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" --prerelease artifacts/*
@@ -161,6 +162,7 @@ jobs:
           NOTES="$NOTES_MAIN
           
           [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
+          下载说明: zip包-免安装版; setup-免解压一键安装版
 
           \`\`\`本release通过GitHub Actions自动构建\`\`\`"
           gh release delete "$TAGNAME" --yes
