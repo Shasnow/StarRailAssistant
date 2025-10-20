@@ -1,0 +1,98 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
+             xmlns:models1="clr-namespace:SRAFrontend.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SRAFrontend.Views.TaskViews.TrailblazePowerView"
+             x:DataType="viewModels:TaskPageViewModel">
+    <Design.DataContext>
+        <viewModels:TaskPageViewModel />
+    </Design.DataContext>
+    
+    <suki:GlassCard>
+        <suki:GroupBox Header="清体力">
+            <Grid ColumnDefinitions="*, *">
+                <ScrollViewer>
+                    <StackPanel Spacing="10">
+                        <suki:GlassCard IsInteractive="True">
+                            <StackPanel>
+                                <Grid RowDefinitions="*,*,*" ColumnDefinitions="*,*" RowSpacing="10">
+                                    <CheckBox Grid.Row="0" Grid.Column="0">补充体力</CheckBox>
+                                    <ComboBox Grid.Row="0" Grid.Column="1" SelectedIndex="0">
+                                        <ComboBoxItem>方式</ComboBoxItem>
+                                    </ComboBox>
+                                    <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">使用支援角色</CheckBox>
+                                    <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">重新编队</CheckBox>
+                                </Grid>
+                            </StackPanel>
+                        </suki:GlassCard>
+                        <!-- 任务列表区域 -->
+                        <ItemsControl ItemsSource="{Binding Tasks}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models1:TrailblazePowerTask">
+                                    <suki:GlassCard Margin="0 0 0 10" IsInteractive="True">
+                                        <suki:GroupBox Header="{Binding Title}">
+                                            <StackPanel Spacing="12">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <Label Content="选择关卡" />
+                                                    <ComboBox ItemsSource="{Binding Levels}" SelectedIndex="{Binding SelectedIndex}" />
+                                                </StackPanel>
+
+                                                <StackPanel Orientation="Horizontal" Spacing="8"
+                                                            IsVisible="{Binding CanMulti}">
+                                                    <Label Content="连续作战" />
+                                                    <NumericUpDown FormatString="0" Value="{Binding Count}"
+                                                                   Minimum="1" Maximum="6" Increment="1"
+                                                                   VerticalContentAlignment="Center" />
+                                                </StackPanel>
+
+                                                <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="8">
+                                                    <Label Content="执行次数" />
+                                                    <NumericUpDown Grid.Column="1" FormatString="0" Value="{Binding RunTimes}"
+                                                                   Minimum="1" Maximum="99" Increment="1" />
+                                                    <Button Grid.Column="2" Classes="Flat Icon" Content="+" HorizontalAlignment="Right" Command="{Binding AddTaskItemCommand}"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </suki:GroupBox>
+                                    </suki:GlassCard>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+                <suki:GlassCard Grid.Column="1">
+                    <suki:GroupBox Header="任务清单">
+                        <ListBox ItemsSource="{Binding TaskItems}" SelectedItem="{Binding SelectedTaskItem}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid RowDefinitions="*,*,*,*" ColumnDefinitions="Auto,*">
+                                        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="{Binding Name}" HorizontalAlignment="Center"/>
+                                        <Label Grid.Row="1" Grid.Column="0">关卡名称</Label>
+                                        <Label Grid.Row="1" Grid.Column="1" Content="{Binding LevelName}" />
+                                        <Label Grid.Row="2" Grid.Column="0" Content="单次次数" />
+                                        <Label Grid.Row="2" Grid.Column="1" Content="{Binding Count}" />
+                                        <Label Grid.Row="3" Grid.Column="0" Content="执行次数" />
+                                        <Label Grid.Row="3" Grid.Column="1" Content="{Binding RunTimes}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Delete" IsEnabled="{Binding EnableContextMenu}" Command="{Binding DeleteSelectedTaskItemCommand}">
+                                        <MenuItem.Icon>
+                                            <Label Classes="icon" Content="&#xE4A6;" FontSize="10"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
+                        </ListBox>
+                    </suki:GroupBox>
+                </suki:GlassCard>
+            </Grid>
+        </suki:GroupBox>
+    </suki:GlassCard>
+
+</UserControl>

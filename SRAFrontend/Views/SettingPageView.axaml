@@ -1,0 +1,166 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SRAFrontend.Views.SettingPageView"
+             x:DataType="viewModels:SettingPageViewModel">
+    <Design.DataContext>
+        <viewModels:SettingPageViewModel />
+    </Design.DataContext>
+    <suki:SukiStackPage>
+        <suki:SukiStackPage.Content>
+            <suki:SettingsLayout Name="{x:Static lang:Resources.SettingText}">
+                <suki:SettingsLayout.Styles>
+                    <Style Selector="Label">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                    <Style Selector="Grid">
+                        <Setter Property="ColumnSpacing" Value="10" />
+                    </Style>
+                </suki:SettingsLayout.Styles>
+                <suki:SettingsLayout.Items>
+                    <objectModel:ObservableCollection x:TypeArguments="suki:SettingsLayoutItem">
+                        <suki:SettingsLayoutItem Header="{x:Static lang:Resources.DisplayText}">
+                            <suki:SettingsLayoutItem.Content>
+                                <StackPanel>
+                                    <!-- <Grid ColumnDefinitions="Auto,*,Auto"> -->
+                                    <!--     <Label Grid.Column="0" Classes="icon">&#xe6c8;</Label> -->
+                                    <!--     <Label Grid.Column="1" Content="{x:Static lang:Resources.ThemeText}" /> -->
+                                    <!--     <ComboBox Grid.Column="2" SelectedIndex="{Binding ThemeSelectedIndex}"> -->
+                                    <!--         <ComboBoxItem Content="{x:Static lang:Resources.LightText}" /> -->
+                                    <!--         <ComboBoxItem Content="{x:Static lang:Resources.DarkText}" /> -->
+                                    <!--     </ComboBox> -->
+                                    <!-- </Grid> -->
+                                    <!-- <Grid ColumnDefinitions="Auto, *, Auto"> -->
+                                    <!--     <Label Grid.Column="0" Classes="icon" Content="&#xE2CA;" /> -->
+                                    <!--     <Label Grid.Column="1" Content="{x:Static lang:Resources.BackgroundImageText}" /> -->
+                                    <!--     <TextBox Grid.Column="2">c:/background.jpg</TextBox> -->
+                                    <!-- </Grid> -->
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Grid.Column="0" Classes="icon" Content="&#xEB42;" />
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.BackgroundImageOpacityText}" />
+                                        <Slider Grid.Column="2" Width="200" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Label Grid.Column="0" Classes="icon">&#xe4a2;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.LanguageText}" />
+                                        <ComboBox Grid.Column="2" SelectedIndex="{Binding CurrentLang}">
+                                            <ComboBoxItem>English</ComboBoxItem>
+                                            <ComboBoxItem>简体中文</ComboBoxItem>
+                                        </ComboBox>
+                                    </Grid>
+                                </StackPanel>
+                            </suki:SettingsLayoutItem.Content>
+                        </suki:SettingsLayoutItem>
+
+                        <suki:SettingsLayoutItem Header="{x:Static lang:Resources.RegularText}">
+                            <suki:SettingsLayoutItem.Content>
+                                <StackPanel>
+                                    <Expander Header="{x:Static lang:Resources.NotificationText}"
+                                              HorizontalAlignment="Stretch">
+                                        <StackPanel Spacing="10">
+                                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                                <Label Classes="icon">&#xe0ce;</Label>
+                                                <Label Grid.Column="1"
+                                                       Content="{x:Static lang:Resources.AllowNotificationText}" />
+                                                <ToggleSwitch Grid.Column="2" />
+                                            </Grid>
+                                            <CheckBox>System Notification</CheckBox>
+                                            <CheckBox>Email Notification</CheckBox>
+                                        </StackPanel>
+                                    </Expander>
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Label Grid.Column="0" Classes="icon">&#xe0f4;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.DefaultPageText}" />
+                                        <ComboBox Grid.Column="2" SelectedIndex="0">
+                                            <ComboBoxItem>Page1</ComboBoxItem>
+                                            <ComboBoxItem>Page2</ComboBoxItem>
+                                            <ComboBoxItem>Page3</ComboBoxItem>
+                                        </ComboBox>
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Label Classes="icon">&#xe586;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.StartUpText}" />
+                                        <ToggleSwitch Grid.Column="2" />
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Label Classes="icon">&#xe40c;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ThreadSafetyText}" />
+                                        <ToggleSwitch Grid.Column="2" />
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="icon">&#xe310;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ZoomText}" />
+                                        <NumericUpDown Grid.Column="2" FormatString="0.00" Value="{Binding Zoom}"
+                                                       Increment="0.25" Minimum="0"
+                                                       Maximum="5" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="icon">&#xee60;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ConfidenceText}" />
+                                        <NumericUpDown Grid.Column="2" FormatString="0.00" Value="0.90"
+                                                       Increment="0.01" Minimum="0"
+                                                       Maximum="1" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Label Classes="icon">&#xe434;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.EnableTrayIconText}" />
+                                        <ToggleSwitch Grid.Column="2" />
+                                    </Grid>
+                                </StackPanel>
+                            </suki:SettingsLayoutItem.Content>
+                        </suki:SettingsLayoutItem>
+                        
+                        <suki:SettingsLayoutItem Header="{x:Static lang:Resources.UpdateText}">
+                            <suki:SettingsLayoutItem.Content>
+                                <StackPanel>
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Label Classes="icon">&#xe094;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.AutoUpdateText}" />
+                                        <ToggleSwitch Grid.Column="2" />
+                                    </Grid>
+                
+                                    <Grid ColumnDefinitions="Auto, *, *">
+                                        <Label Classes="icon">&#xed6a;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.MirrorChyanText}" />
+                                        <TextBox Grid.Column="2" Watermark="Enter You CDK" PasswordChar="*"/>
+                                    </Grid>
+                                </StackPanel>
+                            </suki:SettingsLayoutItem.Content>
+                        </suki:SettingsLayoutItem>
+
+                        <suki:SettingsLayoutItem Header="{x:Static lang:Resources.AdvanceText}">
+                            <suki:SettingsLayoutItem.Content>
+                                <StackPanel>
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="icon">&#xe184;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ResourceIntegrityCheckText}"></Label>
+                                        <Button Grid.Column="2">Check</Button>
+                                    </Grid>
+                                </StackPanel>
+                            </suki:SettingsLayoutItem.Content>
+                        </suki:SettingsLayoutItem>
+                        <suki:SettingsLayoutItem Header="{x:Static lang:Resources.AboutText}">
+                            <suki:SettingsLayoutItem.Content>
+                                <StackPanel>
+                                    <TextBlock TextWrapping="Wrap">
+                                        About Us:
+                                        This application is developed by [Your Company]. For more information, visit our webside.
+                                    </TextBlock>
+                                </StackPanel>
+                            </suki:SettingsLayoutItem.Content>
+                        </suki:SettingsLayoutItem>
+                    </objectModel:ObservableCollection>
+                </suki:SettingsLayout.Items>
+            </suki:SettingsLayout>
+        </suki:SukiStackPage.Content>
+    </suki:SukiStackPage>
+</UserControl>

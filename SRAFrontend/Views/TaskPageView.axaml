@@ -1,0 +1,33 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
+             xmlns:taskViews="clr-namespace:SRAFrontend.Views.TaskViews"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:TaskPageViewModel"
+             x:Class="SRAFrontend.Views.TaskPageView">
+    <Border Margin="10">
+        <Grid RowDefinitions="Auto, *">
+            <suki:GlassCard Content="{Binding ControlPanelViewModel}" />
+            <TabControl Grid.Row="1">
+                <TabItem Header="Start Game">
+                    <taskViews:StartGameView />
+                </TabItem>
+                <TabItem Header="Trailblaze Power">
+                    <taskViews:TrailblazePowerView />
+                </TabItem>
+                <TabItem Header="Receive Reward">
+                    <taskViews:ReceiveRewardView />
+                </TabItem>
+                <TabItem Header="Simulated Universe">
+                    <taskViews:SimulatedUniverse />
+                </TabItem>
+                <TabItem Header="After Mission">
+                    <taskViews:AfterMissionView />
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </Border>
+</UserControl>

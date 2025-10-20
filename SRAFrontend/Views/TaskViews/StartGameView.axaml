@@ -1,0 +1,53 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SRAFrontend.Views.TaskViews.StartGameView"
+             x:DataType="viewModels:TaskPageViewModel">
+    <suki:GlassCard>
+        <suki:GroupBox Header="启动游戏">
+            <ScrollViewer>
+                <StackPanel Margin="10">
+                    <Grid Margin="0,0,0,15" ColumnDefinitions="Auto, Auto">
+                        <TextBlock Text="渠道" VerticalAlignment="Center" />
+                        <ComboBox Grid.Column="1" SelectedIndex="0">
+                            <ComboBoxItem>官服</ComboBoxItem>
+                            <ComboBoxItem>b服</ComboBoxItem>
+                        </ComboBox>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,15">
+                        <TextBlock Grid.Column="0" Text="游戏路径" VerticalAlignment="Center" Margin="0,0,10,0" />
+                        <TextBox Grid.Column="1" Text="{Binding GamePath}"/>
+                        <Button Grid.Column="2" Content="浏览" Command="{Binding SelectedPathCommand}"/>
+                    </Grid>
+
+                    <StackPanel Margin="0,0,0,15">
+                        <CheckBox x:Name="AutoLoginCheckBox" Content="自动登录" IsChecked="True" />
+                        <TextBlock Margin="25,5,0,0" FontSize="12" Foreground="Gray" TextWrapping="Wrap">
+                            勾选自动登录表明您已阅读并同意《用户协议》 和《隐私政策》
+                        </TextBlock>
+                        <CheckBox Content="总是重新登录" Margin="0,10,0,0" />
+                    </StackPanel>
+                    
+                    <Grid RowDefinitions="*, *" ColumnDefinitions="Auto, *, Auto" Width="400" HorizontalAlignment="Left">
+                        <Label Grid.Row="0" Grid.Column="0" Content="账号：" />
+                        <TextBox Grid.Row="0" Grid.Column="1" />
+                        <Label Grid.Row="1" Grid.Column="0" Content="密码：" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Password}" 
+                                 PasswordChar="{Binding PasswordMask}" />
+                        <!-- ReSharper disable once Xaml.StyleClassNotFound -->
+                        <Button Classes="Basic" Grid.Row="1" Grid.Column="2" 
+                                Command="{Binding TogglePasswordVisibilityCommand}" >
+                            <Label Classes="icon" 
+                                   Content="{Binding TogglePasswordVisibilityButtonContent}" />
+                        </Button>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </suki:GroupBox>
+    </suki:GlassCard>
+</UserControl>

@@ -5,9 +5,19 @@ from SRACore.triggers import AutoPlotTrigger
 from SRACore.triggers.BaseTrigger import BaseTrigger
 from SRACore.util.logger import logger
 from SRACore.widget.ToggleSwitch import ToggleSwitch
+class TriggerThread(QThread):
+    def __init__(self):
+        super().__init__()
+        self.trigger_manager = TriggerManager.get_instance()
 
+    def run(self):
+        self.trigger_manager.run()
 
-class TriggerManager(QThread):
+    def stop(self):
+        self.trigger_manager.stop()
+        self.quit()
+
+class TriggerManager:
     __instance = None
     finished_signal = Signal()
 

@@ -1,0 +1,38 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:SRAFrontend.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="50"
+             x:Class="SRAFrontend.Controls.ControlPanelView"
+             x:DataType="controls:ControlPanelViewModel">
+    <Design.DataContext>
+        <controls:ControlPanelViewModel />
+    </Design.DataContext>
+    <StackPanel
+        Orientation="Horizontal"
+        HorizontalAlignment="Right"
+        Spacing="10">
+
+        <ComboBox SelectedIndex="{Binding SelectedIndex}"
+                  Width="150">
+            <ComboBoxItem>Item 1</ComboBoxItem>
+            <ComboBoxItem>Item 2</ComboBoxItem>
+        </ComboBox>
+
+        <SplitButton Content="{Binding StartMode}"
+                     Classes="Flat Rounded"
+                     Command="{Binding StartCommand}">
+            <SplitButton.Flyout>
+                <MenuFlyout>
+                    <MenuItem Header="Current" 
+                              Command="{Binding SwitchStartModeCommand}" 
+                              CommandParameter="Current"/>
+                    <MenuItem Header="All" 
+                              Command="{Binding SwitchStartModeCommand}" 
+                              CommandParameter="All"/>
+                </MenuFlyout>
+            </SplitButton.Flyout>
+        </SplitButton>
+    </StackPanel>
+</UserControl>

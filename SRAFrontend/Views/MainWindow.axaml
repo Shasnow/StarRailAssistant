@@ -1,0 +1,98 @@
+<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+        xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
+        xmlns:lang="clr-namespace:SRAFrontend.Localization"
+        xmlns:controls="clr-namespace:SRAFrontend.Controls"
+        mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+        Width="1024" Height="600"
+        x:Class="SRAFrontend.Views.MainWindow"
+        x:DataType="viewModels:MainWindowViewModel"
+        Icon="/Assets/SRAicon.ico"
+        Title="StarRailAssistant"
+        WindowStartupLocation="CenterScreen"
+        FontSize="16">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <viewModels:MainWindowViewModel/>
+    </Design.DataContext>
+    <suki:SukiWindow.Hosts>
+        <suki:SukiToastHost Manager="{Binding ToastManager}"/>
+    </suki:SukiWindow.Hosts>
+    <suki:SukiWindow.RightWindowTitleBarControls>
+        <!-- ReSharper disable once Xaml.StyleClassNotFound -->
+        <Button Classes="WindowControlsButton" Click="SwitchLightModeButton_OnClick">
+            <Label Classes="icon" Content="{Binding LightModeText}" />
+        </Button>
+        <!-- ReSharper disable once Xaml.StyleClassNotFound -->
+        <Button Classes="WindowControlsButton" Command="{Binding ShowAnnouncementBoardCommand}">
+            <Label Classes="icon" Content="&#xE324;" />
+        </Button>
+    </suki:SukiWindow.RightWindowTitleBarControls>
+
+    <suki:SukiSideMenu ItemsSource="{Binding Pages}">
+        <suki:SukiSideMenu.Styles>
+            <Style Selector="Image.AppIcon">
+                <Setter Property="Transitions">
+                    <Transitions>
+                        <DoubleTransition Property="Opacity" Duration="0.1" />
+                    </Transitions>
+                </Setter>
+                <Style Selector="^:pointerover">
+                    <Setter Property="Opacity" Value="{DynamicResource ThemeDisabledOpacity}" />
+                </Style>
+            </Style>
+        </suki:SukiSideMenu.Styles>
+        
+        <suki:SukiSideMenu.ItemTemplate>
+            <DataTemplate>
+                <suki:SukiSideMenuItem Classes="Compact" Header="{Binding DisplayName}">
+                    <suki:SukiSideMenuItem.Icon>
+                        <Label Classes="icon" FontSize="18" Content="{Binding IconText}" />
+                    </suki:SukiSideMenuItem.Icon>
+                </suki:SukiSideMenuItem>
+            </DataTemplate>
+        </suki:SukiSideMenu.ItemTemplate>
+        
+        <suki:SukiSideMenu.HeaderContent>
+            <StackPanel>
+                <Image Width="80"
+                       Height="80"
+                       Margin="30,10,30,30"
+                       Classes="AppIcon"
+                       Source="/Assets/SRAico.png"
+                       ToolTip.Tip="Just Icon." />
+                <Label Content="{Binding Greeting}" HorizontalAlignment="Center" />
+            </StackPanel>
+        </suki:SukiSideMenu.HeaderContent>
+        
+        <suki:SukiSideMenu.FooterContent>
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <StackPanel.Styles>
+                    <Style Selector="Button">
+                        <Setter Property="Command" Value="{Binding OpenUrlCommand}"></Setter>
+                    </Style>
+                </StackPanel.Styles>
+                <Button Classes="Basic"
+                        CommandParameter="https://github.com/Shasnow/StarRailAssistant"
+                        ToolTip.Tip="{x:Static lang:Resources.GithubToolTipText}">
+                    <Label Classes="icon">&#xE576;</Label>
+                </Button>
+                <Button Classes="Basic"
+                        CommandParameter="https://starrailassistant.top"
+                        ToolTip.Tip="{x:Static lang:Resources.WebsideToolTipText}">
+                    <Label Classes="icon">&#xE976;</Label>
+                </Button>
+                <Button Classes="Basic"
+                        CommandParameter="https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&amp;channel=stable&amp;source=sra-app"
+                        ToolTip.Tip="{x:Static lang:Resources.SponsorText}">
+                    <Label Classes="icon">&#xE2A8;</Label>
+                </Button>
+            </StackPanel>
+        </suki:SukiSideMenu.FooterContent>
+    </suki:SukiSideMenu>
+</suki:SukiWindow>

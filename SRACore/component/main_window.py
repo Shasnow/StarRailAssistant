@@ -13,7 +13,7 @@ from SRACore.component.dialog import AnnouncementBoard, Announcement, MessageBox
 from SRACore.component.multi_account import MultiAccountComponent
 from SRACore.component.settings_page import SettingsPageComponent
 from SRACore.thread.background_thread import BackgroundThreadWorker
-from SRACore.thread.trigger_thread import TriggerManager
+from SRACore.thread.trigger_thread import TriggerThread
 from SRACore.ui.main_ui import Ui_MainWindow
 from SRACore.util import notify, encryption
 from SRACore.util.config import ConfigManager, GlobalConfigManager
@@ -29,7 +29,7 @@ class MainWindowComponent(QMainWindow):
     def __init__(self, parent, global_config_manager: GlobalConfigManager):
         super().__init__(parent)
         self.tray = None
-        self.trigger_thread: TriggerManager | None = None
+        self.trigger_thread: TriggerThread | None = None
         logger.debug("Initializing MainWindowComponent")
         self.is_running = False
         self.background_thread_worker: BackgroundThreadWorker | None = None
