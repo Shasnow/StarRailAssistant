@@ -228,7 +228,7 @@ class ReceiveRewardTask(BaseTask):
             if self.locate("resources/img/daily_train_reward_notreach.png"):
                 self.synthesis()
                 self.relic()
-
+                self.press_key("esc")
             else:
                 logger.info("没有可领取的奖励")
         self.screenshot().save(f"log/daily_training_reward-{self.config_name}.png")
@@ -294,12 +294,11 @@ class ReceiveRewardTask(BaseTask):
             self.click_img("resources/img/daily_reward.png", after_sleep=0.5)
             logger.info("领取奖励")
             self.click_img("resources/img/daily_train_reward.png", after_sleep=1.5)
-
         else:
             logger.info("未能找到合成任务")
 
     def relic(self):
-        if  self.click_img("resources/img/relic.png", y_offset=330):
+        if self.click_img("resources/img/relic.png", y_offset=330):
             logger.info("找到升级遗器任务")
             for _ in range(5):
                 if not self.click_img("resources/img/enhance.png"):
@@ -340,8 +339,10 @@ class ReceiveRewardTask(BaseTask):
             self.click_img("resources/img/daily_reward.png", after_sleep=0.5)
             logger.info("领取奖励")
             self.click_img("resources/img/daily_train_reward.png", after_sleep=1.5)
+            return True
         else:
             logger.info("未能找到升级遗器任务")
+            return False
 
 
 
