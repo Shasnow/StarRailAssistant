@@ -7,7 +7,7 @@ from SRACore.component.main_window import MainWindowComponent
 from SRACore.component.tray import SystemTray
 from SRACore.thread.background_thread import BackgroundThreadWorker
 from SRACore.thread.task_thread import TaskThread
-from SRACore.thread.trigger_thread import TriggerManager
+from SRACore.thread.trigger_thread import TriggerThread
 from SRACore.util.config import GlobalConfigManager
 from SRACore.util.logger import logger
 from SRACore.util.plugin import PluginManager
@@ -19,7 +19,7 @@ class SRA:
     def __init__(self):
         PluginManager.scan_plugins()
         self.global_manager = GlobalConfigManager()
-        self.trigger_manager = TriggerManager.get_instance()
+        self.trigger_manager = TriggerThread()
         self.main_window = MainWindowComponent(None, self.global_manager)
         PluginManager.public_instance = self
         PluginManager.public_main_window = self.main_window

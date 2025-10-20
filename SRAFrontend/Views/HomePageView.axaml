@@ -1,0 +1,21 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
+             x:DataType="viewModels:HomePageViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SRAFrontend.Views.HomePageView">
+    <Grid>
+        <!-- 背景图片 -->
+        <Border CornerRadius="24" BorderThickness="1" ClipToBounds="True" Margin="8">
+            <Image Source="/Assets/background-lt.jpg" Stretch="UniformToFill" Opacity="{Binding ImageOpacity}" />
+        </Border>
+
+        <Grid RowDefinitions="*, Auto" Margin="50">
+            <!-- 下方控制区域 -->
+            <suki:GlassCard Grid.Row="1" Content="{Binding ControlPanelViewModel}" Opacity="0.9" IsOpaque="True"/>
+        </Grid>
+    </Grid>
+</UserControl>
