@@ -102,7 +102,7 @@ class Operator:
             return None
         except pygetwindow.PyGetWindowException as e:
             if raise_exception:
-                raise Exception("窗口未激活") from e
+                raise Exception(f"窗口未激活: {e}") from e
             return None
         except Exception as e:
             if raise_exception:
