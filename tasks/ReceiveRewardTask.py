@@ -293,7 +293,7 @@ class ReceiveRewardTask(BaseTask):
             self.sleep(1)
             self.click_img("resources/img/daily_reward.png", after_sleep=0.5)
             logger.info("领取奖励")
-            self.click_img("resources/img/daily_train_reward.png", after_sleep=1.5)
+            self.click_img("resources/img/daily_train_reward.png", after_sleep=2)
         else:
             logger.info("未能找到合成任务")
 
@@ -338,7 +338,7 @@ class ReceiveRewardTask(BaseTask):
             logger.info("升级完毕，准备返回领取奖励")
             self.click_img("resources/img/daily_reward.png", after_sleep=0.5)
             logger.info("领取奖励")
-            self.click_img("resources/img/daily_train_reward.png", after_sleep=1.5)
+            self.click_img("resources/img/daily_train_reward.png", after_sleep=2)
             return True
         else:
             logger.info("未能找到升级遗器任务")
