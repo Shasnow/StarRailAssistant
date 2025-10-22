@@ -8,6 +8,9 @@
 //------------------------------------------------------------------------------
 
 namespace SRAFrontend.Localization {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -80,6 +83,15 @@ namespace SRAFrontend.Localization {
         public static string AllowNotificationText {
             get {
                 return ResourceManager.GetString("AllowNotificationText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Application Channel.
+        /// </summary>
+        public static string AppChannelText {
+            get {
+                return ResourceManager.GetString("AppChannelText", resourceCulture);
             }
         }
         
@@ -291,6 +303,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Task Settings.
+        /// </summary>
+        public static string TaskSettingsText {
+            get {
+                return ResourceManager.GetString("TaskSettingsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Task.
         /// </summary>
         public static string TaskText {
@@ -314,6 +335,15 @@ namespace SRAFrontend.Localization {
         public static string ThreadSafetyText {
             get {
                 return ResourceManager.GetString("ThreadSafetyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update Channel.
+        /// </summary>
+        public static string UpdateChannelText {
+            get {
+                return ResourceManager.GetString("UpdateChannelText", resourceCulture);
             }
         }
         

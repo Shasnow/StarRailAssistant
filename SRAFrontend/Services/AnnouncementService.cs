@@ -10,8 +10,8 @@ namespace SRAFrontend.Services;
 
 public class AnnouncementService(HttpClient httpClient)
 {
-    private readonly HttpClient _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     private List<Announcement>? _cachedAnnouncements; // 缓存数据，避免重复请求
+    private const string RequestUrl = "https://gitee.com/yukikage/sraresource/raw/main/SRA/announcements.json";
 
     /// <summary>
     /// 获取公告列表（带缓存）
@@ -24,13 +24,13 @@ public class AnnouncementService(HttpClient httpClient)
 
         try
         {
-            _cachedAnnouncements = await _httpClient.GetFromJsonAsync<List<Announcement>>("https://gitee.com/yukikage/sraresource/raw/main/SRA/announcements.json");
+            _cachedAnnouncements = await httpClient.GetFromJsonAsync<List<Announcement>>(RequestUrl);
             return _cachedAnnouncements;
         }
         catch (HttpRequestException ex)
         {
             Console.WriteLine($"Request Error: {ex.Message}");
-            return null; // 或者 throw 一个自定义异常
+            return null;
         }
         catch (JsonException ex)
         {

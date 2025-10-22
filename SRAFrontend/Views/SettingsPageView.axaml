@@ -7,10 +7,11 @@
              xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              xmlns:lang="clr-namespace:SRAFrontend.Localization"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SRAFrontend.Views.SettingPageView"
-             x:DataType="viewModels:SettingPageViewModel">
+             x:Class="SRAFrontend.Views.SettingsPageView"
+             x:DataType="viewModels:SettingsPageViewModel"
+             FontSize="16">
     <Design.DataContext>
-        <viewModels:SettingPageViewModel />
+        <viewModels:SettingsPageViewModel />
     </Design.DataContext>
     <suki:SukiStackPage>
         <suki:SukiStackPage.Content>
@@ -25,6 +26,32 @@
                 </suki:SettingsLayout.Styles>
                 <suki:SettingsLayout.Items>
                     <objectModel:ObservableCollection x:TypeArguments="suki:SettingsLayoutItem">
+                        <suki:SettingsLayoutItem Header="{x:Static lang:Resources.TaskSettingsText}">
+                            <suki:SettingsLayoutItem.Content>
+                                <StackPanel>
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Label Classes="icon">&#xe40c;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ThreadSafetyText}" />
+                                        <ToggleSwitch Grid.Column="2" />
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="icon">&#xe310;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ZoomText}" />
+                                        <NumericUpDown Grid.Column="2" FormatString="0.00" Value="{Binding Zoom}"
+                                                       Increment="0.25" Minimum="0"
+                                                       Maximum="5" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="icon">&#xee60;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ConfidenceText}" />
+                                        <NumericUpDown Grid.Column="2" FormatString="0.00" Value="0.90"
+                                                       Increment="0.01" Minimum="0"
+                                                       Maximum="1" />
+                                    </Grid>
+                                </StackPanel>
+                            </suki:SettingsLayoutItem.Content>
+                        </suki:SettingsLayoutItem>
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.DisplayText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
@@ -41,10 +68,20 @@
                                     <!--     <Label Grid.Column="1" Content="{x:Static lang:Resources.BackgroundImageText}" /> -->
                                     <!--     <TextBox Grid.Column="2">c:/background.jpg</TextBox> -->
                                     <!-- </Grid> -->
-                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                    <Grid ColumnDefinitions="Auto, *, Auto, 28">
                                         <Label Grid.Column="0" Classes="icon" Content="&#xEB42;" />
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.BackgroundImageOpacityText}" />
-                                        <Slider Grid.Column="2" Width="200" />
+                                        <Label Grid.Column="1"
+                                               Content="{x:Static lang:Resources.BackgroundImageOpacityText}" />
+                                        <Slider Grid.Column="2"
+                                                Width="200"
+                                                Maximum="1"
+                                                TickFrequency="0.01"
+                                                IsSnapToTickEnabled="True"
+                                                Value="{Binding BackgroundOpacity}" />
+                                        <TextBlock Grid.Column="3"
+                                                   Text="{Binding BackgroundOpacity}"
+                                                   VerticalAlignment="Center"
+                                                   FontWeight="DemiBold" />
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Grid.Column="0" Classes="icon">&#xe4a2;</Label>
@@ -91,26 +128,6 @@
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto,*,Auto">
-                                        <Label Classes="icon">&#xe40c;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ThreadSafetyText}" />
-                                        <ToggleSwitch Grid.Column="2" />
-                                    </Grid>
-
-                                    <Grid ColumnDefinitions="Auto, *, Auto">
-                                        <Label Classes="icon">&#xe310;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ZoomText}" />
-                                        <NumericUpDown Grid.Column="2" FormatString="0.00" Value="{Binding Zoom}"
-                                                       Increment="0.25" Minimum="0"
-                                                       Maximum="5" />
-                                    </Grid>
-                                    <Grid ColumnDefinitions="Auto, *, Auto">
-                                        <Label Classes="icon">&#xee60;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ConfidenceText}" />
-                                        <NumericUpDown Grid.Column="2" FormatString="0.00" Value="0.90"
-                                                       Increment="0.01" Minimum="0"
-                                                       Maximum="1" />
-                                    </Grid>
-                                    <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Classes="icon">&#xe434;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.EnableTrayIconText}" />
                                         <ToggleSwitch Grid.Column="2" />
@@ -118,7 +135,7 @@
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
                         </suki:SettingsLayoutItem>
-                        
+
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.UpdateText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
@@ -127,11 +144,36 @@
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.AutoUpdateText}" />
                                         <ToggleSwitch Grid.Column="2" />
                                     </Grid>
-                
+
                                     <Grid ColumnDefinitions="Auto, *, *">
                                         <Label Classes="icon">&#xed6a;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.MirrorChyanText}" />
-                                        <TextBox Grid.Column="2" Watermark="Enter You CDK" PasswordChar="*"/>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBox
+                                                Watermark="Enter You CDK"
+                                                PasswordChar="*"
+                                                Text="{Binding MirrorChyanCdk}" />
+                                            <TextBlock Text="{Binding CdkStatus}"
+                                                       Foreground="{Binding CdkStatusForeground}" />
+                                        </StackPanel>
+
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto, *, *">
+                                        <Label Classes="icon">&#xebaa;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.UpdateChannelText}" />
+                                        <ComboBox Grid.Column="2" SelectedIndex="0">
+                                            <ComboBoxItem>Mirror 酱</ComboBoxItem>
+                                            <ComboBoxItem>GitHub</ComboBoxItem>
+                                        </ComboBox>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto, *, *">
+                                        <Label Classes="icon">&#xe77e;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.AppChannelText}" />
+                                        <ComboBox Grid.Column="2" SelectedIndex="0">
+                                            <ComboBoxItem>stable</ComboBoxItem>
+                                            <ComboBoxItem>beta</ComboBoxItem>
+                                        </ComboBox>
                                     </Grid>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
@@ -142,7 +184,8 @@
                                 <StackPanel>
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="icon">&#xe184;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ResourceIntegrityCheckText}"></Label>
+                                        <Label Grid.Column="1"
+                                               Content="{x:Static lang:Resources.ResourceIntegrityCheckText}" />
                                         <Button Grid.Column="2">Check</Button>
                                     </Grid>
                                 </StackPanel>

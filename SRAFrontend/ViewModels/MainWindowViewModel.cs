@@ -27,11 +27,6 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
         // Design-time constructor
     {
-        ToastManager = new SukiToastManager();
-        ControlPanelViewModel controlPanelViewModel = new();
-        Pages = new AvaloniaList<PageViewModel>(new HomePageViewModel(controlPanelViewModel),
-            new TaskPageViewModel(ToastManager, controlPanelViewModel), new ExtensionPageViewModel(),
-            new LogPageViewModel(), new SettingPageViewModel());
     }
 
     public MainWindowViewModel(IEnumerable<PageViewModel> pages, ISukiToastManager toastManager,

@@ -114,4 +114,13 @@
     <data name="SponsorText" xml:space="preserve">
         <value>Sponsor</value>
     </data>
+    <data name="UpdateChannelText" xml:space="preserve">
+        <value>Update Channel</value>
+    </data>
+    <data name="AppChannelText" xml:space="preserve">
+        <value>Application Channel</value>
+    </data>
+    <data name="TaskSettingsText" xml:space="preserve">
+        <value>Task Settings</value>
+    </data>
 </root>

@@ -25,11 +25,11 @@
     </suki:SukiWindow.Hosts>
     <suki:SukiWindow.RightWindowTitleBarControls>
         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
-        <Button Classes="WindowControlsButton" Click="SwitchLightModeButton_OnClick">
+        <Button Classes="WindowControlsButton" Click="SwitchLightModeButton_OnClick" ToolTip.Tip="切换深/浅色模式">
             <Label Classes="icon" Content="{Binding LightModeText}" />
         </Button>
         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
-        <Button Classes="WindowControlsButton" Command="{Binding ShowAnnouncementBoardCommand}">
+        <Button Classes="WindowControlsButton" Command="{Binding ShowAnnouncementBoardCommand}" ToolTip.Tip="公告">
             <Label Classes="icon" Content="&#xE324;" />
         </Button>
     </suki:SukiWindow.RightWindowTitleBarControls>

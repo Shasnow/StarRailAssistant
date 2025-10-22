@@ -36,6 +36,10 @@ public partial class App : Application
             {
                 DataContext = serviceProvider.GetRequiredService<MainWindowViewModel>(),
             };
+            desktop.Exit += (_, _) =>
+            {
+                serviceProvider.GetRequiredService<SettingsService>().SaveSettings();
+            };
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -52,7 +56,7 @@ public partial class App : Application
                 provider.GetRequiredService<TaskPageViewModel>(),
                 provider.GetRequiredService<ExtensionPageViewModel>(),
                 provider.GetRequiredService<LogPageViewModel>(),
-                provider.GetRequiredService<SettingPageViewModel>()
+                provider.GetRequiredService<SettingsPageViewModel>()
             };
             var toastManager = provider.GetRequiredService<ISukiToastManager>();
             var announcementService = provider.GetRequiredService<AnnouncementService>();
@@ -62,11 +66,14 @@ public partial class App : Application
         services.AddTransient<TaskPageViewModel>();
         services.AddTransient<ExtensionPageViewModel>();
         services.AddTransient<LogPageViewModel>();
-        services.AddTransient<SettingPageViewModel>();
+        services.AddTransient<SettingsPageViewModel>();
         services.AddSingleton<ControlPanelViewModel>();
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
         services.AddTransient<AnnouncementService>();
         services.AddTransient<HttpClient>();
+        services.AddSingleton<SettingsService>();
+        services.AddTransient<UpdateService>();
+        services.AddSingleton<DataPersistenceService>();
     }
 
     private void DisableAvaloniaDataAnnotationValidation()
