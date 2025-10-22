@@ -4,16 +4,16 @@ using SRAFrontend.ViewModels;
 
 namespace SRAFrontend.Views;
 
-public partial class SettingPageView : UserControl
+public partial class SettingsPageView : UserControl
 {
-    public SettingPageView()
+    public SettingsPageView()
     {
         InitializeComponent();
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
-        if (DataContext is not SettingPageViewModel viewModel) return;
+        if (DataContext is not SettingsPageViewModel viewModel) return;
         var topLevel = TopLevel.GetTopLevel(this);
         viewModel.Zoom = topLevel?.RenderScaling ?? 1;
     }

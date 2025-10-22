@@ -1,11 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using SRAFrontend.Controls;
 using SRAFrontend.Data;
+using SRAFrontend.Services;
 
 namespace SRAFrontend.ViewModels;
 
-public partial class HomePageViewModel(ControlPanelViewModel controlPanelViewModel) : PageViewModel(PageName.Home, "\uE2C2")
+public partial class HomePageViewModel(ControlPanelViewModel controlPanelViewModel, SettingsService settingsService) : PageViewModel(PageName.Home, "\uE2C2")
 {
-    public double ImageOpacity => 0.9;
+    public double ImageOpacity => settingsService.Settings.BackgroundOpacity;
     [ObservableProperty] private ControlPanelViewModel _controlPanelViewModel = controlPanelViewModel;
 }

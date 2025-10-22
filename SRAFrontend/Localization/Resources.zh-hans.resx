@@ -107,4 +107,13 @@
     <data name="SponsorText" xml:space="preserve">
         <value>赞助</value>
     </data>
+    <data name="UpdateChannelText" xml:space="preserve">
+        <value>更新渠道</value>
+    </data>
+    <data name="AppChannelText" xml:space="preserve">
+        <value>频道</value>
+    </data>
+    <data name="TaskSettingsText" xml:space="preserve">
+        <value>任务通用设置</value>
+    </data>
 </root>
