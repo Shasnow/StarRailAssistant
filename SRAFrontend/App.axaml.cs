@@ -39,6 +39,7 @@ public partial class App : Application
             desktop.Exit += (_, _) =>
             {
                 serviceProvider.GetRequiredService<SettingsService>().SaveSettings();
+                serviceProvider.GetRequiredService<CacheService>().SaveCache();
             };
         }
 
@@ -60,7 +61,9 @@ public partial class App : Application
             };
             var toastManager = provider.GetRequiredService<ISukiToastManager>();
             var announcementService = provider.GetRequiredService<AnnouncementService>();
-            return new MainWindowViewModel(pages, toastManager, announcementService);
+            var settingsService = provider.GetRequiredService<SettingsService>();
+            var updateService = provider.GetRequiredService<UpdateService>();
+            return new MainWindowViewModel(pages, toastManager, announcementService, settingsService, updateService);
         });
         services.AddTransient<HomePageViewModel>();
         services.AddTransient<TaskPageViewModel>();
@@ -74,6 +77,7 @@ public partial class App : Application
         services.AddSingleton<SettingsService>();
         services.AddTransient<UpdateService>();
         services.AddSingleton<DataPersistenceService>();
+        services.AddSingleton<CacheService>();
     }
 
     private void DisableAvaloniaDataAnnotationValidation()
