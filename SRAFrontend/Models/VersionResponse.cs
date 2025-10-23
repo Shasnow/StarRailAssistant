@@ -12,7 +12,7 @@ public class VersionResponse
     public string Msg { get; init; } = "";
 
     [JsonPropertyName("data")]
-    public VersionResponseData? Data { get; init; }
+    public VersionResponseData Data { get; set; } =new();
 }
 
 public class VersionResponseData

@@ -142,7 +142,7 @@
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Classes="icon">&#xe094;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.AutoUpdateText}" />
-                                        <ToggleSwitch Grid.Column="2" />
+                                        <ToggleSwitch Grid.Column="2" IsChecked="{Binding EnableAutoUpdate}"/>
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto, *, *">
@@ -162,7 +162,7 @@
                                     <Grid ColumnDefinitions="Auto, *, *">
                                         <Label Classes="icon">&#xebaa;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.UpdateChannelText}" />
-                                        <ComboBox Grid.Column="2" SelectedIndex="0">
+                                        <ComboBox Grid.Column="2" SelectedIndex="{Binding DownloadChannel}">
                                             <ComboBoxItem>Mirror 酱</ComboBoxItem>
                                             <ComboBoxItem>GitHub</ComboBoxItem>
                                         </ComboBox>
@@ -170,7 +170,7 @@
                                     <Grid ColumnDefinitions="Auto, *, *">
                                         <Label Classes="icon">&#xe77e;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.AppChannelText}" />
-                                        <ComboBox Grid.Column="2" SelectedIndex="0">
+                                        <ComboBox Grid.Column="2" SelectedIndex="{Binding AppChannel}">
                                             <ComboBoxItem>stable</ComboBoxItem>
                                             <ComboBoxItem>beta</ComboBoxItem>
                                         </ComboBox>

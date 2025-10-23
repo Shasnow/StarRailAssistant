@@ -1,9 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using Avalonia.Collections;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Markdown.Avalonia;
 using SRAFrontend.Controls;
 using SRAFrontend.Localization;
+using SRAFrontend.Models;
 using SRAFrontend.Services;
 using SRAFrontend.utilities;
 using SukiUI;
@@ -15,14 +21,14 @@ namespace SRAFrontend.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private readonly AnnouncementService? _announcementService;
+    private readonly AnnouncementService _announcementService;
+    private readonly SettingsService _settingsService;
+    private readonly UpdateService _updateService;
 
     [ObservableProperty] private string _lightModeText =
         SukiTheme.GetInstance().ActiveBaseTheme.ToString() == "Light" ? "\uE472" : "\uE330";
 
     [ObservableProperty] private bool _titleBarVisible = true;
-
-    [ObservableProperty] private ISukiToastManager _toastManager;
 
     public MainWindowViewModel()
         // Design-time constructor
@@ -30,17 +36,22 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     public MainWindowViewModel(IEnumerable<PageViewModel> pages, ISukiToastManager toastManager,
-        AnnouncementService announcementService)
+        AnnouncementService announcementService, SettingsService settingsService, UpdateService updateService)
     {
         _announcementService = announcementService;
         Pages = new AvaloniaList<PageViewModel>(pages);
         ToastManager = toastManager;
+        _settingsService = settingsService;
+        _updateService = updateService;
+        _ = CheckForUpdates();
     }
+
+    public ISukiToastManager ToastManager { get; init; }
 
     public string Greeting { get; } = Resources.GreetingText;
 
     public IAvaloniaReadOnlyList<PageViewModel> Pages { get; }
-    
+
     public void SwitchLightMode()
     {
         SukiTheme.GetInstance().SwitchBaseTheme();
@@ -59,7 +70,106 @@ public partial class MainWindowViewModel : ViewModelBase
         SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
             Header = "Announcements",
-            Content = new AnnouncementBoardViewModel(_announcementService!)
+            Content = new AnnouncementBoardViewModel(_announcementService)
         });
+    }
+
+    private async Task CheckForUpdates()
+    {
+        var cdk = _settingsService.Settings.MirrorChyanCdk;
+        var channel = _settingsService.Settings.AppChannel == 0? "stable" : "beta";
+        var currentVersion = "v0.1.0";
+        var currentVersionNumber = 40;
+        var response = await _updateService.CheckForUpdatesAsync(currentVersion, cdk, channel);
+        if (response == null)
+        {
+            ToastManager.CreateToast()
+                .WithTitle("Update Check Failed")
+                .WithContent("Could not connect to the update server.")
+                .Dismiss().After(TimeSpan.FromSeconds(3))
+                .Dismiss().ByClicking()
+                .Queue();
+            return;
+        }
+
+        if (response.Data.VersionNumber <= currentVersionNumber)
+            return;
+        if (_settingsService.Settings.EnableAutoUpdate)
+        {
+            ToastManager.CreateToast()
+                .WithTitle("Update Available")
+                .WithContent(
+                    $"A new version {response.Data.VersionName} is available and will be downloaded automatically.")
+                .Dismiss().After(TimeSpan.FromSeconds(3))
+                .Dismiss().ByClicking()
+                .Queue();
+            _ = DownloadUpdateAsync(response);
+        }
+        else
+        {
+            var autoUpgradeButton =
+                SukiMessageBoxButtonsFactory.CreateButton("Auto upgrade", SukiMessageBoxResult.Yes, "Flat Accent");
+            var manualUpgradeButton =
+                SukiMessageBoxButtonsFactory.CreateButton("Manual upgrade", SukiMessageBoxResult.OK);
+            var cancelButton = SukiMessageBoxButtonsFactory.CreateButton(SukiMessageBoxResult.Cancel);
+            var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+            {
+                Header = "Update Available - " + response.Data.VersionName,
+                Content = new MarkdownScrollViewer
+                {
+                    Markdown = response.Data.ReleaseNote
+                },
+                ActionButtonsSource = [autoUpgradeButton, manualUpgradeButton, cancelButton]
+            });
+            switch (result)
+            {
+                case SukiMessageBoxResult.Yes:
+                    _ = DownloadUpdateAsync(response);
+                    break;
+                case SukiMessageBoxResult.OK:
+                    UrlUtil.OpenUrl("https://github.com/Shasnow/StarRailAssistant/releases/latest");
+                    break;
+                case SukiMessageBoxResult.Cancel:
+                    break;
+            }
+        }
+    }
+
+    private async Task DownloadUpdateAsync(VersionResponse versionResponse)
+    {
+        var progressBar = new ProgressBar { Value = 0, ShowProgressText = true };
+        var sizeLabel = new Label { Content = "Connecting..." };
+        var progress = new StackPanel { Children = { sizeLabel, progressBar } };
+        var toast = ToastManager.CreateToast()
+            .WithTitle("Updating...")
+            .WithContent(progress)
+            .Queue();
+        var progressHandler = new Progress<DownloadStatus>(value =>
+        {
+            progressBar.Value = value.ProgressPercent;
+            sizeLabel.Content = $"{value.FormattedDownloadedSize} / {value.FormattedTotalSize} {value.FormattedSpeed}";
+        });
+        var proxies = _settingsService.Settings.Proxies;
+        var downloadChannel = _settingsService.Settings.DownloadChannel;
+        string result;
+        try
+        {
+            result = await _updateService.DownloadUpdateAsync(versionResponse, downloadChannel, progressHandler, proxies);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return;
+        }
+        
+        ToastManager.Dismiss(toast);
+        ToastManager.CreateToast()
+            .WithTitle("Download Complete")
+            .WithContent("Update package will be unzip within 3 seconds.")
+            .Dismiss().After(TimeSpan.FromSeconds(3))
+            .Dismiss().ByClicking()
+            .Queue();
+        await Task.Delay(3000);
+        UnzipUtil.Unzip(result, Path.GetDirectoryName(result)!);
     }
 }

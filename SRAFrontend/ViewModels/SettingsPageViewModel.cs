@@ -1,30 +1,50 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
 using SRAFrontend.Data;
 using SRAFrontend.Services;
 
 namespace SRAFrontend.ViewModels;
 
-public partial class SettingsPageViewModel : PageViewModel
+public class SettingsPageViewModel : PageViewModel
 {
+    private readonly CacheService _cacheService;
     private readonly SettingsService _settingsService;
     private readonly UpdateService? _updateService;
-
-    [ObservableProperty] private string _cdkStatus = "";
-
-    [ObservableProperty] private string _cdkStatusForeground = "#F5222D";
 
     public SettingsPageViewModel() : base(PageName.Setting, "\uE272")
     // Design-time constructor
     {
     }
 
-    public SettingsPageViewModel(SettingsService settingsService, UpdateService updateService) : base(PageName.Setting,
+    public SettingsPageViewModel(
+        SettingsService settingsService,
+        UpdateService updateService,
+        CacheService cacheService) : base(PageName.Setting,
         "\uE272")
     {
         _settingsService = settingsService;
         _updateService = updateService;
+        _cacheService = cacheService;
+    }
+
+    public string CdkStatus
+    {
+        get => _cacheService.Cache.CdkStatus;
+        set
+        {
+            _cacheService.Cache.CdkStatus = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string CdkStatusForeground
+    {
+        get => _cacheService.Cache.CdkStatusForeground;
+        set
+        {
+            _cacheService.Cache.CdkStatusForeground = value;
+            OnPropertyChanged();
+        }
     }
 
     public int CurrentLang
@@ -71,6 +91,7 @@ public partial class SettingsPageViewModel : PageViewModel
                 CdkStatusForeground = "#F5222D";
                 return;
             }
+
             // 基础长度校验
             if (value.Length != 24)
             {
@@ -81,6 +102,36 @@ public partial class SettingsPageViewModel : PageViewModel
 
             // 长度正确时，触发异步验证（不阻塞setter）
             _ = VerifyCdkAsync(value); // 使用_忽略未等待的Task（需确保异常处理）
+        }
+    }
+
+    public bool EnableAutoUpdate
+    {
+        get => _settingsService.Settings.EnableAutoUpdate;
+        set
+        {
+            _settingsService.Settings.EnableAutoUpdate = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int DownloadChannel
+    {
+        get => _settingsService.Settings.DownloadChannel;
+        set
+        {
+            _settingsService.Settings.DownloadChannel = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int AppChannel
+    {
+        get => _settingsService.Settings.AppChannel;
+        set
+        {
+            _settingsService.Settings.AppChannel = value;
+            OnPropertyChanged();
         }
     }
 
@@ -102,8 +153,8 @@ public partial class SettingsPageViewModel : PageViewModel
 
         if (response.Code == 0)
         {
-            var leastTime = DateTimeOffset.FromUnixTimeSeconds(response.Data!.CdkExpiredTime);
-            CdkStatus = "有效的CDK" + $" 剩余时间：{(leastTime - DateTimeOffset.Now).Days}天";
+            var leastTime = DateTimeOffset.FromUnixTimeSeconds(response.Data.CdkExpiredTime);
+            CdkStatus = "有效的CDK" + $" 到期时间: {leastTime:yyyy-MM-dd HH:mm:ss}";
             CdkStatusForeground = "#279F27"; // 绿色表示成功
         }
         else
