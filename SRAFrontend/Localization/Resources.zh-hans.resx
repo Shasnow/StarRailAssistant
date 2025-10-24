@@ -17,8 +17,8 @@
     <data name="HomeText" xml:space="preserve">
         <value>主页</value>
     </data>
-    <data name="LogText" xml:space="preserve">
-        <value>日志</value>
+    <data name="ConsoleText" xml:space="preserve">
+        <value>控制台</value>
     </data>
     <data name="RegularText" xml:space="preserve">
         <value>常规</value>

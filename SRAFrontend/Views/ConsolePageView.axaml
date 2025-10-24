@@ -6,14 +6,15 @@
              xmlns:lang="clr-namespace:SRAFrontend.Localization"
              xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SRAFrontend.Views.LogPageView"
-             x:DataType="viewModels:LogPageViewModel">
-    <Design.DataContext>
-        <viewModels:LogPageViewModel />
-    </Design.DataContext>
+             x:Class="SRAFrontend.Views.ConsolePageView"
+             x:DataType="viewModels:ConsolePageViewModel">
+
     <suki:GlassCard>
-        <suki:GroupBox Header="{x:Static lang:Resources.LogText}">
-            <TextBlock Text="{Binding Log}" />
+        <suki:GroupBox Header="{x:Static lang:Resources.ConsoleText}">
+            <Grid RowDefinitions="*,Auto">
+                <TextBlock Grid.Row="0" Text="{Binding LogText}" />
+                <TextBox Grid.Row="1" Watermark="请输入文本" KeyDown="InputElement_OnKeyDown"></TextBox>
+            </Grid>
         </suki:GroupBox>
     </suki:GlassCard>
 </UserControl>
