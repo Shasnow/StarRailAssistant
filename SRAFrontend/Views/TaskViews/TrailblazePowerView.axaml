@@ -8,10 +8,6 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SRAFrontend.Views.TaskViews.TrailblazePowerView"
              x:DataType="viewModels:TaskPageViewModel">
-    <Design.DataContext>
-        <viewModels:TaskPageViewModel />
-    </Design.DataContext>
-    
     <suki:GlassCard>
         <suki:GroupBox Header="清体力">
             <Grid ColumnDefinitions="*, *">
@@ -34,7 +30,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="models1:TrailblazePowerTask">
                                     <suki:GlassCard Margin="0 0 0 10" IsInteractive="True">
-                                        <suki:GroupBox Header="{Binding Title}">
+                                        <suki:GroupBox Header="{Binding HeaderText}">
                                             <StackPanel Spacing="12">
                                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                                     <Label Content="选择关卡" />
@@ -42,7 +38,8 @@
                                                 </StackPanel>
 
                                                 <StackPanel Orientation="Horizontal" Spacing="8"
-                                                            IsVisible="{Binding CanMulti}">
+                                                            IsVisible="{Binding CanMulti}"
+                                                            ToolTip.Tip="n合一">
                                                     <Label Content="连续作战" />
                                                     <NumericUpDown FormatString="0" Value="{Binding Count}"
                                                                    Minimum="1" Maximum="6" Increment="1"

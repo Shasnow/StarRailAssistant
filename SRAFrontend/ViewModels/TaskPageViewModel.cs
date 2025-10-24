@@ -62,6 +62,7 @@ public partial class TaskPageViewModel : PageViewModel
             new TrailblazePowerTask(AddTaskItem)
             {
                 Title = "饰品提取",
+                Cost = 40,
                 Levels = new[]
                 {
                     "---选择副本---",
@@ -82,6 +83,7 @@ public partial class TaskPageViewModel : PageViewModel
             new TrailblazePowerTask(AddTaskItem)
             {
                 Title = "拟造花萼（金）",
+                Cost = 10,
                 Levels = new[]
                 {
                     "---选择副本---",
@@ -104,6 +106,7 @@ public partial class TaskPageViewModel : PageViewModel
             new TrailblazePowerTask(AddTaskItem)
             {
                 Title = "拟造花萼（赤）",
+                Cost = 10,
                 Levels = new[]
                 {
                     "---选择副本---",
@@ -129,6 +132,7 @@ public partial class TaskPageViewModel : PageViewModel
             new TrailblazePowerTask(AddTaskItem)
             {
                 Title = "凝滞虚影",
+                Cost = 30,
                 Levels = new[]
                 {
                     "---选择副本---",
@@ -164,6 +168,7 @@ public partial class TaskPageViewModel : PageViewModel
             new TrailblazePowerTask(AddTaskItem)
             {
                 Title = "侵蚀隧洞",
+                Cost = 40,
                 Levels = new[]
                 {
                     "---选择副本---",
@@ -187,6 +192,7 @@ public partial class TaskPageViewModel : PageViewModel
             new TrailblazePowerTask(AddTaskItem)
             {
                 Title = "历战余响",
+                Cost = 30,
                 Levels = new[]
                 {
                     "---选择副本---",
