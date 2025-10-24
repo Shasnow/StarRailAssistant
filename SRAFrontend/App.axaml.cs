@@ -40,6 +40,7 @@ public partial class App : Application
             {
                 serviceProvider.GetRequiredService<SettingsService>().SaveSettings();
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
+                serviceProvider.GetRequiredService<SraService>().StopSraProcess();
             };
         }
 
@@ -56,7 +57,7 @@ public partial class App : Application
                 provider.GetRequiredService<HomePageViewModel>(),
                 provider.GetRequiredService<TaskPageViewModel>(),
                 provider.GetRequiredService<ExtensionPageViewModel>(),
-                provider.GetRequiredService<LogPageViewModel>(),
+                provider.GetRequiredService<ConsolePageViewModel>(),
                 provider.GetRequiredService<SettingsPageViewModel>()
             };
             var toastManager = provider.GetRequiredService<ISukiToastManager>();
@@ -68,7 +69,7 @@ public partial class App : Application
         services.AddTransient<HomePageViewModel>();
         services.AddTransient<TaskPageViewModel>();
         services.AddTransient<ExtensionPageViewModel>();
-        services.AddTransient<LogPageViewModel>();
+        services.AddTransient<ConsolePageViewModel>();
         services.AddTransient<SettingsPageViewModel>();
         services.AddSingleton<ControlPanelViewModel>();
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
@@ -78,6 +79,7 @@ public partial class App : Application
         services.AddTransient<UpdateService>();
         services.AddSingleton<DataPersistenceService>();
         services.AddSingleton<CacheService>();
+        services.AddSingleton<SraService>();
     }
 
     private void DisableAvaloniaDataAnnotationValidation()

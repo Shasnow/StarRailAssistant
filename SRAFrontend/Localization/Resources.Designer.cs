@@ -132,6 +132,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Console.
+        /// </summary>
+        public static string ConsoleText {
+            get {
+                return ResourceManager.GetString("ConsoleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dark.
         /// </summary>
         public static string DarkText {
@@ -227,15 +236,6 @@ namespace SRAFrontend.Localization {
         public static string LightText {
             get {
                 return ResourceManager.GetString("LightText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Log.
-        /// </summary>
-        public static string LogText {
-            get {
-                return ResourceManager.GetString("LogText", resourceCulture);
             }
         }
         

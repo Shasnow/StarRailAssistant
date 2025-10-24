@@ -24,8 +24,8 @@
     <data name="HomeText" xml:space="preserve">
         <value>Home</value>
     </data>
-    <data name="LogText" xml:space="preserve">
-        <value>Log</value>
+    <data name="ConsoleText" xml:space="preserve">
+        <value>Console</value>
     </data>
     <data name="AdvanceText" xml:space="preserve">
         <value>Advance</value>

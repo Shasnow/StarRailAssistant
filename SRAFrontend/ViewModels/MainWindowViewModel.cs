@@ -30,11 +30,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] private bool _titleBarVisible = true;
 
-    public MainWindowViewModel()
-        // Design-time constructor
-    {
-    }
-
     public MainWindowViewModel(IEnumerable<PageViewModel> pages, ISukiToastManager toastManager,
         AnnouncementService announcementService, SettingsService settingsService, UpdateService updateService)
     {
@@ -77,7 +72,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task CheckForUpdates()
     {
         var cdk = _settingsService.Settings.MirrorChyanCdk;
-        var channel = _settingsService.Settings.AppChannel == 0? "stable" : "beta";
+        var channel = _settingsService.Settings.AppChannel == 0 ? "stable" : "beta";
         var currentVersion = "v0.1.0";
         var currentVersionNumber = 40;
         var response = await _updateService.CheckForUpdatesAsync(currentVersion, cdk, channel);
@@ -154,14 +149,15 @@ public partial class MainWindowViewModel : ViewModelBase
         string result;
         try
         {
-            result = await _updateService.DownloadUpdateAsync(versionResponse, downloadChannel, progressHandler, proxies);
+            result = await _updateService.DownloadUpdateAsync(versionResponse, downloadChannel, progressHandler,
+                proxies);
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             return;
         }
-        
+
         ToastManager.Dismiss(toast);
         ToastManager.CreateToast()
             .WithTitle("Download Complete")

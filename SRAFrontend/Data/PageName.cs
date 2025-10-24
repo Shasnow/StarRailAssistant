@@ -5,6 +5,6 @@ public enum PageName
     Home,
     Task,
     Extension,
-    Log,
+    Console,
     Setting
 }
