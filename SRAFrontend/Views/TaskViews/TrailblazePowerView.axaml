@@ -4,31 +4,40 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
              xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
-             xmlns:models1="clr-namespace:SRAFrontend.Models"
+             xmlns:models="clr-namespace:SRAFrontend.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SRAFrontend.Views.TaskViews.TrailblazePowerView"
              x:DataType="viewModels:TaskPageViewModel">
     <suki:GlassCard>
-        <suki:GroupBox Header="清体力">
+        <suki:GroupBox>
+            <suki:GroupBox.Header>
+                <CheckBox Content="清体力" IsChecked="{Binding CurrentConfig.EnabledTasks[1]}"/>
+            </suki:GroupBox.Header>
             <Grid ColumnDefinitions="*, *">
                 <ScrollViewer>
                     <StackPanel Spacing="10">
                         <suki:GlassCard IsInteractive="True">
                             <StackPanel>
                                 <Grid RowDefinitions="*,*,*" ColumnDefinitions="*,*" RowSpacing="10">
-                                    <CheckBox Grid.Row="0" Grid.Column="0">补充体力</CheckBox>
-                                    <ComboBox Grid.Row="0" Grid.Column="1" SelectedIndex="0">
+                                    <CheckBox Grid.Row="0" Grid.Column="0"
+                                              IsChecked="{Binding CurrentConfig.TrailblazePowerReplenishStamina}"
+                                              Content="补充体力" />
+                                    <ComboBox Grid.Row="0" Grid.Column="1" SelectedIndex="{Binding CurrentConfig.TrailblazePowerReplenishWay}">
                                         <ComboBoxItem>方式</ComboBoxItem>
                                     </ComboBox>
-                                    <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">使用支援角色</CheckBox>
-                                    <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">重新编队</CheckBox>
+                                    <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                              IsChecked="{Binding CurrentConfig.TrailblazePowerUseAssistant}"
+                                              Content="使用支援角色" />
+                                    <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                              IsChecked="{Binding CurrentConfig.TrailblazePowerChangeLineup}"
+                                              Content="重新编队" />
                                 </Grid>
                             </StackPanel>
                         </suki:GlassCard>
                         <!-- 任务列表区域 -->
                         <ItemsControl ItemsSource="{Binding Tasks}">
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="models1:TrailblazePowerTask">
+                                <DataTemplate x:DataType="models:TrailblazePowerTask">
                                     <suki:GlassCard Margin="0 0 0 10" IsInteractive="True">
                                         <suki:GroupBox Header="{Binding HeaderText}">
                                             <StackPanel Spacing="12">
@@ -50,7 +59,10 @@
                                                     <Label Content="执行次数" />
                                                     <NumericUpDown Grid.Column="1" FormatString="0" Value="{Binding RunTimes}"
                                                                    Minimum="1" Maximum="99" Increment="1" />
-                                                    <Button Grid.Column="2" Classes="Flat Icon" Content="+" HorizontalAlignment="Right" Command="{Binding AddTaskItemCommand}"/>
+                                                    <Button Grid.Column="2" Classes="Flat Icon"
+                                                            Content="+"
+                                                            HorizontalAlignment="Right"
+                                                            Command="{Binding AddTaskItemCommand}"/>
                                                 </Grid>
                                             </StackPanel>
                                         </suki:GroupBox>
@@ -62,7 +74,7 @@
                 </ScrollViewer>
                 <suki:GlassCard Grid.Column="1">
                     <suki:GroupBox Header="任务清单">
-                        <ListBox ItemsSource="{Binding TaskItems}" SelectedItem="{Binding SelectedTaskItem}">
+                        <ListBox ItemsSource="{Binding CurrentConfig.TrailblazePowerTaskList}" SelectedItem="{Binding SelectedTaskItem}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid RowDefinitions="*,*,*,*" ColumnDefinitions="Auto,*">

@@ -16,6 +16,7 @@ public class DataPersistenceService
     };
 
     private readonly string _settingsFilePath;
+    private readonly string _configsDirectory;
 
     public DataPersistenceService()
     {
@@ -24,6 +25,7 @@ public class DataPersistenceService
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SRA");
         _settingsFilePath = Path.Combine(_baseStorageDirectory, "settings.json");
         _cacheFilePath = Path.Combine(_baseStorageDirectory, "cache.json");
+        _configsDirectory = Path.Combine(_baseStorageDirectory, "configs");
         EnsurePath();
     }
 
@@ -32,6 +34,7 @@ public class DataPersistenceService
         if (!Directory.Exists(_baseStorageDirectory)) Directory.CreateDirectory(_baseStorageDirectory);
         if (!File.Exists(_settingsFilePath)) File.Create(_settingsFilePath).Dispose();
         if (!File.Exists(_cacheFilePath)) File.Create(_cacheFilePath).Dispose();
+        if (!Directory.Exists(_configsDirectory)) Directory.CreateDirectory(_configsDirectory);
     }
 
     public Settings LoadSettings()
@@ -57,10 +60,28 @@ public class DataPersistenceService
         return JsonSerializer.Deserialize<Cache>(json) ?? new Cache();
     }
 
-    public void SaveCache(Cache cache)
+    public void SaveCache(object cache)
     {
         EnsurePath();
         var json = JsonSerializer.Serialize(cache, _jsonSerializerOptions);
         File.WriteAllText(_cacheFilePath, json);
+    }
+
+    public Config LoadConfig(string name)
+    {
+        Console.Out.WriteLine("Loading config: " + name);
+        var configPath = Path.Combine(_configsDirectory, $"{name}.json");
+        if (!File.Exists(configPath)) return new Config{Name = name};
+        var json = File.ReadAllText(configPath);
+        if (string.IsNullOrWhiteSpace(json)) return new Config{Name = name};
+        return JsonSerializer.Deserialize<Config>(json) ?? new Config{Name = name};
+    }
+
+    public void SaveConfig(Config config)
+    {
+        var configPath = Path.Combine(_configsDirectory, $"{config.Name}.json");
+        var json = JsonSerializer.Serialize(config, _jsonSerializerOptions);
+        File.WriteAllText(configPath, json);
+        Console.Out.WriteLine("Successfully saved config: " + config.Name);
     }
 }

@@ -3,18 +3,23 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SRAFrontend.Views.TaskViews.AfterMissionView">
+             x:Class="SRAFrontend.Views.TaskViews.AfterMissionView"
+             x:DataType="viewModels:TaskPageViewModel">
     <suki:GlassCard>
-        <suki:GroupBox Header="任务完成后">
+        <suki:GroupBox>
+            <suki:GroupBox.Header>
+                <CheckBox Content="任务完成后" IsChecked="{Binding CurrentConfig.EnabledTasks[4]}"/>
+            </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Margin="10" Spacing="20">
-                    <CheckBox>登出当前账号</CheckBox>
-                    <CheckBox>退出游戏</CheckBox>
-                    <CheckBox>关闭程序</CheckBox>
-                    <RadioButton>关机</RadioButton>
-                    <RadioButton>休眠</RadioButton>
-                    <RadioButton>无动作</RadioButton>
+                    <CheckBox IsChecked="{Binding CurrentConfig.AfterLogout}" Content="登出当前账号" />
+                    <CheckBox IsChecked="{Binding CurrentConfig.AfterExitGame}" Content="退出游戏" />
+                    <CheckBox IsChecked="{Binding CurrentConfig.AfterExitApp}" Content="关闭程序" />
+                    <RadioButton IsChecked="{Binding CurrentConfig.AfterSleep}" Content="关机" />
+                    <RadioButton IsChecked="{Binding CurrentConfig.AfterSleep}" Content="休眠" />
+                    <RadioButton Content="无动作" />
                 </StackPanel>
             </ScrollViewer>
         </suki:GroupBox>

@@ -6,18 +6,13 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="50"
              x:Class="SRAFrontend.Controls.ControlPanelView"
              x:DataType="controls:ControlPanelViewModel">
-    <Design.DataContext>
-        <controls:ControlPanelViewModel />
-    </Design.DataContext>
     <StackPanel
         Orientation="Horizontal"
         HorizontalAlignment="Right"
         Spacing="10">
 
-        <ComboBox SelectedIndex="{Binding SelectedIndex}"
-                  Width="150">
-            <ComboBoxItem>Item 1</ComboBoxItem>
-            <ComboBoxItem>Item 2</ComboBoxItem>
+        <ComboBox SelectedIndex="{Binding SelectedConfigIndex}"
+                  Width="150" ItemsSource="{Binding ConfigNames}">
         </ComboBox>
 
         <SplitButton Content="{Binding StartMode}"

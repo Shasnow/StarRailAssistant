@@ -10,12 +10,6 @@ public class SettingsPageViewModel : PageViewModel
     private readonly CacheService _cacheService;
     private readonly SettingsService _settingsService;
     private readonly UpdateService? _updateService;
-
-    public SettingsPageViewModel() : base(PageName.Setting, "\uE272")
-    // Design-time constructor
-    {
-    }
-
     public SettingsPageViewModel(
         SettingsService settingsService,
         UpdateService updateService,

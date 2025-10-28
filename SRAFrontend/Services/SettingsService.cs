@@ -1,7 +1,5 @@
-﻿using System;
-using System.Security.Cryptography;
-using System.Text;
-using SRAFrontend.Models;
+﻿using SRAFrontend.Models;
+using SRAFrontend.utilities;
 
 namespace SRAFrontend.Services;
 
@@ -15,19 +13,12 @@ public class SettingsService
         _dataPersistenceService = dataPersistenceService;
         Settings = dataPersistenceService.LoadSettings();
         if (Settings.MirrorChyanCdk == "") return;
-        var cdkBytes = Convert.FromBase64String(Settings.MirrorChyanCdk);
-        var decodedBytes = ProtectedData.Unprotect(cdkBytes, null, DataProtectionScope.CurrentUser);
-        Settings.MirrorChyanCdk = Encoding.UTF8.GetString(decodedBytes);
+        Settings.MirrorChyanCdk = EncryptUtil.DecryptString(Settings.MirrorChyanCdk);
     }
 
     public void SaveSettings()
     {
-        if (Settings.MirrorChyanCdk != "")
-        {
-            var cdkBytes = Encoding.UTF8.GetBytes(Settings.MirrorChyanCdk);
-            var encodedBytes = ProtectedData.Protect(cdkBytes, null, DataProtectionScope.CurrentUser);
-            Settings.MirrorChyanCdk = Convert.ToBase64String(encodedBytes);
-        }
+        if (Settings.MirrorChyanCdk != "") Settings.MirrorChyanCdk = EncryptUtil.EncryptString(Settings.MirrorChyanCdk);
         _dataPersistenceService.SaveSettings(Settings);
     }
 }
