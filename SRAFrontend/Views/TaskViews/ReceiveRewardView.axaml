@@ -3,20 +3,25 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SRAFrontend.Views.TaskViews.ReceiveRewardView">
+             x:Class="SRAFrontend.Views.TaskViews.ReceiveRewardView"
+             x:DataType="viewModels:TaskPageViewModel">
     <suki:GlassCard>
-        <suki:GroupBox Header="领取奖励">
+        <suki:GroupBox>
+            <suki:GroupBox.Header>
+                <CheckBox Content="领取奖励" IsChecked="{Binding CurrentConfig.EnabledTasks[2]}"/>
+            </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Margin="10" Spacing="20">
-                    <CheckBox>漫游签证</CheckBox>
-                    <CheckBox>派遣</CheckBox>
-                    <CheckBox>右键</CheckBox>
-                    <CheckBox>每日实训</CheckBox>
-                    <CheckBox>无名勋礼</CheckBox>
-                    <CheckBox>巡星之礼</CheckBox>
-                    <CheckBox>兑换码</CheckBox>
-                    <TextBox Watermark="兑换码填写处"></TextBox>
+                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[0]}" Content="漫游签证" />
+                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[1]}" Content="派遣" />
+                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[2]}" Content="邮件" />
+                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[3]}" Content="每日实训" />
+                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[4]}" Content="无名勋礼" />
+                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[5]}" Content="巡星之礼" />
+                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[6]}" Content="兑换码" />
+                    <TextBox Text="{Binding CurrentConfig.ReceiveRewardRedeemCodes}" Watermark="兑换码填写处"></TextBox>
                 </StackPanel>
             </ScrollViewer>
         </suki:GroupBox>

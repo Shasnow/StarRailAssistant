@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using Avalonia;
@@ -17,7 +18,7 @@ public partial class App : Application
 {
     public override void Initialize()
     {
-        Localization.Resources.Culture= new System.Globalization.CultureInfo("zh-Hans");
+        Localization.Resources.Culture= new CultureInfo("zh-Hans");
         AvaloniaXamlLoader.Load(this);
     }
 
@@ -41,6 +42,7 @@ public partial class App : Application
                 serviceProvider.GetRequiredService<SettingsService>().SaveSettings();
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
                 serviceProvider.GetRequiredService<SraService>().StopSraProcess();
+                serviceProvider.GetRequiredService<ConfigService>().SaveConfig();
             };
         }
 
@@ -80,6 +82,7 @@ public partial class App : Application
         services.AddSingleton<DataPersistenceService>();
         services.AddSingleton<CacheService>();
         services.AddSingleton<SraService>();
+        services.AddSingleton<ConfigService>();
     }
 
     private void DisableAvaloniaDataAnnotationValidation()

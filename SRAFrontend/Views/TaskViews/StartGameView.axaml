@@ -8,12 +8,15 @@
              x:Class="SRAFrontend.Views.TaskViews.StartGameView"
              x:DataType="viewModels:TaskPageViewModel">
     <suki:GlassCard>
-        <suki:GroupBox Header="启动游戏">
+        <suki:GroupBox>
+            <suki:GroupBox.Header>
+                <CheckBox Content="启动游戏" IsChecked="{Binding CurrentConfig.EnabledTasks[0]}"/>
+            </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Margin="10">
                     <Grid Margin="0,0,0,15" ColumnDefinitions="Auto, Auto">
                         <TextBlock Text="渠道" VerticalAlignment="Center" />
-                        <ComboBox Grid.Column="1" SelectedIndex="0">
+                        <ComboBox Grid.Column="1" SelectedIndex="{Binding CurrentConfig.StartGameChannel}">
                             <ComboBoxItem>官服</ComboBoxItem>
                             <ComboBoxItem>b服</ComboBoxItem>
                         </ComboBox>
@@ -21,23 +24,23 @@
 
                     <Grid ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,15">
                         <TextBlock Grid.Column="0" Text="游戏路径" VerticalAlignment="Center" Margin="0,0,10,0" />
-                        <TextBox Grid.Column="1" Text="{Binding GamePath}"/>
+                        <TextBox Grid.Column="1" Text="{Binding CurrentConfig.StartGamePath}"/>
                         <Button Grid.Column="2" Content="浏览" Command="{Binding SelectedPathCommand}"/>
                     </Grid>
 
                     <StackPanel Margin="0,0,0,15">
-                        <CheckBox x:Name="AutoLoginCheckBox" Content="自动登录" IsChecked="True" />
+                        <CheckBox x:Name="AutoLoginCheckBox" Content="自动登录" IsChecked="{Binding CurrentConfig.StartGameAutoLogin}" />
                         <TextBlock Margin="25,5,0,0" FontSize="12" Foreground="Gray" TextWrapping="Wrap">
                             勾选自动登录表明您已阅读并同意《用户协议》 和《隐私政策》
                         </TextBlock>
-                        <CheckBox Content="总是重新登录" Margin="0,10,0,0" />
+                        <CheckBox Content="总是重新登录" Margin="0,10,0,0" IsChecked="{Binding CurrentConfig.StartGameAlwaysLogin}"/>
                     </StackPanel>
                     
                     <Grid RowDefinitions="*, *" ColumnDefinitions="Auto, *, Auto" Width="400" HorizontalAlignment="Left">
                         <Label Grid.Row="0" Grid.Column="0" Content="账号：" />
-                        <TextBox Grid.Row="0" Grid.Column="1" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CurrentConfig.StartGameUsername}"/>
                         <Label Grid.Row="1" Grid.Column="0" Content="密码：" />
-                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Password}" 
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CurrentConfig.StartGamePassword}" 
                                  PasswordChar="{Binding PasswordMask}" />
                         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
                         <Button Classes="Basic" Grid.Row="1" Grid.Column="2" 

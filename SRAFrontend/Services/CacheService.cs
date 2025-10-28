@@ -4,7 +4,7 @@ namespace SRAFrontend.Services;
 
 public class CacheService(DataPersistenceService dataPersistenceService)
 {
-    public readonly Cache Cache = dataPersistenceService.LoadCache();
+    public Cache Cache { get; } = dataPersistenceService.LoadCache();
 
     public void SaveCache()
     {

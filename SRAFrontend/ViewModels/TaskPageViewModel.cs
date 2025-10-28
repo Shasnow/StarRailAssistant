@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
@@ -9,6 +10,7 @@ using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Controls;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
+using SRAFrontend.Services;
 using SukiUI.Toasts;
 
 namespace SRAFrontend.ViewModels;
@@ -16,10 +18,11 @@ namespace SRAFrontend.ViewModels;
 public partial class TaskPageViewModel : PageViewModel
 {
     private readonly ISukiToastManager _toastManager;
+    private readonly ConfigService _configService;
+    private readonly CacheService _cacheService;
 
     [ObservableProperty] private ControlPanelViewModel _controlPanelViewModel;
-
-    [ObservableProperty] private string _gamePath = "";
+    
     [ObservableProperty] private string _password = "";
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(TogglePasswordVisibilityButtonContent))]
@@ -28,35 +31,35 @@ public partial class TaskPageViewModel : PageViewModel
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(EnableContextMenu))]
     private object? _selectedTaskItem;
 
-    [ObservableProperty] private AvaloniaList<TrailblazePowerTaskItem> _taskItems =
-    [
-        new()
-        {
-            Name = "饰品提取",
-            Level = 0,
-            LevelName = "月下朱殷（妖精/海隅）",
-            Count = 1,
-            RunTimes = 0
-        },
-
-        new()
-        {
-            Name = "拟造花萼（金）",
-            Level = 0,
-            LevelName = "回忆之蕾（翁法罗斯）",
-            Count = 1,
-            RunTimes = 0
-        }
-    ];
-
     [ObservableProperty] private AvaloniaList<TrailblazePowerTask> _tasks;
     public TopLevel? TopLevelObject;
 
-    public TaskPageViewModel(ISukiToastManager toastManager, ControlPanelViewModel controlPanelViewModel) : base(
+    public Config CurrentConfig { get; set; }
+
+    public TaskPageViewModel(ISukiToastManager toastManager,
+        ControlPanelViewModel controlPanelViewModel,
+        ConfigService configService,
+        CacheService cacheService) : base(
         PageName.Task, "\uE1BC")
     {
         ControlPanelViewModel = controlPanelViewModel;
         _toastManager = toastManager;
+        _configService = configService;
+        _cacheService = cacheService;
+        CurrentConfig = _configService.Config;
+
+        void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName == nameof(Cache.SelectedConfigIndex))
+            {
+                _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.SelectedConfigIndex]);
+                CurrentConfig = _configService.Config;
+                // OnPropertyChanged(nameof(GamePath));
+                OnPropertyChanged(nameof(CurrentConfig));
+            }
+        }
+
+        _cacheService.Cache.PropertyChanged+= OnCachePropertyChanged;
         Tasks =
         [
             new TrailblazePowerTask(AddTaskItem)
@@ -208,7 +211,7 @@ public partial class TaskPageViewModel : PageViewModel
         ];
     }
 
-    public string EnableContextMenu => SelectedTaskItem is not null ? "True" : "False";
+    public bool EnableContextMenu => SelectedTaskItem is not null;
 
     public string TogglePasswordVisibilityButtonContent =>
         PasswordMask == "*" ? "\uE224" : "\uE220";
@@ -216,7 +219,7 @@ public partial class TaskPageViewModel : PageViewModel
     [RelayCommand]
     private void DeleteSelectedTaskItem()
     {
-        if (SelectedTaskItem is TrailblazePowerTaskItem item) TaskItems.Remove(item);
+        if (SelectedTaskItem is TrailblazePowerTaskItem item) CurrentConfig.TrailblazePowerTaskList.Remove(item);
     }
 
     private void AddTaskItem(TrailblazePowerTask task)
@@ -232,7 +235,7 @@ public partial class TaskPageViewModel : PageViewModel
             return;
         }
 
-        TaskItems.Add(new TrailblazePowerTaskItem
+        CurrentConfig.TrailblazePowerTaskList.Add(new TrailblazePowerTaskItem
         {
             Name = task.Title,
             Level = task.SelectedIndex,
@@ -245,11 +248,10 @@ public partial class TaskPageViewModel : PageViewModel
     [RelayCommand]
     private async Task SelectedPath()
     {
-        // Get top level from the current control. Alternatively, you can use Window reference instead.
         if (TopLevelObject is null) return;
         var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
         if (files.Count == 0) return;
-        GamePath = files[0].Path.AbsolutePath;
+        CurrentConfig.StartGamePath = files[0].Path.AbsolutePath;
     }
 
     [RelayCommand]

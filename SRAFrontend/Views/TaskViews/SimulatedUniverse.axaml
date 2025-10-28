@@ -3,10 +3,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SRAFrontend.Views.TaskViews.SimulatedUniverse">
+             x:Class="SRAFrontend.Views.TaskViews.SimulatedUniverse"
+             x:DataType="viewModels:TaskPageViewModel">
     <suki:GlassCard>
-        <suki:GroupBox Header="模拟宇宙">
+        <suki:GroupBox>
+            <suki:GroupBox.Header>
+                <CheckBox Content="模拟宇宙" IsChecked="{Binding CurrentConfig.EnabledTasks[3]}"/>
+            </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Margin="10">
                     <suki:GlassCard>
@@ -14,14 +19,14 @@
                             <Label>差分宇宙 - 千面英雄</Label>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Label>模式</Label>
-                                <ComboBox SelectedIndex="0">
+                                <ComboBox SelectedIndex="{Binding CurrentConfig.SimulatedUniverseMode}">
                                     <ComboBoxItem>普通模式</ComboBoxItem>
                                     <ComboBoxItem>困难模式</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="10">
                                 <Label>次数</Label>
-                                <NumericUpDown FormatString="0" Value="1" Minimum="1" Maximum="99999" />
+                                <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.SimulatedUniverseTimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
                         </StackPanel>
                     </suki:GlassCard>

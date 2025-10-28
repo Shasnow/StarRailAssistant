@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SRAFrontend.Services;
@@ -35,7 +36,7 @@ public partial class SraService: ObservableObject
                 Output += args.Data + "\n";
             }
         };
-        StartSraProcess("");
+        // StartSraProcess("");
     }
 
     private void StartSraProcess(string arguments)
@@ -49,9 +50,16 @@ public partial class SraService: ObservableObject
     
     public void StopSraProcess()
     {
-        if (!_sraProcess.HasExited)
+        try
         {
-            _sraProcess.Kill();
+            if (!_sraProcess.HasExited)
+            {
+                _sraProcess.Kill();
+            }
+        }
+        catch (InvalidOperationException e)
+        {
+            Console.WriteLine(e);
         }
     }
     
