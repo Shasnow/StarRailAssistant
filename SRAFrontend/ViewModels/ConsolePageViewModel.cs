@@ -10,7 +10,14 @@ public class ConsolePageViewModel : PageViewModel
     public ConsolePageViewModel(SraService sraService) : base(PageName.Console, "\uEAE8")
     {
         _sraService = sraService;
-        _sraService.PropertyChanged += (_, _) => OnPropertyChanged(nameof(LogText));
+        _sraService.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(SraService.Output))
+            {
+                OnPropertyChanged(nameof(LogText));
+                
+            }
+        };
     }
 
     public string LogText => _sraService.Output;

@@ -41,7 +41,7 @@ public partial class SraService: ObservableObject
                 Output += args.Data + "\n";
             }
         };
-        // StartSraProcess("");
+        StartSraProcess("");
     }
 
     private void StartSraProcess(string arguments)
