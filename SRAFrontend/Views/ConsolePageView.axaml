@@ -12,7 +12,9 @@
     <suki:GlassCard>
         <suki:GroupBox Header="{x:Static lang:Resources.ConsoleText}">
             <Grid RowDefinitions="*,Auto">
-                <TextBlock Grid.Row="0" Text="{Binding LogText}" />
+                <ScrollViewer Grid.Row="0" x:Name="ConsoleScrollViewer">
+                    <TextBlock Text="{Binding LogText}"/>    
+                </ScrollViewer>
                 <TextBox Grid.Row="1" Watermark="请输入文本" KeyDown="InputElement_OnKeyDown"></TextBox>
             </Grid>
         </suki:GroupBox>

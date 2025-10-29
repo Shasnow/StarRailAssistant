@@ -1,5 +1,7 @@
-﻿using Avalonia.Controls;
+﻿using System.ComponentModel;
+using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using SRAFrontend.ViewModels;
 
 namespace SRAFrontend.Views;
@@ -9,6 +11,23 @@ public partial class ConsolePageView : UserControl
     public ConsolePageView()
     {
         InitializeComponent();
+    }
+
+    private void OnModelOnPropertyChanged(object? _, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName == nameof(ConsolePageViewModel.LogText)) ConsoleScrollViewer.ScrollToEnd();
+    }
+
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+        if (DataContext is ConsolePageViewModel model) model.PropertyChanged += OnModelOnPropertyChanged;
+    }
+
+    protected override void OnUnloaded(RoutedEventArgs e)
+    {
+        base.OnUnloaded(e);
+        if (DataContext is ConsolePageViewModel model) model.PropertyChanged -= OnModelOnPropertyChanged;
     }
 
     private void InputElement_OnKeyDown(object? sender, KeyEventArgs e)
