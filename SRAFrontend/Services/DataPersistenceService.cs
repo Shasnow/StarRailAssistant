@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using SRAFrontend.Models;
 
 namespace SRAFrontend.Services;
@@ -9,18 +10,18 @@ public class DataPersistenceService
 {
     private readonly string _baseStorageDirectory;
     private readonly string _cacheFilePath;
+    private readonly string _configsDirectory;
+    private readonly string _settingsFilePath;
+    private readonly ILogger _logger;
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         WriteIndented = true
     };
 
-    private readonly string _settingsFilePath;
-    private readonly string _configsDirectory;
-
-    public DataPersistenceService()
+    public DataPersistenceService(ILogger<DataPersistenceService> logger)
     {
-        Console.Out.WriteLine("DataPersistenceService initialized.");
+        _logger = logger;
         _baseStorageDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SRA");
         _settingsFilePath = Path.Combine(_baseStorageDirectory, "settings.json");
@@ -32,9 +33,8 @@ public class DataPersistenceService
     private void EnsurePath()
     {
         if (!Directory.Exists(_baseStorageDirectory)) Directory.CreateDirectory(_baseStorageDirectory);
-        if (!File.Exists(_settingsFilePath)) File.Create(_settingsFilePath).Dispose();
-        if (!File.Exists(_cacheFilePath)) File.Create(_cacheFilePath).Dispose();
         if (!Directory.Exists(_configsDirectory)) Directory.CreateDirectory(_configsDirectory);
+        // 仅创建目录，文件将在WriteAllText时创建
     }
 
     public Settings LoadSettings()
@@ -60,7 +60,7 @@ public class DataPersistenceService
         return JsonSerializer.Deserialize<Cache>(json) ?? new Cache();
     }
 
-    public void SaveCache(object cache)
+    public void SaveCache(Cache cache)
     {
         EnsurePath();
         var json = JsonSerializer.Serialize(cache, _jsonSerializerOptions);
@@ -69,12 +69,13 @@ public class DataPersistenceService
 
     public Config LoadConfig(string name)
     {
-        Console.Out.WriteLine("Loading config: " + name);
+        _logger.LogDebug("Loading config: {name}", name);
         var configPath = Path.Combine(_configsDirectory, $"{name}.json");
-        if (!File.Exists(configPath)) return new Config{Name = name};
+        if (!File.Exists(configPath)) return new Config { Name = name };
         var json = File.ReadAllText(configPath);
-        if (string.IsNullOrWhiteSpace(json)) return new Config{Name = name};
-        return JsonSerializer.Deserialize<Config>(json) ?? new Config{Name = name};
+        if (string.IsNullOrWhiteSpace(json)) return new Config { Name = name };
+        var config = JsonSerializer.Deserialize<Config>(json);
+        return config == null || config.Version < 3 ? new Config { Name = name } : config;
     }
 
     public void SaveConfig(Config config)
@@ -82,6 +83,6 @@ public class DataPersistenceService
         var configPath = Path.Combine(_configsDirectory, $"{config.Name}.json");
         var json = JsonSerializer.Serialize(config, _jsonSerializerOptions);
         File.WriteAllText(configPath, json);
-        Console.Out.WriteLine("Successfully saved config: " + config.Name);
+        _logger.LogDebug("Successfully saved config: {config.Name}", config.Name);
     }
 }
