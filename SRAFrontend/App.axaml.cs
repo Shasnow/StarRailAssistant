@@ -112,11 +112,11 @@ public partial class App : Application
         Log.Logger = new LoggerConfiguration()
             // 输出到控制台（开发环境调试用）
             .WriteTo.Console()
-            // 输出到文件（按日期拆分，保留 30 天）
+            // 输出到文件（按日期拆分，保留 7 天）
             .WriteTo.File(
                 path: Path.Combine(logDir, "sra.log"),
                 rollingInterval: RollingInterval.Day, // 按天拆分
-                retainedFileCountLimit: 7, // 保留 30 天日志
+                retainedFileCountLimit: 7, // 保留 7 天日志
                 encoding: System.Text.Encoding.UTF8, // 避免中文乱码
                 outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
             )
@@ -127,6 +127,11 @@ public partial class App : Application
             // 捕获异常时记录堆栈信息
             .Enrich.FromLogContext()
             .CreateLogger();
+        AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+        {
+            Log.Fatal(args.ExceptionObject as Exception, "应用程序发生未处理的异常，正在终止");
+            Log.CloseAndFlush();
+        };
     }
     
     private void DisableAvaloniaDataAnnotationValidation()

@@ -26,8 +26,8 @@ public partial class Config : ObservableObject
     [ObservableProperty] private bool _trailblazePowerLineupCheck; // 是否检查阵容
     [ObservableProperty] private bool _trailblazePowerUseSkill; // 是否使用技能
     
-    [ObservableProperty] private bool[] _receiveRewards = [false, false, false, false, false, false, false]; // 各任务奖励领取状态
-    [ObservableProperty] private AvaloniaList<string> _receiveRewardRedeemCodes = []; // 兑换码列表
+    [ObservableProperty] private AvaloniaList<bool> _receiveRewards = [false, false, false, false, false, false, false]; // 各任务奖励领取状态
+    [ObservableProperty] private string _receiveRewardRedeemCodes = ""; // 兑换码列表
     
     [ObservableProperty] private int _simulatedUniverseMode; // 模拟宇宙模式选择
     [ObservableProperty] private int _simulatedUniverseTimes; // 模拟宇宙运行次数
