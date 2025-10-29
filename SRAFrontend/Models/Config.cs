@@ -23,6 +23,8 @@ public partial class Config : ObservableObject
     [ObservableProperty] private int _trailblazePowerReplenishTimes; // 补充体力次数
     [ObservableProperty] private bool _trailblazePowerUseAssistant; // 是否使用助理
     [ObservableProperty] private bool _trailblazePowerChangeLineup; // 是否更换阵容
+    [ObservableProperty] private bool _trailblazePowerLineupCheck; // 是否检查阵容
+    [ObservableProperty] private bool _trailblazePowerUseSkill; // 是否使用技能
     
     [ObservableProperty] private bool[] _receiveRewards = [false, false, false, false, false, false, false]; // 各任务奖励领取状态
     [ObservableProperty] private AvaloniaList<string> _receiveRewardRedeemCodes = []; // 兑换码列表
@@ -37,5 +39,5 @@ public partial class Config : ObservableObject
     [ObservableProperty] private bool _afterSleep; // 任务完成后睡眠
     [ObservableProperty] private bool _afterShutdown; // 任务完成后关机
 
-    public int Version { get; set; } = 3; // 配置版本号
+    public int Version { get; init; } = 3; // 配置版本号
 }

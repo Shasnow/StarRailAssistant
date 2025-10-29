@@ -1,31 +1,39 @@
 ﻿using System;
 using System.IO;
-using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SRAFrontend.Models;
 using SRAFrontend.Services;
 using SRAFrontend.ViewModels;
 
 namespace SRAFrontend.Controls;
 
-public partial class ControlPanelViewModel(SraService sraService, CacheService cacheService):ViewModelBase
+public partial class ControlPanelViewModel :ViewModelBase
 {
     [ObservableProperty]
     private string _startMode = "Current"; // Current, All
 
-    public int SelectedConfigIndex 
+    private readonly SraService _sraService;
+    private readonly CacheService _cacheService;
+
+    /// <inheritdoc/>
+    public ControlPanelViewModel(SraService sraService, CacheService cacheService)
     {
-        get=>cacheService.Cache.SelectedConfigIndex;
-        set
+        _sraService = sraService;
+        _cacheService = cacheService;
+        _sraService.PropertyChanged+= (_, args) =>
         {
-            cacheService.Cache.SelectedConfigIndex = value;
-            OnPropertyChanged();
-        }
+            if (args.PropertyName == nameof(SraService.IsRunning))
+            {
+                OnPropertyChanged(nameof(CanStart));
+            }
+        };
     }
+    
+    public bool CanStart => !_sraService.IsRunning;
 
-    [ObservableProperty]
-    private AvaloniaList<string> _configNames=cacheService.Cache.ConfigNames; 
-
+    public Cache Cache => _cacheService.Cache;
+    
     [RelayCommand]
     private void SwitchStartMode(string mode)
     {
@@ -37,7 +45,7 @@ public partial class ControlPanelViewModel(SraService sraService, CacheService c
     {
         try
         {
-            sraService.SendInput("");
+            _sraService.TaskRun(StartMode=="All"? null : Cache.CurrentConfigName);
         }
         catch (Exception e)
         {

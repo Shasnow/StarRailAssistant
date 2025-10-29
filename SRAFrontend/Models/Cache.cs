@@ -21,5 +21,5 @@ public partial class Cache : ObservableObject
 
     // 重点：SelectedConfigIndex 变更时会自动触发通知
     [ObservableProperty]
-    private int _selectedConfigIndex = 0;
+    private int _currentConfigIndex = 0;
 }

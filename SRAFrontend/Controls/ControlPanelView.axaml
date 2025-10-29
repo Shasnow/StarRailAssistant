@@ -11,13 +11,15 @@
         HorizontalAlignment="Right"
         Spacing="10">
 
-        <ComboBox SelectedIndex="{Binding SelectedConfigIndex}"
-                  Width="150" ItemsSource="{Binding ConfigNames}">
+        <ComboBox SelectedIndex="{Binding Cache.CurrentConfigIndex}"
+                  SelectedValue="{Binding Cache.CurrentConfigName}"
+                  Width="150" ItemsSource="{Binding Cache.ConfigNames}">
         </ComboBox>
 
         <SplitButton Content="{Binding StartMode}"
                      Classes="Flat Rounded"
-                     Command="{Binding StartCommand}">
+                     Command="{Binding StartCommand}"
+                     IsEnabled="{Binding CanStart}">
             <SplitButton.Flyout>
                 <MenuFlyout>
                     <MenuItem Header="Current" 

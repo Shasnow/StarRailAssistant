@@ -6,7 +6,8 @@ namespace SRAFrontend.Services;
 
 public partial class SraService: ObservableObject
 {
-    [ObservableProperty]private string _output="";
+    [ObservableProperty] private string _output="后端未启动。";
+    [ObservableProperty] private bool _isRunning = false;
     private readonly Process _sraProcess;
     public SraService()
     {
@@ -22,17 +23,21 @@ public partial class SraService: ObservableObject
                 CreateNoWindow = true
             }
         };
-        _sraProcess.OutputDataReceived += (sender, args) =>
+        _sraProcess.OutputDataReceived += (_, args) =>
         {
             if (args.Data != null)
             {
                 Output += args.Data + "\n";
             }
         };
-        _sraProcess.ErrorDataReceived += (sender, args) =>
+        _sraProcess.ErrorDataReceived += (_, args) =>
         {
             if (args.Data != null)
             {
+                if (args.Data.Contains("[Done]"))
+                {
+                    IsRunning = false;
+                }
                 Output += args.Data + "\n";
             }
         };
@@ -70,5 +75,11 @@ public partial class SraService: ObservableObject
         {
             _sraProcess.StandardInput.WriteLine(input);
         }
+    }
+
+    public void TaskRun(string? configName)
+    {
+        IsRunning = true;
+        SendInput(string.IsNullOrEmpty(configName) ? "task run" : $"task run {configName}");
     }
 }

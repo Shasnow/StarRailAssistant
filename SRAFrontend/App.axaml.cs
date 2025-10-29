@@ -1,4 +1,6 @@
+using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using Avalonia;
@@ -6,6 +8,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using SRAFrontend.Controls;
 using SRAFrontend.Services;
 using SRAFrontend.ViewModels;
@@ -24,6 +28,7 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        InitializeSerilog();
         var serviceCollection = new ServiceCollection();
         ConfigureServices(serviceCollection);
         var serviceProvider = serviceCollection.BuildServiceProvider();
@@ -35,14 +40,17 @@ public partial class App : Application
             DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
-                DataContext = serviceProvider.GetRequiredService<MainWindowViewModel>(),
+                DataContext = serviceProvider.GetRequiredService<MainWindowViewModel>()
             };
+            desktop.Startup += (_, _) => Log.Information("Application is starting up.");
             desktop.Exit += (_, _) =>
             {
+                Log.Information("Application is exiting. Saving settings and stopping SRA process.");
                 serviceProvider.GetRequiredService<SettingsService>().SaveSettings();
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
                 serviceProvider.GetRequiredService<SraService>().StopSraProcess();
                 serviceProvider.GetRequiredService<ConfigService>().SaveConfig();
+                Log.CloseAndFlush();
             };
         }
 
@@ -51,6 +59,11 @@ public partial class App : Application
     
     private static void ConfigureServices(IServiceCollection services)
     {
+        services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.ClearProviders();
+            loggingBuilder.AddSerilog(dispose: true);
+        });
         // Register your services here
         services.AddTransient<MainWindowViewModel>(provider =>
         {
@@ -73,18 +86,49 @@ public partial class App : Application
         services.AddTransient<ExtensionPageViewModel>();
         services.AddTransient<ConsolePageViewModel>();
         services.AddTransient<SettingsPageViewModel>();
+        services.AddTransient<UpdateService>();
+        services.AddTransient<AnnouncementService>();
         services.AddSingleton<ControlPanelViewModel>();
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
-        services.AddTransient<AnnouncementService>();
-        services.AddTransient<HttpClient>();
+        services.AddSingleton<HttpClient>();
         services.AddSingleton<SettingsService>();
-        services.AddTransient<UpdateService>();
         services.AddSingleton<DataPersistenceService>();
         services.AddSingleton<CacheService>();
         services.AddSingleton<SraService>();
         services.AddSingleton<ConfigService>();
     }
 
+    private static void InitializeSerilog()
+    {
+        // 日志文件路径（存到 ApplicationData/SRA/logs 目录）
+        var logDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "SRA",
+            "logs"
+        );
+        Directory.CreateDirectory(logDir); // 确保目录存在
+
+        // 配置 Serilog
+        Log.Logger = new LoggerConfiguration()
+            // 输出到控制台（开发环境调试用）
+            .WriteTo.Console()
+            // 输出到文件（按日期拆分，保留 30 天）
+            .WriteTo.File(
+                path: Path.Combine(logDir, "sra.log"),
+                rollingInterval: RollingInterval.Day, // 按天拆分
+                retainedFileCountLimit: 7, // 保留 30 天日志
+                encoding: System.Text.Encoding.UTF8, // 避免中文乱码
+                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+            )
+            // 全局日志级别（生产环境用 Information，开发用 Debug）
+            .MinimumLevel.Information()
+            // 针对特定命名空间调整日志级别（如服务层用 Debug）
+            .MinimumLevel.Override("SRAFrontend.Services", Serilog.Events.LogEventLevel.Debug)
+            // 捕获异常时记录堆栈信息
+            .Enrich.FromLogContext()
+            .CreateLogger();
+    }
+    
     private void DisableAvaloniaDataAnnotationValidation()
     {
         // Get an array of plugins to remove

@@ -50,9 +50,9 @@ public partial class TaskPageViewModel : PageViewModel
 
         void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)
         {
-            if (args.PropertyName == nameof(Cache.SelectedConfigIndex))
+            if (args.PropertyName == nameof(Cache.CurrentConfigIndex))
             {
-                _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.SelectedConfigIndex]);
+                _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.CurrentConfigIndex]);
                 CurrentConfig = _configService.Config;
                 // OnPropertyChanged(nameof(GamePath));
                 OnPropertyChanged(nameof(CurrentConfig));
