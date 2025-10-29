@@ -6,11 +6,12 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using SRAFrontend.Models;
 
 namespace SRAFrontend.Services;
 
-public class UpdateService(HttpClient httpClient)
+public class UpdateService(HttpClient httpClient, ILogger<UpdateService> logger)
 {
     private const string BaseVersionUrl =
         "https://mirrorchyan.com/api/resources/StarRailAssistant/latest";
@@ -70,9 +71,6 @@ public class UpdateService(HttpClient httpClient)
         CancellationToken cancellationToken = default
     )
     {
-        if (versionResponse.Data == null)
-            throw new ArgumentNullException(nameof(versionResponse), "版本响应数据不能为空");
-
         // 确定下载URL和保存路径
         var downloadUrl = GetDownloadUrl(versionResponse, downloadChannel);
         if (string.IsNullOrEmpty(downloadUrl))
@@ -102,7 +100,7 @@ public class UpdateService(HttpClient httpClient)
         foreach (var candidateUrl in downloadCandidates)
             try
             {
-                await Console.Out.WriteLineAsync("trying download from: " + candidateUrl);
+                logger.LogDebug("尝试从 {Url} 下载更新", candidateUrl);
                 await DownloadFileWithDetailsAsync(
                     candidateUrl,
                     savePath,

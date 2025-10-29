@@ -16,6 +16,7 @@ using SukiUI;
 using SukiUI.Controls;
 using SukiUI.MessageBox;
 using SukiUI.Toasts;
+using Version = SRAFrontend.utilities.Version;
 
 namespace SRAFrontend.ViewModels;
 
@@ -73,9 +74,8 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var cdk = _settingsService.Settings.MirrorChyanCdk;
         var channel = _settingsService.Settings.AppChannel == 0 ? "stable" : "beta";
-        var currentVersion = "v0.1.0";
-        var currentVersionNumber = 40;
-        var response = await _updateService.CheckForUpdatesAsync(currentVersion, cdk, channel);
+        var currentVersion = new Version("v1.2.1");
+        var response = await _updateService.CheckForUpdatesAsync(currentVersion.ToString(), cdk, channel);
         if (response == null)
         {
             ToastManager.CreateToast()
@@ -87,7 +87,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        if (response.Data.VersionNumber <= currentVersionNumber)
+        if (currentVersion>new Version(response.Data.VersionName))
             return;
         if (_settingsService.Settings.EnableAutoUpdate)
         {

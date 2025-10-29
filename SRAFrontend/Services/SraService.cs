@@ -4,14 +4,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SRAFrontend.Services;
 
-public partial class SraService: ObservableObject
+public partial class SraService : ObservableObject
 {
-    [ObservableProperty] private string _output="后端未启动。";
-    [ObservableProperty] private bool _isRunning = false;
     private readonly Process _sraProcess;
+    [ObservableProperty] private bool _isRunning;
+    [ObservableProperty] private string _output = "后端未启动。";
+
     public SraService()
     {
-        _sraProcess=new Process
+        _sraProcess = new Process
         {
             StartInfo = new ProcessStartInfo
             {
@@ -25,23 +26,16 @@ public partial class SraService: ObservableObject
         };
         _sraProcess.OutputDataReceived += (_, args) =>
         {
-            if (args.Data != null)
-            {
-                Output += args.Data + "\n";
-            }
+            if (args.Data == null) return;
+            if (args.Data.Contains("[Done]")) IsRunning = false;
+            Output += args.Data + "\n";
         };
         _sraProcess.ErrorDataReceived += (_, args) =>
         {
-            if (args.Data != null)
-            {
-                if (args.Data.Contains("[Done]"))
-                {
-                    IsRunning = false;
-                }
-                Output += args.Data + "\n";
-            }
+            if (args.Data == null) return;
+            Output += args.Data + "\n";
         };
-        StartSraProcess("");
+        // StartSraProcess("");
     }
 
     private void StartSraProcess(string arguments)
@@ -52,29 +46,23 @@ public partial class SraService: ObservableObject
         _sraProcess.BeginOutputReadLine();
         _sraProcess.BeginErrorReadLine();
     }
-    
+
     public void StopSraProcess()
     {
         try
         {
-            if (!_sraProcess.HasExited)
-            {
-                _sraProcess.Kill();
-            }
+            if (!_sraProcess.HasExited) _sraProcess.Kill();
         }
         catch (InvalidOperationException e)
         {
             Console.WriteLine(e);
         }
     }
-    
+
     public void SendInput(string input)
     {
         if (input == "") return;
-        if (!_sraProcess.HasExited)
-        {
-            _sraProcess.StandardInput.WriteLine(input);
-        }
+        if (!_sraProcess.HasExited) _sraProcess.StandardInput.WriteLine(input);
     }
 
     public void TaskRun(string? configName)
