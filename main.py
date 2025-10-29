@@ -1,16 +1,14 @@
 import sys
 
-if __name__ == '__main__':
-    args=sys.argv[1:]
-    if 'run' in args:
-        from SRACore.thread.task_thread import TaskManager
+from SRACore.util.logger import setup_logger,logger
 
-        task_manager = TaskManager()
-        try:
-            task_manager.run()
-        except KeyboardInterrupt:
-            task_manager.stop()
-            exit(0)
-    else:
-        from SRACore.SRA import SRA
-        SRA.run()
+if __name__ == '__main__':
+    setup_logger()
+    logger.debug("工作目录：" + str(sys.path[0]))
+    args = sys.argv[1:]
+    from SRACore.SRA import SRACli
+    cli_instance = SRACli()
+    if args:
+        if args[0] == '--inline' or args[0] == '--embed':
+            cli_instance.prompt='' # 内嵌模式无提示符
+    cli_instance.cmdloop()

@@ -3,19 +3,8 @@ import os
 import sys
 import tomllib
 
-from PySide6.QtCore import QThread
-from PySide6.QtGui import QFont
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton
-
 from SRACore.util.const import VERSION
 from SRACore.util.logger import logger
-
-
-class PluginBase(QThread):
-    def __init__(self, name: str):
-        super().__init__()
-        self.name = name
-
 
 class PluginManager:
     plugin_dir = 'plugins'

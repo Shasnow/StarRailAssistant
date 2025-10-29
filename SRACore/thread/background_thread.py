@@ -1,16 +1,14 @@
+import time
+
 import keyboard
 import schedule
-from PySide6.QtCore import QObject, Signal, QThread
 
 from SRACore.util.config import GlobalConfigManager
 from SRACore.util.logger import logger
 
 
-class BackgroundThreadWorker(QObject):
+class BackgroundThreadWorker():
     """后台线程工作类，用于处理热键监听、定时任务等。"""
-    hotkey_triggered = Signal(str)
-    schedule_triggered = Signal(str)
-    finished_signal = Signal()
 
     def __init__(self, gcm: GlobalConfigManager):
         super().__init__()
@@ -44,7 +42,7 @@ class BackgroundThreadWorker(QObject):
         hotkey1 = self.gcm.get('hotkey1')
         hotkey2 = self.gcm.get('hotkey2')
         while self.isRunning:
-            QThread.msleep(100)
+            time.sleep(0.1)
             if keyboard.is_pressed(hotkey1):
                 self.hotkey_pressed('hotkey1')
             if keyboard.is_pressed(hotkey2):
@@ -63,20 +61,3 @@ class BackgroundThreadWorker(QObject):
         """处理热键按下事件。"""
         self.hotkey_triggered.emit(hotkey)
 
-    @staticmethod
-    def create(gcm: GlobalConfigManager):
-        """
-        创建一个后台线程和工作实例。
-        使用QT推荐的thread-worker模式来处理后台任务。
-        :param gcm: 全局配置管理器实例
-        :return: thread: 线程实例, worker: 工作实例
-        """
-        thread = QThread()
-        worker = BackgroundThreadWorker(gcm)
-        worker.moveToThread(thread)
-
-        # 连接信号
-        thread.started.connect(worker.run)
-        worker.finished_signal.connect(worker.deleteLater)
-        thread.finished.connect(thread.deleteLater)
-        return thread, worker

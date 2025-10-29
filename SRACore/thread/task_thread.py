@@ -1,29 +1,11 @@
 import importlib
 import tomllib
 
-from PySide6.QtCore import QThread
-
+from SRACore.util import sys_util  # NOQA 有动态用法，确保被打包
+from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
 from SRACore.tasks.BaseTask import BaseTask
 from SRACore.util.config import GlobalConfigManager, ConfigManager
-from SRACore.util.logger import logger
-
-
-class TaskThread(QThread):
-    def __init__(self):
-        super().__init__()
-        self.task_manager = TaskManager()
-        self.gcm = GlobalConfigManager.get_instance()  # 全局配置管理器
-        self.config_manager = ConfigManager.get_instance()  # 单例配置管理器
-
-    def run(self):
-        self.task_manager.run()
-
-    def stop(self):
-        self.task_manager.stop()
-        if self.gcm.get('thread_safety'):
-            self.quit()
-        else:
-            self.terminate()
+from SRACore.util.logger import logger, setup_logger
 
 
 class TaskManager:
@@ -70,6 +52,7 @@ class TaskManager:
         2. 对每个配置加载任务列表并执行
         3. 处理任务中断或失败的情况
         """
+        setup_logger()
         self.running_flag = True
         try:
             # 根据全局配置决定是执行多配置还是当前配置
@@ -109,6 +92,7 @@ class TaskManager:
         finally:
             # 确保标志位被重置，避免僵尸线程
             self.running_flag = False
+            logger.info("[Done]")
 
     def get_tasks(self, config_name) -> list[BaseTask]:
         """

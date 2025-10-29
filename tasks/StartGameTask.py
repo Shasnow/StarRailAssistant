@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from SRACore.tasks.BaseTask import BaseTask
-from SRACore.util import system, encryption
+from SRACore.util import sys_util, encryption
 from SRACore.util.logger import logger
 
 
@@ -45,7 +45,7 @@ class StartGameTask(BaseTask):
 
     def launch_game(self):
         """启动游戏"""
-        if system.is_process_running("StarRail.exe"):  # 检查游戏是否已在运行
+        if sys_util.is_process_running("StarRail.exe"):  # 检查游戏是否已在运行
             logger.info("游戏已在运行中")
             return
         if self.config['channel'] == 0:
@@ -56,11 +56,11 @@ class StartGameTask(BaseTask):
     def launch_bl(self):
         self.change_config_ini(14, 0)
         path = Path(self.config['path'])
-        system.Popen(str(path), shell=True, cwd=path.parent)
+        sys_util.Popen(str(path), shell=True, cwd=path.parent)
 
     def launch_au(self):
         self.change_config_ini(1, 1)
-        system.Popen(self.config['path'], shell=True)
+        sys_util.Popen(self.config['path'], shell=True)
 
     def change_config_ini(self, channel, sub_channel):
         """修改配置文件"""
