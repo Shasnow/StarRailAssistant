@@ -1,83 +1,89 @@
 ﻿using System;
 using System.Threading.Tasks;
 using SRAFrontend.Data;
+using SRAFrontend.Models;
 using SRAFrontend.Services;
 
 namespace SRAFrontend.ViewModels;
 
-public class SettingsPageViewModel : PageViewModel
-{
-    private readonly CacheService _cacheService;
-    private readonly SettingsService _settingsService;
-    private readonly UpdateService? _updateService;
-    public SettingsPageViewModel(
-        SettingsService settingsService,
-        UpdateService updateService,
-        CacheService cacheService) : base(PageName.Setting,
+public class SettingsPageViewModel(
+    SettingsService settingsService,
+    UpdateService updateService,
+    CacheService cacheService)
+    : PageViewModel(PageName.Setting,
         "\uE272")
-    {
-        _settingsService = settingsService;
-        _updateService = updateService;
-        _cacheService = cacheService;
-    }
+{
+    private readonly UpdateService? _updateService = updateService;
 
     public string CdkStatus
     {
-        get => _cacheService.Cache.CdkStatus;
+        get => cacheService.Cache.CdkStatus;
         set
         {
-            _cacheService.Cache.CdkStatus = value;
+            cacheService.Cache.CdkStatus = value;
             OnPropertyChanged();
         }
     }
 
     public string CdkStatusForeground
     {
-        get => _cacheService.Cache.CdkStatusForeground;
+        get => cacheService.Cache.CdkStatusForeground;
         set
         {
-            _cacheService.Cache.CdkStatusForeground = value;
+            cacheService.Cache.CdkStatusForeground = value;
             OnPropertyChanged();
         }
     }
 
     public int CurrentLang
     {
-        get => _settingsService.Settings.Language;
+        get => settingsService.Settings.Language;
         set
         {
-            _settingsService.Settings.Language = value;
+            settingsService.Settings.Language = value;
             OnPropertyChanged();
         }
     }
 
     public double BackgroundOpacity
     {
-        get => _settingsService.Settings.BackgroundOpacity;
+        get => settingsService.Settings.BackgroundOpacity;
         set
         {
-            _settingsService.Settings.BackgroundOpacity = value;
+            settingsService.Settings.BackgroundOpacity = value;
             OnPropertyChanged();
         }
     }
 
     public double Zoom
     {
-        get => _settingsService.Settings.Zoom;
+        get => settingsService.Settings.Zoom;
         set
         {
-            _settingsService.Settings.Zoom = value;
+            settingsService.Settings.Zoom = value;
             OnPropertyChanged();
         }
     }
+    
+    public double ConfidenceThreshold
+    {
+        get => settingsService.Settings.ConfidenceThreshold;
+        set
+        {
+            settingsService.Settings.ConfidenceThreshold = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    public string VersionText => Settings.Version; 
 
     public string MirrorChyanCdk
     {
-        get => _settingsService.Settings.MirrorChyanCdk;
+        get => settingsService.Settings.MirrorChyanCdk;
         set
         {
             // 先更新存储的值（即使后续验证失败，也保留用户输入便于修改）
-            _settingsService.Settings.MirrorChyanCdk = value;
+            settingsService.Settings.MirrorChyanCdk = value;
             OnPropertyChanged(); // 通知UI属性已变更
             if (value == "")
             {
@@ -101,30 +107,30 @@ public class SettingsPageViewModel : PageViewModel
 
     public bool EnableAutoUpdate
     {
-        get => _settingsService.Settings.EnableAutoUpdate;
+        get => settingsService.Settings.EnableAutoUpdate;
         set
         {
-            _settingsService.Settings.EnableAutoUpdate = value;
+            settingsService.Settings.EnableAutoUpdate = value;
             OnPropertyChanged();
         }
     }
 
     public int DownloadChannel
     {
-        get => _settingsService.Settings.DownloadChannel;
+        get => settingsService.Settings.DownloadChannel;
         set
         {
-            _settingsService.Settings.DownloadChannel = value;
+            settingsService.Settings.DownloadChannel = value;
             OnPropertyChanged();
         }
     }
 
     public int AppChannel
     {
-        get => _settingsService.Settings.AppChannel;
+        get => settingsService.Settings.AppChannel;
         set
         {
-            _settingsService.Settings.AppChannel = value;
+            settingsService.Settings.AppChannel = value;
             OnPropertyChanged();
         }
     }

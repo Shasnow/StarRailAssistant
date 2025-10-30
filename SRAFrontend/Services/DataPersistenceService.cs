@@ -40,6 +40,7 @@ public class DataPersistenceService
     public Settings LoadSettings()
     {
         EnsurePath();
+        if (!File.Exists(_settingsFilePath)) return new Settings(); 
         var json = File.ReadAllText(_settingsFilePath);
         if (string.IsNullOrWhiteSpace(json)) return new Settings();
         return JsonSerializer.Deserialize<Settings>(json) ?? new Settings();
@@ -55,6 +56,7 @@ public class DataPersistenceService
     public Cache LoadCache()
     {
         EnsurePath();
+        if (!File.Exists(_cacheFilePath)) return new Cache();
         var json = File.ReadAllText(_cacheFilePath);
         if (string.IsNullOrWhiteSpace(json)) return new Cache();
         return JsonSerializer.Deserialize<Cache>(json) ?? new Cache();
