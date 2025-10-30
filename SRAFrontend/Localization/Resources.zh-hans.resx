@@ -116,4 +116,10 @@
     <data name="TaskSettingsText" xml:space="preserve">
         <value>任务通用设置</value>
     </data>
+    <data name="SystemNotificationText" xml:space="preserve">
+        <value>系统通知</value>
+    </data>
+    <data name="EmailNotificationText" xml:space="preserve">
+        <value>邮件通知</value>
+    </data>
 </root>

@@ -168,6 +168,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Email Nofication.
+        /// </summary>
+        public static string EmailNotificationText {
+            get {
+                return ResourceManager.GetString("EmailNotificationText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enable tray icon.
         /// </summary>
         public static string EnableTrayIconText {
@@ -299,6 +308,15 @@ namespace SRAFrontend.Localization {
         public static string StartUpText {
             get {
                 return ResourceManager.GetString("StartUpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System Notification.
+        /// </summary>
+        public static string SystemNotificationText {
+            get {
+                return ResourceManager.GetString("SystemNotificationText", resourceCulture);
             }
         }
         

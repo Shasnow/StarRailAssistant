@@ -10,9 +10,6 @@
              x:Class="SRAFrontend.Views.SettingsPageView"
              x:DataType="viewModels:SettingsPageViewModel"
              FontSize="16">
-    <Design.DataContext>
-        <viewModels:SettingsPageViewModel />
-    </Design.DataContext>
     <suki:SukiStackPage>
         <suki:SukiStackPage.Content>
             <suki:SettingsLayout Name="{x:Static lang:Resources.SettingText}">
@@ -37,7 +34,9 @@
 
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="icon">&#xe310;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ZoomText}" />
+                                        <Label Grid.Column="1"
+                                               Content="{x:Static lang:Resources.ZoomText}"
+                                               ToolTip.Tip="与系统显示设置的缩放对应。自动获取"/>
                                         <NumericUpDown Grid.Column="2" FormatString="0.00" Value="{Binding Zoom}"
                                                        Increment="0.25" Minimum="0"
                                                        Maximum="5" />
@@ -45,7 +44,7 @@
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="icon">&#xee60;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.ConfidenceText}" />
-                                        <NumericUpDown Grid.Column="2" FormatString="0.00" Value="0.90"
+                                        <NumericUpDown Grid.Column="2" FormatString="0.00" Value="{Binding ConfidenceThreshold}"
                                                        Increment="0.01" Minimum="0"
                                                        Maximum="1" />
                                     </Grid>
@@ -107,19 +106,19 @@
                                                        Content="{x:Static lang:Resources.AllowNotificationText}" />
                                                 <ToggleSwitch Grid.Column="2" />
                                             </Grid>
-                                            <CheckBox>System Notification</CheckBox>
-                                            <CheckBox>Email Notification</CheckBox>
+                                            <CheckBox Content="{x:Static lang:Resources.SystemNotificationText}" />
+                                            <CheckBox Content="{x:Static lang:Resources.EmailNotificationText}" />
                                         </StackPanel>
                                     </Expander>
-                                    <Grid ColumnDefinitions="Auto,*,Auto">
-                                        <Label Grid.Column="0" Classes="icon">&#xe0f4;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.DefaultPageText}" />
-                                        <ComboBox Grid.Column="2" SelectedIndex="0">
-                                            <ComboBoxItem>Page1</ComboBoxItem>
-                                            <ComboBoxItem>Page2</ComboBoxItem>
-                                            <ComboBoxItem>Page3</ComboBoxItem>
-                                        </ComboBox>
-                                    </Grid>
+                                    <!-- <Grid ColumnDefinitions="Auto,*,Auto"> -->
+                                        <!-- <Label Grid.Column="0" Classes="icon">&#xe0f4;</Label> -->
+                                        <!-- <Label Grid.Column="1" Content="{x:Static lang:Resources.DefaultPageText}" /> -->
+                                        <!-- <ComboBox Grid.Column="2" SelectedIndex="0"> -->
+                                            <!-- <ComboBoxItem>Page1</ComboBoxItem> -->
+                                            <!-- <ComboBoxItem>Page2</ComboBoxItem> -->
+                                            <!-- <ComboBoxItem>Page3</ComboBoxItem> -->
+                                        <!-- </ComboBox> -->
+                                    <!-- </Grid> -->
 
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Classes="icon">&#xe586;</Label>
@@ -141,13 +140,17 @@
                                 <StackPanel>
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Classes="icon">&#xe094;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.AutoUpdateText}" />
+                                        <Label Grid.Column="1"
+                                               Content="{x:Static lang:Resources.AutoUpdateText}"
+                                               ToolTip.Tip="有可用更新时自动下载并解压"/>
                                         <ToggleSwitch Grid.Column="2" IsChecked="{Binding EnableAutoUpdate}"/>
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto, *, *">
                                         <Label Classes="icon">&#xed6a;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.MirrorChyanText}" />
+                                        <Label Grid.Column="1"
+                                               Content="{x:Static lang:Resources.MirrorChyanText}"
+                                               ToolTip.Tip="Mirror 酱高速下载服务"/>
                                         <StackPanel Grid.Column="2">
                                             <TextBox
                                                 Watermark="Enter You CDK"
@@ -169,7 +172,9 @@
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto, *, *">
                                         <Label Classes="icon">&#xe77e;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.AppChannelText}" />
+                                        <Label Grid.Column="1"
+                                               Content="{x:Static lang:Resources.AppChannelText}"
+                                               ToolTip.Tip="y"/>
                                         <ComboBox Grid.Column="2" SelectedIndex="{Binding AppChannel}">
                                             <ComboBoxItem>stable</ComboBoxItem>
                                             <ComboBoxItem>beta</ComboBoxItem>
@@ -194,9 +199,20 @@
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.AboutText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
-                                    <TextBlock TextWrapping="Wrap">
-                                        About Us:
-                                        This application is developed by [Your Company]. For more information, visit our webside.
+                                    <TextBlock TextWrapping="Wrap" xml:space="preserve">
+版本 : <Run Text="{Binding VersionText}"></Run>
+© 2024-2025 StarRailAssistant, All rights reserved.
+
+链接 :
+<Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="*,*" ColumnSpacing="20" RowSpacing="10">
+    <HyperlinkButton NavigateUri="https://starrailassistant.top" Content="SRA官网"/>
+    <HyperlinkButton Grid.Row="0" Grid.Column="1" NavigateUri="https://github.com/Shasnow/StarRailAssistant" Content="开放源代码仓库(GitHub)" />
+    <HyperlinkButton Grid.Row="0" Grid.Column="2" NavigateUri="https://mirrorchyan.com/zh/get-start?source=sra-about" Content="Mirror 酱" />
+    <HyperlinkButton Grid.Row="0" Grid.Column="3" NavigateUri="https://qm.qq.com/q/u6iJ4lUlLW" Content="用户群(QQ)" />
+    <HyperlinkButton Grid.Row="0" Grid.Column="4" NavigateUri="https://avaloniaui.net/" Content="Avalonia UI" />
+    <HyperlinkButton Grid.Row="0" Grid.Column="5" NavigateUri="https://dotnet.microsoft.com" Content=".NET" />
+    <HyperlinkButton Grid.Row="1" Grid.Column="0" NavigateUri="https://www.python.org/" Content="Python" />
+</Grid>
                                     </TextBlock>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>

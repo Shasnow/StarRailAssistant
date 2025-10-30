@@ -65,7 +65,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
-            Header = "Announcements",
+            Header = "公告",
             Content = new AnnouncementBoardViewModel(_announcementService)
         });
     }
@@ -74,7 +74,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var cdk = _settingsService.Settings.MirrorChyanCdk;
         var channel = _settingsService.Settings.AppChannel == 0 ? "stable" : "beta";
-        var currentVersion = new Version("v1.2.1");
+        var currentVersion = new Version(Settings.Version);
         var response = await _updateService.CheckForUpdatesAsync(currentVersion.ToString(), cdk, channel);
         if (response == null)
         {
@@ -87,7 +87,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        if (currentVersion>new Version(response.Data.VersionName))
+        if (currentVersion > new Version(response.Data.VersionName))
             return;
         if (_settingsService.Settings.EnableAutoUpdate)
         {

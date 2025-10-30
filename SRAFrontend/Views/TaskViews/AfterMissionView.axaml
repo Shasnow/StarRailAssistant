@@ -17,7 +17,7 @@
                     <CheckBox IsChecked="{Binding CurrentConfig.AfterLogout}" Content="登出当前账号" />
                     <CheckBox IsChecked="{Binding CurrentConfig.AfterExitGame}" Content="退出游戏" />
                     <CheckBox IsChecked="{Binding CurrentConfig.AfterExitApp}" Content="关闭程序" />
-                    <RadioButton IsChecked="{Binding CurrentConfig.AfterSleep}" Content="关机" />
+                    <RadioButton IsChecked="{Binding CurrentConfig.AfterShutdown}" Content="关机" />
                     <RadioButton IsChecked="{Binding CurrentConfig.AfterSleep}" Content="休眠" />
                     <RadioButton Content="无动作" />
                 </StackPanel>

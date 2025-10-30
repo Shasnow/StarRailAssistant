@@ -123,4 +123,10 @@
     <data name="TaskSettingsText" xml:space="preserve">
         <value>Task Settings</value>
     </data>
+    <data name="SystemNotificationText" xml:space="preserve">
+        <value>System Notification</value>
+    </data>
+    <data name="EmailNotificationText" xml:space="preserve">
+        <value>Email Nofication</value>
+    </data>
 </root>
