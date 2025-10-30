@@ -134,6 +134,66 @@ public class SettingsPageViewModel(
             OnPropertyChanged();
         }
     }
+    
+    public bool ThreadSafety
+    {
+        get => settingsService.Settings.ThreadSafety;
+        set
+        {
+            settingsService.Settings.ThreadSafety = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    public bool AllowNotifications
+    {
+        get => settingsService.Settings.AllowNotifications;
+        set
+        {
+            settingsService.Settings.AllowNotifications = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    public bool AllowSystemNotifications
+    {
+        get => settingsService.Settings.AllowSystemNotifications;
+        set
+        {
+            settingsService.Settings.AllowSystemNotifications = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    public bool AllowEmailNotifications
+    {
+        get => settingsService.Settings.AllowEmailNotifications;
+        set
+        {
+            settingsService.Settings.AllowEmailNotifications = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    public bool EnableStartupLaunch
+    {
+        get => settingsService.Settings.EnableStartupLaunch;
+        set
+        {
+            settingsService.Settings.EnableStartupLaunch = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    public bool EnableMinimizeToTray
+    {
+        get => settingsService.Settings.EnableMinimizeToTray;
+        set
+        {
+            settingsService.Settings.EnableMinimizeToTray = value;
+            OnPropertyChanged();
+        }
+    }
 
     private async Task VerifyCdkAsync(string cdk)
     {
