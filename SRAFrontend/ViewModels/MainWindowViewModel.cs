@@ -103,10 +103,10 @@ public partial class MainWindowViewModel : ViewModelBase
         else
         {
             var autoUpgradeButton =
-                SukiMessageBoxButtonsFactory.CreateButton("Auto upgrade", SukiMessageBoxResult.Yes, "Flat Accent");
+                SukiMessageBoxButtonsFactory.CreateButton("自动更新", SukiMessageBoxResult.Yes, "Flat Accent");
             var manualUpgradeButton =
-                SukiMessageBoxButtonsFactory.CreateButton("Manual upgrade", SukiMessageBoxResult.OK);
-            var cancelButton = SukiMessageBoxButtonsFactory.CreateButton(SukiMessageBoxResult.Cancel);
+                SukiMessageBoxButtonsFactory.CreateButton("手动更新", SukiMessageBoxResult.OK);
+            var cancelButton = SukiMessageBoxButtonsFactory.CreateButton("忽略", SukiMessageBoxResult.Cancel);
             var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
             {
                 Header = "Update Available - " + response.Data.VersionName,
