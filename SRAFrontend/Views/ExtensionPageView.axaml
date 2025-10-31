@@ -4,13 +4,24 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
              xmlns:lang="clr-namespace:SRAFrontend.Localization"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SRAFrontend.Views.ExtensionPageView">
+             x:Class="SRAFrontend.Views.ExtensionPageView"
+             x:DataType="viewModels:ExtensionPageViewModel">
     <suki:GlassCard>
         <suki:GroupBox Header="{x:Static lang:Resources.ExtensionText}">
-            <TextBlock>
-                这里是拓展功能的内容。
-            </TextBlock>
+            <StackPanel>
+                <suki:GlassCard >
+                    <Expander Header="自动对话" IsExpanded="True">
+                        <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto">
+                            <Label Grid.Row="0" Content="启用" />
+                            <ToggleSwitch Grid.Row="0" Grid.Column="1" IsChecked="{Binding EnableAutoPlot}"/>
+                            <Label Grid.Row="1" Grid.Column="0" Content="跳过对话" />
+                            <ToggleSwitch Grid.Row="1" Grid.Column="1" IsChecked="{Binding SkipPlot}"/>
+                        </Grid>
+                    </Expander>
+                </suki:GlassCard>
+            </StackPanel>
         </suki:GroupBox>
     </suki:GlassCard>
 </UserControl>
