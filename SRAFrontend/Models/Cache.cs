@@ -7,19 +7,13 @@ namespace SRAFrontend.Models;
 public partial class Cache : ObservableObject
 {
     // 自动生成带通知的属性（字段名 _cdkStatus → 属性 CdkStatus）
-    [ObservableProperty]
-    private string _cdkStatus = "";
+    [ObservableProperty] private string _cdkStatus = "";
 
-    [ObservableProperty]
-    private string _cdkStatusForeground = "#F5222D";
+    [ObservableProperty] private string _cdkStatusForeground = "#F5222D";
 
-    [ObservableProperty]
-    private AvaloniaList<string> _configNames = ["Default"];
+    [ObservableProperty] private AvaloniaList<string> _configNames = ["Default"]; // 配置名称列表
 
-    [ObservableProperty]
-    private string _currentConfigName = "Default";
+    [ObservableProperty] private int _currentConfigIndex; // 当前配置索引
 
-    // 重点：SelectedConfigIndex 变更时会自动触发通知
-    [ObservableProperty]
-    private int _currentConfigIndex = 0;
+    [ObservableProperty] private string _currentConfigName = "Default"; // 当前配置名称
 }
