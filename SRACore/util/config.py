@@ -2,6 +2,7 @@ import json
 import os
 from typing import Any
 
+from SRACore.util.const import ApplicationDataPath
 from SRACore.util.logger import logger
 
 version = 1
@@ -77,15 +78,6 @@ class ConfigManager:
             logger.debug(f"Error decoding JSON from config_{name}.json, returning empty config.")
             return {'version': version, 'name': name}
 
-    def set(self, key: str, value) -> None:
-        """
-        设置配置项的值。如果配置项不存在，则创建它。
-        :param key: 配置项的键
-        :param value: 配置项的值
-        :return: None
-        """
-        self._config[key] = value
-
     def get(self, key: str, default=None):
         """
         获取配置项的值。如果配置项不存在，则设置为默认值并返回。
@@ -101,50 +93,6 @@ class ConfigManager:
             self.set(key, default)
         return self._config[key]
 
-    def remove(self, key: str) -> None:
-        """
-        删除指定的配置项。
-        :param key: 配置项的键
-        :return: None
-        """
-        if key in self._config:
-            del self._config[key]
-
-    def clear(self) -> None:
-        """
-        清空当前配置。
-        :return: None
-        """
-        self._config.clear()
-
-    def all(self) -> dict:
-        """
-        获取当前配置的所有键值对。
-        :return: 当前配置的副本
-        """
-        return self._config.copy()
-
-    def sync(self) -> None:
-        """
-        将当前配置保存到文件。
-        如果文件不存在，将创建一个新的配置文件。
-        如果文件已存在，将覆盖它。
-        :return: None
-        """
-        with open(f'data/config_{self.current_name}.json', 'w', encoding='utf-8') as f:
-            json.dump(self._config, f, indent=4, ensure_ascii=False)
-        logger.debug(f"Successfully saved config file: config_{self.current_name}.json")
-
-    def switch(self, name) -> None:
-        """
-        切换到指定名称的配置。
-        在切换前会保存当前配置。
-        :param name: 要切换到的配置名称
-        :return: None
-        """
-        self.sync()
-        self.load(name)
-
     @classmethod
     def get_instance(cls):
         """
@@ -155,22 +103,6 @@ class ConfigManager:
             cls.instance = ConfigManager("default")
         # 如果实例已存在，直接返回
         return cls.instance
-
-    @staticmethod
-    def delete(name: str) -> None:
-        """
-        删除指定名称的配置文件。
-        :param name: 要删除的配置名称
-        :return: None
-        """
-        try:
-            os.remove(f'data/config_{name}.json')
-            logger.debug(f"Successfully deleted config file: config_{name}.json")
-        except FileNotFoundError:
-            logger.warning(f"Config file config_{name}.json not found, nothing to delete.")
-        except Exception as e:
-            logger.error(f"Error deleting config file config_{name}.json: {e}")
-
 
 class GlobalConfigManager:
     """
@@ -196,7 +128,7 @@ class GlobalConfigManager:
         :return: None
         """
         try:
-            with open('data/globals.json', 'r', encoding='utf-8') as f:
+            with open(ApplicationDataPath / "settings.json", 'r', encoding='utf-8') as f:
                 self._global_config = json.load(f)
             if self._global_config.get("version", 0) != version:
                 self._global_config = {"version": version}
@@ -204,7 +136,7 @@ class GlobalConfigManager:
         except FileNotFoundError:
             logger.debug("Global config file not found, using default values.")
         except json.JSONDecodeError:
-            logger.debug("Error decoding JSON from globals.json, using default values.")
+            logger.debug("Error decoding JSON from settings.json, using default values.")
         except TypeError:
             logger.debug("Error initializing GlobalConfig, using default values.")
 
@@ -229,17 +161,6 @@ class GlobalConfigManager:
         :return: None
         """
         self._global_config[key] = value
-
-    def sync(self) -> None:
-        """
-        将当前全局配置保存到文件 globals.json。
-        如果文件不存在，将创建一个新的配置文件。
-        如果文件已存在，将覆盖它。
-        :return: None
-        """
-        with open('data/globals.json', 'w', encoding='utf-8') as f:
-            json.dump(self._global_config, f, indent=4, ensure_ascii=False)
-        logger.debug("Successfully saved global config file: globals.json")
 
     @classmethod
     def get_instance(cls):

@@ -8,9 +8,9 @@ class MissionAccomplishTask(BaseTask):
         super().__init__("mission_accomplish", config)
 
     def run(self):
-        if self.config["logout"]:
+        if self.config["AfterLogout"]:
             self.logout()
-        if self.config["quit_game"]:
+        if self.config["AfterExitGame"]:
             self.quit_game()
         return True
 
