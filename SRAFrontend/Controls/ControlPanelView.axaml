@@ -10,6 +10,18 @@
         Orientation="Horizontal"
         HorizontalAlignment="Right"
         Spacing="10">
+        <TextBox Width="200"
+                 Watermark="请输入配置名称"
+                 Text="{Binding NewConfigName}"
+                 IsVisible="{Binding IsAddConfigOpen}"/>
+        <Button Classes="Icon" Content="+"
+                Command="{Binding OpenAddConfigCommand}"
+                IsVisible="{Binding !IsAddConfigOpen}"/>
+        <Button Classes="Flat Icon" Content="✓"
+                Command="{Binding AddConfigCommand}"
+                IsVisible="{Binding IsAddConfigOpen}"/>
+        <Button Classes="Icon" Content="-" 
+                Command="{Binding RemoveConfigCommand}"/>
 
         <ComboBox SelectedIndex="{Binding Cache.CurrentConfigIndex}"
                   SelectedValue="{Binding Cache.CurrentConfigName}"
