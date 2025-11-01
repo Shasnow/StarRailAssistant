@@ -33,3 +33,5 @@ RANDOM_TITLE = [
     "跨越寰宇终抵黯淡星外",
     "立志成为崩铁糕手",
 ]
+
+ApplicationDataPath = Path(os.getenv("APPDATA") if sys.platform == "win32" else os.path.expanduser("~/.config")) / "SRA"

@@ -28,7 +28,7 @@ class ReceiveRewardTask(BaseTask):
     def _init_tasks(self):
         """根据配置初始化任务列表"""
         tasks = []
-        item_select = self.config['item_select']
+        item_select = self.config['ReceiveRewards']
 
         # 主任务列表（需要传参的任务）esc界面完成的
         if item_select[0]:
@@ -36,7 +36,7 @@ class ReceiveRewardTask(BaseTask):
         if item_select[1]:
             tasks.append((self.assignments_reward, ()))
         if item_select[6]:
-            tasks.append((self.redeem_code, (self.config["redeem_code_list"],)))
+            tasks.append((self.redeem_code, (self.config["ReceiveRewardRedeemCodes"],)))
         if item_select[2]:
             tasks.append((self.mail, ()))
 
@@ -156,7 +156,7 @@ class ReceiveRewardTask(BaseTask):
         if not self.wait_img("resources/img/enter.png", timeout=30):
             logger.error("检测超时，编号2")
             return
-        self.press_key(self.config.get('key_f1', 'f1'))
+        self.press_key('f1')
         self.sleep(0.2)
         target=self.ocr_match("巡星之礼")
         if target is None:
@@ -242,7 +242,7 @@ class ReceiveRewardTask(BaseTask):
         if not self.wait_img("resources/img/enter.png"):
             logger.error("检测超时，编号2")
             return
-        self.press_key(self.config.get('key_f2', 'f2'))
+        self.press_key('f1')
         if not self.wait_img("resources/img/f2.png", timeout=20):
             logger.error("检测超时，编号1")
             self.press_key("esc")

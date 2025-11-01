@@ -6,9 +6,9 @@ class TrailblazePowerTask(BaseTask):
     def __init__(self, config: dict):
         super().__init__('trailblaze_power', config)
         self.f4 = self.gcm.get('key_f4', 'f4')
-        self.replenish_time = self.config.get('replenish_time')
-        self.replenish_way = self.config.get('replenish_way')
-        self.replenish_flag = self.config.get('replenish')
+        self.replenish_time = self.config.get('TrailblazePowerReplenishTimes')
+        self.replenish_way = self.config.get('TrailblazePowerReplenishWay')
+        self.replenish_flag = self.config.get('TrailblazePowerReplenishStamina')
 
     def run(self):
         def name2task(name: str):
@@ -29,7 +29,7 @@ class TrailblazePowerTask(BaseTask):
                     return None
 
         tasks = []
-        tasklist = self.config['task_list']
+        tasklist = self.config['EnabledTasks']
         logger.debug("任务列表：" + str(tasklist))
         for task in tasklist:
             tasks.append((name2task(task["name"]), (task["args"])))
@@ -221,7 +221,7 @@ class TrailblazePowerTask(BaseTask):
                     logger.info("体力不足")
                     self.press_key("esc", interval=1, presses=3)
                     return False
-            if self.config["use_assistant"]:
+            if self.config["TrailblazePowerUseAssistant"]:
                 self.support()
             self.sleep(1)
             if not self.click_img("resources/img/battle_star.png", after_sleep=1):
@@ -255,7 +255,7 @@ class TrailblazePowerTask(BaseTask):
                 self.click_point(0.5, 0.5)  # 点击屏幕中心
                 break
 
-            if self.config["change_lineup"]:
+            if self.config["TrailblazePowerChangeLineup"]:
                 self.click_img("resources/img/change_lineup.png")
             if not self.click_img("resources/img/again.png"):
                 logger.error("发生错误，错误编号5")
@@ -276,9 +276,9 @@ class TrailblazePowerTask(BaseTask):
                     elif result == 1:
                         pass
                     break
-            if self.config["use_assistant"]:
+            if self.config["TrailblazePowerUseAssistant"]:
                 self.support()
-            if self.config["change_lineup"]:
+            if self.config["TrailblazePowerChangeLineup"]:
                 self.click_img("resources/img/battle_star.png")
 
             run_time -= 1
