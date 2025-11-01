@@ -12,7 +12,8 @@ public partial class ControlPanelViewModel :ViewModelBase
 {
     [ObservableProperty]
     private string _startMode = "Current"; // Current, All
-
+    [ObservableProperty] private bool _isAddConfigOpen;
+    [ObservableProperty] private string _newConfigName = "";
     private readonly SraService _sraService;
     private readonly CacheService _cacheService;
 
@@ -51,5 +52,32 @@ public partial class ControlPanelViewModel :ViewModelBase
         {
             File.AppendAllText("error.log", DateTime.Now + " : " + e.Message + Environment.NewLine + e.StackTrace);
         }
+    }
+    
+    [RelayCommand]
+    private void OpenAddConfig()
+    { 
+        IsAddConfigOpen = true;
+    }
+    [RelayCommand]
+    private void AddConfig()
+    {
+        if (string.IsNullOrWhiteSpace(NewConfigName))
+            return;
+        
+        Cache.ConfigNames.Add(NewConfigName);
+        NewConfigName = "";
+        IsAddConfigOpen = false;
+    }
+
+    [RelayCommand]
+    private void RemoveConfig()
+    {
+        if (Cache.ConfigNames.Count==1)
+        {
+            return;
+        }
+        Cache.ConfigNames.RemoveAt(Cache.CurrentConfigIndex);
+        Cache.CurrentConfigIndex = 0;
     }
 }
