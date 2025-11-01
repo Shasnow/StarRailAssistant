@@ -1,17 +1,15 @@
 from abc import ABC, abstractmethod
 
-from SRACore.util.config import ConfigManager
 from SRACore.util.operator import Executable
 
 
 class BaseTask(Executable, ABC):
-    def __init__(self, name: str, config: dict):
+    def __init__(self, config: dict):
         """
         基础任务类，所有任务类都应继承自此类。
-        :param name: 名称，用于配置文件字段的标识
         """
         super().__init__()
-        self.config = config.get(name)
+        self.config = config
         self.stop_flag = False
 
     @abstractmethod
