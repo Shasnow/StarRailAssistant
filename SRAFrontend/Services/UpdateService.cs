@@ -67,7 +67,7 @@ public class UpdateService(HttpClient httpClient, ILogger<UpdateService> logger)
         VersionResponse versionResponse,
         int downloadChannel,
         IProgress<DownloadStatus> statusProgress,
-        string[]? proxies = null,
+        IEnumerable<string>? proxies = null,
         CancellationToken cancellationToken = default
     )
     {
@@ -88,7 +88,7 @@ public class UpdateService(HttpClient httpClient, ILogger<UpdateService> logger)
         var downloadCandidates = new List<string>();
         if (downloadChannel==1)
         {
-            if (proxies is { Length: > 0 })
+            if (proxies is not null)
                 downloadCandidates.AddRange(proxies.Select(proxy =>
                     $"{proxy.TrimEnd('/')}/{downloadUrl.TrimStart('/')}"));
         }
