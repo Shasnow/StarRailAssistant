@@ -30,7 +30,7 @@
                                         <Label Classes="icon">&#xe40c;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.ThreadSafetyText}"
                                                ToolTip.Tip="已过时，无效的设置项" />
-                                        <ToggleSwitch Grid.Column="2" IsChecked="{Binding ThreadSafety}" />
+                                        <ToggleSwitch Grid.Column="2" IsChecked="{Binding Settings.ThreadSafety}" />
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto, *, Auto">
@@ -46,7 +46,7 @@
                                         <Label Classes="icon">&#xee60;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.ConfidenceText}" />
                                         <NumericUpDown Grid.Column="2" FormatString="0.00"
-                                                       Value="{Binding ConfidenceThreshold}"
+                                                       Value="{Binding Settings.ConfidenceThreshold}"
                                                        Increment="0.01" Minimum="0"
                                                        Maximum="1" />
                                     </Grid>
@@ -78,16 +78,16 @@
                                                 Maximum="1"
                                                 TickFrequency="0.01"
                                                 IsSnapToTickEnabled="True"
-                                                Value="{Binding BackgroundOpacity}" />
+                                                Value="{Binding Settings.BackgroundOpacity}" />
                                         <TextBlock Grid.Column="3"
-                                                   Text="{Binding BackgroundOpacity}"
+                                                   Text="{Binding Settings.BackgroundOpacity}"
                                                    VerticalAlignment="Center"
                                                    FontWeight="DemiBold" />
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Grid.Column="0" Classes="icon">&#xe4a2;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.LanguageText}" />
-                                        <ComboBox Grid.Column="2" SelectedIndex="{Binding CurrentLang}">
+                                        <ComboBox Grid.Column="2" SelectedIndex="{Binding Settings.Language}">
                                             <ComboBoxItem>English</ComboBoxItem>
                                             <ComboBoxItem>简体中文</ComboBoxItem>
                                         </ComboBox>
@@ -107,12 +107,12 @@
                                                 <Label Grid.Column="1"
                                                        Content="{x:Static lang:Resources.AllowNotificationText}" />
                                                 <ToggleSwitch Grid.Column="2"
-                                                              IsChecked="{Binding AllowNotifications}" />
+                                                              IsChecked="{Binding Settings.AllowNotifications}" />
                                             </Grid>
                                             <CheckBox Content="{x:Static lang:Resources.SystemNotificationText}"
-                                                      IsChecked="{Binding AllowSystemNotifications}" />
+                                                      IsChecked="{Binding Settings.AllowSystemNotifications}" />
                                             <CheckBox Content="{x:Static lang:Resources.EmailNotificationText}"
-                                                      IsChecked="{Binding AllowEmailNotifications}" />
+                                                      IsChecked="{Binding Settings.AllowEmailNotifications}" />
                                         </StackPanel>
                                     </Expander>
                                     <!-- <Grid ColumnDefinitions="Auto,*,Auto"> -->
@@ -129,14 +129,14 @@
                                         <Label Classes="icon">&#xe586;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.StartUpText}" />
                                         <ToggleSwitch Grid.Column="2"
-                                                      IsChecked="{Binding EnableStartupLaunch}" />
+                                                      IsChecked="{Binding Settings.EnableStartupLaunch}" />
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Classes="icon">&#xe434;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.EnableTrayIconText}" />
                                         <ToggleSwitch Grid.Column="2"
-                                                      IsChecked="{Binding EnableMinimizeToTray}" />
+                                                      IsChecked="{Binding Settings.EnableMinimizeToTray}" />
                                     </Grid>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
@@ -150,7 +150,7 @@
                                         <Label Grid.Column="1"
                                                Content="{x:Static lang:Resources.AutoUpdateText}"
                                                ToolTip.Tip="有可用更新时自动下载并解压" />
-                                        <ToggleSwitch Grid.Column="2" IsChecked="{Binding EnableAutoUpdate}" />
+                                        <ToggleSwitch Grid.Column="2" IsChecked="{Binding Settings.EnableAutoUpdate}" />
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto, *, *">
@@ -163,8 +163,8 @@
                                                 Watermark="Enter You CDK"
                                                 PasswordChar="*"
                                                 Text="{Binding MirrorChyanCdk}" />
-                                            <TextBlock Text="{Binding CdkStatus}"
-                                                       Foreground="{Binding CdkStatusForeground}" />
+                                            <TextBlock Text="{Binding Cache.CdkStatus}"
+                                                       Foreground="{Binding Cache.CdkStatusForeground}" />
                                         </StackPanel>
 
                                     </Grid>
@@ -172,7 +172,7 @@
                                     <Grid ColumnDefinitions="Auto, *, *">
                                         <Label Classes="icon">&#xebaa;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.UpdateChannelText}" />
-                                        <ComboBox Grid.Column="2" SelectedIndex="{Binding DownloadChannel}">
+                                        <ComboBox Grid.Column="2" SelectedIndex="{Binding Settings.DownloadChannel}">
                                             <ComboBoxItem>Mirror 酱</ComboBoxItem>
                                             <ComboBoxItem>GitHub</ComboBoxItem>
                                         </ComboBox>
@@ -182,7 +182,7 @@
                                         <Label Grid.Column="1"
                                                Content="{x:Static lang:Resources.AppChannelText}"
                                                ToolTip.Tip="y" />
-                                        <ComboBox Grid.Column="2" SelectedIndex="{Binding AppChannel}">
+                                        <ComboBox Grid.Column="2" SelectedIndex="{Binding Settings.AppChannel}">
                                             <ComboBoxItem>stable</ComboBoxItem>
                                             <ComboBoxItem>beta</ComboBoxItem>
                                         </ComboBox>

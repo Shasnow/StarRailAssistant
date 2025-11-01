@@ -2,11 +2,10 @@
 using System.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SRAFrontend.ViewModels;
 
 namespace SRAFrontend.Models;
 
-public partial class TrailblazePowerTask(Action<TrailblazePowerTask> onAddTaskItem) : ViewModelBase
+public partial class TrailblazePowerTask(Action<TrailblazePowerTask> onAddTaskItem) : ObservableObject
 {
     public bool CanMulti { get; init; }
 
