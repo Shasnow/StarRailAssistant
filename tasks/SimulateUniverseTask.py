@@ -4,7 +4,7 @@ from SRACore.util.logger import logger
 
 class SimulateUniverseTask(BaseTask):
     def __init__(self,config: dict):
-        super().__init__("simulated_universe",config)
+        super().__init__(config)
         self.times =self.config.get("SimulatedUniverseTimes",1)
 
     def run(self):
@@ -138,7 +138,7 @@ class SimulateUniverseTask(BaseTask):
         """
         page = self.wait_any_img(["resources/img/enter.png", "resources/img/differential_universe_start.png","resources/img/bonus points.png"])
         if page == 0:
-            self.press_key(self.gcm.get('key_f4', 'f4'))
+            self.press_key(self.settings.get('key_f4', 'f4'))
             if not self.wait_img("resources/img/f4.png", timeout=20):
                 logger.error("检测超时，编号1")
                 self.press_key("esc")

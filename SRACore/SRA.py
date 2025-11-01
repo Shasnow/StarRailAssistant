@@ -85,11 +85,12 @@ class SRACli(cmd.Cmd):
             return
         command = args[0]
         if command == 'run':
-            if self.task_process.is_alive():
+            if self.task_process is not None and self.task_process.is_alive():
                 print("TaskManager 已在运行中。")
                 return
             # 重新创建进程（避免重复启动已终止的进程）
-            self.task_process = multiprocessing.Process(target=self.task_manager.run, daemon=True)
+            config_names=args[1:] if len(args)>1 else tuple()
+            self.task_process = multiprocessing.Process(target=self.task_manager.run, daemon=True, args=config_names)
             self.task_process.start()
             time.sleep(1)  # 确保进程有时间启动
             print("TaskManager 已启动。")

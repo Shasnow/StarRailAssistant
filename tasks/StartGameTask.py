@@ -6,9 +6,6 @@ from SRACore.util.logger import logger
 
 
 class StartGameTask(BaseTask):
-    def __init__(self, config: dict):
-        super().__init__('start_game', config)
-
     def run(self):
         logger.info("启动游戏任务开始")
         self.launch_game()
@@ -99,7 +96,7 @@ class StartGameTask(BaseTask):
             return -1
         if result != 0:
             logger.info(f"登录状态 {result}")
-            enable = self.config['always_logout']
+            enable = self.config['StartGameAlwaysLogin']
             if enable and result != 3:  # 是否启用退出账号
                 self.logout_outside()  # 执行退出账号后执行下面的登录操作
             else:

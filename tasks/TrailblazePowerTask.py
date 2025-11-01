@@ -4,8 +4,8 @@ from SRACore.util.logger import logger
 
 class TrailblazePowerTask(BaseTask):
     def __init__(self, config: dict):
-        super().__init__('trailblaze_power', config)
-        self.f4 = self.gcm.get('key_f4', 'f4')
+        super().__init__(config)
+        self.f4 = 'f4'
         self.replenish_time = self.config.get('TrailblazePowerReplenishTimes')
         self.replenish_way = self.config.get('TrailblazePowerReplenishWay')
         self.replenish_flag = self.config.get('TrailblazePowerReplenishStamina')
@@ -29,10 +29,12 @@ class TrailblazePowerTask(BaseTask):
                     return None
 
         tasks = []
-        tasklist = self.config['EnabledTasks']
+        tasklist = self.config['TrailblazePowerTaskList']
         logger.debug("任务列表：" + str(tasklist))
         for task in tasklist:
-            tasks.append((name2task(task["name"]), (task["args"])))
+            tasks.append((name2task(task["Name"]), {"level": task["Level"],
+                                                     "run_time": task["RunTimes"],
+                                                     "single_time": task["Count"]}))
         for task, kwargs in tasks:
             if self.stop_flag:
                 break
