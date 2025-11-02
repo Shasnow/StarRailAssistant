@@ -82,16 +82,12 @@ jobs:
       - name: Install Inno Setup
         run: |
           choco install innosetup --no-progress --yes
-      - name: Add SRAUpdater
+      - name: Prepare for Inno Setup
         run: |
-          Invoke-WebRequest -Uri https://github.com/Shasnow/SRAUpdater/releases/download/SRAUpdater/SRAUpdater.zip -OutFile SRAUpdater.zip
           Expand-Archive -Path StarRailAssistant_${{ env.version }}.zip -DestinationPath StarRailAssistant
-          Expand-Archive -Path SRAUpdater.zip -DestinationPath SRAUpdater
           Remove-Item -Path StarRailAssistant_${{ env.version }}.zip
-          Remove-Item -Path SRAUpdater.zip
-          Copy-Item -Path SRAUpdater\* -Destination StarRailAssistant -Recurse -Force
           Copy-Item version_info.txt -Destination setup\install_info.txt -Force
-      - name: Package
+      - name: Re-Package
         run: |
           Compress-Archive -Path StarRailAssistant\* -DestinationPath StarRailAssistant_${{ env.version }}.zip
           New-Item -ItemType Directory -Path setup\SRA -Force
@@ -183,10 +179,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
-#      - name: Trigger MirrorChyanUploading
-#        shell: bash
-#        run: |
-#          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan
-#          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note
-#        env:
-#          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Trigger MirrorChyanUploading
+        shell: bash
+        run: |
+          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan
+          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
