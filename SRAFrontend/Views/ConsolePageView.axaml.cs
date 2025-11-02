@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using SRAFrontend.ViewModels;
 
 namespace SRAFrontend.Views;
@@ -15,7 +16,13 @@ public partial class ConsolePageView : UserControl
 
     private void OnModelOnPropertyChanged(object? _, PropertyChangedEventArgs args)
     {
-        if (args.PropertyName == nameof(ConsolePageViewModel.LogText)) ConsoleScrollViewer.ScrollToEnd();
+        if (args.PropertyName == nameof(ConsolePageViewModel.LogText))
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                ConsoleScrollViewer.ScrollToEnd();
+            });
+        }
     }
 
     protected override void OnLoaded(RoutedEventArgs e)

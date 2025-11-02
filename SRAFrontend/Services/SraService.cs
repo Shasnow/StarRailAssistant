@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 
 namespace SRAFrontend.Services;
 
-public partial class SraService : ObservableObject
+public partial class SraService : ObservableObject, IDisposable
 {
+    private readonly ILogger _logger;
+    private readonly StringBuilder _outputBuffer = new();
     private readonly Process _sraProcess;
+    private bool _isDisposed;
     [ObservableProperty] private bool _isRunning;
     [ObservableProperty] private string _output = "后端未启动。";
-    private readonly ILogger _logger;
 
     public SraService(ILogger<SraService> logger)
     {
@@ -27,19 +31,27 @@ public partial class SraService : ObservableObject
                 CreateNoWindow = true
             }
         };
-        _sraProcess.OutputDataReceived += (_, args) =>
+        _sraProcess.OutputDataReceived += OnSraProcessOutputDataReceived;
+        _sraProcess.ErrorDataReceived += OnSraProcessErrorDataReceived;
+        StartSraProcess("--inline");
+    }
+
+    private void OnSraProcessErrorDataReceived(object _, DataReceivedEventArgs args)
+    {
+        Dispatcher.UIThread.Post(() => { _outputBuffer.AppendLine(args.Data); });
+    }
+
+    private void OnSraProcessOutputDataReceived(object _, DataReceivedEventArgs args)
+    {
+        if (args.Data == null) return;
+        // 通过 Dispatcher 切换到 UI 线程更新属性
+        Dispatcher.UIThread.Post(() =>
         {
-            if (args.Data == null) return;
             if (args.Data.Contains("[Start]")) IsRunning = true;
             if (args.Data.Contains("[Done]")) IsRunning = false;
-            Output += args.Data + "\n";
-        };
-        _sraProcess.ErrorDataReceived += (_, args) =>
-        {
-            if (args.Data == null) return;
-            Output += args.Data + "\n";
-        };
-        StartSraProcess("");
+            _outputBuffer.AppendLine(args.Data);
+            Output = _outputBuffer.ToString();
+        });
     }
 
     private void StartSraProcess(string arguments)
@@ -48,6 +60,7 @@ public partial class SraService : ObservableObject
         try
         {
             _sraProcess.Start();
+            _outputBuffer.Clear();
             Output = "";
             _sraProcess.BeginOutputReadLine();
             _sraProcess.BeginErrorReadLine();
@@ -56,7 +69,6 @@ public partial class SraService : ObservableObject
         {
             _logger.LogError("Failed to start SRA process: {Message}", e.Message);
         }
-
     }
 
     public void StopSraProcess()
@@ -81,5 +93,49 @@ public partial class SraService : ObservableObject
     public void TaskRun(string? configName)
     {
         SendInput(string.IsNullOrEmpty(configName) ? "task run" : $"task run {configName}");
+    }
+
+    ~SraService() // 终结器（防错机制，确保非托管资源释放）
+    {
+        Dispose(false);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this); // 告诉GC不需要调用终结器
+    }
+
+    private void Dispose(bool disposing)
+    {
+        // 防止重复释放
+        if (_isDisposed)
+            return;
+
+        // 释放托管资源（仅在手动调用Dispose时执行）
+        if (disposing)
+        {
+            // 解绑事件（避免回调被触发时访问已释放资源）
+            _sraProcess.OutputDataReceived -= OnSraProcessOutputDataReceived;
+            _sraProcess.ErrorDataReceived -= OnSraProcessErrorDataReceived;
+
+            // 停止进程（若仍在运行）
+            StopSraProcess();
+        }
+
+        // 释放非托管资源（Process内部的句柄等）
+        if (!_sraProcess.HasExited)
+            try
+            {
+                _sraProcess.Kill(); // 强制终止（若StopSraProcess未成功）
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "释放时终止进程失败");
+            }
+
+        _sraProcess.Dispose(); // 释放Process的所有资源
+
+        _isDisposed = true;
     }
 }

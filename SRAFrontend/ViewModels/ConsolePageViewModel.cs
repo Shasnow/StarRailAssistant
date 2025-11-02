@@ -15,7 +15,6 @@ public class ConsolePageViewModel : PageViewModel
             if (args.PropertyName == nameof(SraService.Output))
             {
                 OnPropertyChanged(nameof(LogText));
-                
             }
         };
     }
