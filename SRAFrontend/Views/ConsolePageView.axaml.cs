@@ -28,6 +28,7 @@ public partial class ConsolePageView : UserControl
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
+        ConsoleScrollViewer.ScrollToEnd();
         if (DataContext is ConsolePageViewModel model) model.PropertyChanged += OnModelOnPropertyChanged;
     }
 
