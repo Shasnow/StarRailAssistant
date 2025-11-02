@@ -31,7 +31,7 @@ class SRACli(cmd.Cmd):
         if arg:
             func = getattr(self, f"do_{arg}", None)
             if func:
-                print(f"  {func} - {func.__doc__ or '没有帮助信息'}")
+                print(f"  {arg} - {func.__doc__ or '没有帮助信息'}")
             else:
                 print(f"未知命令: {arg}")
         else:
