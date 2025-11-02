@@ -251,7 +251,7 @@ public partial class TaskPageViewModel : PageViewModel
         if (TopLevelObject is null) return;
         var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
         if (files.Count == 0) return;
-        CurrentConfig.StartGamePath = files[0].Path.AbsolutePath;
+        CurrentConfig.StartGamePath = files[0].Path.LocalPath;
     }
 
     [RelayCommand]
