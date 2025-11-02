@@ -43,15 +43,27 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - name: Install .NET 8.0 Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+        
+      - name: Publish StarRailAssistant
+        run: |
+          dotnet publish -c Release -r win-x64 .\SRAFrontend\SRAFrontend.sln
+        
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest
           pip install -r requirements.txt
+          
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
@@ -61,6 +73,7 @@ jobs:
       - name: Built with package.py
         run: |
           python package.py
+          
       - name: Read version
         id: read_version
         run: |
@@ -144,7 +157,7 @@ jobs:
           NOTES_MAIN="$(sed 's/\r$//g' <(tail -n +3 version_info.txt))"
           NOTES="$NOTES_MAIN
           
-          [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
+          [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)\n
           下载说明: zip包-免安装版; setup-免解压一键安装版
 
           \`\`\`本release通过GitHub Actions自动构建\`\`\`"
@@ -161,7 +174,7 @@ jobs:
           NOTES_MAIN="$(sed 's/\r$//g' <(tail -n +3 version_info.txt))"
           NOTES="$NOTES_MAIN
           
-          [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
+          [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)\n
           下载说明: zip包-免安装版; setup-免解压一键安装版
 
           \`\`\`本release通过GitHub Actions自动构建\`\`\`"
@@ -170,10 +183,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
-      - name: Trigger MirrorChyanUploading
-        shell: bash
-        run: |
-          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan
-          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Trigger MirrorChyanUploading
+#        shell: bash
+#        run: |
+#          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan
+#          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note
+#        env:
+#          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

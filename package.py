@@ -35,7 +35,7 @@ if __name__ == "__main__":
     with (root_path / "version.json").open(mode="r", encoding="utf-8") as f:
         version = json.load(f)
 
-    print("Packaging main main program ...")
+    print("Packaging Python program...")
 
     os.system(
         "powershell -Command python -m nuitka --standalone --mingw64"
@@ -49,9 +49,11 @@ if __name__ == "__main__":
         " --assume-yes-for-downloads --output-filename=SRA-cli"
         " --remove-output main.py"
     )
+    print("Python program packaging completed !")
 
     print("Start to copy resources ...")
 
+    shutil.copytree(root_path / "SRAFrontend/bin/Release/net8.0/win-x64/publish", root_path / "main.dist/", dirs_exist_ok=True)
     shutil.copytree(root_path / "resources", root_path / "main.dist/resources")
     shutil.copytree(root_path / "plugins", root_path / "main.dist/plugins")
     shutil.copytree(root_path / "tools", root_path / "main.dist/tools")
@@ -73,7 +75,7 @@ if __name__ == "__main__":
     )
     shutil.rmtree(root_path / "main.dist")
 
-    print("main main program packaging completed !")
+    print("SRA program packaging completed !")
 
     (root_path / "version_info.txt").write_text(
         f"v{version['version']}\n\n{version['Announcement'][0]['content']}", encoding="utf-8"
