@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.Logging;
 
 namespace SRAFrontend.Services;
 
@@ -9,9 +10,11 @@ public partial class SraService : ObservableObject
     private readonly Process _sraProcess;
     [ObservableProperty] private bool _isRunning;
     [ObservableProperty] private string _output = "后端未启动。";
+    private readonly ILogger _logger;
 
-    public SraService()
+    public SraService(ILogger<SraService> logger)
     {
+        _logger = logger;
         _sraProcess = new Process
         {
             StartInfo = new ProcessStartInfo
@@ -27,6 +30,7 @@ public partial class SraService : ObservableObject
         _sraProcess.OutputDataReceived += (_, args) =>
         {
             if (args.Data == null) return;
+            if (args.Data.Contains("[Start]")) IsRunning = true;
             if (args.Data.Contains("[Done]")) IsRunning = false;
             Output += args.Data + "\n";
         };
@@ -35,16 +39,24 @@ public partial class SraService : ObservableObject
             if (args.Data == null) return;
             Output += args.Data + "\n";
         };
-        // StartSraProcess("");
+        StartSraProcess("");
     }
 
     private void StartSraProcess(string arguments)
     {
         _sraProcess.StartInfo.Arguments = arguments;
-        Output = "";
-        _sraProcess.Start();
-        _sraProcess.BeginOutputReadLine();
-        _sraProcess.BeginErrorReadLine();
+        try
+        {
+            _sraProcess.Start();
+            Output = "";
+            _sraProcess.BeginOutputReadLine();
+            _sraProcess.BeginErrorReadLine();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Failed to start SRA process: {Message}", e.Message);
+        }
+
     }
 
     public void StopSraProcess()
@@ -55,19 +67,19 @@ public partial class SraService : ObservableObject
         }
         catch (InvalidOperationException e)
         {
-            Console.WriteLine(e);
+            _logger.LogError("Failed to stop SRA process: {Message}", e.Message);
         }
     }
 
     public void SendInput(string input)
     {
         if (input == "") return;
+        _logger.LogInformation("SendInput to SRA-cli: {Input}", input);
         if (!_sraProcess.HasExited) _sraProcess.StandardInput.WriteLine(input);
     }
 
     public void TaskRun(string? configName)
     {
-        IsRunning = true;
         SendInput(string.IsNullOrEmpty(configName) ? "task run" : $"task run {configName}");
     }
 }

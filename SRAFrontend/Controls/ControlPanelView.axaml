@@ -30,7 +30,7 @@
 
         <SplitButton Content="{Binding StartMode}"
                      Classes="Flat Rounded"
-                     Command="{Binding StartCommand}"
+                     Command="{Binding StartButtonCommand}"
                      IsEnabled="{Binding CanStart}">
             <SplitButton.Flyout>
                 <MenuFlyout>
@@ -40,6 +40,9 @@
                     <MenuItem Header="All" 
                               Command="{Binding SwitchStartModeCommand}" 
                               CommandParameter="All"/>
+                    <MenuItem Header="Save Only" 
+                              Command="{Binding SwitchStartModeCommand}"
+                              CommandParameter="Save Only"/>
                 </MenuFlyout>
             </SplitButton.Flyout>
         </SplitButton>
