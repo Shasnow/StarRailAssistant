@@ -1,16 +1,13 @@
 from SRACore.tasks.BaseTask import BaseTask
-from SRACore.util import system
+from SRACore.util import sys_util
 from SRACore.util.logger import logger
 
 
 class MissionAccomplishTask(BaseTask):
-    def __init__(self, config: dict):
-        super().__init__("mission_accomplish", config)
-
     def run(self):
-        if self.config["logout"]:
+        if self.config["AfterLogout"]:
             self.logout()
-        if self.config["quit_game"]:
+        if self.config["AfterExitGame"]:
             self.quit_game()
         return True
 
@@ -30,7 +27,7 @@ class MissionAccomplishTask(BaseTask):
     def quit_game(self):
         logger.info("退出游戏")
         try:
-            system.task_kill("StarRail.exe")
+            sys_util.task_kill("StarRail.exe")
             return True
         except Exception as e:
             logger.debug(e)

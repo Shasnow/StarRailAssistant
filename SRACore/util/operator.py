@@ -13,7 +13,7 @@ import pyscreeze
 from PIL.Image import Image
 from rapidocr_onnxruntime import RapidOCR
 
-from SRACore.util.config import GlobalConfigManager
+from SRACore.util.config import load_settings
 from SRACore.util.logger import logger
 
 
@@ -63,9 +63,9 @@ class Operator:
         return cls.ocr_engine
 
     def __init__(self):
-        self.gcm = GlobalConfigManager.get_instance()
-        self.confidence = self.gcm.get('confidence', 0.9)
-        self.zoom = self.gcm.get('zoom', 1.25)
+        self.settings = load_settings()
+        self.confidence = self.settings.get('ConfidenceThreshold', 0.9)
+        self.zoom = self.settings.get('Zoom', 1.25)
         self.window_title = "崩坏：星穹铁道"
         self.top = 0
         self.left = 0

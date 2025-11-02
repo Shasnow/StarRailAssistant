@@ -1,9 +1,9 @@
 {
-  "version": "1.2.0",
-  "resource_version": "1.2.0",
+  "version": "2.0.0",
+  "resource_version": "2.0.0",
   "Announcement": [
     {
-      "title": "1.2更新公告",
+      "title": "2.0更新公告",
       "content": "### 1.2更新内容：\n- 活跃度补全：现在SRA会在每日实训活跃度不满500时尝试完成下面两个任务来补全：将任意仪器等级提升一次/使用一次万能合成机。\n### 问题修复：\n- 修复了国际服无法正常完成登录的问题。\n",
       "contentType": "markdown"
     },
