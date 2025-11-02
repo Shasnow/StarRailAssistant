@@ -11,4 +11,7 @@ if __name__ == '__main__':
     if args:
         if args[0] == '--inline' or args[0] == '--embed':
             cli_instance.prompt='' # 内嵌模式无提示符
+        elif args[0] == 'run':
+            cli_instance.onecmd(' '.join(args))
+            sys.exit(0)
     cli_instance.cmdloop()
