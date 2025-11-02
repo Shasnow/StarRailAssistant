@@ -16,10 +16,14 @@ public partial class ControlPanelViewModel :ViewModelBase
     [ObservableProperty] private string _newConfigName = "";
     private readonly SraService _sraService;
     private readonly CacheService _cacheService;
+    private readonly ConfigService _configService;
+    private readonly SettingsService _settingsService;
 
     /// <inheritdoc/>
-    public ControlPanelViewModel(SraService sraService, CacheService cacheService)
+    public ControlPanelViewModel(SraService sraService, CacheService cacheService, ConfigService configService, SettingsService settingsService)
     {
+        _settingsService = settingsService;
+        _configService = configService;
         _sraService = sraService;
         _cacheService = cacheService;
         _sraService.PropertyChanged+= (_, args) =>
@@ -42,16 +46,36 @@ public partial class ControlPanelViewModel :ViewModelBase
     }
 
     [RelayCommand]
-    private void Start()
+    private void StartButton()
     {
         try
         {
-            _sraService.TaskRun(StartMode=="All"? null : Cache.CurrentConfigName);
+            switch (StartMode)
+            {
+                case "Current":
+                    Save();
+                    _sraService.TaskRun(Cache.CurrentConfigName);
+                    break;
+                case "All":
+                    Save();
+                    _sraService.TaskRun(null);
+                    break;
+                case "Save Only":
+                    Save();
+                    break;
+            }
         }
         catch (Exception e)
         {
             File.AppendAllText("error.log", DateTime.Now + " : " + e.Message + Environment.NewLine + e.StackTrace);
         }
+    }
+    
+    private void Save()
+    {
+        _cacheService.SaveCache();
+        _configService.SaveConfig();
+        _settingsService.SaveSettings();
     }
     
     [RelayCommand]
