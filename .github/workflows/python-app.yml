@@ -153,7 +153,7 @@ jobs:
           NOTES_MAIN="$(sed 's/\r$//g' <(tail -n +3 version_info.txt))"
           NOTES="$NOTES_MAIN
           
-          [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)\n
+          [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
           下载说明: zip包-免安装版; setup-免解压一键安装版
 
           \`\`\`本release通过GitHub Actions自动构建\`\`\`"
@@ -170,7 +170,7 @@ jobs:
           NOTES_MAIN="$(sed 's/\r$//g' <(tail -n +3 version_info.txt))"
           NOTES="$NOTES_MAIN
           
-          [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)\n
+          [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
           下载说明: zip包-免安装版; setup-免解压一键安装版
 
           \`\`\`本release通过GitHub Actions自动构建\`\`\`"
