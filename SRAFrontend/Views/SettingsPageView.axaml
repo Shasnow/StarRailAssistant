@@ -129,7 +129,9 @@
                                         <Label Classes="icon">&#xe586;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.StartUpText}" />
                                         <ToggleSwitch Grid.Column="2"
-                                                      IsChecked="{Binding Settings.EnableStartupLaunch}" />
+                                                      IsChecked="{Binding Settings.EnableStartupLaunch}" 
+                                                      IsEnabled="False"
+                                                      ToolTip.Tip="SRA需要管理员权限，无法使用开机自启，请使用计划任务"/>
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto,*,Auto">
@@ -198,7 +200,7 @@
                                         <Label Classes="icon">&#xe184;</Label>
                                         <Label Grid.Column="1"
                                                Content="{x:Static lang:Resources.ResourceIntegrityCheckText}" />
-                                        <Button Grid.Column="2">Check</Button>
+                                        <Button Grid.Column="2" IsEnabled="False">Check</Button>
                                     </Grid>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
