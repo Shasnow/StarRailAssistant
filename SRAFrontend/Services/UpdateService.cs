@@ -100,7 +100,7 @@ public class UpdateService(HttpClient httpClient, ILogger<UpdateService> logger)
         foreach (var candidateUrl in downloadCandidates)
             try
             {
-                logger.LogDebug("尝试从 {Url} 下载更新", candidateUrl);
+                logger.LogDebug("Try downloading update from: {Url} ", candidateUrl);
                 await DownloadFileWithDetailsAsync(
                     candidateUrl,
                     savePath,

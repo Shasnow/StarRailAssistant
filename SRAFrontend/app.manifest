@@ -3,8 +3,14 @@
   <!-- This manifest is used on Windows only.
        Don't remove it as it might cause problems with window transparency and embedded controls.
        For more details visit https://learn.microsoft.com/en-us/windows/win32/sbscs/application-manifests -->
-  <assemblyIdentity version="1.0.0.0" name="SRAFrontend.Desktop"/>
-
+  <assemblyIdentity version="2.0.0.0" name="SRAFrontend.Desktop"/>
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+    <security>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <requestedExecutionLevel level="requireAdministrator" uiAccess="false"/>
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
     <application>
       <!-- A list of the Windows versions that this application has been tested on
