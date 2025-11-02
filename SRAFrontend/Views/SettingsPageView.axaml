@@ -100,7 +100,7 @@
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
                                     <Expander Header="{x:Static lang:Resources.NotificationText}"
-                                              HorizontalAlignment="Stretch">
+                                              HorizontalAlignment="Stretch" IsExpanded="True">
                                         <StackPanel Spacing="10">
                                             <Grid ColumnDefinitions="Auto,*,Auto">
                                                 <Label Classes="icon">&#xe0ce;</Label>
@@ -127,18 +127,19 @@
 
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Classes="icon">&#xe586;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.StartUpText}" />
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.StartUpText}"
+                                               ToolTip.Tip="SRA需要管理员权限，无法使用开机自启，请使用计划任务"/>
                                         <ToggleSwitch Grid.Column="2"
                                                       IsChecked="{Binding Settings.EnableStartupLaunch}" 
-                                                      IsEnabled="False"
-                                                      ToolTip.Tip="SRA需要管理员权限，无法使用开机自启，请使用计划任务"/>
+                                                      IsEnabled="False"/>
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Classes="icon">&#xe434;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.EnableTrayIconText}" />
                                         <ToggleSwitch Grid.Column="2"
-                                                      IsChecked="{Binding Settings.EnableMinimizeToTray}" />
+                                                      IsChecked="{Binding Settings.EnableMinimizeToTray}"
+                                                      IsEnabled="False"/>
                                     </Grid>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
