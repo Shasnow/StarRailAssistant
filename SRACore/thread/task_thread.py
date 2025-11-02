@@ -52,6 +52,7 @@ class TaskManager:
         """
         setup_logger()
         self.running_flag = True
+        logger.debug("[Start]")
         try:
             if len(args)==0:
                 # 不指定配置时，加载缓存中的全部配置名称
@@ -94,7 +95,7 @@ class TaskManager:
         finally:
             # 确保标志位被重置，避免僵尸线程
             self.running_flag = False
-            logger.info("[Done]")
+            logger.debug("[Done]")
 
     def get_tasks(self, config_name) -> list[BaseTask]:
         """
