@@ -4,8 +4,8 @@ from SRACore.util.logger import logger
 
 class ReceiveRewardTask(BaseTask):
     def __init__(self, config: dict):
-        super().__init__("receive_reward", config)
-        self.config_name=config.get('name', 'unknown')
+        super().__init__(config)
+        self.config_name=config.get('Name', 'unknown')
 
     def run(self):
         # 初始化任务
@@ -28,7 +28,7 @@ class ReceiveRewardTask(BaseTask):
     def _init_tasks(self):
         """根据配置初始化任务列表"""
         tasks = []
-        item_select = self.config['item_select']
+        item_select = self.config['ReceiveRewards']
 
         # 主任务列表（需要传参的任务）esc界面完成的
         if item_select[0]:
@@ -36,7 +36,7 @@ class ReceiveRewardTask(BaseTask):
         if item_select[1]:
             tasks.append((self.assignments_reward, ()))
         if item_select[6]:
-            tasks.append((self.redeem_code, (self.config["redeem_code_list"],)))
+            tasks.append((self.redeem_code, (self.config["ReceiveRewardRedeemCodes"],)))
         if item_select[2]:
             tasks.append((self.mail, ()))
 
@@ -103,17 +103,18 @@ class ReceiveRewardTask(BaseTask):
             logger.info("没有可领取的奖励3")
         logger.info("任务完成：签证奖励")
 
-    def redeem_code(self, redeem_code_list):
+    def redeem_code(self, redeem_codes:str):
         """Fills in redeem code and redeems them.
 
         Note:
             Do not include the `self` parameter in the ``Args`` section.
         Args:
-            redeem_code_list (list): The list thar stored redeem codes.
+            redeem_codes (str): The str thar stored redeem codes.
         Returns:
             None
         """
         logger.info("执行任务：领取兑换码")
+        redeem_code_list=redeem_codes.split()
         if len(redeem_code_list) == 0:
             logger.warning("未填写兑换码")
         for code in redeem_code_list:
@@ -156,7 +157,7 @@ class ReceiveRewardTask(BaseTask):
         if not self.wait_img("resources/img/enter.png", timeout=30):
             logger.error("检测超时，编号2")
             return
-        self.press_key(self.config.get('key_f1', 'f1'))
+        self.press_key('f1')
         self.sleep(0.2)
         target=self.ocr_match("巡星之礼")
         if target is None:
@@ -210,7 +211,7 @@ class ReceiveRewardTask(BaseTask):
         if not self.wait_img("resources/img/enter.png"):
             logger.error("检测超时，编号2")
             return
-        self.press_key(self.config.get('key_f4', 'f4'))
+        self.press_key('f4')
         if not self.wait_img("resources/img/f4.png", timeout=20):
             logger.error("检测超时，编号1")
             self.press_key("esc")
@@ -242,7 +243,7 @@ class ReceiveRewardTask(BaseTask):
         if not self.wait_img("resources/img/enter.png"):
             logger.error("检测超时，编号2")
             return
-        self.press_key(self.config.get('key_f2', 'f2'))
+        self.press_key('f2')
         if not self.wait_img("resources/img/f2.png", timeout=20):
             logger.error("检测超时，编号1")
             self.press_key("esc")

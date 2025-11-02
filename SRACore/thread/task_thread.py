@@ -1,29 +1,11 @@
 import importlib
 import tomllib
 
-from PySide6.QtCore import QThread
-
+from SRACore.util import sys_util  # NOQA 有动态用法，确保被打包
+from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
 from SRACore.tasks.BaseTask import BaseTask
-from SRACore.util.config import GlobalConfigManager, ConfigManager
-from SRACore.util.logger import logger
-
-
-class TaskThread(QThread):
-    def __init__(self):
-        super().__init__()
-        self.task_manager = TaskManager()
-        self.gcm = GlobalConfigManager.get_instance()  # 全局配置管理器
-        self.config_manager = ConfigManager.get_instance()  # 单例配置管理器
-
-    def run(self):
-        self.task_manager.run()
-
-    def stop(self):
-        self.task_manager.stop()
-        if self.gcm.get('thread_safety'):
-            self.quit()
-        else:
-            self.terminate()
+from SRACore.util.config import load_config, load_cache
+from SRACore.util.logger import logger, setup_logger
 
 
 class TaskManager:
@@ -36,8 +18,6 @@ class TaskManager:
         """
         初始化任务管理器。
         """
-        self.gcm = GlobalConfigManager.get_instance()  # 全局配置管理器
-        self.config_manager = ConfigManager.get_instance()  # 单例配置管理器
         self.running_flag = False
 
         self.task_list = []
@@ -63,18 +43,23 @@ class TaskManager:
         logger.warning("Task execution interrupted by user.")
         self.running_flag = False
 
-    def run(self):
+    def run(self, *args):
         """
-        线程主循环：
+        进程主循环：
         1. 读取配置列表（单配置或多配置）
         2. 对每个配置加载任务列表并执行
         3. 处理任务中断或失败的情况
         """
+        setup_logger()
         self.running_flag = True
+        logger.debug("[Start]")
         try:
-            # 根据全局配置决定是执行多配置还是当前配置
-            config_list = self.gcm.get('config_list') if self.gcm.get('switch2next') else [
-                self.config_manager.current_name]
+            if len(args)==0:
+                # 不指定配置时，加载缓存中的全部配置名称
+                config_list = load_cache().get("ConfigNames")
+            else:
+                # 指定配置名称
+                config_list = args
 
             for config_name in config_list:
                 logger.info(f"当前配置: {config_name}")
@@ -101,6 +86,7 @@ class TaskManager:
                         # 捕获任务执行中的异常（如未处理的错误）
                         logger.exception(f"Task '{task.__class__.__name__}' crashed: {str(e)}")
                         break
+                logger.info(f"配置 '{config_name}' 的所有任务执行完毕。")
 
             logger.info("All tasks completed.")
         except Exception as e:
@@ -109,6 +95,7 @@ class TaskManager:
         finally:
             # 确保标志位被重置，避免僵尸线程
             self.running_flag = False
+            logger.debug("[Done]")
 
     def get_tasks(self, config_name) -> list[BaseTask]:
         """
@@ -124,9 +111,9 @@ class TaskManager:
             Exception: 如果配置加载或任务实例化失败（异常会被上层捕获）
         """
         # 加载指定配置（注意：可能修改全局状态）
-        config = self.config_manager.read(config_name)
+        config = load_config(config_name)
         # 从配置中读取任务选择列表（如 [True, False, True]）
-        task_select = config.get('main_window')['task_select']
+        task_select = config.get("EnabledTasks")
         tasks = []
 
         # 遍历 task_select，根据选择状态实例化对应任务

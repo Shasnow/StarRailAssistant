@@ -39,14 +39,14 @@ if __name__ == "__main__":
 
     os.system(
         "powershell -Command python -m nuitka --standalone --mingw64"
-        " --enable-plugins=pyside6 --windows-console-mode=attach --windows-uac-admin"
+        " --windows-console-mode=force --windows-uac-admin"
         " --windows-icon-from-ico=resources\\SRAicon.ico"
         " --company-name='StarRailAssistant Team' --product-name=StarRailAssistant"
         f" --file-version={version['version'].split('-')[0]}"
         f" --product-version={version['version'].split('-')[0]}"
         " --file-description='StarRailAssistant Component'"
         " --copyright='Copyright © 2024 Shasnow'"
-        " --assume-yes-for-downloads --output-filename=SRA"
+        " --assume-yes-for-downloads --output-filename=SRA-cli"
         " --remove-output main.py"
     )
 

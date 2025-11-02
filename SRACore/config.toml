@@ -2,33 +2,23 @@
 name = "启动游戏"
 main = "StartGameTask"
 module = "tasks.StartGameTask"
-component = "StartGameComponent"
-component_module = "tasks.components.start_game"
 
 [[tasks]]
 name = "清开拓力"
 main = "TrailblazePowerTask"
 module = "tasks.TrailblazePowerTask"
-component = "TrailblazePowerComponent"
-component_module = "tasks.components.trailblaze_power"
 
 [[tasks]]
 name = "领取奖励"
 main = "ReceiveRewardTask"
 module = "tasks.ReceiveRewardTask"
-component = "ReceiveRewardComponent"
-component_module = "tasks.components.receive_reward"
 
 [[tasks]]
 name = "模拟宇宙"
 main = "SimulateUniverseTask"
 module = "tasks.SimulateUniverseTask"
-component = "SimulateUniverseComponent"
-component_module = "tasks.components.simulate_universe"
 
 [[tasks]]
 name = "任务完成"
 main = "MissionAccomplishTask"
 module = "tasks.MissionAccomplishTask"
-component = "MissionAccomplishComponent"
-component_module = "tasks.components.mission_accomplish"

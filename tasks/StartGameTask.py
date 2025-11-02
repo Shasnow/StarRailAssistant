@@ -1,14 +1,11 @@
 from pathlib import Path
 
 from SRACore.tasks.BaseTask import BaseTask
-from SRACore.util import system, encryption
+from SRACore.util import sys_util, encryption
 from SRACore.util.logger import logger
 
 
 class StartGameTask(BaseTask):
-    def __init__(self, config: dict):
-        super().__init__('start_game', config)
-
     def run(self):
         logger.info("启动游戏任务开始")
         self.launch_game()
@@ -45,26 +42,26 @@ class StartGameTask(BaseTask):
 
     def launch_game(self):
         """启动游戏"""
-        if system.is_process_running("StarRail.exe"):  # 检查游戏是否已在运行
+        if sys_util.is_process_running("StarRail.exe"):  # 检查游戏是否已在运行
             logger.info("游戏已在运行中")
             return
-        if self.config['channel'] == 0:
+        if self.config['StartGameChannel'] == 0:
             self.launch_au()  # 启动官服
         else:
             self.launch_bl()  # 启动B站服
 
     def launch_bl(self):
         self.change_config_ini(14, 0)
-        path = Path(self.config['path'])
-        system.Popen(str(path), shell=True, cwd=path.parent)
+        path = Path(self.config['StartGamePath'])
+        sys_util.Popen(str(path), shell=True, cwd=path.parent)
 
     def launch_au(self):
         self.change_config_ini(1, 1)
-        system.Popen(self.config['path'], shell=True)
+        sys_util.Popen(self.config['StartGamePath'], shell=True)
 
     def change_config_ini(self, channel, sub_channel):
         """修改配置文件"""
-        path = Path(self.config['path'])
+        path = Path(self.config['StartGamePath'])
         root_path = path.parent
         config_file = root_path / 'config.ini'
         with open(config_file, 'r') as f:
@@ -78,7 +75,7 @@ class StartGameTask(BaseTask):
             f.writelines(lines)
 
     def login(self):
-        if self.config['channel'] == 0:
+        if self.config['StartGameChannel'] == 0:
             return self.login_au()  # 登录官服
         else:
             return self.login_bl()  # 登录B站服
@@ -99,7 +96,7 @@ class StartGameTask(BaseTask):
             return -1
         if result != 0:
             logger.info(f"登录状态 {result}")
-            enable = self.config['always_logout']
+            enable = self.config['StartGameAlwaysLogin']
             if enable and result != 3:  # 是否启用退出账号
                 self.logout_outside()  # 执行退出账号后执行下面的登录操作
             else:
@@ -107,8 +104,8 @@ class StartGameTask(BaseTask):
         self.click_img("resources/img/bilibili_login_other.png", after_sleep=0.5)
 
         self.click_point(0.5, 0.69)  # 点击账号密码登录
-        if self.config['auto_login']:
-            user = encryption.win_decryptor(self.config['user'])
+        if self.config['StartGameAutoLogin']:
+            user = encryption.win_decryptor(self.config['StartGameUsername'])
             logger.info(f"登录账号：{user}")
             self.press_key('tab')
             self.sleep(1)
@@ -117,7 +114,7 @@ class StartGameTask(BaseTask):
             self.sleep(1)
             self.press_key("tab")
             self.sleep(0.2)
-            self.copy(encryption.win_decryptor(self.config['passwd']))
+            self.copy(encryption.win_decryptor(self.config['StartGamePassword']))
             self.paste()
             self.sleep(0.2)
             self.click_point(0.37, 0.53)  # 同意隐私政策
@@ -140,7 +137,7 @@ class StartGameTask(BaseTask):
             return -1
         if result != 0:
             logger.info(f"登录状态 {result}")
-            enable = self.config['always_logout']
+            enable = self.config['StartGameAlwaysLogin']
             if enable and result != 3:  # 是否启用退出账号
                 self.logout_outside()  # 执行退出账号后执行下面的登录操作
             else:
@@ -152,8 +149,8 @@ class StartGameTask(BaseTask):
         if not self.click_img("resources/img/login_with_account.png"):
             logger.error("发生错误，错误编号10")
             return -1
-        if self.config['auto_login']:
-            user = encryption.win_decryptor(self.config['user'])
+        if self.config['StartGameAutoLogin']:
+            user = encryption.win_decryptor(self.config['StartGameUsername'])
             if user == "":
                 logger.error("未填写账号")
                 return -1
@@ -164,7 +161,7 @@ class StartGameTask(BaseTask):
             self.sleep(1)
             self.press_key("tab")
             self.sleep(0.2)
-            self.copy(encryption.win_decryptor(self.config['passwd']))
+            self.copy(encryption.win_decryptor(self.config['StartGamePassword']))
             self.paste()
             self.click_img("resources/img/agree.png", x_offset=-158)
             if not self.click_img("resources/img/enter_game.png"):
