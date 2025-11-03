@@ -13,17 +13,8 @@ public partial class ConsolePageViewModel : PageViewModel
     public ConsolePageViewModel(SraService sraService) : base(PageName.Console, "\uEAE8")
     {
         _sraService = sraService;
-        _sraService.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName == nameof(SraService.OutputLines))
-            {
-                OnPropertyChanged(nameof(LogText));
-            }
-        };
-        FilterOptions.CollectionChanged+= (_, _) =>
-        {
-            OnPropertyChanged(nameof(LogText));
-        };
+        _sraService.OutputLines.CollectionChanged += (_, _) => OnPropertyChanged(nameof(LogText));
+        FilterOptions.CollectionChanged+= (_, _) => OnPropertyChanged(nameof(LogText));
     }
 
     public string LogText
@@ -42,9 +33,7 @@ public partial class ConsolePageViewModel : PageViewModel
                 {
                     // 勾选了该级别，且日志行包含对应标识 → 保留
                     if (FilterOptions[i] && line.Contains(_levelPrefixes[i]))
-                    {
                         return true;
-                    }
                 }
                 // 2. 保留无任何级别标识的日志（无匹配级别时默认保留）
                 var hasAnyLevelPrefix = _levelPrefixes.Any(line.Contains);
@@ -57,7 +46,7 @@ public partial class ConsolePageViewModel : PageViewModel
     private readonly string[] _levelPrefixes = ["TRACE", "DEBUG", "INFO", "WARN", "ERROR"];
     
     [ObservableProperty]
-    private AvaloniaList<bool> _filterOptions = [false, true, true, true, true]; // TRACE, DEBUG, INFO, WARN, ERROR
+    private AvaloniaList<bool> _filterOptions = [false, false, true, true, true]; // TRACE, DEBUG, INFO, WARN, ERROR
 
     public void SendInput(string input)
     {

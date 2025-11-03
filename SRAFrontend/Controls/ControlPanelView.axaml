@@ -31,20 +31,28 @@
         <SplitButton Content="{Binding StartMode}"
                      Classes="Flat Rounded"
                      Command="{Binding StartButtonCommand}"
-                     IsEnabled="{Binding CanStart}">
+                     IsVisible="{Binding CanStart}"
+                     ToolTip.Tip="以当前模式运行任务">
             <SplitButton.Flyout>
                 <MenuFlyout>
                     <MenuItem Header="Current" 
                               Command="{Binding SwitchStartModeCommand}" 
-                              CommandParameter="Current"/>
+                              CommandParameter="Current"
+                              ToolTip.Tip="运行当前选中配置"/>
                     <MenuItem Header="All" 
                               Command="{Binding SwitchStartModeCommand}" 
-                              CommandParameter="All"/>
+                              CommandParameter="All"
+                              ToolTip.Tip="运行全部配置"/>
                     <MenuItem Header="Save Only" 
                               Command="{Binding SwitchStartModeCommand}"
-                              CommandParameter="Save Only"/>
+                              CommandParameter="Save Only"
+                              ToolTip.Tip="仅保存"/>
                 </MenuFlyout>
             </SplitButton.Flyout>
         </SplitButton>
+        <Button Classes="Flat Rounded"
+                Content="Stop"
+                IsVisible="{Binding !CanStart}"
+                Command="{Binding StopButtonCommand}"></Button>
     </StackPanel>
 </UserControl>

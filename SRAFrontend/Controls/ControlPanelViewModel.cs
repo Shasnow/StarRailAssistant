@@ -28,10 +28,7 @@ public partial class ControlPanelViewModel :ViewModelBase
         _cacheService = cacheService;
         _sraService.PropertyChanged+= (_, args) =>
         {
-            if (args.PropertyName == nameof(SraService.IsRunning))
-            {
-                OnPropertyChanged(nameof(CanStart));
-            }
+            if (args.PropertyName == nameof(SraService.IsRunning)) OnPropertyChanged(nameof(CanStart));
         };
     }
     
@@ -70,6 +67,11 @@ public partial class ControlPanelViewModel :ViewModelBase
             File.AppendAllText("error.log", DateTime.Now + " : " + e.Message + Environment.NewLine + e.StackTrace);
         }
     }
+    [RelayCommand]
+    private void StopButton()
+    {
+        _sraService.TaskStop();
+    }
     
     private void Save()
     {
@@ -86,12 +88,12 @@ public partial class ControlPanelViewModel :ViewModelBase
     [RelayCommand]
     private void AddConfig()
     {
+        IsAddConfigOpen = false;
         if (string.IsNullOrWhiteSpace(NewConfigName))
             return;
         
         Cache.ConfigNames.Add(NewConfigName);
         NewConfigName = "";
-        IsAddConfigOpen = false;
     }
 
     [RelayCommand]
