@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Text;
+using Avalonia.Collections;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
@@ -10,11 +10,10 @@ namespace SRAFrontend.Services;
 public partial class SraService : ObservableObject, IDisposable
 {
     private readonly ILogger _logger;
-    private readonly StringBuilder _outputBuffer = new();
     private readonly Process _sraProcess;
     private bool _isDisposed;
     [ObservableProperty] private bool _isRunning;
-    [ObservableProperty] private string _output = "后端未启动。";
+    [ObservableProperty] private AvaloniaList<string?> _outputLines = ["后端未启动。"];
 
     public SraService(ILogger<SraService> logger)
     {
@@ -38,7 +37,7 @@ public partial class SraService : ObservableObject, IDisposable
 
     private void OnSraProcessErrorDataReceived(object _, DataReceivedEventArgs args)
     {
-        Dispatcher.UIThread.Post(() => { _outputBuffer.AppendLine(args.Data); });
+        Dispatcher.UIThread.Post(() => { OutputLines.Add(args.Data); });
     }
 
     private void OnSraProcessOutputDataReceived(object _, DataReceivedEventArgs args)
@@ -49,8 +48,7 @@ public partial class SraService : ObservableObject, IDisposable
         {
             if (args.Data.Contains("[Start]")) IsRunning = true;
             if (args.Data.Contains("[Done]")) IsRunning = false;
-            _outputBuffer.AppendLine(args.Data);
-            Output = _outputBuffer.ToString();
+            OutputLines.Add(args.Data);
         });
     }
 
@@ -60,8 +58,7 @@ public partial class SraService : ObservableObject, IDisposable
         try
         {
             _sraProcess.Start();
-            _outputBuffer.Clear();
-            Output = "";
+            OutputLines.Clear();
             _sraProcess.BeginOutputReadLine();
             _sraProcess.BeginErrorReadLine();
         }
