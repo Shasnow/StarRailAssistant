@@ -99,9 +99,9 @@ class SRACli(cmd.Cmd):
                 self.task_process.terminate()
                 self.task_process.join(timeout=5)  # 增加超时，避免阻塞
                 if self.task_process.is_alive():
-                    print("警告：TaskManager 强制终止超时。")
+                    print("Error: TaskManager 强制终止超时。")
                 else:
-                    print("TaskManager 已停止。")
+                    print("[Done] TaskManager 已停止。")
             else:
                 print("TaskManager 未在运行中。")
         else:

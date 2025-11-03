@@ -91,6 +91,10 @@ public partial class SraService : ObservableObject, IDisposable
     {
         SendInput(string.IsNullOrEmpty(configName) ? "task run" : $"task run {configName}");
     }
+    public void TaskStop()
+    {
+        SendInput("task stop");
+    }
 
     ~SraService() // 终结器（防错机制，确保非托管资源释放）
     {
