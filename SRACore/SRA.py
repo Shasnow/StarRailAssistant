@@ -198,3 +198,24 @@ class SRACli(cmd.Cmd):
             print(f"未找到触发器 {trigger_name}。")
         else:
             print(f"未知的 trigger 子命令 '{command}'，可用子命令：run, stop, enable, disable, set-<类型>")
+
+    def do_run(self, arg: str):
+        """运行指定任务，会阻塞当前命令行直到任务完成。
+        用法：
+          run [配置文件名称...]
+        说明：
+            - 如果不指定配置文件名称，则运行缓存中的所有配置。
+            - 可以指定一个或多个配置文件名称，空格分隔。
+            - 除了退出程序外，运行过程中无法中断任务。
+        示例：
+            sra> run DefaultConfig
+            sra> run Config1 Config2
+            sra> run
+        """
+        args = arg.split()
+        print("运行任务中，当前命令行将被阻塞，直到任务完成...")
+        try:
+            self.task_manager.run(*args)
+        except KeyboardInterrupt:
+            return
+        print("任务运行完成，返回命令行。")

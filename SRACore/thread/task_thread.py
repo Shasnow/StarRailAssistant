@@ -114,6 +114,8 @@ class TaskManager:
         config = load_config(config_name)
         # 从配置中读取任务选择列表（如 [True, False, True]）
         task_select = config.get("EnabledTasks")
+        if not task_select:
+            return []
         tasks = []
 
         # 遍历 task_select，根据选择状态实例化对应任务
