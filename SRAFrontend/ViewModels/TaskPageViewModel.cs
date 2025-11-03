@@ -46,14 +46,14 @@ public partial class TaskPageViewModel : PageViewModel
         _toastManager = toastManager;
         _configService = configService;
         _cacheService = cacheService;
-        CurrentConfig = _configService.Config;
+        CurrentConfig = _configService.Config!;
 
         void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)
         {
             if (args.PropertyName == nameof(Cache.CurrentConfigIndex))
             {
                 _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.CurrentConfigIndex]);
-                CurrentConfig = _configService.Config;
+                CurrentConfig = _configService.Config!;
                 // OnPropertyChanged(nameof(GamePath));
                 OnPropertyChanged(nameof(CurrentConfig));
             }

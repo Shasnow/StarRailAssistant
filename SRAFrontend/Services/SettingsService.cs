@@ -1,4 +1,5 @@
-﻿using SRAFrontend.Models;
+﻿using System;
+using SRAFrontend.Models;
 using SRAFrontend.utilities;
 
 namespace SRAFrontend.Services;
@@ -12,13 +13,12 @@ public class SettingsService
     {
         _dataPersistenceService = dataPersistenceService;
         Settings = dataPersistenceService.LoadSettings();
-        if (Settings.MirrorChyanCdk == "") return;
-        Settings.MirrorChyanCdk = EncryptUtil.DecryptString(Settings.MirrorChyanCdk);
+        if (!string.IsNullOrEmpty(Settings.EncryptedMirrorChyanCdk)) Settings.MirrorChyanCdk = EncryptUtil.DecryptString(Settings.EncryptedMirrorChyanCdk);
     }
 
     public void SaveSettings()
     {
-        if (Settings.MirrorChyanCdk != "") Settings.MirrorChyanCdk = EncryptUtil.EncryptString(Settings.MirrorChyanCdk);
+        Settings.EncryptedMirrorChyanCdk = string.IsNullOrEmpty(Settings.MirrorChyanCdk) ? "" : EncryptUtil.EncryptString(Settings.MirrorChyanCdk);
         _dataPersistenceService.SaveSettings(Settings);
     }
 }
