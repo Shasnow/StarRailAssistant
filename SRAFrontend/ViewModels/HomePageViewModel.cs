@@ -8,5 +8,6 @@ namespace SRAFrontend.ViewModels;
 public partial class HomePageViewModel(ControlPanelViewModel controlPanelViewModel, SettingsService settingsService) : PageViewModel(PageName.Home, "\uE2C2")
 {
     public double ImageOpacity => settingsService.Settings.BackgroundOpacity;
+    public double GlassCardOpacity => settingsService.Settings.CtrlPanelOpacity;
     [ObservableProperty] private ControlPanelViewModel _controlPanelViewModel = controlPanelViewModel;
 }

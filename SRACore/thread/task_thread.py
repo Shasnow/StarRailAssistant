@@ -4,8 +4,9 @@ import tomllib
 from SRACore.util import sys_util  # NOQA 有动态用法，确保被打包
 from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
 from SRACore.tasks.BaseTask import BaseTask
-from SRACore.util.config import load_config, load_cache
+from SRACore.util.config import load_config, load_cache, load_settings
 from SRACore.util.logger import logger, setup_logger
+from SRACore.util.notify import send_mail_notification, send_windows_notification
 
 
 class TaskManager:
@@ -89,6 +90,7 @@ class TaskManager:
                 logger.info(f"配置 '{config_name}' 的所有任务执行完毕。")
 
             logger.info("All tasks completed.")
+            self.send_notification()
         except Exception as e:
             # 捕获线程主循环中的异常（如配置加载失败）
             logger.exception(f"TaskManager crashed: {str(e)}")
@@ -128,3 +130,13 @@ class TaskManager:
                 except Exception as e:
                     logger.exception(f"Failed to instantiate task at index {index}: {str(e)}")
         return tasks
+
+    @staticmethod
+    def send_notification():
+        setting=load_settings()
+        if not setting.get('AllowNotifications', False):
+            return
+        if setting.get('AllowSystemNotifications', False):
+            send_windows_notification("任务完成提醒", "您的SRA任务运行完成。")
+        if setting.get('AllowEmailNotifications', False):
+            send_mail_notification("任务完成提醒", "您的SRA任务运行完成。", setting)

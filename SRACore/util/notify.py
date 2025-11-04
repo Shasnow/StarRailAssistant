@@ -2,16 +2,29 @@ import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
 
+from plyer import notification
+
 from SRACore.util import encryption
 
 
+def send_windows_notification(title, message, timeout=10):
+    """
+    发送 Windows 系统通知
+    :param title: 通知标题
+    :param message: 通知内容
+    :param timeout: 通知显示时长（秒）
+    """
+    
+    # 发送通知
+    notification.notify(title=title, message=message, app_name="SRA", timeout=timeout)
+
 def send_mail_notification(title="SRA", message="", config: dict = None):
     """发送邮件通知"""
-    SMTP = config["SMTP"]
-    port = config["port"]
-    sender = config["sender"]
-    password = encryption.win_decryptor(config["authorizationCode"])
-    receiver = config["receiver"]
+    SMTP = config["SmtpServer"]
+    port = config["SmtpPort"]
+    sender = config["EmailSender"]
+    password = encryption.win_decryptor(config["EmailAuthCode"])
+    receiver = config["EmailReceiver"]
     send_mail(title, "SRA通知", message, SMTP, port, sender, password, receiver)
 
 

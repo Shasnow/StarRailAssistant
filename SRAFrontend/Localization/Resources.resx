@@ -129,4 +129,7 @@
     <data name="EmailNotificationText" xml:space="preserve">
         <value>Email Nofication</value>
     </data>
+    <data name="ControlPanelOpacityText" xml:space="preserve">
+        <value>Control Panel Opacity</value>
+    </data>
 </root>

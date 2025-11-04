@@ -6,6 +6,7 @@ import time
 from SRACore.thread.task_thread import TaskManager
 from SRACore.thread.trigger_thread import TriggerManager
 
+
 class SRACli(cmd.Cmd):
     prompt = "sra> "  # 增加命令提示符，提升交互体验
 
@@ -39,7 +40,7 @@ class SRACli(cmd.Cmd):
             # 按命令名排序，更易读
             commands = [name[3:] for name in dir(self) if name.startswith("do_")]
             for cmd_name in sorted(commands):
-                doc:str = getattr(self, f"do_{cmd_name}").__doc__ or "无帮助信息"
+                doc: str = getattr(self, f"do_{cmd_name}").__doc__ or "无帮助信息"
                 print(f"  {cmd_name} - {doc.split('\n')[0]}")
             print("\n输入 'help <命令名>' 查看详细用法（例：help trigger）")
 
@@ -87,7 +88,7 @@ class SRACli(cmd.Cmd):
                 print("TaskManager 已在运行中。")
                 return
             # 重新创建进程（避免重复启动已终止的进程）
-            config_names=args[1:] if len(args)>1 else tuple()
+            config_names = args[1:] if len(args) > 1 else tuple()
             self.task_process = multiprocessing.Process(target=self.task_manager.run, daemon=True, args=config_names)
             self.task_process.start()
             time.sleep(1)  # 确保进程有时间启动
@@ -167,25 +168,25 @@ class SRACli(cmd.Cmd):
                     return
             print(f"未找到触发器 {trigger_name}。")
         elif command.startswith('set-'):
-            if len(args)<3:
+            if len(args) < 3:
                 print("用法: trigger set-<类型> <trigger_name> <属性> <值>")
                 return
-            _type=command[4:]
-            trigger_name=args[1]
-            attr=args[2]
-            value=args[3]
+            _type = command[4:]
+            trigger_name = args[1]
+            attr = args[2]
+            value = args[3]
             for trigger in self.trigger_manager.triggers:
                 if trigger.__class__.__name__.lower() == trigger_name.lower():
                     if not hasattr(trigger, attr):
                         print(f"触发器 {trigger_name} 不存在属性 {attr}。")
                         return
-                    if _type=='int':
+                    if _type == 'int':
                         setattr(trigger, attr, int(value))
-                    elif _type=='float':
+                    elif _type == 'float':
                         setattr(trigger, attr, float(value))
-                    elif _type=='str':
+                    elif _type == 'str':
                         setattr(trigger, attr, value)
-                    elif _type=='bool':
+                    elif _type == 'bool':
                         setattr(trigger, attr, value.lower() in ['true', '1', 'yes'])
                     else:
                         print(f"未知的属性类型 {_type}，支持的类型有：int, float, str, bool")

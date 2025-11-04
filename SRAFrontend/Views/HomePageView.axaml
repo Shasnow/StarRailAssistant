@@ -15,7 +15,7 @@
 
         <Grid RowDefinitions="*, Auto" Margin="50">
             <!-- 下方控制区域 -->
-            <suki:GlassCard Grid.Row="1" Content="{Binding ControlPanelViewModel}" Opacity="0.9" IsOpaque="True"/>
+            <suki:GlassCard Grid.Row="1" Content="{Binding ControlPanelViewModel}" Opacity="{Binding GlassCardOpacity}" IsOpaque="True"/>
         </Grid>
     </Grid>
 </UserControl>
