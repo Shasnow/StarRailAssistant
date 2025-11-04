@@ -14,11 +14,13 @@
             <Grid RowDefinitions="Auto,*,Auto">
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="20">
                     <Label Content="过滤器：" />
-                    <ToggleButton Classes="Basic" Content="Trace" IsChecked="{Binding FilterOptions[0]}" />
-                    <ToggleButton Classes="Discrete" Content="Debug" IsChecked="{Binding FilterOptions[1]}" />
-                    <ToggleButton Classes="Information" Content="Info" IsChecked="{Binding FilterOptions[2]}"/>
+                    <!-- ReSharper disable Xaml.StyleClassNotFound -->
+                    <ToggleButton Classes="Discrete" Content="Trace" IsChecked="{Binding FilterOptions[0]}" />
+                    <ToggleButton Classes="Information" Content="Debug" IsChecked="{Binding FilterOptions[1]}" />
+                    <ToggleButton Classes="Success" Content="Info" IsChecked="{Binding FilterOptions[2]}"/>
                     <ToggleButton Classes="Warning" Content="Warn" IsChecked="{Binding FilterOptions[3]}"/>
                     <ToggleButton Classes="Danger" Content="Error" IsChecked="{Binding FilterOptions[4]}"/>
+                    <!-- ReSharper restore Xaml.StyleClassNotFound -->
                 </StackPanel>
                 <ScrollViewer Grid.Row="1" x:Name="ConsoleScrollViewer">
                     <TextBlock Text="{Binding LogText}" TextWrapping="Wrap"/>    
