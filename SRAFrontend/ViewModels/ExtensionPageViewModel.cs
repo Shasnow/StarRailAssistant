@@ -27,7 +27,7 @@ public class ExtensionPageViewModel(SraService sraService) : PageViewModel(PageN
         {
             _skipPlot = value;
             OnPropertyChanged();
-            sraService.SendInput($"trigger set-bool AutoPlotTrigger SkipPlot {value}");
+            sraService.SendInput($"trigger set-bool AutoPlotTrigger skip_plot {value}");
         }
     }
 }

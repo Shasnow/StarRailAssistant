@@ -74,10 +74,8 @@ class SRACli(cmd.Cmd):
         用法：
           task run    - 启动 TaskManager（自动检测是否已运行）
           task stop   - 停止正在运行的 TaskManager
-          task status - 查看 TaskManager 当前状态
         示例：
           sra> task run    # 启动任务进程
-          sra> task status # 查看进程是否在运行
         """
         args = arg.split()
         if not args:
@@ -110,11 +108,10 @@ class SRACli(cmd.Cmd):
     def do_trigger(self, arg: str):
         """触发器管理器命令 - 支持启动/停止/配置触发器
         用法：
-          trigger run                - 启动 TriggerManager（线程模式）
-          trigger stop               - 停止 TriggerManager
-          trigger status             - 查看 TriggerManager 状态
-          trigger enable <名称>       - 启用指定触发器（例：trigger enable TimerTrigger）
-          trigger disable <名称>      - 禁用指定触发器（例：trigger disable TimerTrigger）
+          trigger run                - 启动 TriggerManager 线程
+          trigger stop               - 停止 TriggerManager 线程
+          trigger enable <名称>       - 启用指定触发器
+          trigger disable <名称>      - 禁用指定触发器
           trigger set-<类型> <名> <属性> <值> - 设置属性（支持类型：int/float/str/bool）
             示例：
               trigger set-int  TimerTrigger interval 30    # 整数类型

@@ -9,6 +9,7 @@ class AutoPlotTrigger(BaseTrigger):
             '跳过对话': False,
         }
         self.can_skip = True  # 是否可以跳过对话, 默认可以跳过
+        self.skip_plot = False  # 是否跳过对话
         self.active_window = False
 
     def run(self):
