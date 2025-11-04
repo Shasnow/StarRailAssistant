@@ -84,6 +84,21 @@
                                                    VerticalAlignment="Center"
                                                    FontWeight="DemiBold" />
                                     </Grid>
+                                    <Grid ColumnDefinitions="Auto, *, Auto, 28">
+                                        <Label Grid.Column="0" Classes="icon" Content="&#xEB42;" />
+                                        <Label Grid.Column="1"
+                                               Content="{x:Static lang:Resources.ControlPanelOpacityText}" />
+                                        <Slider Grid.Column="2"
+                                                Width="200"
+                                                Maximum="1"
+                                                TickFrequency="0.01"
+                                                IsSnapToTickEnabled="True"
+                                                Value="{Binding Settings.CtrlPanelOpacity}" />
+                                        <TextBlock Grid.Column="3"
+                                                   Text="{Binding Settings.CtrlPanelOpacity}"
+                                                   VerticalAlignment="Center"
+                                                   FontWeight="DemiBold" />
+                                    </Grid>
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Grid.Column="0" Classes="icon">&#xe4a2;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.LanguageText}" />
@@ -113,6 +128,30 @@
                                                       IsChecked="{Binding Settings.AllowSystemNotifications}" />
                                             <CheckBox Content="{x:Static lang:Resources.EmailNotificationText}"
                                                       IsChecked="{Binding Settings.AllowEmailNotifications}" />
+                                            <Expander Header="SMTP设置">
+                                                <Grid RowDefinitions="Auto,*,*,*,*" ColumnDefinitions="*,*">
+                                                    <Label Grid.Row="0" Grid.Column="0" Content="SMTP服务器" />
+                                                    <TextBox Grid.Row="0" Grid.Column="1"
+                                                             Text="{Binding Settings.SmtpServer}"
+                                                             Watermark="例：smtp.qq.com"/>
+                                                    <Label Grid.Row="1" Grid.Column="0" Content="SMTP端口" />
+                                                    <TextBox Grid.Row="1" Grid.Column="1"
+                                                             Text="{Binding Settings.SmtpPort}"
+                                                             Watermark="例：465"/>
+                                                    <Label Grid.Row="2" Grid.Column="0" Content="发送邮件地址" />
+                                                    <TextBox Grid.Row="2" Grid.Column="1"
+                                                             Text="{Binding Settings.EmailSender}"
+                                                             Watermark="例：123456@qq.com"/>
+                                                    <Label Grid.Row="3" Grid.Column="0" Content="邮件授权码" />
+                                                    <TextBox Grid.Row="3" Grid.Column="1"
+                                                             Text="{Binding Settings.EmailAuthCode}"
+                                                             Watermark="例：123456"/>
+                                                    <Label Grid.Row="4" Grid.Column="0" Content="接收邮件地址" />
+                                                    <TextBox Grid.Row="4" Grid.Column="1"
+                                                             Text="{Binding Settings.EmailReceiver}"
+                                                             Watermark="例：123456@qq.com"/>
+                                                </Grid>
+                                            </Expander>
                                         </StackPanel>
                                     </Expander>
                                     <!-- <Grid ColumnDefinitions="Auto,*,Auto"> -->

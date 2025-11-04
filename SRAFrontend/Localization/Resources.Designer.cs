@@ -141,6 +141,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Control Panel Opacity.
+        /// </summary>
+        public static string ControlPanelOpacityText {
+            get {
+                return ResourceManager.GetString("ControlPanelOpacityText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dark.
         /// </summary>
         public static string DarkText {

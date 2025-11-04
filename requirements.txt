@@ -1,3 +1,4 @@
+plyer
 rapidocr-onnxruntime
 opencv-python
 pillow

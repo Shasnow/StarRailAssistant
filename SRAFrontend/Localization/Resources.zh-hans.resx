@@ -122,4 +122,7 @@
     <data name="EmailNotificationText" xml:space="preserve">
         <value>邮件通知</value>
     </data>
+    <data name="ControlPanelOpacityText" xml:space="preserve">
+        <value>控制面板不透明度</value>
+    </data>
 </root>
