@@ -43,7 +43,7 @@ class TrailblazePowerTask(BaseTask):
             return True
         return False
 
-    def ornament_extraction(self, level, run_time=1, **_):
+    def ornament_extraction(self, level, run_time=1, single_time: int | None = None, **_):
         """Ornament extraction
 
         Note:
@@ -51,6 +51,7 @@ class TrailblazePowerTask(BaseTask):
         Args:
             level (int): The index of level in /resources/img.
             run_time (int): The time of battle.
+            single_time (None|int): If this mission can battle multiply at a single time,
         Returns:
             None
         """
@@ -70,9 +71,14 @@ class TrailblazePowerTask(BaseTask):
         if not self.wait_img('resources/img/ornament_extraction_page.png', timeout=20):  # 等待传送
             logger.error("检测超时，编号4")
             return False
-        if self.click_img("resources/img/nobody.png", after_sleep=2):
+        if self.config.get("TrailblazePowerLineupCheck") and self.click_img("resources/img/nobody.png", after_sleep=2):
             self.click_img("resources/img/preset_formation.png", after_sleep=2)
             self.click_img("resources/img/team1.png", after_sleep=2)
+        if single_time is not None:
+            for _ in range(single_time - 1):
+                self.sleep(0.2)
+                self.click_img("resources/img/plus.png")
+            self.sleep(1)
         if self.click_img("resources/img/battle_star.png", after_sleep=1):
             if self.locate("resources/img/limit.png"):
                 logger.warning("背包内遗器持有数量已达上限，请先清理")
@@ -90,6 +96,12 @@ class TrailblazePowerTask(BaseTask):
             if not self.wait_img("resources/img/f3.png", timeout=240):
                 pass
             self.hold_key("w", 2.5)
+            if self.config.get("TrailblazePowerUseSkill"):
+                for i in range(1, 5):
+                    self.press_key(str(i))
+                    self.sleep(0.5)
+                    self.press_key('e')
+                    self.sleep(2)
             self.click_point(0.5, 0.5)
             self.battle_star(run_time)
         logger.info("任务完成：饰品提取")
@@ -126,7 +138,7 @@ class TrailblazePowerTask(BaseTask):
                     single_time,
                     y_add=-30)
 
-    def stagnant_shadow(self, level, run_time=1, **_):
+    def stagnant_shadow(self, level,single_time=1, run_time=1, **_):
         levels=["溟簇之形",'职司之形','幽府之形','锋芒之形',
                 "嗔怒之形",'燔灼之形','炎华之形',
                 "塞壬之形",'冰酿之形','冰棱之形','霜晶之形',
@@ -140,9 +152,9 @@ class TrailblazePowerTask(BaseTask):
                     level,
                     run_time,
                     True,
-                    None)
+                    single_time)
 
-    def caver_of_corrosion(self, level, run_time=1, **_):
+    def caver_of_corrosion(self, level, single_time=1,run_time=1, **_):
         levels=['隐救之径','雳涌之径', '弦歌之径', '迷识之径', '勇骑之径', '梦潜之径',
                 '幽冥之径', '药使之径', '野焰之径', '圣颂之径', '睿治之径',
                 '漂泊之径', '迅拳之径', '霜风之径']
@@ -152,10 +164,10 @@ class TrailblazePowerTask(BaseTask):
                     level,
                     run_time,
                     True,
-                    None,
+                    single_time,
                     x_add=700)
 
-    def echo_of_war(self, level, run_time=1, **_):
+    def echo_of_war(self, level, single_time=1,run_time=1, **_):
         levels=['晨昏','心兽','尘梦','蛀星',
                 '不死','寒潮','毁灭']
         self.battle("历战余响",
@@ -164,7 +176,7 @@ class TrailblazePowerTask(BaseTask):
                     level,
                     run_time,
                     True,
-                    None,
+                    single_time,
                     x_add=770,
                     y_add=25)
 

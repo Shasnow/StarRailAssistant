@@ -69,6 +69,7 @@ public partial class TaskPageViewModel : PageViewModel
                 Levels = new[]
                 {
                     "---选择副本---",
+                    "西风丛中（翁法罗斯/天国@直播间）",
                     "月下朱殷（妖精/海隅）",
                     "纷争不休（拾骨地/巨树）",
                     "蠹役饥肠（露莎卡/蕉乐园）",
@@ -80,7 +81,8 @@ public partial class TaskPageViewModel : PageViewModel
                     "温柔话语（公司/差分机）",
                     "浴火钢心（塔利亚/翁瓦克）",
                     "坚城不倒（太空封印站/仙舟）"
-                }
+                },
+                MaxSingleTimes = 6
             },
 
             new TrailblazePowerTask(AddTaskItem)
@@ -103,7 +105,7 @@ public partial class TaskPageViewModel : PageViewModel
                     "以太之蕾（雅利洛VI）",
                     "珍藏之蕾（雅利洛VI）"
                 },
-                CanMulti = true
+                MaxSingleTimes = 24
             },
 
             new TrailblazePowerTask(AddTaskItem)
@@ -129,7 +131,7 @@ public partial class TaskPageViewModel : PageViewModel
                     "沉沦黑曜（虚无）",
                     "阿赖耶华（记忆）"
                 },
-                CanMulti = true
+                MaxSingleTimes = 24
             },
 
             new TrailblazePowerTask(AddTaskItem)
@@ -165,7 +167,8 @@ public partial class TaskPageViewModel : PageViewModel
                     "一曲和弦的幻景（虚数）",
                     "镇灵敕符（虚数）",
                     "往日之影的金饰（虚数）"
-                }
+                },
+                MaxSingleTimes = 8
             },
 
             new TrailblazePowerTask(AddTaskItem)
@@ -189,7 +192,8 @@ public partial class TaskPageViewModel : PageViewModel
                     "漂泊之径（过客/快枪手）",
                     "迅拳之径（拳皇/怪盗）",
                     "霜风之径（冰/风套）"
-                }
+                },
+                MaxSingleTimes = 6
             },
 
             new TrailblazePowerTask(AddTaskItem)
@@ -206,7 +210,8 @@ public partial class TaskPageViewModel : PageViewModel
                     "不死的神实",
                     "寒潮的落幕",
                     "毁灭的开端"
-                }
+                },
+                MaxSingleTimes = 3
             }
         ];
     }

@@ -17,4 +17,6 @@ def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log"):
     logger.add(path, level=0,
                format="{time:YYYY-MM-DD HH:mm:ss} {level:5} {module}.{function}:{line} {message}", colorize=False,
                retention=7, enqueue=True)
+# 初始化日志
+setup_logger()
 __all__ = ["logger","setup_logger"]

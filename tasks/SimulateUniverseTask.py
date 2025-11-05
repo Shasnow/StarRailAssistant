@@ -138,11 +138,12 @@ class SimulateUniverseTask(BaseTask):
         """
         page = self.wait_any_img(["resources/img/enter.png", "resources/img/differential_universe_start.png","resources/img/bonus points.png"])
         if page == 0:
-            self.press_key(self.settings.get('key_f4', 'f4'))
+            self.press_key('f4')
             if not self.wait_img("resources/img/f4.png", timeout=20):
                 logger.error("检测超时，编号1")
                 self.press_key("esc")
-            self.click_point(0.3125, 0.20, after_sleep=0.5)  # 差分宇宙
+            self.click_point(0.3125, 0.20, after_sleep=0.5)  # 旷宇纷争
+            self.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙
             self.click_point(0.7786, 0.8194, after_sleep=1)  # 周期演算
             return True
         elif page == 1:

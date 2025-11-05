@@ -16,6 +16,7 @@ class SRACli(cmd.Cmd):
         self.task_process = None
         self.trigger_manager = TriggerManager()
         self.trigger_thread = threading.Thread(target=self.trigger_manager.run, daemon=True)
+        self.trigger_thread.start()
 
     def default(self, line):
         print(f"未知命令: '{line}'. 输入 'help' 获取可用命令列表。")
