@@ -54,8 +54,6 @@ def main():
     # 延迟导入 SRACli（减少启动时的依赖加载）
     from SRACore.SRA import SRACli
     cli_instance = SRACli()
-    # 初始化日志
-    setup_logger()
     logger.debug(f"工作目录：{sys.path[0]}")
     # 根据参数处理模式
     # 内嵌模式：隐藏提示符

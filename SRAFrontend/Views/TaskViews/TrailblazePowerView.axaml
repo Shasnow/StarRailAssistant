@@ -35,10 +35,12 @@
                                               Content="重新编队" />
                                     <CheckBox Grid.Row="2" Grid.Column="0"
                                               IsChecked="{Binding CurrentConfig.TrailblazePowerLineupCheck}"
-                                              Content="编队检查" />
+                                              Content="编队检查"
+                                              ToolTip.Tip="仅对饰品提取有效"/>
                                     <CheckBox Grid.Row="2" Grid.Column="1"
                                               IsChecked="{Binding CurrentConfig.TrailblazePowerUseSkill}"
-                                              Content="使用战技入场" />
+                                              Content="使用战技入场"
+                                              ToolTip.Tip="仅对饰品提取有效"/>
                                 </Grid>
                             </StackPanel>
                         </suki:GlassCard>
@@ -55,11 +57,10 @@
                                                 </StackPanel>
 
                                                 <StackPanel Orientation="Horizontal" Spacing="8"
-                                                            IsVisible="{Binding CanMulti}"
                                                             ToolTip.Tip="n合一">
                                                     <Label Content="连续作战" />
                                                     <NumericUpDown FormatString="0" Value="{Binding Count}"
-                                                                   Minimum="1" Maximum="6" Increment="1"
+                                                                   Minimum="1" Maximum="{Binding MaxSingleTimes}" Increment="1"
                                                                    VerticalContentAlignment="Center" />
                                                 </StackPanel>
 

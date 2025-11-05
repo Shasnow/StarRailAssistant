@@ -7,13 +7,13 @@ namespace SRAFrontend.Models;
 
 public partial class TrailblazePowerTask(Action<TrailblazePowerTask> onAddTaskItem) : ObservableObject
 {
-    public bool CanMulti { get; init; }
+    public int MaxSingleTimes { get; init; } // 最大单次挑战次数
 
     [ObservableProperty] private int _count = 1;
 
     [ObservableProperty] private IEnumerable? _levels;
 
-    [ObservableProperty] private int _runTimes;
+    [ObservableProperty] private int _runTimes = 1;
 
     [ObservableProperty] private int _selectedIndex;
 

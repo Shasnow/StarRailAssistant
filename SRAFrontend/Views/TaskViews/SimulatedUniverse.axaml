@@ -20,8 +20,7 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Label>模式</Label>
                                 <ComboBox SelectedIndex="{Binding CurrentConfig.SimulatedUniverseMode}">
-                                    <ComboBoxItem>普通模式</ComboBoxItem>
-                                    <ComboBoxItem>困难模式</ComboBoxItem>
+                                    <ComboBoxItem>刷单层</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="10">
