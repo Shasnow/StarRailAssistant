@@ -63,6 +63,17 @@ public class UpdateService(HttpClient httpClient, ILogger<UpdateService> logger)
         return await response.Content.ReadFromJsonAsync<VersionResponse>();
     }
 
+    /// <summary>
+    /// 异步下载更新包
+    /// </summary>
+    /// <param name="versionResponse">版本响应模型</param>
+    /// <param name="downloadChannel">下载渠道</param>
+    /// <param name="statusProgress">下载状态回调</param>
+    /// <param name="proxies">代理列表</param>
+    /// <param name="cancellationToken">取消下载Token</param>
+    /// <returns>更新文件的路径</returns>
+    /// <exception cref="InvalidOperationException">下载地址无效或下载失败</exception>
+    /// <exception cref="Exception"></exception>
     public async Task<string> DownloadUpdateAsync(
         VersionResponse versionResponse,
         int downloadChannel,

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Markdown.Avalonia;
+using Microsoft.Extensions.Logging;
 using SRAFrontend.Controls;
-using SRAFrontend.Localization;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 using SRAFrontend.utilities;
@@ -25,6 +24,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly AnnouncementService _announcementService;
     private readonly SettingsService _settingsService;
     private readonly UpdateService _updateService;
+    private readonly ILogger _logger;
 
     [ObservableProperty] private string _lightModeText =
         SukiTheme.GetInstance().ActiveBaseTheme.ToString() == "Light" ? "\uE472" : "\uE330";
@@ -32,19 +32,18 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private bool _titleBarVisible = true;
 
     public MainWindowViewModel(IEnumerable<PageViewModel> pages, ISukiToastManager toastManager,
-        AnnouncementService announcementService, SettingsService settingsService, UpdateService updateService)
+        AnnouncementService announcementService, SettingsService settingsService, UpdateService updateService, ILogger<MainWindowViewModel> logger)
     {
         _announcementService = announcementService;
         Pages = new AvaloniaList<PageViewModel>(pages);
         ToastManager = toastManager;
         _settingsService = settingsService;
         _updateService = updateService;
+        _logger = logger;
         _ = CheckForUpdates();
     }
 
     public ISukiToastManager ToastManager { get; init; }
-
-    public string Greeting { get; } = Resources.GreetingText;
 
     public IAvaloniaReadOnlyList<PageViewModel> Pages { get; }
 
@@ -154,18 +153,25 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error downloading update");
+            ToastManager.Dismiss(toast);
+            ToastManager.CreateToast()
+                .WithTitle("Update Failed")
+                .WithContent($"Failed to download update: {e.Message}")
+                .Dismiss().After(TimeSpan.FromSeconds(5))
+                .Dismiss().ByClicking()
+                .Queue();
             return;
         }
 
         ToastManager.Dismiss(toast);
         ToastManager.CreateToast()
             .WithTitle("Download Complete")
-            .WithContent("Update package will be unzip within 3 seconds.")
+            .WithContent($"Update package will be unzip to {Environment.CurrentDirectory} within 3 seconds.")
             .Dismiss().After(TimeSpan.FromSeconds(3))
             .Dismiss().ByClicking()
             .Queue();
         await Task.Delay(3000);
-        UnzipUtil.Unzip(result, Path.GetDirectoryName(Environment.CurrentDirectory)!);
+        UnzipUtil.Unzip(result, Environment.CurrentDirectory);
     }
 }

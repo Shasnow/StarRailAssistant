@@ -79,7 +79,8 @@ public partial class App : Application
             var announcementService = provider.GetRequiredService<AnnouncementService>();
             var settingsService = provider.GetRequiredService<SettingsService>();
             var updateService = provider.GetRequiredService<UpdateService>();
-            return new MainWindowViewModel(pages, toastManager, announcementService, settingsService, updateService);
+            var logger = provider.GetRequiredService<ILogger<MainWindowViewModel>>();
+            return new MainWindowViewModel(pages, toastManager, announcementService, settingsService, updateService, logger);
         });
         services.AddTransient<HomePageViewModel>();
         services.AddTransient<TaskPageViewModel>();
