@@ -87,7 +87,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        if (currentVersion > new Version(response.Data.VersionName))
+        if (currentVersion >= new Version(response.Data.VersionName))
             return;
         if (_settingsService.Settings.EnableAutoUpdate)
         {
