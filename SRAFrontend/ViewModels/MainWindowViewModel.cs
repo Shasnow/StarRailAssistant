@@ -166,6 +166,6 @@ public partial class MainWindowViewModel : ViewModelBase
             .Dismiss().ByClicking()
             .Queue();
         await Task.Delay(3000);
-        UnzipUtil.Unzip(result, Path.GetDirectoryName(result)!);
+        UnzipUtil.Unzip(result, Path.GetDirectoryName(Environment.CurrentDirectory)!);
     }
 }
