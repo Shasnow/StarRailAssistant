@@ -16,4 +16,6 @@ public partial class Cache : ObservableObject
     [ObservableProperty] private int _currentConfigIndex; // 当前配置索引
 
     [ObservableProperty] private string _currentConfigName = "Default"; // 当前配置名称
+    
+    [ObservableProperty] private string _startMode = "Current"; // 当前启动模式, "Current" 或 "All" 或 "Save Only"
 }

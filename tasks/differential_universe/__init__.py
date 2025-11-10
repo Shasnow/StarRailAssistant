@@ -1,17 +1,18 @@
-from SRACore.tasks.BaseTask import BaseTask
-from SRACore.util.logger import logger
+from loguru import logger
+
+from SRACore.util.operator import Executable
 
 
-class SimulateUniverseTask(BaseTask):
-    def __init__(self,config: dict):
-        super().__init__(config)
-        self.times =self.config.get("SimulatedUniverseTimes",1)
+class DifferentialUniverse(Executable):
+    def __init__(self, run_times):
+        super().__init__()
+        self.run_times = run_times
 
     def run(self):
         """主任务执行函数"""
         logger.info("执行任务：差分宇宙-周期演算")
 
-        for exe_time in range(self.times):
+        for exe_time in range(self.run_times):
             if not self.page_locate():
                 return False
             if not self._start_differential_universe(exe_time):
@@ -136,7 +137,11 @@ class SimulateUniverseTask(BaseTask):
         定位到差分宇宙页面。
         :return: None
         """
-        page = self.wait_any_img(["resources/img/enter.png", "resources/img/differential_universe_start.png","resources/img/bonus points.png"])
+        page = self.wait_any_img([
+            "resources/img/enter.png",
+            "resources/img/differential_universe_start.png",
+            "resources/img/bonus points.png"
+        ],interval=0.5)
         if page == 0:
             self.press_key('f4')
             if not self.wait_img("resources/img/f4.png", timeout=20):
@@ -144,7 +149,7 @@ class SimulateUniverseTask(BaseTask):
                 self.press_key("esc")
             self.click_point(0.3125, 0.20, after_sleep=0.5)  # 旷宇纷争
             self.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙
-            self.click_point(0.7786, 0.8194, after_sleep=1)  # 周期演算
+            self.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
             return True
         elif page == 1:
             return True

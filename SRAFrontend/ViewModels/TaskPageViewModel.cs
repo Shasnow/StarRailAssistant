@@ -145,7 +145,8 @@ public partial class TaskPageViewModel : PageViewModel
                     "星际和平工作证（物理）",
                     "幽府通令（物理）",
                     "铁狼碎齿（物理）",
-                    "怠火之心（火）",
+                    "明辉日珥（火）",
+                    "忿火之心（火）",
                     "过热钢刀（火）",
                     "恒温晶壳（火）",
                     "海妖残鰭（冰）",
@@ -203,6 +204,7 @@ public partial class TaskPageViewModel : PageViewModel
                 Levels = new[]
                 {
                     "---选择副本---",
+                    "铁骸的锈冢",
                     "晨昏的回眸",
                     "心兽的战场",
                     "尘梦的赞礼",

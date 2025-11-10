@@ -59,7 +59,7 @@ class Operator:
     @classmethod
     def get_ocr_instance(cls):
         if cls.ocr_engine is None:
-            cls.ocr_engine = RapidOCR()
+            cls.ocr_engine = RapidOCR(config_path='rapidocr_onnxruntime/config.yaml')
         return cls.ocr_engine
 
     def __init__(self):
@@ -406,15 +406,18 @@ class Operator:
             >>> resul2 = self.ocr_in_region(region)
         """
         try:
-            logger.debug("OCR in region: " + str(region))
+            if trace:
+                logger.debug("OCR in region: " + str(region))
             if region is None:
                 region = self.get_win_region()
                 time.sleep(0.5)  # 等待窗口稳定
             if self.ocr_engine is None:
                 self.ocr_engine = Operator.get_ocr_instance()
             screenshot = self.screenshot(region)
+            screenshot = screenshot.convert("L")
             result, _ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA
-            logger.debug("OCR Result: " + str(result))
+            if trace:
+                logger.debug("OCR Result: " + str(result))
             return result
         except Exception as e:
             if trace:
@@ -519,7 +522,8 @@ class Operator:
                 width = result[0][2][0] - left
                 height = result[0][2][1] - top
                 return Box(left, top, width, height)
-        logger.debug("OCR Result not match text: " + text)
+        if trace:
+            logger.debug("OCR Result not match text: " + text)
         return None
 
     def ocr_match_any(self,
@@ -548,7 +552,6 @@ class Operator:
                     return index, Box(left, top, width, height)
         logger.debug("OCR Result not match any text: " + str(texts))
         return -1, None
-
 
     def wait_ocr(self, text: str, timeout: float = 10, interval: float = 0.2, confidence=0.9, *args,
                  **kwargs) -> Box | None:
@@ -588,7 +591,7 @@ class Operator:
         logger.debug(f"Timeout: '{texts}' -> Not found in {timeout} seconds")
         return -1, None
 
-    def click_point(self, x: int | float, y: int | float, x_offset: int | float= 0, y_offset: int | float= 0,
+    def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
                     after_sleep: float = 0) -> bool:
         """
         点击指定位置
@@ -620,7 +623,7 @@ class Operator:
             raise ValueError(
                 f"Invalid arguments: expected 'int, int' or 'float, float', got '{type(x).__name__}, {type(y).__name__}'")
 
-    def click_box(self, box: Box, x_offset: int | float = 0, y_offset: int | float= 0, after_sleep: float = 0) -> bool:
+    def click_box(self, box: Box, x_offset: int | float = 0, y_offset: int | float = 0, after_sleep: float = 0) -> bool:
         """点击图片位置"""
         if box is None:
             logger.trace("Could not click a Empty Box")
@@ -628,7 +631,8 @@ class Operator:
         x, y = box.center
         return self.click_point(int(x), int(y), x_offset, y_offset, after_sleep)
 
-    def click_img(self, img_path: str, x_offset: int | float = 0, y_offset: int | float = 0, after_sleep: float = 0) -> bool:
+    def click_img(self, img_path: str, x_offset: int | float = 0, y_offset: int | float = 0,
+                  after_sleep: float = 0) -> bool:
         """点击图片中心"""
         box = self.locate(img_path)
         if box is None:
@@ -644,6 +648,7 @@ class Operator:
         :return: bool - 是否找到图片
         """
         start_time = time.time()
+        logger.debug(f"Waiting for image: {img_path}")
         while time.time() - start_time < timeout:
             box = self.locate(img_path)
             if box is not None:
@@ -771,6 +776,7 @@ class Operator:
             bool: 如果移动成功则返回 True，否则返回 False。
         """
         try:
+            logger.debug(f"移动光标到 ({x}, {y})，持续时间: {duration}秒")
             if isinstance(x, int) and isinstance(y, int):
                 pyautogui.moveTo(x + self.left, y + self.top, duration=duration)
             elif isinstance(x, float) and isinstance(y, float):
@@ -784,6 +790,48 @@ class Operator:
             return True
         except Exception as e:
             logger.debug(f"移动光标时发生错误{e}")
+            return False
+
+    def mouse_down(self, x: int | float, y: int | float) -> bool:
+        """
+        按下鼠标按钮。
+
+        Args:
+            x (int | float): X 坐标。
+            y (int | float): Y 坐标。
+        Returns:
+            bool: 如果按下成功则返回 True，否则返回 False。
+        """
+        try:
+            logger.debug(f"按下鼠标按钮 at ({x}, {y})")
+            if isinstance(x, int) and isinstance(y, int):
+                pyautogui.mouseDown(x + self.left, y + self.top)
+            elif isinstance(x, float) and isinstance(y, float):
+                x = int(self.left + self.width * x)
+                y = int(self.top + self.height * y)
+                pyautogui.mouseDown(x, y)
+            else:
+                # NOQA
+                raise ValueError(
+                    f"Invalid arguments: expected 'int, int' or 'float, float', got '{type(x).__name__}, {type(y).__name__}'")
+            return True
+        except Exception as e:
+            logger.debug(f"按下鼠标按钮时发生错误{e}")
+            return False
+
+    @staticmethod
+    def mouse_up() -> bool:
+        """
+        释放鼠标按钮。
+        Returns:
+            bool: 如果释放成功则返回 True，否则返回 False。
+        """
+        try:
+            logger.debug("释放鼠标按钮")
+            pyautogui.mouseUp()
+            return True
+        except Exception as e:
+            logger.debug(f"释放鼠标按钮时发生错误{e}")
             return False
 
     @staticmethod
@@ -803,6 +851,25 @@ class Operator:
         except Exception as e:
             logger.debug(f"指针滚动时发生错误{e}")
             return False
+
+    def drag(self, from_x: int | float, from_y: int | float, to_x: int | float, to_y: int | float,
+             duration: float = 0.5) -> bool:
+        """
+        拖动鼠标到指定位置。
+
+        Args:
+            from_x (int | float): 目标 X 坐标。
+            from_y (int | float): 目标 Y 坐标。
+            to_x (int | float): 目标 X 坐标。
+            to_y (int | float): 目标 Y 坐标。
+            duration (float): 拖动持续时间，单位为秒。
+        Returns:
+            bool: 如果拖动成功则返回 True，否则返回 False。
+        """
+        self.mouse_down(from_x, from_y)
+        self.move_to(to_x, to_y, duration)
+        self.mouse_up()
+        return True
 
 
 class Executable(Operator): pass

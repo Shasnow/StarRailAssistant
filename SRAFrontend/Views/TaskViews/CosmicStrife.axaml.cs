@@ -2,9 +2,9 @@
 
 namespace SRAFrontend.Views.TaskViews;
 
-public partial class SimulatedUniverse : UserControl
+public partial class CosmicStrife : UserControl
 {
-    public SimulatedUniverse()
+    public CosmicStrife()
     {
         InitializeComponent();
     }

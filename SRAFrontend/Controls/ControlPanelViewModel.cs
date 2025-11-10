@@ -10,8 +10,6 @@ namespace SRAFrontend.Controls;
 
 public partial class ControlPanelViewModel :ViewModelBase
 {
-    [ObservableProperty]
-    private string _startMode = "Current"; // Current, All
     [ObservableProperty] private bool _isAddConfigOpen;
     [ObservableProperty] private string _newConfigName = "";
     private readonly SraService _sraService;
@@ -39,7 +37,7 @@ public partial class ControlPanelViewModel :ViewModelBase
     [RelayCommand]
     private void SwitchStartMode(string mode)
     {
-        StartMode = mode;
+        Cache.StartMode = mode;
     }
 
     [RelayCommand]
@@ -47,7 +45,7 @@ public partial class ControlPanelViewModel :ViewModelBase
     {
         try
         {
-            switch (StartMode)
+            switch (Cache.StartMode)
             {
                 case "Current":
                     Save();
