@@ -38,7 +38,7 @@ def main():
     )
     # 接收 run 后的所有参数（作为要执行的命令）
     run_parser.add_argument(
-        '-c','--config',
+        '--config',
         nargs='*',
         help='要运行的配置名称，不指定则运行缓存中的全部配置'
     )
