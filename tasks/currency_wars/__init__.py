@@ -115,7 +115,7 @@ class CurrencyWars(Executable):
             return False
         # 已进入对局
         box=self.wait_img('resources/img/currency_wars/strategy.png', timeout=60)
-        if not self.click_box(box, after_sleep=1):
+        if not self.click_box(box, after_sleep=1.5):
             return False
         self.click_img('resources/img/currency_wars/apply.png', after_sleep=1)
         self.press_key('esc')
@@ -406,9 +406,8 @@ class CurrencyWars(Executable):
                 self.sleep(0.5)
                 return False
         self.force_battle = False
-        result = self.wait_ocr('挑战结束', interval=1, timeout=300, from_x=0.432, from_y=0.180, to_x=0.569, to_y=0.2454,
-                               trace=False)  # 等待挑战结束
-        if result:
+        result = self.wait_any_img(['resources/img/currency_wars/fail.png','resources/img/currency_wars/win.png'], interval=1,timeout=600)
+        if result!=-1:
             logger.info("挑战结束")
             self.sleep(2)
             self.click_point(0.5, 0.824, after_sleep=0.3)  # 点击继续按钮
@@ -451,7 +450,7 @@ class CurrencyWars(Executable):
             self.click_point(0.5, 0.70, after_sleep=1)
             self.wait_img('resources/img/currency_wars/fold.png', timeout=30)
             return True
-        elif stage == 5:  # 通关
+        elif stage == 5:  # 挑战结束
             self.click_point(0.5, 0.82, after_sleep=1)
             self.click_point(0.5, 0.82, after_sleep=1)
             self.click_point(0.5, 0.82, after_sleep=1)
