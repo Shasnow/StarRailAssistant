@@ -28,7 +28,7 @@ class StartGameTask(BaseTask):
         if res == 0:
             return True
         elif res == 1:
-            self.sleep(0.5)
+            self.sleep(1)
             self.click_point(0.5, 0.6, after_sleep=4)
             self.click_point(0.5, 0.8, after_sleep=0.2)
             self.click_point(0.5, 0.5, y_offset=+400)

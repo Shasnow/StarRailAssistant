@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SRAFrontend.Views.TaskViews.CosmicStrife"
+             x:DataType="viewModels:TaskPageViewModel">
+    <suki:GlassCard>
+        <suki:GroupBox>
+            <suki:GroupBox.Header>
+                <CheckBox Content="旷宇纷争" IsChecked="{Binding CurrentConfig.EnabledTasks[3]}"/>
+            </suki:GroupBox.Header>
+            <ScrollViewer>
+                <StackPanel Margin="10">
+                    <suki:GlassCard>
+                        <StackPanel>
+                            <CheckBox IsChecked="{Binding CurrentConfig.SimulatedUniverseEnable}"
+                                      Content="差分宇宙 - 千面英雄"/>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Label>模式</Label>
+                                <ComboBox SelectedIndex="{Binding CurrentConfig.SimulatedUniverseMode}">
+                                    <ComboBoxItem>刷单层</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Label>次数</Label>
+                                <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.SimulatedUniverseRunTimes}" Minimum="1" Maximum="99999" />
+                            </StackPanel>
+                        </StackPanel>
+                    </suki:GlassCard>
+                    <TextBlock>请先手动完成一次以清除所有新手提示</TextBlock>
+                    <suki:GlassCard>
+                        <StackPanel>
+                            <CheckBox IsChecked="{Binding CurrentConfig.CurrencyWarsEnable}"
+                                      Content="货币战争 - 零和博弈" />
+                            <ComboBox SelectedIndex="0" Width="200" HorizontalAlignment="Left">
+                                <ComboBoxItem>标准博弈</ComboBoxItem>
+                                <ComboBoxItem>超频博弈</ComboBoxItem>
+                            </ComboBox>
+                            
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Label>模式</Label>
+                                <ComboBox SelectedIndex="0">
+                                    <ComboBoxItem>通关</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Label>次数</Label>
+                                <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.CurrencyWarsRunTimes}" Minimum="1" Maximum="99999" />
+                            </StackPanel>
+                        </StackPanel>
+                    </suki:GlassCard>
+                    <TextBlock>请先手动完成一次以清除所有新手提示</TextBlock>
+                </StackPanel>
+            </ScrollViewer>
+        </suki:GroupBox>
+    </suki:GlassCard>
+</UserControl>

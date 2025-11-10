@@ -14,9 +14,9 @@ main = "ReceiveRewardTask"
 module = "tasks.ReceiveRewardTask"
 
 [[tasks]]
-name = "模拟宇宙"
-main = "SimulateUniverseTask"
-module = "tasks.SimulateUniverseTask"
+name = "旷宇纷争"
+main = "CosmicStrifeTask"
+module = "tasks.CosmicStrifeTask"
 
 [[tasks]]
 name = "任务完成"

@@ -21,8 +21,8 @@
                 <TabItem Header="Receive Reward">
                     <taskViews:ReceiveRewardView />
                 </TabItem>
-                <TabItem Header="Simulated Universe">
-                    <taskViews:SimulatedUniverse />
+                <TabItem Header="Cosmic Strife">
+                    <taskViews:CosmicStrife />
                 </TabItem>
                 <TabItem Header="After Mission">
                     <taskViews:AfterMissionView />

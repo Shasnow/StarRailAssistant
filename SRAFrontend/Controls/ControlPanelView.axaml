@@ -28,7 +28,7 @@
                   Width="150" ItemsSource="{Binding Cache.ConfigNames}">
         </ComboBox>
 
-        <SplitButton Content="{Binding StartMode}"
+        <SplitButton Content="{Binding Cache.StartMode}"
                      Classes="Flat Rounded"
                      Command="{Binding StartButtonCommand}"
                      IsVisible="{Binding CanStart}"
