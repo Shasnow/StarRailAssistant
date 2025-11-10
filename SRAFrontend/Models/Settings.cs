@@ -46,5 +46,5 @@ public partial class Settings : ObservableObject
 
     [ObservableProperty] private double _zoom = 1; // 屏幕缩放比例
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
-    [JsonIgnore] public static string Version => "2.0.2"; // 应用版本号
+    [JsonIgnore] public static string Version => "2.1.0-beta.1"; // 应用版本号
 }
