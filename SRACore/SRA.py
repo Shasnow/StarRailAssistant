@@ -3,6 +3,8 @@ import multiprocessing
 import threading
 import time
 
+from loguru import logger
+
 from SRACore.thread.task_thread import TaskManager
 from SRACore.thread.trigger_thread import TriggerManager
 
@@ -93,15 +95,16 @@ class SRACli(cmd.Cmd):
             self.task_process = multiprocessing.Process(target=self.task_manager.run, daemon=True, args=config_names)
             self.task_process.start()
             time.sleep(1)  # 确保进程有时间启动
-            print("TaskManager 已启动。")
+            logger.info("TaskManager 已启动。")
         elif command == 'stop':
             if self.task_process.is_alive():
+                logger.debug("[Abort] 用户请求停止 TaskManager...")
                 self.task_process.terminate()
                 self.task_process.join(timeout=5)  # 增加超时，避免阻塞
                 if self.task_process.is_alive():
-                    print("Error: TaskManager 强制终止超时。")
+                    logger.error("TaskManager 强制终止超时。")
                 else:
-                    print("[Done] TaskManager 已停止。")
+                    logger.debug("[Done] TaskManager 已停止。")
             else:
                 print("TaskManager 未在运行中。")
         else:
@@ -141,9 +144,9 @@ class SRACli(cmd.Cmd):
                 self.trigger_manager.stop()
                 self.trigger_thread.join(timeout=5)  # 增加超时
                 if self.trigger_thread.is_alive():
-                    print("警告：TriggerManager 停止超时（可能未正确响应停止信号）。")
+                    logger.error("TriggerManager 停止超时（可能未正确响应停止信号）。")
                 else:
-                    print("TriggerManager 已停止。")
+                    logger.debug("TriggerManager 已停止。")
             else:
                 print("TriggerManager 未在运行中。")
         elif command == 'enable':
@@ -154,7 +157,7 @@ class SRACli(cmd.Cmd):
             for trigger in self.trigger_manager.triggers:
                 if trigger.__class__.__name__.lower() == trigger_name.lower():
                     trigger.set_enable(True)
-                    print(f"触发器 {trigger_name} 已启用。")
+                    logger.info(f"触发器 {trigger_name} 已启用。")
                     return
             print(f"未找到触发器 {trigger_name}。")
         elif command == 'disable':
@@ -165,7 +168,7 @@ class SRACli(cmd.Cmd):
             for trigger in self.trigger_manager.triggers:
                 if trigger.__class__.__name__.lower() == trigger_name.lower():
                     trigger.set_enable(False)
-                    print(f"触发器 {trigger_name} 已禁用。")
+                    logger.info(f"触发器 {trigger_name} 已禁用。")
                     return
             print(f"未找到触发器 {trigger_name}。")
         elif command.startswith('set-'):
@@ -192,7 +195,7 @@ class SRACli(cmd.Cmd):
                     else:
                         print(f"未知的属性类型 {_type}，支持的类型有：int, float, str, bool")
                         return
-                    print(f"触发器 {trigger_name} 的属性 {attr} 已设置为 {value}。")
+                    logger.info(f"触发器 {trigger_name} 的属性 {attr} 已设置为 {value}。")
                     return
             print(f"未找到触发器 {trigger_name}。")
         else:
