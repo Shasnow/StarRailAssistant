@@ -39,7 +39,6 @@ public class DataPersistenceService
 
     public Settings LoadSettings()
     {
-        EnsurePath();
         if (!File.Exists(_settingsFilePath)) return new Settings(); 
         var json = File.ReadAllText(_settingsFilePath);
         if (string.IsNullOrWhiteSpace(json)) return new Settings();
@@ -48,14 +47,12 @@ public class DataPersistenceService
 
     public void SaveSettings(Settings settings)
     {
-        EnsurePath();
         var json = JsonSerializer.Serialize(settings, _jsonSerializerOptions);
         File.WriteAllText(_settingsFilePath, json);
     }
 
     public Cache LoadCache()
     {
-        EnsurePath();
         if (!File.Exists(_cacheFilePath)) return new Cache();
         var json = File.ReadAllText(_cacheFilePath);
         if (string.IsNullOrWhiteSpace(json)) return new Cache();
@@ -64,7 +61,6 @@ public class DataPersistenceService
 
     public void SaveCache(Cache cache)
     {
-        EnsurePath();
         var json = JsonSerializer.Serialize(cache, _jsonSerializerOptions);
         File.WriteAllText(_cacheFilePath, json);
     }

@@ -49,28 +49,17 @@ class SRACli(cmd.Cmd):
 
     def do_exit(self, _):
         """退出命令行工具"""
-        # 退出前尝试停止所有进程和线程
-        print("\n正在清理资源...")
-        # 1. 停止任务进程
         if self.task_process and self.task_process.is_alive():
-            print(f"正在停止 TaskManager（进程ID: {self.task_process.pid}）...")
             self.task_process.terminate()
             self.task_process.join(timeout=5)
             if self.task_process.is_alive():
-                print("警告：TaskManager 强制终止超时，可能存在资源泄漏。")
-            else:
-                print("TaskManager 已成功停止。")
+                logger.error("TaskManager 强制终止超时，可能存在资源泄漏。")
 
-        # 2. 停止触发器线程
         if self.trigger_thread and self.trigger_thread.is_alive():
-            print("正在停止 TriggerManager...")
             self.trigger_manager.stop()  # 调用原类的停止逻辑
             self.trigger_thread.join(timeout=5)
             if self.trigger_thread.is_alive():
-                print("警告：TriggerManager 停止超时，可能未响应停止信号。")
-            else:
-                print("TriggerManager 已成功停止。")
-        print("资源清理完成，退出程序。")
+                logger.error("TriggerManager 停止超时，可能未响应停止信号。")
         return True
 
     def do_task(self, arg: str):
