@@ -94,6 +94,8 @@ class CurrencyWars(Executable):
             box = self.wait_img("resources/img/currency_wars/enter_standard.png", interval=0.5)
             if not self.click_box(box, after_sleep=1.5):
                 return False
+            while self.click_img("resources/img/currency_wars/down_arrow.png", after_sleep=0.5):
+                pass
             if not self.click_img("resources/img/currency_wars/start_game.png", after_sleep=1):
                 return False
             box = self.wait_img("resources/img/currency_wars/next_step.png")
@@ -157,9 +159,6 @@ class CurrencyWars(Executable):
             if c not in on_off_field_characters:
                 c.is_placed = False
 
-    def end_game(self):
-        # TODO: 实现游戏结束逻辑
-        pass
 
     @property
     def coins(self):
@@ -407,13 +406,16 @@ class CurrencyWars(Executable):
                 return False
         self.force_battle = False
         result = self.wait_any_img(['resources/img/currency_wars/fail.png','resources/img/currency_wars/win.png'], interval=1,timeout=600)
-        if result!=-1:
+        if result==1:
             logger.info("挑战结束")
-            self.sleep(2)
-            self.click_point(0.5, 0.824, after_sleep=0.3)  # 点击继续按钮
-            self.click_point(0.5, 0.824, after_sleep=0.3)  # 点击继续按钮
-            self.click_point(0.5, 0.824, after_sleep=0.3)  # 点击继续按钮
-            return True
+            box = self.wait_img('resources/img/currency_wars/continue.png', timeout=30)
+            self.sleep(1)
+            return self.click_box(box, after_sleep=0.3)
+        elif result==0:
+            logger.info("挑战失败")
+            box = self.wait_img('resources/img/currency_wars/settle.png', timeout=30)
+            self.sleep(1)
+            return self.click_box(box, after_sleep=0.3)
         else:
             logger.warning("等待挑战结束超时")
             return False
@@ -428,7 +430,7 @@ class CurrencyWars(Executable):
             'resources/img/currency_wars/click_blank.png',
             'resources/img/currency_wars/next_step.png'
         ], timeout=20, interval=1)
-        self.sleep(1)
+        self.sleep(1.5)
         if stage == 0:  # 补给节点
             self.click_point(0.53, 0.52, after_sleep=1)  # 这里应该实现其他选择逻辑, 目前选择固定位置
             self.click_point(0.88, 0.91, after_sleep=1)  # 点击确认按钮
@@ -458,7 +460,7 @@ class CurrencyWars(Executable):
             return True
         else:
             logger.error("检测超时")
-            return False
+            raise RuntimeError("关卡切换检测超时")
 
     def special_event(self):
         event, _ = self.locate_any(
@@ -541,14 +543,17 @@ class CurrencyWars(Executable):
                 return int(level[0][1].split('.')[1])
             else:
                 return self.max_team_size
-        except Exception as e:
+        except ValueError:
             return self.max_team_size
 
     def update_max_team_size(self):
         result = self.ocr(from_x=0.505, from_y=0.18, to_x=0.608, to_y=0.27)
         if result:
-            self.max_team_size = int(result[-1][1])
-            logger.info(f"最大队伍人数已更新为 {self.max_team_size}")
+            try:
+                self.max_team_size = int(result[-1][1])
+                logger.info(f"最大队伍人数已更新为 {self.max_team_size}")
+            except ValueError:
+                logger.warning(f"无法解析最大队伍人数：{result[-1][1]}")
 
     def get_tendency(self):
         self.faction_tendency.clear()
