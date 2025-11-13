@@ -43,26 +43,19 @@ public partial class ControlPanelViewModel :ViewModelBase
     [RelayCommand]
     private void StartButton()
     {
-        try
+        switch (Cache.StartMode)
         {
-            switch (Cache.StartMode)
-            {
-                case "Current":
-                    Save();
-                    _sraService.TaskRun(Cache.CurrentConfigName);
-                    break;
-                case "All":
-                    Save();
-                    _sraService.TaskRun(null);
-                    break;
-                case "Save Only":
-                    Save();
-                    break;
-            }
-        }
-        catch (Exception e)
-        {
-            File.AppendAllText("error.log", DateTime.Now + " : " + e.Message + Environment.NewLine + e.StackTrace);
+            case "Current":
+                Save();
+                _sraService.TaskRun(Cache.CurrentConfigName);
+                break;
+            case "All":
+                Save();
+                _sraService.TaskRun(null);
+                break;
+            case "Save Only":
+                Save();
+                break;
         }
     }
     [RelayCommand]

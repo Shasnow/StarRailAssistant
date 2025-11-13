@@ -90,13 +90,13 @@ class DifferentialUniverse(Executable):
                 "resources/img/equation_expansion.png",
                 "resources/img/close.png",
                 "resources/img/divergent_universe_quit.png"
-            ],interval=0)
+            ],interval=0.5)
 
             if index==0 or index == 1 or index == 2 or index==3:  # 祝福选择或方程式选择或奇物选择
                 logger.info(var[index])
                 self.sleep(0.5)
                 if not self.click_img("resources/img/collection.png"):
-                    self.click_point(0.5, 0.5, x_offset=-100)
+                    self.click_point(0.5, 0.5, x_offset=-150)
                 self.click_img("resources/img/ensure2.png", after_sleep=1)
             elif index == 4 or index == 5:  # 方程式扩展或关闭
                 self.press_key('esc')
