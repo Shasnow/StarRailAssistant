@@ -48,7 +48,7 @@ class CurrencyWars(Executable):
         self.max_team_size = 3  # 最大队伍人数
         self.faction_tendency = {}  # 阵营倾向字典
         self.school_tendency = {}  # 派系倾向字典
-        self.is_running = True
+        self.is_running = False
 
     def run(self):
         if self.run_times == 0:
@@ -86,6 +86,7 @@ class CurrencyWars(Executable):
     def start_game(self):
         # 实现游戏开始逻辑
         page = self.page_locate()
+        self.is_running=True # 标记任务为运行中
         if page == 1: # 货币战争开始页面
             # 进入对局逻辑
             box = self.wait_img("resources/img/currency_wars/currency_wars_start.png", timeout=30, interval=0.5)
@@ -139,6 +140,8 @@ class CurrencyWars(Executable):
             self.sell_character()
             if self.battle():
                 self.stage_transition()
+                if not self.is_running: # 任务已被标记为停止, 需要退出循环
+                    break
                 self.shopping()
                 self.harvest_crystals()
                 self.get_in_hand_area(True)  # 更新手牌信息
@@ -405,17 +408,11 @@ class CurrencyWars(Executable):
                 self.sleep(0.5)
                 return False
         self.force_battle = False
-        result = self.wait_any_img(['resources/img/currency_wars/fail.png','resources/img/currency_wars/win.png'], interval=1,timeout=600)
-        if result==1:
+        result = self.wait_any_img(['resources/img/currency_wars/settle.png','resources/img/currency_wars/continue.png'], interval=1,timeout=600)
+        if result!=-1:
             logger.info("挑战结束")
-            box = self.wait_img('resources/img/currency_wars/continue.png', timeout=30)
-            self.sleep(1)
-            return self.click_box(box, after_sleep=0.3)
-        elif result==0:
-            logger.info("挑战失败")
-            box = self.wait_img('resources/img/currency_wars/settle.png', timeout=30)
-            self.sleep(1)
-            return self.click_box(box, after_sleep=0.3)
+            self.sleep(0.5)
+            return self.click_point(0.5, 0.824, after_sleep=0.3)  # 点击继续按钮
         else:
             logger.warning("等待挑战结束超时")
             return False
