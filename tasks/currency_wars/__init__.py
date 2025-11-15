@@ -87,7 +87,8 @@ class CurrencyWars(Executable):
         # 实现游戏开始逻辑
         page = self.page_locate()
         self.is_running=True # 标记任务为运行中
-        if page == 1: # 货币战争开始页面
+        if page == 1: # 货币战争开
+            # 始页面
             # 进入对局逻辑
             box = self.wait_img("resources/img/currency_wars/currency_wars_start.png", timeout=30, interval=0.5)
             if not self.click_box(box):
@@ -541,6 +542,8 @@ class CurrencyWars(Executable):
             else:
                 return self.max_team_size
         except ValueError:
+            return self.max_team_size
+        except IndexError:
             return self.max_team_size
 
     def update_max_team_size(self):
