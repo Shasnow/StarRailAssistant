@@ -8,7 +8,6 @@ class BaseTrigger(Executable, ABC):
         super().__init__()
         self.enabled=False
         self.name=None
-        self.config:dict|None=None
 
     @abstractmethod
     def run(self):
@@ -17,6 +16,4 @@ class BaseTrigger(Executable, ABC):
     def set_enable(self, boolean):
         self.enabled=boolean
 
-    def set(self, key, v):
-        self.config[key] = v
 

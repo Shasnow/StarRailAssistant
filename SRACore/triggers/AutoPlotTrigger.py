@@ -5,9 +5,6 @@ class AutoPlotTrigger(BaseTrigger):
     def __init__(self):
         super().__init__()
         self.name = '自动对话'
-        self.config = {
-            '跳过对话': False,
-        }
         self.can_skip = True  # 是否可以跳过对话, 默认可以跳过
         self.skip_plot = False  # 是否跳过对话
         self.active_window = False
@@ -17,7 +14,7 @@ class AutoPlotTrigger(BaseTrigger):
             self.can_skip = True
             return
         self.press_key("space", trace=False)
-        if self.config['跳过对话'] and self.can_skip:
+        if self.skip_plot and self.can_skip:
             self.skip_check()
         for i in range(5, 0, -1):
             if self.locate(f"resources/img/{i}.png", from_x=0.63, from_y=0.375, to_x=0.67, to_y=0.72, trace=False):

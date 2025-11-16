@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
@@ -8,32 +6,32 @@ using SRAFrontend.ViewModels;
 
 namespace SRAFrontend.Controls;
 
-public partial class ControlPanelViewModel :ViewModelBase
+public partial class ControlPanelViewModel : ViewModelBase
 {
-    [ObservableProperty] private bool _isAddConfigOpen;
-    [ObservableProperty] private string _newConfigName = "";
-    private readonly SraService _sraService;
     private readonly CacheService _cacheService;
     private readonly ConfigService _configService;
     private readonly SettingsService _settingsService;
+    private readonly SraService _sraService;
+    [ObservableProperty] private bool _isAddConfigOpen;
+    [ObservableProperty] private string _newConfigName = "";
 
-    /// <inheritdoc/>
-    public ControlPanelViewModel(SraService sraService, CacheService cacheService, ConfigService configService, SettingsService settingsService)
+    public ControlPanelViewModel(SraService sraService, CacheService cacheService, ConfigService configService,
+        SettingsService settingsService)
     {
         _settingsService = settingsService;
         _configService = configService;
         _sraService = sraService;
         _cacheService = cacheService;
-        _sraService.PropertyChanged+= (_, args) =>
+        _sraService.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(SraService.IsRunning)) OnPropertyChanged(nameof(CanStart));
         };
     }
-    
+
     public bool CanStart => !_sraService.IsRunning;
 
     public Cache Cache => _cacheService.Cache;
-    
+
     [RelayCommand]
     private void SwitchStartMode(string mode)
     {
@@ -58,31 +56,33 @@ public partial class ControlPanelViewModel :ViewModelBase
                 break;
         }
     }
+
     [RelayCommand]
     private void StopButton()
     {
         _sraService.TaskStop();
     }
-    
+
     private void Save()
     {
         _cacheService.SaveCache();
         _configService.SaveConfig();
         _settingsService.SaveSettings();
     }
-    
+
     [RelayCommand]
     private void OpenAddConfig()
-    { 
+    {
         IsAddConfigOpen = true;
     }
+
     [RelayCommand]
     private void AddConfig()
     {
         IsAddConfigOpen = false;
         if (string.IsNullOrWhiteSpace(NewConfigName))
             return;
-        
+
         Cache.ConfigNames.Add(NewConfigName);
         NewConfigName = "";
     }
@@ -90,10 +90,7 @@ public partial class ControlPanelViewModel :ViewModelBase
     [RelayCommand]
     private void RemoveConfig()
     {
-        if (Cache.ConfigNames.Count==1)
-        {
-            return;
-        }
+        if (Cache.ConfigNames.Count == 1) return;
         Cache.ConfigNames.RemoveAt(Cache.CurrentConfigIndex);
         Cache.CurrentConfigIndex = 0;
     }
