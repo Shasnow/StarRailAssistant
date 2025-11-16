@@ -398,6 +398,8 @@ class CurrencyWars(Executable):
             self.in_hand_character[i] = None
             logger.info(f"出售角色：{c.name}")
             self.sleep(0.5)
+        self.get_in_hand_area()  # 检测空位，确保没有新插入的角色
+        self.sell_character()  # 递归出售，直到手牌不满
 
     def battle(self) -> bool:
         self.click_point(0.907, 0.714, after_sleep=1)
