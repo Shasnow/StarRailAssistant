@@ -172,6 +172,7 @@ public partial class MainWindowViewModel : ViewModelBase
             .Dismiss().ByClicking()
             .Queue();
         await Task.Delay(3000);
-        UnzipUtil.Unzip(result, Environment.CurrentDirectory);
+        ZipUtil.Unzip(result, Environment.CurrentDirectory);
+        Environment.Exit(0); // 退出应用，等待用户重启以完成更新
     }
 }
