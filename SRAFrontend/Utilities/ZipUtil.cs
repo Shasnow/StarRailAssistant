@@ -1,10 +1,8 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 
 namespace SRAFrontend.utilities;
 
-public static class UnzipUtil
+public static class ZipUtil
 {
     public static void Unzip(string path, string target)
     {
@@ -15,6 +13,5 @@ public static class UnzipUtil
             CreateNoWindow = true,
             UseShellExecute = false
         });
-        Environment.Exit(0);
     }
 }

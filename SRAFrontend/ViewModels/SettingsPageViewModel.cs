@@ -14,7 +14,7 @@ public class SettingsPageViewModel(
         "\uE272")
 {
     private readonly UpdateService? _updateService = updateService;
-    
+
     public Settings Settings => settingsService.Settings;
     public Cache Cache => cacheService.Cache;
 
@@ -28,7 +28,7 @@ public class SettingsPageViewModel(
         }
     }
 
-    public string VersionText => Settings.Version; 
+    public string VersionText => Settings.Version;
 
     public string MirrorChyanCdk
     {

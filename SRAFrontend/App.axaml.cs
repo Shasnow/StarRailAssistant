@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using SRAFrontend.Controls;
+using SRAFrontend.Data;
 using SRAFrontend.Services;
 using SRAFrontend.ViewModels;
 using SRAFrontend.Views;
@@ -102,12 +103,7 @@ public partial class App : Application
     private static void InitializeSerilog()
     {
         // 日志文件路径（存到 ApplicationData/SRA/logs 目录）
-        var logDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "SRA",
-            "logs"
-        );
-        Directory.CreateDirectory(logDir); // 确保目录存在
+        Directory.CreateDirectory(PathString.LogsDir); // 确保目录存在
 
         // 配置 Serilog
         Log.Logger = new LoggerConfiguration()
@@ -115,20 +111,18 @@ public partial class App : Application
             .WriteTo.Console()
             // 输出到文件（按日期拆分，保留 7 天）
             .WriteTo.File(
-                path: Path.Combine(logDir, "sra.log"),
+                path: Path.Combine(PathString.LogsDir, "sra.log"),
                 rollingInterval: RollingInterval.Day, // 按天拆分
                 retainedFileCountLimit: 7, // 保留 7 天日志
                 encoding: System.Text.Encoding.UTF8, // 避免中文乱码
                 outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
             )
-            // 全局日志级别（生产环境用 Information，开发用 Debug）
-            .MinimumLevel.Information()
-            // 针对特定命名空间调整日志级别（如服务层用 Debug）
-            .MinimumLevel.Override("SRAFrontend.Services", Serilog.Events.LogEventLevel.Debug)
+            .MinimumLevel.Debug()
             // 捕获异常时记录堆栈信息
             .Enrich.FromLogContext()
             .CreateLogger();
-        AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+        // 全局未处理异常捕获
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
         {
             Log.Fatal(args.ExceptionObject as Exception, "应用程序发生未处理的异常，正在终止");
             Log.CloseAndFlush();
