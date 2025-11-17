@@ -18,12 +18,12 @@ class CurrencyWars(Executable):
         ]
         self.off_field_character: list[Character | None] = [None, None, None, None, None, None]  # 场下角色列表
         self.off_field_area: list[tuple[float, float]] = [
-            (0.3156, 0.620),
-            (0.3906, 0.620),
-            (0.4625, 0.620),
-            (0.5364, 0.620),
-            (0.6104, 0.620),
-            (0.6838, 0.620)
+            (0.3056, 0.620),
+            (0.3806, 0.620),
+            (0.4525, 0.620),
+            (0.5264, 0.620),
+            (0.6004, 0.620),
+            (0.6738, 0.620)
         ]
         self.in_hand_character: list[Character | None] = [None, None, None, None, None, None, None, None,
                                                           None]  # 手牌角色列表
