@@ -170,7 +170,10 @@ class CurrencyWars(Executable):
         logger.info("获取当前金币数量")
         coins = self.ocr(from_x=0.84, from_y=0.81, to_x=0.89, to_y=0.89)
         if coins:
-            return int(coins[0][1])
+            try:
+                return int(coins[0][1])
+            except (IndexError, ValueError):
+                return 0
         else:
             return 0
 
@@ -543,9 +546,7 @@ class CurrencyWars(Executable):
                 return int(level[0][1].split('.')[1])
             else:
                 return self.max_team_size
-        except ValueError:
-            return self.max_team_size
-        except IndexError:
+        except (ValueError, IndexError):
             return self.max_team_size
 
     def update_max_team_size(self):
