@@ -19,6 +19,8 @@ class SRACli(cmd.Cmd):
         self.trigger_manager = TriggerManager()
         self.trigger_thread = threading.Thread(target=self.trigger_manager.run, daemon=True)
         self.trigger_thread.start()
+        if not self.is_admin():
+            logger.warning("当前用户未具有管理员权限，某些功能可能无法正常工作。请以管理员身份运行此程序以获得完整功能。")
 
     def default(self, line):
         print(f"未知命令: '{line}'. 输入 'help' 获取可用命令列表。")
@@ -210,3 +212,13 @@ class SRACli(cmd.Cmd):
         except KeyboardInterrupt:
             return
         print("任务运行完成，返回命令行。")
+
+    @staticmethod
+    def is_admin() -> bool:
+        """检查当前用户是否具有管理员权限（仅限 Windows）"""
+        try:
+            import ctypes
+            return ctypes.windll.shell32.IsUserAnAdmin() != 0  # NOQA
+        except Exception as e:
+            logger.error(f"检查管理员权限时出错: {e}")
+            return False

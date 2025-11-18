@@ -1,8 +1,6 @@
 import argparse
 import sys
-
-from SRACore.util.logger import setup_logger, logger
-
+import os
 
 def main():
     # 创建 argparse 解析器
@@ -52,9 +50,10 @@ def main():
     args = parser.parse_args()
 
     # 延迟导入 SRACli（减少启动时的依赖加载）
+    from SRACore.util.logger import logger
     from SRACore.SRA import SRACli
     cli_instance = SRACli()
-    logger.debug(f"工作目录：{sys.path[0]}")
+    logger.debug(f"工作目录：{os.getcwd()}")
     # 根据参数处理模式
     # 内嵌模式：隐藏提示符
     if args.inline or args.embed:
