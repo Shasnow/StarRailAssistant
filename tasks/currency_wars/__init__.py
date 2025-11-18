@@ -50,6 +50,10 @@ class CurrencyWars(Executable):
         self.school_tendency = {}  # 派系倾向字典
         self.is_running = False
 
+    @staticmethod
+    def set_username(username: str):
+        characters.username = username
+
     def run(self):
         if self.run_times == 0:
             return True
@@ -135,12 +139,11 @@ class CurrencyWars(Executable):
         while self.is_running:
             self.strategy_event()
             self.update_max_team_size()
-            if self.place_character():
-                self.sleep(0.5)
-                self.special_event()
+            self.place_character()
             self.sell_character()
             if self.battle():
-                self.stage_transition()
+                if not self.stage_transition():
+                    break
                 if not self.is_running: # 任务已被标记为停止, 需要退出循环
                     break
                 self.shopping()
@@ -276,6 +279,7 @@ class CurrencyWars(Executable):
             if character.positioning != Positioning.OffField:
                 if self.place_on_field_character(i):
                     self.sleep(0.5)
+                    self.handle_special_event()
 
         # 第二次遍历：仅处理后台角色（Positioning.OffField），填充剩余空位或替换
         logger.info("=== 放置后台角色 ===")
@@ -285,6 +289,7 @@ class CurrencyWars(Executable):
             if character.positioning != Positioning.OnField:
                 if self.place_off_field_character(i):
                     self.sleep(0.5)
+                    self.handle_special_event()
 
         logger.info("角色放置完成")
         return True
@@ -424,48 +429,99 @@ class CurrencyWars(Executable):
             return False
 
     def stage_transition(self):
-        # 实现关卡切换逻辑
-        stage = self.wait_any_img([
-            'resources/img/currency_wars/replenish_stage.png',
-            'resources/img/currency_wars/encounter_node.png',
-            'resources/img/currency_wars/fold.png',
-            'resources/img/currency_wars/select_invest_strategy.png',
-            'resources/img/currency_wars/click_blank.png',
-            'resources/img/currency_wars/next_step.png'
-        ], timeout=20, interval=1)
-        self.sleep(1.5)
-        if stage == 0:  # 补给节点
-            self.click_point(0.53, 0.52, after_sleep=1)  # 这里应该实现其他选择逻辑, 目前选择固定位置
-            self.click_point(0.88, 0.91, after_sleep=1)  # 点击确认按钮
-            self.wait_img('resources/img/currency_wars/fold.png', timeout=30)  # 等待刷新界面出现
-            return True
-        elif stage == 1:  # 遭遇节点
-            self.click_point(0.35, 0.50, after_sleep=1)  # 简单难度
-            self.click_point(0.50, 0.84, after_sleep=1)  # 点击确认钮
-            self.wait_img('resources/img/currency_wars/fold.png', timeout=30)  # 等待刷新界面出现
-            return True
-        elif stage == 2:  # 刷新界面
-            return True
-        elif stage == 3:  # 选择投资策略界面
-            self.click_point(0.5, 0.68, after_sleep=1)  # 选择中间策略
-            self.click_point(0.5, 0.9, after_sleep=1)  # 点击确认按钮
-            self.wait_img('resources/img/currency_wars/fold.png', timeout=30)
-            return True
-        elif stage == 4:  # 点击空白处关闭
-            self.click_point(0.5, 0.70, after_sleep=1)
-            self.wait_img('resources/img/currency_wars/fold.png', timeout=30)
-            return True
-        elif stage == 5:  # 挑战结束
-            self.click_point(0.5, 0.82, after_sleep=1)
-            self.click_point(0.5, 0.82, after_sleep=1)
-            self.click_point(0.5, 0.82, after_sleep=1)
-            self.is_running = False
-            return True
-        else:
-            logger.error("检测超时")
-            raise RuntimeError("关卡切换检测超时")
+        """实现关卡切换逻辑，通过识别图片状态执行对应操作"""
+        # 定义状态配置：(图片路径, 状态名称, 处理函数, 是否为终止状态)
+        stage_config = [
+            (
+                'resources/img/currency_wars/replenish_stage.png',
+                '补给节点',
+                lambda: [
+                    self.click_point(0.53, 0.52, after_sleep=1),  # 选择固定位置
+                    self.click_point(0.88, 0.91, after_sleep=1)  # 点击确认按钮
+                ],
+                False  # 非终止状态
+            ),
+            (
+                'resources/img/currency_wars/encounter_node.png',
+                '遭遇节点',
+                lambda: [
+                    self.click_point(0.35, 0.50, after_sleep=1),  # 简单难度
+                    self.click_point(0.50, 0.84, after_sleep=1)  # 点击确认钮
+                ],
+                False
+            ),
+            (
+                'resources/img/currency_wars/fold.png',
+                '无',
+                None,  # 目标状态，无需处理
+                True  # 正常终止状态
+            ),
+            (
+                'resources/img/currency_wars/select_invest_strategy.png',
+                '选择投资策略',
+                lambda: [
+                    self.click_point(0.5, 0.68, after_sleep=1),  # 选择中间策略
+                    self.click_point(0.5, 0.9, after_sleep=1)  # 点击确认按钮
+                ],
+                False
+            ),
+            (
+                'resources/img/currency_wars/click_blank.png',
+                '点击空白处关闭',
+                lambda: [self.click_point(0.5, 0.70, after_sleep=1)],
+                False
+            ),
+            (
+                'resources/img/currency_wars/next_step.png',
+                '游戏结束',
+                lambda: [
+                    self.click_point(0.5, 0.82, after_sleep=1),
+                    self.click_point(0.5, 0.82, after_sleep=1),
+                    self.click_point(0.5, 0.82, after_sleep=1),
+                    setattr(self, 'is_running', False)  # 停止运行标志
+                ],
+                True  # 挑战结束，终止状态
+            )
+        ]
 
-    def special_event(self):
+        img_list = [cfg[0] for cfg in stage_config]
+
+        # 等待初始状态
+        stage_index = self.wait_any_img(img_list, timeout=30, interval=1)
+        self.sleep(1.5)
+
+        while True:  # 用无限循环 + 内部break控制退出
+            # 检查是否超时（未识别到任何状态）
+            if stage_index == -1:
+                logger.error("关卡状态检测超时，未识别到任何图片")
+                raise RuntimeError("关卡切换检测超时")
+
+            # 获取当前状态配置
+            img_path, stage_name, handle_func, is_terminal = stage_config[stage_index]
+            logger.info(f"检测到状态：{stage_name}（{img_path}）")
+
+            # 执行状态处理函数
+            if handle_func is not None:
+                try:
+                    actions = handle_func()
+                    if actions:
+                        for _ in actions:
+                            pass  # 操作已在lambda中执行
+                    logger.info(f"状态 {stage_name} 处理完成")
+                except Exception as e:
+                    logger.error(f"处理状态 {stage_name} 时出错: {e}")
+                    raise
+
+            # 若当前是终止状态，直接退出循环
+            if is_terminal:
+                logger.info(f"达到终止状态：{stage_name}，退出关卡切换流程")
+                return True
+
+            # 非终止状态，继续等待下一个状态
+            stage_index = self.wait_any_img(img_list, timeout=30, interval=1)
+            self.sleep(1.5)
+
+    def handle_special_event(self):
         event, _ = self.locate_any(
             ['resources/img/currency_wars/ThePlanetOfFestivities.png', 'resources/img/currency_wars/right.png'])
         if event == 0:  # 盛会之星事件

@@ -35,6 +35,14 @@
                         <StackPanel>
                             <CheckBox IsChecked="{Binding CurrentConfig.CurrencyWarsEnable}"
                                       Content="货币战争 - 零和博弈" />
+                            <Grid ColumnDefinitions="Auto, Auto">
+                                <Label Content="开拓者名称 " />
+                                <TextBox Grid.Column="1"
+                                         Width="200"
+                                         Text="{Binding CurrentConfig.CurrencyWarsUsername}"
+                                         Watermark="请输入开拓者角色名"/>
+                            </Grid>
+                            
                             <ComboBox SelectedIndex="0" Width="200" HorizontalAlignment="Left">
                                 <ComboBoxItem>标准博弈</ComboBoxItem>
                                 <ComboBoxItem>超频博弈</ComboBoxItem>
