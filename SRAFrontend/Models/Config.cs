@@ -28,6 +28,7 @@ public partial class Config : ObservableObject
     [ObservableProperty] private bool _currencyWarsEnable; // 是否启用货币战争任务
     [ObservableProperty] private int _currencyWarsPolicy; // 货币战争策略
     [ObservableProperty] private int _currencyWarsRunTimes; // 货币战争运行次数
+    [ObservableProperty] private string _currencyWarsUsername = ""; // 货币战争用户名
 
     [ObservableProperty] private bool _startGameAlwaysLogin; // 游戏启动时是否总是登录
     [ObservableProperty] private bool _startGameAutoLogin; // 启动游戏时是否自动登录

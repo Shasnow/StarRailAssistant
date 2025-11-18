@@ -108,8 +108,8 @@ characters: dict[str, Character] = {
     '黄泉': Character('黄泉', Faction.GalaxyRanger, [School.Debuff], 3, Positioning.OnField),
     '星期日': Character('星期日', Faction.ThePlanetOfFestivities, [School.Energy], 3, Positioning.OnField),
     '白厄': Character('白厄', Faction.Other, [School.Other], 3, Positioning.OnField),
-    '刻律德拉': Character('刻律德菈', Faction.NightDemigod, [School.SkillPoints], 2, Positioning.OnOffField),
-    '刻律德': Character('刻律德菈', Faction.NightDemigod, [School.SkillPoints], 2, Positioning.OnOffField),
+    '刻律德拉': Character('刻律德菈', Faction.NightDemigod, [School.SkillPoints], 3, Positioning.OnOffField),
+    '刻律德': Character('刻律德菈', Faction.NightDemigod, [School.SkillPoints], 3, Positioning.OnOffField),
     '卡芙卡': Character('卡芙卡', Faction.StellaronHounters, [School.DoT], 2, Positioning.OnField),
     '佩拉': Character('佩拉', Faction.Belobog, [School.Debuff], 2, Positioning.OffField),
     '藿藿': Character('藿藿', Faction.Xianzhou, [School.Energy, School.Heal], 2, Positioning.OnOffField),
@@ -122,13 +122,13 @@ characters: dict[str, Character] = {
                         Positioning.OnOffField),
     '阿格莱雅': Character('阿格莱雅', Faction.DayDemigod, [School.Energy], 1, Positioning.OnField),
 }
-username = '雪影'
+username = '开拓者'  # 请将此处改为你的角色名称
 Trailblazer = Character('开拓者', Faction.ExpressCohort, [School.Energy], 4, Positioning.OnField)
 
 
 def get_character(name: str) -> Character | None:
     """根据名称获取角色信息"""
-    name=name.replace('·', '•').replace('傑','杰')
+    name=name.replace('·', '•').replace('傑','杰').replace('姐', '妲')
     if name == username:
         return Trailblazer
     return characters.get(name)

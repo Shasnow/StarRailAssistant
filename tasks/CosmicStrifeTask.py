@@ -19,6 +19,9 @@ class CosmicStrifeTask(BaseTask):
             logger.info("执行任务：旷宇纷争-货币战争")
             from tasks.currency_wars import CurrencyWars
             cw_task = CurrencyWars(self.config.get("CurrencyWarsRunTimes", 0))
+            username = self.config.get("CurrencyWarsUsername","")
+            if username != "":
+                cw_task.set_username(username)
             if not cw_task.run():
                 logger.error("旷宇纷争-货币战争任务失败")
                 return False
