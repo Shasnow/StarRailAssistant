@@ -56,79 +56,142 @@ class Character:
         return f'{self.name}'
 
 
+class Characters:
+    Cyrene = Character('昔涟', Faction.DayDemigod, [School.Other], 5, Positioning.OnField)
+    DanHeng_PermansorTerrae = Character('丹恒·腾荒', Faction.NightDemigod, [School.Shield], 2, Positioning.OffField)
+    Evernight = Character('长夜月', Faction.NightDemigod, [School.Bloodflame], 3, Positioning.OnOffField)
+    Cerydra = Character('刻律德菈', Faction.NightDemigod, [School.SkillPoints], 3, Positioning.OnOffField)
+    Hysilens = Character('海瑟音', Faction.DayDemigod, [School.DoT], 4, Positioning.OnField)
+    Archer = Character('Archer', Faction.GalacticVoyager, [School.SkillPoints], 5, Positioning.OnField)
+    Saber = Character('Saber', Faction.GalacticVoyager, [School.Energy], 3, Positioning.OnOffField)
+    Phainon = Character('白厄', Faction.Other, [School.Other], 3, Positioning.OnField)
+    Cipher = Character('赛飞儿', Faction.NightDemigod, [School.FollowUpATK, School.Debuff], 1, Positioning.OnField)
+    Hyacine = Character('风堇', Faction.DayDemigod, [School.Heal, School.Bloodflame], 2, Positioning.OnField)
+    Anaxa = Character('那刻夏', Faction.DayDemigod, [School.AoEATK], 3, Positioning.OffField)
+    Castorice = Character('遐蝶', Faction.NightDemigod, [School.Bloodflame], 4, Positioning.OnField)
+    Mydei = Character('万敌', Faction.NightDemigod, [School.Bloodflame], 2, Positioning.OnOffField)
+    Tribbie = Character('缇宝', Faction.DayDemigod, [School.AoEATK], 2, Positioning.OnOffField)
+    Aglaea = Character('阿格莱雅', Faction.DayDemigod, [School.Energy], 1, Positioning.OnField)
+    TheHerta = Character('大黑塔', Faction.CosmicScholar, [School.AoEATK], 4, Positioning.OnField)
+    Sunday = Character('星期日', Faction.ThePlanetOfFestivities, [School.Energy], 3, Positioning.OnField)
+    Fugue = Character('忘归人', Faction.Xianzhou, [School.Break], 3, Positioning.OffField)
+    Rappa = Character('乱破', Faction.GalaxyRanger, [School.Break], 1, Positioning.OnField)
+    Lingsha = Character('灵砂', Faction.WolfHunt, [School.Break], 4, Positioning.OnField)
+    Feixiao = Character('飞霄', Faction.WolfHunt, [School.FollowUpATK], 2, Positioning.OnField)
+    Moze = Character('貊泽', Faction.WolfHunt, [School.FollowUpATK], 1, Positioning.OffField)
+    Jiaoqiu = Character('椒丘', Faction.WolfHunt, [School.Heal, School.Debuff], 1, Positioning.OnField)
+    Yunli = Character('云璃', Faction.WolfHunt, [School.Energy], 5, Positioning.OffField)
+    Jade = Character('翡翠', Faction.IPC, [School.AoEATK], 1, Positioning.OffField)
+    Firefly = Character('流萤', Faction.StellaronHounters, [School.Break], 5, Positioning.OnField)
+    Boothill = Character('波提欧', Faction.GalaxyRanger, [School.Break], 4, Positioning.OnField)
+    Robin = Character('知更鸟', Faction.ThePlanetOfFestivities, [School.FollowUpATK], 4, Positioning.OffField)
+    Aventurine = Character('砂金', Faction.IPC, [School.Shield, School.FollowUpATK], 2, Positioning.OnField)
+    Acheron = Character('黄泉', Faction.GalaxyRanger, [School.Debuff], 3, Positioning.OnField)
+    Gallagher = Character('加拉赫', Faction.ThePlanetOfFestivities, [School.Break, School.Heal], 1,
+                          Positioning.OnOffField)
+    Sparkle = Character('花火', Faction.ThePlanetOfFestivities, [School.QuantumResonance, School.SkillPoints], 2,
+                        Positioning.OffField)
+    BlackSwan = Character('黑天鹅', Faction.ThePlanetOfFestivities, [School.DoT], 5, Positioning.OffField)
+    DrRatio = Character('真理医生', Faction.CosmicScholar, [School.FollowUpATK], 3, Positioning.OnField)
+    RuanMei = Character('阮·梅', Faction.CosmicScholar, [School.Break], 2, Positioning.OffField)
+    Argenti = Character('银枝', Faction.GalacticVoyager, [School.AoEATK], 2, Positioning.OnField)
+    Huohuo = Character('藿藿', Faction.Xianzhou, [School.Energy, School.Heal], 2, Positioning.OnOffField)
+    TopazAndNumby = Character('托帕&账账', Faction.IPC, [School.FollowUpATK], 5, Positioning.OffField)
+    Jingliu = Character('镜流', Faction.WolfHunt, [School.Bloodflame], 3, Positioning.OffField)
+    FuXuan = Character('符玄', Faction.Xianzhou, [School.Heal, School.QuantumResonance], 4, Positioning.OffField)
+    DanHeng_ImbibitorLunae = Character('丹恒·饮月', Faction.ExpressCohort, [School.SkillPoints], 2, Positioning.OnField)
+    Kafka = Character('卡芙卡', Faction.StellaronHounters, [School.DoT], 2, Positioning.OnField)
+    Blade = Character('刃', Faction.StellaronHounters, [School.Bloodflame], 1, Positioning.OffField)
+    Luocha = Character('罗刹', Faction.GalacticVoyager, [School.Heal], 4, Positioning.OffField)
+    SilverWolf = Character('银狼', Faction.StellaronHounters, [School.QuantumResonance], 4, Positioning.OnOffField)
+    JingYuan = Character('景元', Faction.Xianzhou, [School.AoEATK], 5, Positioning.OnField)
+    Seele = Character('希儿', Faction.Belobog, [School.QuantumResonance], 3, Positioning.OnField)
+    Gepard = Character('杰帕德', Faction.Belobog, [School.Shield], 4, Positioning.OnField)
+    Natasha = Character('娜塔莎', Faction.Belobog, [School.Heal], 3, Positioning.OffField)
+    Bronya = Character('布洛妮娅', Faction.Belobog, [School.Bloodflame], 5, Positioning.OnField)
+    Welt = Character('瓦尔特', Faction.ExpressCohort, [School.Debuff], 5, Positioning.OnField)
+    Himeko = Character('姬子', Faction.ExpressCohort, [School.Break], 3, Positioning.OffField)
+    Yanqing = Character('彦卿', Faction.Xianzhou, [School.Debuff], 3, Positioning.OffField)
+    Asta = Character('艾丝妲', Faction.CosmicScholar, [School.DoT], 1, Positioning.OnField)
+    Sampo = Character('桑博', Faction.GalacticVoyager, [School.DoT], 1, Positioning.OnOffField)
+    March7th = Character('三月七', Faction.ExpressCohort, [School.Shield], 1, Positioning.OffField)
+    Tingyun = Character('停云', Faction.Xianzhou, [School.Energy], 1, Positioning.OffField)
+    Qingque = Character('青雀', Faction.Xianzhou, [School.SkillPoints], 1, Positioning.OnField)
+    Pela = Character('佩拉', Faction.Belobog, [School.Debuff], 2, Positioning.OffField)
+    Herta = Character('黑塔', Faction.CosmicScholar, [School.AoEATK], 1, Positioning.OnOffField)
+    Trailblazer = Character('开拓者', Faction.ExpressCohort, [School.Energy], 4, Positioning.OnField)
+
+
 # 角色列表
 characters: dict[str, Character] = {
-    '貊泽': Character('貊泽', Faction.WolfHunt, [School.FollowUpATK], 1, Positioning.OffField),
-    '乱破': Character('乱破', Faction.GalaxyRanger, [School.Break], 1, Positioning.OnField),
-    '花火': Character('花火', Faction.ThePlanetOfFestivities, [School.QuantumResonance, School.SkillPoints], 2,
-                      Positioning.OffField),
-    '遐蝶': Character('遐蝶', Faction.NightDemigod, [School.Bloodflame], 4, Positioning.OnField),
-    '银枝': Character('银枝', Faction.GalacticVoyager, [School.AoEATK], 2, Positioning.OnField),
-    '丹恒•饮月': Character('丹恒·饮月', Faction.ExpressCohort, [School.SkillPoints], 2, Positioning.OnField),
-    '灵砂': Character('灵砂', Faction.WolfHunt, [School.Break], 4, Positioning.OnField),
-    '大黑塔': Character('大黑塔', Faction.CosmicScholar, [School.AoEATK], 4, Positioning.OnField),
-    '托帕&账账': Character('托帕&账账', Faction.IPC, [School.FollowUpATK], 5, Positioning.OffField),
-    '景元': Character('景元', Faction.Xianzhou, [School.AoEATK], 5, Positioning.OnField),
-    '云璃': Character('云璃', Faction.WolfHunt, [School.Energy], 5, Positioning.OffField),
-    '昔涟': Character('昔涟', Faction.DayDemigod, [School.Other], 5, Positioning.OnField),
-    '布洛妮娅': Character('布洛妮娅', Faction.Belobog, [School.Bloodflame], 5, Positioning.OnField),
-    '罗刹': Character('罗刹', Faction.GalacticVoyager, [School.Heal], 4, Positioning.OffField),
-    '知更鸟': Character('知更鸟', Faction.ThePlanetOfFestivities, [School.FollowUpATK], 4, Positioning.OffField),
-    '姬子': Character('姬子', Faction.ExpressCohort, [School.Break], 3, Positioning.OffField),
-    '镜流': Character('镜流', Faction.WolfHunt, [School.Bloodflame], 3, Positioning.OffField),
-    '真理医生': Character('真理医生', Faction.CosmicScholar, [School.FollowUpATK], 3, Positioning.OnField),
-    '那刻夏': Character('那刻夏', Faction.DayDemigod, [School.AoEATK], 3, Positioning.OffField),
-    '长夜月': Character('长夜月', Faction.NightDemigod, [School.Bloodflame], 3, Positioning.OnOffField),
-    '飞霄': Character('飞霄', Faction.WolfHunt, [School.FollowUpATK], 2, Positioning.OnField),
-    '阮•梅': Character('阮·梅', Faction.CosmicScholar, [School.Break], 2, Positioning.OffField),
-    '砂金': Character('砂金', Faction.IPC, [School.Shield, School.FollowUpATK], 2, Positioning.OnField),
-    '缇宝': Character('缇宝', Faction.DayDemigod, [School.AoEATK], 2, Positioning.OnOffField),
-    '万敌': Character('万敌', Faction.NightDemigod, [School.Bloodflame], 2, Positioning.OnOffField),
-    '风堇': Character('风堇', Faction.DayDemigod, [School.Heal, School.Bloodflame], 2, Positioning.OnField),
-    '丹恒•腾荒': Character('丹恒·腾荒', Faction.NightDemigod, [School.Shield], 2, Positioning.OffField),
-    '黑塔': Character('黑塔', Faction.CosmicScholar, [School.AoEATK], 1, Positioning.OnOffField),
-    '赛飞儿': Character('赛飞儿', Faction.NightDemigod, [School.FollowUpATK, School.Debuff], 1, Positioning.OnField),
-    '青雀': Character('青雀', Faction.Xianzhou, [School.SkillPoints], 1, Positioning.OnField),
-    '刃': Character('刃', Faction.StellaronHounters, [School.Bloodflame], 1, Positioning.OffField),
-    '翡翠': Character('翡翠', Faction.IPC, [School.AoEATK], 1, Positioning.OffField),
-    '瓦尔特': Character('瓦尔特', Faction.ExpressCohort, [School.Debuff], 5, Positioning.OnField),
-    'Archer': Character('Archer', Faction.GalacticVoyager, [School.SkillPoints], 5, Positioning.OnField),
-    '黑天鹅': Character('黑天鹅', Faction.ThePlanetOfFestivities, [School.DoT], 5, Positioning.OffField),
-    '流萤': Character('流萤', Faction.StellaronHounters, [School.Break], 5, Positioning.OnField),
-    '银狼': Character('银狼', Faction.StellaronHounters, [School.QuantumResonance], 4, Positioning.OnOffField),
-    '杰帕德': Character('杰帕德', Faction.Belobog, [School.Shield], 4, Positioning.OnField),
-    '符玄': Character('符玄', Faction.Xianzhou, [School.Heal, School.QuantumResonance], 4, Positioning.OffField),
-    '波提欧': Character('波提欧', Faction.GalaxyRanger, [School.Break], 4, Positioning.OnField),
-    '彦卿': Character('彦卿', Faction.Xianzhou, [School.Debuff], 3, Positioning.OffField),
-    '海瑟音': Character('海瑟音', Faction.DayDemigod, [School.DoT], 4, Positioning.OnField),
-    'Saber': Character('Saber', Faction.GalacticVoyager, [School.Energy], 3, Positioning.OnOffField),
-    '希儿': Character('希儿', Faction.Belobog, [School.QuantumResonance], 3, Positioning.OnField),
-    '娜塔莎': Character('娜塔莎', Faction.Belobog, [School.Heal], 3, Positioning.OffField),
-    '忘归人': Character('忘归人', Faction.Xianzhou, [School.Break], 3, Positioning.OffField),
-    '黄泉': Character('黄泉', Faction.GalaxyRanger, [School.Debuff], 3, Positioning.OnField),
-    '星期日': Character('星期日', Faction.ThePlanetOfFestivities, [School.Energy], 3, Positioning.OnField),
-    '白厄': Character('白厄', Faction.Other, [School.Other], 3, Positioning.OnField),
-    '刻律德拉': Character('刻律德菈', Faction.NightDemigod, [School.SkillPoints], 3, Positioning.OnOffField),
-    '刻律德': Character('刻律德菈', Faction.NightDemigod, [School.SkillPoints], 3, Positioning.OnOffField),
-    '卡芙卡': Character('卡芙卡', Faction.StellaronHounters, [School.DoT], 2, Positioning.OnField),
-    '佩拉': Character('佩拉', Faction.Belobog, [School.Debuff], 2, Positioning.OffField),
-    '藿藿': Character('藿藿', Faction.Xianzhou, [School.Energy, School.Heal], 2, Positioning.OnOffField),
-    '三月七': Character('三月七', Faction.ExpressCohort, [School.Shield], 1, Positioning.OffField),
-    '艾丝妲': Character('艾丝妲', Faction.CosmicScholar, [School.DoT], 1, Positioning.OnField),
-    '桑博': Character('桑博', Faction.GalacticVoyager, [School.DoT], 1, Positioning.OnOffField),
-    '停云': Character('停云', Faction.Xianzhou, [School.Energy], 1, Positioning.OffField),
-    '椒丘': Character('椒丘', Faction.WolfHunt, [School.Heal, School.Debuff], 1, Positioning.OnField),
-    '加拉赫': Character('加拉赫', Faction.ThePlanetOfFestivities, [School.Break, School.Heal], 1,
-                        Positioning.OnOffField),
-    '阿格莱雅': Character('阿格莱雅', Faction.DayDemigod, [School.Energy], 1, Positioning.OnField),
+    '貊泽': Characters.Moze,
+    '乱破': Characters.Rappa,
+    '花火': Characters.Sparkle,
+    '遐蝶': Characters.Castorice,
+    '银枝': Characters.Argenti,
+    '丹恒•饮月': Characters.DanHeng_ImbibitorLunae,
+    '灵砂': Characters.Lingsha,
+    '大黑塔': Characters.TheHerta,
+    '托帕&账账': Characters.TopazAndNumby,
+    '景元': Characters.JingYuan,
+    '云璃': Characters.Yunli,
+    '昔涟': Characters.Cyrene,
+    '布洛妮娅': Characters.Bronya,
+    '罗刹': Characters.Luocha,
+    '知更鸟': Characters.Robin,
+    '姬子': Characters.Himeko,
+    '镜流': Characters.Jingliu,
+    '真理医生': Characters.DrRatio,
+    '那刻夏': Characters.Anaxa,
+    '长夜月': Characters.Evernight,
+    '飞霄': Characters.Feixiao,
+    '阮•梅': Characters.RuanMei,
+    '砂金': Characters.Aventurine,
+    '缇宝': Characters.Tribbie,
+    '万敌': Characters.Mydei,
+    '风堇': Characters.Hyacine,
+    '丹恒•腾荒': Characters.DanHeng_PermansorTerrae,
+    '黑塔': Characters.Herta,
+    '赛飞儿': Characters.Cipher,
+    '青雀': Characters.Qingque,
+    '刃': Characters.Blade,
+    '翡翠': Characters.Jade,
+    '瓦尔特': Characters.Welt,
+    'Archer': Characters.Archer,
+    '黑天鹅': Characters.BlackSwan,
+    '流萤': Characters.Firefly,
+    '银狼': Characters.SilverWolf,
+    '杰帕德': Characters.Gepard,
+    '符玄': Characters.FuXuan,
+    '波提欧': Characters.Boothill,
+    '彦卿': Characters.Yanqing,
+    '海瑟音': Characters.Hysilens,
+    'Saber': Characters.Saber,
+    '希儿': Characters.Seele,
+    '娜塔莎': Characters.Natasha,
+    '忘归人': Characters.Fugue,
+    '黄泉': Characters.Acheron,
+    '星期日': Characters.Sunday,
+    '白厄': Characters.Phainon,
+    '刻律德拉': Characters.Cerydra,
+    '刻律德': Characters.Cerydra,
+    '卡芙卡': Characters.Kafka,
+    '佩拉': Characters.Pela,
+    '藿藿': Characters.Huohuo,
+    '三月七': Characters.March7th,
+    '艾丝妲': Characters.Asta,
+    '桑博': Characters.Sampo,
+    '停云': Characters.Tingyun,
+    '椒丘': Characters.Jiaoqiu,
+    '加拉赫': Characters.Gallagher,
+    '阿格莱雅': Characters.Aglaea,
 }
 username = '开拓者'  # 请将此处改为你的角色名称
-Trailblazer = Character('开拓者', Faction.ExpressCohort, [School.Energy], 4, Positioning.OnField)
 
 
 def get_character(name: str) -> Character | None:
     """根据名称获取角色信息"""
-    name=name.replace('·', '•').replace('傑','杰').replace('姐', '妲')
+    name = name.replace('·', '•').replace('傑', '杰').replace('姐', '妲')
     if name == username:
-        return Trailblazer
+        return Characters.Trailblazer
     return characters.get(name)
