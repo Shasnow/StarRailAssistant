@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using Avalonia.Collections;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
+using SRAFrontend.Data;
 
 namespace SRAFrontend.Services;
 
@@ -15,24 +17,13 @@ public partial class SraService : ObservableObject, IDisposable
     [ObservableProperty] private bool _isRunning;
     [ObservableProperty] private AvaloniaList<string?> _outputLines = ["后端未启动。"];
 
-    public SraService(ILogger<SraService> logger)
+    public SraService(ILogger<SraService> logger, PythonService pythonService)
     {
         _logger = logger;
-        _sraProcess = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "SRA-cli.exe",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            }
-        };
+        var mainPyPath = Path.Combine(PathString.SourceCodeDir, "main.py");
+        _sraProcess = pythonService.CreatePythonProcess($"{mainPyPath} --inline");
         _sraProcess.OutputDataReceived += OnSraProcessOutputDataReceived;
         _sraProcess.ErrorDataReceived += OnSraProcessErrorDataReceived;
-        StartSraProcess("--inline");
     }
 
     private void OnSraProcessErrorDataReceived(object _, DataReceivedEventArgs args)

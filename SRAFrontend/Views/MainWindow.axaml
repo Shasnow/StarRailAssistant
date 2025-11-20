@@ -15,7 +15,7 @@
         FontSize="16">
 
     <suki:SukiWindow.Hosts>
-        <suki:SukiToastHost Manager="{Binding ToastManager}"/>
+        <suki:SukiToastHost Manager="{Binding ToastManager}" />
     </suki:SukiWindow.Hosts>
     <suki:SukiWindow.RightWindowTitleBarControls>
         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
