@@ -80,8 +80,9 @@ public partial class App : Application
             var announcementService = provider.GetRequiredService<AnnouncementService>();
             var settingsService = provider.GetRequiredService<SettingsService>();
             var updateService = provider.GetRequiredService<UpdateService>();
+            var pythonService = provider.GetRequiredService<PythonService>();
             var logger = provider.GetRequiredService<ILogger<MainWindowViewModel>>();
-            return new MainWindowViewModel(pages, toastManager, announcementService, settingsService, updateService, logger);
+            return new MainWindowViewModel(pages, toastManager, announcementService, settingsService, updateService, pythonService, logger);
         });
         services.AddTransient<HomePageViewModel>();
         services.AddTransient<TaskPageViewModel>();
@@ -98,6 +99,7 @@ public partial class App : Application
         services.AddSingleton<CacheService>();
         services.AddSingleton<SraService>();
         services.AddSingleton<ConfigService>();
+        services.AddSingleton<PythonService>();
     }
 
     private static void InitializeSerilog()
