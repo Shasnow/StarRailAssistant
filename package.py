@@ -40,7 +40,6 @@ if __name__ == "__main__":
     os.makedirs(root_path / "main.dist/SRA", exist_ok=True)
     shutil.copytree(root_path / "SRAFrontend/bin/Release/net8.0/win-x64/publish", root_path / "main.dist", dirs_exist_ok=True)
     shutil.copytree(root_path / "resources", root_path / "main.dist/SRA/resources")
-    shutil.copytree(root_path / "tools", root_path / "main.dist/tools")
     shutil.copytree(root_path / "tasks", root_path / "main.dist/SRA/tasks")
     shutil.copytree(root_path / "SRACore", root_path / "main.dist/SRA/SRACore")
     shutil.copy(root_path / "LICENSE", root_path / "main.dist/SRA/LICENSE")
