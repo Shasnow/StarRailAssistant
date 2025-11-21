@@ -66,7 +66,7 @@ if __name__ == "__main__":
         format="zip",
         root_dir=root_path / "main.dist/SRA",
         base_dir=".",
-    ))
+    )
     print("SRA source code packaging completed !")
     shutil.rmtree(root_path / "main.dist")
     (root_path / "version_info.txt").write_text(
