@@ -88,28 +88,28 @@ jobs:
           $VERSION=(Get-Content -Path "version_info.txt" -TotalCount 1).Trim()
           "version=$VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
           
-      - name: Install Inno Setup
-        run: |
-          choco install innosetup --no-progress --yes
+#      - name: Install Inno Setup
+#        run: |
+#          choco install innosetup --no-progress --yes
+#          
+#      - name: Prepare for Inno Setup
+#        run: |
+#          Expand-Archive -Path StarRailAssistant_${{ env.version }}.zip -DestinationPath StarRailAssistant
+#          Copy-Item version_info.txt -Destination setup\install_info.txt -Force
           
-      - name: Prepare for Inno Setup
-        run: |
-          Expand-Archive -Path StarRailAssistant_${{ env.version }}.zip -DestinationPath StarRailAssistant
-          Copy-Item version_info.txt -Destination setup\install_info.txt -Force
-          
-      - name: Build Installer
-        run: |
-          New-Item -ItemType Directory -Path setup\SRA -Force
-          Copy-Item -Path StarRailAssistant\* -Destination setup\SRA -Force -Recurse
-          New-Item -ItemType Directory -Path setup\output -Force
-          python setup/version_modifier.py --version "${{ env.version }}"
-          iscc setup\srasetup.iss
-          Copy-Item -Path setup\output\* -Destination . -Force
-      - name: Upload Setup Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: StarRailAssistant_${{ env.version }}_setup
-          path: StarRailAssistant_${{ env.version }}_Setup.exe
+#      - name: Build Installer
+#        run: |
+#          New-Item -ItemType Directory -Path setup\SRA -Force
+#          Copy-Item -Path StarRailAssistant\* -Destination setup\SRA -Force -Recurse
+#          New-Item -ItemType Directory -Path setup\output -Force
+#          python setup/version_modifier.py --version "${{ env.version }}"
+#          iscc setup\srasetup.iss
+#          Copy-Item -Path setup\output\* -Destination . -Force
+#      - name: Upload Setup Artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: StarRailAssistant_${{ env.version }}_setup
+#          path: StarRailAssistant_${{ env.version }}_Setup.exe
       - name: Upload zip Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -118,8 +118,8 @@ jobs:
       - name: Upload SourceCode Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SRA_SourceCode_${{ env.version }}
-          path: SRA_SourceCode_${{ env.version }}.zip
+          name: StarRailAssistant_Core_${{ env.version }}
+          path: StarRailAssistant_Core_${{ env.version }}.zip
           
       - name: Upload Version_Info Artifact
         uses: actions/upload-artifact@v4
