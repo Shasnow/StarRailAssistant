@@ -66,26 +66,12 @@ public partial class App : Application
             loggingBuilder.AddSerilog(dispose: true);
         });
         // Register your services here
-        services.AddTransient<MainWindowViewModel>(provider =>
-        {
-            var pages= new PageViewModel[]
-            {
-                provider.GetRequiredService<HomePageViewModel>(),
-                provider.GetRequiredService<TaskPageViewModel>(),
-                provider.GetRequiredService<ExtensionPageViewModel>(),
-                provider.GetRequiredService<ConsolePageViewModel>(),
-                provider.GetRequiredService<SettingsPageViewModel>()
-            };
-            var commonModel = provider.GetRequiredService<CommonModel>();
-            var toastManager = provider.GetRequiredService<ISukiToastManager>();
-            var announcementService = provider.GetRequiredService<AnnouncementService>();
-            return new MainWindowViewModel(pages, commonModel, toastManager, announcementService);
-        });
-        services.AddTransient<HomePageViewModel>();
-        services.AddTransient<TaskPageViewModel>();
-        services.AddTransient<ExtensionPageViewModel>();
-        services.AddTransient<ConsolePageViewModel>();
-        services.AddTransient<SettingsPageViewModel>();
+        services.AddTransient<MainWindowViewModel>();
+        services.AddTransient<PageViewModel, HomePageViewModel>();
+        services.AddTransient<PageViewModel, TaskPageViewModel>();
+        services.AddTransient<PageViewModel, ExtensionPageViewModel>();
+        services.AddTransient<PageViewModel, ConsolePageViewModel>();
+        services.AddTransient<PageViewModel, SettingsPageViewModel>();
         services.AddTransient<UpdateService>();
         services.AddTransient<AnnouncementService>();
         services.AddTransient<CommonModel>();
