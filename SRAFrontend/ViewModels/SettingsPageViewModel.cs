@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 
 namespace SRAFrontend.ViewModels;
 
-public class SettingsPageViewModel(
+public partial class SettingsPageViewModel(
     SettingsService settingsService,
     UpdateService updateService,
-    CacheService cacheService)
+    CacheService cacheService,
+    CommonModel commonModel)
     : PageViewModel(PageName.Setting,
         "\uE272")
 {
-    private readonly UpdateService? _updateService = updateService;
-
     public Settings Settings => settingsService.Settings;
     public Cache Cache => cacheService.Cache;
 
@@ -65,7 +65,7 @@ public class SettingsPageViewModel(
         Cache.CdkStatusForeground = "#FAAD14"; // 黄色表示处理中
 
         // 执行异步验证
-        var response = await _updateService!.VerifyCdkAsync(cdk);
+        var response = await updateService.VerifyCdkAsync(cdk);
 
         if (response is null)
         {
@@ -82,8 +82,20 @@ public class SettingsPageViewModel(
         }
         else
         {
-            Cache.CdkStatus = _updateService.GetErrorMessage(response.Code);
+            Cache.CdkStatus = updateService.GetErrorMessage(response.Code);
             Cache.CdkStatusForeground = "#F5222D"; // 红色表示错误
         }
+    }
+    
+    [RelayCommand]
+    private void CheckForUpdates()
+    {
+        _ = commonModel.CheckForUpdatesAsync();
+    }
+    
+    [RelayCommand]
+    private void CheckAndFixPythonEnvironment()
+    {
+        _ = commonModel.CheckAndFixPythonEnvironmentAsync();
     }
 }

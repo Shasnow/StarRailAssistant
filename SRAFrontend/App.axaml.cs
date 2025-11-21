@@ -76,13 +76,10 @@ public partial class App : Application
                 provider.GetRequiredService<ConsolePageViewModel>(),
                 provider.GetRequiredService<SettingsPageViewModel>()
             };
+            var commonModel = provider.GetRequiredService<CommonModel>();
             var toastManager = provider.GetRequiredService<ISukiToastManager>();
             var announcementService = provider.GetRequiredService<AnnouncementService>();
-            var settingsService = provider.GetRequiredService<SettingsService>();
-            var updateService = provider.GetRequiredService<UpdateService>();
-            var pythonService = provider.GetRequiredService<PythonService>();
-            var logger = provider.GetRequiredService<ILogger<MainWindowViewModel>>();
-            return new MainWindowViewModel(pages, toastManager, announcementService, settingsService, updateService, pythonService, logger);
+            return new MainWindowViewModel(pages, commonModel, toastManager, announcementService);
         });
         services.AddTransient<HomePageViewModel>();
         services.AddTransient<TaskPageViewModel>();
@@ -91,6 +88,7 @@ public partial class App : Application
         services.AddTransient<SettingsPageViewModel>();
         services.AddTransient<UpdateService>();
         services.AddTransient<AnnouncementService>();
+        services.AddTransient<CommonModel>();
         services.AddSingleton<ControlPanelViewModel>();
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
         services.AddSingleton<HttpClient>();
