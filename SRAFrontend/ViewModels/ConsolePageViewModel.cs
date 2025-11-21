@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Data;
 using SRAFrontend.Services;
 
@@ -21,13 +22,9 @@ public partial class ConsolePageViewModel : PageViewModel
     {
         get
         {
-            // 无需判断 null（已知 OutputLines 非空）
             var lines = _sraService.OutputLines;
             var filteredLines = lines.Where(line =>
             {
-                // 过滤 null 行（避免 Contains 空引用）
-                if (line == null)
-                    return false;
                 // 1. 检查是否匹配已勾选的级别（标识可能在任意位置，用 Contains）
                 for (var i = 0; i < _levelPrefixes.Length; i++)
                 {
@@ -51,5 +48,11 @@ public partial class ConsolePageViewModel : PageViewModel
     public void SendInput(string input)
     {
         _sraService.SendInput(input);
+    }
+
+    [RelayCommand]
+    private void RestartConsole()
+    {
+        _sraService.RestartSraProcess("--inline");
     }
 }
