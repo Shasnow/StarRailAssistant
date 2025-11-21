@@ -12,8 +12,16 @@
     <suki:GlassCard>
         <suki:GroupBox>
             <suki:GroupBox.Header>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{x:Static lang:Resources.ConsoleText}" FontSize="16" />
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="{x:Static lang:Resources.ConsoleText}" VerticalAlignment="Center" />
+                    <Button
+                        Height="20"
+                        Width="20"
+                        FontFamily="{DynamicResource Phosphor}"
+                        Classes="Basic Icon"
+                        Content="&#xE036;"
+                        ToolTip.Tip="重新启动控制台"
+                        Command="{Binding RestartConsoleCommand}"/>
                 </StackPanel>
             </suki:GroupBox.Header>
             <Grid RowDefinitions="Auto,*,Auto">

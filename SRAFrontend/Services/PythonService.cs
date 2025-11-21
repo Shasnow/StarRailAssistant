@@ -603,12 +603,11 @@ public class PythonService(ILogger<PythonService> logger, HttpClient httpClient,
             {
                 FileName = PythonExePath,
                 Arguments = args,
+                RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
-                CreateNoWindow = true,
-                StandardOutputEncoding = Encoding.UTF8,
-                StandardErrorEncoding = Encoding.UTF8
+                CreateNoWindow = true
             },
             EnableRaisingEvents = true
         };
