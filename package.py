@@ -62,7 +62,7 @@ if __name__ == "__main__":
     print("SRA program packaging completed !")
     print("Start to compress source code...")
     shutil.make_archive(
-        base_name=str(root_path / f"SRA_SourceCode_v{version['version']}"),
+        base_name=str(root_path / f"StarRailAssistant_Core_v{version['version']}"),
         format="zip",
         root_dir=root_path / "main.dist/SRA",
         base_dir=".",
