@@ -52,6 +52,11 @@ jobs:
       - name: Publish StarRailAssistant
         run: |
           dotnet publish -c Release -r win-x64 .\SRAFrontend\SRAFrontend.sln
+          
+      - name: Compile SRA-cli.c
+        run: |
+          gcc --version
+          gcc -o SRA-cli.exe SRA-cli.c
         
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
@@ -70,6 +75,7 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          
       - name: Built with package.py
         run: |
           python package.py
@@ -79,21 +85,20 @@ jobs:
         run: |
           $VERSION=(Get-Content -Path "version_info.txt" -TotalCount 1).Trim()
           "version=$VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
+          
       - name: Install Inno Setup
         run: |
           choco install innosetup --no-progress --yes
+          
       - name: Prepare for Inno Setup
         run: |
           Expand-Archive -Path StarRailAssistant_${{ env.version }}.zip -DestinationPath StarRailAssistant
-          Remove-Item -Path StarRailAssistant_${{ env.version }}.zip
           Copy-Item version_info.txt -Destination setup\install_info.txt -Force
-      - name: Re-Package
-        run: |
-          Compress-Archive -Path StarRailAssistant\* -DestinationPath StarRailAssistant_${{ env.version }}.zip
-          New-Item -ItemType Directory -Path setup\SRA -Force
-          Copy-Item -Path StarRailAssistant\* -Destination setup\SRA -Force -Recurse
+          
       - name: Build Installer
         run: |
+          New-Item -ItemType Directory -Path setup\SRA -Force
+          Copy-Item -Path StarRailAssistant\* -Destination setup\SRA -Force -Recurse
           New-Item -ItemType Directory -Path setup\output -Force
           python setup/version_modifier.py --version "${{ env.version }}"
           iscc setup\srasetup.iss
@@ -108,11 +113,18 @@ jobs:
         with:
           name: StarRailAssistant_${{ env.version }}
           path: StarRailAssistant_${{ env.version }}.zip
+      - name: Upload SourceCode Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SRA_SourceCode_${{ env.version }}
+          path: SRA_SourceCode_${{ env.version }}.zip
+          
       - name: Upload Version_Info Artifact
         uses: actions/upload-artifact@v4
         with:
           name: version_info
           path: version_info.txt
+          
   publish_release:
     name: Publish release
     needs: build_StarRailAssistant
@@ -179,10 +191,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
-      - name: Trigger MirrorChyanUploading
-        shell: bash
-        run: |
-          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan
-          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Trigger MirrorChyanUploading
+#        shell: bash
+#        run: |
+#          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan
+#          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note
+#        env:
+#          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
