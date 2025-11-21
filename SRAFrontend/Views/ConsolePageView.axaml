@@ -10,7 +10,12 @@
              x:DataType="viewModels:ConsolePageViewModel">
 
     <suki:GlassCard>
-        <suki:GroupBox Header="{x:Static lang:Resources.ConsoleText}">
+        <suki:GroupBox>
+            <suki:GroupBox.Header>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{x:Static lang:Resources.ConsoleText}" FontSize="16" />
+                </StackPanel>
+            </suki:GroupBox.Header>
             <Grid RowDefinitions="Auto,*,Auto">
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="20">
                     <Label Content="过滤器：" />
