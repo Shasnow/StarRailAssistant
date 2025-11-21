@@ -459,13 +459,11 @@ public class PythonService(ILogger<PythonService> logger, HttpClient httpClient,
     /// </summary>
     private string BuildPipArgs(string args)
     {
-        var baseArgs = "-m pip install --no-cache-dir "; // 禁用缓存，避免旧包干扰
+        var baseArgs = "-m pip install --no-warn-script-location "; // 基础参数, 避免脚本位置警告
 
         // 添加镜像源（支持空值）
         if (!string.IsNullOrEmpty(settingsService.Settings.PipMirror))
-        {
             baseArgs += $"-i \"{settingsService.Settings.PipMirror}\" --trusted-host {new Uri(settingsService.Settings.PipMirror).Host} ";
-        }
 
         return baseArgs + args;
     }
@@ -637,7 +635,7 @@ public class PythonService(ILogger<PythonService> logger, HttpClient httpClient,
         {
             var trimmedLine = line.Trim();
             // 忽略空行和注释
-            if (string.IsNullOrEmpty(trimmedLine) || trimmedLine.StartsWith("#"))
+            if (string.IsNullOrEmpty(trimmedLine) || trimmedLine.StartsWith('#'))
                 continue;
 
             // 解析包名和版本约束（支持 ==、>=、<= 等）
@@ -687,7 +685,7 @@ public class PythonService(ILogger<PythonService> logger, HttpClient httpClient,
             }
 
             // 解析版本约束
-            var versionOperators = new[] { "==", ">=", "<=", ">", "<", "!=" };
+            string[] versionOperators = ["==", ">=", "<=", ">", "<", "!="];
             string? op = null;
             string? targetVersionStr = null;
 

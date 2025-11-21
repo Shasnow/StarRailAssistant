@@ -11,9 +11,9 @@ public partial class MainWindow : SukiWindow
         InitializeComponent();
     }
 
-    private void SwitchLightModeButton_OnClick(object? sender, RoutedEventArgs e)
+    protected override void OnLoaded(RoutedEventArgs e)
     {
-        (DataContext as MainWindowViewModel)?.SwitchLightMode();
+        base.OnLoaded(e);
+        (DataContext as MainWindowViewModel)?.InitializeAsync();
     }
-    
 }

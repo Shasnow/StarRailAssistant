@@ -1,6 +1,8 @@
 import argparse
 import sys
 import os
+os.chdir(os.path.dirname(os.path.abspath(__file__)))  # 切换到脚本所在目录
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))  # 将脚本所在目录加入模块搜索路径
 
 def main():
     # 创建 argparse 解析器

@@ -34,7 +34,7 @@ public partial class TaskPageViewModel : PageViewModel
     [ObservableProperty] private AvaloniaList<TrailblazePowerTask> _tasks;
     public TopLevel? TopLevelObject;
 
-    public Config CurrentConfig { get; set; }
+    [ObservableProperty] private Config _currentConfig;
 
     public TaskPageViewModel(ISukiToastManager toastManager,
         ControlPanelViewModel controlPanelViewModel,
@@ -54,11 +54,8 @@ public partial class TaskPageViewModel : PageViewModel
             {
                 _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.CurrentConfigIndex]);
                 CurrentConfig = _configService.Config!;
-                // OnPropertyChanged(nameof(GamePath));
-                OnPropertyChanged(nameof(CurrentConfig));
             }
         }
-
         _cacheService.Cache.PropertyChanged+= OnCachePropertyChanged;
         Tasks =
         [
