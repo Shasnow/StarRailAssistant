@@ -125,11 +125,13 @@ class CurrencyWars(Executable):
         box=self.wait_img('resources/img/currency_wars/strategy.png', timeout=60)
         if not self.click_box(box, after_sleep=1.5):
             return False
-        self.click_img('resources/img/currency_wars/apply.png', after_sleep=1)
-        self.press_key('esc')
-        self.sleep(1)
-        for _ in range(3):
-            self.click_img('resources/img/currency_wars/trace.png', after_sleep=0.3)
+        box=self.wait_img('resources/img/currency_wars/cancel_apply.png', timeout=1) # 识别取消应用按钮，防止中途接管会修改攻略
+        if box is None:
+            self.click_img('resources/img/currency_wars/apply.png', after_sleep=1)
+            self.press_key('esc')
+            self.sleep(1)
+            for _ in range(3):
+                self.click_img('resources/img/currency_wars/trace.png', after_sleep=0.3)
         self.press_key('esc')
         self.get_in_hand_area()  # 更新手牌信息
         return True
