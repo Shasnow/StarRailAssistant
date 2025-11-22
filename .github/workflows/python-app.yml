@@ -126,7 +126,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          aws s3 sync StarRailAssistant_Core_${{ env.version }}.zip s3://sra/ --endpoint-url=https://955e419b52a8b9fa05c04e29cfb0b17f.r2.cloudflarestorage.com/sra --checksum-algorithm CRC32 --force
+          aws s3 cp StarRailAssistant_Core_${{ env.version }}.zip s3://sra/ --endpoint-url=https://955e419b52a8b9fa05c04e29cfb0b17f.r2.cloudflarestorage.com/sra --checksum-algorithm CRC32 --force
           
   publish_release:
     name: Publish release
