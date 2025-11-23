@@ -6,10 +6,14 @@
              xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
              xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              xmlns:lang="clr-namespace:SRAFrontend.Localization"
+             xmlns:utilities="clr-namespace:SRAFrontend.Utilities"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SRAFrontend.Views.SettingsPageView"
              x:DataType="viewModels:SettingsPageViewModel"
              FontSize="16">
+    <UserControl.Resources>
+        <utilities:HotkeyDisplayConverter x:Key="HotkeyDisplayConverter" />
+    </UserControl.Resources>
     <suki:SukiStackPage>
         <suki:SukiStackPage.Content>
             <suki:SettingsLayout Name="{x:Static lang:Resources.SettingText}">
@@ -61,32 +65,32 @@
                                     <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
                                         <Label Classes="icon">&#xE1F6;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.ActivityText}"/>
-                                        <Button Grid.Column="2" Name="ActivityHotkeyButton" Content="{Binding Settings.ActivityHotkey}" Click="HotkeyButton_OnClick" Tag="ActivityHotkey" MinWidth="100"/>
+                                        <Button Grid.Column="2" Name="ActivityHotkeyButton" Content="{Binding Settings.ActivityHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="ActivityHotkey" MinWidth="100"/>
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
                                         <Label Classes="icon">&#xE2ED;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.ChronicleText}"/>
-                                        <Button Grid.Column="2" Name="ChronicleHotkeyButton" Content="{Binding Settings.ChronicleHotkey}" Click="HotkeyButton_OnClick" Tag="ChronicleHotkey" MinWidth="100"/>
+                                        <Button Grid.Column="2" Name="ChronicleHotkeyButton" Content="{Binding Settings.ChronicleHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="ChronicleHotkey" MinWidth="100"/>
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
                                         <Label Classes="icon">&#xE77E;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.WarpText}"/>
-                                        <Button Grid.Column="2" Name="WarpHotkeyButton" Content="{Binding Settings.WarpHotkey}" Click="HotkeyButton_OnClick" Tag="WarpHotkey" MinWidth="100"/>
+                                        <Button Grid.Column="2" Name="WarpHotkeyButton" Content="{Binding Settings.WarpHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="WarpHotkey" MinWidth="100"/>
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
                                         <Label Classes="icon">&#xE128;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.GuideText}"/>
-                                        <Button Grid.Column="2" Name="GuideHotkeyButton" Content="{Binding Settings.GuideHotkey}" Click="HotkeyButton_OnClick" Tag="GuideHotkey" MinWidth="100"/>
+                                        <Button Grid.Column="2" Name="GuideHotkeyButton" Content="{Binding Settings.GuideHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="GuideHotkey" MinWidth="100"/>
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
                                         <Label Classes="icon">&#xE40C;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.MapText}"/>
-                                        <Button Grid.Column="2" Name="MapHotkeyButton" Content="{Binding Settings.MapHotkey}" Click="HotkeyButton_OnClick" Tag="MapHotkey" MinWidth="100"/>
+                                        <Button Grid.Column="2" Name="MapHotkeyButton" Content="{Binding Settings.MapHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="MapHotkey" MinWidth="100"/>
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
                                         <Label Classes="icon">&#xE1FD;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.TechniqueText}"/>
-                                        <Button Grid.Column="2" Name="TechniqueHotkeyButton" Content="{Binding Settings.TechniqueHotkey}" Click="HotkeyButton_OnClick" Tag="TechniqueHotkey" MinWidth="100"/>
+                                        <Button Grid.Column="2" Name="TechniqueHotkeyButton" Content="{Binding Settings.TechniqueHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="TechniqueHotkey" MinWidth="100"/>
                                     </Grid>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>

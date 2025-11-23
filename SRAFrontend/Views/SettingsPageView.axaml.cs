@@ -55,7 +55,6 @@ public partial class SettingsPageView : UserControl
         {
             // 将按下的键转换为字符串，简单存储 Key 枚举名
             prop.SetValue(vm.Settings, e.Key.ToString());
-            // 通过属性 setter 已触发通知，无需手动 OnPropertyChanged（其为受保护成员）
         }
         // 结束捕获
         var topLevel = TopLevel.GetTopLevel(this);
