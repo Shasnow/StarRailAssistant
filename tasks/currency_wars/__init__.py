@@ -1,5 +1,6 @@
 from loguru import logger
 
+import tasks.currency_wars.characters as cw_chars
 from SRACore.util.operator import Executable
 from tasks.currency_wars.characters import Character, Positioning, get_character
 
@@ -52,7 +53,11 @@ class CurrencyWars(Executable):
 
     @staticmethod
     def set_username(username: str):
-        characters.username = username
+        # 开拓者名称（货币战争用户名）空值校验
+        if username is None or username.strip() == "":
+            logger.error("[EMPTY_COSMIC_STRIFE_USERNAME] 货币战争开拓者名称为空，请在前端配置中填写。")
+            return
+        cw_chars.username = username.strip()
 
     def run(self):
         if self.run_times == 0:
@@ -87,7 +92,7 @@ class CurrencyWars(Executable):
             logger.error("检测超时")
             return -1
 
-    def start_game(self):
+    def start_game(self):# 逻辑太过复杂，考虑重构
         # 实现游戏开始逻辑
         page = self.page_locate()
         self.is_running=True # 标记任务为运行中
