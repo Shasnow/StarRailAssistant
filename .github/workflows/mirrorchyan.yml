@@ -11,7 +11,7 @@ jobs:
       - uses: MirrorChyan/uploading-action@v1
         with:
           filetype: latest-release
-          filename: "StarRailAssistant_*.zip"
+          filename: "StarRailAssistant_v*.zip"
           mirrorchyan_rid: StarRailAssistant
 
           github_token: ${{ secrets.GITHUB_TOKEN }}
