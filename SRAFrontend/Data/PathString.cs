@@ -5,11 +5,12 @@ namespace SRAFrontend.Data;
 
 public static class PathString
 {
-    public static readonly string AppDataSra = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SRA");
-    public static readonly string SettingsJson = Path.Combine(AppDataSra, "settings.json");
-    public static readonly string CacheJson = Path.Combine(AppDataSra, "cache.json");
-    public static readonly string ConfigsDir = Path.Combine(AppDataSra, "configs");
-    public static readonly string LogsDir = Path.Combine(AppDataSra, "logs");
+    public static readonly string AppDataSraDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SRA");
+    public static readonly string TempSraDir = Path.Combine(Path.GetTempPath(), "SRA");
+    public static readonly string SettingsJson = Path.Combine(AppDataSraDir, "settings.json");
+    public static readonly string CacheJson = Path.Combine(AppDataSraDir, "cache.json");
+    public static readonly string ConfigsDir = Path.Combine(AppDataSraDir, "configs");
+    public static readonly string LogsDir = Path.Combine(AppDataSraDir, "logs");
     public static readonly string ReportsDir = "reports";
     public static readonly string PythonDir = Path.Combine(Environment.CurrentDirectory, "python");
     public static readonly string SourceCodeDir = Path.Combine(Environment.CurrentDirectory, "SRA");

@@ -9,5 +9,5 @@ public partial class HomePageViewModel(ControlPanelViewModel controlPanelViewMod
 {
     public double ImageOpacity => settingsService.Settings.BackgroundOpacity;
     public double GlassCardOpacity => settingsService.Settings.CtrlPanelOpacity;
-    [ObservableProperty] private ControlPanelViewModel _controlPanelViewModel = controlPanelViewModel;
+    public ControlPanelViewModel ControlPanelViewModel => controlPanelViewModel;
 }

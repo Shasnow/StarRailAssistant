@@ -21,8 +21,8 @@ public partial class TaskPageViewModel : PageViewModel
     private readonly ConfigService _configService;
     private readonly CacheService _cacheService;
 
-    [ObservableProperty] private ControlPanelViewModel _controlPanelViewModel;
-    
+    public ControlPanelViewModel ControlPanelViewModel { get; }
+
     [ObservableProperty] private string _password = "";
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(TogglePasswordVisibilityButtonContent))]

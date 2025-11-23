@@ -1,5 +1,8 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.IO.Compression;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SRAFrontend.utilities;
 
@@ -28,6 +31,8 @@ public static class ZipUtil
     /// <param name="target">目的地目录</param>
     public static void Unzip(string path, string target)
     {
-        ZipFile.ExtractToDirectory(path, target);
+        // 确保目标目录存在，覆盖已存在的文件
+        Directory.CreateDirectory(target);
+        ZipFile.ExtractToDirectory(path, target, overwriteFiles: true);
     }
 }

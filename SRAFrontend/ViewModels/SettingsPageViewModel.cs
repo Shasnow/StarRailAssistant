@@ -28,7 +28,7 @@ public partial class SettingsPageViewModel(
         }
     }
 
-    public string VersionText => Settings.Version;
+    public string VersionText => Settings.Version.ToString();
 
     public string MirrorChyanCdk
     {

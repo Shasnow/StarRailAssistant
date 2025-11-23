@@ -13,8 +13,9 @@ using Version = System.Version;
 
 namespace SRAFrontend.Services;
 
-public class PythonService(ILogger<PythonService> logger, HttpClient httpClient, SettingsService settingsService)
+public class PythonService(ILogger<PythonService> logger, IHttpClientFactory httpClientFactory, SettingsService settingsService)
 {
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("GlobalClient");
     // 常量定义（避免魔法值，便于维护）
     private const string PythonExeName = "python.exe";
     private const string PythonPthFileName = "python312._pth";
@@ -239,7 +240,7 @@ public class PythonService(ILogger<PythonService> logger, HttpClient httpClient,
             {
                 logger.LogInformation("下载 get-pip.py：路径={Path}", getPipPath);
                 await DownloadUtil.DownloadFileWithDetailsAsync(
-                    httpClient, GetPipUrl, getPipPath, progress, cancelToken);
+                    _httpClient, GetPipUrl, getPipPath, progress, cancelToken);
             }
 
             // 2. 执行 get-pip.py（带取消令牌）
@@ -314,7 +315,7 @@ public class PythonService(ILogger<PythonService> logger, HttpClient httpClient,
 
             // 2. 下载文件（支持断点续传和取消）
             await DownloadUtil.DownloadFileWithDetailsAsync(
-                httpClient, url, tempZipPath, progress, cancelToken);
+                _httpClient, url, tempZipPath, progress, cancelToken);
 
             // 3. MD5 校验
             if (!DownloadUtil.Md5Check(tempZipPath, md5))

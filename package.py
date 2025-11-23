@@ -42,6 +42,7 @@ if __name__ == "__main__":
     shutil.copytree(root_path / "resources", root_path / "main.dist/SRA/resources")
     shutil.copytree(root_path / "tasks", root_path / "main.dist/SRA/tasks")
     shutil.copytree(root_path / "SRACore", root_path / "main.dist/SRA/SRACore")
+    shutil.copy(root_path / "version.json", root_path / "main.dist/SRA/version.json")
     shutil.copy(root_path / "LICENSE", root_path / "main.dist/SRA/LICENSE")
     shutil.copy(root_path / "README.md", root_path / "main.dist/SRA/README.md")
     shutil.copy(root_path / "main.py", root_path / "main.dist/SRA/main.py")
