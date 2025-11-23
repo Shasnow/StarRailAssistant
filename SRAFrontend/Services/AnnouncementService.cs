@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using SRAFrontend.Models;
 
 namespace SRAFrontend.Services;
 
-public class AnnouncementService(HttpClient httpClient)
+public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<AnnouncementService> logger)
 {
     private List<Announcement>? _cachedAnnouncements; // 缓存数据，避免重复请求
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("GlobalClient");
+
     private const string RequestUrl = "https://gitee.com/yukikage/sraresource/raw/main/SRA/announcements.json";
 
     /// <summary>
@@ -24,17 +26,17 @@ public class AnnouncementService(HttpClient httpClient)
 
         try
         {
-            _cachedAnnouncements = await httpClient.GetFromJsonAsync<List<Announcement>>(RequestUrl);
+            _cachedAnnouncements = await _httpClient.GetFromJsonAsync<List<Announcement>>(RequestUrl);
             return _cachedAnnouncements;
         }
         catch (HttpRequestException ex)
         {
-            Console.WriteLine($"Request Error: {ex.Message}");
+            logger.LogError("HTTP Request Error while fetching announcements: {Message}", ex.Message);
             return null;
         }
         catch (JsonException ex)
         {
-            Console.WriteLine($"JSON Decode Error: {ex.Message}");
+            logger.LogError("JSON Error while fetching announcements: {Message}", ex.Message);
             return null;
         }
     }

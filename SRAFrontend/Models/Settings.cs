@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -46,8 +47,8 @@ public partial class Settings : ObservableObject
 
     [ObservableProperty] private double _zoom = 1; // 屏幕缩放比例
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
-    [JsonIgnore] public static string Version => "2.1.0"; // 应用版本号
-    
+    public const string Version = "2.1.0"; // 应用版本号
+
     [ObservableProperty] private string _pythonDownloadPath = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"; // Python下载路径
     [ObservableProperty] private string _pythonMd5 = "fe8ef205f2e9c3ba44d0cf9954e1abd3"; // Python MD5校验值
     [ObservableProperty] private string _pipMirror = ""; // Pip 镜像源

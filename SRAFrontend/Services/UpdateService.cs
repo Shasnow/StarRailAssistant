@@ -7,18 +7,22 @@ using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SRAFrontend.Data;
 using SRAFrontend.Models;
 using SRAFrontend.utilities;
 
 namespace SRAFrontend.Services;
 
-public class UpdateService(HttpClient httpClient, ILogger<UpdateService> logger)
+public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateService> logger)
 {
     private const string BaseVersionUrl =
         "https://mirrorchyan.com/api/resources/StarRailAssistant/latest";
 
     private const string BaseDownloadUrl =
         "https://github.com/Shasnow/StarRailAssistant/releases/download/{version}/StarRailAssistant_{version}.zip";
+    
+    private const string BaseCoreDownloadUrl =
+        "https://resource.starrailassistant.top/StarRailAssistant_Core_{version}.zip";
 
     private readonly Dictionary<int, string> _errorCodes = new()
     {
@@ -34,10 +38,11 @@ public class UpdateService(HttpClient httpClient, ILogger<UpdateService> logger)
         { 8004, "错误的更新通道参数" }
     };
 
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("GlobalClient");
+
     public async Task<VersionResponse?> VerifyCdkAsync(string cdk)
     {
-        // Simulate a call to an external service to verify the CDK
-        var response = await httpClient.GetAsync($"{BaseVersionUrl}?cdk={cdk}");
+        var response = await _httpClient.GetAsync($"{BaseVersionUrl}?cdk={cdk}");
         return await response.Content.ReadFromJsonAsync<VersionResponse>();
     }
 
@@ -46,13 +51,13 @@ public class UpdateService(HttpClient httpClient, ILogger<UpdateService> logger)
         return _errorCodes.GetValueOrDefault(code, "Unknown error code.");
     }
 
-    public async Task<VersionResponse?> CheckForUpdatesAsync(string? currentVersion = null, string? cdk = null,
+    public async Task<VersionResponse?> GetRemoteVersionAsync(string? currentVersion = null, string? cdk = null,
         string? channel = null)
     {
         var url = BaseVersionUrl;
         var queryParams = new List<string>();
         if (!string.IsNullOrEmpty(currentVersion))
-            queryParams.Add($"current_version={currentVersion}");
+            queryParams.Add($"current_version=v{currentVersion}");
         if (!string.IsNullOrEmpty(cdk))
             queryParams.Add($"cdk={cdk}");
         if (!string.IsNullOrEmpty(channel))
@@ -60,7 +65,7 @@ public class UpdateService(HttpClient httpClient, ILogger<UpdateService> logger)
         if (queryParams.Count > 0)
             url += "?user_agent=SRA_avalonia" + string.Join("&", queryParams);
 
-        var response = await httpClient.GetAsync(url);
+        var response = await _httpClient.GetAsync(url);
         return await response.Content.ReadFromJsonAsync<VersionResponse>();
     }
 
@@ -89,11 +94,7 @@ public class UpdateService(HttpClient httpClient, ILogger<UpdateService> logger)
             throw new InvalidOperationException("Could not determine download URL.");
 
         var saveFileName = $"update_{versionResponse.Data.VersionName}.zip";
-        var savePath = Path.Combine(
-            Path.GetTempPath(),
-            "SRA",
-            saveFileName
-        );
+        var savePath = Path.Combine(PathString.TempSraDir, saveFileName);
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
 
         // 下载候选地址（代理+直连）
@@ -114,7 +115,7 @@ public class UpdateService(HttpClient httpClient, ILogger<UpdateService> logger)
             {
                 logger.LogDebug("Try downloading update from: {Url} ", candidateUrl);
                 await DownloadUtil.DownloadFileWithDetailsAsync(
-                    httpClient,
+                    _httpClient,
                     candidateUrl,
                     savePath,
                     statusProgress,
@@ -136,6 +137,33 @@ public class UpdateService(HttpClient httpClient, ILogger<UpdateService> logger)
         throw lastException ?? new InvalidOperationException("Failed to download update.");
 
     }
+
+    public async Task<string> DownloadHotfixAsync(
+        VersionResponse versionResponse,
+        IProgress<DownloadStatus> statusProgress,
+        CancellationToken cancellationToken = default
+    )
+    {
+        // 确定下载URL和保存路径
+        var hotfixVersion = versionResponse.Data.VersionName;
+        var downloadUrl = BaseCoreDownloadUrl.Replace("{version}", hotfixVersion);
+        logger.LogDebug("Downloading hotfix from URL: {Url}", downloadUrl);
+        var saveFileName = $"core_update_{hotfixVersion}.zip";
+        var savePath = Path.Combine(PathString.TempSraDir, saveFileName);
+        Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+
+        // 尝试下载
+        await DownloadUtil.DownloadFileWithDetailsAsync(
+            _httpClient,
+            downloadUrl,
+            savePath,
+            statusProgress,
+            cancellationToken
+        );
+
+        return savePath;
+    }
+    
     // 辅助方法：获取下载URL
     private string GetDownloadUrl(VersionResponse versionResponse, int downloadChannel)
     {

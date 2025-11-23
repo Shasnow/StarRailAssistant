@@ -18,4 +18,6 @@ public partial class Cache : ObservableObject
     [ObservableProperty] private string _currentConfigName = "Default"; // 当前配置名称
     
     [ObservableProperty] private string _startMode = "Current"; // 当前启动模式, "Current" 或 "All" 或 "Save Only"
+    
+    [ObservableProperty] private string _hotfixVersion = ""; // 热更版本号
 }
