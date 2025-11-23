@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using Avalonia.Controls;
+using SukiUI.MessageBox;
 using System.IO;
 using Avalonia.Collections;
 using Avalonia.Threading;
@@ -204,6 +206,20 @@ public partial class SraService(ILogger<SraService> logger, PythonService python
                 IsRunning = true;
             else if (args.Data.Contains(SraServiceConstants.DoneMarker))
                 IsRunning = false;
+
+            // 捕获货币战争开拓者名称为空的后端日志标记并弹窗提示
+            if (args.Data.Contains("[EMPTY_COSMIC_STRIFE_USERNAME]"))
+            {
+                SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+                {
+                    Header = "开拓者名称为空",
+                    Content = new TextBlock
+                    {
+                        Text = "检测到 Cosmic Strife(旷宇纷争-货币战争) 开拓者名称为空。请在任务页面中填写开拓者名称后重新运行。",
+                        TextWrapping = TextWrapping.Wrap
+                    }
+                });
+            }
 
             // 日志限流: 超过最大行数时移除最早的
             if (OutputLines.Count >= SraServiceConstants.MaxOutputLines)
