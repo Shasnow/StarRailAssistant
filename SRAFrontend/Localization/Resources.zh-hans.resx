@@ -125,6 +125,9 @@
     <data name="ControlPanelOpacityText" xml:space="preserve">
         <value>控制面板不透明度</value>
     </data>
+    <data name="NotSetText" xml:space="preserve">
+        <value>未设置</value>
+    </data>
     <data name="HotkeysText" xml:space="preserve">
         <value>快捷键</value>
     </data>
@@ -147,6 +150,6 @@
         <value>秘技</value>
     </data>
     <data name="ModifyHoldText" xml:space="preserve">
-        <value>按住以修改</value>
+        <value>点击以修改</value>
     </data>
 </root>

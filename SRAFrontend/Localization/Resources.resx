@@ -132,6 +132,9 @@
     <data name="ControlPanelOpacityText" xml:space="preserve">
         <value>Control Panel Opacity</value>
     </data>
+        <data name="NotSetText" xml:space="preserve">
+            <value>Not Set</value>
+        </data>
     <data name="HotkeysText" xml:space="preserve">
         <value>Hotkeys</value>
     </data>
