@@ -51,4 +51,12 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private string _pythonDownloadPath = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"; // Python下载路径
     [ObservableProperty] private string _pythonMd5 = "fe8ef205f2e9c3ba44d0cf9954e1abd3"; // Python MD5校验值
     [ObservableProperty] private string _pipMirror = ""; // Pip 镜像源
+
+    // 新增快捷键设置（默认留空，后续可在界面中捕获）
+    [ObservableProperty] private string _activityHotkey = ""; // 活动
+    [ObservableProperty] private string _chronicleHotkey = ""; // 纪行
+    [ObservableProperty] private string _warpHotkey = ""; // 卡池
+    [ObservableProperty] private string _guideHotkey = ""; // 指南
+    [ObservableProperty] private string _mapHotkey = ""; // 地图
+    [ObservableProperty] private string _techniqueHotkey = ""; // 秘技
 }

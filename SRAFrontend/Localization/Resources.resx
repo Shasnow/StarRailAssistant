@@ -132,4 +132,28 @@
     <data name="ControlPanelOpacityText" xml:space="preserve">
         <value>Control Panel Opacity</value>
     </data>
+    <data name="HotkeysText" xml:space="preserve">
+        <value>Hotkeys</value>
+    </data>
+    <data name="ActivityText" xml:space="preserve">
+        <value>Activity</value>
+    </data>
+    <data name="ChronicleText" xml:space="preserve">
+        <value>Chronicle</value>
+    </data>
+    <data name="WarpText" xml:space="preserve">
+        <value>Warp</value>
+    </data>
+    <data name="GuideText" xml:space="preserve">
+        <value>Guide</value>
+    </data>
+    <data name="MapText" xml:space="preserve">
+        <value>Map</value>
+    </data>
+    <data name="TechniqueText" xml:space="preserve">
+        <value>Technique</value>
+    </data>
+    <data name="ModifyHoldText" xml:space="preserve">
+        <value>Hold to modify</value>
+    </data>
 </root>

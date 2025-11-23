@@ -53,6 +53,44 @@
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
                         </suki:SettingsLayoutItem>
+                        <!-- 新增快捷键设置分组，插入在 任务通用设置 与 显示 之间 -->
+                        <suki:SettingsLayoutItem Header="{x:Static lang:Resources.HotkeysText}">
+                            <suki:SettingsLayoutItem.Content>
+                                <StackPanel>
+                                    <TextBlock Text="{x:Static lang:Resources.ModifyHoldText}" FontStyle="Italic" Margin="0,0,0,8"/>
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
+                                        <Label Classes="icon">&#xE1F6;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ActivityText}"/>
+                                        <Button Grid.Column="2" Name="ActivityHotkeyButton" Content="{Binding Settings.ActivityHotkey}" Click="HotkeyButton_OnClick" Tag="ActivityHotkey" MinWidth="100"/>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
+                                        <Label Classes="icon">&#xE2ED;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ChronicleText}"/>
+                                        <Button Grid.Column="2" Name="ChronicleHotkeyButton" Content="{Binding Settings.ChronicleHotkey}" Click="HotkeyButton_OnClick" Tag="ChronicleHotkey" MinWidth="100"/>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
+                                        <Label Classes="icon">&#xE77E;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.WarpText}"/>
+                                        <Button Grid.Column="2" Name="WarpHotkeyButton" Content="{Binding Settings.WarpHotkey}" Click="HotkeyButton_OnClick" Tag="WarpHotkey" MinWidth="100"/>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
+                                        <Label Classes="icon">&#xE128;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.GuideText}"/>
+                                        <Button Grid.Column="2" Name="GuideHotkeyButton" Content="{Binding Settings.GuideHotkey}" Click="HotkeyButton_OnClick" Tag="GuideHotkey" MinWidth="100"/>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
+                                        <Label Classes="icon">&#xE40C;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.MapText}"/>
+                                        <Button Grid.Column="2" Name="MapHotkeyButton" Content="{Binding Settings.MapHotkey}" Click="HotkeyButton_OnClick" Tag="MapHotkey" MinWidth="100"/>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
+                                        <Label Classes="icon">&#xE1FD;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.TechniqueText}"/>
+                                        <Button Grid.Column="2" Name="TechniqueHotkeyButton" Content="{Binding Settings.TechniqueHotkey}" Click="HotkeyButton_OnClick" Tag="TechniqueHotkey" MinWidth="100"/>
+                                    </Grid>
+                                </StackPanel>
+                            </suki:SettingsLayoutItem.Content>
+                        </suki:SettingsLayoutItem>
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.DisplayText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
