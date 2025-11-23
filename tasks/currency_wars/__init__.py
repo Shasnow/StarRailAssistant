@@ -71,7 +71,7 @@ class CurrencyWars(Executable):
                                   "resources/img/currency_wars/currency_wars_start.png",
                                   "resources/img/currency_wars/preparation_stage.png"], interval=0.5)
         if page == 0:
-            self.press_key('f4')
+            self.press_key(self.settings.get('GuideHotkey', 'f4').lower())
             if not self.wait_img("resources/img/f4.png", timeout=20):
                 logger.error("检测超时，编号1")
                 self.press_key("esc")
