@@ -94,38 +94,62 @@ class CurrencyWars(Executable):
         if page == 1: # 货币战争开
             # 始页面
             # 进入对局逻辑
-            box = self.wait_img("resources/img/currency_wars/currency_wars_start.png", timeout=30, interval=0.5)
-            if not self.click_box(box):
+            start_box = self.wait_img("resources/img/currency_wars/currency_wars_start.png", timeout=30, interval=0.5)
+            if start_box is None or not self.click_box(start_box):
                 return False
-            box = self.wait_img("resources/img/currency_wars/enter_standard.png", interval=0.5)
-            if not self.click_box(box, after_sleep=1.5):
-                return False
-            while self.click_img("resources/img/currency_wars/down_arrow.png", after_sleep=0.5):
-                pass
-            if not self.click_img("resources/img/currency_wars/start_game.png", after_sleep=1):
-                return False
-            box = self.wait_img("resources/img/currency_wars/next_step.png")
-            self.sleep(0.5)
-            if not self.click_box(box, after_sleep=2):
-                return False
-            self.click_point(0.5,0.5, after_sleep=0.5)
-            box = self.wait_img("resources/img/currency_wars/invest_environment.png")
-            if box is None:
-                return False
-            if not self.click_img("resources/img/collection.png"):
-                self.click_point(0.5, 0.5)
-            self.click_img("resources/img/ensure2.png", after_sleep=1)
-            if self.locate("resources/img/currency_wars/invest_environment.png"):  # 防止出现二连选择
-                self.click_point(0.5, 0.5)
+            self.click_point(0.5, 0.5, after_sleep=2)
+            enter_standard_box = self.wait_img("resources/img/currency_wars/enter_standard.png",timeout=5, interval=0.5)
+            if enter_standard_box is not None:
+                if not self.click_box(enter_standard_box, after_sleep=1.5):
+                    return False
+                while self.click_img("resources/img/currency_wars/down_arrow.png", after_sleep=0.5): # 
+                    pass
+                if not self.click_img("resources/img/currency_wars/start_game.png", after_sleep=1):
+                    return False
+                next_step_box = self.wait_img("resources/img/currency_wars/next_step.png")
+                self.sleep(0.5)
+                if next_step_box is None or not self.click_box(next_step_box, after_sleep=2):
+                    return False
+                self.click_point(0.5,0.5, after_sleep=0.5)
+                invest_box = self.wait_img("resources/img/currency_wars/invest_environment.png")
+                if invest_box is None:
+                    return False
+                if not self.click_img("resources/img/collection.png"):
+                    self.click_point(0.5, 0.5)
                 self.click_img("resources/img/ensure2.png", after_sleep=1)
-            self.sleep(4)
+                if self.locate("resources/img/currency_wars/invest_environment.png"):
+                    self.click_point(0.5, 0.5)
+                    self.click_img("resources/img/ensure2.png", after_sleep=1)
+                self.sleep(4)
+            elif enter_standard_box is None:
+                # 未找到标准进入，尝试继续进度
+                continue_progress_box = self.wait_img("resources/img/currency_wars/continue_progress.png", timeout=5, interval=0.5)
+                if continue_progress_box is not None:
+                    if not self.click_box(continue_progress_box, after_sleep=1):
+                        return False
+                    # 直接进行关卡状态过渡后进入对局
+                    try:
+                        self.sleep(2)
+                        click_blank = self.wait_img("resources/img/currency_wars/click_blank.png", timeout=5, interval=0.5)
+                        if click_blank is None:
+                            return False
+                        self.click_box(click_blank, after_sleep=1)
+                    except Exception:
+                        logger.error("关卡识别失败，无法进入对局")
+                        return False
+                else:
+                    return False
+            else:
+                logger.error("无法识别到进入按钮")
+                return False
         elif page == -1:
             return False
         # 已进入对局
-        box=self.wait_img('resources/img/currency_wars/strategy.png', timeout=60)
-        if not self.click_box(box, after_sleep=1.5):
+        self.sleep(1)
+        strategy_box=self.wait_img('resources/img/currency_wars/strategy.png', timeout=60, interval=0.5)
+        if strategy_box is None or not self.click_box(strategy_box, after_sleep=1.5):
             return False
-        box=self.wait_img('resources/img/currency_wars/cancel_apply.png', timeout=1) # 识别取消应用按钮，防止中途接管会修改攻略
+        box=self.wait_img('resources/img/currency_wars/cancel_apply.png', timeout=2) # 识别取消应用按钮，防止中途接管会修改攻略
         if box is None:
             self.click_img('resources/img/currency_wars/apply.png', after_sleep=1)
             self.press_key('esc')
