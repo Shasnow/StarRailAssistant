@@ -5,7 +5,6 @@ from SRACore.util.logger import logger
 class TrailblazePowerTask(BaseTask):
     def __init__(self, config: dict):
         super().__init__(config)
-        self.f4 = 'f4'
         self.replenish_time = self.config.get('TrailblazePowerReplenishTimes')
         self.replenish_way = self.config.get('TrailblazePowerReplenishWay')
         self.replenish_flag = self.config.get('TrailblazePowerReplenishStamina')
@@ -100,7 +99,7 @@ class TrailblazePowerTask(BaseTask):
                 for i in range(1, 5):
                     self.press_key(str(i))
                     self.sleep(0.5)
-                    self.press_key('e')
+                    self.press_key(self.settings.get('TechniqueHotkey', 'e').lower())
                     self.sleep(2)
             self.click_point(0.5, 0.5)
             self.battle_star(run_time)
@@ -210,12 +209,12 @@ class TrailblazePowerTask(BaseTask):
                 None
         """
         logger.info(f"执行任务：{mission_name}")
-        level = f"resources/img/{level_belonging} ({level}).png"
+        level_path = f"resources/img/{level_belonging} ({level}).png"
         if not self.find_session_name(level_belonging, scroll_flag):
             return False
-        if not self.find_level(level):
+        if not self.find_level(level_path):
             return False
-        if self.click_img(level, x_offset=x_add, y_offset=y_add):
+        if self.click_img(level_path, x_offset=x_add, y_offset=y_add):
             if not self.wait_img('resources/img/battle.png', timeout=20):  # 等待传送
                 logger.error("检测超时，编号4")
                 return False
@@ -361,7 +360,7 @@ class TrailblazePowerTask(BaseTask):
         if not self.wait_img("resources/img/enter.png", timeout=20):
             logger.error("检测超时，编号2")
             return False
-        self.press_key(self.f4)
+        self.press_key((self.settings.get('GuideHotkey') or 'f4').lower())
         if not self.wait_img("resources/img/f4.png", timeout=20):
             logger.error("检测超时，编号1")
             self.press_key("esc")
