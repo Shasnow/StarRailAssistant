@@ -148,6 +148,15 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ControlPanelOpacityText", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Not Set.
+        /// </summary>
+        public static string NotSetText {
+            get {
+                return ResourceManager.GetString("NotSetText", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Hotkeys.

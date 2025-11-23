@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
+using SRAFrontend.Localization;
 
 namespace SRAFrontend.Utilities;
 
@@ -9,7 +10,7 @@ public class HotkeyDisplayConverter : IValueConverter
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var s = value as string;
-        if (string.IsNullOrWhiteSpace(s)) return "未设置"; // Placeholder when not set
+        if (string.IsNullOrWhiteSpace(s)) return Resources.NotSetText; // Placeholder when not set (localized)
 
         // Normalize (some values may already be literal characters)
         return s switch
@@ -37,7 +38,7 @@ public class HotkeyDisplayConverter : IValueConverter
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var s = value as string;
-        if (string.IsNullOrWhiteSpace(s) || s == "未设置") return string.Empty;
+        if (string.IsNullOrWhiteSpace(s) || s == Resources.NotSetText) return string.Empty;
         // Reverse map for known literals
         return s switch
         {

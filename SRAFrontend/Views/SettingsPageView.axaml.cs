@@ -65,4 +65,14 @@ public partial class SettingsPageView : UserControl
         _capturingProperty = null;
         _capturingButton = null;
     }
+
+    private void ClearHotkeyButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Button btn) return;
+        if (DataContext is not SettingsPageViewModel vm) return;
+        var propertyName = btn.Tag?.ToString();
+        if (string.IsNullOrWhiteSpace(propertyName)) return;
+        var prop = vm.Settings.GetType().GetProperty(propertyName);
+        prop?.SetValue(vm.Settings, string.Empty);
+    }
 }
