@@ -14,6 +14,7 @@ public partial class ConsolePageViewModel : PageViewModel
     public ConsolePageViewModel(SraService sraService) : base(PageName.Console, "\uEAE8")
     {
         _sraService = sraService;
+        _sraService.StartSraProcess("--inline");
         _sraService.OutputLines.CollectionChanged += (_, _) => OnPropertyChanged(nameof(LogText));
         FilterOptions.CollectionChanged+= (_, _) => OnPropertyChanged(nameof(LogText));
     }

@@ -31,7 +31,7 @@ public partial class MainWindowViewModel(
     public async Task InitializeAsync()
     {
         await commonModel.CheckForUpdatesAsync();
-        await commonModel.CheckAndFixPythonEnvironmentAsync();
+        // await commonModel.CheckAndFixPythonEnvironmentAsync();
     }
 
     public ISukiToastManager ToastManager { get; init; } = toastManager;

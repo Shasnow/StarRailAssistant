@@ -77,13 +77,23 @@ public partial class App : Application
         services.AddTransient<CommonModel>();
         services.AddSingleton<ControlPanelViewModel>();
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
-        services.AddSingleton<HttpClient>();
         services.AddSingleton<SettingsService>();
         services.AddSingleton<DataPersistenceService>();
         services.AddSingleton<CacheService>();
         services.AddSingleton<SraService>();
         services.AddSingleton<ConfigService>();
-        services.AddSingleton<PythonService>();
+        // services.AddSingleton<PythonService>();
+        services.AddHttpClient("GlobalClient", client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(60);
+            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0");
+        })
+        // 优化连接池/DNS
+        .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+        {
+            PooledConnectionLifetime = TimeSpan.FromMinutes(5),
+            PooledConnectionIdleTimeout = TimeSpan.FromMinutes(1)
+        });
     }
 
     private static void InitializeSerilog()

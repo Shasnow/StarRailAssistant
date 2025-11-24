@@ -98,7 +98,7 @@ public static class DownloadUtil
         using var stream = File.OpenRead(filePath);
         var hash = md5.ComputeHash(stream);
         var fileMd5 = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-        return fileMd5 == expectedMd5.ToLowerInvariant();
+        return fileMd5.Equals(expectedMd5, StringComparison.InvariantCultureIgnoreCase);
     }
 }
 

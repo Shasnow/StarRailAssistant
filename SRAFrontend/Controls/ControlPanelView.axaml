@@ -24,7 +24,6 @@
                 Command="{Binding RemoveConfigCommand}"/>
 
         <ComboBox SelectedIndex="{Binding Cache.CurrentConfigIndex}"
-                  SelectedValue="{Binding Cache.CurrentConfigName}"
                   Width="150" ItemsSource="{Binding Cache.ConfigNames}">
         </ComboBox>
 

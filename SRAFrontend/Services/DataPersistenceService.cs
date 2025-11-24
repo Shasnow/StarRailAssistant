@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
@@ -23,7 +24,7 @@ public class DataPersistenceService
 
     private void EnsurePath()
     {
-        if (!Directory.Exists(PathString.AppDataSra)) Directory.CreateDirectory(PathString.AppDataSra);
+        if (!Directory.Exists(PathString.AppDataSraDir)) Directory.CreateDirectory(PathString.AppDataSraDir);
         if (!Directory.Exists(PathString.ConfigsDir)) Directory.CreateDirectory(PathString.ConfigsDir);
         // 仅创建目录，文件将在WriteAllText时创建
     }
