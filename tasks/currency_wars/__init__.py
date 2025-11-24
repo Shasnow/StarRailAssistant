@@ -1,7 +1,48 @@
 from loguru import logger
 
+import tasks.currency_wars.characters as cw_chars
 from SRACore.util.operator import Executable
-from tasks.currency_wars.characters import Character, Positioning, get_character
+from tasks.currency_wars.characters import (Character, Positioning,
+                                            get_character)
+
+# ==================== 图片常量集中管理 ====================
+# 说明：集中管理所有在本模块使用的图片路径，避免散落的硬编码字符串，方便统一修改与查找。
+# 分组：通用 IMG（跨模式通用），货币战争专用 CWIMG。
+
+class IMG:
+    ENTER = "resources/img/enter.png"
+    F4 = "resources/img/f4.png"
+    COLLECTION = "resources/img/collection.png"
+    ENSURE = "resources/img/ensure.png"
+    ENSURE2 = "resources/img/ensure2.png"
+
+
+class CWIMG:
+    BASE = "resources/img/currency_wars"
+    CURRENCY_WARS_START = f"{BASE}/currency_wars_start.png"
+    PREPARATION_STAGE = f"{BASE}/preparation_stage.png"
+    ENTER_STANDARD = f"{BASE}/enter_standard.png"
+    CONTINUE_PROGRESS = f"{BASE}/continue_progress.png"
+    DOWN_ARROW = f"{BASE}/down_arrow.png"
+    START_GAME = f"{BASE}/start_game.png"
+    NEXT_STEP = f"{BASE}/next_step.png"
+    INVEST_ENVIRONMENT = f"{BASE}/invest_environment.png"
+    CLICK_BLANK = f"{BASE}/click_blank.png"
+    STRATEGY = f"{BASE}/strategy.png"
+    CANCEL_APPLY = f"{BASE}/cancel_apply.png"
+    APPLY = f"{BASE}/apply.png"
+    TRACE = f"{BASE}/trace.png"
+    OPEN = f"{BASE}/open.png"
+    SETTLE = f"{BASE}/settle.png"
+    CONTINUE = f"{BASE}/continue.png"
+    REPLENISH_STAGE = f"{BASE}/replenish_stage.png"
+    ENCOUNTER_NODE = f"{BASE}/encounter_node.png"
+    FOLD = f"{BASE}/fold.png"
+    SELECT_INVEST_STRATEGY = f"{BASE}/select_invest_strategy.png"
+    THE_PLANET_OF_FESTIVITIES = f"{BASE}/ThePlanetOfFestivities.png"
+    RIGHT = f"{BASE}/right.png"
+    PRIMARY_SELECTION = f"{BASE}/primary_selection.png"
+
 
 
 class CurrencyWars(Executable):
@@ -52,7 +93,11 @@ class CurrencyWars(Executable):
 
     @staticmethod
     def set_username(username: str):
-        characters.username = username
+        # 开拓者名称（货币战争用户名）空值校验
+        if username is None or username.strip() == "":
+            logger.error("[EMPTY_COSMIC_STRIFE_USERNAME] 货币战争开拓者名称为空，请在前端配置中填写。")
+            return
+        cw_chars.username = username.strip()
 
     def run(self):
         if self.run_times == 0:
@@ -67,12 +112,12 @@ class CurrencyWars(Executable):
         定位到货币战争页面
         :return: int 页面编号，1表示货币战争开始页面，2表示准备阶段页面，-1表示定位失败
         """
-        page = self.wait_any_img(["resources/img/enter.png",
-                                  "resources/img/currency_wars/currency_wars_start.png",
-                                  "resources/img/currency_wars/preparation_stage.png"], interval=0.5)
+        page = self.wait_any_img([IMG.ENTER,
+                                  CWIMG.CURRENCY_WARS_START,
+                                  CWIMG.PREPARATION_STAGE], interval=0.5)
         if page == 0:
-            self.press_key('f4')
-            if not self.wait_img("resources/img/f4.png", timeout=20):
+            self.press_key(self.settings.get('GuideHotkey', 'f4').lower())
+            if not self.wait_img(IMG.F4, timeout=20):
                 logger.error("检测超时，编号1")
                 self.press_key("esc")
             self.click_point(0.3125, 0.20, after_sleep=0.8)  # 旷宇纷争
@@ -88,50 +133,120 @@ class CurrencyWars(Executable):
             return -1
 
     def start_game(self):
-        # 实现游戏开始逻辑
+        """开始一局货币战争。
+        拆分原复杂流程为多个独立步骤，提升可读性与可维护性。
+        返回 True 表示进入对局并完成初始策略与手牌识别
+            False 表示流程中断或失败。
+        """
         page = self.page_locate()
-        self.is_running=True # 标记任务为运行中
-        if page == 1: # 货币战争开
-            # 始页面
-            # 进入对局逻辑
-            box = self.wait_img("resources/img/currency_wars/currency_wars_start.png", timeout=30, interval=0.5)
-            if not self.click_box(box):
-                return False
-            box = self.wait_img("resources/img/currency_wars/enter_standard.png", interval=0.5)
-            if not self.click_box(box, after_sleep=1.5):
-                return False
-            while self.click_img("resources/img/currency_wars/down_arrow.png", after_sleep=0.5):
-                pass
-            if not self.click_img("resources/img/currency_wars/start_game.png", after_sleep=1):
-                return False
-            box = self.wait_img("resources/img/currency_wars/next_step.png")
-            self.sleep(0.5)
-            if not self.click_box(box, after_sleep=2):
-                return False
-            self.click_point(0.5,0.5, after_sleep=0.5)
-            box = self.wait_img("resources/img/currency_wars/invest_environment.png")
-            if box is None:
-                return False
-            if not self.click_img("resources/img/collection.png"):
-                self.click_point(0.5, 0.5)
-            self.click_img("resources/img/ensure2.png", after_sleep=1)
-            if self.locate("resources/img/currency_wars/invest_environment.png"):  # 防止出现二连选择
-                self.click_point(0.5, 0.5)
-                self.click_img("resources/img/ensure2.png", after_sleep=1)
-            self.sleep(4)
-        elif page == -1:
+        self.is_running = True  # 标记任务运行中
+
+        if page == -1:
+            logger.error("页面定位失败，无法开始游戏")
             return False
-        # 已进入对局
-        box=self.wait_img('resources/img/currency_wars/strategy.png', timeout=60)
-        if not self.click_box(box, after_sleep=1.5):
+
+        # 仅在开始页面需要进入流程；准备阶段直接跳过进入逻辑
+        if page == 1:
+            if not self._enter_from_start_page():
+                logger.error("进入对局流程失败")
+                return False
+        elif page == 2:
+            logger.info("已处于准备阶段，跳过进入流程")
+
+        # 进入对局后的初始策略与手牌更新
+        if not self._apply_initial_strategy():
+            logger.error("初始策略应用失败")
             return False
-        self.click_img('resources/img/currency_wars/apply.png', after_sleep=1)
-        self.press_key('esc')
+        return True
+
+    # ==================== 进入流程辅助方法 ====================
+    def _enter_from_start_page(self) -> bool:
+        """处理从货币战争开始页面进入对局的完整流程。"""
+        start_box = self.wait_img(CWIMG.CURRENCY_WARS_START, timeout=30, interval=0.5)
+        if start_box is None or not self.click_box(start_box):
+            logger.error("未识别到开始按钮")
+            return False
+        self.click_point(0.5, 0.5, after_sleep=2)
+
+        # 标准进入 or 继续进度
+        enter_standard_box = self.wait_img(CWIMG.ENTER_STANDARD, timeout=5, interval=0.5)
+        if enter_standard_box:
+            return self._standard_entry_flow(enter_standard_box)
+
+        continue_progress_box = self.wait_img(CWIMG.CONTINUE_PROGRESS, timeout=5, interval=0.5)
+        if continue_progress_box:
+            return self._continue_progress_flow(continue_progress_box)
+
+        logger.error("既未识别标准进入，也未识别继续进度入口")
+        return False
+
+    def _standard_entry_flow(self, enter_standard_box) -> bool:
+        """标准进入：选择难度、开始游戏、投资环境。"""
+        if not self.click_box(enter_standard_box, after_sleep=1.5):
+            return False
+        # 下拉选择难度/选项
+        while self.click_img(CWIMG.DOWN_ARROW, after_sleep=0.5):
+            pass
+        if not self.click_img(CWIMG.START_GAME, after_sleep=1):
+            return False
+        next_step_box = self.wait_img(CWIMG.NEXT_STEP)
+        self.sleep(0.5)
+        if next_step_box is None or not self.click_box(next_step_box, after_sleep=2):
+            return False
+        self.click_point(0.5, 0.5, after_sleep=0.5)
+        invest_box = self.wait_img(CWIMG.INVEST_ENVIRONMENT)
+        if invest_box is None:
+            logger.error("未识别到投资环境界面")
+            return False
+        # 投资操作
+        if not self.click_img(IMG.COLLECTION):
+            self.click_point(0.5, 0.5)
+        self.click_img(IMG.ENSURE2, after_sleep=1)
+        if self.locate(CWIMG.INVEST_ENVIRONMENT):
+            self.click_point(0.5, 0.5)
+            self.click_img(IMG.ENSURE2, after_sleep=1)
+        self.sleep(4)
+        return True
+
+    def _continue_progress_flow(self, continue_progress_box) -> bool:
+        """继续已有进度进入对局。"""
+        if not self.click_box(continue_progress_box, after_sleep=1):
+            return False
+        try:
+            self.sleep(2)
+            click_blank = self.wait_img(CWIMG.CLICK_BLANK, timeout=5, interval=0.5)
+            if click_blank is None:
+                logger.error("继续进度后未识别到点击空白提示")
+                return False
+            self.click_box(click_blank, after_sleep=1)
+            return True
+        except Exception:
+            logger.error("继续进度流程异常，无法进入对局")
+            return False
+
+    # ==================== 进入后的初始策略 ====================
+    def _apply_initial_strategy(self) -> bool:
+        """进入对局后的攻略应用与手牌识别。"""
         self.sleep(1)
-        for _ in range(3):
-            self.click_img('resources/img/currency_wars/trace.png', after_sleep=0.3)
+        strategy_box = self.wait_img(CWIMG.STRATEGY, timeout=60, interval=0.5)
+        if strategy_box is None or not self.click_box(strategy_box, after_sleep=1.5):
+            logger.error("未识别到攻略按钮")
+            return False
+        cancel_apply_box = self.wait_img(CWIMG.CANCEL_APPLY, timeout=2)
+        if cancel_apply_box is None:  # 未应用攻略则应用
+            if self.click_img(CWIMG.APPLY, after_sleep=1):
+                self.press_key('esc')
+                self.sleep(1)
+                for _ in range(3):
+                    self.click_img(CWIMG.TRACE, after_sleep=0.3)
         self.press_key('esc')
-        self.get_in_hand_area()  # 更新手牌信息
+        #考虑中途加入、接管情况
+        self.harvest_crystals() # 收获水晶
+        self.refresh_character() # 更新角色信息
+        self.get_in_hand_area()  # 更新手牌信息（若无接管情况，则仅有此行有用）
+        self.place_character() # 放置角色   
+        self.sell_character() # 出售多余角色
+        self.shopping() # 购物
         return True
 
     def run_game(self):
@@ -157,13 +272,14 @@ class CurrencyWars(Executable):
                 self.refresh_character()
 
     def refresh_character(self):
+        """ 刷新角色信息，确保手牌中未放置的角色状态正确。 """
         self.get_on_field_area(True)
         self.sleep(0.3)
         self.get_off_field_area(True)
         self.sleep(0.3)
         on_off_field_characters = self.on_field_character + self.off_field_character
         for c in self.in_hand_character:
-            if c not in on_off_field_characters:
+            if c is not None and c not in on_off_field_characters:
                 c.is_placed = False
 
 
@@ -251,13 +367,13 @@ class CurrencyWars(Executable):
 
     def get_in_hand_area(self, force=False):
         """获取手牌角色信息"""
-        target = self.locate('resources/img/currency_wars/open.png')
+        target = self.locate(CWIMG.OPEN)
         while target:
             self.mouse_down(int(target.center[0]), int(target.center[1]))
             self.mouse_up()
             self.sleep(0.5)
             self.click_point(0.35, 0.20, after_sleep=0.5)
-            target = self.locate('resources/img/currency_wars/open.png')
+            target = self.locate(CWIMG.OPEN)
         self._get_character_area(
             areas=self.in_hand_area,
             target_character_list=self.in_hand_character,
@@ -315,7 +431,7 @@ class CurrencyWars(Executable):
     def _place_to_target(
             self,
             character_in_hand: int,
-            target_characters: list[Character],
+            target_characters: list[Character | None],
             target_areas,
             area_type: str
     ) -> bool:
@@ -360,6 +476,8 @@ class CurrencyWars(Executable):
 
         if min_cost_index != -1:
             existing_char = target_characters[min_cost_index]
+            if existing_char is None:  # 类型保护
+                return False
             # 执行替换
             source = self.in_hand_area[character_in_hand]
             target = target_areas[min_cost_index]
@@ -411,15 +529,15 @@ class CurrencyWars(Executable):
 
     def battle(self) -> bool:
         self.click_point(0.907, 0.714, after_sleep=1)
-        if self.locate('resources/img/ensure.png'):  # 编队未满提醒
+        if self.locate(IMG.ENSURE):  # 编队未满提醒
             if self.force_battle:
-                self.click_img('resources/img/ensure.png')
+                self.click_img(IMG.ENSURE)
             else:
                 self.press_key('esc')
                 self.sleep(0.5)
                 return False
         self.force_battle = False
-        result = self.wait_any_img(['resources/img/currency_wars/settle.png','resources/img/currency_wars/continue.png'], interval=1,timeout=600)
+        result = self.wait_any_img([CWIMG.SETTLE, CWIMG.CONTINUE], interval=1, timeout=600)
         if result!=-1:
             logger.info("挑战结束")
             self.sleep(0.5)
@@ -433,7 +551,7 @@ class CurrencyWars(Executable):
         # 定义状态配置：(图片路径, 状态名称, 处理函数, 是否为终止状态)
         stage_config = [
             (
-                'resources/img/currency_wars/replenish_stage.png',
+                CWIMG.REPLENISH_STAGE,
                 '补给节点',
                 lambda: [
                     self.click_point(0.53, 0.52, after_sleep=1),  # 选择固定位置
@@ -442,7 +560,7 @@ class CurrencyWars(Executable):
                 False  # 非终止状态
             ),
             (
-                'resources/img/currency_wars/encounter_node.png',
+                CWIMG.ENCOUNTER_NODE,
                 '遭遇节点',
                 lambda: [
                     self.click_point(0.35, 0.50, after_sleep=1),  # 简单难度
@@ -451,13 +569,13 @@ class CurrencyWars(Executable):
                 False
             ),
             (
-                'resources/img/currency_wars/fold.png',
+                CWIMG.FOLD,
                 '无',
                 None,  # 目标状态，无需处理
                 True  # 正常终止状态
             ),
             (
-                'resources/img/currency_wars/select_invest_strategy.png',
+                CWIMG.SELECT_INVEST_STRATEGY,
                 '选择投资策略',
                 lambda: [
                     self.click_point(0.5, 0.68, after_sleep=1),  # 选择中间策略
@@ -466,13 +584,13 @@ class CurrencyWars(Executable):
                 False
             ),
             (
-                'resources/img/currency_wars/click_blank.png',
+                CWIMG.CLICK_BLANK,
                 '点击空白处关闭',
                 lambda: [self.click_point(0.5, 0.70, after_sleep=1)],
                 False
             ),
             (
-                'resources/img/currency_wars/next_step.png',
+                CWIMG.NEXT_STEP,
                 '游戏结束',
                 lambda: [
                     self.click_point(0.5, 0.82, after_sleep=1),
@@ -522,22 +640,29 @@ class CurrencyWars(Executable):
             self.sleep(1.5)
 
     def handle_special_event(self):
-        event, _ = self.locate_any(
-            ['resources/img/currency_wars/ThePlanetOfFestivities.png', 'resources/img/currency_wars/right.png'])
+        event, _ = self.locate_any([
+            CWIMG.THE_PLANET_OF_FESTIVITIES,
+            CWIMG.RIGHT
+        ])
         if event == 0:  # 盛会之星事件
             self.click_point(0.5, 0.25, after_sleep=1)  # 选择第一个选项
             self.click_point(0.77, 0.52, after_sleep=1)  # 点击确认按钮
 
     def strategy_event(self):
-        self.click_img('resources/img/currency_wars/right.png', after_sleep=2)
+        self.click_img(CWIMG.RIGHT, after_sleep=2)
         self.click_point(0.5, 0.5, after_sleep=0.5)
 
     def shopping(self):
         def scan_characters_in_store() -> list[Character]:
             results = self.ocr(from_x=0.19, from_y=0.26, to_x=0.88, to_y=0.31)
             chars = []
+            if not results:
+                return []
             for i in range(0, len(results), 2):
-                name = results[i][1]
+                try:
+                    name = results[i][1]
+                except (IndexError, TypeError):
+                    continue
                 if '备战席已满' in name:
                     return []
                 c = get_character(name)
@@ -563,11 +688,11 @@ class CurrencyWars(Executable):
                         target = self.store_area[i]
                         self.click_point(*target, after_sleep=0.5)
 
-            primary_selection = self.locate('resources/img/currency_wars/primary_selection.png')
+            primary_selection = self.locate(CWIMG.PRIMARY_SELECTION)
             for _ in range(5):
                 if primary_selection:
                     self.click_box(primary_selection, after_sleep=0.5)
-                    primary_selection = self.locate('resources/img/currency_wars/primary_selection.png')
+                    primary_selection = self.locate(CWIMG.PRIMARY_SELECTION)
                 else:
                     break
 
