@@ -297,44 +297,6 @@
                             </suki:SettingsLayoutItem.Content>
                         </suki:SettingsLayoutItem>
                         
-                        <suki:SettingsLayoutItem Header="Python">
-                            <suki:SettingsLayoutItem.Content>
-                                <StackPanel>
-                                    <Button Content="检查并修复 Python"
-                                            HorizontalAlignment="Left"
-                                            Command="{Binding CheckAndFixPythonEnvironmentCommand}"/>
-                                    <Grid ColumnDefinitions="Auto, *, Auto">
-                                        <Label Classes="icon">&#xE20C;</Label>
-                                        <Label Grid.Column="1"
-                                               Content="Python 下载链接" />
-                                        <TextBox Grid.Column="2"
-                                                 Watermark="https://example.com/python-3.12.10-embed-amd64.zip"
-                                                 TextWrapping="Wrap"
-                                                 Width="400"
-                                                 Text="{Binding Settings.PythonDownloadPath}" />
-                                    </Grid>
-                                    <Grid ColumnDefinitions="Auto, *, Auto">
-                                        <Label Classes="icon">&#xE2A2;</Label>
-                                        <Label Grid.Column="1"
-                                               Content="MD5 校验码" />
-                                        <TextBox Grid.Column="2"
-                                                 TextWrapping="Wrap"
-                                                 Width="400"
-                                                 Text="{Binding Settings.PythonMd5}" />
-                                    </Grid>
-                                    <Grid ColumnDefinitions="Auto, *, Auto">
-                                        <Label Classes="icon">&#xED6A;</Label>
-                                        <Label Grid.Column="1"
-                                               Content="Pip 镜像" />
-                                        <TextBox Grid.Column="2"
-                                                 TextWrapping="Wrap"
-                                                 Width="400"
-                                                 Text="{Binding Settings.PipMirror}" />
-                                    </Grid>
-                                </StackPanel>
-                            </suki:SettingsLayoutItem.Content>
-                        </suki:SettingsLayoutItem>
-                        
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.AboutText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>

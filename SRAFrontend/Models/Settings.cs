@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -46,11 +47,7 @@ public partial class Settings : ObservableObject
 
     [ObservableProperty] private double _zoom = 1; // 屏幕缩放比例
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
-    [JsonIgnore] public static string Version => "2.1.0"; // 应用版本号
-    
-    [ObservableProperty] private string _pythonDownloadPath = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"; // Python下载路径
-    [ObservableProperty] private string _pythonMd5 = "fe8ef205f2e9c3ba44d0cf9954e1abd3"; // Python MD5校验值
-    [ObservableProperty] private string _pipMirror = ""; // Pip 镜像源
+    public const string Version = "2.2.0-beta.2"; // 应用版本号
 
     // 新增快捷键设置
     [ObservableProperty] private string _activityHotkey = "F1"; // 活动 默认 F1
@@ -59,4 +56,5 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private string _guideHotkey = "F4"; // 指南 默认 F4
     [ObservableProperty] private string _mapHotkey = "M"; // 地图 默认 M
     [ObservableProperty] private string _techniqueHotkey = "E"; // 秘技 默认 E
+
 }

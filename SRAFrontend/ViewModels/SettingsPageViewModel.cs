@@ -28,7 +28,7 @@ public partial class SettingsPageViewModel(
         }
     }
 
-    public string VersionText => Settings.Version;
+    public string VersionText => Settings.Version.ToString();
 
     public string MirrorChyanCdk
     {
@@ -91,11 +91,5 @@ public partial class SettingsPageViewModel(
     private void CheckForUpdates()
     {
         _ = commonModel.CheckForUpdatesAsync();
-    }
-    
-    [RelayCommand]
-    private void CheckAndFixPythonEnvironment()
-    {
-        _ = commonModel.CheckAndFixPythonEnvironmentAsync();
     }
 }
