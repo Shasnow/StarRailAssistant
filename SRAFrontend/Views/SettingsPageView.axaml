@@ -7,6 +7,7 @@
              xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              xmlns:lang="clr-namespace:SRAFrontend.Localization"
              xmlns:utilities="clr-namespace:SRAFrontend.Utilities"
+             xmlns:models="clr-namespace:SRAFrontend.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SRAFrontend.Views.SettingsPageView"
              x:DataType="viewModels:SettingsPageViewModel"
@@ -42,7 +43,8 @@
                                         <Label Grid.Column="1"
                                                Content="{x:Static lang:Resources.ZoomText}"
                                                ToolTip.Tip="与系统显示设置的缩放对应。自动获取" />
-                                        <NumericUpDown Grid.Column="2" FormatString="0.00" Value="{Binding Zoom}"
+                                        <NumericUpDown Grid.Column="2" FormatString="0.00"
+                                                       Value="{Binding Settings.Zoom}"
                                                        Increment="0.25" Minimum="0"
                                                        Maximum="5" />
                                     </Grid>
@@ -61,43 +63,27 @@
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.HotkeysText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
-                                    <TextBlock Text="{x:Static lang:Resources.ModifyHoldText}" FontStyle="Italic" Margin="0,0,0,8"/>
-                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,4">
-                                        <Label Classes="icon">&#xE1F6;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ActivityText}"/>
-                                        <Button Grid.Column="2" Name="ActivityHotkeyButton" Content="{Binding Settings.ActivityHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="ActivityHotkey" MinWidth="100"/>
-                                        <Button Grid.Column="3" Tag="ActivityHotkey" Click="ClearHotkeyButton_OnClick" Content="清除" MinWidth="60"/>
-                                    </Grid>
-                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,4">
-                                        <Label Classes="icon">&#xE2ED;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ChronicleText}"/>
-                                        <Button Grid.Column="2" Name="ChronicleHotkeyButton" Content="{Binding Settings.ChronicleHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="ChronicleHotkey" MinWidth="100"/>
-                                        <Button Grid.Column="3" Tag="ChronicleHotkey" Click="ClearHotkeyButton_OnClick" Content="清除" MinWidth="60"/>
-                                    </Grid>
-                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,4">
-                                        <Label Classes="icon">&#xE77E;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.WarpText}"/>
-                                        <Button Grid.Column="2" Name="WarpHotkeyButton" Content="{Binding Settings.WarpHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="WarpHotkey" MinWidth="100"/>
-                                        <Button Grid.Column="3" Tag="WarpHotkey" Click="ClearHotkeyButton_OnClick" Content="清除" MinWidth="60"/>
-                                    </Grid>
-                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,4">
-                                        <Label Classes="icon">&#xE128;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.GuideText}"/>
-                                        <Button Grid.Column="2" Name="GuideHotkeyButton" Content="{Binding Settings.GuideHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="GuideHotkey" MinWidth="100"/>
-                                        <Button Grid.Column="3" Tag="GuideHotkey" Click="ClearHotkeyButton_OnClick" Content="清除" MinWidth="60"/>
-                                    </Grid>
-                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,4">
-                                        <Label Classes="icon">&#xE40C;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.MapText}"/>
-                                        <Button Grid.Column="2" Name="MapHotkeyButton" Content="{Binding Settings.MapHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="MapHotkey" MinWidth="100"/>
-                                        <Button Grid.Column="3" Tag="MapHotkey" Click="ClearHotkeyButton_OnClick" Content="清除" MinWidth="60"/>
-                                    </Grid>
-                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,4">
-                                        <Label Classes="icon">&#xE1FD;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.TechniqueText}"/>
-                                        <Button Grid.Column="2" Name="TechniqueHotkeyButton" Content="{Binding Settings.TechniqueHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="TechniqueHotkey" MinWidth="100"/>
-                                        <Button Grid.Column="3" Tag="TechniqueHotkey" Click="ClearHotkeyButton_OnClick" Content="清除" MinWidth="60"/>
-                                    </Grid>
+                                    <TextBlock Text="{x:Static lang:Resources.ModifyHoldText}" FontStyle="Italic"
+                                               Margin="0,0,0,8" />
+                                    <ItemsControl ItemsSource="{Binding CustomizableKeys}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="models:CustomizableKey">
+                                                <Grid ColumnDefinitions="Auto, *, Auto, Auto" Margin="0,0,0,4">
+                                                    <Label Grid.Column="0" Classes="icon"
+                                                           Content="{Binding IconText}" />
+                                                    <Label Grid.Column="1" Content="{Binding DisplayText}" />
+                                                    <Button Grid.Column="2" MinWidth="100"
+                                                            Content="{Binding CurrentKey, Converter={StaticResource HotkeyDisplayConverter}}"
+                                                            Command="{Binding ModifyKeyCommand}"/>
+                                                    <Button Grid.Column="3"
+                                                            Classes="Icon"
+                                                            FontFamily="{StaticResource Phosphor}"
+                                                            Content="&#xE036;" 
+                                                            Command="{Binding ResetToDefaultCommand}"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
                         </suki:SettingsLayoutItem>
@@ -181,23 +167,23 @@
                                                     <Label Grid.Row="0" Grid.Column="0" Content="SMTP服务器" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding Settings.SmtpServer}"
-                                                             Watermark="例：smtp.qq.com"/>
+                                                             Watermark="例：smtp.qq.com" />
                                                     <Label Grid.Row="1" Grid.Column="0" Content="SMTP端口" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
                                                              Text="{Binding Settings.SmtpPort}"
-                                                             Watermark="例：465"/>
+                                                             Watermark="例：465" />
                                                     <Label Grid.Row="2" Grid.Column="0" Content="发送邮件地址" />
                                                     <TextBox Grid.Row="2" Grid.Column="1"
                                                              Text="{Binding Settings.EmailSender}"
-                                                             Watermark="例：123456@qq.com"/>
+                                                             Watermark="例：123456@qq.com" />
                                                     <Label Grid.Row="3" Grid.Column="0" Content="邮件授权码" />
                                                     <TextBox Grid.Row="3" Grid.Column="1"
                                                              Text="{Binding Settings.EmailAuthCode}"
-                                                             Watermark="例：123456"/>
+                                                             Watermark="例：123456" />
                                                     <Label Grid.Row="4" Grid.Column="0" Content="接收邮件地址" />
                                                     <TextBox Grid.Row="4" Grid.Column="1"
                                                              Text="{Binding Settings.EmailReceiver}"
-                                                             Watermark="例：123456@qq.com"/>
+                                                             Watermark="例：123456@qq.com" />
                                                 </Grid>
                                             </Expander>
                                         </StackPanel>
@@ -215,10 +201,10 @@
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Classes="icon">&#xe586;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.StartUpText}"
-                                               ToolTip.Tip="SRA需要管理员权限，无法使用开机自启，请使用计划任务"/>
+                                               ToolTip.Tip="SRA需要管理员权限，无法使用开机自启，请使用计划任务" />
                                         <ToggleSwitch Grid.Column="2"
-                                                      IsChecked="{Binding Settings.EnableStartupLaunch}" 
-                                                      IsEnabled="False"/>
+                                                      IsChecked="{Binding Settings.EnableStartupLaunch}"
+                                                      IsEnabled="False" />
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto,*,Auto">
@@ -226,7 +212,7 @@
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.EnableTrayIconText}" />
                                         <ToggleSwitch Grid.Column="2"
                                                       IsChecked="{Binding Settings.EnableMinimizeToTray}"
-                                                      IsEnabled="False"/>
+                                                      IsEnabled="False" />
                                     </Grid>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
@@ -296,7 +282,7 @@
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
                         </suki:SettingsLayoutItem>
-                        
+
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.AboutText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>

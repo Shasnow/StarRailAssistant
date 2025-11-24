@@ -50,11 +50,11 @@ public partial class Settings : ObservableObject
     public const string Version = "2.2.0-beta.2"; // 应用版本号
 
     // 新增快捷键设置
-    [ObservableProperty] private string _activityHotkey = "F1"; // 活动 默认 F1
-    [ObservableProperty] private string _chronicleHotkey = "F2"; // 纪行 默认 F2
-    [ObservableProperty] private string _warpHotkey = "F3"; // 卡池 默认 F3
-    [ObservableProperty] private string _guideHotkey = "F4"; // 指南 默认 F4
-    [ObservableProperty] private string _mapHotkey = "M"; // 地图 默认 M
-    [ObservableProperty] private string _techniqueHotkey = "E"; // 秘技 默认 E
+    public string ActivityHotkey { get; set; } = "F1"; // 活动 默认 F1
+    public string ChronicleHotkey { get; set; } = "F2"; // 纪行 默认 F2
+    public string WarpHotkey { get; set; } = "F3"; // 卡池 默认 F3
+    public string GuideHotkey { get; set; } = "F4"; // 指南 默认 F4
+    public string MapHotkey { get; set; } = "M"; // 地图 默认 M
+    public string TechniqueHotkey { get; set; } = "E"; // 秘技 默认 E
 
 }

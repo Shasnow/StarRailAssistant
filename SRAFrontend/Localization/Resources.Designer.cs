@@ -69,6 +69,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Activity.
+        /// </summary>
+        public static string ActivityText {
+            get {
+                return ResourceManager.GetString("ActivityText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Advance.
         /// </summary>
         public static string AdvanceText {
@@ -123,6 +132,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Chronicle.
+        /// </summary>
+        public static string ChronicleText {
+            get {
+                return ResourceManager.GetString("ChronicleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Image Recognition Confidence.
         /// </summary>
         public static string ConfidenceText {
@@ -146,24 +164,6 @@ namespace SRAFrontend.Localization {
         public static string ControlPanelOpacityText {
             get {
                 return ResourceManager.GetString("ControlPanelOpacityText", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Not Set.
-        /// </summary>
-        public static string NotSetText {
-            get {
-                return ResourceManager.GetString("NotSetText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Hotkeys.
-        /// </summary>
-        public static string HotkeysText {
-            get {
-                return ResourceManager.GetString("HotkeysText", resourceCulture);
             }
         }
         
@@ -240,15 +240,6 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Hold to modify.
-        /// </summary>
-        public static string ModifyHoldText {
-            get {
-                return ResourceManager.GetString("ModifyHoldText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Welcome to SRA.
         /// </summary>
         public static string GreetingText {
@@ -258,11 +249,29 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Guide.
+        /// </summary>
+        public static string GuideText {
+            get {
+                return ResourceManager.GetString("GuideText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Home.
         /// </summary>
         public static string HomeText {
             get {
                 return ResourceManager.GetString("HomeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hotkeys in Game.
+        /// </summary>
+        public static string HotkeysText {
+            get {
+                return ResourceManager.GetString("HotkeysText", resourceCulture);
             }
         }
         
@@ -285,51 +294,6 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mirror Chyan.
-        /// </summary>
-        public static string MirrorChyanText {
-            get {
-                return ResourceManager.GetString("MirrorChyanText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Activity.
-        /// </summary>
-        public static string ActivityText {
-            get {
-                return ResourceManager.GetString("ActivityText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Chronicle.
-        /// </summary>
-        public static string ChronicleText {
-            get {
-                return ResourceManager.GetString("ChronicleText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Warp.
-        /// </summary>
-        public static string WarpText {
-            get {
-                return ResourceManager.GetString("WarpText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Guide.
-        /// </summary>
-        public static string GuideText {
-            get {
-                return ResourceManager.GetString("GuideText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Map.
         /// </summary>
         public static string MapText {
@@ -339,11 +303,20 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Technique.
+        ///   Looks up a localized string similar to Mirror Chyan.
         /// </summary>
-        public static string TechniqueText {
+        public static string MirrorChyanText {
             get {
-                return ResourceManager.GetString("TechniqueText", resourceCulture);
+                return ResourceManager.GetString("MirrorChyanText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hold to modify.
+        /// </summary>
+        public static string ModifyHoldText {
+            get {
+                return ResourceManager.GetString("ModifyHoldText", resourceCulture);
             }
         }
         
@@ -353,6 +326,15 @@ namespace SRAFrontend.Localization {
         public static string NotificationText {
             get {
                 return ResourceManager.GetString("NotificationText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not Set.
+        /// </summary>
+        public static string NotSetText {
+            get {
+                return ResourceManager.GetString("NotSetText", resourceCulture);
             }
         }
         
@@ -429,6 +411,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Technique.
+        /// </summary>
+        public static string TechniqueText {
+            get {
+                return ResourceManager.GetString("TechniqueText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Theme.
         /// </summary>
         public static string ThemeText {
@@ -461,6 +452,15 @@ namespace SRAFrontend.Localization {
         public static string UpdateText {
             get {
                 return ResourceManager.GetString("UpdateText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warp.
+        /// </summary>
+        public static string WarpText {
+            get {
+                return ResourceManager.GetString("WarpText", resourceCulture);
             }
         }
         
