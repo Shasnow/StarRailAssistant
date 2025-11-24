@@ -129,7 +129,7 @@
         <value>未设置</value>
     </data>
     <data name="HotkeysText" xml:space="preserve">
-        <value>快捷键</value>
+        <value>游戏内快捷键</value>
     </data>
     <data name="ActivityText" xml:space="preserve">
         <value>活动</value>

@@ -17,11 +17,11 @@ namespace SRAFrontend.ViewModels;
 
 public partial class TaskPageViewModel : PageViewModel
 {
-    private readonly ISukiToastManager _toastManager;
-    private readonly ConfigService _configService;
     private readonly CacheService _cacheService;
+    private readonly ConfigService _configService;
+    private readonly ISukiToastManager _toastManager;
 
-    public ControlPanelViewModel ControlPanelViewModel { get; }
+    [ObservableProperty] private Config _currentConfig;
 
     [ObservableProperty] private string _password = "";
 
@@ -31,12 +31,10 @@ public partial class TaskPageViewModel : PageViewModel
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(EnableContextMenu))]
     private object? _selectedTaskItem;
 
-    [ObservableProperty] private AvaloniaList<TrailblazePowerTask> _tasks;
     public TopLevel? TopLevelObject;
 
-    [ObservableProperty] private Config _currentConfig;
-
-    public TaskPageViewModel(ISukiToastManager toastManager,
+    public TaskPageViewModel(
+        ISukiToastManager toastManager,
         ControlPanelViewModel controlPanelViewModel,
         ConfigService configService,
         CacheService cacheService) : base(
@@ -56,7 +54,8 @@ public partial class TaskPageViewModel : PageViewModel
                 CurrentConfig = _configService.Config!;
             }
         }
-        _cacheService.Cache.PropertyChanged+= OnCachePropertyChanged;
+
+        _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
         Tasks =
         [
             new TrailblazePowerTask(AddTaskItem)
@@ -214,6 +213,10 @@ public partial class TaskPageViewModel : PageViewModel
             }
         ];
     }
+
+    public ControlPanelViewModel ControlPanelViewModel { get; }
+
+    public AvaloniaList<TrailblazePowerTask> Tasks { get; }
 
     public bool EnableContextMenu => SelectedTaskItem is not null;
 

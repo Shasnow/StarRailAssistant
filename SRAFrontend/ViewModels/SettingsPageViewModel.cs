@@ -1,34 +1,87 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Avalonia.Collections;
+using Avalonia.Controls;
+using Avalonia.Input;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Data;
+using SRAFrontend.Localization;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 
 namespace SRAFrontend.ViewModels;
 
-public partial class SettingsPageViewModel(
-    SettingsService settingsService,
-    UpdateService updateService,
-    CacheService cacheService,
-    CommonModel commonModel)
-    : PageViewModel(PageName.Setting,
-        "\uE272")
+public partial class SettingsPageViewModel : PageViewModel
 {
-    public Settings Settings => settingsService.Settings;
-    public Cache Cache => cacheService.Cache;
+    private readonly CacheService _cacheService;
+    private readonly CommonModel _commonModel;
+    private readonly AvaloniaList<CustomizableKey> _customizableKeys;
 
-    public double Zoom
+    private readonly SettingsService _settingsService;
+    private readonly UpdateService _updateService;
+
+    /// <inheritdoc />
+    public SettingsPageViewModel(SettingsService settingsService,
+        UpdateService updateService,
+        CacheService cacheService,
+        CommonModel commonModel) : base(PageName.Setting,
+        "\uE272")
     {
-        get => Settings.Zoom;
-        set
-        {
-            Settings.Zoom = value;
-            OnPropertyChanged();
-        }
+        _settingsService = settingsService;
+        _updateService = updateService;
+        _cacheService = cacheService;
+        _commonModel = commonModel;
+        _customizableKeys =
+        [
+            new CustomizableKey(ListenKeyFor)
+            {
+                IconText = "\uE1F6",
+                DisplayText = Resources.ActivityText,
+                DefaultKey = "F1"
+            }.Bind(() => settingsService.Settings.ActivityHotkey,
+                value => settingsService.Settings.ActivityHotkey = value),
+            new CustomizableKey(ListenKeyFor)
+            {
+                IconText = "\uE320",
+                DisplayText = Resources.ChronicleText,
+                DefaultKey = "F2"
+            }.Bind(() => settingsService.Settings.ChronicleHotkey,
+                value => settingsService.Settings.ChronicleHotkey = value),
+            new CustomizableKey(ListenKeyFor)
+            {
+                IconText = "\uE77E",
+                DisplayText = Resources.WarpText,
+                DefaultKey = "F3"
+            }.Bind(() => settingsService.Settings.WarpHotkey,
+                value => settingsService.Settings.WarpHotkey = value),
+            new CustomizableKey(ListenKeyFor)
+            {
+                IconText = "\uE0E4",
+                DisplayText = Resources.GuideText,
+                DefaultKey = "F4"
+            }.Bind(() => settingsService.Settings.GuideHotkey,
+                value => settingsService.Settings.GuideHotkey = value),
+            new CustomizableKey(ListenKeyFor)
+            {
+                IconText = "\uE1C6",
+                DisplayText = Resources.MapText,
+                DefaultKey = "M"
+            }.Bind(() => settingsService.Settings.MapHotkey,
+                value => settingsService.Settings.MapHotkey = value),
+            new CustomizableKey(ListenKeyFor)
+            {
+                IconText = "\uE5E4",
+                DisplayText = Resources.TechniqueText,
+                DefaultKey = "E"
+            }.Bind(() => settingsService.Settings.TechniqueHotkey,
+                value => settingsService.Settings.TechniqueHotkey = value)
+        ];
     }
 
-    public string VersionText => Settings.Version.ToString();
+    public IAvaloniaReadOnlyList<CustomizableKey> CustomizableKeys => _customizableKeys;
+    public Settings Settings => _settingsService.Settings;
+    public Cache Cache => _cacheService.Cache;
+    public string VersionText => Settings.Version;
 
     public string MirrorChyanCdk
     {
@@ -58,6 +111,8 @@ public partial class SettingsPageViewModel(
         }
     }
 
+    public TopLevel? TopLevelObject { get; set; }
+
     private async Task VerifyCdkAsync(string cdk)
     {
         // 显示"验证中"状态
@@ -65,7 +120,7 @@ public partial class SettingsPageViewModel(
         Cache.CdkStatusForeground = "#FAAD14"; // 黄色表示处理中
 
         // 执行异步验证
-        var response = await updateService.VerifyCdkAsync(cdk);
+        var response = await _updateService.VerifyCdkAsync(cdk);
 
         if (response is null)
         {
@@ -82,14 +137,61 @@ public partial class SettingsPageViewModel(
         }
         else
         {
-            Cache.CdkStatus = updateService.GetErrorMessage(response.Code);
+            Cache.CdkStatus = _updateService.GetErrorMessage(response.Code);
             Cache.CdkStatusForeground = "#F5222D"; // 红色表示错误
         }
     }
-    
+
     [RelayCommand]
     private void CheckForUpdates()
     {
-        _ = commonModel.CheckForUpdatesAsync();
+        _ = _commonModel.CheckForUpdatesAsync();
     }
+
+    #region 快捷键监听修改逻辑
+
+    private CustomizableKey? _currentListeningKey; // 正在监听的快捷键
+    private bool _isChanged; // 是否已更改快捷键
+    private string _tempKey = ""; // 临时存储原快捷键以防取消
+
+    /// <summary>
+    /// 开始监听指定的快捷键
+    /// </summary>
+    private void ListenKeyFor(CustomizableKey customizableKey)
+    {
+        if (TopLevelObject is null) return;
+        if (_currentListeningKey is not null) ReleaseListening();
+        _currentListeningKey = customizableKey;
+        _isChanged = false;
+        _tempKey = customizableKey.CurrentKey;
+        customizableKey.CurrentKey = "按键盘设置快捷键";
+        TopLevelObject.KeyUp += KeyUpHandler;
+        TopLevelObject.PointerPressed += PointerPressedHandler;
+    }
+
+    /// <summary>
+    /// 停止监听快捷键, 并根据是否更改决定是否保存新快捷键
+    /// </summary>
+    private void ReleaseListening()
+    {
+        if (TopLevelObject is null) return;
+        if (!_isChanged && _currentListeningKey != null) _currentListeningKey.CurrentKey = _tempKey;
+        TopLevelObject.KeyUp -= KeyUpHandler;
+        TopLevelObject.PointerPressed -= PointerPressedHandler;
+        _currentListeningKey = null;
+    }
+
+    private void PointerPressedHandler(object? sender, PointerPressedEventArgs e)
+    {
+        ReleaseListening();
+    }
+
+    private void KeyUpHandler(object? sender, KeyEventArgs e)
+    {
+        if (_currentListeningKey != null) _currentListeningKey.CurrentKey = e.Key.ToString();
+        _isChanged = true;
+        ReleaseListening();
+    }
+
+    #endregion
 }

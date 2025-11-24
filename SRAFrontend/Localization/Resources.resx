@@ -136,7 +136,7 @@
             <value>Not Set</value>
         </data>
     <data name="HotkeysText" xml:space="preserve">
-        <value>Hotkeys</value>
+        <value>Hotkeys in Game</value>
     </data>
     <data name="ActivityText" xml:space="preserve">
         <value>Activity</value>
