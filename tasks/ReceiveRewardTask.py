@@ -157,7 +157,7 @@ class ReceiveRewardTask(BaseTask):
         if not self.wait_img("resources/img/enter.png", timeout=30):
             logger.error("检测超时，编号2")
             return
-        self.press_key('f1')
+        self.press_key((self.settings.get('ActivityHotkey', 'f1')).lower())
         self.sleep(0.2)
         target=self.ocr_match("巡星之礼")
         if target is None:
@@ -211,7 +211,7 @@ class ReceiveRewardTask(BaseTask):
         if not self.wait_img("resources/img/enter.png"):
             logger.error("检测超时，编号2")
             return
-        self.press_key('f4')
+        self.press_key(self.settings.get('GuideHotkey', 'f4').lower())
         if not self.wait_img("resources/img/f4.png", timeout=20):
             logger.error("检测超时，编号1")
             self.press_key("esc")
@@ -242,7 +242,7 @@ class ReceiveRewardTask(BaseTask):
         if not self.wait_img("resources/img/enter.png"):
             logger.error("检测超时，编号2")
             return
-        self.press_key('f2')
+        self.press_key((self.settings.get('ChronicleHotkey', 'f2')).lower())
         if not self.wait_img("resources/img/f2.png", timeout=20):
             logger.error("检测超时，编号1")
             self.press_key("esc")

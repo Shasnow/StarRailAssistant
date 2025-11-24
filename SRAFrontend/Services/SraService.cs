@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using Avalonia.Controls;
 using Avalonia.Collections;
 using Avalonia.Threading;
+using Avalonia.Media; // TextWrapping enum
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
+using SukiUI.MessageBox;
+using SukiUI.Controls;
 
 namespace SRAFrontend.Services;
 
@@ -215,6 +219,22 @@ public partial class SraService(ILogger<SraService> logger)
                 IsRunning = true;
             else if (args.Data.Contains(SraServiceConstants.DoneMarker))
                 IsRunning = false;
+
+            // 捕获货币战争开拓者名称为空的后端日志标记并弹窗提示
+            if (args.Data.Contains("[EMPTY_COSMIC_STRIFE_USERNAME]"))
+            {
+                // 弹出提示对话框（使用 SukiMessageBoxHost + TextBlock 内容）
+                SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+                {
+                    Header = "开拓者名称为空",
+                    Content = new TextBlock
+                    {
+                        Text = "检测到 Cosmic Strife(旷宇纷争-货币战争) 开拓者名称为空。请在任务页面中填写开拓者名称后重新运行。",
+                        TextWrapping = TextWrapping.Wrap,
+                        MaxWidth = 420
+                    }
+                });
+            }
 
             // 日志限流: 超过最大行数时移除最早的
             if (OutputLines.Count >= SraServiceConstants.MaxOutputLines)

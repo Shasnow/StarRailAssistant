@@ -1,18 +1,20 @@
 import dataclasses
 import time
 from pathlib import Path
-from typing import overload, Any
+from typing import Any, overload
 
 import cv2
+import numpy as np
 import pyautogui
 import pygetwindow
+
 # noinspection PyPackageRequirements
 # (pyperclip is in pyautogui requirements)
 import pyperclip
 import pyscreeze
 from PIL.Image import Image
-from rapidocr_onnxruntime import RapidOCR
 
+from rapidocr_onnxruntime import RapidOCR
 from SRACore.util.config import load_settings
 from SRACore.util.logger import logger
 
@@ -639,20 +641,104 @@ class Operator:
             return False
         return self.click_box(box, x_offset, y_offset, after_sleep)
 
-    def wait_img(self, img_path: str, timeout: int = 10, interval: float = 0.5) -> Box | None:
-        """
-        等待图片出现
-        :param img_path: 模板图片路径
-        :param timeout: 超时时间，单位秒
-        :param interval: 检查间隔时间，单位秒，默认为0.5秒
-        :return: bool - 是否找到图片
+    def wait_img(self,
+                 img_path: str,
+                 timeout: int = 10,
+                 interval: float = 0.5,
+                 *,
+                 debug: bool = False,
+                 debug_dir: str | None = None) -> Box | None:
+        """等待图片出现并可选输出调试信息
+
+        Args:
+            img_path: 模板图片路径
+            timeout: 超时时间(秒)
+            interval: 重试间隔(秒)
+            debug: 是否输出调试匹配结果（每次循环）
+            debug_dir: 调试文件输出目录（不存在则自动创建），未指定时默认使用 "debug_image_match"
+
+        调试输出内容：
+            - 每次循环保存当前窗口截图（仅在标注时）
+            - 计算单尺度 matchTemplate 得分与位置（灰度 + TM_CCOEFF_NORMED）
+            - 若得分达到阈值(self.confidence)则返回 Box
+            - 保存标注图片：<debug_dir>/<basename>__attempt<idx>__score<val>.png
+
+        注意：
+            - 仍调用原 locate 逻辑，若 locate 返回 Box 会直接返回
+            - 调试匹配仅用于记录，不会降低性能要求
         """
         start_time = time.time()
         logger.debug(f"Waiting for image: {img_path}")
+        tmpl = None
+        tmpl_gray = None
+        attempt = 0
+        if debug:
+            if debug_dir is None:
+                debug_dir = "debug_image_match"
+            try:
+                Path(debug_dir).mkdir(parents=True, exist_ok=True)
+            except Exception as e:
+                logger.trace(f"Create debug dir failed: {e}")
+                debug = False
+        else:
+            debug_dir = None
+        debug_path = Path(debug_dir) if (debug and debug_dir is not None) else None
+
+        # 预读模板
+        if debug:
+            try:
+                tmpl = cv2.imread(img_path)
+                if tmpl is not None:
+                    tmpl_gray = cv2.cvtColor(tmpl, cv2.COLOR_BGR2GRAY)
+            except Exception as e:
+                logger.trace(f"Load template failed (debug disabled): {e}")
+                debug = False
+
         while time.time() - start_time < timeout:
+            attempt += 1
+            # 原始 locate 逻辑
             box = self.locate(img_path)
             if box is not None:
+                if debug:
+                    logger.debug(f"[wait_img debug] locate() success on attempt {attempt}")
                 return box
+
+            if debug and tmpl_gray is not None:
+                try:
+                    region = self.get_win_region(active_window=True)
+                    screenshot_pil = self.screenshot(region)
+                    scr_rgb = cv2.cvtColor(np.array(screenshot_pil), cv2.COLOR_RGB2BGR)
+                    scr_gray = cv2.cvtColor(scr_rgb, cv2.COLOR_BGR2GRAY)
+                    # 尺寸检查
+                    if tmpl_gray.shape[0] <= scr_gray.shape[0] and tmpl_gray.shape[1] <= scr_gray.shape[1]:
+                        res = cv2.matchTemplate(scr_gray, tmpl_gray, cv2.TM_CCOEFF_NORMED)
+                        _min_val, max_val, _min_loc, max_loc = cv2.minMaxLoc(res)
+                        h, w = tmpl_gray.shape[:2]
+                        logger.debug(f"[wait_img debug] attempt={attempt} score={max_val:.4f} loc={max_loc} conf_th={self.confidence}")
+                        # 保存标注图片
+                        try:
+                            annotated = scr_rgb.copy()
+                            cv2.rectangle(annotated, max_loc, (max_loc[0] + w, max_loc[1] + h), (0, 0, 255), 2)
+                            cv2.putText(annotated,
+                                        f"s={max_val:.3f}",
+                                        (max_loc[0], max(0, max_loc[1] - 10)),
+                                        cv2.FONT_HERSHEY_SIMPLEX,
+                                        0.5,
+                                        (0, 0, 255),
+                                        1)
+                            out_name = f"{Path(img_path).stem}__attempt{attempt}__score{max_val:.3f}.png"
+                            if debug_path is not None:
+                                cv2.imwrite(str(debug_path / out_name), annotated)
+                        except Exception as e:
+                            logger.trace(f"[wait_img debug] save annotated failed: {e}")
+                        # 若得分达到阈值，将该位置作为命中返回
+                        if max_val >= self.confidence:
+                            return Box(max_loc[0], max_loc[1], w, h)
+                    else:
+                        logger.debug(f"[wait_img debug] attempt={attempt} template larger than screenshot; skip match")
+                except Exception as e:
+                    logger.trace(f"[wait_img debug] attempt={attempt} error: {e}")
+
             time.sleep(interval)
         logger.debug(f"Timeout: {img_path} -> Not found in {timeout} seconds")
         return None
@@ -872,4 +958,5 @@ class Operator:
         return True
 
 
-class Executable(Operator): pass
+class Executable(Operator):
+    pass

@@ -6,10 +6,14 @@
              xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
              xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              xmlns:lang="clr-namespace:SRAFrontend.Localization"
+             xmlns:utilities="clr-namespace:SRAFrontend.Utilities"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SRAFrontend.Views.SettingsPageView"
              x:DataType="viewModels:SettingsPageViewModel"
              FontSize="16">
+    <UserControl.Resources>
+        <utilities:HotkeyDisplayConverter x:Key="HotkeyDisplayConverter" />
+    </UserControl.Resources>
     <suki:SukiStackPage>
         <suki:SukiStackPage.Content>
             <suki:SettingsLayout Name="{x:Static lang:Resources.SettingText}">
@@ -49,6 +53,50 @@
                                                        Value="{Binding Settings.ConfidenceThreshold}"
                                                        Increment="0.01" Minimum="0"
                                                        Maximum="1" />
+                                    </Grid>
+                                </StackPanel>
+                            </suki:SettingsLayoutItem.Content>
+                        </suki:SettingsLayoutItem>
+                        <!-- 新增快捷键设置分组，插入在 任务通用设置 与 显示 之间 -->
+                        <suki:SettingsLayoutItem Header="{x:Static lang:Resources.HotkeysText}">
+                            <suki:SettingsLayoutItem.Content>
+                                <StackPanel>
+                                    <TextBlock Text="{x:Static lang:Resources.ModifyHoldText}" FontStyle="Italic" Margin="0,0,0,8"/>
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,4">
+                                        <Label Classes="icon">&#xE1F6;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ActivityText}"/>
+                                        <Button Grid.Column="2" Name="ActivityHotkeyButton" Content="{Binding Settings.ActivityHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="ActivityHotkey" MinWidth="100"/>
+                                        <Button Grid.Column="3" Tag="ActivityHotkey" Click="ClearHotkeyButton_OnClick" Content="清除" MinWidth="60"/>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,4">
+                                        <Label Classes="icon">&#xE2ED;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ChronicleText}"/>
+                                        <Button Grid.Column="2" Name="ChronicleHotkeyButton" Content="{Binding Settings.ChronicleHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="ChronicleHotkey" MinWidth="100"/>
+                                        <Button Grid.Column="3" Tag="ChronicleHotkey" Click="ClearHotkeyButton_OnClick" Content="清除" MinWidth="60"/>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,4">
+                                        <Label Classes="icon">&#xE77E;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.WarpText}"/>
+                                        <Button Grid.Column="2" Name="WarpHotkeyButton" Content="{Binding Settings.WarpHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="WarpHotkey" MinWidth="100"/>
+                                        <Button Grid.Column="3" Tag="WarpHotkey" Click="ClearHotkeyButton_OnClick" Content="清除" MinWidth="60"/>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,4">
+                                        <Label Classes="icon">&#xE128;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.GuideText}"/>
+                                        <Button Grid.Column="2" Name="GuideHotkeyButton" Content="{Binding Settings.GuideHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="GuideHotkey" MinWidth="100"/>
+                                        <Button Grid.Column="3" Tag="GuideHotkey" Click="ClearHotkeyButton_OnClick" Content="清除" MinWidth="60"/>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,4">
+                                        <Label Classes="icon">&#xE40C;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.MapText}"/>
+                                        <Button Grid.Column="2" Name="MapHotkeyButton" Content="{Binding Settings.MapHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="MapHotkey" MinWidth="100"/>
+                                        <Button Grid.Column="3" Tag="MapHotkey" Click="ClearHotkeyButton_OnClick" Content="清除" MinWidth="60"/>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,4">
+                                        <Label Classes="icon">&#xE1FD;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.TechniqueText}"/>
+                                        <Button Grid.Column="2" Name="TechniqueHotkeyButton" Content="{Binding Settings.TechniqueHotkey, Converter={StaticResource HotkeyDisplayConverter}}" Click="HotkeyButton_OnClick" Tag="TechniqueHotkey" MinWidth="100"/>
+                                        <Button Grid.Column="3" Tag="TechniqueHotkey" Click="ClearHotkeyButton_OnClick" Content="清除" MinWidth="60"/>
                                     </Grid>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>

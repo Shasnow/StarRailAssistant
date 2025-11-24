@@ -125,4 +125,31 @@
     <data name="ControlPanelOpacityText" xml:space="preserve">
         <value>控制面板不透明度</value>
     </data>
+    <data name="NotSetText" xml:space="preserve">
+        <value>未设置</value>
+    </data>
+    <data name="HotkeysText" xml:space="preserve">
+        <value>快捷键</value>
+    </data>
+    <data name="ActivityText" xml:space="preserve">
+        <value>活动</value>
+    </data>
+    <data name="ChronicleText" xml:space="preserve">
+        <value>纪行</value>
+    </data>
+    <data name="WarpText" xml:space="preserve">
+        <value>卡池</value>
+    </data>
+    <data name="GuideText" xml:space="preserve">
+        <value>指南</value>
+    </data>
+    <data name="MapText" xml:space="preserve">
+        <value>地图</value>
+    </data>
+    <data name="TechniqueText" xml:space="preserve">
+        <value>秘技</value>
+    </data>
+    <data name="ModifyHoldText" xml:space="preserve">
+        <value>点击以修改</value>
+    </data>
 </root>
