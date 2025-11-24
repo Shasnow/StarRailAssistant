@@ -92,10 +92,4 @@ public partial class SettingsPageViewModel(
     {
         _ = commonModel.CheckForUpdatesAsync();
     }
-    
-    [RelayCommand]
-    private void CheckAndFixPythonEnvironment()
-    {
-        _ = commonModel.CheckAndFixPythonEnvironmentAsync();
-    }
 }

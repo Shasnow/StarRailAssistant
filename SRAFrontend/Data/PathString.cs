@@ -12,6 +12,6 @@ public static class PathString
     public static readonly string ConfigsDir = Path.Combine(AppDataSraDir, "configs");
     public static readonly string LogsDir = Path.Combine(AppDataSraDir, "logs");
     public static readonly string ReportsDir = "reports";
-    public static readonly string PythonDir = Path.Combine(Environment.CurrentDirectory, "python");
+    // public static readonly string PythonDir = Path.Combine(Environment.CurrentDirectory, "python");
     public static readonly string SourceCodeDir = Path.Combine(Environment.CurrentDirectory, "SRA");
 }

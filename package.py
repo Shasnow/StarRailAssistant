@@ -35,21 +35,36 @@ if __name__ == "__main__":
     with (root_path / "version.json").open(mode="r", encoding="utf-8") as f:
         version = json.load(f)
 
+    print("Packaging Python program...")
+
+    os.system(
+        "powershell -Command python -m nuitka --standalone --mingw64"
+        " --windows-console-mode=force --windows-uac-admin"
+        " --windows-icon-from-ico=resources\\SRAicon.ico"
+        " --company-name='StarRailAssistant Team' --product-name=StarRailAssistant"
+        f" --file-version={version['version'].split('-')[0]}"
+        f" --product-version={version['version'].split('-')[0]}"
+        " --file-description='StarRailAssistant Component'"
+        " --copyright='Copyright © 2024 Shasnow'"
+        " --assume-yes-for-downloads --output-filename=SRA-cli"
+        " --remove-output main.py"
+    )
+    print("Python program packaging completed !")
+
     print("Start to copy resources ...")
 
-    os.makedirs(root_path / "main.dist/SRA", exist_ok=True)
-    shutil.copytree(root_path / "SRAFrontend/bin/Release/net8.0/win-x64/publish", root_path / "main.dist", dirs_exist_ok=True)
-    shutil.copytree(root_path / "resources", root_path / "main.dist/SRA/resources")
-    shutil.copytree(root_path / "tasks", root_path / "main.dist/SRA/tasks")
-    shutil.copytree(root_path / "SRACore", root_path / "main.dist/SRA/SRACore")
-    shutil.copy(root_path / "version.json", root_path / "main.dist/SRA/version.json")
-    shutil.copy(root_path / "LICENSE", root_path / "main.dist/SRA/LICENSE")
-    shutil.copy(root_path / "README.md", root_path / "main.dist/SRA/README.md")
-    shutil.copy(root_path / "main.py", root_path / "main.dist/SRA/main.py")
-    shutil.copy(root_path / "requirements.txt", root_path / "main.dist/SRA/requirements.txt")
-    shutil.copy(root_path / "SRA-cli.exe", root_path / "main.dist/SRA-cli.exe")
+    shutil.copytree(root_path / "SRAFrontend/bin/Release/net8.0/win-x64/publish", root_path / "main.dist/", dirs_exist_ok=True)
+    shutil.copytree(root_path / "resources", root_path / "main.dist/resources")
+    shutil.copytree(root_path / "tools", root_path / "main.dist/tools")
+    shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "main.dist/rapidocr_onnxruntime")
+    shutil.copytree(root_path / "tasks", root_path / "main.dist/tasks")
+    os.makedirs(root_path / "main.dist/SRACore", exist_ok=True)
+    shutil.copy(root_path / "SRACore/config.toml", root_path / "main.dist/SRACore/config.toml")
+    shutil.copy(root_path / "LICENSE", root_path / "main.dist/LICENSE")
+    shutil.copy(root_path / "README.md", root_path / "main.dist/README.md")
+    shutil.copy(root_path / "version.json", root_path / "main.dist/version.json")
 
-    print("Start to compress full package...")
+    print("Start to compress ...")
 
     shutil.make_archive(
         base_name=str(root_path / f"StarRailAssistant_v{version['version']}"),
@@ -57,43 +72,10 @@ if __name__ == "__main__":
         root_dir=root_path / "main.dist",
         base_dir=".",
     )
-    
+    shutil.rmtree(root_path / "main.dist")
 
     print("SRA program packaging completed !")
-    print("Start to compress source code...")
-    shutil.make_archive(
-        base_name=str(root_path / f"StarRailAssistant_Core_v{version['version']}"),
-        format="zip",
-        root_dir=root_path / "main.dist/SRA",
-        base_dir=".",
-    )
-    print("SRA source code packaging completed !")
-    shutil.rmtree(root_path / "main.dist")
+
     (root_path / "version_info.txt").write_text(
         f"v{version['version']}\n\n{version['Announcement'][0]['content']}", encoding="utf-8"
     )
-    print("Start to upload source code package...")
-    import requests
-    import base64
-    
-    # 读取文件并转换为 Base64 编码
-    file_name=str(root_path / f"StarRailAssistant_Core_v{version['version']}")
-    with open(file_name, "rb") as file:
-        encoded_file = base64.b64encode(file.read()).decode('utf-8')
-    
-    # 上传的 URL
-    url = "https://update.auto-mas.top/upload"
-    
-    
-    # 请求数据
-    data = {
-        'res_id': 'StarRailAssistant',
-        'file_name': file_name,  # 文件名
-        'file_base64': encoded_file  # 传递 Base64 编码的文件内容
-    }
-    
-    # 发送 POST 请求
-    response = requests.post(url, data=data)
-    
-    # 打印响应
-    print(response.text)
