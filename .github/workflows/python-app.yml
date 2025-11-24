@@ -37,7 +37,7 @@ jobs:
             exit 1
           fi
           exit 0
-  build_StarRailAssistant:
+  build:
     runs-on: windows-latest
     needs: pre_check
     steps:
@@ -80,7 +80,9 @@ jobs:
         id: read_version
         run: |
           $VERSION=(Get-Content -Path "version_info.txt" -TotalCount 1).Trim()
+          $CHANNEL=$VERSION.Contains("-beta") ? "beta" : "stable"
           "version=$VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "channel=$CHANNEL" | Out-File -FilePath $env:GITHUB_ENV -Append
           
       - name: Install Inno Setup
         run: |
@@ -99,6 +101,7 @@ jobs:
           python setup/version_modifier.py --version "${{ env.version }}"
           iscc setup\srasetup.iss
           Copy-Item -Path setup\output\* -Destination . -Force
+          
       - name: Upload Setup Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -130,7 +133,7 @@ jobs:
           
   publish_release:
     name: Publish release
-    needs: build_StarRailAssistant
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -194,10 +197,49 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
-      - name: Trigger MirrorChyanUploading
-        shell: bash
+#      - name: Trigger MirrorChyanUploading
+#        shell: bash
+#        run: |
+#          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan
+#          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note
+#        env:
+#          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+  mirrorchyan:
+    runs-on: macos-latest
+    if: ${{ github.repository_owner == 'Shasnow' }}
+    steps:
+      - name: upload
+        uses: MirrorChyan/uploading-action@v1
+        with:
+          filetype: latest-release
+          filename: "StarRailAssistant_v*.zip"
+          mirrorchyan_rid: StarRailAssistant
+
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          upload_token: ${{ secrets.MirrorChyanUploadToken }}
+          
+      - name: release note
+        uses: MirrorChyan/release-note-action@v1
+        with:
+          mirrorchyan_rid: StarRailAssistant
+          
+          upload_token: ${{ secrets.MirrorChyanUploadToken }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          
+  auto_mas:
+    runs-on: ubuntu-latest
+    needs: publish_release
+    steps:
+      - name: Download Version_Info
+        uses: actions/download-artifact@v4
+        with:
+          name: version_info
+          path: ./version_info
+      - name: Update Auto-MAS
         run: |
-          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan
-          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION=$(sed 's/\r$//g' <(head -n 1 version_info/version_info.txt))
+          CHANNEL=$([[ "$VERSION" == *"-beta"* ]] && echo "beta" || echo "stable")
+          curl -X POST -H "Content-Type: application/json" -d '{"version": "'"$VERSION"'", "res_id": "StarRailAssistant", "channel": "'"$CHANNEL"'"}' "${{ secrets.UPDATE_URL }}"

@@ -72,3 +72,27 @@ if __name__ == "__main__":
     (root_path / "version_info.txt").write_text(
         f"v{version['version']}\n\n{version['Announcement'][0]['content']}", encoding="utf-8"
     )
+    print("Start to upload source code package...")
+    import requests
+    import base64
+    
+    # 读取文件并转换为 Base64 编码
+    with open(str(root_path / f"StarRailAssistant_Core_v{version['version']}"), "rb") as file:
+        encoded_file = base64.b64encode(file.read()).decode('utf-8')
+    
+    # 上传的 URL
+    url = "https://update.auto-mas.top/upload"
+    
+    
+    # 请求数据
+    data = {
+        'res_id': 'StarRailAssistant',
+        'file_name': 'StarRailAssistant_Core_v2.2.0-beta.1.zip',  # 文件名
+        'file_base64': encoded_file  # 传递 Base64 编码的文件内容
+    }
+    
+    # 发送 POST 请求
+    response = requests.post(url, data=data)
+    
+    # 打印响应
+    print(response.text)
