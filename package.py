@@ -77,7 +77,8 @@ if __name__ == "__main__":
     import base64
     
     # 读取文件并转换为 Base64 编码
-    with open(str(root_path / f"StarRailAssistant_Core_v{version['version']}"), "rb") as file:
+    file_name=str(root_path / f"StarRailAssistant_Core_v{version['version']}")
+    with open(file_name, "rb") as file:
         encoded_file = base64.b64encode(file.read()).decode('utf-8')
     
     # 上传的 URL
@@ -87,7 +88,7 @@ if __name__ == "__main__":
     # 请求数据
     data = {
         'res_id': 'StarRailAssistant',
-        'file_name': 'StarRailAssistant_Core_v2.2.0-beta.1.zip',  # 文件名
+        'file_name': file_name,  # 文件名
         'file_base64': encoded_file  # 传递 Base64 编码的文件内容
     }
     
