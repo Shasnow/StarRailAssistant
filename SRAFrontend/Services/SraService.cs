@@ -18,7 +18,7 @@ internal static class SraServiceConstants
     public const int MaxOutputLines = 1000; // 可选: 日志行数限流
 }
 
-public partial class SraService(ILogger<SraService> logger, PythonService pythonService)
+public partial class SraService(ILogger<SraService> logger)
     : ObservableObject, IDisposable
 {
     private readonly ILogger _logger = logger;
@@ -45,11 +45,11 @@ public partial class SraService(ILogger<SraService> logger, PythonService python
         }
 
         // 校验核心文件路径
-        var mainPyPath = Path.Combine(PathString.SourceCodeDir, "main.py");
+        var mainPyPath = Path.Combine(Environment.CurrentDirectory, "SRA-cli.exe");
         if (!File.Exists(mainPyPath))
         {
-            _logger.LogError("Could not find main.py at path: {Path}", mainPyPath);
-            var errorMsg = $"无法找到文件 main.py，请检查安装完整性。\n路径: {mainPyPath}";
+            _logger.LogError("Could not find SRA-cli.exe at path: {Path}", mainPyPath);
+            var errorMsg = $"无法找到文件 SRA-cli.exe，请检查安装完整性。\n路径: {mainPyPath}";
             OutputLines.Add(errorMsg);
             return;
         }
@@ -65,7 +65,18 @@ public partial class SraService(ILogger<SraService> logger, PythonService python
         {
             // 优化: 使用安全的参数传递（避免字符串拼接导致的命令注入）
             var safeArguments = $"\"{mainPyPath}\" {EscapeCommandLineArgument(arguments)}";
-            _sraProcess = pythonService.CreatePythonProcess(safeArguments);
+            _sraProcess = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "SRA-cli.exe",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    RedirectStandardInput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
 
             // 绑定事件（包含Exited事件）
             _sraProcess.OutputDataReceived += OnSraProcessOutputDataReceived;
@@ -75,7 +86,7 @@ public partial class SraService(ILogger<SraService> logger, PythonService python
 
             // 启动进程
             _sraProcess.Start();
-            _logger.LogInformation("Successfully start SRA with command: python {Arguments}", safeArguments);
+            _logger.LogInformation("Successfully start SRA with command: {Arguments}", safeArguments);
 
             OutputLines.Clear();
 

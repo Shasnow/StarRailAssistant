@@ -33,15 +33,17 @@ public static class VersionHelper
     /// </summary>
     public static bool NeedUpdate(SemVerInfo currentVersion, SemVerInfo newVersion, string installedHotfixVersion)
     {
-        // 1. 新版本 <= 当前版本 → 无需更新
-        if (newVersion <= currentVersion)
-        {
-            return false;
-        }
-
-        // 2. 已安装该热修复 → 无需更新
-        var installedHotfix = SemVerParser.Parse(installedHotfixVersion);
-        return installedHotfix == null || installedHotfix != newVersion;
+        return currentVersion < newVersion;
+        // 这些是以后可能用到的妙妙小代码
+        // // 1. 新版本 <= 当前版本 → 无需更新
+        // if (newVersion <= currentVersion)
+        // {
+        //     return false;
+        // }
+        //
+        // // 2. 已安装该热修复 → 无需更新
+        // var installedHotfix = SemVerParser.Parse(installedHotfixVersion);
+        // return installedHotfix == null || installedHotfix != newVersion;
     }
 
     /// <summary>

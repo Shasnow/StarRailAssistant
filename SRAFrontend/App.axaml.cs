@@ -82,7 +82,7 @@ public partial class App : Application
         services.AddSingleton<CacheService>();
         services.AddSingleton<SraService>();
         services.AddSingleton<ConfigService>();
-        services.AddSingleton<PythonService>();
+        // services.AddSingleton<PythonService>();
         services.AddHttpClient("GlobalClient", client =>
         {
             client.Timeout = TimeSpan.FromSeconds(60);

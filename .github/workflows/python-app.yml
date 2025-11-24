@@ -112,11 +112,6 @@ jobs:
         with:
           name: StarRailAssistant_${{ env.version }}
           path: StarRailAssistant_${{ env.version }}.zip
-      - name: Upload SourceCode Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: StarRailAssistant_Core_${{ env.version }}
-          path: StarRailAssistant_Core_${{ env.version }}.zip
           
       - name: Upload Version_Info Artifact
         uses: actions/upload-artifact@v4
@@ -129,7 +124,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          aws s3 cp StarRailAssistant_Core_${{ env.version }}.zip s3://sra/ --endpoint-url=https://955e419b52a8b9fa05c04e29cfb0b17f.r2.cloudflarestorage.com --checksum-algorithm CRC32 --force
+          aws s3 cp StarRailAssistant_${{ env.version }}.zip s3://sra/ --endpoint-url=https://955e419b52a8b9fa05c04e29cfb0b17f.r2.cloudflarestorage.com --checksum-algorithm CRC32 --force
           
   publish_release:
     name: Publish release
