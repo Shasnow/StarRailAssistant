@@ -22,7 +22,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         "https://github.com/Shasnow/StarRailAssistant/releases/download/{version}/StarRailAssistant_{version}.zip";
     
     private const string BaseCoreDownloadUrl =
-        "https://resource.starrailassistant.top/StarRailAssistant_Core_{version}.zip";
+        "https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant_Core_{version}.zip";
 
     private readonly Dictionary<int, string> _errorCodes = new()
     {
