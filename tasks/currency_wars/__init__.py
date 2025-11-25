@@ -5,6 +5,7 @@ from SRACore.util.operator import Executable
 from tasks.currency_wars.characters import (Character, Positioning,
                                             get_character)
 
+
 # ==================== 图片常量集中管理 ====================
 # 说明：集中管理所有在本模块使用的图片路径，避免散落的硬编码字符串，方便统一修改与查找。
 # 分组：通用 IMG（跨模式通用），货币战争专用 CWIMG。
@@ -42,7 +43,6 @@ class CWIMG:
     THE_PLANET_OF_FESTIVITIES = f"{BASE}/ThePlanetOfFestivities.png"
     RIGHT = f"{BASE}/right.png"
     PRIMARY_SELECTION = f"{BASE}/primary_selection.png"
-
 
 
 class CurrencyWars(Executable):
@@ -93,10 +93,7 @@ class CurrencyWars(Executable):
 
     @staticmethod
     def set_username(username: str):
-        # 开拓者名称（货币战争用户名）空值校验
-        if username is None or username.strip() == "":
-            logger.error("[EMPTY_COSMIC_STRIFE_USERNAME] 货币战争开拓者名称为空，请在前端配置中填写。")
-            return
+        # 调用处已经确保 username 非空
         cw_chars.username = username.strip()
 
     def run(self):
@@ -112,7 +109,7 @@ class CurrencyWars(Executable):
         定位到货币战争页面
         :return: int 页面编号，1表示货币战争开始页面，2表示准备阶段页面，-1表示定位失败
         """
-        page = self.wait_any_img([IMG.ENTER,
+        page, _ = self.wait_any_img([IMG.ENTER,
                                   CWIMG.CURRENCY_WARS_START,
                                   CWIMG.PREPARATION_STAGE], interval=0.5)
         if page == 0:
@@ -169,13 +166,12 @@ class CurrencyWars(Executable):
         self.click_point(0.5, 0.5, after_sleep=2)
 
         # 标准进入 or 继续进度
-        enter_standard_box = self.wait_img(CWIMG.ENTER_STANDARD, timeout=5, interval=0.5)
-        if enter_standard_box:
-            return self._standard_entry_flow(enter_standard_box)
+        index, box = self.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONTINUE_PROGRESS], timeout=10, interval=0.5)
 
-        continue_progress_box = self.wait_img(CWIMG.CONTINUE_PROGRESS, timeout=5, interval=0.5)
-        if continue_progress_box:
-            return self._continue_progress_flow(continue_progress_box)
+        if index==0:
+            return self._standard_entry_flow(box)
+        elif index==1:
+            return self._continue_progress_flow(box)
 
         logger.error("既未识别标准进入，也未识别继续进度入口")
         return False
@@ -241,12 +237,11 @@ class CurrencyWars(Executable):
                     self.click_img(CWIMG.TRACE, after_sleep=0.3)
         self.press_key('esc')
         #考虑中途加入、接管情况
-        self.harvest_crystals() # 收获水晶
-        self.refresh_character() # 更新角色信息
+        self.harvest_crystals()  # 收获水晶
+        self.refresh_character()  # 更新角色信息
         self.get_in_hand_area()  # 更新手牌信息（若无接管情况，则仅有此行有用）
-        self.place_character() # 放置角色   
-        self.sell_character() # 出售多余角色
-        self.shopping() # 购物
+        self.place_character()  # 放置角色
+        self.sell_character()  # 出售多余角色
         return True
 
     def run_game(self):
@@ -259,7 +254,7 @@ class CurrencyWars(Executable):
             if self.battle():
                 if not self.stage_transition():
                     break
-                if not self.is_running: # 任务已被标记为停止, 需要退出循环
+                if not self.is_running:  # 任务已被标记为停止, 需要退出循环
                     break
                 self.shopping()
                 self.harvest_crystals()
@@ -281,7 +276,6 @@ class CurrencyWars(Executable):
         for c in self.in_hand_character:
             if c is not None and c not in on_off_field_characters:
                 c.is_placed = False
-
 
     @property
     def coins(self):
@@ -511,7 +505,7 @@ class CurrencyWars(Executable):
 
     def sell_character(self):
         # 实现角色出售逻辑
-        if self.in_hand_character_count < 9:
+        if self.in_hand_character_count < 8:
             logger.info("手牌未满，跳过出售角色")
             return
 
@@ -537,8 +531,8 @@ class CurrencyWars(Executable):
                 self.sleep(0.5)
                 return False
         self.force_battle = False
-        result = self.wait_any_img([CWIMG.SETTLE, CWIMG.CONTINUE], interval=1, timeout=600)
-        if result!=-1:
+        result, _ = self.wait_any_img([CWIMG.SETTLE, CWIMG.CONTINUE], interval=1, timeout=600)
+        if result != -1:
             logger.info("挑战结束")
             self.sleep(0.5)
             return self.click_point(0.5, 0.824, after_sleep=0.3)  # 点击继续按钮
@@ -605,7 +599,7 @@ class CurrencyWars(Executable):
         img_list = [cfg[0] for cfg in stage_config]
 
         # 等待初始状态
-        stage_index = self.wait_any_img(img_list, timeout=30, interval=1)
+        stage_index, _ = self.wait_any_img(img_list, timeout=30, interval=1)
         self.sleep(1.5)
 
         while True:  # 用无限循环 + 内部break控制退出
@@ -636,7 +630,7 @@ class CurrencyWars(Executable):
                 return True
 
             # 非终止状态，继续等待下一个状态
-            stage_index = self.wait_any_img(img_list, timeout=30, interval=1)
+            stage_index, _ = self.wait_any_img(img_list, timeout=30, interval=1)
             self.sleep(1.5)
 
     def handle_special_event(self):
