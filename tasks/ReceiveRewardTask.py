@@ -180,7 +180,7 @@ class ReceiveRewardTask(BaseTask):
             logger.info("没有可领取的奖励")
             return
         match self.wait_any_img(["resources/img/assignment_page.png", "resources/img/assignment_page2.png"],
-                                timeout=10):
+                                timeout=10)[0]:
             case 0:
                 pass
             case 1:

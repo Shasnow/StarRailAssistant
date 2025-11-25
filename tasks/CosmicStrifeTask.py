@@ -3,7 +3,7 @@ from SRACore.util.logger import logger
 
 
 class CosmicStrifeTask(BaseTask):
-    def __init__(self,config: dict):
+    def __init__(self, config: dict):
         super().__init__(config)
 
     def run(self):
@@ -20,8 +20,10 @@ class CosmicStrifeTask(BaseTask):
             from tasks.currency_wars import CurrencyWars
             cw_task = CurrencyWars(self.config.get("CurrencyWarsRunTimes", 0))
             username = self.config.get("CurrencyWarsUsername","")
-            if username != "":
-                cw_task.set_username(username)
+            if username is None or username.strip() == "":
+                logger.error("货币战争开拓者名称为空，请在前端配置中填写。")
+                return False
+            cw_task.set_username(username)
             if not cw_task.run():
                 logger.error("旷宇纷争-货币战争任务失败")
                 return False
