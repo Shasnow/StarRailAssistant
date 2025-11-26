@@ -55,7 +55,6 @@ if __name__ == "__main__":
 
     shutil.copytree(root_path / "SRAFrontend/bin/Release/net8.0/win-x64/publish", root_path / "main.dist/", dirs_exist_ok=True)
     shutil.copytree(root_path / "resources", root_path / "main.dist/resources")
-    shutil.copytree(root_path / "tools", root_path / "main.dist/tools")
     shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "main.dist/rapidocr_onnxruntime")
     shutil.copytree(root_path / "tasks", root_path / "main.dist/tasks")
     os.makedirs(root_path / "main.dist/SRACore", exist_ok=True)

@@ -82,7 +82,7 @@ class DifferentialUniverse(Executable):
         var = ["选择基础效果", "选择祝福", "选择方程", "选择奇物"]
 
         while True:
-            index = self.wait_any_img([
+            index, _ = self.wait_any_img([
                 "resources/img/base_effect_select.png",
                 "resources/img/blessing_select.png",
                 "resources/img/equation_select.png",
@@ -137,7 +137,7 @@ class DifferentialUniverse(Executable):
         定位到差分宇宙页面。
         :return: None
         """
-        page = self.wait_any_img([
+        page, _ = self.wait_any_img([
             "resources/img/enter.png",
             "resources/img/differential_universe_start.png",
             "resources/img/bonus points.png"
