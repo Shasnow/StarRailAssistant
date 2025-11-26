@@ -13,6 +13,7 @@ import pygetwindow
 import pyperclip
 import pyscreeze
 from PIL.Image import Image
+from pyscreeze import Box
 
 from rapidocr_onnxruntime import RapidOCR
 from SRACore.util.config import load_settings
@@ -743,22 +744,22 @@ class Operator:
         logger.debug(f"Timeout: {img_path} -> Not found in {timeout} seconds")
         return None
 
-    def wait_any_img(self, img_paths: list[str], timeout: int = 10, interval: float = 0.2) -> int:
+    def wait_any_img(self, img_paths: list[str], timeout: int = 10, interval: float = 0.2) -> tuple[int, Box | None]:
         """
         等待任意一张图片出现
         :param img_paths: 模板图片路径列表
         :param timeout: 超时时间，单位秒
         :param interval: 检查间隔时间，单位秒，默认为0.2秒
-        :return: int - 找到的图片索引，如果未找到则返回-1
+        :return: int - 找到的图片索引，如果未找到则返回-1; Box | None - 找到的图片位置，如果未找到则返回None
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
-            index, _ = self.locate_any(img_paths)
+            index, box = self.locate_any(img_paths)
             if index != -1:
-                return index
+                return index, box
             time.sleep(interval)
         logger.debug(f"Timeout: {img_paths} -> Not found in {timeout} seconds")
-        return -1
+        return -1, None
 
     @staticmethod
     def press_key(key: str, presses: int = 1, interval: float = 0, wait: float = 0, trace: bool = True) -> bool:
