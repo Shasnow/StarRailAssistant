@@ -3,8 +3,9 @@ from datetime import datetime
 from loguru import logger
 
 import tasks.currency_wars.characters as cw_chars
-from SRACore.util.operator import Executable, Operator
-from tasks.currency_wars.characters import Character, Positioning, get_character
+from SRACore.util.operator import Executable
+from tasks.currency_wars.characters import (Character, Positioning,
+                                            get_character)
 
 # ==================== 图片常量集中管理 ====================
 # 说明：集中管理所有在本模块使用的图片路径，避免散落的硬编码字符串，方便统一修改与查找。
@@ -49,7 +50,6 @@ class CWIMG:
 class CurrencyWars(Executable):
     def __init__(self, run_times):
         super().__init__()
-        self.op = Operator()
         self.run_times = run_times
         self.force_battle = False
         self.on_field_character: list[Character | None] = [None, None, None, None]  # 场上角色列表
@@ -675,7 +675,7 @@ class CurrencyWars(Executable):
             #保存捕获游戏窗口截图到log文件夹
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
             filename = f"log/unhandled_right_event_{timestamp}.png"
-            img=self.op.screenshot_region()
+            img=self.screenshot_region()
             img.save(filename)
             return True
 
@@ -788,4 +788,5 @@ class CurrencyWars(Executable):
         self.school_tendency = {k: v for k, v in
                                 sorted(self.school_tendency.items(), key=lambda item: item[1], reverse=True)}  # 排序
         logger.info(f"当前阵营倾向：{self.faction_tendency}")
+        logger.info(f"当前派系倾向：{self.school_tendency}")
         logger.info(f"当前派系倾向：{self.school_tendency}")
