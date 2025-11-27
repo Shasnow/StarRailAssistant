@@ -24,7 +24,7 @@ class StartGameTask(BaseTask):
         self.start_game_click()
         res,_ = self.wait_any_img(["resources/img/enter.png",
                                  "resources/img/train_supply.png",
-                                 "resources/img/task_resources_manage.png"], timeout=120)
+                                 "resources/img/task_resources_manage.png"], timeout=120, interval=1)
         if res == 0:
             return True
         elif res == 1:
@@ -131,7 +131,7 @@ class StartGameTask(BaseTask):
     def login_au(self):
         result, _ = self.wait_any_img(
             ["resources/img/login_page.png", "resources/img/welcome.png",
-             "resources/img/quit.png", "resources/img/enter.png"], timeout=60)
+             "resources/img/quit.png", "resources/img/enter.png"], timeout=60, interval=1)
         if result == -1:
             logger.error("等待登录界面超时")
             return -1

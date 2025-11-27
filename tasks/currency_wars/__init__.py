@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from loguru import logger
@@ -92,6 +93,7 @@ class CurrencyWars(Executable):
         self.faction_tendency = {}  # 阵营倾向字典
         self.school_tendency = {}  # 派系倾向字典
         self.is_running = False
+        self.is_continue = False  # 是否是继续挑战
 
     @staticmethod
     def set_username(username: str):
@@ -102,7 +104,8 @@ class CurrencyWars(Executable):
         if self.run_times == 0:
             return True
         for _ in range(self.run_times):
-            self.start_game()
+            if not self.start_game():
+                return False
             self.run_game()
         return True
 
@@ -150,9 +153,16 @@ class CurrencyWars(Executable):
                 logger.error("进入对局流程失败")
                 return False
         elif page == 2:
+            self.is_continue= True
             logger.info("已处于准备阶段，跳过进入流程")
 
         # 进入对局后的初始策略与手牌更新
+        if self.is_continue:
+            logger.info("继续进度进入，跳过初始策略应用")
+            self.sleep(2)  # 等待界面稳定
+            self.refresh_character()  # 刷新角色状态
+            self.get_in_hand_area(True)  # 更新手牌信息
+            return True
         if not self._apply_initial_strategy():
             logger.error("初始策略应用失败")
             return False
@@ -208,6 +218,7 @@ class CurrencyWars(Executable):
 
     def _continue_progress_flow(self, continue_progress_box) -> bool:
         """继续已有进度进入对局。"""
+        self.is_continue = True
         if not self.click_box(continue_progress_box, after_sleep=1):
             return False
         try:
@@ -218,8 +229,8 @@ class CurrencyWars(Executable):
                 return False
             self.click_box(click_blank, after_sleep=1)
             return True
-        except Exception:
-            logger.error("继续进度流程异常，无法进入对局")
+        except Exception as e:
+            logger.error(f"继续进度流程异常，无法进入对局: {e}")
             return False
 
     # ==================== 进入后的初始策略 ====================
@@ -238,23 +249,7 @@ class CurrencyWars(Executable):
                 for _ in range(3):
                     self.click_img(CWIMG.TRACE, after_sleep=0.3)
         self.press_key('esc')
-        #考虑中途加入、接管情况
-        self.update_max_team_size()
-        self.handle_special_event()
-        self.refresh_character() # 更新角色信息
-        self.get_in_hand_area()  # 更新手牌信息（若无接管情况，则仅有此行有用）
-        while True:
-            self.place_character()  # 放置角色
-            self.sell_character()   # 出售多余角色
-            self.harvest_crystals() # 收获水晶
-            self.refresh_character() # 更新角色信息
-            self.get_in_hand_area(True)  # 更新手牌信息
-            if self.in_hand_character_count < 8:
-                break
-        self.shopping() # 购物
         self.get_in_hand_area(True)  # 更新手牌信息
-        self.place_character()  # 放置角色
-        self.sell_character()   # 出售多余角色
         return True
 
     def run_game(self):
@@ -674,13 +669,16 @@ class CurrencyWars(Executable):
             logger.info("检测到右侧按钮事件（默认不处理）")
             #保存捕获游戏窗口截图到log文件夹
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-            filename = f"log/unhandled_right_event_{timestamp}.png"
+            if not os.path.exists("log/currency_wars"):
+                os.makedirs("log/currency_wars")
+            filename = f"log/currency_wars/unhandled_right_event_{timestamp}.png"
             img=self.screenshot_region()
             img.save(filename)
             return True
 
     def strategy_event(self):
-        self.click_img(CWIMG.RIGHT, after_sleep=2)
+        """处理攻略事件"""
+        self.click_img(CWIMG.RIGHT, after_sleep=2) # 有可合成的装备，点击对应位置
         self.click_point(0.5, 0.5, after_sleep=0.5)
 
     def shopping(self):
