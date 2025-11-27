@@ -1,10 +1,11 @@
+from datetime import datetime
+
 from loguru import logger
 
 import tasks.currency_wars.characters as cw_chars
 from SRACore.util.operator import Executable
 from tasks.currency_wars.characters import (Character, Positioning,
                                             get_character)
-
 
 # ==================== 图片常量集中管理 ====================
 # 说明：集中管理所有在本模块使用的图片路径，避免散落的硬编码字符串，方便统一修改与查找。
@@ -41,6 +42,7 @@ class CWIMG:
     FOLD = f"{BASE}/fold.png"
     SELECT_INVEST_STRATEGY = f"{BASE}/select_invest_strategy.png"
     THE_PLANET_OF_FESTIVITIES = f"{BASE}/ThePlanetOfFestivities.png"
+    FORTUNE_TELLER = f"{BASE}/FortuneTeller.png"
     RIGHT = f"{BASE}/right.png"
     PRIMARY_SELECTION = f"{BASE}/primary_selection.png"
 
@@ -237,11 +239,22 @@ class CurrencyWars(Executable):
                     self.click_img(CWIMG.TRACE, after_sleep=0.3)
         self.press_key('esc')
         #考虑中途加入、接管情况
-        self.harvest_crystals()  # 收获水晶
-        self.refresh_character()  # 更新角色信息
+        self.update_max_team_size()
+        self.handle_special_event()
+        self.refresh_character() # 更新角色信息
         self.get_in_hand_area()  # 更新手牌信息（若无接管情况，则仅有此行有用）
+        while True:
+            self.place_character()  # 放置角色
+            self.sell_character()   # 出售多余角色
+            self.harvest_crystals() # 收获水晶
+            self.refresh_character() # 更新角色信息
+            self.get_in_hand_area(True)  # 更新手牌信息
+            if self.in_hand_character_count < 8:
+                break
+        self.shopping() # 购物
+        self.get_in_hand_area(True)  # 更新手牌信息
         self.place_character()  # 放置角色
-        self.sell_character()  # 出售多余角色
+        self.sell_character()   # 出售多余角色
         return True
 
     def run_game(self):
@@ -388,7 +401,7 @@ class CurrencyWars(Executable):
                 continue
             if character.positioning != Positioning.OffField:
                 if self.place_on_field_character(i):
-                    self.sleep(0.5)
+                    self.sleep(1)
                     self.handle_special_event()
 
         # 第二次遍历：仅处理后台角色（Positioning.OffField），填充剩余空位或替换
@@ -398,7 +411,7 @@ class CurrencyWars(Executable):
                 continue
             if character.positioning != Positioning.OnField:
                 if self.place_off_field_character(i):
-                    self.sleep(0.5)
+                    self.sleep(1)
                     self.handle_special_event()
 
         logger.info("角色放置完成")
@@ -522,6 +535,10 @@ class CurrencyWars(Executable):
         self.sell_character()  # 递归出售，直到手牌不满
 
     def battle(self) -> bool:
+        """
+        执行战斗流程，返回战斗是否成功结束
+        尽量保证进入流程时手牌未满
+        """
         self.click_point(0.907, 0.714, after_sleep=1)
         if self.locate(IMG.ENSURE):  # 编队未满提醒
             if self.force_battle:
@@ -634,13 +651,33 @@ class CurrencyWars(Executable):
             self.sleep(1.5)
 
     def handle_special_event(self):
+        # for _ in range(3):  # 尝试 3 次
+        #     event, _ = self.locate_any([
+        #         CWIMG.THE_PLANET_OF_FESTIVITIES,
+        #         CWIMG.RIGHT
+        # ])
         event, _ = self.locate_any([
-            CWIMG.THE_PLANET_OF_FESTIVITIES,
-            CWIMG.RIGHT
+                CWIMG.THE_PLANET_OF_FESTIVITIES,
+                CWIMG.FORTUNE_TELLER,
+                CWIMG.RIGHT
         ])
         if event == 0:  # 盛会之星事件
             self.click_point(0.5, 0.25, after_sleep=1)  # 选择第一个选项
             self.click_point(0.77, 0.52, after_sleep=1)  # 点击确认按钮
+            return True
+        elif event == 1:
+            logger.info("触发命运卜者事件")
+            self.click_point(0.8, 0.3, after_sleep=1)  # 选择第三个选项
+            self.click_point(0.77, 0.52, after_sleep=1)  # 点击确认按钮
+            return True
+        else:
+            logger.info("检测到右侧按钮事件（默认不处理）")
+            #保存捕获游戏窗口截图到log文件夹
+            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            filename = f"log/unhandled_right_event_{timestamp}.png"
+            img=self.screenshot_region()
+            img.save(filename)
+            return True
 
     def strategy_event(self):
         self.click_img(CWIMG.RIGHT, after_sleep=2)
@@ -751,4 +788,5 @@ class CurrencyWars(Executable):
         self.school_tendency = {k: v for k, v in
                                 sorted(self.school_tendency.items(), key=lambda item: item[1], reverse=True)}  # 排序
         logger.info(f"当前阵营倾向：{self.faction_tendency}")
+        logger.info(f"当前派系倾向：{self.school_tendency}")
         logger.info(f"当前派系倾向：{self.school_tendency}")
