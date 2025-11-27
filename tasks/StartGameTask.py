@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from SRACore.tasks.BaseTask import BaseTask
+from SRACore.task import BaseTask
 from SRACore.util import sys_util, encryption
 from SRACore.util.logger import logger
 
