@@ -1,4 +1,4 @@
-#   <StarRailAssistant:An automated program that helps you complete daily tasks of StarRail.>
+#   <StarRailAssistant:An automated program that helps you complete daily task of StarRail.>
 #   Copyright © <2024> <Shasnow>
 
 #   This file is part of StarRailAssistant.
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     shutil.copytree(root_path / "SRAFrontend/bin/Release/net8.0/win-x64/publish", root_path / "main.dist/", dirs_exist_ok=True)
     shutil.copytree(root_path / "resources", root_path / "main.dist/resources")
     shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "main.dist/rapidocr_onnxruntime")
-    shutil.copytree(root_path / "tasks", root_path / "main.dist/tasks")
+    shutil.copytree(root_path / "task", root_path / "main.dist/task")
     os.makedirs(root_path / "main.dist/SRACore", exist_ok=True)
     shutil.copy(root_path / "SRACore/config.toml", root_path / "main.dist/SRACore/config.toml")
     shutil.copy(root_path / "LICENSE", root_path / "main.dist/LICENSE")

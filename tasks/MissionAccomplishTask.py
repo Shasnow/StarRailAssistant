@@ -1,4 +1,4 @@
-from SRACore.tasks.BaseTask import BaseTask
+from SRACore.task import BaseTask
 from SRACore.util import sys_util
 from SRACore.util.logger import logger
 
