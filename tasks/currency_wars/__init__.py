@@ -727,7 +727,7 @@ class CurrencyWars(Executable):
 
             self.press_key('d')  # 按d刷新商店
             self.sleep(0.5)
-        self.click_point(0.5, 0.55)  # 点击空白处关闭商店
+        self.click_point(0.5, 0.55, after_sleep=1)  # 点击空白处关闭商店
 
     @property
     def current_team_size(self) -> int:
