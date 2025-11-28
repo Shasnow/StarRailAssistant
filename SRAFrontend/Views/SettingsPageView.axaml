@@ -254,6 +254,7 @@
                                         <ComboBox Grid.Column="2" SelectedIndex="{Binding Settings.DownloadChannel}">
                                             <ComboBoxItem>Mirror 酱</ComboBoxItem>
                                             <ComboBoxItem>GitHub</ComboBoxItem>
+                                            <ComboBoxItem>Auto-MAS</ComboBoxItem>
                                         </ComboBox>
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto, *, *">
