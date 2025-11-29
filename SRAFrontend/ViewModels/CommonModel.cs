@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
@@ -8,6 +9,7 @@ using SRAFrontend.Data;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 using SRAFrontend.utilities;
+using SRAFrontend.Utilities;
 using SukiUI.Controls;
 using SukiUI.MessageBox;
 using SukiUI.Toasts;
@@ -96,6 +98,44 @@ public class CommonModel(
                 case SukiMessageBoxResult.Cancel:
                     break;
             }
+        }
+    }
+
+    public async Task CheckDesktopShortcut()
+    {
+        if (cacheService.Cache.NoNotifyForShortcut) return;
+        if (File.Exists(PathString.DesktopShortcutPath)) return;
+
+        var createShortcutButton =
+            SukiMessageBoxButtonsFactory.CreateButton("创建快捷方式", SukiMessageBoxResult.Yes, "Flat");
+        var cancelButton = SukiMessageBoxButtonsFactory.CreateButton("取消", SukiMessageBoxResult.Cancel);
+        var doNotAskButton =
+            SukiMessageBoxButtonsFactory.CreateButton("不再询问", SukiMessageBoxResult.No, "Flat Warning");
+        var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+        {
+            Header = "创建桌面快捷方式",
+            Content = "检测到桌面快捷方式不存在，是否现在创建？",
+            ActionButtonsSource = [createShortcutButton, doNotAskButton, cancelButton]
+        });
+        switch (result)
+        {
+            case SukiMessageBoxResult.No:
+                cacheService.Cache.NoNotifyForShortcut = true;
+                break;
+            case SukiMessageBoxResult.Yes:
+                try
+                {
+                    ShortcutUtil.CreateWindowsShortcut(PathString.DesktopShortcutPath,
+                        Path.Combine(Environment.CurrentDirectory, "SRA.exe"));
+                    ShowSuccessToast("快捷方式创建成功", "已在桌面创建 SRA 快捷方式");
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Error creating desktop shortcut");
+                    ShowErrorToast("快捷方式创建失败", $"发生错误：{e.Message}");
+                }
+
+                break;
         }
     }
 
