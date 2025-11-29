@@ -3,7 +3,7 @@ import tomllib
 
 from SRACore.util import sys_util  # NOQA 有动态用法，确保被打包
 from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
-from SRACore.task.BaseTask import BaseTask
+from SRACore.task import BaseTask
 from SRACore.util.config import load_config, load_cache, load_settings
 from SRACore.util.logger import logger, setup_logger
 from SRACore.util.notify import send_mail_notification, send_windows_notification
@@ -23,7 +23,7 @@ class TaskManager:
 
         self.task_list = []
         with open("SRACore/config.toml", "rb") as f:
-            tasks = tomllib.load(f).get("task")
+            tasks = tomllib.load(f).get("tasks")
             for task in tasks:
                 main_class = task.get("main")
                 module = task.get("module")
