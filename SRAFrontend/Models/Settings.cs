@@ -12,8 +12,9 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private bool _allowSystemNotifications = true; // 是否允许系统通知
     [ObservableProperty] private int _appChannel; // 0: stable, 1: beta
 
-    [ObservableProperty] private double _backgroundOpacity = 0.9;
-    [ObservableProperty] private double _ctrlPanelOpacity = 0.9;
+    [ObservableProperty] private double _backgroundOpacity = 0.9; // 背景图不透明度
+    [ObservableProperty] private double _ctrlPanelOpacity = 0.9; // 控制面板不透明度
+    [ObservableProperty] private string _backgroundImagePath = ""; // 背景图路径
     [ObservableProperty] private double _confidenceThreshold = 0.9; // 识图置信度阈值
     [ObservableProperty] private int _defaultPage; // 启动时默认页面索引
     [ObservableProperty] private int _downloadChannel = 1; // 0: Mirror, 1: GitHub

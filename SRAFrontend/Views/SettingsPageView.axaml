@@ -98,11 +98,14 @@
                                     <!--         <ComboBoxItem Content="{x:Static lang:Resources.DarkText}" /> -->
                                     <!--     </ComboBox> -->
                                     <!-- </Grid> -->
-                                    <!-- <Grid ColumnDefinitions="Auto, *, Auto"> -->
-                                    <!--     <Label Grid.Column="0" Classes="icon" Content="&#xE2CA;" /> -->
-                                    <!--     <Label Grid.Column="1" Content="{x:Static lang:Resources.BackgroundImageText}" /> -->
-                                    <!--     <TextBox Grid.Column="2">c:/background.jpg</TextBox> -->
-                                    <!-- </Grid> -->
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Grid.Column="0" Classes="icon" Content="&#xE2CA;" />
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.BackgroundImageText}" />
+                                        <TextBox Grid.Column="2"
+                                                 Width="400"
+                                                 Watermark="请输入图片路径"
+                                                 Text="{Binding Settings.BackgroundImagePath}" />
+                                    </Grid>
                                     <Grid ColumnDefinitions="Auto, *, Auto, 28">
                                         <Label Grid.Column="0" Classes="icon" Content="&#xEB42;" />
                                         <Label Grid.Column="1"

@@ -10,7 +10,7 @@
     <Grid>
         <!-- 背景图片 -->
         <Border CornerRadius="24" BorderThickness="1" ClipToBounds="True" Margin="8">
-            <Image Source="/Assets/background-lt.jpg" Stretch="UniformToFill" Opacity="{Binding ImageOpacity}" />
+            <Image Source="{Binding BackgroundImage}" Stretch="UniformToFill" Opacity="{Binding ImageOpacity}" />
         </Border>
 
         <Grid RowDefinitions="*, Auto" Margin="50">
