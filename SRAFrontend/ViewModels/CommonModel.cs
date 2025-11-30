@@ -134,7 +134,6 @@ public class CommonModel(
                     logger.LogError(e, "Error creating desktop shortcut");
                     ShowErrorToast("快捷方式创建失败", $"发生错误：{e.Message}");
                 }
-
                 break;
         }
     }
