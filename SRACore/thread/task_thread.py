@@ -3,7 +3,7 @@ import tomllib
 
 from SRACore.util import sys_util  # NOQA 有动态用法，确保被打包
 from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
-from SRACore.tasks.BaseTask import BaseTask
+from SRACore.task import BaseTask
 from SRACore.util.config import load_config, load_cache, load_settings
 from SRACore.util.logger import logger, setup_logger
 from SRACore.util.notify import send_mail_notification, send_windows_notification
@@ -34,7 +34,7 @@ class TaskManager:
                 if not callable(getattr(_class, "run", None)):
                     raise TypeError(f"Task class {main_class} does not implement a callable 'run' method")
                 self.task_list.append(_class)
-        logger.debug("Successfully load tasks: " + str(self.task_list))
+        logger.debug("Successfully load task: " + str(self.task_list))
 
     def stop(self):
         """
@@ -71,7 +71,7 @@ class TaskManager:
                 # 获取当前配置需要执行的任务列表
                 tasks_to_run = self.get_tasks(config_name)
                 if not tasks_to_run:
-                    logger.warning(f"No tasks selected in config '{config_name}'. Skipping.")
+                    logger.warning(f"No task selected in config '{config_name}'. Skipping.")
                     continue
 
                 # 依次执行任务
@@ -89,7 +89,7 @@ class TaskManager:
                         break
                 logger.info(f"配置 '{config_name}' 的所有任务执行完毕。")
 
-            logger.info("All tasks completed.")
+            logger.info("All task completed.")
             self.send_notification()
         except Exception as e:
             # 捕获线程主循环中的异常（如配置加载失败）

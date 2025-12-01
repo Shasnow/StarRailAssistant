@@ -1,17 +1,18 @@
 import argparse
 import sys
 import os
-os.chdir(os.path.dirname(os.path.abspath(__file__)))  # 切换到脚本所在目录
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))  # 将脚本所在目录加入模块搜索路径
+
+from SRACore.util.const import VERSION
+
 
 def main():
     # 创建 argparse 解析器
     parser = argparse.ArgumentParser(
         description="SRA 命令行工具",
-        epilog="examples：\n"
-               "  交互模式：SRA-cli\n"
-               "  单次执行：SRA-cli run [配置名称...] --once\n"
-               "  内嵌模式：SRA-cli --inline",
+        epilog="examples:\n"
+               "  交互模式: SRA-cli\n"
+               "  单次执行: SRA-cli run [配置名称...] --once\n"
+               "  内嵌模式: SRA-cli --inline",
         formatter_class=argparse.RawTextHelpFormatter  # 保留换行符，优化帮助信息格式
     )
     # 全局参数（模式控制）
@@ -24,6 +25,18 @@ def main():
         '--embed',
         action='store_true',
         help='同 --inline'
+    )
+    parser.add_argument(
+        '--version',
+        action='version',
+        version=f'SRA-cli {VERSION}',
+        help='显示版本信息并退出'
+    )
+
+    parser.add_argument(
+        '--verbose',
+        action='store_true',
+        help='启用详细日志输出（调试模式）'
     )
 
     # 子命令：run（用于单次执行命令）
@@ -50,7 +63,6 @@ def main():
 
     # 解析参数
     args = parser.parse_args()
-
     # 延迟导入 SRACli（减少启动时的依赖加载）
     from SRACore.util.logger import logger
     from SRACore.SRA import SRACli
@@ -59,6 +71,7 @@ def main():
     # 根据参数处理模式
     # 内嵌模式：隐藏提示符
     if args.inline or args.embed:
+        cli_instance.intro = ''
         cli_instance.prompt = ''
     # 处理 run 子命令（单次执行）
     if args.subcommand == 'run':

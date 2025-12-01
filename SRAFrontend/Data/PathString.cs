@@ -14,4 +14,6 @@ public static class PathString
     public static readonly string ReportsDir = "reports";
     // public static readonly string PythonDir = Path.Combine(Environment.CurrentDirectory, "python");
     public static readonly string SourceCodeDir = Path.Combine(Environment.CurrentDirectory, "SRA");
+    public static readonly string DesktopShortcutPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SRA.lnk");
 }
