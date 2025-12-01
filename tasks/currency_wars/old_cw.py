@@ -6,7 +6,45 @@ from loguru import logger
 import tasks.currency_wars.characters as cw_chars
 from SRACore.util.operator import Executable
 from tasks.currency_wars.characters import Character, Positioning, get_character
-from tasks.currency_wars.img import CWIMG, IMG
+
+# ==================== 图片常量集中管理 ====================
+# 说明：集中管理所有在本模块使用的图片路径，避免散落的硬编码字符串，方便统一修改与查找。
+# 分组：通用 IMG（跨模式通用），货币战争专用 CWIMG。
+
+class IMG:
+    ENTER = "resources/img/enter.png"
+    F4 = "resources/img/f4.png"
+    COLLECTION = "resources/img/collection.png"
+    ENSURE = "resources/img/ensure.png"
+    ENSURE2 = "resources/img/ensure2.png"
+
+
+class CWIMG:
+    BASE = "resources/img/currency_wars"
+    CURRENCY_WARS_START = f"{BASE}/currency_wars_start.png"
+    PREPARATION_STAGE = f"{BASE}/preparation_stage.png"
+    ENTER_STANDARD = f"{BASE}/enter_standard.png"
+    CONTINUE_PROGRESS = f"{BASE}/continue_progress.png"
+    DOWN_ARROW = f"{BASE}/down_arrow.png"
+    START_GAME = f"{BASE}/start_game.png"
+    NEXT_STEP = f"{BASE}/next_step.png"
+    INVEST_ENVIRONMENT = f"{BASE}/invest_environment.png"
+    CLICK_BLANK = f"{BASE}/click_blank.png"
+    STRATEGY = f"{BASE}/strategy.png"
+    CANCEL_APPLY = f"{BASE}/cancel_apply.png"
+    APPLY = f"{BASE}/apply.png"
+    TRACE = f"{BASE}/trace.png"
+    OPEN = f"{BASE}/open.png"
+    SETTLE = f"{BASE}/settle.png"
+    CONTINUE = f"{BASE}/continue.png"
+    REPLENISH_STAGE = f"{BASE}/replenish_stage.png"
+    ENCOUNTER_NODE = f"{BASE}/encounter_node.png"
+    FOLD = f"{BASE}/fold.png"
+    SELECT_INVEST_STRATEGY = f"{BASE}/select_invest_strategy.png"
+    THE_PLANET_OF_FESTIVITIES = f"{BASE}/ThePlanetOfFestivities.png"
+    FORTUNE_TELLER = f"{BASE}/FortuneTeller.png"
+    RIGHT = f"{BASE}/right.png"
+    PRIMARY_SELECTION = f"{BASE}/primary_selection.png"
 
 
 class CurrencyWars(Executable):
@@ -14,7 +52,6 @@ class CurrencyWars(Executable):
         super().__init__()
         self.run_times = run_times
         self.force_battle = False
-        self.is_continue = False  # 是否是继续挑战
         self.on_field_character: list[Character | None] = [None, None, None, None]  # 场上角色列表
         self.on_field_area: list[tuple[float, float]] = [
             (0.386, 0.365),
@@ -55,6 +92,7 @@ class CurrencyWars(Executable):
         self.faction_tendency = {}  # 阵营倾向字典
         self.school_tendency = {}  # 派系倾向字典
         self.is_running = False
+        self.is_continue = False  # 是否是继续挑战
 
     @staticmethod
     def set_username(username: str):
@@ -114,15 +152,15 @@ class CurrencyWars(Executable):
                 logger.error("进入对局流程失败")
                 return False
         elif page == 2:
-            self.is_continue = True
+            self.is_continue= True
             logger.info("已处于准备阶段，跳过进入流程")
 
         # 进入对局后的初始策略与手牌更新
         if self.is_continue:
             logger.info("继续进度进入，跳过初始策略应用")
-            self.sleep(2)
-            self.refresh_character()
-            self.get_in_hand_area(True)
+            self.sleep(2)  # 等待界面稳定
+            self.refresh_character()  # 刷新角色状态
+            self.get_in_hand_area(True)  # 更新手牌信息
             return True
         if not self._apply_initial_strategy():
             logger.error("初始策略应用失败")
@@ -210,15 +248,7 @@ class CurrencyWars(Executable):
                 for _ in range(3):
                     self.click_img(CWIMG.TRACE, after_sleep=0.3)
         self.press_key('esc')
-        #考虑中途加入、接管情况
-        fold_box = self.wait_img(CWIMG.FOLD, timeout=2) # 判断商店是否为未收起状态
-        if fold_box is not None:
-            self.click_box(fold_box, after_sleep=1)
-        self.harvest_crystals()  # 收获水晶
-        self.refresh_character()  # 更新角色信息
-        self.get_in_hand_area()  # 更新手牌信息（若无接管情况，则仅有此行有用）
-        self.place_character()  # 放置角色
-        self.sell_character()  # 出售多余角色
+        self.get_in_hand_area(True)  # 更新手牌信息
         return True
 
     def run_game(self):
@@ -365,7 +395,7 @@ class CurrencyWars(Executable):
                 continue
             if character.positioning != Positioning.OffField:
                 if self.place_on_field_character(i):
-                    self.sleep(0.5)
+                    self.sleep(1)
                     self.handle_special_event()
 
         # 第二次遍历：仅处理后台角色（Positioning.OffField），填充剩余空位或替换
@@ -375,7 +405,7 @@ class CurrencyWars(Executable):
                 continue
             if character.positioning != Positioning.OnField:
                 if self.place_off_field_character(i):
-                    self.sleep(0.5)
+                    self.sleep(1)
                     self.handle_special_event()
 
         logger.info("角色放置完成")
@@ -499,6 +529,10 @@ class CurrencyWars(Executable):
         self.sell_character()  # 递归出售，直到手牌不满
 
     def battle(self) -> bool:
+        """
+        执行战斗流程，返回战斗是否成功结束
+        尽量保证进入流程时手牌未满
+        """
         self.click_point(0.907, 0.714, after_sleep=1)
         if self.locate(IMG.ENSURE):  # 编队未满提醒
             if self.force_battle:
@@ -611,10 +645,15 @@ class CurrencyWars(Executable):
             self.sleep(1.5)
 
     def handle_special_event(self):
+        # for _ in range(3):  # 尝试 3 次
+        #     event, _ = self.locate_any([
+        #         CWIMG.THE_PLANET_OF_FESTIVITIES,
+        #         CWIMG.RIGHT
+        # ])
         event, _ = self.locate_any([
-            CWIMG.THE_PLANET_OF_FESTIVITIES,
-            CWIMG.FORTUNE_TELLER,
-            CWIMG.RIGHT
+                CWIMG.THE_PLANET_OF_FESTIVITIES,
+                CWIMG.FORTUNE_TELLER,
+                CWIMG.RIGHT
         ])
         if event == 0:  # 盛会之星事件
             self.click_point(0.5, 0.25, after_sleep=1)  # 选择第一个选项
@@ -627,17 +666,18 @@ class CurrencyWars(Executable):
             return True
         else:
             logger.info("检测到右侧按钮事件（默认不处理）")
-            # 保存捕获游戏窗口截图到log文件夹
+            #保存捕获游戏窗口截图到log文件夹
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
             if not os.path.exists("log/currency_wars"):
                 os.makedirs("log/currency_wars")
             filename = f"log/currency_wars/unhandled_right_event_{timestamp}.png"
-            img = self.screenshot_region()
+            img=self.screenshot_region()
             img.save(filename)
             return True
 
     def strategy_event(self):
-        self.click_img(CWIMG.RIGHT, after_sleep=2)
+        """处理攻略事件"""
+        self.click_img(CWIMG.RIGHT, after_sleep=2) # 有可合成的装备，点击对应位置
         self.click_point(0.5, 0.5, after_sleep=0.5)
 
     def shopping(self):
