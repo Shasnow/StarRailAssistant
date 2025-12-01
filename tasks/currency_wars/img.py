@@ -35,6 +35,7 @@ class CWIMG:
     THE_PLANET_OF_FESTIVITIES = f"{BASE}/ThePlanetOfFestivities.png"
     RIGHT = f"{BASE}/right.png"
     PRIMARY_SELECTION = f"{BASE}/primary_selection.png"
+    FORTUNE_TELLER = f"{BASE}/FortuneTeller.png"
     RETURN_HIGHEST_RANK = f"{BASE}/return_highest_rank.png"
     JI_MI= f"{BASE}/ji_mi.png"
     CONCLUDE_AND_SETTLE= f"{BASE}/conclude_and_settle.png"
