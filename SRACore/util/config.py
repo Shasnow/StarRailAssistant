@@ -1,6 +1,7 @@
 from SRACore.util.logger import logger
 
 from SRACore.util.const import ApplicationDataPath
+from SRACore.util.i18n import t
 import json
 
 
@@ -9,13 +10,13 @@ def load_config(name:str):
         with open(ApplicationDataPath / f'configs/{name}.json','r') as f:
            return json.load(f)
     except FileNotFoundError as e:
-        logger.error(f"配置文件 {name}.json 未找到: {e}")
+        logger.error(t('config.file_not_found', name=name, error=e))
         return {}
     except json.JSONDecodeError as e:
-        logger.error(f"配置文件 {name}.json 解析错误: {e}")
+        logger.error(t('config.parse_error', name=name, error=e))
         return {}
     except Exception as e:
-        logger.error(f"加载配置文件 {name}.json 时发生错误: {e}")
+        logger.error(t('config.load_error', name=name, error=e))
         return {}
 
 def load_settings():
@@ -23,13 +24,13 @@ def load_settings():
         with open(ApplicationDataPath / 'settings.json','r') as f:
            return json.load(f)
     except FileNotFoundError as e:
-        logger.error(f"设置文件 settings.json 未找到: {e}")
+        logger.error(t('config.settings_not_found', error=e))
         return {}
     except json.JSONDecodeError as e:
-        logger.error(f"设置文件 settings.json 解析错误: {e}")
+        logger.error(t('config.settings_parse_error', error=e))
         return {}
     except Exception as e:
-        logger.error(f"加载设置文件 settings.json 时发生错误: {e}")
+        logger.error(t('config.settings_load_error', error=e))
         return {}
 
 def load_cache():
@@ -37,11 +38,11 @@ def load_cache():
         with open(ApplicationDataPath / 'cache.json','r') as f:
            return json.load(f)
     except FileNotFoundError as e:
-        logger.error(f"缓存文件 cache.json 未找到: {e}")
+        logger.error(t('config.cache_not_found', error=e))
         return {}
     except json.JSONDecodeError as e:
-        logger.error(f"缓存文件 cache.json 解析错误: {e}")
+        logger.error(t('config.cache_parse_error', error=e))
         return {}
     except Exception as e:
-        logger.error(f"加载缓存文件 cache.json 时发生错误: {e}")
+        logger.error(t('config.cache_load_error', error=e))
         return {}

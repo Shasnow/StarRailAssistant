@@ -8,11 +8,12 @@ from loguru import logger
 from SRACore.thread.task_thread import TaskManager
 from SRACore.thread.trigger_thread import TriggerManager
 from SRACore.util.const import VERSION, CORE
+from SRACore.util.i18n import t
 
 
 class SRACli(cmd.Cmd):
-    intro = f"SRA-cli {VERSION} ({CORE})\nType 'help' or '?' to list commands."
-    prompt = "sra> "  # 增加命令提示符，提升交互体验
+    intro = t('cli.intro', version=VERSION, core=CORE)
+    prompt = t('cli.prompt')
 
     def __init__(self):
         super().__init__()
@@ -22,151 +23,144 @@ class SRACli(cmd.Cmd):
         self.trigger_thread = threading.Thread(target=self.trigger_manager.run, daemon=True)
         self.trigger_thread.start()
         if not self.is_admin():
-            logger.warning("当前用户未具有管理员权限，某些功能可能无法正常工作。请以管理员身份运行此程序以获得完整功能。")
+            logger.warning(t('cli.no_admin_warning'))
 
     def default(self, line):
-        print(f"未知命令: '{line}'. 输入 'help' 获取可用命令列表。")
+        print(t('cli.unknown_command', line=line))
 
     def emptyline(self):
         pass
 
+    def _get_command_help(self, cmd_name):
+        """获取命令的帮助文本"""
+        help_key = f'cli.help_{cmd_name}'
+        help_text = t(help_key)
+        # 如果翻译键不存在，返回原始docstring
+        if help_text == help_key:
+            func = getattr(self, f"do_{cmd_name}", None)
+            if func and func.__doc__:
+                return func.__doc__.split('\n')[0]
+            return t('cli.help_no_doc')
+        return help_text
+
     def do_EOF(self, arg):
-        """Ctrl+D 退出命令行工具"""
+        """Ctrl+D exit command line tool"""
         return self.do_exit(arg)
 
     def do_help(self, arg):
-        """显示帮助信息"""
+        """Show help information"""
         if arg:
             func = getattr(self, f"do_{arg}", None)
             if func:
-                print(f"  {arg} - {func.__doc__ or '没有帮助信息'}")
+                help_text = self._get_command_help(arg)
+                print(f"  {arg} - {help_text}")
             else:
-                print(f"未知命令: {arg}")
+                print(t('cli.help_unknown', cmd=arg))
         else:
-            print("可用命令:")
+            print(t('cli.help_title'))
             # 按命令名排序，更易读
             commands = [name[3:] for name in dir(self) if name.startswith("do_")]
             for cmd_name in sorted(commands):
-                doc: str = getattr(self, f"do_{cmd_name}").__doc__ or "无帮助信息"
-                print(f"  {cmd_name} - {doc.split('\n')[0]}")
-            print("\n输入 'help <命令名>' 查看详细用法（例：help trigger）")
+                help_text = self._get_command_help(cmd_name)
+                print(f"  {cmd_name} - {help_text}")
+            print("\n" + t('cli.help_detail'))
 
     def do_exit(self, _):
-        """退出命令行工具"""
+        """Exit command line tool"""
         if self.task_process and self.task_process.is_alive():
             self.task_process.terminate()
             self.task_process.join(timeout=5)
             if self.task_process.is_alive():
-                logger.error("TaskManager 强制终止超时，可能存在资源泄漏。")
+                logger.error(t('cli.task_timeout'))
 
         if self.trigger_thread and self.trigger_thread.is_alive():
             self.trigger_manager.stop()  # 调用原类的停止逻辑
             self.trigger_thread.join(timeout=5)
             if self.trigger_thread.is_alive():
-                logger.error("TriggerManager 停止超时，可能未响应停止信号。")
+                logger.error(t('cli.trigger_timeout'))
         return True
 
     def do_task(self, arg: str):
-        """任务管理器命令 - 支持启动/停止任务进程
-        用法：
-          task run    - 启动 TaskManager（自动检测是否已运行）
-          task stop   - 停止正在运行的 TaskManager
-        示例：
-          sra> task run    # 启动任务进程
-        """
+        """Task manager command - support start/stop task process"""
         args = arg.split()
         if not args:
-            print("用法: task <run|stop>")
+            print(t('cli.task_usage'))
             return
         command = args[0]
         if command == 'run':
             if self.task_process is not None and self.task_process.is_alive():
-                print("TaskManager 已在运行中。")
+                print(t('cli.task_already_running'))
                 return
             # 重新创建进程（避免重复启动已终止的进程）
             config_names = args[1:] if len(args) > 1 else tuple()
             self.task_process = multiprocessing.Process(target=self.task_manager.run, daemon=True, args=config_names)
             self.task_process.start()
             time.sleep(1)  # 确保进程有时间启动
-            logger.info("TaskManager 已启动。")
+            logger.info(t('cli.task_started'))
         elif command == 'stop':
             if self.task_process.is_alive():
-                logger.debug("[Abort] 用户请求停止 TaskManager...")
+                logger.debug(t('cli.task_abort'))
                 self.task_process.terminate()
                 self.task_process.join(timeout=5)  # 增加超时，避免阻塞
                 if self.task_process.is_alive():
-                    logger.error("TaskManager 强制终止超时。")
+                    logger.error(t('cli.task_timeout'))
                 else:
-                    logger.debug("[Done] TaskManager 已停止。")
+                    logger.debug(t('cli.task_stopped'))
             else:
-                print("TaskManager 未在运行中。")
+                print(t('cli.task_not_running'))
         else:
-            print(f"未知的 task 子命令 '{command}'，可用子命令：run, stop")
+            print(t('cli.task_unknown_subcommand', command=command))
 
     def do_trigger(self, arg: str):
-        """触发器管理器命令 - 支持启动/停止/配置触发器
-        用法：
-          trigger run                - 启动 TriggerManager 线程
-          trigger stop               - 停止 TriggerManager 线程
-          trigger enable <名称>       - 启用指定触发器
-          trigger disable <名称>      - 禁用指定触发器
-          trigger set-<类型> <名> <属性> <值> - 设置属性（支持类型：int/float/str/bool）
-            示例：
-              trigger set-int  TimerTrigger interval 30    # 整数类型
-              trigger set-bool TimerTrigger enable true     # 布尔类型
-              trigger set-str  LogTrigger path /var/log     # 字符串类型
-        说明：
-          - 触发器名称不区分大小写（例：TimerTrigger 和 timetrigger 等效）
-          - 布尔值支持：true/1/yes（真）、false/0/no（假）
-        """
+        """Trigger manager command - support start/stop/configure triggers"""
         args = arg.split()
         if not args:
-            print("用法: trigger <run|stop|enable|disable|set> [参数]")
+            print(t('cli.trigger_usage'))
             return
         command = args[0]
         if command == 'run':
             if self.trigger_thread.is_alive():
-                print("TriggerManager 已在运行中。")
+                print(t('cli.trigger_already_running'))
                 return
             # 重新创建线程（避免重复启动已终止的线程）
             self.trigger_thread = threading.Thread(target=self.trigger_manager.run, daemon=True)
             self.trigger_thread.start()
-            print("TriggerManager 已启动。")
+            print(t('cli.trigger_started'))
         elif command == 'stop':
             if self.trigger_thread.is_alive():
                 self.trigger_manager.stop()
                 self.trigger_thread.join(timeout=5)  # 增加超时
                 if self.trigger_thread.is_alive():
-                    logger.error("TriggerManager 停止超时（可能未正确响应停止信号）。")
+                    logger.error(t('cli.trigger_timeout'))
                 else:
-                    logger.debug("TriggerManager 已停止。")
+                    logger.debug(t('cli.trigger_stopped'))
             else:
-                print("TriggerManager 未在运行中。")
+                print(t('cli.trigger_not_running'))
         elif command == 'enable':
             if len(args) < 2:
-                print("用法: trigger enable <trigger_name>")
+                print(t('cli.trigger_enable_usage'))
                 return
             trigger_name = args[1]
             for trigger in self.trigger_manager.triggers:
                 if trigger.__class__.__name__.lower() == trigger_name.lower():
                     trigger.set_enable(True)
-                    logger.info(f"触发器 {trigger_name} 已启用。")
+                    logger.info(t('cli.trigger_enabled', name=trigger_name))
                     return
-            print(f"未找到触发器 {trigger_name}。")
+            print(t('cli.trigger_not_found', name=trigger_name))
         elif command == 'disable':
             if len(args) < 2:
-                print("用法: trigger disable <trigger_name>")
+                print(t('cli.trigger_disable_usage'))
                 return
             trigger_name = args[1]
             for trigger in self.trigger_manager.triggers:
                 if trigger.__class__.__name__.lower() == trigger_name.lower():
                     trigger.set_enable(False)
-                    logger.info(f"触发器 {trigger_name} 已禁用。")
+                    logger.info(t('cli.trigger_disabled', name=trigger_name))
                     return
-            print(f"未找到触发器 {trigger_name}。")
+            print(t('cli.trigger_not_found', name=trigger_name))
         elif command.startswith('set-'):
             if len(args) < 3:
-                print("用法: trigger set-<类型> <trigger_name> <属性> <值>")
+                print(t('cli.trigger_set_usage'))
                 return
             _type = command[4:]
             trigger_name = args[1]
@@ -175,7 +169,7 @@ class SRACli(cmd.Cmd):
             for trigger in self.trigger_manager.triggers:
                 if trigger.__class__.__name__.lower() == trigger_name.lower():
                     if not hasattr(trigger, attr):
-                        print(f"触发器 {trigger_name} 不存在属性 {attr}。")
+                        print(t('cli.trigger_attr_not_found', name=trigger_name, attr=attr))
                         return
                     if _type == 'int':
                         setattr(trigger, attr, int(value))
@@ -186,37 +180,26 @@ class SRACli(cmd.Cmd):
                     elif _type == 'bool':
                         setattr(trigger, attr, value.lower() in ['true', '1', 'yes'])
                     else:
-                        print(f"未知的属性类型 {_type}，支持的类型有：int, float, str, bool")
+                        print(t('cli.trigger_unknown_type', type=_type))
                         return
-                    logger.info(f"触发器 {trigger_name} 的属性 {attr} 已设置为 {value}。")
+                    logger.info(t('cli.trigger_attr_set', name=trigger_name, attr=attr, value=value))
                     return
-            print(f"未找到触发器 {trigger_name}。")
+            print(t('cli.trigger_not_found', name=trigger_name))
         else:
-            print(f"未知的 trigger 子命令 '{command}'，可用子命令：run, stop, enable, disable, set-<类型>")
+            print(t('cli.trigger_unknown_subcommand', command=command))
 
     def do_run(self, arg: str):
-        """运行指定任务，会阻塞当前命令行直到任务完成。
-        用法：
-          run [配置文件名称...]
-        说明：
-            - 如果不指定配置文件名称，则运行缓存中的所有配置。
-            - 可以指定一个或多个配置文件名称，空格分隔。
-            - 除了退出程序外，运行过程中无法中断任务。
-        示例：
-            sra> run DefaultConfig
-            sra> run Config1 Config2
-            sra> run
-        """
+        """Run specified tasks, will block current command line until tasks complete"""
         args = arg.split()
-        print("运行任务中，当前命令行将被阻塞，直到任务完成...")
+        print(t('cli.run_blocking'))
         try:
             self.task_manager.run(*args)
         except KeyboardInterrupt:
             return
-        print("任务运行完成，返回命令行。")
+        print(t('cli.run_completed'))
 
     def do_version(self, _):
-        """显示版本信息"""
+        """Show version information"""
         print(f"{VERSION}")
 
     @staticmethod
@@ -226,5 +209,5 @@ class SRACli(cmd.Cmd):
             import ctypes
             return ctypes.windll.shell32.IsUserAnAdmin() != 0  # NOQA
         except Exception as e:
-            logger.error(f"检查管理员权限时出错: {e}")
+            logger.error(t('cli.admin_check_error', error=e))
             return False

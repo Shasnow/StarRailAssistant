@@ -3,62 +3,60 @@ import sys
 import os
 
 from SRACore.util.const import VERSION
+from SRACore.util.i18n import t
 
 
 def main():
     # 创建 argparse 解析器
     parser = argparse.ArgumentParser(
-        description="SRA 命令行工具",
-        epilog="examples:\n"
-               "  交互模式: SRA-cli\n"
-               "  单次执行: SRA-cli run [配置名称...] --once\n"
-               "  内嵌模式: SRA-cli --inline",
+        description=t('cli.description'),
+        epilog=t('cli.examples'),
         formatter_class=argparse.RawTextHelpFormatter  # 保留换行符，优化帮助信息格式
     )
     # 全局参数（模式控制）
     parser.add_argument(
         '--inline',
         action='store_true',
-        help='内嵌模式（无命令提示符，适用于被其他程序调用）'
+        help=t('cli.inline_help')
     )
     parser.add_argument(
         '--embed',
         action='store_true',
-        help='同 --inline'
+        help=t('cli.embed_help')
     )
     parser.add_argument(
         '--version',
         action='version',
         version=f'SRA-cli {VERSION}',
-        help='显示版本信息并退出'
+        help=t('cli.version_help')
     )
 
     parser.add_argument(
         '--verbose',
         action='store_true',
-        help='启用详细日志输出（调试模式）'
+        help=t('cli.verbose_help')
     )
 
     # 子命令：run（用于单次执行命令）
     subparsers = parser.add_subparsers(
         dest='subcommand',  # 存储子命令名称的变量
-        title='commands',
+        title=t('cli.commands_title'),
     )
     run_parser = subparsers.add_parser(
         'run',
-        help='单次执行任务（如 "run Default"）',
-        description='执行完任务后默认进入交互模式，可配合 --once 立即退出'
+        help=t('cli.run_help'),
+        description=t('cli.run_description')
     )
     # 接收 run 后的所有参数（作为要执行的命令）
     run_parser.add_argument(
         '--config',
         nargs='*',
-        help='要运行的配置名称，不指定则运行缓存中的全部配置'
+        help=t('cli.config_help')
     )
     run_parser.add_argument(
         '--once',
         action='store_true',
-        help='执行完任务后退出'
+        help=t('cli.once_help')
     )
 
     # 解析参数
@@ -67,7 +65,7 @@ def main():
     from SRACore.util.logger import logger
     from SRACore.SRA import SRACli
     cli_instance = SRACli()
-    logger.debug(f"工作目录：{os.getcwd()}")
+    logger.debug(t('cli.working_directory', path=os.getcwd()))
     # 根据参数处理模式
     # 内嵌模式：隐藏提示符
     if args.inline or args.embed:
