@@ -97,10 +97,14 @@ class BrushOpening(Executable):
                             if hasattr(self, 'cw'):
                                 self.cw.is_running = False
                             return True
+                        # 刷新后仍未识别到叽米：执行返回备战并结算的完整流程
+                        logger.info("刷新后仍未识别到叽米，返回备战并结算本轮")
+                        self._return_to_prep_and_abort()
+                        continue
 
             # 未识别到叽米：中断探索并重新开始下一轮
-            logger.info("未识别到叽米，本轮结束并结算，准备下一轮")
-            self._safe_abort_and_return()
+            logger.info("未识别到叽米，返回备战并结算，准备下一轮")
+            self._return_to_prep_and_abort()
 
     def _detect_jimi(self) -> bool:
         """使用图像匹配检测是否存在叽米图片。"""
@@ -119,68 +123,79 @@ class BrushOpening(Executable):
         self.click_point(0.5, 0.5, after_sleep=2)
 
         # 标准进入 or 继续进度（若是继续进度则中断并返回）
-        index, box = self.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONTINUE_PROGRESS], timeout=10, interval=0.5)
-
+        index, box = self.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONCLUDE_AND_SETTLE], timeout=10, interval=0.5)
         if index == 0:
+            # 识别到标准进入，直接点击该入口并执行标准进入流程
+            if box is None or not self.click_box(box, after_sleep=1):
+                logger.error("点击标准进入失败")
+                return False
             return self.cw._standard_entry_flow(box)
         elif index == 1:
-            logger.info("检测到继续进度，执行结算并返回主界面后再走正常流程")
-            if not self._conclude_and_settle_from_continue(box):
+            # 识别到放弃并结算（继续进度的替代入口），直接点击并执行结算返回
+            if box is None or not self.click_box(box, after_sleep=1):
+                logger.error("点击放弃并结算入口失败")
                 return False
-            # 重新点击开始，走标准进入
-            start_box = self.wait_img(CWIMG.CURRENCY_WARS_START, timeout=10, interval=0.5)
-            if start_box is None or not self.click_box(start_box):
-                return False
-            self.click_point(0.5, 0.5, after_sleep=1.5)
-            enter_box = self.wait_img(CWIMG.ENTER_STANDARD, timeout=10, interval=0.5)
-            if enter_box is None:
-                return False
-            return self.cw._standard_entry_flow(enter_box)
+            logger.info("检测到放弃并结算入口，执行结算返回主界面")
+            return self._safe_abort_and_return()
 
         logger.error("既未识别标准进入，也未识别继续进度入口")
         return False
     
-    def _conclude_and_settle_from_continue(self, continue_box) -> bool:
-        """从“继续进度”入口中断并结算返回主界面。"""
-        if not self.click_box(continue_box, after_sleep=1):
-            return False
-        # 此处通常会出现“点击空白处”提示，点击以进入结算界面
-        click_blank = self.wait_img(CWIMG.CLICK_BLANK, timeout=5, interval=0.5)
-        if click_blank is not None:
-            self.click_box(click_blank, after_sleep=1)
-        return self._safe_abort_and_return()
-
     def _safe_abort_and_return(self) -> bool:
-        """统一的放弃并结算返回到货币战争主界面流程。"""
+        """兼容旧用法：开始界面直接结算返回到货币战争主界面。"""
+        return self._abort_and_return(in_game=False)
+
+    def _return_to_prep_and_abort(self) -> bool:
+        """兼容旧用法：对局中先返回备战再结算返回主页。"""
+        return self._abort_and_return(in_game=True)
+
+    def _abort_and_return(self, in_game: bool) -> bool:
+        """统一的结算返回流程。
+        - in_game=True：先点击`RETURN_PREPARATION_PAGE`并按`ESC`，再执行结算返回。
+        - in_game=False：直接执行结算返回（用于开始界面或无需返回备战的场景）。
+        点击顺序（结算部分）：WITHDRAW_AND_SETTLE → NEXT_STEP → NEXT_PAGE → BACK_CURRENCY_WARS
+        """
         try:
+            if in_game:
+                # 返回备战页面
+                ret_box = self.wait_img(CWIMG.RETURN_PREPARATION_PAGE, timeout=6, interval=0.5)
+                if ret_box is not None:
+                    self.click_box(ret_box, after_sleep=1.0)
+                # 关闭覆盖层
+                self.press_key('esc')
+                self.sleep(0.8)
+
+            # 放弃并结算
             withdraw_and_settle = self.wait_img(CWIMG.WITHDRAW_AND_SETTLE, timeout=8, interval=0.5)
             if withdraw_and_settle is None:
                 logger.error("未识别到放弃并结算入口")
                 return False
-            self.click_box(withdraw_and_settle, after_sleep=3)
+            self.click_box(withdraw_and_settle, after_sleep=2.5)
 
-            # 结算与返回流程
+            # 下一步
             next_step = self.wait_img(CWIMG.NEXT_STEP, timeout=8, interval=0.5)
             if next_step is None:
                 logger.error("点击放弃并结算后，未识别到下一步")
                 return False
-            self.click_box(next_step, after_sleep=2)
+            self.click_box(next_step, after_sleep=1.8)
 
+            # 下一页
             next_page = self.wait_img(CWIMG.NEXT_PAGE, timeout=8, interval=0.5)
             if next_page is None:
                 logger.error("点击下一步后，未识别到下一页")
                 return False
-            self.click_box(next_page, after_sleep=2)
+            self.click_box(next_page, after_sleep=1.8)
 
+            # 返回货币战争主页
             back_currency_wars = self.wait_img(CWIMG.BACK_CURRENCY_WARS, timeout=8, interval=0.5)
             if back_currency_wars is None:
                 logger.error("点击下一页后，未识别到返回货币战争")
                 return False
             self.click_box(back_currency_wars, after_sleep=2)
-            logger.info("已放弃并结算，返回货币战争主界面")
+            logger.info("已结算并返回货币战争主界面")
             return True
-        except Exception:
-            logger.error("放弃并结算流程异常，无法继续")
+        except Exception as e:
+            logger.error(f"结算返回流程异常：{e}")
             return False
 
     def _collect_refresh_counts(self, max_items: int = 3) -> list[int]:
