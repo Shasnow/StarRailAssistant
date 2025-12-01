@@ -1,4 +1,4 @@
-#   <StarRailAssistant:An automated program that helps you complete daily tasks of StarRail.>
+#   <StarRailAssistant:An automated program that helps you complete daily task of StarRail.>
 #   Copyright © <2024> <Shasnow>
 
 #   This file is part of StarRailAssistant.

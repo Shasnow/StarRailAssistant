@@ -7,9 +7,11 @@ from loguru import logger
 
 from SRACore.thread.task_thread import TaskManager
 from SRACore.thread.trigger_thread import TriggerManager
+from SRACore.util.const import VERSION, CORE
 
 
 class SRACli(cmd.Cmd):
+    intro = f"SRA-cli {VERSION} ({CORE})\nType 'help' or '?' to list commands."
     prompt = "sra> "  # 增加命令提示符，提升交互体验
 
     def __init__(self):
@@ -212,6 +214,10 @@ class SRACli(cmd.Cmd):
         except KeyboardInterrupt:
             return
         print("任务运行完成，返回命令行。")
+
+    def do_version(self, _):
+        """显示版本信息"""
+        print(f"{VERSION}")
 
     @staticmethod
     def is_admin() -> bool:

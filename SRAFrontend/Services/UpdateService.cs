@@ -21,6 +21,9 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     private const string BaseDownloadUrl =
         "https://github.com/Shasnow/StarRailAssistant/releases/download/{version}/StarRailAssistant_{version}.zip";
     
+    private const string BaseDownloadUrl2 =
+        "https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant-{version}.zip";
+    
     private const string BaseCoreDownloadUrl =
         "https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant_Core_{version}.zip";
 
@@ -167,7 +170,9 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     // 辅助方法：获取下载URL
     private string GetDownloadUrl(VersionResponse versionResponse, int downloadChannel)
     {
-        if (versionResponse.Data.Url == "" || downloadChannel==1)
+        if (versionResponse.Data.Url == "" || downloadChannel==2)
+            return BaseDownloadUrl2.Replace("{version}", versionResponse.Data.VersionName);
+        if (downloadChannel == 1)
             return BaseDownloadUrl.Replace("{version}", versionResponse.Data.VersionName);
         return versionResponse.Data.Url;
     }

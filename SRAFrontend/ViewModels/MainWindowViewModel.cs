@@ -32,6 +32,7 @@ public partial class MainWindowViewModel(
     {
         await commonModel.CheckForUpdatesAsync();
         // await commonModel.CheckAndFixPythonEnvironmentAsync();
+        await commonModel.CheckDesktopShortcut();
     }
 
     public ISukiToastManager ToastManager { get; init; } = toastManager;

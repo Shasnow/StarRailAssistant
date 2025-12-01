@@ -44,11 +44,11 @@ public partial class SraService(ILogger<SraService> logger)
         }
 
         // 校验核心文件路径
-        var mainPyPath = Path.Combine(Environment.CurrentDirectory, "SRA-cli.exe");
-        if (!File.Exists(mainPyPath))
+        var cliPath = Path.Combine(Environment.CurrentDirectory, "SRA-cli.exe");
+        if (!File.Exists(cliPath))
         {
-            _logger.LogError("Could not find SRA-cli.exe at path: {Path}", mainPyPath);
-            var errorMsg = $"无法找到文件 SRA-cli.exe，请检查安装完整性。\n路径: {mainPyPath}";
+            _logger.LogError("Could not find SRA-cli.exe at path: {Path}", cliPath);
+            var errorMsg = $"无法找到文件 SRA-cli.exe，请检查安装完整性。\n路径: {cliPath}";
             OutputLines.Add(errorMsg);
             return;
         }
@@ -62,8 +62,6 @@ public partial class SraService(ILogger<SraService> logger)
 
         try
         {
-            // 优化: 使用安全的参数传递（避免字符串拼接导致的命令注入）
-            var safeArguments = $"\"{mainPyPath}\" {EscapeCommandLineArgument(arguments)}";
             _sraProcess = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -73,7 +71,8 @@ public partial class SraService(ILogger<SraService> logger)
                     RedirectStandardError = true,
                     RedirectStandardInput = true,
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = true,
+                    Arguments = arguments
                 }
             };
 
@@ -85,7 +84,7 @@ public partial class SraService(ILogger<SraService> logger)
 
             // 启动进程
             _sraProcess.Start();
-            _logger.LogInformation("Successfully start SRA with command: {Arguments}", safeArguments);
+            _logger.LogInformation("Successfully start SRA with command: {Arguments}", arguments);
 
             OutputLines.Clear();
 
@@ -184,22 +183,6 @@ public partial class SraService(ILogger<SraService> logger)
     {
         SendInput("task stop");
     }
-
-    #region 辅助方法
-
-    /// <summary>
-    ///     转义命令行参数（避免注入风险）
-    /// </summary>
-    private static string EscapeCommandLineArgument(string argument)
-    {
-        // 若参数包含空格、引号等特殊字符，需要添加引号包裹
-        if (!argument.Contains(' ') && !argument.Contains('"') && !argument.Contains('\\')) return argument;
-        // 转义双引号和反斜杠
-        argument = argument.Replace("\\", "\\\\").Replace("\"", "\\\"");
-        return $"\"{argument}\"";
-    }
-
-    #endregion
 
     #region 进程事件处理
 
