@@ -42,3 +42,7 @@ class CWIMG:
     WITHDRAW_AND_SETTLE = f"{BASE}/withdraw_and_settle.png"
     NEXT_PAGE = f"{BASE}/next_page.png"
     BACK_CURRENCY_WARS = f"{BASE}/back_currency_wars.png"
+    RETURN_PREPARATION_PAGE = f"{BASE}/return_preparation_page.png"
+    TWO_TWO = f"{BASE}/2-2.png"
+    REFRESH_COUNT = f"{BASE}/refresh_count.png"
+    REFRESH_COUNT_BTN = f"{BASE}/refresh_count_btn.png"
