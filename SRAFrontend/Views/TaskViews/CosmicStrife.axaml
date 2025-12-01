@@ -61,6 +61,19 @@
                             </StackPanel>
                         </StackPanel>
                     </suki:GlassCard>
+                    <suki:GlassCard>
+                        <StackPanel>
+                            <CheckBox IsChecked="{Binding CurrentConfig.CurrencyWarsBrushOpeningEnable}"
+                                      Content="货币战争 - 刷开局" />
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Label>次数</Label>
+                                <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.CurrencyWarsBrushOpeningRunTimes}" Minimum="1" Maximum="99999" />
+                            </StackPanel>
+                            <TextBlock Foreground="Red"
+                                       IsVisible="{Binding CurrencyWarsConflict}"
+                                       Text="互斥：已同时启用『货币战争 - 零和博弈』与『货币战争 - 刷开局』，请仅选择其一。"/>
+                        </StackPanel>
+                    </suki:GlassCard>
                     <TextBlock>请先手动完成一次以清除所有新手提示</TextBlock>
                 </StackPanel>
             </ScrollViewer>

@@ -1,6 +1,11 @@
+import re
+import time
+from pathlib import Path
+
 from loguru import logger
 
-from SRACore.util.operator import Executable
+from SRACore.util.notify import send_windows_notification
+from SRACore.util.operator import Executable, Region
 from tasks.currency_wars.img import CWIMG
 
 from .CurrencyWars import CurrencyWars
@@ -11,7 +16,6 @@ class BrushOpening(Executable):
         super().__init__()
         self.run_times = run_times
         self.force_battle = False
-        # 持久化 CurrencyWars 实例以复用其辅助流程
         self.cw = CurrencyWars(run_times)
         
     def openning(self):
@@ -27,7 +31,6 @@ class BrushOpening(Executable):
             tries += 1
             logger.info(f"开始刷开局，第 {tries} 次尝试")
 
-            # 使用持久化的 CurrencyWars 实例调用页面定位
             page = self.cw.page_locate()
             if page == -1:
                 logger.error("页面定位失败，无法开始游戏")
@@ -54,37 +57,58 @@ class BrushOpening(Executable):
                 self.click_box(box, after_sleep=1)
                 _ = self.wait_img(CWIMG.SELECT_INVEST_STRATEGY, timeout=8, interval=0.5)
 
-            # 在策略界面 OCR 全屏，查找“叽米”字样
-            if self._detect_jimi():
-                logger.success("识别到叽米，停止脚本并通知用户")
-                try:
-                    # 若有统一的通知方式，可改为调用通知模块
-                    # from SRACore.util.notify import notify
-                    # notify("刷开局命中叽米，已停止脚本")
-                    pass
-                except Exception:
-                    pass
-                return True
+            # 需求：在策略页面后，识别“返回备战页面”，点击后识别关卡是否为2-2，然后识别是否存在叽米图片
+            ret_box = self.wait_img(CWIMG.RETURN_PREPARATION_PAGE, timeout=10, interval=0.5)
+            if ret_box is not None:
+                self.click_box(ret_box, after_sleep=1.5)
+                # 识别是否为 2-2 关卡
+                two_two_box = self.wait_img(CWIMG.TWO_TWO, timeout=6, interval=0.5)
+                if two_two_box is not None:
+                    # 识别是否存在叽米（使用图片匹配，而非 OCR）
+                    if self._detect_jimi():
+                        logger.success("2-2 关卡识别到叽米，停止脚本并通知用户")
+                        try:
+                            send_windows_notification("SRA", "刷开局命中叽米，脚本已停止")
+                        except Exception:
+                            logger.warning("通知模块调用失败")
+                        # 标记运行状态为停止
+                        self.is_running = False
+                        if hasattr(self, 'cw'):
+                            self.cw.is_running = False
+                        return True
+
+                    # 未命中叽米：记录刷新次数并尝试刷新一次后再检测
+                    try:
+                        counts = self._collect_refresh_counts(max_items=3)
+                        if counts:
+                            logger.info(f"刷新次数记录: {counts}")
+                    except Exception as e:
+                        logger.trace(f"采集刷新次数异常: {e}")
+
+                    if self._click_refresh_button():
+                        self.sleep(1.2)
+                        if self._detect_jimi():
+                            logger.success("刷新后识别到叽米，停止脚本并通知用户")
+                            try:
+                                send_windows_notification("SRA", "刷新后命中叽米，脚本已停止")
+                            except Exception:
+                                logger.warning("通知模块调用失败")
+                            self.is_running = False
+                            if hasattr(self, 'cw'):
+                                self.cw.is_running = False
+                            return True
 
             # 未识别到叽米：中断探索并重新开始下一轮
             logger.info("未识别到叽米，本轮结束并结算，准备下一轮")
             self._safe_abort_and_return()
 
     def _detect_jimi(self) -> bool:
-        """在当前界面 OCR 文本，检测是否包含“叽米”。"""
+        """使用图像匹配检测是否存在叽米图片。"""
         try:
-            # 尽可能覆盖更多区域以提升命中概率
-            results = []
-            # 顶部、中央、底部三段 OCR（坐标按相对比例）
-            results += (self.ocr(from_x=0.05, from_y=0.10, to_x=0.95, to_y=0.28) or [])
-            results += (self.ocr(from_x=0.05, from_y=0.28, to_x=0.95, to_y=0.70) or [])
-            results += (self.ocr(from_x=0.05, from_y=0.70, to_x=0.95, to_y=0.95) or [])
-            text = ''.join([r[1] for r in results if isinstance(r, (list, tuple)) and len(r) >= 2])
-            if '叽米' in text:
-                return True
+            return self.locate(CWIMG.JI_MI) is not None
         except Exception as e:
-            logger.warning(f"检测叽米时发生异常：{e}")
-        return False
+            logger.warning(f"检测叽米图片时发生异常：{e}")
+            return False
 
     def _bo_enter_from_start_page(self) -> bool:
         """处理从货币战争开始页面进入对局的完整流程。(刷开局专用)"""
@@ -158,3 +182,71 @@ class BrushOpening(Executable):
         except Exception:
             logger.error("放弃并结算流程异常，无法继续")
             return False
+
+    def _collect_refresh_counts(self, max_items: int = 3) -> list[int]:
+        """基于 REFRESH_COUNT 锚点，OCR 其右侧同一行的刷新次数，返回列表（最多 max_items 个）。
+
+        实际UI：三个刷新次数同处同一行，形如“刷新次数1 刷新次数2 刷新次数3”。
+        方案：以锚点为起点，截取其右侧一段“行高”的细长区域，做一次 OCR，按从左到右解析出最多3个数字。
+        """
+        counts: list[int] = []
+        try:
+            win = self.get_win_region(active_window=True)
+        except Exception:
+            return counts
+        if win is None:
+            return counts
+
+        # 单一锚点
+        anchor = self.locate(CWIMG.REFRESH_COUNT)
+        if anchor is None:
+            logger.debug("未找到刷新次数锚点")
+            return counts
+
+        # 构造“同一行右侧”OCR区域（细长条）
+        pad_x = 6
+        pad_y = 2
+        left = min(win.left + win.width - 10, anchor.left + anchor.width + pad_x)
+        top = max(win.top, anchor.top - pad_y)
+        # 宽度尽可能覆盖到右侧边界，高度与锚点行高相近
+        width = max(40, min(600, win.left + win.width - left - 6))
+        height = max(16, min(anchor.height + 2 * pad_y, win.top + win.height - top - 4))
+        if width <= 0 or height <= 0:
+            return counts
+
+        region = Region(left, top, width, height)
+        # 调试：输出用于识别的区域截图
+        try:
+            debug_dir = Path("log") / "currency_wars"
+            debug_dir.mkdir(parents=True, exist_ok=True)
+            ts = time.strftime("%Y%m%d_%H%M%S")
+            img_path = debug_dir / f"refresh_counts_region_{ts}.png"
+            self.screenshot(region).save(img_path)
+            logger.debug(f"刷新次数OCR区域: {region.tuple}, 截图: {img_path}")
+        except Exception as e:
+            logger.trace(f"保存刷新次数OCR区域截图失败: {e}")
+        results = self.ocr_in_region(region, trace=False) or []
+        if not results:
+            return counts
+
+        # 左到右排序后拼接成一行文本
+        items = sorted(results, key=lambda r: r[0][0][0])
+        line = " ".join([str(r[1]) for r in items])
+
+        # 优先匹配“刷新次数<数字>”模式（OCR 可能分词，允许空白）
+        pattern = r"刷\s*新\s*次\s*数\s*(\d+)"
+        found = [int(x) for x in re.findall(pattern, line)]
+        if found:
+            return found[:max_items]
+
+        # 回退：在该行内提取所有数字（可能包含干扰，但区域较窄，通常只有目标数字）
+        nums = [int(x) for x in re.findall(r"(\d+)", line)]
+        return nums[:max_items]
+
+    def _click_refresh_button(self) -> bool:
+        """点击刷新按钮（REFRESH_COUNT_BTN）。"""
+        btn = self.wait_img(CWIMG.REFRESH_COUNT_BTN, timeout=6, interval=0.5)
+        if btn is None:
+            logger.debug("未找到刷新按钮")
+            return False
+        return self.click_box(btn, after_sleep=1.0)

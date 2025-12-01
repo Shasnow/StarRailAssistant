@@ -56,6 +56,10 @@ public partial class TaskPageViewModel : PageViewModel
         }
 
         _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
+        if (CurrentConfig != null)
+        {
+            CurrentConfig.PropertyChanged += CurrentConfigOnPropertyChanged;
+        }
         Tasks =
         [
             new TrailblazePowerTask(AddTaskItem)
@@ -214,6 +218,15 @@ public partial class TaskPageViewModel : PageViewModel
         ];
     }
 
+    private void CurrentConfigOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Config.CurrencyWarsEnable) ||
+            e.PropertyName == nameof(Config.CurrencyWarsBrushOpeningEnable))
+        {
+            OnPropertyChanged(nameof(CurrencyWarsConflict));
+        }
+    }
+
     public ControlPanelViewModel ControlPanelViewModel { get; }
 
     public AvaloniaList<TrailblazePowerTask> Tasks { get; }
@@ -222,6 +235,12 @@ public partial class TaskPageViewModel : PageViewModel
 
     public string TogglePasswordVisibilityButtonContent =>
         PasswordMask == "*" ? "\uE224" : "\uE220";
+
+    // 货币战争互斥提示：当常规与刷开局同时启用时为 true
+    public bool CurrencyWarsConflict =>
+        CurrentConfig is not null &&
+        CurrentConfig.CurrencyWarsEnable &&
+        CurrentConfig.CurrencyWarsBrushOpeningEnable;
 
     [RelayCommand]
     private void DeleteSelectedTaskItem()
