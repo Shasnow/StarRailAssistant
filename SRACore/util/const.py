@@ -33,4 +33,4 @@ RANDOM_TITLE = [
     "立志成为崩铁糕手",
 ]
 
-ApplicationDataPath = Path(os.getenv("APPDATA") if sys.platform == "win32" else os.path.expanduser("~/.config")) / "SRA"
+AppDataSraDir = Path(os.getenv("APPDATA") if sys.platform == "win32" else os.path.expanduser("~/.config")) / "SRA"

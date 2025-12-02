@@ -24,6 +24,8 @@ import sys
 from pathlib import Path
 from typing import Optional
 
+from SRACore.util.const import AppDataSraDir
+
 
 class I18n:
     """国际化管理类"""
@@ -46,30 +48,20 @@ class I18n:
     def _load_language(self):
         """从settings.json加载语言设置并加载对应的翻译文件"""
         try:
-            # 动态获取ApplicationDataPath
-            appdata_path = Path(os.getenv("APPDATA") if sys.platform == "win32" else os.path.expanduser("~/.config")) / "SRA"
-            settings_path = appdata_path / 'settings.json'
-            if settings_path.exists():
-                with open(settings_path, 'r', encoding='utf-8') as f:
-                    settings = json.load(f)
-                    # 支持大小写两种格式
-                    language_code = settings.get('language', settings.get('Language', 1))
-                    # language: 1 = 中文, 0 = 英文
-                    self._current_language = "zh_CN" if language_code == 1 else "en_US"
-            else:
-                # 默认使用中文
-                self._current_language = "zh_CN"
+            with open(AppDataSraDir / 'settings.json', 'r') as f:
+                settings = json.load(f)
+            language_code = settings.get('language', settings.get('Language', 1))
+            # language: 1 = 中文, 0 = 英文
+            self._current_language = "zh_CN" if language_code == 1 else "en_US"
         except Exception:
-            # 如果加载失败，默认使用中文
             self._current_language = "zh_CN"
-        
         # 加载翻译文件
         self._load_translations()
     
     def _load_translations(self):
         """加载翻译文件"""
         try:
-            translation_file = Path(__file__).parent.parent / 'i18n' / f'{self._current_language}.json'
+            translation_file = Path(f"SRACore/i18n/{self._current_language}.json")
             if translation_file.exists():
                 with open(translation_file, 'r', encoding='utf-8') as f:
                     self._translations = json.load(f)
