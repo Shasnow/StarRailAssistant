@@ -4,6 +4,7 @@
 /SRAFrontend/obj/
 /SRAFrontend/SRAFrontend.sln.DotSettings.user
 /.venv/
+/.vscode/
 /setup/output/
 /setup/SRA/
 /setup/install_info.txt
