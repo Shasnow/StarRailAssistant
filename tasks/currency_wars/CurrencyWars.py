@@ -16,8 +16,7 @@ class CurrencyWars(Executable):
         self.run_times = run_times
         self.force_battle = False
         self.is_continue = False  # 是否是继续挑战
-        # 当外部（如刷开局流程）希望在“选择投资策略”页接管逻辑时，置为 True
-        self.strategy_external_control: bool = False
+        self.strategy_external_control: bool = False# 当外部（如刷开局流程）希望在“选择投资策略”页接管逻辑时，置为 True
         self.on_field_character: list[Character | None] = [None, None, None, None]  # 场上角色列表
         self.on_field_area: list[tuple[float, float]] = [
             (0.386, 0.365),
@@ -502,7 +501,11 @@ class CurrencyWars(Executable):
         self.sell_character()  # 递归出售，直到手牌不满
 
     def battle(self) -> bool:
-        self.click_point(0.907, 0.714, after_sleep=1)
+        # self.click_point(0.907, 0.714, after_sleep=1)
+        battle_box = self.wait_img(CWIMG.BATTLE, timeout=3, interval=0.5)
+        if battle_box is None or not self.click_box(battle_box, after_sleep=2):
+            logger.error("未识别到战斗按钮")
+            return False
         if self.locate(IMG.ENSURE):  # 编队未满提醒
             if self.force_battle:
                 self.click_img(IMG.ENSURE)
@@ -640,18 +643,35 @@ class CurrencyWars(Executable):
             self.click_point(0.8, 0.3, after_sleep=1)  # 选择第三个选项
             self.click_point(0.77, 0.52, after_sleep=1)  # 点击确认按钮
             return True
-        elif event == 2:  # 右侧按钮事件（保留占位，不做处理）
-            logger.info("检测到右侧按钮事件（默认不处理）")
-            # 保存捕获游戏窗口截图到log文件夹
-            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-            if not os.path.exists("log/currency_wars"):
-                os.makedirs("log/currency_wars")
-            filename = f"log/currency_wars/unhandled_right_event_{timestamp}.png"
-            img = self.screenshot_region()
-            img.save(filename)
+        elif event == 2:  # 是否应该存在存疑
+            # logger.info("检测到右侧按钮事件（默认不处理）")
+            # # 保存捕获游戏窗口截图到log文件夹
+            # timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            # if not os.path.exists("log/currency_wars"):
+            #     os.makedirs("log/currency_wars")
+            # filename = f"log/currency_wars/unhandled_right_event_{timestamp}.png"
+            # img = self.screenshot_region()
+            # img.save(filename)
             return True
-        else:
-            return False
+        
+        # 将 OCR 检测放在所有图片事件之后，作为兜底处理
+        try:
+            ocr_results = self.ocr(from_x=0.073, from_y=0.546, to_x=0.807, to_y=0.574)
+            if ocr_results:
+                text_line = "".join([str(item[1]) for item in ocr_results])
+                if "确认选择" in text_line:
+                    logger.info("检测到 OCR 提示：确认选择（未记录在案的特殊事件）")
+                    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+                    if not os.path.exists("log/currency_wars"):
+                        os.makedirs("log/currency_wars")
+                    filename = f"log/currency_wars/unhandled_right_event_{timestamp}.png"
+                    img = self.screenshot_region()
+                    img.save(filename)
+                    return True
+        except Exception:
+            pass
+
+        return False
 
     def strategy_event(self):
         self.click_img(CWIMG.RIGHT, after_sleep=2)
