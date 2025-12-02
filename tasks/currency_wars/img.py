@@ -46,3 +46,4 @@ class CWIMG:
     TWO_TWO = f"{BASE}/2-2.png"
     REFRESH_COUNT = f"{BASE}/refresh_count.png"
     REFRESH_COUNT_BTN = f"{BASE}/refresh_count_btn.png"
+    RETURN_INVESTMENT_STRATEGY = f"{BASE}/return_investment_strategy.png"
