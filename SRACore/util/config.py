@@ -1,13 +1,13 @@
 from SRACore.util.logger import logger
 
-from SRACore.util.const import ApplicationDataPath
+from SRACore.util.const import AppDataSraDir
 from SRACore.util.i18n import t
 import json
 
 
 def load_config(name:str):
     try:
-        with open(ApplicationDataPath / f'configs/{name}.json','r') as f:
+        with open(AppDataSraDir / f'configs/{name}.json', 'r') as f:
            return json.load(f)
     except FileNotFoundError as e:
         logger.error(t('config.file_not_found', name=name, error=e))
@@ -21,7 +21,7 @@ def load_config(name:str):
 
 def load_settings():
     try:
-        with open(ApplicationDataPath / 'settings.json','r') as f:
+        with open(AppDataSraDir / 'settings.json', 'r') as f:
            return json.load(f)
     except FileNotFoundError as e:
         logger.error(t('config.settings_not_found', error=e))
@@ -35,7 +35,7 @@ def load_settings():
 
 def load_cache():
     try:
-        with open(ApplicationDataPath / 'cache.json','r') as f:
+        with open(AppDataSraDir / 'cache.json', 'r') as f:
            return json.load(f)
     except FileNotFoundError as e:
         logger.error(t('config.cache_not_found', error=e))

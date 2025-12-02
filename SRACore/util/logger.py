@@ -1,7 +1,6 @@
 import sys
 
 from loguru import logger
-from SRACore.util.i18n import t
 
 # 实例化日志记录器
 def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log"):
@@ -10,7 +9,6 @@ def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log"):
         logger.add(sys.stdout, level=0,
                format="<green>{time:HH:mm:ss}</green>[{thread}] | <level>{level:5}</level> | <cyan>{module}.{function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>",
                colorize=True, enqueue=True)
-        logger.success(t('logger.terminal_connected'))
     else:
         logger.add(sys.stdout, level=0,
                    format="{time:HH:mm:ss}[{thread}] | {level:5} | {message}",
