@@ -5,7 +5,8 @@ from loguru import logger
 
 import tasks.currency_wars.characters as cw_chars
 from SRACore.util.operator import Executable
-from tasks.currency_wars.characters import Character, Positioning, get_character
+from tasks.currency_wars.characters import (Character, Positioning,
+                                            get_character)
 from tasks.currency_wars.img import CWIMG, IMG
 
 
@@ -15,6 +16,8 @@ class CurrencyWars(Executable):
         self.run_times = run_times
         self.force_battle = False
         self.is_continue = False  # 是否是继续挑战
+        # 当外部（如刷开局流程）希望在“选择投资策略”页接管逻辑时，置为 True
+        self.strategy_external_control: bool = False
         self.on_field_character: list[Character | None] = [None, None, None, None]  # 场上角色列表
         self.on_field_area: list[tuple[float, float]] = [
             (0.386, 0.365),
@@ -549,6 +552,9 @@ class CurrencyWars(Executable):
                 CWIMG.SELECT_INVEST_STRATEGY,
                 '选择投资策略',
                 lambda: [
+                    # 当外部接管策略页时，停止 CW 循环并不进行点击，由外层流程处理。
+                    setattr(self, 'is_running', False)
+                ] if self.strategy_external_control else [
                     self.click_point(0.5, 0.68, after_sleep=1),  # 选择中间策略
                     self.click_point(0.5, 0.9, after_sleep=1)  # 点击确认按钮
                 ],
@@ -580,6 +586,10 @@ class CurrencyWars(Executable):
         self.sleep(1.5)
 
         while True:  # 用无限循环 + 内部break控制退出
+            # 若被外部标记停止（例如策略页外部接管），立刻退出切换流程
+            if not self.is_running:
+                logger.info("检测到 is_running=False，退出关卡切换流程")
+                return True
             # 检查是否超时（未识别到任何状态）
             if stage_index == -1:
                 logger.error("关卡状态检测超时，未识别到任何图片")
@@ -601,6 +611,11 @@ class CurrencyWars(Executable):
                     logger.error(f"处理状态 {stage_name} 时出错: {e}")
                     raise
 
+            # 若当前为策略页且启用了外部接管，则立即退出切换流程
+            if img_path == CWIMG.SELECT_INVEST_STRATEGY and self.strategy_external_control:
+                logger.info("策略页外部接管生效，退出关卡切换流程")
+                return True
+
             # 若当前是终止状态，直接退出循环
             if is_terminal:
                 logger.info(f"达到终止状态：{stage_name}，退出关卡切换流程")
@@ -620,12 +635,12 @@ class CurrencyWars(Executable):
             self.click_point(0.5, 0.25, after_sleep=1)  # 选择第一个选项
             self.click_point(0.77, 0.52, after_sleep=1)  # 点击确认按钮
             return True
-        elif event == 1:
+        elif event == 1:  # 命运卜者事件
             logger.info("触发命运卜者事件")
             self.click_point(0.8, 0.3, after_sleep=1)  # 选择第三个选项
             self.click_point(0.77, 0.52, after_sleep=1)  # 点击确认按钮
             return True
-        else:
+        elif event == 2:  # 右侧按钮事件（保留占位，不做处理）
             logger.info("检测到右侧按钮事件（默认不处理）")
             # 保存捕获游戏窗口截图到log文件夹
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -635,6 +650,8 @@ class CurrencyWars(Executable):
             img = self.screenshot_region()
             img.save(filename)
             return True
+        else:
+            return False
 
     def strategy_event(self):
         self.click_img(CWIMG.RIGHT, after_sleep=2)
@@ -745,4 +762,5 @@ class CurrencyWars(Executable):
         self.school_tendency = {k: v for k, v in
                                 sorted(self.school_tendency.items(), key=lambda item: item[1], reverse=True)}  # 排序
         logger.info(f"当前阵营倾向：{self.faction_tendency}")
+        logger.info(f"当前派系倾向：{self.school_tendency}")
         logger.info(f"当前派系倾向：{self.school_tendency}")

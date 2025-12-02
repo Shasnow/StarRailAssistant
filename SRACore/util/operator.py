@@ -7,7 +7,6 @@ import cv2
 import numpy as np
 import pyautogui
 import pygetwindow
-
 # noinspection PyPackageRequirements
 # (pyperclip is in pyautogui requirements)
 import pyperclip
@@ -114,8 +113,12 @@ class Operator:
 
     def _major_win_region(self, left, top, width, height):
         """获取主要操作区域"""
-        self.width = width // 160 * 160
-        self.height = height // 90 * 90
+        # 将窗口尺寸对齐到 160x90 的比例，但避免出现 0 尺寸
+        aligned_width = (width // 160) * 160
+        aligned_height = (height // 90) * 90
+        # 当窗口较小或对齐后为 0 时，回退到原始尺寸以避免截屏高度为 0
+        self.width = aligned_width if aligned_width > 0 else width
+        self.height = aligned_height if aligned_height > 0 else height
         self.top = (top + int(30 * self.zoom)) if top != 0 else top
         self.left = (left + int(8 * self.zoom)) if left != 0 else left
         return Region(self.left, self.top, self.width, self.height)
@@ -135,6 +138,15 @@ class Operator:
         """
         if region is None:
             region = self.get_win_region(active_window=True)
+        # 保护：避免出现宽或高为 0 的区域
+        if region.width <= 0 or region.height <= 0:
+            # 尝试使用未对齐的窗口区域重新计算
+            fallback = self.get_win_region(active_window=True)
+            if fallback and fallback.width > 0 and fallback.height > 0:
+                region = fallback
+            else:
+                # 返回整个屏幕截图作为最后回退，避免下游报错
+                return pyscreeze.screenshot()
         return pyscreeze.screenshot(region=region.tuple)
 
     def screenshot_tuple(self, from_x: float, from_y: float, to_x: float, to_y: float):
