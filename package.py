@@ -58,6 +58,7 @@ if __name__ == "__main__":
     shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "main.dist/rapidocr_onnxruntime")
     shutil.copytree(root_path / "tasks", root_path / "main.dist/tasks")
     os.makedirs(root_path / "main.dist/SRACore", exist_ok=True)
+    shutil.copytree(root_path / "SRACore/i18n", root_path / "main.dist/SRACore/i18n")
     shutil.copy(root_path / "SRACore/config.toml", root_path / "main.dist/SRACore/config.toml")
     shutil.copy(root_path / "LICENSE", root_path / "main.dist/LICENSE")
     shutil.copy(root_path / "README.md", root_path / "main.dist/README.md")
