@@ -23,7 +23,6 @@ public partial class App : Application
 {
     public override void Initialize()
     {
-        Localization.Resources.Culture= new CultureInfo("zh-Hans");
         AvaloniaXamlLoader.Load(this);
     }
 
@@ -33,7 +32,9 @@ public partial class App : Application
         var serviceCollection = new ServiceCollection();
         ConfigureServices(serviceCollection);
         var serviceProvider = serviceCollection.BuildServiceProvider();
-        
+        Localization.Resources.Culture =
+            new CultureInfo(
+                serviceProvider.GetRequiredService<SettingsService>().Settings.Language == 0 ? "zh-CN" : "en-US");
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
@@ -48,9 +49,9 @@ public partial class App : Application
             {
                 Log.Information("Application is exiting. Saving settings and stopping SRA process.");
                 serviceProvider.GetRequiredService<SettingsService>().SaveSettings();
+                serviceProvider.GetRequiredService<ConfigService>().SaveConfig();
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
                 serviceProvider.GetRequiredService<SraService>().StopSraProcess();
-                serviceProvider.GetRequiredService<ConfigService>().SaveConfig();
                 Log.CloseAndFlush();
             };
         }
