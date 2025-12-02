@@ -38,20 +38,25 @@ class BrushOpening(Executable):
 
             # 进入流程：从开始页进入；准备阶段直接继续
             if page == 1:
+                # 先清除上轮残留的结算标记，仅在本轮确实进行“继续进度→结算返回”时再置位。
+                self._just_settled = False
                 if not self._bo_enter_from_start_page():
                     logger.error("进入对局流程失败，重试下一轮")
                     continue
-                # 如果刚刚进行了“放弃并结算”，本轮应直接重启进入流程
+                # 若本轮识别到了“继续进度”并已结算返回，则回到顶部重新定位与进入。
                 if self._just_settled:
-                    logger.info("完成结算返回主页，开启下一轮刷开局")
-                    self._just_settled = False
-                    self.sleep(1.0)
+                    logger.info("完成结算返回主页，已重新进入，本轮继续")
+                    self.sleep(0.8)
                     continue
             elif page == 2:
                 logger.info("已处于准备阶段，进入结算返回流程")
                 if not self._return_to_prep_and_abort():
                     logger.error("准备阶段结算返回失败，报错终止脚本")
                     return False
+                # 结算成功后已回到货币战争主页，下一轮应重新定位并进入
+                self._just_settled = True
+                self.sleep(1.0)
+                continue
 
             # 到这里才算正式开始一次刷开局尝试（排除仅“继续进度→结算返回”的前置流程）
             tries += 1
@@ -100,7 +105,7 @@ class BrushOpening(Executable):
                 # 识别是否为 2-2 关卡
                 two_two_box = self.wait_img(CWIMG.TWO_TWO, timeout=6, interval=0.5)
                 # 点击返回投资策略界面
-                self.click_img(CWIMG.RETURN_INVESTMENT_STRATEGY, after_sleep=1.0)
+                self.click_img(CWIMG.RETURN_INVESTMENT_STRATEGY, after_sleep=2.0)
                 if two_two_box is not None:
                     # 命中 2-2：进入叽米判定逻辑
                     if self._detect_jimi():
@@ -166,8 +171,16 @@ class BrushOpening(Executable):
                         # 模拟CW的默认策略选择：点中间策略并确认，以推进进程
                         self.click_point(0.5, 0.68, after_sleep=0.6)
                         self.click_point(0.5, 0.90, after_sleep=0.8)
+                        self.sleep(2.0)
+                        fold_box = self.wait_img(CWIMG.FOLD, timeout=2) # 判断商店是否为未收起状态
+                        if fold_box is not None:
+                            self.click_box(fold_box, after_sleep=1)
+                        self.cw.harvest_crystals()  # 收获水晶
+                        self.cw.refresh_character()  # 更新角色信息
+                        self.cw.get_in_hand_area()  # 更新手牌信息
+                        self.cw.place_character()  # 放置角色
+                        self.cw.sell_character()  # 出售多余角色
                         # 策略处理完成后，交还给 CW 继续战斗与推进
-                        self.cw.strategy_external_control = False
                         self.cw.is_running = True
                         self.cw.run_game()
                     except Exception:
@@ -181,7 +194,6 @@ class BrushOpening(Executable):
                 self.click_point(0.5, 0.68, after_sleep=0.5)
                 self.click_point(0.5, 0.90, after_sleep=0.8)
                 # 默认策略推进后，交还给 CW 继续战斗与推进
-                self.cw.strategy_external_control = False
                 self.cw.is_running = True
                 self.cw.run_game()
             except Exception:
@@ -205,7 +217,7 @@ class BrushOpening(Executable):
         self.click_point(0.5, 0.5, after_sleep=2)
 
         # 标准进入 or 继续进度（若是继续进度则中断并返回）
-        index, box = self.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONCLUDE_AND_SETTLE], timeout=10, interval=0.5)
+        index, box = self.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONCLUDE_AND_SETTLE], timeout=3, interval=0.5)
         if index == 0:
             # 识别到标准进入，直接点击该入口并执行标准进入流程
             if box is None:
@@ -240,13 +252,13 @@ class BrushOpening(Executable):
         if not self.click_box(enter_standard_box, after_sleep=1.5):
             logger.error("点击标准进入失败")
             return False
-        # 返回最高名望（替代下拉选择难度）
+        # 返回最高名望
         try:
             highest_rank = self.wait_img(CWIMG.RETURN_HIGHEST_RANK, timeout=5, interval=0.5)
             if highest_rank is not None:
                 self.click_box(highest_rank, after_sleep=0.8)
             else:
-                logger.debug("未识别到返回最高名望按钮，继续后续流程")
+                logger.info("未识别到返回最高名望按钮，继续后续流程")
         except Exception:
             logger.trace("返回最高名望步骤跳过")
         # 点击开始游戏
