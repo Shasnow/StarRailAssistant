@@ -51,8 +51,8 @@ class I18n:
             with open(AppDataSraDir / 'settings.json', 'r') as f:
                 settings = json.load(f)
             language_code = settings.get('language', settings.get('Language', 1))
-            # language: 1 = 中文, 0 = 英文
-            self._current_language = "zh_CN" if language_code == 1 else "en_US"
+            # language: 0 = 中文, 1 = 英文
+            self._current_language = "zh_CN" if language_code == 0 else "en_US"
         except Exception:
             self._current_language = "zh_CN"
         # 加载翻译文件

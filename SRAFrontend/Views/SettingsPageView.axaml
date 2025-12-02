@@ -31,10 +31,9 @@
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.TaskSettingsText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
-                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ToolTip.Tip="已过时，无效的设置项" >
                                         <Label Classes="icon">&#xe40c;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ThreadSafetyText}"
-                                               ToolTip.Tip="已过时，无效的设置项" />
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.ThreadSafetyText}"/>
                                         <ToggleSwitch Grid.Column="2" IsChecked="{Binding Settings.ThreadSafety}" />
                                     </Grid>
 
@@ -140,8 +139,8 @@
                                         <Label Grid.Column="0" Classes="icon">&#xe4a2;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.LanguageText}" />
                                         <ComboBox Grid.Column="2" SelectedIndex="{Binding Settings.Language}">
-                                            <ComboBoxItem>English</ComboBoxItem>
                                             <ComboBoxItem>简体中文</ComboBoxItem>
+                                            <ComboBoxItem>English</ComboBoxItem>
                                         </ComboBox>
                                     </Grid>
                                 </StackPanel>
@@ -201,10 +200,9 @@
                                     <!-- </ComboBox> -->
                                     <!-- </Grid> -->
 
-                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ToolTip.Tip="SRA需要管理员权限，无法使用开机自启，请使用计划任务" >
                                         <Label Classes="icon">&#xe586;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.StartUpText}"
-                                               ToolTip.Tip="SRA需要管理员权限，无法使用开机自启，请使用计划任务" />
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.StartUpText}"/>
                                         <ToggleSwitch Grid.Column="2"
                                                       IsChecked="{Binding Settings.EnableStartupLaunch}"
                                                       IsEnabled="False" />
