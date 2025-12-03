@@ -1,11 +1,9 @@
 import re
-import time
-from pathlib import Path
 
 from loguru import logger
 
 from SRACore.util.notify import send_windows_notification
-from SRACore.util.operator import Executable, Region
+from SRACore.util.operator import Executable
 from tasks.currency_wars.img import CWIMG, IMG
 
 from .CurrencyWars import CurrencyWars
@@ -19,6 +17,31 @@ class BrushOpening(Executable):
         self.cw = CurrencyWars(run_times)
         # 结算返回后需重启下一轮的标记（避免在同一轮等待策略页）
         self._just_settled = False
+        # 轻量通用配置：统一点击后的短暂停顿（不改变原有各处的具体等待）
+        self._default_after_click_sleep = 1.0
+        # 标记：进入策略页外部接管阶段后，禁止回到初始策略/进入流程
+        self._in_strategy_phase = False
+
+    # —— 微型助手方法：仅用于提升可读性与健壮性 ——
+    def _wait_then_click_box(self, img, *, timeout=8, interval=0.5, after_sleep=None):
+        """等待图像并点击其区域。保持与原有 wait_img + click_box 组合一致的行为。
+
+        不改变业务顺序与时间参数的默认值；仅封装以减少重复代码。
+        """
+        box = self.wait_img(img, timeout=timeout, interval=interval)
+        if box is None:
+            return None
+        self.click_box(box, after_sleep=(self._default_after_click_sleep if after_sleep is None else after_sleep))
+        return box
+
+    def _reset_cw_flags_after_abort(self, result: bool):
+        """统一在结算返回后重置 CW 运行/接管标记。"""
+        if result:
+            self.cw.strategy_external_control = False
+            self.cw.is_running = False
+            # 退出策略阶段，允许下一轮重新定位与进入
+            self._in_strategy_phase = False
+        return result
         
     def openning(self):
         """刷开局主流程。
@@ -30,15 +53,15 @@ class BrushOpening(Executable):
         """
         tries = 0
         while True:
-            # 在策略页外部接管期间，不再调用 page_locate，直接按策略页流程推进
-            if not (self.cw.strategy_external_control and self.cw.is_running):
+            # 在策略阶段外才进行页面定位与进入流程；策略阶段内直接进行策略页等待与判定
+            if not self._in_strategy_phase:
                 page = self.cw.page_locate()
                 if page == -1:
                     logger.error("页面定位失败，无法开始游戏")
                     return False
 
             # 进入流程：从开始页进入；准备阶段直接继续
-            if not (self.cw.strategy_external_control and self.cw.is_running) and page == 1:
+            if not self._in_strategy_phase and page == 1:
                 # 先清除上轮残留的结算标记，仅在本轮确实进行“继续进度→结算返回”时再置位。
                 self._just_settled = False
                 if not self._bo_enter_from_start_page():
@@ -49,7 +72,7 @@ class BrushOpening(Executable):
                     logger.info("完成结算返回主页，已重新进入，本轮继续")
                     self.sleep(0.8)
                     continue
-            elif not (self.cw.strategy_external_control and self.cw.is_running) and page == 2:
+            elif not self._in_strategy_phase and page == 2:
                 logger.info("已处于准备阶段，进入结算返回流程")
                 if not self._return_to_prep_and_abort():
                     logger.error("准备阶段结算返回失败，报错终止脚本")
@@ -59,47 +82,40 @@ class BrushOpening(Executable):
                 self.sleep(1.0)
                 continue
 
-            # 到这里才算正式开始一次刷开局尝试（排除仅“继续进度→结算返回”的前置流程）
-            tries += 1
-            logger.info(f"开始刷开局，第 {tries} 次尝试")
-            # 进入后应用一次初始策略，保持与 CW 正常流程一致
-            try:
-                if not self.cw._apply_initial_strategy():
-                    logger.error("初始策略应用失败，结束本轮并重试")
+            # 到这里才算正式开始一次刷开局尝试（为了排除仅“继续进度→结算返回”的前置流程）
+            # 若当前处于策略页外部接管，则不应计为一次新的尝试（避免二次触发策略页时误增尝试次数）
+            if not self._in_strategy_phase:
+                tries += 1
+                logger.info(f"开始刷开局，第 {tries} 次尝试")
+            # 进入后应用一次初始策略，与 CW 正常流程一致
+            if not self._in_strategy_phase:
+                try:
+                    if not self.cw._apply_initial_strategy():
+                        logger.error("初始策略应用失败，结束本轮并重试")
+                        self._safe_abort_and_return()
+                        self.sleep(1.5)
+                        continue
+                except Exception as e:
+                    logger.error(f"初始策略应用过程异常：{e}")
                     self._safe_abort_and_return()
                     self.sleep(1.5)
                     continue
-            except Exception as e:
-                logger.error(f"初始策略应用过程异常：{e}")
-                self._safe_abort_and_return()
-                self.sleep(1.5)
-                continue
             # 启用策略页外部接管：在识别到“选择投资策略”页时，CW停止推进，由本流程处理2-2与叽米判断
             self.cw.strategy_external_control = True
+            self._in_strategy_phase = True
             # 确保 CW 进入运行状态，否则 run_game() 循环不会执行
             self.cw.is_running = True
             # 运行一次 CW 的战斗与关卡推进，直到到达策略页被外部接管为止
-            
             self.cw.run_game()
             
-
-            # 等待到首次“选择投资策略”界面（提高超时阈值，增强稳定性）
+            # 等待到“选择投资策略”界面
             idx, box = self.wait_any_img([CWIMG.SELECT_INVEST_STRATEGY, CWIMG.CLICK_BLANK], timeout=45, interval=0.5)
-            if idx == -1:
-                logger.warning("未在限定时间内到达选择投资策略界面，结束本轮并重试")
-                # 结算返回后增加短暂稳定等待，避免下一轮立即识图失败
-                self._safe_abort_and_return()
-                self.sleep(2.0)
-                continue
 
-            # 保证在策略界面停留，避免误关
             if idx == 1 and box is not None:
-                # 如果出现“点击空白处关闭”，先点击以继续弹出策略
                 self.click_box(box, after_sleep=1)
-                # 再次等待策略页面，适当延长一次以兼容加载/动画遮罩
                 _ = self.wait_img(CWIMG.SELECT_INVEST_STRATEGY, timeout=20, interval=0.5)
 
-            # 需求：在策略页面后，识别是否为 2-2。不是 2-2 则继续探索，是 2-2 则进入叽米判定逻辑。
+            # 下方逻辑为  在策略页面后，识别是否为 2-2。不是 2-2 则继续探索，是 2-2 则进入叽米判定逻辑。
             ret_box = self.wait_img(CWIMG.RETURN_PREPARATION_PAGE, timeout=10, interval=0.5)
             if ret_box is not None:
                 self.click_box(ret_box, after_sleep=1.5)
@@ -118,15 +134,44 @@ class BrushOpening(Executable):
                         self.is_running = False
                         if hasattr(self, 'cw'):
                             self.cw.is_running = False
+                        self._in_strategy_phase = False
                         return True
 
                     # 未命中叽米：消耗刷新次数逐次检测，直到刷新用尽或命中为止
-                    refresh_attempts = 0
-                    max_safe_attempts = 6  # 安全上限，避免异常导致死循环
-                    while refresh_attempts < max_safe_attempts:
+                    # 动态上限：优先由OCR决定；不可用时使用安全兜底（3 次）
+                    refresh_attempts = 0  # 已尝试刷新次数
+                    safe_cap = 30  # 兜底上限（用于读取成功时的最大保护）
+                    fallback_attempts = 3  # OCR 不可用时，默认尝试 3 次
+                    consecutive_ocr_fail = 0  # 连续 OCR 失败计数
+                    max_attempts = safe_cap  # 本轮最大尝试刷新次数
+                    # 先尝试读取一次作为初始上限依据
+                    try:
+                        init_counts = self._collect_refresh_counts(max_items=3)
+                        if init_counts:
+                            logger.info(f"刷新次数初始记录: {init_counts}")
+                            # 若能读到非零，取其总和或最大值作为本轮可刷新上限
+                            nonneg = [x for x in init_counts if isinstance(x, int) and x >= 0]
+                            if nonneg:
+                                # 三个位置取总和；如OCR拆分异常也不超过safe_cap
+                                max_attempts = min(sum(nonneg), 30) or safe_cap
+                                if all(x == 0 for x in nonneg):
+                                    logger.info("检测到刷新次数为0，执行返回备战并结算本轮")
+                                    self._return_to_prep_and_abort()
+                                    self.sleep(2.0)
+                                    continue
+                        else:
+                            # 初次读取失败：采用保守策略，最多尝试 3 次刷新
+                            consecutive_ocr_fail += 1
+                            max_attempts = fallback_attempts
+                            logger.info("刷新次数OCR不可用，采用保守策略：最多尝试 3 次刷新")
+                    except Exception as e:
+                        logger.trace(f"采集刷新次数异常: {e}")
+
+                    while refresh_attempts < max_attempts:
                         try:
                             counts = self._collect_refresh_counts(max_items=3)
                             if counts:
+                                consecutive_ocr_fail = 0
                                 logger.info(f"刷新次数记录: {counts}")
                                 # 如果检测到全部为0，则认为刷新次数已用尽
                                 if all(isinstance(x, int) and x == 0 for x in counts):
@@ -134,6 +179,12 @@ class BrushOpening(Executable):
                                     self._return_to_prep_and_abort()
                                     self.sleep(2.0)
                                     break
+                            else:
+                                # OCR 未读到数字时，不再提前退出；继续走“尝试点击刷新按钮”策略
+                                consecutive_ocr_fail += 1
+                                if consecutive_ocr_fail == 1 and max_attempts == safe_cap:
+                                    # 中途 OCR 开始失败但此前读过次数：保持之前推导的 max_attempts，不做调整
+                                    logger.debug("OCR未读到次数，沿用先前上限并继续尝试刷新")
                         except Exception as e:
                             logger.trace(f"采集刷新次数异常: {e}")
 
@@ -156,7 +207,7 @@ class BrushOpening(Executable):
                             if hasattr(self, 'cw'):
                                 self.cw.is_running = False
                             return True
-                    # 如果循环自然结束且未命中叽米，继续外层流程（已在用尽时结算并continue）
+                    # 如果循环自然结束且未命中叽米，继续外层流程
                     continue
                 else:
                     # 非 2-2：不结算，继续探索（尽量回到策略界面并按默认策略继续）
@@ -173,6 +224,8 @@ class BrushOpening(Executable):
                         self.click_point(0.5, 0.68, after_sleep=0.6)
                         self.click_point(0.5, 0.90, after_sleep=0.8)
                         self.sleep(2.0)
+                        
+                        #若无下方操作，会导致交还CW后直接进入battle逻辑，卡死
                         fold_box = self.wait_img(CWIMG.FOLD, timeout=2) # 判断商店是否为未收起状态
                         if fold_box is not None:
                             self.click_box(fold_box, after_sleep=1)
@@ -181,11 +234,20 @@ class BrushOpening(Executable):
                         self.cw.get_in_hand_area()  # 更新手牌信息
                         self.cw.place_character()  # 放置角色
                         self.cw.sell_character()  # 出售多余角色
-                        # 策略处理完成后，交还给 CW 继续战斗与推进
+                        
+                        # 策略处理完成后，需推进战斗与节点切换直到下一个策略页
+                        # 不能直接调用 run_game()，因为它会先执行 strategy_event 等常规流程
+                        # 应手动推进：battle → stage_transition，直到再次到达策略页
                         self.cw.is_running = True
-                        self.cw.run_game()
-                    except Exception:
-                        logger.debug("继续探索推进过程出现异常，忽略并进入下一轮等待")
+                        if self.cw.battle():
+                            self.cw.stage_transition()
+                            # stage_transition 会在遇到策略页时设置 is_running=False 并退出
+                            # 此时回到 BrushOpening 的 while 顶部，重新等待策略页
+                            self.cw.shopping()
+                            self.cw.harvest_crystals()
+                            self.cw.get_in_hand_area(True)
+                    except Exception as e:
+                        logger.debug(f"继续探索推进过程出现异常：{e}，忽略并进入下一轮等待")
                     # 回到等待下一个策略页/节点的循环
                     continue
 
@@ -292,19 +354,13 @@ class BrushOpening(Executable):
         """兼容旧用法：开始界面直接结算返回到货币战争主界面。"""
         result = self._abort_and_return(in_game=False)
         # 重置CW运行与接管状态，确保下一轮回到page_locate流程
-        if result:
-            self.cw.strategy_external_control = False
-            self.cw.is_running = False
-        return result
+        return self._reset_cw_flags_after_abort(result)
 
     def _return_to_prep_and_abort(self) -> bool:
         """兼容旧用法：对局中先返回备战再结算返回主页。"""
         result = self._abort_and_return(in_game=True)
         # 重置CW运行与接管状态，确保下一轮回到page_locate流程
-        if result:
-            self.cw.strategy_external_control = False
-            self.cw.is_running = False
-        return result
+        return self._reset_cw_flags_after_abort(result)
 
     def _abort_and_return(self, in_game: bool) -> bool:
         """统一的结算返回流程。
@@ -372,38 +428,56 @@ class BrushOpening(Executable):
         # 单一锚点
         anchor = self.locate(CWIMG.REFRESH_COUNT)
         if anchor is None:
-            logger.debug("未找到刷新次数锚点")
+            logger.debug("未找到刷新次数锚点，改用回退OCR区域尝试识别")
+            # 回退方案：在预估的横条区域进行一次OCR（基于常见UI布局），尽量读取数字
+            try:
+                # 经验区域：界面底部靠上的横条（适配1920x1080及缩放）
+                # from_y/to_y 根据日志中点击y≈856（约0.79-0.82）来设定一个稍宽的条带
+                results = self.ocr_in_tuple(0.15, 0.78, 0.95, 0.92, trace=False) or []
+                if results:
+                    # 左到右排序后拼接
+                    items = sorted(results, key=lambda r: r[0][0][0])
+                    line = " ".join([str(r[1]) for r in items])
+                    logger.debug(f"刷新次数OCR(回退)结果行: '{line}'")
+                    pattern = r"刷\s*新\s*次\s*数\s*(\d+)"
+                    found = [int(x) for x in re.findall(pattern, line)]
+                    if found:
+                        return found[:max_items]
+                    nums = [int(x) for x in re.findall(r"(\d+)", line)]
+                    return nums[:max_items]
+            except Exception as e:
+                logger.trace(f"回退OCR识别刷新次数失败: {e}")
             return counts
 
-        # 构造“同一行右侧”OCR区域（细长条）
-        pad_x = 6
-        pad_y = 2
-        left = min(win.left + win.width - 10, anchor.left + anchor.width + pad_x)
-        top = max(win.top, anchor.top - pad_y)
-        # 宽度尽可能覆盖到右侧边界，高度与锚点行高相近
-        width = max(40, min(600, win.left + win.width - left - 6))
-        height = max(16, min(anchor.height + 2 * pad_y, win.top + win.height - top - 4))
+        # 输出锚点坐标用于调试与后续参考
+        logger.debug(
+            f"刷新次数锚点定位: left={anchor.left}, top={anchor.top}, "
+            f"width={anchor.width}, height={anchor.height}"
+        )
+        logger.debug(f"窗口区域: left={win.left}, top={win.top}, width={win.width}, height={win.height}")
+
+        rel_top = max(0.0, min(1.0, anchor.top / float(win.height)))
+        rel_bottom = max(rel_top, min(1.0, (anchor.top + anchor.height) / float(win.height)))
+        left = int(win.left)
+        top = int(win.top + rel_top * win.height)
+        width = int(win.width)
+        height = int(max(1, (rel_bottom - rel_top) * win.height))
+
+        logger.debug(
+            f"OCR区域: rel=(0.0,{rel_top:.6f},1.0,{rel_bottom:.6f}), px=(left={left},top={top},w={width},h={height})"
+        )
+        
         if width <= 0 or height <= 0:
             return counts
 
-        region = Region(left, top, width, height)
-        # 调试：输出用于识别的区域截图
-        try:
-            debug_dir = Path("log") / "currency_wars"
-            debug_dir.mkdir(parents=True, exist_ok=True)
-            ts = time.strftime("%Y%m%d_%H%M%S")
-            img_path = debug_dir / f"refresh_counts_region_{ts}.png"
-            self.screenshot(region).save(img_path)
-            logger.debug(f"刷新次数OCR区域: {region.tuple}, 截图: {img_path}")
-        except Exception as e:
-            logger.trace(f"保存刷新次数OCR区域截图失败: {e}")
-        results = self.ocr_in_region(region, trace=False) or []
+        results = self.ocr_in_tuple(0.0, rel_top, 1.0, rel_bottom, trace=False) or []
         if not results:
             return counts
 
         # 左到右排序后拼接成一行文本
         items = sorted(results, key=lambda r: r[0][0][0])
         line = " ".join([str(r[1]) for r in items])
+        logger.debug(f"刷新次数OCR结果行: '{line}'")
 
         # 优先匹配“刷新次数<数字>”模式（OCR 可能分词，允许空白）
         pattern = r"刷\s*新\s*次\s*数\s*(\d+)"
