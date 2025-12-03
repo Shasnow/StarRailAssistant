@@ -632,7 +632,6 @@ class CurrencyWars(Executable):
         event, _ = self.locate_any([
             CWIMG.THE_PLANET_OF_FESTIVITIES,
             CWIMG.FORTUNE_TELLER,
-            CWIMG.RIGHT
         ])
         if event == 0:  # 盛会之星事件
             self.click_point(0.5, 0.25, after_sleep=1)  # 选择第一个选项
@@ -642,16 +641,6 @@ class CurrencyWars(Executable):
             logger.info("触发命运卜者事件")
             self.click_point(0.8, 0.3, after_sleep=1)  # 选择第三个选项
             self.click_point(0.77, 0.52, after_sleep=1)  # 点击确认按钮
-            return True
-        elif event == 2:  # 是否应该存在存疑
-            # logger.info("检测到右侧按钮事件（默认不处理）")
-            # # 保存捕获游戏窗口截图到log文件夹
-            # timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-            # if not os.path.exists("log/currency_wars"):
-            #     os.makedirs("log/currency_wars")
-            # filename = f"log/currency_wars/unhandled_right_event_{timestamp}.png"
-            # img = self.screenshot_region()
-            # img.save(filename)
             return True
         
         # 将 OCR 检测放在所有图片事件之后，作为兜底处理

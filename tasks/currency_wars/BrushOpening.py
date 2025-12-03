@@ -30,14 +30,15 @@ class BrushOpening(Executable):
         """
         tries = 0
         while True:
-
-            page = self.cw.page_locate()
-            if page == -1:
-                logger.error("页面定位失败，无法开始游戏")
-                return False
+            # 在策略页外部接管期间，不再调用 page_locate，直接按策略页流程推进
+            if not (self.cw.strategy_external_control and self.cw.is_running):
+                page = self.cw.page_locate()
+                if page == -1:
+                    logger.error("页面定位失败，无法开始游戏")
+                    return False
 
             # 进入流程：从开始页进入；准备阶段直接继续
-            if page == 1:
+            if not (self.cw.strategy_external_control and self.cw.is_running) and page == 1:
                 # 先清除上轮残留的结算标记，仅在本轮确实进行“继续进度→结算返回”时再置位。
                 self._just_settled = False
                 if not self._bo_enter_from_start_page():
@@ -48,7 +49,7 @@ class BrushOpening(Executable):
                     logger.info("完成结算返回主页，已重新进入，本轮继续")
                     self.sleep(0.8)
                     continue
-            elif page == 2:
+            elif not (self.cw.strategy_external_control and self.cw.is_running) and page == 2:
                 logger.info("已处于准备阶段，进入结算返回流程")
                 if not self._return_to_prep_and_abort():
                     logger.error("准备阶段结算返回失败，报错终止脚本")
@@ -289,11 +290,21 @@ class BrushOpening(Executable):
     
     def _safe_abort_and_return(self) -> bool:
         """兼容旧用法：开始界面直接结算返回到货币战争主界面。"""
-        return self._abort_and_return(in_game=False)
+        result = self._abort_and_return(in_game=False)
+        # 重置CW运行与接管状态，确保下一轮回到page_locate流程
+        if result:
+            self.cw.strategy_external_control = False
+            self.cw.is_running = False
+        return result
 
     def _return_to_prep_and_abort(self) -> bool:
         """兼容旧用法：对局中先返回备战再结算返回主页。"""
-        return self._abort_and_return(in_game=True)
+        result = self._abort_and_return(in_game=True)
+        # 重置CW运行与接管状态，确保下一轮回到page_locate流程
+        if result:
+            self.cw.strategy_external_control = False
+            self.cw.is_running = False
+        return result
 
     def _abort_and_return(self, in_game: bool) -> bool:
         """统一的结算返回流程。
