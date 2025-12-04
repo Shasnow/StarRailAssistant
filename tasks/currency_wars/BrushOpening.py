@@ -23,10 +23,10 @@ class BrushOpening(Executable):
         self._in_strategy_phase = False
 
     # —— 微型助手方法：仅用于提升可读性与健壮性 ——
-    def _wait_then_click_box(self, img, *, timeout=8, interval=0.5, after_sleep=None):
+    def _wait_then_click_box(self, img, *, timeout=5, interval=0.5, after_sleep=None):
         """等待图像并点击其区域。保持与原有 wait_img + click_box 组合一致的行为。
 
-        不改变业务顺序与时间参数的默认值；仅封装以减少重复代码。
+        仅封装以减少重复代码。
         """
         box = self.wait_img(img, timeout=timeout, interval=interval)
         if box is None:
@@ -45,7 +45,7 @@ class BrushOpening(Executable):
         
     def openning(self):
         """刷开局主流程。
-        需求：
+        逻辑：
         - 若识别到 CONTINUE_PROGRESS，则中断当前对局并结算返回，再走正常进入流程；
         - 循环直到首次识别到“选择投资策略”界面；
         - 在该界面 OCR 检测是否出现“叽米”，出现则停止脚本并通知用户；
@@ -124,133 +124,15 @@ class BrushOpening(Executable):
                 # 点击返回投资策略界面
                 self.click_img(CWIMG.RETURN_INVESTMENT_STRATEGY, after_sleep=2.0)
                 if two_two_box is not None:
-                    # 命中 2-2：进入叽米判定逻辑
-                    if self._detect_jimi():
-                        logger.success("2-2 关卡识别到叽米，停止脚本并通知用户")
-                        try:
-                            send_windows_notification("SRA", "刷开局命中叽米，脚本已停止")
-                        except Exception:
-                            logger.warning("通知模块调用失败")
-                        self.is_running = False
-                        if hasattr(self, 'cw'):
-                            self.cw.is_running = False
-                        self._in_strategy_phase = False
+                    # 命中 2-2：进入叽米判定与刷新循环
+                    if self._handle_two_two_refresh_loop():
                         return True
-
-                    # 未命中叽米：消耗刷新次数逐次检测，直到刷新用尽或命中为止
-                    # 动态上限：优先由OCR决定；不可用时使用安全兜底（3 次）
-                    refresh_attempts = 0  # 已尝试刷新次数
-                    safe_cap = 30  # 兜底上限（用于读取成功时的最大保护）
-                    fallback_attempts = 3  # OCR 不可用时，默认尝试 3 次
-                    consecutive_ocr_fail = 0  # 连续 OCR 失败计数
-                    max_attempts = safe_cap  # 本轮最大尝试刷新次数
-                    # 先尝试读取一次作为初始上限依据
-                    try:
-                        init_counts = self._collect_refresh_counts(max_items=3)
-                        if init_counts:
-                            logger.info(f"刷新次数初始记录: {init_counts}")
-                            # 若能读到非零，取其总和或最大值作为本轮可刷新上限
-                            nonneg = [x for x in init_counts if isinstance(x, int) and x >= 0]
-                            if nonneg:
-                                # 三个位置取总和；如OCR拆分异常也不超过safe_cap
-                                max_attempts = min(sum(nonneg), 30) or safe_cap
-                                if all(x == 0 for x in nonneg):
-                                    logger.info("检测到刷新次数为0，执行返回备战并结算本轮")
-                                    self._return_to_prep_and_abort()
-                                    self.sleep(2.0)
-                                    continue
-                        else:
-                            # 初次读取失败：采用保守策略，最多尝试 3 次刷新
-                            consecutive_ocr_fail += 1
-                            max_attempts = fallback_attempts
-                            logger.info("刷新次数OCR不可用，采用保守策略：最多尝试 3 次刷新")
-                    except Exception as e:
-                        logger.trace(f"采集刷新次数异常: {e}")
-
-                    while refresh_attempts < max_attempts:
-                        try:
-                            counts = self._collect_refresh_counts(max_items=3)
-                            if counts:
-                                consecutive_ocr_fail = 0
-                                logger.info(f"刷新次数记录: {counts}")
-                                # 如果检测到全部为0，则认为刷新次数已用尽
-                                if all(isinstance(x, int) and x == 0 for x in counts):
-                                    logger.info("检测到刷新次数已用尽，执行返回备战并结算本轮")
-                                    self._return_to_prep_and_abort()
-                                    self.sleep(2.0)
-                                    break
-                            else:
-                                # OCR 未读到数字时，不再提前退出；继续走“尝试点击刷新按钮”策略
-                                consecutive_ocr_fail += 1
-                                if consecutive_ocr_fail == 1 and max_attempts == safe_cap:
-                                    # 中途 OCR 开始失败但此前读过次数：保持之前推导的 max_attempts，不做调整
-                                    logger.debug("OCR未读到次数，沿用先前上限并继续尝试刷新")
-                        except Exception as e:
-                            logger.trace(f"采集刷新次数异常: {e}")
-
-                        # 尝试点击刷新按钮；若按钮不可用/不存在，视为已用尽
-                        if not self._click_refresh_button():
-                            logger.info("刷新按钮不可用或未找到，可能已用尽刷新次数，执行返回备战并结算本轮")
-                            self._return_to_prep_and_abort()
-                            self.sleep(2.0)
-                            break
-
-                        refresh_attempts += 1
-                        self.sleep(1.2)
-                        if self._detect_jimi():
-                            logger.success("刷新后识别到叽米，停止脚本并通知用户")
-                            try:
-                                send_windows_notification("SRA", "刷新后命中叽米，脚本已停止")
-                            except Exception:
-                                logger.warning("通知模块调用失败")
-                            self.is_running = False
-                            if hasattr(self, 'cw'):
-                                self.cw.is_running = False
-                            return True
                     # 如果循环自然结束且未命中叽米，继续外层流程
                     continue
                 else:
-                    # 非 2-2：不结算，继续探索（尽量回到策略界面并按默认策略继续）
-                    logger.info("当前并非 2-2，继续探索本轮")
-                    try:
-                        # 关闭返回备战覆盖层
-                        self.press_key('esc')
-                        self.sleep(0.8)
-                        # 若仍有“点击空白处关闭”，点击一次
-                        click_blank = self.wait_img(CWIMG.CLICK_BLANK, timeout=3, interval=0.5)
-                        if click_blank is not None:
-                            self.click_box(click_blank, after_sleep=0.8)
-                        # 模拟CW的默认策略选择：点中间策略并确认，以推进进程
-                        self.click_point(0.5, 0.68, after_sleep=0.6)
-                        self.click_point(0.5, 0.90, after_sleep=0.8)
-                        self.sleep(2.0)
-                        
-                        #若无下方操作，会导致交还CW后直接进入battle逻辑，卡死
-                        fold_box = self.wait_img(CWIMG.FOLD, timeout=2) # 判断商店是否为未收起状态
-                        if fold_box is not None:
-                            self.click_box(fold_box, after_sleep=1)
-                        self.cw.harvest_crystals()  # 收获水晶
-                        self.cw.refresh_character()  # 更新角色信息
-                        self.cw.get_in_hand_area()  # 更新手牌信息
-                        self.cw.place_character()  # 放置角色
-                        self.cw.sell_character()  # 出售多余角色
-                        
-                        # 策略处理完成后，需推进战斗与节点切换直到下一个策略页
-                        # 不能直接调用 run_game()，因为它会先执行 strategy_event 等常规流程
-                        # 应手动推进：battle → stage_transition，直到再次到达策略页
-                        self.cw.is_running = True
-                        if self.cw.battle():
-                            self.cw.stage_transition()
-                            # stage_transition 会在遇到策略页时设置 is_running=False 并退出
-                            # 此时回到 BrushOpening 的 while 顶部，重新等待策略页
-                            self.cw.shopping()
-                            self.cw.harvest_crystals()
-                            self.cw.get_in_hand_area(True)
-                    except Exception as e:
-                        logger.debug(f"继续探索推进过程出现异常：{e}，忽略并进入下一轮等待")
-                    # 回到等待下一个策略页/节点的循环
+                    # 非 2-2：不结算，继续探索
+                    self._handle_non_two_two_strategy()
                     continue
-
             # 走到此处表示：未进入 2-2 分支或未触发返回备战逻辑。
             # 使用默认操作推进一次策略选择，继续等待下一次策略页。
             try:
@@ -489,11 +371,176 @@ class BrushOpening(Executable):
         nums = [int(x) for x in re.findall(r"(\d+)", line)]
         return nums[:max_items]
 
+    def _handle_two_two_refresh_loop(self) -> bool:
+        """处理 2-2 关卡的叽米检测与刷新循环。
+        
+        Returns:
+            True: 检测到叽米，脚本应停止
+            False: 未检测到叽米，继续外层流程
+        """
+        # 首次叽米检测
+        if self._detect_jimi():
+            return self._stop_on_jimi_found("2-2 关卡识别到叽米")
+
+        # 初始化刷新参数
+        max_attempts = self._determine_max_refresh_attempts()
+        if max_attempts == 0:
+            return False  # 刷新次数已为0，回到外层等待
+        
+        # 刷新循环
+        refresh_attempts = 0
+        while refresh_attempts < max_attempts:
+            # OCR采集次数（不阻塞流程）
+            counts = self._try_collect_refresh_counts()
+            if counts and all(isinstance(x, int) and x == 0 for x in counts):
+                logger.info("检测到刷新次数已用尽，执行返回备战并结算本轮")
+                self._return_to_prep_and_abort()
+                self.sleep(2.0)
+                break
+
+            # 点击刷新按钮
+            if not self._click_refresh_button():
+                logger.info("刷新按钮不可用或未找到，可能已用尽刷新次数，执行返回备战并结算本轮")
+                self._return_to_prep_and_abort()
+                self.sleep(2.0)
+                break
+
+            refresh_attempts += 1
+            self.sleep(1.2)
+            
+            # 刷新后再次检测叽米
+            if self._detect_jimi():
+                return self._stop_on_jimi_found("刷新后识别到叽米")
+
+        return False
+
+    def _handle_non_two_two_strategy(self):
+        """处理非2-2关卡：选择默认策略并手动推进到下一个策略页。
+        
+        执行流程:
+        1. 关闭返回备战覆盖层
+        2. 选择中间策略并确认
+        3. 整理场面(收起商店、收获水晶、放置/出售角色)
+        4. 手动推进战斗→关卡切换→商店,直到再次到达策略页
+        
+        Note:
+            不能调用cw.run_game(),因为会执行常规策略事件流程。
+            必须手动调用battle→stage_transition→shopping以回到策略页等待。
+        """
+        logger.info("当前并非 2-2，继续探索本轮")
+        try:
+            # 关闭返回备战覆盖层
+            self.press_key('esc')
+            self.sleep(0.8)
+            click_blank = self.wait_img(CWIMG.CLICK_BLANK, timeout=3, interval=0.5)
+            if click_blank is not None:
+                self.click_box(click_blank, after_sleep=0.8)
+            
+            # 选择策略并推进
+            self.click_point(0.5, 0.68, after_sleep=0.6)
+            self.click_point(0.5, 0.90, after_sleep=0.8)
+            self.sleep(2.0)
+            
+            # 整理场面状态
+            fold_box = self.wait_img(CWIMG.FOLD, timeout=2)
+            if fold_box is not None:
+                self.click_box(fold_box, after_sleep=1)
+            self.cw.harvest_crystals()
+            self.cw.refresh_character()
+            self.cw.get_in_hand_area()
+            self.cw.place_character()
+            self.cw.sell_character()
+            
+            # 手动推进：battle → stage_transition → shopping
+            self.cw.is_running = True
+            if self.cw.battle():
+                self.cw.stage_transition()
+                self.cw.shopping()
+                self.cw.harvest_crystals()
+                self.cw.get_in_hand_area(True)
+        except Exception as e:
+            logger.debug(f"继续探索推进过程出现异常：{e}，忽略并进入下一轮等待")
+
+    def _determine_max_refresh_attempts(self) -> int:
+        """确定本轮最大刷新尝试次数。
+        
+        Returns:
+            max_attempts: 基于OCR或保守策略的最大尝试次数
+        """
+        safe_cap = 30
+        fallback_attempts = 3
+        
+        try:
+            init_counts = self._collect_refresh_counts(max_items=3)
+            if init_counts:
+                logger.info(f"刷新次数初始记录: {init_counts}")
+                nonneg = [x for x in init_counts if isinstance(x, int) and x >= 0]
+                if nonneg:
+                    if all(x == 0 for x in nonneg):
+                        logger.info("检测到刷新次数为0，执行返回备战并结算本轮")
+                        self._return_to_prep_and_abort()
+                        self.sleep(2.0)
+                        return 0
+                    return min(sum(nonneg), safe_cap)
+            
+            logger.info("刷新次数OCR不可用，采用保守策略：最多尝试 3 次刷新")
+            return fallback_attempts
+        except Exception as e:
+            logger.trace(f"采集刷新次数异常: {e}")
+            return fallback_attempts
+
+    def _try_collect_refresh_counts(self) -> list[int]:
+        """尝试采集刷新次数(不阻塞流程)。
+        
+        Returns:
+            list[int]: 刷新次数列表[位置1, 位置2, 位置3]；OCR失败时返回空列表
+            
+        Note:
+            此方法封装了异常处理,确保OCR失败不会中断主流程
+        """
+        try:
+            counts = self._collect_refresh_counts(max_items=3)
+            if counts:
+                logger.info(f"刷新次数记录: {counts}")
+            return counts or []
+        except Exception as e:
+            logger.trace(f"采集刷新次数异常: {e}")
+            return []
+
+    def _stop_on_jimi_found(self, message: str) -> bool:
+        """检测到叽米后的统一停止处理。
+        
+        Args:
+            message (str): 日志消息前缀,用于区分不同检测场景(如"2-2关卡"或"刷新后")
+            
+        Returns:
+            bool: 始终返回True,表示脚本应立即停止
+            
+        Side Effects:
+            - 发送Windows系统通知
+            - 设置 self.is_running = False
+            - 设置 self.cw.is_running = False
+            - 重置 self._in_strategy_phase = False
+        """
+        logger.success(f"{message}，停止脚本并通知用户")
+        try:
+            send_windows_notification("SRA", "刷开局命中叽米，脚本已停止")
+        except Exception:
+            logger.warning("通知模块调用失败")
+        self.is_running = False
+        if hasattr(self, 'cw'):
+            self.cw.is_running = False
+        self._in_strategy_phase = False
+        return True
+
     def _click_refresh_button(self) -> bool:
-        """点击刷新按钮（REFRESH_COUNT_BTN）。"""
+        """点击策略刷新按钮(REFRESH_COUNT_BTN)。
+        
+        Returns:
+            bool: 成功点击返回True; 按钮不存在或不可用时返回False
+        """
         btn = self.wait_img(CWIMG.REFRESH_COUNT_BTN, timeout=6, interval=0.5)
         if btn is None:
             logger.debug("未找到刷新按钮")
             return False
         return self.click_box(btn, after_sleep=1.0)
-    
