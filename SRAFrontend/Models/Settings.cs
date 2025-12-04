@@ -57,5 +57,6 @@ public partial class Settings : ObservableObject
     public string GuideHotkey { get; set; } = "F4"; // 指南 默认 F4
     public string MapHotkey { get; set; } = "M"; // 地图 默认 M
     public string TechniqueHotkey { get; set; } = "E"; // 秘技 默认 E
+    public string StartStopHotkey { get; set; } = "F9"; // 启动/停止 默认 F9
 
 }

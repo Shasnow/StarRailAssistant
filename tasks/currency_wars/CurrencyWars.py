@@ -17,6 +17,7 @@ class CurrencyWars(Executable):
         self.force_battle = False
         self.is_continue = False  # 是否是继续挑战
         self.strategy_external_control: bool = False# 当外部（如刷开局流程）希望在“选择投资策略”页接管逻辑时，置为 True
+        self.difficulty_mode: int = 0  # 难度模式：0=最低难度，1=最高难度（默认最低）
         self.on_field_character: list[Character | None] = [None, None, None, None]  # 场上角色列表
         self.on_field_area: list[tuple[float, float]] = [
             (0.386, 0.365),
@@ -155,8 +156,19 @@ class CurrencyWars(Executable):
         """标准进入：选择难度、开始游戏、投资环境。"""
         if not self.click_box(enter_standard_box, after_sleep=1.5):
             return False
-        # 下拉选择难度/选项
-        while self.click_img(CWIMG.DOWN_ARROW, after_sleep=0.5):
+        # 难度选择：根据前端配置选择最低或最高
+        try:
+            if self.difficulty_mode == 1:
+                # 最高难度：若识别到“返回最高名望”则点击，否则直接开始
+                highest_rank = self.wait_img(CWIMG.RETURN_HIGHEST_RANK, timeout=3, interval=0.5)
+                if highest_rank is not None:
+                    self.click_box(highest_rank, after_sleep=0.8)
+            else:
+                # 最低难度：尝试点击下拉至最低项
+                while self.click_img(CWIMG.DOWN_ARROW, after_sleep=0.5):
+                    pass
+        except Exception:
+            # 识别失败不阻断流程
             pass
         if not self.click_img(CWIMG.START_GAME, after_sleep=1):
             return False
@@ -178,6 +190,14 @@ class CurrencyWars(Executable):
             self.click_img(IMG.ENSURE2, after_sleep=1)
         self.sleep(4)
         return True
+
+    # =============== 配置注入 ===============
+    def set_difficulty(self, mode: int):
+        """设置难度模式：0=最低难度，1=最高难度"""
+        try:
+            self.difficulty_mode = 1 if int(mode) == 1 else 0
+        except Exception:
+            self.difficulty_mode = 0
 
     def _continue_progress_flow(self, continue_progress_box) -> bool:
         """继续已有进度进入对局。"""

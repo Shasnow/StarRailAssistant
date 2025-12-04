@@ -56,6 +56,14 @@
                                                        Increment="0.01" Minimum="0"
                                                        Maximum="1" />
                                     </Grid>
+                                    <!-- 启动/停止 快捷键（任务通用设置） -->
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="icon">&#xE3E4;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.StartStopText}" />
+                                        <Button Grid.Column="2" MinWidth="120"
+                                                Content="{Binding StartStopKey.CurrentKey, Converter={StaticResource HotkeyDisplayConverter}}"
+                                                Command="{Binding StartStopKey.ModifyKeyCommand}" />
+                                    </Grid>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
                         </suki:SettingsLayoutItem>
