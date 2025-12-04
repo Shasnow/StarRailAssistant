@@ -156,6 +156,9 @@
     <data name="TechniqueText" xml:space="preserve">
         <value>Technique</value>
     </data>
+    <data name="StartStopText" xml:space="preserve">
+        <value>Start/Stop</value>
+    </data>
     <data name="ModifyHoldText" xml:space="preserve">
         <value>Hold to modify</value>
     </data>

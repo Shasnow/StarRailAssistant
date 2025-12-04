@@ -16,6 +16,7 @@ public partial class SettingsPageViewModel : PageViewModel
     private readonly CacheService _cacheService;
     private readonly CommonModel _commonModel;
     private readonly AvaloniaList<CustomizableKey> _customizableKeys;
+    private readonly CustomizableKey _startStopKey;
 
     private readonly SettingsService _settingsService;
     private readonly UpdateService _updateService;
@@ -31,6 +32,15 @@ public partial class SettingsPageViewModel : PageViewModel
         _updateService = updateService;
         _cacheService = cacheService;
         _commonModel = commonModel;
+        // 任务通用设置中的 启动/停止 快捷键（非游戏内快捷键分组）
+        _startStopKey = new CustomizableKey(ListenKeyFor)
+        {
+            IconText = "\uE3E4",
+            DisplayText = Resources.StartStopText,
+            DefaultKey = "F9"
+        }.Bind(() => settingsService.Settings.StartStopHotkey,
+            value => settingsService.Settings.StartStopHotkey = value);
+
         _customizableKeys =
         [
             new CustomizableKey(ListenKeyFor)
@@ -79,6 +89,7 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     public IAvaloniaReadOnlyList<CustomizableKey> CustomizableKeys => _customizableKeys;
+    public CustomizableKey StartStopKey => _startStopKey;
     public Settings Settings => _settingsService.Settings;
     public Cache Cache => _cacheService.Cache;
     public string VersionText => Settings.Version;
