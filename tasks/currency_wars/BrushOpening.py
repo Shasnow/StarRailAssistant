@@ -10,6 +10,28 @@ from .CurrencyWars import CurrencyWars
 
 
 class BrushOpening(Executable):
+    # 坐标常量
+    STRATEGY_SELECT_X = 0.5
+    STRATEGY_SELECT_Y = 0.68
+    STRATEGY_CONFIRM_Y = 0.90
+    CENTER_X = 0.5
+    CENTER_Y = 0.5
+    
+    # OCR 区域常量（回退方案）
+    OCR_FALLBACK_LEFT = 0.15
+    OCR_FALLBACK_TOP = 0.78
+    OCR_FALLBACK_RIGHT = 0.95
+    OCR_FALLBACK_BOTTOM = 0.92
+    
+    # 刷新限制常量
+    MAX_REFRESH_CAP = 30
+    FALLBACK_REFRESH_ATTEMPTS = 3
+    
+    # 页面类型常量
+    PAGE_ERROR = -1
+    PAGE_START = 1
+    PAGE_PREPARATION = 2
+    
     def __init__(self, run_times):
         super().__init__()
         self.run_times = run_times
