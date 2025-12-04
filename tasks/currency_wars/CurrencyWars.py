@@ -647,10 +647,10 @@ class CurrencyWars(Executable):
         # 未知原因，ocr结果为空
         try:
             ocr_results = self.ocr(from_x=0.073, from_y=0.546, to_x=0.807, to_y=0.574)
-            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-            filename = f"log/currency_wars/before_unhandled_right_event_{timestamp}.png"
-            img = self.screenshot_region()
-            img.save(filename)
+            # timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            # filename = f"log/currency_wars/before_unhandled_right_event_{timestamp}.png"
+            # img = self.screenshot_region()
+            # img.save(filename)
             if ocr_results:
                 text_line = "".join([str(item[1]) for item in ocr_results])
                 if "确认选择" in text_line:
