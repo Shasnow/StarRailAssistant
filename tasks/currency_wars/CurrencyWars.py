@@ -651,6 +651,7 @@ class CurrencyWars(Executable):
             # filename = f"log/currency_wars/before_unhandled_right_event_{timestamp}.png"
             # img = self.screenshot_region()
             # img.save(filename)
+            logger.debug(f"特殊事件OCR结果: {ocr_results}")
             if ocr_results:
                 text_line = "".join([str(item[1]) for item in ocr_results])
                 if "确认选择" in text_line:
