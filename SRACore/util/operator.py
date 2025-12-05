@@ -778,7 +778,7 @@ class Operator:
         try:
             time.sleep(wait)
             if trace:
-                logger.debug(t('operator.press_key', key=key))
+                logger.debug(t('operator.press_key', keyname=key))
             pyautogui.press(key, presses=presses, interval=interval)
             return True
         except Exception as e:
@@ -799,7 +799,7 @@ class Operator:
             按键成功返回True，否则返回False
         """
         try:
-            logger.debug(t('operator.hold_key', key=key))
+            logger.debug(t('operator.hold_key', keyname=key))
             pyautogui.keyDown(key)
             time.sleep(duration)
             pyautogui.keyUp(key)
