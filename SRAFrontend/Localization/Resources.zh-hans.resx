@@ -149,6 +149,9 @@
     <data name="TechniqueText" xml:space="preserve">
         <value>秘技</value>
     </data>
+    <data name="StartStopText" xml:space="preserve">
+        <value>启动/停止</value>
+    </data>
     <data name="ModifyHoldText" xml:space="preserve">
         <value>点击以修改</value>
     </data>
