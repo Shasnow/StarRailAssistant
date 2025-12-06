@@ -20,8 +20,7 @@ class DifferentialUniverse(Executable):
             if not self._select():
                 return False
             if not self._navigate_and_fight():
-                return False+65
-
+                return False
             if not self._select():
                 return False
             if not self._complete_mission():
@@ -154,6 +153,7 @@ class DifferentialUniverse(Executable):
         elif page == 1:
             return True
         elif page == 2:
+            # 积分奖励页面
             self.sleep(4)
             self.press_key('esc')
             return True
