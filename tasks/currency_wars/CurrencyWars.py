@@ -593,6 +593,7 @@ class CurrencyWars(Executable):
                 CWIMG.NEXT_STEP,
                 '游戏结束',
                 lambda: [
+                    self.sleep(15),  # 如果职级晋升需要等待约13s动画
                     self.click_point(0.5, 0.82, after_sleep=1),
                     self.click_point(0.5, 0.82, after_sleep=1),
                     self.click_point(0.5, 0.82, after_sleep=1),
@@ -796,5 +797,4 @@ class CurrencyWars(Executable):
         self.school_tendency = {k: v for k, v in
                                 sorted(self.school_tendency.items(), key=lambda item: item[1], reverse=True)}  # 排序
         logger.info(f"当前阵营倾向：{self.faction_tendency}")
-        logger.info(f"当前派系倾向：{self.school_tendency}")
         logger.info(f"当前派系倾向：{self.school_tendency}")
