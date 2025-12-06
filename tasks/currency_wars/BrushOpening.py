@@ -2,7 +2,9 @@ import re
 
 from loguru import logger
 
-from SRACore.util.notify import send_windows_notification
+from SRACore.util.config import load_config, load_settings
+from SRACore.util.notify import (send_mail_notification,
+                                 send_windows_notification)
 from SRACore.util.operator import Executable
 from tasks.currency_wars.img import CWIMG, IMG
 
@@ -75,13 +77,13 @@ class BrushOpening(Executable):
         """
         tries = 0
         while True:
-            # 阶段1：页面定位
+            # 页面定位
             if not self._in_strategy_phase:
                 page = self._handle_page_location()
                 if page == self.PAGE_ERROR:
                     return False
 
-                # 阶段2：进入流程处理
+                # 进入流程处理
                 entry_result = self._handle_entry_phase(page)
                 if entry_result == "error":
                     return False
@@ -91,7 +93,7 @@ class BrushOpening(Executable):
                     self.sleep(0.8)
                     continue
 
-            # 阶段3：初始策略应用
+            # 初始策略应用
             if not self._in_strategy_phase:
                 tries += 1
                 logger.info(f"开始刷开局，第 {tries} 次尝试")
@@ -99,23 +101,23 @@ class BrushOpening(Executable):
                     self.sleep(1.5)
                     continue
 
-            # 阶段4：启用外部接管并推进到策略页
+            # 启用外部接管并推进到策略页
             self._enable_strategy_control()
             self.cw.run_game()
 
-            # 阶段5：等待并处理策略页
+            # 等待并处理策略页
             if not self._wait_for_strategy_page():
                 logger.debug("未能到达策略页，继续循环")
                 continue
 
-            # 阶段6：检测 2-2 关卡并处理
+            # 检测 2-2 关卡并处理
             detection_result = self._handle_stage_detection()
             if detection_result == "jimi_found":
                 return True
             elif detection_result == "continue":
                 continue
 
-            # 阶段7：默认策略推进（未进入 2-2 分支时）
+            # 默认策略推进（未进入 2-2 分支时）
             self._handle_default_strategy_advance()
             continue
 
@@ -604,7 +606,7 @@ class BrushOpening(Executable):
         """检测到叽米后的统一停止处理。
         
         Args:
-            message (str): 日志消息前缀,用于区分不同检测场景(如"2-2关卡"或"刷新后")
+            message (str): 日志消息前缀,用于区分不同检测场景
             
         Returns:
             bool: 始终返回True,表示脚本应立即停止
@@ -616,10 +618,32 @@ class BrushOpening(Executable):
             - 重置 self._in_strategy_phase = False
         """
         logger.success(f"{message}，停止脚本并通知用户")
+        # 根据设置开关优先走 SRA 的通知
+        allow_notify = True
+        enable_system = True
+        enable_email = False
         try:
-            send_windows_notification("SRA", "刷开局命中叽米，脚本已停止")
+            settings = load_settings() or {}
+            notify_cfg = settings.get('Notify') or settings.get('Notification') or {}
+            allow_notify = bool(notify_cfg.get('AllowNotification', True))
+            enable_system = bool(notify_cfg.get('EnableWindows', True))
+            enable_email = bool(notify_cfg.get('EnableEmail', False))
         except Exception:
-            logger.warning("通知模块调用失败")
+            logger.trace("读取通知开关失败，使用默认开关")
+
+        if allow_notify and enable_system:
+            try:
+                send_windows_notification("SRA", "刷开局命中叽米，脚本已停止")
+            except Exception:
+                logger.warning("Windows系统通知发送失败")
+
+        if allow_notify and enable_email:
+            try:
+                email_cfg = load_config('email')
+                if isinstance(email_cfg, dict) and email_cfg:
+                    send_mail_notification("SRA", "刷开局命中叽米，脚本已停止", email_cfg)
+            except Exception:
+                logger.trace("邮件通知发送失败或未配置，已忽略")
         self.is_running = False
         if hasattr(self, 'cw'):
             self.cw.is_running = False
