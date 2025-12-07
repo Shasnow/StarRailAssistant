@@ -24,7 +24,7 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private bool _enableAutoUpdate = true; // 是否启用自动更新
     [ObservableProperty] private bool _enableMinimizeToTray; // 是否启用最小化到托盘
     [ObservableProperty] private bool _enableStartupLaunch; // 是否启用开机自启动
-    [ObservableProperty] private int _language = 1; // 0: English, 1: Simplified Chinese
+    [ObservableProperty] private int _language; // 0: 简体中文, 1: English
 
     [ObservableProperty] [property: JsonIgnore]
     private string _mirrorChyanCdk = "";
