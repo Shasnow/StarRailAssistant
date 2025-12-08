@@ -34,11 +34,10 @@ class BrushOpening(Executable):
     PAGE_START = 1
     PAGE_PREPARATION = 2
     
-    def __init__(self, run_times):
+    def __init__(self):
         super().__init__()
-        self.run_times = run_times
         self.force_battle = False
-        self.cw = CurrencyWars(run_times)
+        self.cw = CurrencyWars(0)
         # 结算返回后需重启下一轮的标记（避免在同一轮等待策略页）
         self._just_settled = False
         # 轻量通用配置：统一点击后的短暂停顿（不改变原有各处的具体等待）
@@ -67,7 +66,7 @@ class BrushOpening(Executable):
             self._in_strategy_phase = False
         return result
         
-    def openning(self):
+    def opening(self):
         """刷开局主流程。
         逻辑：
         - 若识别到 CONTINUE_PROGRESS，则中断当前对局并结算返回，再走正常进入流程；
@@ -315,7 +314,7 @@ class BrushOpening(Executable):
             logger.error("未识别到投资环境界面")
             return False
         # 投资操作（与CW一致逻辑）
-        if not self.click_img(IMG.COLLECTION):
+        if not self.click_img(CWIMG.COLLECTION):
             self.click_point(0.5, 0.5)
         self.click_img(IMG.ENSURE2, after_sleep=1)
         if self.locate(CWIMG.INVEST_ENVIRONMENT):

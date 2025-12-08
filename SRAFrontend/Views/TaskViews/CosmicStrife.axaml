@@ -45,7 +45,7 @@
                             
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Label>类型</Label>
-                                <ComboBox SelectedIndex="{Binding CurrencyWarsGameType}" Width="200" HorizontalAlignment="Left">
+                                <ComboBox SelectedIndex="{Binding CurrencyWarsModeIndex}" Width="200" HorizontalAlignment="Left">
                                     <ComboBoxItem>标准博弈</ComboBoxItem>
                                     <ComboBoxItem>超频博弈</ComboBoxItem>
                                     <ComboBoxItem>刷开局</ComboBoxItem>
@@ -53,7 +53,7 @@
                             </StackPanel>
                             
                             <!-- 难度显示在类型与模式之间，仅标准模式显示 -->
-                            <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsCurrencyWarsStandard}">
+                            <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsCurrencyWarsNormalMode}">
                                 <Label>难度</Label>
                                 <ComboBox SelectedIndex="{Binding CurrentConfig.CurrencyWarsDifficulty}" Width="200">
                                     <ComboBoxItem>最低难度</ComboBoxItem>
@@ -73,15 +73,11 @@
                                 <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.CurrencyWarsRunTimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
 
-                            <TextBlock IsVisible="{Binding IsCurrencyWarsBrushOpening}"
+                            <TextBlock IsVisible="{Binding !IsCurrencyWarsNormalMode}"
                                        Foreground="Gray"
                                        Text="默认使用最高难度" />
                         </StackPanel>
                     </suki:GlassCard>
-                    <!-- 刷开局已纳入类型下拉，不再单独显示 -->
-                    <TextBlock Foreground="Red"
-                               IsVisible="{Binding CurrencyWarsConflict}"
-                               Text="互斥：已同时启用『货币战争 - 零和博弈』与『货币战争 - 刷开局』，请仅选择其一。"/>
                     <TextBlock>请先手动完成一次以清除所有新手提示</TextBlock>
                 </StackPanel>
             </ScrollViewer>
