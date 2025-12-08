@@ -24,7 +24,7 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private bool _enableAutoUpdate = true; // 是否启用自动更新
     [ObservableProperty] private bool _enableMinimizeToTray; // 是否启用最小化到托盘
     [ObservableProperty] private bool _enableStartupLaunch; // 是否启用开机自启动
-    [ObservableProperty] private int _language = 1; // 0: English, 1: Simplified Chinese
+    [ObservableProperty] private int _language; // 0: 简体中文, 1: English
 
     [ObservableProperty] [property: JsonIgnore]
     private string _mirrorChyanCdk = "";
@@ -48,7 +48,7 @@ public partial class Settings : ObservableObject
 
     [ObservableProperty] private double _zoom = 1; // 屏幕缩放比例
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
-    public const string Version = "2.2.0-beta.5"; // 应用版本号
+    public const string Version = "2.2.0"; // 应用版本号
 
     // 新增快捷键设置
     public string ActivityHotkey { get; set; } = "F1"; // 活动 默认 F1
@@ -57,5 +57,6 @@ public partial class Settings : ObservableObject
     public string GuideHotkey { get; set; } = "F4"; // 指南 默认 F4
     public string MapHotkey { get; set; } = "M"; // 地图 默认 M
     public string TechniqueHotkey { get; set; } = "E"; // 秘技 默认 E
+    public string StartStopHotkey { get; set; } = "F9"; // 启动/停止 默认 F9
 
 }

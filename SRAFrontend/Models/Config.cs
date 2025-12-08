@@ -29,6 +29,7 @@ public partial class Config : ObservableObject
     [ObservableProperty] private int _currencyWarsPolicy; // 货币战争策略
     [ObservableProperty] private int _currencyWarsRunTimes; // 货币战争运行次数
     [ObservableProperty] private string _currencyWarsUsername = ""; // 货币战争用户名
+    [ObservableProperty] private int _currencyWarsDifficulty; // 货币战争难度：0=最低难度，1=最高难度
 
     // 货币战争 - 刷开局
     [ObservableProperty] private bool _currencyWarsBrushOpeningEnable; // 是否启用货币战争刷开局

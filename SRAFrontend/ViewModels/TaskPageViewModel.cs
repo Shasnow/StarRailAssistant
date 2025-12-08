@@ -242,6 +242,48 @@ public partial class TaskPageViewModel : PageViewModel
         CurrentConfig.CurrencyWarsEnable &&
         CurrentConfig.CurrencyWarsBrushOpeningEnable;
 
+    // 货币战争类型选择：0=标准博弈,1=超频博弈,2=刷开局
+    public int CurrencyWarsGameType
+    {
+        get
+        {
+            if (CurrentConfig is null) return 0;
+            if (CurrentConfig.CurrencyWarsBrushOpeningEnable) return 2;
+            // 默认：常规货币战争启用时按策略区分（目前仅两种，统一映射为0/1）
+            return CurrentConfig.CurrencyWarsPolicy switch
+            {
+                1 => 1,
+                _ => 0
+            };
+        }
+        set
+        {
+            if (CurrentConfig is null) return;
+            // 当选择刷开局时：启用刷开局，禁用常规；否则相反
+            if (value == 2)
+            {
+                CurrentConfig.CurrencyWarsBrushOpeningEnable = true;
+                CurrentConfig.CurrencyWarsEnable = false;
+            }
+            else
+            {
+                CurrentConfig.CurrencyWarsBrushOpeningEnable = false;
+                CurrentConfig.CurrencyWarsEnable = true;
+                CurrentConfig.CurrencyWarsPolicy = value; // 0 标准，1 超频
+            }
+            OnPropertyChanged(nameof(CurrencyWarsGameType));
+            OnPropertyChanged(nameof(IsCurrencyWarsBrushOpening));
+            OnPropertyChanged(nameof(IsCurrencyWarsNormalMode));
+            OnPropertyChanged(nameof(IsCurrencyWarsStandard));
+            OnPropertyChanged(nameof(CurrencyWarsConflict));
+        }
+    }
+
+    // UI 辅助可见性绑定
+    public bool IsCurrencyWarsBrushOpening => CurrencyWarsGameType == 2;
+    public bool IsCurrencyWarsNormalMode => CurrencyWarsGameType != 2;
+    public bool IsCurrencyWarsStandard => CurrencyWarsGameType == 0;
+
     [RelayCommand]
     private void DeleteSelectedTaskItem()
     {

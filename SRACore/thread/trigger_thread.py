@@ -3,6 +3,7 @@ import time
 from SRACore.triggers import AutoPlotTrigger
 from SRACore.triggers.BaseTrigger import BaseTrigger
 from SRACore.util.logger import logger
+from SRACore.util.i18n import t
 
 class TriggerManager:
     __instance = None
@@ -20,13 +21,13 @@ class TriggerManager:
                 if trigger.enabled:
                     trigger.run()
             time.sleep(0.1)
-        logger.debug("TriggerManager stopped.")
+        logger.debug(t('trigger.stopped'))
 
     def stop(self):
         """
         停止触发器管理器的运行。
         """
-        logger.debug("正在停止触发器线程...")
+        logger.debug(t('trigger.stopping'))
         for trigger in self.triggers:
             trigger.set_enable(False)
         self.isRunning = False
@@ -38,9 +39,9 @@ class TriggerManager:
         """
         if trigger not in self.triggers:
             self.triggers.append(trigger)
-            logger.debug(f"Trigger {trigger.__class__.__name__} registered successfully.")
+            logger.debug(t('trigger.registered', name=trigger.__class__.__name__))
         else:
-            logger.debug(f"Trigger {trigger.__class__.__name__} is already registered.")
+            logger.debug(t('trigger.already_registered', name=trigger.__class__.__name__))
 
     @classmethod
     def get_instance(cls):

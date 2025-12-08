@@ -24,10 +24,11 @@ class StartGameTask(BaseTask):
         self.start_game_click()
         res,_ = self.wait_any_img(["resources/img/enter.png",
                                  "resources/img/train_supply.png",
-                                 "resources/img/task_resources_manage.png"], timeout=120, interval=1)
+                                 "resources/img/task_resources_manage.png"], timeout=120, interval=2)
         if res == 0:
             return True
         elif res == 1:
+            # 领取月卡
             self.sleep(1)
             self.click_point(0.5, 0.6, after_sleep=4)
             self.click_point(0.5, 0.8, after_sleep=0.2)

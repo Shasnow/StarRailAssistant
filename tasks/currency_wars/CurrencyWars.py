@@ -17,6 +17,7 @@ class CurrencyWars(Executable):
         self.force_battle = False
         self.is_continue = False  # 是否是继续挑战
         self.strategy_external_control: bool = False# 当外部（如刷开局流程）希望在“选择投资策略”页接管逻辑时，置为 True
+        self.difficulty_mode: int = 0  # 难度模式：0=最低难度，1=最高难度（默认最低）
         self.on_field_character: list[Character | None] = [None, None, None, None]  # 场上角色列表
         self.on_field_area: list[tuple[float, float]] = [
             (0.386, 0.365),
@@ -155,8 +156,19 @@ class CurrencyWars(Executable):
         """标准进入：选择难度、开始游戏、投资环境。"""
         if not self.click_box(enter_standard_box, after_sleep=1.5):
             return False
-        # 下拉选择难度/选项
-        while self.click_img(CWIMG.DOWN_ARROW, after_sleep=0.5):
+        # 难度选择：根据前端配置选择最低或最高
+        try:
+            if self.difficulty_mode == 1:
+                # 最高难度：若识别到“返回最高名望”则点击，否则直接开始
+                highest_rank = self.wait_img(CWIMG.RETURN_HIGHEST_RANK, timeout=3, interval=0.5)
+                if highest_rank is not None:
+                    self.click_box(highest_rank, after_sleep=0.8)
+            else:
+                # 最低难度：尝试点击下拉至最低项
+                while self.click_img(CWIMG.DOWN_ARROW, after_sleep=0.5):
+                    pass
+        except Exception:
+            # 识别失败不阻断流程
             pass
         if not self.click_img(CWIMG.START_GAME, after_sleep=1):
             return False
@@ -178,6 +190,14 @@ class CurrencyWars(Executable):
             self.click_img(IMG.ENSURE2, after_sleep=1)
         self.sleep(4)
         return True
+
+    # =============== 配置注入 ===============
+    def set_difficulty(self, mode: int):
+        """设置难度模式：0=最低难度，1=最高难度"""
+        try:
+            self.difficulty_mode = 1 if int(mode) == 1 else 0
+        except Exception:
+            self.difficulty_mode = 0
 
     def _continue_progress_flow(self, continue_progress_box) -> bool:
         """继续已有进度进入对局。"""
@@ -573,6 +593,7 @@ class CurrencyWars(Executable):
                 CWIMG.NEXT_STEP,
                 '游戏结束',
                 lambda: [
+                    self.sleep(15),  # 如果职级晋升需要等待约13s动画
                     self.click_point(0.5, 0.82, after_sleep=1),
                     self.click_point(0.5, 0.82, after_sleep=1),
                     self.click_point(0.5, 0.82, after_sleep=1),
@@ -644,13 +665,13 @@ class CurrencyWars(Executable):
             return True
         
         # 将 OCR 检测放在所有图片事件之后，作为兜底处理
-        # 未知原因，ocr结果为空
+        # x=1435,y=544,w=116,h=38
         try:
-            ocr_results = self.ocr(from_x=0.073, from_y=0.546, to_x=0.807, to_y=0.574)
-            # timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-            # filename = f"log/currency_wars/before_unhandled_right_event_{timestamp}.png"
-            # img = self.screenshot_region()
-            # img.save(filename)
+            from_x = 0.747
+            from_y = 0.504
+            to_x = 0.808
+            to_y = 0.539
+            ocr_results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
             if ocr_results:
                 text_line = "".join([str(item[1]) for item in ocr_results])
                 if "确认选择" in text_line:
@@ -776,5 +797,4 @@ class CurrencyWars(Executable):
         self.school_tendency = {k: v for k, v in
                                 sorted(self.school_tendency.items(), key=lambda item: item[1], reverse=True)}  # 排序
         logger.info(f"当前阵营倾向：{self.faction_tendency}")
-        logger.info(f"当前派系倾向：{self.school_tendency}")
         logger.info(f"当前派系倾向：{self.school_tendency}")

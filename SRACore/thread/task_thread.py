@@ -7,6 +7,7 @@ from SRACore.task import BaseTask
 from SRACore.util.config import load_config, load_cache, load_settings
 from SRACore.util.logger import logger, setup_logger
 from SRACore.util.notify import send_mail_notification, send_windows_notification
+from SRACore.util.i18n import t
 
 
 class TaskManager:
@@ -34,14 +35,14 @@ class TaskManager:
                 if not callable(getattr(_class, "run", None)):
                     raise TypeError(f"Task class {main_class} does not implement a callable 'run' method")
                 self.task_list.append(_class)
-        logger.debug("Successfully load task: " + str(self.task_list))
+        logger.debug(t('task.load_success', tasks=str(self.task_list)))
 
     def stop(self):
         """
         外部调用的停止方法，设置运行标志为 False 并记录日志。
         注意：此方法可能不会立即终止正在运行的任务（需任务内部支持中断）。
         """
-        logger.warning("Task execution interrupted by user.")
+        logger.warning(t('task.interrupted'))
         self.running_flag = False
 
     def run(self, *args):
@@ -53,7 +54,7 @@ class TaskManager:
         """
         setup_logger()
         self.running_flag = True
-        logger.debug("[Start]")
+        logger.debug(t('task.start'))
         try:
             if len(args)==0:
                 # 不指定配置时，加载缓存中的全部配置名称
@@ -63,7 +64,7 @@ class TaskManager:
                 config_list = args
 
             for config_name in config_list:
-                logger.info(f"当前配置: {config_name}")
+                logger.info(t('task.current_config', name=config_name))
                 # 每次循环检查中断标志
                 if not self.running_flag:
                     break
@@ -71,7 +72,7 @@ class TaskManager:
                 # 获取当前配置需要执行的任务列表
                 tasks_to_run = self.get_tasks(config_name)
                 if not tasks_to_run:
-                    logger.warning(f"No task selected in config '{config_name}'. Skipping.")
+                    logger.warning(t('task.no_task_selected', name=config_name))
                     continue
 
                 # 依次执行任务
@@ -81,23 +82,23 @@ class TaskManager:
                     try:
                         # 运行任务，如果返回 False 表示任务失败
                         if not task.run():
-                            logger.error(f"Task '{task.__class__.__name__}' failed. Stopping further execution.")
+                            logger.error(t('task.task_failed', name=task.__class__.__name__))
                             return  # 终止当前配置的执行
                     except Exception as e:
                         # 捕获任务执行中的异常（如未处理的错误）
-                        logger.exception(f"Task '{task.__class__.__name__}' crashed: {str(e)}")
+                        logger.exception(t('task.task_crashed', name=task.__class__.__name__, error=str(e)))
                         break
-                logger.info(f"配置 '{config_name}' 的所有任务执行完毕。")
+                logger.info(t('task.config_completed', name=config_name))
 
-            logger.info("All task completed.")
+            logger.info(t('task.all_completed'))
             self.send_notification()
         except Exception as e:
             # 捕获线程主循环中的异常（如配置加载失败）
-            logger.exception(f"TaskManager crashed: {str(e)}")
+            logger.exception(t('task.manager_crashed', error=str(e)))
         finally:
             # 确保标志位被重置，避免僵尸线程
             self.running_flag = False
-            logger.debug("[Done]")
+            logger.debug(t('task.done'))
 
     def get_tasks(self, config_name) -> list[BaseTask]:
         """
@@ -128,7 +129,7 @@ class TaskManager:
                     # 实例化任务类
                     tasks.append(self.task_list[index](config))
                 except Exception as e:
-                    logger.exception(f"Failed to instantiate task at index {index}: {str(e)}")
+                    logger.exception(t('task.instantiate_failed', index=index, error=str(e)))
         return tasks
 
     @staticmethod
@@ -137,6 +138,6 @@ class TaskManager:
         if not setting.get('AllowNotifications', False):
             return
         if setting.get('AllowSystemNotifications', False):
-            send_windows_notification("任务完成提醒", "您的SRA任务运行完成。")
+            send_windows_notification(t('task.notification_title'), t('task.notification_body'))
         if setting.get('AllowEmailNotifications', False):
-            send_mail_notification("任务完成提醒", "您的SRA任务运行完成。", setting)
+            send_mail_notification(t('task.notification_title'), t('task.notification_body'), setting)
