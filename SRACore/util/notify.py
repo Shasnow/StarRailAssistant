@@ -7,7 +7,7 @@ from plyer import notification
 from SRACore.util import encryption
 
 
-def send_windows_notification(title, message, timeout=10):
+def send_windows_notification(title: str, message: str, timeout: int = 10):
     """
     发送 Windows 系统通知
     :param title: 通知标题
@@ -18,17 +18,28 @@ def send_windows_notification(title, message, timeout=10):
     # 发送通知
     notification.notify(title=title, message=message, app_name="SRA", timeout=timeout)
 
-def send_mail_notification(title="SRA", message="", config: dict = None):
+def send_mail_notification(title: str = "SRA", message: str = "", config: dict | None = None):
     """发送邮件通知"""
-    SMTP = config["SmtpServer"]
-    port = config["SmtpPort"]
-    sender = config["EmailSender"]
-    password = encryption.win_decryptor(config["EmailAuthCode"])
-    receiver = config["EmailReceiver"]
+    config = config or {}
+    SMTP = config.get("SmtpServer", "")
+    port = config.get("SmtpPort", 465)
+    sender = config.get("EmailSender", "")
+    auth_code = config.get("EmailAuthCode", "")
+    password = encryption.win_decryptor(auth_code) if auth_code else ""
+    receiver = config.get("EmailReceiver", "")
     send_mail(title, "SRA通知", message, SMTP, port, sender, password, receiver)
 
 
-def send_mail(title="SRA", subject="SRA通知", message="", SMTP="", port=465, sender="", password="", receiver=""):
+def send_mail(
+    title: str = "SRA",
+    subject: str = "SRA通知",
+    message: str = "",
+    SMTP: str = "",
+    port: int = 465,
+    sender: str = "",
+    password: str = "",
+    receiver: str = "",
+) -> bool:
     """发送邮件"""
     if SMTP=="" or sender=="" or password=="" or receiver=="":
         return False
