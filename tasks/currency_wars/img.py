@@ -48,3 +48,4 @@ class CWIMG:
     REFRESH_COUNT_BTN = f"{BASE}/refresh_count_btn.png"
     RETURN_INVESTMENT_STRATEGY = f"{BASE}/return_investment_strategy.png"
     BATTLE= f"{BASE}/battle.png"
+    REFRESH_ENV = f'{BASE}/refresh_environment.png'

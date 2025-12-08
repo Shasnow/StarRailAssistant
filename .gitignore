@@ -13,3 +13,4 @@
 SRACore/util/config.py
 SRACore/util/const.py
 SRACore/util/logger.py
+test.py
