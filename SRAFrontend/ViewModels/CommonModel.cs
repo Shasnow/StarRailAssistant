@@ -101,9 +101,9 @@ public class CommonModel(
         }
     }
 
-    public async Task CheckDesktopShortcut()
+    public async Task CheckDesktopShortcut(bool forceCheck = false)
     {
-        if (cacheService.Cache.NoNotifyForShortcut) return;
+        if (cacheService.Cache.NoNotifyForShortcut && !forceCheck) return;
         if (File.Exists(PathString.DesktopShortcutPath)) return;
 
         var createShortcutButton =

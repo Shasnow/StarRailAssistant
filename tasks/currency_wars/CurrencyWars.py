@@ -16,7 +16,7 @@ class CurrencyWars(Executable):
         self.run_times = run_times
         self.force_battle = False
         self.is_continue = False  # 是否是继续挑战
-        self.strategy_external_control: bool = False# 当外部（如刷开局流程）希望在“选择投资策略”页接管逻辑时，置为 True
+        self.strategy_external_control: bool = False  # 当外部（如刷开局流程）希望在“选择投资策略”页接管逻辑时，置为 True
         self.difficulty_mode: int = 0  # 难度模式：0=最低难度，1=最高难度（默认最低）
         self.on_field_character: list[Character | None] = [None, None, None, None]  # 场上角色列表
         self.on_field_area: list[tuple[float, float]] = [
@@ -59,6 +59,21 @@ class CurrencyWars(Executable):
         self.school_tendency = {}  # 派系倾向字典
         self.is_running = False
 
+    def reset_character(self):
+        """ 重置所有角色信息 """
+        for i,c in enumerate(self.on_field_character):
+            if c is not None:
+                c.is_placed = False  # 重置放置状态
+            self.on_field_character[i] = None  # 重置角色信息
+        for i,c in enumerate(self.off_field_character):
+            if c is not None:
+                c.is_placed = False
+            self.off_field_character[i] = None
+        for i,c in enumerate(self.in_hand_character):
+            if c is not None:
+                c.is_placed = False
+            self.in_hand_character[i] = None
+
     @staticmethod
     def set_username(username: str):
         # 调用处已经确保 username 非空
@@ -79,8 +94,8 @@ class CurrencyWars(Executable):
         :return: int 页面编号，1表示货币战争开始页面，2表示准备阶段页面，-1表示定位失败
         """
         page, _ = self.wait_any_img([IMG.ENTER,
-                                  CWIMG.CURRENCY_WARS_START,
-                                  CWIMG.PREPARATION_STAGE], interval=0.5)
+                                     CWIMG.CURRENCY_WARS_START,
+                                     CWIMG.PREPARATION_STAGE], interval=0.5)
         if page == 0:
             self.press_key(self.settings.get('GuideHotkey', 'f4').lower())
             if not self.wait_img(IMG.F4, timeout=20):
@@ -144,9 +159,9 @@ class CurrencyWars(Executable):
         # 标准进入 or 继续进度
         index, box = self.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONTINUE_PROGRESS], timeout=10, interval=0.5)
 
-        if index==0:
+        if index == 0:
             return self._standard_entry_flow(box)
-        elif index==1:
+        elif index == 1:
             return self._continue_progress_flow(box)
 
         logger.error("既未识别标准进入，也未识别继续进度入口")
@@ -157,19 +172,16 @@ class CurrencyWars(Executable):
         if not self.click_box(enter_standard_box, after_sleep=1.5):
             return False
         # 难度选择：根据前端配置选择最低或最高
-        try:
-            if self.difficulty_mode == 1:
-                # 最高难度：若识别到“返回最高名望”则点击，否则直接开始
-                highest_rank = self.wait_img(CWIMG.RETURN_HIGHEST_RANK, timeout=3, interval=0.5)
-                if highest_rank is not None:
-                    self.click_box(highest_rank, after_sleep=0.8)
-            else:
-                # 最低难度：尝试点击下拉至最低项
-                while self.click_img(CWIMG.DOWN_ARROW, after_sleep=0.5):
-                    pass
-        except Exception:
-            # 识别失败不阻断流程
-            pass
+        if self.difficulty_mode == 1:
+            # 最高难度：若识别到“返回最高职级”则点击，否则直接开始
+            highest_rank = self.wait_img(CWIMG.RETURN_HIGHEST_RANK, timeout=3, interval=0.5)
+            if highest_rank is not None:
+                self.click_box(highest_rank, after_sleep=0.8)
+        else:
+            # 最低难度：尝试点击下拉至最低项
+            while self.click_img(CWIMG.DOWN_ARROW, after_sleep=0.5):
+                pass
+
         if not self.click_img(CWIMG.START_GAME, after_sleep=1):
             return False
         next_step_box = self.wait_img(CWIMG.NEXT_STEP)
@@ -182,7 +194,7 @@ class CurrencyWars(Executable):
             logger.error("未识别到投资环境界面")
             return False
         # 投资操作
-        if not self.click_img(IMG.COLLECTION):
+        if not self.click_img(CWIMG.COLLECTION):
             self.click_point(0.5, 0.5)
         self.click_img(IMG.ENSURE2, after_sleep=1)
         if self.locate(CWIMG.INVEST_ENVIRONMENT):
@@ -194,10 +206,7 @@ class CurrencyWars(Executable):
     # =============== 配置注入 ===============
     def set_difficulty(self, mode: int):
         """设置难度模式：0=最低难度，1=最高难度"""
-        try:
-            self.difficulty_mode = 1 if int(mode) == 1 else 0
-        except Exception:
-            self.difficulty_mode = 0
+        self.difficulty_mode = mode
 
     def _continue_progress_flow(self, continue_progress_box) -> bool:
         """继续已有进度进入对局。"""
@@ -232,15 +241,10 @@ class CurrencyWars(Executable):
                 for _ in range(3):
                     self.click_img(CWIMG.TRACE, after_sleep=0.3)
         self.press_key('esc')
-        #考虑中途加入、接管情况
-        fold_box = self.wait_img(CWIMG.FOLD, timeout=2) # 判断商店是否为未收起状态
-        if fold_box is not None:
-            self.click_box(fold_box, after_sleep=1)
-        self.harvest_crystals()  # 收获水晶
-        self.refresh_character()  # 更新角色信息
+        # 不考虑中途加入、接管情况
+
         self.get_in_hand_area()  # 更新手牌信息（若无接管情况，则仅有此行有用）
         self.place_character()  # 放置角色
-        self.sell_character()  # 出售多余角色
         return True
 
     def run_game(self):
@@ -262,8 +266,10 @@ class CurrencyWars(Executable):
                 self.refresh_character()
                 self.force_battle = True
             run_times += 1
-            if run_times % 5 == 0:
+            if run_times % 5 == 0: # 每5轮更新一次角色状态，防止异常
                 self.refresh_character()
+        # 任务结束，重置角色状态
+        self.reset_character()
 
     def refresh_character(self):
         """ 刷新角色信息，确保手牌中未放置的角色状态正确。 """
@@ -289,13 +295,13 @@ class CurrencyWars(Executable):
         else:
             return 0
 
-    def _get_character_area(self, areas, target_character_list, force=False, click_delay=0.2):
+    def _get_character_in_area(self, areas, target_character_list, force=False, equip=False):
         """
         通用方法：获取指定区域的角色信息
         :param areas: 区域坐标列表（如 off_field_area）
         :param target_character_list: 目标角色列表（如 off_field_character，将被更新）
         :param force: 强制更新角色信息，默认False（即已有角色则跳过）
-        :param click_delay: 点击后等待延迟（秒），默认0.2秒
+        :param equip: 是否顺便穿戴装备
         :return: 更新后的角色列表
         """
         # 默认OCR区域（如果未指定）
@@ -306,7 +312,7 @@ class CurrencyWars(Executable):
                 # 点击区域（带延迟，确保界面响应）
                 if target_character_list[index] is not None and not force:
                     continue  # 已有角色则跳过
-                self.click_point(*area, after_sleep=click_delay)
+                self.click_point(*area, after_sleep=0.2)
 
                 # OCR识别角色名称
                 character_names = self.ocr(
@@ -322,6 +328,11 @@ class CurrencyWars(Executable):
                     for char_name in character_names:
                         name += char_name[1]
                     target_character_list[index] = get_character(name)
+                    if equip:
+                        self.click_img(CWIMG.EQUIPMENT_RECOMMEND, after_sleep=1)
+                        _,box=self.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS])
+                        if box:
+                            self.click_box(box, after_sleep=0.5)
                 else:
                     target_character_list[index] = None  # 未识别到角色
 
@@ -336,11 +347,9 @@ class CurrencyWars(Executable):
 
     def get_off_field_area(self, force=False):
         """获取场下角色信息"""
-        self._get_character_area(
-            areas=self.off_field_area,
-            force=force,
-            target_character_list=self.off_field_character
-        )
+        self._get_character_in_area(areas=self.off_field_area, target_character_list=self.off_field_character,
+                                    equip=True,
+                                    force=force)
         for char in self.off_field_character:
             if char is not None:
                 char.is_placed = True
@@ -348,11 +357,9 @@ class CurrencyWars(Executable):
 
     def get_on_field_area(self, force=False):
         """获取场上角色信息"""
-        self._get_character_area(
-            areas=self.on_field_area,
-            target_character_list=self.on_field_character,
-            force=force
-        )
+        self._get_character_in_area(areas=self.on_field_area, target_character_list=self.on_field_character,
+                                    equip=True,
+                                    force=force)
         for char in self.on_field_character:
             if char is not None:
                 char.is_placed = True
@@ -367,17 +374,13 @@ class CurrencyWars(Executable):
             self.sleep(0.5)
             self.click_point(0.35, 0.20, after_sleep=0.5)
             target = self.locate(CWIMG.OPEN)
-        self._get_character_area(
-            areas=self.in_hand_area,
-            target_character_list=self.in_hand_character,
-            force=force
-        )
+        self._get_character_in_area(areas=self.in_hand_area, target_character_list=self.in_hand_character, force=force)
         logger.info(f"当前手牌角色：{self.in_hand_character}")
 
     def place_character(self) -> bool:
         """
         将手中的角色放置到场上或场下（严格先放前台角色，再放后台角色，确保前台优先占位）
-        队伍不满时优先放空位，队伍满时仅替换低cost角色
+        队伍不满时优先放空位，队伍满时仅替换低priority角色
         :return: 至少有一个角色放置成功返回 True，否则返回 False
         """
         # 第一次遍历：仅处理前台角色（Positioning.OnField / OnOffField），优先占满编队
@@ -458,35 +461,35 @@ class CurrencyWars(Executable):
                     return True
             logger.info(f"{area_type}无空位可放置")
 
-        # 3. 队伍已满时：仅替换低cost角色（不占用新名额）
-        min_cost = character.cost
-        min_cost_index = -1
-        # 查找目标区域中cost最低的角色
+        # 3. 队伍已满时：仅替换低priority角色（不占用新名额）
+        min_priority = character.priority
+        min_priority_index = -1
+        # 查找目标区域中priority最低的角色
         for index, existing_char in enumerate(target_characters):
-            if existing_char is not None and existing_char.cost < min_cost:
-                min_cost = existing_char.cost
-                min_cost_index = index
+            if existing_char is not None and existing_char.priority < min_priority:
+                min_priority = existing_char.priority
+                min_priority_index = index
 
-        if min_cost_index != -1:
-            existing_char = target_characters[min_cost_index]
+        if min_priority_index != -1:
+            existing_char = target_characters[min_priority_index]
             if existing_char is None:  # 类型保护
                 return False
             # 执行替换
             source = self.in_hand_area[character_in_hand]
-            target = target_areas[min_cost_index]
+            target = target_areas[min_priority_index]
             self.drag(source[0], source[1], target[0], target[1])
             # 更新角色状态（队伍人数不变）
             self.in_hand_character[character_in_hand] = existing_char
             existing_char.is_placed = False
-            target_characters[min_cost_index] = character
+            target_characters[min_priority_index] = character
             character.is_placed = True
             logger.info(
-                f"角色 {character.name} 替换{area_type}索引 {min_cost_index} 的 {existing_char.name} "
-                f"（cost {existing_char.cost} → {character.cost}）"
+                f"角色 {character.name} 替换{area_type}索引 {min_priority_index} 的 {existing_char.name} "
+                f"（priority {existing_char.priority} → {character.priority}）"
             )
             return True
 
-        logger.info(f"{area_type}无低cost角色可替换")
+        logger.info(f"{area_type}无低priority角色可替换")
         return False
 
     def harvest_crystals(self):
@@ -495,30 +498,66 @@ class CurrencyWars(Executable):
         self.sleep(0.3)
         self.drag(0.68, 0.25, 0.82, 0.25)
         self.sleep(0.3)
-        self.drag(0.68, 0.30, 0.82, 0.30)
+        self.drag(0.68, 0.30, 0.83, 0.30)
         self.sleep(0.3)
-        self.drag(0.68, 0.35, 0.82, 0.35)
+        self.drag(0.68, 0.35, 0.84, 0.35)
         self.sleep(0.3)
-        self.drag(0.68, 0.40, 0.82, 0.40)
+        self.drag(0.68, 0.40, 0.85, 0.40)
         self.sleep(0.3)
 
     def sell_character(self):
-        # 实现角色出售逻辑
+        """
+        实现角色出售逻辑，确保手牌不超过8个角色
+        :return: bool - 出售操作是否成功
+        """
+        max_attempts = 5
+        attempt = 0
+        
+        while attempt < max_attempts:
+            if self.in_hand_character_count < 8:
+                logger.info(f"手牌未满，跳过出售角色")
+                return True
+            logger.info(f"手牌已满，尝试出售角色")
+            self.handle_sell_character()
+            self.get_in_hand_area()  # 检测空位，确保没有新插入的角色
+            attempt += 1
+            
+        # 超过最大尝试次数仍未成功出售时的逻辑
+        logger.warning(f"已尝试{max_attempts}次出售角色，手牌仍为满状态，将强制执行出售")
+        self.handle_sell_character(force=True)
+        self.get_in_hand_area()  # 最后更新手牌状态
+        
         if self.in_hand_character_count < 8:
-            logger.info("手牌未满，跳过出售角色")
-            return
+            logger.info("强制出售角色成功")
+            return True
+        else:
+            logger.error("强制出售角色失败，手牌仍为满状态")
+            return False
 
+    def handle_sell_character(self, force=False):
+        """
+        角色出售逻辑
+        :param force: bool - 是否强制出售所有角色（包括已放置的角色）
+        """
         sell_area = (0.05, 0.86)  # 出售区域
-        for i, c in enumerate(self.in_hand_character):
-            if c is None or c.is_placed:
+        # 创建需要出售的角色索引列表
+        characters_to_sell = []
+        for i, character in enumerate(self.in_hand_character):
+            if character is None:
                 continue
+            if force:
+                characters_to_sell.append((i, character))
+            elif not character.is_placed:
+                characters_to_sell.append((i, character))
+        # 执行出售操作
+        for i, character in characters_to_sell:
             source = self.in_hand_area[i]
             self.drag(source[0], source[1], sell_area[0], sell_area[1])
             self.in_hand_character[i] = None
-            logger.info(f"出售角色：{c.name}")
+            logger.info(f"已出售角色：{character.name}")
             self.sleep(0.5)
-        self.get_in_hand_area()  # 检测空位，确保没有新插入的角色
-        self.sell_character()  # 递归出售，直到手牌不满
+        logger.info(f"出售操作完成")
+
 
     def battle(self) -> bool:
         # self.click_point(0.907, 0.714, after_sleep=1)
@@ -663,7 +702,7 @@ class CurrencyWars(Executable):
             self.click_point(0.8, 0.3, after_sleep=1)  # 选择第三个选项
             self.click_point(0.77, 0.52, after_sleep=1)  # 点击确认按钮
             return True
-        
+
         # 将 OCR 检测放在所有图片事件之后，作为兜底处理
         # x=1435,y=544,w=116,h=38
         try:
@@ -689,7 +728,8 @@ class CurrencyWars(Executable):
         return False
 
     def strategy_event(self):
-        self.click_img(CWIMG.RIGHT, after_sleep=2)
+        """处理攻略事件"""
+        self.click_img(CWIMG.RIGHT, after_sleep=2)  # 装备合成
         self.click_point(0.5, 0.5, after_sleep=0.5)
 
     def shopping(self):
@@ -738,7 +778,7 @@ class CurrencyWars(Executable):
 
             self.press_key('d')  # 按d刷新商店
             self.sleep(0.5)
-        self.click_point(0.5, 0.55, after_sleep=1)  # 点击空白处关闭商店
+        self.click_point(0.5, 0.55, after_sleep=1.5)  # 点击空白处关闭商店
 
     @property
     def current_team_size(self) -> int:

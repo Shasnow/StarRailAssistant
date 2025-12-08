@@ -158,6 +158,12 @@ public partial class SettingsPageViewModel : PageViewModel
     {
         _ = _commonModel.CheckForUpdatesAsync();
     }
+    
+    [RelayCommand]
+    private void CreateDesktopShortcut()
+    {
+        _ = _commonModel.CheckDesktopShortcut(true);
+    }
 
     #region 快捷键监听修改逻辑
 
