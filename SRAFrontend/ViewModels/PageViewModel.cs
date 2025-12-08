@@ -1,14 +1,13 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using SRAFrontend.Data;
+﻿using SRAFrontend.Data;
+using SRAFrontend.Localization;
 
 namespace SRAFrontend.ViewModels;
 
 public partial class PageViewModel(PageName pageName, string iconText) : ViewModelBase
 {
-    [ObservableProperty]
-    private PageName _pageName = pageName;
-    [ObservableProperty]
-    private string _displayName = Localization.Resources.ResourceManager.GetString(pageName+"Text")!;
+    public string DisplayName =>
+        Resources.ResourceManager.GetString(pageName + "Text", Resources.Culture) ??
+        pageName.ToString();
 
-    [ObservableProperty] private string _iconText = iconText;
+    public string IconText => iconText;
 }

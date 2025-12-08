@@ -5,6 +5,7 @@ import tomllib
 
 from SRACore.util.const import VERSION
 from SRACore.util.logger import logger
+from SRACore.util.i18n import t
 
 class PluginManager:
     plugin_dir = 'plugins'
@@ -33,7 +34,7 @@ class PluginManager:
                     if plugin_info.get('enable', True):
                         cls.plugin_datas[plugin_name] = plugin_info
             except Exception as e:
-                logger.warning(f"Failed to load plugin '{plugin_name}': {e}")
+                logger.warning(t('plugin.load_failed', name=plugin_name, error=e))
 
     @classmethod
     def load_plugins(cls, period="normal"):
@@ -53,14 +54,14 @@ class PluginManager:
             if plugin_info.get("loadPeriod", "normal") != period:
                 continue
             if plugin_info.get("SRAversion", "0.0.0") != VERSION:
-                logger.warning(
-                    f"版本不匹配：插件 '{plugin_name}' 需要 {plugin_info.get('SRAversion', '0.0.0')}, 但实际为 {VERSION}")
+                logger.warning(t('plugin.version_mismatch', name=plugin_name, 
+                                 required=plugin_info.get('SRAversion', '0.0.0'), actual=VERSION))
                 continue
             try:
                 # 构建插件的完整路径
                 plugin_path = os.path.join(cls.plugin_dir, plugin_name)
                 # 导入插件模块
-                logger.info("Importing plugin module from path: " + plugin_path.replace('\\', '.'))
+                logger.info(t('plugin.importing', path=plugin_path.replace('\\', '.')))
                 model = importlib.import_module(plugin_path.replace('\\', '.'))
                 # 检查插件是否实现了 'run' 方法
                 if not hasattr(model, 'run') and plugin_info.get("loadPeriod") != "late":
@@ -74,7 +75,7 @@ class PluginManager:
                 cls.plugins[plugin_info.get("displayName", plugin_name)] = model.run
             except Exception as e:
                 # 如果加载插件时发生异常，记录警告日志并跳过该插件
-                logger.warning(f"Failed to load plugin '{plugin_name}': {e}")
+                logger.warning(t('plugin.load_failed', name=plugin_name, error=e))
                 continue
 
     @classmethod

@@ -2,7 +2,9 @@ import re
 
 from loguru import logger
 
-from SRACore.util.notify import send_windows_notification
+from SRACore.util.config import load_config, load_settings
+from SRACore.util.notify import (send_mail_notification,
+                                 send_windows_notification)
 from SRACore.util.operator import Executable
 from tasks.currency_wars.img import CWIMG, IMG
 
@@ -10,6 +12,28 @@ from .CurrencyWars import CurrencyWars
 
 
 class BrushOpening(Executable):
+    # 坐标常量
+    STRATEGY_SELECT_X = 0.5
+    STRATEGY_SELECT_Y = 0.68
+    STRATEGY_CONFIRM_Y = 0.90
+    CENTER_X = 0.5
+    CENTER_Y = 0.5
+    
+    # OCR 区域常量（回退方案）
+    OCR_FALLBACK_LEFT = 0.15
+    OCR_FALLBACK_TOP = 0.78
+    OCR_FALLBACK_RIGHT = 0.95
+    OCR_FALLBACK_BOTTOM = 0.92
+    
+    # 刷新限制常量
+    MAX_REFRESH_CAP = 30
+    FALLBACK_REFRESH_ATTEMPTS = 3
+    
+    # 页面类型常量
+    PAGE_ERROR = -1
+    PAGE_START = 1
+    PAGE_PREPARATION = 2
+    
     def __init__(self, run_times):
         super().__init__()
         self.run_times = run_times
@@ -53,97 +77,165 @@ class BrushOpening(Executable):
         """
         tries = 0
         while True:
-            # 在策略阶段外才进行页面定位与进入流程；策略阶段内直接进行策略页等待与判定
+            # 页面定位
             if not self._in_strategy_phase:
-                page = self.cw.page_locate()
-                if page == -1:
-                    logger.error("页面定位失败，无法开始游戏")
+                page = self._handle_page_location()
+                if page == self.PAGE_ERROR:
                     return False
 
-            # 进入流程：从开始页进入；准备阶段直接继续
-            if not self._in_strategy_phase and page == 1:
-                # 先清除上轮残留的结算标记，仅在本轮确实进行“继续进度→结算返回”时再置位。
-                self._just_settled = False
-                if not self._bo_enter_from_start_page():
-                    logger.error("进入对局流程失败，重试下一轮")
+                # 进入流程处理
+                entry_result = self._handle_entry_phase(page)
+                if entry_result == "error":
+                    return False
+                elif entry_result == "continue":
                     continue
-                # 若本轮识别到了“继续进度”并已结算返回，则回到顶部重新定位与进入。
-                if self._just_settled:
-                    logger.info("完成结算返回主页，已重新进入，本轮继续")
+                elif entry_result == "settled":
                     self.sleep(0.8)
                     continue
-            elif not self._in_strategy_phase and page == 2:
-                logger.info("已处于准备阶段，进入结算返回流程")
-                if not self._return_to_prep_and_abort():
-                    logger.error("准备阶段结算返回失败，报错终止脚本")
-                    return False
-                # 结算成功后已回到货币战争主页，下一轮应重新定位并进入
-                self._just_settled = True
-                self.sleep(1.0)
-                continue
 
-            # 到这里才算正式开始一次刷开局尝试（为了排除仅“继续进度→结算返回”的前置流程）
-            # 若当前处于策略页外部接管，则不应计为一次新的尝试（避免二次触发策略页时误增尝试次数）
+            # 初始策略应用
             if not self._in_strategy_phase:
                 tries += 1
                 logger.info(f"开始刷开局，第 {tries} 次尝试")
-            # 进入后应用一次初始策略，与 CW 正常流程一致
-            if not self._in_strategy_phase:
-                try:
-                    if not self.cw._apply_initial_strategy():
-                        logger.error("初始策略应用失败，结束本轮并重试")
-                        self._safe_abort_and_return()
-                        self.sleep(1.5)
-                        continue
-                except Exception as e:
-                    logger.error(f"初始策略应用过程异常：{e}")
-                    self._safe_abort_and_return()
+                if not self._handle_initial_strategy():
                     self.sleep(1.5)
                     continue
-            # 启用策略页外部接管：在识别到“选择投资策略”页时，CW停止推进，由本流程处理2-2与叽米判断
-            self.cw.strategy_external_control = True
-            self._in_strategy_phase = True
-            # 确保 CW 进入运行状态，否则 run_game() 循环不会执行
-            self.cw.is_running = True
-            # 运行一次 CW 的战斗与关卡推进，直到到达策略页被外部接管为止
+
+            # 启用外部接管并推进到策略页
+            self._enable_strategy_control()
             self.cw.run_game()
-            
-            # 等待到“选择投资策略”界面
-            idx, box = self.wait_any_img([CWIMG.SELECT_INVEST_STRATEGY, CWIMG.CLICK_BLANK], timeout=45, interval=0.5)
 
-            if idx == 1 and box is not None:
-                self.click_box(box, after_sleep=1)
-                _ = self.wait_img(CWIMG.SELECT_INVEST_STRATEGY, timeout=20, interval=0.5)
+            # 等待并处理策略页
+            if not self._wait_for_strategy_page():
+                logger.debug("未能到达策略页，继续循环")
+                continue
 
-            # 下方逻辑为  在策略页面后，识别是否为 2-2。不是 2-2 则继续探索，是 2-2 则进入叽米判定逻辑。
-            ret_box = self.wait_img(CWIMG.RETURN_PREPARATION_PAGE, timeout=10, interval=0.5)
-            if ret_box is not None:
-                self.click_box(ret_box, after_sleep=1.5)
-                # 识别是否为 2-2 关卡
-                two_two_box = self.wait_img(CWIMG.TWO_TWO, timeout=6, interval=0.5)
-                # 点击返回投资策略界面
-                self.click_img(CWIMG.RETURN_INVESTMENT_STRATEGY, after_sleep=2.0)
-                if two_two_box is not None:
-                    # 命中 2-2：进入叽米判定与刷新循环
-                    if self._handle_two_two_refresh_loop():
-                        return True
-                    # 如果循环自然结束且未命中叽米，继续外层流程
-                    continue
-                else:
-                    # 非 2-2：不结算，继续探索
-                    self._handle_non_two_two_strategy()
-                    continue
-            # 走到此处表示：未进入 2-2 分支或未触发返回备战逻辑。
-            # 使用默认操作推进一次策略选择，继续等待下一次策略页。
-            try:
-                self.click_point(0.5, 0.68, after_sleep=0.5)
-                self.click_point(0.5, 0.90, after_sleep=0.8)
-                # 默认策略推进后，交还给 CW 继续战斗与推进
-                self.cw.is_running = True
-                self.cw.run_game()
-            except Exception:
-                logger.debug("默认策略推进失败，忽略并继续循环")
+            # 检测 2-2 关卡并处理
+            detection_result = self._handle_stage_detection()
+            if detection_result == "jimi_found":
+                return True
+            elif detection_result == "continue":
+                continue
+
+            # 默认策略推进（未进入 2-2 分支时）
+            self._handle_default_strategy_advance()
             continue
+
+    def _handle_page_location(self) -> int:
+        """处理页面定位阶段。
+        
+        Returns:
+            int: 页面类型 (PAGE_START=1, PAGE_PREPARATION=2, PAGE_ERROR=-1)
+        """
+        page = self.cw.page_locate()
+        if page == self.PAGE_ERROR:
+            logger.error("页面定位失败，无法开始游戏")
+        return page
+
+    def _handle_entry_phase(self, page: int) -> str:
+        """处理进入流程阶段。
+        
+        Args:
+            page: 页面类型
+        
+        Returns:
+            str: "ok" 正常继续 | "continue" 需重新循环 | "settled" 已结算需重新进入 | "error" 错误终止
+        """
+        if page == self.PAGE_START:
+            # 从开始页进入
+            self._just_settled = False
+            if not self._bo_enter_from_start_page():
+                logger.error("进入对局流程失败，重试下一轮")
+                return "continue"
+            if self._just_settled:
+                logger.info("完成结算返回主页，已重新进入，本轮继续")
+                return "settled"
+        elif page == self.PAGE_PREPARATION:
+            # 准备阶段，执行结算返回
+            logger.info("已处于准备阶段，进入结算返回流程")
+            if not self._return_to_prep_and_abort():
+                logger.error("准备阶段结算返回失败，报错终止脚本")
+                return "error"
+            self._just_settled = True
+            self.sleep(1.0)
+            return "continue"
+        return "ok"
+
+    def _handle_initial_strategy(self) -> bool:
+        """处理初始策略应用阶段。
+        
+        Returns:
+            bool: True 成功 | False 失败
+        """
+        try:
+            if not self.cw._apply_initial_strategy():
+                logger.error("初始策略应用失败，结束本轮并重试")
+                self._safe_abort_and_return()
+                return False
+            return True
+        except Exception as e:
+            logger.error(f"初始策略应用过程异常：{e}")
+            self._safe_abort_and_return()
+            return False
+
+    def _enable_strategy_control(self):
+        """启用策略页外部接管并设置运行状态。"""
+        self.cw.strategy_external_control = True
+        self._in_strategy_phase = True
+        self.cw.is_running = True
+
+    def _wait_for_strategy_page(self) -> bool:
+        """等待并确认到达选择投资策略界面。
+        
+        Returns:
+            bool: True 成功到达 | False 未能到达
+        """
+        idx, box = self.wait_any_img(
+            [CWIMG.SELECT_INVEST_STRATEGY, CWIMG.CLICK_BLANK],
+            timeout=45,
+            interval=0.5
+        )
+
+        if idx == 1 and box is not None:
+            self.click_box(box, after_sleep=1)
+            result = self.wait_img(CWIMG.SELECT_INVEST_STRATEGY, timeout=20, interval=0.5)
+            return result is not None
+
+        return idx == 0
+
+    def _handle_stage_detection(self) -> str:
+        """处理关卡检测阶段（检测是否为 2-2 关卡）。
+        
+        Returns:
+            str: "jimi_found" 发现叽米 | "continue" 需继续循环 | "default" 使用默认流程
+        """
+        ret_box = self.wait_img(CWIMG.RETURN_PREPARATION_PAGE, timeout=10, interval=0.5)
+        if ret_box is None:
+            return "default"
+        
+        self.click_box(ret_box, after_sleep=1.5)
+        two_two_box = self.wait_img(CWIMG.TWO_TWO, timeout=6, interval=0.5)
+        self.click_img(CWIMG.RETURN_INVESTMENT_STRATEGY, after_sleep=2.0)
+        
+        if two_two_box is not None:
+            # 命中 2-2：进入叽米判定与刷新循环
+            if self._handle_two_two_refresh_loop():
+                return "jimi_found"
+            return "continue"
+        else:
+            # 非 2-2：不结算，继续探索
+            self._handle_non_two_two_strategy()
+            return "continue"
+
+    def _handle_default_strategy_advance(self):
+        """处理默认策略推进（未进入 2-2 分支时）。"""
+        try:
+            self.click_point(self.STRATEGY_SELECT_X, self.STRATEGY_SELECT_Y, after_sleep=0.5)
+            self.click_point(self.STRATEGY_SELECT_X, self.STRATEGY_CONFIRM_Y, after_sleep=0.8)
+            self.cw.is_running = True
+            self.cw.run_game()
+        except Exception:
+            logger.debug("默认策略推进失败，忽略并继续循环")
 
     def _detect_jimi(self) -> bool:
         """使用图像匹配检测是否存在叽米图片。"""
@@ -382,36 +474,39 @@ class BrushOpening(Executable):
         if self._detect_jimi():
             return self._stop_on_jimi_found("2-2 关卡识别到叽米")
 
-        # 初始化刷新参数
-        max_attempts = self._determine_max_refresh_attempts()
-        if max_attempts == 0:
-            return False  # 刷新次数已为0，回到外层等待
-        
-        # 刷新循环
-        refresh_attempts = 0
-        while refresh_attempts < max_attempts:
-            # OCR采集次数（不阻塞流程）
+        # 动态 OCR 刷新循环：每轮以最新 OCR 结果为准
+        total_clicks = 0
+        safe_cap = 30
+
+        while total_clicks < safe_cap:
             counts = self._try_collect_refresh_counts()
-            if counts and all(isinstance(x, int) and x == 0 for x in counts):
-                logger.info("检测到刷新次数已用尽，执行返回备战并结算本轮")
-                self._return_to_prep_and_abort()
-                self.sleep(2.0)
-                break
 
-            # 点击刷新按钮
+            # 有有效 OCR 结果时：全部为 0 则直接结算退出
+            if counts:
+                nonneg = [x for x in counts if isinstance(x, int) and x >= 0]
+                if nonneg and all(x == 0 for x in nonneg):
+                    logger.info("动态OCR检测到刷新次数为 0，执行返回备战并结算本轮")
+                    self._return_to_prep_and_abort()
+                    self.sleep(2.0)
+                    return False
+
+            # 按钮不可用/未找到也视为次数用尽
             if not self._click_refresh_button():
-                logger.info("刷新按钮不可用或未找到，可能已用尽刷新次数，执行返回备战并结算本轮")
+                logger.info("刷新按钮不可用或未找到，视为刷新次数已用尽，执行返回备战并结算本轮")
                 self._return_to_prep_and_abort()
                 self.sleep(2.0)
-                break
+                return False
 
-            refresh_attempts += 1
+            total_clicks += 1
             self.sleep(1.2)
-            
+
             # 刷新后再次检测叽米
             if self._detect_jimi():
                 return self._stop_on_jimi_found("刷新后识别到叽米")
 
+        logger.info("达到安全刷新上限，执行返回备战并结算本轮")
+        self._return_to_prep_and_abort()
+        self.sleep(2.0)
         return False
 
     def _handle_non_two_two_strategy(self):
@@ -511,7 +606,7 @@ class BrushOpening(Executable):
         """检测到叽米后的统一停止处理。
         
         Args:
-            message (str): 日志消息前缀,用于区分不同检测场景(如"2-2关卡"或"刷新后")
+            message (str): 日志消息前缀,用于区分不同检测场景
             
         Returns:
             bool: 始终返回True,表示脚本应立即停止
@@ -523,10 +618,32 @@ class BrushOpening(Executable):
             - 重置 self._in_strategy_phase = False
         """
         logger.success(f"{message}，停止脚本并通知用户")
+        # 根据设置开关优先走 SRA 的通知
+        allow_notify = True
+        enable_system = True
+        enable_email = False
         try:
-            send_windows_notification("SRA", "刷开局命中叽米，脚本已停止")
+            settings = load_settings() or {}
+            notify_cfg = settings.get('Notify') or settings.get('Notification') or {}
+            allow_notify = bool(notify_cfg.get('AllowNotification', True))
+            enable_system = bool(notify_cfg.get('EnableWindows', True))
+            enable_email = bool(notify_cfg.get('EnableEmail', False))
         except Exception:
-            logger.warning("通知模块调用失败")
+            logger.trace("读取通知开关失败，使用默认开关")
+
+        if allow_notify and enable_system:
+            try:
+                send_windows_notification("SRA", "刷开局命中叽米，脚本已停止")
+            except Exception:
+                logger.warning("Windows系统通知发送失败")
+
+        if allow_notify and enable_email:
+            try:
+                email_cfg = load_config('email')
+                if isinstance(email_cfg, dict) and email_cfg:
+                    send_mail_notification("SRA", "刷开局命中叽米，脚本已停止", email_cfg)
+            except Exception:
+                logger.trace("邮件通知发送失败或未配置，已忽略")
         self.is_running = False
         if hasattr(self, 'cw'):
             self.cw.is_running = False

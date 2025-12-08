@@ -17,6 +17,7 @@ from pyscreeze import Box
 from rapidocr_onnxruntime import RapidOCR
 from SRACore.util.config import load_settings
 from SRACore.util.logger import logger
+from SRACore.util.i18n import t
 
 
 @dataclasses.dataclass
@@ -422,7 +423,7 @@ class Operator:
         """
         try:
             if trace:
-                logger.debug("OCR in region: " + str(region))
+                logger.debug(t('operator.ocr_region', region=str(region)))
             if region is None:
                 region = self.get_win_region()
                 time.sleep(0.5)  # 等待窗口稳定
@@ -432,7 +433,7 @@ class Operator:
             screenshot = screenshot.convert("L")
             result, _ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA
             if trace:
-                logger.debug("OCR Result: " + str(result))
+                logger.debug(t('operator.ocr_result', result=str(result)))
             return result
         except Exception as e:
             if trace:
@@ -538,7 +539,7 @@ class Operator:
                 height = result[0][2][1] - top
                 return Box(left, top, width, height)
         if trace:
-            logger.debug("OCR Result not match text: " + text)
+            logger.debug(t('operator.ocr_not_match', text=text))
         return None
 
     def ocr_match_any(self,
@@ -565,7 +566,7 @@ class Operator:
                     width = result[0][2][0] - left
                     height = result[0][2][1] - top
                     return index, Box(left, top, width, height)
-        logger.debug("OCR Result not match any text: " + str(texts))
+        logger.debug(t('operator.ocr_not_match_any', texts=str(texts)))
         return -1, None
 
     def wait_ocr(self, text: str, timeout: float = 10, interval: float = 0.2, confidence=0.9, *args,
@@ -584,7 +585,7 @@ class Operator:
             if box is not None:
                 return box
             time.sleep(interval)
-        logger.debug(f"Timeout: '{text}' -> Not found in {timeout} seconds")
+        logger.debug(t('operator.timeout_not_found', text=text, timeout=timeout))
         return None
 
     def wait_ocr_any(self, texts: list[str], timeout: float = 10, interval: float = 0.2, confidence=0.9, *args,
@@ -603,7 +604,7 @@ class Operator:
             if index != -1:
                 return index, box
             time.sleep(interval)
-        logger.debug(f"Timeout: '{texts}' -> Not found in {timeout} seconds")
+        logger.debug(t('operator.timeout_texts_not_found', texts=texts, timeout=timeout))
         return -1, None
 
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
@@ -619,7 +620,7 @@ class Operator:
         :param after_sleep: 点击后等待时间，单位秒
         :return: None
         """
-        logger.debug(f"点击位置: ({x}, {y}), 偏移: ({x_offset}, {y_offset}), 等待时间: {after_sleep}秒")
+        logger.debug(t('operator.click_position', x=x, y=y, x_offset=x_offset, y_offset=y_offset, after_sleep=after_sleep))
         if isinstance(x_offset, float) and isinstance(y_offset, float):
             x_offset = int(self.width * x_offset)
             y_offset = int(self.height * y_offset)
@@ -681,7 +682,7 @@ class Operator:
             - 调试匹配仅用于记录，不会降低性能要求
         """
         start_time = time.time()
-        logger.debug(f"Waiting for image: {img_path}")
+        logger.debug(t('operator.waiting_image', path=img_path))
         tmpl = None
         tmpl_gray = None
         attempt = 0
@@ -713,7 +714,7 @@ class Operator:
             box = self.locate(img_path)
             if box is not None:
                 if debug:
-                    logger.debug(f"[wait_img debug] locate() success on attempt {attempt}")
+                    logger.debug(t('operator.wait_img_success', attempt=attempt))
                 return box
 
             if debug and tmpl_gray is not None:
@@ -727,7 +728,7 @@ class Operator:
                         res = cv2.matchTemplate(scr_gray, tmpl_gray, cv2.TM_CCOEFF_NORMED)
                         _min_val, max_val, _min_loc, max_loc = cv2.minMaxLoc(res)
                         h, w = tmpl_gray.shape[:2]
-                        logger.debug(f"[wait_img debug] attempt={attempt} score={max_val:.4f} loc={max_loc} conf_th={self.confidence}")
+                        logger.debug(t('operator.wait_img_attempt', attempt=attempt, score=max_val, loc=max_loc, conf=self.confidence))
                         # 保存标注图片
                         try:
                             annotated = scr_rgb.copy()
@@ -748,12 +749,12 @@ class Operator:
                         if max_val >= self.confidence:
                             return Box(max_loc[0], max_loc[1], w, h)
                     else:
-                        logger.debug(f"[wait_img debug] attempt={attempt} template larger than screenshot; skip match")
+                        logger.debug(t('operator.wait_img_too_large', attempt=attempt))
                 except Exception as e:
                     logger.trace(f"[wait_img debug] attempt={attempt} error: {e}")
 
             time.sleep(interval)
-        logger.debug(f"Timeout: {img_path} -> Not found in {timeout} seconds")
+        logger.debug(t('operator.timeout_image', path=img_path, timeout=timeout))
         return None
 
     def wait_any_img(self, img_paths: list[str], timeout: int = 10, interval: float = 0.2) -> tuple[int, Box | None]:
@@ -770,7 +771,7 @@ class Operator:
             if index != -1:
                 return index, box
             time.sleep(interval)
-        logger.debug(f"Timeout: {img_paths} -> Not found in {timeout} seconds")
+        logger.debug(t('operator.timeout_images', paths=img_paths, timeout=timeout))
         return -1, None
 
     @staticmethod
@@ -789,12 +790,12 @@ class Operator:
         try:
             time.sleep(wait)
             if trace:
-                logger.debug("按下按键" + key)
+                logger.debug(t('operator.press_key', keyname=key))
             pyautogui.press(key, presses=presses, interval=interval)
             return True
         except Exception as e:
             if trace:
-                logger.debug(f"按下按键失败: {e}")
+                logger.debug(t('operator.press_key_failed', error=e))
             return False
 
     @staticmethod
@@ -810,13 +811,13 @@ class Operator:
             按键成功返回True，否则返回False
         """
         try:
-            logger.debug("按下按键 " + key)
+            logger.debug(t('operator.hold_key', keyname=key))
             pyautogui.keyDown(key)
             time.sleep(duration)
             pyautogui.keyUp(key)
             return True
         except Exception as e:
-            logger.debug(f"按下按键失败: {e}")
+            logger.debug(t('operator.hold_key_failed', error=e))
             return False
 
     @staticmethod
@@ -859,7 +860,7 @@ class Operator:
             pyautogui.moveRel(x_offset, y_offset)
             return True
         except Exception as e:
-            logger.debug(f"移动光标时出错{e}")
+            logger.debug(t('operator.move_cursor_error', error=e))
             return False
 
     def move_to(self, x: int | float, y: int | float, duration: float = 0.0) -> bool:
@@ -875,7 +876,7 @@ class Operator:
             bool: 如果移动成功则返回 True，否则返回 False。
         """
         try:
-            logger.debug(f"移动光标到 ({x}, {y})，持续时间: {duration}秒")
+            logger.debug(t('operator.move_to', x=x, y=y, duration=duration))
             if isinstance(x, int) and isinstance(y, int):
                 pyautogui.moveTo(x + self.left, y + self.top, duration=duration)
             elif isinstance(x, float) and isinstance(y, float):
@@ -888,7 +889,7 @@ class Operator:
                     f"Invalid arguments: expected 'int, int' or 'float, float', got '{type(x).__name__}, {type(y).__name__}'")
             return True
         except Exception as e:
-            logger.debug(f"移动光标时发生错误{e}")
+            logger.debug(t('operator.move_to_error', error=e))
             return False
 
     def mouse_down(self, x: int | float, y: int | float) -> bool:
@@ -902,7 +903,7 @@ class Operator:
             bool: 如果按下成功则返回 True，否则返回 False。
         """
         try:
-            logger.debug(f"按下鼠标按钮 at ({x}, {y})")
+            logger.debug(t('operator.mouse_down', x=x, y=y))
             if isinstance(x, int) and isinstance(y, int):
                 pyautogui.mouseDown(x + self.left, y + self.top)
             elif isinstance(x, float) and isinstance(y, float):
@@ -915,7 +916,7 @@ class Operator:
                     f"Invalid arguments: expected 'int, int' or 'float, float', got '{type(x).__name__}, {type(y).__name__}'")
             return True
         except Exception as e:
-            logger.debug(f"按下鼠标按钮时发生错误{e}")
+            logger.debug(t('operator.mouse_down_error', error=e))
             return False
 
     @staticmethod
@@ -926,11 +927,11 @@ class Operator:
             bool: 如果释放成功则返回 True，否则返回 False。
         """
         try:
-            logger.debug("释放鼠标按钮")
+            logger.debug(t('operator.mouse_up'))
             pyautogui.mouseUp()
             return True
         except Exception as e:
-            logger.debug(f"释放鼠标按钮时发生错误{e}")
+            logger.debug(t('operator.mouse_up_error', error=e))
             return False
 
     @staticmethod
@@ -948,7 +949,7 @@ class Operator:
             pyautogui.scroll(distance)
             return True
         except Exception as e:
-            logger.debug(f"指针滚动时发生错误{e}")
+            logger.debug(t('operator.scroll_error', error=e))
             return False
 
     def drag(self, from_x: int | float, from_y: int | float, to_x: int | float, to_y: int | float,
