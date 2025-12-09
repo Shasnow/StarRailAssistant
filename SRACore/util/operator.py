@@ -47,6 +47,7 @@ class Box:
     top: int
     width: int
     height: int
+    source: str = None
 
     @property
     def center(self):
@@ -224,7 +225,7 @@ class Operator:
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
             img = cv2.imread(img_path)
             box = pyscreeze.locate(img, self.screenshot(region), confidence=self.confidence)
-            return Box(box.left, box.top, box.width, box.height)
+            return Box(box.left, box.top, box.width, box.height, source=img_path)
         except Exception as e:
             if trace:
                 logger.trace(f"ImageNotFound: {img_path} -> {e}")
@@ -262,7 +263,7 @@ class Operator:
     def locate_any_in_region(self,
                              img_paths: list[str],
                              region: Region | None = None,
-                             trace: bool = True) -> tuple[int, pyscreeze.Box | None]:
+                             trace: bool = True) -> tuple[int, Box | None]:
         """在窗口内查找任意一张图片位置"""
         try:
             screenshot = self.screenshot(region=region)
@@ -280,7 +281,7 @@ class Operator:
                     logger.trace(f"ImageNotFound: {img_path} -> {e}")
                 continue
             if box is not None:
-                return img_paths.index(img_path), Box(box.left, box.top, box.width, box.height)
+                return img_paths.index(img_path), Box(box.left, box.top, box.width, box.height, source=img_path)
         return -1, None
 
     def locate_any_in_tuple(self,
@@ -289,7 +290,7 @@ class Operator:
                             from_y: float,
                             to_x: float,
                             to_y: float,
-                            trace: bool = False) -> tuple[int, pyscreeze.Box | None]:
+                            trace: bool = False) -> tuple[int, Box | None]:
         """
         在窗口内查找任意一张图片位置，使用比例坐标
         :param img_paths: 模板图片路径列表
@@ -313,12 +314,12 @@ class Operator:
 
     @overload
     def locate_any(self, img_paths: list[str], region: Region | None = None, trace: bool = True) -> tuple[
-        int, pyscreeze.Box | None]:
+        int, Box | None]:
         ...
 
     @overload
     def locate_any(self, img_paths: list[str], *, from_x: float, from_y: float, to_x: float, to_y: float,
-                   trace: bool = True) -> tuple[int, pyscreeze.Box | None]:
+                   trace: bool = True) -> tuple[int, Box | None]:
         ...
 
     def locate_any(self,
@@ -329,7 +330,7 @@ class Operator:
                    from_y: float | None = None,
                    to_x: float | None = None,
                    to_y: float | None = None,
-                   trace: bool = True) -> tuple[int, pyscreeze.Box | None]:
+                   trace: bool = True) -> tuple[int, Box | None]:
         """在窗口内查找任意一张图片位置
         Args:
             img_paths (list[str]): 模板图片路径列表
@@ -537,7 +538,7 @@ class Operator:
                 left, top = result[0][0]
                 width = result[0][2][0] - left
                 height = result[0][2][1] - top
-                return Box(left, top, width, height)
+                return Box(left, top, width, height, source=text)
         if trace:
             logger.debug(t('operator.ocr_not_match', text=text))
         return None
@@ -565,7 +566,7 @@ class Operator:
                     left, top = result[0][0]
                     width = result[0][2][0] - left
                     height = result[0][2][1] - top
-                    return index, Box(left, top, width, height)
+                    return index, Box(left, top, width, height, source=text)
         logger.debug(t('operator.ocr_not_match_any', texts=str(texts)))
         return -1, None
 
@@ -620,8 +621,8 @@ class Operator:
         :param after_sleep: 点击后等待时间，单位秒
         :return: None
         """
-        logger.debug(t('operator.click_position', x=x, y=y, x_offset=x_offset, y_offset=y_offset, after_sleep=after_sleep))
         if isinstance(x_offset, float) and isinstance(y_offset, float):
+            logger.debug(t('operator.click_position', x=x, y=y, x_offset=x_offset, y_offset=y_offset, after_sleep=after_sleep))
             x_offset = int(self.width * x_offset)
             y_offset = int(self.height * y_offset)
         if isinstance(x, int) and isinstance(y, int):
@@ -645,6 +646,7 @@ class Operator:
             logger.trace("Could not click a Empty Box")
             return False
         x, y = box.center
+        logger.debug(f"Click box center:({x}, {y}), source: {box.source}, offset:({x_offset}, {y_offset}), wait {after_sleep}s")
         return self.click_point(int(x), int(y), x_offset, y_offset, after_sleep)
 
     def click_img(self, img_path: str, x_offset: int | float = 0, y_offset: int | float = 0,
@@ -683,7 +685,6 @@ class Operator:
         """
         start_time = time.time()
         logger.debug(t('operator.waiting_image', path=img_path))
-        tmpl = None
         tmpl_gray = None
         attempt = 0
         if debug:
