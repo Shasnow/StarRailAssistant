@@ -1,13 +1,13 @@
 import importlib
 import tomllib
 
-from SRACore.util import sys_util  # NOQA 有动态用法，确保被打包
-from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
 from SRACore.task import BaseTask
-from SRACore.util.config import load_config, load_cache, load_settings
-from SRACore.util.logger import logger, setup_logger
-from SRACore.util.notify import send_mail_notification, send_windows_notification
+from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
+from SRACore.util import notify
+from SRACore.util import sys_util  # NOQA 有动态用法，确保被打包
+from SRACore.util.config import load_config, load_cache
 from SRACore.util.i18n import t
+from SRACore.util.logger import logger, setup_logger
 
 
 class TaskManager:
@@ -89,9 +89,8 @@ class TaskManager:
                         logger.exception(t('task.task_crashed', name=task.__class__.__name__, error=str(e)))
                         break
                 logger.info(t('task.config_completed', name=config_name))
-
             logger.info(t('task.all_completed'))
-            self.send_notification()
+            notify.try_send_notification(t('task.notification_title'), t('task.notification_body'))
         except Exception as e:
             # 捕获线程主循环中的异常（如配置加载失败）
             logger.exception(t('task.manager_crashed', error=str(e)))
@@ -131,13 +130,3 @@ class TaskManager:
                 except Exception as e:
                     logger.exception(t('task.instantiate_failed', index=index, error=str(e)))
         return tasks
-
-    @staticmethod
-    def send_notification():
-        setting=load_settings()
-        if not setting.get('AllowNotifications', False):
-            return
-        if setting.get('AllowSystemNotifications', False):
-            send_windows_notification(t('task.notification_title'), t('task.notification_body'))
-        if setting.get('AllowEmailNotifications', False):
-            send_mail_notification(t('task.notification_title'), t('task.notification_body'), setting)

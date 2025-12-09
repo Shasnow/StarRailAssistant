@@ -36,7 +36,7 @@ public partial class SettingsPageViewModel : PageViewModel
         _startStopKey = new CustomizableKey(ListenKeyFor)
         {
             IconText = "\uE3E4",
-            DisplayText = Resources.StartStopText,
+            DisplayText = Resources.StopHotkeyText,
             DefaultKey = "F9"
         }.Bind(() => settingsService.Settings.StartStopHotkey,
             value => settingsService.Settings.StartStopHotkey = value);

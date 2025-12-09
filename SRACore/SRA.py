@@ -5,8 +5,10 @@ import time
 
 from loguru import logger
 
+from SRACore.thread.event_thread import EventListener
 from SRACore.thread.task_thread import TaskManager
 from SRACore.thread.trigger_thread import TriggerManager
+from SRACore.util.config import load_settings
 from SRACore.util.const import VERSION, CORE
 from SRACore.util.i18n import t
 
@@ -24,6 +26,12 @@ class SRACli(cmd.Cmd):
         self.trigger_thread.start()
         if not self.is_admin():
             logger.warning(t('cli.no_admin_warning'))
+        stop_hotkey:str = load_settings().get('StartStopHotkey')
+        stop_hotkey=stop_hotkey.lower()  # 统一小写
+        if stop_hotkey is None or stop_hotkey == '':
+            stop_hotkey = 'f9'
+        EventListener.register_key_event(stop_hotkey, self.do_task, "stop")
+        EventListener.run()
 
     def default(self, line):
         print(t('cli.unknown_command', line=line))
@@ -78,6 +86,7 @@ class SRACli(cmd.Cmd):
             self.trigger_thread.join(timeout=5)
             if self.trigger_thread.is_alive():
                 logger.error(t('cli.trigger_timeout'))
+        EventListener.stop()
         return True
 
     def do_task(self, arg: str):
@@ -98,7 +107,7 @@ class SRACli(cmd.Cmd):
             time.sleep(1)  # 确保进程有时间启动
             logger.info(t('cli.task_started'))
         elif command == 'stop':
-            if self.task_process.is_alive():
+            if self.task_process is not None and self.task_process.is_alive():
                 logger.debug(t('cli.task_abort'))
                 self.task_process.terminate()
                 self.task_process.join(timeout=5)  # 增加超时，避免阻塞
