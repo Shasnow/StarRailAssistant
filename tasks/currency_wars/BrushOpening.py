@@ -8,39 +8,8 @@ from SRACore.util.notify import (send_mail_notification,
                                  send_windows_notification)
 from SRACore.util.operator import Executable
 from tasks.currency_wars.img import CWIMG, IMG
-
+from SRACore.util.logger import _auto_log_methods
 from .CurrencyWars import CurrencyWars
-
-
-def _log_entry_exit(func):
-    """装饰器：在函数进入和退出时打印日志，方便调试函数调用流程"""
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        func_name = func.__name__
-        logger.debug(f">>> 进入 {func_name}")
-        try:
-            result = func(*args, **kwargs)
-            logger.debug(f"<<< 退出 {func_name} (返回: {result})")
-            return result
-        except Exception as e:
-            logger.debug(f"<<< 异常退出 {func_name}: {type(e).__name__}: {e}")
-            raise
-    return wrapper
-
-
-def _auto_log_methods(cls):
-    """类装饰器：自动给类中所有公开方法添加进入/退出日志"""
-    for name in dir(cls):
-        # if name.startswith('__'):
-            # continue
-        attr = getattr(cls, name)
-        if callable(attr) and hasattr(attr, '__func__'):
-            # 跳过继承自父类的方法，只装饰本类定义的方法
-            # if name in cls.__dict__:
-            setattr(cls, name, _log_entry_exit(cls.__dict__[name]))
-        elif callable(attr) and name in cls.__dict__:
-            setattr(cls, name, _log_entry_exit(attr))
-    return cls
 
 
 @_auto_log_methods
@@ -86,7 +55,7 @@ class BrushOpening(Executable):
         self.wanted_invest_environment = self.config.get("InvestEnvironment", [])
         self.wanted_invest_strategy = self.config.get("InvestStrategy", [])
         self.wanted_invest_strategy_stage = self.config.get("InvestStrategyStage", 1)
-        self.run_times = self.config.get("RunTimes", 100)
+        self.run_times = self.config.get("RunTimes", 0)
 
     # —— 微型助手方法：仅用于提升可读性与健壮性 ——
     def _wait_then_click_box(self, img, *, timeout=5, interval=0.5, after_sleep=None):

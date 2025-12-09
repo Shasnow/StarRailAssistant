@@ -10,7 +10,3 @@
 /setup/install_info.txt
 **/__pycache__/
 **/.vs/
-SRACore/util/config.py
-SRACore/util/const.py
-SRACore/util/logger.py
-test.py
