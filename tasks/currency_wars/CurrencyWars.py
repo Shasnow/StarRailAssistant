@@ -174,9 +174,7 @@ class CurrencyWars(Executable):
         # 难度选择：根据前端配置选择最低或最高
         if self.difficulty_mode == 1:
             # 最高难度：若识别到“返回最高职级”则点击，否则直接开始
-            highest_rank = self.wait_img(CWIMG.RETURN_HIGHEST_RANK, timeout=3, interval=0.5)
-            if highest_rank is not None:
-                self.click_box(highest_rank, after_sleep=0.8)
+            self.click_img(CWIMG.RETURN_HIGHEST_RANK, after_sleep=0.8)
         else:
             # 最低难度：尝试点击下拉至最低项
             while self.click_img(CWIMG.DOWN_ARROW, after_sleep=0.5):
@@ -412,7 +410,7 @@ class CurrencyWars(Executable):
             character_in_hand,
             target_characters=self.on_field_character,
             target_areas=self.on_field_area,
-            area_type="场上（前台）"
+            area_type="前台"
         )
 
     def place_off_field_character(self, character_in_hand: int) -> bool:
@@ -421,7 +419,7 @@ class CurrencyWars(Executable):
             character_in_hand,
             target_characters=self.off_field_character,
             target_areas=self.off_field_area,
-            area_type="场下（后台）"
+            area_type="后台"
         )
 
     def _place_to_target(
@@ -485,7 +483,7 @@ class CurrencyWars(Executable):
             character.is_placed = True
             logger.info(
                 f"角色 {character.name} 替换{area_type}索引 {min_priority_index} 的 {existing_char.name} "
-                f"（priority {existing_char.priority} → {character.priority}）"
+                f"(priority {existing_char.priority} → {character.priority})"
             )
             return True
 
@@ -660,7 +658,7 @@ class CurrencyWars(Executable):
 
             # 获取当前状态配置
             img_path, stage_name, handle_func, is_terminal = stage_config[stage_index]
-            logger.info(f"检测到状态：{stage_name}（{img_path}）")
+            logger.info(f"检测到状态：{stage_name}({img_path})")
 
             # 执行状态处理函数
             if handle_func is not None:
