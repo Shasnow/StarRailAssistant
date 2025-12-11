@@ -45,19 +45,26 @@ class Character:
     faction: Faction  # 阵营
     schools: list[School]  # 派系
     cost: int  # 费用
-    positioning: Positioning  # 站位
-    priority: int = None
+    positioning: Positioning  # 默认站位
+    position: Positioning = None  # 实际站位（适配攻略的特殊情况）
+    priority: int = None  # 优先级
     is_placed: bool = False  # 是否已放置
 
     def __post_init__(self):
         if self.priority is None:
             self.priority = self.cost
+        if self.position is None:
+            self.position = self.positioning
 
     def __str__(self):
         return f'{self.name}'
 
     def __repr__(self):
         return f'{self.name}'
+
+    def reset(self):
+        self.priority = self.cost
+        self.position = self.positioning
 
 
 class Characters:
@@ -189,6 +196,7 @@ characters: dict[str, Character] = {
     '椒丘': Characters.Jiaoqiu,
     '加拉赫': Characters.Gallagher,
     '阿格莱雅': Characters.Aglaea,
+    '开拓者': Characters.Trailblazer,
 }
 username = '开拓者'  # 请将此处改为你的角色名称
 

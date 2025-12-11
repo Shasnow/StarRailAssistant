@@ -36,6 +36,7 @@ class CosmicStrifeTask(BaseTask):
                 logger.error("货币战争开拓者名称为空，请在前端配置中填写。")
                 return False
             cw_task.set_username(username)
+            cw_task.load_strategy("template")
             # 前端难度选择：0=最低难度，1=最高难度
             difficulty = self.config.get("CurrencyWarsDifficulty", 0)
             cw_task.set_difficulty(difficulty)

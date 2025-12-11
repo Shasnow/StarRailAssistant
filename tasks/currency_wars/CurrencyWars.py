@@ -1,5 +1,7 @@
+import json
 import os
 from datetime import datetime
+from typing import Any
 
 from loguru import logger
 
@@ -58,18 +60,21 @@ class CurrencyWars(Executable):
         self.faction_tendency = {}  # 阵营倾向字典
         self.school_tendency = {}  # 派系倾向字典
         self.is_running = False
+        self.min_coins = 40  # 最小金币数
+        self.min_level = 7  # 商店等级
+        self.strategy_characters: list[Character] = []  # 在攻略中的角色
 
     def reset_character(self):
         """ 重置所有角色信息 """
-        for i,c in enumerate(self.on_field_character):
+        for i, c in enumerate(self.on_field_character):
             if c is not None:
                 c.is_placed = False  # 重置放置状态
             self.on_field_character[i] = None  # 重置角色信息
-        for i,c in enumerate(self.off_field_character):
+        for i, c in enumerate(self.off_field_character):
             if c is not None:
                 c.is_placed = False
             self.off_field_character[i] = None
-        for i,c in enumerate(self.in_hand_character):
+        for i, c in enumerate(self.in_hand_character):
             if c is not None:
                 c.is_placed = False
             self.in_hand_character[i] = None
@@ -142,8 +147,8 @@ class CurrencyWars(Executable):
             self.refresh_character()
             self.get_in_hand_area(True)
             return True
-        if not self._apply_initial_strategy():
-            logger.error("初始策略应用失败")
+        if not self.initialize():
+            logger.error("对局初始化失败")
             return False
         return True
 
@@ -224,21 +229,21 @@ class CurrencyWars(Executable):
             return False
 
     # ==================== 进入后的初始策略 ====================
-    def _apply_initial_strategy(self) -> bool:
+    def initialize(self) -> bool:
         """进入对局后的攻略应用与手牌识别。"""
         self.sleep(1)
-        strategy_box = self.wait_img(CWIMG.STRATEGY, timeout=60, interval=0.5)
-        if strategy_box is None or not self.click_box(strategy_box, after_sleep=1.5):
-            logger.error("未识别到攻略按钮")
-            return False
-        cancel_apply_box = self.wait_img(CWIMG.CANCEL_APPLY, timeout=2)
-        if cancel_apply_box is None:  # 未应用攻略则应用
-            if self.click_img(CWIMG.APPLY, after_sleep=1):
-                self.press_key('esc')
-                self.sleep(1)
-                for _ in range(3):
-                    self.click_img(CWIMG.TRACE, after_sleep=0.3)
-        self.press_key('esc')
+        # strategy_box = self.wait_img(CWIMG.STRATEGY, timeout=60, interval=0.5)
+        # if strategy_box is None or not self.click_box(strategy_box, after_sleep=1.5):
+        #     logger.error("未识别到攻略按钮")
+        #     return False
+        # cancel_apply_box = self.wait_img(CWIMG.CANCEL_APPLY, timeout=2)
+        # if cancel_apply_box is None:  # 未应用攻略则应用
+        #     if self.click_img(CWIMG.APPLY, after_sleep=1):
+        #         self.press_key('esc')
+        #         self.sleep(1)
+        #         for _ in range(3):
+        #             self.click_img(CWIMG.TRACE, after_sleep=0.3)
+        # self.press_key('esc')
         # 不考虑中途加入、接管情况
 
         self.get_in_hand_area()  # 更新手牌信息（若无接管情况，则仅有此行有用）
@@ -248,7 +253,7 @@ class CurrencyWars(Executable):
     def run_game(self):
         run_times = 0
         while self.is_running:
-            self.strategy_event()
+            # self.strategy_event()
             self.update_max_team_size()
             self.place_character()
             self.sell_character()
@@ -264,7 +269,7 @@ class CurrencyWars(Executable):
                 self.refresh_character()
                 self.force_battle = True
             run_times += 1
-            if run_times % 5 == 0: # 每5轮更新一次角色状态，防止异常
+            if run_times % 3 == 0:  # 每3轮更新一次场上角色，顺便穿戴装备
                 self.refresh_character()
         # 任务结束，重置角色状态
         self.reset_character()
@@ -328,7 +333,7 @@ class CurrencyWars(Executable):
                     target_character_list[index] = get_character(name)
                     if equip:
                         self.click_img(CWIMG.EQUIPMENT_RECOMMEND, after_sleep=1)
-                        _,box=self.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS])
+                        _, box = self.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS])
                         if box:
                             self.click_box(box, after_sleep=0.5)
                 else:
@@ -386,7 +391,7 @@ class CurrencyWars(Executable):
         for i, character in enumerate(self.in_hand_character):
             if character is None or character.is_placed:
                 continue
-            if character.positioning != Positioning.OffField:
+            if character.position != Positioning.OffField:
                 if self.place_on_field_character(i):
                     self.sleep(0.5)
                     self.handle_special_event()
@@ -396,7 +401,7 @@ class CurrencyWars(Executable):
         for i, character in enumerate(self.in_hand_character):
             if character is None or character.is_placed:
                 continue
-            if character.positioning != Positioning.OnField:
+            if character.position != Positioning.OnField:
                 if self.place_off_field_character(i):
                     self.sleep(0.5)
                     self.handle_special_event()
@@ -500,7 +505,7 @@ class CurrencyWars(Executable):
         self.sleep(0.3)
         self.drag(0.68, 0.35, 0.84, 0.35)
         self.sleep(0.3)
-        self.drag(0.68, 0.40, 0.85, 0.40)
+        self.drag(0.68, 0.40, 0.83, 0.40)
         self.sleep(0.3)
 
     def sell_character(self):
@@ -510,7 +515,7 @@ class CurrencyWars(Executable):
         """
         max_attempts = 5
         attempt = 0
-        
+
         while attempt < max_attempts:
             if self.in_hand_character_count < 8:
                 logger.info(f"手牌未满，跳过出售角色")
@@ -519,12 +524,12 @@ class CurrencyWars(Executable):
             self.handle_sell_character()
             self.get_in_hand_area()  # 检测空位，确保没有新插入的角色
             attempt += 1
-            
+
         # 超过最大尝试次数仍未成功出售时的逻辑
         logger.warning(f"已尝试{max_attempts}次出售角色，手牌仍为满状态，将强制执行出售")
         self.handle_sell_character(force=True)
         self.get_in_hand_area()  # 最后更新手牌状态
-        
+
         if self.in_hand_character_count < 8:
             logger.info("强制出售角色成功")
             return True
@@ -555,7 +560,6 @@ class CurrencyWars(Executable):
             logger.info(f"已出售角色：{character.name}")
             self.sleep(0.5)
         logger.info(f"出售操作完成")
-
 
     def battle(self) -> bool:
         # self.click_point(0.907, 0.714, after_sleep=1)
@@ -736,43 +740,43 @@ class CurrencyWars(Executable):
             chars = []
             if not results:
                 return []
-            for i in range(0, len(results), 2):
+            for index in range(0, len(results), 2):
                 try:
-                    name = results[i][1]
+                    name = results[index][1]
                 except (IndexError, TypeError):
                     continue
                 if '备战席已满' in name:
                     return []
-                c = get_character(name)
-                if c is not None:
-                    chars.append(c)
-                    logger.info(f"商店中发现角色：{c.name}，Cost: {c.cost}")
+                char = get_character(name)
+                if char is not None:
+                    chars.append(char)
+                    logger.info(f"商店中发现角色：{char.name}，Cost: {char.cost}")
                 else:
                     logger.info(f"商店中发现未知角色：{name}")
             return chars
 
-        while self.coins > 40:
+        while self.coins > self.min_coins:
             if self.in_hand_character_count == 9:
                 break
 
-            if self.level < 7:
+            if self.level < self.min_level:
                 self.press_key('f')
                 self.sleep(0.5)
                 continue
             cs = scan_characters_in_store()
             if len(cs) != 0:
                 for i, c in enumerate(cs):
-                    if c in self.on_field_character + self.off_field_character:
+                    if c in self.strategy_characters:
                         target = self.store_area[i]
                         self.click_point(*target, after_sleep=0.5)
 
-            primary_selection = self.locate(CWIMG.PRIMARY_SELECTION)
-            for _ in range(5):
-                if primary_selection:
-                    self.click_box(primary_selection, after_sleep=0.5)
-                    primary_selection = self.locate(CWIMG.PRIMARY_SELECTION)
-                else:
-                    break
+            # primary_selection = self.locate(CWIMG.PRIMARY_SELECTION)
+            # for _ in range(5):
+            #     if primary_selection:
+            #         self.click_box(primary_selection, after_sleep=0.5)
+            #         primary_selection = self.locate(CWIMG.PRIMARY_SELECTION)
+            #     else:
+            #         break
 
             self.press_key('d')  # 按d刷新商店
             self.sleep(0.5)
@@ -836,3 +840,37 @@ class CurrencyWars(Executable):
                                 sorted(self.school_tendency.items(), key=lambda item: item[1], reverse=True)}  # 排序
         logger.info(f"当前阵营倾向：{self.faction_tendency}")
         logger.info(f"当前派系倾向：{self.school_tendency}")
+
+    def load_strategy(self, name: str):
+        """加载攻略文件"""
+        if ".json" in name:
+            path=name
+        else:
+            path=f"tasks/currency_wars/strategies/{name}.json"
+        with open(path, "r", encoding="utf-8") as f:
+            strategy_data:dict[str, Any] = json.load(f)
+        name=strategy_data.get("name")
+        description=strategy_data.get("description")
+        self.min_coins = strategy_data.get("min_coins", 40)
+        self.min_level = strategy_data.get("min_level", 7)
+        # 在攻略中的角色设置成最高优先级
+        for i, cn in enumerate(strategy_data.get("on_field", [])):
+            c = get_character(cn)
+            c.priority = 9-i  # 确保攻略中的前台角色优先级都大于其他角色，同时有所差别
+            c.position = Positioning.OnField
+            self.strategy_characters.append(c)
+        for i, cn in enumerate(strategy_data.get("off_field", [])):
+            c=get_character(cn)
+            c.priority = 15 - i  # 确保攻略中的后台角色优先级都大于其他角色
+            c.position = Positioning.OffField
+            self.strategy_characters.append(c)
+        logger.info(f"已加载攻略: {name}: {description}")
+
+    def unload_strategy(self):
+        """卸载当前攻略，重置角色"""
+        for c in cw_chars.characters.values():
+            c.reset()
+        self.min_coins = 40
+        self.min_level = 7
+        self.strategy_characters.clear()
+        logger.info("已卸载当前攻略，角色优先级已重置")

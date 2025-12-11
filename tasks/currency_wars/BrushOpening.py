@@ -167,7 +167,7 @@ class BrushOpening(Executable):
             bool: True 成功 | False 失败
         """
         try:
-            if not self.cw._apply_initial_strategy():
+            if not self.cw.initialize():
                 logger.error("初始策略应用失败，结束本轮并重试")
                 self._safe_abort_and_return()
                 return False
