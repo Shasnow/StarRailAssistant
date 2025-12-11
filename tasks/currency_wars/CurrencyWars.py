@@ -125,12 +125,10 @@ class CurrencyWars(Executable):
             False 表示流程中断或失败。
         """
         page = self.page_locate()
-        self.is_running = True  # 标记任务运行中
-
         if page == -1:
             logger.error("页面定位失败，无法开始游戏")
             return False
-
+        self.is_running = True  # 标记任务运行中
         # 仅在开始页面需要进入流程；准备阶段直接跳过进入逻辑
         if page == 1:
             if not self._enter_from_start_page():
@@ -156,10 +154,12 @@ class CurrencyWars(Executable):
     def _enter_from_start_page(self) -> bool:
         """处理从货币战争开始页面进入对局的完整流程。"""
         start_box = self.wait_img(CWIMG.CURRENCY_WARS_START, timeout=30, interval=0.5)
-        if start_box is None or not self.click_box(start_box):
+        if start_box is None:
             logger.error("未识别到开始按钮")
             return False
-        self.click_point(0.5, 0.5, after_sleep=2)
+        self.do_while(lambda : self.click_box(start_box, after_sleep=0.5),
+                      lambda : self.locate(CWIMG.LOGO) is None,
+                      interval=0.5, max_iterations=10)
 
         # 标准进入 or 继续进度
         index, box = self.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONTINUE_PROGRESS], timeout=10, interval=0.5)
