@@ -974,7 +974,7 @@ class Operator:
 
     @staticmethod
     def do_while(action: Callable[[], Any], condition: Callable[[], bool], interval: float = 0.1,
-                 max_iterations: int = 100) -> bool:
+                 max_iterations: int = 50) -> bool:
         """
         在满足条件时重复执行操作。
 
@@ -984,7 +984,7 @@ class Operator:
             interval (float): 每次检查条件前的等待时间，单位为秒。
             max_iterations (int): 最大迭代次数，防止无限循环。
         Returns:
-            bool: 因不满足条件而退出返回 True，达到最大迭代次数返回 False。
+            bool: 因不再满足条件而退出返回 True，达到最大迭代次数返回 False。
         """
         iterations = 0
         while condition() and iterations < max_iterations:
