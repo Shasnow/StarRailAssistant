@@ -47,8 +47,8 @@
                                 <Label>类型</Label>
                                 <ComboBox SelectedIndex="{Binding CurrencyWarsModeIndex}" Width="200" HorizontalAlignment="Left">
                                     <ComboBoxItem>标准博弈</ComboBoxItem>
-                                    <ComboBoxItem>超频博弈</ComboBoxItem>
-                                    <ComboBoxItem>刷开局</ComboBoxItem>
+                                    <!-- <ComboBoxItem>超频博弈</ComboBoxItem> -->
+                                    <!-- <ComboBoxItem>刷开局</ComboBoxItem> -->
                                 </ComboBox>
                             </StackPanel>
                             
