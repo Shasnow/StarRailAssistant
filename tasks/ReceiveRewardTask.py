@@ -244,8 +244,9 @@ class ReceiveRewardTask(BaseTask):
             return
         self.press_key((self.settings.get('ChronicleHotkey', 'f2')).lower())
         if not self.wait_img("resources/img/f2.png", timeout=20):
-            logger.error("检测超时，编号1")
-            self.press_key("esc")
+            logger.warning("检测超时，编号1")
+            if not self.locate("resources/img/enter.png"):
+                self.press_key("esc")
             return
         if self.click_img("resources/img/nameless_honor_reward_receive.png", after_sleep=2):
             logger.info("领取了无名勋礼奖励")
