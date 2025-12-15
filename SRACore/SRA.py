@@ -109,6 +109,7 @@ class SRACli(cmd.Cmd):
         elif command == 'stop':
             if self.task_process is not None and self.task_process.is_alive():
                 logger.debug(t('cli.task_abort'))
+                logger.warning(t('task.interrupted'))
                 self.task_process.terminate()
                 self.task_process.join(timeout=5)  # 增加超时，避免阻塞
                 if self.task_process.is_alive():
