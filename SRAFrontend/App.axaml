@@ -12,7 +12,7 @@
   
     <Application.Styles>
         <StyleInclude Source="/Styles/LabelStyles.axaml"></StyleInclude>
-        <sukiUi:SukiTheme ThemeColor="Blue" />
+        <sukiUi:SukiTheme ThemeColor="Blue" Locale="zh-CN"/>
     </Application.Styles>
              
     <Application.Resources>
