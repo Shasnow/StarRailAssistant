@@ -100,7 +100,7 @@ public partial class App : Application
     private static void InitializeSerilog()
     {
         // 日志文件路径（存到 ApplicationData/SRA/logs 目录）
-        Directory.CreateDirectory(PathString.LogsDir); // 确保目录存在
+        Directory.CreateDirectory(PathString.FrontendLogsDir); // 确保目录存在
 
         // 配置 Serilog
         Log.Logger = new LoggerConfiguration()
@@ -108,7 +108,7 @@ public partial class App : Application
             .WriteTo.Console()
             // 输出到文件（按日期拆分，保留 7 天）
             .WriteTo.File(
-                path: Path.Combine(PathString.LogsDir, "sra.log"),
+                path: Path.Combine(PathString.FrontendLogsDir, "sra.log"),
                 rollingInterval: RollingInterval.Day, // 按天拆分
                 retainedFileCountLimit: 7, // 保留 7 天日志
                 encoding: System.Text.Encoding.UTF8, // 避免中文乱码

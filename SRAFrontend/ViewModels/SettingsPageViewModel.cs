@@ -164,6 +164,20 @@ public partial class SettingsPageViewModel : PageViewModel
     {
         _ = _commonModel.CheckDesktopShortcut(true);
     }
+    
+    [RelayCommand]
+    private void OpenFolder(string folder)
+    {
+        var folderPath = folder switch
+        {
+            "backendLogs" => PathString.BackendLogsDir,
+            "frontendLogs" => PathString.FrontendLogsDir,
+            "configs" => PathString.ConfigsDir,
+            "appdata" => PathString.AppDataSraDir,
+            _ => "."
+        };
+        _commonModel.OpenFolderInExplorer(folderPath);
+    }
 
     #region 快捷键监听修改逻辑
 
