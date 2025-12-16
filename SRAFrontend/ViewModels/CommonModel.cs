@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -9,7 +10,6 @@ using SRAFrontend.Data;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 using SRAFrontend.utilities;
-using SRAFrontend.Utilities;
 using SukiUI.Controls;
 using SukiUI.MessageBox;
 using SukiUI.Toasts;
@@ -20,6 +20,7 @@ public class CommonModel(
     SettingsService settingsService,
     CacheService cacheService,
     UpdateService updateService,
+    SraService sraService,
     ILogger<CommonModel> logger,
     ISukiToastManager toastManager)
 {
@@ -30,7 +31,7 @@ public class CommonModel(
     {
         var cdk = settingsService.Settings.MirrorChyanCdk;
         var channel = settingsService.Settings.AppChannel == 0 ? "stable" : "beta";
-        
+
         var currentVersion = SemVerParser.Parse(Settings.Version);
         logger.LogDebug("Checking for updates: {Version}", currentVersion);
         if (currentVersion == null)
@@ -39,6 +40,7 @@ public class CommonModel(
             ShowErrorToast("检查更新失败", "当前版本号格式无效");
             return;
         }
+
         var response = await updateService.GetRemoteVersionAsync(currentVersion.ToString(), cdk, channel);
         if (response == null)
         {
@@ -72,9 +74,9 @@ public class CommonModel(
         else
         {
             var autoUpgradeButton =
-                SukiMessageBoxButtonsFactory.CreateButton("自动更新", SukiMessageBoxResult.Yes, "Flat Accent");
+                SukiMessageBoxButtonsFactory.CreateButton("自动更新", SukiMessageBoxResult.Yes, "Flat");
             var manualUpgradeButton =
-                SukiMessageBoxButtonsFactory.CreateButton("手动更新", SukiMessageBoxResult.OK);
+                SukiMessageBoxButtonsFactory.CreateButton("手动更新", SukiMessageBoxResult.OK, "Flat Accent");
             var cancelButton = SukiMessageBoxButtonsFactory.CreateButton("忽略", SukiMessageBoxResult.Cancel);
             var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
             {
@@ -123,18 +125,46 @@ public class CommonModel(
                 cacheService.Cache.NoNotifyForShortcut = true;
                 break;
             case SukiMessageBoxResult.Yes:
-                try
-                {
-                    ShortcutUtil.CreateWindowsShortcut(PathString.DesktopShortcutPath,
-                        Path.Combine(Environment.CurrentDirectory, "SRA.exe"));
+                if (CreateWindowsShortcut(PathString.DesktopShortcutPath, PathString.SraExePath))
                     ShowSuccessToast("快捷方式创建成功", "已在桌面创建 SRA 快捷方式");
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e, "Error creating desktop shortcut");
-                    ShowErrorToast("快捷方式创建失败", $"发生错误：{e.Message}");
-                }
+                else
+                    ShowErrorToast("快捷方式创建失败", "查看日志以获取更多信息");
                 break;
+        }
+    }
+
+    public async Task CleanupOldExeAsync()
+    {
+        if (File.Exists(PathString.SraOldExePath))
+        {
+            logger.LogDebug("Cleaning up old executable file: SRA_old.exe");
+            await Task.Run(() => File.Delete(PathString.SraOldExePath));
+        }
+    }
+
+    public void OpenFolderInExplorer(string folderPath)
+    {
+        try
+        {
+            if (!Directory.Exists(folderPath))
+            {
+                logger.LogWarning("Folder does not exist: {FolderPath}", folderPath);
+                ShowErrorToast("打开文件夹失败", "指定的文件夹不存在");
+                return;
+            }
+
+            logger.LogInformation("Opening folder: {FolderPath}", folderPath);
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = folderPath,
+                UseShellExecute = true,
+                Verb = "open"
+            });
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error opening folder: {FolderPath}", folderPath);
+            ShowErrorToast("打开文件夹失败", $"发生错误：{e.Message}");
         }
     }
 
@@ -145,8 +175,10 @@ public class CommonModel(
         var isHotfix = false; // 这是以后可能会用到的妙妙小工具
         var (progressPanel, progressBar, sizeLabel) = BuildDownloadProgressUi();
         var toastBuilder = CreateStandardToastBuilder("正在下载...", progressPanel, NotificationType.Information);
-        toastBuilder.SetDismissAfter(TimeSpan.FromMinutes(10));
-        var toast = toastBuilder.Queue();
+        var downloadToast = toastBuilder.Queue();
+        // 禁用自动关闭
+        downloadToast.CanDismissByClicking = false;
+        downloadToast.CanDismissByTime = false;
         var progressHandler = new Progress<DownloadStatus>(value =>
         {
             progressBar.Value = value.ProgressPercent;
@@ -161,23 +193,23 @@ public class CommonModel(
                 ? await updateService.DownloadHotfixAsync(versionResponse, progressHandler)
                 : await updateService.DownloadUpdateAsync(versionResponse, downloadChannel, progressHandler,
                     proxies);
-            toastManager.Dismiss(toast);
+            toastManager.Dismiss(downloadToast);
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error downloading update");
-            toastManager.Dismiss(toast);
+            toastManager.Dismiss(downloadToast);
             ShowErrorToast("下载更新失败", $"发生错误：{e.Message}");
             return;
         }
 
         ShowSuccessToast("下载完成", "更新包将在3秒后解压");
         await Task.Delay(3000);
+        sraService.StopSraProcess();
         if (isHotfix)
         {
             logger.LogDebug("Extracting hotfix: {Source} → {Destination}", downloadFilePath, PathString.SourceCodeDir);
             ZipUtil.UnzipExternal(downloadFilePath, PathString.SourceCodeDir);
-
             // 保存热修复版本（直接用已解析的 Version，避免重复转换）
             cacheService.Cache.HotfixVersion = remoteVersion.ToString();
             logger.LogDebug("Hotfix applied successfully: {Version}", remoteVersion);
@@ -187,12 +219,101 @@ public class CommonModel(
         {
             logger.LogDebug("Extracting full update: {Source} → {Destination}", downloadFilePath,
                 Environment.CurrentDirectory);
-            ZipUtil.UnzipExternal(downloadFilePath, Environment.CurrentDirectory);
-            ShowSuccessToast("更新准备完成", "应用将退出，请手动重启以完成更新");
-            Environment.Exit(0);
+            var unzipToast = ShowInfoToast("正在解压更新", "请稍候...");
+            unzipToast.CanDismissByClicking = false;
+            unzipToast.CanDismissByTime = false;
+            try
+            {
+                // 重命名当前可执行文件（以防更新过程中被占用）
+                File.Move(PathString.SraExePath, PathString.SraOldExePath);
+                // 解压更新包
+                await Task.Run(() => ZipUtil.Unzip(downloadFilePath, Environment.CurrentDirectory));
+                toastManager.Dismiss(unzipToast);
+            }
+            catch (Exception e)
+            {
+                toastManager.Dismiss(unzipToast);
+                logger.LogError(e, "Error extracting update");
+                ShowErrorToast("更新解压失败", $"发生错误，应用程序将退出以重新解压：{e.Message}");
+                await Task.Delay(5000);
+                ZipUtil.UnzipExternal(downloadFilePath, Environment.CurrentDirectory);
+                Environment.Exit(0);
+                return;
+            }
+
+            ShowSuccessToast("更新准备完成", "重启应用程序以应用最新版本");
+            var restartNowButton =
+                SukiMessageBoxButtonsFactory.CreateButton("立即重启", SukiMessageBoxResult.Yes, "Flat");
+            var restartLaterButton =
+                SukiMessageBoxButtonsFactory.CreateButton("稍后", SukiMessageBoxResult.Cancel);
+            var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+            {
+                Header = "更新已准备就绪",
+                Content = "是否现在重启应用以应用最新版本？",
+                ActionButtonsSource = [restartNowButton, restartLaterButton]
+            });
+            if (result is SukiMessageBoxResult.Yes) RestartApplication();
         }
     }
-    
+
+    private void RestartApplication()
+    {
+        var exePath = PathString.SraExePath;
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = exePath,
+                WorkingDirectory = Environment.CurrentDirectory,
+                UseShellExecute = true
+            });
+            Environment.Exit(0);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error restarting application");
+            ShowErrorToast("重启失败", $"发生错误：{e.Message}");
+        }
+    }
+
+    private bool CreateWindowsShortcut(string shortcutPath, string appExePath)
+    {
+        var vbsScript = $"""
+
+                                 Set WshShell = WScript.CreateObject("WScript.Shell")
+                                 Set shortcut = WshShell.CreateShortcut("{shortcutPath}")
+                                 shortcut.TargetPath = "{appExePath}"
+                                 shortcut.WorkingDirectory = "{Path.GetDirectoryName(appExePath)}"
+                                 shortcut.Save
+                             
+                         """;
+        var vbsPath = Path.Combine(Path.GetTempPath(), "create_shortcut.vbs");
+        try
+        {
+            File.WriteAllText(vbsPath, vbsScript);
+
+            // 执行 VBScript
+            using var process = new Process();
+            process.StartInfo = new ProcessStartInfo
+            {
+                FileName = "cscript.exe",
+                Arguments = $"/nologo \"{vbsPath}\"",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            process.Start();
+            process.WaitForExit();
+            File.Delete(vbsPath); // 删除临时脚本
+
+            return File.Exists(shortcutPath);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error creating shortcut");
+            return false;
+        }
+    }
+
     /// <summary>
     ///     显示成功 Toast
     /// </summary>
@@ -220,9 +341,9 @@ public class CommonModel(
     /// <summary>
     ///     显示信息 Toast
     /// </summary>
-    private void ShowInfoToast(string title, string content)
+    private ISukiToast ShowInfoToast(string title, string content)
     {
-        CreateStandardToastBuilder(title, content, NotificationType.Information).Queue();
+        return CreateStandardToastBuilder(title, content, NotificationType.Information).Queue();
     }
 
     /// <summary>
@@ -237,7 +358,7 @@ public class CommonModel(
             .Dismiss().After(TimeSpan.FromSeconds(ToastDisplayDuration))
             .Dismiss().ByClicking();
     }
-    
+
     /// <summary>
     ///     构建下载进度 UI（代码复用）
     /// </summary>

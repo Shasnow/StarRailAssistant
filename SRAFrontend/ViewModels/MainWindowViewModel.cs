@@ -30,6 +30,7 @@ public partial class MainWindowViewModel(
     /// </summary>
     public async Task InitializeAsync()
     {
+        await commonModel.CleanupOldExeAsync();
         await commonModel.CheckForUpdatesAsync();
         // await commonModel.CheckAndFixPythonEnvironmentAsync();
         await commonModel.CheckDesktopShortcut();
