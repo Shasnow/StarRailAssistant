@@ -94,9 +94,14 @@ python ./package.py
 
 ### 注意事项
 
-* **调整游戏分辨率为1920*1080（推荐）并保持游戏窗口无遮挡，不要让游戏窗口超出屏幕**
+* **大屏幕调整游戏分辨率为 1920*1080（推荐）并保持游戏窗口无遮挡，不要让游戏窗口超出屏幕**
+* **小屏幕调整游戏分辨率为 1920*1080全屏 并保证游戏窗口无遮挡**
 * **执行任务时不要进行其他键鼠操作！**
 * **还有一件事，菜单要用初始壁纸**
+* **还有一件事，如果在构建前端后发现前端缺少文件，请考虑使用以下指令，然后重新构建前端**
+  ```bash
+  dotnet restore ./SRAFrontend/SRAFrontend.csproj -r win-x64
+  ```
 
 ## 你这代码保熟吗？
 
@@ -166,4 +171,5 @@ python ./package.py
 [![Star History Chart](https://api.star-history.com/svg?repos=Shasnow/StarRailAssistant&type=Date)](https://star-history.com/#Shasnow/StarRailAssistant&Date)
 
 ----------------------------------------------------------------------------------------------
+
 
