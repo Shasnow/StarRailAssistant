@@ -1,10 +1,12 @@
 {
-  "name": "Template Strategy",
-  "description": "A template strategy for currency wars.",
+  "name": "攻略模版",
+  "description": "这是一个攻略模版，请根据实际情况进行修改。",
+  "author": "YourName",
+  "uploader": "YourUploaderName",
   "min_coins": 40,
   "min_level": 5,
   "mid_level": 7,
   "on_field": ["阿格莱雅","昔涟","星期日","风堇"],
   "off_field": ["停云","藿藿","知更鸟","开拓者","缇宝"],
-  "priorities": []
+
 }

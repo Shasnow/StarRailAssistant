@@ -62,6 +62,7 @@ class CurrencyWars(Executable):
         self.is_running = False
         self.min_coins = 40  # 最小金币数
         self.min_level = 7  # 商店等级
+        self.mid_level = 7  # 商店等级
         self.strategy_characters: list[Character] = []  # 在攻略中的角色
 
     def reset_character(self):
@@ -750,19 +751,20 @@ class CurrencyWars(Executable):
                 char = get_character(name)
                 if char is not None:
                     chars.append(char)
-                    logger.info(f"商店中发现角色：{char.name}，Cost: {char.cost}")
+                    logger.info(f"商店中发现角色：{char.name}，P: {char.priority}")
                 else:
                     logger.info(f"商店中发现未知角色：{name}")
             return chars
 
+        refresh_times = 0
         while self.coins > self.min_coins:
-            if self.in_hand_character_count == 9:
-                break
-
-            if self.level < self.min_level:
+            level=self.get_level()
+            if level < self.min_level:
+                # 当等级小于最低等级要求时，持续按f提升等级，跳过购买
                 self.press_key('f')
                 self.sleep(0.5)
                 continue
+
             cs = scan_characters_in_store()
             if len(cs) != 0:
                 for i, c in enumerate(cs):
@@ -779,7 +781,12 @@ class CurrencyWars(Executable):
             #         break
 
             self.press_key('d')  # 按d刷新商店
+            refresh_times+=1
             self.sleep(0.5)
+            if level < self.mid_level and refresh_times % 3 == 0:
+                # 当等级小于中级等级要求时，每3次刷新按一次f提升等级
+                self.press_key('f')
+                self.sleep(0.5)
         self.click_point(0.5, 0.55, after_sleep=1.5)  # 点击空白处关闭商店
 
     @property
@@ -800,8 +807,7 @@ class CurrencyWars(Executable):
                 count += 1
         return count
 
-    @property
-    def level(self):
+    def get_level(self):
         logger.info("获取当前等级")
         level = self.ocr(from_x=0.05, from_y=0.815, to_x=0.3, to_y=0.87)
         try:
@@ -853,6 +859,7 @@ class CurrencyWars(Executable):
         description=strategy_data.get("description")
         self.min_coins = strategy_data.get("min_coins", 40)
         self.min_level = strategy_data.get("min_level", 7)
+        self.mid_level = strategy_data.get("mid_level", 7)
         # 在攻略中的角色设置成最高优先级
         for i, cn in enumerate(strategy_data.get("on_field", [])):
             c = get_character(cn)
@@ -872,5 +879,6 @@ class CurrencyWars(Executable):
             c.reset()
         self.min_coins = 40
         self.min_level = 7
+        self.mid_level = 7
         self.strategy_characters.clear()
         logger.info("已卸载当前攻略，角色优先级已重置")
