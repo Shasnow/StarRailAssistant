@@ -286,22 +286,20 @@
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.AdvanceText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
-                                    <Grid ColumnDefinitions="Auto,Auto"
-                                          RowDefinitions="Auto, Auto"
-                                          ColumnSpacing="10" RowSpacing="10">
-                                        <Button Grid.Row="0" Grid.Column="0" Content="后端日志文件夹"
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Button Content="后端日志文件夹"
                                                 Command="{Binding OpenFolderCommand}"
                                                 CommandParameter="backendLogs"/>
-                                        <Button Grid.Row="0" Grid.Column="1" Content="前端日志文件夹"
+                                        <Button Content="前端日志文件夹"
                                                 Command="{Binding OpenFolderCommand}"
                                                 CommandParameter="frontendLogs"/>
-                                        <Button Grid.Row="1" Grid.Column="0" Content="配置文件夹"
+                                        <Button Content="配置文件夹"
                                                 Command="{Binding OpenFolderCommand}"
                                                 CommandParameter="configs"/>
-                                        <Button Grid.Row="1" Grid.Column="1" Content="应用程序文件夹"
+                                        <Button Content="应用程序文件夹"
                                                 Command="{Binding OpenFolderCommand}"
                                                 CommandParameter="appdata"/>
-                                    </Grid>
+                                    </StackPanel>
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="icon">&#xe184;</Label>
                                         <Label Grid.Column="1"
