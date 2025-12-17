@@ -208,7 +208,7 @@ public class CommonModel(
         sraService.StopSraProcess();
         if (isHotfix)
         {
-            logger.LogDebug("Extracting hotfix: {Source} → {Destination}", downloadFilePath, PathString.SourceCodeDir);
+            logger.LogDebug("Extracting hotfix: {Source} -> {Destination}", downloadFilePath, PathString.SourceCodeDir);
             ZipUtil.UnzipExternal(downloadFilePath, PathString.SourceCodeDir);
             // 保存热修复版本（直接用已解析的 Version，避免重复转换）
             cacheService.Cache.HotfixVersion = remoteVersion.ToString();
