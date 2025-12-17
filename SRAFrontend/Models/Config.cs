@@ -46,7 +46,7 @@ public partial class Config : ObservableObject
 
     [ObservableProperty] private bool _trailblazePowerChangeLineup; // 是否更换阵容
     [ObservableProperty] private bool _trailblazePowerLineupCheck; // 是否检查阵容
-    [ObservableProperty] private bool _trailblazePowerReplenishStamina; // 是否补充体力
+    [ObservableProperty] private bool _trailblazePowerReplenishEnable; // 是否补充体力
     [ObservableProperty] private int _trailblazePowerReplenishTimes; // 补充体力次数
     [ObservableProperty] private int _trailblazePowerReplenishWay; // 补充体力方式
 
