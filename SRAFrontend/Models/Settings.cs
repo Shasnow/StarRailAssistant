@@ -48,7 +48,7 @@ public partial class Settings : ObservableObject
 
     [ObservableProperty] private double _zoom = 1; // 屏幕缩放比例
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
-    public const string Version = "2.2.0"; // 应用版本号
+    public const string Version = "2.3.1"; // 应用版本号
 
     // 新增快捷键设置
     public string ActivityHotkey { get; set; } = "F1"; // 活动 默认 F1

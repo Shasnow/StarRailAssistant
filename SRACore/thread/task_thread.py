@@ -1,13 +1,13 @@
 import importlib
 import tomllib
 
-from SRACore.util import sys_util  # NOQA 有动态用法，确保被打包
-from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
 from SRACore.task import BaseTask
-from SRACore.util.config import load_config, load_cache, load_settings
-from SRACore.util.logger import logger, setup_logger
-from SRACore.util.notify import send_mail_notification, send_windows_notification
+from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
+from SRACore.util import notify
+from SRACore.util import sys_util  # NOQA 有动态用法，确保被打包
+from SRACore.util.config import load_config, load_cache
 from SRACore.util.i18n import t
+from SRACore.util.logger import logger, setup_logger
 
 
 class TaskManager:
@@ -71,6 +71,7 @@ class TaskManager:
 
                 # 获取当前配置需要执行的任务列表
                 tasks_to_run = self.get_tasks(config_name)
+                logger.debug('tasks_to_run: ' + str(tasks_to_run))
                 if not tasks_to_run:
                     logger.warning(t('task.no_task_selected', name=config_name))
                     continue
@@ -81,7 +82,9 @@ class TaskManager:
                         break
                     try:
                         # 运行任务，如果返回 False 表示任务失败
+                        logger.debug('running task: ' + str(task.__class__.__name__))
                         if not task.run():
+                            logger.debug('task failed: ' + str(task.__class__.__name__))
                             logger.error(t('task.task_failed', name=task.__class__.__name__))
                             return  # 终止当前配置的执行
                     except Exception as e:
@@ -89,9 +92,8 @@ class TaskManager:
                         logger.exception(t('task.task_crashed', name=task.__class__.__name__, error=str(e)))
                         break
                 logger.info(t('task.config_completed', name=config_name))
-
             logger.info(t('task.all_completed'))
-            self.send_notification()
+            notify.try_send_notification(t('task.notification_title'), t('task.notification_body'))
         except Exception as e:
             # 捕获线程主循环中的异常（如配置加载失败）
             logger.exception(t('task.manager_crashed', error=str(e)))
@@ -115,8 +117,10 @@ class TaskManager:
         """
         # 加载指定配置（注意：可能修改全局状态）
         config = load_config(config_name)
+        logger.debug('config: ' + str(config))
         # 从配置中读取任务选择列表（如 [True, False, True]）
         task_select = config.get("EnabledTasks")
+        logger.debug('task_select: ' + str(task_select))
         if not task_select:
             return []
         tasks = []
@@ -131,13 +135,3 @@ class TaskManager:
                 except Exception as e:
                     logger.exception(t('task.instantiate_failed', index=index, error=str(e)))
         return tasks
-
-    @staticmethod
-    def send_notification():
-        setting=load_settings()
-        if not setting.get('AllowNotifications', False):
-            return
-        if setting.get('AllowSystemNotifications', False):
-            send_windows_notification(t('task.notification_title'), t('task.notification_body'))
-        if setting.get('AllowEmailNotifications', False):
-            send_mail_notification(t('task.notification_title'), t('task.notification_body'), setting)

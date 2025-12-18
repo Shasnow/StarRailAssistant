@@ -26,14 +26,16 @@ public partial class Config : ObservableObject
     [ObservableProperty] private int _simulatedUniversePolicy; // 模拟宇宙策略
     [ObservableProperty] private int _simulatedUniverseRunTimes; // 模拟宇宙运行次数
     [ObservableProperty] private bool _currencyWarsEnable; // 是否启用货币战争任务
+    [ObservableProperty] private int _currencyWarsMode; // 货币战争模式：0=标准博弈,1=超频博弈,2=刷开局（对应后端 CurrencyWarsMode）
     [ObservableProperty] private int _currencyWarsPolicy; // 货币战争策略
-    [ObservableProperty] private int _currencyWarsRunTimes; // 货币战争运行次数
+    [ObservableProperty] private int _currencyWarsRunTimes = 1; // 货币战争运行次数
     [ObservableProperty] private string _currencyWarsUsername = ""; // 货币战争用户名
     [ObservableProperty] private int _currencyWarsDifficulty; // 货币战争难度：0=最低难度，1=最高难度
-
+    
     // 货币战争 - 刷开局
     [ObservableProperty] private bool _currencyWarsBrushOpeningEnable; // 是否启用货币战争刷开局
-    [ObservableProperty] private int _currencyWarsBrushOpeningRunTimes; // 刷开局运行次数
+    [ObservableProperty] private int _currencyWarsBrushOpeningRunTimes; // 刷开局运行次数（如需单独限制刷开局的总轮数）
+    [ObservableProperty] private CurrencyWarsBrushOpeningConfig _currencyWarsBrushOpening = new(); // 刷开局详细配置
 
     [ObservableProperty] private bool _startGameAlwaysLogin; // 游戏启动时是否总是登录
     [ObservableProperty] private bool _startGameAutoLogin; // 启动游戏时是否自动登录
@@ -49,7 +51,7 @@ public partial class Config : ObservableObject
 
     [ObservableProperty] private bool _trailblazePowerChangeLineup; // 是否更换阵容
     [ObservableProperty] private bool _trailblazePowerLineupCheck; // 是否检查阵容
-    [ObservableProperty] private bool _trailblazePowerReplenishStamina; // 是否补充体力
+    [ObservableProperty] private bool _trailblazePowerReplenishEnable; // 是否补充体力
     [ObservableProperty] private int _trailblazePowerReplenishTimes; // 补充体力次数
     [ObservableProperty] private int _trailblazePowerReplenishWay; // 补充体力方式
 

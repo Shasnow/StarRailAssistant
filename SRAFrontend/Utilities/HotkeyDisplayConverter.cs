@@ -26,16 +26,11 @@ public class HotkeyDisplayConverter : IValueConverter
             "Oem6" => "]",
             "Oem7" => "'",
             "Oem1" => ";",        // semicolon/colon
-            "Space" => "Space",
-            "Tab" => "Tab",
-            "Enter" => "Enter",
-            "Escape" => "Esc",
-            "Back" => "Backspace",
             _ => s
         };
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var s = value as string;
         if (string.IsNullOrWhiteSpace(s) || s == Resources.NotSetText) return string.Empty;
@@ -53,11 +48,6 @@ public class HotkeyDisplayConverter : IValueConverter
             "]" => "Oem6",
             "'" => "Oem7",
             ";" => "Oem1",
-            "Space" => "Space",
-            "Tab" => "Tab",
-            "Enter" => "Enter",
-            "Esc" => "Escape",
-            "Backspace" => "Back",
             _ => s
         };
     }

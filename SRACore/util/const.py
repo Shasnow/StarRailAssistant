@@ -18,7 +18,7 @@ from pathlib import Path
 
 # 基础的常量定义
 AppPath = Path(os.path.dirname(os.path.realpath(sys.argv[0])))
-VERSION = "2.2.0"  # 版本号
+VERSION = "2.3.1"  # 版本号
 CORE = f"{VERSION} on {sys.platform}"  # 核心版本信息
 
 # 随机标题列表

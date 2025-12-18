@@ -11,36 +11,47 @@
     <suki:GlassCard>
         <suki:GroupBox>
             <suki:GroupBox.Header>
-                <CheckBox Content="清体力" IsChecked="{Binding CurrentConfig.EnabledTasks[1]}"/>
+                <CheckBox Content="清体力" IsChecked="{Binding CurrentConfig.EnabledTasks[1]}" />
             </suki:GroupBox.Header>
             <Grid ColumnDefinitions="*, *">
                 <ScrollViewer>
                     <StackPanel Spacing="10">
                         <suki:GlassCard IsInteractive="True">
                             <StackPanel>
-                                <Grid RowDefinitions="*,*,*" ColumnDefinitions="*,*" RowSpacing="10">
+                                <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" ColumnDefinitions="*,*" RowSpacing="10">
                                     <CheckBox Grid.Row="0" Grid.Column="0"
-                                              IsChecked="{Binding CurrentConfig.TrailblazePowerReplenishStamina}"
+                                              IsChecked="{Binding CurrentConfig.TrailblazePowerReplenishEnable}"
                                               Content="补充体力" />
-                                    <ComboBox Grid.Row="0" Grid.Column="1" SelectedIndex="{Binding CurrentConfig.TrailblazePowerReplenishWay}">
-                                        <ComboBoxItem Content="后备开拓力" />
-                                        <ComboBoxItem Content="燃料" />
-                                        <ComboBoxItem Content="星琼" />
-                                    </ComboBox>
-                                    <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                    <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                          ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="10">
+                                        <Label Grid.Column="0" Content="使用" />
+                                        <ComboBox Grid.Column="1"
+                                                  SelectedIndex="{Binding CurrentConfig.TrailblazePowerReplenishWay}">
+                                            <ComboBoxItem Content="后备开拓力" />
+                                            <ComboBoxItem Content="燃料" />
+                                            <ComboBoxItem Content="星琼" />
+                                        </ComboBox>
+                                        <Label Grid.Column="2" Content="补充" />
+                                        <NumericUpDown Grid.Column="3" Minimum="1" Maximum="99" FormatString="0"
+                                                       Height="20"
+                                                       Value="{Binding CurrentConfig.TrailblazePowerReplenishTimes}" />
+                                        <Label Grid.Column="4" Content="次" />
+                                    </Grid>
+
+                                    <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
                                               IsChecked="{Binding CurrentConfig.TrailblazePowerUseAssistant}"
-                                              Content="使用支援角色" />
-                                    <CheckBox Grid.Row="1" Grid.Column="1"
+                                              Content="使用助战" />
+                                    <CheckBox Grid.Row="3" Grid.Column="1"
                                               IsChecked="{Binding CurrentConfig.TrailblazePowerChangeLineup}"
                                               Content="重新编队" />
-                                    <CheckBox Grid.Row="2" Grid.Column="0"
+                                    <CheckBox Grid.Row="4" Grid.Column="0"
                                               IsChecked="{Binding CurrentConfig.TrailblazePowerLineupCheck}"
                                               Content="编队检查"
-                                              ToolTip.Tip="仅对饰品提取有效"/>
-                                    <CheckBox Grid.Row="2" Grid.Column="1"
+                                              ToolTip.Tip="仅对饰品提取有效" />
+                                    <CheckBox Grid.Row="4" Grid.Column="1"
                                               IsChecked="{Binding CurrentConfig.TrailblazePowerUseSkill}"
-                                              Content="使用战技入场"
-                                              ToolTip.Tip="仅对饰品提取有效"/>
+                                              Content="战技入场"
+                                              ToolTip.Tip="仅对饰品提取有效" />
                                 </Grid>
                             </StackPanel>
                         </suki:GlassCard>
@@ -53,25 +64,28 @@
                                             <StackPanel Spacing="12">
                                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                                     <Label Content="选择关卡" />
-                                                    <ComboBox ItemsSource="{Binding Levels}" SelectedIndex="{Binding SelectedIndex}" />
+                                                    <ComboBox ItemsSource="{Binding Levels}"
+                                                              SelectedIndex="{Binding SelectedIndex}" />
                                                 </StackPanel>
 
                                                 <StackPanel Orientation="Horizontal" Spacing="8"
                                                             ToolTip.Tip="n合一">
                                                     <Label Content="连续作战" />
                                                     <NumericUpDown FormatString="0" Value="{Binding Count}"
-                                                                   Minimum="1" Maximum="{Binding MaxSingleTimes}" Increment="1"
+                                                                   Minimum="1" Maximum="{Binding MaxSingleTimes}"
+                                                                   Increment="1"
                                                                    VerticalContentAlignment="Center" />
                                                 </StackPanel>
 
                                                 <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="8">
                                                     <Label Content="执行次数" />
-                                                    <NumericUpDown Grid.Column="1" FormatString="0" Value="{Binding RunTimes}"
+                                                    <NumericUpDown Grid.Column="1" FormatString="0"
+                                                                   Value="{Binding RunTimes}"
                                                                    Minimum="1" Maximum="99" Increment="1" />
                                                     <Button Grid.Column="2" Classes="Flat Icon"
                                                             Content="+"
                                                             HorizontalAlignment="Right"
-                                                            Command="{Binding AddTaskItemCommand}"/>
+                                                            Command="{Binding AddTaskItemCommand}" />
                                                 </Grid>
                                             </StackPanel>
                                         </suki:GroupBox>
@@ -83,11 +97,13 @@
                 </ScrollViewer>
                 <suki:GlassCard Grid.Column="1">
                     <suki:GroupBox Header="任务清单">
-                        <ListBox ItemsSource="{Binding CurrentConfig.TrailblazePowerTaskList}" SelectedItem="{Binding SelectedTaskItem}">
+                        <ListBox ItemsSource="{Binding CurrentConfig.TrailblazePowerTaskList}"
+                                 SelectedItem="{Binding SelectedTaskItem}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid RowDefinitions="*,*,*,*" ColumnDefinitions="Auto,*">
-                                        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="{Binding Name}" HorizontalAlignment="Center"/>
+                                        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                               Content="{Binding Name}" HorizontalAlignment="Center" />
                                         <Label Grid.Row="1" Grid.Column="0">关卡名称</Label>
                                         <Label Grid.Row="1" Grid.Column="1" Content="{Binding LevelName}" />
                                         <Label Grid.Row="2" Grid.Column="0" Content="单次次数" />
@@ -99,9 +115,10 @@
                             </ListBox.ItemTemplate>
                             <ListBox.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="Delete" IsEnabled="{Binding EnableContextMenu}" Command="{Binding DeleteSelectedTaskItemCommand}">
+                                    <MenuItem Header="Delete" IsEnabled="{Binding EnableContextMenu}"
+                                              Command="{Binding DeleteSelectedTaskItemCommand}">
                                         <MenuItem.Icon>
-                                            <Label Classes="icon" Content="&#xE4A6;" FontSize="10"/>
+                                            <Label Classes="icon" Content="&#xE4A6;" FontSize="10" />
                                         </MenuItem.Icon>
                                     </MenuItem>
                                 </ContextMenu>

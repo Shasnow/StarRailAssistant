@@ -3,13 +3,14 @@ import functools
 
 from loguru import logger
 
-# 实例化日志记录器
+
+# 设置日志记录器
 def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log"):
     logger.remove()
     if sys.stdout.isatty():
         logger.add(sys.stdout, level=0,
-               format="<green>{time:HH:mm:ss}</green>[{thread}] | <level>{level:5}</level> | <cyan>{module}.{function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>",
-               colorize=True, enqueue=True)
+                   format="<green>{time:HH:mm:ss}</green>[{thread}] | <level>{level:5}</level> | <cyan>{module}.{function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>",
+                   colorize=True, enqueue=True)
     else:
         logger.add(sys.stdout, level=0,
                    format="{time:HH:mm:ss}[{thread}] | {level:5} | {message}",
@@ -53,4 +54,4 @@ def _auto_log_methods(cls):
 
 # 初始化日志
 setup_logger()
-__all__ = ["logger","setup_logger"]
+__all__ = ["logger", "setup_logger"]

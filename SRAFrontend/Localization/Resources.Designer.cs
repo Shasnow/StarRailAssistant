@@ -258,15 +258,6 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Start/Stop.
-        /// </summary>
-        public static string StartStopText {
-            get {
-                return ResourceManager.GetString("StartStopText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Home.
         /// </summary>
         public static string HomeText {
@@ -389,6 +380,15 @@ namespace SRAFrontend.Localization {
         public static string StartUpText {
             get {
                 return ResourceManager.GetString("StartUpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop Hotkey.
+        /// </summary>
+        public static string StopHotkeyText {
+            get {
+                return ResourceManager.GetString("StopHotkeyText", resourceCulture);
             }
         }
         
