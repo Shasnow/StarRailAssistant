@@ -7,7 +7,7 @@ class TrailblazePowerTask(BaseTask):
         super().__init__(config)
         self.replenish_time = self.config.get('TrailblazePowerReplenishTimes')
         self.replenish_way = self.config.get('TrailblazePowerReplenishWay')
-        self.replenish_flag = self.config.get('TrailblazePowerReplenishStamina')
+        self.replenish_flag = self.config.get('TrailblazePowerReplenishEnable')
 
     def run(self):
         def name2task(name: str):
@@ -404,7 +404,7 @@ class TrailblazePowerTask(BaseTask):
         """
         if self.replenish_time != 0:
             logger.info("补充体力")
-            if way == 1 or way == 0:
+            if way == 0:
                 if self.locate("resources/img/reserved_trailblaze_power_onclick.png") or self.click_img(
                         "resources/img/reserved_trailblaze_power.png"):
                     # click('resources/img/count.png', x_add=200)
@@ -417,23 +417,26 @@ class TrailblazePowerTask(BaseTask):
                     self.click_img("resources/img/ensure.png", after_sleep=1)
                     self.click_img("resources/img/ensure.png", after_sleep=1)
                     self.click_point(0.5, 0.7)  # 点击屏幕中心
+                    logger.info("已使用后备开拓力进行补充")
                 else:
                     logger.error("发生错误，错误编号13")
                     return False
-            elif way == 2:
+            elif way == 1:
                 if self.click_img("resources/img/fuel.png") or self.locate("resources/img/fuel_onclick.png"):
                     self.click_img("resources/img/ensure.png", after_sleep=1.5)
                     self.click_img("resources/img/ensure.png", after_sleep=1.5)
                     self.click_point(0.5, 0.7)  # 点击屏幕中心
+                    logger.info("已使用燃料进行补充")
                 else:
                     logger.error("发生错误，错误编号14")
                     return False
-            elif way == 3:
+            elif way == 2:
                 if self.click_img("resources/img/stellar_jade.png") or self.locate(
                         "resources/img/stellar_jade_onclick.png"):
                     self.click_img("resources/img/ensure.png", after_sleep=2)
                     self.click_img("resources/img/ensure.png", after_sleep=3)
                     self.click_point(0.5, 0.7)
+                    logger.info("已使用星琼进行补充")
                 else:
                     logger.error("发生错误，错误编号15")
                     return False

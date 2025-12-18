@@ -104,7 +104,7 @@
         "ocr_not_match_any": "OCR Result not match any text: {texts}",
         "timeout_not_found": "Timeout: '{text}' -> Not found in {timeout} seconds",
         "timeout_texts_not_found": "Timeout: '{texts}' -> Not found in {timeout} seconds",
-        "click_position": "点击位置: ({x}, {y}), 偏移: ({x_offset}, {y_offset}), 等待时间: {after_sleep}秒",
+        "click_position": "Click point: ({x}, {y}), offset: ({x_offset}, {y_offset}), wait: {after_sleep}s",
         "waiting_image": "Waiting for image: {path}",
         "wait_img_success": "[wait_img debug] locate() success on attempt {attempt}",
         "wait_img_attempt": "[wait_img debug] attempt={attempt} score={score:.4f} loc={loc} conf_th={conf}",

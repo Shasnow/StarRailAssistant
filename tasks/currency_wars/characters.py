@@ -12,7 +12,7 @@ class Faction(enum.IntEnum):
     CosmicScholar = 7  # 银河学者
     GalacticVoyager = 8  # 星间旅人
     ThePlanetOfFestivities = 9  # 盛会之星
-    StellaronHounters = 10  # 星核猎手
+    StellaronHunters = 10  # 星核猎手
     GalaxyRanger = 11  # 巡海游侠
     IPC = 12  # 公司
     Other = 13  # 其他
@@ -45,15 +45,26 @@ class Character:
     faction: Faction  # 阵营
     schools: list[School]  # 派系
     cost: int  # 费用
-    positioning: Positioning  # 站位
-    select_will: int = 0  # 抓取意愿
+    positioning: Positioning  # 默认站位
+    position: Positioning = None  # 实际站位（适配攻略的特殊情况）
+    priority: int = None  # 优先级
     is_placed: bool = False  # 是否已放置
+
+    def __post_init__(self):
+        if self.priority is None:
+            self.priority = self.cost
+        if self.position is None:
+            self.position = self.positioning
 
     def __str__(self):
         return f'{self.name}'
 
     def __repr__(self):
         return f'{self.name}'
+
+    def reset(self):
+        self.priority = self.cost
+        self.position = self.positioning
 
 
 class Characters:
@@ -82,7 +93,7 @@ class Characters:
     Jiaoqiu = Character('椒丘', Faction.WolfHunt, [School.Heal, School.Debuff], 1, Positioning.OnField)
     Yunli = Character('云璃', Faction.WolfHunt, [School.Energy], 5, Positioning.OffField)
     Jade = Character('翡翠', Faction.IPC, [School.AoEATK], 1, Positioning.OffField)
-    Firefly = Character('流萤', Faction.StellaronHounters, [School.Break], 5, Positioning.OnField)
+    Firefly = Character('流萤', Faction.StellaronHunters, [School.Break], 5, Positioning.OnField)
     Boothill = Character('波提欧', Faction.GalaxyRanger, [School.Break], 4, Positioning.OnField)
     Robin = Character('知更鸟', Faction.ThePlanetOfFestivities, [School.FollowUpATK], 4, Positioning.OffField)
     Aventurine = Character('砂金', Faction.IPC, [School.Shield, School.FollowUpATK], 2, Positioning.OnField)
@@ -100,10 +111,10 @@ class Characters:
     Jingliu = Character('镜流', Faction.WolfHunt, [School.Bloodflame], 3, Positioning.OffField)
     FuXuan = Character('符玄', Faction.Xianzhou, [School.Heal, School.QuantumResonance], 4, Positioning.OffField)
     DanHeng_ImbibitorLunae = Character('丹恒·饮月', Faction.ExpressCohort, [School.SkillPoints], 2, Positioning.OnField)
-    Kafka = Character('卡芙卡', Faction.StellaronHounters, [School.DoT], 2, Positioning.OnField)
-    Blade = Character('刃', Faction.StellaronHounters, [School.Bloodflame], 1, Positioning.OffField)
+    Kafka = Character('卡芙卡', Faction.StellaronHunters, [School.DoT], 2, Positioning.OnField)
+    Blade = Character('刃', Faction.StellaronHunters, [School.Bloodflame], 1, Positioning.OffField)
     Luocha = Character('罗刹', Faction.GalacticVoyager, [School.Heal], 4, Positioning.OffField)
-    SilverWolf = Character('银狼', Faction.StellaronHounters, [School.QuantumResonance], 4, Positioning.OnOffField)
+    SilverWolf = Character('银狼', Faction.StellaronHunters, [School.QuantumResonance], 4, Positioning.OnOffField)
     JingYuan = Character('景元', Faction.Xianzhou, [School.AoEATK], 5, Positioning.OnField)
     Seele = Character('希儿', Faction.Belobog, [School.QuantumResonance], 3, Positioning.OnField)
     Gepard = Character('杰帕德', Faction.Belobog, [School.Shield], 4, Positioning.OnField)
@@ -185,6 +196,7 @@ characters: dict[str, Character] = {
     '椒丘': Characters.Jiaoqiu,
     '加拉赫': Characters.Gallagher,
     '阿格莱雅': Characters.Aglaea,
+    '开拓者': Characters.Trailblazer,
 }
 username = '开拓者'  # 请将此处改为你的角色名称
 

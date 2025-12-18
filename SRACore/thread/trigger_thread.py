@@ -43,9 +43,3 @@ class TriggerManager:
         else:
             logger.debug(t('trigger.already_registered', name=trigger.__class__.__name__))
 
-    @classmethod
-    def get_instance(cls):
-        if cls.__instance is None:
-            cls.__instance = cls()
-        return cls.__instance
-

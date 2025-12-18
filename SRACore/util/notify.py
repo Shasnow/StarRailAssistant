@@ -5,6 +5,18 @@ from email.utils import formataddr
 from plyer import notification
 
 from SRACore.util import encryption
+from SRACore.util.config import load_settings
+from SRACore.util.i18n import t
+
+
+def try_send_notification(title: str, message: str):
+    setting = load_settings()
+    if not setting.get('AllowNotifications', False):
+        return
+    if setting.get('AllowSystemNotifications', False):
+        send_windows_notification(title, message)
+    if setting.get('AllowEmailNotifications', False):
+        send_mail_notification(title, message, setting)
 
 
 def send_windows_notification(title: str, message: str, timeout: int = 10):
@@ -14,9 +26,10 @@ def send_windows_notification(title: str, message: str, timeout: int = 10):
     :param message: 通知内容
     :param timeout: 通知显示时长（秒）
     """
-    
+
     # 发送通知
     notification.notify(title=title, message=message, app_name="SRA", timeout=timeout)
+
 
 def send_mail_notification(title: str = "SRA", message: str = "", config: dict | None = None):
     """发送邮件通知"""
@@ -31,17 +44,17 @@ def send_mail_notification(title: str = "SRA", message: str = "", config: dict |
 
 
 def send_mail(
-    title: str = "SRA",
-    subject: str = "SRA通知",
-    message: str = "",
-    SMTP: str = "",
-    port: int = 465,
-    sender: str = "",
-    password: str = "",
-    receiver: str = "",
+        title: str = "SRA",
+        subject: str = "SRA通知",
+        message: str = "",
+        SMTP: str = "",
+        port: int = 465,
+        sender: str = "",
+        password: str = "",
+        receiver: str = "",
 ) -> bool:
     """发送邮件"""
-    if SMTP=="" or sender=="" or password=="" or receiver=="":
+    if SMTP == "" or sender == "" or password == "" or receiver == "":
         return False
     try:
         msg = MIMEText(message, 'plain', 'utf-8')

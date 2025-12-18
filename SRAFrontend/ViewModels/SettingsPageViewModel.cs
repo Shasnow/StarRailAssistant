@@ -36,7 +36,7 @@ public partial class SettingsPageViewModel : PageViewModel
         _startStopKey = new CustomizableKey(ListenKeyFor)
         {
             IconText = "\uE3E4",
-            DisplayText = Resources.StartStopText,
+            DisplayText = Resources.StopHotkeyText,
             DefaultKey = "F9"
         }.Bind(() => settingsService.Settings.StartStopHotkey,
             value => settingsService.Settings.StartStopHotkey = value);
@@ -157,6 +157,26 @@ public partial class SettingsPageViewModel : PageViewModel
     private void CheckForUpdates()
     {
         _ = _commonModel.CheckForUpdatesAsync();
+    }
+    
+    [RelayCommand]
+    private void CreateDesktopShortcut()
+    {
+        _ = _commonModel.CheckDesktopShortcut(true);
+    }
+    
+    [RelayCommand]
+    private void OpenFolder(string folder)
+    {
+        var folderPath = folder switch
+        {
+            "backendLogs" => PathString.BackendLogsDir,
+            "frontendLogs" => PathString.FrontendLogsDir,
+            "configs" => PathString.ConfigsDir,
+            "appdata" => PathString.AppDataSraDir,
+            _ => "."
+        };
+        _commonModel.OpenFolderInExplorer(folderPath);
     }
 
     #region 快捷键监听修改逻辑

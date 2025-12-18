@@ -36,26 +36,26 @@ class BrushOpening(Executable):
     PAGE_START = 1
     PAGE_PREPARATION = 2
     
-    def __init__(self, config, run_times):
+    def __init__(self, config):
         super().__init__()
-        self.run_times = run_times
+        # 需要的开局
+        self.config = config
+        self.wanted_invest_environment = self.config.get("InvestEnvironment", [])
+        self.wanted_invest_strategy = self.config.get("InvestStrategy", [])
+        self.wanted_invest_strategy_stage = self.config.get("InvestStrategyStage", 1)
+        self.run_times = self.config.get("RunTimes", 0)
         self.force_battle = False
-        self.cw = CurrencyWars(run_times)
+        self.cw = CurrencyWars(self.run_times)
         # 结算返回后需重启下一轮的标记（避免在同一轮等待策略页）
         self._just_settled = False
         # 轻量通用配置：统一点击后的短暂停顿（不改变原有各处的具体等待）
         self._default_after_click_sleep = 1.0
         # 标记：进入策略页外部接管阶段后，禁止回到初始策略/进入流程
         self._in_strategy_phase = False
-        self.config = config
         # 刷到的开局配置，用于检测是否完成刷开局需求
         self.invest_environment = None
         self.invest_strategy = None
-        # 需要的开局
-        self.wanted_invest_environment = self.config.get("InvestEnvironment", [])
-        self.wanted_invest_strategy = self.config.get("InvestStrategy", [])
-        self.wanted_invest_strategy_stage = self.config.get("InvestStrategyStage", 1)
-        self.run_times = self.config.get("RunTimes", 0)
+        
 
     # —— 微型助手方法：仅用于提升可读性与健壮性 ——
     def _wait_then_click_box(self, img, *, timeout=5, interval=0.5, after_sleep=None):
@@ -80,7 +80,7 @@ class BrushOpening(Executable):
             self.invest_strategy = None
         return result
         
-    def openning(self):
+    def opening(self):
         """刷开局主流程。
         逻辑：
         - 若识别到 CONTINUE_PROGRESS，则中断当前对局并结算返回，再走正常进入流程；
@@ -102,6 +102,8 @@ class BrushOpening(Executable):
                 if entry_result == "error":
                     return False
                 elif entry_result == "continue":
+                    tries += 1
+                    logger.info(f"第 {tries} 次尝试开始刷开局")
                     continue
                 elif entry_result == "settled":
                     self.sleep(0.8)
@@ -114,12 +116,13 @@ class BrushOpening(Executable):
             # 初始策略应用
             if not self._in_strategy_phase:
                 tries += 1
-                logger.info(f"开始刷开局，第 {tries} 次尝试")
+                logger.info(f"第 {tries} 次尝试开始刷开局")
                 if not self._handle_initial_strategy():
                     self.sleep(1.5)
                     continue
 
             # 启用外部接管并推进到策略页
+            logger.info("启用外部接管并推进到策略页")
             self._enable_strategy_control()
             self.cw.run_game()
 
@@ -186,7 +189,7 @@ class BrushOpening(Executable):
             bool: True 成功 | False 失败
         """
         try:
-            if not self.cw._apply_initial_strategy():
+            if not self.cw.initialize():
                 logger.error("初始策略应用失败，结束本轮并重试")
                 self._safe_abort_and_return()
                 return False
@@ -198,6 +201,7 @@ class BrushOpening(Executable):
 
     def _enable_strategy_control(self):
         """启用策略页外部接管并设置运行状态。"""
+        logger.info("启用策略页外部接管并设置运行状态。")
         self.cw.strategy_external_control = True
         self._in_strategy_phase = True
         self.cw.is_running = True
@@ -357,6 +361,16 @@ class BrushOpening(Executable):
         - 如果收集后仍未刷到，则返回备战页面并结算返回
         - 如果刷到，则点击投资环境
         """
+        if self.wanted_invest_environment == []:
+            if not self.click_img(IMG.COLLECTION):
+                self.click_point(0.5, 0.5)
+            self.click_img(IMG.ENSURE2, after_sleep=1)
+            if self.locate(CWIMG.INVEST_ENVIRONMENT):
+                self.click_point(0.5, 0.5)
+                self.click_img(IMG.ENSURE2, after_sleep=1)
+            self.sleep(4)
+            return True
+
         index, box = self.wait_ocr_any(self.wanted_invest_environment, timeout=2, interval=0.5)
         if index == -1:
             box = self.wait_img(CWIMG.REFRESH_ENV, timeout=2, interval=0.5)

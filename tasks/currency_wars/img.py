@@ -12,7 +12,11 @@ class IMG:
 
 class CWIMG:
     BASE = "resources/img/currency_wars"
+    COLLECTION = f"{BASE}/collection.png"
     CURRENCY_WARS_START = f"{BASE}/currency_wars_start.png"
+    EQUIP = f"{BASE}/equip.png"
+    EQUIPMENT_RECOMMEND = f"{BASE}/equipment_recommend.png"
+    SYNTHESIS = f"{BASE}/synthesis.png"
     PREPARATION_STAGE = f"{BASE}/preparation_stage.png"
     ENTER_STANDARD = f"{BASE}/enter_standard.png"
     CONTINUE_PROGRESS = f"{BASE}/continue_progress.png"
@@ -47,5 +51,6 @@ class CWIMG:
     REFRESH_COUNT = f"{BASE}/refresh_count.png"
     REFRESH_COUNT_BTN = f"{BASE}/refresh_count_btn.png"
     RETURN_INVESTMENT_STRATEGY = f"{BASE}/return_investment_strategy.png"
-    BATTLE= f"{BASE}/battle.png"
+    BATTLE = f"{BASE}/battle.png"
     REFRESH_ENV = f'{BASE}/refresh_environment.png'
+    LOGO = f"{BASE}/logo.png"
