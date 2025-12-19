@@ -217,7 +217,7 @@ public class CommonModel(
         }
         else
         {
-            logger.LogDebug("Extracting full update: {Source} → {Destination}", downloadFilePath,
+            logger.LogDebug("Extracting full update: {Source} -> {Destination}", downloadFilePath,
                 Environment.CurrentDirectory);
             var unzipToast = ShowInfoToast("正在解压更新", "请稍候...");
             unzipToast.CanDismissByClicking = false;
@@ -278,6 +278,8 @@ public class CommonModel(
 
     private bool CreateWindowsShortcut(string shortcutPath, string appExePath)
     {
+        logger.LogDebug("Creating Windows shortcut: {ShortcutPath} -> {AppExePath}", shortcutPath, appExePath);
+        // 使用 VBScript 创建快捷方式
         var vbsScript = $"""
 
                                  Set WshShell = WScript.CreateObject("WScript.Shell")
