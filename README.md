@@ -82,7 +82,7 @@ nothing to do with it.
 
   构建前端：使用下面的命令将前端项目构建为可执行文件。
   ```bash
-  dotnet publish -c Release -o win-x64 ./SRAFrontend/SRAFrontend.csproj
+  dotnet publish -c Release -r win-x64 ./SRAFrontend/SRAFrontend.csproj
   ```
 
   构建后端：使用下面的命令将后端项目构建为可执行文件。

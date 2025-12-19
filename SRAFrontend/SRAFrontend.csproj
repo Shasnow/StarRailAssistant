@@ -8,6 +8,7 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>false</SelfContained>
         <ApplicationIcon>Assets\SRAicon.ico</ApplicationIcon>
     </PropertyGroup>
 
