@@ -36,7 +36,7 @@ public partial class Config : ObservableObject
     [ObservableProperty] private string _cwRsInvestEnvironments = ""; // 刷开局 - 期望投资环境，空格分隔
     [ObservableProperty] private string _cwRsInvestStrategies = ""; // 刷开局 - 期望投资策略，空格分隔
     [ObservableProperty] private int _cwRsInvestStrategyStage = 1; // 刷开局 - 期望投资策略阶段
-    [ObservableProperty] private int _cwRsMaxRetry; // 刷开局 - 最大尝试轮数
+    [ObservableProperty] private int _cwRsMaxRetry = 1; // 刷开局 - 最大尝试轮数
 
     [ObservableProperty] private bool _startGameAlwaysLogin; // 游戏启动时是否总是登录
     [ObservableProperty] private bool _startGameAutoLogin; // 启动游戏时是否自动登录

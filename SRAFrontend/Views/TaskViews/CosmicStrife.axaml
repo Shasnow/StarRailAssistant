@@ -83,7 +83,7 @@
                                     <Label Content="投资环境" />
                                     <TextBox Width="320"
                                              Text="{Binding CurrentConfig.CwRsInvestEnvironments}"
-                                             Watermark="例如：长线利好，轮岗" />
+                                             Watermark="例如：长线利好 轮岗" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
