@@ -91,6 +91,9 @@ class BrushOpening(Executable):
         """
         tries = 0
         while True:
+            if tries >= self.run_times:
+                logger.info(f"达到最大尝试次数{self.run_times}，结束刷开局")
+                return True
             # 页面定位
             if not self._in_strategy_phase:
                 page = self._handle_page_location()
