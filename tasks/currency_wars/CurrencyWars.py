@@ -64,6 +64,7 @@ class CurrencyWars(Executable):
         self.min_level = 7  # 商店等级
         self.mid_level = 7  # 商店等级
         self.strategy_characters: list[Character] = []  # 在攻略中的角色
+        self.is_overclock = False  # 超频博弈
 
     def reset_character(self):
         """ 重置所有角色信息 """
@@ -84,6 +85,9 @@ class CurrencyWars(Executable):
     def set_username(username: str):
         # 调用处已经确保 username 非空
         cw_chars.username = username.strip()
+
+    def set_overclock(self, overclock: bool):
+        self.is_overclock = overclock
 
     def run(self):
         if self.run_times == 0:
@@ -158,14 +162,16 @@ class CurrencyWars(Executable):
         if start_box is None:
             logger.error("未识别到开始按钮")
             return False
-        self.do_while(lambda : self.click_box(start_box, after_sleep=0.5),
-                      lambda : self.locate(CWIMG.LOGO) is None,
+        self.do_while(lambda: self.click_box(start_box, after_sleep=0.5),
+                      lambda: self.locate(CWIMG.LOGO) is None,
                       interval=0.5, max_iterations=10)
 
         # 标准进入 or 继续进度
         index, box = self.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONTINUE_PROGRESS], timeout=10, interval=0.5)
 
         if index == 0:
+            if self.is_overclock:
+                self.click_point(0.1526, 0.4139, after_sleep=1, tag="超频博弈按钮")  # 超频博弈
             return self._standard_entry_flow(box)
         elif index == 1:
             return self._continue_progress_flow(box)
@@ -286,8 +292,7 @@ class CurrencyWars(Executable):
             if c is not None and c not in on_off_field_characters:
                 c.is_placed = False
 
-    @property
-    def coins(self):
+    def get_coins(self):
         # 实现获取金币逻辑
         logger.info("获取当前金币数量")
         coins = self.ocr(from_x=0.84, from_y=0.81, to_x=0.89, to_y=0.89)
@@ -394,7 +399,7 @@ class CurrencyWars(Executable):
                 continue
             if character.position != Positioning.OffField:
                 if self.place_on_field_character(i):
-                    self.sleep(0.5)
+                    self.sleep(1)
                     self.handle_special_event()
 
         # 第二次遍历：仅处理后台角色（Positioning.OffField），填充剩余空位或替换
@@ -404,7 +409,7 @@ class CurrencyWars(Executable):
                 continue
             if character.position != Positioning.OnField:
                 if self.place_off_field_character(i):
-                    self.sleep(0.5)
+                    self.sleep(1)
                     self.handle_special_event()
 
         logger.info("角色放置完成")
@@ -705,29 +710,6 @@ class CurrencyWars(Executable):
             self.click_point(0.8, 0.3, after_sleep=1)  # 选择第三个选项
             self.click_point(0.77, 0.52, after_sleep=1)  # 点击确认按钮
             return True
-
-        # 将 OCR 检测放在所有图片事件之后，作为兜底处理
-        # x=1435,y=544,w=116,h=38
-        try:
-            from_x = 0.747
-            from_y = 0.504
-            to_x = 0.808
-            to_y = 0.539
-            ocr_results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
-            if ocr_results:
-                text_line = "".join([str(item[1]) for item in ocr_results])
-                if "确认选择" in text_line:
-                    logger.info("检测到 OCR 提示：确认选择（未记录在案的特殊事件）")
-                    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-                    if not os.path.exists("log/currency_wars"):
-                        os.makedirs("log/currency_wars")
-                    filename = f"log/currency_wars/unhandled_right_event_{timestamp}.png"
-                    img = self.screenshot_region()
-                    img.save(filename)
-                    return True
-        except Exception:
-            pass
-
         return False
 
     def strategy_event(self):
@@ -757,15 +739,16 @@ class CurrencyWars(Executable):
             return chars
 
         refresh_times = 0
-        while self.coins > 4:
-            level=self.get_level()
+        while self.get_coins() > 4:
+            level = self.get_level()
             if level < self.min_level:
                 # 当等级小于最低等级要求时，持续按f提升等级，跳过购买
                 self.press_key('f')
                 self.sleep(0.5)
                 continue
-            if self.coins < self.min_coins:
-                logger.info(f"当前金币 {self.coins} 小于最低购买要求 {self.min_coins}")
+            coins = self.get_coins()
+            if not self.is_overclock and coins < self.min_coins:
+                logger.info(f"当前金币 {coins} 小于最低保留数量 {self.min_coins}")
                 break
 
             cs = scan_characters_in_store()
@@ -784,7 +767,7 @@ class CurrencyWars(Executable):
             #         break
 
             self.press_key('d')  # 按d刷新商店
-            refresh_times+=1
+            refresh_times += 1
             self.sleep(0.5)
             if level < self.mid_level and refresh_times % 3 == 0:
                 # 当等级小于中级等级要求时，每3次刷新按一次f提升等级
@@ -853,24 +836,24 @@ class CurrencyWars(Executable):
     def load_strategy(self, name: str):
         """加载攻略文件"""
         if ".json" in name:
-            path=name
+            path = name
         else:
-            path=f"tasks/currency_wars/strategies/{name}.json"
+            path = f"tasks/currency_wars/strategies/{name}.json"
         with open(path, "r", encoding="utf-8") as f:
-            strategy_data:dict[str, Any] = json.load(f)
-        name=strategy_data.get("name")
-        description=strategy_data.get("description")
+            strategy_data: dict[str, Any] = json.load(f)
+        name = strategy_data.get("name")
+        description = strategy_data.get("description")
         self.min_coins = strategy_data.get("min_coins", 40)
         self.min_level = strategy_data.get("min_level", 7)
         self.mid_level = strategy_data.get("mid_level", 7)
         # 在攻略中的角色设置成最高优先级
         for i, cn in enumerate(strategy_data.get("on_field", [])):
             c = get_character(cn)
-            c.priority = 9-i  # 确保攻略中的前台角色优先级都大于其他角色，同时有所差别
+            c.priority = 9 - i  # 确保攻略中的前台角色优先级都大于其他角色，同时有所差别
             c.position = Positioning.OnField
             self.strategy_characters.append(c)
         for i, cn in enumerate(strategy_data.get("off_field", [])):
-            c=get_character(cn)
+            c = get_character(cn)
             c.priority = 15 - i  # 确保攻略中的后台角色优先级都大于其他角色
             c.position = Positioning.OffField
             self.strategy_characters.append(c)
