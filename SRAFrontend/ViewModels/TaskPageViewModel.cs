@@ -216,15 +216,17 @@ public partial class TaskPageViewModel : PageViewModel
 
     public int CurrencyWarsModeIndex
     {
-        get => CurrentConfig.CurrencyWarsMode;
+        // 兼容旧 XAML 绑定：此前前端用 CurrencyWarsModeIndex(0/1/2) 表示“标准/超频/刷开局”
+        // 现在由 CurrencyWarsGameType 统一承载该语义（并映射到 Config 的 CurrencyWarsPolicy / CurrencyWarsBrushOpeningEnable）
+        get => CurrencyWarsGameType;
         set
         {
-            CurrentConfig.CurrencyWarsMode = value;
-            OnPropertyChanged(nameof(IsCurrencyWarsNormalMode));
+            CurrencyWarsGameType = value;
+
+            // CurrencyWarsGameType 的 setter 已经触发了相关 OnPropertyChanged，这里补一条兼容通知，防止有绑定只监听本属性
+            OnPropertyChanged(nameof(CurrencyWarsModeIndex));
         }
     }
-
-    public bool IsCurrencyWarsNormalMode => CurrencyWarsModeIndex != 2;
     public ControlPanelViewModel ControlPanelViewModel { get; }
 
     public AvaloniaList<TrailblazePowerTask> Tasks { get; }
@@ -233,6 +235,174 @@ public partial class TaskPageViewModel : PageViewModel
 
     public string TogglePasswordVisibilityButtonContent =>
         PasswordMask == "*" ? "\uE224" : "\uE220";
+
+    /// <summary>
+    /// 刷开局 - 投资环境文本表示（逗号/空格分隔），用于前端编辑。
+    /// 实际保存时会拆分为 CurrencyWarsBrushOpening.InvestEnvironment 列表。
+    /// </summary>
+    public string CurrencyWarsBrushOpeningEnvironmentText
+    {
+        get
+        {
+            if (CurrentConfig?.CurrencyWarsBrushOpening?.InvestEnvironment is null ||
+                CurrentConfig.CurrencyWarsBrushOpening.InvestEnvironment.Count == 0)
+                return string.Empty;
+            return string.Join("，", CurrentConfig.CurrencyWarsBrushOpening.InvestEnvironment);
+        }
+        set
+        {
+            if (CurrentConfig?.CurrencyWarsBrushOpening is null) return;
+            var items = (value ?? string.Empty)
+                .Split(new[] { ',', '，', ';', '；', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => s.Trim())
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct()
+                .ToList();
+            CurrentConfig.CurrencyWarsBrushOpening.InvestEnvironment = items;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 刷开局 - 投资策略文本表示（逗号/空格分隔），用于前端编辑。
+    /// 实际保存时会拆分为 CurrencyWarsBrushOpening.InvestStrategy 列表。
+    /// </summary>
+    public string CurrencyWarsBrushOpeningStrategyText
+    {
+        get
+        {
+            if (CurrentConfig?.CurrencyWarsBrushOpening?.InvestStrategy is null ||
+                CurrentConfig.CurrencyWarsBrushOpening.InvestStrategy.Count == 0)
+                return string.Empty;
+            return string.Join("，", CurrentConfig.CurrencyWarsBrushOpening.InvestStrategy);
+        }
+        set
+        {
+            if (CurrentConfig?.CurrencyWarsBrushOpening is null) return;
+            var items = (value ?? string.Empty)
+                .Split(new[] { ',', '，', ';', '；', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => s.Trim())
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct()
+                .ToList();
+            CurrentConfig.CurrencyWarsBrushOpening.InvestStrategy = items;
+            OnPropertyChanged();
+        }
+    }
+
+    // 货币战争互斥提示：当常规与刷开局同时启用时为 true
+    public bool CurrencyWarsConflict =>
+        CurrentConfig is not null &&
+        CurrentConfig.CurrencyWarsEnable &&
+        CurrentConfig.CurrencyWarsBrushOpeningEnable;
+
+    // 货币战争总开关：勾选框绑定此属性
+    // 未勾选时：两个 Enable 都是 False
+    // 勾选时：根据下拉菜单的类型，设置对应的 Enable 为 true，另一个为 false
+    public bool CurrencyWarsEnabled
+    {
+        get
+        {
+            if (CurrentConfig is null) return false;
+            // 只要有一个启用，总开关就是开启状态
+            return CurrentConfig.CurrencyWarsEnable || CurrentConfig.CurrencyWarsBrushOpeningEnable;
+        }
+        set
+        {
+            if (CurrentConfig is null) return;
+            
+            if (!value)
+            {
+                // 总开关关闭：两个都设为 false
+                CurrentConfig.CurrencyWarsEnable = false;
+                CurrentConfig.CurrencyWarsBrushOpeningEnable = false;
+            }
+            else
+            {
+                // 总开关开启：根据当前下拉菜单的类型，设置对应的模式
+                var currentType = CurrencyWarsGameType;
+                if (currentType == 2)
+                {
+                    // 刷开局模式
+                    CurrentConfig.CurrencyWarsBrushOpeningEnable = true;
+                    CurrentConfig.CurrencyWarsEnable = false;
+                }
+                else
+                {
+                    // 标准/超频模式
+                    CurrentConfig.CurrencyWarsBrushOpeningEnable = false;
+                    CurrentConfig.CurrencyWarsEnable = true;
+                    CurrentConfig.CurrencyWarsPolicy = currentType; // 0 标准，1 超频
+                }
+            }
+            
+            OnPropertyChanged(nameof(CurrencyWarsEnabled));
+            OnPropertyChanged(nameof(CurrencyWarsConflict));
+            OnPropertyChanged(nameof(IsCurrencyWarsBrushOpening));
+            OnPropertyChanged(nameof(IsCurrencyWarsNormalMode));
+            OnPropertyChanged(nameof(IsCurrencyWarsStandard));
+        }
+    }
+
+    // 货币战争类型选择：0=标准博弈,1=超频博弈,2=刷开局
+    public int CurrencyWarsGameType
+    {
+        get
+        {
+            if (CurrentConfig is null) return 0;
+            // 以“后端口径”的 CurrencyWarsMode 为准（后端读取 CurrencyWarsMode）
+            // 兼容旧配置：若 CurrencyWarsMode 未设置/非法，则回退到 Enable/Policy 推断
+            if (CurrentConfig.CurrencyWarsMode is >= 0 and <= 2) return CurrentConfig.CurrencyWarsMode;
+            if (CurrentConfig.CurrencyWarsBrushOpeningEnable) return 2;
+            // 默认：常规货币战争启用时按策略区分（目前仅两种，统一映射为0/1）
+            return CurrentConfig.CurrencyWarsPolicy switch
+            {
+                1 => 1,
+                _ => 0
+            };
+        }
+        set
+        {
+            if (CurrentConfig is null) return;
+            // 规范化到 0/1/2
+            var mode = value switch
+            {
+                2 => 2,
+                1 => 1,
+                _ => 0
+            };
+            CurrentConfig.CurrencyWarsMode = mode;
+            
+            // 如果总开关是关闭的，只更新类型但不启用任何模式
+            var wasEnabled = CurrencyWarsEnabled;
+            
+            if (mode == 2)
+            {
+                // 选择刷开局
+                CurrentConfig.CurrencyWarsBrushOpeningEnable = wasEnabled; // 只有总开关开启时才设为 true
+                CurrentConfig.CurrencyWarsEnable = false;
+            }
+            else
+            {
+                // 选择标准/超频
+                CurrentConfig.CurrencyWarsBrushOpeningEnable = false;
+                CurrentConfig.CurrencyWarsEnable = wasEnabled; // 只有总开关开启时才设为 true
+                CurrentConfig.CurrencyWarsPolicy = mode; // 0 标准，1 超频
+            }
+            
+            OnPropertyChanged(nameof(CurrencyWarsGameType));
+            OnPropertyChanged(nameof(CurrencyWarsModeIndex));
+            OnPropertyChanged(nameof(IsCurrencyWarsBrushOpening));
+            OnPropertyChanged(nameof(IsCurrencyWarsNormalMode));
+            OnPropertyChanged(nameof(IsCurrencyWarsStandard));
+            OnPropertyChanged(nameof(CurrencyWarsConflict));
+        }
+    }
+
+    // UI 辅助可见性绑定
+    public bool IsCurrencyWarsBrushOpening => CurrencyWarsGameType == 2;
+    public bool IsCurrencyWarsNormalMode => CurrencyWarsGameType != 2;
+    public bool IsCurrencyWarsStandard => CurrencyWarsGameType == 0;
 
     [RelayCommand]
     private void DeleteSelectedTaskItem()

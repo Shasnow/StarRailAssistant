@@ -1,3 +1,4 @@
+import functools
 import re
 
 from loguru import logger
@@ -7,10 +8,11 @@ from SRACore.util.notify import (send_mail_notification,
                                  send_windows_notification)
 from SRACore.util.operator import Executable
 from tasks.currency_wars.img import CWIMG, IMG
-
+from SRACore.util.logger import _auto_log_methods
 from .CurrencyWars import CurrencyWars
 
 
+@_auto_log_methods
 class BrushOpening(Executable):
     # 坐标常量
     STRATEGY_SELECT_X = 0.5
@@ -34,16 +36,26 @@ class BrushOpening(Executable):
     PAGE_START = 1
     PAGE_PREPARATION = 2
     
-    def __init__(self):
+    def __init__(self, config):
         super().__init__()
+        # 需要的开局
+        self.config = config
+        self.wanted_invest_environment = self.config.get("InvestEnvironment", [])
+        self.wanted_invest_strategy = self.config.get("InvestStrategy", [])
+        self.wanted_invest_strategy_stage = self.config.get("InvestStrategyStage", 1)
+        self.run_times = self.config.get("RunTimes", 0)
         self.force_battle = False
-        self.cw = CurrencyWars(0)
+        self.cw = CurrencyWars(self.run_times)
         # 结算返回后需重启下一轮的标记（避免在同一轮等待策略页）
         self._just_settled = False
         # 轻量通用配置：统一点击后的短暂停顿（不改变原有各处的具体等待）
         self._default_after_click_sleep = 1.0
         # 标记：进入策略页外部接管阶段后，禁止回到初始策略/进入流程
         self._in_strategy_phase = False
+        # 刷到的开局配置，用于检测是否完成刷开局需求
+        self.invest_environment = None
+        self.invest_strategy = None
+        
 
     # —— 微型助手方法：仅用于提升可读性与健壮性 ——
     def _wait_then_click_box(self, img, *, timeout=5, interval=0.5, after_sleep=None):
@@ -64,14 +76,17 @@ class BrushOpening(Executable):
             self.cw.is_running = False
             # 退出策略阶段，允许下一轮重新定位与进入
             self._in_strategy_phase = False
+            self.invest_environment = None
+            self.invest_strategy = None
         return result
         
     def opening(self):
         """刷开局主流程。
         逻辑：
         - 若识别到 CONTINUE_PROGRESS，则中断当前对局并结算返回，再走正常进入流程；
-        - 循环直到首次识别到“选择投资策略”界面；
-        - 在该界面 OCR 检测是否出现“叽米”，出现则停止脚本并通知用户；
+        - 在开局阶段判断投资环境，没有需要的环境就重开，有需要的环境时，判断是否还需要投资策略；
+        - 若还需要刷投资策略，则继续执行到1-2/2-2；否则直接结束任务；
+        - 在1-2/2-2用 OCR 检测是否出现需要的策略，出现则停止脚本并通知用户；
         - 未出现则中断探索（结束并结算）并重新开始；
         """
         tries = 0
@@ -87,20 +102,27 @@ class BrushOpening(Executable):
                 if entry_result == "error":
                     return False
                 elif entry_result == "continue":
+                    tries += 1
+                    logger.info(f"第 {tries} 次尝试开始刷开局")
                     continue
                 elif entry_result == "settled":
                     self.sleep(0.8)
                     continue
+                else:
+                    if self._check_tesk_success():
+                        self._stop_on_wanted_opening(f'开局刷到需要的投资环境: {self.invest_environment}')
+                        return True
 
             # 初始策略应用
             if not self._in_strategy_phase:
                 tries += 1
-                logger.info(f"开始刷开局，第 {tries} 次尝试")
+                logger.info(f"第 {tries} 次尝试开始刷开局")
                 if not self._handle_initial_strategy():
                     self.sleep(1.5)
                     continue
 
             # 启用外部接管并推进到策略页
+            logger.info("启用外部接管并推进到策略页")
             self._enable_strategy_control()
             self.cw.run_game()
 
@@ -109,14 +131,14 @@ class BrushOpening(Executable):
                 logger.debug("未能到达策略页，继续循环")
                 continue
 
-            # 检测 2-2 关卡并处理
+            # 检测 1-2/2-2 关卡并处理
             detection_result = self._handle_stage_detection()
-            if detection_result == "jimi_found":
+            if detection_result == "wanted_opening_reached":
                 return True
             elif detection_result == "continue":
                 continue
 
-            # 默认策略推进（未进入 2-2 分支时）
+            # 默认策略推进（未进入 1-2/2-2 分支时）
             self._handle_default_strategy_advance()
             continue
 
@@ -179,9 +201,17 @@ class BrushOpening(Executable):
 
     def _enable_strategy_control(self):
         """启用策略页外部接管并设置运行状态。"""
+        logger.info("启用策略页外部接管并设置运行状态。")
         self.cw.strategy_external_control = True
         self._in_strategy_phase = True
         self.cw.is_running = True
+    
+    def _check_tesk_success(self) -> bool:
+        """检查任务是否成功。"""
+        return (self.wanted_invest_environment == [] \
+                or self.invest_environment in self.wanted_invest_environment) \
+                and (self.wanted_invest_strategy == [] \
+                or self.invest_strategy in self.wanted_invest_strategy)
 
     def _wait_for_strategy_page(self) -> bool:
         """等待并确认到达选择投资策略界面。
@@ -203,10 +233,10 @@ class BrushOpening(Executable):
         return idx == 0
 
     def _handle_stage_detection(self) -> str:
-        """处理关卡检测阶段（检测是否为 2-2 关卡）。
-        
+        """处理关卡检测阶段（检测是否为对应的策略阶段（1-2/2-2）。
+
         Returns:
-            str: "jimi_found" 发现叽米 | "continue" 需继续循环 | "default" 使用默认流程
+            str: "wanted_opening_reached" 找到目标开局 | "continue" 需继续循环 | "default" 使用默认流程
         """
         ret_box = self.wait_img(CWIMG.RETURN_PREPARATION_PAGE, timeout=10, interval=0.5)
         if ret_box is None:
@@ -216,15 +246,19 @@ class BrushOpening(Executable):
         two_two_box = self.wait_img(CWIMG.TWO_TWO, timeout=6, interval=0.5)
         self.click_img(CWIMG.RETURN_INVESTMENT_STRATEGY, after_sleep=2.0)
         
-        if two_two_box is not None:
-            # 命中 2-2：进入叽米判定与刷新循环
-            if self._handle_two_two_refresh_loop():
-                return "jimi_found"
+        current_stage = 1 if two_two_box is None else 2
+
+        if current_stage < self.wanted_invest_strategy_stage:
+            # 未达到目标策略阶段，不结算，继续探索
+            self._handle_non_target_strategy_stage()
             return "continue"
         else:
-            # 非 2-2：不结算，继续探索
-            self._handle_non_two_two_strategy()
+            # 达到目标策略阶段，进入投资策略检测与刷新循环
+            if self._handle_target_strategy_stage():
+                return "wanted_opening_reached"
             return "continue"
+        
+            
 
     def _handle_default_strategy_advance(self):
         """处理默认策略推进（未进入 2-2 分支时）。"""
@@ -236,12 +270,16 @@ class BrushOpening(Executable):
         except Exception:
             logger.debug("默认策略推进失败，忽略并继续循环")
 
-    def _detect_jimi(self) -> bool:
-        """使用图像匹配检测是否存在叽米图片。"""
+    def _detect_strategy(self) -> bool:
+        """使用图像匹配或OCR检测是否存在目标投资策略。"""
         try:
-            return self.locate(CWIMG.JI_MI) is not None
+            if '叽米金币大使' in self.wanted_invest_strategy:
+                return self.locate(CWIMG.JI_MI) is not None
+            else:
+                index, box = self.wait_ocr_any(self.wanted_invest_strategy, timeout=2, interval=0.5)
+                return index != -1
         except Exception as e:
-            logger.warning(f"检测叽米图片时发生异常：{e}")
+            logger.warning(f"检测投资策略时发生异常：{e}")
             return False
 
     def _bo_enter_from_start_page(self) -> bool:
@@ -313,13 +351,47 @@ class BrushOpening(Executable):
         if invest_box is None:
             logger.error("未识别到投资环境界面")
             return False
-        # 投资操作（与CW一致逻辑）
-        if not self.click_img(CWIMG.COLLECTION):
-            self.click_point(0.5, 0.5)
-        self.click_img(IMG.ENSURE2, after_sleep=1)
-        if self.locate(CWIMG.INVEST_ENVIRONMENT):
-            self.click_point(0.5, 0.5)
+        return self._bo_handle_invest_environment()
+    
+    def _bo_handle_invest_environment(self) -> bool:
+        """刷开局专用的投资环境处理：
+        - 检测需要的投资环境
+        - 如果未刷到，则点击刷新
+        - 如果刷新后仍未刷到，则点击收集
+        - 如果收集后仍未刷到，则返回备战页面并结算返回
+        - 如果刷到，则点击投资环境
+        """
+        if self.wanted_invest_environment == []:
+            if not self.click_img(IMG.COLLECTION):
+                self.click_point(0.5, 0.5)
             self.click_img(IMG.ENSURE2, after_sleep=1)
+            if self.locate(CWIMG.INVEST_ENVIRONMENT):
+                self.click_point(0.5, 0.5)
+                self.click_img(IMG.ENSURE2, after_sleep=1)
+            self.sleep(4)
+            return True
+
+        index, box = self.wait_ocr_any(self.wanted_invest_environment, timeout=2, interval=0.5)
+        if index == -1:
+            box = self.wait_img(CWIMG.REFRESH_ENV, timeout=2, interval=0.5)
+            if box is not None and self.click_box(box, after_sleep=1):
+                index, box = self.wait_ocr_any(self.wanted_invest_environment, timeout=2, interval=0.5)
+        if index == -1:
+            logger.info("未刷到需要的投资环境")
+            if not self.click_img(IMG.COLLECTION):
+                self.click_point(0.5, 0.5)
+            self.click_img(IMG.ENSURE2, after_sleep=1)
+            if self.locate(CWIMG.INVEST_ENVIRONMENT):
+                self.click_point(0.5, 0.5)
+                self.click_img(IMG.ENSURE2, after_sleep=1)
+            self._return_to_prep_and_abort()
+            self.sleep(2)
+            return False
+        
+        logger.info(f"刷到需要的投资环境: {self.wanted_invest_environment[index]}")
+        if self.click_box(box, after_sleep=1):
+            self.click_img(IMG.ENSURE2, after_sleep=1)
+        self.invest_environment = self.wanted_invest_environment[index]
         self.sleep(4)
         return True
     
@@ -462,16 +534,17 @@ class BrushOpening(Executable):
         nums = [int(x) for x in re.findall(r"(\d+)", line)]
         return nums[:max_items]
 
-    def _handle_two_two_refresh_loop(self) -> bool:
-        """处理 2-2 关卡的叽米检测与刷新循环。
-        
+    def _handle_target_strategy_stage(self) -> bool:
+        """处理 2-2 关卡的投资策略检测与刷新循环。
+
         Returns:
-            True: 检测到叽米，脚本应停止
-            False: 未检测到叽米，继续外层流程
+            True: 检测到目标投资策略，脚本应停止
+            False: 未检测到目标策略，继续外层流程
         """
-        # 首次叽米检测
-        if self._detect_jimi():
-            return self._stop_on_jimi_found("2-2 关卡识别到叽米")
+        # 首次投资策略检测
+
+        if self._detect_strategy():
+            return self._stop_on_wanted_opening(f'找到需要的投资策略: {self.invest_strategy}')
 
         # 动态 OCR 刷新循环：每轮以最新 OCR 结果为准
         total_clicks = 0
@@ -499,16 +572,16 @@ class BrushOpening(Executable):
             total_clicks += 1
             self.sleep(1.2)
 
-            # 刷新后再次检测叽米
-            if self._detect_jimi():
-                return self._stop_on_jimi_found("刷新后识别到叽米")
+            # 刷新后再次检测投资策略
+            if self._detect_strategy():
+                return self._stop_on_wanted_opening(f'找到需要的投资策略: {self.invest_strategy}')
 
         logger.info("达到安全刷新上限，执行返回备战并结算本轮")
         self._return_to_prep_and_abort()
         self.sleep(2.0)
         return False
 
-    def _handle_non_two_two_strategy(self):
+    def _handle_non_target_strategy_stage(self):
         """处理非2-2关卡：选择默认策略并手动推进到下一个策略页。
         
         执行流程:
@@ -601,8 +674,8 @@ class BrushOpening(Executable):
             logger.trace(f"采集刷新次数异常: {e}")
             return []
 
-    def _stop_on_jimi_found(self, message: str) -> bool:
-        """检测到叽米后的统一停止处理。
+    def _stop_on_wanted_opening(self, message: str) -> bool:
+        """检测到需要的开局后的统一停止处理。
         
         Args:
             message (str): 日志消息前缀,用于区分不同检测场景
@@ -632,7 +705,7 @@ class BrushOpening(Executable):
 
         if allow_notify and enable_system:
             try:
-                send_windows_notification("SRA", "刷开局命中叽米，脚本已停止")
+                send_windows_notification("SRA", "刷到需要的开局，脚本已停止")
             except Exception:
                 logger.warning("Windows系统通知发送失败")
 
@@ -640,7 +713,7 @@ class BrushOpening(Executable):
             try:
                 email_cfg = load_config('email')
                 if isinstance(email_cfg, dict) and email_cfg:
-                    send_mail_notification("SRA", "刷开局命中叽米，脚本已停止", email_cfg)
+                    send_mail_notification("SRA", "刷到需要的开局，脚本已停止", email_cfg)
             except Exception:
                 logger.trace("邮件通知发送失败或未配置，已忽略")
         self.is_running = False

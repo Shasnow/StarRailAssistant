@@ -22,7 +22,8 @@ class CosmicStrifeTask(BaseTask):
         if cw_mode==2:
             logger.info("执行任务：旷宇纷争-货币战争刷开局")
             from tasks.currency_wars import BrushOpening
-            bo_task = BrushOpening()
+            bo_config = self.config.get("CurrencyWarsBrushOpening", {})
+            bo_task = BrushOpening(bo_config)
             if not bo_task.opening():
                 logger.error("旷宇纷争-货币战争刷开局任务失败")
                 return False

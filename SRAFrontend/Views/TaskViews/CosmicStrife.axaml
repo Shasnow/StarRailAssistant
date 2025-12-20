@@ -33,7 +33,7 @@
                     <TextBlock>请先手动完成一次以清除所有新手提示</TextBlock>
                     <suki:GlassCard>
                         <StackPanel>
-                            <CheckBox IsChecked="{Binding CurrentConfig.CurrencyWarsEnable}"
+                            <CheckBox IsChecked="{Binding CurrencyWarsEnabled}"
                                       Content="货币战争 - 零和博弈" />
                             <Grid ColumnDefinitions="Auto, Auto">
                                 <Label Content="开拓者名称 " />
@@ -47,8 +47,8 @@
                                 <Label>类型</Label>
                                 <ComboBox SelectedIndex="{Binding CurrencyWarsModeIndex}" Width="200" HorizontalAlignment="Left">
                                     <ComboBoxItem>标准博弈</ComboBoxItem>
-                                    <!-- <ComboBoxItem>超频博弈</ComboBoxItem> -->
-                                    <!-- <ComboBoxItem>刷开局</ComboBoxItem> -->
+                                    <ComboBoxItem>超频博弈</ComboBoxItem>
+                                    <ComboBoxItem>刷开局</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
                             
@@ -73,9 +73,42 @@
                                 <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.CurrencyWarsRunTimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
 
-                            <TextBlock IsVisible="{Binding !IsCurrencyWarsNormalMode}"
-                                       Foreground="Gray"
-                                       Text="默认使用最高难度" />
+                            <StackPanel IsVisible="{Binding IsCurrencyWarsBrushOpening}" Margin="0,4,0,0" Spacing="4">
+                                <TextBlock Foreground="Gray"
+                                           Text="刷开局将默认使用最高难度。下方可配置需要的投资环境与投资策略（用逗号/空格分隔多个）。" />
+
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label Content="投资环境" />
+                                    <TextBox Width="320"
+                                             Text="{Binding CurrencyWarsBrushOpeningEnvironmentText, UpdateSourceTrigger=PropertyChanged}"
+                                             Watermark="例如：长线利好，轮岗" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label Content="投资策略" />
+                                    <TextBox Width="320"
+                                             Text="{Binding CurrencyWarsBrushOpeningStrategyText, UpdateSourceTrigger=PropertyChanged}"
+                                             Watermark="例如：砂里淘金" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label Content="策略阶段" />
+                                    <NumericUpDown Width="120"
+                                                   FormatString="0"
+                                                   Minimum="1"
+                                                   Maximum="2"
+                                                   Value="{Binding CurrentConfig.CurrencyWarsBrushOpening.InvestStrategyStage}" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label Content="最大尝试轮数" />
+                                    <NumericUpDown Width="120"
+                                                   FormatString="0"
+                                                   Minimum="0"
+                                                   Maximum="99999"
+                                                   Value="{Binding CurrentConfig.CurrencyWarsBrushOpening.RunTimes}" />
+                                </StackPanel>
+                            </StackPanel>
                         </StackPanel>
                     </suki:GlassCard>
                     <TextBlock>请先手动完成一次以清除所有新手提示</TextBlock>

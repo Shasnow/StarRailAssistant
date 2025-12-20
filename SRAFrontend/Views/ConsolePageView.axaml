@@ -36,7 +36,12 @@
                     <!-- ReSharper restore Xaml.StyleClassNotFound -->
                 </StackPanel>
                 <ScrollViewer Grid.Row="1" x:Name="ConsoleScrollViewer">
-                    <TextBlock Text="{Binding LogText}" TextWrapping="Wrap"/>    
+                    <TextBox Text="{Binding LogText}" 
+                             TextWrapping="Wrap"
+                             IsReadOnly="True"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Padding="0"/>    
                 </ScrollViewer>
                 <TextBox Grid.Row="2" Watermark="请输入文本" KeyDown="InputElement_OnKeyDown"/>
             </Grid>
