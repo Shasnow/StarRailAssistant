@@ -757,13 +757,16 @@ class CurrencyWars(Executable):
             return chars
 
         refresh_times = 0
-        while self.coins > self.min_coins:
+        while self.coins > 4:
             level=self.get_level()
             if level < self.min_level:
                 # 当等级小于最低等级要求时，持续按f提升等级，跳过购买
                 self.press_key('f')
                 self.sleep(0.5)
                 continue
+            if self.coins < self.min_coins:
+                logger.info(f"当前金币 {self.coins} 小于最低购买要求 {self.min_coins}")
+                break
 
             cs = scan_characters_in_store()
             if len(cs) != 0:

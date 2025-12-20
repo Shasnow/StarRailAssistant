@@ -31,7 +31,7 @@
                     <StackPanel Margin="0,0,0,15">
                         <CheckBox x:Name="AutoLoginCheckBox" Content="自动登录" IsChecked="{Binding CurrentConfig.StartGameAutoLogin}" />
                         <TextBlock Margin="25,5,0,0" FontSize="12" Foreground="Gray" TextWrapping="Wrap">
-                            勾选自动登录表明您已阅读并同意《用户协议》 和《隐私政策》
+                            勾选自动登录表明您已阅读并同意《用户协议》和《隐私政策》
                         </TextBlock>
                         <CheckBox Content="总是重新登录" Margin="0,10,0,0" IsChecked="{Binding CurrentConfig.StartGameAlwaysLogin}"/>
                     </StackPanel>
@@ -40,14 +40,9 @@
                         <Label Grid.Row="0" Grid.Column="0" Content="账号：" />
                         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CurrentConfig.StartGameUsername}"/>
                         <Label Grid.Row="1" Grid.Column="0" Content="密码：" />
-                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CurrentConfig.StartGamePassword}" 
-                                 PasswordChar="{Binding PasswordMask}" />
                         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
-                        <Button Classes="Basic" Grid.Row="1" Grid.Column="2" 
-                                Command="{Binding TogglePasswordVisibilityCommand}" >
-                            <Label Classes="icon" 
-                                   Content="{Binding TogglePasswordVisibilityButtonContent}" />
-                        </Button>
+                        <TextBox Grid.Row="1" Grid.Column="1" Classes="revealPasswordButton" PasswordChar="*"
+                                 Text="{Binding CurrentConfig.StartGamePassword}"/> 
                     </Grid>
                 </StackPanel>
             </ScrollViewer>

@@ -17,25 +17,33 @@ class CosmicStrifeTask(BaseTask):
                 return False
         # 互斥：货币战争常规 vs 刷开局
         cw_enable = self.config.get("CurrencyWarsEnable", False)
+        if not cw_enable:
+            logger.info("旷宇纷争任务全部完成")
+            return True
         cw_mode = self.config.get("CurrencyWarsMode", 0)
+        username = self.config.get("CurrencyWarsUsername", "")
+
+        if username is None or username.strip() == "":
+            logger.error("货币战争开拓者名称为空，请在前端配置中填写。")
+            return False
 
         if cw_mode==2:
-            logger.info("执行任务：旷宇纷争-货币战争刷开局")
-            from tasks.currency_wars import BrushOpening
-            bo_config = self.config.get("CurrencyWarsBrushOpening", {})
-            bo_task = BrushOpening(bo_config)
-            if not bo_task.opening():
+            logger.info("执行任务：旷宇纷争-货币战争 刷开局")
+            from tasks.currency_wars import RerollStart
+            rs_task = RerollStart(invest_env=self.config.get("CwRsInvestEnvironments"),
+                                  invest_strategy=self.config.get("CwRsInvestStrategies"),
+                                  invest_strategy_stage= self.config.get("CwRsInvestStrategyStage", 1),
+                                  max_retry=self.config.get("CwRsMaxRetry", 0))
+            rs_task.cw.set_username(username)
+            rs_task.cw.load_strategy("template")
+            if not rs_task.run():
                 logger.error("旷宇纷争-货币战争刷开局任务失败")
                 return False
 
-        if cw_mode==1 or cw_mode==0:
+        elif cw_mode==1 or cw_mode==0:
             logger.info("执行任务：旷宇纷争-货币战争")
             from tasks.currency_wars import CurrencyWars
             cw_task = CurrencyWars(self.config.get("CurrencyWarsRunTimes", 0))
-            username = self.config.get("CurrencyWarsUsername","")
-            if username is None or username.strip() == "":
-                logger.error("货币战争开拓者名称为空，请在前端配置中填写。")
-                return False
             cw_task.set_username(username)
             cw_task.load_strategy("template")
             # 前端难度选择：0=最低难度，1=最高难度
