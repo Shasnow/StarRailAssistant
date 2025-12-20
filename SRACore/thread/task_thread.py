@@ -71,7 +71,7 @@ class TaskManager:
 
                 # 获取当前配置需要执行的任务列表
                 tasks_to_run = self.get_tasks(config_name)
-                logger.debug('tasks_to_run: ' + str(tasks_to_run))
+                logger.debug('tasks_to_run: ' + str([c.__class__.__name__ for c in tasks_to_run]))
                 if not tasks_to_run:
                     logger.warning(t('task.no_task_selected', name=config_name))
                     continue

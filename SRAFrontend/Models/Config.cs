@@ -32,10 +32,11 @@ public partial class Config : ObservableObject
     [ObservableProperty] private string _currencyWarsUsername = ""; // 货币战争用户名
     [ObservableProperty] private int _currencyWarsDifficulty; // 货币战争难度：0=最低难度，1=最高难度
     
-    // 货币战争 - 刷开局
-    [ObservableProperty] private bool _currencyWarsBrushOpeningEnable; // 是否启用货币战争刷开局
-    [ObservableProperty] private int _currencyWarsBrushOpeningRunTimes; // 刷开局运行次数（如需单独限制刷开局的总轮数）
-    [ObservableProperty] private CurrencyWarsBrushOpeningConfig _currencyWarsBrushOpening = new(); // 刷开局详细配置
+    // 货币战争 - 刷开局 ps: CwRs = Currency wars Reroll start
+    [ObservableProperty] private string _cwRsInvestEnvironments = ""; // 刷开局 - 期望投资环境，逗号分隔
+    [ObservableProperty] private string _cwRsInvestStrategies = ""; // 刷开局 - 期望投资策略，逗号分隔
+    [ObservableProperty] private int _cwRsInvestStrategyStage = 1; // 刷开局 - 期望投资策略阶段
+    [ObservableProperty] private int _cwRsMaxRetry; // 刷开局 - 最大尝试轮数
 
     [ObservableProperty] private bool _startGameAlwaysLogin; // 游戏启动时是否总是登录
     [ObservableProperty] private bool _startGameAutoLogin; // 启动游戏时是否自动登录

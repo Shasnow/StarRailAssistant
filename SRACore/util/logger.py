@@ -25,18 +25,18 @@ def _log_entry_exit(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         func_name = func.__name__
-        logger.debug(f">>> 进入 {func_name}")
+        logger.debug(f">>> Enter {func_name}")
         try:
             result = func(*args, **kwargs)
-            logger.debug(f"<<< 退出 {func_name} (返回: {result})")
+            logger.debug(f"<<< Exit {func_name} (return: {result})")
             return result
         except Exception as e:
-            logger.debug(f"<<< 异常退出 {func_name}: {type(e).__name__}: {e}")
+            logger.debug(f"<<< Exception {func_name}: {type(e).__name__}: {e}")
             raise
     return wrapper
 
 
-def _auto_log_methods(cls):
+def auto_log_methods(cls):
     """类装饰器：自动给类中所有公开方法添加进入/退出日志"""
     for name in dir(cls):
         # if name.startswith('__'):
@@ -54,4 +54,4 @@ def _auto_log_methods(cls):
 
 # 初始化日志
 setup_logger()
-__all__ = ["logger", "setup_logger"]
+__all__ = ["logger", "setup_logger", "auto_log_methods"]

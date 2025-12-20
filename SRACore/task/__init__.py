@@ -19,3 +19,9 @@ class BaseTask(Executable, ABC):
     def stop(self):
         """停止任务"""
         self.stop_flag = True
+
+    def __str__(self):
+        return f"{self.__class__.__name__}"
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}>"

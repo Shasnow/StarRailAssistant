@@ -1,4 +1,4 @@
-from .BrushOpening import BrushOpening
+from .RerollStart import RerollStart
 from .CurrencyWars import CurrencyWars
 
-__all__ = ["CurrencyWars", "BrushOpening"]  
+__all__ = ["CurrencyWars", "RerollStart"]

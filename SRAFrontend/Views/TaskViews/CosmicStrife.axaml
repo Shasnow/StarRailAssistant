@@ -33,7 +33,7 @@
                     <TextBlock>请先手动完成一次以清除所有新手提示</TextBlock>
                     <suki:GlassCard>
                         <StackPanel>
-                            <CheckBox IsChecked="{Binding CurrencyWarsEnabled}"
+                            <CheckBox IsChecked="{Binding CurrentConfig.CurrencyWarsEnable}"
                                       Content="货币战争 - 零和博弈" />
                             <Grid ColumnDefinitions="Auto, Auto">
                                 <Label Content="开拓者名称 " />
@@ -51,62 +51,58 @@
                                     <ComboBoxItem>刷开局</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
-                            
-                            <!-- 难度显示在类型与模式之间，仅标准模式显示 -->
-                            <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsCurrencyWarsNormalMode}">
-                                <Label>难度</Label>
-                                <ComboBox SelectedIndex="{Binding CurrentConfig.CurrencyWarsDifficulty}" Width="200">
-                                    <ComboBoxItem>最低难度</ComboBoxItem>
-                                    <ComboBoxItem>最高难度</ComboBoxItem>
-                                </ComboBox>
-                            </StackPanel>
+                            <Separator/>
+                            <StackPanel IsVisible="{Binding IsCwNormalMode}">
+                                <!-- 难度显示在类型与模式之间，仅标准模式显示 -->
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label>难度</Label>
+                                    <ComboBox SelectedIndex="{Binding CurrentConfig.CurrencyWarsDifficulty}" Width="200">
+                                        <ComboBoxItem>最低难度</ComboBoxItem>
+                                        <ComboBoxItem>最高难度</ComboBoxItem>
+                                    </ComboBox>
+                                </StackPanel>
 
-                            <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsCurrencyWarsNormalMode}">
-                                <Label>模式</Label>
-                                <ComboBox SelectedIndex="0">
-                                    <ComboBoxItem>通关</ComboBoxItem>
-                                </ComboBox>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label>模式</Label>
+                                    <ComboBox SelectedIndex="0">
+                                        <ComboBoxItem>通关</ComboBoxItem>
+                                    </ComboBox>
+                                </StackPanel>
+                            
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Label>次数</Label>
+                                    <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.CurrencyWarsRunTimes}" Minimum="1" Maximum="99999" />
+                                </StackPanel>
                             </StackPanel>
                             
-                            <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding IsCurrencyWarsNormalMode}">
-                                <Label>次数</Label>
-                                <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.CurrencyWarsRunTimes}" Minimum="1" Maximum="99999" />
-                            </StackPanel>
-
-                            <StackPanel IsVisible="{Binding IsCurrencyWarsBrushOpening}" Margin="0,4,0,0" Spacing="4">
+                            <StackPanel IsVisible="{Binding !IsCwNormalMode}" Margin="0,4,0,0" Spacing="4">
                                 <TextBlock Foreground="Gray"
-                                           Text="刷开局将默认使用最高难度。下方可配置需要的投资环境与投资策略（用逗号/空格分隔多个）。" />
+                                           Text="刷开局将默认使用最高难度。下方可配置需要的投资环境与投资策略（用空格分隔多个）。" />
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="投资环境" />
                                     <TextBox Width="320"
-                                             Text="{Binding CurrencyWarsBrushOpeningEnvironmentText, UpdateSourceTrigger=PropertyChanged}"
+                                             Text="{Binding CurrentConfig.CwRsInvestEnvironments}"
                                              Watermark="例如：长线利好，轮岗" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="投资策略" />
                                     <TextBox Width="320"
-                                             Text="{Binding CurrencyWarsBrushOpeningStrategyText, UpdateSourceTrigger=PropertyChanged}"
+                                             Text="{Binding CurrentConfig.CwRsInvestStrategies}"
                                              Watermark="例如：砂里淘金" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="策略阶段" />
-                                    <NumericUpDown Width="120"
-                                                   FormatString="0"
-                                                   Minimum="1"
-                                                   Maximum="2"
-                                                   Value="{Binding CurrentConfig.CurrencyWarsBrushOpening.InvestStrategyStage}" />
+                                    <NumericUpDown Width="120" FormatString="0" Minimum="1" Maximum="2"
+                                                   Value="{Binding CurrentConfig.CwRsInvestStrategyStage}"/>
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="最大尝试轮数" />
-                                    <NumericUpDown Width="120"
-                                                   FormatString="0"
-                                                   Minimum="0"
-                                                   Maximum="99999"
-                                                   Value="{Binding CurrentConfig.CurrencyWarsBrushOpening.RunTimes}" />
+                                    <NumericUpDown Width="120" FormatString="0" Minimum="0" Maximum="99999"
+                                                   Value="{Binding CurrentConfig.CwRsMaxRetry}"/>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>

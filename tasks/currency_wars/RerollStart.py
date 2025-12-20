@@ -1,73 +1,53 @@
-import functools
 import re
 
 from loguru import logger
 
-from SRACore.util.config import load_config, load_settings
-from SRACore.util.notify import (send_mail_notification,
-                                 send_windows_notification)
+from SRACore.util.logger import auto_log_methods
+from SRACore.util.notify import try_send_notification
 from SRACore.util.operator import Executable
 from tasks.currency_wars.img import CWIMG, IMG
-from SRACore.util.logger import _auto_log_methods
 from .CurrencyWars import CurrencyWars
 
 
-@_auto_log_methods
-class BrushOpening(Executable):
+@auto_log_methods
+class RerollStart(Executable):
     # 坐标常量
     STRATEGY_SELECT_X = 0.5
     STRATEGY_SELECT_Y = 0.68
     STRATEGY_CONFIRM_Y = 0.90
-    CENTER_X = 0.5
-    CENTER_Y = 0.5
-    
+    CENTER_X = 0.5  # 未使用的变量
+    CENTER_Y = 0.5  # 未使用的变量
+
     # OCR 区域常量（回退方案）
-    OCR_FALLBACK_LEFT = 0.15
-    OCR_FALLBACK_TOP = 0.78
-    OCR_FALLBACK_RIGHT = 0.95
-    OCR_FALLBACK_BOTTOM = 0.92
-    
+    OCR_FALLBACK_LEFT = 0.15  # 未使用的变量
+    OCR_FALLBACK_TOP = 0.78  # 未使用的变量
+    OCR_FALLBACK_RIGHT = 0.95  # 未使用的变量
+    OCR_FALLBACK_BOTTOM = 0.92  # 未使用的变量
+
     # 刷新限制常量
-    MAX_REFRESH_CAP = 30
-    FALLBACK_REFRESH_ATTEMPTS = 3
-    
+    MAX_REFRESH_CAP = 30  # 未使用的变量
+    FALLBACK_REFRESH_ATTEMPTS = 3  # 未使用的变量
+
     # 页面类型常量
     PAGE_ERROR = -1
     PAGE_START = 1
     PAGE_PREPARATION = 2
-    
-    def __init__(self, config):
+
+    def __init__(self, invest_env:str, invest_strategy:str, invest_strategy_stage:int, max_retry:int):
         super().__init__()
         # 需要的开局
-        self.config = config
-        self.wanted_invest_environment = self.config.get("InvestEnvironment", [])
-        self.wanted_invest_strategy = self.config.get("InvestStrategy", [])
-        self.wanted_invest_strategy_stage = self.config.get("InvestStrategyStage", 1)
-        self.run_times = self.config.get("RunTimes", 0)
-        self.force_battle = False
-        self.cw = CurrencyWars(self.run_times)
+        self.wanted_invest_environment = invest_env.split(',') if invest_env else []
+        self.wanted_invest_strategy = invest_strategy.split(',') if invest_strategy else []
+        self.wanted_invest_strategy_stage = invest_strategy_stage
+        self.max_retry = max_retry
+        self.cw = CurrencyWars(0)
         # 结算返回后需重启下一轮的标记（避免在同一轮等待策略页）
         self._just_settled = False
-        # 轻量通用配置：统一点击后的短暂停顿（不改变原有各处的具体等待）
-        self._default_after_click_sleep = 1.0
         # 标记：进入策略页外部接管阶段后，禁止回到初始策略/进入流程
         self._in_strategy_phase = False
         # 刷到的开局配置，用于检测是否完成刷开局需求
         self.invest_environment = None
         self.invest_strategy = None
-        
-
-    # —— 微型助手方法：仅用于提升可读性与健壮性 ——
-    def _wait_then_click_box(self, img, *, timeout=5, interval=0.5, after_sleep=None):
-        """等待图像并点击其区域。保持与原有 wait_img + click_box 组合一致的行为。
-
-        仅封装以减少重复代码。
-        """
-        box = self.wait_img(img, timeout=timeout, interval=interval)
-        if box is None:
-            return None
-        self.click_box(box, after_sleep=(self._default_after_click_sleep if after_sleep is None else after_sleep))
-        return box
 
     def _reset_cw_flags_after_abort(self, result: bool):
         """统一在结算返回后重置 CW 运行/接管标记。"""
@@ -79,8 +59,8 @@ class BrushOpening(Executable):
             self.invest_environment = None
             self.invest_strategy = None
         return result
-        
-    def opening(self):
+
+    def run(self):
         """刷开局主流程。
         逻辑：
         - 若识别到 CONTINUE_PROGRESS，则中断当前对局并结算返回，再走正常进入流程；
@@ -91,8 +71,8 @@ class BrushOpening(Executable):
         """
         tries = 0
         while True:
-            if tries >= self.run_times:
-                logger.info(f"达到最大尝试次数{self.run_times}，结束刷开局")
+            if tries >= self.max_retry:
+                logger.info(f"达到最大尝试次数{self.max_retry}，结束刷开局")
                 return True
             # 页面定位
             if not self._in_strategy_phase:
@@ -168,7 +148,7 @@ class BrushOpening(Executable):
         if page == self.PAGE_START:
             # 从开始页进入
             self._just_settled = False
-            if not self._bo_enter_from_start_page():
+            if not self._rs_enter_from_start_page():
                 logger.error("进入对局流程失败，重试下一轮")
                 return "continue"
             if self._just_settled:
@@ -208,13 +188,13 @@ class BrushOpening(Executable):
         self.cw.strategy_external_control = True
         self._in_strategy_phase = True
         self.cw.is_running = True
-    
+
     def _check_tesk_success(self) -> bool:
         """检查任务是否成功。"""
-        return (self.wanted_invest_environment == [] \
+        return (self.wanted_invest_environment == []
                 or self.invest_environment in self.wanted_invest_environment) \
-                and (self.wanted_invest_strategy == [] \
-                or self.invest_strategy in self.wanted_invest_strategy)
+            and (self.wanted_invest_strategy == []
+                 or self.invest_strategy in self.wanted_invest_strategy)
 
     def _wait_for_strategy_page(self) -> bool:
         """等待并确认到达选择投资策略界面。
@@ -244,11 +224,11 @@ class BrushOpening(Executable):
         ret_box = self.wait_img(CWIMG.RETURN_PREPARATION_PAGE, timeout=10, interval=0.5)
         if ret_box is None:
             return "default"
-        
+
         self.click_box(ret_box, after_sleep=1.5)
         two_two_box = self.wait_img(CWIMG.TWO_TWO, timeout=6, interval=0.5)
         self.click_img(CWIMG.RETURN_INVESTMENT_STRATEGY, after_sleep=2.0)
-        
+
         current_stage = 1 if two_two_box is None else 2
 
         if current_stage < self.wanted_invest_strategy_stage:
@@ -260,8 +240,6 @@ class BrushOpening(Executable):
             if self._handle_target_strategy_stage():
                 return "wanted_opening_reached"
             return "continue"
-        
-            
 
     def _handle_default_strategy_advance(self):
         """处理默认策略推进（未进入 2-2 分支时）。"""
@@ -285,7 +263,7 @@ class BrushOpening(Executable):
             logger.warning(f"检测投资策略时发生异常：{e}")
             return False
 
-    def _bo_enter_from_start_page(self) -> bool:
+    def _rs_enter_from_start_page(self) -> bool:
         """处理从货币战争开始页面进入对局的完整流程。(刷开局专用)"""
         start_box = self.wait_img(CWIMG.CURRENCY_WARS_START, timeout=30, interval=0.5)
         if start_box is None or not self.click_box(start_box):
@@ -300,7 +278,7 @@ class BrushOpening(Executable):
             if box is None:
                 logger.error("未获取到标准进入按钮位置")
                 return False
-            return self._bo_standard_entry_flow(box)
+            return self._rs_standard_entry_flow(box)
         elif index == 1:
             # 识别到放弃并结算（继续进度的替代入口），直接点击并执行结算返回
             if box is None or not self.click_box(box, after_sleep=1):
@@ -316,7 +294,7 @@ class BrushOpening(Executable):
         logger.error("既未识别标准进入，也未识别继续进度入口")
         return False
 
-    def _bo_standard_entry_flow(self, enter_standard_box) -> bool:
+    def _rs_standard_entry_flow(self, enter_standard_box) -> bool:
         """刷开局专用的标准进入流程：
         - 点击标准进入
         - 下拉选择到最低难度（或确保可开始）
@@ -330,14 +308,7 @@ class BrushOpening(Executable):
             logger.error("点击标准进入失败")
             return False
         # 返回最高名望
-        try:
-            highest_rank = self.wait_img(CWIMG.RETURN_HIGHEST_RANK, timeout=5, interval=0.5)
-            if highest_rank is not None:
-                self.click_box(highest_rank, after_sleep=0.8)
-            else:
-                logger.info("未识别到返回最高名望按钮，继续后续流程")
-        except Exception:
-            logger.trace("返回最高名望步骤跳过")
+        self.click_img(CWIMG.RETURN_HIGHEST_RANK, after_sleep=0.8)
         # 点击开始游戏
         if not self.click_img(CWIMG.START_GAME, after_sleep=1):
             logger.error("未识别到开始游戏按钮")
@@ -354,9 +325,9 @@ class BrushOpening(Executable):
         if invest_box is None:
             logger.error("未识别到投资环境界面")
             return False
-        return self._bo_handle_invest_environment()
-    
-    def _bo_handle_invest_environment(self) -> bool:
+        return self._rs_handle_invest_environment()
+
+    def _rs_handle_invest_environment(self) -> bool:
         """刷开局专用的投资环境处理：
         - 检测需要的投资环境
         - 如果未刷到，则点击刷新
@@ -390,14 +361,14 @@ class BrushOpening(Executable):
             self._return_to_prep_and_abort()
             self.sleep(2)
             return False
-        
+
         logger.info(f"刷到需要的投资环境: {self.wanted_invest_environment[index]}")
         if self.click_box(box, after_sleep=1):
             self.click_img(IMG.ENSURE2, after_sleep=1)
         self.invest_environment = self.wanted_invest_environment[index]
         self.sleep(4)
         return True
-    
+
     def _safe_abort_and_return(self) -> bool:
         """兼容旧用法：开始界面直接结算返回到货币战争主界面。"""
         result = self._abort_and_return(in_game=False)
@@ -509,12 +480,12 @@ class BrushOpening(Executable):
         left = int(win.left)
         top = int(win.top + rel_top * win.height)
         width = int(win.width)
-        height = int(max(1, (rel_bottom - rel_top) * win.height))
+        height = int(max(1.0, (rel_bottom - rel_top) * win.height))
 
         logger.debug(
             f"OCR区域: rel=(0.0,{rel_top:.6f},1.0,{rel_bottom:.6f}), px=(left={left},top={top},w={width},h={height})"
         )
-        
+
         if width <= 0 or height <= 0:
             return counts
 
@@ -605,12 +576,12 @@ class BrushOpening(Executable):
             click_blank = self.wait_img(CWIMG.CLICK_BLANK, timeout=3, interval=0.5)
             if click_blank is not None:
                 self.click_box(click_blank, after_sleep=0.8)
-            
+
             # 选择策略并推进
             self.click_point(0.5, 0.68, after_sleep=0.6)
             self.click_point(0.5, 0.90, after_sleep=0.8)
             self.sleep(2.0)
-            
+
             # 整理场面状态
             fold_box = self.wait_img(CWIMG.FOLD, timeout=2)
             if fold_box is not None:
@@ -620,7 +591,7 @@ class BrushOpening(Executable):
             self.cw.get_in_hand_area()
             self.cw.place_character()
             self.cw.sell_character()
-            
+
             # 手动推进：battle → stage_transition → shopping
             self.cw.is_running = True
             if self.cw.battle():
@@ -639,7 +610,7 @@ class BrushOpening(Executable):
         """
         safe_cap = 30
         fallback_attempts = 3
-        
+
         try:
             init_counts = self._collect_refresh_counts(max_items=3)
             if init_counts:
@@ -652,7 +623,7 @@ class BrushOpening(Executable):
                         self.sleep(2.0)
                         return 0
                     return min(sum(nonneg), safe_cap)
-            
+
             logger.info("刷新次数OCR不可用，采用保守策略：最多尝试 3 次刷新")
             return fallback_attempts
         except Exception as e:
@@ -694,31 +665,7 @@ class BrushOpening(Executable):
         """
         logger.success(f"{message}，停止脚本并通知用户")
         # 根据设置开关优先走 SRA 的通知
-        allow_notify = True
-        enable_system = True
-        enable_email = False
-        try:
-            settings = load_settings() or {}
-            notify_cfg = settings.get('Notify') or settings.get('Notification') or {}
-            allow_notify = bool(notify_cfg.get('AllowNotification', True))
-            enable_system = bool(notify_cfg.get('EnableWindows', True))
-            enable_email = bool(notify_cfg.get('EnableEmail', False))
-        except Exception:
-            logger.trace("读取通知开关失败，使用默认开关")
-
-        if allow_notify and enable_system:
-            try:
-                send_windows_notification("SRA", "刷到需要的开局，脚本已停止")
-            except Exception:
-                logger.warning("Windows系统通知发送失败")
-
-        if allow_notify and enable_email:
-            try:
-                email_cfg = load_config('email')
-                if isinstance(email_cfg, dict) and email_cfg:
-                    send_mail_notification("SRA", "刷到需要的开局，脚本已停止", email_cfg)
-            except Exception:
-                logger.trace("邮件通知发送失败或未配置，已忽略")
+        try_send_notification("SRA", f"刷到需要的开局，脚本已停止: {message}")
         self.is_running = False
         if hasattr(self, 'cw'):
             self.cw.is_running = False
