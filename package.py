@@ -51,9 +51,17 @@ if __name__ == "__main__":
     )
     print("Python program packaging completed !")
 
+    print("Start to compress Core package ...")
+    shutil.make_archive(
+        base_name=str(root_path / f"StarRailAssistant_Core_v{version['version']}"),
+        format="zip",
+        root_dir=root_path / "main.dist",
+        base_dir=".",
+    )
+
     print("Start to copy resources ...")
 
-    shutil.copytree(root_path / "SRAFrontend/bin/Release/net8.0/win-x64", root_path / "main.dist/", dirs_exist_ok=True)
+    shutil.copytree(root_path / "SRAFrontend/bin/Release/net8.0/win-x64/publish", root_path / "main.dist/", dirs_exist_ok=True)
     shutil.copytree(root_path / "resources", root_path / "main.dist/resources")
     shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "main.dist/rapidocr_onnxruntime")
     shutil.copytree(root_path / "tasks", root_path / "main.dist/tasks")
@@ -64,8 +72,15 @@ if __name__ == "__main__":
     shutil.copy(root_path / "README.md", root_path / "main.dist/README.md")
     shutil.copy(root_path / "version.json", root_path / "main.dist/version.json")
 
-    print("Start to compress ...")
+    print("Start to compressing Lite package ...")
+    shutil.make_archive(
+        base_name=str(root_path / f"StarRailAssistant_Lite_v{version['version']}"),
+        format="zip",
+        root_dir=root_path / "SRAFrontend/bin/Release/net8.0/win-x64/publish",
+        base_dir=".",
+    )
 
+    print("Start to compressing Full package ...")
     shutil.make_archive(
         base_name=str(root_path / f"StarRailAssistant_v{version['version']}"),
         format="zip",
