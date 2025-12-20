@@ -10,3 +10,5 @@
 /setup/install_info.txt
 **/__pycache__/
 **/.vs/
+win-x64
+StarRailAssistant_v*

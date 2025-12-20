@@ -71,6 +71,7 @@ class TaskManager:
 
                 # 获取当前配置需要执行的任务列表
                 tasks_to_run = self.get_tasks(config_name)
+                logger.debug('tasks_to_run: ' + str(tasks_to_run))
                 if not tasks_to_run:
                     logger.warning(t('task.no_task_selected', name=config_name))
                     continue
@@ -81,7 +82,9 @@ class TaskManager:
                         break
                     try:
                         # 运行任务，如果返回 False 表示任务失败
+                        logger.debug('running task: ' + str(task.__class__.__name__))
                         if not task.run():
+                            logger.debug('task failed: ' + str(task.__class__.__name__))
                             logger.error(t('task.task_failed', name=task.__class__.__name__))
                             return  # 终止当前配置的执行
                     except Exception as e:
@@ -114,8 +117,10 @@ class TaskManager:
         """
         # 加载指定配置（注意：可能修改全局状态）
         config = load_config(config_name)
+        logger.debug('config: ' + str(config))
         # 从配置中读取任务选择列表（如 [True, False, True]）
         task_select = config.get("EnabledTasks")
+        logger.debug('task_select: ' + str(task_select))
         if not task_select:
             return []
         tasks = []
