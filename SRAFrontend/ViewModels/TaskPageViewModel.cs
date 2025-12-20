@@ -25,9 +25,6 @@ public partial class TaskPageViewModel : PageViewModel
 
     [ObservableProperty] private string _password = "";
 
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(TogglePasswordVisibilityButtonContent))]
-    private string _passwordMask = "*";
-
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(EnableContextMenu))]
     private object? _selectedTaskItem;
 
@@ -220,9 +217,6 @@ public partial class TaskPageViewModel : PageViewModel
     public AvaloniaList<TrailblazePowerTask> Tasks { get; }
 
     public bool EnableContextMenu => SelectedTaskItem is not null;
-
-    public string TogglePasswordVisibilityButtonContent =>
-        PasswordMask == "*" ? "\uE224" : "\uE220";
 
     public int CurrencyWarsModeIndex
     {

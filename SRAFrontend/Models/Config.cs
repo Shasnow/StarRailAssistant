@@ -33,8 +33,8 @@ public partial class Config : ObservableObject
     [ObservableProperty] private int _currencyWarsDifficulty; // 货币战争难度：0=最低难度，1=最高难度
     
     // 货币战争 - 刷开局 ps: CwRs = Currency wars Reroll start
-    [ObservableProperty] private string _cwRsInvestEnvironments = ""; // 刷开局 - 期望投资环境，逗号分隔
-    [ObservableProperty] private string _cwRsInvestStrategies = ""; // 刷开局 - 期望投资策略，逗号分隔
+    [ObservableProperty] private string _cwRsInvestEnvironments = ""; // 刷开局 - 期望投资环境，空格分隔
+    [ObservableProperty] private string _cwRsInvestStrategies = ""; // 刷开局 - 期望投资策略，空格分隔
     [ObservableProperty] private int _cwRsInvestStrategyStage = 1; // 刷开局 - 期望投资策略阶段
     [ObservableProperty] private int _cwRsMaxRetry; // 刷开局 - 最大尝试轮数
 

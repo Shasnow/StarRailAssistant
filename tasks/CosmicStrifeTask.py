@@ -49,6 +49,8 @@ class CosmicStrifeTask(BaseTask):
             # 前端难度选择：0=最低难度，1=最高难度
             difficulty = self.config.get("CurrencyWarsDifficulty", 0)
             cw_task.set_difficulty(difficulty)
+            if cw_mode == 1:  # 超频博弈
+                cw_task.set_overclock(True)
 
             if not cw_task.run():
                 logger.error("旷宇纷争-货币战争任务失败")

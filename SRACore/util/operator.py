@@ -609,7 +609,7 @@ class Operator:
         return -1, None
 
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
-                    after_sleep: float = 0) -> bool:
+                    after_sleep: float = 0, tag: str = "") -> bool:
         """
         点击指定位置
         如果x和y是整数，则直接点击坐标(x, y)
@@ -619,10 +619,12 @@ class Operator:
         :param x_offset: x偏移量(px)或百分比(float)
         :param y_offset: y偏移量(px)或百分比(float)
         :param after_sleep: 点击后等待时间，单位秒
+        :param tag: 日志标记
         :return: None
         """
         if isinstance(x_offset, float) and isinstance(y_offset, float):
-            logger.debug(t('operator.click_position', x=x, y=y, x_offset=x_offset, y_offset=y_offset, after_sleep=after_sleep))
+            logger.debug(
+                t('operator.click_position', x=x, y=y, x_offset=x_offset, y_offset=y_offset, after_sleep=after_sleep))
             x_offset = int(self.width * x_offset)
             y_offset = int(self.height * y_offset)
         if isinstance(x, int) and isinstance(y, int):
@@ -632,6 +634,7 @@ class Operator:
         elif isinstance(x, float) and isinstance(y, float):
             x = int(self.left + self.width * x + x_offset)
             y = int(self.top + self.height * y + y_offset)
+            logger.debug(f"Click point: ({x}, {y}), tag: {tag}")
             pyautogui.click(x, y)
             self.sleep(after_sleep)
             return True
@@ -646,7 +649,8 @@ class Operator:
             logger.trace("Could not click a Empty Box")
             return False
         x, y = box.center
-        logger.debug(f"Click box center:({x}, {y}), source: {box.source}, offset:({x_offset}, {y_offset}), wait {after_sleep}s")
+        logger.debug(
+            f"Click box center:({x}, {y}), source: {box.source}, offset:({x_offset}, {y_offset}), wait {after_sleep}s")
         return self.click_point(int(x), int(y), x_offset, y_offset, after_sleep)
 
     def click_img(self, img_path: str, x_offset: int | float = 0, y_offset: int | float = 0,
@@ -729,7 +733,8 @@ class Operator:
                         res = cv2.matchTemplate(scr_gray, tmpl_gray, cv2.TM_CCOEFF_NORMED)
                         _min_val, max_val, _min_loc, max_loc = cv2.minMaxLoc(res)
                         h, w = tmpl_gray.shape[:2]
-                        logger.debug(t('operator.wait_img_attempt', attempt=attempt, score=max_val, loc=max_loc, conf=self.confidence))
+                        logger.debug(t('operator.wait_img_attempt', attempt=attempt, score=max_val, loc=max_loc,
+                                       conf=self.confidence))
                         # 保存标注图片
                         try:
                             annotated = scr_rgb.copy()
