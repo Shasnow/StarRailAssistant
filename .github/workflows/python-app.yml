@@ -178,7 +178,15 @@ jobs:
           NOTES="$NOTES_MAIN
           
           [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
-          下载说明: zip包-免安装版; setup-免解压一键安装版
+
+          下载说明: 
+          - StarRailAssistant_vX.X.X.zip - 全量压缩包、免安装
+          - StarRailAssistant_*Setup.exe - 全量安装包
+          - StarRailAssistant_Core*.zip - 核心包、无gui、可运行、需手写配置文件
+          - StarRailAssistant_Lite*.zip - 轻量包、需额外下载核心包才有实际功能
+
+          除了核心包以外的包都需要安装 .NET Desktop Runtime 8 才能运行
+          首次使用建议下载全量压缩包或全量安装包
 
           \`\`\`本release通过GitHub Actions自动构建\`\`\`"
           gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" --prerelease artifacts/*
@@ -195,7 +203,15 @@ jobs:
           NOTES="$NOTES_MAIN
           
           [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
-          下载说明: zip包-免安装版; setup-免解压一键安装版
+
+          下载说明: 
+          - StarRailAssistant_vX.X.X.zip - 全量压缩包、免安装
+          - StarRailAssistant_*Setup.exe - 全量安装包
+          - StarRailAssistant_Core*.zip - 核心包、无gui、可运行、需手写配置文件
+          - StarRailAssistant_Lite*.zip - 轻量包、需额外下载核心包才有实际功能
+
+          除了核心包以外的包都需要安装 [.NET Desktop Runtime 8](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0) 才能运行
+          首次使用建议下载全量压缩包或全量安装包
 
           \`\`\`本release通过GitHub Actions自动构建\`\`\`"
           gh release delete "$TAGNAME" --yes
