@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
+using System.IO.Compression;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
 using SRAFrontend.utilities;
@@ -106,6 +107,42 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         var savePath = Path.Combine(PathString.TempSraDir, saveFileName);
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
 
+        // 下载前：先获取期望的校验值并校验本地文件，避免重复下载
+        string? expectedSha256 = null;
+        if (downloadChannel == 1)
+        {
+            // GitHub 渠道：从 Gitee 的 api.json 获取 sha256 进行校验
+            // expectedSha256 = await TryGetSha256FromGiteeAsync(versionResponse.Data.VersionName, cancellationToken);
+            
+            // GitHub 渠道：仅当更新通道为 stable 时，使用 Gitee 的 sha256 进行校验
+            var isStable = string.Equals(versionResponse.Data.Channel, "stable", StringComparison.OrdinalIgnoreCase);
+            if (isStable)
+            {
+                expectedSha256 = await TryGetSha256FromGiteeAsync(versionResponse.Data.VersionName, cancellationToken);
+            }
+            else
+            {
+                expectedSha256 = null; // 非 stable 不进行 sha 校验
+            }
+        }
+        else
+        {
+            // mirror渠道：使用 VersionResponse 传入的 sha256
+            expectedSha256 = versionResponse.Data.Sha256?.Trim();
+        }
+        var parsedExpected = ExtractSha256(expectedSha256 ?? "");
+
+        if (IsLocalPackageValid(savePath, parsedExpected))
+        {
+                logger.LogInformation("检测到本地已存在有效更新包，跳过下载：{Path}", savePath);
+            return savePath;
+        }
+        else if (File.Exists(savePath))
+        {
+            // 本地存在但校验不通过，删除后继续下载
+            try { File.Delete(savePath); } catch { /* ignore */ }
+        }
+
         // 下载候选地址（代理+直连）
         var downloadCandidates = new List<string>();
         if (downloadChannel==1)
@@ -122,7 +159,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         foreach (var candidateUrl in downloadCandidates)
             try
             {
-                logger.LogDebug("Try downloading update from: {Url} ", candidateUrl);
+                logger.LogDebug("尝试从此地址下载更新包：{Url}", candidateUrl);
                 await DownloadUtil.DownloadFileWithDetailsAsync(
                     _httpClient,
                     candidateUrl,
@@ -142,38 +179,13 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
 
         if (downloadSuccess)
         {
-            // 根据更新渠道选择期望的 SHA256 校验来源
-            string? expectedSha256 = null;
-            if (downloadChannel == 1)
-            {
-                // GitHub 渠道：从 Gitee 的 api.json 获取 sha256 进行校验
-                // expectedSha256 = await TryGetSha256FromGiteeAsync(versionResponse.Data.VersionName, cancellationToken);
-
-                // GitHub 渠道：仅当更新通道为 stable 时，使用 Gitee 的 sha256 进行校验
-                var isStable = string.Equals(versionResponse.Data.Channel, "stable", StringComparison.OrdinalIgnoreCase);
-                if (isStable)
-                {
-                    expectedSha256 = await TryGetSha256FromGiteeAsync(versionResponse.Data.VersionName, cancellationToken);
-                }
-                else
-                {
-                    expectedSha256 = null; // 非 stable 不进行 sha 校验
-                }
-            }
-            else
-            {
-                // mirror渠道：使用 VersionResponse 传入的 sha256
-                expectedSha256 = versionResponse.Data.Sha256?.Trim();
-            }
-
             // 执行校验（若期望值存在且合法）
-            var parsedExpected = ExtractSha256(expectedSha256 ?? "");
             if (!string.IsNullOrEmpty(parsedExpected))
             {
                 var actualSha256 = ComputeSHA256(savePath);
                 if (!string.Equals(actualSha256, parsedExpected, StringComparison.OrdinalIgnoreCase))
                 {
-                    logger.LogWarning("SHA256 mismatch for downloaded update. Expected: {Expected}, Actual: {Actual}", parsedExpected, actualSha256);
+                    logger.LogWarning("下载的更新包 SHA256 校验失败。期望：{Expected}，实际：{Actual}", parsedExpected, actualSha256);
                     if (File.Exists(savePath)) File.Delete(savePath);
                     throw new InvalidOperationException("Downloaded update file hash mismatch.");
                 }
@@ -196,10 +208,23 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         // 确定下载URL和保存路径
         var hotfixVersion = versionResponse.Data.VersionName;
         var downloadUrl = BaseCoreDownloadUrl.Replace("{version}", hotfixVersion);
-        logger.LogDebug("Downloading hotfix from URL: {Url}", downloadUrl);
+        logger.LogDebug("开始下载核心热修补包，来源：{Url}", downloadUrl);
         var saveFileName = $"core_update_{hotfixVersion}.zip";
         var savePath = Path.Combine(PathString.TempSraDir, saveFileName);
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+
+        // 下载前：若本地已存在，先进行校验，避免重复下载
+        var expectedSha256 = versionResponse.Data.Sha256?.Trim();
+        var parsedExpected = ExtractSha256(expectedSha256 ?? "");
+        if (IsLocalPackageValid(savePath, parsedExpected))
+        {
+                logger.LogInformation("检测到本地已存在有效热修补包，跳过下载：{Path}", savePath);
+            return savePath;
+        }
+        else if (File.Exists(savePath))
+        {
+            try { File.Delete(savePath); } catch { /* ignore */ }
+        }
 
         // 尝试下载
         await DownloadUtil.DownloadFileWithDetailsAsync(
@@ -211,19 +236,45 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         );
 
         // 校验 SHA256（若远端提供）
-        var expectedSha256 = versionResponse.Data.Sha256?.Trim();
-        if (!string.IsNullOrEmpty(expectedSha256))
+        if (!string.IsNullOrEmpty(parsedExpected))
         {
             var actualSha256 = ComputeSHA256(savePath);
-            if (!string.Equals(actualSha256, expectedSha256, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(actualSha256, parsedExpected, StringComparison.OrdinalIgnoreCase))
             {
-                logger.LogWarning("SHA256 mismatch for downloaded hotfix. Expected: {Expected}, Actual: {Actual}", expectedSha256, actualSha256);
+                logger.LogWarning("下载的热修补包 SHA256 校验失败。期望：{Expected}，实际：{Actual}", parsedExpected, actualSha256);
                 if (File.Exists(savePath)) File.Delete(savePath);
                 throw new InvalidOperationException("Downloaded hotfix file hash mismatch.");
             }
         }
 
         return savePath;
+    }
+
+    // 简单校验ZIP是否有效：能否正常打开
+    private static bool IsZipValid(string filePath)
+    {
+        try
+        {
+            using var archive = ZipFile.OpenRead(filePath);
+            // 能正常打开即认为有效；不要求含有条目
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    
+    // 复用的本地包有效性校验：优先用 SHA256，其次尝试打开ZIP
+    private static bool IsLocalPackageValid(string filePath, string? parsedExpected)
+    {
+        if (!File.Exists(filePath)) return false;
+        if (!string.IsNullOrEmpty(parsedExpected))
+        {
+            var actual = ComputeSHA256(filePath);
+            return string.Equals(actual, parsedExpected, StringComparison.OrdinalIgnoreCase);
+        }
+        return IsZipValid(filePath);
     }
     
     // 辅助方法：获取下载URL
@@ -258,7 +309,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
             using var resp = await _httpClient.SendAsync(req, cancellationToken);
             if (!resp.IsSuccessStatusCode)
             {
-                logger.LogDebug("Gitee api.json request failed: {Status}", resp.StatusCode);
+                logger.LogDebug("从 Gitee 获取校验信息失败，HTTP 状态：{Status}", resp.StatusCode);
                 return null;
             }
 
@@ -274,7 +325,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
                 // 若 name 可用且包含版本号，进一步确认匹配
                 if (!string.IsNullOrWhiteSpace(name) && !name.Contains(versionName, StringComparison.OrdinalIgnoreCase))
                 {
-                    logger.LogWarning("Gitee sha256 name mismatch. Expected contains: {Version}, Got name: {Name}", versionName, name);
+                    logger.LogWarning("Gitee 返回的资源名称与版本不匹配。期望包含：{Version}，实际名称：{Name}", versionName, name);
                 }
                 // 验证 sha 格式
                 var parsed = ExtractSha256(sha);
@@ -283,7 +334,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         }
         catch (Exception ex)
         {
-            logger.LogDebug("Error fetching sha256 from Gitee: {Message}", ex.Message);
+            logger.LogDebug("从 Gitee 获取 sha256 时发生错误：{Message}", ex.Message);
         }
         return null;
     }
