@@ -93,6 +93,13 @@ nothing to do with it.
   ```
   ✅ 完成后，您可以在项目根目录找到创建好的压缩包，解压即可使用。
 
+### 😡 我不想安装 .NET 8.0 
+
+没关系!🤗 SRA 甚至有**社区版**🤓，您可以在[这里](https://github.com/EveGlowLuna/StarRailAssistant-CommunityEdition)查看。
+
+社区版使用 Tauri + Vue 3 重构了前端界面，使您可以在不安装 .NET 8.0 的情况下运行 SRA。 🥵
+除此之外并无其他区别。
+
 ### ⚠️ 注意事项
 
 * 📺 **分辨率要求**：
