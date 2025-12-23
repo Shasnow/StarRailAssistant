@@ -323,6 +323,14 @@ class TrailblazePowerTask(BaseTask):
         logger.info("等待战斗结束")
         while True:
             self.sleep(0.2)
+
+            # 检查是否获得光锥弹窗
+            if self.click_img("resources/img/light_cone.png"):
+                logger.info("检测到光锥获得弹窗，点击关闭")
+                self.sleep(1)  # 等待弹窗关闭动画
+                continue  # 继续检测战斗结束状态
+
+            # 检查战斗结束状态
             index, _ = self.locate_any(["resources/img/quit_battle.png", "resources/img/battle_failure.png"],
                                        trace=False)
             if index != -1:
