@@ -71,33 +71,101 @@ nothing to do with it.
 
 **自2.0.0版本后，SRA需要`.NET 8.0。`**
 
-* 🎯 **小白友好版**：只需要下载项目中的`zip`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`SRA.exe`即可！
-* 🔧 **开发者版**：尽管不再推荐这种方式，但我们仍然会指导你如何从源码运行SRA。
-  📋 **环境要求**：
-    * `Python` 3.12+
-    * `.NET 8.0`
+* 🎯 **小白友好版**：在Release页面下载`StarRailAssistant_vX.X.X.zip`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`SRA.exe`即可！
+* 🔧 **开发者版**：从源码运行SRA，适合想要自定义或贡献代码的开发者。
 
-  📦 **安装依赖**：
+  ### 📋 **环境要求**
+  - **操作系统**：Windows 10 或 Windows 11 (推荐)
+  - **Python**：3.12 或更高版本（需添加到系统环境变量）
+  - **.NET SDK**：8.0 或更高版本（下载地址：[.NET 8.0 SDK](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0)）
+  - **Git**：用于克隆仓库（可选，但推荐）
+
+  ### 📥 **获取源码**
   ```bash
+  # 克隆仓库（推荐）
+  git clone https://github.com/Shasnow/StarRailAssistant.git
+  cd StarRailAssistant
+  
+  # 或直接下载 ZIP 压缩包并解压
+  ```
+
+  ### 📦 **安装 Python 依赖**
+  ```bash
+  # 使用 pip 安装所有依赖
   pip install -r requirements.txt
+  
+  # 如果遇到安装失败的情况，尝试使用以下命令
+  pip install -r requirements.txt --upgrade --no-cache-dir
+  
   ```
 
-  🏗️ **构建前端**：使用下面的命令将前端项目构建为可执行文件。
+  ### 🏗️ **构建前端项目**
   ```bash
-  dotnet publish -c Release -r win-x64 ./SRAFrontend/SRAFrontend.csproj
+  # 进入前端目录
+  cd SRAFrontend
+  
+  # 还原 NuGet 依赖（首次构建时必须执行）
+  dotnet restore -r win-x64
+  
+  # 构建前端项目（Release 模式）
+  dotnet publish -c Release -r win-x64
+  
+  # 构建完成后，可执行文件将位于：
+  # ./SRAFrontend/bin/Release/net8.0/win-x64/publish/SRA.exe
+  
+  # 返回项目根目录
+  cd ..
   ```
 
-  🏗️ **构建后端**：使用下面的命令将后端项目构建为可执行文件。
+  ### 🚀 **直接运行（开发模式）**
+  如果您不想构建可执行文件，可以直接运行：
   ```bash
+  # 启动前端（开发模式）
+  cd SRAFrontend
+  dotnet run
+  
+  # 在另一个终端中启动后端
+  cd ..
+  python main.py
+  ```
+
+  ### 📦 **构建完整发布包**
+  ```bash
+  # 运行打包脚本
   python ./package.py
+  
+  # 打包脚本会自动执行以下操作：
+  # 收集所有必要的文件（含前端构建输出，所以确保前端已构建）
+  # 创建 ZIP 压缩包
+  
+  # 完成后，发布包将位于项目根目录，命名格式为：StarRailAssistant_vX.X.X.zip
   ```
-  ✅ 完成后，您可以在项目根目录找到创建好的压缩包，解压即可使用。
+
+  ### 🎯 **运行构建后的应用**
+  1. 解压生成的 ZIP 压缩包
+  2. 运行 `SRA.exe` 启动应用程序
+
+  ### ⚠️ **常见问题与解决方案**
+  - **Python 依赖安装失败**：尝试使用国内镜像源，如：
+    ```bash
+    pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+    ```
+    
+  - **前端构建失败**：确保已安装 .NET 8.0 SDK，并尝试重新还原依赖：
+    ```bash
+    dotnet restore ./SRAFrontend/SRAFrontend.csproj -r win-x64 --force
+    ```
+    
+  - **运行时缺少 DLL 文件**：确保构建时使用了 `--self-contained true` 参数，或安装对应版本的 .NET 运行时。
+    
+  - **图像识别不准确**：确保游戏分辨率设置为 1920x1080（全屏或窗口模式），并检查 `resources/img/` 目录下的模板图片是否完整。
 
 ### 😡 我不想安装 .NET 8.0 
 
-没关系!🤗 SRA 甚至有**社区版**🤓，您可以在[这里](https://github.com/EveGlowLuna/StarRailAssistant-CommunityEdition)查看。
+没关系!🤗 SRA 甚至有**社区版**🤓，您可以在 [这里](https://github.com/EveGlowLuna/StarRailAssistant-CommunityEdition) 查看。
 
-社区版使用 Tauri + Vue 3 重构了前端界面，使您可以在不安装 .NET 8.0 的情况下运行 SRA。 🥵
+社区版使用 Tauri + Vue 3 重构了前端界面，使您可以在不安装 .NET 8.0 的情况下运行 SRA 🥵
+
 除此之外并无其他区别。
 
 ### ⚠️ 注意事项
@@ -106,16 +174,12 @@ nothing to do with it.
   * 如果你的屏幕分辨率**大于1080p**，请将游戏调整至**1920x1080窗口模式**下运行，否则可能出现识别错误！
   * 如果你的屏幕分辨率**等于1080p**，请将游戏调整至**1920x1080全屏**模式下运行，否则可能出现识别错误！
 * 🖱️ **操作提示**：**执行任务时不要进行其他键鼠操作！**
-* 🔧 **构建问题**：如果在构建前端后发现前端缺少文件，请考虑使用以下指令，然后重新构建前端
-  ```bash
-  dotnet restore ./SRAFrontend/SRAFrontend.csproj -r win-x64
-  ```
 
 ## 📁 项目结构
 
 ```
-├── .github/                # 🔧 GitHub相关配置文件
-├── SRACore/                # 🐍 Python后端核心代码
+├── .github/               # 🔧 GitHub相关配置文件
+├── SRACore/               # 🐍 Python后端核心代码
 │   ├── i18n/              # 🌐 国际化语言文件
 │   ├── task/              # 📋 任务相关代码
 │   ├── thread/            # 🧵 线程管理
@@ -143,8 +207,6 @@ nothing to do with it.
 │   └── ui/                # 🎨 UI资源
 ├── setup/                 # 📦 安装包制作相关文件
 ├── tasks/                 # 📋 任务实现目录
-│   ├── currency_wars/     # 🎲 货币战争任务相关代码
-│   └── differential_universe/ # 🚀 差分宇宙任务相关代码
 └── version.json           # 🔢 版本信息
 ```
 
