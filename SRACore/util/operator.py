@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any, overload, Callable
 
 import cv2
-import numpy as np
 import pyautogui
 import pygetwindow
 # noinspection PyPackageRequirements
@@ -214,9 +213,12 @@ class Operator:
     def locate_in_region(self,
                          img_path: str,
                          region: Region | None = None,
+                         confidence: float | None = None,
                          trace: bool = True,
                          **_) -> Box | None:
         """在屏幕上查找图片位置"""
+        if confidence is None:
+            confidence = self.confidence
         try:
             if region is None:
                 region = self.get_win_region()
@@ -224,7 +226,7 @@ class Operator:
             if not Path(img_path).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
             img = cv2.imread(img_path)
-            box = pyscreeze.locate(img, self.screenshot(region), confidence=self.confidence)
+            box = pyscreeze.locate(img, self.screenshot(region), confidence=confidence)
             return Box(box.left, box.top, box.width, box.height, source=img_path)
         except Exception as e:
             if trace:
@@ -237,6 +239,7 @@ class Operator:
                         from_y: float,
                         to_x: float,
                         to_y: float,
+                        confidence: float | None = None,
                         trace: bool = True,
                         **_) -> Box | None:
         """
@@ -246,6 +249,7 @@ class Operator:
         :param from_y: 区域起始y坐标比例(0-1)
         :param to_x: 区域结束x坐标比例(0-1)
         :param to_y: 区域结束y坐标比例(0-1)
+        :param confidence: 匹配度, 0-1之间的浮点数, 默认为self.confidence
         :param trace: 是否打印调试信息
         :return: Box | None - 找到的图片位置，如果未找到则返回None
         """
@@ -258,13 +262,16 @@ class Operator:
         top = int(region.top + region.height * from_y)
         width = int(region.width * (to_x - from_x))
         height = int(region.height * (to_y - from_y))
-        return self.locate_in_region(img_path, Region(left, top, width, height), trace)
+        return self.locate_in_region(img_path, Region(left, top, width, height), confidence, trace)
 
     def locate_any_in_region(self,
                              img_paths: list[str],
                              region: Region | None = None,
+                             confidence: float | None = None,
                              trace: bool = True) -> tuple[int, Box | None]:
         """在窗口内查找任意一张图片位置"""
+        if confidence is None:
+            confidence = self.confidence
         try:
             screenshot = self.screenshot(region=region)
         except Exception as e:
@@ -275,7 +282,7 @@ class Operator:
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
             img = cv2.imread(img_path)
             try:
-                box = pyscreeze.locate(img, screenshot, confidence=self.confidence)
+                box = pyscreeze.locate(img, screenshot, confidence=confidence)
             except pyscreeze.ImageNotFoundException as e:
                 if trace:
                     logger.trace(f"ImageNotFound: {img_path} -> {e}")
@@ -290,6 +297,7 @@ class Operator:
                             from_y: float,
                             to_x: float,
                             to_y: float,
+                            confidence: float | None = None,
                             trace: bool = False) -> tuple[int, Box | None]:
         """
         在窗口内查找任意一张图片位置，使用比例坐标
@@ -298,6 +306,7 @@ class Operator:
         :param from_y: 区域起始y坐标比例(0-1)
         :param to_x: 区域结束x坐标比例(0-1)
         :param to_y: 区域结束y坐标比例(0-1)
+        :param confidence: 匹配度, 0-1之间的浮点数, 默认为self.confidence
         :param trace: 是否打印调试信息
         :return: tuple[int, Box | None] - 找到的图片索引和位置，如果未找到则返回-1和None
         """
@@ -310,16 +319,15 @@ class Operator:
         top = int(region.top + region.height * from_y)
         width = int(region.width * (to_x - from_x))
         height = int(region.height * (to_y - from_y))
-        return self.locate_any_in_region(img_paths, Region(left, top, width, height), trace)
+        return self.locate_any_in_region(img_paths, Region(left, top, width, height), confidence, trace)
 
     @overload
-    def locate_any(self, img_paths: list[str], region: Region | None = None, trace: bool = True) -> tuple[
+    def locate_any(self, img_paths: list[str], region: Region | None = None, confidence: float | None = None, trace: bool = True) -> tuple[
         int, Box | None]:
         ...
 
     @overload
-    def locate_any(self, img_paths: list[str], *, from_x: float, from_y: float, to_x: float, to_y: float,
-                   trace: bool = True) -> tuple[int, Box | None]:
+    def locate_any(self, img_paths: list[str], *, from_x: float, from_y: float, to_x: float, to_y: float, confidence: float | None = None, trace: bool = True) -> tuple[int, Box | None]:
         ...
 
     def locate_any(self,
@@ -330,6 +338,7 @@ class Operator:
                    from_y: float | None = None,
                    to_x: float | None = None,
                    to_y: float | None = None,
+                   confidence: float | None = None,
                    trace: bool = True) -> tuple[int, Box | None]:
         """在窗口内查找任意一张图片位置
         Args:
@@ -340,6 +349,7 @@ class Operator:
             from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
             to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
             to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
+            confidence (float | None, optional): 匹配度, 0-1之间的浮点数, 默认为self.confidence
             trace (bool, optional): 是否打印调试信息。默认为True。
         Returns:
             tuple[int, Box | None]: 找到的图片索引和位置，如果未找到则返回-1和None
@@ -347,17 +357,17 @@ class Operator:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
         if all(v is not None for v in [from_x, from_y, to_x, to_y]):
-            return self.locate_any_in_tuple(img_paths, from_x, from_y, to_x, to_y, trace)
+            return self.locate_any_in_tuple(img_paths, from_x, from_y, to_x, to_y, confidence, trace)
         else:
-            return self.locate_any_in_region(img_paths, region, trace)
+            return self.locate_any_in_region(img_paths, region, confidence, trace)
 
     @overload
-    def locate(self, template: str, region: Region | None = None, trace: bool = True) -> Box | None:
+    def locate(self, template: str, region: Region | None = None, confidence: float | None = None, trace: bool = True) -> Box | None:
         ...
 
     @overload
-    def locate(self, template: str, *, from_x: float, from_y: float, to_x: float, to_y: float,
-               trace: bool = True) -> Box | None:
+    def locate(self, template: str, *, from_x: float, from_y: float, to_x: float, to_y: float, 
+               confidence: float | None = None, trace: bool = True) -> Box | None:
         ...
 
     def locate(self,
@@ -368,6 +378,7 @@ class Operator:
                from_y: float | None = None,
                to_x: float | None = None,
                to_y: float | None = None,
+               confidence: float | None = None,
                trace: bool = True) -> Box | None:
         """在窗口内查找图片位置
 
@@ -375,10 +386,11 @@ class Operator:
             template (str): 模板图片路径
             region (Region | None, optional): 要查找的区域对象，包含left, top, width, height属性。
                 如果为None，则默认查找当前活动窗口的区域。默认为None。
-            from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
-            from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
-            to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
-            to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
+            from_x (float, optional): 起始点X坐标比例 (0-1), 相对于窗口左上角
+            from_y (float, optional): 起始点Y坐标比例 (0-1), 相对于窗口左上角
+            to_x (float, optional): 结束点X坐标比例 (0-1), 相对于窗口左上角
+            to_y (float, optional): 结束点Y坐标比例 (0-1), 相对于窗口左上角
+            confidence (float | None, optional): 匹配置信度阈值 (0-1), 如果为None则使用默认值。默认为None。
             trace (bool, optional): 是否打印调试信息。默认为True。
         Returns:
             Box | None: 找到的图片位置，如果未找到则返回None
@@ -386,9 +398,9 @@ class Operator:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
         if all(v is not None for v in [from_x, from_y, to_x, to_y]):
-            return self.locate_in_tuple(template, from_x, from_y, to_x, to_y, trace)
+            return self.locate_in_tuple(template, from_x, from_y, to_x, to_y, confidence, trace)
         else:
-            return self.locate_in_region(template, region, trace)
+            return self.locate_in_region(template, region, confidence, trace)
 
     def ocr_in_region(
             self,
@@ -661,106 +673,22 @@ class Operator:
             return False
         return self.click_box(box, x_offset, y_offset, after_sleep)
 
-    def wait_img(self,
-                 img_path: str,
-                 timeout: int = 10,
-                 interval: float = 0.5,
-                 *,
-                 debug: bool = False,
-                 debug_dir: str | None = None) -> Box | None:
-        """等待图片出现并可选输出调试信息
-
-        Args:
-            img_path: 模板图片路径
-            timeout: 超时时间(秒)
-            interval: 重试间隔(秒)
-            debug: 是否输出调试匹配结果（每次循环）
-            debug_dir: 调试文件输出目录（不存在则自动创建），未指定时默认使用 "debug_image_match"
-
-        调试输出内容：
-            - 每次循环保存当前窗口截图（仅在标注时）
-            - 计算单尺度 matchTemplate 得分与位置（灰度 + TM_CCOEFF_NORMED）
-            - 若得分达到阈值(self.confidence)则返回 Box
-            - 保存标注图片：<debug_dir>/<basename>__attempt<idx>__score<val>.png
-
-        注意：
-            - 仍调用原 locate 逻辑，若 locate 返回 Box 会直接返回
-            - 调试匹配仅用于记录，不会降低性能要求
+    def wait_img(self, img_path: str, timeout: int = 10, interval: float = 0.5) -> Box | None:
+        """
+        等待图片出现
+        :param img_path: 模板图片路径
+        :param timeout: 超时时间，单位秒
+        :param interval: 检查间隔时间，单位秒，默认为0.5秒
+        :return: bool - 是否找到图片
         """
         start_time = time.time()
-        logger.debug(t('operator.waiting_image', path=img_path))
-        tmpl_gray = None
-        attempt = 0
-        if debug:
-            if debug_dir is None:
-                debug_dir = "debug_image_match"
-            try:
-                Path(debug_dir).mkdir(parents=True, exist_ok=True)
-            except Exception as e:
-                logger.trace(f"Create debug dir failed: {e}")
-                debug = False
-        else:
-            debug_dir = None
-        debug_path = Path(debug_dir) if (debug and debug_dir is not None) else None
-
-        # 预读模板
-        if debug:
-            try:
-                tmpl = cv2.imread(img_path)
-                if tmpl is not None:
-                    tmpl_gray = cv2.cvtColor(tmpl, cv2.COLOR_BGR2GRAY)
-            except Exception as e:
-                logger.trace(f"Load template failed (debug disabled): {e}")
-                debug = False
-
+        logger.debug(f"Waiting for image: {img_path}")
         while time.time() - start_time < timeout:
-            attempt += 1
-            # 原始 locate 逻辑
             box = self.locate(img_path)
             if box is not None:
-                if debug:
-                    logger.debug(t('operator.wait_img_success', attempt=attempt))
                 return box
-
-            if debug and tmpl_gray is not None:
-                try:
-                    region = self.get_win_region(active_window=True)
-                    screenshot_pil = self.screenshot(region)
-                    scr_rgb = cv2.cvtColor(np.array(screenshot_pil), cv2.COLOR_RGB2BGR)
-                    scr_gray = cv2.cvtColor(scr_rgb, cv2.COLOR_BGR2GRAY)
-                    # 尺寸检查
-                    if tmpl_gray.shape[0] <= scr_gray.shape[0] and tmpl_gray.shape[1] <= scr_gray.shape[1]:
-                        res = cv2.matchTemplate(scr_gray, tmpl_gray, cv2.TM_CCOEFF_NORMED)
-                        _min_val, max_val, _min_loc, max_loc = cv2.minMaxLoc(res)
-                        h, w = tmpl_gray.shape[:2]
-                        logger.debug(t('operator.wait_img_attempt', attempt=attempt, score=max_val, loc=max_loc,
-                                       conf=self.confidence))
-                        # 保存标注图片
-                        try:
-                            annotated = scr_rgb.copy()
-                            cv2.rectangle(annotated, max_loc, (max_loc[0] + w, max_loc[1] + h), (0, 0, 255), 2)
-                            cv2.putText(annotated,
-                                        f"s={max_val:.3f}",
-                                        (max_loc[0], max(0, max_loc[1] - 10)),
-                                        cv2.FONT_HERSHEY_SIMPLEX,
-                                        0.5,
-                                        (0, 0, 255),
-                                        1)
-                            out_name = f"{Path(img_path).stem}__attempt{attempt}__score{max_val:.3f}.png"
-                            if debug_path is not None:
-                                cv2.imwrite(str(debug_path / out_name), annotated)
-                        except Exception as e:
-                            logger.trace(f"[wait_img debug] save annotated failed: {e}")
-                        # 若得分达到阈值，将该位置作为命中返回
-                        if max_val >= self.confidence:
-                            return Box(max_loc[0], max_loc[1], w, h)
-                    else:
-                        logger.debug(t('operator.wait_img_too_large', attempt=attempt))
-                except Exception as e:
-                    logger.trace(f"[wait_img debug] attempt={attempt} error: {e}")
-
             time.sleep(interval)
-        logger.debug(t('operator.timeout_image', path=img_path, timeout=timeout))
+        logger.debug(f"Timeout: {img_path} -> Not found in {timeout} seconds")
         return None
 
     def wait_any_img(self, img_paths: list[str], timeout: int = 10, interval: float = 0.2) -> tuple[int, Box | None]:
