@@ -7,7 +7,11 @@ import json
 
 def load_config(name:str):
     try:
-        with open(AppDataSraDir / f'configs/{name}.json', 'r') as f:
+        if ".json" in name:
+            path = name.replace('\"', '')
+        else:
+            path = AppDataSraDir / f'configs/{name}.json'
+        with open(path, 'r') as f:
            return json.load(f)
     except FileNotFoundError as e:
         logger.error(t('config.file_not_found', name=name, error=e))
