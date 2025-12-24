@@ -65,7 +65,7 @@
         "task_failed": "Task '{name}' failed. Stopping further execution.",
         "task_crashed": "Task '{name}' crashed: {error}",
         "config_completed": "配置 '{name}' 的所有任务执行完毕。",
-        "all_completed": "All task completed.",
+        "all_completed": "All tasks completed.",
         "manager_crashed": "TaskManager crashed: {error}",
         "done": "[Done]",
         "instantiate_failed": "Failed to instantiate task at index {index}: {error}",

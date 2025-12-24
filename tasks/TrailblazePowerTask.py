@@ -32,8 +32,8 @@ class TrailblazePowerTask(BaseTask):
         logger.debug("任务列表：" + str(tasklist))
         for task in tasklist:
             tasks.append((name2task(task["Name"]), {"level": task["Level"],
-                                                     "run_time": task["RunTimes"],
-                                                     "single_time": task["Count"]}))
+                                                    "run_time": task["RunTimes"],
+                                                    "single_time": task["Count"]}))
         for task, kwargs in tasks:
             if self.stop_flag:
                 break
@@ -120,14 +120,14 @@ class TrailblazePowerTask(BaseTask):
                     single_time)
 
     def calyx_crimson(self, level, single_time=1, run_time=1, **_):
-        levels=["鳞渊境", "收容舱段",
-                "克劳克", "支援舱段",
-                "苏乐达", "城郊雪原",
-                "绥园", "边缘通路",
-                "匹诺", "铆钉镇",
-                "白日梦", "机械聚落",
-                "丹鼎司", "大矿区",
-                "纷争"]
+        levels = ["鳞渊境", "收容舱段",
+                  "克劳克", "支援舱段",
+                  "苏乐达", "城郊雪原",
+                  "绥园", "边缘通路",
+                  "匹诺", "铆钉镇",
+                  "白日梦", "机械聚落",
+                  "丹鼎司", "大矿区",
+                  "纷争"]
         self.battle("拟造花萼（赤）",
                     "calyx(crimson)",
                     levels,
@@ -137,14 +137,14 @@ class TrailblazePowerTask(BaseTask):
                     single_time,
                     y_add=-30)
 
-    def stagnant_shadow(self, level,single_time=1, run_time=1, **_):
-        levels=["溟簇之形",'职司之形','幽府之形','锋芒之形',
-                "嗔怒之形",'燔灼之形','炎华之形',
-                "塞壬之形",'冰酿之形','冰棱之形','霜晶之形',
-                "机狼之形",'震厄之形','鸣雷之形',
-                '烬日之形','今宵之形','天人之形','风之形',
-                '凛月之形','焦炙之形','孽兽之形','空海之形',
-                '役轮之形','弦音之形','偃偶之形','幻光之形']
+    def stagnant_shadow(self, level, single_time=1, run_time=1, **_):
+        levels = ["溟簇之形", '职司之形', '幽府之形', '锋芒之形',
+                  "嗔怒之形", '燔灼之形', '炎华之形',
+                  "塞壬之形", '冰酿之形', '冰棱之形', '霜晶之形',
+                  "机狼之形", '震厄之形', '鸣雷之形',
+                  '烬日之形', '今宵之形', '天人之形', '风之形',
+                  '凛月之形', '焦炙之形', '孽兽之形', '空海之形',
+                  '役轮之形', '弦音之形', '偃偶之形', '幻光之形']
         self.battle("凝滞虚影",
                     "stagnant_shadow",
                     levels,
@@ -153,10 +153,10 @@ class TrailblazePowerTask(BaseTask):
                     True,
                     single_time)
 
-    def caver_of_corrosion(self, level, single_time=1,run_time=1, **_):
-        levels=['隐救之径','雳涌之径', '弦歌之径', '迷识之径', '勇骑之径', '梦潜之径',
-                '幽冥之径', '药使之径', '野焰之径', '圣颂之径', '睿治之径',
-                '漂泊之径', '迅拳之径', '霜风之径']
+    def caver_of_corrosion(self, level, single_time=1, run_time=1, **_):
+        levels = ['隐救之径', '雳涌之径', '弦歌之径', '迷识之径', '勇骑之径', '梦潜之径',
+                  '幽冥之径', '药使之径', '野焰之径', '圣颂之径', '睿治之径',
+                  '漂泊之径', '迅拳之径', '霜风之径']
         self.battle("侵蚀隧洞",
                     "caver_of_corrosion",
                     levels,
@@ -166,9 +166,9 @@ class TrailblazePowerTask(BaseTask):
                     single_time,
                     x_add=700)
 
-    def echo_of_war(self, level, single_time=1,run_time=1, **_):
-        levels=['晨昏','心兽','尘梦','蛀星',
-                '不死','寒潮','毁灭']
+    def echo_of_war(self, level, single_time=1, run_time=1, **_):
+        levels = ['晨昏', '心兽', '尘梦', '蛀星',
+                  '不死', '寒潮', '毁灭']
         self.battle("历战余响",
                     "echo_of_war",
                     levels,
@@ -322,20 +322,21 @@ class TrailblazePowerTask(BaseTask):
         """
         logger.info("等待战斗结束")
         while True:
-            self.sleep(0.2)
-
-            # 检查是否获得光锥弹窗
-            if self.click_img("resources/img/light_cone.png"):
-                logger.info("检测到光锥获得弹窗，点击关闭")
-                self.sleep(1)  # 等待弹窗关闭动画
-                continue  # 继续检测战斗结束状态
-
+            self.sleep(1)
             # 检查战斗结束状态
-            index, _ = self.locate_any(["resources/img/quit_battle.png", "resources/img/battle_failure.png"],
-                                       trace=False)
-            if index != -1:
-                logger.info("战斗结束")
-                return index
+            index, _ = self.locate_any([
+                "resources/img/quit_battle.png",
+                "resources/img/battle_failure.png",
+                "resources/img/light_cone.png"
+            ],trace=False)
+            if index == -1:
+                continue  # 继续等待战斗结束
+            if index == 2:
+                logger.info("获得光锥")
+                self.click_point(0.5, 0.8)  # 点击屏幕中心偏下位置关闭弹窗
+                continue  # 继续检测战斗结束状态
+            logger.info("战斗结束")
+            return index
 
     def find_level(self, level: str) -> bool:
         """Fine battle level

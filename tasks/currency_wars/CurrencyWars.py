@@ -336,7 +336,7 @@ class CurrencyWars(Executable):
                     target_character_list[index] = get_character(name)
                     if equip:
                         self.click_img(CWIMG.EQUIPMENT_RECOMMEND, after_sleep=1)
-                        _, box = self.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS])
+                        _, box = self.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS], confidence=0.8)
                         if box:
                             self.click_box(box, after_sleep=0.5)
                 else:
