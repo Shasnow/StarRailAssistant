@@ -1,6 +1,4 @@
 import json
-import os
-from datetime import datetime
 from typing import Any
 
 from loguru import logger
@@ -57,13 +55,11 @@ class CurrencyWars(Executable):
             (0.80, 0.18)
         ]
         self.max_team_size = 3  # 最大队伍人数
-        self.faction_tendency = {}  # 阵营倾向字典
-        self.school_tendency = {}  # 派系倾向字典
         self.is_running = False
         self.min_coins = 40  # 最小金币数
         self.min_level = 7  # 商店等级
         self.mid_level = 7  # 商店等级
-        self.strategy_characters: list[Character] = []  # 在攻略中的角色
+        self.strategy_characters: dict[str, int] = dict()  # 在攻略中的角色及其预期购买数量
         self.is_overclock = False  # 超频博弈
 
     def reset_character(self):
@@ -278,6 +274,7 @@ class CurrencyWars(Executable):
             run_times += 1
             if run_times % 3 == 0:  # 每3轮更新一次场上角色，顺便穿戴装备
                 self.refresh_character()
+                self.sort_all_areas_by_priority()  # 优先级排序
         # 任务结束，重置角色状态
         self.reset_character()
 
@@ -420,7 +417,6 @@ class CurrencyWars(Executable):
         return self._place_to_target(
             character_in_hand,
             target_characters=self.on_field_character,
-            target_areas=self.on_field_area,
             area_type="前台"
         )
 
@@ -429,7 +425,6 @@ class CurrencyWars(Executable):
         return self._place_to_target(
             character_in_hand,
             target_characters=self.off_field_character,
-            target_areas=self.off_field_area,
             area_type="后台"
         )
 
@@ -437,7 +432,6 @@ class CurrencyWars(Executable):
             self,
             character_in_hand: int,
             target_characters: list[Character | None],
-            target_areas,
             area_type: str
     ) -> bool:
         """通用放置逻辑：适配前台/后台角色，处理空位放置和满员替换"""
@@ -453,21 +447,24 @@ class CurrencyWars(Executable):
             logger.warning(f"手牌索引 {character_in_hand} 无有效角色或角色已放置")
             return False
 
+        # 确定目标区域类型
+        target_area_type = 'on_field' if area_type == "前台" else 'off_field'
+
         # 2. 队伍不满时：优先填充空位（前台角色优先占名额）
         if not full_team:
             for index, existing_char in enumerate(target_characters):
                 if existing_char is None:
-                    # 执行拖拽放置
-                    source = self.in_hand_area[character_in_hand]
-                    target = target_areas[index]
-                    self.drag(source[0], source[1], target[0], target[1])
-                    # 更新角色状态和队伍人数
-                    target_characters[index] = character
-                    character.is_placed = True
-                    self.in_hand_character[character_in_hand] = None
-                    logger.info(
-                        f"角色 {character.name} 放置到{area_type}索引 {index}（空位）")
-                    return True
+                    # 使用通用对换方法实现放置
+                    success = self.swap_character_between_areas(
+                        source_area_type='in_hand',
+                        source_index=character_in_hand,
+                        target_area_type=target_area_type,
+                        target_index=index
+                    )
+                    if success:
+                        logger.info(
+                            f"角色 {character.name} 放置到{area_type}索引 {index}（空位）")
+                    return success
             logger.info(f"{area_type}无空位可放置")
 
         # 3. 队伍已满时：仅替换低priority角色（不占用新名额）
@@ -483,22 +480,21 @@ class CurrencyWars(Executable):
             existing_char = target_characters[min_priority_index]
             if existing_char is None:  # 类型保护
                 return False
-            # 执行替换
-            source = self.in_hand_area[character_in_hand]
-            target = target_areas[min_priority_index]
-            self.drag(source[0], source[1], target[0], target[1])
-            # 更新角色状态（队伍人数不变）
-            self.in_hand_character[character_in_hand] = existing_char
-            existing_char.is_placed = False
-            target_characters[min_priority_index] = character
-            character.is_placed = True
-            logger.info(
-                f"角色 {character.name} 替换{area_type}索引 {min_priority_index} 的 {existing_char.name} "
-                f"(priority {existing_char.priority} → {character.priority})"
+            # 使用通用对换方法实现替换
+            success = self.swap_character_between_areas(
+                source_area_type='in_hand',
+                source_index=character_in_hand,
+                target_area_type=target_area_type,
+                target_index=min_priority_index
             )
-            return True
+            if success:
+                logger.info(
+                    f"角色 {character.name} 替换{area_type}索引 {min_priority_index} 的 {existing_char.name} "
+                    f"(priority {existing_char.priority} → {character.priority})"
+                )
+            return success
 
-        logger.info(f"{area_type}无低priority角色可替换")
+        logger.info(f"{character.name}无低priority角色可替换")
         return False
 
     def harvest_crystals(self):
@@ -548,7 +544,6 @@ class CurrencyWars(Executable):
         角色出售逻辑
         :param force: bool - 是否强制出售所有角色（包括已放置的角色）
         """
-        sell_area = (0.05, 0.86)  # 出售区域
         # 创建需要出售的角色索引列表
         characters_to_sell = []
         for i, character in enumerate(self.in_hand_character):
@@ -558,11 +553,17 @@ class CurrencyWars(Executable):
                 characters_to_sell.append((i, character))
             elif not character.is_placed:
                 characters_to_sell.append((i, character))
-        # 执行出售操作
+        
+        # 执行出售操作 - 使用通用对换方法（商店区域没有角色列表）
         for i, character in characters_to_sell:
+            # 由于商店区域没有角色列表，直接执行拖拽
+            sell_area = (0.05, 0.86)  # 出售区域
             source = self.in_hand_area[i]
             self.drag(source[0], source[1], sell_area[0], sell_area[1])
+            # 更新手牌状态
             self.in_hand_character[i] = None
+            if character:
+                character.is_placed = False
             logger.info(f"已出售角色：{character.name}")
             self.sleep(0.5)
         logger.info(f"出售操作完成")
@@ -570,7 +571,7 @@ class CurrencyWars(Executable):
     def battle(self) -> bool:
         # self.click_point(0.907, 0.714, after_sleep=1)
         battle_box = self.wait_img(CWIMG.BATTLE, timeout=3, interval=0.5)
-        if battle_box is None or not self.click_box(battle_box, after_sleep=2):
+        if battle_box is None or not self.click_box(battle_box, after_sleep=1.5):
             logger.error("未识别到战斗按钮")
             return False
         if self.locate(IMG.ENSURE):  # 编队未满提醒
@@ -640,8 +641,7 @@ class CurrencyWars(Executable):
                 CWIMG.NEXT_STEP,
                 '游戏结束',
                 lambda: [
-                    self.sleep(15),  # 如果职级晋升需要等待约13s动画
-                    self.click_point(0.5, 0.82, after_sleep=1),
+                    self.click_img(CWIMG.NEXT_STEP, after_sleep=1),
                     self.click_point(0.5, 0.82, after_sleep=1),
                     self.click_point(0.5, 0.82, after_sleep=1),
                     setattr(self, 'is_running', False)  # 停止运行标志
@@ -723,12 +723,11 @@ class CurrencyWars(Executable):
             chars = []
             if not results:
                 return []
-            for index in range(0, len(results), 2):
-                try:
-                    name = results[index][1]
-                except (IndexError, TypeError):
+            for item in results:
+                name:str = item[1]
+                if name.isdecimal(): # 跳过价格识别结果
                     continue
-                if '备战席已满' in name:
+                if '备' in name:  # 备战席已满
                     return []
                 char = get_character(name)
                 if char is not None:
@@ -738,39 +737,37 @@ class CurrencyWars(Executable):
                     logger.info(f"商店中发现未知角色：{name}")
             return chars
 
-        refresh_times = 0
-        while self.get_coins() > 4:
+        while True:
+            purchased = False
+            coins = self.get_coins()
+            if coins < 4:
+                break
             level = self.get_level()
+
+            if not self.is_overclock and coins < self.min_coins:
+                logger.info(f"当前金币 {coins} 小于最低保留数量 {self.min_coins}")
+                break
             if level < self.min_level:
                 # 当等级小于最低等级要求时，持续按f提升等级，跳过购买
                 self.press_key('f')
                 self.sleep(0.5)
                 continue
-            coins = self.get_coins()
-            if not self.is_overclock and coins < self.min_coins:
-                logger.info(f"当前金币 {coins} 小于最低保留数量 {self.min_coins}")
-                break
-
             cs = scan_characters_in_store()
             if len(cs) != 0:
                 for i, c in enumerate(cs):
-                    if c in self.strategy_characters:
+                    if c.name in self.strategy_characters.keys():  # 如果角色在攻略中出现
+                        if self.strategy_characters[c.name] <= 0:
+                            continue  # 如果该角色已达购买上限则跳过
                         target = self.store_area[i]
                         self.click_point(*target, after_sleep=0.5)
-
-            # primary_selection = self.locate(CWIMG.PRIMARY_SELECTION)
-            # for _ in range(5):
-            #     if primary_selection:
-            #         self.click_box(primary_selection, after_sleep=0.5)
-            #         primary_selection = self.locate(CWIMG.PRIMARY_SELECTION)
-            #     else:
-            #         break
+                        purchased = True # 标记购买了角色
+                        self.strategy_characters[c.name] -= 1  # 购买次数减一
+                        self.move_to(0.5, 0.5)  # 移动鼠标避免遮挡
 
             self.press_key('d')  # 按d刷新商店
-            refresh_times += 1
             self.sleep(0.5)
-            if level < self.mid_level and refresh_times % 3 == 0:
-                # 当等级小于中级等级要求时，每3次刷新按一次f提升等级
+            if level < self.mid_level and not purchased:
+                # 当等级小于中级等级要求且未购买任何角色时，按f提升等级
                 self.press_key('f')
                 self.sleep(0.5)
         self.click_point(0.5, 0.55, after_sleep=1.5)  # 点击空白处关闭商店
@@ -813,30 +810,10 @@ class CurrencyWars(Executable):
             except ValueError:
                 logger.warning(f"无法解析最大队伍人数：{result[-1][1]}")
 
-    def get_tendency(self):
-        self.faction_tendency.clear()
-        self.school_tendency.clear()
-        for character in self.on_field_character + self.off_field_character:
-            if character is None:
-                continue
-            if character.faction not in self.faction_tendency:
-                self.faction_tendency[character.faction] = 0
-            self.faction_tendency[character.faction] += 1
-            for school in character.schools:
-                if school not in self.school_tendency:
-                    self.school_tendency[school] = 0
-                self.school_tendency[school] += 1
-        self.faction_tendency = {k: v for k, v in
-                                 sorted(self.faction_tendency.items(), key=lambda item: item[1], reverse=True)}  # 排序
-        self.school_tendency = {k: v for k, v in
-                                sorted(self.school_tendency.items(), key=lambda item: item[1], reverse=True)}  # 排序
-        logger.info(f"当前阵营倾向：{self.faction_tendency}")
-        logger.info(f"当前派系倾向：{self.school_tendency}")
-
     def load_strategy(self, name: str):
         """加载攻略文件"""
         if ".json" in name:
-            path = name.replace('\"', '/')
+            path = name
         else:
             path = f"tasks/currency_wars/strategies/{name}.json"
         with open(path, "r", encoding="utf-8") as f:
@@ -847,16 +824,18 @@ class CurrencyWars(Executable):
         self.min_level = strategy_data.get("min_level", 7)
         self.mid_level = strategy_data.get("mid_level", 7)
         # 在攻略中的角色设置成最高优先级
-        for i, cn in enumerate(strategy_data.get("on_field", [])):
+        strategy_on_field: dict[str,int] = strategy_data.get("on_field", {})
+        strategy_off_field: dict[str,int] = strategy_data.get("off_field", {})
+        for i, cn in enumerate(strategy_on_field.keys()):
             c = get_character(cn)
-            c.priority = 9 - i  # 确保攻略中的前台角色优先级都大于其他角色，同时有所差别
+            c.priority = 99 - i  # 确保攻略中的前台角色优先级都大于其他角色，同时有所差别
             c.position = Positioning.OnField
-            self.strategy_characters.append(c)
-        for i, cn in enumerate(strategy_data.get("off_field", [])):
+            self.strategy_characters[cn] = strategy_on_field[cn]
+        for i, cn in enumerate(strategy_off_field):
             c = get_character(cn)
-            c.priority = 15 - i  # 确保攻略中的后台角色优先级都大于其他角色
+            c.priority = 99 - i  # 确保攻略中的后台角色优先级都大于其他角色
             c.position = Positioning.OffField
-            self.strategy_characters.append(c)
+            self.strategy_characters[cn] = strategy_off_field[cn]
         logger.info(f"已加载攻略: {name}: {description}")
 
     def unload_strategy(self):
@@ -868,3 +847,205 @@ class CurrencyWars(Executable):
         self.mid_level = 7
         self.strategy_characters.clear()
         logger.info("已卸载当前攻略，角色优先级已重置")
+
+    def swap_character_between_areas(
+            self,
+            source_area_type: str,
+            source_index: int,
+            target_area_type: str,
+            target_index: int
+    ) -> bool:
+        """
+        通用方法：将两个任意区域的任意位置的内容进行对换
+        
+        :param source_area_type: 源区域类型 ('on_field', 'off_field', 'in_hand')
+        :param source_index: 源区域中的位置索引
+        :param target_area_type: 目标区域类型 ('on_field', 'off_field', 'in_hand')
+        :param target_index: 目标区域中的位置索引
+        :return: 对换操作是否成功
+        """
+        # 区域映射：区域类型 -> (角色列表, 坐标列表, 区域名称)
+        area_mapping = {
+            'on_field': (self.on_field_character, self.on_field_area, "场上"),
+            'off_field': (self.off_field_character, self.off_field_area, "场下"),
+            'in_hand': (self.in_hand_character, self.in_hand_area, "手牌")
+        }
+        
+        # 验证区域类型
+        if source_area_type not in area_mapping or target_area_type not in area_mapping:
+            logger.error(f"无效的区域类型: source={source_area_type}, target={target_area_type}")
+            return False
+        
+        # 获取源区域信息
+        source_chars, source_coords, source_name = area_mapping[source_area_type]
+        # 获取目标区域信息
+        target_chars, target_coords, target_name = area_mapping[target_area_type]
+        
+        # 验证索引范围
+        if not (0 <= source_index < len(source_coords)):
+            logger.error(f"源区域索引超出范围: {source_index} (0~{len(source_coords)-1})")
+            return False
+        if not (0 <= target_index < len(target_coords)):
+            logger.error(f"目标区域索引超出范围: {target_index} (0~{len(target_coords)-1})")
+            return False
+        
+        # 获取源和目标角色
+        source_char = source_chars[source_index]
+        target_char = target_chars[target_index]
+        
+        # 记录操作前的状态
+        logger.info(f"开始对换操作: {source_name}[{source_index}] <-> {target_name}[{target_index}]")
+        logger.info(f"源角色: {source_char.name if source_char else 'None'}")
+        logger.info(f"目标角色: {target_char.name if target_char else 'None'}")
+        
+        # 执行拖拽对换操作
+        source_coord = source_coords[source_index]
+        target_coord = target_coords[target_index]
+        
+        # 执行拖拽
+        self.drag(source_coord[0], source_coord[1], target_coord[0], target_coord[1])
+        self.sleep(0.5)  # 等待操作完成
+        
+        # 交换角色列表中的内容
+        source_chars[source_index], target_chars[target_index] = target_chars[target_index], source_chars[source_index]
+        
+        # 更新角色的放置状态
+        if source_char:
+            source_char.is_placed = (target_area_type != 'in_hand')
+        if target_char:
+            target_char.is_placed = (source_area_type != 'in_hand')
+        
+        logger.info(f"对换操作完成: {source_name}[{source_index}] <-> {target_name}[{target_index}]")
+        return True
+
+    def swap_field_and_hand_character(self, field_index: int, hand_index: int) -> bool:
+        """
+        示例方法：交换场上和手牌区的角色
+        
+        :param field_index: 场上角色的索引 (0-3)
+        :param hand_index: 手牌角色的索引 (0-8)
+        :return: 交换是否成功
+        """
+        return self.swap_character_between_areas(
+            source_area_type='on_field',
+            source_index=field_index,
+            target_area_type='in_hand',
+            target_index=hand_index
+        )
+
+    def swap_field_and_offfield_character(self, field_index: int, offfield_index: int) -> bool:
+        """
+        示例方法：交换场上和场下区的角色
+        
+        :param field_index: 场上角色的索引 (0-3)
+        :param offfield_index: 场下角色的索引 (0-5)
+        :return: 交换是否成功
+        """
+        return self.swap_character_between_areas(
+            source_area_type='on_field',
+            source_index=field_index,
+            target_area_type='off_field',
+            target_index=offfield_index
+        )
+
+    def sort_characters_by_priority(self, area_type: str) -> bool:
+        """
+        对指定区域的角色按优先级进行排序，高优先级角色靠前
+        
+        :param area_type: 区域类型 ('on_field', 'off_field')
+        :return: 排序操作是否成功
+        """
+        # 验证区域类型
+        if area_type not in ['on_field', 'off_field']:
+            logger.error(f"无效的区域类型: {area_type}，只支持 'on_field' 或 'off_field'")
+            return False
+        
+        # 获取区域信息
+        if area_type == 'on_field':
+            characters = self.on_field_character
+            area_name = "场上"
+        else:  # off_field
+            characters = self.off_field_character
+            area_name = "场下"
+        
+        logger.info(f"开始对{area_name}区域角色按优先级排序")
+        
+        # 创建包含角色、索引和优先级的列表
+        char_info_list = []
+        for i, char in enumerate(characters):
+            if char is not None:
+                char_info_list.append({
+                    'character': char,
+                    'index': i,
+                    'priority': char.priority
+                })
+            else:
+                char_info_list.append({
+                    'character': None,
+                    'index': i,
+                    'priority': -1  # 空位置优先级设为-1，排在最后
+                })
+        
+        # 按优先级降序排序（高优先级在前）
+        sorted_char_info = sorted(char_info_list, key=lambda x: x['priority'], reverse=True)
+        
+        # 执行排序交换
+        success_count = 0
+        for target_pos, target_info in enumerate(sorted_char_info):
+            current_pos = target_info['index']
+            
+            # 如果已经在正确位置，跳过
+            if current_pos == target_pos:
+                continue
+            
+            # 找到目标位置当前的角色信息
+            target_current_info = None
+            for info in char_info_list:
+                if info['index'] == target_pos:
+                    target_current_info = info
+                    break
+            
+            # 如果目标位置为空或优先级较低，执行交换
+            if (target_current_info is None or 
+                target_current_info['character'] is None or
+                target_current_info['priority'] <= target_info['priority']):
+                
+                # 执行交换
+                if self.swap_character_between_areas(
+                    source_area_type=area_type,
+                    source_index=current_pos,
+                    target_area_type=area_type,
+                    target_index=target_pos
+                ):
+                    success_count += 1
+                    logger.info(f"{area_name}区域位置交换: [{current_pos}] <-> [{target_pos}]")
+                    
+                    # 更新char_info_list中的索引信息
+                    for info in char_info_list:
+                        if info['index'] == current_pos:
+                            info['index'] = target_pos
+                        elif info['index'] == target_pos:
+                            info['index'] = current_pos
+        
+        logger.info(f"{area_name}区域优先级排序完成，成功交换 {success_count} 次")
+        return success_count > 0
+
+    def sort_all_areas_by_priority(self) -> bool:
+        """
+        对所有区域（前台和后台）的角色按优先级进行排序
+        
+        :return: 排序操作是否成功
+        """
+        logger.info("开始对所有区域进行优先级排序")
+        
+        field_success = self.sort_characters_by_priority('on_field')
+        offfield_success = self.sort_characters_by_priority('off_field')
+        
+        overall_success = field_success or offfield_success
+        
+        if overall_success:
+            logger.info("所有区域优先级排序完成")
+        else:
+            logger.info("无需进行排序操作")
+        
+        return overall_success
