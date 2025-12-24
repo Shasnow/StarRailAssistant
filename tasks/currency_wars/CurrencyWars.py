@@ -836,7 +836,7 @@ class CurrencyWars(Executable):
     def load_strategy(self, name: str):
         """加载攻略文件"""
         if ".json" in name:
-            path = name
+            path = name.replace('\"', '/')
         else:
             path = f"tasks/currency_wars/strategies/{name}.json"
         with open(path, "r", encoding="utf-8") as f:
