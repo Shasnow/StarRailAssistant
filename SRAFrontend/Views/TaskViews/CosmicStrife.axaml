@@ -61,13 +61,6 @@
                                         <ComboBoxItem>最高难度</ComboBoxItem>
                                     </ComboBox>
                                 </StackPanel>
-
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Label>模式</Label>
-                                    <ComboBox SelectedIndex="0">
-                                        <ComboBoxItem>通关</ComboBoxItem>
-                                    </ComboBox>
-                                </StackPanel>
                             
                                 <StackPanel Orientation="Horizontal" Spacing="10">
                                     <Label>次数</Label>
