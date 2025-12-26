@@ -11,7 +11,6 @@ namespace SRAFrontend.Services;
 public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<AnnouncementService> logger)
 {
     private List<Announcement>? _cachedAnnouncements; // 缓存数据，避免重复请求
-    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("GlobalClient");
 
     private const string RequestUrl = "https://gitee.com/yukikage/sraresource/raw/main/SRA/announcements.json";
 
@@ -26,7 +25,8 @@ public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<A
 
         try
         {
-            _cachedAnnouncements = await _httpClient.GetFromJsonAsync<List<Announcement>>(RequestUrl);
+            var httpClient = httpClientFactory.CreateClient("GlobalClient");
+            _cachedAnnouncements = await httpClient.GetFromJsonAsync<List<Announcement>>(RequestUrl);
             return _cachedAnnouncements;
         }
         catch (HttpRequestException ex)

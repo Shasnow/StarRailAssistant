@@ -41,11 +41,10 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         { 8004, "错误的更新通道参数" }
     };
 
-    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("GlobalClient");
-
     public async Task<VersionResponse?> VerifyCdkAsync(string cdk)
     {
-        var response = await _httpClient.GetAsync($"{BaseVersionUrl}?cdk={cdk}");
+        var httpClient = httpClientFactory.CreateClient("GlobalClient");
+        var response = await httpClient.GetAsync($"{BaseVersionUrl}?cdk={cdk}");
         return await response.Content.ReadFromJsonAsync<VersionResponse>();
     }
 
@@ -68,7 +67,8 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         if (queryParams.Count > 0)
             url += "?user_agent=SRA_avalonia" + string.Join("&", queryParams);
 
-        var response = await _httpClient.GetAsync(url);
+        var httpClient = httpClientFactory.CreateClient("GlobalClient");
+        var response = await httpClient.GetAsync(url);
         return await response.Content.ReadFromJsonAsync<VersionResponse>();
     }
 
@@ -111,6 +111,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         downloadCandidates.Add(downloadUrl);
 
         // 尝试下载
+        var httpClient = httpClientFactory.CreateClient("GlobalClient");
         var downloadSuccess = false;
         Exception? lastException = null;
         foreach (var candidateUrl in downloadCandidates)
@@ -118,7 +119,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
             {
                 logger.LogDebug("Try downloading update from: {Url} ", candidateUrl);
                 await DownloadUtil.DownloadFileWithDetailsAsync(
-                    _httpClient,
+                    httpClient,
                     candidateUrl,
                     savePath,
                     statusProgress,
@@ -156,8 +157,9 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
 
         // 尝试下载
+        var httpClient = httpClientFactory.CreateClient("GlobalClient");
         await DownloadUtil.DownloadFileWithDetailsAsync(
-            _httpClient,
+            httpClient,
             downloadUrl,
             savePath,
             statusProgress,
