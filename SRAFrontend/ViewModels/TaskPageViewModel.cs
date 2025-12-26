@@ -255,7 +255,8 @@ public partial class TaskPageViewModel : PageViewModel
             Level = task.SelectedIndex,
             LevelName = (task.Levels?.Cast<string>()!).ElementAtOrDefault(task.SelectedIndex) ?? string.Empty,
             Count = task.Count,
-            RunTimes = task.RunTimes
+            RunTimes = task.RunTimes,
+            AutoDetect = task.IsAutoDetect
         });
     }
 
