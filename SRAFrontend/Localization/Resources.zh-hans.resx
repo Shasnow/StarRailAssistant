@@ -155,4 +155,19 @@
     <data name="ModifyHoldText" xml:space="preserve">
         <value>点击以修改</value>
     </data>
+    <data name="StartGameText" xml:space="preserve">
+        <value>启动游戏</value>
+    </data>
+    <data name="TrailblazePowerText" xml:space="preserve">
+        <value>清体力</value>
+    </data>
+    <data name="ReceiveRewardsText" xml:space="preserve">
+        <value>领取奖励</value>
+    </data>
+    <data name="CosmicStrifeText" xml:space="preserve">
+        <value>旷宇纷争</value>
+    </data>
+    <data name="InTheEndText" xml:space="preserve">
+        <value>任务结束</value>
+    </data>
 </root>

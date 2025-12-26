@@ -168,6 +168,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cosmic Strife.
+        /// </summary>
+        public static string CosmicStrifeText {
+            get {
+                return ResourceManager.GetString("CosmicStrifeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dark.
         /// </summary>
         public static string DarkText {
@@ -276,6 +285,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to In the End.
+        /// </summary>
+        public static string InTheEndText {
+            get {
+                return ResourceManager.GetString("InTheEndText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Language.
         /// </summary>
         public static string LanguageText {
@@ -339,6 +357,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Receive Rewards.
+        /// </summary>
+        public static string ReceiveRewardsText {
+            get {
+                return ResourceManager.GetString("ReceiveRewardsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Regular.
         /// </summary>
         public static string RegularText {
@@ -371,6 +398,15 @@ namespace SRAFrontend.Localization {
         public static string SponsorText {
             get {
                 return ResourceManager.GetString("SponsorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start Game.
+        /// </summary>
+        public static string StartGameText {
+            get {
+                return ResourceManager.GetString("StartGameText", resourceCulture);
             }
         }
         
@@ -443,6 +479,15 @@ namespace SRAFrontend.Localization {
         public static string ThreadSafetyText {
             get {
                 return ResourceManager.GetString("ThreadSafetyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trailblaze Power.
+        /// </summary>
+        public static string TrailblazePowerText {
+            get {
+                return ResourceManager.GetString("TrailblazePowerText", resourceCulture);
             }
         }
         

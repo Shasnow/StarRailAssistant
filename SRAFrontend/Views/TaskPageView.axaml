@@ -5,6 +5,7 @@
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
              xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              xmlns:taskViews="clr-namespace:SRAFrontend.Views.TaskViews"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:TaskPageViewModel"
              x:Class="SRAFrontend.Views.TaskPageView">
@@ -12,19 +13,19 @@
         <Grid RowDefinitions="Auto, *">
             <suki:GlassCard Content="{Binding ControlPanelViewModel}" />
             <TabControl Grid.Row="1">
-                <TabItem Header="Start Game">
+                <TabItem Header="{x:Static lang:Resources.StartGameText}">
                     <taskViews:StartGameView />
                 </TabItem>
-                <TabItem Header="Trailblaze Power">
+                <TabItem Header="{x:Static lang:Resources.TrailblazePowerText}">
                     <taskViews:TrailblazePowerView />
                 </TabItem>
-                <TabItem Header="Receive Reward">
+                <TabItem Header="{x:Static lang:Resources.ReceiveRewardsText}">
                     <taskViews:ReceiveRewardView />
                 </TabItem>
-                <TabItem Header="Cosmic Strife">
+                <TabItem Header="{x:Static lang:Resources.CosmicStrifeText}">
                     <taskViews:CosmicStrife />
                 </TabItem>
-                <TabItem Header="After Mission">
+                <TabItem Header="{x:Static lang:Resources.InTheEndText}">
                     <taskViews:AfterMissionView />
                 </TabItem>
             </TabControl>
