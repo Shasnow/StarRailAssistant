@@ -32,9 +32,11 @@ def main():
     )
 
     parser.add_argument(
-        '--verbose',
-        action='store_true',
-        help=t('cli.verbose_help')
+        '--log-level',
+        type=str,
+        choices=['TRACE','DEBUG', 'INFO', 'SUCCESS', 'WARNING', 'ERROR', 'CRITICAL'],
+        default='TRACE',
+        help=t('cli.log_level_help')
     )
 
     # 子命令：run（用于单次执行命令）
@@ -62,7 +64,11 @@ def main():
     # 解析参数
     args = parser.parse_args()
     # 延迟导入 SRACli（减少启动时的依赖加载）
-    from SRACore.util.logger import logger
+    from SRACore.util.logger import logger, setup_logger, set_log_level
+    # 设置日志级别
+    set_log_level(args.log_level)
+    # 设置日志记录器
+    setup_logger()
     from SRACore.SRA import SRACli
     cli_instance = SRACli()
     logger.debug(t('cli.working_directory', path=os.getcwd()))

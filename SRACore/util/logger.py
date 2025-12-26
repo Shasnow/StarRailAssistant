@@ -3,19 +3,24 @@ import functools
 
 from loguru import logger
 
+_log_level = 0  # 全局日志级别变量
+def set_log_level(level: int):
+    global _log_level
+    _log_level = level
 
 # 设置日志记录器
 def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log"):
+    global _log_level
     logger.remove()
     if sys.stdout.isatty():
-        logger.add(sys.stdout, level=0,
+        logger.add(sys.stdout, level=_log_level,
                    format="<green>{time:HH:mm:ss}</green>[{thread}] | <level>{level:5}</level> | <cyan>{module}.{function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>",
                    colorize=True, enqueue=True)
     else:
-        logger.add(sys.stdout, level=0,
+        logger.add(sys.stdout, level=_log_level,
                    format="{time:HH:mm:ss}[{thread}] | {level:5} | {message}",
                    colorize=False, enqueue=True)
-    logger.add(path, level=0,
+    logger.add(path, level=_log_level,
            format="{time:YYYY-MM-DD HH:mm:ss} {level:5} {module}.{function}:{line} {message}",
            colorize=False, retention=7, enqueue=True,
            encoding="utf-8")
@@ -52,6 +57,4 @@ def auto_log_methods(cls):
             setattr(cls, name, _log_entry_exit(attr))
     return cls
 
-# 初始化日志
-setup_logger()
-__all__ = ["logger", "setup_logger", "auto_log_methods"]
+__all__ = ["logger", "setup_logger", "auto_log_methods", "set_log_level"]
