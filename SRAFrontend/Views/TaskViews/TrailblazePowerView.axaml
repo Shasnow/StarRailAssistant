@@ -61,30 +61,40 @@
                                 <DataTemplate x:DataType="models:TrailblazePowerTask">
                                     <suki:GlassCard Margin="0 0 0 10" IsInteractive="True">
                                         <suki:GroupBox Header="{Binding HeaderText}">
-                                            <StackPanel Spacing="12">
+                                            <StackPanel Spacing="4">
                                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                                     <Label Content="选择关卡" />
                                                     <ComboBox ItemsSource="{Binding Levels}"
                                                               SelectedIndex="{Binding SelectedIndex}" />
                                                 </StackPanel>
 
-                                                <StackPanel Orientation="Horizontal" Spacing="8"
-                                                            ToolTip.Tip="n合一">
-                                                    <Label Content="连续作战" />
-                                                    <NumericUpDown FormatString="0" Value="{Binding Count}"
-                                                                   Minimum="1" Maximum="{Binding MaxSingleTimes}"
-                                                                   Increment="1"
-                                                                   VerticalContentAlignment="Center" />
-                                                </StackPanel>
+                                                <Grid ColumnDefinitions="*, *">
+                                                    <StackPanel Grid.Column="0" Spacing="4">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Label Content="自动检测" />
+                                                            <ToggleSwitch IsChecked="{Binding IsAutoDetect}"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" Spacing="8"
+                                                                    ToolTip.Tip="n合一" IsVisible="{Binding !IsAutoDetect}">
+                                                            <Label Content="连续作战" />
+                                                            <NumericUpDown FormatString="0" Value="{Binding Count}"
+                                                                           Minimum="1"
+                                                                           Maximum="{Binding MaxSingleTimes}"
+                                                                           Increment="1"
+                                                                           VerticalContentAlignment="Center" />
+                                                        </StackPanel>
 
-                                                <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="8">
-                                                    <Label Content="执行次数" />
-                                                    <NumericUpDown Grid.Column="1" FormatString="0"
-                                                                   Value="{Binding RunTimes}"
-                                                                   Minimum="1" Maximum="99" Increment="1" />
-                                                    <Button Grid.Column="2" Classes="Flat Icon"
+                                                        <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding !IsAutoDetect}">
+                                                            <Label Content="执行次数" />
+                                                            <NumericUpDown
+                                                                FormatString="0"
+                                                                Value="{Binding RunTimes}"
+                                                                Minimum="1" Maximum="99" Increment="1" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                    <!-- ReSharper disable once Xaml.StyleClassNotFound -->
+                                                    <Button Grid.Column="1" Classes="Flat Icon"
                                                             Content="+"
-                                                            HorizontalAlignment="Right"
                                                             Command="{Binding AddTaskItemCommand}" />
                                                 </Grid>
                                             </StackPanel>
@@ -101,15 +111,23 @@
                                  SelectedItem="{Binding SelectedTaskItem}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid RowDefinitions="*,*,*,*" ColumnDefinitions="Auto,*">
+                                    <Grid RowDefinitions="*,*,*" ColumnDefinitions="Auto,*">
                                         <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                                                Content="{Binding Name}" HorizontalAlignment="Center" />
                                         <Label Grid.Row="1" Grid.Column="0">关卡名称</Label>
                                         <Label Grid.Row="1" Grid.Column="1" Content="{Binding LevelName}" />
-                                        <Label Grid.Row="2" Grid.Column="0" Content="单次次数" />
-                                        <Label Grid.Row="2" Grid.Column="1" Content="{Binding Count}" />
-                                        <Label Grid.Row="3" Grid.Column="0" Content="执行次数" />
-                                        <Label Grid.Row="3" Grid.Column="1" Content="{Binding RunTimes}" />
+                                        <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                               Content="自动检测"
+                                               IsVisible="{Binding AutoDetect}"/>
+                                        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                              RowDefinitions="*, *" ColumnDefinitions="Auto, *"
+                                              IsVisible="{Binding !AutoDetect}">
+                                            <Label Grid.Row="0" Grid.Column="0" Content="单次次数" />
+                                            <Label Grid.Row="0" Grid.Column="1" Content="{Binding Count}" />
+                                            <Label Grid.Row="1" Grid.Column="0" Content="执行次数" />
+                                            <Label Grid.Row="1" Grid.Column="1" Content="{Binding RunTimes}" />
+                                        </Grid>
+                                        
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

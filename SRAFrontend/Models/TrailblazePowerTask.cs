@@ -16,6 +16,8 @@ public partial class TrailblazePowerTask(Action<TrailblazePowerTask> onAddTaskIt
     [ObservableProperty] private int _runTimes = 1;
 
     [ObservableProperty] private int _selectedIndex;
+    
+    [ObservableProperty] private bool _isAutoDetect;
 
     public string Title { get; init; } = string.Empty;
     public int Cost { get; init; }
