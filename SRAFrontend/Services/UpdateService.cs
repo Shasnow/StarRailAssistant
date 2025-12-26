@@ -117,12 +117,14 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
             try
             {
                 logger.LogDebug("Try downloading update from: {Url} ", candidateUrl);
-                await DownloadUtil.DownloadFileWithDetailsAsync(
+                await DownloadUtil.DownloadFileSegmentedWithResumeAsync(
                     _httpClient,
                     candidateUrl,
                     savePath,
                     statusProgress,
-                    cancellationToken
+                    cancellationToken,
+                    maxConcurrency: 8,
+                    segmentSizeBytes: 4 * 1024 * 1024
                 );
                 downloadSuccess = true;
                 break;
@@ -156,12 +158,14 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
 
         // 尝试下载
-        await DownloadUtil.DownloadFileWithDetailsAsync(
+        await DownloadUtil.DownloadFileSegmentedWithResumeAsync(
             _httpClient,
             downloadUrl,
             savePath,
             statusProgress,
-            cancellationToken
+            cancellationToken,
+            maxConcurrency: 8,
+            segmentSizeBytes: 4 * 1024 * 1024
         );
 
         return savePath;
