@@ -60,7 +60,9 @@
                        Classes="AppIcon"
                        Source="/Assets/SRAico.png"
                        ToolTip.Tip="Just Icon." />
-                <Label Content="{x:Static lang:Resources.GreetingText}" HorizontalAlignment="Center" />
+                <TextBlock TextWrapping="Wrap" FontSize="16"
+                           Text="{Binding GreetingMessage}"
+                           HorizontalAlignment="Center" TextAlignment="Center"/>
             </StackPanel>
         </suki:SukiSideMenu.HeaderContent>
         
