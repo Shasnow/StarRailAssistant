@@ -70,7 +70,8 @@
         "done": "[Done]",
         "instantiate_failed": "Failed to instantiate task at index {index}: {error}",
         "notification_title": "任务完成提醒",
-        "notification_body": "您的SRA任务运行完成。"
+        "notification_body": "您的SRA任务运行完成。",
+        "task_completed": "任务 '{name}' 已完成。"
     },
     "trigger": {
         "stopped": "TriggerManager stopped.",

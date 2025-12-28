@@ -70,7 +70,8 @@
         "done": "[Done]",
         "instantiate_failed": "Failed to instantiate task at index {index}: {error}",
         "notification_title": "Task Completion Reminder",
-        "notification_body": "Your SRA task has completed."
+        "notification_body": "Your SRA task has completed.",
+        "task_completed": "Task '{name}' completed."
     },
     "trigger": {
         "stopped": "TriggerManager stopped.",

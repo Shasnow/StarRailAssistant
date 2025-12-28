@@ -118,6 +118,19 @@ class SRACli(cmd.Cmd):
                     logger.debug(t('cli.task_stopped'))
             else:
                 print(t('cli.task_not_running'))
+        elif command == 'single':
+            if len(args) < 2:
+                print(f"Usage: task single <task name | index> [config_name]")
+                return
+            if self.task_process is not None and self.task_process.is_alive():
+                print(t('cli.task_already_running'))
+                return
+            sub_args = args[1:]
+            # 重新创建进程（避免重复启动已终止的进程）
+            self.task_process = multiprocessing.Process(target=self.task_manager.run_task, daemon=True, args=sub_args)
+            self.task_process.start()
+            time.sleep(1)  # 确保进程有时间启动
+            logger.info(t('cli.task_started'))
         else:
             print(t('cli.task_unknown_subcommand', command=command))
 
