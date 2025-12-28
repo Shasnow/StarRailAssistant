@@ -423,8 +423,8 @@ class TrailblazePowerTask(BaseTask):
         if not self.goto_survival_index():
             return False
         if scroll_flag:
+            self.move_to(0.25, 0.5)
             self.sleep(1)
-            self.move_rel(0, 100)
             for i in range(10):
                 self.scroll(-5)
         self.sleep(0.5)
