@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:SRAFrontend.Controls"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="50"
              x:Class="SRAFrontend.Controls.ControlPanelView"
              x:DataType="controls:ControlPanelViewModel">
@@ -10,48 +11,56 @@
         Orientation="Horizontal"
         HorizontalAlignment="Right"
         Spacing="10">
-        <TextBox Width="200"
-                 Watermark="请输入配置名称"
+        <TextBox Width="250"
+                 Watermark="{x:Static lang:Resources.ConfigInputMarkText}"
                  Text="{Binding NewConfigName}"
                  IsVisible="{Binding IsAddConfigOpen}"/>
         <Button Classes="Icon" Content="+"
                 Command="{Binding OpenAddConfigCommand}"
-                IsVisible="{Binding !IsAddConfigOpen}"/>
+                IsVisible="{Binding !IsAddConfigOpen}"
+                ToolTip.Tip="{x:Static lang:Resources.NewConfigText}"/>
+        <!-- ReSharper disable once Xaml.StyleClassNotFound -->
         <Button Classes="Flat Icon" Content="✓"
                 Command="{Binding AddConfigCommand}"
-                IsVisible="{Binding IsAddConfigOpen}"/>
+                IsVisible="{Binding IsAddConfigOpen}"
+                ToolTip.Tip="{x:Static lang:Resources.EnsureText}"/>
         <Button Classes="Icon" Content="-" 
-                Command="{Binding RemoveConfigCommand}"/>
+                Command="{Binding RemoveConfigCommand}"
+                ToolTip.Tip="{x:Static lang:Resources.RemoveConfigText}"/>
 
         <ComboBox SelectedIndex="{Binding Cache.CurrentConfigIndex}"
                   Width="150" ItemsSource="{Binding Cache.ConfigNames}">
         </ComboBox>
 
-        <SplitButton Content="{Binding Cache.StartMode}"
+        <!-- ReSharper disable Xaml.StyleClassNotFound -->
+        <SplitButton Content="{Binding StartModeText}"
                      Classes="Flat Rounded"
                      Command="{Binding StartButtonCommand}"
                      IsVisible="{Binding CanStart}"
-                     ToolTip.Tip="以当前模式运行任务">
+                     ToolTip.Tip="{x:Static lang:Resources.StartButtonTipText}">
+            <!-- ReSharper restore Xaml.StyleClassNotFound -->
             <SplitButton.Flyout>
                 <MenuFlyout>
-                    <MenuItem Header="Current" 
+                    <MenuItem Header="{x:Static lang:Resources.CurrentText}" 
                               Command="{Binding SwitchStartModeCommand}" 
                               CommandParameter="Current"
-                              ToolTip.Tip="运行当前选中配置"/>
-                    <MenuItem Header="All" 
+                              ToolTip.Tip="{x:Static lang:Resources.CurrentButtonTipText}"/>
+                    <MenuItem Header="{x:Static lang:Resources.AllText}" 
                               Command="{Binding SwitchStartModeCommand}" 
                               CommandParameter="All"
-                              ToolTip.Tip="运行全部配置"/>
-                    <MenuItem Header="Save Only" 
+                              ToolTip.Tip="{x:Static lang:Resources.AllButtonTipText}"/>
+                    <MenuItem Header="{x:Static lang:Resources.SaveOnlyText}" 
                               Command="{Binding SwitchStartModeCommand}"
                               CommandParameter="Save Only"
-                              ToolTip.Tip="仅保存"/>
+                              ToolTip.Tip="{x:Static lang:Resources.SaveOnlyButtonTipText}"/>
                 </MenuFlyout>
             </SplitButton.Flyout>
         </SplitButton>
+        <!-- ReSharper disable Xaml.StyleClassNotFound -->
         <Button Classes="Flat Rounded"
-                Content="Stop"
+                Content="{x:Static lang:Resources.StopText}"
                 IsVisible="{Binding !CanStart}"
                 Command="{Binding StopButtonCommand}"></Button>
+        <!-- ReSharper restore Xaml.StyleClassNotFound -->
     </StackPanel>
 </UserControl>

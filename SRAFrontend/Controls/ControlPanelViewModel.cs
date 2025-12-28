@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SRAFrontend.Localization;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 using SRAFrontend.ViewModels;
@@ -28,6 +29,20 @@ public partial class ControlPanelViewModel : ViewModelBase
         };
     }
 
+    public string StartModeText
+    {
+        get
+        {
+            return Cache.StartMode switch
+            {
+                "Current" => Resources.CurrentText,
+                "All" => Resources.AllText,
+                "Save Only" => Resources.SaveOnlyText,
+                _ => Resources.UnknownText
+            };
+        }
+    }
+
     public bool CanStart => !_sraService.IsRunning;
 
     public Cache Cache => _cacheService.Cache;
@@ -36,6 +51,7 @@ public partial class ControlPanelViewModel : ViewModelBase
     private void SwitchStartMode(string mode)
     {
         Cache.StartMode = mode;
+        OnPropertyChanged(nameof(StartModeText));
     }
 
     [RelayCommand]
