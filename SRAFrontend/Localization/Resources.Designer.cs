@@ -87,11 +87,29 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Run all configurations.
+        /// </summary>
+        public static string AllButtonTipText {
+            get {
+                return ResourceManager.GetString("AllButtonTipText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Allow Notification.
         /// </summary>
         public static string AllowNotificationText {
             get {
                 return ResourceManager.GetString("AllowNotificationText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All.
+        /// </summary>
+        public static string AllText {
+            get {
+                return ResourceManager.GetString("AllText", resourceCulture);
             }
         }
         
@@ -105,11 +123,38 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to App data folder.
+        /// </summary>
+        public static string AppDataFolder {
+            get {
+                return ResourceManager.GetString("AppDataFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization Code.
+        /// </summary>
+        public static string AuthorCodeText {
+            get {
+                return ResourceManager.GetString("AuthorCodeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Auto Update.
         /// </summary>
         public static string AutoUpdateText {
             get {
                 return ResourceManager.GetString("AutoUpdateText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically download and unzip when updates are available.
+        /// </summary>
+        public static string AutoUpdateTipText {
+            get {
+                return ResourceManager.GetString("AutoUpdateTipText", resourceCulture);
             }
         }
         
@@ -132,6 +177,33 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Backend logs folder.
+        /// </summary>
+        public static string BeLogsFolderText {
+            get {
+                return ResourceManager.GetString("BeLogsFolderText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter the image path.
+        /// </summary>
+        public static string BgImagePathWatermarkText {
+            get {
+                return ResourceManager.GetString("BgImagePathWatermarkText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check for update.
+        /// </summary>
+        public static string CheckForUpdateText {
+            get {
+                return ResourceManager.GetString("CheckForUpdateText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Chronicle.
         /// </summary>
         public static string ChronicleText {
@@ -146,6 +218,24 @@ namespace SRAFrontend.Localization {
         public static string ConfidenceText {
             get {
                 return ResourceManager.GetString("ConfidenceText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter a config name.
+        /// </summary>
+        public static string ConfigInputMarkText {
+            get {
+                return ResourceManager.GetString("ConfigInputMarkText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configs folder.
+        /// </summary>
+        public static string ConfigsFolder {
+            get {
+                return ResourceManager.GetString("ConfigsFolder", resourceCulture);
             }
         }
         
@@ -173,6 +263,33 @@ namespace SRAFrontend.Localization {
         public static string CosmicStrifeText {
             get {
                 return ResourceManager.GetString("CosmicStrifeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create a desktop shortcut.
+        /// </summary>
+        public static string CreateShortcutText {
+            get {
+                return ResourceManager.GetString("CreateShortcutText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Run the currently selected config.
+        /// </summary>
+        public static string CurrentButtonTipText {
+            get {
+                return ResourceManager.GetString("CurrentButtonTipText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current.
+        /// </summary>
+        public static string CurrentText {
+            get {
+                return ResourceManager.GetString("CurrentText", resourceCulture);
             }
         }
         
@@ -222,11 +339,29 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ensure.
+        /// </summary>
+        public static string EnsureText {
+            get {
+                return ResourceManager.GetString("EnsureText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Extension.
         /// </summary>
         public static string ExtensionText {
             get {
                 return ResourceManager.GetString("ExtensionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Frontend logs folder.
+        /// </summary>
+        public static string FeLogsFolder {
+            get {
+                return ResourceManager.GetString("FeLogsFolder", resourceCulture);
             }
         }
         
@@ -330,11 +465,29 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mirror Chyan‘s high-speed download service.
+        /// </summary>
+        public static string MirrorChyanTipText {
+            get {
+                return ResourceManager.GetString("MirrorChyanTipText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hold to modify.
         /// </summary>
         public static string ModifyHoldText {
             get {
                 return ResourceManager.GetString("ModifyHoldText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New config.
+        /// </summary>
+        public static string NewConfigText {
+            get {
+                return ResourceManager.GetString("NewConfigText", resourceCulture);
             }
         }
         
@@ -357,6 +510,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Receiver.
+        /// </summary>
+        public static string ReceiverEmailAddrText {
+            get {
+                return ResourceManager.GetString("ReceiverEmailAddrText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Receive Rewards.
         /// </summary>
         public static string ReceiveRewardsText {
@@ -375,11 +537,47 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove current config.
+        /// </summary>
+        public static string RemoveConfigText {
+            get {
+                return ResourceManager.GetString("RemoveConfigText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Resource integrity check.
         /// </summary>
         public static string ResourceIntegrityCheckText {
             get {
                 return ResourceManager.GetString("ResourceIntegrityCheckText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save data only without running.
+        /// </summary>
+        public static string SaveOnlyButtonTipText {
+            get {
+                return ResourceManager.GetString("SaveOnlyButtonTipText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save Only.
+        /// </summary>
+        public static string SaveOnlyText {
+            get {
+                return ResourceManager.GetString("SaveOnlyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sender.
+        /// </summary>
+        public static string SenderEmailAddrText {
+            get {
+                return ResourceManager.GetString("SenderEmailAddrText", resourceCulture);
             }
         }
         
@@ -393,11 +591,47 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SMTP Port.
+        /// </summary>
+        public static string SmtpPortText {
+            get {
+                return ResourceManager.GetString("SmtpPortText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SMTP Server.
+        /// </summary>
+        public static string SmtpServerText {
+            get {
+                return ResourceManager.GetString("SmtpServerText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SMTP Settings.
+        /// </summary>
+        public static string SmtpSettingsText {
+            get {
+                return ResourceManager.GetString("SmtpSettingsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sponsor.
         /// </summary>
         public static string SponsorText {
             get {
                 return ResourceManager.GetString("SponsorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Run the task in the current mode.
+        /// </summary>
+        public static string StartButtonTipText {
+            get {
+                return ResourceManager.GetString("StartButtonTipText", resourceCulture);
             }
         }
         
@@ -425,6 +659,15 @@ namespace SRAFrontend.Localization {
         public static string StopHotkeyText {
             get {
                 return ResourceManager.GetString("StopHotkeyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop.
+        /// </summary>
+        public static string StopText {
+            get {
+                return ResourceManager.GetString("StopText", resourceCulture);
             }
         }
         
@@ -488,6 +731,15 @@ namespace SRAFrontend.Localization {
         public static string TrailblazePowerText {
             get {
                 return ResourceManager.GetString("TrailblazePowerText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        public static string UnknownText {
+            get {
+                return ResourceManager.GetString("UnknownText", resourceCulture);
             }
         }
         

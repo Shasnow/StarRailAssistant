@@ -177,4 +177,88 @@
     <data name="InTheEndText" xml:space="preserve">
         <value>In the End</value>
     </data>
+    <data name="StopText" xml:space="preserve">
+        <value>Stop</value>
+    </data>
+    <data name="CurrentText" xml:space="preserve">
+        <value>Current</value>
+    </data>
+    <data name="AllText" xml:space="preserve">
+        <value>All</value>
+    </data>
+    <data name="SaveOnlyText" xml:space="preserve">
+        <value>Save Only</value>
+    </data>
+    <data name="UnknownText" xml:space="preserve">
+        <value>Unknown</value>
+    </data>
+    <data name="ConfigInputMarkText" xml:space="preserve">
+        <value>Please enter a config name</value>
+    </data>
+    <data name="NewConfigText" xml:space="preserve">
+        <value>New config</value>
+    </data>
+    <data name="EnsureText" xml:space="preserve">
+        <value>Ensure</value>
+    </data>
+    <data name="RemoveConfigText" xml:space="preserve">
+        <value>Remove current config</value>
+    </data>
+    <data name="StartButtonTipText" xml:space="preserve">
+        <value>Run the task in the current mode</value>
+    </data>
+    <data name="CurrentButtonTipText" xml:space="preserve">
+        <value>Run the currently selected config</value>
+    </data>
+    <data name="AllButtonTipText" xml:space="preserve">
+        <value>Run all configurations</value>
+    </data>
+    <data name="SaveOnlyButtonTipText" xml:space="preserve">
+        <value>Save data only without running</value>
+    </data>
+    <data name="BgImagePathWatermarkText" xml:space="preserve">
+        <value>Please enter the image path</value>
+    </data>
+    <data name="SmtpSettingsText" xml:space="preserve">
+        <value>SMTP Settings</value>
+    </data>
+    <data name="SmtpServerText" xml:space="preserve">
+        <value>SMTP Server</value>
+    </data>
+    <data name="SmtpPortText" xml:space="preserve">
+        <value>SMTP Port</value>
+    </data>
+    <data name="SenderEmailAddrText" xml:space="preserve">
+        <value>Sender</value>
+    </data>
+    <data name="AuthorCodeText" xml:space="preserve">
+        <value>Authorization Code</value>
+    </data>
+    <data name="ReceiverEmailAddrText" xml:space="preserve">
+        <value>Receiver</value>
+    </data>
+    <data name="CreateShortcutText" xml:space="preserve">
+        <value>Create a desktop shortcut</value>
+    </data>
+    <data name="CheckForUpdateText" xml:space="preserve">
+        <value>Check for update</value>
+    </data>
+    <data name="AutoUpdateTipText" xml:space="preserve">
+        <value>Automatically download and unzip when updates are available</value>
+    </data>
+    <data name="MirrorChyanTipText" xml:space="preserve">
+        <value>Mirror Chyan‘s high-speed download service</value>
+    </data>
+    <data name="BeLogsFolderText" xml:space="preserve">
+        <value>Backend logs folder</value>
+    </data>
+    <data name="FeLogsFolder" xml:space="preserve">
+        <value>Frontend logs folder</value>
+    </data>
+    <data name="ConfigsFolder" xml:space="preserve">
+        <value>Configs folder</value>
+    </data>
+    <data name="AppDataFolder" xml:space="preserve">
+        <value>App data folder</value>
+    </data>
 </root>

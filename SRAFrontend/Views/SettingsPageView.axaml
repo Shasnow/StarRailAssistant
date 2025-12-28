@@ -110,7 +110,7 @@
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.BackgroundImageText}" />
                                         <TextBox Grid.Column="2"
                                                  Width="400"
-                                                 Watermark="请输入图片路径"
+                                                 Watermark="{x:Static lang:Resources.BgImagePathWatermarkText}"
                                                  Text="{Binding Settings.BackgroundImagePath}" />
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto, *, Auto, 28">
@@ -172,28 +172,28 @@
                                                       IsChecked="{Binding Settings.AllowSystemNotifications}" />
                                             <CheckBox Content="{x:Static lang:Resources.EmailNotificationText}"
                                                       IsChecked="{Binding Settings.AllowEmailNotifications}" />
-                                            <Expander Header="SMTP设置">
+                                            <Expander Header="{x:Static lang:Resources.SmtpSettingsText}">
                                                 <Grid RowDefinitions="Auto,*,*,*,*" ColumnDefinitions="*,*">
-                                                    <Label Grid.Row="0" Grid.Column="0" Content="SMTP服务器" />
+                                                    <Label Grid.Row="0" Grid.Column="0" Content="{x:Static lang:Resources.SmtpServerText}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding Settings.SmtpServer}"
-                                                             Watermark="例：smtp.qq.com" />
-                                                    <Label Grid.Row="1" Grid.Column="0" Content="SMTP端口" />
+                                                             Watermark="smtp.qq.com" />
+                                                    <Label Grid.Row="1" Grid.Column="0" Content="{x:Static lang:Resources.SmtpPortText}" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
                                                              Text="{Binding Settings.SmtpPort}"
-                                                             Watermark="例：465" />
-                                                    <Label Grid.Row="2" Grid.Column="0" Content="发送邮件地址" />
+                                                             Watermark="465" />
+                                                    <Label Grid.Row="2" Grid.Column="0" Content="{x:Static lang:Resources.SenderEmailAddrText}" />
                                                     <TextBox Grid.Row="2" Grid.Column="1"
                                                              Text="{Binding Settings.EmailSender}"
-                                                             Watermark="例：123456@qq.com" />
-                                                    <Label Grid.Row="3" Grid.Column="0" Content="邮件授权码" />
+                                                             Watermark="123456@qq.com" />
+                                                    <Label Grid.Row="3" Grid.Column="0" Content="{x:Static lang:Resources.AuthorCodeText}" />
                                                     <TextBox Grid.Row="3" Grid.Column="1"
                                                              Text="{Binding Settings.EmailAuthCode}"
-                                                             Watermark="例：123456" />
-                                                    <Label Grid.Row="4" Grid.Column="0" Content="接收邮件地址" />
+                                                             Watermark="123456" />
+                                                    <Label Grid.Row="4" Grid.Column="0" Content="{x:Static lang:Resources.ReceiverEmailAddrText}" />
                                                     <TextBox Grid.Row="4" Grid.Column="1"
                                                              Text="{Binding Settings.EmailReceiver}"
-                                                             Watermark="例：123456@qq.com" />
+                                                             Watermark="123456@qq.com" />
                                                 </Grid>
                                             </Expander>
                                         </StackPanel>
@@ -223,7 +223,7 @@
                                     <!--                   IsChecked="{Binding Settings.EnableMinimizeToTray}" -->
                                     <!--                   IsEnabled="False" /> -->
                                     <!-- </Grid> -->
-                                    <Button Content="创建桌面快捷方式"
+                                    <Button Content="{x:Static lang:Resources.CreateShortcutText}"
                                             HorizontalAlignment="Left"
                                             Command="{Binding CreateDesktopShortcutCommand}"/>
                                 </StackPanel>
@@ -233,14 +233,14 @@
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.UpdateText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
-                                    <Button Content="检查更新"
+                                    <Button Content="{x:Static lang:Resources.CheckForUpdateText}"
                                             HorizontalAlignment="Left"
                                             Command="{Binding CheckForUpdatesCommand}" />
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Classes="icon">&#xe094;</Label>
                                         <Label Grid.Column="1"
                                                Content="{x:Static lang:Resources.AutoUpdateText}"
-                                               ToolTip.Tip="有可用更新时自动下载并解压" />
+                                               ToolTip.Tip="{x:Static lang:Resources.AutoUpdateTipText}" />
                                         <ToggleSwitch Grid.Column="2" IsChecked="{Binding Settings.EnableAutoUpdate}" />
                                     </Grid>
 
@@ -248,7 +248,7 @@
                                         <Label Classes="icon">&#xed6a;</Label>
                                         <Label Grid.Column="1"
                                                Content="{x:Static lang:Resources.MirrorChyanText}"
-                                               ToolTip.Tip="Mirror 酱高速下载服务" />
+                                               ToolTip.Tip="{x:Static lang:Resources.MirrorChyanTipText}" />
                                         <StackPanel Grid.Column="2">
                                             <TextBox
                                                 Watermark="Enter You CDK"
@@ -287,16 +287,16 @@
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <Button Content="后端日志文件夹"
+                                        <Button Content="{x:Static lang:Resources.BeLogsFolderText}"
                                                 Command="{Binding OpenFolderCommand}"
                                                 CommandParameter="backendLogs"/>
-                                        <Button Content="前端日志文件夹"
+                                        <Button Content="{x:Static lang:Resources.FeLogsFolder}"
                                                 Command="{Binding OpenFolderCommand}"
                                                 CommandParameter="frontendLogs"/>
-                                        <Button Content="配置文件夹"
+                                        <Button Content="{x:Static lang:Resources.ConfigsFolder}"
                                                 Command="{Binding OpenFolderCommand}"
                                                 CommandParameter="configs"/>
-                                        <Button Content="应用程序文件夹"
+                                        <Button Content="{x:Static lang:Resources.AppDataFolder}"
                                                 Command="{Binding OpenFolderCommand}"
                                                 CommandParameter="appdata"/>
                                     </StackPanel>
@@ -314,10 +314,10 @@
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
                                     <TextBlock TextWrapping="Wrap" xml:space="preserve">
-版本 : <Run Text="{Binding VersionText}" />
+版本 / Version : <Run Text="{Binding VersionText}" />
 © 2024-2025 StarRailAssistant, All rights reserved.
 
-链接 :
+链接 / Links :
 <Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="*,*" ColumnSpacing="20" RowSpacing="10">
     <HyperlinkButton NavigateUri="https://starrailassistant.top" Content="SRA官网" />
     <HyperlinkButton Grid.Row="0" Grid.Column="1" NavigateUri="https://github.com/Shasnow/StarRailAssistant"
