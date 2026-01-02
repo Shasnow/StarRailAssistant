@@ -153,11 +153,11 @@ class TaskManager:
         setup_logger()
         self.running_flag = True
         logger.debug(t('task.start'))
-        logger.debug(f"run single task: config={config_name}, task={task}")
         try:
             if config_name is None:
                 # 不指定配置时，使用缓存中的当前配置名称
                 config_name = load_cache().get("CurrentConfigName")
+            logger.debug(f"run single task: config={config_name}, task={task}")
             # 获取任务实例
             task_instance = self.get_task(config_name, task)
             logger.debug('running task: ' + str(task_instance.__class__.__name__))

@@ -1,3 +1,4 @@
+import math
 from typing import Any
 
 from SRACore.task import BaseTask
@@ -23,6 +24,14 @@ class TrailblazePowerTask(BaseTask):
             "侵蚀隧洞": 40,
             "历战余响": 30
         }
+        self.task_max_count_map = {
+            "饰品提取": 6,
+            "拟造花萼（金）": 24,
+            "拟造花萼（赤）": 24,
+            "凝滞虚影": 8,
+            "侵蚀隧洞": 6,
+            "历战余响": 3
+        }
         self.replenish_time = self.config.get('TrailblazePowerReplenishTimes')
         self.replenish_way = self.config.get('TrailblazePowerReplenishWay')
         self.replenish_flag = self.config.get('TrailblazePowerReplenishEnable')
@@ -41,38 +50,81 @@ class TrailblazePowerTask(BaseTask):
                 ))
 
     def detect_tasks(self) -> list[Any] | None:
+        """
+        识别体力值并计算可执行的任务列表
+        返回：任务列表（格式：[(任务对象, {"level": 等级, "single_time": 单次次数, "run_time": 执行轮数})]）
+        失败返回None
+        """
         if not self.goto_survival_index():
+            logger.error("跳转生存索引页面失败")
             return None
         self.sleep(0.5)  # 等待页面加载
-        # 识别体力值
-        res = self.ocr(from_x=0.65625, from_y=0.0417, to_x=0.908, to_y=0.076)
-        valid_res=[r[1] for r in res if r[1] not in ['+', '十']]  # 过滤掉识别结果中的加号
         try:
+            # OCR识别体力值并过滤无效字符
+            res = self.ocr(from_x=0.65625, from_y=0.0417, to_x=0.908, to_y=0.076)
+            if not res:
+                logger.error("OCR识别结果为空")
+                self.press_key("esc")
+                return None
+            # 过滤加号（兼容全角/空格变体）+ 空字符串
+            exclude_chars = {'+', '十', '＋'}
+            valid_res = [r[1] for r in res if r[1] not in exclude_chars]
             reserve_tbp = int(valid_res[0])
-            current_tbp = int(valid_res[1].split('/')[0])
-            immersion_dev = int(valid_res[2].split('/')[0])
-        except (ValueError, IndexError):
-            logger.error("体力识别失败，无法进行自动检测")
+            current_tbp_str = valid_res[1].split('/')[0] if '/' in valid_res[1] else valid_res[1]
+            current_tbp = int(current_tbp_str)
+            immersion_dev_str = valid_res[2].split('/')[0] if '/' in valid_res[2] else valid_res[2]
+            immersion_dev = int(immersion_dev_str)
+        except (ValueError, IndexError) as e:
+            logger.error(f"体力识别失败, 无法进行自动检测: {e}")
             self.press_key("esc")
             return None
+
         logger.info(f"当前后备开拓力: {reserve_tbp}, 当前开拓力: {current_tbp}, 沉浸器: {immersion_dev}")
-        ava_current_tbp = current_tbp//10 * 10  # 向下取整到10的倍数
-        cost_per_task = int(ava_current_tbp // len(self.auto_detect_tasklist))  # 每个任务可用体力
+        # 计算可用体力, 向下取整到10的倍数，且确保大于0
+        ava_current_tbp = (current_tbp // 10) * 10
+        if ava_current_tbp <= 0:
+            logger.warning("可用开拓力为0，无任务可执行")
+            return None
+        # 计算每个任务的可执行次数
+        total_tasks = len(self.auto_detect_tasklist)
+        cost_per_task = ava_current_tbp // total_tasks  # 每个任务分配的体力
+        if cost_per_task <= 0:
+            logger.warning(f"每个任务分配的体力为0 (总可用体力：{ava_current_tbp}，任务数：{total_tasks})")
+            return None
+
         tasks = []
         for task_info in self.auto_detect_tasklist:
-            task_name = task_info["Name"]
-            task_level = task_info["Level"]
+            # 提取任务基础信息
+            task_name = task_info.get("Name")
+            task_level = task_info.get("Level", 0)
+            if not task_name:
+                logger.warning("任务名为空，跳过该任务")
+                continue
+            # 获取任务单次成本
             task_cost = self.get_task_cost(task_name)
-            max_single_times = cost_per_task // task_cost  # 该任务单次可执行最大次数
-            logger.info(f"{task_name} 自动检测的挑战次数: {max_single_times}")
-            if max_single_times > 0:
+            # 计算该任务可执行总次数
+            total_task_count = cost_per_task // task_cost
+            if total_task_count <= 0:
+                logger.debug(f"任务[{task_name}]可执行次数为0 (分配体力: {cost_per_task}, 单次成本: {task_cost})")
+                continue
+            logger.info(f"{task_name} 自动检测的挑战次数: {total_task_count}")
+            # 获取任务最大单次执行次数（默认1）
+            max_count = self.task_max_count_map.get(task_name, 1)
+            # 分割任务（按最大次数拆分）
+            remaining_count = total_task_count
+            while remaining_count > 0:
+                # 单次执行次数：不超过最大次数，且不超过剩余次数
+                single_time = min(max_count, remaining_count)
                 tasks.append((
                     self.name2task(task_name),
-                    {"level": task_level,
-                     "single_time": max_single_times,
-                     "run_time": 1}
+                    {
+                        "level": task_level,
+                        "single_time": single_time,
+                        "run_time": 1  # 每轮执行1次
+                    }
                 ))
-        return tasks
+                remaining_count -= single_time
+        return tasks if tasks else None
 
 
     def name2task(self, name: str):
