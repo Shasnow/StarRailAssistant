@@ -7,7 +7,7 @@
         "version_help": "Show version information and exit",
         "verbose_help": "Enable verbose logging (debug mode)",
         "commands_title": "commands",
-        "run_help": "Execute task once (e.g., \"run Default\")",
+        "run_help": "Execute tasks in configs (e.g., \"run Default\")",
         "run_description": "Enter interactive mode after execution by default, use --once to exit immediately",
         "config_help": "Configuration names to run, if not specified, run all configurations in cache",
         "once_help": "Exit after task execution",
@@ -54,7 +54,10 @@
         "run_usage": "Usage:\n  run [config_name...]\nDescription:\n    - If no configuration name is specified, run all configurations in cache.\n    - You can specify one or more configuration names, separated by spaces.\n    - Tasks cannot be interrupted during execution except by exiting the program.\nExamples:\n    sra> run DefaultConfig\n    sra> run Config1 Config2\n    sra> run",
         "run_blocking": "Running tasks, current command line will be blocked until tasks complete...",
         "run_completed": "Task execution completed, returning to command line.",
-        "admin_check_error": "Error checking administrator privileges: {error}"
+        "admin_check_error": "Error checking administrator privileges: {error}",
+        "single_help": "Execute a single task in config",
+        "single_description": "Execute a single task in the specified configuration and exit immediately after completion",
+        "single_usage": "Usage: SRA-cli single <config_name>"
     },
     "task": {
         "load_success": "Successfully load task: {tasks}",

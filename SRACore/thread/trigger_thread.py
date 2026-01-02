@@ -27,10 +27,10 @@ class TriggerManager:
         """
         停止触发器管理器的运行。
         """
-        logger.debug(t('trigger.stopping'))
         for trigger in self.triggers:
             trigger.set_enable(False)
         self.isRunning = False
+        logger.debug('request to stop trigger manager')
 
     def register(self, trigger: BaseTrigger):
         """

@@ -7,11 +7,10 @@ from SRACore.util.i18n import t
 
 
 def main():
-    # 创建 argparse 解析器
     parser = argparse.ArgumentParser(
         description=t('cli.description'),
         epilog=t('cli.examples'),
-        formatter_class=argparse.RawTextHelpFormatter  # 保留换行符，优化帮助信息格式
+        formatter_class=argparse.RawTextHelpFormatter
     )
     # 全局参数（模式控制）
     parser.add_argument(
@@ -30,26 +29,26 @@ def main():
         version=f'SRA-cli {VERSION}',
         help=t('cli.version_help')
     )
-
     parser.add_argument(
         '--log-level',
         type=str,
-        choices=['TRACE','DEBUG', 'INFO', 'SUCCESS', 'WARNING', 'ERROR', 'CRITICAL'],
+        choices=['TRACE', 'DEBUG', 'INFO', 'SUCCESS', 'WARNING', 'ERROR', 'CRITICAL'],
         default='TRACE',
         help=t('cli.log_level_help')
     )
-
-    # 子命令：run（用于单次执行命令）
+    # 子命令解析器
     subparsers = parser.add_subparsers(
-        dest='subcommand',  # 存储子命令名称的变量
+        dest='subcommand',
         title=t('cli.commands_title'),
+        required=False,  # 允许不指定子命令（进入交互模式）
+        help=t('cli.commands_help')  # 补充子命令整体说明
     )
+    # 子命令：run
     run_parser = subparsers.add_parser(
         'run',
         help=t('cli.run_help'),
         description=t('cli.run_description')
     )
-    # 接收 run 后的所有参数（作为要执行的命令）
     run_parser.add_argument(
         '--config',
         nargs='*',
@@ -61,9 +60,32 @@ def main():
         help=t('cli.once_help')
     )
 
+    # 子命令：single
+    single_parser = subparsers.add_parser(
+        'single',
+        help=t('cli.single_help'),
+        description=t('cli.single_description')
+    )
+    single_parser.add_argument(
+        '--task-name', '-t',
+        type=str,
+        required=True,
+        help=t('cli.task_name_help')
+    )
+    single_parser.add_argument(
+        '--config',
+        nargs='?',  # 0或1个参数
+        help=t('cli.config_help')
+    )
+    single_parser.add_argument(
+        '--once',
+        action='store_true',
+        help=t('cli.once_help')
+    )
+
     # 解析参数
     args = parser.parse_args()
-    # 延迟导入 SRACli（减少启动时的依赖加载）
+    # 延迟导入 SRACli
     from SRACore.util.logger import logger, setup_logger, set_log_level
     # 设置日志级别
     set_log_level(args.log_level)
@@ -72,20 +94,41 @@ def main():
     from SRACore.SRA import SRACli
     cli_instance = SRACli()
     logger.debug(t('cli.working_directory', path=os.getcwd()))
-    # 根据参数处理模式
-    # 内嵌模式：隐藏提示符
+    # 配置交互式模式（隐藏提示符）
     if args.inline or args.embed:
         cli_instance.intro = ''
         cli_instance.prompt = ''
-    # 处理 run 子命令（单次执行）
-    if args.subcommand == 'run':
-        cmd_str = 'run '
-        if args.config:
-             cmd_str += ' '.join(args.config)
-        cli_instance.onecmd(cmd_str)
-        if args.once:
-            sys.exit(0)  # 若指定 --once 或命令返回退出信号（如 exit），则退出
 
+    # 统一处理子命令逻辑
+    def execute_subcommand(cmd_prefix: str, *args_parts:str) -> bool:
+        """
+        拼接并执行子命令，返回是否需要退出
+        :param cmd_prefix: 指令前缀（run/single）
+        :param args_parts: 指令参数列表
+        :return: 是否退出（onecmd返回True 或 指定--once）
+        """
+        # 拼接指令
+        cmd_str = f"{cmd_prefix} {' '.join(arg for arg in args_parts if arg)}"
+        if not cmd_str:
+            return False
+        # 执行指令
+        logger.info(cmd_str)
+        exit_flag = cli_instance.onecmd(cmd_str)
+        # 判断是否需要退出
+        return exit_flag or args.once
+
+    # 7. 处理子命令
+    exit_program = False
+    if args.subcommand == 'run':
+        # 处理 run 子命令：config 是列表，拼接为空格分隔的字符串
+        exit_program = execute_subcommand('run', *args.config if args.config else [])
+    elif args.subcommand == 'single':
+        # 处理 single 子命令：task-name + config（单个参数）
+        exit_program = execute_subcommand('single', args.task_name, args.config)
+
+    # 8. 退出或启动交互式命令行
+    if exit_program:
+        sys.exit(0)
     cli_instance.cmdloop()
 
 

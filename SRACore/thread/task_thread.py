@@ -117,7 +117,11 @@ class TaskManager:
         """
         # 加载指定配置
         config = load_config(config_name)
-        logger.debug('config: ' + str(config))
+        if config is None:
+            return []
+        print_config = config.copy()
+        print_config["StartGamePassword"] = "******"
+        logger.debug('config: ' + str(print_config))
         # 从配置中读取任务选择列表（如 [True, False, True]）
         task_select = config.get("EnabledTasks")
         logger.debug('task_select: ' + str(task_select))
@@ -160,6 +164,9 @@ class TaskManager:
             logger.debug(f"run single task: config={config_name}, task={task}")
             # 获取任务实例
             task_instance = self.get_task(config_name, task)
+            if task_instance is None:
+                logger.error(f"Task not found: {task}")
+                return False
             logger.debug('running task: ' + str(task_instance.__class__.__name__))
             # 运行任务
             result = task_instance.run()
@@ -175,7 +182,7 @@ class TaskManager:
             self.running_flag = False
             logger.debug("[Done]")
 
-    def get_task(self, config_name: str, task: str) -> BaseTask:
+    def get_task(self, config_name: str, task: str) -> BaseTask | None:
         """
         根据配置名称和任务索引或名称获取单个任务实例。
 
@@ -189,10 +196,6 @@ class TaskManager:
         Raises:
             ValueError: 如果任务未找到或配置加载失败
         """
-        # 加载指定配置
-        config = load_config(config_name)
-        logger.debug('config: ' + str(config))
-
         # 根据参数类型获取任务类
         task_class = None
         if task.isdecimal():
@@ -205,10 +208,17 @@ class TaskManager:
                     task_class = cls
                     break
         if task_class is None:
-            raise ValueError(f"Task not found: {task}")
+            return None
         try:
+            # 加载指定配置
+            config = load_config(config_name)
+            if config is None:
+                return None
+            print_config = config.copy()
+            print_config["StartGamePassword"] = "******"
+            logger.debug('config: ' + str(config))
             # 实例化任务类
             return task_class(config)
         except Exception as e:
-            logger.exception(t('task.instantiate_failed', index=task, error=str(e)))
-            raise
+            logger.error(t('task.instantiate_failed', index=task, error=f'{e.__class__.__name__}: {e}'))
+            return None
