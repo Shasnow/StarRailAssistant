@@ -206,7 +206,8 @@ public partial class TaskPageViewModel : PageViewModel
                     "寒潮的落幕",
                     "毁灭的开端"
                 },
-                MaxSingleTimes = 3
+                MaxSingleTimes = 3,
+                CanAutoDetect = false
             }
         ];
     }
