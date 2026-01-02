@@ -51,8 +51,9 @@ class SRACli(cmd.Cmd):
             return t('cli.help_no_doc')
         return help_text
 
-    def do_EOF(self, arg):
+    def do_EOF(self, arg):  # NOQA
         """Ctrl+D exit command line tool"""
+        print()
         return self.do_exit(arg)
 
     def do_help(self, arg):
@@ -221,7 +222,20 @@ class SRACli(cmd.Cmd):
             return
         print(t('cli.run_completed'))
 
-    def do_version(self, _):
+    def do_single(self, arg: str):
+        """Run a single specified task, will block current command line until task complete"""
+        args = arg.split()
+        if len(args) < 1:
+            print(f"Usage: single <task name | index> [config_name]")
+            return
+        print(t('cli.run_blocking'))
+        try:
+            self.task_manager.run_task(*args)
+        except KeyboardInterrupt:
+            return
+        print(t('cli.run_completed'))
+
+    def do_version(self, _):  # NOQA
         """Show version information"""
         print(f"{VERSION}")
 

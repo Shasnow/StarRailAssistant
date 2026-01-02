@@ -94,7 +94,7 @@ class EventListener:
     def run(cls) -> None:
         """启动事件监听器（独立子线程，不阻塞主线程）"""
         if cls._listener_thread and cls._listener_thread.is_alive():
-            logger.info("事件监听器已启动，无需重复运行")
+            logger.info("event listener is already running")
             return
 
         # 重置退出事件
@@ -105,7 +105,7 @@ class EventListener:
             daemon=True  # 守护线程，主线程退出时自动终止
         )
         cls._listener_thread.start()
-        logger.debug("事件监听器已启动")
+        logger.debug("event listener started")
 
     @classmethod
     def stop(cls) -> None:
@@ -114,4 +114,4 @@ class EventListener:
         if cls._listener_thread and cls._listener_thread.is_alive():
             cls._listener_thread.join(timeout=1)
             cls._listener_thread = None
-        logger.debug("事件监听器已停止")
+        logger.debug("event listener stopped")

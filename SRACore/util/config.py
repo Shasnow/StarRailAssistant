@@ -1,3 +1,5 @@
+from typing import Any
+
 from SRACore.util.logger import logger
 
 from SRACore.util.const import AppDataSraDir
@@ -5,7 +7,7 @@ from SRACore.util.i18n import t
 import json
 
 
-def load_config(name:str):
+def load_config(name:str) -> dict[str, Any] | None:
     try:
         if ".json" in name:
             path = name.replace('\"', '')
@@ -15,13 +17,13 @@ def load_config(name:str):
            return json.load(f)
     except FileNotFoundError as e:
         logger.error(t('config.file_not_found', name=name, error=e))
-        return {}
+        return None
     except json.JSONDecodeError as e:
         logger.error(t('config.parse_error', name=name, error=e))
-        return {}
+        return None
     except Exception as e:
         logger.error(t('config.load_error', name=name, error=e))
-        return {}
+        return None
 
 def load_settings():
     try:
