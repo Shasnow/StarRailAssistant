@@ -17,6 +17,8 @@ public partial class TrailblazePowerTask(Action<TrailblazePowerTask> onAddTaskIt
 
     [ObservableProperty] private int _selectedIndex;
     
+    [ObservableProperty] private bool _canAutoDetect = true;
+    
     [ObservableProperty] private bool _isAutoDetect;
 
     public string Title { get; init; } = string.Empty;

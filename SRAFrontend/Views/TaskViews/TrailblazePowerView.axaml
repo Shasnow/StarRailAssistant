@@ -70,7 +70,8 @@
 
                                                 <Grid ColumnDefinitions="*, *">
                                                     <StackPanel Grid.Column="0" Spacing="4">
-                                                        <StackPanel Orientation="Horizontal">
+                                                        <StackPanel Orientation="Horizontal"
+                                                                    IsVisible="{Binding CanAutoDetect}">
                                                             <Label Content="自动检测" />
                                                             <ToggleSwitch IsChecked="{Binding IsAutoDetect}"/>
                                                         </StackPanel>
