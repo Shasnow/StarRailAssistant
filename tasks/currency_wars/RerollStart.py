@@ -36,8 +36,8 @@ class RerollStart(Executable):
     def __init__(self, operator, invest_env:str, invest_strategy:str, invest_strategy_stage:int, max_retry:int):
         super().__init__(operator)
         # 需要的开局
-        self.wanted_invest_environment = invest_env.split(',') if invest_env else []
-        self.wanted_invest_strategy = invest_strategy.split(',') if invest_strategy else []
+        self.wanted_invest_environment = invest_env.split() if invest_env else []
+        self.wanted_invest_strategy = invest_strategy.split() if invest_strategy else []
         self.wanted_invest_strategy_stage = invest_strategy_stage
         self.max_retry = max_retry
         self.cw = CurrencyWars(self.operator, 0)
