@@ -1,4 +1,3 @@
-import math
 from typing import Any
 
 from SRACore.task import BaseTask
@@ -57,13 +56,13 @@ class TrailblazePowerTask(BaseTask):
         if not self.goto_survival_index():
             logger.error("跳转生存索引页面失败")
             return None
-        self.sleep(0.5)  # 等待页面加载
+        self.operator.sleep(0.5)  # 等待页面加载
         try:
             # OCR识别体力值并过滤无效字符
-            res = self.ocr(from_x=0.65625, from_y=0.0417, to_x=0.908, to_y=0.076)
+            res = self.operator.ocr(from_x=0.65625, from_y=0.0417, to_x=0.908, to_y=0.076)
             if not res:
                 logger.error("OCR识别结果为空")
-                self.press_key("esc")
+                self.operator.press_key("esc")
                 return None
             # 过滤加号（兼容全角/空格变体）+ 空字符串
             exclude_chars = {'+', '十', '＋'}
@@ -75,7 +74,7 @@ class TrailblazePowerTask(BaseTask):
             immersion_dev = int(immersion_dev_str)
         except (ValueError, IndexError) as e:
             logger.error(f"体力识别失败, 无法进行自动检测: {e}")
-            self.press_key("esc")
+            self.operator.press_key("esc")
             return None
 
         logger.info(f"当前后备开拓力: {reserve_tbp}, 当前开拓力: {current_tbp}, 沉浸器: {immersion_dev}")
@@ -163,50 +162,50 @@ class TrailblazePowerTask(BaseTask):
         level = f"resources/img/ornament_extraction ({level}).png"
         if not self.find_session("ornament_extraction"):
             return False
-        if self.locate("resources/img/no_save.png"):
+        if self.operator.locate("resources/img/no_save.png"):
             logger.warning("当前暂无可用存档，请前往[差分宇宙]获取存档")
-            self.press_key("esc")
+            self.operator.press_key("esc")
             return False
         if not self.find_level(level):
             return False
-        if not self.click_img(level, x_offset=700):
+        if not self.operator.click_img(level, x_offset=700):
             logger.error("发生错误，错误编号3")
             return False
-        if not self.wait_img('resources/img/ornament_extraction_page.png', timeout=20):  # 等待传送
+        if not self.operator.wait_img('resources/img/ornament_extraction_page.png', timeout=20):  # 等待传送
             logger.error("检测超时，编号4")
             return False
-        if self.config.get("TrailblazePowerLineupCheck") and self.click_img("resources/img/nobody.png", after_sleep=2):
-            self.click_img("resources/img/preset_formation.png", after_sleep=2)
-            self.click_img("resources/img/team1.png", after_sleep=2)
+        if self.config.get("TrailblazePowerLineupCheck") and self.operator.click_img("resources/img/nobody.png", after_sleep=2):
+            self.operator.click_img("resources/img/preset_formation.png", after_sleep=2)
+            self.operator.click_img("resources/img/team1.png", after_sleep=2)
         if single_time is not None:
             for _ in range(single_time - 1):
-                self.sleep(0.2)
-                self.click_img("resources/img/plus.png")
-            self.sleep(1)
-        if self.click_img("resources/img/battle_star.png", after_sleep=1):
-            if self.locate("resources/img/limit.png"):
+                self.operator.sleep(0.2)
+                self.operator.click_img("resources/img/plus.png")
+            self.operator.sleep(1)
+        if self.operator.click_img("resources/img/battle_star.png", after_sleep=1):
+            if self.operator.locate("resources/img/limit.png"):
                 logger.warning("背包内遗器持有数量已达上限，请先清理")
-                self.sleep(2)
-                self.press_key("esc", interval=1, presses=2)
+                self.operator.sleep(2)
+                self.operator.press_key("esc", interval=1, presses=2)
                 return False
-            if self.locate("resources/img/replenish.png"):
+            if self.operator.locate("resources/img/replenish.png"):
                 if self.replenish_flag:
                     self.replenish(self.replenish_way)
-                    self.click_img("resources/img/battle_star.png")
+                    self.operator.click_img("resources/img/battle_star.png")
                 else:
                     logger.info("体力不足")
-                    self.press_key("esc", interval=1, presses=3)
+                    self.operator.press_key("esc", interval=1, presses=3)
                     return False
-            if not self.wait_img("resources/img/f3.png", timeout=240):
+            if not self.operator.wait_img("resources/img/f3.png", timeout=240):
                 pass
-            self.hold_key("w", 2.5)
+            self.operator.hold_key("w", 2.5)
             if self.config.get("TrailblazePowerUseSkill"):
                 for i in range(1, 5):
-                    self.press_key(str(i))
-                    self.sleep(0.5)
-                    self.press_key(self.settings.get('TechniqueHotkey', 'e').lower())
-                    self.sleep(2)
-            self.click_point(0.5, 0.5)
+                    self.operator.press_key(str(i))
+                    self.operator.sleep(0.5)
+                    self.operator.press_key(self.settings.get('TechniqueHotkey', 'e').lower())
+                    self.operator.sleep(2)
+            self.operator.click_point(0.5, 0.5)
             self.battle_star(run_time)
         logger.info("任务完成：饰品提取")
         return True
@@ -319,41 +318,41 @@ class TrailblazePowerTask(BaseTask):
             return False
         if not self.find_level(level_path):
             return False
-        if self.click_img(level_path, x_offset=x_add, y_offset=y_add):
-            if not self.wait_img('resources/img/battle.png', timeout=20):  # 等待传送
+        if self.operator.click_img(level_path, x_offset=x_add, y_offset=y_add):
+            if not self.operator.wait_img('resources/img/battle.png', timeout=20):  # 等待传送
                 logger.error("检测超时，编号4")
                 return False
             if multi is not None:
                 for _ in range(multi - 1):
-                    self.sleep(0.2)
-                    self.click_img("resources/img/plus.png")
-                self.sleep(1)
-            if not self.click_img("resources/img/battle.png", after_sleep=1):
+                    self.operator.sleep(0.2)
+                    self.operator.click_img("resources/img/plus.png")
+                self.operator.sleep(1)
+            if not self.operator.click_img("resources/img/battle.png", after_sleep=1):
                 logger.error("发生错误，错误编号3")
                 return False
-            if self.locate("resources/img/replenish.png"):
+            if self.operator.locate("resources/img/replenish.png"):
                 if self.replenish_flag and self.replenish_time != 0:
                     self.replenish(self.replenish_way)
-                    self.click_img("resources/img/battle.png")
+                    self.operator.click_img("resources/img/battle.png")
                 else:
                     logger.info("体力不足")
-                    self.press_key("esc", interval=1, presses=3)
+                    self.operator.press_key("esc", interval=1, presses=3)
                     return False
             if self.config["TrailblazePowerUseAssistant"]:
                 self.support()
-            self.sleep(1)
-            if not self.click_img("resources/img/battle_star.png", after_sleep=1):
+            self.operator.sleep(1)
+            if not self.operator.click_img("resources/img/battle_star.png", after_sleep=1):
                 logger.warning("发生错误，错误编号4")
-                self.press_key("esc", interval=1, presses=3)
+                self.operator.press_key("esc", interval=1, presses=3)
                 return False
-            if self.locate("resources/img/limit.png"):
+            if self.operator.locate("resources/img/limit.png"):
                 logger.warning("背包内遗器已达上限，请先清理")
-                self.sleep(3)
-                self.press_key("esc", interval=1, presses=3)
+                self.operator.sleep(3)
+                self.operator.press_key("esc", interval=1, presses=3)
                 return False
-            if self.locate("resources/img/ensure.png"):
+            if self.operator.locate("resources/img/ensure.png"):
                 logger.info("编队中存在无法战斗的角色")
-                self.press_key("esc", presses=3, interval=1.5)
+                self.operator.press_key("esc", presses=3, interval=1.5)
                 return False
             else:
                 self.battle_star(run_time)
@@ -363,56 +362,56 @@ class TrailblazePowerTask(BaseTask):
     def battle_star(self, run_time: int):
         logger.info("开始战斗")
         logger.info("请检查自动战斗和倍速是否开启")
-        if self.wait_img("resources/img/q.png"):
-            self.press_key("v")
+        if self.operator.wait_img("resources/img/q.png"):
+            self.operator.press_key("v")
         while run_time > 1:
             logger.info(f"剩余次数{run_time}")
             battle_status = self.wait_battle_end()
             if battle_status == 1:
                 logger.warning("战斗失败")
-                self.click_point(0.5, 0.5)  # 点击屏幕中心
+                self.operator.click_point(0.5, 0.5)  # 点击屏幕中心
                 break
 
             if self.config["TrailblazePowerChangeLineup"]:
-                self.click_img("resources/img/change_lineup.png")
-            if not self.click_img("resources/img/again.png"):
+                self.operator.click_img("resources/img/change_lineup.png")
+            if not self.operator.click_img("resources/img/again.png"):
                 logger.error("发生错误，错误编号5")
                 continue
-            if self.wait_img("resources/img/replenish.png", timeout=2):
+            if self.operator.wait_img("resources/img/replenish.png", timeout=2):
                 if self.replenish_flag and self.replenish_time:
                     self.replenish(self.replenish_way)
-                    self.click_img("resources/img/again.png")
+                    self.operator.click_img("resources/img/again.png")
                 else:
                     logger.info("体力不足")
-                    self.press_key("esc")
-                    if not self.click_img("resources/img/quit_battle.png"):
+                    self.operator.press_key("esc")
+                    if not self.operator.click_img("resources/img/quit_battle.png"):
                         logger.error("发生错误，错误编号12")
                     logger.info("退出战斗")
-                    result, _ = self.wait_any_img(["resources/img/battle.png", "resources/img/enter.png"], timeout=10)
+                    result, _ = self.operator.wait_any_img(["resources/img/battle.png", "resources/img/enter.png"], timeout=10)
                     if result == 0:
-                        self.press_key("esc", wait=1)
+                        self.operator.press_key("esc", wait=1)
                     elif result == 1:
                         pass
                     break
             if self.config["TrailblazePowerUseAssistant"]:
                 self.support()
             if self.config["TrailblazePowerChangeLineup"]:
-                self.click_img("resources/img/battle_star.png")
+                self.operator.click_img("resources/img/battle_star.png")
 
             run_time -= 1
-            self.sleep(3)
+            self.operator.sleep(3)
         else:
             battle_status = self.wait_battle_end()
             if battle_status == 1:
                 logger.warning("战斗失败")
-                self.click_point(0.5, 0.5)  # 点击屏幕中心
+                self.operator.click_point(0.5, 0.5)  # 点击屏幕中心
             else:
-                if not self.click_img("resources/img/quit_battle.png"):
+                if not self.operator.click_img("resources/img/quit_battle.png"):
                     logger.error("发生错误，错误编号12")
             logger.info("退出战斗")
-            resources, _ = self.wait_any_img(["resources/img/battle.png", "resources/img/enter.png"])
+            resources, _ = self.operator.wait_any_img(["resources/img/battle.png", "resources/img/enter.png"])
             if resources == 0:
-                self.press_key("esc", wait=1)
+                self.operator.press_key("esc", wait=1)
             elif resources == 1:
                 pass
 
@@ -427,9 +426,9 @@ class TrailblazePowerTask(BaseTask):
         """
         logger.info("等待战斗结束")
         while True:
-            self.sleep(1)
+            self.operator.sleep(1)
             # 检查战斗结束状态
-            index, _ = self.locate_any([
+            index, _ = self.operator.locate_any([
                 "resources/img/quit_battle.png",
                 "resources/img/battle_failure.png",
                 "resources/img/light_cone.png"
@@ -438,7 +437,7 @@ class TrailblazePowerTask(BaseTask):
                 continue  # 继续等待战斗结束
             if index == 2:
                 logger.info("获得光锥")
-                self.click_point(0.5, 0.8)  # 点击屏幕中心偏下位置关闭弹窗
+                self.operator.click_point(0.5, 0.8)  # 点击屏幕中心偏下位置关闭弹窗
                 continue  # 继续检测战斗结束状态
             logger.info("战斗结束")
             return index
@@ -449,24 +448,24 @@ class TrailblazePowerTask(BaseTask):
         Returns:
             True if found.
         """
-        self.move_to(0.45, 0.5)
+        self.operator.move_to(0.45, 0.5)
         times = 0
         while True:
             times += 1
             if times == 20:
                 return False
-            self.sleep(0.5)
-            if self.locate(level):
+            self.operator.sleep(0.5)
+            if self.operator.locate(level):
                 return True
             else:
                 for _ in range(12):
-                    self.scroll(-1)
+                    self.operator.scroll(-1)
 
     def support(self):
-        if self.click_img("resources/img/remove_support.png", after_sleep=1):
-            self.move_rel(0, 100)
-        if self.click_img("resources/img/support.png", after_sleep=1):
-            self.click_img("resources/img/enter_line.png", after_sleep=1)
+        if self.operator.click_img("resources/img/remove_support.png", after_sleep=1):
+            self.operator.move_rel(0, 100)
+        if self.operator.click_img("resources/img/support.png", after_sleep=1):
+            self.operator.click_img("resources/img/enter_line.png", after_sleep=1)
 
     def find_session(self, name, scroll_flag=False):
         name1 = "resources/img/" + name + ".png"
@@ -474,17 +473,17 @@ class TrailblazePowerTask(BaseTask):
         if not self.goto_survival_index():
             return False
         if scroll_flag:
-            self.move_to(0.25, 0.5)
-            self.sleep(1)
+            self.operator.move_to(0.25, 0.5)
+            self.operator.sleep(1)
             for i in range(10):
-                self.scroll(-5)
-        self.sleep(0.5)
-        _, result = self.locate_any([name1, name2])
+                self.operator.scroll(-5)
+        self.operator.sleep(0.5)
+        _, result = self.operator.locate_any([name1, name2])
         if result:
-            self.click_box(result)
+            self.operator.click_box(result)
         else:
             logger.error("发生错误，错误编号2")
-            self.press_key("esc")
+            self.operator.press_key("esc")
             return False
         return True
 
@@ -506,7 +505,7 @@ class TrailblazePowerTask(BaseTask):
         if self.replenish_time != 0:
             logger.info("补充体力")
             if way == 0:
-                if self.locate("resources/img/reserved_trailblaze_power_onclick.png") or self.click_img(
+                if self.operator.locate("resources/img/reserved_trailblaze_power_onclick.png") or self.operator.click_img(
                         "resources/img/reserved_trailblaze_power.png"):
                     # click('resources/img/count.png', x_add=200)
                     # if self.replenish_time>300:
@@ -515,28 +514,28 @@ class TrailblazePowerTask(BaseTask):
                     # else:
                     #     write(str(self.replenish_time))
                     #     self.replenish_time=1
-                    self.click_img("resources/img/ensure.png", after_sleep=1)
-                    self.click_img("resources/img/ensure.png", after_sleep=1)
-                    self.click_point(0.5, 0.7)  # 点击屏幕中心
+                    self.operator.click_img("resources/img/ensure.png", after_sleep=1)
+                    self.operator.click_img("resources/img/ensure.png", after_sleep=1)
+                    self.operator.click_point(0.5, 0.7)  # 点击屏幕中心
                     logger.info("已使用后备开拓力进行补充")
                 else:
                     logger.error("发生错误，错误编号13")
                     return False
             elif way == 1:
-                if self.click_img("resources/img/fuel.png") or self.locate("resources/img/fuel_onclick.png"):
-                    self.click_img("resources/img/ensure.png", after_sleep=1.5)
-                    self.click_img("resources/img/ensure.png", after_sleep=1.5)
-                    self.click_point(0.5, 0.7)  # 点击屏幕中心
+                if self.operator.click_img("resources/img/fuel.png") or self.operator.locate("resources/img/fuel_onclick.png"):
+                    self.operator.click_img("resources/img/ensure.png", after_sleep=1.5)
+                    self.operator.click_img("resources/img/ensure.png", after_sleep=1.5)
+                    self.operator.click_point(0.5, 0.7)  # 点击屏幕中心
                     logger.info("已使用燃料进行补充")
                 else:
                     logger.error("发生错误，错误编号14")
                     return False
             elif way == 2:
-                if self.click_img("resources/img/stellar_jade.png") or self.locate(
+                if self.operator.click_img("resources/img/stellar_jade.png") or self.operator.locate(
                         "resources/img/stellar_jade_onclick.png"):
-                    self.click_img("resources/img/ensure.png", after_sleep=2)
-                    self.click_img("resources/img/ensure.png", after_sleep=3)
-                    self.click_point(0.5, 0.7)
+                    self.operator.click_img("resources/img/ensure.png", after_sleep=2)
+                    self.operator.click_img("resources/img/ensure.png", after_sleep=3)
+                    self.operator.click_point(0.5, 0.7)
                     logger.info("已使用星琼进行补充")
                 else:
                     logger.error("发生错误，错误编号15")
@@ -549,7 +548,7 @@ class TrailblazePowerTask(BaseTask):
     def goto_survival_index(self) -> bool:
         """前往生存索引页面"""
         logger.info("前往生存索引页面")
-        index, box = self.wait_any_img([
+        index, box = self.operator.wait_any_img([
             "resources/img/enter.png",
             "resources/img/survival_index.png",
             "resources/img/survival_index_onclick.png"
@@ -559,12 +558,12 @@ class TrailblazePowerTask(BaseTask):
             return True
         elif index == 1:
             # 生存索引页面，点击进入
-            self.click_box(box)
+            self.operator.click_box(box)
             return True
         elif index == 0:
             # 主页面，按快捷键进入生存索引页面
-            self.press_key(self.settings.get('GuideHotkey', 'f4').lower())
-            self.sleep(1.5)
+            self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
+            self.operator.sleep(1.5)
             return self.goto_survival_index()  # 递归调用，直到进入生存索引页面
         else:
             return False

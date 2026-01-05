@@ -1,10 +1,16 @@
 from abc import ABC, abstractmethod
 
-from SRACore.operator import Executable
+from SRACore.operator import IOperator
+
+
+class Executable:
+    def __init__(self, operator: IOperator):
+        self.operator = operator
+        self.settings = operator.settings
 
 
 class BaseTask(Executable, ABC):
-    def __init__(self, operator, config: dict):
+    def __init__(self, operator: IOperator, config: dict):
         """
         基础任务类，所有任务类都应继承自此类。
         """
