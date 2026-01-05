@@ -4,7 +4,7 @@ from loguru import logger
 
 from SRACore.util.logger import auto_log_methods
 from SRACore.util.notify import try_send_notification
-from SRACore.operator import Executable
+from SRACore.task import Executable
 from tasks.currency_wars.img import CWIMG, IMG
 from .CurrencyWars import CurrencyWars
 
@@ -89,7 +89,7 @@ class RerollStart(Executable):
                     logger.info(f"第 {tries} 次尝试开始刷开局")
                     continue
                 elif entry_result == "settled":
-                    self.sleep(0.8)
+                    self.operator.sleep(0.8)
                     continue
                 else:
                     if self._check_tesk_success():
@@ -101,7 +101,7 @@ class RerollStart(Executable):
                 tries += 1
                 logger.info(f"第 {tries} 次尝试开始刷开局")
                 if not self._handle_initial_strategy():
-                    self.sleep(1.5)
+                    self.operator.sleep(1.5)
                     continue
 
             # 启用外部接管并推进到策略页
@@ -161,7 +161,7 @@ class RerollStart(Executable):
                 logger.error("准备阶段结算返回失败，报错终止脚本")
                 return "error"
             self._just_settled = True
-            self.sleep(1.0)
+            self.operator.sleep(1.0)
             return "continue"
         return "ok"
 
@@ -202,15 +202,15 @@ class RerollStart(Executable):
         Returns:
             bool: True 成功到达 | False 未能到达
         """
-        idx, box = self.wait_any_img(
+        idx, box = self.operator.wait_any_img(
             [CWIMG.SELECT_INVEST_STRATEGY, CWIMG.CLICK_BLANK],
             timeout=45,
             interval=0.5
         )
 
         if idx == 1 and box is not None:
-            self.click_box(box, after_sleep=1)
-            result = self.wait_img(CWIMG.SELECT_INVEST_STRATEGY, timeout=20, interval=0.5)
+            self.operator.click_box(box, after_sleep=1)
+            result = self.operator.wait_img(CWIMG.SELECT_INVEST_STRATEGY, timeout=20, interval=0.5)
             return result is not None
 
         return idx == 0
@@ -221,13 +221,13 @@ class RerollStart(Executable):
         Returns:
             str: "wanted_opening_reached" 找到目标开局 | "continue" 需继续循环 | "default" 使用默认流程
         """
-        ret_box = self.wait_img(CWIMG.RETURN_PREPARATION_PAGE, timeout=10, interval=0.5)
+        ret_box = self.operator.wait_img(CWIMG.RETURN_PREPARATION_PAGE, timeout=10, interval=0.5)
         if ret_box is None:
             return "default"
 
-        self.click_box(ret_box, after_sleep=1.5)
-        two_two_box = self.wait_img(CWIMG.TWO_TWO, timeout=6, interval=0.5)
-        self.click_img(CWIMG.RETURN_INVESTMENT_STRATEGY, after_sleep=2.0)
+        self.operator.click_box(ret_box, after_sleep=1.5)
+        two_two_box = self.operator.wait_img(CWIMG.TWO_TWO, timeout=6, interval=0.5)
+        self.operator.click_img(CWIMG.RETURN_INVESTMENT_STRATEGY, after_sleep=2.0)
 
         current_stage = 1 if two_two_box is None else 2
 
@@ -244,8 +244,8 @@ class RerollStart(Executable):
     def _handle_default_strategy_advance(self):
         """处理默认策略推进（未进入 2-2 分支时）。"""
         try:
-            self.click_point(self.STRATEGY_SELECT_X, self.STRATEGY_SELECT_Y, after_sleep=0.5)
-            self.click_point(self.STRATEGY_SELECT_X, self.STRATEGY_CONFIRM_Y, after_sleep=0.8)
+            self.operator.click_point(self.STRATEGY_SELECT_X, self.STRATEGY_SELECT_Y, after_sleep=0.5)
+            self.operator.click_point(self.STRATEGY_SELECT_X, self.STRATEGY_CONFIRM_Y, after_sleep=0.8)
             self.cw.is_running = True
             self.cw.run_game()
         except Exception:
@@ -255,9 +255,9 @@ class RerollStart(Executable):
         """使用图像匹配或OCR检测是否存在目标投资策略。"""
         try:
             if '叽米金币大使' in self.wanted_invest_strategy:
-                return self.locate(CWIMG.JI_MI) is not None
+                return self.operator.locate(CWIMG.JI_MI) is not None
             else:
-                index, box = self.wait_ocr_any(self.wanted_invest_strategy, timeout=2, interval=0.5)
+                index, box = self.operator.wait_ocr_any(self.wanted_invest_strategy, timeout=2, interval=0.5)
                 return index != -1
         except Exception as e:
             logger.warning(f"检测投资策略时发生异常：{e}")
@@ -265,14 +265,14 @@ class RerollStart(Executable):
 
     def _rs_enter_from_start_page(self) -> bool:
         """处理从货币战争开始页面进入对局的完整流程。(刷开局专用)"""
-        start_box = self.wait_img(CWIMG.CURRENCY_WARS_START, timeout=30, interval=0.5)
-        if start_box is None or not self.click_box(start_box):
+        start_box = self.operator.wait_img(CWIMG.CURRENCY_WARS_START, timeout=30, interval=0.5)
+        if start_box is None or not self.operator.click_box(start_box):
             logger.error("未识别到开始按钮")
             return False
-        self.click_point(0.5, 0.5, after_sleep=2)
+        self.operator.click_point(0.5, 0.5, after_sleep=2)
 
         # 标准进入 or 继续进度（若是继续进度则中断并返回）
-        index, box = self.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONCLUDE_AND_SETTLE], timeout=3, interval=0.5)
+        index, box = self.operator.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONCLUDE_AND_SETTLE], timeout=3, interval=0.5)
         if index == 0:
             # 识别到标准进入，直接点击该入口并执行标准进入流程
             if box is None:
@@ -281,7 +281,7 @@ class RerollStart(Executable):
             return self._rs_standard_entry_flow(box)
         elif index == 1:
             # 识别到放弃并结算（继续进度的替代入口），直接点击并执行结算返回
-            if box is None or not self.click_box(box, after_sleep=1):
+            if box is None or not self.operator.click_box(box, after_sleep=1):
                 logger.error("点击放弃并结算入口失败")
                 return False
             logger.info("检测到放弃并结算入口，执行结算返回主界面")
@@ -304,24 +304,24 @@ class RerollStart(Executable):
         返回 True 表示完成进入并通过投资界面。
         """
         # 点击标准进入
-        if not self.click_box(enter_standard_box, after_sleep=1.5):
+        if not self.operator.click_box(enter_standard_box, after_sleep=1.5):
             logger.error("点击标准进入失败")
             return False
         # 返回最高名望
-        self.click_img(CWIMG.RETURN_HIGHEST_RANK, after_sleep=0.8)
+        self.operator.click_img(CWIMG.RETURN_HIGHEST_RANK, after_sleep=0.8)
         # 点击开始游戏
-        if not self.click_img(CWIMG.START_GAME, after_sleep=1):
+        if not self.operator.click_img(CWIMG.START_GAME, after_sleep=1):
             logger.error("未识别到开始游戏按钮")
             return False
         # “下一步”
-        next_step_box = self.wait_img(CWIMG.NEXT_STEP)
-        self.sleep(0.5)
-        if next_step_box is None or not self.click_box(next_step_box, after_sleep=2):
+        next_step_box = self.operator.wait_img(CWIMG.NEXT_STEP)
+        self.operator.sleep(0.5)
+        if next_step_box is None or not self.operator.click_box(next_step_box, after_sleep=2):
             logger.error("进入后未识别到下一步按钮")
             return False
-        self.click_point(0.5, 0.5, after_sleep=0.5)
+        self.operator.click_point(0.5, 0.5, after_sleep=0.5)
         # 投资环境
-        invest_box = self.wait_img(CWIMG.INVEST_ENVIRONMENT)
+        invest_box = self.operator.wait_img(CWIMG.INVEST_ENVIRONMENT)
         if invest_box is None:
             logger.error("未识别到投资环境界面")
             return False
@@ -336,37 +336,37 @@ class RerollStart(Executable):
         - 如果刷到，则点击投资环境
         """
         if self.wanted_invest_environment == []:
-            if not self.click_img(IMG.COLLECTION):
-                self.click_point(0.5, 0.5)
-            self.click_img(IMG.ENSURE2, after_sleep=1)
-            if self.locate(CWIMG.INVEST_ENVIRONMENT):
-                self.click_point(0.5, 0.5)
-                self.click_img(IMG.ENSURE2, after_sleep=1)
-            self.sleep(4)
+            if not self.operator.click_img(IMG.COLLECTION):
+                self.operator.click_point(0.5, 0.5)
+            self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+            if self.operator.locate(CWIMG.INVEST_ENVIRONMENT):
+                self.operator.click_point(0.5, 0.5)
+                self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+            self.operator.sleep(4)
             return True
 
-        index, box = self.wait_ocr_any(self.wanted_invest_environment, timeout=2, interval=0.5)
+        index, box = self.operator.wait_ocr_any(self.wanted_invest_environment, timeout=2, interval=0.5)
         if index == -1:
-            box = self.wait_img(CWIMG.REFRESH_ENV, timeout=2, interval=0.5)
-            if box is not None and self.click_box(box, after_sleep=1):
-                index, box = self.wait_ocr_any(self.wanted_invest_environment, timeout=2, interval=0.5)
+            box = self.operator.wait_img(CWIMG.REFRESH_ENV, timeout=2, interval=0.5)
+            if box is not None and self.operator.click_box(box, after_sleep=1):
+                index, box = self.operator.wait_ocr_any(self.wanted_invest_environment, timeout=2, interval=0.5)
         if index == -1:
             logger.info("未刷到需要的投资环境")
-            if not self.click_img(IMG.COLLECTION):
-                self.click_point(0.5, 0.5)
-            self.click_img(IMG.ENSURE2, after_sleep=1)
-            if self.locate(CWIMG.INVEST_ENVIRONMENT):
-                self.click_point(0.5, 0.5)
-                self.click_img(IMG.ENSURE2, after_sleep=1)
+            if not self.operator.click_img(IMG.COLLECTION):
+                self.operator.click_point(0.5, 0.5)
+            self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+            if self.operator.locate(CWIMG.INVEST_ENVIRONMENT):
+                self.operator.click_point(0.5, 0.5)
+                self.operator.click_img(IMG.ENSURE2, after_sleep=1)
             self._return_to_prep_and_abort()
-            self.sleep(2)
+            self.operator.sleep(2)
             return False
 
         logger.info(f"刷到需要的投资环境: {self.wanted_invest_environment[index]}")
-        if self.click_box(box, after_sleep=1):
-            self.click_img(IMG.ENSURE2, after_sleep=1)
+        if self.operator.click_box(box, after_sleep=1):
+            self.operator.click_img(IMG.ENSURE2, after_sleep=1)
         self.invest_environment = self.wanted_invest_environment[index]
-        self.sleep(4)
+        self.operator.sleep(4)
         return True
 
     def _safe_abort_and_return(self) -> bool:
@@ -390,40 +390,40 @@ class RerollStart(Executable):
         try:
             if in_game:
                 # 返回备战页面
-                ret_box = self.wait_img(CWIMG.RETURN_PREPARATION_PAGE, timeout=6, interval=0.5)
+                ret_box = self.operator.wait_img(CWIMG.RETURN_PREPARATION_PAGE, timeout=6, interval=0.5)
                 if ret_box is not None:
-                    self.click_box(ret_box, after_sleep=1.0)
+                    self.operator.click_box(ret_box, after_sleep=1.0)
                 # 关闭覆盖层
-                self.press_key('esc')
-                self.sleep(0.8)
+                self.operator.press_key('esc')
+                self.operator.sleep(0.8)
 
             # 放弃并结算
-            withdraw_and_settle = self.wait_img(CWIMG.WITHDRAW_AND_SETTLE, timeout=8, interval=0.5)
+            withdraw_and_settle = self.operator.wait_img(CWIMG.WITHDRAW_AND_SETTLE, timeout=8, interval=0.5)
             if withdraw_and_settle is None:
                 logger.error("未识别到放弃并结算入口")
                 return False
-            self.click_box(withdraw_and_settle, after_sleep=2.5)
+            self.operator.click_box(withdraw_and_settle, after_sleep=2.5)
 
             # 下一步
-            next_step = self.wait_img(CWIMG.NEXT_STEP, timeout=8, interval=0.5)
+            next_step = self.operator.wait_img(CWIMG.NEXT_STEP, timeout=8, interval=0.5)
             if next_step is None:
                 logger.error("点击放弃并结算后，未识别到下一步")
                 return False
-            self.click_box(next_step, after_sleep=1.8)
+            self.operator.click_box(next_step, after_sleep=1.8)
 
             # 下一页
-            next_page = self.wait_img(CWIMG.NEXT_PAGE, timeout=8, interval=0.5)
+            next_page = self.operator.wait_img(CWIMG.NEXT_PAGE, timeout=8, interval=0.5)
             if next_page is None:
                 logger.error("点击下一步后，未识别到下一页")
                 return False
-            self.click_box(next_page, after_sleep=1.8)
+            self.operator.click_box(next_page, after_sleep=1.8)
 
             # 返回货币战争主页
-            back_currency_wars = self.wait_img(CWIMG.BACK_CURRENCY_WARS, timeout=8, interval=0.5)
+            back_currency_wars = self.operator.wait_img(CWIMG.BACK_CURRENCY_WARS, timeout=8, interval=0.5)
             if back_currency_wars is None:
                 logger.error("点击下一页后，未识别到返回货币战争")
                 return False
-            self.click_box(back_currency_wars, after_sleep=2)
+            self.operator.click_box(back_currency_wars, after_sleep=2)
             logger.info("已结算并返回货币战争主界面")
             return True
         except Exception as e:
@@ -438,21 +438,21 @@ class RerollStart(Executable):
         """
         counts: list[int] = []
         try:
-            win = self.get_win_region(active_window=True)
+            win = self.operator.get_win_region(active_window=True)
         except Exception:
             return counts
         if win is None:
             return counts
 
         # 单一锚点
-        anchor = self.locate(CWIMG.REFRESH_COUNT)
+        anchor = self.operator.locate(CWIMG.REFRESH_COUNT)
         if anchor is None:
             logger.debug("未找到刷新次数锚点，改用回退OCR区域尝试识别")
             # 回退方案：在预估的横条区域进行一次OCR（基于常见UI布局），尽量读取数字
             try:
                 # 经验区域：界面底部靠上的横条（适配1920x1080及缩放）
                 # from_y/to_y 根据日志中点击y≈856（约0.79-0.82）来设定一个稍宽的条带
-                results = self.ocr(from_x=0.15, from_y=0.78, to_x=0.95, to_y=0.92, trace=False) or []
+                results = self.operator.ocr(from_x=0.15, from_y=0.78, to_x=0.95, to_y=0.92, trace=False) or []
                 if results:
                     # 左到右排序后拼接
                     items = sorted(results, key=lambda r: r[0][0][0])
@@ -489,7 +489,7 @@ class RerollStart(Executable):
         if width <= 0 or height <= 0:
             return counts
 
-        results = self.ocr(from_x=0.0, from_y=rel_top, to_x=1.0, to_y=rel_bottom, trace=False) or []
+        results = self.operator.ocr(from_x=0.0, from_y=rel_top, to_x=1.0, to_y=rel_bottom, trace=False) or []
         if not results:
             return counts
 
@@ -533,18 +533,18 @@ class RerollStart(Executable):
                 if nonneg and all(x == 0 for x in nonneg):
                     logger.info("动态OCR检测到刷新次数为 0，执行返回备战并结算本轮")
                     self._return_to_prep_and_abort()
-                    self.sleep(2.0)
+                    self.operator.sleep(2.0)
                     return False
 
             # 按钮不可用/未找到也视为次数用尽
             if not self._click_refresh_button():
                 logger.info("刷新按钮不可用或未找到，视为刷新次数已用尽，执行返回备战并结算本轮")
                 self._return_to_prep_and_abort()
-                self.sleep(2.0)
+                self.operator.sleep(2.0)
                 return False
 
             total_clicks += 1
-            self.sleep(1.2)
+            self.operator.sleep(1.2)
 
             # 刷新后再次检测投资策略
             if self._detect_strategy():
@@ -552,7 +552,7 @@ class RerollStart(Executable):
 
         logger.info("达到安全刷新上限，执行返回备战并结算本轮")
         self._return_to_prep_and_abort()
-        self.sleep(2.0)
+        self.operator.sleep(2.0)
         return False
 
     def _handle_non_target_strategy_stage(self):
@@ -571,21 +571,21 @@ class RerollStart(Executable):
         logger.info("当前并非 2-2，继续探索本轮")
         try:
             # 关闭返回备战覆盖层
-            self.press_key('esc')
-            self.sleep(0.8)
-            click_blank = self.wait_img(CWIMG.CLICK_BLANK, timeout=3, interval=0.5)
+            self.operator.press_key('esc')
+            self.operator.sleep(0.8)
+            click_blank = self.operator.wait_img(CWIMG.CLICK_BLANK, timeout=3, interval=0.5)
             if click_blank is not None:
-                self.click_box(click_blank, after_sleep=0.8)
+                self.operator.click_box(click_blank, after_sleep=0.8)
 
             # 选择策略并推进
-            self.click_point(0.5, 0.68, after_sleep=0.6)
-            self.click_point(0.5, 0.90, after_sleep=0.8)
-            self.sleep(2.0)
+            self.operator.click_point(0.5, 0.68, after_sleep=0.6)
+            self.operator.click_point(0.5, 0.90, after_sleep=0.8)
+            self.operator.sleep(2.0)
 
             # 整理场面状态
-            fold_box = self.wait_img(CWIMG.FOLD, timeout=2)
+            fold_box = self.operator.wait_img(CWIMG.FOLD, timeout=2)
             if fold_box is not None:
-                self.click_box(fold_box, after_sleep=1)
+                self.operator.click_box(fold_box, after_sleep=1)
             self.cw.harvest_crystals()
             self.cw.refresh_character()
             self.cw.get_in_hand_area()
@@ -620,7 +620,7 @@ class RerollStart(Executable):
                     if all(x == 0 for x in nonneg):
                         logger.info("检测到刷新次数为0，执行返回备战并结算本轮")
                         self._return_to_prep_and_abort()
-                        self.sleep(2.0)
+                        self.operator.sleep(2.0)
                         return 0
                     return min(sum(nonneg), safe_cap)
 
@@ -678,8 +678,8 @@ class RerollStart(Executable):
         Returns:
             bool: 成功点击返回True; 按钮不存在或不可用时返回False
         """
-        btn = self.wait_img(CWIMG.REFRESH_COUNT_BTN, timeout=6, interval=0.5)
+        btn = self.operator.wait_img(CWIMG.REFRESH_COUNT_BTN, timeout=6, interval=0.5)
         if btn is None:
             logger.debug("未找到刷新按钮")
             return False
-        return self.click_box(btn, after_sleep=1.0)
+        return self.operator.click_box(btn, after_sleep=1.0)

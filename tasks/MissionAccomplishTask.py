@@ -13,15 +13,15 @@ class MissionAccomplishTask(BaseTask):
 
     def logout(self):
         logger.info("登出账号")
-        if not self.wait_img("resources/img/enter.png"):
+        if not self.operator.wait_img("resources/img/enter.png"):
             return False
-        self.press_key('esc')
-        self.wait_img("resources/img/power.png")
-        self.click_img("resources/img/power.png", after_sleep=0.5)
-        self.click_img("resources/img/ensure.png")
-        if self.wait_img("resources/img/logout.png", timeout=60):
-            self.click_img("resources/img/logout.png")
-        self.click_img("resources/img/quit2.png")
+        self.operator.press_key('esc')
+        self.operator.wait_img("resources/img/power.png")
+        self.operator.click_img("resources/img/power.png", after_sleep=0.5)
+        self.operator.click_img("resources/img/ensure.png")
+        if self.operator.wait_img("resources/img/logout.png", timeout=60):
+            self.operator.click_img("resources/img/logout.png")
+        self.operator.click_img("resources/img/quit2.png")
         return True
 
     def quit_game(self):

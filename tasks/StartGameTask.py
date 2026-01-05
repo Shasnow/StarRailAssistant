@@ -22,17 +22,17 @@ class StartGameTask(BaseTask):
                 logger.error("未知登录状态")
                 return False
         self.start_game_click()
-        res,_ = self.wait_any_img(["resources/img/enter.png",
+        res,_ = self.operator.wait_any_img(["resources/img/enter.png",
                                  "resources/img/train_supply.png",
                                  "resources/img/task_resources_manage.png"], timeout=120, interval=2)
         if res == 0:
             return True
         elif res == 1:
             # 领取月卡
-            self.sleep(1)
-            self.click_point(0.5, 0.6, after_sleep=4)
-            self.click_point(0.5, 0.8, after_sleep=0.2)
-            self.click_point(0.5, 0.5, y_offset=+400)
+            self.operator.sleep(1)
+            self.operator.click_point(0.5, 0.6, after_sleep=4)
+            self.operator.click_point(0.5, 0.8, after_sleep=0.2)
+            self.operator.click_point(0.5, 0.5, y_offset=+400)
             return True
         elif res == 2:
             logger.error("未能进入游戏，需要下载过往任务资源。")
@@ -83,13 +83,13 @@ class StartGameTask(BaseTask):
 
     def logout_outside(self):
         logger.info("登出账号")
-        if self.wait_img("resources/img/logout.png", timeout=60):
-            self.click_img("resources/img/logout.png")
-        self.click_img("resources/img/quit2.png")
+        if self.operator.wait_img("resources/img/logout.png", timeout=60):
+            self.operator.click_img("resources/img/logout.png")
+        self.operator.click_img("resources/img/quit2.png")
         return True
 
     def login_bl(self):
-        result,_ = self.wait_any_img(['resources/img/bilibili_login.png', 'resources/img/bilibili_welcome.png',
+        result,_ = self.operator.wait_any_img(['resources/img/bilibili_login.png', 'resources/img/bilibili_welcome.png',
                                     "resources/img/quit.png", "resources/img/enter.png"],
                                    timeout=60)
         if result == -1:
@@ -102,35 +102,35 @@ class StartGameTask(BaseTask):
                 self.logout_outside()  # 执行退出账号后执行下面的登录操作
             else:
                 return result  # 直接返回登录状态
-        self.click_img("resources/img/bilibili_login_other.png", after_sleep=0.5)
+        self.operator.click_img("resources/img/bilibili_login_other.png", after_sleep=0.5)
 
-        self.click_point(0.5, 0.69)  # 点击账号密码登录
+        self.operator.click_point(0.5, 0.69)  # 点击账号密码登录
         if self.config['StartGameAutoLogin']:
             user = encryption.win_decryptor(self.config['StartGameUsername'])
             logger.info(f"登录账号：{user}")
-            self.press_key('tab')
-            self.sleep(1)
-            self.copy(user)
-            self.paste()
-            self.sleep(1)
-            self.press_key("tab")
-            self.sleep(0.2)
-            self.copy(encryption.win_decryptor(self.config['StartGamePassword']))
-            self.paste()
-            self.sleep(0.2)
-            self.click_point(0.37, 0.53)  # 同意隐私政策
-            self.sleep(0.2)
-            self.click_point(0.5, 0.6)  # 登录
+            self.operator.press_key('tab')
+            self.operator.sleep(1)
+            self.operator.copy(user)
+            self.operator.paste()
+            self.operator.sleep(1)
+            self.operator.press_key("tab")
+            self.operator.sleep(0.2)
+            self.operator.copy(encryption.win_decryptor(self.config['StartGamePassword']))
+            self.operator.paste()
+            self.operator.sleep(0.2)
+            self.operator.click_point(0.37, 0.53)  # 同意隐私政策
+            self.operator.sleep(0.2)
+            self.operator.click_point(0.5, 0.6)  # 登录
         else:
             logger.info("未启用自动登录，请手动输入账号密码")
-        if self.wait_img("resources/img/bilibili_welcome.png", timeout=60):
+        if self.operator.wait_img("resources/img/bilibili_welcome.png", timeout=60):
             return 1
         else:
             logger.warning("长时间未成功登录，可能密码错误或需要新设备验证")
             return -1
 
     def login_au(self):
-        result, _ = self.wait_any_img(
+        result, _ = self.operator.wait_any_img(
             ["resources/img/login_page.png", "resources/img/welcome.png",
              "resources/img/quit.png", "resources/img/enter.png"], timeout=60, interval=1)
         if result == -1:
@@ -143,11 +143,11 @@ class StartGameTask(BaseTask):
                 self.logout_outside()  # 执行退出账号后执行下面的登录操作
             else:
                 return result  # 直接返回登录状态
-        target=self.ocr_match("登录其他")
+        target=self.operator.ocr_match("登录其他")
         if target is not None:
-            self.click_box(target)
+            self.operator.click_box(target)
 
-        if not self.click_img("resources/img/login_with_account.png"):
+        if not self.operator.click_img("resources/img/login_with_account.png"):
             logger.error("发生错误，错误编号10")
             return -1
         if self.config['StartGameAutoLogin']:
@@ -156,35 +156,35 @@ class StartGameTask(BaseTask):
                 logger.error("未填写账号")
                 return -1
             logger.info(f"登录账号：{user}")
-            self.sleep(1)
-            self.copy(user)
-            self.paste()
-            self.sleep(1)
-            self.press_key("tab")
-            self.sleep(0.2)
-            self.copy(encryption.win_decryptor(self.config['StartGamePassword']))
-            self.paste()
-            self.click_img("resources/img/agree.png", x_offset=-158)
-            if not self.click_img("resources/img/enter_game.png"):
+            self.operator.sleep(1)
+            self.operator.copy(user)
+            self.operator.paste()
+            self.operator.sleep(1)
+            self.operator.press_key("tab")
+            self.operator.sleep(0.2)
+            self.operator.copy(encryption.win_decryptor(self.config['StartGamePassword']))
+            self.operator.paste()
+            self.operator.click_img("resources/img/agree.png", x_offset=-158)
+            if not self.operator.click_img("resources/img/enter_game.png"):
                 logger.error("发生错误，错误编号9")
                 return -1
         else:
             logger.info("未启用自动登录，请手动输入账号密码")
-        if self.wait_img("resources/img/welcome.png", timeout=60):
+        if self.operator.wait_img("resources/img/welcome.png", timeout=60):
             return 1
         else:
             logger.warning("长时间未成功登录，可能密码错误或需要新设备验证")
             return -1
 
     def start_game_click(self):
-        result,_ = self.wait_ocr_any(["开始游戏", "点击进入"], timeout=60, interval=1, from_x=0.44, from_y=0.74, to_x=0.57, to_y=0.97)
+        result,_ = self.operator.wait_ocr_any(["开始游戏", "点击进入"], timeout=60, interval=1, from_x=0.44, from_y=0.74, to_x=0.57, to_y=0.97)
         if result == 0:
-            self.click_point(0.5, 0.6, after_sleep=1.5)
-            self.wait_ocr("点击进入", timeout=20, interval=1, from_x=0.44, from_y=0.74, to_x=0.57, to_y=0.97)
-            self.click_point(0.5, 0.5)
+            self.operator.click_point(0.5, 0.6, after_sleep=1.5)
+            self.operator.wait_ocr("点击进入", timeout=20, interval=1, from_x=0.44, from_y=0.74, to_x=0.57, to_y=0.97)
+            self.operator.click_point(0.5, 0.5)
             return True
         elif result == 1:
-            self.click_point(0.5, 0.5)
+            self.operator.click_point(0.5, 0.5)
             return True
         else:
             return False

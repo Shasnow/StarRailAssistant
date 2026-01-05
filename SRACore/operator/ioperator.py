@@ -26,6 +26,7 @@ class IOperator(ABC):
         if cls.ocr_engine is None:
             cls.ocr_engine = RapidOCR(config_path='rapidocr_onnxruntime/config.yaml')
         return cls.ocr_engine
+
     @property
     @abstractmethod
     def is_window_active(self) -> bool:
@@ -608,7 +609,7 @@ class IOperator(ABC):
         ...
 
     def drag_to(self, from_x: int | float, from_y: int | float, to_x: int | float, to_y: int | float,
-             duration: float = 0.5) -> bool:
+                duration: float = 0.5) -> bool:
         """
         拖动鼠标到指定位置。
 

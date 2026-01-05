@@ -1,11 +1,9 @@
 from abc import ABC, abstractmethod
 
-from SRACore.operator import Executable
 
-
-class BaseTrigger(Executable, ABC):
+class BaseTrigger(ABC):
     def __init__(self, operator):
-        super().__init__(operator)
+        self.operator = operator
         self.enabled=False
         self.name=None
 
