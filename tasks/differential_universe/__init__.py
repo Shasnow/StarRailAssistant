@@ -1,6 +1,6 @@
 from loguru import logger
 
-from SRACore.util.operator import Executable
+from SRACore.operator.operator import Executable
 
 
 class DifferentialUniverse(Executable):

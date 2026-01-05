@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from SRACore.util.operator import Executable
+from SRACore.operator.operator import Executable
 
 
 class BaseTrigger(Executable, ABC):

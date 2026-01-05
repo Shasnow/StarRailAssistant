@@ -4,7 +4,7 @@ from typing import Any
 from loguru import logger
 
 import tasks.currency_wars.characters as cw_chars
-from SRACore.util.operator import Executable
+from SRACore.operator.operator import Executable
 from tasks.currency_wars.characters import (Character, Positioning,
                                             get_character)
 from tasks.currency_wars.img import CWIMG, IMG
@@ -499,15 +499,15 @@ class CurrencyWars(Executable):
 
     def harvest_crystals(self):
         # 实现水晶收集逻辑
-        self.drag(0.68, 0.18, 0.82, 0.18)
+        self.drag_to(0.68, 0.18, 0.82, 0.18)
         self.sleep(0.3)
-        self.drag(0.68, 0.25, 0.82, 0.25)
+        self.drag_to(0.68, 0.25, 0.82, 0.25)
         self.sleep(0.3)
-        self.drag(0.68, 0.30, 0.83, 0.30)
+        self.drag_to(0.68, 0.30, 0.83, 0.30)
         self.sleep(0.3)
-        self.drag(0.68, 0.35, 0.84, 0.35)
+        self.drag_to(0.68, 0.35, 0.84, 0.35)
         self.sleep(0.3)
-        self.drag(0.68, 0.40, 0.83, 0.40)
+        self.drag_to(0.68, 0.40, 0.83, 0.40)
         self.sleep(0.3)
 
     def sell_character(self):
@@ -559,7 +559,7 @@ class CurrencyWars(Executable):
             # 由于商店区域没有角色列表，直接执行拖拽
             sell_area = (0.05, 0.86)  # 出售区域
             source = self.in_hand_area[i]
-            self.drag(source[0], source[1], sell_area[0], sell_area[1])
+            self.drag_to(source[0], source[1], sell_area[0], sell_area[1])
             # 更新手牌状态
             self.in_hand_character[i] = None
             if character:
@@ -903,7 +903,7 @@ class CurrencyWars(Executable):
         target_coord = target_coords[target_index]
         
         # 执行拖拽
-        self.drag(source_coord[0], source_coord[1], target_coord[0], target_coord[1])
+        self.drag_to(source_coord[0], source_coord[1], target_coord[0], target_coord[1])
         self.sleep(0.5)  # 等待操作完成
         
         # 交换角色列表中的内容

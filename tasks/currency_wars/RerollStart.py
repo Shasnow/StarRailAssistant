@@ -4,7 +4,7 @@ from loguru import logger
 
 from SRACore.util.logger import auto_log_methods
 from SRACore.util.notify import try_send_notification
-from SRACore.util.operator import Executable
+from SRACore.operator.operator import Executable
 from tasks.currency_wars.img import CWIMG, IMG
 from .CurrencyWars import CurrencyWars
 
