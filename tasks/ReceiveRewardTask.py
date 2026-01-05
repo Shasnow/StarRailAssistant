@@ -3,9 +3,8 @@ from SRACore.util.logger import logger
 
 
 class ReceiveRewardTask(BaseTask):
-    def __init__(self, config: dict):
-        super().__init__(config)
-        self.config_name=config.get('Name', 'unknown')
+    def _post_init(self):
+        self.config_name=self.config.get('Name', 'unknown')
 
     def run(self):
         # 初始化任务

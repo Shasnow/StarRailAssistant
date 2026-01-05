@@ -1,11 +1,11 @@
 from loguru import logger
 
-from SRACore.operator.operator import Executable
+from SRACore.operator import Executable
 
 
 class DifferentialUniverse(Executable):
-    def __init__(self, run_times):
-        super().__init__()
+    def __init__(self, operator, run_times):
+        super().__init__(operator)
         self.run_times = run_times
 
     def run(self):

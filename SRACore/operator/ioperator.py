@@ -7,11 +7,25 @@ from typing import Any, Callable
 import pyperclip
 from PIL.Image import Image
 from loguru import logger
+from rapidocr_onnxruntime import RapidOCR
 
 from SRACore.operator.model import Region, Box
+from SRACore.util.config import load_settings
 
 
 class IOperator(ABC):
+    ocr_engine = None
+
+    def __init__(self):
+        self.settings = load_settings()
+        self.confidence = self.settings.get('ConfidenceThreshold', 0.9)
+        self.zoom = self.settings.get('Zoom', 1.25)
+
+    @classmethod
+    def get_ocr_instance(cls):
+        if cls.ocr_engine is None:
+            cls.ocr_engine = RapidOCR(config_path='rapidocr_onnxruntime/config.yaml')
+        return cls.ocr_engine
     @property
     @abstractmethod
     def is_window_active(self) -> bool:
@@ -23,10 +37,36 @@ class IOperator(ABC):
 
     @abstractmethod
     def screenshot_in_region(self, region: Region | None = None) -> Image:
+        """截取指定区域的屏幕截图
+
+        Args:
+            region (Region | None, optional): 要截取的区域对象，包含left, top, width, height属性。
+                如果为None，则默认截取当前活动窗口的区域。默认为None。
+
+        Returns:
+            PIL.Image.Image: 返回截取的屏幕区域图像对象
+
+        Note:
+            当region为None时，会自动获取活动窗口区域
+        """
         ...
 
     @abstractmethod
     def screenshot_in_tuple(self, from_x: float, from_y: float, to_x: float, to_y: float) -> Image:
+        """根据相对坐标比例截取窗口内区域
+
+        Args:
+            from_x (float): 起始点X坐标比例 (0-1)，相对于窗口左上角
+            from_y (float): 起始点Y坐标比例 (0-1)，相对于窗口左上角
+            to_x (float): 结束点X坐标比例 (0-1)，相对于窗口左上角
+            to_y (float): 结束点Y坐标比例 (0-1)，相对于窗口左上角
+
+        Returns:
+            PIL.Image.Image: 返回截取的屏幕区域图像对象
+
+        Note:
+            坐标比例是基于当前窗口区域计算的，会自动获取窗口区域并短暂延迟(0.5秒)
+        """
         ...
 
     def screenshot(self, region: Region | None = None,
@@ -63,6 +103,7 @@ class IOperator(ABC):
                          confidence: float | None = None,
                          trace: bool = True,
                          **_) -> Box | None:
+        """在屏幕上查找图片位置"""
         ...
 
     @abstractmethod
@@ -75,6 +116,17 @@ class IOperator(ABC):
                         confidence: float | None = None,
                         trace: bool = True,
                         **_) -> Box | None:
+        """
+        在窗口内查找图片位置，使用比例坐标
+        :param img_path: 模板图片路径
+        :param from_x: 区域起始x坐标比例(0-1)
+        :param from_y: 区域起始y坐标比例(0-1)
+        :param to_x: 区域结束x坐标比例(0-1)
+        :param to_y: 区域结束y坐标比例(0-1)
+        :param confidence: 匹配度, 0-1之间的浮点数, 默认为self.confidence
+        :param trace: 是否打印调试信息
+        :return: Box | None - 找到的图片位置，如果未找到则返回None
+        """
         ...
 
     @abstractmethod
@@ -83,6 +135,7 @@ class IOperator(ABC):
                              region: Region | None = None,
                              confidence: float | None = None,
                              trace: bool = True) -> tuple[int, Box | None]:
+        """在窗口内查找任意一张图片位置"""
         ...
 
     @abstractmethod
@@ -94,6 +147,17 @@ class IOperator(ABC):
                             to_y: float,
                             confidence: float | None = None,
                             trace: bool = False) -> tuple[int, Box | None]:
+        """
+        在窗口内查找任意一张图片位置，使用比例坐标
+        :param img_paths: 模板图片路径列表
+        :param from_x: 区域起始x坐标比例(0-1)
+        :param from_y: 区域起始y坐标比例(0-1)
+        :param to_x: 区域结束x坐标比例(0-1)
+        :param to_y: 区域结束y坐标比例(0-1)
+        :param confidence: 匹配度, 0-1之间的浮点数, 默认为self.confidence
+        :param trace: 是否打印调试信息
+        :return: tuple[int, Box | None] - 找到的图片索引和位置，如果未找到则返回-1和None
+        """
         ...
 
     def locate_any(self,
@@ -159,14 +223,49 @@ class IOperator(ABC):
         else:
             return self.locate_in_region(template, region, confidence, trace)
 
-    @abstractmethod
     def ocr_in_region(
             self,
             region: Region = None,
             trace: bool = True) -> list[Any] | None:
-        ...
+        """
+        在窗口的指定区域内执行 OCR 文字识别，返回原始 OCR 结果（包含文本、坐标、置信度等）。
 
-    @abstractmethod
+        Args:
+            region (Optional[Region]):
+                要识别的区域坐标（`Region(left, top, width, height)`）。
+                如果为 `None`，则自动获取整个窗口区域。默认为 `None`。
+            trace (bool):
+                是否打印调试信息（如 OCR 错误）。默认为 `True`。
+
+        Returns:
+            list[Any] | None:
+                OCR 引擎返回的原始结果（通常为列表，每项包含文本、坐标、置信度等信息）。
+                如果发生错误，返回 `None`。
+
+        Raises:
+            Exception:
+                如果 OCR 引擎初始化失败或截图失败，且 `trace=False`，异常会被捕获并返回 `None`。
+                如果 `trace=True`，错误会被记录到日志（`logger.trace`）。
+        """
+        try:
+            if trace:
+                logger.debug(f"OCR in region: {region}")
+            if region is None:
+                region = self.get_win_region()
+                time.sleep(0.5)  # 等待窗口稳定
+            if self.ocr_engine is None:
+                self.ocr_engine = IOperator.get_ocr_instance()
+            screenshot = self.screenshot(region)
+            screenshot = screenshot.convert("L")
+            result, _ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA
+            if trace:
+                logger.debug(f"OCR Result: {result}")
+            return result
+        except Exception as e:
+            if trace:
+                logger.trace(f"OCR Error: {e}")
+            return None
+
     def ocr_in_tuple(
             self,
             from_x: float,
@@ -174,7 +273,31 @@ class IOperator(ABC):
             to_x: float,
             to_y: float,
             trace: bool = True) -> list[Any] | None:
-        ...
+        """
+        在窗口内通过比例坐标指定区域，并执行 OCR 文字识别。
+
+        Args:
+            from_x (float): 区域起始 X 坐标比例（0-1），相对于窗口左上角。
+            from_y (float): 区域起始 Y 坐标比例（0-1），相对于窗口左上角。
+            to_x (float): 区域结束 X 坐标比例（0-1），相对于窗口左上角。
+            to_y (float): 区域结束 Y 坐标比例（0-1），相对于窗口左上角。
+            trace (bool): 是否打印调试信息。默认为 `True`。
+
+        Returns:
+          list[Any] | None:
+                OCR 引擎返回的原始结果。如果发生错误，返回 `None`。
+
+        Raises:
+            ValueError: 如果坐标比例不在 [0, 1] 范围内。
+            Exception: 如果窗口区域获取失败或 OCR 过程出错（根据 `trace` 参数决定是否记录日志）。
+        """
+        try:
+            region = self.get_win_region()
+        except Exception as e:
+            if trace:
+                logger.trace(f"OCR Error: {e}")
+            return None
+        return self.ocr_in_region(region.sub_region(from_x, from_y, to_x, to_y), trace)
 
     def ocr(self,
             region: Region = None,
@@ -298,6 +421,18 @@ class IOperator(ABC):
     @abstractmethod
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
                     after_sleep: float = 0, tag: str = "") -> bool:
+        """
+        点击指定位置
+        如果x和y是整数，则直接点击坐标(x, y)
+        如果x和y是浮点数，则将其转换为相对于窗口区域的坐标
+        :param x: int或float类型，表示点击位置的x坐标
+        :param y: int或float类型，表示点击位置的y坐标
+        :param x_offset: x偏移量(px)或百分比(float)
+        :param y_offset: y偏移量(px)或百分比(float)
+        :param after_sleep: 点击后等待时间，单位秒
+        :param tag: 日志标记
+        :return: None
+        """
         ...
 
     def click_box(self, box: Box, x_offset: int | float = 0, y_offset: int | float = 0, after_sleep: float = 0) -> bool:
@@ -355,10 +490,31 @@ class IOperator(ABC):
 
     @abstractmethod
     def press_key(self, key: str, presses: int = 1, interval: float = 0, wait: float = 0, trace: bool = True) -> bool:
+        """按下按键
+
+        Args:
+            key: 按键
+            presses: 按下次数
+            interval: 按键间隔时间(如果填入,程序会间隔interval秒再按下按键)
+            wait: 首次按下按键前的等待时间
+            trace: 是否打印调试信息
+        Returns:
+            按键成功返回True，否则返回False
+        """
         ...
 
     @abstractmethod
     def hold_key(self, key: str, duration: float = 0) -> bool:
+        """
+        按下按键一段时间
+
+        Args:
+            key: 按键
+            duration: 按下时间
+
+        Returns:
+            按键成功返回True，否则返回False
+        """
         ...
 
     @staticmethod
@@ -389,22 +545,66 @@ class IOperator(ABC):
 
     @abstractmethod
     def move_rel(self, x_offset: int, y_offset: int) -> bool:
+        """
+        相对当前位置移动光标。
+
+        Args:
+            x_offset (int): X 轴偏移量。
+            y_offset (int): Y 轴偏移量。
+
+        Returns:
+            bool: 如果移动成功则返回 True，否则返回 False。
+        """
         ...
 
     @abstractmethod
     def move_to(self, x: int | float | None, y: int | float | None, duration: float = 0.0) -> bool:
+        """
+        将鼠标移动到指定位置。
+
+        Args:
+            x (int | float): X 坐标。
+            y (int | float): Y 坐标。
+            duration (float): 移动持续时间，单位为秒。
+
+        Returns:
+            bool: 如果移动成功则返回 True，否则返回 False。
+        """
         ...
 
     @abstractmethod
     def mouse_down(self, x: int | float | None, y: int | float | None) -> bool:
+        """
+        按下鼠标按钮。
+
+        Args:
+            x (int | float): X 坐标。
+            y (int | float): Y 坐标。
+        Returns:
+            bool: 如果按下成功则返回 True，否则返回 False。
+        """
         ...
 
     @abstractmethod
     def mouse_up(self, x: int | float | None = None, y: int | float | None = None) -> bool:
+        """
+        释放鼠标按钮。
+        Returns:
+            bool: 如果释放成功则返回 True，否则返回 False。
+        """
         ...
 
     @abstractmethod
     def scroll(self, distance: int) -> bool:
+        """
+        滚动鼠标滚轮。
+
+        Args:
+            distance (int): 滚动距离。
+
+        Returns:
+            bool: 如果滚动成功则返回 True，否则返回 False。
+        """
         ...
 
     def drag_to(self, from_x: int | float, from_y: int | float, to_x: int | float, to_y: int | float,

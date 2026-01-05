@@ -4,15 +4,15 @@ from typing import Any
 from loguru import logger
 
 import tasks.currency_wars.characters as cw_chars
-from SRACore.operator.operator import Executable
+from SRACore.operator import Executable
 from tasks.currency_wars.characters import (Character, Positioning,
                                             get_character)
 from tasks.currency_wars.img import CWIMG, IMG
 
 
 class CurrencyWars(Executable):
-    def __init__(self, run_times):
-        super().__init__()
+    def __init__(self, operator, run_times):
+        super().__init__(operator)
         self.run_times = run_times
         self.force_battle = False
         self.is_continue = False  # 是否是继续挑战

@@ -1,5 +1,6 @@
 import time
 
+from SRACore.operator import Operator
 from SRACore.triggers import AutoPlotTrigger
 from SRACore.triggers.BaseTrigger import BaseTrigger
 from SRACore.util.logger import logger
@@ -12,7 +13,7 @@ class TriggerManager:
         self.isRunning = False
         super().__init__()
         self.triggers: list[BaseTrigger] = []
-        self.register(AutoPlotTrigger())
+        self.register(AutoPlotTrigger(Operator()))
 
     def run(self):
         self.isRunning = True

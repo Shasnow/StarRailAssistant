@@ -3,15 +3,12 @@ from SRACore.util.logger import logger
 
 
 class CosmicStrifeTask(BaseTask):
-    def __init__(self, config: dict):
-        super().__init__(config)
-
     def run(self):
         """主任务执行函数"""
         if self.config.get("SimulatedUniverseEnable", False):
             logger.info("执行任务：旷宇纷争-模拟宇宙")
             from tasks.differential_universe import DifferentialUniverse
-            du_task = DifferentialUniverse(self.config.get("SimulatedUniverseRunTimes", 0))
+            du_task = DifferentialUniverse(self.operator, self.config.get("SimulatedUniverseRunTimes", 0))
             if not du_task.run():
                 logger.error("旷宇纷争-模拟宇宙任务失败")
                 return False
@@ -30,7 +27,8 @@ class CosmicStrifeTask(BaseTask):
         if cw_mode==2:
             logger.info("执行任务：旷宇纷争-货币战争 刷开局")
             from tasks.currency_wars import RerollStart
-            rs_task = RerollStart(invest_env=self.config.get("CwRsInvestEnvironments"),
+            rs_task = RerollStart(operator=self.operator,
+                                  invest_env=self.config.get("CwRsInvestEnvironments"),
                                   invest_strategy=self.config.get("CwRsInvestStrategies"),
                                   invest_strategy_stage= self.config.get("CwRsInvestStrategyStage", 1),
                                   max_retry=self.config.get("CwRsMaxRetry", 0))
@@ -43,7 +41,7 @@ class CosmicStrifeTask(BaseTask):
         elif cw_mode==1 or cw_mode==0:
             logger.info("执行任务：旷宇纷争-货币战争")
             from tasks.currency_wars import CurrencyWars
-            cw_task = CurrencyWars(self.config.get("CurrencyWarsRunTimes", 0))
+            cw_task = CurrencyWars(self.operator, self.config.get("CurrencyWarsRunTimes", 0))
             cw_task.set_username(username)
             cw_task.load_strategy("template")
             # 前端难度选择：0=最低难度，1=最高难度

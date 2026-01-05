@@ -2,8 +2,8 @@ from SRACore.triggers.BaseTrigger import BaseTrigger
 
 
 class AutoPlotTrigger(BaseTrigger):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, operator):
+        super().__init__(operator)
         self.name = '自动对话'
         self.can_skip = True  # 是否可以跳过对话, 默认可以跳过
         self.skip_plot = False  # 是否跳过对话
