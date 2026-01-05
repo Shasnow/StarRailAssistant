@@ -4,7 +4,7 @@ from loguru import logger
 
 from SRACore.util.logger import auto_log_methods
 from SRACore.util.notify import try_send_notification
-from SRACore.operator.operator import Executable
+from SRACore.operator import Executable
 from tasks.currency_wars.img import CWIMG, IMG
 from .CurrencyWars import CurrencyWars
 
@@ -33,14 +33,14 @@ class RerollStart(Executable):
     PAGE_START = 1
     PAGE_PREPARATION = 2
 
-    def __init__(self, invest_env:str, invest_strategy:str, invest_strategy_stage:int, max_retry:int):
-        super().__init__()
+    def __init__(self, operator, invest_env:str, invest_strategy:str, invest_strategy_stage:int, max_retry:int):
+        super().__init__(operator)
         # 需要的开局
         self.wanted_invest_environment = invest_env.split(',') if invest_env else []
         self.wanted_invest_strategy = invest_strategy.split(',') if invest_strategy else []
         self.wanted_invest_strategy_stage = invest_strategy_stage
         self.max_retry = max_retry
-        self.cw = CurrencyWars(0)
+        self.cw = CurrencyWars(self.operator, 0)
         # 结算返回后需重启下一轮的标记（避免在同一轮等待策略页）
         self._just_settled = False
         # 标记：进入策略页外部接管阶段后，禁止回到初始策略/进入流程
@@ -452,7 +452,7 @@ class RerollStart(Executable):
             try:
                 # 经验区域：界面底部靠上的横条（适配1920x1080及缩放）
                 # from_y/to_y 根据日志中点击y≈856（约0.79-0.82）来设定一个稍宽的条带
-                results = self.ocr_in_tuple(0.15, 0.78, 0.95, 0.92, trace=False) or []
+                results = self.ocr(from_x=0.15, from_y=0.78, to_x=0.95, to_y=0.92, trace=False) or []
                 if results:
                     # 左到右排序后拼接
                     items = sorted(results, key=lambda r: r[0][0][0])
@@ -489,7 +489,7 @@ class RerollStart(Executable):
         if width <= 0 or height <= 0:
             return counts
 
-        results = self.ocr_in_tuple(0.0, rel_top, 1.0, rel_bottom, trace=False) or []
+        results = self.ocr(from_x=0.0, from_y=rel_top, to_x=1.0, to_y=rel_bottom, trace=False) or []
         if not results:
             return counts
 

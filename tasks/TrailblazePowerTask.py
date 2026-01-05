@@ -6,8 +6,7 @@ from SRACore.util.logger import logger
 
 
 class TrailblazePowerTask(BaseTask):
-    def __init__(self, config: dict):
-        super().__init__(config)
+    def _post_init(self):
         self.name_task_map = {
             "饰品提取": self.ornament_extraction,
             "拟造花萼（金）": self.calyx_golden,

@@ -1,16 +1,21 @@
 from abc import ABC, abstractmethod
 
-from SRACore.operator.operator import Executable
+from SRACore.operator import Executable
 
 
 class BaseTask(Executable, ABC):
-    def __init__(self, config: dict):
+    def __init__(self, operator, config: dict):
         """
         基础任务类，所有任务类都应继承自此类。
         """
-        super().__init__()
+        super().__init__(operator)
         self.config = config
         self.stop_flag = False
+        self._post_init()
+
+    def _post_init(self):
+        """子类可重写此方法以进行额外初始化"""
+        pass
 
     @abstractmethod
     def run(self):

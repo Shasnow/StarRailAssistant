@@ -1,6 +1,7 @@
 import importlib
 import tomllib
 
+from SRACore.operator import Operator
 from SRACore.task import BaseTask
 from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
 from SRACore.util import notify
@@ -135,7 +136,7 @@ class TaskManager:
             if is_select and index < len(self.task_list) and self.task_list[index] is not None:
                 try:
                     # 实例化任务类
-                    tasks.append(self.task_list[index](config))
+                    tasks.append(self.task_list[index](Operator(), config))
                 except Exception as e:
                     logger.exception(t('task.instantiate_failed', index=index, error=str(e)))
         return tasks
@@ -218,7 +219,7 @@ class TaskManager:
             print_config["StartGamePassword"] = "******"
             logger.debug('config: ' + str(config))
             # 实例化任务类
-            return task_class(config)
+            return task_class(Operator(), config)
         except Exception as e:
             logger.error(t('task.instantiate_failed', index=task, error=f'{e.__class__.__name__}: {e}'))
             return None
