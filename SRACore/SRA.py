@@ -5,17 +5,16 @@ import time
 
 from loguru import logger
 
+from SRACore.localization.resource import Resource
 from SRACore.thread.event_thread import EventListener
 from SRACore.thread.task_thread import TaskManager
 from SRACore.thread.trigger_thread import TriggerManager
 from SRACore.util.config import load_settings
 from SRACore.util.const import VERSION, CORE
-from SRACore.util.i18n import t
-
 
 class SRACli(cmd.Cmd):
-    intro = t('cli.intro', version=VERSION, core=CORE)
-    prompt = t('cli.prompt')
+    intro = Resource.cli_intro(version=VERSION, core=CORE)
+    prompt = "sra> "
 
     def __init__(self):
         super().__init__()
@@ -25,7 +24,7 @@ class SRACli(cmd.Cmd):
         self.trigger_thread = threading.Thread(target=self.trigger_manager.run, daemon=True)
         self.trigger_thread.start()
         if not self.is_admin():
-            logger.warning(t('cli.no_admin_warning'))
+            logger.warning(Resource.cli_noAdminWarning)
         stop_hotkey:str = load_settings().get('StartStopHotkey')
         stop_hotkey=stop_hotkey.lower()  # 统一小写
         if stop_hotkey is None or stop_hotkey == '':
@@ -34,21 +33,27 @@ class SRACli(cmd.Cmd):
         EventListener.run()
 
     def default(self, line):
-        print(t('cli.unknown_command', line=line))
+        print(Resource.cli_unknownCommand(line))
 
     def emptyline(self):
         pass
 
-    def _get_command_help(self, cmd_name):
-        """获取命令的帮助文本"""
-        help_key = f'cli.help_{cmd_name}'
-        help_text = t(help_key)
+    def _get_command_help(self, cmd_name, detail=False) -> str:
+        """
+        获取指定命令的帮助信息
+        先尝试从本地化资源中获取帮助文本，如果不存在则使用方法的docstring。
+        :param cmd_name: 命令名称
+        :param detail: 是否获取详细帮助
+        :return: str
+        """
+        help_key = f'cli.{cmd_name}.help' if not detail else f'cli.help.{cmd_name}'
+        help_text = Resource.get_translation(help_key)
         # 如果翻译键不存在，返回原始docstring
         if help_text == help_key:
             func = getattr(self, f"do_{cmd_name}", None)
             if func and func.__doc__:
                 return func.__doc__.split('\n')[0]
-            return t('cli.help_no_doc')
+            return ""
         return help_text
 
     def do_EOF(self, arg):  # NOQA
@@ -61,18 +66,18 @@ class SRACli(cmd.Cmd):
         if arg:
             func = getattr(self, f"do_{arg}", None)
             if func:
-                help_text = self._get_command_help(arg)
-                print(f"  {arg} - {help_text}")
+                help_text = self._get_command_help(arg, True)
+                print(help_text)
             else:
-                print(t('cli.help_unknown', cmd=arg))
+                print(Resource.cli_help_unknownCommand(arg))
         else:
-            print(t('cli.help_title'))
+            print(Resource.cli_helpTitle)
             # 按命令名排序，更易读
             commands = [name[3:] for name in dir(self) if name.startswith("do_")]
             for cmd_name in sorted(commands):
                 help_text = self._get_command_help(cmd_name)
                 print(f"  {cmd_name} - {help_text}")
-            print("\n" + t('cli.help_detail'))
+            print(Resource.cli_helpFooter)
 
     def do_exit(self, _):
         """Exit command line tool"""
@@ -80,13 +85,13 @@ class SRACli(cmd.Cmd):
             self.task_process.terminate()
             self.task_process.join(timeout=5)
             if self.task_process.is_alive():
-                logger.error(t('cli.task_timeout'))
+                logger.error(Resource.cli_exit_taskTimeout)
 
         if self.trigger_thread and self.trigger_thread.is_alive():
             self.trigger_manager.stop()  # 调用原类的停止逻辑
             self.trigger_thread.join(timeout=5)
             if self.trigger_thread.is_alive():
-                logger.error(t('cli.trigger_timeout'))
+                logger.error(Resource.cli_exit_triggerTimeout)
         EventListener.stop()
         return True
 
@@ -94,97 +99,96 @@ class SRACli(cmd.Cmd):
         """Task manager command - support start/stop task process"""
         args = arg.split()
         if not args:
-            print(t('cli.task_usage'))
+            print(Resource.cli_task_invalidArguments('task'))
             return
         command = args[0]
         if command == 'run':
             if self.task_process is not None and self.task_process.is_alive():
-                print(t('cli.task_already_running'))
+                print(Resource.cli_task_taskAlreadyRunning)
                 return
             # 重新创建进程（避免重复启动已终止的进程）
             config_names = args[1:] if len(args) > 1 else tuple()
             self.task_process = multiprocessing.Process(target=self.task_manager.run, daemon=True, args=config_names)
             self.task_process.start()
             time.sleep(1)  # 确保进程有时间启动
-            logger.info(t('cli.task_started'))
+            logger.info("[Start]")
         elif command == 'stop':
             if self.task_process is not None and self.task_process.is_alive():
-                logger.debug(t('cli.task_abort'))
-                logger.warning(t('task.interrupted'))
+                logger.warning(Resource.cli_task_interrupted)
                 self.task_process.terminate()
                 self.task_process.join(timeout=5)  # 增加超时，避免阻塞
                 if self.task_process.is_alive():
-                    logger.error(t('cli.task_timeout'))
+                    logger.error(Resource.cli_task_timeout)
                 else:
-                    logger.debug(t('cli.task_stopped'))
+                    logger.info(Resource.cli_task_stopped)
             else:
-                print(t('cli.task_not_running'))
+                print(Resource.cli_task_notRunning)
         elif command == 'single':
             if len(args) < 2:
-                print(f"Usage: task single <task name | index> [config_name]")
+                print(Resource.cli_invalidArguments('task'))
                 return
             if self.task_process is not None and self.task_process.is_alive():
-                print(t('cli.task_already_running'))
+                print(Resource.cli_task_taskAlreadyRunning)
                 return
             sub_args = args[1:]
             # 重新创建进程（避免重复启动已终止的进程）
             self.task_process = multiprocessing.Process(target=self.task_manager.run_task, daemon=True, args=sub_args)
             self.task_process.start()
             time.sleep(1)  # 确保进程有时间启动
-            logger.info(t('cli.task_started'))
+            logger.info("[Start]")
         else:
-            print(t('cli.task_unknown_subcommand', command=command))
+            print(Resource.cli_invalidArguments('task'))
 
     def do_trigger(self, arg: str):
         """Trigger manager command - support start/stop/configure triggers"""
         args = arg.split()
         if not args:
-            print(t('cli.trigger_usage'))
+            print(Resource.cli_invalidArguments('trigger'))
             return
         command = args[0]
         if command == 'run':
             if self.trigger_thread.is_alive():
-                print(t('cli.trigger_already_running'))
+                print(Resource.cli_trigger_alreadyRunning)
                 return
             # 重新创建线程（避免重复启动已终止的线程）
             self.trigger_thread = threading.Thread(target=self.trigger_manager.run, daemon=True)
             self.trigger_thread.start()
-            print(t('cli.trigger_started'))
+            print(Resource.cli_trigger_started)
         elif command == 'stop':
             if self.trigger_thread.is_alive():
                 self.trigger_manager.stop()
                 self.trigger_thread.join(timeout=5)  # 增加超时
                 if self.trigger_thread.is_alive():
-                    logger.error(t('cli.trigger_timeout'))
+                    logger.error(Resource.cli_trigger_timeout)
                 else:
-                    logger.debug(t('cli.trigger_stopped'))
+                    logger.info(Resource.cli_trigger_stopped)
             else:
-                print(t('cli.trigger_not_running'))
+                print(Resource.cli_trigger_notRunning)
         elif command == 'enable':
             if len(args) < 2:
-                print(t('cli.trigger_enable_usage'))
+                print(Resource.cli_invalidArguments('trigger'))
                 return
             trigger_name = args[1]
             for trigger in self.trigger_manager.triggers:
                 if trigger.__class__.__name__.lower() == trigger_name.lower():
                     trigger.set_enable(True)
-                    logger.info(t('cli.trigger_enabled', name=trigger_name))
+                    logger.info(Resource.cli_trigger_enabled(trigger_name))
                     return
-            print(t('cli.trigger_not_found', name=trigger_name))
+            print(Resource.cli_trigger_notFound(trigger_name))
         elif command == 'disable':
             if len(args) < 2:
-                print(t('cli.trigger_disable_usage'))
+                print(Resource.cli_trigger_invalidArguments('trigger'))
                 return
             trigger_name = args[1]
             for trigger in self.trigger_manager.triggers:
                 if trigger.__class__.__name__.lower() == trigger_name.lower():
                     trigger.set_enable(False)
-                    logger.info(t('cli.trigger_disabled', name=trigger_name))
+                    logger.info(Resource.cli_trigger_disabled(trigger_name))
                     return
-            print(t('cli.trigger_not_found', name=trigger_name))
+            print(Resource.cli_trigger_notFound(trigger_name))
         elif command.startswith('set-'):
             if len(args) < 3:
-                print(t('cli.trigger_set_usage'))
+                print(Resource.cli_invalidArguments('trigger'))
                 return
             _type = command[4:]
             trigger_name = args[1]
@@ -193,7 +197,7 @@ class SRACli(cmd.Cmd):
             for trigger in self.trigger_manager.triggers:
                 if trigger.__class__.__name__.lower() == trigger_name.lower():
                     if not hasattr(trigger, attr):
-                        print(t('cli.trigger_attr_not_found', name=trigger_name, attr=attr))
+                        print(Resource.cli_trigger_attrNotFound(attr, trigger_name))
                         return
                     if _type == 'int':
                         setattr(trigger, attr, int(value))
@@ -204,36 +208,36 @@ class SRACli(cmd.Cmd):
                     elif _type == 'bool':
                         setattr(trigger, attr, value.lower() in ['true', '1', 'yes'])
                     else:
-                        print(t('cli.trigger_unknown_type', type=_type))
+                        print(Resource.cli_trigger_unknownType(_type))
                         return
-                    logger.info(t('cli.trigger_attr_set', name=trigger_name, attr=attr, value=value))
+                    logger.info(Resource.cli_trigger_attrSet(attr, trigger_name, value))
                     return
-            print(t('cli.trigger_not_found', name=trigger_name))
+            print(Resource.cli_trigger_notFound(trigger_name))
         else:
-            print(t('cli.trigger_unknown_subcommand', command=command))
+            print(Resource.cli_invalidArguments('trigger'))
 
     def do_run(self, arg: str):
         """Run specified tasks, will block current command line until tasks complete"""
         args = arg.split()
-        print(t('cli.run_blocking'))
+        print(Resource.cli_run_started)
         try:
             self.task_manager.run(*args)
         except KeyboardInterrupt:
             return
-        print(t('cli.run_completed'))
+        print(Resource.cli_run_started)
 
     def do_single(self, arg: str):
         """Run a single specified task, will block current command line until task complete"""
         args = arg.split()
         if len(args) < 1:
-            print(f"Usage: single <task name | index> [config_name]")
+            print(Resource.invalidArguments('single'))
             return
-        print(t('cli.run_blocking'))
+        print(Resource.cli_run_started)
         try:
             self.task_manager.run_task(*args)
         except KeyboardInterrupt:
             return
-        print(t('cli.run_completed'))
+        print(Resource.cli_run_started)
 
     def do_version(self, _):  # NOQA
         """Show version information"""
@@ -246,5 +250,5 @@ class SRACli(cmd.Cmd):
             import ctypes
             return ctypes.windll.shell32.IsUserAnAdmin() != 0  # NOQA
         except Exception as e:
-            logger.error(t('cli.admin_check_error', error=e))
+            logger.debug(f"Error checking administrator privileges: {e}")
             return False
