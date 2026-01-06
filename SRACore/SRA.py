@@ -5,7 +5,7 @@ import time
 
 from loguru import logger
 
-from SRACore.localization.resource import Resource
+from SRACore.localization import Resource
 from SRACore.thread.event_thread import EventListener
 from SRACore.thread.task_thread import TaskManager
 from SRACore.thread.trigger_thread import TriggerManager

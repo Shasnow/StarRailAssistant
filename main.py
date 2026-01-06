@@ -1,86 +1,84 @@
 import argparse
-import sys
 import os
+import sys
 
+from SRACore.localization import Resource
 from SRACore.util.const import VERSION
-from SRACore.util.i18n import t
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description=t('cli.description'),
-        epilog=t('cli.examples'),
+        description=Resource.argparse_description,
+        epilog= Resource.argparse_epilog,
         formatter_class=argparse.RawTextHelpFormatter
     )
     # 全局参数（模式控制）
     parser.add_argument(
         '--inline',
         action='store_true',
-        help=t('cli.inline_help')
+        help=Resource.argparse_inline_help
     )
     parser.add_argument(
         '--embed',
         action='store_true',
-        help=t('cli.embed_help')
+        help=Resource.argparse_embed_help
     )
     parser.add_argument(
         '--version',
         action='version',
         version=f'SRA-cli {VERSION}',
-        help=t('cli.version_help')
+        help=Resource.argparse_version_help
     )
     parser.add_argument(
         '--log-level',
         type=str,
         choices=['TRACE', 'DEBUG', 'INFO', 'SUCCESS', 'WARNING', 'ERROR', 'CRITICAL'],
         default='TRACE',
-        help=t('cli.log_level_help')
+        help=Resource.argparse_log_level_help
     )
     # 子命令解析器
     subparsers = parser.add_subparsers(
         dest='subcommand',
-        title=t('cli.commands_title'),
-        required=False,  # 允许不指定子命令（进入交互模式）
-        help=t('cli.commands_help')  # 补充子命令整体说明
+        title= 'subcommands',
     )
     # 子命令：run
     run_parser = subparsers.add_parser(
         'run',
-        help=t('cli.run_help'),
-        description=t('cli.run_description')
+        help=Resource.argparse_run_help,
+        description=Resource.argparse_run_description
     )
     run_parser.add_argument(
         '--config',
         nargs='*',
-        help=t('cli.config_help')
+        help=Resource.argparse_config_help
     )
     run_parser.add_argument(
         '--once',
         action='store_true',
-        help=t('cli.once_help')
+        help=Resource.argparse_once_help
     )
 
     # 子命令：single
     single_parser = subparsers.add_parser(
         'single',
-        help=t('cli.single_help'),
-        description=t('cli.single_description')
+        help=Resource.argparse_single_help,
+        description=Resource.argparse_single_description
     )
     single_parser.add_argument(
         '--task-name', '-t',
         type=str,
         required=True,
-        help=t('cli.task_name_help')
+        help=Resource.argparse_task_name_help
     )
     single_parser.add_argument(
         '--config',
         nargs='?',  # 0或1个参数
-        help=t('cli.config_help')
+        help=Resource.argparse_config_help
     )
     single_parser.add_argument(
         '--once',
         action='store_true',
-        help=t('cli.once_help')
+        help=Resource.argparse_once_help
     )
 
     # 解析参数
@@ -93,7 +91,7 @@ def main():
     setup_logger()
     from SRACore.SRA import SRACli
     cli_instance = SRACli()
-    logger.debug(t('cli.working_directory', path=os.getcwd()))
+    logger.debug(f"cwd: {os.getcwd()}")
     # 配置交互式模式（隐藏提示符）
     if args.inline or args.embed:
         cli_instance.intro = ''
