@@ -6,7 +6,6 @@ from plyer import notification
 
 from SRACore.util import encryption
 from SRACore.util.config import load_settings
-from SRACore.util.i18n import t
 
 
 def try_send_notification(title: str, message: str):

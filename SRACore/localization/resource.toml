@@ -1,0 +1,325 @@
+[cli.intro]
+en-us = "SRA-cli {version} ({core})\nType 'help' or '?' to list commands."
+zh-cn = "SRA-cli {version} ({core})\n输入 'help' 或 '?' 来查看命令列表。"
+
+[cli.noAdminWarning]
+en-us = "You are not running SRA-cli with administrative privileges. Some commands may not work as expected."
+zh-cn = "您没有以管理员权限运行 SRA-cli。某些命令可能无法正常工作。"
+
+[cli.unknownCommand]
+en-us = "Unknown command: '{command}'. Type 'help' to get a list of available commands."
+zh-cn = "未知命令: '{command}'。输入 'help' 来获取可用命令列表。"
+
+[cli.invalidArguments]
+en-us = "Invalid arguments for command '{command}'. Type 'help {command}' for usage."
+zh-cn = "命令 '{command}' 的参数无效。输入 'help {command}' 获取用法说明。"
+
+[cli.helpTitle]
+en-us = "Available commands:"
+zh-cn = "可用命令："
+
+[cli.helpFooter]
+en-us = "\nType 'help <command>' to get more information about a specific command."
+zh-cn = "\n输入 'help <command>' 来获取特定命令的更多信息。"
+
+[cli.help.unknownCommand]
+en-us = "Unknown command: '{command}'."
+zh-cn = "未知命令: '{command}'。"
+
+[cli.help.EOF]
+en-us = "Exits the SRA-cli application."
+zh-cn = "退出 SRA-cli 应用程序。"
+
+[cli.help.help]
+en-us = "Displays help information for commands."
+zh-cn = "显示命令的帮助信息。"
+
+[cli.help.task]
+en-us = """
+Manages tasks within SRA-cli.
+Usage:
+  task run [<name | path>...]
+                Runs all selected tasks in specified configuration file(s).
+                If no configuration file is specified, the current config file in cache will be used.
+  task single (taks_name | task_index) [<config_name | config_path>]
+                Runs a single task specified by its name or index, wether it is selected or not.
+                If no configuration file is specified, the current config file in cache will be used.
+  task stop     Stops all running tasks.
+"""
+zh-cn = """
+管理 SRA-cli 中的任务。
+用法：
+  task run [<name | path>...]
+                运行指定配置文件中的所有选中的任务。
+                如果未指定配置文件，则使用缓存中的当前配置文件。
+  task single (taks_name | task_index) [<config_name | config_path>]
+                运行由其名称或索引指定的单个任务，无论它是否被选中。
+                如果未指定配置文件，则使用缓存中的当前配置文件。
+  task stop     停止所有正在运行的任务。
+"""
+
+[cli.help.trigger]
+en-us = """
+Manages triggers within SRA-cli.
+Usage:
+  trigger run                   Starts the trigger service.
+  trigger stop                  Stops the trigger service.
+  trigger enable <trigger_name>    Enables a specific trigger.
+  trigger disable <trigger_name>   Disables a specific trigger.
+  trigger set-<type> <trigger_name> <property> <value>
+                                Changes a property of a specific trigger.
+"""
+zh-cn = """
+管理 SRA-cli 中的触发器。
+用法：
+  trigger run                   启动触发器服务。
+  trigger stop                  停止触发器服务。
+  trigger enable <trigger_name>    启用特定触发器。
+  trigger disable <trigger_name>   禁用特定触发器。
+  trigger set-<type> <trigger_name> <property> <value>
+                                更改特定触发器的属性。
+"""
+
+[cli.help.run]
+en-us = """
+Usage: run [<config_name | config_path>...]
+Runs all tasks in specified configuration file(s). If no configuration file is specified, the current config file in cache will be used.
+!!! This command will block the CLI until all tasks are finished. !!!
+"""
+zh-cn = """
+用法：run [<config_name | config_path>...]
+运行指定配置文件中的所有任务。如果未指定配置文件，则使用缓存中的当前配置文件。
+!!! 此命令将阻塞 CLI 直到所有任务完成。 !!!
+"""
+
+[cli.help.single]
+en-us = """
+Usage: single (task_name | task_index) [<config_name | config_path>]
+Runs a single task specified by its name or index, whether it is selected or not. If no configuration file is specified, the current config file in cache will be used.
+!!! This command will block the CLI until the task is finished. !!!
+"""
+zh-cn = """
+用法：single (task_name | task_index) [<config_name | config_path>]
+运行由其名称或索引指定的单个任务，无论它是否被选中。如果未指定配置文件，则使用缓存中的当前配置文件。
+!!! 此命令将阻塞 CLI 直到任务完成。 !!!
+"""
+
+[cli.exit.help]
+en-us = "Exits the SRA-cli application."
+zh-cn = "退出 SRA-cli 应用程序。"
+
+[cli.exit.taskTimeout]
+en-us = "Timeout reached while waiting for tasks to stop. Forcing exit."
+zh-cn = "等待任务停止时超时。强制退出。"
+
+[cli.exit.triggerTimeout]
+en-us = "Timeout reached while waiting for triggers to stop. Forcing exit."
+zh-cn = "等待触发器停止时超时。强制退出。"
+
+[cli.task.help]
+en-us = "Manages tasks within SRA-cli, type 'help task' for more information."
+zh-cn = "管理 SRA-cli 中的任务，输入 'help task' 获取更多信息。"
+
+[cli.task.taskAlreadyRunning]
+en-us = "Task is already running."
+zh-cn = "任务已在运行中。"
+
+[cli.task.interrupted]
+en-us = "Task execution interrupted by user."
+zh-cn = "任务执行被用户中断。"
+
+[cli.task.timeout]
+en-us = "Timeout reached while waiting for tasks to complete."
+zh-cn = "等待任务完成时超时。"
+
+[cli.task.stopped]
+en-us = "All running tasks have been stopped."
+zh-cn = "所有正在运行的任务已停止。"
+
+[cli.task.notRunning]
+en-us = "No tasks are currently running."
+zh-cn = "当前没有任务在运行。"
+
+[cli.trigger.help]
+en-us = "Manages triggers within SRA-cli, type 'help trigger' for more information."
+zh-cn = "管理 SRA-cli 中的触发器，输入 'help trigger' 获取更多信息。"
+
+[cli.trigger.alreadyRunning]
+en-us = "Trigger service is already running."
+zh-cn = "触发器服务已在运行中。"
+
+[cli.trigger.started]
+en-us = "Trigger service started."
+zh-cn = "触发器服务已启动。"
+
+[cli.trigger.stopped]
+en-us = "Trigger service stopped."
+zh-cn = "触发器服务已停止。"
+
+[cli.trigger.notRunning]
+en-us = "Trigger service is not running."
+zh-cn = "触发器服务未运行。"
+
+[cli.trigger.timeout]
+en-us = "Timeout reached while waiting for triggers to complete."
+zh-cn = "等待触发器完成时超时。"
+
+[cli.trigger.enabled]
+en-us = "Trigger '{trigger_name}' has been enabled."
+zh-cn = "触发器 '{trigger_name}' 已启用。"
+
+[cli.trigger.disabled]
+en-us = "Trigger '{trigger_name}' has been disabled."
+zh-cn = "触发器 '{trigger_name}' 已禁用。"
+
+[cli.trigger.notFound]
+en-us = "Trigger '{trigger_name}' not found."
+zh-cn = "未找到触发器 '{trigger_name}'。"
+
+[cli.trigger.attrNotFound]
+en-us = "Attribute '{attr}' not found in trigger '{trigger_name}'."
+zh-cn = "在触发器 '{trigger_name}' 中未找到属性 '{attr}'。"
+
+[cli.trigger.attrSet]
+en-us = "Attribute '{attr}' of trigger '{trigger_name}' has been set to '{value}'."
+zh-cn = "触发器 '{trigger_name}' 的属性 '{attr}' 已设置为 '{value}'。"
+
+[cli.trigger.unknownType]
+en-us = "Unknown attribute type: '{type}', supports: 'int', 'float', 'bool', 'str'."
+zh-cn = "未知属性类型: '{type}'，支持: 'int'，'float'，'bool'，'str'。"
+
+[cli.run.help]
+en-us = "Runs all selected tasks in specified configuration file, type 'help run' for more information."
+zh-cn = "运行指定配置文件中的所有选中的任务，输入 'help run' 获取更多信息。"
+
+[cli.run.started]
+en-us = "Task execution started, the CLI will be blocked until all tasks are finished."
+zh-cn = "任务执行已开始，CLI 将被阻塞直到所有任务完成。"
+
+[cli.run.completed]
+en-us = "All tasks have been completed."
+zh-cn = "所有任务已完成。"
+
+[cli.single.help]
+en-us = "Runs a single task specified by its name or index, type 'help single' for more information."
+zh-cn = "运行由其名称或索引指定的单个任务，输入 'help single' 获取更多信息。"
+
+[cli.version.help]
+en-us = "Displays the current version of SRA-cli."
+zh-cn = "显示 SRA-cli 的当前版本。"
+
+[argparse.description]
+en-us = "SRA-cli: A command-line interface for SRA."
+zh-cn = "SRA-cli：SRA 的命令行界面。"
+
+[argparse.epilog]
+en-us = "For more information, visit the SRA-cli documentation."
+zh-cn = "欲了解更多信息，请访问 SRA-cli 文档。"
+
+[argparse.inline_help]
+en-us = "Inline mode (no command prompt)"
+zh-cn = "内联模式（无命令提示符）"
+
+[argparse.embed_help]
+en-us = "Embed mode (no command prompt)"
+zh-cn = "嵌入模式（无命令提示符）"
+
+[argparse.version_help]
+en-us = "Show the version of SRA-cli and exit."
+zh-cn = "显示 SRA-cli 的版本并退出。"
+
+[argparse.log_level_help]
+en-us = "Set the logging level (default: TRACE)."
+zh-cn = "设置日志记录级别（默认：TRACE）。"
+
+[argparse.run_help]
+en-us = "Run all selected tasks in specified configuration file(s). Type 'run --help' for more information."
+zh-cn = "运行指定配置文件中的所有选中的任务。输入 'run --help' 获取更多信息。"
+
+[argparse.run_description]
+en-us = """
+Runs all tasks in specified configuration file(s).
+If no configuration file is specified, the current config file in cache will be used.
+This command will block the CLI until all tasks are finished.
+"""
+zh-cn = "运行指定配置文件中的所有任务。如果未指定配置文件，则使用缓存中的当前配置文件。此命令将阻塞 CLI 直到所有任务完成。"
+
+[argparse.config_help]
+en-us = "Configuration file name or path."
+zh-cn = "配置文件名称或路径。"
+
+[argparse.single_help]
+en-us = "Run a single task specified by its name or index. Type 'single --help' for more information."
+zh-cn = "运行由其名称或索引指定的单个任务。输入 'single --help' 获取更多信息。"
+
+[argparse.single_description]
+en-us = """
+Runs a single task specified by its name or index, whether it is selected or not.
+If no configuration file is specified, the current config file in cache will be used.
+This command will block the CLI until the task is finished.
+"""
+zh-cn = "运行由其名称或索引指定的单个任务，无论它是否被选中。如果未指定配置文件，则使用缓存中的当前配置文件。此命令将阻塞 CLI 直到任务完成。"
+
+[argparse.task_name_help]
+en-us = "Name or index of the task to run."
+zh-cn = "要运行的任务的名称或索引。"
+
+[argparse.once_help]
+en-us = "Exit SRA-cli after running the command."
+zh-cn = "运行命令后退出 SRA-cli。"
+
+[task.currentConfig]
+en-us = "Current config: {config_name}"
+zh-cn = "当前配置：{config_name}"
+
+[task.noSelectedTasks]
+en-us = "No tasks are selected in {config_name}, skipping execution."
+zh-cn = "{config_name} 配置中没有选中的任务, 跳过执行。"
+
+[task.taskFailed]
+en-us = "Task '{name}' failed. Stopping further execution."
+zh-cn = "任务 '{name}' 失败。停止进一步执行。"
+
+[task.taskCrashed]
+en-us = "Task '{name}' crashed due to an unexpected error: {error}"
+zh-cn = "任务 '{name}' 因意外错误崩溃：{error}"
+
+[task.taskCompleted]
+en-us = "Task '{name}' has been completed."
+zh-cn = "任务 '{name}' 已完成。"
+
+[task.configCompleted]
+en-us = "All tasks in config '{config_name}' have been completed."
+zh-cn = "配置 '{config_name}' 中的所有任务已完成。"
+
+[task.notificationTitle]
+en-us = "Task Completion Reminder"
+zh-cn = "任务完成提醒"
+
+[task.notificationMessage]
+en-us = "Your SRA task has completed."
+zh-cn = "您的SRA任务运行完成。"
+
+[task.instantiateFailed]
+en-us = "Failed to instantiate task '{name}': {error}"
+zh-cn = "实例化任务 '{name}' 失败：{error}"
+
+[task.noSuchTask]
+en-us = "No such task: '{identifier}'"
+zh-cn = "没有此任务：'{identifier}'"
+
+[task.managerCrashed]
+en-us = "Task manager crashed due to an unexpected error: {error}"
+zh-cn = "任务管理器因意外错误崩溃：{error}"
+
+[config.fileNotFound]
+en-us = "Could not find config file: '{path}'"
+zh-cn = "找不到文件：'{path}'"
+
+[config.parseError]
+en-us = "Failed to parse config file '{path}': {error}"
+zh-cn = "解析文件 '{path}' 失败：{error}"
+
+[config.exception]
+en-us = "An error occurred while loading config file '{path}': {error}"
+zh-cn = "加载文件 '{path}' 时发生错误：{error}"
