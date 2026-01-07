@@ -141,7 +141,7 @@ class TrailblazePowerTask(BaseTask):
         if len(self.auto_detect_tasklist) > 0:
             detected_tasks = self.detect_tasks()
             if detected_tasks is None:
-                return False
+                return self.operator.press_key('esc') # 退出生存索引页面
             for task, kwargs in detected_tasks:
                 if self.stop_flag:
                     return False
