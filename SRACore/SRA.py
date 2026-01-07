@@ -111,7 +111,6 @@ class SRACli(cmd.Cmd):
             self.task_process = multiprocessing.Process(target=self.task_manager.run, daemon=True, args=config_names)
             self.task_process.start()
             time.sleep(1)  # 确保进程有时间启动
-            logger.info("[Start]")
         elif command == 'stop':
             if self.task_process is not None and self.task_process.is_alive():
                 logger.warning(Resource.cli_task_interrupted)

@@ -1,13 +1,13 @@
 import importlib
 import tomllib
 
+from SRACore.localization import Resource
 from SRACore.operator import Operator
 from SRACore.task import BaseTask
 from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
 from SRACore.util import notify
 from SRACore.util import sys_util  # NOQA 有动态用法，确保被打包
 from SRACore.util.config import load_config, load_cache
-from SRACore.util.i18n import t
 from SRACore.util.logger import logger, setup_logger
 
 
@@ -36,14 +36,13 @@ class TaskManager:
                 if not callable(getattr(_class, "run", None)):
                     raise TypeError(f"Task class {main_class} does not implement a callable 'run' method")
                 self.task_list.append(_class)
-        logger.debug(t('task.load_success', tasks=str(self.task_list)))
+        logger.debug(f"Successfully load task: {self.task_list}")
 
     def stop(self):
         """
         外部调用的停止方法，设置运行标志为 False 并记录日志。
         注意：此方法可能不会立即终止正在运行的任务（需任务内部支持中断）。
         """
-        logger.warning(t('task.interrupted'))
         self.running_flag = False
 
     def run(self, *args):
@@ -55,7 +54,7 @@ class TaskManager:
         """
         setup_logger()
         self.running_flag = True
-        logger.debug(t('task.start'))
+        logger.debug('[Start]')
         try:
             if len(args)==0:
                 # 不指定配置时，加载缓存中的全部配置名称
@@ -65,16 +64,16 @@ class TaskManager:
                 config_list = args
 
             for config_name in config_list:
-                logger.info(t('task.current_config', name=config_name))
+                logger.info(Resource.task_currentConfig(config_name))
                 # 每次循环检查中断标志
                 if not self.running_flag:
                     break
 
                 # 获取当前配置需要执行的任务列表
                 tasks_to_run = self.get_tasks(config_name)
-                logger.debug('tasks_to_run: ' + str([c.__class__.__name__ for c in tasks_to_run]))
+                logger.debug(f'tasks_to_run: {tasks_to_run}')
                 if not tasks_to_run:
-                    logger.warning(t('task.no_task_selected', name=config_name))
+                    logger.warning(Resource.task_noSelectedTasks(config_name))
                     continue
 
                 # 依次执行任务
@@ -83,25 +82,25 @@ class TaskManager:
                         break
                     try:
                         # 运行任务，如果返回 False 表示任务失败
-                        logger.debug('running task: ' + str(task.__class__.__name__))
+                        logger.debug('running task: ' + str(task))
                         if not task.run():
-                            logger.debug('task failed: ' + str(task.__class__.__name__))
-                            logger.error(t('task.task_failed', name=task.__class__.__name__))
+                            logger.debug('task failed: ' + str(task))
+                            logger.error(Resource.task_taskFailed(str(task)))
                             return  # 终止当前配置的执行
                     except Exception as e:
                         # 捕获任务执行中的异常（如未处理的错误）
-                        logger.exception(t('task.task_crashed', name=task.__class__.__name__, error=str(e)))
+                        logger.exception(Resource.task_taskCrashed(str(task), str(e)))
                         break
-                logger.info(t('task.config_completed', name=config_name))
-            logger.info(t('task.all_completed'))
-            notify.try_send_notification(t('task.notification_title'), t('task.notification_body'))
+                logger.info(Resource.task_configCompleted(config_name))
+            logger.info("All tasks completed.")
+            notify.try_send_notification(Resource.task_notificationTitle, Resource.task_notificationMessage)
         except Exception as e:
             # 捕获线程主循环中的异常（如配置加载失败）
-            logger.exception(t('task.manager_crashed', error=str(e)))
+            logger.exception(Resource.task_managerCrashed(str(e)))
         finally:
             # 确保标志位被重置，避免僵尸线程
             self.running_flag = False
-            logger.debug(t('task.done'))
+            logger.debug("[Done]")
 
     def get_tasks(self, config_name) -> list[BaseTask]:
         """
@@ -138,7 +137,7 @@ class TaskManager:
                     # 实例化任务类
                     tasks.append(self.task_list[index](Operator(), config))
                 except Exception as e:
-                    logger.exception(t('task.instantiate_failed', index=index, error=str(e)))
+                    logger.exception(Resource.task_instantiateFailed(index, str(e)))
         return tasks
 
     def run_task(self, task: int | str, config_name: str | None = None) -> bool:
@@ -157,7 +156,7 @@ class TaskManager:
         """
         setup_logger()
         self.running_flag = True
-        logger.debug(t('task.start'))
+        logger.debug('[Start]')
         try:
             if config_name is None:
                 # 不指定配置时，使用缓存中的当前配置名称
@@ -166,18 +165,18 @@ class TaskManager:
             # 获取任务实例
             task_instance = self.get_task(config_name, task)
             if task_instance is None:
-                logger.error(f"Task not found: {task}")
+                logger.error(Resource.task_noSuchTask(config_name))
                 return False
             logger.debug('running task: ' + str(task_instance.__class__.__name__))
             # 运行任务
             result = task_instance.run()
             if not result:
-                logger.error(t('task.task_failed', name=task_instance.__class__.__name__))
+                logger.error(Resource.task_taskFailed(str(task_instance)))
             else:
-                logger.info(t('task.task_completed', name=task_instance.__class__.__name__))
+                logger.info(Resource.task_taskCompleted(str(task_instance)))
             return result
         except Exception as e:
-            logger.exception(t('task.task_crashed', name=str(task), error=str(e)))
+            logger.exception(Resource.task_taskCrashed(task, str(e)))
             return False
         finally:
             self.running_flag = False
@@ -221,5 +220,5 @@ class TaskManager:
             # 实例化任务类
             return task_class(Operator(), config)
         except Exception as e:
-            logger.error(t('task.instantiate_failed', index=task, error=f'{e.__class__.__name__}: {e}'))
+            logger.error(Resource.task_instantiateFailed(task, f'{e.__class__.__name__}: {e}'))
             return None

@@ -180,7 +180,7 @@ nothing to do with it.
 ```
 ├── .github/               # 🔧 GitHub相关配置文件
 ├── SRACore/               # 🐍 Python后端核心代码
-│   ├── i18n/              # 🌐 国际化语言文件
+│   ├── localization/      # 🌐 本地化支持
 │   ├── task/              # 📋 任务相关代码
 │   ├── thread/            # 🧵 线程管理
 │   ├── triggers/          # ⚡ 触发器实现
@@ -204,7 +204,6 @@ nothing to do with it.
 ├── resources/             # 📁 资源文件目录
 │   ├── img/               # 🖼️ 图像资源
 │   ├── test/              # 🧪 测试资源
-│   └── ui/                # 🎨 UI资源
 ├── setup/                 # 📦 安装包制作相关文件
 ├── tasks/                 # 📋 任务实现目录
 └── version.json           # 🔢 版本信息
@@ -215,7 +214,7 @@ nothing to do with it.
 - **SRACore/**: 🐍 包含程序的核心逻辑，包括任务管理、线程控制、触发器系统和工具函数等。
 - **SRAFrontend/**: 🎯 使用Avalonia框架开发的C#前端界面，实现用户交互和配置管理。
 - **tasks/**: 📋 各种自动化任务的具体实现，如启动游戏、领取奖励、清体力等。
-- **resources/**: 📁 存放程序所需的各种资源文件，包括图像识别所需的模板图片和UI资源。
+- **resources/**: 📁 存放程序所需的各种资源文件，包括图像识别所需的模板图片。
 
 ### 📄 关键文件说明
 
@@ -243,18 +242,39 @@ nothing to do with it.
 
 ## 🤝 想要为项目做出贡献
 
-当然，我们不会拒绝，不过我们会对你提出一些要求：
-
-如果你希望参与后端开发，你需要：
+### 参与后端开发：
 
 * 🐍 熟悉 `Python` 。
 * 🎮 正在游玩并将长期游玩`崩坏：星穹铁道` 。
 
-如果你希望参与前端开发，你需要：
+### 参与前端开发：
 
 * 🎯 熟悉 `C#` 以及 `Avalonia` 框架。
 
-或许，您可以`另辟蹊径`？
+### 本地化支持：
+
+为了减少工作量，SRA仅对日志级别高于或等于`INFO`的日志进行本地化支持。其他日志内容将保持英文。
+
+SRA 后端采用 `pyl10nc` 进行本地化支持，欢迎为SRA贡献更多语言的翻译！
+1. 克隆仓库并创建新的分支
+2. 在 `SRACore/localization/` 目录下编辑 `resource.toml` 文件，添加新的语言支持
+示例：
+```toml
+[cli.intro] # 资源键
+en-us = "SRA-cli {version} ({core})\nType 'help' or '?' to list commands." # 现有的英文翻译
+zh-cn = "SRA-cli {version} ({core})\n输入 'help' 或 '?' 来查看命令列表。" # 现有的中文翻译
+```
+新增语言键：
+```toml
+[cli.intro]
+# ......
+es-es = "SRA-cli {version} ({core})\nEscriba 'help' o '?' para listar los comandos." # 新增的西班牙语翻译
+```
+3. 提交 Pull Request
+
+SRA 前端采用 `ResX` 进行本地化支持，推荐使用 `Rider` 或 `Visual Studio` 进行编辑。
+
+### 另辟蹊径
 
 * 🎨 尝试为SRA绘制软件图标。`没有稿费`
 
