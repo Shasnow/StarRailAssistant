@@ -40,7 +40,7 @@ Manages tasks within SRA-cli.
 Usage:
   task run [<name | path>...]
                 Runs all selected tasks in specified configuration file(s).
-                If no configuration file is specified, the current config file in cache will be used.
+                If no configuration file is specified, all config files in cache will be used.
   task single (taks_name | task_index) [<config_name | config_path>]
                 Runs a single task specified by its name or index, wether it is selected or not.
                 If no configuration file is specified, the current config file in cache will be used.
@@ -51,7 +51,7 @@ zh-cn = """
 用法：
   task run [<name | path>...]
                 运行指定配置文件中的所有选中的任务。
-                如果未指定配置文件，则使用缓存中的当前配置文件。
+                如果未指定配置文件，则使用缓存中的全部配置文件。
   task single (taks_name | task_index) [<config_name | config_path>]
                 运行由其名称或索引指定的单个任务，无论它是否被选中。
                 如果未指定配置文件，则使用缓存中的当前配置文件。
@@ -84,24 +84,24 @@ zh-cn = """
 en-us = """
 Usage: run [<config_name | config_path>...]
 Runs all tasks in specified configuration file(s). If no configuration file is specified, the current config file in cache will be used.
-!!! This command will block the CLI until all tasks are finished. !!!
+This command will block the CLI until all tasks are finished.
 """
 zh-cn = """
 用法：run [<config_name | config_path>...]
 运行指定配置文件中的所有任务。如果未指定配置文件，则使用缓存中的当前配置文件。
-!!! 此命令将阻塞 CLI 直到所有任务完成。 !!!
+此命令将阻塞 CLI 直到所有任务完成。
 """
 
 [cli.help.single]
 en-us = """
 Usage: single (task_name | task_index) [<config_name | config_path>]
 Runs a single task specified by its name or index, whether it is selected or not. If no configuration file is specified, the current config file in cache will be used.
-!!! This command will block the CLI until the task is finished. !!!
+This command will block the CLI until the task is finished.
 """
 zh-cn = """
 用法：single (task_name | task_index) [<config_name | config_path>]
 运行由其名称或索引指定的单个任务，无论它是否被选中。如果未指定配置文件，则使用缓存中的当前配置文件。
-!!! 此命令将阻塞 CLI 直到任务完成。 !!!
+此命令将阻塞 CLI 直到任务完成。
 """
 
 [cli.exit.help]
@@ -210,11 +210,11 @@ zh-cn = "显示 SRA-cli 的当前版本。"
 
 [argparse.description]
 en-us = "SRA-cli: A command-line interface for SRA."
-zh-cn = "SRA-cli：SRA 的命令行界面。"
+zh-cn = "SRA-cli：SRA 命令行工具"
 
 [argparse.epilog]
-en-us = "For more information, visit the SRA-cli documentation."
-zh-cn = "欲了解更多信息，请访问 SRA-cli 文档。"
+en-us = ""
+zh-cn = ""
 
 [argparse.inline_help]
 en-us = "Inline mode (no command prompt)"
@@ -242,7 +242,7 @@ Runs all tasks in specified configuration file(s).
 If no configuration file is specified, the current config file in cache will be used.
 This command will block the CLI until all tasks are finished.
 """
-zh-cn = "运行指定配置文件中的所有任务。如果未指定配置文件，则使用缓存中的当前配置文件。此命令将阻塞 CLI 直到所有任务完成。"
+zh-cn = "运行指定配置文件中的所有任务。如果未指定配置文件，则使用缓存中的全部配置文件。此命令将阻塞 CLI 直到所有任务完成。"
 
 [argparse.config_help]
 en-us = "Configuration file name or path."

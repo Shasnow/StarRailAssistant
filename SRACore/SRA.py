@@ -119,6 +119,7 @@ class SRACli(cmd.Cmd):
                 if self.task_process.is_alive():
                     logger.error(Resource.cli_task_timeout)
                 else:
+                    logger.debug('[Done]')
                     logger.info(Resource.cli_task_stopped)
             else:
                 print(Resource.cli_task_notRunning)
@@ -134,7 +135,6 @@ class SRACli(cmd.Cmd):
             self.task_process = multiprocessing.Process(target=self.task_manager.run_task, daemon=True, args=sub_args)
             self.task_process.start()
             time.sleep(1)  # 确保进程有时间启动
-            logger.info("[Start]")
         else:
             print(Resource.cli_invalidArguments('task'))
 

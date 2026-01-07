@@ -2,7 +2,7 @@ from SRACore.task import BaseTask
 from SRACore.util.logger import logger
 
 
-class ReceiveRewardTask(BaseTask):
+class ReceiveRewardsTask(BaseTask):
     def _post_init(self):
         self.config_name=self.config.get('Name', 'unknown')
 
