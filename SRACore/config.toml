@@ -10,8 +10,8 @@ module = "tasks.TrailblazePowerTask"
 
 [[tasks]]
 name = "领取奖励"
-main = "ReceiveRewardTask"
-module = "tasks.ReceiveRewardTask"
+main = "ReceiveRewardsTask"
+module = "tasks.ReceiveRewardsTask"
 
 [[tasks]]
 name = "旷宇纷争"
