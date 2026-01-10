@@ -13,7 +13,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Localization\" />
         <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
@@ -41,17 +40,17 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Update="Localization\Resources.resx">
-            <Generator>PublicResXFileCodeGenerator</Generator>
-            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
+      <EmbeddedResource Update="Localization\Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="Localization\Resources.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Resources.resx</DependentUpon>
-        </Compile>
+      <Compile Update="Localization\Resources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>
