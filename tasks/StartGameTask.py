@@ -23,8 +23,8 @@ class StartGameTask(BaseTask):
                 return False
         self.start_game_click()
         res,_ = self.operator.wait_any_img(["resources/img/enter.png",
-                                 "resources/img/train_supply.png",
-                                 "resources/img/task_resources_manage.png"], timeout=120, interval=2)
+                                            "resources/img/train_supply.png",
+                                            "resources/img/task_resources_manage.png"], timeout=120, interval=2)
         if res == 0:
             return True
         elif res == 1:
@@ -90,8 +90,7 @@ class StartGameTask(BaseTask):
 
     def login_bl(self):
         result,_ = self.operator.wait_any_img(['resources/img/bilibili_login.png', 'resources/img/bilibili_welcome.png',
-                                    "resources/img/quit.png", "resources/img/enter.png"],
-                                   timeout=60)
+                                               "resources/img/quit.png", "resources/img/enter.png"], timeout=60)
         if result == -1:
             logger.error("等待登录界面超时")
             return -1
@@ -130,9 +129,9 @@ class StartGameTask(BaseTask):
             return -1
 
     def login_au(self):
-        result, _ = self.operator.wait_any_img(
-            ["resources/img/login_page.png", "resources/img/welcome.png",
-             "resources/img/quit.png", "resources/img/enter.png"], timeout=60, interval=1)
+        result, _ = self.operator.wait_any_img(["resources/img/login_page.png", "resources/img/welcome.png",
+                                                "resources/img/quit.png", "resources/img/enter.png"], timeout=60,
+                                               interval=1)
         if result == -1:
             logger.error("等待登录界面超时")
             return -1
