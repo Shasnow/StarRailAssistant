@@ -14,8 +14,8 @@ import os
 class Localization:
     """Automatically generated localization class."""
     __normalized_data: dict[str, str] = None
-    lang: str = "en-us"
-    __available_languages = ['en-us', 'zh-cn']
+    lang: str = "zh-cn"
+    __available_languages = ['zh-cn', 'en-us']
     __data_loaded: bool = False
 
     def __init__(self):
@@ -131,7 +131,7 @@ class Localization:
 
     @property
     def cli_help_task(self) -> str:
-        """Manages tasks within SRA-cli.\nUsage:\n  task run [<name | path>...]\n                Runs all selected tasks in specified configuration file(s).\n                If no configuration file is specified, the current config file in cache will be used.\n  task single (taks_name | task_index) [<config_name | config_path>]\n                Runs a single task specified by its name or index, wether it is selected or not.\n                If no configuration file is specified, the current config file in cache will be used.\n  task stop     Stops all running tasks.\n
+        """Manages tasks within SRA-cli.\nUsage:\n  task run [<name | path>...]\n                Runs all selected tasks in specified configuration file(s).\n                If no configuration file is specified, all config files in cache will be used.\n  task single (taks_name | task_index) [<config_name | config_path>]\n                Runs a single task specified by its name or index, wether it is selected or not.\n                If no configuration file is specified, the current config file in cache will be used.\n  task stop     Stops all running tasks.\n
 
         From cli.help.task"""
         return self.get_translation("cli.help.task")
@@ -145,17 +145,31 @@ class Localization:
 
     @property
     def cli_help_run(self) -> str:
-        """Usage: run [<config_name | config_path>...]\nRuns all tasks in specified configuration file(s). If no configuration file is specified, the current config file in cache will be used.\n!!! This command will block the CLI until all tasks are finished. !!!\n
+        """Usage: run [<config_name | config_path>...]\nRuns all tasks in specified configuration file(s). If no configuration file is specified, the current config file in cache will be used.\nThis command will block the CLI until all tasks are finished.\n
 
         From cli.help.run"""
         return self.get_translation("cli.help.run")
 
     @property
     def cli_help_single(self) -> str:
-        """Usage: single (task_name | task_index) [<config_name | config_path>]\nRuns a single task specified by its name or index, whether it is selected or not. If no configuration file is specified, the current config file in cache will be used.\n!!! This command will block the CLI until the task is finished. !!!\n
+        """Usage: single (task_name | task_index) [<config_name | config_path>]\nRuns a single task specified by its name or index, whether it is selected or not. If no configuration file is specified, the current config file in cache will be used.\nThis command will block the CLI until the task is finished.\n
 
         From cli.help.single"""
         return self.get_translation("cli.help.single")
+
+    @property
+    def cli_help_host(self) -> str:
+        """Start WebSocket server on specified port
+
+        From cli.help.host"""
+        return self.get_translation("cli.help.host")
+
+    @property
+    def cli_help_version(self) -> str:
+        """Displays the current version of SRA-cli.
+
+        From cli.help.version"""
+        return self.get_translation("cli.help.version")
 
     @property
     def cli_exit_help(self) -> str:
@@ -283,19 +297,19 @@ class Localization:
         template = self.get_translation("cli.trigger.notFound")
         return template.format(trigger_name=trigger_name)
 
-    def cli_trigger_attrNotFound(self, trigger_name, attr) -> str:
+    def cli_trigger_attrNotFound(self, attr, trigger_name) -> str:
         """Attribute '{attr}' not found in trigger '{trigger_name}'.
 
         From cli.trigger.attrNotFound"""
         template = self.get_translation("cli.trigger.attrNotFound")
-        return template.format(trigger_name=trigger_name, attr=attr)
+        return template.format(attr=attr, trigger_name=trigger_name)
 
-    def cli_trigger_attrSet(self, trigger_name, value, attr) -> str:
+    def cli_trigger_attrSet(self, attr, value, trigger_name) -> str:
         """Attribute '{attr}' of trigger '{trigger_name}' has been set to '{value}'.
 
         From cli.trigger.attrSet"""
         template = self.get_translation("cli.trigger.attrSet")
-        return template.format(trigger_name=trigger_name, value=value, attr=attr)
+        return template.format(attr=attr, value=value, trigger_name=trigger_name)
 
     def cli_trigger_unknownType(self, type) -> str:
         """Unknown attribute type: '{type}', supports: 'int', 'float', 'bool', 'str'.
@@ -340,6 +354,41 @@ class Localization:
         return self.get_translation("cli.version.help")
 
     @property
+    def cli_host_help(self) -> str:
+        """Starts a WebSocket server on the specified port for remote control.\n\nUsage: host <port>\n
+
+        From cli.host.help"""
+        return self.get_translation("cli.host.help")
+
+    def cli_host_started(self, port) -> str:
+        """WebSocket server started on port {port}.
+
+        From cli.host.started"""
+        template = self.get_translation("cli.host.started")
+        return template.format(port=port)
+
+    def cli_host_invalidPort(self, port) -> str:
+        """Invalid port number: {port}.
+
+        From cli.host.invalidPort"""
+        template = self.get_translation("cli.host.invalidPort")
+        return template.format(port=port)
+
+    @property
+    def cli_host_stopped(self) -> str:
+        """WebSocket server stopped.
+
+        From cli.host.stopped"""
+        return self.get_translation("cli.host.stopped")
+
+    @property
+    def cli_host_notRunning(self) -> str:
+        """WebSocket server is not running.
+
+        From cli.host.notRunning"""
+        return self.get_translation("cli.host.notRunning")
+
+    @property
     def argparse_description(self) -> str:
         """SRA-cli: A command-line interface for SRA.
 
@@ -348,10 +397,22 @@ class Localization:
 
     @property
     def argparse_epilog(self) -> str:
-        """For more information, visit the SRA-cli documentation.
-
-        From argparse.epilog"""
+        """From argparse.epilog"""
         return self.get_translation("argparse.epilog")
+
+    @property
+    def argparse_host_help(self) -> str:
+        """Start WebSocket server
+
+        From argparse.host_help"""
+        return self.get_translation("argparse.host_help")
+
+    @property
+    def argparse_port_help(self) -> str:
+        """Port number to start the WebSocket server on.
+
+        From argparse.port_help"""
+        return self.get_translation("argparse.port_help")
 
     @property
     def argparse_inline_help(self) -> str:

@@ -2,7 +2,7 @@ import importlib
 import tomllib
 
 from SRACore.localization import Resource
-from SRACore.operator import Operator
+from SRACore.operators import Operator
 from SRACore.task import BaseTask
 from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
 from SRACore.util import notify

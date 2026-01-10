@@ -11,6 +11,7 @@ from SRACore.thread.task_thread import TaskManager
 from SRACore.thread.trigger_thread import TriggerManager
 from SRACore.util.config import load_settings
 from SRACore.util.const import VERSION, CORE
+from SRACore.websocket_server import WebSocketServer
 
 class SRACli(cmd.Cmd):
     intro = Resource.cli_intro(version=VERSION, core=CORE)
@@ -29,8 +30,38 @@ class SRACli(cmd.Cmd):
         stop_hotkey=stop_hotkey.lower()  # 统一小写
         if stop_hotkey is None or stop_hotkey == '':
             stop_hotkey = 'f9'
-        EventListener.register_key_event(stop_hotkey, self.do_task, "stop")
-        EventListener.run()
+
+        self.event_listener = EventListener()
+        self.event_listener.register_key_event(stop_hotkey, self.do_task, "stop")
+        self.event_listener.start()
+
+        self.websocket_server = None
+
+    def do_host(self, port):
+        """Start WebSocket server on specified port"""
+        if not self.websocket_server:
+            self.websocket_server = WebSocketServer(self)
+        if port:
+            if port == 'stop':
+                if self.websocket_server.is_alive():
+                    self.websocket_server.stop()
+                    time.sleep(0.5)
+                    self.websocket_server = None
+                    print(Resource.cli_host_stopped)
+                else:
+                    print(Resource.cli_host_notRunning)
+                return
+            try:
+                port_num = int(port)
+                if self.websocket_server.is_alive():
+                    self.websocket_server.stop()
+                self.websocket_server.port = port_num
+            except ValueError:
+                print(Resource.cli_host_invalidPort(port))
+                return
+        self.websocket_server.start()
+        time.sleep(0.5)
+        print(Resource.cli_host_started(self.websocket_server.port))
 
     def default(self, line):
         print(Resource.cli_unknownCommand(line))
@@ -92,14 +123,17 @@ class SRACli(cmd.Cmd):
             self.trigger_thread.join(timeout=5)
             if self.trigger_thread.is_alive():
                 logger.error(Resource.cli_exit_triggerTimeout)
-        EventListener.stop()
+
+        if self.websocket_server:
+            self.websocket_server.stop()
+        self.event_listener.stop()
         return True
 
     def do_task(self, arg: str):
         """Task manager command - support start/stop task process"""
         args = arg.split()
         if not args:
-            print(Resource.cli_task_invalidArguments('task'))
+            print(Resource.cli_invalidArguments('task'))
             return
         command = args[0]
         if command == 'run':
@@ -176,7 +210,7 @@ class SRACli(cmd.Cmd):
             print(Resource.cli_trigger_notFound(trigger_name))
         elif command == 'disable':
             if len(args) < 2:
-                print(Resource.cli_trigger_invalidArguments('trigger'))
+                print(Resource.cli_invalidArguments('trigger'))
                 return
             trigger_name = args[1]
             for trigger in self.trigger_manager.triggers:
@@ -229,7 +263,7 @@ class SRACli(cmd.Cmd):
         """Run a single specified task, will block current command line until task complete"""
         args = arg.split()
         if len(args) < 1:
-            print(Resource.invalidArguments('single'))
+            print(Resource.cli_invalidArguments('single'))
             return
         print(Resource.cli_run_started)
         try:

@@ -3,7 +3,7 @@ import base64
 import win32crypt
 
 
-def win_decryptor(entropy: str = None) -> str:
+def win_decryptor(entropy: str | None = None) -> str:
     """使用Windows DPAPI解密数据"""
 
     if entropy == "":

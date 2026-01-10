@@ -9,7 +9,7 @@ from PIL.Image import Image
 from loguru import logger
 from rapidocr_onnxruntime import RapidOCR
 
-from SRACore.operator.model import Region, Box
+from SRACore.operators.model import Region, Box
 from SRACore.util.config import load_settings
 
 

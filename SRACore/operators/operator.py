@@ -7,7 +7,7 @@ import pygetwindow
 # (pyperclip is in pyautogui requirements)
 import pyscreeze
 
-from SRACore.operator.ioperator import *
+from SRACore.operators.ioperator import *
 
 
 class Operator(IOperator):

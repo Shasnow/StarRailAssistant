@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from SRACore.operator import IOperator
+from SRACore.operators import IOperator
 
 
 class Executable:

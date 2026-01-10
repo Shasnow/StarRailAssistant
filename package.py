@@ -31,7 +31,6 @@ from pathlib import Path
 if __name__ == "__main__":
 
     root_path = Path(sys.argv[0]).resolve().parent
-
     with (root_path / "version.json").open(mode="r", encoding="utf-8") as f:
         version = json.load(f)
 
@@ -47,9 +46,25 @@ if __name__ == "__main__":
         " --file-description='StarRailAssistant Component'"
         " --copyright='Copyright © 2024 Shasnow'"
         " --assume-yes-for-downloads --output-filename=SRA-cli"
+        " --include-module=websockets.asyncio.server"
         " --remove-output main.py"
     )
     print("Python program packaging completed !")
+
+    print("Start to copy resources ...")
+    os.makedirs(root_path / "main.dist/SRACore", exist_ok=True)
+    shutil.copy(root_path / "SRACore/config.toml", root_path / "main.dist/SRACore/config.toml")
+    shutil.copy(root_path / "LICENSE", root_path / "main.dist/LICENSE")
+    shutil.copy(root_path / "README.md", root_path / "main.dist/README.md")
+    shutil.copy(root_path / "version.json", root_path / "main.dist/version.json")
+    shutil.copytree(root_path / "resources", root_path / "main.dist/resources")
+    os.makedirs(root_path / "main.dist/SRACore/localization", exist_ok=True)
+    for dirpath, dirnames, filenames in os.walk(root_path / "SRACore/localization"):
+        for file in filenames:
+            if file.endswith(".json"):
+                shutil.copy(Path(dirpath) / file, root_path / "main.dist/SRACore/localization" / file)
+    shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "main.dist/rapidocr_onnxruntime")
+    shutil.copytree(root_path / "tasks", root_path / "main.dist/tasks")
 
     print("Start to compress Core package ...")
     shutil.make_archive(
@@ -59,18 +74,7 @@ if __name__ == "__main__":
         base_dir=".",
     )
 
-    print("Start to copy resources ...")
-
     shutil.copytree(root_path / "SRAFrontend/bin/Release/net8.0/win-x64/publish", root_path / "main.dist/", dirs_exist_ok=True)
-    shutil.copytree(root_path / "resources", root_path / "main.dist/resources")
-    shutil.copytree(root_path / "rapidocr_onnxruntime", root_path / "main.dist/rapidocr_onnxruntime")
-    shutil.copytree(root_path / "tasks", root_path / "main.dist/tasks")
-    os.makedirs(root_path / "main.dist/SRACore", exist_ok=True)
-    shutil.copytree(root_path / "SRACore/i18n", root_path / "main.dist/SRACore/i18n")
-    shutil.copy(root_path / "SRACore/config.toml", root_path / "main.dist/SRACore/config.toml")
-    shutil.copy(root_path / "LICENSE", root_path / "main.dist/LICENSE")
-    shutil.copy(root_path / "README.md", root_path / "main.dist/README.md")
-    shutil.copy(root_path / "version.json", root_path / "main.dist/version.json")
 
     print("Start to compressing Lite package ...")
     shutil.make_archive(

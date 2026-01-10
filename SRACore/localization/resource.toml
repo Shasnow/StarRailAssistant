@@ -104,6 +104,14 @@ zh-cn = """
 此命令将阻塞 CLI 直到任务完成。
 """
 
+[cli.help.host]
+en-us = "Start WebSocket server on specified port"
+zh-cn = "在指定端口启动 WebSocket 服务器"
+
+[cli.help.version]
+en-us = "Displays the current version of SRA-cli."
+zh-cn = "显示 SRA-cli 的当前版本。"
+
 [cli.exit.help]
 en-us = "Exits the SRA-cli application."
 zh-cn = "退出 SRA-cli 应用程序。"
@@ -208,6 +216,38 @@ zh-cn = "运行由其名称或索引指定的单个任务，输入 'help single'
 en-us = "Displays the current version of SRA-cli."
 zh-cn = "显示 SRA-cli 的当前版本。"
 
+[cli.host.help]
+en-us = """
+Starts a WebSocket server on the specified port for remote control.
+
+Usage:
+  host <port>  Starts a WebSocket server on the specified port.
+  host stop    Stops the WebSocket server.
+"""
+zh-cn = """
+在指定端口启动一个 WebSocket 服务器以进行远程控制。
+
+用法：
+  host <port>  在指定端口启动 WebSocket 服务器。
+  host stop    停止 WebSocket 服务器。
+"""
+
+[cli.host.started]
+en-us = "WebSocket server started on port {port}."
+zh-cn = "WebSocket 服务器已在端口 {port} 启动。"
+
+[cli.host.invalidPort]
+en-us = "Invalid port number: {port}."
+zh-cn = "无效的端口号: {port}。"
+
+[cli.host.stopped]
+en-us = "WebSocket server stopped."
+zh-cn = "WebSocket 服务器已停止。"
+
+[cli.host.notRunning]
+en-us = "WebSocket server is not running."
+zh-cn = "WebSocket 服务器未运行。"
+
 [argparse.description]
 en-us = "SRA-cli: A command-line interface for SRA."
 zh-cn = "SRA-cli：SRA 命令行工具"
@@ -215,6 +255,14 @@ zh-cn = "SRA-cli：SRA 命令行工具"
 [argparse.epilog]
 en-us = ""
 zh-cn = ""
+
+[argparse.host_help]
+en-us = "Start WebSocket server"
+zh-cn = "启动 WebSocket 服务器"
+
+[argparse.port_help]
+en-us = "Port number to start the WebSocket server on."
+zh-cn = "启动 WebSocket 服务器的端口号。"
 
 [argparse.inline_help]
 en-us = "Inline mode (no command prompt)"
