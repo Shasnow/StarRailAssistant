@@ -163,7 +163,8 @@ class ReceiveRewardsTask(BaseTask):
             logger.info("没有巡星之礼活动")
             self.operator.press_key("esc")
             return
-        if self.operator.click_img("resources/img/gift_receive.png") or self.operator.click_img("resources/img/gift_receive2.png"):
+        if self.operator.click_img("resources/img/gift_receive.png") or self.operator.click_img(
+                "resources/img/gift_receive2.png"):
             logger.info("领取成功")
             self.operator.sleep(2)
             self.operator.press_key("esc", presses=2, interval=2)
@@ -179,7 +180,7 @@ class ReceiveRewardsTask(BaseTask):
             logger.info("没有可领取的奖励")
             return
         match self.operator.wait_any_img(["resources/img/assignment_page.png", "resources/img/assignment_page2.png"],
-                                timeout=10)[0]:
+                                         timeout=10)[0]:
             case 0:
                 pass
             case 1:
@@ -272,7 +273,7 @@ class ReceiveRewardsTask(BaseTask):
         logger.info("完成任务：领取无名勋礼奖励")
 
     def synthesis(self):
-        if self.operator.click_img("resources/img/synthesis.png",y_offset=330):
+        if self.operator.click_img("resources/img/synthesis.png", y_offset=330):
             logger.info("找到合成任务")
             self.operator.sleep(2)
             self.operator.click_img("resources/img/material _replacement.png")

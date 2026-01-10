@@ -202,11 +202,8 @@ class RerollStart(Executable):
         Returns:
             bool: True 成功到达 | False 未能到达
         """
-        idx, box = self.operator.wait_any_img(
-            [CWIMG.SELECT_INVEST_STRATEGY, CWIMG.CLICK_BLANK],
-            timeout=45,
-            interval=0.5
-        )
+        idx, box = self.operator.wait_any_img([CWIMG.SELECT_INVEST_STRATEGY, CWIMG.CLICK_BLANK], timeout=45,
+                                              interval=0.5)
 
         if idx == 1 and box is not None:
             self.operator.click_box(box, after_sleep=1)
@@ -272,7 +269,8 @@ class RerollStart(Executable):
         self.operator.click_point(0.5, 0.5, after_sleep=2)
 
         # 标准进入 or 继续进度（若是继续进度则中断并返回）
-        index, box = self.operator.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONCLUDE_AND_SETTLE], timeout=3, interval=0.5)
+        index, box = self.operator.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONCLUDE_AND_SETTLE], timeout=3,
+                                                interval=0.5)
         if index == 0:
             # 识别到标准进入，直接点击该入口并执行标准进入流程
             if box is None:

@@ -100,8 +100,8 @@ class CurrencyWars(Executable):
         :return: int 页面编号，1表示货币战争开始页面，2表示准备阶段页面，-1表示定位失败
         """
         page, _ = self.operator.wait_any_img([IMG.ENTER,
-                                     CWIMG.CURRENCY_WARS_START,
-                                     CWIMG.PREPARATION_STAGE], interval=0.5)
+                                              CWIMG.CURRENCY_WARS_START,
+                                              CWIMG.PREPARATION_STAGE], interval=0.5)
         if page == 0:
             self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
             if not self.operator.wait_img(IMG.F4, timeout=20):
@@ -163,7 +163,8 @@ class CurrencyWars(Executable):
                       interval=0.5, max_iterations=10)
 
         # 标准进入 or 继续进度
-        index, box = self.operator.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONTINUE_PROGRESS], timeout=10, interval=0.5)
+        index, box = self.operator.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONTINUE_PROGRESS], timeout=10,
+                                                interval=0.5)
 
         if index == 0:
             if self.is_overclock:
@@ -582,7 +583,7 @@ class CurrencyWars(Executable):
                 self.operator.sleep(0.5)
                 return False
         self.force_battle = False
-        result, _ = self.operator.wait_any_img([CWIMG.SETTLE, CWIMG.CONTINUE], interval=1, timeout=600)
+        result, _ = self.operator.wait_any_img([CWIMG.SETTLE, CWIMG.CONTINUE], timeout=600, interval=1)
         if result != -1:
             logger.info("挑战结束")
             self.operator.sleep(0.5)

@@ -23,6 +23,7 @@ class IOperator(ABC):
 
     @classmethod
     def get_ocr_instance(cls):
+        """获取OCR引擎实例"""
         if cls.ocr_engine is None:
             cls.ocr_engine = RapidOCR(config_path='rapidocr_onnxruntime/config.yaml')
         return cls.ocr_engine
@@ -30,10 +31,21 @@ class IOperator(ABC):
     @property
     @abstractmethod
     def is_window_active(self) -> bool:
+        """检查目标窗口是否为当前活动窗口"""
         ...
 
     @abstractmethod
     def get_win_region(self, active_window: bool | None = None, raise_exception: bool = True) -> Region | None:
+        """获取目标窗口的区域坐标
+
+        Args:
+            active_window (bool | None, optional): 是否在获取窗口区域前激活窗口。
+            raise_exception (bool, optional): 如果无法获取窗口区域，是否抛出异常。默认为True。
+        Returns:
+            Region | None: 返回窗口区域对象，如果无法获取且raise_exception为False，则返回None。
+        Raises:
+            Exception: 如果无法获取窗口区域且raise_exception为True，则抛出异常。
+        """
         ...
 
     @abstractmethod
@@ -104,12 +116,20 @@ class IOperator(ABC):
                          confidence: float | None = None,
                          trace: bool = True,
                          **_) -> Box | None:
-        """在屏幕上查找图片位置"""
+        """
+        在窗口内查找图片位置
+        :param img_path: 模板图片路径
+        :param region: 要查找的区域对象，包含left, top, width, height属性。
+        :param confidence:
+        :param trace:
+        :param _:
+        :return:
+        """
         ...
 
     @abstractmethod
     def locate_in_tuple(self,
-                        img_path: str,
+                        templates: str,
                         from_x: float,
                         from_y: float,
                         to_x: float,
@@ -119,7 +139,7 @@ class IOperator(ABC):
                         **_) -> Box | None:
         """
         在窗口内查找图片位置，使用比例坐标
-        :param img_path: 模板图片路径
+        :param templates: 模板图片路径
         :param from_x: 区域起始x坐标比例(0-1)
         :param from_y: 区域起始y坐标比例(0-1)
         :param to_x: 区域结束x坐标比例(0-1)
@@ -132,16 +152,23 @@ class IOperator(ABC):
 
     @abstractmethod
     def locate_any_in_region(self,
-                             img_paths: list[str],
+                             templates: list[str],
                              region: Region | None = None,
                              confidence: float | None = None,
                              trace: bool = True) -> tuple[int, Box | None]:
-        """在窗口内查找任意一张图片位置"""
+        """
+        在窗口内查找任意一张图片位置
+        :param templates: 模板图片路径列表
+        :param region: 要查找的区域对象
+        :param confidence: 匹配度, 0-1之间的浮点数, 默认为self.confidence
+        :param trace: 是否打印调试信息
+        :return: tuple[int, Box | None] - 找到的图片索引和位置，如果未找到则返回-1和None
+        """
         ...
 
     @abstractmethod
     def locate_any_in_tuple(self,
-                            img_paths: list[str],
+                            templates: list[str],
                             from_x: float,
                             from_y: float,
                             to_x: float,
@@ -150,7 +177,7 @@ class IOperator(ABC):
                             trace: bool = False) -> tuple[int, Box | None]:
         """
         在窗口内查找任意一张图片位置，使用比例坐标
-        :param img_paths: 模板图片路径列表
+        :param templates: 模板图片路径列表
         :param from_x: 区域起始x坐标比例(0-1)
         :param from_y: 区域起始y坐标比例(0-1)
         :param to_x: 区域结束x坐标比例(0-1)
@@ -339,7 +366,18 @@ class IOperator(ABC):
                   to_y: float | None = None,
                   trace: bool = True) -> Box | None:
         """
-        OCR识别并匹配文本
+        OCR识别并匹配指定文本，返回文本位置
+
+        当提供完整4个比例坐标时，region参数会被忽略。
+        :param text: 要识别的文本
+        :param confidence: 识别置信度
+        :param region: 识别区域
+        :param from_x: 识别区域起始x坐标比例(0-1)
+        :param from_y: 识别区域起始y坐标比例(0-1)
+        :param to_x: 识别区域结束x坐标比例(0-1)
+        :param to_y: 识别区域结束y坐标比例(0-1)
+        :param trace: 是否打印调试信息
+        :return: Box | None - 找到的文本位置，如果未找到则返回None
         """
         results = self.ocr(region, from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
         if results is None:
@@ -365,8 +403,18 @@ class IOperator(ABC):
                       to_y: float | None = None,
                       trace: bool = True) -> tuple[int, Box | None]:
         """
-        OCR识别并匹配任意文本，返回第一个找到的文本索引和位置
-        :returns tuple[int, Box | None] - 找到的文本索引和位置，如果未找到则返回-1和None
+        OCR识别并匹配任意指定文本，返回文本索引和位置
+
+        当提供完整4个比例坐标时，region参数会被忽略。
+        :param texts: 要识别的文本列表
+        :param confidence: 识别置信度
+        :param region: 识别区域
+        :param from_x: 识别区域起始x坐标比例(0-1)
+        :param from_y: 识别区域起始y坐标比例(0-1)
+        :param to_x: 识别区域结束x坐标比例(0-1)
+        :param to_y: 识别区域结束y坐标比例(0-1)
+        :param trace: 是否打印调试信息
+        :return: tuple[int, Box | None] - 找到的文本索引和位置，如果未找到则返回-1和None
         """
         results = self.ocr(region, from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
         if results is None:
@@ -389,6 +437,8 @@ class IOperator(ABC):
         :param timeout: 超时时间，单位秒
         :param interval: 检查间隔时间，单位秒，默认为0.2秒
         :param confidence: 识别置信度，默认为0.9
+        :param args: 传递给ocr_match的其他位置参数
+        :param kwargs: 传递给ocr_match的其他关键字参数
         :return: Box | None - 找到的文本位置，如果未找到则返回None
         """
         start_time = time.time()
@@ -408,6 +458,8 @@ class IOperator(ABC):
         :param timeout: 超时时间，单位秒
         :param interval: 检查间隔时间，单位秒，默认为0.2秒
         :param confidence: 识别置信度，默认为0.9
+        :param args: 传递给ocr_match_any的其他位置参数
+        :param kwargs: 传递给ocr_match_any的其他关键字参数
         :return: tuple[int, Box | None] - 找到的文本索引和位置，如果未找到则返回-1和None
         """
         start_time = time.time()
@@ -437,7 +489,15 @@ class IOperator(ABC):
         ...
 
     def click_box(self, box: Box, x_offset: int | float = 0, y_offset: int | float = 0, after_sleep: float = 0) -> bool:
-        """点击图片位置"""
+        """
+        点击Box区域中心
+        计算box中心点坐标并调用click_point方法进行点击
+        :param box: Box对象，表示要点击的区域
+        :param x_offset: x偏移量(px)或百分比(float)
+        :param y_offset: y偏移量(px)或百分比(float)
+        :param after_sleep: 点击后等待时间，单位秒
+        :return: bool - 点击成功返回True，否则返回False
+        """
         if box is None:
             logger.trace("Could not click a Empty Box")
             return False
@@ -446,47 +506,55 @@ class IOperator(ABC):
             f"Click box center:({x}, {y}), source: {box.source}, offset:({x_offset}, {y_offset}), wait {after_sleep}s")
         return self.click_point(int(x), int(y), x_offset, y_offset, after_sleep)
 
-    def click_img(self, img_path: str, x_offset: int | float = 0, y_offset: int | float = 0,
+    def click_img(self, template: str, x_offset: int | float = 0, y_offset: int | float = 0,
                   after_sleep: float = 0) -> bool:
-        """点击图片中心"""
-        box = self.locate(img_path)
+        """
+        查找图片并点击其中心位置
+        先调用locate方法查找图片位置，如果找到则调用click_box方法点击
+        :param template: 模板图片路径
+        :param x_offset: x偏移量(px)或百分比(float)
+        :param y_offset: y偏移量(px)或百分比(float)
+        :param after_sleep: 点击后等待时间，单位秒
+        :return: bool - 点击成功返回True，否则返回False
+        """
+        box = self.locate(template)
         if box is None:
             return False
         return self.click_box(box, x_offset, y_offset, after_sleep)
 
-    def wait_img(self, img_path: str, timeout: int = 10, interval: float = 0.5) -> Box | None:
+    def wait_img(self, template: str, timeout: int = 10, interval: float = 0.5) -> Box | None:
         """
         等待图片出现
-        :param img_path: 模板图片路径
+        :param template: 模板图片路径
         :param timeout: 超时时间，单位秒
         :param interval: 检查间隔时间，单位秒，默认为0.5秒
         :return: bool - 是否找到图片
         """
         start_time = time.time()
-        logger.debug(f"Waiting for image: {img_path}")
+        logger.debug(f"Waiting for image: {template}")
         while time.time() - start_time < timeout:
-            box = self.locate(img_path)
+            box = self.locate(template)
             if box is not None:
                 return box
             time.sleep(interval)
-        logger.debug(f"Timeout: {img_path} -> NotFound in {timeout} seconds")
+        logger.debug(f"Timeout: {template} -> NotFound in {timeout} seconds")
         return None
 
-    def wait_any_img(self, img_paths: list[str], timeout: int = 10, interval: float = 0.2) -> tuple[int, Box | None]:
+    def wait_any_img(self, templates: list[str], timeout: int = 10, interval: float = 0.2) -> tuple[int, Box | None]:
         """
         等待任意一张图片出现
-        :param img_paths: 模板图片路径列表
+        :param templates: 模板图片路径列表
         :param timeout: 超时时间，单位秒
         :param interval: 检查间隔时间，单位秒，默认为0.2秒
         :return: int - 找到的图片索引，如果未找到则返回-1; Box | None - 找到的图片位置，如果未找到则返回None
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
-            index, box = self.locate_any(img_paths)
+            index, box = self.locate_any(templates)
             if index != -1:
                 return index, box
             time.sleep(interval)
-        logger.debug(f"Timeout: {img_paths} -> NotFound in {timeout} seconds")
+        logger.debug(f"Timeout: {templates} -> NotFound in {timeout} seconds")
         return -1, None
 
     @abstractmethod

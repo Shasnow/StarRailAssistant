@@ -108,26 +108,16 @@ class Operator(IOperator):
                 logger.trace(f"ImageNotFound: {img_path} -> {e}")
             return None
 
-    def locate_in_tuple(self,
-                        img_path: str,
-                        from_x: float,
-                        from_y: float,
-                        to_x: float,
-                        to_y: float,
-                        confidence: float | None = None,
-                        trace: bool = True,
-                        **_) -> Box | None:
+    def locate_in_tuple(self, templates: str, from_x: float, from_y: float, to_x: float, to_y: float,
+                        confidence: float | None = None, trace: bool = True, **_) -> Box | None:
         try:
             region = self.get_win_region()
         except Exception as e:
-            logger.trace(f"ImageNotFound: {img_path} -> {e}")
+            logger.trace(f"ImageNotFound: {templates} -> {e}")
             return None
-        return self.locate_in_region(img_path, region.sub_region(from_x,from_y,to_x,to_y), confidence, trace)
+        return self.locate_in_region(templates, region.sub_region(from_x, from_y, to_x, to_y), confidence, trace)
 
-    def locate_any_in_region(self,
-                             img_paths: list[str],
-                             region: Region | None = None,
-                             confidence: float | None = None,
+    def locate_any_in_region(self, templates: list[str], region: Region | None = None, confidence: float | None = None,
                              trace: bool = True) -> tuple[int, Box | None]:
         if confidence is None:
             confidence = self.confidence
@@ -136,7 +126,7 @@ class Operator(IOperator):
         except Exception as e:
             logger.trace(f"Error taking screenshot: {e}")
             return -1, None
-        for img_path in img_paths:
+        for img_path in templates:
             if not Path(img_path).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
             img = cv2.imread(img_path)
@@ -147,23 +137,17 @@ class Operator(IOperator):
                     logger.trace(f"ImageNotFound: {img_path} -> {e}")
                 continue
             if box is not None:
-                return img_paths.index(img_path), Box(box.left, box.top, box.width, box.height, source=img_path)
+                return templates.index(img_path), Box(box.left, box.top, box.width, box.height, source=img_path)
         return -1, None
 
-    def locate_any_in_tuple(self,
-                            img_paths: list[str],
-                            from_x: float,
-                            from_y: float,
-                            to_x: float,
-                            to_y: float,
-                            confidence: float | None = None,
-                            trace: bool = False) -> tuple[int, Box | None]:
+    def locate_any_in_tuple(self, templates: list[str], from_x: float, from_y: float, to_x: float, to_y: float,
+                            confidence: float | None = None, trace: bool = False) -> tuple[int, Box | None]:
         try:
             region = self.get_win_region()
         except Exception as e:
-            logger.trace(f"UnexceptedInterrupt: {img_paths} -> {e}")
+            logger.trace(f"UnexceptedInterrupt: {templates} -> {e}")
             return -1, None
-        return self.locate_any_in_region(img_paths, region.sub_region(from_x,from_y,to_x,to_y), confidence, trace)
+        return self.locate_any_in_region(templates, region.sub_region(from_x, from_y, to_x, to_y), confidence, trace)
 
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
                     after_sleep: float = 0, tag: str = "") -> bool:

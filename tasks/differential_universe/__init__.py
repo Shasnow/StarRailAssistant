@@ -87,7 +87,7 @@ class DifferentialUniverse(Executable):
                 "resources/img/equation_expansion.png",
                 "resources/img/close.png",
                 "resources/img/divergent_universe_quit.png"
-            ],interval=0.5)
+            ], interval=0.5)
 
             if index==0 or index == 1 or index == 2 or index==3:  # 祝福选择或方程式选择或奇物选择
                 logger.info(var[index])
@@ -138,7 +138,7 @@ class DifferentialUniverse(Executable):
             "resources/img/enter.png",
             "resources/img/differential_universe_start.png",
             "resources/img/bonus points.png"
-        ],interval=0.5)
+        ], interval=0.5)
         if page == 0:
             self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
             if not self.operator.wait_img("resources/img/f4.png", timeout=20):

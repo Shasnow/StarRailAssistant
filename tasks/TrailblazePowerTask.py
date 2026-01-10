@@ -387,7 +387,8 @@ class TrailblazePowerTask(BaseTask):
                     if not self.operator.click_img("resources/img/quit_battle.png"):
                         logger.error("发生错误，错误编号12")
                     logger.info("退出战斗")
-                    result, _ = self.operator.wait_any_img(["resources/img/battle.png", "resources/img/enter.png"], timeout=10)
+                    result, _ = self.operator.wait_any_img(["resources/img/battle.png", "resources/img/enter.png"],
+                                                           timeout=10)
                     if result == 0:
                         self.operator.press_key("esc", wait=1)
                     elif result == 1:
