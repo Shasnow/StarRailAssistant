@@ -236,18 +236,18 @@ class CurrencyWars(Executable):
     def initialize(self) -> bool:
         """进入对局后的攻略应用与手牌识别。"""
         self.operator.sleep(1)
-        # strategy_box = self.operator.wait_img(CWIMG.STRATEGY, timeout=60, interval=0.5)
-        # if strategy_box is None or not self.operator.click_box(strategy_box, after_sleep=1.5):
+        # strategy_box = self.operators.wait_img(CWIMG.STRATEGY, timeout=60, interval=0.5)
+        # if strategy_box is None or not self.operators.click_box(strategy_box, after_sleep=1.5):
         #     logger.error("未识别到攻略按钮")
         #     return False
-        # cancel_apply_box = self.operator.wait_img(CWIMG.CANCEL_APPLY, timeout=2)
+        # cancel_apply_box = self.operators.wait_img(CWIMG.CANCEL_APPLY, timeout=2)
         # if cancel_apply_box is None:  # 未应用攻略则应用
-        #     if self.operator.click_img(CWIMG.APPLY, after_sleep=1):
-        #         self.operator.press_key('esc')
-        #         self.operator.sleep(1)
+        #     if self.operators.click_img(CWIMG.APPLY, after_sleep=1):
+        #         self.operators.press_key('esc')
+        #         self.operators.sleep(1)
         #         for _ in range(3):
-        #             self.operator.click_img(CWIMG.TRACE, after_sleep=0.3)
-        # self.operator.press_key('esc')
+        #             self.operators.click_img(CWIMG.TRACE, after_sleep=0.3)
+        # self.operators.press_key('esc')
         # 不考虑中途加入、接管情况
 
         self.get_in_hand_area()  # 更新手牌信息（若无接管情况，则仅有此行有用）
@@ -570,7 +570,7 @@ class CurrencyWars(Executable):
         logger.info(f"出售操作完成")
 
     def battle(self) -> bool:
-        # self.operator.click_point(0.907, 0.714, after_sleep=1)
+        # self.operators.click_point(0.907, 0.714, after_sleep=1)
         battle_box = self.operator.wait_img(CWIMG.BATTLE, timeout=3, interval=0.5)
         if battle_box is None or not self.operator.click_box(battle_box, after_sleep=1.5):
             logger.error("未识别到战斗按钮")

@@ -1,6 +1,6 @@
 import time
 
-from SRACore.operator import Operator
+from SRACore.operators import Operator
 from SRACore.triggers import AutoPlotTrigger
 from SRACore.triggers.BaseTrigger import BaseTrigger
 from SRACore.util.logger import logger

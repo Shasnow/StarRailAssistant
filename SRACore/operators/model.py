@@ -11,7 +11,7 @@ class Region:
     top: int
     width: int
     height: int
-    parent: 'Region' = None
+    parent: 'Region | None' = None
 
     def __repr__(self):
         return f'Region(left={self.left}, top={self.top}, width={self.width}, height={self.height})'
@@ -39,7 +39,7 @@ class Box:
     top: int
     width: int
     height: int
-    source: str = None
+    source: str | None = None
 
     @property
     def center(self):
