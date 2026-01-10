@@ -1,11 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-
-<root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-        <xsd:element name="root" msdata:IsDataSet="true">
-            
-        </xsd:element>
-    </xsd:schema>
+﻿<root>
     <resheader name="resmimetype">
         <value>text/microsoft-resx</value>
     </resheader>
@@ -19,246 +12,246 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="GreetingText" xml:space="preserve">
-        <value>Welcome to SRA</value>
+        <value>欢迎来到 SRA</value>
     </data>
     <data name="HomeText" xml:space="preserve">
-        <value>Home</value>
+        <value>主页</value>
     </data>
     <data name="ConsoleText" xml:space="preserve">
-        <value>Console</value>
-    </data>
-    <data name="AdvanceText" xml:space="preserve">
-        <value>Advance</value>
+        <value>控制台</value>
     </data>
     <data name="RegularText" xml:space="preserve">
-        <value>Regular</value>
+        <value>常规</value>
+    </data>
+    <data name="AdvanceText" xml:space="preserve">
+        <value>高级</value>
     </data>
     <data name="ResourceIntegrityCheckText" xml:space="preserve">
-        <value>Resource integrity check</value>
+        <value>资源完整性检查</value>
     </data>
     <data name="ExtensionText" xml:space="preserve">
-        <value>Extension</value>
+        <value>拓展</value>
     </data>
     <data name="SettingText" xml:space="preserve">
-        <value>Setting</value>
+        <value>设置</value>
     </data>
     <data name="AutoUpdateText" xml:space="preserve">
-        <value>Auto Update</value>
+        <value>自动更新</value>
     </data>
     <data name="EnableTrayIconText" xml:space="preserve">
-        <value>Enable tray icon</value>
+        <value>启用托盘图标</value>
     </data>
     <data name="StartUpText" xml:space="preserve">
-        <value>Start Up</value>
+        <value>开机自启动</value>
     </data>
     <data name="ThreadSafetyText" xml:space="preserve">
-        <value>Thread Safety</value>
+        <value>线程安全</value>
     </data>
     <data name="AllowNotificationText" xml:space="preserve">
-        <value>Allow Notification</value>
+        <value>允许通知</value>
     </data>
     <data name="DisplayText" xml:space="preserve">
-        <value>Display</value>
+        <value>显示</value>
     </data>
     <data name="ThemeText" xml:space="preserve">
-        <value>Theme</value>
+        <value>主题</value>
     </data>
     <data name="LanguageText" xml:space="preserve">
-        <value>Language</value>
+        <value>语言</value>
     </data>
     <data name="NotificationText" xml:space="preserve">
-        <value>Notification</value>
+        <value>通知</value>
     </data>
     <data name="DefaultPageText" xml:space="preserve">
-        <value>Default Start Page</value>
+        <value>默认起始页</value>
     </data>
     <data name="ZoomText" xml:space="preserve">
-        <value>Zoom</value>
+        <value>缩放</value>
     </data>
     <data name="ConfidenceText" xml:space="preserve">
-        <value>Image Recognition Confidence</value>
+        <value>识图置信度</value>
     </data>
     <data name="UpdateText" xml:space="preserve">
-        <value>Update</value>
+        <value>更新</value>
     </data>
     <data name="MirrorChyanText" xml:space="preserve">
-        <value>Mirror Chyan</value>
+        <value>Mirror 酱</value>
     </data>
     <data name="TaskText" xml:space="preserve">
-        <value>Task</value>
+        <value>任务</value>
     </data>
     <data name="DarkText" xml:space="preserve">
-        <value>Dark</value>
+        <value>深色</value>
     </data>
     <data name="LightText" xml:space="preserve">
-        <value>Light</value>
+        <value>浅色</value>
     </data>
     <data name="FollowSystemText" xml:space="preserve">
-        <value>Follow System</value>
+        <value>跟随系统</value>
     </data>
     <data name="AboutText" xml:space="preserve">
-        <value>About</value>
+        <value>关于</value>
     </data>
     <data name="BackgroundImageText" xml:space="preserve">
-        <value>Background Image</value>
+        <value>背景图片</value>
     </data>
     <data name="BackgroundImageOpacityText" xml:space="preserve">
-        <value>Background Image Opacity</value>
+        <value>背景图片不透明度</value>
     </data>
     <data name="GithubToolTipText" xml:space="preserve">
-        <value>Open On GitHub</value>
+        <value>浏览 GitHub 仓库</value>
     </data>
     <data name="WebsideToolTipText" xml:space="preserve">
-        <value>Open Official Webside</value>
+        <value>浏览官网</value>
     </data>
     <data name="SponsorText" xml:space="preserve">
-        <value>Sponsor</value>
+        <value>赞助</value>
     </data>
     <data name="UpdateChannelText" xml:space="preserve">
-        <value>Update Channel</value>
+        <value>更新渠道</value>
     </data>
     <data name="AppChannelText" xml:space="preserve">
-        <value>Application Channel</value>
+        <value>频道</value>
     </data>
     <data name="TaskSettingsText" xml:space="preserve">
-        <value>Task Settings</value>
+        <value>任务通用设置</value>
     </data>
     <data name="SystemNotificationText" xml:space="preserve">
-        <value>System Notification</value>
+        <value>系统通知</value>
     </data>
     <data name="EmailNotificationText" xml:space="preserve">
-        <value>Email Nofication</value>
+        <value>邮件通知</value>
     </data>
     <data name="ControlPanelOpacityText" xml:space="preserve">
-        <value>Control Panel Opacity</value>
+        <value>控制面板不透明度</value>
     </data>
     <data name="NotSetText" xml:space="preserve">
-        <value>Not Set</value>
+        <value>未设置</value>
     </data>
     <data name="HotkeysText" xml:space="preserve">
-        <value>Hotkeys in Game</value>
+        <value>游戏内快捷键</value>
     </data>
     <data name="ActivityText" xml:space="preserve">
-        <value>Activity</value>
+        <value>活动</value>
     </data>
     <data name="ChronicleText" xml:space="preserve">
-        <value>Chronicle</value>
+        <value>纪行</value>
     </data>
     <data name="WarpText" xml:space="preserve">
-        <value>Warp</value>
+        <value>卡池</value>
     </data>
     <data name="GuideText" xml:space="preserve">
-        <value>Guide</value>
+        <value>指南</value>
     </data>
     <data name="MapText" xml:space="preserve">
-        <value>Map</value>
+        <value>地图</value>
     </data>
     <data name="TechniqueText" xml:space="preserve">
-        <value>Technique</value>
+        <value>秘技</value>
     </data>
     <data name="StopHotkeyText" xml:space="preserve">
-        <value>Stop Hotkey</value>
+        <value>停止快捷键</value>
     </data>
     <data name="ModifyHoldText" xml:space="preserve">
-        <value>Hold to modify</value>
+        <value>点击以修改</value>
     </data>
     <data name="StartGameText" xml:space="preserve">
-        <value>Start Game</value>
+        <value>启动游戏</value>
     </data>
     <data name="TrailblazePowerText" xml:space="preserve">
-        <value>Trailblaze Power</value>
+        <value>清体力</value>
     </data>
     <data name="ReceiveRewardsText" xml:space="preserve">
-        <value>Receive Rewards</value>
+        <value>领取奖励</value>
     </data>
     <data name="CosmicStrifeText" xml:space="preserve">
-        <value>Cosmic Strife</value>
+        <value>旷宇纷争</value>
     </data>
     <data name="InTheEndText" xml:space="preserve">
-        <value>In the End</value>
+        <value>任务结束</value>
     </data>
     <data name="StopText" xml:space="preserve">
-        <value>Stop</value>
+        <value>停止</value>
     </data>
     <data name="CurrentText" xml:space="preserve">
-        <value>Current</value>
+        <value>启动当前配置</value>
     </data>
     <data name="AllText" xml:space="preserve">
-        <value>All</value>
+        <value>启动所有配置</value>
     </data>
     <data name="SaveOnlyText" xml:space="preserve">
-        <value>Save Only</value>
+        <value>仅保存数据</value>
     </data>
     <data name="UnknownText" xml:space="preserve">
-        <value>Unknown</value>
+        <value>未知</value>
     </data>
     <data name="ConfigInputMarkText" xml:space="preserve">
-        <value>Please enter a config name</value>
+        <value>请输入配置名称</value>
     </data>
     <data name="NewConfigText" xml:space="preserve">
-        <value>New config</value>
+        <value>新建配置</value>
     </data>
     <data name="EnsureText" xml:space="preserve">
-        <value>Ensure</value>
+        <value>确认</value>
     </data>
     <data name="RemoveConfigText" xml:space="preserve">
-        <value>Remove current config</value>
+        <value>移除当前配置</value>
     </data>
     <data name="StartButtonTipText" xml:space="preserve">
-        <value>Run the task in the current mode</value>
+        <value>以当前模式运行任务</value>
     </data>
     <data name="CurrentButtonTipText" xml:space="preserve">
-        <value>Run the currently selected config</value>
+        <value>运行当前选中配置</value>
     </data>
     <data name="AllButtonTipText" xml:space="preserve">
-        <value>Run all configurations</value>
+        <value>运行全部配置</value>
     </data>
     <data name="SaveOnlyButtonTipText" xml:space="preserve">
-        <value>Save data only without running</value>
+        <value>仅保存数据而不运行</value>
     </data>
     <data name="BgImagePathWatermarkText" xml:space="preserve">
-        <value>Please enter the image path</value>
+        <value>请输入图片路径</value>
     </data>
     <data name="SmtpSettingsText" xml:space="preserve">
-        <value>SMTP Settings</value>
+        <value>SMTP 设置</value>
     </data>
     <data name="SmtpServerText" xml:space="preserve">
-        <value>SMTP Server</value>
+        <value>SMTP 服务器</value>
     </data>
     <data name="SmtpPortText" xml:space="preserve">
-        <value>SMTP Port</value>
+        <value>SMTP 端口</value>
     </data>
     <data name="SenderEmailAddrText" xml:space="preserve">
-        <value>Sender</value>
+        <value>发信邮箱地址</value>
     </data>
     <data name="AuthorCodeText" xml:space="preserve">
-        <value>Authorization Code</value>
+        <value>邮箱授权码</value>
     </data>
     <data name="ReceiverEmailAddrText" xml:space="preserve">
-        <value>Receiver</value>
+        <value>收件邮箱地址</value>
     </data>
     <data name="CreateShortcutText" xml:space="preserve">
-        <value>Create a desktop shortcut</value>
+        <value>创建桌面快捷方式</value>
     </data>
     <data name="CheckForUpdateText" xml:space="preserve">
-        <value>Check for update</value>
+        <value>检查更新</value>
     </data>
     <data name="AutoUpdateTipText" xml:space="preserve">
-        <value>Automatically download and unzip when updates are available</value>
+        <value>有可用更新时自动下载并解压</value>
     </data>
     <data name="MirrorChyanTipText" xml:space="preserve">
-        <value>Mirror Chyan‘s high-speed download service</value>
+        <value>Mirror酱高速下载服务</value>
     </data>
     <data name="BeLogsFolderText" xml:space="preserve">
-        <value>Backend logs folder</value>
+        <value>后端日志文件夹</value>
     </data>
     <data name="FeLogsFolder" xml:space="preserve">
-        <value>Frontend logs folder</value>
+        <value>前端日志文件夹</value>
     </data>
     <data name="ConfigsFolder" xml:space="preserve">
-        <value>Configs folder</value>
+        <value>配置文件文件夹</value>
     </data>
     <data name="AppDataFolder" xml:space="preserve">
-        <value>App data folder</value>
+        <value>应用程序文件夹</value>
     </data>
 </root>
