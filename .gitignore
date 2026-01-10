@@ -10,4 +10,5 @@
 /setup/install_info.txt
 **/__pycache__/
 **/.vs/
+/.history/
 version_info.txt
