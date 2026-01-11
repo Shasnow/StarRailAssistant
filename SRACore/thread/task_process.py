@@ -21,6 +21,7 @@ class TaskManager:
         """
         初始化任务管理器。
         """
+        self.log_level = "TRACE"
         self.task_list: list[type] = []
         with open("SRACore/config.toml", "rb") as f:
             tasks = tomllib.load(f).get("tasks")
@@ -43,7 +44,7 @@ class TaskManager:
         2. 对每个配置加载任务列表并执行
         3. 处理任务中断或失败的情况
         """
-        setup_logger()
+        setup_logger(level=self.log_level)
         logger.debug('[Start]')
         try:
             if len(args)==0:
@@ -137,7 +138,7 @@ class TaskManager:
         Raises:
             ValueError: 如果任务未找到或配置加载失败
         """
-        setup_logger()
+        setup_logger(self.log_level)
         logger.debug('[Start]')
         try:
             if config_name is None:
