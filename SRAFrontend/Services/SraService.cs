@@ -147,41 +147,43 @@ public partial class SraService(ILogger<SraService> logger)
     /// <summary>
     ///     发送输入到进程
     /// </summary>
-    public void SendInput(string input)
+    public bool SendInput(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
         {
             _logger.LogWarning("Attempted to send empty input to SRA process.");
-            return;
+            return false;
         }
 
         if (_sraProcess == null || _sraProcess.HasExited)
         {
             _logger.LogWarning("Attempted to send input to SRA process, but it is not running. Input: {Input}", input);
             OutputLines.Add($"发送失败: 进程未运行（输入: {input}）");
-            return;
+            return false;
         }
 
         try
         {
             _logger.LogInformation("Sending input to SRA process: {Input}", input);
             _sraProcess.StandardInput.WriteLine(input);
+            return true;
         }
         catch (IOException e)
         {
             _logger.LogError(e, "Fail to send input to SRA process: {Message}", e.Message);
             OutputLines.Add($"发送失败: {e.Message}（输入: {input}）");
+            return false;
         }
     }
 
-    public void TaskRun(string? configName)
+    public bool TaskRun(string? configName)
     {
-        SendInput(string.IsNullOrEmpty(configName) ? "task run" : $"task run {configName}");
+        return SendInput(string.IsNullOrEmpty(configName) ? "task run" : $"task run {configName}");
     }
 
-    public void TaskStop()
+    public bool TaskStop()
     {
-        SendInput("task stop");
+        return SendInput("task stop");
     }
 
     #region 进程事件处理

@@ -13,16 +13,22 @@ public partial class ControlPanelViewModel : ViewModelBase
     private readonly ConfigService _configService;
     private readonly SettingsService _settingsService;
     private readonly SraService _sraService;
+    private readonly CommonModel _commonModel;
     [ObservableProperty] private bool _isAddConfigOpen;
     [ObservableProperty] private string _newConfigName = "";
 
-    public ControlPanelViewModel(SraService sraService, CacheService cacheService, ConfigService configService,
-        SettingsService settingsService)
+    public ControlPanelViewModel(
+        SraService sraService,
+        CacheService cacheService,
+        ConfigService configService,
+        SettingsService settingsService,
+        CommonModel commonModel)
     {
         _settingsService = settingsService;
         _configService = configService;
         _sraService = sraService;
         _cacheService = cacheService;
+        _commonModel = commonModel;
         _sraService.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(SraService.IsRunning)) OnPropertyChanged(nameof(CanStart));
@@ -61,14 +67,21 @@ public partial class ControlPanelViewModel : ViewModelBase
         {
             case "Current":
                 Save();
-                _sraService.TaskRun(Cache.CurrentConfigName);
+                if (_sraService.TaskRun(Cache.CurrentConfigName))
+                    _commonModel.ShowSuccessToast("任务启动成功", $"已启动配置：{Cache.CurrentConfigName}");
+                else
+                    _commonModel.ShowErrorToast("任务启动失败", $"无法启动配置：{Cache.CurrentConfigName}，请检查后端状态。");
                 break;
             case "All":
                 Save();
-                _sraService.TaskRun(null);
+                if (_sraService.TaskRun(null))
+                    _commonModel.ShowSuccessToast("任务启动成功", "已启动所有配置任务。");
+                else
+                    _commonModel.ShowErrorToast("任务启动失败", "无法启动所有配置任务，请检查后端状态。");
                 break;
             case "Save Only":
                 Save();
+                _commonModel.ShowSuccessToast("保存成功", "已保存当前配置。");
                 break;
         }
     }
