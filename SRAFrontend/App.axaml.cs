@@ -79,7 +79,6 @@ public partial class App : Application
         services.AddSingleton<ControlPanelViewModel>();
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
         services.AddSingleton<SettingsService>();
-        services.AddSingleton<DataPersistenceService>();
         services.AddSingleton<CacheService>();
         services.AddSingleton<SraService>();
         services.AddSingleton<ConfigService>();

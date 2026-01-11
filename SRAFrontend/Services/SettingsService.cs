@@ -1,23 +1,50 @@
-﻿using SRAFrontend.Models;
-using SRAFrontend.utilities;
+﻿using System;
+using Microsoft.Extensions.Logging;
+using SRAFrontend.Models;
+using SRAFrontend.Utils;
 
 namespace SRAFrontend.Services;
 
 public class SettingsService
 {
-    private readonly DataPersistenceService _dataPersistenceService;
     public readonly Settings Settings;
+    private readonly ILogger _logger;
 
-    public SettingsService(DataPersistenceService dataPersistenceService)
+    public SettingsService(ILogger<SettingsService> logger)
     {
-        _dataPersistenceService = dataPersistenceService;
-        Settings = dataPersistenceService.LoadSettings();
-        if (!string.IsNullOrEmpty(Settings.EncryptedMirrorChyanCdk)) Settings.MirrorChyanCdk = EncryptUtil.DecryptString(Settings.EncryptedMirrorChyanCdk);
+        _logger = logger;
+        _logger.LogInformation("Loading settings...");
+        Settings = DataPersister.LoadSettings();
+        if (string.IsNullOrEmpty(Settings.EncryptedMirrorChyanCdk)) return;
+        string decryptedString;
+        try
+        {
+            decryptedString = EncryptUtil.DecryptString(Settings.EncryptedMirrorChyanCdk);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to decrypt MirrorChyanCdk");
+            decryptedString = "";
+        }
+        Settings.MirrorChyanCdk = decryptedString;
     }
 
     public void SaveSettings()
     {
-        Settings.EncryptedMirrorChyanCdk = string.IsNullOrEmpty(Settings.MirrorChyanCdk) ? "" : EncryptUtil.EncryptString(Settings.MirrorChyanCdk);
-        _dataPersistenceService.SaveSettings(Settings);
+        string encryptedString;
+        if (string.IsNullOrWhiteSpace(Settings.MirrorChyanCdk))
+            encryptedString = "";
+        else
+            try
+            {
+                encryptedString = EncryptUtil.EncryptString(Settings.MirrorChyanCdk);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to encrypt MirrorChyanCdk");
+                encryptedString = "";
+            }
+        Settings.EncryptedMirrorChyanCdk = encryptedString;
+        DataPersister.SaveSettings(Settings);
     }
 }
