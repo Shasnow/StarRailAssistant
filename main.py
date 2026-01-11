@@ -97,13 +97,12 @@ def main():
     # 解析参数
     args = parser.parse_args()
     # 延迟导入 SRACli
-    from SRACore.util.logger import logger, setup_logger, set_log_level
-    # 设置日志级别
-    set_log_level(args.log_level)
+    from SRACore.util.logger import logger, setup_logger
     # 设置日志记录器
-    setup_logger()
+    setup_logger(level=args.log_level)
     from SRACore.SRA import SRACli
     cli_instance = SRACli()
+    cli_instance.task_manager.log_level = args.log_level
     logger.debug(f"cwd: {os.getcwd()}")
     # 配置交互式模式（隐藏提示符）
     if args.inline or args.embed:
