@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace SRAFrontend.utilities;
+namespace SRAFrontend.Utils;
 
 /// <summary>
 /// 语义化版本号（SemVer 2.0）解析工具

@@ -4,7 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 
-namespace SRAFrontend.utilities;
+namespace SRAFrontend.Utils;
 
 public static class ZipUtil
 {

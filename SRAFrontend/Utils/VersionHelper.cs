@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SRAFrontend.utilities;
+﻿namespace SRAFrontend.Utils;
 
 public static class VersionHelper
 {

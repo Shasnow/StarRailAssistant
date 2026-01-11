@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace SRAFrontend.utilities;
+namespace SRAFrontend.Utils;
 
 public static class EncryptUtil
 {
