@@ -319,7 +319,7 @@ public class CommonModel(
     /// <summary>
     ///     显示成功 Toast
     /// </summary>
-    private void ShowSuccessToast(string title, string content)
+    public void ShowSuccessToast(string title, string content)
     {
         CreateStandardToastBuilder(title, content, NotificationType.Success).Queue();
     }
@@ -327,7 +327,7 @@ public class CommonModel(
     /// <summary>
     ///     显示警告 Toast
     /// </summary>
-    private void ShowWarningToast(string title, string content)
+    public void ShowWarningToast(string title, string content)
     {
         CreateStandardToastBuilder(title, content, NotificationType.Warning).Queue();
     }
@@ -335,7 +335,7 @@ public class CommonModel(
     /// <summary>
     ///     显示错误 Toast
     /// </summary>
-    private void ShowErrorToast(string title, string content)
+    public void ShowErrorToast(string title, string content)
     {
         CreateStandardToastBuilder(title, content, NotificationType.Error).Queue();
     }
