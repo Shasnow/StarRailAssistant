@@ -21,8 +21,6 @@ class TaskManager:
         """
         初始化任务管理器。
         """
-        self.running_flag = False
-
         self.task_list: list[type] = []
         with open("SRACore/config.toml", "rb") as f:
             tasks = tomllib.load(f).get("tasks")
@@ -38,13 +36,6 @@ class TaskManager:
                 self.task_list.append(_class)
         logger.debug(f"Successfully load task: {self.task_list}")
 
-    def stop(self):
-        """
-        外部调用的停止方法，设置运行标志为 False 并记录日志。
-        注意：此方法可能不会立即终止正在运行的任务（需任务内部支持中断）。
-        """
-        self.running_flag = False
-
     def run(self, *args):
         """
         进程主循环：
@@ -53,7 +44,6 @@ class TaskManager:
         3. 处理任务中断或失败的情况
         """
         setup_logger()
-        self.running_flag = True
         logger.debug('[Start]')
         try:
             if len(args)==0:
@@ -65,9 +55,6 @@ class TaskManager:
 
             for config_name in config_list:
                 logger.info(Resource.task_currentConfig(config_name))
-                # 每次循环检查中断标志
-                if not self.running_flag:
-                    break
 
                 # 获取当前配置需要执行的任务列表
                 tasks_to_run = self.get_tasks(config_name)
@@ -78,8 +65,6 @@ class TaskManager:
 
                 # 依次执行任务
                 for task in tasks_to_run:
-                    if not self.running_flag:
-                        break
                     try:
                         # 运行任务，如果返回 False 表示任务失败
                         logger.debug('running task: ' + str(task))
@@ -98,8 +83,6 @@ class TaskManager:
             # 捕获线程主循环中的异常（如配置加载失败）
             logger.exception(Resource.task_managerCrashed(str(e)))
         finally:
-            # 确保标志位被重置，避免僵尸线程
-            self.running_flag = False
             logger.debug("[Done]")
 
     def get_tasks(self, config_name) -> list[BaseTask]:
@@ -155,7 +138,6 @@ class TaskManager:
             ValueError: 如果任务未找到或配置加载失败
         """
         setup_logger()
-        self.running_flag = True
         logger.debug('[Start]')
         try:
             if config_name is None:
@@ -179,7 +161,6 @@ class TaskManager:
             logger.exception(Resource.task_taskCrashed(task, str(e)))
             return False
         finally:
-            self.running_flag = False
             logger.debug("[Done]")
 
     def get_task(self, config_name: str, task: str) -> BaseTask | None:
