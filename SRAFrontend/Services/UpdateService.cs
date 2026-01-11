@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
-using SRAFrontend.utilities;
+using SRAFrontend.Utils;
 
 namespace SRAFrontend.Services;
 
@@ -65,11 +65,18 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         if (!string.IsNullOrEmpty(channel))
             queryParams.Add($"channel={channel}");
         if (queryParams.Count > 0)
-            url += "?user_agent=SRA_avalonia" + string.Join("&", queryParams);
+            url += "?user_agent=SRA" + string.Join("&", queryParams);
 
         var httpClient = httpClientFactory.CreateClient("GlobalClient");
-        var response = await httpClient.GetAsync(url);
-        return await response.Content.ReadFromJsonAsync<VersionResponse>();
+        try
+        {
+            var response = await httpClient.GetAsync(url);
+            return await response.Content.ReadFromJsonAsync<VersionResponse>();
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     /// <summary>

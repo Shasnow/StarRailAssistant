@@ -7,7 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Controls;
 using SRAFrontend.Localization;
 using SRAFrontend.Services;
-using SRAFrontend.utilities;
+using SRAFrontend.Utils;
 using SukiUI;
 using SukiUI.Controls;
 using SukiUI.MessageBox;

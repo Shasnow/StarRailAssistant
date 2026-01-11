@@ -1,13 +1,14 @@
 ﻿using SRAFrontend.Models;
+using SRAFrontend.Utils;
 
 namespace SRAFrontend.Services;
 
-public class CacheService(DataPersistenceService dataPersistenceService)
+public class CacheService
 {
-    public Cache Cache { get; } = dataPersistenceService.LoadCache();
+    public Cache Cache { get; } = DataPersister.LoadCache();
 
     public void SaveCache()
     {
-        dataPersistenceService.SaveCache(Cache);
+        DataPersister.SaveCache(Cache);
     }
 }

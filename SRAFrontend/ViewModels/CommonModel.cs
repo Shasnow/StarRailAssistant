@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
-using SRAFrontend.utilities;
+using SRAFrontend.Utils;
 using SukiUI.Controls;
 using SukiUI.MessageBox;
 using SukiUI.Toasts;
