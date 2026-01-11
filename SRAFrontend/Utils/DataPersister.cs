@@ -1,34 +1,29 @@
 ﻿using System.IO;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
 
-namespace SRAFrontend.Services;
+namespace SRAFrontend.Utils;
 
-public class DataPersistenceService
+public static class DataPersister
 {
-    private readonly ILogger _logger;
-
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
         WriteIndented = true
     };
-
-    public DataPersistenceService(ILogger<DataPersistenceService> logger)
+    static DataPersister()
     {
-        _logger = logger;
         EnsurePath();
     }
 
-    private void EnsurePath()
+    private static void EnsurePath()
     {
         if (!Directory.Exists(PathString.AppDataSraDir)) Directory.CreateDirectory(PathString.AppDataSraDir);
         if (!Directory.Exists(PathString.ConfigsDir)) Directory.CreateDirectory(PathString.ConfigsDir);
         // 仅创建目录，文件将在WriteAllText时创建
     }
 
-    public Settings LoadSettings()
+    public static Settings LoadSettings()
     {
         if (!File.Exists(PathString.SettingsJson)) return new Settings(); 
         var json = File.ReadAllText(PathString.SettingsJson);
@@ -36,13 +31,13 @@ public class DataPersistenceService
         return JsonSerializer.Deserialize<Settings>(json) ?? new Settings();
     }
 
-    public void SaveSettings(Settings settings)
+    public static void SaveSettings(Settings settings)
     {
-        var json = JsonSerializer.Serialize(settings, _jsonSerializerOptions);
+        var json = JsonSerializer.Serialize(settings, JsonSerializerOptions);
         File.WriteAllText(PathString.SettingsJson, json);
     }
 
-    public Cache LoadCache()
+    public static Cache LoadCache()
     {
         if (!File.Exists(PathString.CacheJson)) return new Cache();
         var json = File.ReadAllText(PathString.CacheJson);
@@ -50,15 +45,14 @@ public class DataPersistenceService
         return JsonSerializer.Deserialize<Cache>(json) ?? new Cache();
     }
 
-    public void SaveCache(Cache cache)
+    public static void SaveCache(Cache cache)
     {
-        var json = JsonSerializer.Serialize(cache, _jsonSerializerOptions);
+        var json = JsonSerializer.Serialize(cache, JsonSerializerOptions);
         File.WriteAllText(PathString.CacheJson, json);
     }
 
-    public Config LoadConfig(string name)
+    public static Config LoadConfig(string name)
     {
-        _logger.LogDebug("Loading config: {name}", name);
         var configPath = Path.Combine(PathString.ConfigsDir, $"{name}.json");
         if (!File.Exists(configPath)) return new Config { Name = name };
         var json = File.ReadAllText(configPath);
@@ -67,11 +61,10 @@ public class DataPersistenceService
         return config == null || config.Version < 3 ? new Config { Name = name } : config;
     }
 
-    public void SaveConfig(Config config)
+    public static void SaveConfig(Config config)
     {
         var configPath = Path.Combine(PathString.ConfigsDir, $"{config.Name}.json");
-        var json = JsonSerializer.Serialize(config, _jsonSerializerOptions);
+        var json = JsonSerializer.Serialize(config, JsonSerializerOptions);
         File.WriteAllText(configPath, json);
-        _logger.LogDebug("Successfully saved config: {config.Name}", config.Name);
     }
 }
