@@ -1,17 +1,12 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using Avalonia.Collections;
-using Avalonia.Controls;
-using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Controls;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
-using SukiUI.Toasts;
 
 namespace SRAFrontend.ViewModels;
 
@@ -19,7 +14,7 @@ public partial class TaskPageViewModel : PageViewModel
 {
     private readonly CacheService _cacheService;
     private readonly ConfigService _configService;
-    private readonly ISukiToastManager _toastManager;
+    private readonly CommonModel _commonModel;
 
     [ObservableProperty] private Config _currentConfig;
 
@@ -28,17 +23,15 @@ public partial class TaskPageViewModel : PageViewModel
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(EnableContextMenu))]
     private object? _selectedTaskItem;
 
-    public TopLevel? TopLevelObject;
-
     public TaskPageViewModel(
-        ISukiToastManager toastManager,
+        CommonModel commonModel,
         ControlPanelViewModel controlPanelViewModel,
         ConfigService configService,
         CacheService cacheService) : base(
         PageName.Task, "\uE1BC")
     {
         ControlPanelViewModel = controlPanelViewModel;
-        _toastManager = toastManager;
+        _commonModel = commonModel;
         _configService = configService;
         _cacheService = cacheService;
         CurrentConfig = _configService.Config!;
@@ -211,7 +204,6 @@ public partial class TaskPageViewModel : PageViewModel
             }
         ];
     }
-
     
     public ControlPanelViewModel ControlPanelViewModel { get; }
 
@@ -241,12 +233,7 @@ public partial class TaskPageViewModel : PageViewModel
     {
         if (task.SelectedIndex == 0)
         {
-            _toastManager.CreateToast()
-                .WithTitle("Info")
-                .WithContent("请选择副本")
-                .Dismiss().After(TimeSpan.FromSeconds(3))
-                .Dismiss().ByClicking()
-                .Queue();
+            _commonModel.ShowInfoToast("Info", "请选择副本关卡后再添加任务");
             return;
         }
 
@@ -259,14 +246,5 @@ public partial class TaskPageViewModel : PageViewModel
             RunTimes = task.RunTimes,
             AutoDetect = task.IsAutoDetect
         });
-    }
-
-    [RelayCommand]
-    private async Task SelectedPath()
-    {
-        if (TopLevelObject is null) return;
-        var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
-        if (files.Count == 0) return;
-        CurrentConfig.StartGamePath = files[0].Path.LocalPath;
     }
 }

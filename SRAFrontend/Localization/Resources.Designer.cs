@@ -375,6 +375,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Game Path.
+        /// </summary>
+        public static string GamePathText {
+            get {
+                return ResourceManager.GetString("GamePathText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open On GitHub.
         /// </summary>
         public static string GithubToolTipText {

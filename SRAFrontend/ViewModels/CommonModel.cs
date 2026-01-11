@@ -343,7 +343,7 @@ public class CommonModel(
     /// <summary>
     ///     显示信息 Toast
     /// </summary>
-    private ISukiToast ShowInfoToast(string title, string content)
+    public ISukiToast ShowInfoToast(string title, string content)
     {
         return CreateStandardToastBuilder(title, content, NotificationType.Information).Queue();
     }

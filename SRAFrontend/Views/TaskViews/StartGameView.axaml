@@ -22,12 +22,6 @@
                         </ComboBox>
                     </Grid>
 
-                    <Grid ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,15">
-                        <TextBlock Grid.Column="0" Text="游戏路径" VerticalAlignment="Center" Margin="0,0,10,0" />
-                        <TextBox Grid.Column="1" Text="{Binding CurrentConfig.StartGamePath}"/>
-                        <Button Grid.Column="2" Content="浏览" Command="{Binding SelectedPathCommand}"/>
-                    </Grid>
-
                     <StackPanel Margin="0,0,0,15">
                         <CheckBox x:Name="AutoLoginCheckBox" Content="自动登录" IsChecked="{Binding CurrentConfig.StartGameAutoLogin}" />
                         <TextBlock Margin="25,5,0,0" FontSize="12" Foreground="Gray" TextWrapping="Wrap">

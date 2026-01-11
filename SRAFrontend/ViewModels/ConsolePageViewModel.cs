@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -15,11 +16,11 @@ public partial class ConsolePageViewModel : PageViewModel
     {
         _sraService = sraService;
         _sraService.StartSraProcess("--inline");
-        _sraService.OutputLines.CollectionChanged += (_, _) => OnPropertyChanged(nameof(LogText));
-        FilterOptions.CollectionChanged+= (_, _) => OnPropertyChanged(nameof(LogText));
+        _sraService.OutputLines.CollectionChanged += (_, _) => OnPropertyChanged(nameof(ConsoleText));
+        FilterOptions.CollectionChanged+= (_, _) => OnPropertyChanged(nameof(ConsoleText));
     }
 
-    public string LogText
+    public string ConsoleText
     {
         get
         {

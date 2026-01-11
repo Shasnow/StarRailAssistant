@@ -39,11 +39,10 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private int _smtpPort = 465; // SMTP服务器端口
 
     [ObservableProperty] private string _smtpServer = "smtp.qq.com"; // SMTP服务器地址
+    
+    [ObservableProperty] private bool _isAutoDetectGamePath = true; // 是否自动检测游戏安装路径
 
-    /// <summary>
-    ///     是否启用线程安全模式 已过时，现在使用进程而非线程来防止阻塞
-    /// </summary>
-    [ObservableProperty] private bool _threadSafety;
+    [ObservableProperty] private string _gamePath = ""; // 游戏安装路径
 
     [ObservableProperty] private double _zoom = 1; // 屏幕缩放比例
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";

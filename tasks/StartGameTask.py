@@ -63,16 +63,23 @@ class StartGameTask(BaseTask):
 
     def launch_bl(self):
         self.change_config_ini(14, 0)
-        path = Path(self.config['StartGamePath'])
-        sys_util.Popen(str(path), shell=True, cwd=path.parent)
+        path = self.settings.get('StartGamePath')
+        if not path or path == "":
+            logger.error("未设置游戏启动路径")
+            raise RuntimeError("未设置游戏启动路径")
+        sys_util.Popen(path, shell=True, cwd=path.parent)
 
     def launch_au(self):
         self.change_config_ini(1, 1)
-        sys_util.Popen(self.config['StartGamePath'], shell=True)
+        path = self.settings.get('StartGamePath')
+        if not path or path == "":
+            logger.error("未设置游戏启动路径")
+            raise RuntimeError("未设置游戏启动路径")
+        sys_util.Popen(path, shell=True)
 
     def change_config_ini(self, channel, sub_channel):
         """修改配置文件"""
-        path = Path(self.config['StartGamePath'])
+        path = Path(self.settings.get('StartGamePath'))
         root_path = path.parent
         config_file = root_path / 'config.ini'
         with open(config_file, 'r') as f:

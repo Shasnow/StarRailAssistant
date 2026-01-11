@@ -261,4 +261,7 @@
     <data name="AppDataFolder" xml:space="preserve">
         <value>App data folder</value>
     </data>
+    <data name="GamePathText" xml:space="preserve">
+        <value>Game Path</value>
+    </data>
 </root>

@@ -10,13 +10,4 @@ public partial class StartGameView : UserControl
     {
         InitializeComponent();
     }
-
-    protected override void OnLoaded(RoutedEventArgs e)
-    {
-        base.OnLoaded(e);
-        if (DataContext is TaskPageViewModel { TopLevelObject: null } model)
-        {
-            model.TopLevelObject= TopLevel.GetTopLevel(this);
-        }
-    }
 }
