@@ -9,6 +9,9 @@ class StartGameTask(BaseTask):
     def run(self):
         logger.info("启动游戏任务开始")
         self.launch_game()
+        return self.login_and_enter_game()
+
+    def login_and_enter_game(self):
         match self.login():
             case -1 | 0:
                 logger.warning("登录失败")
@@ -22,9 +25,12 @@ class StartGameTask(BaseTask):
                 logger.error("未知登录状态")
                 return False
         self.start_game_click()
-        res,_ = self.operator.wait_any_img(["resources/img/enter.png",
-                                            "resources/img/train_supply.png",
-                                            "resources/img/task_resources_manage.png"], timeout=120, interval=2)
+        res, _ = self.operator.wait_any_img([
+            "resources/img/enter.png",
+            "resources/img/train_supply.png",
+            "resources/img/task_resources_manage.png",
+            "resources/img/restart_for_update.png"
+        ], timeout=120, interval=2)
         if res == 0:
             return True
         elif res == 1:
@@ -37,6 +43,10 @@ class StartGameTask(BaseTask):
         elif res == 2:
             logger.error("未能进入游戏，需要下载过往任务资源。")
             return False
+        elif res == 3:
+            logger.info("需要重启游戏以完成更新，正在重启游戏...")
+            self.operator.click_img("resources/img/ensure2.png")
+            return self.login_and_enter_game() # 递归调用重新登录进入游戏
         else:
             logger.error("未能进入游戏，发生未知错误")
             return False
