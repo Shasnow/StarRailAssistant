@@ -6,15 +6,11 @@
              xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
              xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              xmlns:lang="clr-namespace:SRAFrontend.Localization"
-             xmlns:utilities="clr-namespace:SRAFrontend.Utilities"
              xmlns:models="clr-namespace:SRAFrontend.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SRAFrontend.Views.SettingsPageView"
              x:DataType="viewModels:SettingsPageViewModel"
              FontSize="16">
-    <UserControl.Resources>
-        <utilities:HotkeyDisplayConverter x:Key="HotkeyDisplayConverter" />
-    </UserControl.Resources>
     <suki:SukiStackPage>
         <suki:SukiStackPage.Content>
             <suki:SettingsLayout Name="{x:Static lang:Resources.SettingText}">
@@ -60,7 +56,7 @@
                                         <Label Classes="icon">&#xE3E4;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.StopHotkeyText}" />
                                         <Button Grid.Column="2" MinWidth="100"
-                                                Content="{Binding StartStopKey.CurrentKey, Converter={StaticResource HotkeyDisplayConverter}}"
+                                                Content="{Binding StartStopKey.CurrentKey}"
                                                 Command="{Binding StartStopKey.ModifyKeyCommand}" />
                                     </Grid>
                                 </StackPanel>
@@ -80,7 +76,7 @@
                                                            Content="{Binding IconText}" />
                                                     <Label Grid.Column="1" Content="{Binding DisplayText}" />
                                                     <Button Grid.Column="2" MinWidth="100"
-                                                            Content="{Binding CurrentKey, Converter={StaticResource HotkeyDisplayConverter}}"
+                                                            Content="{Binding CurrentKey}"
                                                             Command="{Binding ModifyKeyCommand}"/>
                                                     <Button Grid.Column="3"
                                                             Classes="Icon"
