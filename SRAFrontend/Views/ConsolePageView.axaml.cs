@@ -16,7 +16,7 @@ public partial class ConsolePageView : UserControl
 
     private void OnModelOnPropertyChanged(object? _, PropertyChangedEventArgs args)
     {
-        if (args.PropertyName == nameof(ConsolePageViewModel.LogText))
+        if (args.PropertyName == nameof(ConsolePageViewModel.ConsoleText))
         {
             Dispatcher.UIThread.Post(() =>
             {

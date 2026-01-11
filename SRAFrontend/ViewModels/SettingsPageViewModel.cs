@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using SRAFrontend.Data;
 using SRAFrontend.Localization;
 using SRAFrontend.Models;
@@ -16,7 +19,6 @@ public partial class SettingsPageViewModel : PageViewModel
     private readonly CacheService _cacheService;
     private readonly CommonModel _commonModel;
     private readonly AvaloniaList<CustomizableKey> _customizableKeys;
-    private readonly CustomizableKey _startStopKey;
 
     private readonly SettingsService _settingsService;
     private readonly UpdateService _updateService;
@@ -33,7 +35,7 @@ public partial class SettingsPageViewModel : PageViewModel
         _cacheService = cacheService;
         _commonModel = commonModel;
         // 任务通用设置中的 启动/停止 快捷键（非游戏内快捷键分组）
-        _startStopKey = new CustomizableKey(ListenKeyFor)
+        StartStopKey = new CustomizableKey(ListenKeyFor)
         {
             IconText = "\uE3E4",
             DisplayText = Resources.StopHotkeyText,
@@ -86,10 +88,14 @@ public partial class SettingsPageViewModel : PageViewModel
             }.Bind(() => settingsService.Settings.TechniqueHotkey,
                 value => settingsService.Settings.TechniqueHotkey = value)
         ];
+        
+        DetectGamePath();
+        
     }
 
     public IAvaloniaReadOnlyList<CustomizableKey> CustomizableKeys => _customizableKeys;
-    public CustomizableKey StartStopKey => _startStopKey;
+    public CustomizableKey StartStopKey { get; }
+
     public Settings Settings => _settingsService.Settings;
     public Cache Cache => _cacheService.Cache;
     public string VersionText => Settings.Version;
@@ -178,7 +184,32 @@ public partial class SettingsPageViewModel : PageViewModel
         };
         _commonModel.OpenFolderInExplorer(folderPath);
     }
-
+    
+    [RelayCommand]
+    private async Task SelectedPath()
+    {
+        if (TopLevelObject is null) return;
+        var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
+        if (files.Count == 0) return;
+        Settings.GamePath = files[0].Path.LocalPath;
+    }
+    
+    [RelayCommand]
+    private void DetectGamePath()
+    {
+        if (!Settings.IsAutoDetectGamePath) return;
+        Settings.GamePath = "无法自动检测游戏路径";
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+        var userKey = Registry.CurrentUser;
+        using var hkrpgcnKey =
+            userKey.OpenSubKey(@"Software\miHoYo\HYP\standalone\14_0\hkrpg_cn\6P5gHMNyK3\hkrpg_cn")
+            ?? userKey.OpenSubKey(@"Software\miHoYo\HYP\1_1\hkrpg_cn");
+        if (hkrpgcnKey is null) return;
+        var gameInstallPath = hkrpgcnKey.GetValue("GameInstallPath") as string;
+        if (string.IsNullOrEmpty(gameInstallPath)) return;
+        Settings.GamePath = $"{gameInstallPath}\\StarRail.exe";
+    }
+    
     #region 快捷键监听修改逻辑
 
     private CustomizableKey? _currentListeningKey; // 正在监听的快捷键
@@ -219,6 +250,11 @@ public partial class SettingsPageViewModel : PageViewModel
 
     private void KeyUpHandler(object? sender, KeyEventArgs e)
     {
+        if (e.Key == Key.Escape)
+        {
+            ReleaseListening();
+            return; // 退出方法，不执行后续修改逻辑
+        }
         if (_currentListeningKey != null) _currentListeningKey.CurrentKey = e.Key.ToString();
         _isChanged = true;
         ReleaseListening();

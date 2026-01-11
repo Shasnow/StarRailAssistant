@@ -13,18 +13,18 @@ def main():
         formatter_class=argparse.RawTextHelpFormatter
     )
     # 全局参数（模式控制）
-    parser.add_argument(
-        '--host',
-        action='store_true',
-        help=Resource.argparse_host_help
-    )
-
-    parser.add_argument(
-        '--port',
-        type=int,
-        default=8765,
-        help=Resource.argparse_port_help
-    )
+    # parser.add_argument(
+    #     '--host',
+    #     action='store_true',
+    #     help=Resource.argparse_host_help
+    # )
+    #
+    # parser.add_argument(
+    #     '--port',
+    #     type=int,
+    #     default=8765,
+    #     help=Resource.argparse_port_help
+    # )
 
     parser.add_argument(
         '--inline',
@@ -108,8 +108,8 @@ def main():
     if args.inline or args.embed:
         cli_instance.intro = ''
         cli_instance.prompt = ''
-    if args.host:
-        cli_instance.do_host(args.port)
+    # if args.host:
+    #     cli_instance.do_host(args.port)
 
     # 统一处理子命令逻辑
     def execute_subcommand(cmd_prefix: str, *args_parts:str) -> bool:

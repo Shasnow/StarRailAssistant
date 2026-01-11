@@ -45,8 +45,6 @@ public partial class Config : ObservableObject
     [ObservableProperty] [property: JsonIgnore]
     private string _startGamePassword = ""; // 游戏启动密码
 
-    [ObservableProperty] private string _startGamePath = ""; // 游戏启动路径
-
     [ObservableProperty] [property: JsonIgnore]
     private string _startGameUsername = ""; // 游戏启动用户名
 
