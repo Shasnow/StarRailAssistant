@@ -207,7 +207,7 @@ public partial class SettingsPageViewModel : PageViewModel
         if (hkrpgcnKey is null) return;
         var gameInstallPath = hkrpgcnKey.GetValue("GameInstallPath") as string;
         if (string.IsNullOrEmpty(gameInstallPath)) return;
-        Settings.GamePath = $"{gameInstallPath}\\StarRail.exe";
+        Settings.GamePath = $"{gameInstallPath.Replace('\\','/')}/StarRail.exe";
     }
     
     #region 快捷键监听修改逻辑
