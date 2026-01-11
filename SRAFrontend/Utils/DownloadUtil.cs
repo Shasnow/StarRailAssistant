@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SRAFrontend.utilities;
+namespace SRAFrontend.Utils;
 
 public static class DownloadUtil
 {

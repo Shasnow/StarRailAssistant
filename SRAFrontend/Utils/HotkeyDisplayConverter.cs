@@ -3,7 +3,7 @@ using System.Globalization;
 using Avalonia.Data.Converters;
 using SRAFrontend.Localization;
 
-namespace SRAFrontend.Utilities;
+namespace SRAFrontend.Utils;
 
 public class HotkeyDisplayConverter : IValueConverter
 {

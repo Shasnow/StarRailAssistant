@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace SRAFrontend.utilities;
+namespace SRAFrontend.Utils;
 
 
 public static class UrlUtil
