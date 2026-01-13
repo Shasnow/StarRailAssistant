@@ -276,6 +276,20 @@ class SRACli(cmd.Cmd):
         """Show version information"""
         print(f"{VERSION}")
 
+    def do_notify(self, arg: str):
+        """Notification command - support test email notification"""
+        args = arg.split()
+        if not args:
+            print(Resource.cli_invalidArguments('notify'))
+            return
+
+        command = args[0]
+        if command == 'test-email':
+            from SRACore.util.notify import send_test_email
+            send_test_email()
+        else:
+            print(Resource.cli_invalidArguments('notify'))
+
     @staticmethod
     def is_admin() -> bool:
         """检查当前用户是否具有管理员权限（仅限 Windows）"""
