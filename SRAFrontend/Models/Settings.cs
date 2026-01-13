@@ -17,7 +17,6 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private double _confidenceThreshold = 0.9; // 识图置信度阈值
     [ObservableProperty] private int _defaultPage; // 启动时默认页面索引
     [ObservableProperty] private int _downloadChannel = 1; // 0: Mirror, 1: GitHub
-    [ObservableProperty] private string _emailAuthCode = ""; // 邮件授权码
     [ObservableProperty] private string _emailReceiver = ""; // 接收邮件地址
     [ObservableProperty] private string _emailSender = ""; // 发送邮件地址
     [ObservableProperty] private bool _enableAutoUpdate = true; // 是否启用自动更新
@@ -27,6 +26,8 @@ public partial class Settings : ObservableObject
 
     [ObservableProperty] [property: JsonIgnore]
     private string _mirrorChyanCdk = "";
+    [ObservableProperty] [property: JsonIgnore]
+    private string _emailAuthCode = ""; // 邮件授权码
 
     [ObservableProperty] private AvaloniaList<string> _proxies =
     [
@@ -39,13 +40,14 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private int _smtpPort = 465; // SMTP服务器端口
 
     [ObservableProperty] private string _smtpServer = "smtp.qq.com"; // SMTP服务器地址
-    
+
     [ObservableProperty] private bool _isAutoDetectGamePath = true; // 是否自动检测游戏安装路径
 
     [ObservableProperty] private string _gamePath = ""; // 游戏安装路径
 
     [ObservableProperty] private double _zoom = 1; // 屏幕缩放比例
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
+    [JsonPropertyName("EmailAuthCode")] public string EncryptedEmailAuthCode { get; set; } = "";
     public const string Version = "2.5.0-beta.1"; // 应用版本号
 
     // 新增快捷键设置
