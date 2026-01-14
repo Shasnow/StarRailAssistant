@@ -257,4 +257,10 @@
     <data name="GamePathText" xml:space="preserve">
         <value>游戏路径</value>
     </data>
+    <data name="AutoDetectText" xml:space="preserve">
+        <value>自动检测</value>
+    </data>
+    <data name="CurrentConfigText" xml:space="preserve">
+        <value>当前配置</value>
+    </data>
 </root>

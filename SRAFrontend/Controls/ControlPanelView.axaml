@@ -29,7 +29,8 @@
                 ToolTip.Tip="{x:Static lang:Resources.RemoveConfigText}"/>
 
         <ComboBox SelectedIndex="{Binding Cache.CurrentConfigIndex}"
-                  Width="150" ItemsSource="{Binding Cache.ConfigNames}">
+                  Width="150" ItemsSource="{Binding Cache.ConfigNames}"
+                  ToolTip.Tip="{x:Static lang:Resources.CurrentConfigText}">
         </ComboBox>
 
         <!-- ReSharper disable Xaml.StyleClassNotFound -->
