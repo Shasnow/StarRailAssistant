@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
@@ -107,7 +108,11 @@ public class CommonModel(
     public async Task CheckDesktopShortcut(bool forceCheck = false)
     {
         if (cacheService.Cache.NoNotifyForShortcut && !forceCheck) return;
-        if (File.Exists(PathString.DesktopShortcutPath)) return;
+        if (File.Exists(PathString.DesktopShortcutPath))
+        {
+            if (forceCheck) ShowSuccessToast("快捷方式已存在", "快捷方式已存在于桌面");
+            return;
+        }
 
         var createShortcutButton =
             SukiMessageBoxButtonsFactory.CreateButton("创建快捷方式", SukiMessageBoxResult.Yes, "Flat");
@@ -126,7 +131,7 @@ public class CommonModel(
                 cacheService.Cache.NoNotifyForShortcut = true;
                 break;
             case SukiMessageBoxResult.Yes:
-                if (CreateWindowsShortcut(PathString.DesktopShortcutPath, PathString.SraExePath))
+                if (CreateDesktopShortcut(PathString.DesktopShortcutPath, PathString.SraExecutablePath))
                     ShowSuccessToast("快捷方式创建成功", "已在桌面创建 SRA 快捷方式");
                 else
                     ShowErrorToast("快捷方式创建失败", "查看日志以获取更多信息");
@@ -136,10 +141,10 @@ public class CommonModel(
 
     public async Task CleanupOldExeAsync()
     {
-        if (File.Exists(PathString.SraOldExePath))
+        if (File.Exists(PathString.SraOldExecutablePath))
         {
             logger.LogDebug("Cleaning up old executable file: SRA_old.exe");
-            await Task.Run(() => File.Delete(PathString.SraOldExePath));
+            await Task.Run(() => File.Delete(PathString.SraOldExecutablePath));
         }
     }
 
@@ -226,7 +231,7 @@ public class CommonModel(
             try
             {
                 // 重命名当前可执行文件（以防更新过程中被占用）
-                File.Move(PathString.SraExePath, PathString.SraOldExePath);
+                File.Move(PathString.SraExecutablePath, PathString.SraOldExecutablePath);
                 // 解压更新包
                 await Task.Run(() => ZipUtil.Unzip(downloadFilePath, Environment.CurrentDirectory));
                 toastManager.Dismiss(unzipToast);
@@ -259,7 +264,7 @@ public class CommonModel(
 
     private void RestartApplication()
     {
-        var exePath = PathString.SraExePath;
+        var exePath = PathString.SraExecutablePath;
         try
         {
             Process.Start(new ProcessStartInfo
@@ -277,44 +282,70 @@ public class CommonModel(
         }
     }
 
-    private bool CreateWindowsShortcut(string shortcutPath, string appExePath)
+    private bool CreateDesktopShortcut(string shortcutPath, string appExePath)
     {
-        logger.LogDebug("Creating Windows shortcut: {ShortcutPath} -> {AppExePath}", shortcutPath, appExePath);
-        // 使用 VBScript 创建快捷方式
-        var vbsScript = $"""
-
-                                 Set WshShell = WScript.CreateObject("WScript.Shell")
-                                 Set shortcut = WshShell.CreateShortcut("{shortcutPath}")
-                                 shortcut.TargetPath = "{appExePath}"
-                                 shortcut.WorkingDirectory = "{Path.GetDirectoryName(appExePath)}"
-                                 shortcut.Save
-
-                         """;
-        var vbsPath = Path.Combine(Path.GetTempPath(), "create_shortcut.vbs");
-        try
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            File.WriteAllText(vbsPath, vbsScript);
-
-            // 执行 VBScript
-            using var process = new Process();
-            process.StartInfo = new ProcessStartInfo
+            logger.LogDebug("Creating Windows shortcut: {ShortcutPath} -> {AppExePath}", shortcutPath, appExePath);
+            // 使用 VBScript 创建快捷方式
+            var vbsScript = $"""
+                             Set WshShell = WScript.CreateObject("WScript.Shell")
+                             Set shortcut = WshShell.CreateShortcut("{shortcutPath}")
+                             shortcut.TargetPath = "{appExePath}"
+                             shortcut.WorkingDirectory = "{Path.GetDirectoryName(appExePath)}"
+                             shortcut.Save
+                             """;
+            var vbsPath = Path.Combine(Path.GetTempPath(), "create_shortcut.vbs");
+            try
             {
-                FileName = "cscript.exe",
-                Arguments = $"/nologo \"{vbsPath}\"",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-            process.Start();
-            process.WaitForExit();
-            File.Delete(vbsPath); // 删除临时脚本
+                File.WriteAllText(vbsPath, vbsScript);
+    
+                // 执行 VBScript
+                using var process = new Process();
+                process.StartInfo = new ProcessStartInfo
+                {
+                    FileName = "cscript.exe",
+                    Arguments = $"/nologo \"{vbsPath}\"",
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                process.Start();
+                process.WaitForExit();
+                File.Delete(vbsPath); // 删除临时脚本
+    
+                return File.Exists(shortcutPath);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error creating shortcut");
+                return false;
+            }
+        }
 
-            return File.Exists(shortcutPath);
-        }
-        catch (Exception e)
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            logger.LogError(e, "Error creating shortcut");
-            return false;
+            logger.LogDebug("Creating Linux desktop entry: {ShortcutPath} -> {AppExePath}", shortcutPath, appExePath);
+            var desktopEntry = $"""
+                                 [Desktop Entry]
+                                 Version=1.0
+                                 Type=Application
+                                 Name=SRA
+                                 Exec={appExePath}
+                                 Icon={Path.Combine(Path.GetDirectoryName(appExePath) ?? "", "sra_icon.png")}
+                                 Terminal=false
+                                 Categories=Utility;
+                                 """;
+            try
+            {
+                File.WriteAllText(shortcutPath, desktopEntry);
+                return File.Exists(shortcutPath);
+            } catch (Exception e)
+            {
+                logger.LogError(e, "Error creating shortcut");
+                return false;
+            }
         }
+        return false;
     }
 
     /// <summary>
