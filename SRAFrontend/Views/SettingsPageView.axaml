@@ -85,7 +85,7 @@
                                                     <Button Grid.Column="3"
                                                             Classes="Icon"
                                                             FontFamily="{StaticResource Phosphor}"
-                                                            Content="&#xE036;" 
+                                                            Content="&#xE036;"
                                                             Command="{Binding ResetToDefaultCommand}"/>
                                                 </Grid>
                                             </DataTemplate>
@@ -170,8 +170,16 @@
                                             </Grid>
                                             <CheckBox Content="{x:Static lang:Resources.SystemNotificationText}"
                                                       IsChecked="{Binding Settings.AllowSystemNotifications}" />
-                                            <CheckBox Content="{x:Static lang:Resources.EmailNotificationText}"
-                                                      IsChecked="{Binding Settings.AllowEmailNotifications}" />
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <CheckBox Grid.Column="0"
+                                                          Content="{x:Static lang:Resources.EmailNotificationText}"
+                                                          IsChecked="{Binding Settings.AllowEmailNotifications}" />
+                                                <Button Grid.Column="1"
+                                                        Content="Check"
+                                                        Margin="10,0,0,0"
+                                                        Command="{Binding TestEmailCommand}"
+                                                        IsEnabled="{Binding Settings.AllowEmailNotifications}" />
+                                            </Grid>
                                             <Expander Header="{x:Static lang:Resources.SmtpSettingsText}">
                                                 <Grid RowDefinitions="Auto,*,*,*,*" ColumnDefinitions="*,*">
                                                     <Label Grid.Row="0" Grid.Column="0" Content="{x:Static lang:Resources.SmtpServerText}" />

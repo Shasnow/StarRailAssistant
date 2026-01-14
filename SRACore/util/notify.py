@@ -70,6 +70,52 @@ def send_mail(
         raise
 
 
+def send_test_email() -> bool:
+    """
+    发送测试邮件
+    :return: 是否发送成功
+    """
+    import datetime
+
+    try:
+        settings = load_settings()
+
+        # 检查邮件通知是否启用
+        if not settings.get('AllowEmailNotifications', False):
+            print("邮件通知未启用")
+            return False
+
+        # 检查必要的配置
+        required_fields = ['SmtpServer', 'EmailSender', 'EmailAuthCode', 'EmailReceiver']
+        missing_fields = [field for field in required_fields if not settings.get(field)]
+
+        if missing_fields:
+            print(f"邮件配置不完整，缺少: {', '.join(missing_fields)}")
+            return False
+
+        # 发送测试邮件
+        test_message = f"""这是一条测试信息。
+
+如果您收到此邮件，说明邮件通知功能配置正确。
+
+配置信息：
+- SMTP服务器: {settings.get('SmtpServer')}
+- 端口: {settings.get('SmtpPort', 465)}
+- 发送邮箱: {settings.get('EmailSender')}
+- 接收邮箱: {settings.get('EmailReceiver')}
+
+感谢您使用 StarRailAssistant！
+"""
+
+        send_mail_notification('SRA 测试邮件', test_message, settings)
+        print("测试邮件发送成功")
+        return True
+
+    except Exception as e:
+        print(f"测试邮件发送失败: {e}")
+        return False
+
+
 class Summary:
     def __init__(self):
         self.date = None

@@ -15,18 +15,41 @@ public class SettingsService
         _logger = logger;
         _logger.LogInformation("Loading settings...");
         Settings = DataPersister.LoadSettings();
-        if (string.IsNullOrEmpty(Settings.EncryptedMirrorChyanCdk)) return;
-        string decryptedString;
-        try
+        if (string.IsNullOrEmpty(Settings.EncryptedMirrorChyanCdk))
         {
-            decryptedString = EncryptUtil.DecryptString(Settings.EncryptedMirrorChyanCdk);
         }
-        catch (Exception e)
+        else
         {
-            _logger.LogError(e, "Failed to decrypt MirrorChyanCdk");
-            decryptedString = "";
+            string decryptedString;
+            try
+            {
+                decryptedString = EncryptUtil.DecryptString(Settings.EncryptedMirrorChyanCdk);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to decrypt MirrorChyanCdk");
+                decryptedString = "";
+            }
+            Settings.MirrorChyanCdk = decryptedString;
         }
-        Settings.MirrorChyanCdk = decryptedString;
+
+        if (string.IsNullOrEmpty(Settings.EncryptedEmailAuthCode))
+        {
+        }
+        else
+        {
+            string decryptedAuthCode;
+            try
+            {
+                decryptedAuthCode = EncryptUtil.DecryptString(Settings.EncryptedEmailAuthCode);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to decrypt EmailAuthCode");
+                decryptedAuthCode = "";
+            }
+            Settings.EmailAuthCode = decryptedAuthCode;
+        }
     }
 
     public void SaveSettings()
@@ -45,6 +68,22 @@ public class SettingsService
                 encryptedString = "";
             }
         Settings.EncryptedMirrorChyanCdk = encryptedString;
+
+        string encryptedAuthCode;
+        if (string.IsNullOrWhiteSpace(Settings.EmailAuthCode))
+            encryptedAuthCode = "";
+        else
+            try
+            {
+                encryptedAuthCode = EncryptUtil.EncryptString(Settings.EmailAuthCode);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to encrypt EmailAuthCode");
+                encryptedAuthCode = "";
+            }
+        Settings.EncryptedEmailAuthCode = encryptedAuthCode;
+
         DataPersister.SaveSettings(Settings);
     }
 }
