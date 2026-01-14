@@ -88,9 +88,9 @@ public partial class SettingsPageViewModel : PageViewModel
             }.Bind(() => settingsService.Settings.TechniqueHotkey,
                 value => settingsService.Settings.TechniqueHotkey = value)
         ];
-        
+
         DetectGamePath();
-        
+
     }
 
     public IAvaloniaReadOnlyList<CustomizableKey> CustomizableKeys => _customizableKeys;
@@ -164,13 +164,13 @@ public partial class SettingsPageViewModel : PageViewModel
     {
         _ = _commonModel.CheckForUpdatesAsync();
     }
-    
+
     [RelayCommand]
     private void CreateDesktopShortcut()
     {
         _ = _commonModel.CheckDesktopShortcut(true);
     }
-    
+
     [RelayCommand]
     private void OpenFolder(string folder)
     {
@@ -184,7 +184,7 @@ public partial class SettingsPageViewModel : PageViewModel
         };
         _commonModel.OpenFolderInExplorer(folderPath);
     }
-    
+
     [RelayCommand]
     private async Task SelectedPath()
     {
@@ -193,7 +193,7 @@ public partial class SettingsPageViewModel : PageViewModel
         if (files.Count == 0) return;
         Settings.GamePath = files[0].Path.LocalPath;
     }
-    
+
     [RelayCommand]
     private void DetectGamePath()
     {
@@ -209,7 +209,13 @@ public partial class SettingsPageViewModel : PageViewModel
         if (string.IsNullOrEmpty(gameInstallPath)) return;
         Settings.GamePath = $"{gameInstallPath.Replace('\\','/')}/StarRail.exe";
     }
-    
+
+    [RelayCommand]
+    private async Task TestEmail()
+    {
+        await _commonModel.SendTestEmailAsync();
+    }
+
     #region 快捷键监听修改逻辑
 
     private CustomizableKey? _currentListeningKey; // 正在监听的快捷键
