@@ -181,10 +181,10 @@
         <value>Stop</value>
     </data>
     <data name="CurrentText" xml:space="preserve">
-        <value>Current</value>
+        <value>Launch Current</value>
     </data>
     <data name="AllText" xml:space="preserve">
-        <value>All</value>
+        <value>Launch All</value>
     </data>
     <data name="SaveOnlyText" xml:space="preserve">
         <value>Save Only</value>
@@ -263,5 +263,11 @@
     </data>
     <data name="GamePathText" xml:space="preserve">
         <value>Game Path</value>
+    </data>
+    <data name="AutoDetectText" xml:space="preserve">
+        <value>Auto Detect</value>
+    </data>
+    <data name="CurrentConfigText" xml:space="preserve">
+        <value>Current configuration</value>
     </data>
 </root>

@@ -27,14 +27,23 @@
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.TaskSettingsText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
-                                    <Grid ColumnDefinitions="Auto,Auto,Auto,*" ToolTip.Tip="游戏路径" >
+                                    <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto">
                                         <Label Classes="icon">&#xe40c;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.GamePathText}"/>
-                                        <ToggleSwitch OnContent="自动检测" Grid.Column="2"
+                                        <ToggleSwitch OnContent="{x:Static lang:Resources.AutoDetectText}" Grid.Column="2"
                                                       IsChecked="{Binding Settings.IsAutoDetectGamePath}"
                                                       Command="{Binding DetectGamePathCommand}"
-                                                      Width="120"/>
-                                        <TextBox Grid.Column="3" Text="{Binding Settings.GamePath}" IsEnabled="{Binding !Settings.IsAutoDetectGamePath}"/>
+                                                      Width="120"
+                                                      ToolTip.Tip="开启以自动检测电脑中的游戏"/>
+                                        <TextBox Grid.Column="3" Text="{Binding Settings.GamePath}"
+                                                 IsEnabled="{Binding !Settings.IsAutoDetectGamePath}"
+                                                 ToolTip.Tip="当使用自动检测时，无法手动修改"/>
+                                        <Button Grid.Column="4" Classes="Icon"
+                                                FontFamily="{StaticResource Phosphor}"
+                                                Content="&#xE256;"
+                                                Command="{Binding SelectedPathCommand}"
+                                                IsVisible="{Binding !Settings.IsAutoDetectGamePath}"
+                                                ToolTip.Tip="浏览并选择文件"/>
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto, *, Auto">
