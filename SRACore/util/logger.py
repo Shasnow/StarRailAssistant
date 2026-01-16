@@ -5,7 +5,7 @@ from loguru import logger
 
 
 # 设置日志记录器
-def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log", level: str = "TRACE"):
+def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log", level: str = "TRACE", queue = None) -> None:
     logger.remove()
     if sys.stdout.isatty():
         logger.add(sys.stdout, level=level,
@@ -20,6 +20,10 @@ def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log", level: str = "TRACE")
                format="{time:YYYY-MM-DD HH:mm:ss} {level:5} {module}.{function}:{line} {message}",
                colorize=False, retention=7, enqueue=True,
                encoding="utf-8")
+    if queue is not None:
+        logger.add(queue.put, level=level,
+                   format="{time:HH:mm:ss}[{thread}] | {level:5} | {message}",
+                   colorize=False, enqueue=True)
 
 
 def _log_entry_exit(func):

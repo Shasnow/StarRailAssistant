@@ -11,7 +11,7 @@ from SRACore.thread.task_process import TaskManager
 from SRACore.thread.trigger_thread import TriggerManager
 from SRACore.util.config import load_settings
 from SRACore.util.const import VERSION, CORE
-# from SRACore.websocket_server import WebSocketServer
+
 
 class SRACli(cmd.Cmd):
     intro = Resource.cli_intro(version=VERSION, core=CORE)
@@ -35,33 +35,43 @@ class SRACli(cmd.Cmd):
         self.event_listener.register_key_event(stop_hotkey, self.do_task, "stop")
         self.event_listener.start()
 
-    #     self.websocket_server = None
-    #
-    # def do_host(self, port):
-    #     """Start WebSocket server on specified port"""
-    #     if not self.websocket_server:
-    #         self.websocket_server = WebSocketServer(self)
-    #     if port:
-    #         if port == 'stop':
-    #             if self.websocket_server.is_alive():
-    #                 self.websocket_server.stop()
-    #                 time.sleep(0.5)
-    #                 self.websocket_server = None
-    #                 print(Resource.cli_host_stopped)
-    #             else:
-    #                 print(Resource.cli_host_notRunning)
-    #             return
-    #         try:
-    #             port_num = int(port)
-    #             if self.websocket_server.is_alive():
-    #                 self.websocket_server.stop()
-    #             self.websocket_server.port = port_num
-    #         except ValueError:
-    #             print(Resource.cli_host_invalidPort(port))
-    #             return
-    #     self.websocket_server.start()
-    #     time.sleep(0.5)
-    #     print(Resource.cli_host_started(self.websocket_server.port))
+        self.websocket_server = None
+        self.log_queue = None
+
+    def do_host(self, port):
+        """Start WebSocket server on specified port"""
+        try:
+            from SRACore.websocket_server import WebSocketServer
+        except ImportError as e:
+            logger.debug(f"ImportError: {e}")
+            print("You need to install 'websockets' package to use WebSocket server feature.")
+            return
+        if not self.websocket_server:
+            self.websocket_server = WebSocketServer(self)
+        if port:
+            if port == 'stop':
+                if self.websocket_server.is_alive():
+                    self.websocket_server.stop()
+                    time.sleep(0.5)
+                    self.websocket_server = None
+                    print(Resource.cli_host_stopped)
+                else:
+                    print(Resource.cli_host_notRunning)
+                return
+            try:
+                port_num = int(port)
+                if self.websocket_server.is_alive():
+                    self.websocket_server.stop()
+                self.websocket_server.port = port_num
+            except ValueError:
+                print(Resource.cli_host_invalidPort(port))
+                return
+        self.log_queue = multiprocessing.Queue()
+        self.task_manager.log_queue = self.log_queue
+        self.websocket_server.log_queue = self.log_queue
+        self.websocket_server.start()
+        time.sleep(0.5)
+        print(Resource.cli_host_started(self.websocket_server.port))
 
     def default(self, line):
         print(Resource.cli_unknownCommand(line))
@@ -124,8 +134,8 @@ class SRACli(cmd.Cmd):
             if self.trigger_thread.is_alive():
                 logger.error(Resource.cli_exit_triggerTimeout)
 
-        # if self.websocket_server:
-        #     self.websocket_server.stop()
+        if self.websocket_server:
+            self.websocket_server.stop()
         self.event_listener.stop()
         return True
 
