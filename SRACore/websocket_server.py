@@ -2,9 +2,12 @@ import asyncio
 import json
 import threading
 
-import websockets
 from loguru import logger
-
+import websockets
+# from SRACore.util.config import load_app_config
+# import importlib
+# package = load_app_config().get('websockets', {}).get('package', 'websockets')
+# websockets = importlib.import_module(package)
 
 class WebSocketServer:
     def __init__(self, cli):
@@ -18,12 +21,15 @@ class WebSocketServer:
         self.host = '0.0.0.0'
         self.port = 8765
         self.thread = None
+        self.connections: set = set()
+        self.log_queue = None
 
-    async def handle_connection(self, websocket: websockets.ServerConnection):
+    async def handle_connection(self, websocket):
         """
         处理WebSocket连接
         :param websocket: WebSocket连接对象
         """
+        self.connections.add(websocket)
         logger.debug(f"WebSocket client connected from {websocket.remote_address}")
         try:
             async for message in websocket:
@@ -31,6 +37,7 @@ class WebSocketServer:
         except Exception as e:
             logger.error(f"WebSocket error: {e}")
         finally:
+            self.connections.remove(websocket)
             logger.debug(f"WebSocket client disconnected from {websocket.remote_address}")
 
     async def handle_message(self, websocket, message):
@@ -109,6 +116,11 @@ class WebSocketServer:
             # 等待停止事件
             while not self.stop_event.is_set():
                 await asyncio.sleep(0.1)
+                if self.log_queue.empty():
+                    continue
+                msg = self.log_queue.get()
+                for client in self.connections:
+                    await client.send(msg)
             logger.debug("WebSocket server stopping...")
 
     def run(self):

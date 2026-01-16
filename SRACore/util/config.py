@@ -25,8 +25,16 @@ def load_config(name:str) -> dict[str, Any] | None:
         logger.error(Resource.config_exception(path, str(e)))
         return None
 
-def load_settings():
-    path = AppDataSraDir / 'settings.json'
+def load_data(typ):
+    path = ''
+    match typ:
+        case 'settings':
+            path = AppDataSraDir / 'settings.json'
+        case 'cache':
+            path = AppDataSraDir / 'cache.json'
+        case _:
+            return None
+
     try:
         with open(path, 'r') as f:
            return json.load(f)
@@ -40,17 +48,21 @@ def load_settings():
         logger.error(Resource.config_exception(path, str(e)))
         return {}
 
+def load_settings():
+    return load_data('settings')
+
 def load_cache():
-    path = AppDataSraDir / 'cache.json'
+    return load_data('cache')
+
+def load_app_config():
+    path = 'SRACore/config.toml'
     try:
-        with open(path, 'r') as f:
-           return json.load(f)
+        import tomllib
+        with open(path, 'rb') as f:
+            return tomllib.load(f)
     except FileNotFoundError:
         logger.error(Resource.config_fileNotFound(path))
-        return {}
-    except json.JSONDecodeError as e:
-        logger.error(Resource.config_parseError(path, str(e)))
-        return {}
+        return None
     except Exception as e:
         logger.error(Resource.config_exception(path, str(e)))
-        return {}
+        return None
