@@ -17,7 +17,7 @@ def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log", level: str = "TRACE",
                    format="{time:HH:mm:ss}[{thread}] | {level:5} | {message}",
                    colorize=False, enqueue=True)
     logger.add(path, level=level,
-               format="{time:YYYY-MM-DD HH:mm:ss} {level:5} {module}.{function}:{line} {message}",
+               format="{time:HH:mm:ss} {level:5} {module}.{function}:{line} {message}",
                colorize=False, retention=7, enqueue=True,
                encoding="utf-8")
     if queue is not None:

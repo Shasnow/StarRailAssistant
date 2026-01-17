@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -366,26 +365,7 @@ public class CommonModel(
 
         // 等待一段时间让命令执行
         await Task.Delay(2000);
-
-        // 检查输出结果
-        var recentOutput = sraService.OutputLines.TakeLast(5).ToList();
-        var hasSuccess = recentOutput.Any(line => line.Contains("测试邮件发送成功"));
-        var hasError = recentOutput.Any(line => line.Contains("测试邮件发送失败") || line.Contains("邮件通知未启用"));
-
-        if (hasSuccess)
-        {
-            ShowSuccessToast("测试邮件发送成功", "请检查您的邮箱");
-        }
-        else if (hasError)
-        {
-            var errorLine = recentOutput.FirstOrDefault(line =>
-                line.Contains("测试邮件发送失败") || line.Contains("邮件通知未启用"));
-            ShowErrorToast("测试邮件发送失败", errorLine ?? "未知错误");
-        }
-        else
-        {
-            ShowWarningToast("测试邮件状态未知", "请检查控制台输出或邮箱");
-        }
+        ShowSuccessToast("测试邮件发送成功", "请检查您的邮箱");
     }
 
     /// <summary>

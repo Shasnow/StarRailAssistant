@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using Avalonia.Collections;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
@@ -11,10 +10,8 @@ namespace SRAFrontend.Services;
 // 提取常量，提高可维护性
 internal static class SraServiceConstants
 {
-    public const string BackendNotStartedText = "后端未启动。";
     public const string StartMarker = "[Start]";
     public const string DoneMarker = "[Done]";
-    public const int MaxOutputLines = 1000; // 可选: 日志行数限流
 }
 
 public partial class SraService(ILogger<SraService> logger)
@@ -22,11 +19,10 @@ public partial class SraService(ILogger<SraService> logger)
 {
     private readonly ILogger _logger = logger;
     private bool _isDisposed;
+    public event Action<string>? Outputted;
 
     // 简化 ObservableProperty 初始化
     [ObservableProperty] private bool _isRunning;
-
-    [ObservableProperty] private AvaloniaList<string> _outputLines = [SraServiceConstants.BackendNotStartedText];
 
     private Process? _sraProcess;
 
@@ -49,7 +45,7 @@ public partial class SraService(ILogger<SraService> logger)
         {
             _logger.LogError("Could not find SRA-cli.exe at path: {Path}", cliPath);
             var errorMsg = $"无法找到文件 SRA-cli.exe，请检查安装完整性。\n路径: {cliPath}";
-            OutputLines.Add(errorMsg);
+            Outputted?.Invoke(errorMsg);
             return;
         }
 
@@ -86,15 +82,13 @@ public partial class SraService(ILogger<SraService> logger)
             _sraProcess.Start();
             _logger.LogInformation("Successfully start SRA with command: {Arguments}", arguments);
 
-            OutputLines.Clear();
-
             _sraProcess.BeginOutputReadLine();
             _sraProcess.BeginErrorReadLine();
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Fail to start SRA: {Message}", e.Message);
-            Dispatcher.UIThread.Post(() => OutputLines.Add($"启动失败: {e.Message}"));
+            Dispatcher.UIThread.Post(() => Outputted?.Invoke($"启动失败: {e.Message}"));
             // 异常时清理资源
             _sraProcess?.Dispose();
             _sraProcess = null;
@@ -158,7 +152,7 @@ public partial class SraService(ILogger<SraService> logger)
         if (_sraProcess == null || _sraProcess.HasExited)
         {
             _logger.LogWarning("Attempted to send input to SRA process, but it is not running. Input: {Input}", input);
-            OutputLines.Add($"发送失败: 进程未运行（输入: {input}）");
+            Outputted?.Invoke($"发送失败: 进程未运行（输入: {input}）");
             return false;
         }
 
@@ -171,7 +165,7 @@ public partial class SraService(ILogger<SraService> logger)
         catch (IOException e)
         {
             _logger.LogError(e, "Fail to send input to SRA process: {Message}", e.Message);
-            OutputLines.Add($"发送失败: {e.Message}（输入: {input}）");
+            Outputted?.Invoke($"发送失败: {e.Message}（输入: {input}）");
             return false;
         }
     }
@@ -199,12 +193,8 @@ public partial class SraService(ILogger<SraService> logger)
                 IsRunning = true;
             else if (args.Data.Contains(SraServiceConstants.DoneMarker))
                 IsRunning = false;
-            
-            // 日志限流: 超过最大行数时移除最早的
-            if (OutputLines.Count >= SraServiceConstants.MaxOutputLines)
-                OutputLines.RemoveAt(0);
 
-            OutputLines.Add(args.Data);
+            Outputted?.Invoke(args.Data);
         });
     }
 
@@ -215,7 +205,7 @@ public partial class SraService(ILogger<SraService> logger)
         Dispatcher.UIThread.Post(() =>
         {
             // 错误日志标红（如果UI支持，可在这里添加标记）
-            OutputLines.Add(args.Data);
+            Outputted?.Invoke(args.Data);
         });
     }
 
@@ -231,7 +221,7 @@ public partial class SraService(ILogger<SraService> logger)
         Dispatcher.UIThread.Post(() =>
         {
             IsRunning = false;
-            OutputLines.Add($"进程已退出（PID: {processId}，退出代码为: {exitCode}）");
+            Outputted?.Invoke($"进程已退出（PID: {processId}，退出代码为: {exitCode}）");
         });
 
         // 清理资源

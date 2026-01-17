@@ -46,14 +46,13 @@ class SRACli(cmd.Cmd):
             logger.debug(f"ImportError: {e}")
             print("You need to install 'websockets' package to use WebSocket server feature.")
             return
-        if not self.websocket_server:
+        if self.websocket_server is None:
             self.websocket_server = WebSocketServer(self)
         if port:
             if port == 'stop':
                 if self.websocket_server.is_alive():
                     self.websocket_server.stop()
                     time.sleep(0.5)
-                    self.websocket_server = None
                     print(Resource.cli_host_stopped)
                 else:
                     print(Resource.cli_host_notRunning)
@@ -66,7 +65,8 @@ class SRACli(cmd.Cmd):
             except ValueError:
                 print(Resource.cli_host_invalidPort(port))
                 return
-        self.log_queue = multiprocessing.Queue()
+        if self.log_queue is None:
+            self.log_queue = multiprocessing.Queue()
         self.task_manager.log_queue = self.log_queue
         self.websocket_server.log_queue = self.log_queue
         self.websocket_server.start()
