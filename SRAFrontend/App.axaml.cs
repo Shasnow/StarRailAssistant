@@ -52,7 +52,6 @@ public partial class App : Application
                 serviceProvider.GetRequiredService<ConfigService>().SaveConfig();
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
                 serviceProvider.GetRequiredService<SraService>().StopSraProcess();
-                _ = serviceProvider.GetRequiredService<WebsocketService>().StopAsync();
                 Log.CloseAndFlush();
             };
         }
@@ -82,7 +81,6 @@ public partial class App : Application
         services.AddSingleton<SettingsService>();
         services.AddSingleton<CacheService>();
         services.AddSingleton<SraService>();
-        services.AddSingleton<WebsocketService>();
         services.AddSingleton<ConfigService>();
         services.AddHttpClient("GlobalClient", client =>
         {

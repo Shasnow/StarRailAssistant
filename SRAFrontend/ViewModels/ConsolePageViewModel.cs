@@ -10,16 +10,13 @@ namespace SRAFrontend.ViewModels;
 public partial class ConsolePageViewModel : PageViewModel
 {
     private readonly SraService _sraService;
-    private readonly WebsocketService _websocketService;
-    private bool _isConnected;
     private readonly AvaloniaList<string> _consoleLines = [];
     
     private const int MaxConsoleLines = 1000;
 
-    public ConsolePageViewModel(SraService sraService, WebsocketService websocketService) : base(PageName.Console, "\uEAE8")
+    public ConsolePageViewModel(SraService sraService) : base(PageName.Console, "\uEAE8")
     {
         _sraService = sraService;
-        _websocketService = websocketService;
         _sraService.Outputted += AddConsoleLine;
         _sraService.StartSraProcess("--inline");
         FilterOptions.CollectionChanged+= (_, _) => OnPropertyChanged(nameof(ConsoleLines));
@@ -60,61 +57,24 @@ public partial class ConsolePageViewModel : PageViewModel
         // 触发UI更新
         OnPropertyChanged(nameof(ConsoleLines));
     }
-    private void HandleConnectionStateChanged(bool isConnected)
-    {
-        _isConnected = isConnected;
-        var statusMessage = isConnected ? "已连接到WebSocket服务器" : "已断开与WebSocket服务器的连接";
-        AddConsoleLine(statusMessage);
-    }
     
     private void HandleMessage(string message)
     {
-        if (_isConnected)
-        {
-            _ = _websocketService.SendAsync(message);
-        }
-        else
-        {
-            _sraService.SendInput(message);
-        }
+        _sraService.SendInput(message);
     }
     
     private void HandleCommand(string line)
     {
         var parts = line.Split(' ', 2);
         var command = parts[0].ToLower();
-        var args = parts.Length > 1 ? parts[1] : string.Empty;
+        // var args = parts.Length > 1 ? parts[1] : string.Empty;
         switch (command)
         {
             case "connect":
-                if (_isConnected)
-                {
-                    AddConsoleLine("已经连接到WebSocket服务器");
-                    return;
-                }
-            
-                // 核心：订阅WebSocket消息事件（输出到控制台）
-                _websocketService.MessageReceived += AddConsoleLine;
-                _websocketService.ConnectionStateChanged += HandleConnectionStateChanged;
-            
-                _ = _websocketService.StartAsync(args).ContinueWith(task =>
-                {
-                    if (!task.Result)
-                    {
-                        _isConnected = false;
-                        // 取消订阅避免内存泄漏
-                        _websocketService.MessageReceived -= AddConsoleLine;
-                        _websocketService.ConnectionStateChanged -= HandleConnectionStateChanged;
-                    }
-                });
+                AddConsoleLine("未来版本支持WebSocket连接命令");
                 break;
             case "disconnect":
-                if (!_isConnected)
-                {
-                    AddConsoleLine("未连接到任何WebSocket服务器");
-                }
-
-                _ = _websocketService.StopAsync();
+                AddConsoleLine("未连接到任何WebSocket服务器");
                 break;
             default:
                 AddConsoleLine($"未知命令: {command}");

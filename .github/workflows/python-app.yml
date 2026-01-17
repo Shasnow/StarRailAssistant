@@ -53,10 +53,6 @@ jobs:
         run: |
           dotnet publish -c Release -r win-x64 .\SRAFrontend\SRAFrontend.sln
 
-      - name: Publish linux-x64
-        run: |
-          dotnet publish -c Release -r linux-x64 .\SRAFrontend\SRAFrontend.sln
-
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:

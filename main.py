@@ -12,19 +12,6 @@ def main():
         epilog= Resource.argparse_epilog,
         formatter_class=argparse.RawTextHelpFormatter
     )
-    # 全局参数（模式控制）
-    # parser.add_argument(
-    #     '--host',
-    #     action='store_true',
-    #     help=Resource.argparse_host_help
-    # )
-    #
-    # parser.add_argument(
-    #     '--port',
-    #     type=int,
-    #     default=8765,
-    #     help=Resource.argparse_port_help
-    # )
 
     parser.add_argument(
         '--inline',
