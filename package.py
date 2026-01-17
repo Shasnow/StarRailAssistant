@@ -78,9 +78,15 @@ if __name__ == "__main__":
 
     print("Start to compressing Lite package ...")
     shutil.make_archive(
-        base_name=str(root_path / f"StarRailAssistant_Lite_v{version['version']}"),
+        base_name=str(root_path / f"StarRailAssistant_Lite_v{version['version']}_win-x64"),
         format="zip",
         root_dir=root_path / "SRAFrontend/bin/Release/net8.0/win-x64/publish",
+        base_dir=".",
+    )
+    shutil.make_archive(
+        base_name=str(root_path / f"StarRailAssistant_Lite_v{version['version']}_linux-x64"),
+        format="zip",
+        root_dir=root_path / "SRAFrontend/bin/Release/net8.0/linux-x64/publish",
         base_dir=".",
     )
 
