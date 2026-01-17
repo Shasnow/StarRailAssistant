@@ -24,7 +24,7 @@ class WebSocketServer:
         self.connections: set = set()
         self.log_queue = None
 
-    async def handle_connection(self, websocket):
+    async def handle_connection(self, websocket:websockets.ServerConnection):
         """
         处理WebSocket连接
         :param websocket: WebSocket连接对象

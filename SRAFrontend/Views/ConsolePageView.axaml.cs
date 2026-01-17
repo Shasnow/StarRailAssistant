@@ -16,7 +16,7 @@ public partial class ConsolePageView : UserControl
 
     private void OnModelOnPropertyChanged(object? _, PropertyChangedEventArgs args)
     {
-        if (args.PropertyName == nameof(ConsolePageViewModel.ConsoleText))
+        if (args.PropertyName == nameof(ConsolePageViewModel.ConsoleLines))
         {
             Dispatcher.UIThread.Post(() =>
             {
@@ -43,7 +43,7 @@ public partial class ConsolePageView : UserControl
         if (e.Key == Key.Enter)
         {
             if (sender is not TextBox textBox) return;
-            if (textBox.Text != null) (DataContext as ConsolePageViewModel)?.SendInput(textBox.Text);
+            if (textBox.Text != null) (DataContext as ConsolePageViewModel)?.HandleInput(textBox.Text);
             textBox.Text = string.Empty;
         }
     }
