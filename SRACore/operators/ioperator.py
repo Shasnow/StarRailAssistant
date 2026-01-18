@@ -189,7 +189,7 @@ class IOperator(ABC):
         ...
 
     def locate_any(self,
-                   img_paths: list[str],
+                   templates: list[str],
                    region: Region | None = None,
                    *,
                    from_x: float | None = None,
@@ -200,7 +200,7 @@ class IOperator(ABC):
                    trace: bool = True) -> tuple[int, Box | None]:
         """在窗口内查找任意一张图片位置
         Args:
-            img_paths (list[str]): 模板图片路径列表
+            templates (list[str]): 模板图片路径列表
             region (Region | None, optional): 要查找的区域对象，包含left, top, width, height属性。
                 如果为None，则默认查找当前活动窗口的区域。默认为None。
             from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
@@ -215,9 +215,9 @@ class IOperator(ABC):
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
         if all(v is not None for v in [from_x, from_y, to_x, to_y]):
-            return self.locate_any_in_tuple(img_paths, from_x, from_y, to_x, to_y, confidence, trace)
+            return self.locate_any_in_tuple(templates, from_x, from_y, to_x, to_y, confidence, trace)
         else:
-            return self.locate_any_in_region(img_paths, region, confidence, trace)
+            return self.locate_any_in_region(templates, region, confidence, trace)
 
     def locate(self,
                template: str,
