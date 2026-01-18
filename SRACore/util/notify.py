@@ -18,7 +18,7 @@ def try_send_notification(title: str, message: str):
         send_mail_notification(title, message, setting)
 
 
-def send_windows_notification(title: str, message: str, timeout: int = 10):
+def send_windows_notification(title: str, message: str, timeout: int = 5):
     """
     发送 Windows 系统通知
     :param title: 通知标题

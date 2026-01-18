@@ -16,18 +16,19 @@
                 <StackPanel Margin="10">
                     <suki:GlassCard>
                         <StackPanel>
-                            <CheckBox IsChecked="{Binding CurrentConfig.SimulatedUniverseEnable}"
+                            <CheckBox IsChecked="{Binding CurrentConfig.DUEnable}"
                                       Content="差分宇宙 - 千面英雄"/>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Label>模式</Label>
-                                <ComboBox SelectedIndex="{Binding CurrentConfig.SimulatedUniverseMode}">
+                                <ComboBox SelectedIndex="{Binding CurrentConfig.DUMode}">
                                     <ComboBoxItem>刷单层</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="10">
                                 <Label>次数</Label>
-                                <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.SimulatedUniverseRunTimes}" Minimum="1" Maximum="99999" />
+                                <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.DURunTimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
+                            <ToggleSwitch OnContent="秘技速刷" IsChecked="{Binding CurrentConfig.DUUseTechnique}" />
                         </StackPanel>
                     </suki:GlassCard>
                     <TextBlock>请先手动完成一次以清除所有新手提示</TextBlock>

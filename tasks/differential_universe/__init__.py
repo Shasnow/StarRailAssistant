@@ -4,9 +4,10 @@ from SRACore.task import Executable
 
 
 class DifferentialUniverse(Executable):
-    def __init__(self, operator, run_times: int):
+    def __init__(self, operator, run_times: int, use_technique: bool):
         super().__init__(operator)
         self.run_times = run_times
+        self.use_technique = use_technique
 
     def run(self):
         """主任务执行函数"""
@@ -43,13 +44,9 @@ class DifferentialUniverse(Executable):
                       interval=0.5, max_iterations=10)
         self.operator.click_img("resources/img/periodic_calculus.png")
 
-        # 处理队伍选择
-        if self.operator.click_img("resources/img/nobody.png"):
-            self.operator.click_img("resources/img/preset_formation.png")
-            self.operator.click_img("resources/img/team1.png")
-
+        launch_button_box = self.operator.wait_img("resources/img/launch_differential_universe.png")
         # 启动差分宇宙
-        if not self.operator.click_img("resources/img/launch_differential_universe.png"):
+        if not self.operator.click_box(launch_button_box):
             logger.error("发生错误，错误编号20")
             return False
 
@@ -58,10 +55,14 @@ class DifferentialUniverse(Executable):
     def _navigate_and_fight(self):
         """导航和战斗处理"""
         logger.info("移动")
-        self.operator.hold_key("w", duration=2.6)
+        self.operator.hold_key("w", duration=2.5)
 
         logger.info("进入战斗")
-        self.operator.click_point(0.5, 0.5)
+        if self.use_technique:
+            self.operator.press_key("e")
+            self.operator.sleep(0.5)
+        self.operator.click_point(0.5, 0.5, after_sleep=0.1)
+        self.operator.click_point(0.5, 0.5, after_sleep=0.1)
 
         # 检查是否需要使用技能
         if self.operator.wait_img("resources/img/q.png", timeout=10):
