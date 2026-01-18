@@ -21,10 +21,12 @@ public partial class Config : ObservableObject
     [ObservableProperty]
     private AvaloniaList<bool> _receiveRewards = [false, false, false, false, false, false, false]; // 各任务奖励领取状态
 
-    [ObservableProperty] private bool _simulatedUniverseEnable; // 是否启用模拟宇宙任务
-    [ObservableProperty] private int _simulatedUniverseMode; // 模拟宇宙模式选择
-    [ObservableProperty] private int _simulatedUniversePolicy; // 模拟宇宙策略
-    [ObservableProperty] private int _simulatedUniverseRunTimes; // 模拟宇宙运行次数
+    // du - DifferentialUniverse 差分宇宙
+    [ObservableProperty] private bool _dUEnable; // 是否启用模拟宇宙任务
+    [ObservableProperty] private int _dUMode; // 模拟宇宙模式选择
+    [ObservableProperty] private int _dUPolicy; // 模拟宇宙策略
+    [ObservableProperty] private int _dURunTimes = 1; // 模拟宇宙运行次数
+    [ObservableProperty] private bool _dUUseTechnique; // 差分宇宙是否使用秘技
     [ObservableProperty] private bool _currencyWarsEnable; // 是否启用货币战争任务
     [ObservableProperty] private int _currencyWarsMode; // 货币战争模式：0=标准博弈,1=超频博弈,2=刷开局（对应后端 CurrencyWarsMode）
     [ObservableProperty] private int _currencyWarsPolicy; // 货币战争策略
@@ -47,16 +49,13 @@ public partial class Config : ObservableObject
 
     [ObservableProperty] [property: JsonIgnore]
     private string _startGameUsername = ""; // 游戏启动用户名
-
-    [ObservableProperty] private bool _trailblazePowerChangeLineup; // 是否更换阵容
-    [ObservableProperty] private bool _trailblazePowerLineupCheck; // 是否检查阵容
+    
     [ObservableProperty] private bool _trailblazePowerReplenishEnable; // 是否补充体力
     [ObservableProperty] private int _trailblazePowerReplenishTimes; // 补充体力次数
     [ObservableProperty] private int _trailblazePowerReplenishWay; // 补充体力方式
 
     [ObservableProperty] private AvaloniaList<TrailblazePowerTaskItem> _trailblazePowerTaskList = [];
     [ObservableProperty] private bool _trailblazePowerUseAssistant; // 是否使用助理
-    [ObservableProperty] private bool _trailblazePowerUseSkill; // 是否使用技能
 
     [JsonPropertyName("StartGamePassword")] public string EncryptedStartGamePassword { get; set; } = "";
 

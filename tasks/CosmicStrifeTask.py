@@ -5,10 +5,13 @@ from SRACore.util.logger import logger
 class CosmicStrifeTask(BaseTask):
     def run(self):
         """主任务执行函数"""
-        if self.config.get("SimulatedUniverseEnable", False):
+        if self.config.get("DUEnable", False):
             logger.info("执行任务：旷宇纷争-模拟宇宙")
             from tasks.differential_universe import DifferentialUniverse
-            du_task = DifferentialUniverse(self.operator, self.config.get("SimulatedUniverseRunTimes", 0))
+            du_task = DifferentialUniverse(
+                self.operator,
+                self.config.get("DURunTimes", 0),
+                self.config.get("DUUseTechnique", False))
             if not du_task.run():
                 logger.error("旷宇纷争-模拟宇宙任务失败")
                 return False
