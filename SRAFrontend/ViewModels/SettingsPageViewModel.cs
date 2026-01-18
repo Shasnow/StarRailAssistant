@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Win32;
 using SRAFrontend.Data;
 using SRAFrontend.Localization;
 using SRAFrontend.Models;
@@ -22,17 +20,22 @@ public partial class SettingsPageViewModel : PageViewModel
 
     private readonly SettingsService _settingsService;
     private readonly UpdateService _updateService;
+    private readonly RegistryService _registryService;
 
     /// <inheritdoc />
-    public SettingsPageViewModel(SettingsService settingsService,
+    public SettingsPageViewModel(
+        SettingsService settingsService,
         UpdateService updateService,
         CacheService cacheService,
-        CommonModel commonModel) : base(PageName.Setting,
+        CommonModel commonModel,
+        RegistryService registryService
+        ) : base(PageName.Setting,
         "\uE272")
     {
         _settingsService = settingsService;
         _updateService = updateService;
         _cacheService = cacheService;
+        _registryService = registryService;
         _commonModel = commonModel;
         // 任务通用设置中的 启动/停止 快捷键（非游戏内快捷键分组）
         StartStopKey = new CustomizableKey(ListenKeyFor)
@@ -90,7 +93,7 @@ public partial class SettingsPageViewModel : PageViewModel
         ];
 
         DetectGamePath();
-
+        SetGameResolution();
     }
 
     public IAvaloniaReadOnlyList<CustomizableKey> CustomizableKeys => _customizableKeys;
@@ -198,16 +201,14 @@ public partial class SettingsPageViewModel : PageViewModel
     private void DetectGamePath()
     {
         if (!Settings.IsAutoDetectGamePath) return;
-        Settings.GamePath = "无法自动检测游戏路径";
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
-        var userKey = Registry.CurrentUser;
-        using var hkrpgcnKey =
-            userKey.OpenSubKey(@"Software\miHoYo\HYP\standalone\14_0\hkrpg_cn\6P5gHMNyK3\hkrpg_cn")
-            ?? userKey.OpenSubKey(@"Software\miHoYo\HYP\1_1\hkrpg_cn");
-        if (hkrpgcnKey is null) return;
-        var gameInstallPath = hkrpgcnKey.GetValue("GameInstallPath") as string;
-        if (string.IsNullOrEmpty(gameInstallPath)) return;
-        Settings.GamePath = $"{gameInstallPath.Replace('\\','/')}/StarRail.exe";
+        Settings.GamePath = _registryService.GetGameInstallPath();
+    }
+    
+    [RelayCommand]
+    private void SetGameResolution()
+    {
+        if (!Settings.IsAutoSetGameResolution) return;
+        _registryService.SetTargetPcResolution();
     }
 
     [RelayCommand]

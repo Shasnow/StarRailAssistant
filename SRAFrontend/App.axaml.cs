@@ -52,6 +52,7 @@ public partial class App : Application
                 serviceProvider.GetRequiredService<ConfigService>().SaveConfig();
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
                 serviceProvider.GetRequiredService<SraService>().StopSraProcess();
+                serviceProvider.GetRequiredService<RegistryService>().RestoreUserPcResolution();
                 Log.CloseAndFlush();
             };
         }
@@ -81,6 +82,7 @@ public partial class App : Application
         services.AddSingleton<SettingsService>();
         services.AddSingleton<CacheService>();
         services.AddSingleton<SraService>();
+        services.AddSingleton<RegistryService>();
         services.AddSingleton<ConfigService>();
         services.AddHttpClient("GlobalClient", client =>
         {
@@ -119,7 +121,7 @@ public partial class App : Application
         // 全局未处理异常捕获
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
         {
-            Log.Fatal(args.ExceptionObject as Exception, "应用程序发生未处理的异常，正在终止");
+            Log.Fatal(args.ExceptionObject as Exception, "Unhandled exception occurred");
             Log.CloseAndFlush();
         };
     }

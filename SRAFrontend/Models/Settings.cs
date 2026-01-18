@@ -42,6 +42,8 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private string _smtpServer = "smtp.qq.com"; // SMTP服务器地址
 
     [ObservableProperty] private bool _isAutoDetectGamePath = true; // 是否自动检测游戏安装路径
+    
+    [ObservableProperty] private bool _isAutoSetGameResolution = true; // 是否自动设置游戏分辨率
 
     [ObservableProperty] private string _gamePath = ""; // 游戏安装路径
 
