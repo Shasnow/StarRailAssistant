@@ -21,5 +21,11 @@ public partial class Cache : ObservableObject
     
     public string HotfixVersion { get; set; } =""; // 热更版本号
     
+    public byte[]? UserGameResolution { get; set; } // 用户游戏分辨率设置的二进制数据
+    public int? UserGameResolutionWidth { get; set; } // 用户游戏分辨率宽度
+    public int? UserGameResolutionHeight { get; set; } // 用户游戏分辨率高度
+    public int? UserGameFullscreenMode { get; set; } // 用户游戏全屏模式
     public bool NoNotifyForShortcut { get; set; } // 是否不再提示创建桌面快捷方式
+
+    public bool IsGameResolutionChanged = false; // 游戏分辨率是否已更改
 }

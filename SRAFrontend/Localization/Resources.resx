@@ -270,4 +270,7 @@
     <data name="CurrentConfigText" xml:space="preserve">
         <value>Current configuration</value>
     </data>
+    <data name="AutoResolutionText" xml:space="preserve">
+        <value>Auto Set Game Resolotion</value>
+    </data>
 </root>

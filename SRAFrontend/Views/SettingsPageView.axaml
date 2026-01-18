@@ -64,6 +64,13 @@
                                                        Increment="0.01" Minimum="0"
                                                        Maximum="1" />
                                     </Grid>
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Grid.Column="0" Classes="icon">&#xE7D4;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.AutoResolutionText}"></Label>
+                                        <ToggleSwitch Grid.Column="2"
+                                                      IsChecked="{Binding Settings.IsAutoSetGameResolution}"
+                                                      Command="{Binding SetGameResolutionCommand}"/>
+                                    </Grid>
                                     <!-- 启动/停止 快捷键（任务通用设置） -->
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="icon">&#xE3E4;</Label>

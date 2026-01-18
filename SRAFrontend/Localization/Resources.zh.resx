@@ -263,4 +263,7 @@
     <data name="CurrentConfigText" xml:space="preserve">
         <value>当前配置</value>
     </data>
+    <data name="AutoResolutionText" xml:space="preserve">
+        <value>自动设置游戏分辨率</value>
+    </data>
 </root>
