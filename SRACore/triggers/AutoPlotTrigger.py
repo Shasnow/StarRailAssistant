@@ -26,12 +26,8 @@ class AutoPlotTrigger(BaseTrigger):
         检测是否处于对话状态
         """
         self.operator.sleep(1)
-        return self.operator.locate_any(["resources/img/dialog.png", "resources/img/m.png"],
-                               from_x=0.067,
-                               from_y=0.033,
-                               to_x=0.156,
-                               to_y=0.076,
-                               trace=False)[0] != -1
+        return self.operator.locate_any(["resources/img/dialog.png", "resources/img/m.png"], from_x=0.067, from_y=0.033,
+                                        to_x=0.156, to_y=0.076, trace=False)[0] != -1
 
     def skip_check(self):
         """

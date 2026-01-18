@@ -13,7 +13,7 @@ public partial class Config : ObservableObject
     [ObservableProperty] private bool _afterLogout; // 任务完成后是否登出
     [ObservableProperty] private bool _afterShutdown; // 任务完成后关机
     [ObservableProperty] private bool _afterSleep; // 任务完成后睡眠
-    [ObservableProperty] private bool[] _enabledTasks = [false, false, false, false, false]; // 各任务启用状态
+    [ObservableProperty] private bool[] _enabledTasks = [true, false, false, false, false]; // 各任务启用状态
 
     [ObservableProperty] private string _name = "Default"; // 配置名称，默认为 "Default"
     [ObservableProperty] private string _receiveRewardRedeemCodes = ""; // 兑换码列表

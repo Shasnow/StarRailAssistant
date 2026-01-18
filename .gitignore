@@ -8,6 +8,7 @@
 /setup/output/
 /setup/SRA/
 /setup/install_info.txt
+/main.dist/
 **/__pycache__/
 **/.vs/
 version_info.txt
