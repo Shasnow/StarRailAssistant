@@ -13,8 +13,7 @@ namespace SRAFrontend.Services;
 /// </summary>
 public class RegistryService(
     ILogger<RegistryService> logger,
-    CacheService cacheService,
-    SettingsService settingsService)
+    CacheService cacheService)
 {
     // 注册表键名常量
      private static class RegistryKeys
