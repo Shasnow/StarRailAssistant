@@ -1,7 +1,7 @@
 import psutil
+from pathlib import Path
 
-
-def Popen(arg: str | list[str], shell: bool = False, **kwargs) -> bool:  # NOQA
+def Popen(arg: str | Path | list[str], shell: bool = False, **kwargs) -> bool:  # NOQA
     """
     Launches a process using the specified path.
 

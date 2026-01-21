@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Collections;
+using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Controls;
@@ -208,6 +211,8 @@ public partial class TaskPageViewModel : PageViewModel
     public ControlPanelViewModel ControlPanelViewModel { get; }
 
     public AvaloniaList<TrailblazePowerTask> Tasks { get; }
+    
+    public TopLevel? TopLevelObject { get; set; }
 
     public bool EnableContextMenu => SelectedTaskItem is not null;
 
@@ -222,6 +227,15 @@ public partial class TaskPageViewModel : PageViewModel
     }
 
     public bool IsCwNormalMode => CurrentConfig.CurrencyWarsMode != 2;
+    
+    [RelayCommand]
+    private async Task SelectedPath()
+    {
+        if (TopLevelObject is null) return;
+        var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
+        if (files.Count == 0) return;
+        CurrentConfig.StartGamePath = files[0].Path.LocalPath;
+    }
 
     [RelayCommand]
     private void DeleteSelectedTaskItem()

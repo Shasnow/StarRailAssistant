@@ -65,7 +65,7 @@ class TrailblazePowerTask(BaseTask):
                 self.operator.press_key("esc")
                 return None
             # 过滤加号（兼容全角/空格变体）+ 空字符串
-            exclude_chars = {'+', '十', '＋'}
+            exclude_chars = {'+', '十', '＋', '满'}
             valid_res = [r[1] for r in res if r[1] not in exclude_chars]
             reserve_tbp = int(valid_res[0])
             current_tbp_str = valid_res[1].split('/')[0] if '/' in valid_res[1] else valid_res[1]

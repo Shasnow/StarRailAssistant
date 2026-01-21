@@ -1,6 +1,4 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Interactivity;
-using SRAFrontend.ViewModels;
 
 namespace SRAFrontend.Views.TaskViews;
 

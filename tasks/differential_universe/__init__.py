@@ -145,7 +145,7 @@ class DifferentialUniverse(Executable):
             if not self.operator.wait_img("resources/img/f4.png", timeout=20):
                 logger.error("检测超时，编号1")
                 self.operator.press_key("esc")
-            self.operator.click_point(0.3125, 0.20, after_sleep=0.5)  # 旷宇纷争
+            self.operator.click_img("resources/img/cosmic_strife.png", after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙
             self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
             return True

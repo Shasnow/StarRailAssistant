@@ -17,10 +17,10 @@ public partial class SettingsPageViewModel : PageViewModel
     private readonly CacheService _cacheService;
     private readonly CommonModel _commonModel;
     private readonly AvaloniaList<CustomizableKey> _customizableKeys;
+    private readonly RegistryService _registryService;
 
     private readonly SettingsService _settingsService;
     private readonly UpdateService _updateService;
-    private readonly RegistryService _registryService;
 
     /// <inheritdoc />
     public SettingsPageViewModel(
@@ -29,7 +29,7 @@ public partial class SettingsPageViewModel : PageViewModel
         CacheService cacheService,
         CommonModel commonModel,
         RegistryService registryService
-        ) : base(PageName.Setting,
+    ) : base(PageName.Setting,
         "\uE272")
     {
         _settingsService = settingsService;
@@ -203,7 +203,7 @@ public partial class SettingsPageViewModel : PageViewModel
         if (!Settings.IsAutoDetectGamePath) return;
         Settings.GamePath = _registryService.GetGameInstallPath();
     }
-    
+
     [RelayCommand]
     private void SetGameResolution()
     {
@@ -224,7 +224,7 @@ public partial class SettingsPageViewModel : PageViewModel
     private string _tempKey = ""; // 临时存储原快捷键以防取消
 
     /// <summary>
-    /// 开始监听指定的快捷键
+    ///     开始监听指定的快捷键
     /// </summary>
     private void ListenKeyFor(CustomizableKey customizableKey)
     {
@@ -239,7 +239,7 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     /// <summary>
-    /// 停止监听快捷键, 并根据是否更改决定是否保存新快捷键
+    ///     停止监听快捷键, 并根据是否更改决定是否保存新快捷键
     /// </summary>
     private void ReleaseListening()
     {
@@ -262,6 +262,7 @@ public partial class SettingsPageViewModel : PageViewModel
             ReleaseListening();
             return; // 退出方法，不执行后续修改逻辑
         }
+
         if (_currentListeningKey != null) _currentListeningKey.CurrentKey = e.Key.ToString();
         _isChanged = true;
         ReleaseListening();

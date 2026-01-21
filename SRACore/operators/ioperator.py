@@ -20,6 +20,10 @@ class IOperator(ABC):
         self.settings = load_settings()
         self.confidence = self.settings.get('ConfidenceThreshold', 0.9)
         self.zoom = self.settings.get('Zoom', 1.25)
+        self.top = 0
+        self.left = 0
+        self.width = 0
+        self.height = 0
 
     @classmethod
     def get_ocr_instance(cls):
@@ -337,6 +341,7 @@ class IOperator(ABC):
             trace: bool = True) -> list[Any] | None:
         """执行 OCR 文字识别
 
+        考虑使用 ocr_match 或 ocr_match_any 方法来处理文本匹配和位置获取，而不是直接使用此方法。
         Args:
             region (Region | None, optional): 要识别的区域对象，包含left, top, width, height属性。
                 如果为None，则默认识别当前活动窗口的区域。默认为None。如果传入完整的比例坐标时，region参数会被忽略
@@ -387,6 +392,9 @@ class IOperator(ABC):
                 left, top = result[0][0]
                 width = result[0][2][0] - left
                 height = result[0][2][1] - top
+                if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+                    left += int(self.width * from_x)
+                    top += int(self.height * from_y)
                 return Box(left, top, width, height, source=text)
         if trace:
             logger.debug(f"OCR Result not match text: {text}")
@@ -425,6 +433,9 @@ class IOperator(ABC):
                     left, top = result[0][0]
                     width = result[0][2][0] - left
                     height = result[0][2][1] - top
+                    if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+                        left += int(self.width * from_x)
+                        top += int(self.height * from_y)
                     return index, Box(left, top, width, height, source=text)
         logger.debug(f"OCR Result not match any text: {texts}")
         return -1, None
