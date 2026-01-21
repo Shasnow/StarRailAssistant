@@ -136,6 +136,10 @@ class Operator(IOperator):
                 if trace:
                     logger.trace(f"ImageNotFound: {img_path} -> {e}")
                 continue
+            except ValueError as e:
+                if trace:
+                    logger.trace(f"ImageNotFound: {img_path} -> {e}")
+                continue
             if box is not None:
                 return templates.index(img_path), Box(box.left, box.top, box.width, box.height, source=img_path)
         return -1, None

@@ -43,6 +43,8 @@ public partial class Config : ObservableObject
     [ObservableProperty] private bool _startGameAlwaysLogin; // 游戏启动时是否总是登录
     [ObservableProperty] private bool _startGameAutoLogin; // 启动游戏时是否自动登录
     [ObservableProperty] private int _startGameChannel; // 游戏启动通道
+    [ObservableProperty] private string _startGamePath = ""; // 游戏启动路径
+    [ObservableProperty] private bool _startGameUseGlobalPath = true; // 游戏启动是否使用全局路径
 
     [ObservableProperty] [property: JsonIgnore]
     private string _startGamePassword = ""; // 游戏启动密码

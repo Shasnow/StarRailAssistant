@@ -14,8 +14,8 @@ import os
 class Localization:
     """Automatically generated localization class."""
     __normalized_data: dict[str, str] = None
-    lang: str = "zh-cn"
-    __available_languages = ['zh-cn', 'en-us']
+    lang: str = "en-us"
+    __available_languages = ['en-us', 'zh-cn']
     __data_loaded: bool = False
 
     def __init__(self):
@@ -172,6 +172,13 @@ class Localization:
         return self.get_translation("cli.help.version")
 
     @property
+    def cli_help_notify(self) -> str:
+        """Notification command - support test email notification
+
+        From cli.help.notify"""
+        return self.get_translation("cli.help.notify")
+
+    @property
     def cli_exit_help(self) -> str:
         """Exits the SRA-cli application.
 
@@ -304,12 +311,12 @@ class Localization:
         template = self.get_translation("cli.trigger.attrNotFound")
         return template.format(attr=attr, trigger_name=trigger_name)
 
-    def cli_trigger_attrSet(self, attr, value, trigger_name) -> str:
+    def cli_trigger_attrSet(self, attr, trigger_name, value) -> str:
         """Attribute '{attr}' of trigger '{trigger_name}' has been set to '{value}'.
 
         From cli.trigger.attrSet"""
         template = self.get_translation("cli.trigger.attrSet")
-        return template.format(attr=attr, value=value, trigger_name=trigger_name)
+        return template.format(attr=attr, trigger_name=trigger_name, value=value)
 
     def cli_trigger_unknownType(self, type) -> str:
         """Unknown attribute type: '{type}', supports: 'int', 'float', 'bool', 'str'.
@@ -347,6 +354,13 @@ class Localization:
         return self.get_translation("cli.single.help")
 
     @property
+    def cli_notify_help(self) -> str:
+        """Manages notifications within SRA-cli, type 'help notify' for more information.
+
+        From cli.notify.help"""
+        return self.get_translation("cli.notify.help")
+
+    @property
     def cli_version_help(self) -> str:
         """Displays the current version of SRA-cli.
 
@@ -355,7 +369,7 @@ class Localization:
 
     @property
     def cli_host_help(self) -> str:
-        """Starts a WebSocket server on the specified port for remote control.\n\nUsage: host <port>\n
+        """Starts a WebSocket server on the specified port for remote control.\n\nUsage:\n  host <port>  Starts a WebSocket server on the specified port.\n  host stop    Stops the WebSocket server.\n
 
         From cli.host.help"""
         return self.get_translation("cli.host.help")
@@ -512,12 +526,12 @@ class Localization:
         template = self.get_translation("task.taskFailed")
         return template.format(name=name)
 
-    def task_taskCrashed(self, error, name) -> str:
+    def task_taskCrashed(self, name, error) -> str:
         """Task '{name}' crashed due to an unexpected error: {error}
 
         From task.taskCrashed"""
         template = self.get_translation("task.taskCrashed")
-        return template.format(error=error, name=name)
+        return template.format(name=name, error=error)
 
     def task_taskCompleted(self, name) -> str:
         """Task '{name}' has been completed.
@@ -547,12 +561,12 @@ class Localization:
         From task.notificationMessage"""
         return self.get_translation("task.notificationMessage")
 
-    def task_instantiateFailed(self, error, name) -> str:
+    def task_instantiateFailed(self, name, error) -> str:
         """Failed to instantiate task '{name}': {error}
 
         From task.instantiateFailed"""
         template = self.get_translation("task.instantiateFailed")
-        return template.format(error=error, name=name)
+        return template.format(name=name, error=error)
 
     def task_noSuchTask(self, identifier) -> str:
         """No such task: '{identifier}'
@@ -575,18 +589,18 @@ class Localization:
         template = self.get_translation("config.fileNotFound")
         return template.format(path=path)
 
-    def config_parseError(self, error, path) -> str:
+    def config_parseError(self, path, error) -> str:
         """Failed to parse config file '{path}': {error}
 
         From config.parseError"""
         template = self.get_translation("config.parseError")
-        return template.format(error=error, path=path)
+        return template.format(path=path, error=error)
 
-    def config_exception(self, error, path) -> str:
+    def config_exception(self, path, error) -> str:
         """An error occurred while loading config file '{path}': {error}
 
         From config.exception"""
         template = self.get_translation("config.exception")
-        return template.format(error=error, path=path)
+        return template.format(path=path, error=error)
 
 Resource = Localization()

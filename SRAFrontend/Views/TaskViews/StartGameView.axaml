@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
              xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SRAFrontend.Views.TaskViews.StartGameView"
              x:DataType="viewModels:TaskPageViewModel">
@@ -19,10 +20,28 @@
                         <ComboBox Grid.Column="1" SelectedIndex="{Binding CurrentConfig.StartGameChannel}">
                             <ComboBoxItem>官服</ComboBoxItem>
                             <ComboBoxItem>b服</ComboBoxItem>
+                            <ComboBoxItem>国际服</ComboBoxItem>
                         </ComboBox>
                     </Grid>
+                    
+                    <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto" ColumnSpacing="12">
+                        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                            <Label Content="{x:Static lang:Resources.GamePathText}"/>
+                            <ToggleSwitch OnContent="使用全局设置"
+                                          IsChecked="{Binding CurrentConfig.StartGameUseGlobalPath}"/>
+                        </StackPanel>
+                        <TextBox Grid.Row="1" Grid.Column="0" x:Name="PathTextBox"
+                                 Text="{Binding CurrentConfig.StartGamePath}"
+                                 IsEnabled="{Binding !CurrentConfig.StartGameUseGlobalPath}"/>
+                        <Button Grid.Row="1" Grid.Column="1"
+                                Classes="Icon"
+                                FontFamily="{StaticResource Phosphor}"
+                                Content="&#xE256;"
+                                Command="{Binding SelectedPathCommand}"
+                                IsEnabled="{Binding !CurrentConfig.StartGameUseGlobalPath}"/>
+                    </Grid>
 
-                    <StackPanel Margin="0,0,0,15">
+                    <StackPanel Margin="0,15,0,15">
                         <CheckBox x:Name="AutoLoginCheckBox" Content="自动登录" IsChecked="{Binding CurrentConfig.StartGameAutoLogin}" />
                         <TextBlock Margin="25,5,0,0" FontSize="12" Foreground="Gray" TextWrapping="Wrap">
                             勾选自动登录表明您已阅读并同意《用户协议》和《隐私政策》

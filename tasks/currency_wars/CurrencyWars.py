@@ -107,7 +107,7 @@ class CurrencyWars(Executable):
             if not self.operator.wait_img(IMG.F4, timeout=20):
                 logger.error("检测超时，编号1")
                 self.operator.press_key("esc")
-            self.operator.click_point(0.3125, 0.20, after_sleep=0.8)  # 旷宇纷争
+            self.operator.click_img("resources/img/cosmic_strife.png", after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.30, after_sleep=0.8)  # 货币战争
             self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
             return 1
