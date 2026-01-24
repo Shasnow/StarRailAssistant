@@ -64,8 +64,19 @@ class Operator(IOperator):
         # 当窗口较小或对齐后为 0 时，回退到原始尺寸以避免截屏高度为 0
         self.width = aligned_width if aligned_width > 0 else width
         self.height = aligned_height if aligned_height > 0 else height
-        self.top = (top + int(30 * self.zoom)) if top != 0 else top
-        self.left = (left + int(8 * self.zoom)) if left != 0 else left
+
+        # 根据无边框窗口配置决定是否应用边框偏移
+        popup_window = self.settings.get('LaunchArgumentsPopupWindow', False)
+
+        if popup_window:
+            # 无边框窗口：不需要偏移
+            self.top = top
+            self.left = left
+        else:
+            # 有边框窗口：应用标题栏和边框偏移
+            self.top = (top + int(30 * self.zoom)) if top != 0 else top
+            self.left = (left + int(8 * self.zoom)) if left != 0 else left
+
         return Region(self.left, self.top, self.width, self.height)
 
     def screenshot_in_region(self, region: Region | None = None):
