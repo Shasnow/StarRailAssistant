@@ -127,13 +127,8 @@ public class RegistryService(
             var height = int.Parse(screenSize[1]);
 
             // 显示模式转换
-            // "窗口化" -> 3, "全屏窗口" -> 1, "独占全屏" -> 0
-            var fullscreenMode = settingsService.Settings.LaunchArgumentsFullScreenMode switch
-            {
-                "独占全屏" => 0,
-                "全屏窗口" => 1,
-                _ => 3
-            };
+            // "窗口化" -> 3, "全屏" -> 1
+            var fullscreenMode = settingsService.Settings.LaunchArgumentsFullScreenMode == "全屏" ? 1 : 3;
             var isFullScreen = fullscreenMode != 3;
 
             // 写入目标分辨率配置
