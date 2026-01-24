@@ -87,8 +87,15 @@ class StartGameTask(BaseTask):
         if advanced_args:
             launch_args.extend(advanced_args.split())
 
-        # 启动游戏
-        sys_util.Popen([str(path)] + launch_args)
+        # 根据配置选择启动方式
+        use_cmd = self.settings.get('LaunchWithCmd', False)
+        if use_cmd:
+            logger.info("使用 CMD 启动游戏")
+            import subprocess
+            cmd = f'start "" "{path}" {" ".join(launch_args)}'
+            subprocess.Popen(cmd, shell=True)
+        else:
+            sys_util.Popen([str(path)] + launch_args)
 
     @staticmethod
     def change_config_ini(path: Path, channel, sub_channel):

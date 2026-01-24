@@ -53,6 +53,7 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private string _launchArgumentsFullScreenMode = "窗口化"; // 显示模式 (窗口化/全屏)
     [ObservableProperty] private bool _launchArgumentsPopupWindow = false; // 是否无边框窗口
     [ObservableProperty] private string _launchArgumentsAdvanced = ""; // 高级参数
+    [ObservableProperty] private bool _launchWithCmd = false; // 使用 CMD 启动游戏
 
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
     [JsonPropertyName("EmailAuthCode")] public string EncryptedEmailAuthCode { get; set; } = "";
