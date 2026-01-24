@@ -77,8 +77,17 @@ class StartGameTask(BaseTask):
             logger.error("未设置游戏启动路径")
             raise RuntimeError("未设置游戏启动路径")
 
+        # 构建启动参数
+        launch_args = []
+        if self.settings.get('LaunchArgumentsPopupWindow', False):
+            launch_args.append('-popupwindow')
+
+        # 添加高级参数
+        advanced_args = self.settings.get('LaunchArgumentsAdvanced', '').strip()
+        if advanced_args:
+            launch_args.extend(advanced_args.split())
+
         # 启动游戏
-        launch_args = ['-popupwindow'] if self.settings.get('LaunchArgumentsPopupWindow', False) else []
         sys_util.Popen([str(path)] + launch_args)
 
     @staticmethod

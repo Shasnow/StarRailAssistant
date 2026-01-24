@@ -118,6 +118,16 @@
                                             <ToggleSwitch Grid.Column="2"
                                                           IsChecked="{Binding Settings.LaunchArgumentsPopupWindow}" />
                                         </Grid>
+
+                                        <!-- 高级参数 -->
+                                        <Grid ColumnDefinitions="Auto, *, Auto">
+                                            <Label Classes="icon">&#xE77E;</Label>
+                                            <Label Grid.Column="1" Content="高级参数" />
+                                            <TextBox Grid.Column="2"
+                                                     MinWidth="300"
+                                                     Watermark="如果你不知道这是做什么的 请不要填写"
+                                                     Text="{Binding Settings.LaunchArgumentsAdvanced}" />
+                                        </Grid>
                                     </StackPanel>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
