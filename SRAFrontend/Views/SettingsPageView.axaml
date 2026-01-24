@@ -129,6 +129,14 @@
                                                      Text="{Binding Settings.LaunchArgumentsAdvanced}" />
                                         </Grid>
                                     </StackPanel>
+
+                                    <!-- 使用 CMD 启动游戏（不受启用开关影响） -->
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="icon">&#xE272;</Label>
+                                        <Label Grid.Column="1" Content="使用 CMD 启动游戏" />
+                                        <ToggleSwitch Grid.Column="2"
+                                                      IsChecked="{Binding Settings.LaunchWithCmd}" />
+                                    </Grid>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
                         </suki:SettingsLayoutItem>
