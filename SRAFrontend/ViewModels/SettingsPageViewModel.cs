@@ -94,6 +94,16 @@ public partial class SettingsPageViewModel : PageViewModel
 
         DetectGamePath();
         SetGameResolution();
+
+        // 监听启动参数变化，自动更新注册表
+        _settingsService.Settings.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(Settings.LaunchArgumentsScreenSize)
+                or nameof(Settings.LaunchArgumentsFullScreenMode))
+            {
+                SetGameResolution();
+            }
+        };
     }
 
     public IAvaloniaReadOnlyList<CustomizableKey> CustomizableKeys => _customizableKeys;
@@ -207,7 +217,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void SetGameResolution()
     {
-        if (!Settings.IsAutoSetGameResolution) return;
+        if (!Settings.LaunchArgumentsEnabled) return;
         _registryService.SetTargetPcResolution();
     }
 
