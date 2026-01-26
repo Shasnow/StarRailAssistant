@@ -13,7 +13,8 @@ namespace SRAFrontend.Services;
 /// </summary>
 public class RegistryService(
     ILogger<RegistryService> logger,
-    CacheService cacheService)
+    CacheService cacheService,
+    SettingsService settingsService)
 {
     // 注册表键名常量
      private static class RegistryKeys
@@ -35,10 +36,6 @@ public class RegistryService(
     // 提示文本常量
     private const string CanNotDetectGamePath = "无法自动检测游戏路径";
     private const string RegistryKeyAccessDenied = "注册表访问被拒绝（请以管理员身份运行）";
-    private const string TargetPcResolutionJson = "{\"width\":1920,\"height\":1080,\"isFullScreen\":false}\0";
-    private readonly byte[] _binaryTargetPcResolution = Encoding.ASCII.GetBytes(TargetPcResolutionJson);
-    // 目标分辨率配置
-    private readonly (int Width, int Height, int FullscreenMode) _targetResolution = (1920, 1080, 3);
 
     /// <summary>
     ///     获取星穹铁道游戏安装路径（自动适配多注册表路径）
@@ -123,18 +120,32 @@ public class RegistryService(
             }
             // 备份原有分辨率配置到缓存
             BackupCurrentResolution(gameResolutionKey);
+
+            // 从配置读取目标分辨率
+            var screenSize = settingsService.Settings.LaunchArgumentsScreenSize.Split('x');
+            var width = int.Parse(screenSize[0]);
+            var height = int.Parse(screenSize[1]);
+
+            // 显示模式转换
+            // "窗口化" -> 3, "全屏" -> 1
+            var fullscreenMode = settingsService.Settings.LaunchArgumentsFullScreenMode == "全屏" ? 1 : 3;
+            var isFullScreen = fullscreenMode != 3;
+
             // 写入目标分辨率配置
             logger.LogInformation(
-                "Start setting target resolution: Width={Width}, Height={Height}, FullscreenMode={Mode}",
-                _targetResolution.Width, _targetResolution.Height, _targetResolution.FullscreenMode);
+                "Start setting target resolution: Width={Width}, Height={Height}, FullscreenMode={Mode}, IsFullScreen={IsFullScreen}",
+                width, height, fullscreenMode, isFullScreen);
 
-            gameResolutionKey.SetValue(RegistryKeys.GraphicsSettingsPcResolution, _binaryTargetPcResolution,
+            var targetPcResolutionJson = $"{{\"width\":{width},\"height\":{height},\"isFullScreen\":{isFullScreen.ToString().ToLower()}}}\0";
+            var binaryTargetPcResolution = Encoding.ASCII.GetBytes(targetPcResolutionJson);
+
+            gameResolutionKey.SetValue(RegistryKeys.GraphicsSettingsPcResolution, binaryTargetPcResolution,
                 RegistryValueKind.Binary);
-            gameResolutionKey.SetValue(RegistryKeys.ScreenManagerResolutionWidth, _targetResolution.Width,
+            gameResolutionKey.SetValue(RegistryKeys.ScreenManagerResolutionWidth, width,
                 RegistryValueKind.DWord);
-            gameResolutionKey.SetValue(RegistryKeys.ScreenManagerResolutionHeight, _targetResolution.Height,
+            gameResolutionKey.SetValue(RegistryKeys.ScreenManagerResolutionHeight, height,
                 RegistryValueKind.DWord);
-            gameResolutionKey.SetValue(RegistryKeys.ScreenManagerFullscreenMode, _targetResolution.FullscreenMode,
+            gameResolutionKey.SetValue(RegistryKeys.ScreenManagerFullscreenMode, fullscreenMode,
                 RegistryValueKind.DWord);
 
             logger.LogInformation("Target resolution set successfully");
@@ -249,5 +260,5 @@ public class RegistryService(
         }
     }
 
-    
+
 }

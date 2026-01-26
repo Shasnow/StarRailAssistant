@@ -42,12 +42,19 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private string _smtpServer = "smtp.qq.com"; // SMTP服务器地址
 
     [ObservableProperty] private bool _isAutoDetectGamePath = true; // 是否自动检测游戏安装路径
-    
-    [ObservableProperty] private bool _isAutoSetGameResolution = true; // 是否自动设置游戏分辨率
 
     [ObservableProperty] private string _gamePath = ""; // 游戏安装路径
 
     [ObservableProperty] private double _zoom = 1; // 屏幕缩放比例
+
+    // 启动参数配置
+    [ObservableProperty] private bool _launchArgumentsEnabled = true; // 是否启用启动参数
+    [ObservableProperty] private string _launchArgumentsScreenSize = "1920x1080"; // 窗口尺寸
+    [ObservableProperty] private string _launchArgumentsFullScreenMode = "窗口化"; // 显示模式 (窗口化/全屏)
+    [ObservableProperty] private bool _launchArgumentsPopupWindow = false; // 是否无边框窗口
+    [ObservableProperty] private string _launchArgumentsAdvanced = ""; // 高级参数
+    [ObservableProperty] private bool _launchWithCmd = false; // 使用 CMD 启动游戏
+
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
     [JsonPropertyName("EmailAuthCode")] public string EncryptedEmailAuthCode { get; set; } = "";
     public const string Version = "2.5.2"; // 应用版本号

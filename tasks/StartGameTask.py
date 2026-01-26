@@ -76,7 +76,26 @@ class StartGameTask(BaseTask):
         if not path or path == "":
             logger.error("未设置游戏启动路径")
             raise RuntimeError("未设置游戏启动路径")
-        sys_util.Popen(path, cwd=path.parent)
+
+        # 构建启动参数
+        launch_args = []
+        if self.settings.get('LaunchArgumentsPopupWindow', False):
+            launch_args.append('-popupwindow')
+
+        # 添加高级参数
+        advanced_args = self.settings.get('LaunchArgumentsAdvanced', '').strip()
+        if advanced_args:
+            launch_args.extend(advanced_args.split())
+
+        # 根据配置选择启动方式
+        use_cmd = self.settings.get('LaunchWithCmd', False)
+        if use_cmd:
+            logger.info("使用 CMD 启动游戏")
+            import subprocess
+            cmd = f'start "" "{path}" {" ".join(launch_args)}'
+            subprocess.Popen(cmd, shell=True)
+        else:
+            sys_util.Popen([str(path)] + launch_args)
 
     @staticmethod
     def change_config_ini(path: Path, channel, sub_channel):
