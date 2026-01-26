@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
              xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              xmlns:lang="clr-namespace:SRAFrontend.Localization"
              xmlns:models="clr-namespace:SRAFrontend.Models"
@@ -64,13 +65,6 @@
                                                        Increment="0.01" Minimum="0"
                                                        Maximum="1" />
                                     </Grid>
-                                    <Grid ColumnDefinitions="Auto, *, Auto">
-                                        <Label Grid.Column="0" Classes="icon">&#xE7D4;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.AutoResolutionText}"></Label>
-                                        <ToggleSwitch Grid.Column="2"
-                                                      IsChecked="{Binding Settings.IsAutoSetGameResolution}"
-                                                      Command="{Binding SetGameResolutionCommand}"/>
-                                    </Grid>
                                     <!-- 启动/停止 快捷键（任务通用设置） -->
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="icon">&#xE3E4;</Label>
@@ -78,6 +72,70 @@
                                         <Button Grid.Column="2" MinWidth="100"
                                                 Content="{Binding StartStopKey.CurrentKey}"
                                                 Command="{Binding StartStopKey.ModifyKeyCommand}" />
+                                    </Grid>
+                                </StackPanel>
+                            </suki:SettingsLayoutItem.Content>
+                        </suki:SettingsLayoutItem>
+                        <!-- 启动参数设置 -->
+                        <suki:SettingsLayoutItem Header="启动参数">
+                            <suki:SettingsLayoutItem.Content>
+                                <StackPanel>
+                                    <!-- 启用开关 -->
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="icon">&#xE5CA;</Label>
+                                        <Label Grid.Column="1" Content="启用启动参数" />
+                                        <ToggleSwitch Grid.Column="2"
+                                                      IsChecked="{Binding Settings.LaunchArgumentsEnabled}" />
+                                    </Grid>
+
+                                    <!-- 以下控件仅在启用时显示 -->
+                                    <StackPanel IsVisible="{Binding Settings.LaunchArgumentsEnabled}">
+                                        <!-- 窗口尺寸 -->
+                                        <Grid ColumnDefinitions="Auto, *, Auto">
+                                            <Label Classes="icon">&#xE310;</Label>
+                                            <Label Grid.Column="1" Content="窗口尺寸" />
+                                            <ComboBox Grid.Column="2"
+                                                      SelectedItem="{Binding Settings.LaunchArgumentsScreenSize}">
+                                                <system:String>1920x1080</system:String>
+                                            </ComboBox>
+                                        </Grid>
+
+                                        <!-- 显示模式 -->
+                                        <Grid ColumnDefinitions="Auto, *, Auto">
+                                            <Label Classes="icon">&#xE7F4;</Label>
+                                            <Label Grid.Column="1" Content="显示模式" />
+                                            <ComboBox Grid.Column="2"
+                                                      SelectedItem="{Binding Settings.LaunchArgumentsFullScreenMode}">
+                                                <system:String>窗口化</system:String>
+                                                <system:String>全屏</system:String>
+                                            </ComboBox>
+                                        </Grid>
+
+                                        <!-- 无边框窗口 -->
+                                        <Grid ColumnDefinitions="Auto, *, Auto">
+                                            <Label Classes="icon">&#xE2B4;</Label>
+                                            <Label Grid.Column="1" Content="无边框窗口" />
+                                            <ToggleSwitch Grid.Column="2"
+                                                          IsChecked="{Binding Settings.LaunchArgumentsPopupWindow}" />
+                                        </Grid>
+
+                                        <!-- 高级参数 -->
+                                        <Grid ColumnDefinitions="Auto, *, Auto">
+                                            <Label Classes="icon">&#xE77E;</Label>
+                                            <Label Grid.Column="1" Content="高级参数" />
+                                            <TextBox Grid.Column="2"
+                                                     MinWidth="300"
+                                                     Watermark="如果你不知道这是做什么的 请不要填写"
+                                                     Text="{Binding Settings.LaunchArgumentsAdvanced}" />
+                                        </Grid>
+                                    </StackPanel>
+
+                                    <!-- 使用 CMD 启动游戏（不受启用开关影响） -->
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="icon">&#xE272;</Label>
+                                        <Label Grid.Column="1" Content="使用 CMD 启动游戏" />
+                                        <ToggleSwitch Grid.Column="2"
+                                                      IsChecked="{Binding Settings.LaunchWithCmd}" />
                                     </Grid>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
