@@ -30,21 +30,22 @@
                                 <StackPanel>
                                     <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto">
                                         <Label Classes="icon">&#xe40c;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.GamePathText}"/>
-                                        <ToggleSwitch OnContent="{x:Static lang:Resources.AutoDetectText}" Grid.Column="2"
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.GamePathText}" />
+                                        <ToggleSwitch OnContent="{x:Static lang:Resources.AutoDetectText}"
+                                                      Grid.Column="2"
                                                       IsChecked="{Binding Settings.IsAutoDetectGamePath}"
                                                       Command="{Binding DetectGamePathCommand}"
                                                       Width="120"
-                                                      ToolTip.Tip="开启以自动检测电脑中的游戏"/>
+                                                      ToolTip.Tip="开启以自动检测电脑中的游戏" />
                                         <TextBox Grid.Column="3" Text="{Binding Settings.GamePath}"
                                                  IsEnabled="{Binding !Settings.IsAutoDetectGamePath}"
-                                                 ToolTip.Tip="当使用自动检测时，无法手动修改"/>
+                                                 ToolTip.Tip="当使用自动检测时，无法手动修改" />
                                         <Button Grid.Column="4" Classes="Icon"
                                                 FontFamily="{StaticResource Phosphor}"
                                                 Content="&#xE256;"
                                                 Command="{Binding SelectedPathCommand}"
                                                 IsVisible="{Binding !Settings.IsAutoDetectGamePath}"
-                                                ToolTip.Tip="浏览并选择文件"/>
+                                                ToolTip.Tip="浏览并选择文件" />
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto, *, Auto">
@@ -73,101 +74,99 @@
                                                 Content="{Binding StartStopKey.CurrentKey}"
                                                 Command="{Binding StartStopKey.ModifyKeyCommand}" />
                                     </Grid>
-                                </StackPanel>
-                            </suki:SettingsLayoutItem.Content>
-                        </suki:SettingsLayoutItem>
-                        <!-- 启动参数设置 -->
-                        <suki:SettingsLayoutItem Header="启动参数">
-                            <suki:SettingsLayoutItem.Content>
-                                <StackPanel>
-                                    <!-- 启用开关 -->
-                                    <Grid ColumnDefinitions="Auto, *, Auto">
-                                        <Label Classes="icon">&#xE5CA;</Label>
-                                        <Label Grid.Column="1" Content="启用启动参数" />
-                                        <ToggleSwitch Grid.Column="2"
-                                                      IsChecked="{Binding Settings.LaunchArgumentsEnabled}" />
-                                    </Grid>
 
-                                    <!-- 以下控件仅在启用时显示 -->
-                                    <StackPanel IsVisible="{Binding Settings.LaunchArgumentsEnabled}">
-                                        <!-- 窗口尺寸 -->
-                                        <Grid ColumnDefinitions="Auto, *, Auto">
-                                            <Label Classes="icon">&#xE310;</Label>
-                                            <Label Grid.Column="1" Content="窗口尺寸" />
-                                            <ComboBox Grid.Column="2"
-                                                      SelectedItem="{Binding Settings.LaunchArgumentsScreenSize}">
-                                                <system:String>1920x1080</system:String>
-                                            </ComboBox>
-                                        </Grid>
+                                    <Expander Header="游戏启动参数" IsExpanded="True">
+                                        <StackPanel>
+                                            <!-- 启用开关 -->
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="icon">&#xE47E;</Label>
+                                                <Label Grid.Column="1" Content="启用启动参数" />
+                                                <ToggleSwitch Grid.Column="2"
+                                                              IsChecked="{Binding Settings.LaunchArgumentsEnabled}" />
+                                            </Grid>
 
-                                        <!-- 显示模式 -->
-                                        <Grid ColumnDefinitions="Auto, *, Auto">
-                                            <Label Classes="icon">&#xE7F4;</Label>
-                                            <Label Grid.Column="1" Content="显示模式" />
-                                            <ComboBox Grid.Column="2"
-                                                      SelectedItem="{Binding Settings.LaunchArgumentsFullScreenMode}">
-                                                <system:String>窗口化</system:String>
-                                                <system:String>全屏</system:String>
-                                            </ComboBox>
-                                        </Grid>
-
-                                        <!-- 无边框窗口 -->
-                                        <Grid ColumnDefinitions="Auto, *, Auto">
-                                            <Label Classes="icon">&#xE2B4;</Label>
-                                            <Label Grid.Column="1" Content="无边框窗口" />
-                                            <ToggleSwitch Grid.Column="2"
-                                                          IsChecked="{Binding Settings.LaunchArgumentsPopupWindow}" />
-                                        </Grid>
-
-                                        <!-- 高级参数 -->
-                                        <Grid ColumnDefinitions="Auto, *, Auto">
-                                            <Label Classes="icon">&#xE77E;</Label>
-                                            <Label Grid.Column="1" Content="高级参数" />
-                                            <TextBox Grid.Column="2"
-                                                     MinWidth="300"
-                                                     Watermark="如果你不知道这是做什么的 请不要填写"
-                                                     Text="{Binding Settings.LaunchArgumentsAdvanced}" />
-                                        </Grid>
-                                    </StackPanel>
-
-                                    <!-- 使用 CMD 启动游戏（不受启用开关影响） -->
-                                    <Grid ColumnDefinitions="Auto, *, Auto">
-                                        <Label Classes="icon">&#xE272;</Label>
-                                        <Label Grid.Column="1" Content="使用 CMD 启动游戏" />
-                                        <ToggleSwitch Grid.Column="2"
-                                                      IsChecked="{Binding Settings.LaunchWithCmd}" />
-                                    </Grid>
-                                </StackPanel>
-                            </suki:SettingsLayoutItem.Content>
-                        </suki:SettingsLayoutItem>
-                        <!-- 新增快捷键设置分组，插入在 任务通用设置 与 显示 之间 -->
-                        <suki:SettingsLayoutItem Header="{x:Static lang:Resources.HotkeysText}">
-                            <suki:SettingsLayoutItem.Content>
-                                <StackPanel>
-                                    <TextBlock Text="{x:Static lang:Resources.ModifyHoldText}" FontStyle="Italic"
-                                               Margin="0,0,0,8" />
-                                    <ItemsControl ItemsSource="{Binding CustomizableKeys}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate x:DataType="models:CustomizableKey">
-                                                <Grid ColumnDefinitions="Auto, *, Auto, Auto" Margin="0,0,0,4">
-                                                    <Label Grid.Column="0" Classes="icon"
-                                                           Content="{Binding IconText}" />
-                                                    <Label Grid.Column="1" Content="{Binding DisplayText}" />
-                                                    <Button Grid.Column="2" MinWidth="100"
-                                                            Content="{Binding CurrentKey}"
-                                                            Command="{Binding ModifyKeyCommand}"/>
-                                                    <Button Grid.Column="3"
-                                                            Classes="Icon"
-                                                            FontFamily="{StaticResource Phosphor}"
-                                                            Content="&#xE036;"
-                                                            Command="{Binding ResetToDefaultCommand}"/>
+                                            <!-- 以下控件仅在启用时显示 -->
+                                            <StackPanel IsVisible="{Binding Settings.LaunchArgumentsEnabled}">
+                                                <!-- 窗口尺寸 -->
+                                                <Grid ColumnDefinitions="Auto, *, Auto">
+                                                    <Label Classes="icon">&#xED6E;</Label>
+                                                    <Label Grid.Column="1" Content="窗口尺寸" />
+                                                    <ComboBox Grid.Column="2"
+                                                              SelectedItem="{Binding Settings.LaunchArgumentsScreenSize}">
+                                                        <system:String>1920x1080</system:String>
+                                                    </ComboBox>
                                                 </Grid>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
+
+                                                <!-- 显示模式 -->
+                                                <Grid ColumnDefinitions="Auto, *, Auto">
+                                                    <Label Classes="icon">&#xE626;</Label>
+                                                    <Label Grid.Column="1" Content="显示模式" />
+                                                    <ComboBox Grid.Column="2"
+                                                              SelectedItem="{Binding Settings.LaunchArgumentsFullScreenMode}">
+                                                        <system:String>窗口化</system:String>
+                                                        <system:String>全屏</system:String>
+                                                    </ComboBox>
+                                                </Grid>
+
+                                                <!-- 无边框窗口 -->
+                                                <Grid ColumnDefinitions="Auto, *, Auto">
+                                                    <Label Classes="icon">&#xE5DA;</Label>
+                                                    <Label Grid.Column="1" Content="无边框窗口" />
+                                                    <ToggleSwitch Grid.Column="2"
+                                                                  IsChecked="{Binding Settings.LaunchArgumentsPopupWindow}" />
+                                                </Grid>
+
+                                                <!-- 高级参数 -->
+                                                <Grid ColumnDefinitions="Auto, *, Auto">
+                                                    <Label Classes="icon">&#xE12C;</Label>
+                                                    <Label Grid.Column="1" Content="高级参数" />
+                                                    <TextBox Grid.Column="2"
+                                                             MinWidth="300"
+                                                             Watermark="如果你不知道这是做什么的 请不要填写"
+                                                             Text="{Binding Settings.LaunchArgumentsAdvanced}" />
+                                                </Grid>
+                                            </StackPanel>
+
+                                            <!-- 使用 CMD 启动游戏（不受启用开关影响） -->
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="icon">&#xE272;</Label>
+                                                <Label Grid.Column="1" Content="使用 CMD 启动游戏" />
+                                                <ToggleSwitch Grid.Column="2"
+                                                              IsChecked="{Binding Settings.LaunchWithCmd}" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Expander>
+
+                                    <Expander Header="{x:Static lang:Resources.HotkeysText}">
+                                        <StackPanel>
+                                            <TextBlock Text="{x:Static lang:Resources.ModifyHoldText}"
+                                                       FontStyle="Italic"
+                                                       Margin="0,0,0,8" />
+                                            <ItemsControl ItemsSource="{Binding CustomizableKeys}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="models:CustomizableKey">
+                                                        <Grid ColumnDefinitions="Auto, *, Auto, Auto" Margin="0,0,0,4">
+                                                            <Label Grid.Column="0" Classes="icon"
+                                                                   Content="{Binding IconText}" />
+                                                            <Label Grid.Column="1" Content="{Binding DisplayText}" />
+                                                            <Button Grid.Column="2" MinWidth="100"
+                                                                    Content="{Binding CurrentKey}"
+                                                                    Command="{Binding ModifyKeyCommand}" />
+                                                            <Button Grid.Column="3"
+                                                                    Classes="Icon"
+                                                                    FontFamily="{StaticResource Phosphor}"
+                                                                    Content="&#xE036;"
+                                                                    Command="{Binding ResetToDefaultCommand}" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Expander>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
                         </suki:SettingsLayoutItem>
+
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.DisplayText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
@@ -256,23 +255,28 @@
                                             </Grid>
                                             <Expander Header="{x:Static lang:Resources.SmtpSettingsText}">
                                                 <Grid RowDefinitions="Auto,*,*,*,*" ColumnDefinitions="*,*">
-                                                    <Label Grid.Row="0" Grid.Column="0" Content="{x:Static lang:Resources.SmtpServerText}" />
+                                                    <Label Grid.Row="0" Grid.Column="0"
+                                                           Content="{x:Static lang:Resources.SmtpServerText}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding Settings.SmtpServer}"
                                                              Watermark="smtp.qq.com" />
-                                                    <Label Grid.Row="1" Grid.Column="0" Content="{x:Static lang:Resources.SmtpPortText}" />
+                                                    <Label Grid.Row="1" Grid.Column="0"
+                                                           Content="{x:Static lang:Resources.SmtpPortText}" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
                                                              Text="{Binding Settings.SmtpPort}"
                                                              Watermark="465" />
-                                                    <Label Grid.Row="2" Grid.Column="0" Content="{x:Static lang:Resources.SenderEmailAddrText}" />
+                                                    <Label Grid.Row="2" Grid.Column="0"
+                                                           Content="{x:Static lang:Resources.SenderEmailAddrText}" />
                                                     <TextBox Grid.Row="2" Grid.Column="1"
                                                              Text="{Binding Settings.EmailSender}"
                                                              Watermark="123456@qq.com" />
-                                                    <Label Grid.Row="3" Grid.Column="0" Content="{x:Static lang:Resources.AuthorCodeText}" />
+                                                    <Label Grid.Row="3" Grid.Column="0"
+                                                           Content="{x:Static lang:Resources.AuthorCodeText}" />
                                                     <TextBox Grid.Row="3" Grid.Column="1"
                                                              Text="{Binding Settings.EmailAuthCode}"
                                                              Watermark="123456" />
-                                                    <Label Grid.Row="4" Grid.Column="0" Content="{x:Static lang:Resources.ReceiverEmailAddrText}" />
+                                                    <Label Grid.Row="4" Grid.Column="0"
+                                                           Content="{x:Static lang:Resources.ReceiverEmailAddrText}" />
                                                     <TextBox Grid.Row="4" Grid.Column="1"
                                                              Text="{Binding Settings.EmailReceiver}"
                                                              Watermark="123456@qq.com" />
@@ -307,7 +311,7 @@
                                     <!-- </Grid> -->
                                     <Button Content="{x:Static lang:Resources.CreateShortcutText}"
                                             HorizontalAlignment="Left"
-                                            Command="{Binding CreateDesktopShortcutCommand}"/>
+                                            Command="{Binding CreateDesktopShortcutCommand}" />
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
                         </suki:SettingsLayoutItem>
@@ -371,16 +375,16 @@
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <Button Content="{x:Static lang:Resources.BeLogsFolderText}"
                                                 Command="{Binding OpenFolderCommand}"
-                                                CommandParameter="backendLogs"/>
+                                                CommandParameter="backendLogs" />
                                         <Button Content="{x:Static lang:Resources.FeLogsFolder}"
                                                 Command="{Binding OpenFolderCommand}"
-                                                CommandParameter="frontendLogs"/>
+                                                CommandParameter="frontendLogs" />
                                         <Button Content="{x:Static lang:Resources.ConfigsFolder}"
                                                 Command="{Binding OpenFolderCommand}"
-                                                CommandParameter="configs"/>
+                                                CommandParameter="configs" />
                                         <Button Content="{x:Static lang:Resources.AppDataFolder}"
                                                 Command="{Binding OpenFolderCommand}"
-                                                CommandParameter="appdata"/>
+                                                CommandParameter="appdata" />
                                     </StackPanel>
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="icon">&#xe184;</Label>
