@@ -7,6 +7,7 @@ from SRACore.util.logger import logger
 class TrailblazePowerTask(BaseTask):
     def _post_init(self):
         self.name_task_map = {
+            "培养目标": self.character_training,
             "饰品提取": self.ornament_extraction,
             "拟造花萼（金）": self.calyx_golden,
             "拟造花萼（赤）": self.calyx_crimson,
@@ -15,6 +16,7 @@ class TrailblazePowerTask(BaseTask):
             "历战余响": self.echo_of_war
         }
         self.task_cost_map = {
+            "培养目标": 40,
             "饰品提取": 40,
             "拟造花萼（金）": 10,
             "拟造花萼（赤）": 10,
@@ -23,6 +25,7 @@ class TrailblazePowerTask(BaseTask):
             "历战余响": 30
         }
         self.task_max_count_map = {
+            "培养目标": 6,
             "饰品提取": 6,
             "拟造花萼（金）": 24,
             "拟造花萼（赤）": 24,
@@ -146,6 +149,42 @@ class TrailblazePowerTask(BaseTask):
                 if self.stop_flag:
                     return False
                 task(**kwargs)
+        return True
+
+    def character_training(self, level=0, single_time=1, run_time=1, **_) -> bool:
+        """培养目标：直接刷第一个推荐的副本"""
+        logger.info("执行任务：培养目标")
+
+        if not self.goto_survival_index():
+            return False
+
+        # 点击培养目标分类
+        name1 = "resources/img/character_training.png"
+        name2 = "resources/img/character_training_onclick.png"
+        self.operator.sleep(0.5)
+        _, result = self.operator.locate_any([name1, name2])
+        if result:
+            self.operator.click_box(result)
+        else:
+            logger.error("未找到培养目标分类")
+            self.operator.press_key("esc")
+            return False
+
+        self.operator.sleep(1)
+
+        # 直接点击第一个进入按钮
+        enter_result = self.operator.ocr_match("进入", from_x=0.5, from_y=0.2, to_x=1.0, to_y=0.8)
+        if enter_result:
+            self.operator.click_box(enter_result)
+        else:
+            logger.warning("未找到进入按钮，请先在游戏中设置培养目标角色")
+            self.operator.press_key("esc")
+            return False
+
+        # 复用通用战斗逻辑
+        if not self._battle_after_enter(single_time, run_time):
+            return False
+        logger.info("任务完成：培养目标")
         return True
 
     def ornament_extraction(self, level, single_time: int | None = None, run_time=1, **_)-> bool:
@@ -317,43 +356,48 @@ class TrailblazePowerTask(BaseTask):
         if not self.find_level(level_path):
             return False
         if self.operator.click_img(level_path, x_offset=x_add, y_offset=y_add):
-            if not self.operator.wait_img('resources/img/battle.png', timeout=20):  # 等待传送
-                logger.error("检测超时，编号4")
+            if not self._battle_after_enter(multi, run_time):
                 return False
-            if multi is not None:
-                for _ in range(multi - 1):
-                    self.operator.sleep(0.2)
-                    self.operator.click_img("resources/img/plus.png")
-                self.operator.sleep(1)
-            if not self.operator.click_img("resources/img/battle.png", after_sleep=1):
-                logger.error("发生错误，错误编号3")
-                return False
-            if self.operator.locate("resources/img/replenish.png"):
-                if self.replenish_flag and self.replenish_time != 0:
-                    self.replenish(self.replenish_way)
-                    self.operator.click_img("resources/img/battle.png")
-                else:
-                    logger.info("体力不足")
-                    self.operator.press_key("esc", interval=1, presses=3)
-                    return False
-            if self.config["TrailblazePowerUseAssistant"]:
-                self.support()
-            if not self.operator.click_img("resources/img/battle_star.png", after_sleep=1):
-                logger.warning("发生错误，错误编号4")
-                self.operator.press_key("esc", interval=1, presses=3)
-                return False
-            if self.operator.locate("resources/img/limit.png"):
-                logger.warning("背包内遗器已达上限，请先清理")
-                self.operator.sleep(3)
-                self.operator.press_key("esc", interval=1, presses=3)
-                return False
-            if self.operator.locate("resources/img/ensure.png"):
-                logger.info("编队中存在无法战斗的角色")
-                self.operator.press_key("esc", presses=3, interval=1.5)
-                return False
-            else:
-                self.battle_star(run_time)
         logger.info(f"任务完成：{mission_name}")
+        return True
+
+    def _battle_after_enter(self, multi: int | None, run_time: int) -> bool:
+        """进入副本后的通用战斗逻辑"""
+        if not self.operator.wait_img('resources/img/battle.png', timeout=20):  # 等待传送
+            logger.error("检测超时，编号4")
+            return False
+        if multi is not None:
+            for _ in range(multi - 1):
+                self.operator.sleep(0.2)
+                self.operator.click_img("resources/img/plus.png")
+            self.operator.sleep(1)
+        if not self.operator.click_img("resources/img/battle.png", after_sleep=1):
+            logger.error("发生错误，错误编号3")
+            return False
+        if self.operator.locate("resources/img/replenish.png"):
+            if self.replenish_flag and self.replenish_time != 0:
+                self.replenish(self.replenish_way)
+                self.operator.click_img("resources/img/battle.png")
+            else:
+                logger.info("体力不足")
+                self.operator.press_key("esc", interval=1, presses=3)
+                return False
+        if self.config["TrailblazePowerUseAssistant"]:
+            self.support()
+        if not self.operator.click_img("resources/img/battle_star.png", after_sleep=1):
+            logger.warning("发生错误，错误编号4")
+            self.operator.press_key("esc", interval=1, presses=3)
+            return False
+        if self.operator.locate("resources/img/limit.png"):
+            logger.warning("背包内遗器已达上限，请先清理")
+            self.operator.sleep(3)
+            self.operator.press_key("esc", interval=1, presses=3)
+            return False
+        if self.operator.locate("resources/img/ensure.png"):
+            logger.info("编队中存在无法战斗的角色")
+            self.operator.press_key("esc", presses=3, interval=1.5)
+            return False
+        self.battle_star(run_time)
         return True
 
     def battle_star(self, run_time: int):
