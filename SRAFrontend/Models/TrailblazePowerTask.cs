@@ -16,14 +16,17 @@ public partial class TrailblazePowerTask(Action<TrailblazePowerTask> onAddTaskIt
     [ObservableProperty] private int _runTimes = 1;
 
     [ObservableProperty] private int _selectedIndex;
-    
+
     [ObservableProperty] private bool _canAutoDetect = true;
-    
+
     [ObservableProperty] private bool _isAutoDetect;
 
     public string Title { get; init; } = string.Empty;
     public int Cost { get; init; }
-    public string HeaderText => $"{Title} (单次消耗: {Cost})";
+    public string? CostText { get; init; }  // 自定义消耗显示文本，如 "10-40"
+    public string HeaderText => CostText != null
+        ? $"{Title} (单次消耗: {CostText})"
+        : $"{Title} (单次消耗: {Cost})";
 
     [RelayCommand]
     private void AddTaskItem()
