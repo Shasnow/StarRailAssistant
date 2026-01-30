@@ -55,6 +55,7 @@ public partial class TaskPageViewModel : PageViewModel
             {
                 Title = "培养目标",
                 Cost = 40,
+                CostText = "10-40",  // 培养目标可能是花萼(10)、虚影(30)、隧洞(40)
                 Levels = new[] { "---选择副本---", "培养目标" },
                 MaxSingleTimes = 6
             },
