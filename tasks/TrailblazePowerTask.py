@@ -16,7 +16,6 @@ class TrailblazePowerTask(BaseTask):
             "历战余响": self.echo_of_war
         }
         self.task_cost_map = {
-            "培养目标": 40,
             "饰品提取": 40,
             "拟造花萼（金）": 10,
             "拟造花萼（赤）": 10,
@@ -25,7 +24,6 @@ class TrailblazePowerTask(BaseTask):
             "历战余响": 30
         }
         self.task_max_count_map = {
-            "培养目标": 6,
             "饰品提取": 6,
             "拟造花萼（金）": 24,
             "拟造花萼（赤）": 24,
@@ -101,9 +99,22 @@ class TrailblazePowerTask(BaseTask):
             if not task_name:
                 logger.warning("任务名为空，跳过该任务")
                 continue
-            # 获取任务单次成本
+
+            # 培养目标特殊处理：体力消耗动态，直接传递分配的体力值
+            if task_name == "培养目标":
+                logger.info(f"培养目标 自动检测分配体力: {cost_per_task}")
+                tasks.append((
+                    self.name2task(task_name),
+                    {
+                        "level": task_level,
+                        "allocated_power": cost_per_task,  # 传递分配的体力值，由任务动态计算次数
+                        "run_time": 1
+                    }
+                ))
+                continue
+
+            # 其他任务：按固定体力消耗计算次数
             task_cost = self.get_task_cost(task_name)
-            # 计算该任务可执行总次数
             total_task_count = cost_per_task // task_cost
             if total_task_count <= 0:
                 logger.debug(f"任务[{task_name}]可执行次数为0 (分配体力: {cost_per_task}, 单次成本: {task_cost})")
@@ -151,8 +162,15 @@ class TrailblazePowerTask(BaseTask):
                 task(**kwargs)
         return True
 
-    def character_training(self, level=0, single_time=1, run_time=1, **_) -> bool:
-        """培养目标：直接刷第一个推荐的副本"""
+    def character_training(self, level=0, single_time: int | None = None, allocated_power: int | None = None, run_time=1, **_) -> bool:
+        """培养目标：直接刷第一个推荐的副本
+
+        Args:
+            level: 等级（未使用）
+            single_time: 手动模式下的挑战次数
+            allocated_power: 自动检测模式下分配的体力值（动态计算次数）
+            run_time: 执行轮数
+        """
         logger.info("执行任务：培养目标")
 
         if not self.goto_survival_index():
@@ -181,11 +199,54 @@ class TrailblazePowerTask(BaseTask):
             self.operator.press_key("esc")
             return False
 
-        # 复用通用战斗逻辑
-        if not self._battle_after_enter(single_time, run_time):
+        # 等待传送后识别副本类型，动态计算挑战次数
+        if not self.operator.wait_img('resources/img/battle.png', timeout=20):
+            logger.error("检测超时，等待副本界面失败")
+            return False
+
+        # 确定挑战次数
+        if allocated_power is not None:
+            # 自动检测模式：根据副本类型和分配的体力动态计算
+            single_time = self._calculate_challenge_count(allocated_power)
+            logger.info(f"培养目标自动检测：分配体力 {allocated_power}，挑战次数 {single_time}")
+        elif single_time is None:
+            single_time = 1
+
+        # 执行通用战斗逻辑（跳过 wait_img，已经等待过了）
+        if not self._battle_after_enter(single_time, run_time, skip_wait=True):
             return False
         logger.info("任务完成：培养目标")
         return True
+
+    def _calculate_challenge_count(self, allocated_power: int) -> int:
+        """根据副本类型和分配的体力计算挑战次数"""
+        # 副本类型关键词与体力消耗映射
+        # 注：关键词需要能映射到 task_max_count_map 中的任务名
+        dungeon_info = {
+            "拟造花萼": (10, "拟造花萼（金）"),  # 花萼金/赤都是10体力，最大24次
+            "凝滞虚影": (30, "凝滞虚影"),
+            "侵蚀隧洞": (40, "侵蚀隧洞"),
+            "饰品提取": (40, "饰品提取"),
+            "历战余响": (30, "历战余响"),
+        }
+
+        # 全屏 OCR 识别副本类型
+        ocr_results = self.operator.ocr()
+        if not ocr_results:
+            logger.warning("OCR 识别失败，将按默认体力消耗40计算")
+            return allocated_power // 40
+
+        # 在 OCR 结果中查找副本类型关键词
+        all_text = " ".join([r[1] for r in ocr_results])
+        for keyword, (cost, task_name) in dungeon_info.items():
+            if keyword in all_text:
+                logger.info(f"检测到副本类型：{keyword}，体力消耗：{cost}")
+                max_count = self.task_max_count_map.get(task_name, 6)
+                return min(allocated_power // cost, max_count)
+
+        # 未识别到副本类型，按默认最高消耗计算
+        logger.warning("未识别到副本类型，将按默认体力消耗40计算")
+        return allocated_power // 40
 
     def ornament_extraction(self, level, single_time: int | None = None, run_time=1, **_)-> bool:
         """Ornament extraction
@@ -361,12 +422,19 @@ class TrailblazePowerTask(BaseTask):
         logger.info(f"任务完成：{mission_name}")
         return True
 
-    def _battle_after_enter(self, multi: int | None, run_time: int) -> bool:
-        """进入副本后的通用战斗逻辑"""
-        if not self.operator.wait_img('resources/img/battle.png', timeout=20):  # 等待传送
-            logger.error("检测超时，编号4")
-            return False
-        if multi is not None:
+    def _battle_after_enter(self, multi: int | None, run_time: int, skip_wait: bool = False) -> bool:
+        """进入副本后的通用战斗逻辑
+
+        Args:
+            multi: 单次连续挑战次数
+            run_time: 执行轮数
+            skip_wait: 是否跳过等待传送（已在外部完成时设为True）
+        """
+        if not skip_wait:
+            if not self.operator.wait_img('resources/img/battle.png', timeout=20):  # 等待传送
+                logger.error("检测超时，编号4")
+                return False
+        if multi is not None and multi > 1:
             for _ in range(multi - 1):
                 self.operator.sleep(0.2)
                 self.operator.click_img("resources/img/plus.png")
