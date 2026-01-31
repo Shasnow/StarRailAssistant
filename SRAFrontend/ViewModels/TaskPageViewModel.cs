@@ -53,6 +53,15 @@ public partial class TaskPageViewModel : PageViewModel
         [
             new TrailblazePowerTask(AddTaskItem)
             {
+                Title = "培养目标",
+                Cost = 40,
+                CostText = "10-40",  // 培养目标可能是花萼(10)、虚影(30)、隧洞(40)
+                Levels = new[] { "---选择副本---", "培养目标" },
+                MaxSingleTimes = 6
+            },
+
+            new TrailblazePowerTask(AddTaskItem)
+            {
                 Title = "饰品提取",
                 Cost = 40,
                 Levels = new[]
@@ -207,11 +216,11 @@ public partial class TaskPageViewModel : PageViewModel
             }
         ];
     }
-    
+
     public ControlPanelViewModel ControlPanelViewModel { get; }
 
     public AvaloniaList<TrailblazePowerTask> Tasks { get; }
-    
+
     public TopLevel? TopLevelObject { get; set; }
 
     public bool EnableContextMenu => SelectedTaskItem is not null;
@@ -227,7 +236,7 @@ public partial class TaskPageViewModel : PageViewModel
     }
 
     public bool IsCwNormalMode => CurrentConfig.CurrencyWarsMode != 2;
-    
+
     [RelayCommand]
     private async Task SelectedPath()
     {
