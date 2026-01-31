@@ -44,7 +44,10 @@ public partial class App : Application
             {
                 DataContext = serviceProvider.GetRequiredService<MainWindowViewModel>()
             };
-            desktop.Startup += (_, _) => Log.Information("Application is starting up.");
+            desktop.Startup += (_, _) =>
+            {
+                Log.Information("Application is starting up.");
+            };
             desktop.Exit += (_, _) =>
             {
                 Log.Information("Application is exiting. Saving settings and stopping SRA process.");
@@ -53,6 +56,7 @@ public partial class App : Application
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
                 serviceProvider.GetRequiredService<SraService>().StopSraProcess();
                 serviceProvider.GetRequiredService<RegistryService>().RestoreUserPcResolution();
+                serviceProvider.GetRequiredService<ReportService>().Report("logout", null);
                 Log.CloseAndFlush();
             };
         }
@@ -84,6 +88,7 @@ public partial class App : Application
         services.AddSingleton<SraService>();
         services.AddSingleton<RegistryService>();
         services.AddSingleton<ConfigService>();
+        services.AddSingleton<ReportService>();
         services.AddHttpClient("GlobalClient", client =>
         {
             client.Timeout = TimeSpan.FromSeconds(60);
