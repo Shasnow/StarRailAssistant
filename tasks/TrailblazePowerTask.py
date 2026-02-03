@@ -139,10 +139,6 @@ class TrailblazePowerTask(BaseTask):
             return None
         # 计算每个任务的可执行次数
         tasks_count = len(self.auto_detect_tasks)
-        cost_per_task = ava_current_tbp // tasks_count  # 每个任务分配的体力
-        if cost_per_task <= 0:
-            logger.warning(f"每个任务分配的体力为0 (总可用体力：{ava_current_tbp}，任务数：{tasks_count})")
-            return None
         task_cost_list = [self.get_cost_by_id(task.get("Id")) for task in self.auto_detect_tasks]  # 获取任务体力消耗列表
         sum_cost = sum(task_cost_list)
         base = ava_current_tbp // sum_cost  # 基础可执行次数
@@ -165,15 +161,22 @@ class TrailblazePowerTask(BaseTask):
         tasks = []
         for i, item in enumerate(self.auto_detect_tasks):
             task_func = self.get_task_by_id(item["Id"])
-            tasks.append((
-                task_func,
-                {
-                    "level": item["Level"],
-                    "single_time": 1,
-                    "run_time": tasks_times[i]
-                }
-            ))
-            logger.info(f"任务 {item['Name']} ({item['Level']}) 将执行 {tasks_times[i]} 次")
+            run_time= tasks_times[i]
+            logger.info(f"任务 {item['Name']} ({item['Level']}) 将执行 {run_time} 次")
+            if run_time == 0:
+                continue  # 跳过执行次数为0的任务
+            max_single_time = self.get_max_count_by_id(item["Id"])
+            while run_time > 0:
+                single_time = min(run_time, max_single_time)
+                tasks.append((
+                    task_func,
+                    {
+                        "level": item["Level"],
+                        "single_time": single_time,
+                        "run_time": 1
+                    }
+                ))
+                run_time -= single_time
         return tasks if tasks else None
 
     def _get_task_detail_by_id(self, detail: str, task_id: str):
