@@ -65,5 +65,5 @@ public partial class Config : ObservableObject
     [JsonPropertyName("StartGameUsername")] public string EncryptedStartGameUsername { get; set; } = "";
 
     public int Version { get; init; } = StaticVersion; // 配置版本号
-    public static int StaticVersion => 4;
+    public static int StaticVersion => 3;
 }

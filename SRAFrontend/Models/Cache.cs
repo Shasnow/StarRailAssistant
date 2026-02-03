@@ -27,6 +27,7 @@ public partial class Cache : ObservableObject
     public int? UserGameFullscreenMode { get; set; } // 用户游戏全屏模式
     public bool NoNotifyForShortcut { get; set; } // 是否不再提示创建桌面快捷方式
     public long LastLaunchTimestamp { get; set; } // 上次启动时间戳
+    public int LastViewAnnouncementId { get; set; } // 上次查看的公告ID
     
     // 以下字段不需要持久化存储，仅在运行时使用
     public bool IsGameResolutionChanged = false; // 游戏分辨率是否已更改
