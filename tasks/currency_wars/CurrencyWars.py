@@ -376,7 +376,7 @@ class CurrencyWars(Executable):
         """获取手牌角色信息"""
         target = self.operator.locate(CWIMG.OPEN)
         while target:
-            self.operator.mouse_down(int(target.center[0]), int(target.center[1]))
+            self.operator.mouse_down(target.center[0], target.center[1])
             self.operator.mouse_up()
             self.operator.sleep(0.5)
             self.operator.click_point(0.35, 0.20, after_sleep=0.5)

@@ -164,6 +164,36 @@ class Operator(IOperator):
             return -1, None
         return self.locate_any_in_region(templates, region.sub_region(from_x, from_y, to_x, to_y), confidence, trace)
 
+    def locate_all_in_region(self, template: str, region: Region | None = None, confidence: float | None = None,
+                             trace: bool = True) -> list[Box] | None:
+        if confidence is None:
+            confidence = self.confidence
+        try:
+            if region is None:
+                region = self.get_win_region()
+                time.sleep(0.5)
+            if not Path(template).exists():
+                raise FileNotFoundError("无法找到或读取文件 " + template)
+            img = cv2.imread(template)
+            boxes = pyscreeze.locateAll(img, self.screenshot(region), confidence=confidence)
+            result = []
+            for box in boxes:
+                result.append(Box(box.left, box.top, box.width, box.height, source=template))
+            return result
+        except Exception as e:
+            if trace:
+                logger.trace(f"ImageNotFound: {template} -> {e}")
+            return None
+
+    def locate_all_in_tuple(self, template: str, from_x: float, from_y: float, to_x: float, to_y: float,
+                            confidence: float | None = None, trace: bool = True) -> list[Box] | None:
+        try:
+            region = self.get_win_region()
+        except Exception as e:
+            logger.trace(f"ImageNotFound: {template} -> {e}")
+            return None
+        return self.locate_all_in_region(template, region.sub_region(from_x, from_y, to_x, to_y), confidence, trace)
+
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
                     after_sleep: float = 0, tag: str = "") -> bool:
         if isinstance(x_offset, float) and isinstance(y_offset, float):

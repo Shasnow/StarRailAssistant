@@ -22,6 +22,7 @@ public partial class TrailblazePowerTask(Action<TrailblazePowerTask> onAddTaskIt
     [ObservableProperty] private bool _isAutoDetect;
 
     public string Title { get; init; } = string.Empty;
+    public string Id { get; init; } = string.Empty;
     public int Cost { get; init; }
     public string? CostText { get; init; }  // 自定义消耗显示文本，如 "10-40"
     public string HeaderText => CostText != null

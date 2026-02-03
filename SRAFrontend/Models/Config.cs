@@ -19,7 +19,7 @@ public partial class Config : ObservableObject
     [ObservableProperty] private string _receiveRewardRedeemCodes = ""; // 兑换码列表
 
     [ObservableProperty]
-    private AvaloniaList<bool> _receiveRewards = [false, false, false, false, false, false, false]; // 各任务奖励领取状态
+    private AvaloniaList<bool> _receiveRewards = [true, true, true, true, true, true, false]; // 各任务奖励领取状态
 
     // du - DifferentialUniverse 差分宇宙
     [ObservableProperty] private bool _dUEnable; // 是否启用模拟宇宙任务
@@ -58,10 +58,12 @@ public partial class Config : ObservableObject
 
     [ObservableProperty] private AvaloniaList<TrailblazePowerTaskItem> _trailblazePowerTaskList = [];
     [ObservableProperty] private bool _trailblazePowerUseAssistant; // 是否使用助理
+    [ObservableProperty] private bool _trailblazePowerUseBuildTarget; // 是否使用培养目标
 
     [JsonPropertyName("StartGamePassword")] public string EncryptedStartGamePassword { get; set; } = "";
 
     [JsonPropertyName("StartGameUsername")] public string EncryptedStartGameUsername { get; set; } = "";
 
-    public int Version { get; init; } = 3; // 配置版本号
+    public int Version { get; init; } = StaticVersion; // 配置版本号
+    public static int StaticVersion => 4;
 }

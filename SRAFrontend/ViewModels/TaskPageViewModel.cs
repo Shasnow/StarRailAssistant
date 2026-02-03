@@ -53,16 +53,8 @@ public partial class TaskPageViewModel : PageViewModel
         [
             new TrailblazePowerTask(AddTaskItem)
             {
-                Title = "培养目标",
-                Cost = 40,
-                CostText = "10-40",  // 培养目标可能是花萼(10)、虚影(30)、隧洞(40)
-                Levels = new[] { "---选择副本---", "培养目标" },
-                MaxSingleTimes = 6
-            },
-
-            new TrailblazePowerTask(AddTaskItem)
-            {
                 Title = "饰品提取",
+                Id = "ornament_extraction",
                 Cost = 40,
                 Levels = new[]
                 {
@@ -86,6 +78,7 @@ public partial class TaskPageViewModel : PageViewModel
             new TrailblazePowerTask(AddTaskItem)
             {
                 Title = "拟造花萼（金）",
+                Id = "calyx_golden",
                 Cost = 10,
                 Levels = new[]
                 {
@@ -109,6 +102,7 @@ public partial class TaskPageViewModel : PageViewModel
             new TrailblazePowerTask(AddTaskItem)
             {
                 Title = "拟造花萼（赤）",
+                Id = "calyx_crimson",
                 Cost = 10,
                 Levels = new[]
                 {
@@ -135,6 +129,7 @@ public partial class TaskPageViewModel : PageViewModel
             new TrailblazePowerTask(AddTaskItem)
             {
                 Title = "凝滞虚影",
+                Id = "stagnant_shadow",
                 Cost = 30,
                 Levels = new[]
                 {
@@ -173,6 +168,7 @@ public partial class TaskPageViewModel : PageViewModel
             new TrailblazePowerTask(AddTaskItem)
             {
                 Title = "侵蚀隧洞",
+                Id = "caver_of_corrosion",
                 Cost = 40,
                 Levels = new[]
                 {
@@ -198,6 +194,7 @@ public partial class TaskPageViewModel : PageViewModel
             new TrailblazePowerTask(AddTaskItem)
             {
                 Title = "历战余响",
+                Id = "echo_of_war",
                 Cost = 30,
                 Levels = new[]
                 {
@@ -263,6 +260,7 @@ public partial class TaskPageViewModel : PageViewModel
         CurrentConfig.TrailblazePowerTaskList.Add(new TrailblazePowerTaskItem
         {
             Name = task.Title,
+            Id = task.Id,
             Level = task.SelectedIndex,
             LevelName = (task.Levels?.Cast<string>()!).ElementAtOrDefault(task.SelectedIndex) ?? string.Empty,
             Count = task.Count,
