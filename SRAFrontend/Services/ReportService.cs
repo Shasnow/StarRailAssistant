@@ -1,8 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SRAFrontend.Data;
 using SRAFrontend.Models;
 
 namespace SRAFrontend.Services;
@@ -13,11 +15,26 @@ public class ReportService(
     ILogger<ReportService> logger)
 {
     private const string ReportUrl = "https://shasnow.top/api/report";
+    private string? _deviceIdCache;
 
+    private string GetDeviceId()
+    {
+        if (!string.IsNullOrEmpty(_deviceIdCache)) return _deviceIdCache;
+        var deviceIdFilePath = Path.Combine(PathString.AppDataSraDir, "profile.txt");
+        if (File.Exists(deviceIdFilePath))
+        {
+            _deviceIdCache = File.ReadAllText(deviceIdFilePath).Trim();
+            if (!string.IsNullOrEmpty(_deviceIdCache)) return _deviceIdCache;
+        }
+        _deviceIdCache = Guid.NewGuid().ToString();
+        File.WriteAllText(deviceIdFilePath, _deviceIdCache);
+        return _deviceIdCache;
+    }
+    
     public async Task<bool> ReportAsync(string eventType, string? eventData)
     {
         var httpClient = httpClientFactory.CreateClient("GlobalClient");
-        var deviceId = cacheService.Cache.DeviceId;
+        var deviceId = GetDeviceId();
         var timestampNow = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var appEvent = new AppEvent
         {

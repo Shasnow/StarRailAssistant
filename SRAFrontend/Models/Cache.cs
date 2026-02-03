@@ -26,7 +26,6 @@ public partial class Cache : ObservableObject
     public int? UserGameResolutionHeight { get; set; } // 用户游戏分辨率高度
     public int? UserGameFullscreenMode { get; set; } // 用户游戏全屏模式
     public bool NoNotifyForShortcut { get; set; } // 是否不再提示创建桌面快捷方式
-    public string DeviceId { get; set; } = string.Empty; // 设备ID
     public long LastLaunchTimestamp { get; set; } // 上次启动时间戳
     
     // 以下字段不需要持久化存储，仅在运行时使用
