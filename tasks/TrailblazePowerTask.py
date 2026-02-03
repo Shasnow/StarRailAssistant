@@ -138,58 +138,42 @@ class TrailblazePowerTask(BaseTask):
             logger.warning("可用开拓力为0，无任务可执行")
             return None
         # 计算每个任务的可执行次数
-        total_tasks = len(self.auto_detect_tasks)
-        cost_per_task = ava_current_tbp // total_tasks  # 每个任务分配的体力
+        tasks_count = len(self.auto_detect_tasks)
+        cost_per_task = ava_current_tbp // tasks_count  # 每个任务分配的体力
         if cost_per_task <= 0:
-            logger.warning(f"每个任务分配的体力为0 (总可用体力：{ava_current_tbp}，任务数：{total_tasks})")
+            logger.warning(f"每个任务分配的体力为0 (总可用体力：{ava_current_tbp}，任务数：{tasks_count})")
             return None
+        task_cost_list = [self.get_cost_by_id(task.get("Id")) for task in self.auto_detect_tasks]  # 获取任务体力消耗列表
+        sum_cost = sum(task_cost_list)
+        base = ava_current_tbp // sum_cost  # 基础可执行次数
+        remain = ava_current_tbp % sum_cost  # 剩余体力
+        logger.info(f"每个任务基础可执行次数: {base}, 剩余体力: {remain}")
+        tasks_times = [base for _ in range(tasks_count)]  # 初始化每个任务的执行次数列表
+        # 分配剩余体力
+        # 将任务按体力升序排序，保留原始索引 (体力值, 原索引)
+        sorted_tasks = sorted((val, idx) for idx, val in enumerate(task_cost_list))
+        # 分配剩余体力：小体力任务优先，尽可能多分配
+        for val, idx in sorted_tasks:
+            if remain >= val:
+                tasks_times[idx] += 1
+                remain -= val
+            # 剩余体力不足，直接退出
+            if remain < min(task_cost_list):
+                break
 
+        # 生成最终任务列表
         tasks = []
-        for task_info in self.auto_detect_tasks:
-            # 提取任务基础信息
-            task_name = task_info.get("Name")
-            task_id = task_info.get("Id")
-            task_level = task_info.get("Level", 0)
-            if not task_name:
-                logger.warning("任务名为空，跳过该任务")
-                continue
-
-            # 培养目标特殊处理：体力消耗动态，直接传递分配的体力值
-            if task_name == "培养目标":
-                logger.info(f"培养目标 自动检测分配体力: {cost_per_task}")
-                tasks.append((
-                    self.get_task_by_id(task_id),
-                    {
-                        "level": task_level,
-                        "allocated_power": cost_per_task,  # 传递分配的体力值，由任务动态计算次数
-                        "run_time": 1
-                    }
-                ))
-                continue
-
-            # 其他任务：按固定体力消耗计算次数
-            task_cost = self.get_cost_by_id(task_id)
-            total_task_count = cost_per_task // task_cost
-            if total_task_count <= 0:
-                logger.debug(f"任务[{task_name}]可执行次数为0 (分配体力: {cost_per_task}, 单次成本: {task_cost})")
-                continue
-            logger.info(f"{task_name} 自动检测的挑战次数: {total_task_count}")
-            # 获取任务最大单次执行次数（默认1）
-            max_count = self.get_max_count_by_id(task_id)
-            # 分割任务（按最大次数拆分）
-            remaining_count = total_task_count
-            while remaining_count > 0:
-                # 单次执行次数：不超过最大次数，且不超过剩余次数
-                single_time = min(max_count, remaining_count)
-                tasks.append((
-                    self.get_task_by_id(task_id),
-                    {
-                        "level": task_level,
-                        "single_time": single_time,
-                        "run_time": 1  # 每轮执行1次
-                    }
-                ))
-                remaining_count -= single_time
+        for i, item in enumerate(self.auto_detect_tasks):
+            task_func = self.get_task_by_id(item["Id"])
+            tasks.append((
+                task_func,
+                {
+                    "level": item["Level"],
+                    "single_time": 1,
+                    "run_time": tasks_times[i]
+                }
+            ))
+            logger.info(f"任务 {item['Name']} ({item['Level']}) 将执行 {tasks_times[i]} 次")
         return tasks if tasks else None
 
     def _get_task_detail_by_id(self, detail: str, task_id: str):
