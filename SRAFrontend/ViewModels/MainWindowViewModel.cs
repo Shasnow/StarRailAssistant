@@ -4,13 +4,9 @@ using System.Threading.Tasks;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SRAFrontend.Controls;
 using SRAFrontend.Localization;
-using SRAFrontend.Services;
 using SRAFrontend.Utils;
 using SukiUI;
-using SukiUI.Controls;
-using SukiUI.MessageBox;
 using SukiUI.Toasts;
 
 namespace SRAFrontend.ViewModels;
@@ -18,8 +14,7 @@ namespace SRAFrontend.ViewModels;
 public partial class MainWindowViewModel(
     IEnumerable<PageViewModel> pages,
     CommonModel commonModel,
-    ISukiToastManager toastManager,
-    AnnouncementService announcementService)
+    ISukiToastManager toastManager)
     : ViewModelBase
 {
     private static readonly List<string> GreetingsZh =
@@ -69,6 +64,7 @@ public partial class MainWindowViewModel(
         await commonModel.CleanupOldExeAsync();
         await commonModel.CheckForUpdatesAsync();
         await commonModel.CheckDesktopShortcut();
+        await commonModel.CheckAnnouncementAsync();
     }
 
     [RelayCommand]
@@ -87,10 +83,6 @@ public partial class MainWindowViewModel(
     [RelayCommand]
     private void ShowAnnouncementBoard()
     {
-        SukiMessageBox.ShowDialog(new SukiMessageBoxHost
-        {
-            Header = "公告",
-            Content = new AnnouncementBoardViewModel(announcementService)
-        });
+        commonModel.ShowAnnouncementBoard();
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -10,23 +9,19 @@ namespace SRAFrontend.Services;
 
 public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<AnnouncementService> logger)
 {
-    private List<Announcement>? _cachedAnnouncements; // 缓存数据，避免重复请求
+    private AnnouncementList? _cachedAnnouncements; // 缓存数据，避免重复请求
 
-    private const string RequestUrl = "https://gitee.com/yukikage/sraresource/raw/main/SRA/announcements.json";
+    private const string RequestUrl = "https://gitee.com/yukikage/sraresource/raw/main/SRA/anno.json";
 
     /// <summary>
     /// 获取公告列表（带缓存）
     /// </summary>
-    public async Task<List<Announcement>?> GetAnnouncementsAsync()
+    public async Task<AnnouncementList?> GetAnnouncementsAsync()
     {
-        // 如果已有缓存，直接返回
-        if (_cachedAnnouncements != null)
-            return _cachedAnnouncements;
-
         try
         {
             var httpClient = httpClientFactory.CreateClient("GlobalClient");
-            _cachedAnnouncements = await httpClient.GetFromJsonAsync<List<Announcement>>(RequestUrl);
+            _cachedAnnouncements = await httpClient.GetFromJsonAsync<AnnouncementList>(RequestUrl);
             return _cachedAnnouncements;
         }
         catch (HttpRequestException ex)
@@ -44,7 +39,7 @@ public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<A
     /// <summary>
     /// 强制刷新缓存（重新请求数据）
     /// </summary>
-    public async Task<List<Announcement>?> RefreshAnnouncementsAsync()
+    public async Task<AnnouncementList?> RefreshAnnouncementsAsync()
     {
         _cachedAnnouncements = null; // 清空缓存
         return await GetAnnouncementsAsync(); // 重新获取

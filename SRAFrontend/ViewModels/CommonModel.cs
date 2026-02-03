@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Markdown.Avalonia;
 using Microsoft.Extensions.Logging;
+using SRAFrontend.Controls;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
@@ -22,12 +23,47 @@ public class CommonModel(
     CacheService cacheService,
     UpdateService updateService,
     SraService sraService,
+    AnnouncementService announcementService,
     ILogger<CommonModel> logger,
     ISukiToastManager toastManager)
 {
     // 常量定义（避免魔法值）
     private const int ToastDisplayDuration = 5; // Toast 显示时长（秒）
+    
+    private AnnouncementList? _announcementList;
 
+    public void ShowAnnouncementBoard()
+    {
+        if (_announcementList is null)
+        {
+            ShowWarningToast("公告获取失败", "当前没有可显示的公告");
+            return;
+        }
+        SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+        {
+            Header = "公告栏",
+            Content = new AnnouncementBoardViewModel
+            {
+                Announcements = _announcementList.Announcements
+            }
+        });
+        cacheService.Cache.LastViewAnnouncementId = _announcementList.Id;
+    }
+    
+    public async Task CheckAnnouncementAsync()
+    {
+        _announcementList = await announcementService.GetAnnouncementsAsync();
+        if (_announcementList == null || _announcementList.Announcements.Count == 0)
+        {
+            logger.LogInformation("No announcements available");
+            return;
+        }
+
+        // 检查是否有新公告, 自动弹出公告栏
+        if (cacheService.Cache.LastViewAnnouncementId != _announcementList.Id)
+            ShowAnnouncementBoard();
+    }
+    
     public async Task CheckForUpdatesAsync()
     {
         var cdk = settingsService.Settings.MirrorChyanCdk;
