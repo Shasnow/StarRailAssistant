@@ -29,6 +29,7 @@ class Region:
         new_height = int(self.height * (to_y - from_y))
         return Region(new_left, new_top, new_width, new_height, parent=self)
 
+
 @dataclasses.dataclass
 class Box:
     """表示窗口内的一个矩形区域
@@ -44,6 +45,6 @@ class Box:
     @property
     def center(self):
         """获取Box的中心点坐标"""
-        center_x = self.left + self.width // 2
-        center_y = self.top + self.height // 2
+        center_x = int(self.left + self.width // 2)
+        center_y = int(self.top + self.height // 2)
         return center_x, center_y

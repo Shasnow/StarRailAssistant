@@ -18,30 +18,31 @@
                     <StackPanel Spacing="10">
                         <suki:GlassCard IsInteractive="True">
                             <StackPanel>
-                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,*" RowSpacing="10">
-                                    <CheckBox Grid.Row="0" Grid.Column="0"
-                                              IsChecked="{Binding CurrentConfig.TrailblazePowerReplenishEnable}"
-                                              Content="补充体力" />
-                                    <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                                          ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="10">
-                                        <Label Grid.Column="0" Content="使用" />
-                                        <ComboBox Grid.Column="1"
-                                                  SelectedIndex="{Binding CurrentConfig.TrailblazePowerReplenishWay}">
-                                            <ComboBoxItem Content="后备开拓力" />
-                                            <ComboBoxItem Content="燃料" />
-                                            <ComboBoxItem Content="星琼" />
-                                        </ComboBox>
-                                        <Label Grid.Column="2" Content="补充" />
-                                        <NumericUpDown Grid.Column="3" Minimum="1" Maximum="99" FormatString="0"
-                                                       Height="20"
-                                                       Value="{Binding CurrentConfig.TrailblazePowerReplenishTimes}" />
-                                        <Label Grid.Column="4" Content="次" />
-                                    </Grid>
-
-                                    <ToggleSwitch Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                                              IsChecked="{Binding CurrentConfig.TrailblazePowerUseAssistant}"
-                                              OnContent="使用支援角色" />
+                                <CheckBox
+                                    IsChecked="{Binding CurrentConfig.TrailblazePowerReplenishEnable}"
+                                    Content="补充体力" />
+                                <Grid
+                                    ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="10">
+                                    <Label Grid.Column="0" Content="使用" />
+                                    <ComboBox Grid.Column="1"
+                                              SelectedIndex="{Binding CurrentConfig.TrailblazePowerReplenishWay}">
+                                        <ComboBoxItem Content="后备开拓力" />
+                                        <ComboBoxItem Content="燃料" />
+                                        <ComboBoxItem Content="星琼" />
+                                    </ComboBox>
+                                    <Label Grid.Column="2" Content="补充" />
+                                    <NumericUpDown Grid.Column="3" Minimum="1" Maximum="99" FormatString="0"
+                                                   Height="20"
+                                                   Value="{Binding CurrentConfig.TrailblazePowerReplenishTimes}" />
+                                    <Label Grid.Column="4" Content="次" />
                                 </Grid>
+
+                                <ToggleSwitch
+                                    IsChecked="{Binding CurrentConfig.TrailblazePowerUseAssistant}"
+                                    OnContent="使用支援角色" />
+                                <ToggleSwitch
+                                    IsChecked="{Binding CurrentConfig.TrailblazePowerUseBuildTarget}"
+                                    OnContent="启用培养目标" />
                             </StackPanel>
                         </suki:GlassCard>
                         <!-- 任务列表区域 -->
@@ -62,10 +63,11 @@
                                                         <StackPanel Orientation="Horizontal"
                                                                     IsVisible="{Binding CanAutoDetect}">
                                                             <Label Content="自动检测" />
-                                                            <ToggleSwitch IsChecked="{Binding IsAutoDetect}"/>
+                                                            <ToggleSwitch IsChecked="{Binding IsAutoDetect}" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal" Spacing="8"
-                                                                    ToolTip.Tip="n合一" IsVisible="{Binding !IsAutoDetect}">
+                                                                    ToolTip.Tip="n合一"
+                                                                    IsVisible="{Binding !IsAutoDetect}">
                                                             <Label Content="连续作战" />
                                                             <NumericUpDown FormatString="0" Value="{Binding Count}"
                                                                            Minimum="1"
@@ -74,7 +76,8 @@
                                                                            VerticalContentAlignment="Center" />
                                                         </StackPanel>
 
-                                                        <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding !IsAutoDetect}">
+                                                        <StackPanel Orientation="Horizontal" Spacing="8"
+                                                                    IsVisible="{Binding !IsAutoDetect}">
                                                             <Label Content="执行次数" />
                                                             <NumericUpDown
                                                                 FormatString="0"
@@ -108,7 +111,7 @@
                                         <Label Grid.Row="1" Grid.Column="1" Content="{Binding LevelName}" />
                                         <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                                                Content="自动检测"
-                                               IsVisible="{Binding AutoDetect}"/>
+                                               IsVisible="{Binding AutoDetect}" />
                                         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                                               RowDefinitions="*, *" ColumnDefinitions="Auto, *"
                                               IsVisible="{Binding !AutoDetect}">
@@ -117,7 +120,7 @@
                                             <Label Grid.Row="1" Grid.Column="0" Content="执行次数" />
                                             <Label Grid.Row="1" Grid.Column="1" Content="{Binding RunTimes}" />
                                         </Grid>
-                                        
+
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

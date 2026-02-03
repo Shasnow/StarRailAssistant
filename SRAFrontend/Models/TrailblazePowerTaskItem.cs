@@ -3,6 +3,7 @@
 public class TrailblazePowerTaskItem
 {
     public string Name { get; set; } = "";
+    public string Id { get; set; } = "";
     public int Level { get; set; }
     public string LevelName { get; set; } = "";
     public int Count { get; set; } = 1;

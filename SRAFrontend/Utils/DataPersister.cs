@@ -58,7 +58,7 @@ public static class DataPersister
         var json = File.ReadAllText(configPath);
         if (string.IsNullOrWhiteSpace(json)) return new Config { Name = name };
         var config = JsonSerializer.Deserialize<Config>(json);
-        return config == null || config.Version < 3 ? new Config { Name = name } : config;
+        return config == null || config.Version < Config.StaticVersion ? new Config { Name = name } : config;
     }
 
     public static void SaveConfig(Config config)

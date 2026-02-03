@@ -192,6 +192,76 @@ class IOperator(ABC):
         """
         ...
 
+    @abstractmethod
+    def locate_all_in_region(self,
+                            template: str,
+                            region: Region | None = None,
+                            confidence: float | None = None,
+                            trace: bool = True) -> list[Box] | None:
+        """
+        在窗口内匹配所有图片位置
+        :param template: 模板图片路径
+        :param region: 要查找的区域对象
+        :param confidence: 置信度
+        :param trace: 是否打印调试信息
+        :return: list[Box] - 找到的所有图片位置列表，如果未找到则返回None
+        """
+        ...
+
+    @abstractmethod
+    def locate_all_in_tuple(self,
+                            template: str,
+                            from_x: float,
+                            from_y: float,
+                            to_x: float,
+                            to_y: float,
+                            confidence: float | None = None,
+                            trace: bool = True) -> list[Box] | None:
+        """
+        在窗口内匹配所有图片位置，使用比例坐标
+        :param template: 模板图片路径
+        :param from_x: 区域起始x坐标比例(0-1)
+        :param from_y: 区域起始y坐标比例(0-1)
+        :param to_x: 区域结束x坐标比例(0-1)
+        :param to_y: 区域结束y坐标比例(0-1)
+        :param confidence: 匹配度, 0-1之间的浮点数, 默认为self.confidence
+        :param trace: 是否打印调试信息
+        :return: list[Box] - 找到的所有图片位置列表，如果未找到则返回None
+        """
+        ...
+
+    def locate_all(self,
+               template: str,
+               region: Region | None = None,
+               *,
+               from_x: float | None = None,
+               from_y: float | None = None,
+               to_x: float | None = None,
+               to_y: float | None = None,
+               confidence: float | None = None,
+               trace: bool = True) -> list[Box] | None:
+        """在窗口内查找图片位置
+
+        Args:
+            template (str): 模板图片路径
+            region (Region | None, optional): 要查找的区域对象，包含left, top, width, height属性。
+                如果为None，则默认查找当前活动窗口的区域。默认为None。
+            from_x (float, optional): 起始点X坐标比例 (0-1), 相对于窗口左上角
+            from_y (float, optional): 起始点Y坐标比例 (0-1), 相对于窗口左上角
+            to_x (float, optional): 结束点X坐标比例 (0-1), 相对于窗口左上角
+            to_y (float, optional): 结束点Y坐标比例 (0-1), 相对于窗口左上角
+            confidence (float | None, optional): 匹配置信度阈值 (0-1), 如果为None则使用默认值。默认为None。
+            trace (bool, optional): 是否打印调试信息。默认为True。
+        Returns:
+            Box | None: 找到的图片位置，如果未找到则返回None
+        Raises:
+            ValueError: 如果坐标比例参数不完整或不在0-1范围内
+        """
+        if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+            return self.locate_all_in_tuple(template, from_x, from_y, to_x, to_y, confidence, trace)
+        else:
+            return self.locate_all_in_region(template, region, confidence, trace)
+
     def locate_any(self,
                    templates: list[str],
                    region: Region | None = None,
@@ -515,7 +585,7 @@ class IOperator(ABC):
         x, y = box.center
         logger.debug(
             f"Click box center:({x}, {y}), source: {box.source}, offset:({x_offset}, {y_offset}), wait {after_sleep}s")
-        return self.click_point(int(x), int(y), x_offset, y_offset, after_sleep)
+        return self.click_point(x, y, x_offset, y_offset, after_sleep)
 
     def click_img(self, template: str, x_offset: int | float = 0, y_offset: int | float = 0,
                   after_sleep: float = 0) -> bool:

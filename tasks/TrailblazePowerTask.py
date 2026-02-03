@@ -1,52 +1,105 @@
-from typing import Any
+import tomllib
+from typing import Any, Callable
 
 from SRACore.task import BaseTask
 from SRACore.util.logger import logger
-
+type TrailblazePowerFunc = Callable[[int, int, int], bool]
 
 class TrailblazePowerTask(BaseTask):
     def _post_init(self):
-        self.name_task_map = {
-            "培养目标": self.character_training,
-            "饰品提取": self.ornament_extraction,
-            "拟造花萼（金）": self.calyx_golden,
-            "拟造花萼（赤）": self.calyx_crimson,
-            "凝滞虚影": self.stagnant_shadow,
-            "侵蚀隧洞": self.caver_of_corrosion,
-            "历战余响": self.echo_of_war
-        }
-        self.task_cost_map = {
-            "饰品提取": 40,
-            "拟造花萼（金）": 10,
-            "拟造花萼（赤）": 10,
-            "凝滞虚影": 30,
-            "侵蚀隧洞": 40,
-            "历战余响": 30
-        }
-        self.task_max_count_map = {
-            "饰品提取": 6,
-            "拟造花萼（金）": 24,
-            "拟造花萼（赤）": 24,
-            "凝滞虚影": 8,
-            "侵蚀隧洞": 6,
-            "历战余响": 3
-        }
+        with open(r"tasks/config/trailblaze_power.toml", "rb") as tf:
+            self.task_config = tomllib.load(tf)
+
         self.replenish_time = self.config.get('TrailblazePowerReplenishTimes')
         self.replenish_way = self.config.get('TrailblazePowerReplenishWay')
         self.replenish_flag = self.config.get('TrailblazePowerReplenishEnable')
+        self.manual_tasks: list[tuple[TrailblazePowerFunc, dict[str, Any]]] = list()
+        self.auto_detect_tasks = list()
+
+    def run(self):
+        self.manual_tasks.clear()
+        self.auto_detect_tasks.clear()
+        use_build_target = self.config.get('TrailblazePowerUseBuildTarget')
+        if use_build_target:
+            self.detect_build_target_tasklist()
+        else:
+            self.init_custom_tasklist()
+        for task, kwargs in self.manual_tasks:
+            if self.stop_flag:
+                return False
+            task(**kwargs)
+        if len(self.auto_detect_tasks) > 0:
+            detected_tasks = self.detect_tasks()
+            if detected_tasks is None:
+                return self.operator.press_key('esc') # 退出生存索引页面
+            for task, kwargs in detected_tasks:
+                if self.stop_flag:
+                    return False
+                task(**kwargs)
+        return True
+
+    def init_custom_tasklist(self):
+        """初始化自定义任务清单"""
         tasklist: list[dict[str, Any]] = self.config['TrailblazePowerTaskList']
-        self.manual_tasks = list()
-        self.auto_detect_tasklist = list()
         for task in tasklist:
             if task.get("AutoDetect", False):
-                self.auto_detect_tasklist.append(task)
+                self.auto_detect_tasks.append(task)
             else:
                 self.manual_tasks.append((
-                    self.name2task(task["Name"]),
+                    self.get_task_by_id(task["Id"]),
                     {"level": task["Level"],
                      "single_time": task["Count"],
                      "run_time": task["RunTimes"]}
                 ))
+
+    def detect_build_target_tasklist(self):
+        """识别培养目标任务信息"""
+        self.find_session("build_target")
+        logger.info("识别培养目标任务信息")
+        boxes = self.operator.locate_all("resources/img/tp/trailblaze_power.png")  # 定位所有体力图标
+        if not boxes:
+            logger.error("未找到任何培养目标任务")
+            self.operator.press_key("esc")
+            return
+        target_objects = [] # 存储识别到的培养目标任务对象
+        for box in boxes:
+            self.operator.click_box(box, x_offset=-520, after_sleep=1)  # 点击体力图标左侧位置, 检测目标材料
+            raw_res = self.operator.ocr(from_x=0.406, from_y=0.296, to_x=0.594, to_y=0.351)
+            res = "".join(t[1] for t in raw_res)
+            logger.info(f"识别到所需物品: {res}")
+            target_objects.append(res)
+            self.operator.press_key('esc')
+            self.operator.sleep(1)
+
+        for obj in target_objects:
+            # 从配置文件中匹配产物对应的副本任务
+            for subtask_id, subtask_info in self.task_config.get("subtasks").items():
+                subtask_results = subtask_info.get("results")
+                if subtask_results is None:
+                    continue
+                found = False  # 标记是否找到对应结果
+                for index, r in enumerate(subtask_results):
+                    if obj in r:
+                        logger.info(f"{obj} 需要刷取 {subtask_info.get('name')} 的关卡 {index + 1}")
+                        found = True
+                        if subtask_id == "echo_of_war":
+                            # 历战余响特殊处理
+                            self.manual_tasks.append((self.get_task_by_id(subtask_id), {
+                                "level": index + 1,
+                                "single_time": 3,
+                                "run_time": 1
+                            }))
+                        else:
+                            self.auto_detect_tasks.append(
+                                {"Name": subtask_info.get("name"),
+                                 "Id": subtask_id,
+                                 "Level": index + 1
+                                 })
+                        break
+                else:
+                    logger.debug(f"Could not find {obj} in subtask results of {subtask_id}")
+                if found:
+                    break
 
     def detect_tasks(self) -> list[Any] | None:
         """
@@ -85,16 +138,17 @@ class TrailblazePowerTask(BaseTask):
             logger.warning("可用开拓力为0，无任务可执行")
             return None
         # 计算每个任务的可执行次数
-        total_tasks = len(self.auto_detect_tasklist)
+        total_tasks = len(self.auto_detect_tasks)
         cost_per_task = ava_current_tbp // total_tasks  # 每个任务分配的体力
         if cost_per_task <= 0:
             logger.warning(f"每个任务分配的体力为0 (总可用体力：{ava_current_tbp}，任务数：{total_tasks})")
             return None
 
         tasks = []
-        for task_info in self.auto_detect_tasklist:
+        for task_info in self.auto_detect_tasks:
             # 提取任务基础信息
             task_name = task_info.get("Name")
+            task_id = task_info.get("Id")
             task_level = task_info.get("Level", 0)
             if not task_name:
                 logger.warning("任务名为空，跳过该任务")
@@ -104,7 +158,7 @@ class TrailblazePowerTask(BaseTask):
             if task_name == "培养目标":
                 logger.info(f"培养目标 自动检测分配体力: {cost_per_task}")
                 tasks.append((
-                    self.name2task(task_name),
+                    self.get_task_by_id(task_id),
                     {
                         "level": task_level,
                         "allocated_power": cost_per_task,  # 传递分配的体力值，由任务动态计算次数
@@ -114,21 +168,21 @@ class TrailblazePowerTask(BaseTask):
                 continue
 
             # 其他任务：按固定体力消耗计算次数
-            task_cost = self.get_task_cost(task_name)
+            task_cost = self.get_cost_by_id(task_id)
             total_task_count = cost_per_task // task_cost
             if total_task_count <= 0:
                 logger.debug(f"任务[{task_name}]可执行次数为0 (分配体力: {cost_per_task}, 单次成本: {task_cost})")
                 continue
             logger.info(f"{task_name} 自动检测的挑战次数: {total_task_count}")
             # 获取任务最大单次执行次数（默认1）
-            max_count = self.task_max_count_map.get(task_name, 1)
+            max_count = self.get_max_count_by_id(task_id)
             # 分割任务（按最大次数拆分）
             remaining_count = total_task_count
             while remaining_count > 0:
                 # 单次执行次数：不超过最大次数，且不超过剩余次数
                 single_time = min(max_count, remaining_count)
                 tasks.append((
-                    self.name2task(task_name),
+                    self.get_task_by_id(task_id),
                     {
                         "level": task_level,
                         "single_time": single_time,
@@ -138,115 +192,25 @@ class TrailblazePowerTask(BaseTask):
                 remaining_count -= single_time
         return tasks if tasks else None
 
+    def _get_task_detail_by_id(self, detail: str, task_id: str):
+        """任务ID转任务详情"""
+        task_info = self.task_config.get("subtasks", {}).get(task_id)
+        if not task_info:
+            raise RuntimeError("Invalid task ID")
+        return task_info.get(detail)
 
-    def name2task(self, name: str):
-        """任务名称转任务函数"""
-        return self.name_task_map.get(name)
+    def get_task_by_id(self, task_id: str) -> TrailblazePowerFunc:
+        """任务ID转任务函数"""
+        task_func = self._get_task_detail_by_id("func", task_id)
+        return getattr(self, task_func)
 
-    def get_task_cost(self, name: str):
-        """任务体力消耗"""
-        return self.task_cost_map.get(name, 0)
+    def get_cost_by_id(self, task_id: str):
+        """任务ID转任务体力消耗"""
+        return self._get_task_detail_by_id("cost", task_id)
 
-    def run(self):
-        for task, kwargs in self.manual_tasks:
-            if self.stop_flag:
-                return False
-            task(**kwargs)
-        if len(self.auto_detect_tasklist) > 0:
-            detected_tasks = self.detect_tasks()
-            if detected_tasks is None:
-                return self.operator.press_key('esc') # 退出生存索引页面
-            for task, kwargs in detected_tasks:
-                if self.stop_flag:
-                    return False
-                task(**kwargs)
-        return True
-
-    def character_training(self, level=0, single_time: int | None = None, allocated_power: int | None = None, run_time=1, **_) -> bool:
-        """培养目标：直接刷第一个推荐的副本
-
-        Args:
-            level: 等级（未使用）
-            single_time: 手动模式下的挑战次数
-            allocated_power: 自动检测模式下分配的体力值（动态计算次数）
-            run_time: 执行轮数
-        """
-        logger.info("执行任务：培养目标")
-
-        if not self.goto_survival_index():
-            return False
-
-        # 点击培养目标分类
-        name1 = "resources/img/character_training.png"
-        name2 = "resources/img/character_training_onclick.png"
-        self.operator.sleep(0.5)
-        _, result = self.operator.locate_any([name1, name2])
-        if result:
-            self.operator.click_box(result)
-        else:
-            logger.error("未找到培养目标分类")
-            self.operator.press_key("esc")
-            return False
-
-        self.operator.sleep(1)
-
-        # 直接点击第一个进入按钮
-        enter_result = self.operator.ocr_match("进入", from_x=0.5, from_y=0.2, to_x=1.0, to_y=0.8)
-        if enter_result:
-            self.operator.click_box(enter_result)
-        else:
-            logger.warning("未找到进入按钮，请先在游戏中设置培养目标角色")
-            self.operator.press_key("esc")
-            return False
-
-        # 等待传送后识别副本类型，动态计算挑战次数
-        if not self.operator.wait_img('resources/img/battle.png', timeout=20):
-            logger.error("检测超时，等待副本界面失败")
-            return False
-
-        # 确定挑战次数
-        if allocated_power is not None:
-            # 自动检测模式：根据副本类型和分配的体力动态计算
-            single_time = self._calculate_challenge_count(allocated_power)
-            logger.info(f"培养目标自动检测：分配体力 {allocated_power}，挑战次数 {single_time}")
-        elif single_time is None:
-            single_time = 1
-
-        # 执行通用战斗逻辑（跳过 wait_img，已经等待过了）
-        if not self._battle_after_enter(single_time, run_time, skip_wait=True):
-            return False
-        logger.info("任务完成：培养目标")
-        return True
-
-    def _calculate_challenge_count(self, allocated_power: int) -> int:
-        """根据副本类型和分配的体力计算挑战次数"""
-        # 副本类型关键词与体力消耗映射
-        # 注：关键词需要能映射到 task_max_count_map 中的任务名
-        dungeon_info = {
-            "拟造花萼": (10, "拟造花萼（金）"),  # 花萼金/赤都是10体力，最大24次
-            "凝滞虚影": (30, "凝滞虚影"),
-            "侵蚀隧洞": (40, "侵蚀隧洞"),
-            "饰品提取": (40, "饰品提取"),
-            "历战余响": (30, "历战余响"),
-        }
-
-        # 全屏 OCR 识别副本类型
-        ocr_results = self.operator.ocr()
-        if not ocr_results:
-            logger.warning("OCR 识别失败，将按默认体力消耗40计算")
-            return allocated_power // 40
-
-        # 在 OCR 结果中查找副本类型关键词
-        all_text = " ".join([r[1] for r in ocr_results])
-        for keyword, (cost, task_name) in dungeon_info.items():
-            if keyword in all_text:
-                logger.info(f"检测到副本类型：{keyword}，体力消耗：{cost}")
-                max_count = self.task_max_count_map.get(task_name, 6)
-                return min(allocated_power // cost, max_count)
-
-        # 未识别到副本类型，按默认最高消耗计算
-        logger.warning("未识别到副本类型，将按默认体力消耗40计算")
-        return allocated_power // 40
+    def get_max_count_by_id(self, task_id: str):
+        """任务ID转任务最大单次执行次数"""
+        return self._get_task_detail_by_id("max_count", task_id)
 
     def ornament_extraction(self, level, single_time: int | None = None, run_time=1, **_)-> bool:
         """Ornament extraction
@@ -309,30 +273,16 @@ class TrailblazePowerTask(BaseTask):
         return True
 
     def calyx_golden(self, level, single_time=1, run_time=1, **_):
-        levels = ["神谕圣地", "纷争荒墟", "呓语密林",
-                  "筑梦边境", "稚子的梦", "白日梦",
-                  "流云渡", "太卜司", "工造司",
-                  "城郊雪原", "边缘通路", "大矿区"]
         return self.battle("拟造花萼（金）",
                     "calyx(golden)",
-                    levels,
                     level,
                     run_time,
                     False,
                     single_time)
 
     def calyx_crimson(self, level, single_time=1, run_time=1, **_):
-        levels = ["鳞渊境", "收容舱段",
-                  "克劳克", "支援舱段",
-                  "苏乐达", "城郊雪原",
-                  "绥园", "边缘通路",
-                  "匹诺", "铆钉镇",
-                  "白日梦", "机械聚落",
-                  "丹鼎司", "大矿区",
-                  "纷争"]
         return self.battle("拟造花萼（赤）",
                     "calyx(crimson)",
-                    levels,
                     level,
                     run_time,
                     False,
@@ -340,28 +290,16 @@ class TrailblazePowerTask(BaseTask):
                     y_add=-30)
 
     def stagnant_shadow(self, level, single_time=1, run_time=1, **_):
-        levels = ["溟簇之形", '职司之形', '幽府之形', '锋芒之形',
-                  "嗔怒之形", '燔灼之形', '炎华之形',
-                  "塞壬之形", '冰酿之形', '冰棱之形', '霜晶之形',
-                  "机狼之形", '震厄之形', '鸣雷之形',
-                  '烬日之形', '今宵之形', '天人之形', '风之形',
-                  '凛月之形', '焦炙之形', '孽兽之形', '空海之形',
-                  '役轮之形', '弦音之形', '偃偶之形', '幻光之形']
         return self.battle("凝滞虚影",
                     "stagnant_shadow",
-                    levels,
                     level,
                     run_time,
                     True,
                     single_time)
 
     def caver_of_corrosion(self, level, single_time=1, run_time=1, **_):
-        levels = ['隐救之径', '雳涌之径', '弦歌之径', '迷识之径', '勇骑之径', '梦潜之径',
-                  '幽冥之径', '药使之径', '野焰之径', '圣颂之径', '睿治之径',
-                  '漂泊之径', '迅拳之径', '霜风之径']
         return self.battle("侵蚀隧洞",
                     "caver_of_corrosion",
-                    levels,
                     level,
                     run_time,
                     True,
@@ -369,11 +307,8 @@ class TrailblazePowerTask(BaseTask):
                     x_add=700)
 
     def echo_of_war(self, level, single_time=1, run_time=1, **_):
-        levels = ['晨昏', '心兽', '尘梦', '蛀星',
-                  '不死', '寒潮', '毁灭']
         return self.battle("历战余响",
                     "echo_of_war",
-                    levels,
                     level,
                     run_time,
                     True,
@@ -384,7 +319,6 @@ class TrailblazePowerTask(BaseTask):
     def battle(self,
                mission_name: str,
                level_belonging: str,
-               levels: list,
                level: int,
                run_time: int,
                scroll_flag: bool,
@@ -399,7 +333,6 @@ class TrailblazePowerTask(BaseTask):
 
                 mission_name (str): The name of this mission.
                 level_belonging (str): The series to which the level belongs.
-                levels (list): The list of levels in this series.
                 level (int): The index of level in /resources/img.
                 run_time (int): Number of times the task was executed.
                 scroll_flag (bool): Whether scroll or not when finding session.
@@ -580,8 +513,8 @@ class TrailblazePowerTask(BaseTask):
         self.operator.click_img("resources/img/ensure2.png", after_sleep=1)  # 点掉可能出现的提示框
 
     def find_session(self, name, scroll_flag=False):
-        name1 = "resources/img/" + name + ".png"
-        name2 = "resources/img/" + name + "_onclick.png"
+        name1 = f"resources/img/tp/{name}.png"
+        name2 = f"resources/img/tp/{name}_onclick.png"
         if not self.goto_survival_index():
             return False
         if scroll_flag:
@@ -671,7 +604,7 @@ class TrailblazePowerTask(BaseTask):
         elif index == 1:
             # 生存索引页面，点击进入
             self.operator.click_box(box)
-            return True
+            return self.operator.wait_img("resources/img/survival_index_onclick.png", timeout=10) is not None
         elif index == 0:
             # 主页面，按快捷键进入生存索引页面
             self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
