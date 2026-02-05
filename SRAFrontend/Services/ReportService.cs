@@ -31,12 +31,11 @@ public class ReportService(
         return _deviceIdCache;
     }
     
-    public async Task<bool> ReportAsync(string eventType, string? eventData)
+    private AppEvent CreateAppEvent(string eventType, string? eventData)
     {
-        var httpClient = httpClientFactory.CreateClient("GlobalClient");
         var deviceId = GetDeviceId();
         var timestampNow = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        var appEvent = new AppEvent
+        return new AppEvent
         {
             DeviceId = deviceId,
             EventType = eventType,
@@ -46,8 +45,15 @@ public class ReportService(
             Timestamp = timestampNow,
             SessionDuration = timestampNow - cacheService.Cache.LastLaunchTimestamp,
         };
+    }
+    
+    public async Task<bool> ReportAsync(string eventType, string? eventData)
+    {
+        logger.LogInformation("Start report event {EventType}.", eventType);
+        var httpClient = httpClientFactory.CreateClient("GlobalClient");
         try
         {
+            var appEvent = CreateAppEvent(eventType, eventData);
             var response = await httpClient.PostAsJsonAsync(ReportUrl, appEvent);
             response.EnsureSuccessStatusCode();
             logger.LogInformation("Reported event {EventType} successfully.", eventType);
@@ -64,12 +70,25 @@ public class ReportService(
     {
         try
         {
-            var reportTask = ReportAsync(eventType, eventData);
-            if (!reportTask.Wait(timeoutMs)) logger.LogWarning("Reporting event {EventType} timed out.", eventType);
+            logger.LogInformation("Start report event {EventType}", eventType);
+            var httpClient = httpClientFactory.CreateClient("GlobalClient");
+            httpClient.Timeout = TimeSpan.FromMilliseconds(timeoutMs);
+        
+            var appEvent = CreateAppEvent(eventType, eventData);
+            var response = httpClient.PostAsJsonAsync(ReportUrl, appEvent).Result;
+            response.EnsureSuccessStatusCode();
+            logger.LogInformation("Reported event {EventType} successfully.", eventType);
         }
-        catch (Exception )
+        catch (AggregateException ex)
         {
-            logger.LogError("Failed to report event {EventType}.", eventType);
+            // 捕获Result的聚合异常，解析实际错误
+            var innerEx = ex.InnerException ?? ex;
+            logger.LogError(innerEx, "Failed to report event {EventType}, inner error: {Msg}", 
+                eventType, innerEx.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to report event {EventType}.", eventType);
         }
     }
 }
