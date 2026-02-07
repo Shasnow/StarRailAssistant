@@ -3,7 +3,9 @@ from typing import Any, Callable
 
 from SRACore.task import BaseTask
 from SRACore.util.logger import logger
+
 type TrailblazePowerFunc = Callable[[int, int, int], bool]
+
 
 class TrailblazePowerTask(BaseTask):
     def _post_init(self):
@@ -31,7 +33,7 @@ class TrailblazePowerTask(BaseTask):
         if len(self.auto_detect_tasks) > 0:
             detected_tasks = self.detect_tasks()
             if detected_tasks is None:
-                return self.operator.press_key('esc') # 退出生存索引页面
+                return self.operator.press_key('esc')  # 退出生存索引页面
             for task, kwargs in detected_tasks:
                 if self.stop_flag:
                     return False
@@ -61,11 +63,11 @@ class TrailblazePowerTask(BaseTask):
             logger.error("未找到任何培养目标任务")
             self.operator.press_key("esc")
             return
-        target_objects = [] # 存储识别到的培养目标任务对象
+        target_objects = []  # 存储识别到的培养目标任务对象
         for box in boxes:
             self.operator.click_box(box, x_offset=-520, after_sleep=1)  # 点击体力图标左侧位置, 检测目标材料
             raw_res = self.operator.ocr(from_x=0.406, from_y=0.296, to_x=0.594, to_y=0.351)
-            res = "".join(t[1] for t in raw_res)
+            res = "".join(t[1] for t in raw_res).replace('-', "一")  # OCR结果拼接并替换可能的错误字符
             logger.info(f"识别到所需物品: {res}")
             target_objects.append(res)
             self.operator.press_key('esc')
@@ -120,8 +122,8 @@ class TrailblazePowerTask(BaseTask):
                 return None
             # 过滤加号（兼容全角/空格变体）+ 空字符串
             exclude_chars = {'+', '十', '＋', '满'}
-            valid_res = [r[1] for r in res if r[1] not in exclude_chars]
-            reserve_tbp = int(valid_res[0])
+            valid_res:list[str] = [r[1] for r in res if r[1] not in exclude_chars]
+            reserve_tbp = int(valid_res[0].replace('满', ''))  # 后备开拓力，替换可能的错误字符
             current_tbp_str = valid_res[1].split('/')[0] if '/' in valid_res[1] else valid_res[1]
             current_tbp = int(current_tbp_str)
             immersion_dev_str = valid_res[2].split('/')[0] if '/' in valid_res[2] else valid_res[2]
@@ -141,6 +143,7 @@ class TrailblazePowerTask(BaseTask):
         tasks_count = len(self.auto_detect_tasks)
         task_cost_list = [self.get_cost_by_id(task.get("Id")) for task in self.auto_detect_tasks]  # 获取任务体力消耗列表
         sum_cost = sum(task_cost_list)
+        min_cost = min(task_cost_list)
         base = ava_current_tbp // sum_cost  # 基础可执行次数
         remain = ava_current_tbp % sum_cost  # 剩余体力
         logger.info(f"每个任务基础可执行次数: {base}, 剩余体力: {remain}")
@@ -149,19 +152,20 @@ class TrailblazePowerTask(BaseTask):
         # 将任务按体力升序排序，保留原始索引 (体力值, 原索引)
         sorted_tasks = sorted((val, idx) for idx, val in enumerate(task_cost_list))
         # 分配剩余体力：小体力任务优先，尽可能多分配
-        for val, idx in sorted_tasks:
-            if remain >= val:
-                tasks_times[idx] += 1
-                remain -= val
-            # 剩余体力不足，直接退出
-            if remain < min(task_cost_list):
-                break
+        while remain >= min_cost:
+            for val, idx in sorted_tasks:
+                if remain >= val:
+                    tasks_times[idx] += 1
+                    remain -= val
+                # 剩余体力不足，直接退出
+                if remain < min_cost:
+                    break
 
         # 生成最终任务列表
         tasks = []
         for i, item in enumerate(self.auto_detect_tasks):
             task_func = self.get_task_by_id(item["Id"])
-            run_time= tasks_times[i]
+            run_time = tasks_times[i]
             logger.info(f"任务 {item['Name']} ({item['Level']}) 将执行 {run_time} 次")
             if run_time == 0:
                 continue  # 跳过执行次数为0的任务
@@ -199,7 +203,7 @@ class TrailblazePowerTask(BaseTask):
         """任务ID转任务最大单次执行次数"""
         return self._get_task_detail_by_id("max_count", task_id)
 
-    def ornament_extraction(self, level, single_time: int | None = None, run_time=1, **_)-> bool:
+    def ornament_extraction(self, level, single_time: int | None = None, run_time=1, **_) -> bool:
         """Ornament extraction
 
         Args:
@@ -261,47 +265,47 @@ class TrailblazePowerTask(BaseTask):
 
     def calyx_golden(self, level, single_time=1, run_time=1, **_):
         return self.battle("拟造花萼（金）",
-                    "calyx(golden)",
-                    level,
-                    run_time,
-                    False,
-                    single_time)
+                           "calyx(golden)",
+                           level,
+                           run_time,
+                           False,
+                           single_time)
 
     def calyx_crimson(self, level, single_time=1, run_time=1, **_):
         return self.battle("拟造花萼（赤）",
-                    "calyx(crimson)",
-                    level,
-                    run_time,
-                    False,
-                    single_time,
-                    y_add=-30)
+                           "calyx(crimson)",
+                           level,
+                           run_time,
+                           False,
+                           single_time,
+                           y_add=-30)
 
     def stagnant_shadow(self, level, single_time=1, run_time=1, **_):
         return self.battle("凝滞虚影",
-                    "stagnant_shadow",
-                    level,
-                    run_time,
-                    True,
-                    single_time)
+                           "stagnant_shadow",
+                           level,
+                           run_time,
+                           True,
+                           single_time)
 
     def caver_of_corrosion(self, level, single_time=1, run_time=1, **_):
         return self.battle("侵蚀隧洞",
-                    "caver_of_corrosion",
-                    level,
-                    run_time,
-                    True,
-                    single_time,
-                    x_add=700)
+                           "caver_of_corrosion",
+                           level,
+                           run_time,
+                           True,
+                           single_time,
+                           x_add=700)
 
     def echo_of_war(self, level, single_time=1, run_time=1, **_):
         return self.battle("历战余响",
-                    "echo_of_war",
-                    level,
-                    run_time,
-                    True,
-                    single_time,
-                    x_add=770,
-                    y_add=25)
+                           "echo_of_war",
+                           level,
+                           run_time,
+                           True,
+                           single_time,
+                           x_add=770,
+                           y_add=25)
 
     def battle(self,
                mission_name: str,
@@ -490,7 +494,8 @@ class TrailblazePowerTask(BaseTask):
     def support(self):
         if self.operator.click_img("resources/img/remove_support.png", after_sleep=1):
             self.operator.move_rel(0, 100)
-        target_index, target_box = self.operator.locate_any(["resources/img/support.png", "resources/img/tp/support2.png"])
+        target_index, target_box = self.operator.locate_any(
+            ["resources/img/support.png", "resources/img/tp/support2.png"])
         self.operator.click_box(target_box, after_sleep=1)
         if target_index == 0:
             self.operator.click_img("resources/img/enter_line.png")
@@ -537,7 +542,8 @@ class TrailblazePowerTask(BaseTask):
         if self.replenish_time != 0:
             logger.info("补充体力")
             if way == 0:
-                if self.operator.locate("resources/img/reserved_trailblaze_power_onclick.png") or self.operator.click_img(
+                if self.operator.locate(
+                        "resources/img/reserved_trailblaze_power_onclick.png") or self.operator.click_img(
                         "resources/img/reserved_trailblaze_power.png"):
                     # click('resources/img/count.png', x_add=200)
                     # if self.replenish_time>300:
@@ -554,7 +560,8 @@ class TrailblazePowerTask(BaseTask):
                     logger.error("发生错误，错误编号13")
                     return False
             elif way == 1:
-                if self.operator.click_img("resources/img/fuel.png") or self.operator.locate("resources/img/fuel_onclick.png"):
+                if self.operator.click_img("resources/img/fuel.png") or self.operator.locate(
+                        "resources/img/fuel_onclick.png"):
                     self.operator.click_img("resources/img/ensure.png", after_sleep=1.5)
                     self.operator.click_img("resources/img/ensure.png", after_sleep=1.5)
                     self.operator.click_point(0.5, 0.7)  # 点击屏幕中心
