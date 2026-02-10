@@ -214,10 +214,10 @@ class TrailblazePowerTask(BaseTask):
             None
         """
         logger.info("执行任务：饰品提取")
-        level = f"resources/img/ornament_extraction ({level}).png"
+        level = f"resources/img/tp/ornament_extraction ({level}).png"
         if not self.find_session("ornament_extraction"):
             return False
-        if self.operator.locate("resources/img/no_save.png"):
+        if self.operator.locate("resources/img/tp/ornament_extraction_no_save.png"):
             logger.warning("当前暂无可用存档，请前往[差分宇宙]获取存档")
             self.operator.press_key("esc")
             return False
@@ -226,7 +226,7 @@ class TrailblazePowerTask(BaseTask):
         if not self.operator.click_img(level, x_offset=700):
             logger.error("发生错误，错误编号3")
             return False
-        if not self.operator.wait_img('resources/img/ornament_extraction_page.png', timeout=20):  # 等待传送
+        if not self.operator.wait_img('resources/img/tp/ornament_extraction_page.png', timeout=20):  # 等待传送
             logger.error("检测超时，编号4")
             return False
         if single_time is not None:
@@ -335,7 +335,7 @@ class TrailblazePowerTask(BaseTask):
                 None
         """
         logger.info(f"执行任务：{mission_name}")
-        level_path = f"resources/img/{level_belonging} ({level}).png"
+        level_path = f"resources/img/tp/{level_belonging} ({level}).png"
         if not self.find_session(level_belonging, scroll_flag):
             return False
         if not self.find_level(level_path):
