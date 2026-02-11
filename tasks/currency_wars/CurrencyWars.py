@@ -14,7 +14,6 @@ class CurrencyWars(Executable):
     def __init__(self, operator, run_times: int):
         super().__init__(operator)
         self.run_times = run_times
-        self.force_battle = False
         self.is_continue = False  # 是否是继续挑战
         self.strategy_external_control: bool = False  # 当外部（如刷开局流程）希望在“选择投资策略”页接管逻辑时，置为 True
         self.difficulty_mode: int = 0  # 难度模式：0=最低难度，1=最高难度（默认最低）
@@ -261,17 +260,16 @@ class CurrencyWars(Executable):
             self.update_max_team_size()
             self.place_character()
             self.sell_character()
-            if self.battle():
-                if not self.stage_transition():
-                    break
-                if not self.is_running:  # 任务已被标记为停止, 需要退出循环
-                    break
-                self.shopping()
-                self.harvest_crystals()
-                self.get_in_hand_area(True)  # 更新手牌信息
-            else:
-                self.refresh_character()
-                self.force_battle = True
+            if not self.battle():
+                break
+            if not self.stage_transition():
+                break
+            if not self.is_running:  # 任务已被标记为停止, 需要退出循环
+                break
+            self.shopping()
+            self.harvest_crystals()
+            self.get_in_hand_area(True)  # 更新手牌信息
+
             run_times += 1
             if run_times % 3 == 0:  # 每3轮更新一次场上角色，顺便穿戴装备
                 self.refresh_character()
@@ -576,13 +574,7 @@ class CurrencyWars(Executable):
             logger.error("未识别到战斗按钮")
             return False
         if self.operator.locate(IMG.ENSURE):  # 编队未满提醒
-            if self.force_battle:
-                self.operator.click_img(IMG.ENSURE)
-            else:
-                self.operator.press_key('esc')
-                self.operator.sleep(0.5)
-                return False
-        self.force_battle = False
+            self.operator.click_img(IMG.ENSURE)
         result, _ = self.operator.wait_any_img([CWIMG.SETTLE, CWIMG.CONTINUE], timeout=600, interval=1)
         if result != -1:
             logger.info("挑战结束")
@@ -596,6 +588,16 @@ class CurrencyWars(Executable):
         """实现关卡切换逻辑，通过识别图片状态执行对应操作"""
         # 定义状态配置：(图片路径, 状态名称, 处理函数, 是否为终止状态)
         stage_config = [
+            (
+                CWIMG.FORTUNE_TELLER,
+                '命运卜者',
+                lambda: [
+                    self.operator.click_point(0.8, 0.3, after_sleep=1),  # 选择第三个选项
+                    self.operator.click_point(0.77, 0.521, after_sleep=1),  # 点击确认按钮
+                    self.operator.click_point(0.8438, 0.8481, after_sleep=1)  # 打开商店界面
+                ],
+                False  # 非终止状态
+            ),
             (
                 CWIMG.REPLENISH_STAGE,
                 '补给节点',
@@ -634,7 +636,7 @@ class CurrencyWars(Executable):
             ),
             (
                 CWIMG.CLICK_BLANK,
-                '点击空白处关闭',
+                '强敌来袭',
                 lambda: [self.operator.click_point(0.5, 0.70, after_sleep=1)],
                 False
             ),
@@ -704,14 +706,16 @@ class CurrencyWars(Executable):
         ])
         if event == 0:  # 盛会之星事件
             self.operator.click_point(0.5, 0.25, after_sleep=1)  # 选择第一个选项
-            self.operator.click_point(0.77, 0.52, after_sleep=1)  # 点击确认按钮
-            return True
+            self.operator.click_point(0.77, 0.521, after_sleep=1)  # 点击确认按钮
+            return self.handle_special_event()  # 可能连续触发事件，递归处理
         elif event == 1:  # 命运卜者事件
             logger.info("触发命运卜者事件")
             self.operator.click_point(0.8, 0.3, after_sleep=1)  # 选择第三个选项
-            self.operator.click_point(0.77, 0.52, after_sleep=1)  # 点击确认按钮
+            self.operator.click_point(0.77, 0.521, after_sleep=1)  # 点击确认按钮
+            return self.handle_special_event()  # 可能连续触发事件，递归处理
+        else:
+            # 未检测到特殊事件，正常返回
             return True
-        return False
 
     def strategy_event(self):
         """处理攻略事件"""
