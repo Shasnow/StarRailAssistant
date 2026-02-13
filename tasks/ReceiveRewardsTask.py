@@ -9,16 +9,16 @@ class ReceiveRewardsTask(BaseTask):
     def run(self):
         # 初始化任务
         tasks, tasks2 = self._init_tasks()
-
+        logger.info("领取奖励")
         # 校验界面状态
         if not self._prepare_ui():
             return False
 
-        # 执行任务组1（带参数）
+        # 执行任务组1（esc界面完成）
         if tasks and not self._execute_tasks_with_args(tasks):
             return False
 
-        # 执行任务组2（无参数）
+        # 执行任务组2（其他界面）
         if tasks2 and not self._execute_tasks_without_args(tasks2):
             return False
 
@@ -52,7 +52,6 @@ class ReceiveRewardsTask(BaseTask):
 
     def _prepare_ui(self):
         """等待进入主界面并打开菜单"""
-        logger.info("领取奖励")
         if not self.operator.wait_img("resources/img/enter.png", timeout=30):
             logger.error("检测超时，编号2")
             return False
@@ -191,14 +190,7 @@ class ReceiveRewardsTask(BaseTask):
                 return
 
         if self.operator.click_img("resources/img/assignments_reward.png", after_sleep=2):
-            if self.operator.click_img("resources/img/assign_again.png"):
-                logger.info("再次派遣")
-                while not self.operator.ocr_match("开拓", from_x=0.656,from_y=0.222, to_x=0.740, to_y=0.278):
-                    self.operator.press_key("esc")
-                    self.operator.sleep(1)
-            else:
-                logger.error("发生错误，错误编号6")
-                self.operator.press_key("esc")
+            self.operator.press_key("esc", presses=2, interval=1)
         else:
             logger.info("没有可以领取的派遣奖励")
             self.operator.press_key("esc")

@@ -26,7 +26,8 @@ public partial class MainWindowViewModel(
         "-1073741819",
         "飞荧扑火，向死而生",
         "跨越寰宇终抵黯淡星外",
-        "立志成为崩铁糕手"
+        "立志成为崩铁糕手",
+        "满月是神不在的时间"
     ];
 
     private static readonly List<string> GreetingsEn =

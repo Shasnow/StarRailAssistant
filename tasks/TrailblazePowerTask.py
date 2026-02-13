@@ -66,7 +66,7 @@ class TrailblazePowerTask(BaseTask):
         target_objects = []  # 存储识别到的培养目标任务对象
         for box in boxes:
             self.operator.click_box(box, x_offset=-520, after_sleep=1)  # 点击体力图标左侧位置, 检测目标材料
-            raw_res = self.operator.ocr(from_x=0.406, from_y=0.296, to_x=0.594, to_y=0.351)
+            raw_res = self.operator.ocr(from_x=0.4, from_y=0.25, to_x=0.6, to_y=0.35)
             res = "".join(t[1] for t in raw_res).replace('-', "一")  # OCR结果拼接并替换可能的错误字符
             logger.info(f"识别到所需物品: {res}")
             target_objects.append(res)
@@ -278,7 +278,8 @@ class TrailblazePowerTask(BaseTask):
                            run_time,
                            False,
                            single_time,
-                           y_add=-30)
+                           x_add = 700,
+                           y_add = 0)
 
     def stagnant_shadow(self, level, single_time=1, run_time=1, **_):
         return self.battle("凝滞虚影",
@@ -495,7 +496,7 @@ class TrailblazePowerTask(BaseTask):
         if self.operator.click_img("resources/img/remove_support.png", after_sleep=1):
             self.operator.move_rel(0, 100)
         target_index, target_box = self.operator.locate_any(
-            ["resources/img/support.png", "resources/img/tp/support2.png"])
+            ["resources/img/tp/support.png", "resources/img/tp/support2.png"])
         self.operator.click_box(target_box, after_sleep=1)
         if target_index == 0:
             self.operator.click_img("resources/img/enter_line.png")

@@ -46,7 +46,7 @@ class CosmicStrifeTask(BaseTask):
             from tasks.currency_wars import CurrencyWars
             cw_task = CurrencyWars(self.operator, self.config.get("CurrencyWarsRunTimes", 0))
             cw_task.set_username(username)
-            cw_task.load_strategy("test")
+            cw_task.load_strategy("template")
             # 前端难度选择：0=最低难度，1=最高难度
             difficulty = self.config.get("CurrencyWarsDifficulty", 0)
             cw_task.set_difficulty(difficulty)

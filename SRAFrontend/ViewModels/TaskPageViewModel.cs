@@ -83,6 +83,9 @@ public partial class TaskPageViewModel : PageViewModel
                 Levels = new[]
                 {
                     "---选择副本---",
+                    "回忆之蕾（二相乐园）",
+                    "以太之蕾（二相乐园）",
+                    "珍藏之蕾（二相乐园）",
                     "回忆之蕾（翁法罗斯）",
                     "以太之蕾（翁法罗斯）",
                     "珍藏之蕾（翁法罗斯）",
@@ -111,6 +114,7 @@ public partial class TaskPageViewModel : PageViewModel
                     "净世残刃（毀灭）",
                     "神体琥珀（存护）",
                     "琥珀的坚守（存护）",
+                    "天谴血矛（巡猎）",
                     "逆时一击（巡猎）",
                     "逐星之矢（巡猎）",
                     "万象果实（丰饶）",
@@ -121,7 +125,8 @@ public partial class TaskPageViewModel : PageViewModel
                     "群星乐章（同谐）",
                     "焚天之魔（虚无）",
                     "沉沦黑曜（虚无）",
-                    "阿赖耶华（记忆）"
+                    "阿赖耶华（记忆）",
+                    "《绒绒号》典藏版合集（欢愉）"
                 },
                 MaxSingleTimes = 24
             },
@@ -146,6 +151,7 @@ public partial class TaskPageViewModel : PageViewModel
                     "冷藏梦箱（冰）",
                     "苦寒晶壳（冰）",
                     "风雪之角（冰）",
+                    "狂雷扫弦（雷）",
                     "兽馆之钉（雷）",
                     "炼形者雷枝（雷）",
                     "往日之影的雷冠（雷）",
@@ -173,6 +179,7 @@ public partial class TaskPageViewModel : PageViewModel
                 Levels = new[]
                 {
                     "---选择副本---",
+                    "魔占之径（魔法少女/卜者）",
                     "隐救之径（救世主/隐士）",
                     "雳勇之径（女武神/船长）",
                     "弦歌之径（英豪/诗人）",
