@@ -42,7 +42,7 @@ class Positioning(enum.IntEnum):
 @dataclasses.dataclass
 class Character:
     name: str  # 名称
-    faction: Faction  # 阵营
+    faction: list[Faction] | Faction  # 阵营
     schools: list[School]  # 派系
     cost: int  # 费用
     positioning: Positioning  # 默认站位
@@ -87,7 +87,7 @@ class Characters:
     Sunday = Character('星期日', Faction.ThePlanetOfFestivities, [School.Energy], 3, Positioning.OnField)
     Fugue = Character('忘归人', Faction.Xianzhou, [School.Break], 3, Positioning.OffField)
     Rappa = Character('乱破', Faction.GalaxyRanger, [School.Break], 1, Positioning.OnField)
-    Lingsha = Character('灵砂', Faction.WolfHunt, [School.Break], 4, Positioning.OnField)
+    Lingsha = Character('灵砂', Faction.WolfHunt, [School.Break, School.Heal], 2, Positioning.OnField)
     Feixiao = Character('飞霄', Faction.WolfHunt, [School.FollowUpATK], 2, Positioning.OnField)
     Moze = Character('貊泽', Faction.WolfHunt, [School.FollowUpATK], 1, Positioning.OffField)
     Jiaoqiu = Character('椒丘', Faction.WolfHunt, [School.Heal, School.Debuff], 1, Positioning.OnField)
@@ -105,12 +105,12 @@ class Characters:
     BlackSwan = Character('黑天鹅', Faction.ThePlanetOfFestivities, [School.DoT], 5, Positioning.OffField)
     DrRatio = Character('真理医生', Faction.CosmicScholar, [School.FollowUpATK], 3, Positioning.OnField)
     RuanMei = Character('阮·梅', Faction.CosmicScholar, [School.Break], 2, Positioning.OffField)
-    Argenti = Character('银枝', Faction.GalacticVoyager, [School.AoEATK], 2, Positioning.OnField)
+    Argenti = Character('银枝', Faction.GalacticVoyager, [School.AoEATK, School.Energy], 2, Positioning.OnField)
     Huohuo = Character('藿藿', Faction.Xianzhou, [School.Energy, School.Heal], 2, Positioning.OnOffField)
     TopazAndNumby = Character('托帕&账账', Faction.IPC, [School.FollowUpATK], 5, Positioning.OffField)
     Jingliu = Character('镜流', Faction.WolfHunt, [School.Bloodflame], 3, Positioning.OffField)
     FuXuan = Character('符玄', Faction.Xianzhou, [School.Heal, School.QuantumResonance], 4, Positioning.OffField)
-    DanHeng_ImbibitorLunae = Character('丹恒·饮月', Faction.ExpressCohort, [School.SkillPoints], 2, Positioning.OnField)
+    DanHeng_ImbibitorLunae = Character('丹恒·饮月', [Faction.ExpressCohort, Faction.Xianzhou], [School.SkillPoints], 2, Positioning.OnField)
     Kafka = Character('卡芙卡', Faction.StellaronHunters, [School.DoT], 2, Positioning.OnField)
     Blade = Character('刃', Faction.StellaronHunters, [School.Bloodflame], 1, Positioning.OffField)
     Luocha = Character('罗刹', Faction.GalacticVoyager, [School.Heal], 4, Positioning.OffField)
@@ -131,6 +131,9 @@ class Characters:
     Pela = Character('佩拉', Faction.Belobog, [School.Debuff], 2, Positioning.OffField)
     Herta = Character('黑塔', Faction.CosmicScholar, [School.AoEATK], 1, Positioning.OnOffField)
     Trailblazer = Character('开拓者', Faction.ExpressCohort, [School.Energy], 4, Positioning.OnField)
+    TheDahlia = Character('大丽花', Faction.ThePlanetOfFestivities, [School.Break], 1, Positioning.OnOffField)
+    YaoGuang = Character('爻光', Faction.Xianzhou, [School.SkillPoints], 1, Positioning.OnOffField)
+    Sparxie = Character('火花', Faction.GalacticVoyager, [School.SkillPoints], 4, Positioning.OnField)
 
 
 # 角色列表
@@ -197,13 +200,16 @@ characters: dict[str, Character] = {
     '加拉赫': Characters.Gallagher,
     '阿格莱雅': Characters.Aglaea,
     '开拓者': Characters.Trailblazer,
+    '大丽花': Characters.TheDahlia,
+    '光': Characters.YaoGuang,
+    '火花': Characters.Sparxie,
 }
 username = '开拓者'  # 请将此处改为你的角色名称
 
 
 def get_character(name: str) -> Character | None:
     """根据名称获取角色信息"""
-    name = name.replace('·', '•').replace('傑', '杰').replace('姐', '妲')
+    name = name.replace('·', '•').replace('傑', '杰').replace('姐', '妲').replace("交", "")
     if name == username:
         return Characters.Trailblazer
     return characters.get(name)
