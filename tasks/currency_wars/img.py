@@ -54,3 +54,4 @@ class CWIMG:
     BATTLE = f"{BASE}/battle.png" #依赖于目前的默认 灰度 CCOEFF 算法
     REFRESH_ENV = f'{BASE}/refresh_environment.png'
     LOGO = f"{BASE}/logo.png"
+    FAIL = f"{BASE}/fail.png"
