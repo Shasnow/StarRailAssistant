@@ -5,8 +5,7 @@ from loguru import logger
 
 import tasks.currency_wars.characters as cw_chars
 from SRACore.task import Executable
-from tasks.currency_wars.characters import (Character, Positioning,
-                                            get_character)
+from tasks.currency_wars.characters import Character, Positioning, get_character
 from tasks.currency_wars.img import CWIMG, IMG
 
 
@@ -102,7 +101,8 @@ class CurrencyWars(Executable):
                                               CWIMG.CURRENCY_WARS_START,
                                               CWIMG.PREPARATION_STAGE], interval=0.5)
         if page == 0:
-            self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
+            guide_hotkey = ((self.settings or {}).get('GuideHotkey', 'f4') or 'f4')
+            self.operator.press_key(str(guide_hotkey).lower())
             if not self.operator.wait_img(IMG.F4, timeout=20):
                 logger.error("检测超时，编号1")
                 self.operator.press_key("esc")
@@ -519,9 +519,9 @@ class CurrencyWars(Executable):
 
         while attempt < max_attempts:
             if self.in_hand_character_count < 8:
-                logger.info(f"手牌未满，跳过出售角色")
+                logger.info("手牌未满，跳过出售角色")
                 return True
-            logger.info(f"手牌已满，尝试出售角色")
+            logger.info("手牌已满，尝试出售角色")
             self.handle_sell_character()
             self.get_in_hand_area()  # 检测空位，确保没有新插入的角色
             attempt += 1
@@ -565,7 +565,7 @@ class CurrencyWars(Executable):
                 character.is_placed = False
             logger.info(f"已出售角色：{character.name}")
             self.operator.sleep(0.5)
-        logger.info(f"出售操作完成")
+        logger.info("出售操作完成")
 
     def battle(self) -> bool:
         # self.operators.click_point(0.907, 0.714, after_sleep=1)
@@ -729,7 +729,12 @@ class CurrencyWars(Executable):
             if not results:
                 return []
             for item in results:
-                name:str = item[1]
+                name_raw = item[1]
+                if not isinstance(name_raw, str):
+                    continue
+                name: str = name_raw.strip()
+                if not name:
+                    continue
                 if name.isdecimal(): # 跳过价格识别结果
                     continue
                 if '备' in name:  # 备战席已满
@@ -810,7 +815,7 @@ class CurrencyWars(Executable):
         result = self.operator.ocr(from_x=0.505, from_y=0.18, to_x=0.608, to_y=0.27)
         if result:
             try:
-                self.max_team_size = int(result[-1][1])
+                self.max_team_size = int(str(result[-1][1]).strip())
                 logger.info(f"最大队伍人数已更新为 {self.max_team_size}")
             except ValueError:
                 logger.warning(f"无法解析最大队伍人数：{result[-1][1]}")
@@ -823,7 +828,7 @@ class CurrencyWars(Executable):
             path = f"tasks/currency_wars/strategies/{name}.json"
         with open(path, "r", encoding="utf-8") as f:
             strategy_data: dict[str, Any] = json.load(f)
-        name = strategy_data.get("name")
+        strategy_name = strategy_data.get("name")
         description = strategy_data.get("description")
         self.min_coins = strategy_data.get("min_coins", 40)
         self.min_level = strategy_data.get("min_level", 7)
@@ -833,15 +838,21 @@ class CurrencyWars(Executable):
         strategy_off_field: dict[str,int] = strategy_data.get("off_field", {})
         for i, cn in enumerate(strategy_on_field.keys()):
             c = get_character(cn)
+            if c is None:
+                logger.warning(f"攻略角色不存在，跳过：{cn}")
+                continue
             c.priority = 99 - i  # 确保攻略中的前台角色优先级都大于其他角色，同时有所差别
             c.position = Positioning.OnField
             self.strategy_characters[cn] = strategy_on_field[cn]
         for i, cn in enumerate(strategy_off_field):
             c = get_character(cn)
+            if c is None:
+                logger.warning(f"攻略角色不存在，跳过：{cn}")
+                continue
             c.priority = 99 - i  # 确保攻略中的后台角色优先级都大于其他角色
             c.position = Positioning.OffField
             self.strategy_characters[cn] = strategy_off_field[cn]
-        logger.info(f"已加载攻略: {name}: {description}")
+        logger.info(f"已加载攻略: {strategy_name}: {description}")
 
     def unload_strategy(self):
         """卸载当前攻略，重置角色"""
