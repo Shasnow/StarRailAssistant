@@ -51,6 +51,6 @@ class CWIMG:
     REFRESH_COUNT = f"{BASE}/refresh_count.png"
     REFRESH_COUNT_BTN = f"{BASE}/refresh_count_btn.png"
     RETURN_INVESTMENT_STRATEGY = f"{BASE}/return_investment_strategy.png"
-    BATTLE = f"{BASE}/battle.png"
+    BATTLE = f"{BASE}/battle.png" #依赖于目前的默认 灰度 CCOEFF 算法
     REFRESH_ENV = f'{BASE}/refresh_environment.png'
     LOGO = f"{BASE}/logo.png"
