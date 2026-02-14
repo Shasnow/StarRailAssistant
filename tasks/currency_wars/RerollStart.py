@@ -2,10 +2,11 @@ import re
 
 from loguru import logger
 
+from SRACore.task import Executable
 from SRACore.util.logger import auto_log_methods
 from SRACore.util.notify import try_send_notification
-from SRACore.task import Executable
 from tasks.currency_wars.img import CWIMG, IMG
+
 from .CurrencyWars import CurrencyWars
 
 
@@ -50,14 +51,19 @@ class RerollStart(Executable):
         self.invest_strategy = None
 
     def _reset_cw_flags_after_abort(self, result: bool):
-        """统一在结算返回后重置 CW 运行/接管标记。"""
-        if result:
-            self.cw.strategy_external_control = False
-            self.cw.is_running = False
-            # 退出策略阶段，允许下一轮重新定位与进入
-            self._in_strategy_phase = False
-            self.invest_environment = None
-            self.invest_strategy = None
+        """统一在结算/中断流程后重置 CW 运行/接管标记。
+
+        关键点：即使结算返回流程失败（例如卡在“进入失败/结算页”），也必须强制停止 `cw.run_game()`
+        的主循环并退出策略接管阶段，否则外层 while 会在错误页面上反复执行放置/出售等对局逻辑。
+        """
+        # 无论结算是否成功，都先停掉 CW 循环与接管，避免在异常页面持续跑对局逻辑
+        self.cw.strategy_external_control = False
+        self.cw.is_running = False
+        # 退出策略阶段，允许下一轮重新定位与进入
+        self._in_strategy_phase = False
+        # 清空本轮记录，避免异常时携带旧状态影响判断
+        self.invest_environment = None
+        self.invest_strategy = None
         return result
 
     def run(self):
@@ -361,7 +367,7 @@ class RerollStart(Executable):
             return False
 
         logger.info(f"刷到需要的投资环境: {self.wanted_invest_environment[index]}")
-        if self.operator.click_box(box, after_sleep=1):
+        if box is not None and self.operator.click_box(box, after_sleep=1):
             self.operator.click_img(IMG.ENSURE2, after_sleep=1)
         self.invest_environment = self.wanted_invest_environment[index]
         self.operator.sleep(4)
@@ -398,29 +404,25 @@ class RerollStart(Executable):
             # 放弃并结算
             withdraw_and_settle = self.operator.wait_img(CWIMG.WITHDRAW_AND_SETTLE, timeout=8, interval=0.5)
             if withdraw_and_settle is None:
-                logger.error("未识别到放弃并结算入口")
-                return False
+                raise RuntimeError("未识别到放弃并结算入口")
             self.operator.click_box(withdraw_and_settle, after_sleep=2.5)
 
             # 下一步
             next_step = self.operator.wait_img(CWIMG.NEXT_STEP, timeout=8, interval=0.5)
             if next_step is None:
-                logger.error("点击放弃并结算后，未识别到下一步")
-                return False
+                raise RuntimeError("点击放弃并结算后，未识别到下一步")
             self.operator.click_box(next_step, after_sleep=1.8)
 
             # 下一页
             next_page = self.operator.wait_img(CWIMG.NEXT_PAGE, timeout=8, interval=0.5)
             if next_page is None:
-                logger.error("点击下一步后，未识别到下一页")
-                return False
+                raise RuntimeError("点击下一步后，未识别到下一页")
             self.operator.click_box(next_page, after_sleep=1.8)
 
             # 返回货币战争主页
             back_currency_wars = self.operator.wait_img(CWIMG.BACK_CURRENCY_WARS, timeout=8, interval=0.5)
             if back_currency_wars is None:
-                logger.error("点击下一页后，未识别到返回货币战争")
-                return False
+                raise RuntimeError("点击下一页后，未识别到返回货币战争")
             self.operator.click_box(back_currency_wars, after_sleep=2)
             logger.info("已结算并返回货币战争主界面")
             return True
