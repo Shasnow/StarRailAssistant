@@ -408,8 +408,36 @@ class CurrencyWars(Executable):
                     self.operator.sleep(1)
                     self.handle_special_event()
 
+        # 若前台为空，则从后台提升一个角色到前台第一个位置，避免出现前台全空的情况
+        self.ensure_on_field_not_empty()
+
         logger.info("角色放置完成")
         return True
+
+    def ensure_on_field_not_empty(self) -> bool:
+        """校验前台角色列表是否为空。
+
+        若前台（on_field_character）全部为空，则从后台（off_field_character）中按顺序取第一个非空角色，
+        将其移动到前台第一个位置（索引 0）。
+
+        :return: 若无需处理或移动成功返回 True；若前台为空且后台也无角色可移动则返回 False。
+        """
+        if any(c is not None for c in self.on_field_character):
+            return True
+
+        for off_index, char in enumerate(self.off_field_character):
+            if char is None:
+                continue
+            logger.info(f"前台为空，提升后台角色 {char.name} (off_field[{off_index}]) 到前台 on_field[0]")
+            return self.swap_character_between_areas(
+                source_area_type='off_field',
+                source_index=off_index,
+                target_area_type='on_field',
+                target_index=0,
+            )
+
+        logger.warning("前台为空且后台无角色可提升")
+        return False
 
     def place_on_field_character(self, character_in_hand: int) -> bool:
         """将手中的角色放置到场上（前台角色专用，优先占位）"""
