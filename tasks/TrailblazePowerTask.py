@@ -493,17 +493,46 @@ class TrailblazePowerTask(BaseTask):
                     self.operator.scroll(-1)
 
     def support(self):
+        """选择支援角色（固定选第一个可用角色）
+
+        处理重复角色场景：
+        - 第一个支援角色有替换图标（与队伍中角色重复）→ 直接入队，游戏自动替换
+        - 没有替换图标 → 先踢掉 4 号位角色腾出位置，再入队
+        """
+        # 解除已有的支援角色
         if self.operator.click_img("resources/img/remove_support.png", after_sleep=1):
             self.operator.move_rel(0, 100)
-        target_index, target_box = self.operator.locate_any(
+
+        # 点击支援按钮，打开支援角色列表
+        _, target_box = self.operator.locate_any(
             ["resources/img/tp/support.png", "resources/img/tp/support2.png"])
+        if target_box is None:
+            logger.warning("未找到支援按钮")
+            return
         self.operator.click_box(target_box, after_sleep=1)
-        if target_index == 0:
-            self.operator.click_img("resources/img/enter_line.png")
-        elif target_index == 1:
-            self.operator.click_point(0.1646, 0.2241, tag="支援1号位")
-        self.operator.sleep(1)
-        self.operator.click_img("resources/img/ensure2.png", after_sleep=1)  # 点掉可能出现的提示框
+
+        # 第一个支援角色头像区域
+        x1, y1, x2, y2 = 45, 190, 155, 320
+
+        # 检查第一个支援角色是否有替换图标（与队伍中角色重复）
+        w, h = self.operator.width, self.operator.height
+        has_replace = self.operator.locate(
+            "resources/img/tp/duplicate_replaced.png",
+            from_x=x1 / w, from_y=y1 / h,
+            to_x=x2 / w, to_y=y2 / h,
+            confidence=0.7
+        ) is not None
+
+        if not has_replace:
+            # 没有替换图标，先踢掉 4 号位角色腾出位置
+            logger.info("未检测到替换图标，踢掉4号位角色")
+            self.operator.click_point(0.892, 0.534, tag="踢掉4号位角色", after_sleep=1)
+
+        # 点击第一个支援角色
+        self.operator.click_point((x1 + x2) // 2, (y1 + y2) // 2, after_sleep=1)
+
+        # 确认入队
+        self.operator.click_img("resources/img/ensure2.png", after_sleep=1)
 
     def find_session(self, name, scroll_flag=False):
         name1 = f"resources/img/tp/{name}.png"
