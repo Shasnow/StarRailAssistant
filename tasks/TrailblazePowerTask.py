@@ -529,7 +529,12 @@ class TrailblazePowerTask(BaseTask):
             self.operator.click_point(0.892, 0.534, tag="踢掉4号位角色", after_sleep=1)
 
         # 点击第一个支援角色
-        self.operator.click_point((x1 + x2) // 2, (y1 + y2) // 2, after_sleep=1)
+        self.operator.click_point(
+            (x1 + x2) // 2,
+            (y1 + y2) // 2,
+            tag="选择第一个支援角色",
+            after_sleep=1,
+        )
 
         # 确认入队
         self.operator.click_img("resources/img/ensure2.png", after_sleep=1)
