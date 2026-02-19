@@ -833,14 +833,20 @@ class CurrencyWars(Executable):
         strategy_off_field: dict[str,int] = strategy_data.get("off_field", {})
         for i, cn in enumerate(strategy_on_field.keys()):
             c = get_character(cn)
-            c.priority = 99 - i  # 确保攻略中的前台角色优先级都大于其他角色，同时有所差别
-            c.position = Positioning.OnField
-            self.strategy_characters[cn] = strategy_on_field[cn]
+            if c is not None:
+                c.priority = 99 - i  # 确保攻略中的前台角色优先级都大于其他角色，同时有所差别
+                c.position = Positioning.OnField
+                self.strategy_characters[cn] = strategy_on_field[cn]
+            else:
+                logger.warning(f"未能找到角色: {cn}")
         for i, cn in enumerate(strategy_off_field):
             c = get_character(cn)
-            c.priority = 99 - i  # 确保攻略中的后台角色优先级都大于其他角色
-            c.position = Positioning.OffField
-            self.strategy_characters[cn] = strategy_off_field[cn]
+            if c is not None:
+                c.priority = 99 - i  # 确保攻略中的后台角色优先级都大于其他角色
+                c.position = Positioning.OffField
+                self.strategy_characters[cn] = strategy_off_field[cn]
+            else:
+                logger.warning(f"未能找到角色: {cn}")
         logger.info(f"已加载攻略: {name}: {description}")
 
     def unload_strategy(self):
