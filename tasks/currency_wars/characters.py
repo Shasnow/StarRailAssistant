@@ -187,6 +187,7 @@ characters: dict[str, Character] = {
     '黄泉': Characters.Acheron,
     '星期日': Characters.Sunday,
     '白厄': Characters.Phainon,
+    '刻律德菈': Characters.Cerydra,
     '刻律德拉': Characters.Cerydra,
     '刻律德': Characters.Cerydra,
     '卡芙卡': Characters.Kafka,
@@ -201,6 +202,7 @@ characters: dict[str, Character] = {
     '阿格莱雅': Characters.Aglaea,
     '开拓者': Characters.Trailblazer,
     '大丽花': Characters.TheDahlia,
+    '爻光': Characters.YaoGuang,
     '光': Characters.YaoGuang,
     '火花': Characters.Sparxie,
 }
