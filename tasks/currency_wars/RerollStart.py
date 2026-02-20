@@ -520,35 +520,69 @@ class RerollStart(Executable):
         if self._detect_strategy():
             return self._stop_on_wanted_opening(f'找到需要的投资策略: {self.invest_strategy}')
 
-        # 动态 OCR 刷新循环：每轮以最新 OCR 结果为准
-        total_clicks = 0
+        # 新流程：
+        # 1) 仅在开始做一次 OCR，得到总刷新次数；
+        # 2) 按总次数执行刷新；
+        # 3) 刷新完成后检查 REFRESH_COUNT 模板：消失则视为次数耗尽；
+        # 4) 若模板仍存在，回退到 OCR 重新判断剩余次数并继续。
         safe_cap = 30
+        total_clicks = 0
+
+        init_counts = self._try_collect_refresh_counts()
+        nonneg_init = [x for x in init_counts if isinstance(x, int) and x >= 0]
+        planned_clicks = min(sum(nonneg_init), safe_cap) if nonneg_init else 3
+
+        if nonneg_init and all(x == 0 for x in nonneg_init):
+            logger.info("初始OCR检测到刷新次数为 0，执行返回备战并结算本轮")
+            self._return_to_prep_and_abort()
+            self.operator.sleep(2.0)
+            return False
+
+        if not nonneg_init:
+            logger.info("初始OCR未识别到有效刷新次数，回退为最多尝试 3 次刷新")
 
         while total_clicks < safe_cap:
-            counts = self._try_collect_refresh_counts()
-
-            # 有有效 OCR 结果时：全部为 0 则直接结算退出
-            if counts:
-                nonneg = [x for x in counts if isinstance(x, int) and x >= 0]
-                if nonneg and all(x == 0 for x in nonneg):
-                    logger.info("动态OCR检测到刷新次数为 0，执行返回备战并结算本轮")
-                    self._return_to_prep_and_abort()
-                    self.operator.sleep(2.0)
-                    return False
-
-            # 按钮不可用/未找到也视为次数用尽
-            if not self._click_refresh_button():
-                logger.info("刷新按钮不可用或未找到，视为刷新次数已用尽，执行返回备战并结算本轮")
+            remaining = min(planned_clicks, safe_cap - total_clicks)
+            if remaining <= 0:
+                logger.info("无可执行的刷新次数，执行返回备战并结算本轮")
                 self._return_to_prep_and_abort()
                 self.operator.sleep(2.0)
                 return False
 
-            total_clicks += 1
-            self.operator.sleep(1.2)
+            logger.info(f"本轮计划刷新 {remaining} 次")
+            for _ in range(remaining):
+                if not self._click_refresh_button():
+                    logger.info("刷新按钮不可用或未找到，视为刷新次数已用尽，执行返回备战并结算本轮")
+                    self._return_to_prep_and_abort()
+                    self.operator.sleep(2.0)
+                    return False
 
-            # 刷新后再次检测投资策略
-            if self._detect_strategy():
-                return self._stop_on_wanted_opening(f'找到需要的投资策略: {self.invest_strategy}')
+                total_clicks += 1
+                self.operator.sleep(1.2)
+
+                if self._detect_strategy():
+                    return self._stop_on_wanted_opening(f'找到需要的投资策略: {self.invest_strategy}')
+
+            # 刷新到计划次数后，检查模板是否仍存在
+            if self.operator.locate(CWIMG.REFRESH_COUNT) is None:
+                logger.info("刷新模板已消失，说明刷新次数已耗尽，执行返回备战并结算本轮")
+                self._return_to_prep_and_abort()
+                self.operator.sleep(2.0)
+                return False
+
+            # 模板仍在：回退 OCR 重新计算剩余可刷新次数
+            logger.info("刷新模板仍存在，回退OCR重新判断剩余刷新次数")
+            fallback_counts = self._try_collect_refresh_counts()
+            nonneg_fallback = [x for x in fallback_counts if isinstance(x, int) and x >= 0]
+            if nonneg_fallback and all(x == 0 for x in nonneg_fallback):
+                logger.info("回退OCR检测到刷新次数为 0，执行返回备战并结算本轮")
+                self._return_to_prep_and_abort()
+                self.operator.sleep(2.0)
+                return False
+
+            planned_clicks = min(sum(nonneg_fallback), safe_cap - total_clicks) if nonneg_fallback else 1
+            if not nonneg_fallback:
+                logger.info("回退OCR未识别到有效刷新次数，保守追加 1 次刷新后重试")
 
         logger.info("达到安全刷新上限，执行返回备战并结算本轮")
         self._return_to_prep_and_abort()
