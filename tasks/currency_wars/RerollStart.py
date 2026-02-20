@@ -402,25 +402,25 @@ class RerollStart(Executable):
                 self.operator.sleep(0.8)
 
             # 放弃并结算
-            withdraw_and_settle = self.operator.wait_img(CWIMG.WITHDRAW_AND_SETTLE, timeout=16, interval=0.5)
+            withdraw_and_settle = self.operator.wait_img(CWIMG.WITHDRAW_AND_SETTLE, timeout=8, interval=0.5)
             if withdraw_and_settle is None:
                 raise RuntimeError("未识别到放弃并结算入口")
-            self.operator.click_box(withdraw_and_settle, after_sleep=2.5)
+            self.operator.click_box(withdraw_and_settle, after_sleep=5)
 
             # 下一步
-            next_step = self.operator.wait_img(CWIMG.NEXT_STEP, timeout=16, interval=0.5)
+            next_step = self.operator.wait_img(CWIMG.NEXT_STEP, timeout=8, interval=0.5)
             if next_step is None:
                 raise RuntimeError("点击放弃并结算后，未识别到下一步")
             self.operator.click_box(next_step, after_sleep=1.8)
 
             # 下一页
-            next_page = self.operator.wait_img(CWIMG.NEXT_PAGE, timeout=16, interval=0.5)
+            next_page = self.operator.wait_img(CWIMG.NEXT_PAGE, timeout=8, interval=0.5)
             if next_page is None:
                 raise RuntimeError("点击下一步后，未识别到下一页")
             self.operator.click_box(next_page, after_sleep=1.8)
 
             # 返回货币战争主页
-            back_currency_wars = self.operator.wait_img(CWIMG.BACK_CURRENCY_WARS, timeout=16, interval=0.5)
+            back_currency_wars = self.operator.wait_img(CWIMG.BACK_CURRENCY_WARS, timeout=8, interval=0.5)
             if back_currency_wars is None:
                 raise RuntimeError("点击下一页后，未识别到返回货币战争")
             self.operator.click_box(back_currency_wars, after_sleep=2)
