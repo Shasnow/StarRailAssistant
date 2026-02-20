@@ -301,7 +301,7 @@ class RerollStart(Executable):
     def _rs_standard_entry_flow(self, enter_standard_box) -> bool:
         """刷开局专用的标准进入流程：
         - 点击标准进入
-        - 下拉选择到最低难度（或确保可开始）
+        - 根据配置选择难度（最低/最高/当前）
         - 点击开始游戏
         - 通过“下一步”进入投资环境
         - 执行一次默认投资确认
@@ -311,8 +311,22 @@ class RerollStart(Executable):
         if not self.operator.click_box(enter_standard_box, after_sleep=1.5):
             logger.error("点击标准进入失败")
             return False
-        # 返回最高名望
-        self.operator.click_img(CWIMG.RETURN_HIGHEST_RANK, after_sleep=0.8)
+
+        # 难度选择：复用 CurrencyWars.difficulty_mode
+        # 0=最低难度，1=最高难度，2=当前难度（不切换）
+        if getattr(self.cw, 'difficulty_mode', 1) == 1:
+            # 最高难度：若识别到“返回最高职级”则点击，否则直接开始
+            self.operator.click_img(CWIMG.RETURN_HIGHEST_RANK, after_sleep=0.8)
+        elif getattr(self.cw, 'difficulty_mode', 1) == 0:
+            # 最低难度：尝试点击下拉至最低项
+            while self.operator.click_img(CWIMG.DOWN_ARROW, after_sleep=0.5):
+                pass
+        elif getattr(self.cw, 'difficulty_mode', 1) == 2:
+            # 当前难度：不切换难度，直接开始
+            pass
+        else:
+            logger.warning(f"未知难度模式 difficulty_mode={getattr(self.cw, 'difficulty_mode', None)}，将按当前难度直接开始")
+
         # 点击开始游戏
         if not self.operator.click_img(CWIMG.START_GAME, after_sleep=1):
             logger.error("未识别到开始游戏按钮")
