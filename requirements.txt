@@ -1,5 +1,6 @@
 plyer==2.1.0
 rapidocr-onnxruntime==1.4.4
+onnxruntime-directml; platform_system == "Windows"
 opencv-python==4.12.0.88
 pillow==12.0.0
 pyscreeze==1.0.1

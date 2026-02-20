@@ -46,6 +46,7 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private string _gamePath = ""; // 游戏安装路径
 
     [ObservableProperty] private double _zoom = 1; // 屏幕缩放比例
+    [ObservableProperty] private bool _useDirectML; // 启用 DirectML OCR 后端
 
     // 启动参数配置
     [ObservableProperty] private bool _launchArgumentsEnabled = true; // 是否启用启动参数
