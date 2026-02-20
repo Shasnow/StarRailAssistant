@@ -5,7 +5,8 @@ from loguru import logger
 
 import tasks.currency_wars.characters as cw_chars
 from SRACore.task import Executable
-from tasks.currency_wars.characters import Character, Positioning, get_character
+from tasks.currency_wars.characters import (Character, Positioning,
+                                            get_character)
 from tasks.currency_wars.img import CWIMG, IMG
 
 
@@ -15,7 +16,7 @@ class CurrencyWars(Executable):
         self.run_times = run_times
         self.is_continue = False  # 是否是继续挑战
         self.strategy_external_control: bool = False  # 当外部（如刷开局流程）希望在“选择投资策略”页接管逻辑时，置为 True
-        self.difficulty_mode: int = 0  # 难度模式：0=最低难度，1=最高难度（默认最低）
+        self.difficulty_mode: int = 0  # 难度模式：0=最低难度，1=最高难度，2=当前难度（不切换，默认最低）
         self.on_field_character: list[Character | None] = [None, None, None, None]  # 场上角色列表
         self.on_field_area: list[tuple[float, float]] = [
             (0.386, 0.365),
@@ -179,14 +180,19 @@ class CurrencyWars(Executable):
         """标准进入：选择难度、开始游戏、投资环境。"""
         if not self.operator.click_box(enter_standard_box, after_sleep=1.5):
             return False
-        # 难度选择：根据前端配置选择最低或最高
+        # 难度选择：0=最低，1=最高，2=当前（不做选择）
         if self.difficulty_mode == 1:
             # 最高难度：若识别到“返回最高职级”则点击，否则直接开始
             self.operator.click_img(CWIMG.RETURN_HIGHEST_RANK, after_sleep=0.8)
-        else:
+        elif self.difficulty_mode == 0:
             # 最低难度：尝试点击下拉至最低项
             while self.operator.click_img(CWIMG.DOWN_ARROW, after_sleep=0.5):
                 pass
+        elif self.difficulty_mode == 2:
+            # 当前难度：不切换难度，直接开始
+            pass
+        else:
+            logger.warning(f"未知难度模式 difficulty_mode={self.difficulty_mode}，将按当前难度直接开始")
 
         if not self.operator.click_img(CWIMG.START_GAME, after_sleep=1):
             return False
@@ -211,7 +217,7 @@ class CurrencyWars(Executable):
 
     # =============== 配置注入 ===============
     def set_difficulty(self, mode: int):
-        """设置难度模式：0=最低难度，1=最高难度"""
+        """设置难度模式：0=最低难度，1=最高难度，2=当前难度（不切换）"""
         self.difficulty_mode = mode
 
     def _continue_progress_flow(self, continue_progress_box) -> bool:
