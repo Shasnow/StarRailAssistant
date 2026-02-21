@@ -2,10 +2,11 @@ import re
 
 from loguru import logger
 
+from SRACore.task import Executable
 from SRACore.util.logger import auto_log_methods
 from SRACore.util.notify import try_send_notification
-from SRACore.task import Executable
 from tasks.currency_wars.img import CWIMG, IMG
+
 from .CurrencyWars import CurrencyWars
 
 
@@ -33,11 +34,19 @@ class RerollStart(Executable):
     PAGE_START = 1
     PAGE_PREPARATION = 2
 
-    def __init__(self, operator, invest_env:str, invest_strategy:str, invest_strategy_stage:int, max_retry:int):
+    # Boss词条OCR区域（基于1920x1080截图坐标: 30,930-1200,1030）
+    BOSS_AFFIX_FROM_X = 0.016
+    BOSS_AFFIX_FROM_Y = 0.861
+    BOSS_AFFIX_TO_X = 0.625
+    BOSS_AFFIX_TO_Y = 0.954
+
+    def __init__(self, operator, invest_env:str, invest_strategy:str, invest_strategy_stage:int, max_retry:int,
+                 boss_affix: str = ""):
         super().__init__(operator)
         # 需要的开局
         self.wanted_invest_environment = invest_env.split() if invest_env else []
         self.wanted_invest_strategy = invest_strategy.split() if invest_strategy else []
+        self.wanted_boss_affix = boss_affix.split() if boss_affix else []
         self.wanted_invest_strategy_stage = invest_strategy_stage
         self.max_retry = max_retry
         self.cw = CurrencyWars(self.operator, 0)
@@ -48,6 +57,7 @@ class RerollStart(Executable):
         # 刷到的开局配置，用于检测是否完成刷开局需求
         self.invest_environment = None
         self.invest_strategy = None
+        self.boss_affix = None
 
     def _reset_cw_flags_after_abort(self, result: bool):
         """统一在结算返回后重置 CW 运行/接管标记。"""
@@ -58,6 +68,7 @@ class RerollStart(Executable):
             self._in_strategy_phase = False
             self.invest_environment = None
             self.invest_strategy = None
+            self.boss_affix = None
         return result
 
     def run(self):
@@ -93,8 +104,17 @@ class RerollStart(Executable):
                     continue
                 else:
                     if self._check_tesk_success():
-                        self._stop_on_wanted_opening(f'开局刷到需要的投资环境: {self.invest_environment}')
+                        self._stop_on_wanted_opening(
+                            f'开局刷到需要的条件: Boss词条={self.boss_affix}，投资环境={self.invest_environment}')
                         return True
+
+                # 需要Boss词条但本轮未命中：直接结束本轮，不放置角色
+                if self.wanted_boss_affix and self.boss_affix is None:
+                    tries += 1
+                    logger.info(f"第 {tries} 次尝试Boss词条未命中，直接结束本轮")
+                    if not self._return_to_prep_and_abort():
+                        logger.error("Boss词条未命中后的快速结算失败，重试下一轮")
+                    continue
 
             # 初始策略应用
             if not self._in_strategy_phase:
@@ -194,7 +214,55 @@ class RerollStart(Executable):
         return (self.wanted_invest_environment == []
                 or self.invest_environment in self.wanted_invest_environment) \
             and (self.wanted_invest_strategy == []
-                 or self.invest_strategy in self.wanted_invest_strategy)
+                 or self.invest_strategy in self.wanted_invest_strategy) \
+            and (self.wanted_boss_affix == []
+                 or self.boss_affix in self.wanted_boss_affix)
+
+    def _detect_boss_affix(self) -> bool:
+        """在开始游戏后、点击下一步前检测Boss词条。"""
+        if self.wanted_boss_affix == []:
+            self.boss_affix = None
+            return True
+        try:
+            # 先输出一次OCR原始结果，便于调试词条识别问题
+            raw_results = self.operator.ocr(
+                from_x=self.BOSS_AFFIX_FROM_X,
+                from_y=self.BOSS_AFFIX_FROM_Y,
+                to_x=self.BOSS_AFFIX_TO_X,
+                to_y=self.BOSS_AFFIX_TO_Y,
+                trace=False
+            ) or []
+            if raw_results:
+                debug_items = []
+                for item in raw_results:
+                    text = str(item[1]).strip() if len(item) > 1 else ""
+                    score = float(item[2]) if len(item) > 2 else 0.0
+                    debug_items.append(f"{text}({score:.3f})")
+                logger.debug(f"Boss词条OCR结果: {' | '.join(debug_items)}")
+            else:
+                logger.debug("Boss词条OCR结果: <empty>")
+
+            index, _ = self.operator.wait_ocr_any(
+                self.wanted_boss_affix,
+                timeout=2,
+                interval=0.4,
+                from_x=self.BOSS_AFFIX_FROM_X,
+                from_y=self.BOSS_AFFIX_FROM_Y,
+                to_x=self.BOSS_AFFIX_TO_X,
+                to_y=self.BOSS_AFFIX_TO_Y,
+                trace=False
+            )
+            if index != -1:
+                self.boss_affix = self.wanted_boss_affix[index]
+                logger.info(f"检测到需要的Boss词条: {self.boss_affix}")
+                return True
+            self.boss_affix = None
+            logger.info("未检测到需要的Boss词条")
+            return False
+        except Exception as e:
+            self.boss_affix = None
+            logger.warning(f"检测Boss词条时发生异常: {e}")
+            return False
 
     def _wait_for_strategy_page(self) -> bool:
         """等待并确认到达选择投资策略界面。
@@ -252,9 +320,14 @@ class RerollStart(Executable):
         """使用图像匹配或OCR检测是否存在目标投资策略。"""
         try:
             if '叽米金币大使' in self.wanted_invest_strategy:
-                return self.operator.locate(CWIMG.JI_MI) is not None
+                found = self.operator.locate(CWIMG.JI_MI) is not None
+                if found:
+                    self.invest_strategy = '叽米金币大使'
+                return found
             else:
-                index, box = self.operator.wait_ocr_any(self.wanted_invest_strategy, timeout=2, interval=0.5)
+                index, _ = self.operator.wait_ocr_any(self.wanted_invest_strategy, timeout=2, interval=0.5)
+                if index != -1:
+                    self.invest_strategy = self.wanted_invest_strategy[index]
                 return index != -1
         except Exception as e:
             logger.warning(f"检测投资策略时发生异常：{e}")
@@ -311,8 +384,10 @@ class RerollStart(Executable):
         if not self.operator.click_img(CWIMG.START_GAME, after_sleep=1):
             logger.error("未识别到开始游戏按钮")
             return False
-        # “下一步”
+        # 先等待“下一步”出现，确保Boss词条已稳定
         next_step_box = self.operator.wait_img(CWIMG.NEXT_STEP)
+        # Boss词条（开始游戏后出现，下一步前检测）
+        self._detect_boss_affix()
         self.operator.sleep(0.5)
         if next_step_box is None or not self.operator.click_box(next_step_box, after_sleep=2):
             logger.error("进入后未识别到下一步按钮")
@@ -515,8 +590,9 @@ class RerollStart(Executable):
         """
         # 首次投资策略检测
 
-        if self._detect_strategy():
-            return self._stop_on_wanted_opening(f'找到需要的投资策略: {self.invest_strategy}')
+        if self._detect_strategy() and self._check_tesk_success():
+            return self._stop_on_wanted_opening(
+                f'找到需要的开局条件: 投资策略={self.invest_strategy}, Boss词条={self.boss_affix}')
 
         # 动态 OCR 刷新循环：每轮以最新 OCR 结果为准
         total_clicks = 0
@@ -545,8 +621,9 @@ class RerollStart(Executable):
             self.operator.sleep(1.2)
 
             # 刷新后再次检测投资策略
-            if self._detect_strategy():
-                return self._stop_on_wanted_opening(f'找到需要的投资策略: {self.invest_strategy}')
+            if self._detect_strategy() and self._check_tesk_success():
+                return self._stop_on_wanted_opening(
+                    f'找到需要的开局条件: 投资策略={self.invest_strategy}, Boss词条={self.boss_affix}')
 
         logger.info("达到安全刷新上限，执行返回备战并结算本轮")
         self._return_to_prep_and_abort()

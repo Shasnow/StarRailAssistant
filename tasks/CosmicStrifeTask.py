@@ -34,7 +34,8 @@ class CosmicStrifeTask(BaseTask):
                                   invest_env=self.config.get("CwRsInvestEnvironments"),
                                   invest_strategy=self.config.get("CwRsInvestStrategies"),
                                   invest_strategy_stage= self.config.get("CwRsInvestStrategyStage", 1),
-                                  max_retry=self.config.get("CwRsMaxRetry", 0))
+                                  max_retry=self.config.get("CwRsMaxRetry", 0),
+                                  boss_affix=self.config.get("CwRsBossAffixes", ""))
             rs_task.cw.set_username(username)
             rs_task.cw.load_strategy("template")
             if not rs_task.run():
