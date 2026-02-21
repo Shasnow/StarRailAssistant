@@ -66,6 +66,14 @@
                                                        Increment="0.01" Minimum="0"
                                                        Maximum="1" />
                                     </Grid>
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="icon">&#xED0F;</Label>
+                                        <Label Grid.Column="1"
+                                               Content="启用加速推理"
+                                               ToolTip.Tip="适用于 AMD/Intel/NVIDIA 显卡。需要安装 onnxruntime-directml。" />
+                                        <ToggleSwitch Grid.Column="2"
+                                                      IsChecked="{Binding Settings.UseDirectML}" />
+                                    </Grid>
                                     <!-- 启动/停止 快捷键（任务通用设置） -->
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="icon">&#xE3E4;</Label>
