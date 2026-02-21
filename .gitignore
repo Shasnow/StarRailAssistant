@@ -1,14 +1,31 @@
+# 数据和日志
 /data/
 /log/
+
+# IDE / 编辑器
+/.vscode/
+**/.vs/
+
+# .NET 构建输出
 /SRAFrontend/bin/
 /SRAFrontend/obj/
 /SRAFrontend/SRAFrontend.sln.DotSettings.user
+
+# Python 虚拟环境和缓存
 /.venv/
-/.vscode/
+**/__pycache__/
+
+# 打包 / 安装输出
 /setup/output/
 /setup/SRA/
 /setup/install_info.txt
 /main.dist/
-**/__pycache__/
-**/.vs/
+
+# 构建产物
+*.dll
+*.pyd
+*.pdb
+*.exe
+
+# 其他
 version_info.txt
