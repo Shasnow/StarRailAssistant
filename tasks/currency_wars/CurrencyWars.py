@@ -16,7 +16,7 @@ class CurrencyWars(Executable):
         self.run_times = run_times
         self.is_continue = False  # 是否是继续挑战
         self.strategy_external_control: bool = False  # 当外部（如刷开局流程）希望在“选择投资策略”页接管逻辑时，置为 True
-        self.difficulty_mode: int = 0  # 难度模式：0=最低难度，1=最高难度（默认最低）
+        self.difficulty_mode: int = 0  # 难度模式：0=最低难度，1=最高难度，2=当前难度（不切换，默认最低）
         self.on_field_character: list[Character | None] = [None, None, None, None]  # 场上角色列表
         self.on_field_area: list[tuple[float, float]] = [
             (0.386, 0.365),
@@ -102,7 +102,8 @@ class CurrencyWars(Executable):
                                               CWIMG.CURRENCY_WARS_START,
                                               CWIMG.PREPARATION_STAGE], interval=0.5)
         if page == 0:
-            self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
+            guide_hotkey = ((self.settings or {}).get('GuideHotkey', 'f4') or 'f4')
+            self.operator.press_key(str(guide_hotkey).lower())
             if not self.operator.wait_img(IMG.F4, timeout=20):
                 logger.error("检测超时，编号1")
                 self.operator.press_key("esc")
@@ -179,14 +180,19 @@ class CurrencyWars(Executable):
         """标准进入：选择难度、开始游戏、投资环境。"""
         if not self.operator.click_box(enter_standard_box, after_sleep=1.5):
             return False
-        # 难度选择：根据前端配置选择最低或最高
+        # 难度选择：0=最低，1=最高，2=当前（不做选择）
         if self.difficulty_mode == 1:
             # 最高难度：若识别到“返回最高职级”则点击，否则直接开始
             self.operator.click_img(CWIMG.RETURN_HIGHEST_RANK, after_sleep=0.8)
-        else:
+        elif self.difficulty_mode == 0:
             # 最低难度：尝试点击下拉至最低项
             while self.operator.click_img(CWIMG.DOWN_ARROW, after_sleep=0.5):
                 pass
+        elif self.difficulty_mode == 2:
+            # 当前难度：不切换难度，直接开始
+            pass
+        else:
+            logger.warning(f"未知难度模式 difficulty_mode={self.difficulty_mode}，将按当前难度直接开始")
 
         if not self.operator.click_img(CWIMG.START_GAME, after_sleep=1):
             return False
@@ -211,7 +217,7 @@ class CurrencyWars(Executable):
 
     # =============== 配置注入 ===============
     def set_difficulty(self, mode: int):
-        """设置难度模式：0=最低难度，1=最高难度"""
+        """设置难度模式：0=最低难度，1=最高难度，2=当前难度（不切换）"""
         self.difficulty_mode = mode
 
     def _continue_progress_flow(self, continue_progress_box) -> bool:
@@ -519,9 +525,9 @@ class CurrencyWars(Executable):
 
         while attempt < max_attempts:
             if self.in_hand_character_count < 8:
-                logger.info(f"手牌未满，跳过出售角色")
+                logger.info("手牌未满，跳过出售角色")
                 return True
-            logger.info(f"手牌已满，尝试出售角色")
+            logger.info("手牌已满，尝试出售角色")
             self.handle_sell_character()
             self.get_in_hand_area()  # 检测空位，确保没有新插入的角色
             attempt += 1
@@ -565,7 +571,7 @@ class CurrencyWars(Executable):
                 character.is_placed = False
             logger.info(f"已出售角色：{character.name}")
             self.operator.sleep(0.5)
-        logger.info(f"出售操作完成")
+        logger.info("出售操作完成")
 
     def battle(self) -> bool:
         # self.operators.click_point(0.907, 0.714, after_sleep=1)
@@ -729,7 +735,12 @@ class CurrencyWars(Executable):
             if not results:
                 return []
             for item in results:
-                name:str = item[1]
+                name_raw = item[1]
+                if not isinstance(name_raw, str):
+                    continue
+                name: str = name_raw.strip()
+                if not name:
+                    continue
                 if name.isdecimal(): # 跳过价格识别结果
                     continue
                 if '备' in name:  # 备战席已满
@@ -810,7 +821,7 @@ class CurrencyWars(Executable):
         result = self.operator.ocr(from_x=0.505, from_y=0.18, to_x=0.608, to_y=0.27)
         if result:
             try:
-                self.max_team_size = int(result[-1][1])
+                self.max_team_size = int(str(result[-1][1]).strip())
                 logger.info(f"最大队伍人数已更新为 {self.max_team_size}")
             except ValueError:
                 logger.warning(f"无法解析最大队伍人数：{result[-1][1]}")
@@ -823,7 +834,7 @@ class CurrencyWars(Executable):
             path = f"tasks/currency_wars/strategies/{name}.json"
         with open(path, "r", encoding="utf-8") as f:
             strategy_data: dict[str, Any] = json.load(f)
-        name = strategy_data.get("name")
+        strategy_name = strategy_data.get("name")
         description = strategy_data.get("description")
         self.min_coins = strategy_data.get("min_coins", 40)
         self.min_level = strategy_data.get("min_level", 7)
@@ -833,15 +844,21 @@ class CurrencyWars(Executable):
         strategy_off_field: dict[str,int] = strategy_data.get("off_field", {})
         for i, cn in enumerate(strategy_on_field.keys()):
             c = get_character(cn)
+            if c is None:
+                logger.warning(f"攻略角色不存在，跳过：{cn}")
+                continue
             c.priority = 99 - i  # 确保攻略中的前台角色优先级都大于其他角色，同时有所差别
             c.position = Positioning.OnField
             self.strategy_characters[cn] = strategy_on_field[cn]
         for i, cn in enumerate(strategy_off_field):
             c = get_character(cn)
+            if c is None:
+                logger.warning(f"攻略角色不存在，跳过：{cn}")
+                continue
             c.priority = 99 - i  # 确保攻略中的后台角色优先级都大于其他角色
             c.position = Positioning.OffField
             self.strategy_characters[cn] = strategy_off_field[cn]
-        logger.info(f"已加载攻略: {name}: {description}")
+        logger.info(f"已加载攻略: {strategy_name}: {description}")
 
     def unload_strategy(self):
         """卸载当前攻略，重置角色"""
