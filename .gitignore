@@ -11,4 +11,5 @@
 /main.dist/
 **/__pycache__/
 **/.vs/
+/.history/
 version_info.txt
