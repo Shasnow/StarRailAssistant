@@ -691,4 +691,3 @@ class RerollStart(Executable):
             logger.debug("未找到刷新按钮")
             return False
         return self.operator.click_box(btn, after_sleep=1.0)
-        return self.operator.click_box(btn, after_sleep=1.0)
