@@ -188,6 +188,7 @@ characters: dict[str, Character] = {
     '星期日': Characters.Sunday,
     '白厄': Characters.Phainon,
     '刻律德拉': Characters.Cerydra,
+    '刻律德菈': Characters.Cerydra,
     '刻律德': Characters.Cerydra,
     '卡芙卡': Characters.Kafka,
     '佩拉': Characters.Pela,
@@ -202,6 +203,7 @@ characters: dict[str, Character] = {
     '开拓者': Characters.Trailblazer,
     '大丽花': Characters.TheDahlia,
     '光': Characters.YaoGuang,
+    '爻光': Characters.YaoGuang,
     '火花': Characters.Sparxie,
 }
 username = '开拓者'  # 请将此处改为你的角色名称
