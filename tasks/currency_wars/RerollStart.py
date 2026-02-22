@@ -68,7 +68,6 @@ class RerollStart(Executable):
             self._in_strategy_phase = False
             self.invest_environment = None
             self.invest_strategy = None
-            self.boss_affix = None
         return result
 
     def run(self):
@@ -177,7 +176,7 @@ class RerollStart(Executable):
         elif page == self.PAGE_PREPARATION:
             # 准备阶段，执行结算返回
             logger.info("已处于准备阶段，进入结算返回流程")
-            if not self._return_to_prep_and_abort():
+            if not self._abort_and_return(in_game=True):
                 logger.error("准备阶段结算返回失败，报错终止脚本")
                 return "error"
             self._just_settled = True
@@ -194,12 +193,12 @@ class RerollStart(Executable):
         try:
             if not self.cw.initialize():
                 logger.error("初始策略应用失败，结束本轮并重试")
-                self._safe_abort_and_return()
+                self._abort_and_return(in_game=False)
                 return False
             return True
         except Exception as e:
             logger.error(f"初始策略应用过程异常：{e}")
-            self._safe_abort_and_return()
+            self._abort_and_return(in_game=False)
             return False
 
     def _enable_strategy_control(self):
@@ -270,15 +269,18 @@ class RerollStart(Executable):
         Returns:
             bool: True 成功到达 | False 未能到达
         """
-        idx, box = self.operator.wait_any_img([CWIMG.SELECT_INVEST_STRATEGY, CWIMG.CLICK_BLANK], timeout=45,
-                                              interval=0.5)
+        match_index, click_blank_box = self.operator.wait_any_img(
+            [CWIMG.SELECT_INVEST_STRATEGY, CWIMG.CLICK_BLANK],
+            timeout=45,
+            interval=0.5,
+        )
 
-        if idx == 1 and box is not None:
-            self.operator.click_box(box, after_sleep=1)
+        if match_index == 1 and click_blank_box is not None:
+            self.operator.click_box(click_blank_box, after_sleep=1)
             result = self.operator.wait_img(CWIMG.SELECT_INVEST_STRATEGY, timeout=20, interval=0.5)
             return result is not None
 
-        return idx == 0
+        return match_index == 0
 
     def _handle_stage_detection(self) -> str:
         """处理关卡检测阶段（检测是否为对应的策略阶段（1-2/2-2）。
@@ -325,9 +327,7 @@ class RerollStart(Executable):
                     self.invest_strategy = '叽米金币大使'
                 return found
             else:
-                index, _ = self.operator.wait_ocr_any(self.wanted_invest_strategy, timeout=2, interval=0.5)
-                if index != -1:
-                    self.invest_strategy = self.wanted_invest_strategy[index]
+                index, box = self.operator.wait_ocr_any(self.wanted_invest_strategy, timeout=2, interval=0.5)
                 return index != -1
         except Exception as e:
             logger.warning(f"检测投资策略时发生异常：{e}")
@@ -342,21 +342,26 @@ class RerollStart(Executable):
         self.operator.click_point(0.5, 0.5, after_sleep=2)
 
         # 标准进入 or 继续进度（若是继续进度则中断并返回）
-        index, box = self.operator.wait_any_img([CWIMG.ENTER_STANDARD, CWIMG.CONCLUDE_AND_SETTLE], timeout=3,
-                                                interval=0.5)
-        if index == 0:
+        entry_index, entry_btn_box = self.operator.wait_any_img(
+            [CWIMG.ENTER_STANDARD, CWIMG.CONCLUDE_AND_SETTLE],
+            timeout=3,
+            interval=0.5,
+        )
+        if entry_index == 0:
             # 识别到标准进入，直接点击该入口并执行标准进入流程
-            if box is None:
+            enter_standard_box = entry_btn_box
+            if enter_standard_box is None:
                 logger.error("未获取到标准进入按钮位置")
                 return False
-            return self._rs_standard_entry_flow(box)
-        elif index == 1:
+            return self._rs_standard_entry_flow(enter_standard_box)
+        elif entry_index == 1:
             # 识别到放弃并结算（继续进度的替代入口），直接点击并执行结算返回
-            if box is None or not self.operator.click_box(box, after_sleep=1):
+            conclude_and_settle_box = entry_btn_box
+            if conclude_and_settle_box is None or not self.operator.click_box(conclude_and_settle_box, after_sleep=1):
                 logger.error("点击放弃并结算入口失败")
                 return False
             logger.info("检测到放弃并结算入口，执行结算返回主界面")
-            result = self._safe_abort_and_return()
+            result = self._abort_and_return(in_game=False)
             if result:
                 # 标记：该轮仅执行了结算，需回到 while 顶部重新 page_locate
                 self._just_settled = True
@@ -368,7 +373,7 @@ class RerollStart(Executable):
     def _rs_standard_entry_flow(self, enter_standard_box) -> bool:
         """刷开局专用的标准进入流程：
         - 点击标准进入
-        - 下拉选择到最低难度（或确保可开始）
+        - 根据配置选择难度（最低/最高/当前）
         - 点击开始游戏
         - 通过“下一步”进入投资环境
         - 执行一次默认投资确认
@@ -378,8 +383,22 @@ class RerollStart(Executable):
         if not self.operator.click_box(enter_standard_box, after_sleep=1.5):
             logger.error("点击标准进入失败")
             return False
-        # 返回最高名望
-        self.operator.click_img(CWIMG.RETURN_HIGHEST_RANK, after_sleep=0.8)
+
+        # 难度选择：复用 CurrencyWars.difficulty_mode
+        # 0=最低难度，1=最高难度，2=当前难度（不切换）
+        if getattr(self.cw, 'difficulty_mode', 1) == 1:
+            # 最高难度：若识别到“返回最高职级”则点击，否则直接开始
+            self.operator.click_img(CWIMG.RETURN_HIGHEST_RANK, after_sleep=0.8)
+        elif getattr(self.cw, 'difficulty_mode', 1) == 0:
+            # 最低难度：尝试点击下拉至最低项
+            while self.operator.click_img(CWIMG.DOWN_ARROW, after_sleep=0.5):
+                pass
+        elif getattr(self.cw, 'difficulty_mode', 1) == 2:
+            # 当前难度：不切换难度，直接开始
+            pass
+        else:
+            logger.warning(f"未知难度模式 difficulty_mode={getattr(self.cw, 'difficulty_mode', None)}，将按当前难度直接开始")
+
         # 点击开始游戏
         if not self.operator.click_img(CWIMG.START_GAME, after_sleep=1):
             logger.error("未识别到开始游戏按钮")
@@ -418,12 +437,14 @@ class RerollStart(Executable):
             self.operator.sleep(4)
             return True
 
-        index, box = self.operator.wait_ocr_any(self.wanted_invest_environment, timeout=2, interval=0.5)
-        if index == -1:
-            box = self.operator.wait_img(CWIMG.REFRESH_ENV, timeout=2, interval=0.5)
-            if box is not None and self.operator.click_box(box, after_sleep=1):
-                index, box = self.operator.wait_ocr_any(self.wanted_invest_environment, timeout=2, interval=0.5)
-        if index == -1:
+        env_index, env_ocr_box = self.operator.wait_ocr_any(self.wanted_invest_environment, timeout=2, interval=0.5)
+        if env_index == -1:
+            refresh_env_box = self.operator.wait_img(CWIMG.REFRESH_ENV, timeout=2, interval=0.5)
+            if refresh_env_box is not None and self.operator.click_box(refresh_env_box, after_sleep=1):
+                env_index, env_ocr_box = self.operator.wait_ocr_any(
+                    self.wanted_invest_environment, timeout=2, interval=0.5
+                )
+        if env_index == -1:
             logger.info("未刷到需要的投资环境")
             if not self.operator.click_img(IMG.COLLECTION):
                 self.operator.click_point(0.5, 0.5)
@@ -431,35 +452,26 @@ class RerollStart(Executable):
             if self.operator.locate(CWIMG.INVEST_ENVIRONMENT):
                 self.operator.click_point(0.5, 0.5)
                 self.operator.click_img(IMG.ENSURE2, after_sleep=1)
-            self._return_to_prep_and_abort()
+            self._abort_and_return(in_game=True)
             self.operator.sleep(2)
             return False
 
-        logger.info(f"刷到需要的投资环境: {self.wanted_invest_environment[index]}")
-        if self.operator.click_box(box, after_sleep=1):
+        logger.info(f"刷到需要的投资环境: {self.wanted_invest_environment[env_index]}")
+        wanted_env_box = env_ocr_box
+        if wanted_env_box is not None and self.operator.click_box(wanted_env_box, after_sleep=1):
             self.operator.click_img(IMG.ENSURE2, after_sleep=1)
-        self.invest_environment = self.wanted_invest_environment[index]
+        self.invest_environment = self.wanted_invest_environment[env_index]
         self.operator.sleep(4)
         return True
 
-    def _safe_abort_and_return(self) -> bool:
-        """兼容旧用法：开始界面直接结算返回到货币战争主界面。"""
-        result = self._abort_and_return(in_game=False)
-        # 重置CW运行与接管状态，确保下一轮回到page_locate流程
-        return self._reset_cw_flags_after_abort(result)
-
-    def _return_to_prep_and_abort(self) -> bool:
-        """兼容旧用法：对局中先返回备战再结算返回主页。"""
-        result = self._abort_and_return(in_game=True)
-        # 重置CW运行与接管状态，确保下一轮回到page_locate流程
-        return self._reset_cw_flags_after_abort(result)
-
-    def _abort_and_return(self, in_game: bool) -> bool:
+    def _abort_and_return(self, in_game: bool, reset_flags: bool = True) -> bool:
         """统一的结算返回流程。
         - in_game=True：先点击`RETURN_PREPARATION_PAGE`并按`ESC`，再执行结算返回。
         - in_game=False：直接执行结算返回（用于开始界面或无需返回备战的场景）。
+        - reset_flags=True：无论成功或失败，都强制重置 CW 运行/接管标记，避免异常页面继续跑对局逻辑。
         点击顺序（结算部分）：WITHDRAW_AND_SETTLE → NEXT_STEP → NEXT_PAGE → BACK_CURRENCY_WARS
         """
+        result = False
         try:
             if in_game:
                 # 返回备战页面
@@ -474,34 +486,40 @@ class RerollStart(Executable):
             withdraw_and_settle = self.operator.wait_img(CWIMG.WITHDRAW_AND_SETTLE, timeout=8, interval=0.5)
             if withdraw_and_settle is None:
                 logger.error("未识别到放弃并结算入口")
-                return False
+                result = False
+                return self._reset_cw_flags_after_abort(result) if reset_flags else result
             self.operator.click_box(withdraw_and_settle, after_sleep=2.5)
 
             # 下一步
             next_step = self.operator.wait_img(CWIMG.NEXT_STEP, timeout=8, interval=0.5)
             if next_step is None:
                 logger.error("点击放弃并结算后，未识别到下一步")
-                return False
+                result = False
+                return self._reset_cw_flags_after_abort(result) if reset_flags else result
             self.operator.click_box(next_step, after_sleep=1.8)
 
             # 下一页
             next_page = self.operator.wait_img(CWIMG.NEXT_PAGE, timeout=8, interval=0.5)
             if next_page is None:
                 logger.error("点击下一步后，未识别到下一页")
-                return False
+                result = False
+                return self._reset_cw_flags_after_abort(result) if reset_flags else result
             self.operator.click_box(next_page, after_sleep=1.8)
 
             # 返回货币战争主页
             back_currency_wars = self.operator.wait_img(CWIMG.BACK_CURRENCY_WARS, timeout=8, interval=0.5)
             if back_currency_wars is None:
                 logger.error("点击下一页后，未识别到返回货币战争")
-                return False
+                result = False
+                return self._reset_cw_flags_after_abort(result) if reset_flags else result
             self.operator.click_box(back_currency_wars, after_sleep=2)
             logger.info("已结算并返回货币战争主界面")
-            return True
+            result = True
         except Exception as e:
             logger.error(f"结算返回流程异常：{e}")
-            return False
+            result = False
+
+        return self._reset_cw_flags_after_abort(result) if reset_flags else result
 
     def _collect_refresh_counts(self, max_items: int = 3) -> list[int]:
         """基于 REFRESH_COUNT 锚点，OCR 其右侧同一行的刷新次数，返回列表（最多 max_items 个）。
@@ -589,41 +607,77 @@ class RerollStart(Executable):
             False: 未检测到目标策略，继续外层流程
         """
         # 首次投资策略检测
-
         if self._detect_strategy() and self._check_tesk_success():
             return self._stop_on_wanted_opening(
                 f'找到需要的开局条件: 投资策略={self.invest_strategy}, Boss词条={self.boss_affix}')
 
-        # 动态 OCR 刷新循环：每轮以最新 OCR 结果为准
-        total_clicks = 0
+        # 流程：
+        # 1) 首次OCR读取刷新次数并规划本轮点击数；
+        # 2) 执行刷新并在每次后检测策略；
+        # 3) 一轮完成后检查刷新模板是否仍存在；
+        # 4) 若仍存在，回退OCR重新规划剩余点击数继续循环。
         safe_cap = 30
+        total_clicks = 0
+
+        init_counts = self._try_collect_refresh_counts()
+        nonneg_init = [x for x in init_counts if isinstance(x, int) and x >= 0]
+        planned_clicks = min(sum(nonneg_init), safe_cap) if nonneg_init else 3
+
+        if nonneg_init and all(x == 0 for x in nonneg_init):
+            logger.info("初始OCR检测到刷新次数为 0，执行返回备战并结算本轮")
+            self._return_to_prep_and_abort()
+            self.operator.sleep(2.0)
+            return False
+
+        if not nonneg_init:
+            logger.info("初始OCR未识别到有效刷新次数，回退为最多尝试 3 次刷新")
 
         while total_clicks < safe_cap:
-            counts = self._try_collect_refresh_counts()
-
-            # 有有效 OCR 结果时：全部为 0 则直接结算退出
-            if counts:
-                nonneg = [x for x in counts if isinstance(x, int) and x >= 0]
-                if nonneg and all(x == 0 for x in nonneg):
-                    logger.info("动态OCR检测到刷新次数为 0，执行返回备战并结算本轮")
-                    self._return_to_prep_and_abort()
-                    self.operator.sleep(2.0)
-                    return False
-
-            # 按钮不可用/未找到也视为次数用尽
-            if not self._click_refresh_button():
-                logger.info("刷新按钮不可用或未找到，视为刷新次数已用尽，执行返回备战并结算本轮")
+            remaining = min(planned_clicks, safe_cap - total_clicks)
+            if remaining <= 0:
+                logger.info("无可执行的刷新次数，执行返回备战并结算本轮")
                 self._return_to_prep_and_abort()
                 self.operator.sleep(2.0)
                 return False
 
-            total_clicks += 1
-            self.operator.sleep(1.2)
+            for _ in range(remaining):
+                if not self._click_refresh_button():
+                    logger.info("刷新按钮不可用或未找到，视为刷新次数已用尽，执行返回备战并结算本轮")
+                    self._return_to_prep_and_abort()
+                    self.operator.sleep(2.0)
+                    return False
 
-            # 刷新后再次检测投资策略
-            if self._detect_strategy() and self._check_tesk_success():
-                return self._stop_on_wanted_opening(
-                    f'找到需要的开局条件: 投资策略={self.invest_strategy}, Boss词条={self.boss_affix}')
+                total_clicks += 1
+                self.operator.sleep(1.2)
+
+                # 刷新后再次检测投资策略
+                if self._detect_strategy() and self._check_tesk_success():
+                    return self._stop_on_wanted_opening(
+                        f'找到需要的开局条件: 投资策略={self.invest_strategy}, Boss词条={self.boss_affix}')
+
+                if total_clicks >= safe_cap:
+                    break
+
+            # 刷新次数标签消失，视为无次数可用
+            if self.operator.locate(CWIMG.REFRESH_COUNT) is None:
+                logger.info("刷新次数模板已消失，视为刷新次数耗尽，执行返回备战并结算本轮")
+                self._return_to_prep_and_abort()
+                self.operator.sleep(2.0)
+                return False
+
+            # 模板仍在：回退 OCR 重新计算剩余可刷新次数
+            logger.info("刷新模板仍存在，回退OCR重新判断剩余刷新次数")
+            fallback_counts = self._try_collect_refresh_counts()
+            nonneg_fallback = [x for x in fallback_counts if isinstance(x, int) and x >= 0]
+            if nonneg_fallback and all(x == 0 for x in nonneg_fallback):
+                logger.info("回退OCR检测到刷新次数为 0，执行返回备战并结算本轮")
+                self._return_to_prep_and_abort()
+                self.operator.sleep(2.0)
+                return False
+
+            planned_clicks = min(sum(nonneg_fallback), safe_cap - total_clicks) if nonneg_fallback else 1
+            if not nonneg_fallback:
+                logger.info("回退OCR未识别到有效刷新次数，保守追加 1 次刷新后重试")
 
         logger.info("达到安全刷新上限，执行返回备战并结算本轮")
         self._return_to_prep_and_abort()
@@ -694,7 +748,7 @@ class RerollStart(Executable):
                 if nonneg:
                     if all(x == 0 for x in nonneg):
                         logger.info("检测到刷新次数为0，执行返回备战并结算本轮")
-                        self._return_to_prep_and_abort()
+                        self._abort_and_return(in_game=True)
                         self.operator.sleep(2.0)
                         return 0
                     return min(sum(nonneg), safe_cap)
