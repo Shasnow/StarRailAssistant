@@ -32,10 +32,9 @@ public partial class Config : ObservableObject
     [ObservableProperty] private int _currencyWarsPolicy; // 货币战争策略
     [ObservableProperty] private int _currencyWarsRunTimes = 1; // 货币战争运行次数
     [ObservableProperty] private string _currencyWarsUsername = ""; // 货币战争用户名
-    [ObservableProperty] private int _currencyWarsDifficulty; // 货币战争难度：0=最低难度，1=最高难度
+    [ObservableProperty] private int _currencyWarsDifficulty; // 货币战争难度：0=最低难度，1=最高难度，2=当前难度（不切换难度）
     
     // 货币战争 - 刷开局 ps: CwRs = Currency wars Reroll start
-    [ObservableProperty] private int _cwRsDifficulty; // 刷开局难度：0=最高难度(默认)，1=当前难度（不切换难度）
     [ObservableProperty] private string _cwRsInvestEnvironments = ""; // 刷开局 - 期望投资环境，空格分隔
     [ObservableProperty] private string _cwRsInvestStrategies = ""; // 刷开局 - 期望投资策略，空格分隔
     [ObservableProperty] private string _cwRsBossAffixes = ""; // 刷开局 - 期望Boss词条，空格分隔
