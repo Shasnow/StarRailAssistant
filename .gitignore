@@ -20,6 +20,7 @@
 /setup/SRA/
 /setup/install_info.txt
 /main.dist/
+*.zip
 
 # 构建产物
 *.dll
