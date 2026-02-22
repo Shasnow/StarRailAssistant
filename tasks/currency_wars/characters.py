@@ -3,6 +3,10 @@ import enum
 
 
 class Faction(enum.IntEnum):
+    """
+    角色阵营枚举类
+    表示角色所属的游戏阵营
+    """
     Xianzhou = 1  # 仙舟
     WolfHunt = 2  # 狼狩
     NightDemigod = 3  # 夜之半神
@@ -19,6 +23,10 @@ class Faction(enum.IntEnum):
 
 
 class School(enum.IntEnum):
+    """
+    角色派系枚举类
+    表示角色所属的游戏派系
+    """
     Break = 1  # 击破
     FollowUpATK = 2  # 追加攻击
     Energy = 3  # 能量
@@ -34,6 +42,10 @@ class School(enum.IntEnum):
 
 
 class Positioning(enum.IntEnum):
+    """
+    角色站位枚举类
+    表示角色在游戏中的默认站位
+    """
     OnField = 1  # 前台
     OffField = 2  # 后台
     OnOffField = 3  # 前后兼备
@@ -41,6 +53,10 @@ class Positioning(enum.IntEnum):
 
 @dataclasses.dataclass
 class Character:
+    """
+    角色类
+    包含角色的基本信息和状态
+    """
     name: str  # 名称
     faction: list[Faction] | Faction  # 阵营
     schools: list[School]  # 派系
@@ -68,6 +84,10 @@ class Character:
 
 
 class Characters:
+    """
+    角色工具类
+    提供角色信息查询、设置开拓者名称等功能
+    """
     Cyrene = Character('昔涟', Faction.DayDemigod, [School.Other], 5, Positioning.OnField)
     DanHeng_PermansorTerrae = Character('丹恒·腾荒', Faction.NightDemigod, [School.Shield], 2, Positioning.OffField)
     Evernight = Character('长夜月', Faction.NightDemigod, [School.Bloodflame], 3, Positioning.OnOffField)
@@ -135,83 +155,87 @@ class Characters:
     YaoGuang = Character('爻光', Faction.Xianzhou, [School.SkillPoints], 1, Positioning.OnOffField)
     Sparxie = Character('火花', Faction.GalacticVoyager, [School.SkillPoints], 4, Positioning.OnField)
 
+    # 角色列表
+    characters: dict[str, Character] = {
+        '貊泽': Moze,
+        '乱破': Rappa,
+        '花火': Sparkle,
+        '遐蝶': Castorice,
+        '银枝': Argenti,
+        '丹恒•饮月': DanHeng_ImbibitorLunae,
+        '灵砂': Lingsha,
+        '大黑塔': TheHerta,
+        '托帕&账账': TopazAndNumby,
+        '景元': JingYuan,
+        '云璃': Yunli,
+        '昔涟': Cyrene,
+        '布洛妮娅': Bronya,
+        '罗刹': Luocha,
+        '知更鸟': Robin,
+        '姬子': Himeko,
+        '镜流': Jingliu,
+        '真理医生': DrRatio,
+        '那刻夏': Anaxa,
+        '长夜月': Evernight,
+        '飞霄': Feixiao,
+        '阮•梅': RuanMei,
+        '砂金': Aventurine,
+        '缇宝': Tribbie,
+        '万敌': Mydei,
+        '风堇': Hyacine,
+        '丹恒•腾荒': DanHeng_PermansorTerrae,
+        '黑塔': Herta,
+        '赛飞儿': Cipher,
+        '青雀': Qingque,
+        '刃': Blade,
+        '翡翠': Jade,
+        '瓦尔特': Welt,
+        'Archer': Archer,
+        '黑天鹅': BlackSwan,
+        '流萤': Firefly,
+        '银狼': SilverWolf,
+        '杰帕德': Gepard,
+        '符玄': FuXuan,
+        '波提欧': Boothill,
+        '彦卿': Yanqing,
+        '海瑟音': Hysilens,
+        'Saber': Saber,
+        '希儿': Seele,
+        '娜塔莎': Natasha,
+        '忘归人': Fugue,
+        '黄泉': Acheron,
+        '星期日': Sunday,
+        '白厄': Phainon,
+        '刻律德拉': Cerydra,
+        '刻律德菈': Cerydra,
+        '刻律德': Cerydra,
+        '卡芙卡': Kafka,
+        '佩拉': Pela,
+        '藿藿': Huohuo,
+        '三月七': March7th,
+        '艾丝妲': Asta,
+        '桑博': Sampo,
+        '停云': Tingyun,
+        '椒丘': Jiaoqiu,
+        '加拉赫': Gallagher,
+        '阿格莉莎': Aglaea,
+        '开拓者': Trailblazer,
+        '大丽花': TheDahlia,
+        '光': YaoGuang,
+        '爻光': YaoGuang,
+        '火花': Sparxie,
+    }
+    username = '开拓者'  # 请将此处改为你的角色名称
 
-# 角色列表
-characters: dict[str, Character] = {
-    '貊泽': Characters.Moze,
-    '乱破': Characters.Rappa,
-    '花火': Characters.Sparkle,
-    '遐蝶': Characters.Castorice,
-    '银枝': Characters.Argenti,
-    '丹恒•饮月': Characters.DanHeng_ImbibitorLunae,
-    '灵砂': Characters.Lingsha,
-    '大黑塔': Characters.TheHerta,
-    '托帕&账账': Characters.TopazAndNumby,
-    '景元': Characters.JingYuan,
-    '云璃': Characters.Yunli,
-    '昔涟': Characters.Cyrene,
-    '布洛妮娅': Characters.Bronya,
-    '罗刹': Characters.Luocha,
-    '知更鸟': Characters.Robin,
-    '姬子': Characters.Himeko,
-    '镜流': Characters.Jingliu,
-    '真理医生': Characters.DrRatio,
-    '那刻夏': Characters.Anaxa,
-    '长夜月': Characters.Evernight,
-    '飞霄': Characters.Feixiao,
-    '阮•梅': Characters.RuanMei,
-    '砂金': Characters.Aventurine,
-    '缇宝': Characters.Tribbie,
-    '万敌': Characters.Mydei,
-    '风堇': Characters.Hyacine,
-    '丹恒•腾荒': Characters.DanHeng_PermansorTerrae,
-    '黑塔': Characters.Herta,
-    '赛飞儿': Characters.Cipher,
-    '青雀': Characters.Qingque,
-    '刃': Characters.Blade,
-    '翡翠': Characters.Jade,
-    '瓦尔特': Characters.Welt,
-    'Archer': Characters.Archer,
-    '黑天鹅': Characters.BlackSwan,
-    '流萤': Characters.Firefly,
-    '银狼': Characters.SilverWolf,
-    '杰帕德': Characters.Gepard,
-    '符玄': Characters.FuXuan,
-    '波提欧': Characters.Boothill,
-    '彦卿': Characters.Yanqing,
-    '海瑟音': Characters.Hysilens,
-    'Saber': Characters.Saber,
-    '希儿': Characters.Seele,
-    '娜塔莎': Characters.Natasha,
-    '忘归人': Characters.Fugue,
-    '黄泉': Characters.Acheron,
-    '星期日': Characters.Sunday,
-    '白厄': Characters.Phainon,
-    '刻律德拉': Characters.Cerydra,
-    '刻律德菈': Characters.Cerydra,
-    '刻律德': Characters.Cerydra,
-    '卡芙卡': Characters.Kafka,
-    '佩拉': Characters.Pela,
-    '藿藿': Characters.Huohuo,
-    '三月七': Characters.March7th,
-    '艾丝妲': Characters.Asta,
-    '桑博': Characters.Sampo,
-    '停云': Characters.Tingyun,
-    '椒丘': Characters.Jiaoqiu,
-    '加拉赫': Characters.Gallagher,
-    '阿格莱雅': Characters.Aglaea,
-    '开拓者': Characters.Trailblazer,
-    '大丽花': Characters.TheDahlia,
-    '光': Characters.YaoGuang,
-    '爻光': Characters.YaoGuang,
-    '火花': Characters.Sparxie,
-}
-username = '开拓者'  # 请将此处改为你的角色名称
+    @classmethod
+    def get_character(cls, name: str) -> Character | None:
+        """根据名称获取角色信息"""
+        name = name.replace('·', '•').replace('傑', '杰').replace('姐', '妲').replace("交", "")
+        if name == cls.username:
+            return cls.Trailblazer
+        return cls.characters.get(name)
 
-
-def get_character(name: str) -> Character | None:
-    """根据名称获取角色信息"""
-    name = name.replace('·', '•').replace('傑', '杰').replace('姐', '妲').replace("交", "")
-    if name == username:
-        return Characters.Trailblazer
-    return characters.get(name)
+    @classmethod
+    def set_username(cls, username: str):
+        """设置开拓者名称"""
+        cls.username = username

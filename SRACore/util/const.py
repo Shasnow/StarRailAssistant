@@ -18,7 +18,7 @@ from pathlib import Path
 
 # 基础的常量定义
 AppPath = Path(os.path.dirname(os.path.realpath(sys.argv[0])))
-VERSION = "2.7.0"  # 版本号
+VERSION = "2.7.1"  # 版本号
 CORE = f"{VERSION} on {sys.platform}"  # 核心版本信息
 
 AppDataSraDir = Path(os.getenv("APPDATA") if sys.platform == "win32" else os.path.expanduser("~/.config")) / "SRA"

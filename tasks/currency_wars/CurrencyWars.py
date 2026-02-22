@@ -3,10 +3,8 @@ from typing import Any
 
 from loguru import logger
 
-import tasks.currency_wars.characters as cw_chars
 from SRACore.task import Executable
-from tasks.currency_wars.characters import (Character, Positioning,
-                                            get_character)
+from tasks.currency_wars.characters import Character, Characters, Positioning
 from tasks.currency_wars.img import CWIMG, IMG
 
 
@@ -75,11 +73,6 @@ class CurrencyWars(Executable):
             if c is not None:
                 c.is_placed = False
             self.in_hand_character[i] = None
-
-    @staticmethod
-    def set_username(username: str):
-        # 调用处已经确保 username 非空
-        cw_chars.username = username.strip()
 
     def set_overclock(self, overclock: bool):
         self.is_overclock = overclock
@@ -241,19 +234,6 @@ class CurrencyWars(Executable):
     def initialize(self) -> bool:
         """进入对局后的攻略应用与手牌识别。"""
         self.operator.sleep(1)
-        # strategy_box = self.operators.wait_img(CWIMG.STRATEGY, timeout=60, interval=0.5)
-        # if strategy_box is None or not self.operators.click_box(strategy_box, after_sleep=1.5):
-        #     logger.error("未识别到攻略按钮")
-        #     return False
-        # cancel_apply_box = self.operators.wait_img(CWIMG.CANCEL_APPLY, timeout=2)
-        # if cancel_apply_box is None:  # 未应用攻略则应用
-        #     if self.operators.click_img(CWIMG.APPLY, after_sleep=1):
-        #         self.operators.press_key('esc')
-        #         self.operators.sleep(1)
-        #         for _ in range(3):
-        #             self.operators.click_img(CWIMG.TRACE, after_sleep=0.3)
-        # self.operators.press_key('esc')
-        # 不考虑中途加入、接管情况
 
         self.get_in_hand_area()  # 更新手牌信息（若无接管情况，则仅有此行有用）
         self.place_character()  # 放置角色
@@ -262,7 +242,6 @@ class CurrencyWars(Executable):
     def run_game(self):
         run_times = 0
         while self.is_running:
-            # self.strategy_event()
             self.update_max_team_size()
             self.place_character()
             self.sell_character()
@@ -338,7 +317,7 @@ class CurrencyWars(Executable):
                     name = ''
                     for char_name in character_names:
                         name += char_name[1]
-                    target_character_list[index] = get_character(name)
+                    target_character_list[index] = Characters.get_character(name)
                     if equip:
                         self.operator.click_img(CWIMG.EQUIPMENT_RECOMMEND, after_sleep=1)
                         _, box = self.operator.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS], confidence=0.8)
@@ -751,11 +730,6 @@ class CurrencyWars(Executable):
             # 未检测到特殊事件，正常返回
             return True
 
-    def strategy_event(self):
-        """处理攻略事件"""
-        self.operator.click_img(CWIMG.RIGHT, after_sleep=2)  # 装备合成
-        self.operator.click_point(0.5, 0.5, after_sleep=0.5)
-
     def shopping(self):
         def scan_characters_in_store() -> list[Character]:
             results = self.operator.ocr(from_x=0.19, from_y=0.26, to_x=0.88, to_y=0.31)
@@ -773,7 +747,7 @@ class CurrencyWars(Executable):
                     continue
                 if '备' in name:  # 备战席已满
                     return []
-                char = get_character(name)
+                char = Characters.get_character(name)
                 if char is not None:
                     chars.append(char)
                     logger.info(f"商店中发现角色：{char.name}，P: {char.priority}")
@@ -871,7 +845,7 @@ class CurrencyWars(Executable):
         strategy_on_field: dict[str,int] = strategy_data.get("on_field", {})
         strategy_off_field: dict[str,int] = strategy_data.get("off_field", {})
         for i, cn in enumerate(strategy_on_field.keys()):
-            c = get_character(cn)
+            c = Characters.get_character(cn)
             if c is None:
                 logger.warning(f"攻略角色不存在，跳过：{cn}")
                 continue
@@ -879,7 +853,7 @@ class CurrencyWars(Executable):
             c.position = Positioning.OnField
             self.strategy_characters[cn] = strategy_on_field[cn]
         for i, cn in enumerate(strategy_off_field):
-            c = get_character(cn)
+            c = Characters.get_character(cn)
             if c is None:
                 logger.warning(f"攻略角色不存在，跳过：{cn}")
                 continue
@@ -890,7 +864,7 @@ class CurrencyWars(Executable):
 
     def unload_strategy(self):
         """卸载当前攻略，重置角色"""
-        for c in cw_chars.characters.values():
+        for c in Characters.characters.values():
             c.reset()
         self.min_coins = 40
         self.min_level = 7
@@ -967,36 +941,6 @@ class CurrencyWars(Executable):
         
         logger.info(f"对换操作完成: {source_name}[{source_index}] <-> {target_name}[{target_index}]")
         return True
-
-    def swap_field_and_hand_character(self, field_index: int, hand_index: int) -> bool:
-        """
-        示例方法：交换场上和手牌区的角色
-        
-        :param field_index: 场上角色的索引 (0-3)
-        :param hand_index: 手牌角色的索引 (0-8)
-        :return: 交换是否成功
-        """
-        return self.swap_character_between_areas(
-            source_area_type='on_field',
-            source_index=field_index,
-            target_area_type='in_hand',
-            target_index=hand_index
-        )
-
-    def swap_field_and_offfield_character(self, field_index: int, offfield_index: int) -> bool:
-        """
-        示例方法：交换场上和场下区的角色
-        
-        :param field_index: 场上角色的索引 (0-3)
-        :param offfield_index: 场下角色的索引 (0-5)
-        :return: 交换是否成功
-        """
-        return self.swap_character_between_areas(
-            source_area_type='on_field',
-            source_index=field_index,
-            target_area_type='off_field',
-            target_index=offfield_index
-        )
 
     def sort_characters_by_priority(self, area_type: str) -> bool:
         """

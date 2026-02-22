@@ -1,5 +1,6 @@
 from SRACore.task import BaseTask
 from SRACore.util.logger import logger
+from tasks.currency_wars.characters import Characters
 
 
 class CosmicStrifeTask(BaseTask):
@@ -26,6 +27,7 @@ class CosmicStrifeTask(BaseTask):
         if username is None or username.strip() == "":
             logger.error("货币战争开拓者名称为空，请在前端配置中填写。")
             return False
+        Characters.set_username(username)
 
         if cw_mode==2:
             logger.info("执行任务：旷宇纷争-货币战争 刷开局")
@@ -36,10 +38,8 @@ class CosmicStrifeTask(BaseTask):
                                   invest_strategy_stage= self.config.get("CwRsInvestStrategyStage", 1),
                                   max_retry=self.config.get("CwRsMaxRetry", 0),
                                   boss_affix=self.config.get("CwRsBossAffixes", ""))
-            # 刷开局难度选择：0=最高难度(默认)，1=当前难度（不切换难度，直接开始）
-            rs_difficulty = self.config.get("CwRsDifficulty", 0)
-            rs_task.cw.set_difficulty(1 if rs_difficulty == 0 else 2)
-            rs_task.cw.set_username(username)
+            # 刷开局难度选择：和标准模式使用同一个难度配置项
+            rs_task.cw.set_difficulty(self.config.get("CurrencyWarsDifficulty", 0))
             rs_task.cw.load_strategy("template")
             if not rs_task.run():
                 logger.error("旷宇纷争-货币战争刷开局任务失败")
@@ -49,7 +49,6 @@ class CosmicStrifeTask(BaseTask):
             logger.info("执行任务：旷宇纷争-货币战争")
             from tasks.currency_wars import CurrencyWars
             cw_task = CurrencyWars(self.operator, self.config.get("CurrencyWarsRunTimes", 0))
-            cw_task.set_username(username)
             cw_task.load_strategy("template")
             # 前端难度选择：0=最低难度，1=最高难度
             difficulty = self.config.get("CurrencyWarsDifficulty", 0)

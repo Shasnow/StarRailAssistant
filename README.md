@@ -11,18 +11,18 @@
 </p>
 <p align="center"><a href="https://starrailassistant.top"><b>主页</b></a></p>
 
-#### [帮助文档](https://docs.qq.com/doc/DWUFOUmJDc2xLRk1B) | [FAQ](https://starrailassistant.top/faq.html) | [下载和安装](https://starrailassistant.top/download.html) | [使用方法](https://starrailassistant.top/getstarted/getstarted.html)
+#### [问题排查](https://starrailassistant.top/trouble/having_trouble.html) | [FAQ](https://starrailassistant.top/faq.html) | [下载和安装](https://starrailassistant.top/download.html) | [使用方法](https://starrailassistant.top/getstarted/getstarted.html)
 
 # 🌟 StarRailAssistant(SRA)
 
 🎮 崩坏星穹铁道自动化助手  
-如果您在使用的过程中遇到问题，请先阅读[常见问题](https://starrailassistant.top/faq.html)。
+如果您在使用的过程中遇到问题，请先阅读[问题排查](https://starrailassistant.top/trouble/having_trouble.html)。
 
 ## ❓ 什么是SRA？
 
 🤖 一个基于图像识别的崩铁自动化程序，帮您完成从启动到退出的崩铁日常。
 
-![preview](https://starrailassistant.top/img/use/softwaremain2.png)
+![预览](https://starrailassistant.top/img/use/softwaremain2.png)
 
 ## ⚠️ 免责声明
 
