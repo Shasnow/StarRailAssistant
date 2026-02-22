@@ -111,7 +111,7 @@ class RerollStart(Executable):
                 if self.wanted_boss_affix and self.boss_affix is None:
                     tries += 1
                     logger.info(f"第 {tries} 次尝试Boss词条未命中，直接结束本轮")
-                    if not self._return_to_prep_and_abort():
+                    if not self._abort_and_return(in_game=True):
                         logger.error("Boss词条未命中后的快速结算失败，重试下一轮")
                     continue
 
@@ -625,7 +625,7 @@ class RerollStart(Executable):
 
         if nonneg_init and all(x == 0 for x in nonneg_init):
             logger.info("初始OCR检测到刷新次数为 0，执行返回备战并结算本轮")
-            self._return_to_prep_and_abort()
+            self._abort_and_return(in_game=True)
             self.operator.sleep(2.0)
             return False
 
@@ -636,14 +636,14 @@ class RerollStart(Executable):
             remaining = min(planned_clicks, safe_cap - total_clicks)
             if remaining <= 0:
                 logger.info("无可执行的刷新次数，执行返回备战并结算本轮")
-                self._return_to_prep_and_abort()
+                self._abort_and_return(in_game=True)
                 self.operator.sleep(2.0)
                 return False
 
             for _ in range(remaining):
                 if not self._click_refresh_button():
                     logger.info("刷新按钮不可用或未找到，视为刷新次数已用尽，执行返回备战并结算本轮")
-                    self._return_to_prep_and_abort()
+                    self._abort_and_return(in_game=True)
                     self.operator.sleep(2.0)
                     return False
 
@@ -661,7 +661,7 @@ class RerollStart(Executable):
             # 刷新次数标签消失，视为无次数可用
             if self.operator.locate(CWIMG.REFRESH_COUNT) is None:
                 logger.info("刷新次数模板已消失，视为刷新次数耗尽，执行返回备战并结算本轮")
-                self._return_to_prep_and_abort()
+                self._abort_and_return(in_game=True)
                 self.operator.sleep(2.0)
                 return False
 
@@ -671,7 +671,7 @@ class RerollStart(Executable):
             nonneg_fallback = [x for x in fallback_counts if isinstance(x, int) and x >= 0]
             if nonneg_fallback and all(x == 0 for x in nonneg_fallback):
                 logger.info("回退OCR检测到刷新次数为 0，执行返回备战并结算本轮")
-                self._return_to_prep_and_abort()
+                self._abort_and_return(in_game=True)
                 self.operator.sleep(2.0)
                 return False
 
@@ -680,7 +680,7 @@ class RerollStart(Executable):
                 logger.info("回退OCR未识别到有效刷新次数，保守追加 1 次刷新后重试")
 
         logger.info("达到安全刷新上限，执行返回备战并结算本轮")
-        self._return_to_prep_and_abort()
+        self._abort_and_return(in_game=True)
         self.operator.sleep(2.0)
         return False
 
