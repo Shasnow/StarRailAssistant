@@ -34,7 +34,8 @@ class CosmicStrifeTask(BaseTask):
                                   invest_env=self.config.get("CwRsInvestEnvironments"),
                                   invest_strategy=self.config.get("CwRsInvestStrategies"),
                                   invest_strategy_stage= self.config.get("CwRsInvestStrategyStage", 1),
-                                  max_retry=self.config.get("CwRsMaxRetry", 0))
+                                  max_retry=self.config.get("CwRsMaxRetry", 0),
+                                  boss_affix=self.config.get("CwRsBossAffixes", ""))
             # 刷开局难度选择：0=最高难度(默认)，1=当前难度（不切换难度，直接开始）
             rs_difficulty = self.config.get("CwRsDifficulty", 0)
             rs_task.cw.set_difficulty(1 if rs_difficulty == 0 else 2)

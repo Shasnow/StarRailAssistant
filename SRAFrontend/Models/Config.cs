@@ -38,6 +38,7 @@ public partial class Config : ObservableObject
     [ObservableProperty] private int _cwRsDifficulty; // 刷开局难度：0=最高难度(默认)，1=当前难度（不切换难度）
     [ObservableProperty] private string _cwRsInvestEnvironments = ""; // 刷开局 - 期望投资环境，空格分隔
     [ObservableProperty] private string _cwRsInvestStrategies = ""; // 刷开局 - 期望投资策略，空格分隔
+    [ObservableProperty] private string _cwRsBossAffixes = ""; // 刷开局 - 期望Boss词条，空格分隔
     [ObservableProperty] private int _cwRsInvestStrategyStage = 1; // 刷开局 - 期望投资策略阶段
     [ObservableProperty] private int _cwRsMaxRetry = 1; // 刷开局 - 最大尝试轮数
 

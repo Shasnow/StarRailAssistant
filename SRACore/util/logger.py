@@ -7,45 +7,42 @@ from loguru import logger
 # 设置日志记录器
 def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log", level: str = "TRACE", queue = None) -> None:
     logger.remove()
+    log_format = "{time:HH:mm:ss}[{process.id}] | {level:5} | {message}"
     if sys.stdout.isatty():
         logger.add(sys.stdout, level=level,
-                   format="<green>{time:HH:mm:ss}</green>[{thread}] | <level>{level:5}</level> | <cyan>{module}.{"
-                          "function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>",
+                   format=f"<green>{log_format}</green>",
                    colorize=True, enqueue=True)
     else:
         logger.add(sys.stdout, level=level,
-                   format="{time:HH:mm:ss}[{thread}] | {level:5} | {message}",
+                   format=log_format,
                    colorize=False, enqueue=True)
     logger.add(path, level=level,
-               format="{time:HH:mm:ss} {level:5} {module}.{function}:{line} {message}",
+               format=log_format,
                colorize=False, retention=7, enqueue=True,
                encoding="utf-8")
     if queue is not None:
         logger.add(queue.put, level=level,
-                   format="{time:HH:mm:ss}[{thread}] | {level:5} | {message}",
+                   format=log_format,
                    colorize=False, enqueue=True)
 
 
 def _log_entry_exit(func):
-    """装饰器：在函数进入和退出时打印日志，方便调试函数调用流程"""
+    """装饰器：仅在函数异常时打印日志，避免 Enter/Exit 噪音"""
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         func_name = func.__name__
-        logger.debug(f">>> Enter {func_name}")
         try:
-            result = func(*args, **kwargs)
-            logger.debug(f"<<< Exit {func_name} (return: {result})")
-            return result
+            return func(*args, **kwargs)
         except Exception as e:
-            logger.debug(f"<<< Exception {func_name}: {type(e).__name__}: {e}")
+            logger.exception(f"Exception in {func_name}: {type(e).__name__}: {e}")
             raise
 
     return wrapper
 
 
 def auto_log_methods(cls):
-    """类装饰器：自动给类中所有公开方法添加进入/退出日志"""
+    """类装饰器：自动给类中所有公开方法添加异常日志"""
     for name in dir(cls):
         # if name.startswith('__'):
         # continue
