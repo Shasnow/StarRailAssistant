@@ -57,7 +57,7 @@ public partial class Settings : ObservableObject
 
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
     [JsonPropertyName("EmailAuthCode")] public string EncryptedEmailAuthCode { get; set; } = "";
-    public const string Version = "2.7.1"; // 应用版本号
+    public const string Version = "2.7.2"; // 应用版本号
 
     // 新增快捷键设置
     public string ActivityHotkey { get; set; } = "F1"; // 活动 默认 F1
