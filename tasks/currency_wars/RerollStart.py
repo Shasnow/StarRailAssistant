@@ -336,6 +336,7 @@ class RerollStart(Executable):
                 found = self.operator.locate(CWIMG.JI_MI) is not None
                 if found:
                     self.invest_strategy = '叽米金币大使'
+                    logger.info(f"检测到目标投资策略: {self.invest_strategy}")
                 return found
             else:
                 index, box = self.operator.wait_ocr_any(
@@ -347,7 +348,11 @@ class RerollStart(Executable):
                     to_x=self.INVEST_STRATEGY_OCR_TO_X,
                     to_y=self.INVEST_STRATEGY_OCR_TO_Y,
                 )
-                return index != -1
+                if index != -1:
+                    self.invest_strategy = self.wanted_invest_strategy[index]
+                    logger.info(f"检测到目标投资策略: {self.invest_strategy}")
+                    return True
+                return False
         except Exception as e:
             logger.warning(f"检测投资策略时发生异常：{e}")
             return False
