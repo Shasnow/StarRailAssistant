@@ -40,6 +40,18 @@ class RerollStart(Executable):
     BOSS_AFFIX_TO_X = 0.625
     BOSS_AFFIX_TO_Y = 0.954
 
+    # 投资策略OCR区域（基于1920x1080截图坐标: 270,455-1650,510）
+    INVEST_STRATEGY_OCR_FROM_X = 0.141
+    INVEST_STRATEGY_OCR_FROM_Y = 0.421
+    INVEST_STRATEGY_OCR_TO_X = 0.859
+    INVEST_STRATEGY_OCR_TO_Y = 0.472
+
+    # 投资环境OCR区域（基于1920x1080截图坐标: 235,360-1700,410）
+    INVEST_ENV_OCR_FROM_X = 0.122
+    INVEST_ENV_OCR_FROM_Y = 0.333
+    INVEST_ENV_OCR_TO_X = 0.885
+    INVEST_ENV_OCR_TO_Y = 0.380
+
     def __init__(self, operator, invest_env:str, invest_strategy:str, invest_strategy_stage:int, max_retry:int,
                  boss_affix: str = ""):
         super().__init__(operator)
@@ -61,13 +73,12 @@ class RerollStart(Executable):
 
     def _reset_cw_flags_after_abort(self, result: bool):
         """统一在结算返回后重置 CW 运行/接管标记。"""
-        if result:
-            self.cw.strategy_external_control = False
-            self.cw.is_running = False
-            # 退出策略阶段，允许下一轮重新定位与进入
-            self._in_strategy_phase = False
-            self.invest_environment = None
-            self.invest_strategy = None
+        self.cw.strategy_external_control = False
+        self.cw.is_running = False
+        # 退出策略阶段，允许下一轮重新定位与进入
+        self._in_strategy_phase = False
+        self.invest_environment = None
+        self.invest_strategy = None
         return result
 
     def run(self):
@@ -325,10 +336,23 @@ class RerollStart(Executable):
                 found = self.operator.locate(CWIMG.JI_MI) is not None
                 if found:
                     self.invest_strategy = '叽米金币大使'
+                    logger.info(f"检测到目标投资策略: {self.invest_strategy}")
                 return found
             else:
-                index, box = self.operator.wait_ocr_any(self.wanted_invest_strategy, timeout=2, interval=0.5)
-                return index != -1
+                index, box = self.operator.wait_ocr_any(
+                    self.wanted_invest_strategy,
+                    timeout=2,
+                    interval=0.5,
+                    from_x=self.INVEST_STRATEGY_OCR_FROM_X,
+                    from_y=self.INVEST_STRATEGY_OCR_FROM_Y,
+                    to_x=self.INVEST_STRATEGY_OCR_TO_X,
+                    to_y=self.INVEST_STRATEGY_OCR_TO_Y,
+                )
+                if index != -1:
+                    self.invest_strategy = self.wanted_invest_strategy[index]
+                    logger.info(f"检测到目标投资策略: {self.invest_strategy}")
+                    return True
+                return False
         except Exception as e:
             logger.warning(f"检测投资策略时发生异常：{e}")
             return False
@@ -437,12 +461,26 @@ class RerollStart(Executable):
             self.operator.sleep(4)
             return True
 
-        env_index, env_ocr_box = self.operator.wait_ocr_any(self.wanted_invest_environment, timeout=2, interval=0.5)
+        env_index, env_ocr_box = self.operator.wait_ocr_any(
+            self.wanted_invest_environment,
+            timeout=2,
+            interval=0.5,
+            from_x=self.INVEST_ENV_OCR_FROM_X,
+            from_y=self.INVEST_ENV_OCR_FROM_Y,
+            to_x=self.INVEST_ENV_OCR_TO_X,
+            to_y=self.INVEST_ENV_OCR_TO_Y,
+        )
         if env_index == -1:
             refresh_env_box = self.operator.wait_img(CWIMG.REFRESH_ENV, timeout=2, interval=0.5)
             if refresh_env_box is not None and self.operator.click_box(refresh_env_box, after_sleep=1):
                 env_index, env_ocr_box = self.operator.wait_ocr_any(
-                    self.wanted_invest_environment, timeout=2, interval=0.5
+                    self.wanted_invest_environment,
+                    timeout=2,
+                    interval=0.5,
+                    from_x=self.INVEST_ENV_OCR_FROM_X,
+                    from_y=self.INVEST_ENV_OCR_FROM_Y,
+                    to_x=self.INVEST_ENV_OCR_TO_X,
+                    to_y=self.INVEST_ENV_OCR_TO_Y,
                 )
         if env_index == -1:
             logger.info("未刷到需要的投资环境")
@@ -720,6 +758,11 @@ class RerollStart(Executable):
             self.cw.get_in_hand_area()
             self.cw.place_character()
             self.cw.sell_character()
+
+            # 若结算流程已把运行标记关闭，则不再推进，避免错误页面调用 battle
+            if not self._in_strategy_phase or not self.cw.is_running:
+                logger.info("当前不在可推进对局状态，跳过 battle 推进")
+                return
 
             # 手动推进：battle → stage_transition → shopping
             self.cw.is_running = True
