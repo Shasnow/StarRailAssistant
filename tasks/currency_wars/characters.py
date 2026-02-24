@@ -218,7 +218,7 @@ class Characters:
         '停云': Tingyun,
         '椒丘': Jiaoqiu,
         '加拉赫': Gallagher,
-        '阿格莉莎': Aglaea,
+        '阿格莱雅': Aglaea,
         '开拓者': Trailblazer,
         '大丽花': TheDahlia,
         '光': YaoGuang,
