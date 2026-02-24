@@ -55,3 +55,5 @@ class CWIMG:
     REFRESH_ENV = f'{BASE}/refresh_environment.png'
     LOGO = f"{BASE}/logo.png"
     FAIL = f"{BASE}/fail.png"
+    QUIT = f"{BASE}/quit.png"
+    CANNOT_BE_FIELDED = f"{BASE}/cannot_be_fielded.png"
