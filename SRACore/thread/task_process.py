@@ -7,7 +7,7 @@ from SRACore.task import BaseTask
 from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
 from SRACore.util import notify
 from SRACore.util import sys_util  # NOQA 有动态用法，确保被打包
-from SRACore.util.config import load_config, load_cache
+from SRACore.util.data_persister import load_config, load_cache
 from SRACore.util.logger import logger, setup_logger
 
 
