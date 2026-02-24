@@ -5,7 +5,7 @@ from email.utils import formataddr
 from plyer import notification
 
 from SRACore.util import encryption
-from SRACore.util.config import load_settings
+from SRACore.util.data_persister import load_settings
 
 
 def try_send_notification(title: str, message: str):

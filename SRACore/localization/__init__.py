@@ -1,5 +1,5 @@
 from SRACore.localization.resource import Resource
-from SRACore.util.config import load_settings
+from SRACore.util.data_persister import load_settings
 
 lang_support = [
     'zh-cn',  # 中文

@@ -10,7 +10,7 @@ from loguru import logger
 from rapidocr_onnxruntime import RapidOCR
 
 from SRACore.operators.model import Region, Box
-from SRACore.util.config import load_settings
+from SRACore.util.data_persister import load_settings
 
 
 class IOperator(ABC):

@@ -9,7 +9,7 @@ from SRACore.localization import Resource
 from SRACore.thread.event_thread import EventListener
 from SRACore.thread.task_process import TaskManager
 from SRACore.thread.trigger_thread import TriggerManager
-from SRACore.util.config import load_settings
+from SRACore.util.data_persister import load_settings
 from SRACore.util.const import VERSION, CORE
 
 
