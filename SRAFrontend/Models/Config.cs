@@ -29,6 +29,8 @@ public partial class Config : ObservableObject
     [ObservableProperty] private bool _dUUseTechnique; // 差分宇宙是否使用秘技
     [ObservableProperty] private bool _currencyWarsEnable; // 是否启用货币战争任务
     [ObservableProperty] private int _currencyWarsMode; // 货币战争模式：0=标准博弈,1=超频博弈,2=刷开局（对应后端 CurrencyWarsMode）
+    [ObservableProperty] private string _currencyWarsStrategy = "template"; // 货币战争攻略
+    [ObservableProperty] private int _currencyWarsStrategyIndex;
     [ObservableProperty] private int _currencyWarsPolicy; // 货币战争策略
     [ObservableProperty] private int _currencyWarsRunTimes = 1; // 货币战争运行次数
     [ObservableProperty] private string _currencyWarsUsername = ""; // 货币战争用户名

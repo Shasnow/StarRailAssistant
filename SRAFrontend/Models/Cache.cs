@@ -11,14 +11,16 @@ public partial class Cache : ObservableObject
 
     [ObservableProperty] private string _cdkStatusForeground = "#F5222D";
 
-    [ObservableProperty] private AvaloniaList<string> _configNames = ["Default"]; // 配置名称列表
-
     [ObservableProperty] private int _currentConfigIndex; // 当前配置索引
 
     [ObservableProperty] private string _currentConfigName = "Default"; // 当前配置名称
-    
+
     [ObservableProperty] private string _startMode = "Current"; // 当前启动模式, "Current" 或 "All" 或 "Save Only"
     
+    public AvaloniaList<string> ConfigNames { get; set; } = ["Default"]; // 配置名称列表
+    
+    public AvaloniaList<Strategy> Strategies { get; set; } = []; // 攻略列表
+
     // 以下字段无UI绑定
     public string HotfixVersion { get; set; } = ""; // 热更版本号
     public byte[]? UserGameResolution { get; set; } // 用户游戏分辨率设置的二进制数据
