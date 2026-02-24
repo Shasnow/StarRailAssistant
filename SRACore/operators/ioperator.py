@@ -26,7 +26,7 @@ class IOperator(ABC):
         self.height = 0
 
     @classmethod
-    def get_ocr_instance(cls):
+    def _get_ocr_instance(cls):
         """获取OCR引擎实例"""
         if cls.ocr_engine is None:
             cls.ocr_engine = RapidOCR(config_path='rapidocr_onnxruntime/config.yaml')
@@ -194,10 +194,10 @@ class IOperator(ABC):
 
     @abstractmethod
     def locate_all_in_region(self,
-                            template: str,
-                            region: Region | None = None,
-                            confidence: float | None = None,
-                            trace: bool = True) -> list[Box] | None:
+                             template: str,
+                             region: Region | None = None,
+                             confidence: float | None = None,
+                             trace: bool = True) -> list[Box] | None:
         """
         在窗口内匹配所有图片位置
         :param template: 模板图片路径
@@ -231,16 +231,16 @@ class IOperator(ABC):
         ...
 
     def locate_all(self,
-               template: str,
-               region: Region | None = None,
-               *,
-               from_x: float | None = None,
-               from_y: float | None = None,
-               to_x: float | None = None,
-               to_y: float | None = None,
-               confidence: float | None = None,
-               trace: bool = True) -> list[Box] | None:
-        """在窗口内查找图片位置
+                   template: str,
+                   region: Region | None = None,
+                   *,
+                   from_x: float | None = None,
+                   from_y: float | None = None,
+                   to_x: float | None = None,
+                   to_y: float | None = None,
+                   confidence: float | None = None,
+                   trace: bool = True) -> list[Box] | None:
+        """在窗口内查找所有匹配的图片位置
 
         Args:
             template (str): 模板图片路径
@@ -273,6 +273,7 @@ class IOperator(ABC):
                    confidence: float | None = None,
                    trace: bool = True) -> tuple[int, Box | None]:
         """在窗口内查找任意一张图片位置
+        
         Args:
             templates (list[str]): 模板图片路径列表
             region (Region | None, optional): 要查找的区域对象，包含left, top, width, height属性。
@@ -303,7 +304,7 @@ class IOperator(ABC):
                to_y: float | None = None,
                confidence: float | None = None,
                trace: bool = True) -> Box | None:
-        """在窗口内查找图片位置
+        """在窗口内查找模板图片位置
 
         Args:
             template (str): 模板图片路径
@@ -356,7 +357,7 @@ class IOperator(ABC):
                 region = self.get_win_region()
                 time.sleep(0.5)  # 等待窗口稳定
             if self.ocr_engine is None:
-                self.ocr_engine = IOperator.get_ocr_instance()
+                self.ocr_engine = IOperator._get_ocr_instance()
             screenshot = self.screenshot(region)
             screenshot = screenshot.convert("L")
             result, _ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA
@@ -417,7 +418,7 @@ class IOperator(ABC):
                 如果为None，则默认识别当前活动窗口的区域。默认为None。如果传入完整的比例坐标时，region参数会被忽略
             from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
             from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
-            to_x (float, optional): 结束点X坐标比例 (0-1
+            to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
             to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
             trace (bool, optional): 是否打印调试信息。默认为True。
         Returns:
@@ -444,15 +445,17 @@ class IOperator(ABC):
         OCR识别并匹配指定文本，返回文本位置
 
         当提供完整4个比例坐标时，region参数会被忽略。
-        :param text: 要识别的文本
-        :param confidence: 识别置信度
-        :param region: 识别区域
-        :param from_x: 识别区域起始x坐标比例(0-1)
-        :param from_y: 识别区域起始y坐标比例(0-1)
-        :param to_x: 识别区域结束x坐标比例(0-1)
-        :param to_y: 识别区域结束y坐标比例(0-1)
-        :param trace: 是否打印调试信息
-        :return: Box | None - 找到的文本位置，如果未找到则返回None
+        Args:
+            text (str): 要识别的文本
+            confidence (float, optional): 识别置信度。默认为0.9。
+            region (Region | None, optional): 识别区域。如果为None，则默认识别当前活动窗口的区域。默认为None。
+            from_x (float, optional): 识别区域起始x坐标比例(0-1)。
+            from_y (float, optional): 识别区域起始y坐标比例(0-1)。
+            to_x (float, optional): 识别区域结束x坐标比例(0-1)。
+            to_y (float, optional): 识别区域结束y坐标比例(0-1)。
+            trace (bool, optional): 是否打印调试信息。默认为True。
+        Returns:
+            Box | None: 找到的文本位置，如果未找到则返回None。
         """
         results = self.ocr(region, from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
         if results is None:
@@ -484,15 +487,17 @@ class IOperator(ABC):
         OCR识别并匹配任意指定文本，返回文本索引和位置
 
         当提供完整4个比例坐标时，region参数会被忽略。
-        :param texts: 要识别的文本列表
-        :param confidence: 识别置信度
-        :param region: 识别区域
-        :param from_x: 识别区域起始x坐标比例(0-1)
-        :param from_y: 识别区域起始y坐标比例(0-1)
-        :param to_x: 识别区域结束x坐标比例(0-1)
-        :param to_y: 识别区域结束y坐标比例(0-1)
-        :param trace: 是否打印调试信息
-        :return: tuple[int, Box | None] - 找到的文本索引和位置，如果未找到则返回-1和None
+        Args:
+            texts (list[str]): 要识别的文本列表
+            confidence (float, optional): 识别置信度。默认为0.9。
+            region (Region | None, optional): 识别区域。如果为None，则默认识别当前活动窗口的区域。默认为None。
+            from_x (float, optional): 识别区域起始x坐标比例(0-1)。
+            from_y (float, optional): 识别区域起始y坐标比例(0-1)。
+            to_x (float, optional): 识别区域结束x坐标比例(0-1)。
+            to_y (float, optional): 识别区域结束y坐标比例(0-1)。
+            trace (bool, optional): 是否打印调试信息。默认为True。
+        Returns:
+            tuple[int, Box | None]: 找到的文本索引和位置，如果未找到则返回-1和None
         """
         results = self.ocr(region, from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
         if results is None:
@@ -514,13 +519,16 @@ class IOperator(ABC):
                  **kwargs) -> Box | None:
         """
         等待OCR识别到指定文本
-        :param text: 要识别的文本
-        :param timeout: 超时时间，单位秒
-        :param interval: 检查间隔时间，单位秒，默认为0.2秒
-        :param confidence: 识别置信度，默认为0.9
-        :param args: 传递给ocr_match的其他位置参数
-        :param kwargs: 传递给ocr_match的其他关键字参数
-        :return: Box | None - 找到的文本位置，如果未找到则返回None
+
+        Args:
+            text (str): 要识别的文本
+            timeout (float, optional): 超时时间，单位秒。默认值为10秒。
+            interval (float, optional): 检查间隔时间，单位秒。默认值为0.2秒。
+            confidence (float, optional): 识别置信度。默认值为0.9。
+            *args: 传递给ocr_match的其他位置参数。
+            **kwargs: 传递给ocr_match的其他关键字参数。
+        Returns:
+            Box | None: 找到的文本位置，如果未找到则返回None。
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
@@ -535,13 +543,16 @@ class IOperator(ABC):
                      **kwargs) -> tuple[int, Box | None]:
         """
         等待OCR识别到任意指定文本
-        :param texts: 要识别的文本列表
-        :param timeout: 超时时间，单位秒
-        :param interval: 检查间隔时间，单位秒，默认为0.2秒
-        :param confidence: 识别置信度，默认为0.9
-        :param args: 传递给ocr_match_any的其他位置参数
-        :param kwargs: 传递给ocr_match_any的其他关键字参数
-        :return: tuple[int, Box | None] - 找到的文本索引和位置，如果未找到则返回-1和None
+
+        Args:
+            texts (list[str]): 要识别的文本列表
+            timeout (float, optional): 超时时间，单位秒。默认值为10秒。
+            interval (float, optional): 检查间隔时间，单位秒。默认值为0.2秒。
+            confidence (float, optional): 识别置信度。默认值为0.9。
+            *args: 传递给ocr_match_any的其他位置参数。
+            **kwargs: 传递给ocr_match_any的其他关键字参数。
+        Returns:
+            tuple[int, Box | None]: 找到的文本索引和位置，如果未找到则返回-1和None
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
@@ -557,27 +568,33 @@ class IOperator(ABC):
                     after_sleep: float = 0, tag: str = "") -> bool:
         """
         点击指定位置
+
         如果x和y是整数，则直接点击坐标(x, y)
         如果x和y是浮点数，则将其转换为相对于窗口区域的坐标
-        :param x: int或float类型，表示点击位置的x坐标
-        :param y: int或float类型，表示点击位置的y坐标
-        :param x_offset: x偏移量(px)或百分比(float)
-        :param y_offset: y偏移量(px)或百分比(float)
-        :param after_sleep: 点击后等待时间，单位秒
-        :param tag: 日志标记
-        :return: None
+        Args:
+            x (int | float): 点击位置的x坐标
+            y (int | float): 点击位置的y坐标
+            x_offset (int | float, optional): x偏移量(px)或百分比(float)。默认值为0。
+            y_offset (int | float, optional): y偏移量(px)或百分比(float)。默认值为0。
+            after_sleep (float, optional): 点击后等待时间，单位秒。默认值为0。
+            tag (str, optional): 日志标记。默认值为空字符串。
+        Returns:
+            bool: 点击成功返回True，否则返回False
         """
         ...
 
     def click_box(self, box: Box, x_offset: int | float = 0, y_offset: int | float = 0, after_sleep: float = 0) -> bool:
         """
         点击Box区域中心
+        
         计算box中心点坐标并调用click_point方法进行点击
-        :param box: Box对象，表示要点击的区域
-        :param x_offset: x偏移量(px)或百分比(float)
-        :param y_offset: y偏移量(px)或百分比(float)
-        :param after_sleep: 点击后等待时间，单位秒
-        :return: bool - 点击成功返回True，否则返回False
+        Args:
+            box (Box): Box对象，表示要点击的区域
+            x_offset (int | float, optional): x偏移量(px)或百分比(float)。默认值为0。
+            y_offset (int | float, optional): y偏移量(px)或百分比(float)。默认值为0。
+            after_sleep (float, optional): 点击后等待时间，单位秒。默认值为0。
+        Returns:
+            bool: 点击成功返回True，否则返回False
         """
         if box is None:
             logger.trace("Could not click a Empty Box")
@@ -591,12 +608,15 @@ class IOperator(ABC):
                   after_sleep: float = 0) -> bool:
         """
         查找图片并点击其中心位置
+        
         先调用locate方法查找图片位置，如果找到则调用click_box方法点击
-        :param template: 模板图片路径
-        :param x_offset: x偏移量(px)或百分比(float)
-        :param y_offset: y偏移量(px)或百分比(float)
-        :param after_sleep: 点击后等待时间，单位秒
-        :return: bool - 点击成功返回True，否则返回False
+        Args:
+            template (str): 模板图片路径
+            x_offset (int | float, optional): x偏移量(px)或百分比(float)。默认值为0。
+            y_offset (int | float, optional): y偏移量(px)或百分比(float)。默认值为0。
+            after_sleep (float, optional): 点击后等待时间，单位秒。默认值为0。
+        Returns:
+            bool: 点击成功返回True，否则返回False
         """
         box = self.locate(template)
         if box is None:
@@ -605,11 +625,14 @@ class IOperator(ABC):
 
     def wait_img(self, template: str, timeout: int = 10, interval: float = 0.5) -> Box | None:
         """
-        等待图片出现
-        :param template: 模板图片路径
-        :param timeout: 超时时间，单位秒
-        :param interval: 检查间隔时间，单位秒，默认为0.5秒
-        :return: bool - 是否找到图片
+        等待模板图片出现
+        
+        Args:
+            template (str): 模板图片路径
+            timeout (int, optional): 超时时间，单位秒。默认值为10秒。
+            interval (float, optional): 检查间隔时间，单位秒，默认为0.5秒。默认值为0.5秒。
+        Returns:
+            Box | None: 找到的图片位置，如果未找到则返回None
         """
         start_time = time.time()
         logger.debug(f"Waiting for image: {template}")
@@ -621,17 +644,21 @@ class IOperator(ABC):
         logger.debug(f"Timeout: {template} -> NotFound in {timeout} seconds")
         return None
 
-    def wait_any_img(self, templates: list[str], timeout: int = 10, interval: float = 0.2) -> tuple[int, Box | None]:
+    def wait_any_img(self, templates: list[str], timeout: int = 10, interval: float = 0.5, trace: bool = True) -> tuple[int, Box | None]:
         """
         等待任意一张图片出现
-        :param templates: 模板图片路径列表
-        :param timeout: 超时时间，单位秒
-        :param interval: 检查间隔时间，单位秒，默认为0.2秒
-        :return: int - 找到的图片索引，如果未找到则返回-1; Box | None - 找到的图片位置，如果未找到则返回None
+        
+        Args:
+            templates (list[str]): 模板图片路径列表
+            timeout (int, optional): 超时时间，单位秒。默认值为10秒。
+            interval (float, optional): 检查间隔时间，单位秒，默认为0.2秒。默认值为0.2秒。
+            trace (bool, optional): 是否打印调试信息。默认为True。
+        Returns:
+            tuple[int, Box | None]: 找到的图片索引(如果未找到则返回-1)和图片位置(如果未找到则返回None)
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
-            index, box = self.locate_any(templates)
+            index, box = self.locate_any(templates, trace = trace)
             if index != -1:
                 return index, box
             time.sleep(interval)
@@ -671,8 +698,11 @@ class IOperator(ABC):
     def sleep(seconds) -> None:
         """
         Sleep for the specified number of seconds.
-        :param seconds: The number of seconds to sleep.
-        :return: None
+        
+        Args:
+            seconds (float): The number of seconds to sleep.
+        Returns:
+            None
         """
         return time.sleep(seconds)
 
@@ -680,8 +710,11 @@ class IOperator(ABC):
     def copy(text: str) -> None:
         """
         Copy the text to clipboard.
-        :param text: The text to copy.
-        :return: None
+        
+        Args:
+            text (str): The text to copy.
+        Returns:
+            None
         """
         return pyperclip.copy(text)
 
@@ -689,7 +722,9 @@ class IOperator(ABC):
     def paste(self) -> str:
         """
         Paste the text from clipboard.
-        :return: The text from clipboard.
+        
+        Returns:
+            str: The text from clipboard.
         """
         ...
 
@@ -708,7 +743,7 @@ class IOperator(ABC):
         ...
 
     @abstractmethod
-    def move_to(self, x: int | float | None, y: int | float | None, duration: float = 0.0) -> bool:
+    def move_to(self, x: int | float | None, y: int | float | None, duration: float = 0.0, trace: bool = True) -> bool:
         """
         将鼠标移动到指定位置。
 
@@ -716,29 +751,35 @@ class IOperator(ABC):
             x (int | float): X 坐标。
             y (int | float): Y 坐标。
             duration (float): 移动持续时间，单位为秒。
-
+            trace (bool): 是否打印调试信息。默认为 True。
         Returns:
             bool: 如果移动成功则返回 True，否则返回 False。
         """
         ...
 
     @abstractmethod
-    def mouse_down(self, x: int | float | None, y: int | float | None) -> bool:
+    def mouse_down(self, x: int | float | None, y: int | float | None, trace: bool = True) -> bool:
         """
         按下鼠标按钮。
 
         Args:
             x (int | float): X 坐标。
             y (int | float): Y 坐标。
+            trace (bool): 是否打印调试信息。默认为 True。
         Returns:
             bool: 如果按下成功则返回 True，否则返回 False。
         """
         ...
 
     @abstractmethod
-    def mouse_up(self, x: int | float | None = None, y: int | float | None = None) -> bool:
+    def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace: bool = True) -> bool:
         """
         释放鼠标按钮。
+        
+        Args:
+            x (int | float): X 坐标。
+            y (int | float): Y 坐标。
+            trace (bool): 是否打印调试信息。默认为 True。
         Returns:
             bool: 如果释放成功则返回 True，否则返回 False。
         """
@@ -757,8 +798,13 @@ class IOperator(ABC):
         """
         ...
 
-    def drag_to(self, from_x: int | float, from_y: int | float, to_x: int | float, to_y: int | float,
-                duration: float = 0.5) -> bool:
+    def drag_to(self,
+                from_x: int | float,
+                from_y: int | float,
+                to_x: int | float,
+                to_y: int | float,
+                duration: float = 0.5,
+                trace: bool = True) -> bool:
         """
         拖动鼠标到指定位置。
 
@@ -768,12 +814,13 @@ class IOperator(ABC):
             to_x (int | float): 目标 X 坐标。
             to_y (int | float): 目标 Y 坐标。
             duration (float): 拖动持续时间，单位为秒。
+            trace (bool): 是否打印调试信息。默认为 True。
         Returns:
             bool: 如果拖动成功则返回 True，否则返回 False。
         """
-        self.mouse_down(from_x, from_y)
-        self.move_to(to_x, to_y, duration)
-        self.mouse_up()
+        self.mouse_down(from_x, from_y, trace=trace)
+        self.move_to(to_x, to_y, duration, trace=trace)
+        self.mouse_up(trace=trace)
         return True
 
     @staticmethod
@@ -782,6 +829,7 @@ class IOperator(ABC):
         """
         在满足条件时重复执行操作。
 
+        操作函数会先被执行一次，然后在每次检查条件前等待指定的时间。如果条件不再满足或达到最大迭代次数，循环将停止。
         Args:
             action (Callable[[], None]): 操作函数。
             condition (Callable[[], bool]): 条件函数，返回布尔值。
@@ -791,6 +839,7 @@ class IOperator(ABC):
             bool: 因不再满足条件而退出返回 True，达到最大迭代次数返回 False。
         """
         iterations = 0
+        action()
         while condition() and iterations < max_iterations:
             action()
             time.sleep(interval)
