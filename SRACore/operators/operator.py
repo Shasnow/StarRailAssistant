@@ -252,9 +252,10 @@ class Operator(IOperator):
             logger.debug(f"Error moving cursor: {e}")
             return False
 
-    def move_to(self, x: int | float, y: int | float, duration: float = 0.0) -> bool:
+    def move_to(self, x: int | float, y: int | float, duration: float = 0.0, trace:bool = True) -> bool:
         try:
-            logger.debug(f"Move cursor to ({x}, {y}), duration: {duration}s")
+            if trace:
+                logger.debug(f"Move cursor to ({x}, {y}), duration: {duration}s")
             if isinstance(x, int) and isinstance(y, int):
                 pyautogui.moveTo(x + self.left, y + self.top, duration=duration)
             elif isinstance(x, float) and isinstance(y, float):
@@ -269,9 +270,10 @@ class Operator(IOperator):
             logger.debug(f"Error moving cursor: {e}")
             return False
 
-    def mouse_down(self, x: int | float, y: int | float) -> bool:
+    def mouse_down(self, x: int | float, y: int | float, trace: bool = True) -> bool:
         try:
-            logger.debug(f"Mouse down: ({x}, {y})")
+            if trace:
+                logger.debug(f"Mouse down: ({x}, {y})")
             if isinstance(x, int) and isinstance(y, int):
                 pyautogui.mouseDown(x + self.left, y + self.top)
             elif isinstance(x, float) and isinstance(y, float):
@@ -286,9 +288,10 @@ class Operator(IOperator):
             logger.debug(f"Error pressing mouse button: {e}")
             return False
 
-    def mouse_up(self, x: int | float | None = None, y: int | float | None = None) -> bool:
+    def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace:bool = True) -> bool:
         try:
-            logger.debug(f"Mouse up")
+            if trace:
+                logger.debug(f"Mouse up")
             pyautogui.mouseUp()
             return True
         except Exception as e:
