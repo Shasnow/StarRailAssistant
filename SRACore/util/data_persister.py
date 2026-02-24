@@ -25,7 +25,7 @@ def load_config(name:str) -> dict[str, Any] | None:
         logger.error(Resource.config_exception(path, str(e)))
         return None
 
-def load_data(typ):
+def load_data(typ) -> dict[Any, Any]:
     path = ''
     match typ:
         case 'settings':
@@ -33,7 +33,7 @@ def load_data(typ):
         case 'cache':
             path = AppDataSraDir / 'cache.json'
         case _:
-            return None
+            return {}
 
     try:
         with open(path, 'r') as f:
