@@ -1,5 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
@@ -26,6 +29,17 @@ public partial class TaskPageViewModel : PageViewModel
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(EnableContextMenu))]
     private object? _selectedTaskItem;
 
+    public int CurrencyWarsStrategyIndex
+    {
+        get => CurrentConfig.CurrencyWarsStrategyIndex;
+        set
+        {
+            CurrentConfig.CurrencyWarsStrategyIndex = value;
+            OnPropertyChanged();
+            CurrentConfig.CurrencyWarsStrategy = Cache.Strategies.ElementAtOrDefault(value)?.FileName ?? "";
+        }
+    }
+
     public TaskPageViewModel(
         CommonModel commonModel,
         ControlPanelViewModel controlPanelViewModel,
@@ -41,11 +55,9 @@ public partial class TaskPageViewModel : PageViewModel
 
         void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)
         {
-            if (args.PropertyName == nameof(Cache.CurrentConfigIndex))
-            {
-                _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.CurrentConfigIndex]);
-                CurrentConfig = _configService.Config!;
-            }
+            if (args.PropertyName != nameof(Cache.CurrentConfigIndex)) return;
+            _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.CurrentConfigIndex]);
+            CurrentConfig = _configService.Config!;
         }
 
         _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
@@ -219,6 +231,10 @@ public partial class TaskPageViewModel : PageViewModel
                 CanAutoDetect = false
             }
         ];
+        if (Cache.Strategies.Count == 0)
+        {
+            RefreshStrategies();
+        }
     }
 
     public ControlPanelViewModel ControlPanelViewModel { get; }
@@ -240,6 +256,32 @@ public partial class TaskPageViewModel : PageViewModel
     }
 
     public bool IsCwNormalMode => CurrentConfig.CurrencyWarsMode != 2;
+
+    public Cache Cache => _cacheService.Cache;
+
+    [RelayCommand]
+    private void RefreshStrategies()
+    {
+        if (!Directory.Exists(PathString.StrategiesDir))
+        {
+            _commonModel.ShowErrorToast("Error", "未找到攻略文件夹，无法刷新");
+            return;
+        }
+        // 遍历攻略文件夹中的json文件，反序列化成Strategy对象，并更新Cache中的Strategies列表
+        var strategies = new List<Strategy>();
+        foreach (var file in Directory.GetFiles(PathString.StrategiesDir))
+        {
+            if (!file.EndsWith(".json")) continue;
+            var json = File.ReadAllText(file);
+            var strategy = JsonSerializer.Deserialize<Strategy>(json);
+            if (strategy is null) continue;
+            strategy.FileName = Path.GetFileNameWithoutExtension(file);
+            strategies.Add(strategy);
+        }
+        Cache.Strategies.Clear();
+        Cache.Strategies.AddRange(strategies);
+        CurrencyWarsStrategyIndex = 0;
+    }
 
     [RelayCommand]
     private async Task SelectedPath()

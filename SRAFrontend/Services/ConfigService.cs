@@ -22,7 +22,7 @@ public class ConfigService
 
     public void SaveConfig()
     {
-        _logger.LogInformation("Saving config");
+        _logger.LogInformation("Saving config: {name}", Config?.Name);
         if (Config is null) throw new InvalidOperationException("Config is null");
         if (!string.IsNullOrEmpty(Config.StartGamePassword))
             try

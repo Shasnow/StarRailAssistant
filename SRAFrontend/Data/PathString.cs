@@ -18,6 +18,7 @@ public static class PathString
     public static readonly string BackendLogsDir = Path.Combine(Environment.CurrentDirectory, "log");
     public static readonly string ReportsDir = "reports";
     public static readonly string SourceCodeDir = Path.Combine(Environment.CurrentDirectory, "SRA");
+    public static readonly string StrategiesDir = Path.Combine(Environment.CurrentDirectory, "tasks", "currency_wars", "strategies");
 
     public static string SraExecutablePath
     {

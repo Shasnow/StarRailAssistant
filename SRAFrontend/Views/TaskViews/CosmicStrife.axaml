@@ -52,7 +52,6 @@
                                     <ComboBoxItem>刷开局</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
-                            <Separator/>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Label>难度</Label>
                                 <ComboBox SelectedIndex="{Binding CurrentConfig.CurrencyWarsDifficulty}" Width="200">
@@ -61,7 +60,22 @@
                                     <ComboBoxItem>当前难度</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
-                        
+
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Label>攻略</Label>
+                                <ComboBox ItemsSource="{Binding Cache.Strategies}"
+                                          SelectedIndex="{Binding CurrencyWarsStrategyIndex}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <Button Command="{Binding RefreshStrategiesCommand}">刷新</Button>
+                            </StackPanel>
+                            
+                            <Separator/>
+
                             <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding IsCwNormalMode}">
                                 <Label>次数</Label>
                                 <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.CurrencyWarsRunTimes}" Minimum="1" Maximum="99999" />
