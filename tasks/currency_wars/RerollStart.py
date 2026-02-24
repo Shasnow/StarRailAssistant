@@ -137,7 +137,7 @@ class RerollStart(Executable):
             # 启用外部接管并推进到策略页
             logger.info("启用外部接管并推进到策略页")
             self._enable_strategy_control()
-            self.cw.run_game()
+            self.cw.game_loop()
 
             # 等待并处理策略页
             if not self._wait_for_strategy_page():
@@ -325,7 +325,7 @@ class RerollStart(Executable):
             self.operator.click_point(self.STRATEGY_SELECT_X, self.STRATEGY_SELECT_Y, after_sleep=0.5)
             self.operator.click_point(self.STRATEGY_SELECT_X, self.STRATEGY_CONFIRM_Y, after_sleep=0.8)
             self.cw.is_running = True
-            self.cw.run_game()
+            self.cw.game_loop()
         except Exception:
             logger.debug("默认策略推进失败，忽略并继续循环")
 
