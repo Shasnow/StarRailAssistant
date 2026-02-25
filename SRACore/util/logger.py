@@ -7,10 +7,10 @@ from loguru import logger
 # 设置日志记录器
 def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log", level: str = "TRACE", queue = None) -> None:
     logger.remove()
-    log_format = "{time:HH:mm:ss}[{process.id}] | {level:5} | {message}"
+    log_format = "{time:HH:mm:ss} | {level:5} | {message}"
     if sys.stdout.isatty():
         logger.add(sys.stdout, level=level,
-                   format=f"<green>{log_format}</green>",
+                   format="<green>{time:HH:mm:ss}</green> | <level>{level:5}</level> | <level>{message}</level>",
                    colorize=True, enqueue=True)
     else:
         logger.add(sys.stdout, level=level,
