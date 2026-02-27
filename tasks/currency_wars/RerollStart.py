@@ -488,10 +488,10 @@ class RerollStart(Executable):
                 logger.error("未识别到放弃并结算入口")
                 result = False
                 return self._reset_cw_flags_after_abort(result) if reset_flags else result
-            self.operator.click_box(withdraw_and_settle, after_sleep=2.5)
+            self.operator.click_box(withdraw_and_settle, after_sleep=1.8)
 
             # 下一步
-            next_step = self.operator.wait_img(CWIMG.NEXT_STEP, timeout=8, interval=0.5)
+            next_step = self.operator.wait_img(CWIMG.NEXT_STEP, timeout=16, interval=0.5)
             if next_step is None:
                 logger.error("点击放弃并结算后，未识别到下一步")
                 result = False
