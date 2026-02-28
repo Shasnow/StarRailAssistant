@@ -75,15 +75,19 @@ class CurrencyWars(Executable):
         self.is_overclock = False  # 超频博弈
 
     def run(self):
+        self.is_running = True
         if self.runtimes == 0:
             return True
-        for _ in range(self.runtimes):
-            if self.start_game():
-                try:
+        for i in range(self.runtimes):
+            if not self.is_running:
+                break
+            logger.info(f"第{i + 1}次进入货币战争，剩余{self.runtimes - i - 1}次")
+            try:
+                if self.start_game():
                     self.game_loop()
-                except Exception as e:
-                    logger.error(e)
-                    return False
+            except Exception as e:
+                logger.error(e)
+                return False
         return True
 
     def reset_character(self):
@@ -295,6 +299,7 @@ class CurrencyWars(Executable):
         if not self.operator.wait_img(CWIMG.INVEST_ENVIRONMENT):
             logger.error("[投资环境] 未识别到投资环境界面")
             return False
+        self.operator.sleep(1)  # 等待界面稳定
         self.handle_invest_environment()
         # 有些情况下点击投资环境界面后会再次弹出投资环境界面，需要再次处理
         if self.operator.locate(CWIMG.INVEST_ENVIRONMENT):
@@ -346,13 +351,13 @@ class CurrencyWars(Executable):
         # 新游戏：没有初始化逻辑
         return True
 
-    def handle_boss_info(self) -> bool:
+    def handle_boss_info(self) -> None:
         """处理进入对局后可能出现的Boss信息提示框。
 
         如果需要额外的操作（如记录Boss信息、调整策略等），可以在此方法中实现。"""
         ...
 
-    def handle_invest_environment(self) -> bool:
+    def handle_invest_environment(self) -> None:
         """处理投资环境界面
 
         标准模式下，简单地选择中间的投资环境或选择尚未收集的投资环境，点击确定即可。
@@ -361,9 +366,8 @@ class CurrencyWars(Executable):
             self.operator.click_point(0.5, 0.5)
         self.operator.click_img(IMG.ENSURE2, after_sleep=1)
         if self.operator.locate(CWIMG.INVEST_ENVIRONMENT):
-            self.operator.click_point(0.5, 0.5)
+            self.operator.click_point(0.5, 0.5, after_sleep=1)
             self.operator.click_img(IMG.ENSURE2, after_sleep=1)
-        return True
 
     def handle_game_entered(self) -> bool:  # NOQA
         """进入游戏的后续处理逻辑（如有）。默认实现为无操作，子类可重写此方法以添加额外逻辑。
@@ -717,7 +721,7 @@ class CurrencyWars(Executable):
         self.handle_fortune_teller()
         self.operator.click_point(0.8438, 0.8481, after_sleep=1, tag="打开商店界面")
 
-    def handle_stage_transitioned(self):  # NOQA
+    def handle_stage_transitioned(self) -> bool:  # NOQA
         """关卡切换完成后的处理逻辑（如有）。默认实现为无操作，子类可重写此方法以添加额外逻辑。
         调用时机：在完成关卡切换流程后、正式进入下一轮游戏循环前调用
         Returns:
@@ -727,7 +731,7 @@ class CurrencyWars(Executable):
 
     def handle_characters_updated(self):
         """角色信息更新后的处理逻辑（如有）。默认实现为无操作，可重写此方法以添加额外逻辑。"""
-        if all(c is None for c in self.on_field_character+self.off_field_character+self.in_hand_character):
+        if all(c is None for c in self.on_field_character + self.off_field_character + self.in_hand_character):
             # 如果所有角色信息均为None，打开商店界面购买角色
             self.operator.click_point(0.8438, 0.8481, after_sleep=1, tag="打开商店界面")
             self.shopping()
@@ -741,11 +745,11 @@ class CurrencyWars(Executable):
         self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击返回货币战争"),
         self.is_running = False  # 停止运行标志
 
-    def handle_boss_preview(self):
+    def handle_boss_preview(self) -> None:
         """处理Boss预览界面的逻辑"""
         self.operator.click_point(0.5, 0.70, after_sleep=1)
 
-    def handle_invest_strategy(self):
+    def handle_invest_strategy(self) -> None:
         """处理投资策略选择界面的逻辑"""
         if not self.operator.click_img(CWIMG.COLLECTION):
             self.operator.click_point(0.5, 0.3)

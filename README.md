@@ -292,21 +292,6 @@ SRA 前端采用 `ResX` 进行本地化支持，推荐使用 `Rider` 或 `Visual
 
 </a>
 
-## 💖 赞助者
-
-感谢以下用户对本项目的赞助
-<div>
-<div style="float:left">
-<img src="https://avatars.githubusercontent.com/u/79625207?v=4" height="50" width="50" alt="avatars">
-&nbsp;
-</div>
-
-<div>
-<a href="https://github.com/sanhaQAQ">Sanha</a><br>
-<a href="https://www.miyoushe.com/sr/article/62787970">推荐链接</a>
-</div>
-</div>
-
 ## ⭐ Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Shasnow/StarRailAssistant&type=Date)](https://star-history.com/#Shasnow/StarRailAssistant&Date)

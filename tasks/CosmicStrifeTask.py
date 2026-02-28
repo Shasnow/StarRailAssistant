@@ -24,6 +24,8 @@ class CosmicStrifeTask(BaseTask):
         cw_mode = self.config.get("CurrencyWarsMode", 0)
         username = self.config.get("CurrencyWarsUsername", "")
         strategy = self.config.get("CurrencyWarsStrategy", "template")
+        runtimes = self.config.get("CurrencyWarsRunTimes", 0)
+        difficulty = self.config.get("CurrencyWarsDifficulty", 0)
 
         if username is None or username.strip() == "":
             logger.error("货币战争开拓者名称为空，请在前端配置中填写。")
@@ -33,15 +35,13 @@ class CosmicStrifeTask(BaseTask):
         if cw_mode==2:
             logger.info("执行任务：旷宇纷争-货币战争 刷开局")
             from tasks.currency_wars import RerollStart
-            rs_task = RerollStart(operator=self.operator,
-                                  invest_env=self.config.get("CwRsInvestEnvironments"),
-                                  invest_strategy=self.config.get("CwRsInvestStrategies"),
-                                  invest_strategy_stage= self.config.get("CwRsInvestStrategyStage", 1),
-                                  max_retry=self.config.get("CwRsMaxRetry", 0),
-                                  boss_affix=self.config.get("CwRsBossAffixes", ""))
+            rs_task = RerollStart(operator=self.operator, runtimes=runtimes)
             # 刷开局难度选择：和标准模式使用同一个难度配置项
-            rs_task.cw.set_difficulty(self.config.get("CurrencyWarsDifficulty", 0))
-            rs_task.cw.load_strategy(strategy)
+            rs_task.set_difficulty(difficulty)
+            rs_task.load_strategy(strategy)
+            rs_task.set_boss_affix(self.config.get("CwRsBossAffixes", ""))
+            rs_task.set_invest_env(self.config.get("CwRsInvestEnvironments", ""))
+            rs_task.set_invest_strategy(self.config.get("CwRsInvestStrategies", ""))
             if not rs_task.run():
                 logger.error("旷宇纷争-货币战争刷开局任务失败")
                 return False
@@ -49,14 +49,12 @@ class CosmicStrifeTask(BaseTask):
         elif cw_mode==1 or cw_mode==0:
             logger.info("执行任务：旷宇纷争-货币战争 常规")
             from tasks.currency_wars import CurrencyWars
-            cw_task = CurrencyWars(self.operator, self.config.get("CurrencyWarsRunTimes", 0))
+            cw_task = CurrencyWars(operator=self.operator, runtimes=runtimes)
             cw_task.load_strategy(strategy)
             # 前端难度选择：0=最低难度，1=最高难度
-            difficulty = self.config.get("CurrencyWarsDifficulty", 0)
             cw_task.set_difficulty(difficulty)
             if cw_mode == 1:  # 超频博弈
                 cw_task.set_overclock(True)
-
             if not cw_task.run():
                 logger.error("旷宇纷争-货币战争任务失败")
                 return False
