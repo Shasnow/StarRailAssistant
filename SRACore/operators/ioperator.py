@@ -1,5 +1,7 @@
 import time
+import re
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Any, Callable
 
 # noinspection PyPackageRequirements
@@ -15,6 +17,7 @@ from SRACore.util.data_persister import load_settings
 
 class IOperator(ABC):
     ocr_engine = None
+    OCR_CONFIG_PATH = Path("rapidocr_onnxruntime/config.yaml")
 
     def __init__(self):
         self.settings = load_settings()
@@ -29,8 +32,54 @@ class IOperator(ABC):
     def _get_ocr_instance(cls):
         """获取OCR引擎实例"""
         if cls.ocr_engine is None:
+            cls._prepare_ocr_backend()
             cls.ocr_engine = RapidOCR(config_path='rapidocr_onnxruntime/config.yaml')
         return cls.ocr_engine
+
+    @classmethod
+    def _prepare_ocr_backend(cls) -> None:
+        """根据设置和运行时能力更新 OCR 后端配置。"""
+        settings = load_settings()
+        use_directml = bool(settings.get('UseDirectML', False))
+        if not use_directml:
+            return
+
+        provider_available = cls._is_directml_available()
+        cls._patch_ocr_config(use_dml=provider_available, use_cuda=False)
+        if not provider_available:
+            logger.warning("UseDirectML is enabled but DmlExecutionProvider is unavailable, fallback to CPU.")
+        else:
+            logger.info("OCR backend switched to DirectML.")
+
+    @staticmethod
+    def _is_directml_available() -> bool:
+        try:
+            import onnxruntime as ort
+            providers = ort.get_available_providers()
+            return 'DmlExecutionProvider' in providers
+        except Exception as e:
+            logger.warning(f"Failed to detect onnxruntime providers: {e}")
+            return False
+
+    @classmethod
+    def _patch_ocr_config(cls, *, use_dml: bool, use_cuda: bool) -> None:
+        try:
+            content = cls.OCR_CONFIG_PATH.read_text(encoding='utf-8')
+        except Exception as e:
+            logger.warning(f"Failed to read OCR config for backend patch: {e}")
+            return
+
+        dml_literal = 'true' if use_dml else 'false'
+        cuda_literal = 'true' if use_cuda else 'false'
+        updated = re.sub(r'(?m)^(\s*use_dml:\s*)(true|false)\s*$', rf'\g<1>{dml_literal}', content)
+        updated = re.sub(r'(?m)^(\s*use_cuda:\s*)(true|false)\s*$', rf'\g<1>{cuda_literal}', updated)
+        if updated == content:
+            return
+
+        try:
+            cls.OCR_CONFIG_PATH.write_text(updated, encoding='utf-8')
+        except Exception as e:
+            logger.warning(f"Failed to patch OCR config for backend: {e}")
 
     @property
     @abstractmethod
