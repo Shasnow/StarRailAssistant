@@ -111,7 +111,11 @@ public partial class ControlPanelViewModel : ViewModelBase
         IsAddConfigOpen = false;
         if (string.IsNullOrWhiteSpace(NewConfigName))
             return;
-
+        if (NewConfigName.IndexOfAny(['\\', '/', ':', '*', '?', '"', '<', '>', '|']) != -1)
+        {
+            _commonModel.ShowErrorToast("无效的配置名称", "配置名称不能包含以下字符：\\ / : * ? \" < > |");
+            return;
+        }
         Cache.ConfigNames.Add(NewConfigName);
         NewConfigName = "";
     }
