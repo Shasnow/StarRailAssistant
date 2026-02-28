@@ -73,18 +73,25 @@
                                 </ComboBox>
                                 <Button Command="{Binding RefreshStrategiesCommand}">刷新</Button>
                             </StackPanel>
-                            
-                            <Separator/>
 
-                            <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding IsCwNormalMode}">
-                                <Label>次数</Label>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Label>运行次数</Label>
                                 <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.CurrencyWarsRunTimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
                             
+                            <Separator/>
+
                             <StackPanel IsVisible="{Binding !IsCwNormalMode}" Margin="0,4,0,0" Spacing="4">
                                 <TextBlock Foreground="Gray"
                                            Text="下方可配置需要的投资环境与投资策略（用空格分隔多个）。" />
 
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label Content="Boss词条" />
+                                    <TextBox Width="320"
+                                             Text="{Binding CurrentConfig.CwRsBossAffixes}"
+                                             Watermark="例如：决战在即" />
+                                </StackPanel>
+                                
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="投资环境" />
                                     <TextBox Width="320"
@@ -100,22 +107,9 @@
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Label Content="Boss词条" />
-                                    <TextBox Width="320"
-                                             Text="{Binding CurrentConfig.CwRsBossAffixes}"
-                                             Watermark="例如：决战在即" />
-                                </StackPanel>
-
-                                <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="策略阶段" />
                                     <NumericUpDown Width="120" FormatString="0" Minimum="1" Maximum="2"
                                                    Value="{Binding CurrentConfig.CwRsInvestStrategyStage}"/>
-                                </StackPanel>
-
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Label Content="最大尝试轮数" />
-                                    <NumericUpDown Width="120" FormatString="0" Minimum="0" Maximum="99999"
-                                                   Value="{Binding CurrentConfig.CwRsMaxRetry}"/>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>

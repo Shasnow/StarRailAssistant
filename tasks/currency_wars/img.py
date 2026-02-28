@@ -57,3 +57,5 @@ class CWIMG:
     FAIL = f"{BASE}/fail.png"
     QUIT = f"{BASE}/quit.png"
     CANNOT_BE_FIELDED = f"{BASE}/cannot_be_fielded.png"
+    INVEST_STRATEGY_REFRESH = f"{BASE}/invest_strategy_refresh.png"
+    INVEST_ENV_REFRESH = f"{BASE}/invest_env_refresh.png"
