@@ -21,7 +21,7 @@ public partial class MainWindowViewModel(
     [
         "欢迎使用 SRA",
         "坐和放宽",
-        "not 'Sequence Read Archive'",
+        "并非\n'Sequence Read Archive'",
         "启动器启动启动器",
         "-1073741819",
         "飞荧扑火，向死而生",
@@ -35,7 +35,7 @@ public partial class MainWindowViewModel(
     [
         "Welcome to SRA",
         "Sit back and relax",
-        "not 'Sequence Read Archive'",
+        "not\n'Sequence Read Archive'",
         "Launcher launching launcher",
         "-1073741819",
         "Bon voyage"
