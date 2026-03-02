@@ -174,6 +174,11 @@ public partial class SraService(ILogger<SraService> logger)
     {
         return SendInput(string.IsNullOrEmpty(configName) ? "task run" : $"task run {configName}");
     }
+    
+    public bool TaskSingle(string taskName)
+    {
+        return SendInput($"task single {taskName}");
+    }
 
     public bool TaskStop()
     {

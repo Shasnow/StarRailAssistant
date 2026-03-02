@@ -10,7 +10,14 @@
     <suki:GlassCard>
         <suki:GroupBox>
             <suki:GroupBox.Header>
-                <CheckBox Content="领取奖励" IsChecked="{Binding CurrentConfig.EnabledTasks[2]}"/>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <CheckBox Content="领取奖励" IsChecked="{Binding CurrentConfig.EnabledTasks[2]}"/>
+                    <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
+                            Command="{Binding SingleTaskCommand}"
+                            CommandParameter="ReceiveRewardTask"
+                            ToolTip.Tip="单次运行"/>
+                </StackPanel>
+                
             </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Margin="10" Spacing="20">

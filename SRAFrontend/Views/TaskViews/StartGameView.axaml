@@ -11,7 +11,13 @@
     <suki:GlassCard>
         <suki:GroupBox>
             <suki:GroupBox.Header>
-                <CheckBox Content="启动游戏" IsChecked="{Binding CurrentConfig.EnabledTasks[0]}"/>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <CheckBox Content="启动游戏" IsChecked="{Binding CurrentConfig.EnabledTasks[0]}"/>
+                    <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
+                            Command="{Binding SingleTaskCommand}"
+                            CommandParameter="StartGameTask"
+                            ToolTip.Tip="单次运行"/>
+                </StackPanel>
             </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Margin="10">

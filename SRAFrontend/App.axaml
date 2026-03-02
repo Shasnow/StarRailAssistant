@@ -11,7 +11,8 @@
     </Application.DataTemplates>
   
     <Application.Styles>
-        <StyleInclude Source="/Styles/LabelStyles.axaml"></StyleInclude>
+        <StyleInclude Source="/Styles/LabelStyles.axaml"/>
+        <StyleInclude Source="/Styles/ButtonStyles.axaml"/>
         <sukiUi:SukiTheme ThemeColor="Blue" Locale="zh-CN"/>
     </Application.Styles>
              

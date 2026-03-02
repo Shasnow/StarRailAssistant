@@ -20,11 +20,11 @@
     <suki:SukiWindow.RightWindowTitleBarControls>
         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
         <Button Classes="WindowControlsButton" Command="{Binding SwitchLightModeCommand}" ToolTip.Tip="切换深/浅色模式">
-            <Label Classes="icon" Content="{Binding LightModeText}" />
+            <Label Classes="Icon" Content="{Binding LightModeText}" />
         </Button>
         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
         <Button Classes="WindowControlsButton" Command="{Binding ShowAnnouncementBoardCommand}" ToolTip.Tip="公告">
-            <Label Classes="icon" Content="&#xE324;" />
+            <Label Classes="Icon" Content="&#xE324;" />
         </Button>
     </suki:SukiWindow.RightWindowTitleBarControls>
 
@@ -46,7 +46,7 @@
             <DataTemplate>
                 <suki:SukiSideMenuItem Classes="Compact" Header="{Binding DisplayName}">
                     <suki:SukiSideMenuItem.Icon>
-                        <Label Classes="icon" FontSize="18" Content="{Binding IconText}" />
+                        <Label Classes="Icon" FontSize="18" Content="{Binding IconText}" />
                     </suki:SukiSideMenuItem.Icon>
                 </suki:SukiSideMenuItem>
             </DataTemplate>
@@ -76,17 +76,17 @@
                 <Button Classes="Basic"
                         CommandParameter="https://github.com/Shasnow/StarRailAssistant"
                         ToolTip.Tip="{x:Static lang:Resources.GithubToolTipText}">
-                    <Label Classes="icon">&#xE576;</Label>
+                    <Label Classes="Icon">&#xE576;</Label>
                 </Button>
                 <Button Classes="Basic"
                         CommandParameter="https://starrailassistant.top"
                         ToolTip.Tip="{x:Static lang:Resources.WebsideToolTipText}">
-                    <Label Classes="icon">&#xE976;</Label>
+                    <Label Classes="Icon">&#xE976;</Label>
                 </Button>
                 <Button Classes="Basic"
                         CommandParameter="https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&amp;channel=stable&amp;source=sra-app"
                         ToolTip.Tip="{x:Static lang:Resources.SponsorText}">
-                    <Label Classes="icon">&#xE2A8;</Label>
+                    <Label Classes="Icon">&#xE2A8;</Label>
                 </Button>
             </StackPanel>
         </suki:SukiSideMenu.FooterContent>

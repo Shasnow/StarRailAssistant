@@ -21,6 +21,7 @@ public partial class TaskPageViewModel : PageViewModel
     private readonly CacheService _cacheService;
     private readonly ConfigService _configService;
     private readonly CommonModel _commonModel;
+    private readonly SraService _sraService;
 
     [ObservableProperty] private Config _currentConfig;
 
@@ -44,13 +45,15 @@ public partial class TaskPageViewModel : PageViewModel
         CommonModel commonModel,
         ControlPanelViewModel controlPanelViewModel,
         ConfigService configService,
-        CacheService cacheService) : base(
+        CacheService cacheService,
+        SraService sraService) : base(
         PageName.Task, "\uE1BC")
     {
         ControlPanelViewModel = controlPanelViewModel;
         _commonModel = commonModel;
         _configService = configService;
         _cacheService = cacheService;
+        _sraService = sraService;
         CurrentConfig = _configService.Config!;
 
         void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)
@@ -61,9 +64,17 @@ public partial class TaskPageViewModel : PageViewModel
         }
 
         _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
-        Tasks =
-        [
-            new TrailblazePowerTask(AddTaskItem)
+
+        if (Cache.Strategies.Count == 0)
+        {
+            RefreshStrategies();
+        }
+    }
+
+    public ControlPanelViewModel ControlPanelViewModel { get; }
+
+    public AvaloniaList<TrailblazePowerTask> Tasks => [
+            new(AddTaskItem)
             {
                 Title = "饰品提取",
                 Id = "ornament_extraction",
@@ -87,7 +98,7 @@ public partial class TaskPageViewModel : PageViewModel
                 MaxSingleTimes = 6
             },
 
-            new TrailblazePowerTask(AddTaskItem)
+            new(AddTaskItem)
             {
                 Title = "拟造花萼（金）",
                 Id = "calyx_golden",
@@ -114,7 +125,7 @@ public partial class TaskPageViewModel : PageViewModel
                 MaxSingleTimes = 24
             },
 
-            new TrailblazePowerTask(AddTaskItem)
+            new(AddTaskItem)
             {
                 Title = "拟造花萼（赤）",
                 Id = "calyx_crimson",
@@ -143,7 +154,7 @@ public partial class TaskPageViewModel : PageViewModel
                 MaxSingleTimes = 24
             },
 
-            new TrailblazePowerTask(AddTaskItem)
+            new(AddTaskItem)
             {
                 Title = "凝滞虚影",
                 Id = "stagnant_shadow",
@@ -183,7 +194,7 @@ public partial class TaskPageViewModel : PageViewModel
                 MaxSingleTimes = 8
             },
 
-            new TrailblazePowerTask(AddTaskItem)
+            new(AddTaskItem)
             {
                 Title = "侵蚀隧洞",
                 Id = "caver_of_corrosion",
@@ -210,7 +221,7 @@ public partial class TaskPageViewModel : PageViewModel
                 MaxSingleTimes = 6
             },
 
-            new TrailblazePowerTask(AddTaskItem)
+            new(AddTaskItem)
             {
                 Title = "历战余响",
                 Id = "echo_of_war",
@@ -231,15 +242,6 @@ public partial class TaskPageViewModel : PageViewModel
                 CanAutoDetect = false
             }
         ];
-        if (Cache.Strategies.Count == 0)
-        {
-            RefreshStrategies();
-        }
-    }
-
-    public ControlPanelViewModel ControlPanelViewModel { get; }
-
-    public AvaloniaList<TrailblazePowerTask> Tasks { get; }
 
     public TopLevel? TopLevelObject { get; set; }
 
@@ -258,6 +260,17 @@ public partial class TaskPageViewModel : PageViewModel
     public bool IsCwNormalMode => CurrentConfig.CurrencyWarsMode != 2;
 
     public Cache Cache => _cacheService.Cache;
+
+    [RelayCommand]
+    private void SingleTask(string taskName)
+    {
+        if (!_sraService.TaskSingle(taskName))
+        {
+            _commonModel.ShowErrorToast("执行任务失败", "执行任务失败，请查阅控制台日志获取详情");
+            return;
+        }
+        _commonModel.ShowSuccessToast("执行任务成功", "已开始执行任务");
+    }
 
     [RelayCommand]
     private void RefreshStrategies()
