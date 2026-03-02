@@ -1,0 +1,16 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+
+    <!-- Add Styles Here -->
+    <Style Selector="Button.Icon">
+        <Setter Property="FontFamily" Value="{DynamicResource Phosphor}"/>
+    </Style>
+    <Style Selector="Button.FillIcon">
+        <Setter Property="FontFamily" Value="{DynamicResource PhosphorFill}"/>
+    </Style>
+</Styles>

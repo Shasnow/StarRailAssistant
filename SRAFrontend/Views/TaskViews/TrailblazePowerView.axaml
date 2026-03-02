@@ -11,7 +11,14 @@
     <suki:GlassCard>
         <suki:GroupBox>
             <suki:GroupBox.Header>
-                <CheckBox Content="清体力" IsChecked="{Binding CurrentConfig.EnabledTasks[1]}" />
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <CheckBox Content="清体力" IsChecked="{Binding CurrentConfig.EnabledTasks[1]}"/>
+                    <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
+                            Command="{Binding SingleTaskCommand}"
+                            CommandParameter="TrailblazePowerTask"
+                            ToolTip.Tip="单次运行"/>
+                </StackPanel>
+                
             </suki:GroupBox.Header>
             <Grid ColumnDefinitions="*, *">
                 <ScrollViewer>
@@ -129,7 +136,7 @@
                                     <MenuItem Header="Delete" IsEnabled="{Binding EnableContextMenu}"
                                               Command="{Binding DeleteSelectedTaskItemCommand}">
                                         <MenuItem.Icon>
-                                            <Label Classes="icon" Content="&#xE4A6;" FontSize="10" />
+                                            <Label Classes="Icon" Content="&#xE4A6;" FontSize="10" />
                                         </MenuItem.Icon>
                                     </MenuItem>
                                 </ContextMenu>

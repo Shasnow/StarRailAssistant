@@ -168,23 +168,20 @@ class RerollStart(CurrencyWars):
         筛选规则优先级：仇恨词缀 > 需要词缀 > 可选词缀
         :return: True-词缀符合要求，False-词缀不符合要求
         """
-        # 1. 初始化变量：去重+过滤空值，避免重复/无效词缀干扰判断
         detected_affixes = []
-
-        # 2. 执行OCR识别Boss词缀
+        # 执行OCR识别Boss词缀
         raw_results = self.operator.ocr(
             from_x=self.BOSS_AFFIX_FROM_X,
             from_y=self.BOSS_AFFIX_FROM_Y,
             to_x=self.BOSS_AFFIX_TO_X,
             to_y=self.BOSS_AFFIX_TO_Y
         )
-
-        # 3. 边界处理：OCR识别失败/无结果
+        # 边界处理：OCR识别失败/无结果
         if not raw_results:  # 覆盖None和空列表两种情况
             logger.warning("Boss词缀OCR识别失败：无识别结果")
             return False
 
-        # 4. 解析OCR结果：过滤空字符串+去重，仅保留有效词缀
+        # 解析OCR结果：过滤空字符串+去重，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
             affix_text = str(item[1]).strip()
@@ -195,12 +192,12 @@ class RerollStart(CurrencyWars):
         # 日志输出识别到的词缀，便于调试
         logger.info(f"识别到Boss词缀：{detected_affixes}")
 
-        # 5. 筛选规则校验（优先级：仇恨词缀 → 需要词缀 → 可选词缀）
+        # 筛选规则校验（优先级：仇恨词缀 → 需要词缀 → 可选词缀）
         # 规则1：检测仇恨词缀（只要包含任意一个，直接返回False）
         if self.hate_boss_affix:
             for hate_affix in self.hate_boss_affix:
                 if hate_affix in detected_affixes:
-                    logger.warning(f"检测到仇恨词缀【{hate_affix}】，不符合要求")
+                    logger.warning(f"检测到词缀【{hate_affix}】，不符合要求")
                     return False
 
         # 规则2：检测需要词缀（必须包含所有需要词缀，否则返回False）
@@ -220,13 +217,12 @@ class RerollStart(CurrencyWars):
             to_x=self.INVEST_ENV_OCR_TO_X,
             to_y=self.INVEST_ENV_OCR_TO_Y,
         )
-
-        # 3. 边界处理：OCR识别失败/无结果
+        # 边界处理：OCR识别失败/无结果
         if not raw_results:  # 覆盖None和空列表两种情况
             logger.warning("投资环境OCR识别失败：无识别结果")
             return False
 
-        # 4. 解析OCR结果：过滤空字符串+去重，仅保留有效词缀
+        # 解析OCR结果：过滤空字符串+去重，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
             affix_text = str(item[1]).strip()
@@ -234,7 +230,6 @@ class RerollStart(CurrencyWars):
 
         # 日志输出识别到的词缀，便于调试
         logger.info(f"识别到投资环境：{detected_invest_env}")
-
         for i, env in enumerate(detected_invest_env):
             if env in self.wanted_invest_env:
                 logger.info("检测到需要的投资环境【{env}】")
