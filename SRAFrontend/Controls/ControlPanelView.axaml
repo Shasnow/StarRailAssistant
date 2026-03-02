@@ -15,16 +15,16 @@
                  Watermark="{x:Static lang:Resources.ConfigInputMarkText}"
                  Text="{Binding NewConfigName}"
                  IsVisible="{Binding IsAddConfigOpen}"/>
-        <Button Classes="Icon" Content="+"
+        <Button Classes="Icon" Content="&#xE3D4;"
                 Command="{Binding OpenAddConfigCommand}"
                 IsVisible="{Binding !IsAddConfigOpen}"
                 ToolTip.Tip="{x:Static lang:Resources.NewConfigText}"/>
         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
-        <Button Classes="Flat Icon" Content="✓"
+        <Button Classes="Flat Icon" Content="&#xE182;"
                 Command="{Binding AddConfigCommand}"
                 IsVisible="{Binding IsAddConfigOpen}"
                 ToolTip.Tip="{x:Static lang:Resources.EnsureText}"/>
-        <Button Classes="Icon" Content="-" 
+        <Button Classes="Icon" Content="&#xE32A;" 
                 Command="{Binding RemoveConfigCommand}"
                 ToolTip.Tip="{x:Static lang:Resources.RemoveConfigText}"/>
 
