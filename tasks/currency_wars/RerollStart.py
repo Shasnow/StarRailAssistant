@@ -38,7 +38,9 @@ class RerollStart(CurrencyWars):
 
     def set_invest_strategy(self, invest_strategy: str):
         """设置投资策略"""
-        self.wanted_invest_strategy = invest_strategy.split()
+        def clean_strategy(s):
+            return s.strip().replace("·", "").replace("•", "")
+        self.wanted_invest_strategy = list(map(clean_strategy, invest_strategy.split()))
 
     def set_boss_affix(self, boss_affix: str):
         """设置boss词缀"""
@@ -150,7 +152,7 @@ class RerollStart(CurrencyWars):
         # 解析OCR结果：过滤空字符串，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
-            affix_text = str(item[1]).strip()
+            affix_text = str(item[1]).strip().replace("·", "").replace("•", "")
             detected_invest_strategy.append(affix_text)
 
         # 日志输出识别到的词缀，便于调试
