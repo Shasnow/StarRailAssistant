@@ -25,8 +25,6 @@ public partial class TaskPageViewModel : PageViewModel
 
     [ObservableProperty] private Config _currentConfig;
 
-    [ObservableProperty] private string _password = "";
-
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(EnableContextMenu))]
     private object? _selectedTaskItem;
 
