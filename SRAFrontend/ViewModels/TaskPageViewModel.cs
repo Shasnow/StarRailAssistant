@@ -262,12 +262,7 @@ public partial class TaskPageViewModel : PageViewModel
     [RelayCommand]
     private void SingleTask(string taskName)
     {
-        if (!_sraService.TaskSingle(taskName))
-        {
-            _commonModel.ShowErrorToast("执行任务失败", "执行任务失败，请查阅控制台日志获取详情");
-            return;
-        }
-        _commonModel.ShowSuccessToast("执行任务成功", "已开始执行任务");
+        ControlPanelViewModel.StartSingleTask(taskName);
     }
 
     [RelayCommand]
