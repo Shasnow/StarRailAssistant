@@ -27,6 +27,7 @@ class RerollStart(CurrencyWars):
         self.reroll = False  # 重开标志
         self.satisfied = False  # 满意标志
         self.wanted_invest_env = None  # 需要的投资环境
+        self.optional_invest_env = None  # 可选的投资环境
         self.wanted_invest_strategy = None  # 必须出现的投资策略
         self.wanted_boss_affix = None  # 必须出现的boss词缀
         self.hate_boss_affix = None  # 讨厌的boss词缀，出现就重开
@@ -34,7 +35,14 @@ class RerollStart(CurrencyWars):
 
     def set_invest_env(self, invest_env: str):
         """设置投资环境"""
-        self.wanted_invest_env = invest_env.split()
+        invest_env = invest_env.split()
+        self.wanted_invest_env = list()
+        self.optional_invest_env = list()
+        for item in invest_env:
+            if item.startswith("?"):
+                self.optional_invest_env.append(item[1:])
+            else:
+                self.wanted_invest_env.append(item)
 
     def set_invest_strategy(self, invest_strategy: str):
         """设置投资策略"""
@@ -63,26 +71,32 @@ class RerollStart(CurrencyWars):
                 logger.info("Boss词缀符合要求，继续游戏...")
 
     def handle_invest_environment(self) -> None:
-        if self.wanted_invest_env:
-            for _ in range(2):
-                logger.info("正在识别投资环境...")
-                result = self._detect_invest_env()
-                if result == -1:
-                    logger.info("投资环境不符合要求，尝试刷新...")
-                    refresh_box = self.operator.locate(CWIMG.INVEST_ENV_REFRESH)
-                    if refresh_box is not None:
-                        self.operator.click_box(refresh_box, after_sleep=1)
-                    else:
-                        logger.info("无法刷新，准备重开...")
-                        self.reroll = True
-                        super().handle_invest_environment()
-                else:
-                    self.operator.click_point(0.25 * (result + 1), 0.27, tag="投资环境")  # 根据投资环境的位置计算点击坐标，每个环境占屏幕宽度的25%
-                    self.operator.click_img(IMG.ENSURE2, after_sleep=1)
-                    logger.info("投资环境符合要求，继续游戏...")
-                    break
-        else:
+        if not (self.wanted_invest_env or self.optional_invest_env):
             super().handle_invest_environment()
+            return
+        
+        for _ in range(2):
+            logger.info("正在识别投资环境...")
+            result = self._detect_invest_env()
+            if result != -1:
+                self.operator.click_point(0.25 * (result + 1), 0.27, tag="投资环境")  # 根据投资环境的位置计算点击坐标，每个环境占屏幕宽度的25%
+                self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+                logger.info("投资环境符合要求，继续游戏...")
+                break
+            
+            # 如果没有必须的投资环境，也没有可选的投资环境
+            if not self.wanted_invest_env:
+                super().handle_invest_environment()
+                return
+            
+            logger.info("投资环境不符合要求，尝试刷新...")
+            refresh_box = self.operator.locate(CWIMG.INVEST_ENV_REFRESH)
+            if refresh_box is not None:
+                self.operator.click_box(refresh_box, after_sleep=1)
+            else:
+                logger.info("无法刷新，准备重开...")
+                self.reroll = True
+                super().handle_invest_environment()
 
     def handle_game_entered(self) -> bool:
         if self.reroll:
@@ -232,9 +246,20 @@ class RerollStart(CurrencyWars):
 
         # 日志输出识别到的词缀，便于调试
         logger.info(f"识别到投资环境：{detected_invest_env}")
+        
+        # 优先检测必须的投资环境
         for i, env in enumerate(detected_invest_env):
             if env in self.wanted_invest_env:
-                logger.info("检测到需要的投资环境【{env}】")
+                logger.info(f"检测到必须的投资环境【{env}】")
                 return i
+        
+        # 如果没有必须的投资环境，检测可选的投资环境
+        if self.optional_invest_env:
+            for i, env in enumerate(detected_invest_env):
+                if env in self.optional_invest_env:
+                    logger.info(f"检测到可选的投资环境【{env}】")
+                    return i
+        
+        # 既没有必须的投资环境，也没有可选的投资环境
         return -1
 
