@@ -32,6 +32,7 @@ class RerollStart(CurrencyWars):
         self.wanted_boss_affix = None  # 必须出现的boss词缀
         self.hate_boss_affix = None  # 讨厌的boss词缀，出现就重开
         self.invest_strategy_stage = 0  # 投资策略阶段
+        self.invest_strategy_stage_limit = 2  # 投资策略阶段上限，超过后不再检测投资策略
 
     def set_invest_env(self, invest_env: str):
         """设置投资环境"""
@@ -44,11 +45,12 @@ class RerollStart(CurrencyWars):
             else:
                 self.wanted_invest_env.append(item)
 
-    def set_invest_strategy(self, invest_strategy: str):
+    def set_invest_strategy(self, invest_strategy: str, invest_strategy_stage_limit: int = 2):
         """设置投资策略"""
         def clean_strategy(s):
             return s.strip().replace("·", "").replace("•", "")
         self.wanted_invest_strategy = list(map(clean_strategy, invest_strategy.split()))
+        self.invest_strategy_stage_limit = invest_strategy_stage_limit
 
     def set_boss_affix(self, boss_affix: str):
         """设置boss词缀"""
@@ -133,7 +135,7 @@ class RerollStart(CurrencyWars):
 
         super().handle_invest_strategy()
 
-        if self.invest_strategy_stage >= 2:
+        if self.invest_strategy_stage >= self.invest_strategy_stage_limit:
             logger.warning("策略阶段已达上限，停止检测投资策略")
             self.reroll = True
             return
