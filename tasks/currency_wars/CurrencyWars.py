@@ -742,8 +742,7 @@ class CurrencyWars(Executable):
         """处理游戏结束后的逻辑，如点击继续、返回主界面等"""
         self.operator.click_img(CWIMG.NEXT_STEP, after_sleep=1),
         self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击下一页"),
-        self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击返回货币战争"),
-        self.is_running = False  # 停止运行标志
+        self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击返回货币战争")
 
     def handle_boss_preview(self) -> None:
         """处理Boss预览界面的逻辑"""
