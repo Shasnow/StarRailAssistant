@@ -86,18 +86,14 @@ class RerollStart(CurrencyWars):
                 logger.info("投资环境符合要求，继续游戏...")
                 break
             
-            # 如果没有必须的投资环境，也没有可选的投资环境
-            if not self.wanted_invest_env:
-                super().handle_invest_environment()
-                return
-            
             logger.info("投资环境不符合要求，尝试刷新...")
             refresh_box = self.operator.locate(CWIMG.INVEST_ENV_REFRESH)
             if refresh_box is not None:
                 self.operator.click_box(refresh_box, after_sleep=1)
             else:
-                logger.info("无法刷新，准备重开...")
-                self.reroll = True
+                if self.wanted_invest_env:
+                    logger.info("无法刷新，准备重开...")
+                    self.reroll = True
                 super().handle_invest_environment()
 
     def handle_game_entered(self) -> bool:
@@ -136,7 +132,7 @@ class RerollStart(CurrencyWars):
         super().handle_invest_strategy()
 
         if self.invest_strategy_stage >= self.invest_strategy_stage_limit:
-            logger.warning("策略阶段已达上限，停止检测投资策略")
+            logger.info(f"已达到投资策略阶段 {self.invest_strategy_stage_limit}, 准备重开...")
             self.reroll = True
             return
 

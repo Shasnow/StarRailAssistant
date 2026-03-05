@@ -171,6 +171,7 @@ class CurrencyWars(Executable):
         if not self.handle_game_initialized():
             return False
         logger.info("[启动流程] 对局启动成功")
+        self.is_game_over = False
         return True
 
     def _handle_page_enter(self, page: CurrencyWarsPage) -> bool:
@@ -391,17 +392,15 @@ class CurrencyWars(Executable):
     def abort_and_return(self) -> bool:
         """中止当前对局并返回开始页面"""
         logger.info("中止当前对局并返回开始页面")
-        if not self.operator.wait_img(CWIMG.QUIT):
+        box = self.operator.wait_img(CWIMG.QUIT)
+        if box is None:
             return False
-        self.operator.press_key("esc")
-        self.operator.sleep(1)
+        self.operator.click_box(box, after_sleep=1)
         self.operator.click_img(CWIMG.WITHDRAW_AND_SETTLE)
         b = self.operator.wait_img(CWIMG.NEXT_STEP)
         if b is None:
             return False
-        self.operator.click_box(b, after_sleep=1)
-        self.operator.click_point(0.5, 0.82, after_sleep=1, tag="下一页"),
-        self.operator.click_point(0.5, 0.82, after_sleep=1, tag="返回货币战争"),
+        self.handle_game_over()
         return True
 
     # ==================== 进入后的初始策略 ====================
@@ -741,8 +740,14 @@ class CurrencyWars(Executable):
 
     def handle_game_over(self):
         """处理游戏结束后的逻辑，如点击继续、返回主界面等"""
-        self.operator.click_img(CWIMG.NEXT_STEP, after_sleep=1),
-        self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击下一页"),
+        self.operator.click_img(CWIMG.NEXT_STEP),
+        self.operator.move_to(0.5, 0.5)  # 移动鼠标避免遮挡
+        next_page_box = self.operator.wait_img(CWIMG.NEXT_PAGE)
+        if next_page_box is None:
+            logger.warning("未识别到下一页按钮，无法继续")
+            self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击下一页")  # 兜底方案
+        else:
+            self.operator.click_box(next_page_box, after_sleep=1),
         self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击返回货币战争")
         self.is_game_over = True  # 标记游戏结束
 
