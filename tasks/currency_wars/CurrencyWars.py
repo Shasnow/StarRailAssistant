@@ -28,6 +28,7 @@ class CurrencyWars(Executable):
         super().__init__(operator)
         self.runtimes = runtimes
         self.is_continue = False  # 是否是继续挑战
+        self.is_game_over = False
         self.strategy_external_control: bool = False  # 当外部（如刷开局流程）希望在“选择投资策略”页接管逻辑时，置为 True
         self.difficulty: int = Difficulty.LOWEST
         self.on_field_character: list[Character | None] = [None, None, None, None]  # 场上角色列表
@@ -425,7 +426,7 @@ class CurrencyWars(Executable):
                 break
             if not self.stage_transition():
                 break
-            if not self.is_running:  # 任务已被标记为停止, 需要退出循环
+            if self.is_game_over:  # 任务已被标记为停止, 需要退出循环
                 break
             self.shopping()
 
@@ -743,6 +744,7 @@ class CurrencyWars(Executable):
         self.operator.click_img(CWIMG.NEXT_STEP, after_sleep=1),
         self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击下一页"),
         self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击返回货币战争")
+        self.is_game_over = True  # 标记游戏结束
 
     def handle_boss_preview(self) -> None:
         """处理Boss预览界面的逻辑"""
