@@ -4,6 +4,7 @@
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
              xmlns:models="clr-namespace:SRAFrontend.Models"
              xmlns:mdxaml="https://github.com/whistyun/Markdown.Avalonia.Tight"
+             xmlns:ctb="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
              x:Class="SRAFrontend.Controls.AnnouncementBoardView"
              x:DataType="local:AnnouncementBoardViewModel"
              Width="600"
@@ -21,7 +22,24 @@
             </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
                 <DataTemplate DataType="{x:Type models:Announcement}">
-                    <mdxaml:MarkdownScrollViewer Markdown="{Binding Content}"/>
+                    <mdxaml:MarkdownScrollViewer Markdown="{Binding Content}">
+                        <mdxaml:MarkdownScrollViewer.Styles>
+                            <!-- 普通文本 -->
+                            <Style Selector="TextBlock">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                            <!-- Markdown 标题类（来自 Markdown.Avalonia.Tight） -->
+                            <Style Selector="TextBlock.Heading1, TextBlock.Heading2, TextBlock.Heading3, TextBlock.Heading4, TextBlock.Heading5, TextBlock.Heading6">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                            <Style Selector="ctb|CTextBlock.Heading1, ctb|CTextBlock.Heading2, ctb|CTextBlock.Heading3, ctb|CTextBlock.Heading4, ctb|CTextBlock.Heading5, ctb|CTextBlock.Heading6">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                            <Style Selector="Run">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                        </mdxaml:MarkdownScrollViewer.Styles>
+                    </mdxaml:MarkdownScrollViewer>
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>
