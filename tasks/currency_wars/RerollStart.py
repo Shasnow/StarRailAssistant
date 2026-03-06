@@ -159,7 +159,7 @@ class RerollStart(CurrencyWars):
         # 边界处理：OCR识别失败/无结果
         if not raw_results:  # 覆盖None和空列表两种情况
             logger.warning("投资策略OCR识别失败：无识别结果")
-            return False
+            return -1
 
         # 解析OCR结果：过滤空字符串，仅保留有效词缀
         for item in raw_results:
@@ -170,9 +170,9 @@ class RerollStart(CurrencyWars):
         # 日志输出识别到的词缀，便于调试
         logger.info(f"识别到投资策略：{detected_invest_strategy}")
 
-        for i, wanted_strategy in enumerate(self.wanted_invest_strategy):
-            if wanted_strategy in detected_invest_strategy:
-                logger.info(f"检测到需要的投资策略【{wanted_strategy}】")
+        for i, invest_strategy in enumerate(detected_invest_strategy):
+            if invest_strategy in self.wanted_invest_strategy:
+                logger.info(f"检测到需要的投资策略 {invest_strategy}")
                 return i
         return -1
 
@@ -234,7 +234,7 @@ class RerollStart(CurrencyWars):
         # 边界处理：OCR识别失败/无结果
         if not raw_results:  # 覆盖None和空列表两种情况
             logger.warning("投资环境OCR识别失败：无识别结果")
-            return False
+            return -1
 
         # 解析OCR结果：过滤空字符串+去重，仅保留有效词缀
         for item in raw_results:
