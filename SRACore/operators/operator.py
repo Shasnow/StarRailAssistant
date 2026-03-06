@@ -74,9 +74,12 @@ class Operator(IOperator):
             self.left = left
         else:
             # 有边框窗口：应用标题栏和边框偏移
-            self.top = (top + int(30 * self.zoom)) if top != 0 else top
-            self.left = (left + int(8 * self.zoom)) if left != 0 else left
-
+            if top == 0 and left == 0:  # 防止单边为0时错误的被认为是全屏
+                self.top = 0
+                self.left = 0
+            else:
+                self.top = (top + int(30 * self.zoom))
+                self.left = (left + int(8 * self.zoom))
         return Region(self.left, self.top, self.width, self.height)
 
     def screenshot_in_region(self, region: Region | None = None):
