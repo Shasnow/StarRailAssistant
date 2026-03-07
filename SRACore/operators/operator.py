@@ -1,3 +1,5 @@
+import ctypes
+from ctypes.wintypes import RECT, POINT
 from pathlib import Path
 
 import cv2
@@ -19,6 +21,26 @@ class Operator(IOperator):
         self.width = 0
         self.height = 0
         self.active_window: bool = True
+        self._win = None
+        self._hwnd = None
+
+    def _init_win(self):
+        """初始化/刷新窗口句柄，精确匹配窗口标题"""
+        windows = pygetwindow.getWindowsWithTitle(self.window_title)
+        for w in windows:
+            if w.title == self.window_title:
+                self._win = w
+                self._hwnd = w._hWnd
+                return
+        self._win = None
+        self._hwnd = None
+
+    def _get_hwnd(self) -> int | None:
+        """获取有效的窗口句柄，无效时自动刷新"""
+        if self._hwnd is not None and ctypes.windll.user32.IsWindow(self._hwnd):
+            return self._hwnd
+        self._init_win()
+        return self._hwnd
 
     @property
     def is_window_active(self) -> bool:
