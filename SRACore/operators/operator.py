@@ -44,13 +44,10 @@ class Operator(IOperator):
 
     @property
     def is_window_active(self) -> bool:
-        try:
-            win = pygetwindow.getWindowsWithTitle(self.window_title)[0]
-            return win.isActive
-        except IndexError:
+        hwnd = self._get_hwnd()
+        if hwnd is None or self._win is None:
             return False
-        except pygetwindow.PyGetWindowException:
-            return False
+        return self._win.isActive
 
     def get_win_region(self, active_window: bool | None = None, raise_exception: bool = True) -> Region | None:
         """
