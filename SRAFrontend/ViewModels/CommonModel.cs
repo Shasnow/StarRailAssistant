@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
-using Markdown.Avalonia;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Controls;
 using SRAFrontend.Data;
@@ -118,11 +117,12 @@ public class CommonModel(
             var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
             {
                 Header = "Update Available - " + response.Data.VersionName,
-                Content = new MarkdownScrollViewer
+                Content = new UpdateReleaseNoteView
                 {
-                    Markdown = response.Data.ReleaseNote,
-                    Width = 600,
-                    Height = 400
+                    DataContext = new UpdateReleaseNoteViewModel
+                    {
+                        ReleaseNote = response.Data.ReleaseNote
+                    }
                 },
                 ActionButtonsSource = [autoUpgradeButton, manualUpgradeButton, cancelButton]
             });
