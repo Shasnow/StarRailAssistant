@@ -1,3 +1,5 @@
+import ctypes
+from ctypes.wintypes import RECT, POINT
 from pathlib import Path
 
 import cv2
@@ -19,67 +21,83 @@ class Operator(IOperator):
         self.width = 0
         self.height = 0
         self.active_window: bool = True
+        self._win = None
+        self._hwnd = None
+
+    def _init_win(self):
+        """初始化/刷新窗口句柄，精确匹配窗口标题"""
+        try:
+            windows = pygetwindow.getWindowsWithTitle(self.window_title)
+        except Exception:
+            self._win = None
+            self._hwnd = None
+            return
+        for w in windows:
+            if w.title == self.window_title:
+                self._win = w
+                self._hwnd = w._hWnd
+                return
+        self._win = None
+        self._hwnd = None
+
+    def _get_hwnd(self) -> int | None:
+        """获取有效的窗口句柄，无效时自动刷新"""
+        if self._hwnd is not None and ctypes.windll.user32.IsWindow(self._hwnd):
+            return self._hwnd
+        self._init_win()
+        return self._hwnd
 
     @property
     def is_window_active(self) -> bool:
-        try:
-            win = pygetwindow.getWindowsWithTitle(self.window_title)[0]
-            return win.isActive
-        except IndexError:
+        hwnd = self._get_hwnd()
+        if hwnd is None or self._win is None:
             return False
-        except pygetwindow.PyGetWindowException:
-            return False
+        return self._win.isActive
 
     def get_win_region(self, active_window: bool | None = None, raise_exception: bool = True) -> Region | None:
         """
-        获取崩坏：星穹铁道窗口区域
-        :return: Region - 窗口区域
+        获取崩坏：星穹铁道窗口客户区区域
+        :return: Region - 窗口客户区区域
         :raises Exception: 如果未找到窗口或窗口未激活
         """
         if active_window is None:
             active_window = self.active_window
         try:
-            win = pygetwindow.getWindowsWithTitle(self.window_title)[0]
-            if not win.isActive and active_window:
-                win.activate()
-            return self._major_win_region(win.left, win.top, win.width, win.height)
-        except IndexError:
+            hwnd = self._get_hwnd()
+            if hwnd is None:
+                if raise_exception:
+                    raise Exception("未找到崩坏：星穹铁道窗口")
+                return None
+            if active_window and self._win is not None and not self._win.isActive:
+                self._win.activate()
+            region = self._get_client_region()
+            if region is None:
+                if raise_exception:
+                    raise Exception("获取窗口客户区失败（窗口可能已最小化）")
+                return None
+            return region
+        except Exception:
             if raise_exception:
-                raise Exception("未找到崩坏：星穹铁道窗口")
-            return None
-        except pygetwindow.PyGetWindowException as e:
-            if raise_exception:
-                raise Exception(f"窗口未激活: {e}") from e
-            return None
-        except Exception as e:
-            if raise_exception:
-                raise Exception(f"获取窗口区域失败: {e}") from e
+                raise
             return None
 
-    def _major_win_region(self, left, top, width, height):
-        """获取主要操作区域"""
-        # 将窗口尺寸对齐到 160x90 的比例，但避免出现 0 尺寸
-        aligned_width = (width // 160) * 160
-        aligned_height = (height // 90) * 90
-        # 当窗口较小或对齐后为 0 时，回退到原始尺寸以避免截屏高度为 0
-        self.width = aligned_width if aligned_width > 0 else width
-        self.height = aligned_height if aligned_height > 0 else height
-
-        # 根据无边框窗口配置决定是否应用边框偏移
-        popup_window = self.settings.get('LaunchArgumentsPopupWindow', False)
-
-        if popup_window:
-            # 无边框窗口：不需要偏移
-            self.top = top
-            self.left = left
-        else:
-            # 有边框窗口：应用标题栏和边框偏移
-            if top == 0 and left == 0:  # 防止单边为0时错误的被认为是全屏
-                self.top = 0
-                self.left = 0
-            else:
-                self.top = (top + int(30 * self.zoom))
-                self.left = (left + int(8 * self.zoom))
+    def _get_client_region(self) -> Region | None:
+        """通过 Win32 API 获取窗口客户区的精确屏幕坐标"""
+        hwnd = self._get_hwnd()
+        if hwnd is None:
+            return None
+        client_rect = RECT()
+        ctypes.windll.user32.GetClientRect(hwnd, ctypes.byref(client_rect))
+        left_top = POINT(client_rect.left, client_rect.top)
+        ctypes.windll.user32.ClientToScreen(hwnd, ctypes.byref(left_top))
+        width = client_rect.right - client_rect.left
+        height = client_rect.bottom - client_rect.top
+        if width <= 0 or height <= 0:
+            return None
+        self.left = left_top.x
+        self.top = left_top.y
+        self.width = width
+        self.height = height
         return Region(self.left, self.top, self.width, self.height)
 
     def screenshot_in_region(self, region: Region | None = None):
