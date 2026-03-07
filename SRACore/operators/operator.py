@@ -26,7 +26,12 @@ class Operator(IOperator):
 
     def _init_win(self):
         """初始化/刷新窗口句柄，精确匹配窗口标题"""
-        windows = pygetwindow.getWindowsWithTitle(self.window_title)
+        try:
+            windows = pygetwindow.getWindowsWithTitle(self.window_title)
+        except Exception:
+            self._win = None
+            self._hwnd = None
+            return
         for w in windows:
             if w.title == self.window_title:
                 self._win = w
@@ -65,8 +70,13 @@ class Operator(IOperator):
                 return None
             if active_window and self._win is not None and not self._win.isActive:
                 self._win.activate()
-            return self._get_client_region()
-        except Exception as e:
+            region = self._get_client_region()
+            if region is None:
+                if raise_exception:
+                    raise Exception("获取窗口客户区失败（窗口可能已最小化）")
+                return None
+            return region
+        except Exception:
             if raise_exception:
                 raise
             return None
