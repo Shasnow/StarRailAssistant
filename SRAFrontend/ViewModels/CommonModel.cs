@@ -3,8 +3,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls.Documents;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
+using Avalonia.Media;
+using Avalonia.Styling;
+using ColorTextBlock.Avalonia;
+using Markdown.Avalonia;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Controls;
 using SRAFrontend.Data;
@@ -117,13 +123,7 @@ public class CommonModel(
             var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
             {
                 Header = "Update Available - " + response.Data.VersionName,
-                Content = new UpdateReleaseNoteView
-                {
-                    DataContext = new UpdateReleaseNoteViewModel
-                    {
-                        ReleaseNote = response.Data.ReleaseNote
-                    }
-                },
+                Content = BuildUpdateReleaseNoteContent(response.Data.ReleaseNote),
                 ActionButtonsSource = [autoUpgradeButton, manualUpgradeButton, cancelButton]
             });
             switch (result)
@@ -458,5 +458,96 @@ public class CommonModel(
         var sizeLabel = new Label { Content = "连接中..." };
         var progressPanel = new StackPanel { Children = { sizeLabel, progressBar } };
         return (progressPanel, progressBar, sizeLabel);
+    }
+
+    private Control BuildUpdateReleaseNoteContent(string releaseNote)
+    {
+        var markdownViewer = new MarkdownScrollViewer
+        {
+            Width = 600,
+            Height = 400,
+            Markdown = releaseNote
+        };
+
+        var foregroundBrush = new SolidColorBrush();
+        ApplyUpdateReleaseNoteBrush(foregroundBrush, markdownViewer.ActualThemeVariant);
+        AttachUpdateReleaseNoteStyles(markdownViewer, foregroundBrush);
+        markdownViewer.PropertyChanged += (_, args) =>
+        {
+            if (args.Property == ThemeVariantScope.ActualThemeVariantProperty)
+            {
+                ApplyUpdateReleaseNoteBrush(foregroundBrush, markdownViewer.ActualThemeVariant);
+            }
+        };
+
+        return markdownViewer;
+    }
+
+    private static void ApplyUpdateReleaseNoteBrush(SolidColorBrush foregroundBrush, ThemeVariant themeVariant)
+    {
+        foregroundBrush.Color = themeVariant == ThemeVariant.Dark ? Colors.White : Colors.Black;
+    }
+
+    private static void AttachUpdateReleaseNoteStyles(MarkdownScrollViewer markdownViewer, IBrush foregroundBrush)
+    {
+        markdownViewer.Styles.Add(new Style(x => x.OfType<TextBlock>())
+        {
+            Setters = { new Setter(TextBlock.ForegroundProperty, foregroundBrush) }
+        });
+
+        markdownViewer.Styles.Add(new Style(x => x.OfType<Run>())
+        {
+            Setters = { new Setter(Run.ForegroundProperty, foregroundBrush) }
+        });
+
+        markdownViewer.Styles.Add(new Style(x => x.OfType<TextBlock>().Class("Heading1"))
+        {
+            Setters = { new Setter(TextBlock.ForegroundProperty, foregroundBrush) }
+        });
+        markdownViewer.Styles.Add(new Style(x => x.OfType<TextBlock>().Class("Heading2"))
+        {
+            Setters = { new Setter(TextBlock.ForegroundProperty, foregroundBrush) }
+        });
+        markdownViewer.Styles.Add(new Style(x => x.OfType<TextBlock>().Class("Heading3"))
+        {
+            Setters = { new Setter(TextBlock.ForegroundProperty, foregroundBrush) }
+        });
+        markdownViewer.Styles.Add(new Style(x => x.OfType<TextBlock>().Class("Heading4"))
+        {
+            Setters = { new Setter(TextBlock.ForegroundProperty, foregroundBrush) }
+        });
+        markdownViewer.Styles.Add(new Style(x => x.OfType<TextBlock>().Class("Heading5"))
+        {
+            Setters = { new Setter(TextBlock.ForegroundProperty, foregroundBrush) }
+        });
+        markdownViewer.Styles.Add(new Style(x => x.OfType<TextBlock>().Class("Heading6"))
+        {
+            Setters = { new Setter(TextBlock.ForegroundProperty, foregroundBrush) }
+        });
+
+        markdownViewer.Styles.Add(new Style(x => x.OfType<CTextBlock>().Class("Heading1"))
+        {
+            Setters = { new Setter(CTextBlock.ForegroundProperty, foregroundBrush) }
+        });
+        markdownViewer.Styles.Add(new Style(x => x.OfType<CTextBlock>().Class("Heading2"))
+        {
+            Setters = { new Setter(CTextBlock.ForegroundProperty, foregroundBrush) }
+        });
+        markdownViewer.Styles.Add(new Style(x => x.OfType<CTextBlock>().Class("Heading3"))
+        {
+            Setters = { new Setter(CTextBlock.ForegroundProperty, foregroundBrush) }
+        });
+        markdownViewer.Styles.Add(new Style(x => x.OfType<CTextBlock>().Class("Heading4"))
+        {
+            Setters = { new Setter(CTextBlock.ForegroundProperty, foregroundBrush) }
+        });
+        markdownViewer.Styles.Add(new Style(x => x.OfType<CTextBlock>().Class("Heading5"))
+        {
+            Setters = { new Setter(CTextBlock.ForegroundProperty, foregroundBrush) }
+        });
+        markdownViewer.Styles.Add(new Style(x => x.OfType<CTextBlock>().Class("Heading6"))
+        {
+            Setters = { new Setter(CTextBlock.ForegroundProperty, foregroundBrush) }
+        });
     }
 }
