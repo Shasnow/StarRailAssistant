@@ -2,6 +2,7 @@ from pathlib import Path
 
 from SRACore.task import BaseTask
 from SRACore.util import sys_util, encryption
+from SRACore.util.error_codes import SRAError, ErrorCode
 from SRACore.util.logger import logger
 
 
@@ -48,7 +49,7 @@ class StartGameTask(BaseTask):
             self.operator.click_img("resources/img/ensure2.png")
             return self.login_and_enter_game()  # 递归调用重新登录进入游戏
         else:
-            logger.error("未能进入游戏，发生未知错误")
+            logger.error(SRAError(ErrorCode.INVALID_STATE, "未知游戏状态", f"当前状态码: {res}，预期状态码: 0~3"))
             return False
 
     def launch_game(self):
@@ -71,11 +72,11 @@ class StartGameTask(BaseTask):
                 logger.info("正在启动国际服游戏客户端...")
             case _:
                 logger.error("未知的游戏渠道配置")
-                raise RuntimeError("未知的游戏渠道配置")
+                raise SRAError(ErrorCode.INVALID_INPUT, "未知的游戏渠道配置", f"当前配置值 {self.config.get('StartGameChannel')}")
 
         if not path or path == "":
             logger.error("未设置游戏启动路径")
-            raise RuntimeError("未设置游戏启动路径")
+            raise SRAError(ErrorCode.INVALID_INPUT, "未设置游戏启动路径")
 
         # 构建启动参数
         launch_args = []
@@ -102,15 +103,21 @@ class StartGameTask(BaseTask):
         """修改配置文件"""
         root_path = path.parent
         config_file = root_path / 'config.ini'
-        with open(config_file, 'r') as f:
-            lines = f.readlines()
-        for line in lines:
-            if line.startswith('channel='):
-                lines[lines.index(line)] = f'channel={channel}\n'
-            elif line.startswith('sub_channel='):
-                lines[lines.index(line)] = f'sub_channel={sub_channel}\n'
-        with open(config_file, 'w') as f:
-            f.writelines(lines)
+        try:
+            with open(config_file, 'r') as f:
+                lines = f.readlines()
+            for line in lines:
+                if line.startswith('channel='):
+                    lines[lines.index(line)] = f'channel={channel}\n'
+                elif line.startswith('sub_channel='):
+                    lines[lines.index(line)] = f'sub_channel={sub_channel}\n'
+            with open(config_file, 'w') as f:
+                f.writelines(lines)
+        except FileNotFoundError:
+            logger.error(SRAError(ErrorCode.FILE_NOT_FOUND, "配置文件未找到", f"路径: {config_file}"))
+        except Exception as e:
+            logger.error(SRAError(ErrorCode.UNKNOWN_ERROR, "修改配置文件时发生未知错误", str(e)))
+
 
     def login(self):
         channel = None
@@ -122,8 +129,7 @@ class StartGameTask(BaseTask):
             case 2:
                 channel = 'gb'
             case _:
-                logger.error("未知的游戏渠道配置")
-                raise RuntimeError("未知的游戏渠道配置")
+                raise SRAError(ErrorCode.INVALID_INPUT, "未知的游戏渠道配置", f"当前配置值 {self.config['StartGameChannel']}")
 
         result, _ = self.operator.wait_any_img([
             f'resources/img/sg/{channel}/login_page.png',
@@ -133,7 +139,7 @@ class StartGameTask(BaseTask):
         ], timeout=60, interval=1)
 
         if result == -1:
-            logger.error("等待登录界面超时")
+            logger.error(SRAError(ErrorCode.LOGIN_TIMEOUT, "等待登录界面超时", "请检查游戏状态"))
             return -1
         if result != 0:
             logger.info(f"登录状态 {result}")
@@ -149,7 +155,7 @@ class StartGameTask(BaseTask):
             user = encryption.win_decryptor(self.config['StartGameUsername'])
             passwd = encryption.win_decryptor(self.config['StartGamePassword'])
             if user == "" or passwd == "":
-                logger.error("未设置自动登录账号或密码")
+                logger.error(SRAError(ErrorCode.INVALID_INPUT, "自动登录账号或密码未设置", "请检查配置中的自动登录账号和密码"))
                 return -1
             logger.info(f"登录账号：{user}")
             self.operator.click_img(f"resources/img/sg/{channel}/username_input.png", after_sleep=1)
@@ -161,15 +167,13 @@ class StartGameTask(BaseTask):
             self.operator.copy(passwd)
             self.operator.paste()
             self.operator.click_img(f"resources/img/sg/{channel}/agree.png", x_offset=-35, after_sleep=1)
-            if not self.operator.click_img(f"resources/img/sg/{channel}/enter_game.png"):
-                logger.error("发生错误，错误编号9")
-                return -1
+            self.operator.click_img(f"resources/img/sg/{channel}/enter_game.png")
         else:
             logger.info("未启用自动登录，请手动完成登录")
         if self.operator.wait_img(f"resources/img/sg/{channel}/welcome.png", timeout=120):
             return 1
         else:
-            logger.warning("长时间未成功登录，可能密码错误或需要验证")
+            logger.warning(SRAError(ErrorCode.LOGIN_FAILED, "登录后等待欢迎界面超时", "请检查游戏状态"))
             return -1
 
     def logout(self):
