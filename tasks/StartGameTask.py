@@ -2,7 +2,7 @@ from pathlib import Path
 
 from SRACore.task import BaseTask
 from SRACore.util import sys_util, encryption
-from SRACore.util.error_codes import SRAError, ErrorCode
+from SRACore.util.errors import SRAError, ErrorCode
 from SRACore.util.logger import logger
 
 
