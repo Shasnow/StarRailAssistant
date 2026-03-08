@@ -5,11 +5,10 @@ from pathlib import Path
 import cv2
 import pyautogui
 import pygetwindow
-# noinspection PyPackageRequirements
-# (pyperclip is in pyautogui requirements)
 import pyscreeze
 
 from SRACore.operators.ioperator import *
+from SRACore.util.errors import SRAError, ErrorCode
 
 
 class Operator(IOperator):
@@ -20,76 +19,66 @@ class Operator(IOperator):
         self.left = 0
         self.width = 0
         self.height = 0
-        self.active_window: bool = True
-        self._win = None
-        self._hwnd = None
-
-    def _init_win(self):
-        """初始化/刷新窗口句柄，精确匹配窗口标题"""
-        try:
-            windows = pygetwindow.getWindowsWithTitle(self.window_title)
-        except Exception:
-            self._win = None
-            self._hwnd = None
-            return
-        for w in windows:
-            if w.title == self.window_title:
-                self._win = w
-                self._hwnd = w._hWnd
-                return
         self._win = None
         self._hwnd = None
 
     def _get_hwnd(self) -> int | None:
         """获取有效的窗口句柄，无效时自动刷新"""
-        if self._hwnd is not None and ctypes.windll.user32.IsWindow(self._hwnd):
+        if self._hwnd is not None and ctypes.windll.user32.IsWindow(self._hwnd):  # NOQA
             return self._hwnd
-        self._init_win()
+
+        self._win = None
+        self._hwnd = None
+        try:
+            windows = pygetwindow.getWindowsWithTitle(self.window_title)
+            for w in windows:
+                if w.title == self.window_title:
+                    self._win = w
+                    self._hwnd = w._hWnd  # NOQA
+                    break
+        except Exception as e:
+            logger.trace(f"WindowNotFound: {self.window_title} -> {e}")
         return self._hwnd
 
-    @property
     def is_window_active(self) -> bool:
         hwnd = self._get_hwnd()
         if hwnd is None or self._win is None:
             return False
         return self._win.isActive
 
-    def get_win_region(self, active_window: bool | None = None, raise_exception: bool = True) -> Region | None:
+    def get_win_region(self, active_window: bool = True, raise_exception: bool = True) -> Region | None:
         """
         获取崩坏：星穹铁道窗口客户区区域
         :return: Region - 窗口客户区区域
         :raises Exception: 如果未找到窗口或窗口未激活
         """
-        if active_window is None:
-            active_window = self.active_window
         try:
             hwnd = self._get_hwnd()
             if hwnd is None:
                 if raise_exception:
-                    raise Exception("未找到崩坏：星穹铁道窗口")
+                    raise SRAError(ErrorCode.WINDOW_NOT_FOUND, f"未找到窗口: {self.window_title}")
                 return None
             if active_window and self._win is not None and not self._win.isActive:
                 self._win.activate()
-            region = self._get_client_region()
+            region = self._get_client_region(hwnd)
             if region is None:
                 if raise_exception:
-                    raise Exception("获取窗口客户区失败（窗口可能已最小化）")
+                    raise SRAError(
+                        ErrorCode.WINDOW_REGION_INVALID,
+                        f"无法获取窗口客户区区域 '{self.window_title}'", "窗口可能被最小化")
                 return None
             return region
-        except Exception:
+        except Exception:  # NOQA
             if raise_exception:
                 raise
             return None
 
-    def _get_client_region(self) -> Region | None:
+    def _get_client_region(self, hwnd) -> Region | None:
         """通过 Win32 API 获取窗口客户区的精确屏幕坐标"""
-        hwnd = self._get_hwnd()
-        if hwnd is None:
-            return None
         client_rect = RECT()
-        ctypes.windll.user32.GetClientRect(hwnd, ctypes.byref(client_rect))
+        ctypes.windll.user32.GetClientRect(hwnd, ctypes.byref(client_rect))  # NOQA
         left_top = POINT(client_rect.left, client_rect.top)
-        ctypes.windll.user32.ClientToScreen(hwnd, ctypes.byref(left_top))
+        ctypes.windll.user32.ClientToScreen(hwnd, ctypes.byref(left_top))  # NOQA
         width = client_rect.right - client_rect.left
         height = client_rect.bottom - client_rect.top
         if width <= 0 or height <= 0:
