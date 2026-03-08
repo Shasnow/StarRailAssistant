@@ -8,7 +8,7 @@
     "cli.help.unknownCommand": "未知命令: '{command}'。",
     "cli.help.EOF": "退出 SRA-cli 应用程序。",
     "cli.help.help": "显示命令的帮助信息。",
-    "cli.help.task": "管理 SRA-cli 中的任务。\n用法：\n  task run [<name | path>...]\n                运行指定配置文件中的所有选中的任务。\n                如果未指定配置文件，则使用缓存中的全部配置文件。\n  task single (taks_name | task_index) [<config_name | config_path>]\n                运行由其名称或索引指定的单个任务，无论它是否被选中。\n                如果未指定配置文件，则使用缓存中的当前配置文件。\n  task stop     停止所有正在运行的任务。\n",
+    "cli.help.task": "管理 SRA-cli 中的任务。\n用法：\ntask run [<name | path>...]\n运行指定配置文件中的所有选中的任务。\n如果未指定配置文件，则使用缓存中的全部配置文件。\ntask single (taks_name | task_index) [<config_name | config_path>]\n运行由其名称或索引指定的单个任务，无论它是否被选中。\n如果未指定配置文件，则使用缓存中的当前配置文件。\ntask stop     停止所有正在运行的任务。\n",
     "cli.help.trigger": "管理 SRA-cli 中的触发器。\n用法：\n  trigger run                   启动触发器服务。\n  trigger stop                  停止触发器服务。\n  trigger enable <trigger_name>    启用特定触发器。\n  trigger disable <trigger_name>   禁用特定触发器。\n  trigger set-<type> <trigger_name> <property> <value>\n                                更改特定触发器的属性。\n",
     "cli.help.run": "用法：run [<config_name | config_path>...]\n运行指定配置文件中的所有任务。如果未指定配置文件，则使用缓存中的当前配置文件。\n此命令将阻塞 CLI 直到所有任务完成。\n",
     "cli.help.single": "用法：single (task_name | task_index) [<config_name | config_path>]\n运行由其名称或索引指定的单个任务，无论它是否被选中。如果未指定配置文件，则使用缓存中的当前配置文件。\n此命令将阻塞 CLI 直到任务完成。\n",
