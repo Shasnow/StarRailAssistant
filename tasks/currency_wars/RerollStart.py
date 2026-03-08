@@ -25,7 +25,6 @@ class RerollStart(CurrencyWars):
     def __init__(self, operator, runtimes):
         super().__init__(operator, runtimes)
         self.reroll = False  # 重开标志
-        self.satisfied = False  # 满意标志
         self.wanted_invest_env = None  # 需要的投资环境
         self.optional_invest_env = None  # 可选的投资环境
         self.wanted_invest_strategy = None  # 必须出现的投资策略
@@ -33,6 +32,7 @@ class RerollStart(CurrencyWars):
         self.hate_boss_affix = None  # 讨厌的boss词缀，出现就重开
         self.invest_strategy_stage = 0  # 投资策略阶段
         self.invest_strategy_stage_limit = 2  # 投资策略阶段上限，超过后不再检测投资策略
+        self.invest_strategy_satisfied = False  # 满意标志
 
     def set_invest_env(self, invest_env: str):
         """设置投资环境"""
@@ -109,6 +109,10 @@ class RerollStart(CurrencyWars):
         return True
 
     def handle_invest_strategy(self):
+        def default_invest_strategy_handler():
+            if not self.operator.click_img(CWIMG.COLLECTION):  # 优先点击带有收集图标的策略
+                self.operator.click_point(0.5, 0.27)  # 无法点击时，点击中心点
+            self.operator.click_img(IMG.ENSURE2, after_sleep=1)  # 确认选择
         self.invest_strategy_stage += 1
 
         for _ in range(3):
@@ -126,10 +130,10 @@ class RerollStart(CurrencyWars):
                 logger.info("投资策略符合要求，继续游戏...")
                 self.operator.click_point(0.25 * (result + 1), 0.27, tag="投资策略")  # 根据投资策略的位置计算点击坐标，每个策略占屏幕宽度的25%
                 self.operator.click_img(IMG.ENSURE2, after_sleep=1)
-                self.satisfied = True
+                self.invest_strategy_satisfied = True
                 return
 
-        super().handle_invest_strategy()
+        default_invest_strategy_handler()
 
         if self.invest_strategy_stage >= self.invest_strategy_stage_limit:
             logger.info(f"已达到投资策略阶段 {self.invest_strategy_stage_limit}, 准备重开...")
@@ -141,7 +145,7 @@ class RerollStart(CurrencyWars):
             self.abort_and_return()
             self.reroll = False
             return False
-        if self.satisfied:
+        if self.invest_strategy_satisfied:
             # 如果已经满足投资策略要求，则中止刷开局
             logger.info("已刷到满足要求的开局，停止刷开局")
             self.is_running = False
