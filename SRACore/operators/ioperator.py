@@ -19,7 +19,6 @@ class IOperator(ABC):
     def __init__(self):
         self.settings = load_settings()
         self.confidence = self.settings.get('ConfidenceThreshold', 0.9)
-        self.zoom = self.settings.get('Zoom', 1.25)
         self.top = 0
         self.left = 0
         self.width = 0
@@ -32,14 +31,13 @@ class IOperator(ABC):
             cls.ocr_engine = RapidOCR(config_path='rapidocr_onnxruntime/config.yaml')
         return cls.ocr_engine
 
-    @property
     @abstractmethod
     def is_window_active(self) -> bool:
         """检查目标窗口是否为当前活动窗口"""
         ...
 
     @abstractmethod
-    def get_win_region(self, active_window: bool | None = None, raise_exception: bool = True) -> Region | None:
+    def get_win_region(self, active_window: bool = True, raise_exception: bool = True) -> Region | None:
         """获取目标窗口的区域坐标
 
         Args:
