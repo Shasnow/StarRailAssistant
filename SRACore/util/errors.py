@@ -69,7 +69,7 @@ class ErrorCode(IntEnum):
     # ========== 3XXX: 操作错误 ==========
     # 3000-3099: 窗口操作错误
     WINDOW_NOT_FOUND = 3001  # 窗口未找到
-    WINDOW_NOT_ACTIVE = 3002  # 窗口未激活
+    WINDOW_INACTIVE = 3002  # 窗口未激活
     WINDOW_ACTIVATE_FAILED = 3003  # 窗口激活失败
     WINDOW_REGION_INVALID = 3004  # 窗口区域无效
     
@@ -225,11 +225,6 @@ class SRAError(Exception):
             'message': self.message,
             'details': self.details
         }
-
-
-class SystemError(SRAError):
-    """系统级错误"""
-    pass
 
 
 class ConfigError(SRAError):
