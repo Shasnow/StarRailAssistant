@@ -1,6 +1,7 @@
 from SRACore.util.logger import logger
+
 from .CurrencyWars import CurrencyWars
-from .img import IMG, CWIMG
+from .img import CWIMG, IMG
 
 
 class RerollStart(CurrencyWars):
@@ -36,10 +37,10 @@ class RerollStart(CurrencyWars):
 
     def set_invest_env(self, invest_env: str):
         """设置投资环境"""
-        invest_env = invest_env.split()
+        invest_env_tokens = invest_env.split()
         self.wanted_invest_env = list()
         self.optional_invest_env = list()
-        for item in invest_env:
+        for item in invest_env_tokens:
             if item.startswith("?"):
                 self.optional_invest_env.append(item[1:])
             else:
@@ -54,10 +55,10 @@ class RerollStart(CurrencyWars):
 
     def set_boss_affix(self, boss_affix: str):
         """设置boss词缀"""
-        boss_affix = boss_affix.split() if boss_affix else []
+        boss_affix_tokens = boss_affix.split() if boss_affix else []
         self.wanted_boss_affix = list()
         self.hate_boss_affix = list()
-        for item in boss_affix:
+        for item in boss_affix_tokens:
             if item.startswith("!"):
                 self.hate_boss_affix.append(item[1:])
             else:
@@ -264,4 +265,6 @@ class RerollStart(CurrencyWars):
         
         # 既没有必须的投资环境，也没有可选的投资环境
         return -1
+
+
 

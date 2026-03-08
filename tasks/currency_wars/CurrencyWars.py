@@ -740,14 +740,14 @@ class CurrencyWars(Executable):
 
     def handle_game_over(self):
         """处理游戏结束后的逻辑，如点击继续、返回主界面等"""
-        self.operator.click_img(CWIMG.NEXT_STEP),
+        self.operator.click_img(CWIMG.NEXT_STEP)
         self.operator.move_to(0.5, 0.5)  # 移动鼠标避免遮挡
         next_page_box = self.operator.wait_img(CWIMG.NEXT_PAGE)
         if next_page_box is None:
             logger.warning("未识别到下一页按钮，无法继续")
             self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击下一页")  # 兜底方案
         else:
-            self.operator.click_box(next_page_box, after_sleep=1),
+            self.operator.click_box(next_page_box, after_sleep=1)
         self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击返回货币战争")
         self.is_game_over = True  # 标记游戏结束
 
@@ -768,7 +768,7 @@ class CurrencyWars(Executable):
 
     def handle_encounter_node(self):
         """处理遭遇节点的逻辑"""
-        self.operator.click_point(0.35, 0.50, after_sleep=1),  # 简单难度
+        self.operator.click_point(0.35, 0.50, after_sleep=1)  # 简单难度
         self.operator.click_point(0.50, 0.84, after_sleep=1)  # 点击确认钮
 
     def handle_fortune_teller(self):
@@ -1096,11 +1096,17 @@ class CurrencyWars(Executable):
             logger.info(f"{area_type}无空位可放置")
 
         # 3. 队伍已满时：仅替换低priority角色（不占用新名额）
-        min_priority = character.priority
+        min_priority = character.priority if character.priority is not None else -1
         min_priority_index = -1
         # 查找目标区域中priority最低的角色
         for index, existing_char in enumerate(target_characters):
-            if existing_char is not None and existing_char.priority < min_priority:
+            # if existing_char is None:
+            if existing_char is None or existing_char.priority is None:
+                continue
+            # existing_priority = existing_char.priority if existing_char.priority is not None else -1
+            # if existing_priority < min_priority:
+            if existing_char.priority < min_priority:
+                # min_priority = existing_priority
                 min_priority = existing_char.priority
                 min_priority_index = index
 
