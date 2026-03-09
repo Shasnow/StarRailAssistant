@@ -4,6 +4,7 @@ from SRACore.task import BaseTask
 from SRACore.util import sys_util, encryption
 from SRACore.util.errors import SRAError, ErrorCode
 from SRACore.util.logger import logger
+from SRACore.util.img import IMG, SGIMG
 
 
 class StartGameTask(BaseTask):
@@ -27,10 +28,10 @@ class StartGameTask(BaseTask):
                 return False
         self.start_game_click()
         res, _ = self.operator.wait_any_img([
-            "resources/img/enter.png",
-            "resources/img/train_supply.png",
-            "resources/img/task_resources_manage.png",
-            "resources/img/restart_for_update.png"
+            IMG.ENTER,
+            SGIMG.TRAIN_SUPPLY,
+            SGIMG.TASK_RESOURCES_MANAGE,
+            SGIMG.RESTART_FOR_UPDATE
         ], timeout=120, interval=2)
         if res == 0:
             return True
@@ -46,7 +47,7 @@ class StartGameTask(BaseTask):
             return False
         elif res == 3:
             logger.info("需要重启游戏以完成更新，正在重启游戏...")
-            self.operator.click_img("resources/img/ensure2.png")
+            self.operator.click_img(IMG.ENSURE2)
             return self.login_and_enter_game()  # 递归调用重新登录进入游戏
         else:
             logger.error(SRAError(ErrorCode.INVALID_STATE, "未知游戏状态", f"当前状态码: {res}，预期状态码: 0~3"))
@@ -132,10 +133,10 @@ class StartGameTask(BaseTask):
                 raise SRAError(ErrorCode.INVALID_INPUT, "未知的游戏渠道配置", f"当前配置值 {self.config['StartGameChannel']}")
 
         result, _ = self.operator.wait_any_img([
-            f'resources/img/sg/{channel}/login_page.png',
-            f'resources/img/sg/{channel}/welcome.png',
-            "resources/img/quit.png",
-            "resources/img/enter.png"
+            SGIMG.LOGIN_PAGE % channel,
+            SGIMG.WELCOME % channel,
+            IMG.QUIT,
+            IMG.ENTER
         ], timeout=60, interval=1)
 
         if result == -1:
@@ -149,8 +150,8 @@ class StartGameTask(BaseTask):
             else:
                 return result  # 直接返回登录状态
 
-        self.operator.click_img(f'resources/img/sg/{channel}/login_other.png', after_sleep=1)
-        self.operator.click_img(f"resources/img/sg/{channel}/login_with_account.png", after_sleep=1)
+        self.operator.click_img(SGIMG.LOGIN_OTHER % channel, after_sleep=1)
+        self.operator.click_img(SGIMG.LOGIN_WITH_ACCOUNT % channel, after_sleep=1)
         if self.config['StartGameAutoLogin']:
             user = encryption.win_decryptor(self.config['StartGameUsername'])
             passwd = encryption.win_decryptor(self.config['StartGamePassword'])
@@ -158,7 +159,7 @@ class StartGameTask(BaseTask):
                 logger.error(SRAError(ErrorCode.INVALID_INPUT, "自动登录账号或密码未设置", "请检查配置中的自动登录账号和密码"))
                 return -1
             logger.info(f"登录账号：{user}")
-            self.operator.click_img(f"resources/img/sg/{channel}/username_input.png", after_sleep=1)
+            self.operator.click_img(SGIMG.USERNAME_INPUT % channel, after_sleep=1)
             self.operator.copy(user)
             self.operator.paste()
             self.operator.sleep(1)
@@ -166,11 +167,11 @@ class StartGameTask(BaseTask):
             self.operator.sleep(0.2)
             self.operator.copy(passwd)
             self.operator.paste()
-            self.operator.click_img(f"resources/img/sg/{channel}/agree.png", x_offset=-35, after_sleep=1)
-            self.operator.click_img(f"resources/img/sg/{channel}/enter_game.png")
+            self.operator.click_img(SGIMG.AGREE % channel, x_offset=-35, after_sleep=1)
+            self.operator.click_img(SGIMG.ENTER_GAME % channel)
         else:
             logger.info("未启用自动登录，请手动完成登录")
-        if self.operator.wait_img(f"resources/img/sg/{channel}/welcome.png", timeout=120):
+        if self.operator.wait_img(SGIMG.WELCOME % channel, timeout=120):
             return 1
         else:
             logger.warning(SRAError(ErrorCode.LOGIN_FAILED, "登录后等待欢迎界面超时", "请检查游戏状态"))
@@ -181,8 +182,8 @@ class StartGameTask(BaseTask):
         box = self.operator.wait_ocr("登出", timeout=60, interval=1, from_x=0.9375, from_y=0.1204, to_x=0.96875, to_y=0.3935)
         if box:
             self.operator.click_box(box, after_sleep=1)
-            if not self.operator.click_img("resources/img/quit2.png", after_sleep=1):
-                self.operator.click_img("resources/img/ensure3.png", after_sleep=1)
+            if not self.operator.click_img(IMG.QUIT2, after_sleep=1):
+                self.operator.click_img(IMG.ENSURE3, after_sleep=1)
             return True
         return False
 

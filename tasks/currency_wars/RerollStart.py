@@ -1,7 +1,7 @@
 from SRACore.util.logger import logger
 
 from .CurrencyWars import CurrencyWars
-from .img import CWIMG, IMG
+from SRACore.util.img import CWIMG, IMG
 
 
 class RerollStart(CurrencyWars):

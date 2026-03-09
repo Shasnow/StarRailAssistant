@@ -1,6 +1,7 @@
 from SRACore.task import BaseTask
 from SRACore.util import sys_util
 from SRACore.util.logger import logger
+from SRACore.util.img import IMG, MAIMG
 
 
 class MissionAccomplishTask(BaseTask):
@@ -13,15 +14,15 @@ class MissionAccomplishTask(BaseTask):
 
     def logout(self):
         logger.info("登出账号")
-        if not self.operator.wait_img("resources/img/enter.png"):
+        if not self.operator.wait_img(IMG.ENTER):
             return False
         self.operator.press_key('esc')
-        self.operator.wait_img("resources/img/power.png")
-        self.operator.click_img("resources/img/power.png", after_sleep=0.5)
-        self.operator.click_img("resources/img/ensure.png")
-        if self.operator.wait_img("resources/img/logout.png", timeout=60):
-            self.operator.click_img("resources/img/logout.png")
-        self.operator.click_img("resources/img/quit2.png")
+        self.operator.wait_img(MAIMG.POWER)
+        self.operator.click_img(MAIMG.POWER, after_sleep=0.5)
+        self.operator.click_img(IMG.ENSURE)
+        if self.operator.wait_img(MAIMG.LOGOUT, timeout=60):
+            self.operator.click_img(MAIMG.LOGOUT)
+        self.operator.click_img(IMG.QUIT2)
         return True
 
     def quit_game(self):

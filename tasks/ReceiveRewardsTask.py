@@ -1,5 +1,6 @@
 from SRACore.task import BaseTask
 from SRACore.util.logger import logger
+from SRACore.util.img import IMG, RRIMG
 
 
 class ReceiveRewardsTask(BaseTask):
@@ -52,7 +53,7 @@ class ReceiveRewardsTask(BaseTask):
 
     def _prepare_ui(self):
         """等待进入主界面并打开菜单"""
-        if not self.operator.wait_img("resources/img/enter.png", timeout=30):
+        if not self.operator.wait_img(IMG.ENTER, timeout=30):
             logger.error("检测超时，编号2")
             return False
         return True
@@ -89,7 +90,7 @@ class ReceiveRewardsTask(BaseTask):
         logger.info("执行任务：签证奖励")
         if self.operator.click_point(0.92,0.10, after_sleep=1):
             if self.operator.click_point(0.82,0.13, after_sleep=1):
-                if self.operator.click_img("resources/img/assistance_reward.png"):
+                if self.operator.click_img(RRIMG.ASSISTANCE_REWARD):
                     self.operator.sleep(1)
                     self.operator.press_key("esc", presses=2, interval=1.2)
                 else:
@@ -118,12 +119,12 @@ class ReceiveRewardsTask(BaseTask):
         for code in redeem_code_list:
             self.operator.sleep(1)
             if self.operator.click_point(0.92, 0.10):
-                if self.operator.click_img("resources/img/redeem_code.png"):
+                if self.operator.click_img(RRIMG.REDEEM_CODE):
                     self.operator.sleep(2)
                     self.operator.copy(code)
                     self.operator.click_point(0.5, 0.5)
                     self.operator.paste()
-                    self.operator.click_img("resources/img/ensure.png")
+                    self.operator.click_img(IMG.ENSURE)
                     self.operator.sleep(2)
                     self.operator.press_key("esc")
                 else:
@@ -136,7 +137,7 @@ class ReceiveRewardsTask(BaseTask):
         """Open mailbox and pick up mails."""
         logger.info("执行任务：领取邮件")
         if self.operator.click_point(0.97,0.25, after_sleep=1.5):
-            if self.operator.click_img("resources/img/claim_all_mail.png"):
+            if self.operator.click_img(RRIMG.CLAIM_ALL_MAIL):
                 self.operator.sleep(2)
                 self.operator.press_key("esc", presses=2, interval=1)
             else:
@@ -152,7 +153,7 @@ class ReceiveRewardsTask(BaseTask):
         Remember to update the gift_of_odyssey.png in each game version.
         """
         logger.info("执行任务：巡星之礼")
-        if not self.operator.wait_img("resources/img/enter.png", timeout=30):
+        if not self.operator.wait_img(IMG.ENTER, timeout=30):
             logger.error("检测超时，编号2")
             return
         self.operator.press_key((self.settings.get('ActivityHotkey', 'f1')).lower())
@@ -162,8 +163,7 @@ class ReceiveRewardsTask(BaseTask):
             logger.info("没有巡星之礼活动")
             self.operator.press_key("esc")
             return
-        if self.operator.click_img("resources/img/gift_receive.png") or self.operator.click_img(
-                "resources/img/gift_receive2.png"):
+        if self.operator.click_img(RRIMG.GIFT_RECEIVE) or self.operator.click_img(RRIMG.GIFT_RECEIVE2):
             logger.info("领取成功")
             self.operator.sleep(2)
             self.operator.press_key("esc", presses=2, interval=2)
@@ -175,10 +175,10 @@ class ReceiveRewardsTask(BaseTask):
     def assignments_reward(self):
         """Receive assignment reward"""
         logger.info("执行任务：领取派遣奖励")
-        if not self.operator.click_img("resources/img/assignments_none.png"):
+        if not self.operator.click_img(RRIMG.ASSIGNMENTS_NONE):
             logger.info("没有可领取的奖励")
             return
-        match self.operator.wait_any_img(["resources/img/assignment_page.png", "resources/img/assignment_page2.png"],
+        match self.operator.wait_any_img([RRIMG.ASSIGNMENT_PAGE, RRIMG.ASSIGNMENT_PAGE2],
                                          timeout=10)[0]:
             case 0:
                 pass
@@ -189,7 +189,7 @@ class ReceiveRewardsTask(BaseTask):
                 self.operator.press_key("esc")
                 return
 
-        if self.operator.click_img("resources/img/assignments_reward.png", after_sleep=2):
+        if self.operator.click_img(RRIMG.ASSIGNMENTS_REWARD, after_sleep=2):
             self.operator.press_key("esc", presses=2, interval=1)
         else:
             logger.info("没有可以领取的派遣奖励")
@@ -200,25 +200,25 @@ class ReceiveRewardsTask(BaseTask):
     def daily_training_reward(self):
         """Receive daily training reward"""
         logger.info("执行任务：领取每日实训奖励")
-        if not self.operator.wait_img("resources/img/enter.png"):
+        if not self.operator.wait_img(IMG.ENTER):
             logger.error("检测超时，编号2")
             return
         self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
-        if not self.operator.wait_img("resources/img/f4.png", timeout=20):
+        if not self.operator.wait_img(IMG.F4, timeout=20):
             logger.error("检测超时，编号1")
             self.operator.press_key("esc")
             return
-        if self.operator.locate("resources/img/survival_index_onclick.png"):
+        if self.operator.locate(IMG.SURVIVAL_INDEX_ONCLICK):
             logger.info("没有可领取的奖励")
         else:
-            while self.operator.click_img("resources/img/daily_reward.png", after_sleep=0.5):
+            while self.operator.click_img(RRIMG.DAILY_REWARD, after_sleep=0.5):
                 self.operator.move_rel(0, 50)
 
-            if self.operator.click_img("resources/img/daily_train_reward.png", after_sleep=1.5):
+            if self.operator.click_img(RRIMG.DAILY_TRAIN_REWARD, after_sleep=1.5):
                 self.operator.press_key("esc")
                 self.operator.sleep(0.5)
 
-            if self.operator.locate("resources/img/daily_train_reward_notreach.png"):
+            if self.operator.locate(RRIMG.DAILY_TRAIN_REWARD_NOTREACH):
                 if self.synthesis() or self.relic():
                     self.operator.press_key("esc")
                     self.operator.sleep(0.5)
@@ -231,33 +231,33 @@ class ReceiveRewardsTask(BaseTask):
     def nameless_honor(self):
         """Receive nameless honor reward"""
         logger.info("执行任务：领取无名勋礼奖励")
-        if not self.operator.wait_img("resources/img/enter.png"):
+        if not self.operator.wait_img(IMG.ENTER):
             logger.error("检测超时，编号2")
             return
         self.operator.press_key((self.settings.get('ChronicleHotkey', 'f2')).lower())
-        if not self.operator.wait_img("resources/img/f2.png", timeout=20):
+        if not self.operator.wait_img(IMG.F2, timeout=20):
             logger.warning("检测超时，编号1")
-            if not self.operator.locate("resources/img/enter.png"):
+            if not self.operator.locate(IMG.ENTER):
                 self.operator.press_key("esc")
             return
-        if self.operator.click_img("resources/img/nameless_honor_reward_receive.png", after_sleep=2):
+        if self.operator.click_img(RRIMG.NAMLESS_HONOR_REWARD_RECEIVE, after_sleep=2):
             logger.info("领取了无名勋礼奖励")
             self.operator.press_key("esc")
-        if not self.operator.click_img("resources/img/nameless_honor_task.png"):
+        if not self.operator.click_img(RRIMG.NAMLESS_HONOR_TASK):
             logger.info("没有可领取的奖励")
             self.operator.press_key("esc")
             return
-        if not self.operator.click_img("resources/img/nameless_honor_task_receive.png"):
+        if not self.operator.click_img(RRIMG.NAMLESS_HONOR_TASK_RECEIVE):
             logger.info("没有已完成的无名勋礼任务")
             self.operator.press_key("esc")
             return
         logger.info("成功领取无名勋礼任务奖励")
         self.operator.sleep(1)
         self.operator.press_key("esc")
-        if not self.operator.click_img("resources/img/nameless_honor_reward.png"):
+        if not self.operator.click_img(RRIMG.NAMLESS_HONOR_REWARD):
             logger.info("没有可领取的奖励")
             return
-        if self.operator.click_img("resources/img/nameless_honor_reward_receive.png", after_sleep=2):
+        if self.operator.click_img(RRIMG.NAMLESS_HONOR_REWARD_RECEIVE, after_sleep=2):
             logger.info("领取了无名勋礼奖励")
             self.operator.press_key("esc", presses=2, interval=2)
         else:
@@ -265,43 +265,43 @@ class ReceiveRewardsTask(BaseTask):
         logger.info("完成任务：领取无名勋礼奖励")
 
     def synthesis(self):
-        if self.operator.click_img("resources/img/synthesis.png", y_offset=330):
+        if self.operator.click_img(RRIMG.SYNTHESIS, y_offset=330):
             logger.info("找到合成任务")
             self.operator.sleep(2)
-            self.operator.click_img("resources/img/material _replacement.png")
+            self.operator.click_img(RRIMG.MATERIAL_REPLACEMENT)
             logger.info("材料合成")
             self.operator.sleep(2)
             self.operator.click_point(0.220, 0.176, after_sleep=1)
-            self.operator.click_img("resources/img/automatic _placement.png")
+            self.operator.click_img(RRIMG.AUTOMATIC_PLACEMENT)
             self.operator.sleep(2)
-            if not self.operator.click_img("resources/img/synthesis2.png"):
+            if not self.operator.click_img(RRIMG.SYNTHESIS2):
                 logger.info("未能找到合适的材料进行合成")
                 return False
             self.operator.sleep(2)
-            self.operator.click_img("resources/img/ensure.png")
+            self.operator.click_img(IMG.ENSURE)
             self.operator.sleep(3)
-            if self.operator.click_img("resources/img/close.png"):
+            if self.operator.click_img(IMG.CLOSE):
                 logger.info("合成完毕，返回领取奖励")
             self.operator.sleep(1.5)
             self.operator.press_key("esc",presses=1, interval=1.5)
             self.operator.sleep(1)
-            self.operator.click_img("resources/img/daily_reward.png", after_sleep=0.5)
+            self.operator.click_img(RRIMG.DAILY_REWARD, after_sleep=0.5)
             logger.info("领取奖励")
-            self.operator.click_img("resources/img/daily_train_reward.png", after_sleep=2)
+            self.operator.click_img(RRIMG.DAILY_TRAIN_REWARD, after_sleep=2)
             return True
         else:
             logger.info("未能找到合成任务")
             return False
 
     def relic(self):
-        if self.operator.click_img("resources/img/relic.png", y_offset=330):
+        if self.operator.click_img(RRIMG.RELIC, y_offset=330):
             logger.info("找到升级遗器任务")
             for _ in range(5):
-                if not self.operator.click_img("resources/img/enhance.png"):
-                    self.operator.click_img("resources/img/order.png", x_offset=114)
-                    self.operator.click_img("resources/img/order.png", x_offset=114, y_offset=-155)
+                if not self.operator.click_img(RRIMG.ENHANCE):
+                    self.operator.click_img(RRIMG.ORDER, x_offset=114)
+                    self.operator.click_img(RRIMG.ORDER, x_offset=114, y_offset=-155)
                     self.operator.sleep(0.5)
-                    self.operator.click_img("resources/img/reverse_order.png")
+                    self.operator.click_img(RRIMG.REVERSE_ORDER)
                     self.operator.sleep(1)
                     self.operator.click_point(0.097, 0.220, after_sleep=1.5)
                 else:
@@ -311,17 +311,17 @@ class ReceiveRewardsTask(BaseTask):
                 return False
             self.operator.sleep(1)
             for _ in range(5):
-                if not self.operator.click_img("resources/img/close.png"):
-                    self.operator.click_img("resources/img/upgrade_materials.png")
+                if not self.operator.click_img(IMG.CLOSE):
+                    self.operator.click_img(RRIMG.UPGRADE_MATERIALS)
                     logger.info("更换升级材料为四星及以下")
                     self.operator.sleep(1)
-                    self.operator.click_img("resources/img/four_star.png")
-                    self.operator.click_img("resources/img/next_code.png")
-                    self.operator.click_img("resources/img/ensure.png")
+                    self.operator.click_img(RRIMG.FOUR_STAR)
+                    self.operator.click_img(RRIMG.NEXT_CODE)
+                    self.operator.click_img(IMG.ENSURE)
                     self.operator.sleep(1)
-                    self.operator.click_img("resources/img/automatic_placement2.png")
+                    self.operator.click_img(RRIMG.AUTOMATIC_PLACEMENT2)
                     self.operator.sleep(1)
-                    self.operator.click_img("resources/img/enhance.png")
+                    self.operator.click_img(RRIMG.ENHANCE)
                     self.operator.sleep(1.5)
                 else:
                     break
@@ -332,9 +332,9 @@ class ReceiveRewardsTask(BaseTask):
             self.operator.press_key("esc",presses=2, interval=1.5)
             self.operator.sleep(1)
             logger.info("升级完毕，准备返回领取奖励")
-            self.operator.click_img("resources/img/daily_reward.png", after_sleep=0.5)
+            self.operator.click_img(RRIMG.DAILY_REWARD, after_sleep=0.5)
             logger.info("领取奖励")
-            self.operator.click_img("resources/img/daily_train_reward.png", after_sleep=1.5)
+            self.operator.click_img(RRIMG.DAILY_TRAIN_REWARD, after_sleep=1.5)
             return True
         else:
             logger.info("未能找到升级遗器任务")
