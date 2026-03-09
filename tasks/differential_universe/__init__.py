@@ -138,7 +138,7 @@ class DifferentialUniverse(Executable):
         page, _ = self.operator.wait_any_img([
             "resources/img/enter.png",
             "resources/img/differential_universe_start.png",
-            "resources/img/bonus points.png"
+            "resources/img/bonus_points.png"
         ], interval=0.5)
         if page == 0:
             self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())

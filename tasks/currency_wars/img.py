@@ -1,15 +1,17 @@
 # ==================== 图片常量集中管理 ====================
 # 说明：集中管理所有在本模块使用的图片路径，避免散落的硬编码字符串，方便统一修改与查找。
-# 分组：通用 IMG（跨模式通用），货币战争专用 CWIMG。
+# 分组：通用 IMG（跨模式通用），货币战争专用 CWIMG，差分宇宙专用 DUIMG。
 
+#通用
 class IMG:
     ENTER = "resources/img/enter.png"
     F4 = "resources/img/f4.png"
     COLLECTION = "resources/img/collection.png"
     ENSURE = "resources/img/ensure.png"
     ENSURE2 = "resources/img/ensure2.png"
+    Q = "resources/img/q.png"
 
-
+#货币战争
 class CWIMG:
     BASE = "resources/img/currency_wars"
     COLLECTION = f"{BASE}/collection.png"
@@ -59,3 +61,22 @@ class CWIMG:
     CANNOT_BE_FIELDED = f"{BASE}/cannot_be_fielded.png"
     INVEST_STRATEGY_REFRESH = f"{BASE}/invest_strategy_refresh.png"
     INVEST_ENV_REFRESH = f"{BASE}/invest_env_refresh.png"
+
+#差分宇宙
+class DUIMG:
+    BASE = "resources/img"
+    DIFFERENTIAL_UNIVERSE_START=f"{BASE}/differential_universe_start.png"
+    PERIODIC_CALCULUS = f"{BASE}/periodic_calculus.png"
+    LAUNCH_DIFFERENTIAL_UNIVERSE = f"{BASE}/launch_differential_universe.png"
+    BLESSING_SELECT = f"{BASE}/blessing_select.png"
+    BASE_EFFECT_SELECT = f"{BASE}/base_effect_select.png"
+    EQUATION_SELECT = f"{BASE}/equation_select.png"
+    CURIOSITY_SELECT = f"{BASE}/curiosity_select.png"
+    EQUATION_EXPANSION = f"{BASE}/equation_expansion.png"
+    CLOSE = f"{BASE}/close.png"
+    DIVERGENT_UNIVERSE_QUIT = f"{BASE}/divergent_universe_quit.png"
+    COLLECTION = f"{BASE}/collection.png"
+    END_AND_SETTLE = f"{BASE}/end_and_settle.png"
+    RETURN = f"{BASE}/return.png"
+    BONUS_POINTS = f"{BASE}/bonus_points.png"
+    COSMIC_STRIFE = f"{BASE}/cosmic_strife.png"
