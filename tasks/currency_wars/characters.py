@@ -62,8 +62,8 @@ class Character:
     schools: list[School]  # 派系
     cost: int  # 费用
     positioning: Positioning  # 默认站位
-    position: Positioning = None  # 实际站位（适配攻略的特殊情况）
-    priority: int = None  # 优先级
+    position: Positioning | None = None  # 实际站位（适配攻略的特殊情况）
+    priority: int | None = None  # 优先级
     is_placed: bool = False  # 是否已放置
 
     def __post_init__(self):
