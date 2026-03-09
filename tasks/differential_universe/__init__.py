@@ -1,5 +1,6 @@
 from loguru import logger
 
+from SRACore.util.img import DUIMG, IMG
 from SRACore.task import Executable
 
 
@@ -34,17 +35,17 @@ class DifferentialUniverse(Executable):
     def _start_differential_universe(self, exe_time):
         """开始差分宇宙任务"""
         logger.info(f"第{exe_time + 1}次进入差分宇宙，少女祈祷中…")
-        box = self.operator.wait_img("resources/img/differential_universe_start.png")
+        box = self.operator.wait_img(DUIMG.DIFFERENTIAL_UNIVERSE_START)
         # 点击开始按钮
         if box is None:
             logger.error("发生错误，错误编号18")
             return False
         self.operator.do_while(lambda : self.operator.click_box(box),
-                      lambda : self.operator.locate("resources/img/periodic_calculus.png") is None,
+                      lambda : self.operator.locate(DUIMG.PERIODIC_CALCULUS) is None,
                       interval=0.5, max_iterations=10)
-        self.operator.click_img("resources/img/periodic_calculus.png")
+        self.operator.click_img(DUIMG.PERIODIC_CALCULUS)
 
-        launch_button_box = self.operator.wait_img("resources/img/launch_differential_universe.png")
+        launch_button_box = self.operator.wait_img(DUIMG.LAUNCH_DIFFERENTIAL_UNIVERSE)
         # 启动差分宇宙
         if not self.operator.click_box(launch_button_box):
             logger.error("发生错误，错误编号20")
@@ -65,11 +66,11 @@ class DifferentialUniverse(Executable):
         self.operator.click_point(0.5, 0.5, after_sleep=0.1)
 
         # 检查是否需要使用技能
-        if self.operator.wait_img("resources/img/q.png", timeout=10):
+        if self.operator.wait_img(IMG.Q, timeout=10):
             self.operator.press_key("v")
 
         logger.info("等待战斗结束")
-        if not self.operator.wait_img("resources/img/blessing_select.png", timeout=120, interval=1):
+        if not self.operator.wait_img(DUIMG.BLESSING_SELECT, timeout=120, interval=1):
             logger.error("失败/超时")
             return False
 
@@ -81,21 +82,21 @@ class DifferentialUniverse(Executable):
 
         while True:
             index, _ = self.operator.wait_any_img([
-                "resources/img/base_effect_select.png",
-                "resources/img/blessing_select.png",
-                "resources/img/equation_select.png",
-                "resources/img/curiosity_select.png",
-                "resources/img/equation_expansion.png",
-                "resources/img/close.png",
-                "resources/img/divergent_universe_quit.png"
+                DUIMG.BASE_EFFECT_SELECT,
+                DUIMG.BLESSING_SELECT,
+                DUIMG.EQUATION_SELECT,
+                DUIMG.CURIOSITY_SELECT,
+                DUIMG.EQUATION_EXPANSION,
+                DUIMG.CLOSE,
+                DUIMG.DIVERGENT_UNIVERSE_QUIT
             ], interval=0.5)
 
             if index==0 or index == 1 or index == 2 or index==3:  # 祝福选择或方程式选择或奇物选择
                 logger.info(var[index])
                 self.operator.sleep(0.5)
-                if not self.operator.click_img("resources/img/collection.png"):
+                if not self.operator.click_img(DUIMG.COLLECTION):
                     self.operator.click_point(0.5, 0.5, x_offset=-150)
-                self.operator.click_img("resources/img/ensure2.png", after_sleep=1)
+                self.operator.click_img(IMG.ENSURE2, after_sleep=1)
             elif index == 4 or index == 5:  # 方程式扩展或关闭
                 self.operator.press_key('esc')
                 self.operator.sleep(0.5)
@@ -107,8 +108,8 @@ class DifferentialUniverse(Executable):
     def _complete_mission(self):
         """完成任务结算"""
         logger.info("退出并结算")
-        for i in range(30):
-            if not self.operator.locate("resources/img/end_and_settle.png"):
+        for _ in range(30):
+            if not self.operator.locate(DUIMG.END_AND_SETTLE):
                 self.operator.press_key("esc")
                 self.operator.sleep(1)
             else:
@@ -118,11 +119,11 @@ class DifferentialUniverse(Executable):
             return False
 
         self.operator.click_point(0.8, 0.9, after_sleep=0.5)
-        self.operator.click_img("resources/img/ensure2.png", after_sleep=0.5)
+        self.operator.click_img(IMG.ENSURE2, after_sleep=0.5)
 
         logger.info("返回主界面")
-        if self.operator.wait_img("resources/img/return.png"):
-            self.operator.click_img("resources/img/return.png", after_sleep=0.5)
+        if self.operator.wait_img(DUIMG.RETURN):
+            self.operator.click_img(DUIMG.RETURN, after_sleep=0.5)
 
         return True
 
@@ -136,16 +137,16 @@ class DifferentialUniverse(Executable):
         :return: None
         """
         page, _ = self.operator.wait_any_img([
-            "resources/img/enter.png",
-            "resources/img/differential_universe_start.png",
-            "resources/img/bonus_points.png"
+            IMG.ENTER,
+            DUIMG.DIFFERENTIAL_UNIVERSE_START,
+            DUIMG.BONUS_POINTS
         ], interval=0.5)
         if page == 0:
             self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
-            if not self.operator.wait_img("resources/img/f4.png", timeout=20):
+            if not self.operator.wait_img(IMG.F4, timeout=20):
                 logger.error("检测超时，编号1")
                 self.operator.press_key("esc")
-            self.operator.click_img("resources/img/cosmic_strife.png", after_sleep=1)  # 旷宇纷争
+            self.operator.click_img(DUIMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙
             self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
             return True
