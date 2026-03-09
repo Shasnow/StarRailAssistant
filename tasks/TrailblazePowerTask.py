@@ -2,9 +2,9 @@ import tomllib
 from typing import Any, Callable
 
 from SRACore.task import BaseTask
-from SRACore.util.logger import logger
 from SRACore.util.errors import ErrorCode, SRAError
-from SRACore.util.img import TPIMG, IMG
+from SRACore.util.img import IMG, TPIMG
+from SRACore.util.logger import logger
 
 type TrailblazePowerFunc = Callable[[int, int, int], bool]
 
@@ -338,7 +338,7 @@ class TrailblazePowerTask(BaseTask):
                 None
         """
         logger.info(f"执行任务：{mission_name}")
-        level_path = f"{TPIMG.BASE}/{level_belonging} ({level}).png"
+        level_path = TPIMG.level(level_belonging, level)
         if not self.find_session(level_belonging, scroll_flag):
             return False
         if not self.find_level(level_path):
@@ -419,8 +419,7 @@ class TrailblazePowerTask(BaseTask):
                     if not self.operator.click_img(TPIMG.QUIT_BATTLE):
                         logger.error(SRAError(ErrorCode.QUIT_BATTLE_FAILED, "退出战斗失败"))
                     logger.info("退出战斗")
-                    result, _ = self.operator.wait_any_img([TPIMG.BATTLE, TPIMG.ENTER],
-                                                           timeout=10)
+                    result, _ = self.operator.wait_any_img([TPIMG.BATTLE, TPIMG.ENTER],timeout=10)
                     if result == 0:
                         self.operator.press_key("esc", wait=1)
                     elif result == 1:
@@ -440,7 +439,7 @@ class TrailblazePowerTask(BaseTask):
                 if not self.operator.click_img(TPIMG.QUIT_BATTLE):
                     logger.error(SRAError(ErrorCode.QUIT_BATTLE_FAILED, "退出战斗失败"))
             logger.info("退出战斗")
-            resources, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER])
+            resources, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER])#此处enter是IMG还是TP需要确认
             if resources == 0:
                 self.operator.press_key("esc", wait=1)
             elif resources == 1:
@@ -540,8 +539,8 @@ class TrailblazePowerTask(BaseTask):
         self.operator.click_img(IMG.ENSURE2, after_sleep=1)
 
     def find_session(self, name, scroll_flag=False):
-        name1 = f"{TPIMG.BASE}/{name}.png"
-        name2 = f"{TPIMG.BASE}/{name}_onclick.png"
+        name1 = TPIMG.session(name)
+        name2 = TPIMG.session(name, onclick=True)
         if not self.goto_survival_index():
             return False
         if scroll_flag:

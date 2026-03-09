@@ -1,14 +1,41 @@
-# ==================== 图片常量集中管理 ====================
-# 说明：集中管理所有在本模块使用的图片路径，避免散落的硬编码字符串，方便统一修改与查找。
-# 分组：通用 IMG（跨模式通用），货币战争专用 CWIMG，差分宇宙专用 DUIMG。
+"""
+图片常量集中管理
 
-#通用
+集中管理本模块使用的所有图片路径。
+
+分类：
+    SRAIMG  SRA程序资源
+    IMG     通用图片
+    SGIMG   登录相关
+    TPIMG   体力任务
+    RRIMG   领取奖励
+    CWIMG   货币战争
+    DUIMG   差分宇宙
+    MAIMG   使命完成
+"""
+# region SRA专用
+class SRAIMG:
+    BASE = "resources"
+    ROBIN = f"{BASE}/Robin.gif"
+    ROBIN2 = f"{BASE}/Robin2.gif"
+    SRAICO_PNG = f"{BASE}/SRAico.png"
+    SRAICON_ICO = f"{BASE}/SRAicon.ico"
+# endregion
+
+# region 通用
 class IMG:
     BASE = "resources/img"
+    NUMBER_1 = f"{BASE}/1.png"
+    NUMBER_2 = f"{BASE}/2.png"
+    NUMBER_3 = f"{BASE}/3.png"
+    NUMBER_4 = f"{BASE}/4.png"
+    NUMBER_5 = f"{BASE}/5.png"
     ENTER = f"{BASE}/enter.png"
     F2 = f"{BASE}/f2.png"
     F3 = f"{BASE}/f3.png"
     F4 = f"{BASE}/f4.png"
+    DIALOG = f"{BASE}/dialog.png"
+    M = f"{BASE}/m.png"
     ENSURE = f"{BASE}/ensure.png"
     ENSURE2 = f"{BASE}/ensure2.png"
     ENSURE3 = f"{BASE}/ensure3.png"
@@ -18,7 +45,9 @@ class IMG:
     SURVIVAL_INDEX = f"{BASE}/survival_index.png"
     SURVIVAL_INDEX_ONCLICK = f"{BASE}/survival_index_onclick.png"
     COSMIC_STRIFE = f"{BASE}/cosmic_strife.png"
+# endregion
 
+# region 登录相关专用
 class SGIMG:
     BASE = "resources/img/sg"
     TRAIN_SUPPLY = f"{BASE}/train_supply.png"
@@ -31,9 +60,12 @@ class SGIMG:
     USERNAME_INPUT = f"{BASE}/%s/username_input.png"
     AGREE = f"{BASE}/%s/agree.png"
     ENTER_GAME = f"{BASE}/%s/enter_game.png"
+# endregion
 
+# region 体力任务专用
 class TPIMG:
     BASE = "resources/img/tp"
+    ENTER= f"{BASE}/enter.png"
     TRAILBLAZE_POWER = f"{BASE}/trailblaze_power.png"
     ORNAMENT_EXTRACTION = f"{BASE}/ornament_extraction (%s).png"
     ORNAMENT_EXTRACTION_NO_SAVE = f"{BASE}/ornament_extraction_no_save.png"
@@ -58,6 +90,19 @@ class TPIMG:
     STELLAR_JADE = f"{BASE}/stellar_jade.png"
     STELLAR_JADE_ONCLICK = f"{BASE}/stellar_jade_onclick.png"
 
+    # 体力任务的等级图
+    @staticmethod
+    def level(level_belonging: str, level: int) -> str:
+        return f"{TPIMG.BASE}/{level_belonging} ({level}).png"
+
+    # 体力任务的索引图
+    @staticmethod
+    def session(name: str, onclick: bool = False) -> str:
+        suffix = "_onclick" if onclick else ""
+        return f"{TPIMG.BASE}/{name}{suffix}.png"
+# endregion
+
+# region 领取奖励专用
 class RRIMG:
     BASE = "resources/img/receive_rewards"
     ASSISTANCE_REWARD = f"{BASE}/assistance_reward.png"
@@ -88,8 +133,9 @@ class RRIMG:
     AUTOMATIC_PLACEMENT2 = f"{BASE}/automatic_placement2.png"
     FOUR_STAR = f"{BASE}/four_star.png"
     NEXT_CODE = f"{BASE}/next_code.png"
+# endregion
 
-#货币战争
+# region 货币战争
 class CWIMG:
     BASE = "resources/img/currency_wars"
     COLLECTION = f"{BASE}/collection.png"
@@ -125,8 +171,9 @@ class CWIMG:
     CANNOT_BE_FIELDED = f"{BASE}/cannot_be_fielded.png"
     INVEST_STRATEGY_REFRESH = f"{BASE}/invest_strategy_refresh.png"
     INVEST_ENV_REFRESH = f"{BASE}/invest_env_refresh.png"
+# endregion
 
-#差分宇宙
+# region 差分宇宙
 class DUIMG:
     BASE = "resources/img/differential_universe"
     DIFFERENTIAL_UNIVERSE_START=f"{BASE}/differential_universe_start.png"
@@ -143,8 +190,11 @@ class DUIMG:
     END_AND_SETTLE = f"{BASE}/end_and_settle.png"
     RETURN = f"{BASE}/return.png"
     BONUS_POINTS = f"{BASE}/bonus_points.png"
+# endregion
 
+# region 使命完成专用
 class MAIMG:
     BASE = "resources/img/mission_accomplish"
     POWER = f"{BASE}/power.png"
     LOGOUT = f"{BASE}/logout.png"
+# endregion
