@@ -129,7 +129,7 @@ class CurrencyWars(Executable):
             if not self.operator.wait_img(IMG.F4, timeout=20):
                 logger.error("检测超时，编号1")
                 self.operator.press_key("esc")
-            self.operator.click_img(CWIMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
+            self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.30, after_sleep=0.8)  # 货币战争
             self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
             logger.info("[页面定位] 引导流程完成，进入开始页面")
@@ -234,7 +234,7 @@ class CurrencyWars(Executable):
 
     def _enter_new_game(self, enter_button_box) -> bool:
         """
-        新游戏进入流程（重构后，逻辑更清晰）
+        新游戏进入流程
         :param enter_button_box: 进入按钮坐标框
         :return: True-成功，False-失败
         """

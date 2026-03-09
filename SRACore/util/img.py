@@ -17,7 +17,7 @@ class IMG:
     QUIT2 = f"{BASE}/quit2.png"
     SURVIVAL_INDEX = f"{BASE}/survival_index.png"
     SURVIVAL_INDEX_ONCLICK = f"{BASE}/survival_index_onclick.png"
-    CLOSE = f"{BASE}/close.png"
+    COSMIC_STRIFE = f"{BASE}/cosmic_strife.png"
 
 class SGIMG:
     BASE = "resources/img/sg"
@@ -139,7 +139,6 @@ class CWIMG:
     CANNOT_BE_FIELDED = f"{BASE}/cannot_be_fielded.png"
     INVEST_STRATEGY_REFRESH = f"{BASE}/invest_strategy_refresh.png"
     INVEST_ENV_REFRESH = f"{BASE}/invest_env_refresh.png"
-    COSMIC_STRIFE = f"{BASE}/cosmic_strife.png"
 
 #差分宇宙
 class DUIMG:
@@ -158,7 +157,6 @@ class DUIMG:
     END_AND_SETTLE = f"{BASE}/end_and_settle.png"
     RETURN = f"{BASE}/return.png"
     BONUS_POINTS = f"{BASE}/bonus_points.png"
-    COSMIC_STRIFE = f"{BASE}/cosmic_strife.png"
 
 class MAIMG:
     BASE = "resources/img/mission_accomplish"
