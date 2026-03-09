@@ -240,24 +240,24 @@ class ReceiveRewardsTask(BaseTask):
             if not self.operator.locate(IMG.ENTER):
                 self.operator.press_key("esc")
             return
-        if self.operator.click_img(RRIMG.NAMLESS_HONOR_REWARD_RECEIVE, after_sleep=2):
+        if self.operator.click_img(RRIMG.NAMELESS_HONOR_REWARD_RECEIVE, after_sleep=2):
             logger.info("领取了无名勋礼奖励")
             self.operator.press_key("esc")
-        if not self.operator.click_img(RRIMG.NAMLESS_HONOR_TASK):
+        if not self.operator.click_img(RRIMG.NAMELESS_HONOR_TASK):
             logger.info("没有可领取的奖励")
             self.operator.press_key("esc")
             return
-        if not self.operator.click_img(RRIMG.NAMLESS_HONOR_TASK_RECEIVE):
+        if not self.operator.click_img(RRIMG.NAMELESS_HONOR_TASK_RECEIVE):
             logger.info("没有已完成的无名勋礼任务")
             self.operator.press_key("esc")
             return
         logger.info("成功领取无名勋礼任务奖励")
         self.operator.sleep(1)
         self.operator.press_key("esc")
-        if not self.operator.click_img(RRIMG.NAMLESS_HONOR_REWARD):
+        if not self.operator.click_img(RRIMG.NAMELESS_HONOR_REWARD):
             logger.info("没有可领取的奖励")
             return
-        if self.operator.click_img(RRIMG.NAMLESS_HONOR_REWARD_RECEIVE, after_sleep=2):
+        if self.operator.click_img(RRIMG.NAMELESS_HONOR_REWARD_RECEIVE, after_sleep=2):
             logger.info("领取了无名勋礼奖励")
             self.operator.press_key("esc", presses=2, interval=2)
         else:
