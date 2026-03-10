@@ -1,9 +1,7 @@
 import argparse
-import re
+import io
 import sys
 from pathlib import Path
-import locale
-import codecs
 
 
 def modify_version(file_path, new_version):
@@ -28,7 +26,7 @@ def modify_version(file_path, new_version):
                 break
         
         if not modified:
-            print(f"Warning: Could not find '#define MyAppVersion' definition")
+            print("Warning: Could not find '#define MyAppVersion' definition")
             return False
         
         # 写入修改后的内容
@@ -48,8 +46,9 @@ def modify_version(file_path, new_version):
 
 def main():
     # 设置标准输出编码为UTF-8，避免Windows环境下中文输出错误
-    if sys.stdout.encoding != 'utf-8':
-        sys.stdout.reconfigure(encoding='utf-8')
+    stdout = sys.stdout
+    if isinstance(stdout, io.TextIOWrapper):
+        stdout.reconfigure(encoding="utf-8")
     
     parser = argparse.ArgumentParser(description='Modify version number in Inno Setup script')
     parser.add_argument('--version', '-v', required=True, help='New version number')
