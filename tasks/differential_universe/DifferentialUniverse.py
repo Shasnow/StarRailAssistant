@@ -2,7 +2,7 @@ from loguru import logger
 
 from SRACore.util import errors
 from SRACore.util.errors import SRAError
-from SRACore.util.img import DUIMG, IMG
+from tasks.img import DUIMG, IMG
 from SRACore.task import Executable
 
 

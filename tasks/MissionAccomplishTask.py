@@ -2,7 +2,7 @@ from SRACore.task import BaseTask
 from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util import sys_util
 from SRACore.util.logger import logger
-from SRACore.util.img import IMG, MAIMG
+from tasks.img import IMG, MAIMG
 
 
 class MissionAccomplishTask(BaseTask):
