@@ -42,11 +42,7 @@ class CosmicStrifeTask(BaseTask):
             rs_task.set_boss_affix(self.config.get("CwRsBossAffixes", ""))
             rs_task.set_invest_env(self.config.get("CwRsInvestEnvironments", ""))
             stage_limit = self.config.get("CwRsInvestStrategyStage")
-            if not isinstance(stage_limit, int):# 需确认此处配置缺失时的处理方式
-                # stage_limit = 2
-                logger.error("刷开局投资策略阶段限制配置错误")
-                return False
-            rs_task.set_invest_strategy(self.config.get("CwRsInvestStrategies", ""), stage_limit)
+            rs_task.set_invest_strategy(self.config.get("CwRsInvestStrategies", ""), self.config.get("CwRsInvestStrategyStage", 1))
             if not rs_task.run():
                 logger.error("旷宇纷争-货币战争刷开局任务失败")
                 return False
