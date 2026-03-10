@@ -58,8 +58,11 @@ class StartGameTask(BaseTask):
         if sys_util.is_process_running("StarRail.exe"):  # 检查游戏是否已在运行
             logger.info("游戏已在运行中")
             return
-        path = Path(self.settings.get('GamePath')) if self.config.get("StartGameUseGlobalPath", True) else Path(
-            self.config.get('StartGamePath'))
+        raw_path = self.settings.get('GamePath') if self.config.get("StartGameUseGlobalPath", True) else self.config.get('StartGamePath')
+        if not raw_path:
+            logger.error("未设置游戏启动路径")
+            raise SRAError(ErrorCode.INVALID_INPUT, "未设置游戏启动路径")
+        path = Path(str(raw_path))
         logger.debug(f"游戏启动路径: {path}")
         # 根据配置选择游戏路径
         match self.config.get('StartGameChannel'):
@@ -74,10 +77,6 @@ class StartGameTask(BaseTask):
             case _:
                 logger.error("未知的游戏渠道配置")
                 raise SRAError(ErrorCode.INVALID_INPUT, "未知的游戏渠道配置", f"当前配置值 {self.config.get('StartGameChannel')}")
-
-        if not path or path == "":
-            logger.error("未设置游戏启动路径")
-            raise SRAError(ErrorCode.INVALID_INPUT, "未设置游戏启动路径")
 
         # 构建启动参数
         launch_args = []
