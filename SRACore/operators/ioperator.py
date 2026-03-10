@@ -5,6 +5,7 @@ from typing import Any, Callable
 # noinspection PyPackageRequirements
 # (pyperclip is in pyautogui requirements)
 import pyperclip
+import numpy as np
 from PIL.Image import Image
 from loguru import logger
 from rapidocr_onnxruntime import RapidOCR
@@ -107,7 +108,7 @@ class IOperator(ABC):
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+        if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
             return self.screenshot_in_tuple(from_x, from_y, to_x, to_y)
         else:
             return self.screenshot_in_region(region)
@@ -255,7 +256,7 @@ class IOperator(ABC):
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+        if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
             return self.locate_all_in_tuple(template, from_x, from_y, to_x, to_y, confidence, trace)
         else:
             return self.locate_all_in_region(template, region, confidence, trace)
@@ -287,7 +288,7 @@ class IOperator(ABC):
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+        if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
             return self.locate_any_in_tuple(templates, from_x, from_y, to_x, to_y, confidence, trace)
         else:
             return self.locate_any_in_region(templates, region, confidence, trace)
@@ -319,14 +320,14 @@ class IOperator(ABC):
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+        if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
             return self.locate_in_tuple(template, from_x, from_y, to_x, to_y, confidence, trace)
         else:
             return self.locate_in_region(template, region, confidence, trace)
 
     def ocr_in_region(
             self,
-            region: Region = None,
+            region: Region | None = None,
             trace: bool = True) -> list[Any] | None:
         """
         在窗口的指定区域内执行 OCR 文字识别，返回原始 OCR 结果（包含文本、坐标、置信度等）。
@@ -354,11 +355,13 @@ class IOperator(ABC):
             if region is None:
                 region = self.get_win_region()
                 time.sleep(0.5)  # 等待窗口稳定
+            if region is None:
+                return None
             if self.ocr_engine is None:
                 self.ocr_engine = IOperator._get_ocr_instance()
-            screenshot = self.screenshot(region)
-            screenshot = screenshot.convert("L")
-            result, _ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA
+            screenshot = self.screenshot(region).convert("L")
+            screenshot_array = np.array(screenshot)
+            result, _ = self.ocr_engine(screenshot_array, use_det=True, use_cls=False, use_rec=True)  # NOQA
             if trace:
                 logger.debug(f"OCR Result: {result}")
             return result
@@ -398,10 +401,12 @@ class IOperator(ABC):
             if trace:
                 logger.trace(f"OCR Error: {e}")
             return None
+        if region is None:
+            return None
         return self.ocr_in_region(region.sub_region(from_x, from_y, to_x, to_y), trace)
 
     def ocr(self,
-            region: Region = None,
+            region: Region | None = None,
             *,
             from_x: float | None = None,
             from_y: float | None = None,
@@ -424,7 +429,7 @@ class IOperator(ABC):
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+        if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
             return self.ocr_in_tuple(from_x, from_y, to_x, to_y, trace)
         else:
             return self.ocr_in_region(region, trace)
@@ -432,7 +437,7 @@ class IOperator(ABC):
     def ocr_match(self,
                   text: str,
                   confidence=0.9,
-                  region: Region = None,
+                  region: Region | None = None,
                   *,
                   from_x: float | None = None,
                   from_y: float | None = None,
@@ -463,7 +468,7 @@ class IOperator(ABC):
                 left, top = result[0][0]
                 width = result[0][2][0] - left
                 height = result[0][2][1] - top
-                if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+                if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
                     left += int(self.width * from_x)
                     top += int(self.height * from_y)
                 return Box(left, top, width, height, source=text)
@@ -474,7 +479,7 @@ class IOperator(ABC):
     def ocr_match_any(self,
                       texts: list[str],
                       confidence=0.9,
-                      region: Region = None,
+                      region: Region | None = None,
                       *,
                       from_x: float | None = None,
                       from_y: float | None = None,
@@ -506,7 +511,7 @@ class IOperator(ABC):
                     left, top = result[0][0]
                     width = result[0][2][0] - left
                     height = result[0][2][1] - top
-                    if all(v is not None for v in [from_x, from_y, to_x, to_y]):
+                    if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
                         left += int(self.width * from_x)
                         top += int(self.height * from_y)
                     return index, Box(left, top, width, height, source=text)

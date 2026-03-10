@@ -25,7 +25,7 @@ class TaskManager:
         self.log_queue = None
         self.task_list: list[type] = []
         with open("SRACore/config.toml", "rb") as f:
-            tasks = tomllib.load(f).get("tasks")
+            tasks = tomllib.load(f).get("tasks", [])
             for task in tasks:
                 main_class = task.get("main")
                 module = task.get("module")
@@ -50,7 +50,7 @@ class TaskManager:
         try:
             if len(args)==0:
                 # 不指定配置时，加载缓存中的全部配置名称
-                config_list = load_cache().get("ConfigNames")
+                config_list = load_cache().get("ConfigNames") or []
             else:
                 # 指定配置名称
                 config_list = args
@@ -145,9 +145,12 @@ class TaskManager:
             if config_name is None:
                 # 不指定配置时，使用缓存中的当前配置名称
                 config_name = load_cache().get("CurrentConfigName")
+            if config_name is None:
+                return False
+            task_name = str(task)
             logger.debug(f"run single task: config={config_name}, task={task}")
             # 获取任务实例
-            task_instance = self.get_task(config_name, task)
+            task_instance = self.get_task(config_name, task_name)
             if task_instance is None:
                 logger.error(Resource.task_noSuchTask(config_name))
                 return False
@@ -158,7 +161,7 @@ class TaskManager:
                 logger.error(Resource.task_taskFailed(str(task_instance)))
             else:
                 logger.info(Resource.task_taskCompleted(str(task_instance)))
-            return result
+            return bool(result)
         except Exception as e:
             logger.exception(Resource.task_taskCrashed(task, str(e)))
             return False
