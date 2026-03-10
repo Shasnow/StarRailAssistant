@@ -13,7 +13,7 @@ import os
 
 class Localization:
     """Automatically generated localization class."""
-    __normalized_data: dict[str, str] | None = None
+    __normalized_data: dict[str, str] = None
     lang: str = "en-us"
     __available_languages = ['en-us', 'zh-cn']
     __data_loaded: bool = False
@@ -64,14 +64,12 @@ class Localization:
 
     def get_translation(self, key: str) -> str:
         """
-        获取指定键的翻译值。
+        Get the translation value for the specified key.
         
-        :param key: 扁平化翻译键（例如 test.group1.hello）
-        :return: 目标语言的翻译值，如果没有找到则为键
+        :param key: Flattened translation key (e.g., test.group1.hello)
+        :return: Translation value for the target language, or key if not found
         """
         self.__ensure_data_loaded()
-        if self.__normalized_data is None:
-            return key
         return self.__normalized_data.get(key, key)
 
     def cli_intro(self, version, core) -> str:

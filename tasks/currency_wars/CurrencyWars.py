@@ -7,7 +7,7 @@ from loguru import logger
 from SRACore.task import Executable
 from SRACore.util.errors import ErrorCode, SRAError
 from tasks.currency_wars.characters import Character, Characters, Positioning
-from SRACore.util.img import CWIMG, IMG
+from tasks.img import CWIMG, IMG
 
 
 class Difficulty(enum.IntEnum):

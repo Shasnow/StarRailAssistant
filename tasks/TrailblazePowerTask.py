@@ -3,7 +3,7 @@ from typing import Any, Callable
 
 from SRACore.task import BaseTask
 from SRACore.util.errors import ErrorCode, SRAError
-from SRACore.util.img import IMG, TPIMG
+from tasks.img import IMG, TPIMG
 from SRACore.util.logger import logger
 
 type TrailblazePowerFunc = Callable[..., bool]

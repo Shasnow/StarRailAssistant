@@ -1,5 +1,5 @@
 from SRACore.triggers.BaseTrigger import BaseTrigger
-from SRACore.util.img import IMG
+from tasks.img import IMG
 
 
 class AutoPlotTrigger(BaseTrigger):
