@@ -14,6 +14,7 @@ public class SettingsService
     {
         _logger = logger;
         _logger.LogInformation("Loading settings...");
+        _logger.LogInformation("Current version: {Version}", Settings.Version);
         Settings = DataPersister.LoadSettings();
         if (string.IsNullOrEmpty(Settings.EncryptedMirrorChyanCdk))
         {
