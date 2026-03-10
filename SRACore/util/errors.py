@@ -302,7 +302,6 @@ __all__ = [
     'ErrorLevel',
     'ErrorCode',
     'SRAError',
-    'SystemError',
     'ConfigError',
     'OperationError',
     'TaskError',

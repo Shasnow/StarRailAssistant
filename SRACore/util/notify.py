@@ -27,7 +27,9 @@ def send_windows_notification(title: str, message: str, timeout: int = 5):
     """
 
     # 发送通知
-    notification.notify(title=title, message=message, app_name="SRA", timeout=timeout)
+    notify_func = getattr(notification, "notify", None)
+    if callable(notify_func):
+        notify_func(title=title, message=message, app_name="SRA", timeout=timeout)
 
 
 def send_mail_notification(title: str = "SRA", message: str = "", config: dict | None = None):
@@ -75,7 +77,6 @@ def send_test_email() -> bool:
     发送测试邮件
     :return: 是否发送成功
     """
-    import datetime
 
     try:
         settings = load_settings()
