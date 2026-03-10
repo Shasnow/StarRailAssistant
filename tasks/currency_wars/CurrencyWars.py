@@ -5,6 +5,7 @@ from typing import Any
 from loguru import logger
 
 from SRACore.task import Executable
+from SRACore.util.errors import ErrorCode, SRAError
 from tasks.currency_wars.characters import Character, Characters, Positioning
 from SRACore.util.img import CWIMG, IMG
 
@@ -127,7 +128,7 @@ class CurrencyWars(Executable):
             guide_hotkey = self.settings.get('GuideHotkey', 'f4')
             self.operator.press_key(str(guide_hotkey).lower())
             if not self.operator.wait_img(IMG.F4, timeout=20):
-                logger.error("检测超时，编号1")
+                logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
                 self.operator.press_key("esc")
             self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.30, after_sleep=0.8)  # 货币战争

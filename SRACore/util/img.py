@@ -11,7 +11,7 @@
     RRIMG   领取奖励
     CWIMG   货币战争
     DUIMG   差分宇宙
-    MAIMG   使命完成
+    MAIMG   任务完成
 """
 # region SRA专用
 class SRAIMG:
@@ -192,7 +192,7 @@ class DUIMG:
     BONUS_POINTS = f"{BASE}/bonus_points.png"
 # endregion
 
-# region 使命完成专用
+# region 任务完成专用
 class MAIMG:
     BASE = "resources/img/mission_accomplish"
     POWER = f"{BASE}/power.png"
