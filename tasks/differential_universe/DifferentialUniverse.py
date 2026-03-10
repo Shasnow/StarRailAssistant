@@ -1,5 +1,7 @@
 from loguru import logger
 
+from SRACore.util import errors
+from SRACore.util.errors import SRAError
 from SRACore.util.img import DUIMG, IMG
 from SRACore.task import Executable
 
@@ -38,7 +40,7 @@ class DifferentialUniverse(Executable):
         box = self.operator.wait_img(DUIMG.DIFFERENTIAL_UNIVERSE_START)
         # 点击开始按钮
         if box is None:
-            logger.error("发生错误，错误编号18")
+            logger.error(SRAError(errors.ErrorCode.IMAGE_NOT_FOUND, "未识别到差分宇宙开始按钮"))
             return False
         self.operator.do_while(lambda : self.operator.click_box(box),
                       lambda : self.operator.locate(DUIMG.PERIODIC_CALCULUS) is None,
@@ -48,10 +50,10 @@ class DifferentialUniverse(Executable):
         launch_button_box = self.operator.wait_img(DUIMG.LAUNCH_DIFFERENTIAL_UNIVERSE)
         # 启动差分宇宙
         if launch_button_box is None:
-            logger.error("未找到差分宇宙启动按钮")
+            logger.error(SRAError(errors.ErrorCode.IMAGE_NOT_FOUND, "未找到差分宇宙启动按钮"))
             return False
         if not self.operator.click_box(launch_button_box):
-            logger.error("发生错误，错误编号20")
+            logger.error(SRAError(errors.ErrorCode.MOUSE_CLICK_FAILED, "点击差分宇宙启动按钮失败"))
             return False
 
         return True
@@ -118,7 +120,7 @@ class DifferentialUniverse(Executable):
             else:
                 break
         else:
-            logger.error("无法退出，错误编号21")
+            logger.error(SRAError(errors.ErrorCode.WAIT_TIMEOUT, "等待结算退出入口超时"))
             return False
 
         self.operator.click_point(0.8, 0.9, after_sleep=0.5)
@@ -147,7 +149,7 @@ class DifferentialUniverse(Executable):
         if page == 0:
             self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
             if not self.operator.wait_img(IMG.F4, timeout=20):
-                logger.error("检测超时，编号1")
+                logger.error(SRAError(errors.ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
                 self.operator.press_key("esc")
             self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙

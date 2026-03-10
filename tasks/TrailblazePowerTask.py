@@ -455,7 +455,7 @@ class TrailblazePowerTask(BaseTask):
                 if not self.operator.click_img(TPIMG.QUIT_BATTLE):
                     logger.error(SRAError(ErrorCode.QUIT_BATTLE_FAILED, "退出战斗失败"))
             logger.info("退出战斗")
-            resources, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER])#此处enter是IMG还是TP需要确认
+            resources, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER])
             if resources == 0:
                 self.operator.press_key("esc", wait=1)
             elif resources == 1:

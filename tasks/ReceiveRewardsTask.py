@@ -1,4 +1,5 @@
 from SRACore.task import BaseTask
+from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
 from SRACore.util.img import DUIMG, IMG, RRIMG
 
@@ -54,7 +55,7 @@ class ReceiveRewardsTask(BaseTask):
     def _prepare_ui(self):
         """等待进入主界面并打开菜单"""
         if not self.operator.wait_img(IMG.ENTER, timeout=30):
-            logger.error("检测超时，编号2")
+            logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待主界面超时"))
             return False
         return True
 
@@ -128,9 +129,9 @@ class ReceiveRewardsTask(BaseTask):
                     self.operator.sleep(2)
                     self.operator.press_key("esc")
                 else:
-                    logger.error("发生错误，错误编号16")
+                    logger.error(SRAError(ErrorCode.MOUSE_CLICK_FAILED, "点击兑换码入口失败"))
             else:
-                logger.error("发生错误，错误编号17")
+                logger.error(SRAError(ErrorCode.MOUSE_CLICK_FAILED, "点击更多功能入口失败"))
         logger.info("任务完成：领取兑换码")
 
     def mail(self):
@@ -154,7 +155,7 @@ class ReceiveRewardsTask(BaseTask):
         """
         logger.info("执行任务：巡星之礼")
         if not self.operator.wait_img(IMG.ENTER, timeout=30):
-            logger.error("检测超时，编号2")
+            logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待主界面超时"))
             return
         self.operator.press_key((self.settings.get('ActivityHotkey', 'f1')).lower())
         self.operator.sleep(0.2)
@@ -185,7 +186,7 @@ class ReceiveRewardsTask(BaseTask):
             case 1:
                 self.operator.click_point(0.34, 0.22)
             case _:
-                logger.error("发生错误，错误编号7")
+                logger.error(SRAError(ErrorCode.INVALID_STATE, "派遣页面状态异常"))
                 self.operator.press_key("esc")
                 return
 
@@ -201,11 +202,11 @@ class ReceiveRewardsTask(BaseTask):
         """Receive daily training reward"""
         logger.info("执行任务：领取每日实训奖励")
         if not self.operator.wait_img(IMG.ENTER):
-            logger.error("检测超时，编号2")
+            logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待主界面超时"))
             return
         self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
         if not self.operator.wait_img(IMG.F4, timeout=20):
-            logger.error("检测超时，编号1")
+            logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
             self.operator.press_key("esc")
             return
         if self.operator.locate(IMG.SURVIVAL_INDEX_ONCLICK):
@@ -232,11 +233,11 @@ class ReceiveRewardsTask(BaseTask):
         """Receive nameless honor reward"""
         logger.info("执行任务：领取无名勋礼奖励")
         if not self.operator.wait_img(IMG.ENTER):
-            logger.error("检测超时，编号2")
+            logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待主界面超时"))
             return
         self.operator.press_key((self.settings.get('ChronicleHotkey', 'f2')).lower())
         if not self.operator.wait_img(IMG.F2, timeout=20):
-            logger.warning("检测超时，编号1")
+            logger.warning(SRAError(ErrorCode.WAIT_TIMEOUT, "等待纪行界面超时"))
             if not self.operator.locate(IMG.ENTER):
                 self.operator.press_key("esc")
             return

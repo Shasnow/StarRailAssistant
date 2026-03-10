@@ -1,4 +1,5 @@
 from SRACore.task import BaseTask
+from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util import sys_util
 from SRACore.util.logger import logger
 from SRACore.util.img import IMG, MAIMG
@@ -32,5 +33,5 @@ class MissionAccomplishTask(BaseTask):
             return True
         except Exception as e:
             logger.debug(e)
-            logger.error("发生错误，错误编号7")
+            logger.error(SRAError(ErrorCode.PROCESS_KILL_FAILED, "结束游戏进程失败", str(e)))
             return False
