@@ -1,6 +1,6 @@
 from loguru import logger
 
-from SRACore.util.img import DUIMG, IMG
+from tasks.img import DUIMG, IMG
 from SRACore.task import Executable
 
 

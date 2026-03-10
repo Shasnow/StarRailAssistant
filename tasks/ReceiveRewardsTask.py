@@ -1,6 +1,6 @@
 from SRACore.task import BaseTask
 from SRACore.util.logger import logger
-from SRACore.util.img import IMG, RRIMG
+from tasks.img import IMG, RRIMG
 
 
 class ReceiveRewardsTask(BaseTask):

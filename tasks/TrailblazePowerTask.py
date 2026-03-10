@@ -4,7 +4,7 @@ from typing import Any, Callable
 from SRACore.task import BaseTask
 from SRACore.util.logger import logger
 from SRACore.util.errors import ErrorCode, SRAError
-from SRACore.util.img import TPIMG, IMG
+from tasks.img import TPIMG, IMG
 
 type TrailblazePowerFunc = Callable[[int, int, int], bool]
 

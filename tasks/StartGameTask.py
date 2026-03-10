@@ -4,7 +4,7 @@ from SRACore.task import BaseTask
 from SRACore.util import sys_util, encryption
 from SRACore.util.errors import SRAError, ErrorCode
 from SRACore.util.logger import logger
-from SRACore.util.img import IMG, SGIMG
+from tasks.img import IMG, SGIMG
 
 
 class StartGameTask(BaseTask):

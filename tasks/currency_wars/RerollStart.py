@@ -1,7 +1,7 @@
 from SRACore.util.logger import logger
 
 from .CurrencyWars import CurrencyWars
-from SRACore.util.img import CWIMG, IMG
+from tasks.img import CWIMG, IMG
 
 
 class RerollStart(CurrencyWars):
@@ -49,7 +49,7 @@ class RerollStart(CurrencyWars):
     def set_invest_strategy(self, invest_strategy: str, invest_strategy_stage_limit: int = 2):
         """设置投资策略"""
         def clean_strategy(s):
-            return s.strip().replace("·", "").replace("•", "")
+            return s.strip().replace("·", "").replace("•", "").replace("?", "")  # 去除常见的干扰字符
         self.wanted_invest_strategy = list(map(clean_strategy, invest_strategy.split()))
         self.invest_strategy_stage_limit = invest_strategy_stage_limit
 
@@ -169,7 +169,7 @@ class RerollStart(CurrencyWars):
         # 解析OCR结果：过滤空字符串，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
-            affix_text = str(item[1]).strip().replace("·", "").replace("•", "")
+            affix_text = str(item[1]).strip().replace("·", "").replace("•", "").replace("?", "")  # 去除常见的干扰字符
             detected_invest_strategy.append(affix_text)
 
         # 日志输出识别到的词缀，便于调试
