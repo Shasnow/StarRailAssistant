@@ -87,10 +87,11 @@ def main():
     from SRACore.util.logger import logger, setup_logger
     # 设置日志记录器
     setup_logger(level=args.log_level)
+    logger.debug(f"Current version: {VERSION}")
+    logger.debug(f"cwd: {os.getcwd()}")
     from SRACore.SRA import SRACli
     cli_instance = SRACli()
     cli_instance.task_manager.log_level = args.log_level
-    logger.debug(f"cwd: {os.getcwd()}")
     # 配置交互式模式（隐藏提示符）
     if args.inline or args.embed:
         cli_instance.intro = ''
