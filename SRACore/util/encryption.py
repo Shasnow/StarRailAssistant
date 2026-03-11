@@ -11,7 +11,7 @@ def win_decryptor(entropy: str | None = None) -> str:
     try:
         encrypted_bytes = base64.b64decode(entropy)
         # 参数说明：加密数据、熵（C# 中为 null）、标志（0 表示当前用户）
-        decrypted_bytes = win32crypt.CryptUnprotectData(
+        decrypted_bytes = win32crypt.CryptUnprotectData( # type: ignore
             encrypted_bytes,
             None,
             None,

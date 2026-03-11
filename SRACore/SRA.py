@@ -1,7 +1,9 @@
+# type: ignore
 import cmd
 import multiprocessing
 import threading
 import time
+from typing import Any
 
 from loguru import logger
 
@@ -31,20 +33,20 @@ class SRACli(cmd.Cmd):
         stop_hotkey=stop_hotkey.lower()  # 统一小写
         language = 'zh-cn' if settings.get('Language', 0) == 0 else 'en-us'
         Resource.set_language(language)
-        if stop_hotkey is None or stop_hotkey == '':
+        if stop_hotkey == '':
             stop_hotkey = 'f9'
 
         self.event_listener = EventListener()
         self.event_listener.register_key_event(stop_hotkey, self.do_task, "stop")
         self.event_listener.start()
 
-    def default(self, line):
+    def default(self, line: str):
         print(Resource.cli_unknownCommand(line))
 
-    def emptyline(self):
-        pass
+    def emptyline(self) -> bool:
+        return False
 
-    def _get_command_help(self, cmd_name, detail=False) -> str:
+    def _get_command_help(self, cmd_name: str, detail: bool = False) -> str:
         """
         获取指定命令的帮助信息
         先尝试从本地化资源中获取帮助文本，如果不存在则使用方法的docstring。
@@ -62,12 +64,12 @@ class SRACli(cmd.Cmd):
             return ""
         return help_text
 
-    def do_EOF(self, arg):  # NOQA
+    def do_EOF(self, arg: Any):  # NOQA
         """Ctrl+D exit command line tool"""
         print()
         return self.do_exit(arg)
 
-    def do_help(self, arg):
+    def do_help(self, arg: str):
         """Show help information"""
         if arg:
             func = getattr(self, f"do_{arg}", None)
@@ -85,7 +87,7 @@ class SRACli(cmd.Cmd):
                 print(f"  {cmd_name} - {help_text}")
             print(Resource.cli_helpFooter)
 
-    def do_exit(self, _):
+    def do_exit(self, _: Any):
         """Exit command line tool"""
         if self.task_process and self.task_process.is_alive():
             self.task_process.terminate()

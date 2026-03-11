@@ -1,3 +1,4 @@
+# type: ignore
 import json
 from typing import Any
 
@@ -25,7 +26,7 @@ def load_config(name:str) -> dict[str, Any] | None:
         logger.error(Resource.config_exception(path, str(e)))
         return None
 
-def load_data(typ) -> dict[Any, Any]:
+def load_data(typ: str) -> dict[Any, Any]:
     path = ''
     match typ:
         case 'settings':

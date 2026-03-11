@@ -1,9 +1,10 @@
+from SRACore.operators.ioperator import IOperator
 from SRACore.triggers.BaseTrigger import BaseTrigger
 from tasks.img import IMG
 
 
 class AutoPlotTrigger(BaseTrigger):
-    def __init__(self, operator):
+    def __init__(self, operator: IOperator):
         super().__init__(operator)
         self.name = '自动对话'
         self.can_skip = True  # 是否可以跳过对话, 默认可以跳过
