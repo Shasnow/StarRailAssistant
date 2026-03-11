@@ -63,7 +63,7 @@ class ReceiveRewardsTask(BaseTask):
         """执行需要传参的任务列表"""
         # 打开ESC菜单
         self.operator.press_key("esc")
-        if not self.operator.wait_ocr("开拓", timeout=20, from_x=0.656,from_y=0.222, to_x=0.740, to_y=0.278):
+        if not self.operator.wait_ocr("开拓", timeout=20, from_x=0.656, from_y=0.222, to_x=0.740, to_y=0.278):
             return False
 
         for task, args in tasks:

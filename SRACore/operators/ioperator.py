@@ -8,7 +8,7 @@ import pyperclip
 from loguru import logger
 from PIL.Image import Image
 
-from rapidocr_onnxruntime import RapidOCR
+from rapidocr_onnxruntime import RapidOCR # type: ignore
 from SRACore.operators.model import Box, Region
 from SRACore.util.data_persister import load_settings
 
@@ -18,7 +18,7 @@ class IOperator(ABC):
 
     def __init__(self):
         self.settings = load_settings()
-        self.confidence = self.settings.get('ConfidenceThreshold', 0.9)
+        self.confidence:float = self.settings.get('ConfidenceThreshold', 0.9)
         self.top = 0
         self.left = 0
         self.width = 0
@@ -37,16 +37,15 @@ class IOperator(ABC):
         ...
 
     @abstractmethod
-    def get_win_region(self, active_window: bool = True, raise_exception: bool = True) -> Region | None:
+    def get_win_region(self, active_window: bool = True) -> Region:
         """获取目标窗口的区域坐标
 
         Args:
             active_window (bool | None, optional): 是否在获取窗口区域前激活窗口。
-            raise_exception (bool, optional): 如果无法获取窗口区域，是否抛出异常。默认为True。
         Returns:
-            Region | None: 返回窗口区域对象，如果无法获取且raise_exception为False，则返回None。
+            Region: 返回窗口区域对象
         Raises:
-            Exception: 如果无法获取窗口区域且raise_exception为True，则抛出异常。
+            SRAError: 如果无法获取窗口区域，或窗口未找到
         """
         ...
 
@@ -116,16 +115,14 @@ class IOperator(ABC):
     def locate_in_region(self, img_path: str,
                          region: Region | None = None,
                          confidence: float | None = None,
-                         trace: bool = True,
-                         **_) -> Box | None:
+                         trace: bool = True) -> Box | None:
         """
         在窗口内查找图片位置
         :param img_path: 模板图片路径
         :param region: 要查找的区域对象，包含left, top, width, height属性。
-        :param confidence:
-        :param trace:
-        :param _:
-        :return:
+        :param confidence: 匹配度, 0-1之间的浮点数, 默认为self.confidence
+        :param trace: 是否打印调试信息
+        :return: Box | None - 找到的图片位置，如果未找到则返回None
         """
         ...
 
@@ -137,8 +134,7 @@ class IOperator(ABC):
                         to_x: float,
                         to_y: float,
                         confidence: float | None = None,
-                        trace: bool = True,
-                        **_) -> Box | None:
+                        trace: bool = True) -> Box | None:
         """
         在窗口内查找图片位置，使用比例坐标
         :param templates: 模板图片路径
@@ -353,9 +349,6 @@ class IOperator(ABC):
                 logger.debug(f"OCR in region: {region}")
             if region is None:
                 region = self.get_win_region()
-                time.sleep(0.5)  # 等待窗口稳定
-            if region is None:
-                return None
             if self.ocr_engine is None:
                 self.ocr_engine = IOperator._get_ocr_instance()
             screenshot = self.screenshot(region)
@@ -399,8 +392,6 @@ class IOperator(ABC):
             if trace:
                 logger.trace(f"OCR Error: {e}")
             return None
-        if region is None:
-            return None
         return self.ocr_in_region(region.sub_region(from_x, from_y, to_x, to_y), trace)
 
     def ocr(self,
@@ -434,7 +425,7 @@ class IOperator(ABC):
 
     def ocr_match(self,
                   text: str,
-                  confidence=0.9,
+                  confidence: float = 0.9,
                   region: Region | None = None,
                   *,
                   from_x: float | None = None,
@@ -476,7 +467,7 @@ class IOperator(ABC):
 
     def ocr_match_any(self,
                       texts: list[str],
-                      confidence=0.9,
+                      confidence: float = 0.9,
                       region: Region | None = None,
                       *,
                       from_x: float | None = None,
@@ -516,8 +507,12 @@ class IOperator(ABC):
         logger.debug(f"OCR Result not match any text: {texts}")
         return -1, None
 
-    def wait_ocr(self, text: str, timeout: float = 10, interval: float = 0.2, confidence=0.9, *args,
-                 **kwargs) -> Box | None:
+    def wait_ocr(self, text: str,
+                 confidence: float = 0.9,
+                 interval: float = 0.2,
+                 timeout: float = 10,
+                 *args: Any,
+                 **kwargs: Any) -> Box | None:
         """
         等待OCR识别到指定文本
 
@@ -540,8 +535,13 @@ class IOperator(ABC):
         logger.debug(f"Timeout: '{text}' -> NotFound in {timeout} seconds")
         return None
 
-    def wait_ocr_any(self, texts: list[str], timeout: float = 10, interval: float = 0.2, confidence=0.9, *args,
-                     **kwargs) -> tuple[int, Box | None]:
+    def wait_ocr_any(self,
+                     texts: list[str],
+                     confidence: float = 0.9,
+                     interval: float = 0.2,
+                     timeout: float = 10,
+                     *args: Any,
+                     **kwargs: Any) -> tuple[int, Box | None]:
         """
         等待OCR识别到任意指定文本
 
@@ -597,9 +597,6 @@ class IOperator(ABC):
         Returns:
             bool: 点击成功返回True，否则返回False
         """
-        if box is None:
-            logger.trace("Could not click a Empty Box")
-            return False
         x, y = box.center
         logger.debug(
             f"Click box center:({x}, {y}), source: {box.source}, offset:({x_offset}, {y_offset}), wait {after_sleep}s")
@@ -696,7 +693,7 @@ class IOperator(ABC):
         ...
 
     @staticmethod
-    def sleep(seconds) -> None:
+    def sleep(seconds: float) -> None:
         """
         Sleep for the specified number of seconds.
         
@@ -720,12 +717,12 @@ class IOperator(ABC):
         return pyperclip.copy(text)
 
     @abstractmethod
-    def paste(self) -> str:
+    def paste(self) -> None:
         """
         Paste the text from clipboard.
         
         Returns:
-            str: The text from clipboard.
+            None
         """
         ...
 
@@ -744,7 +741,7 @@ class IOperator(ABC):
         ...
 
     @abstractmethod
-    def move_to(self, x: int | float | None, y: int | float | None, duration: float = 0.0, trace: bool = True) -> bool:
+    def move_to(self, x: int | float, y: int | float, duration: float = 0.0, trace: bool = True) -> bool:
         """
         将鼠标移动到指定位置。
 
@@ -759,7 +756,7 @@ class IOperator(ABC):
         ...
 
     @abstractmethod
-    def mouse_down(self, x: int | float | None, y: int | float | None, trace: bool = True) -> bool:
+    def mouse_down(self, x: int | float, y: int | float, trace: bool = True) -> bool:
         """
         按下鼠标按钮。
 

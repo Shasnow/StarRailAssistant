@@ -1,11 +1,11 @@
+
 import ctypes
 import time
 from ctypes.wintypes import POINT, RECT
 from pathlib import Path
-from typing import cast
 
 import pyautogui
-import pygetwindow
+import pygetwindow # type: ignore
 import pyscreeze
 
 from SRACore.operators.ioperator import IOperator
@@ -23,7 +23,7 @@ class Operator(IOperator):
         self.width = 0
         self.height = 0
         self._win = None
-        self._hwnd = None
+        self._hwnd: int | None = None
 
     def _get_hwnd(self) -> int | None:
         """获取有效的窗口句柄，无效时自动刷新"""
@@ -33,11 +33,11 @@ class Operator(IOperator):
         self._win = None
         self._hwnd = None
         try:
-            windows = pygetwindow.getWindowsWithTitle(self.window_title)
+            windows: list[pygetwindow.Win32Window] = pygetwindow.getWindowsWithTitle(self.window_title) # type: ignore
             for w in windows:
                 if w.title == self.window_title:
                     self._win = w
-                    self._hwnd = w._hWnd  # NOQA
+                    self._hwnd = w._hWnd  # type: ignore # NOQA
                     break
         except Exception as e:
             logger.trace(f"WindowNotFound: {self.window_title} -> {e}")
@@ -47,36 +47,22 @@ class Operator(IOperator):
         hwnd = self._get_hwnd()
         if hwnd is None or self._win is None:
             return False
-        return self._win.isActive
+        return self._win.isActive # type: ignore
 
-    def get_win_region(self, active_window: bool = True, raise_exception: bool = True) -> Region | None:
-        """
-        获取崩坏：星穹铁道窗口客户区区域
-        :return: Region - 窗口客户区区域
-        :raises Exception: 如果未找到窗口或窗口未激活
-        """
-        try:
-            hwnd = self._get_hwnd()
-            if hwnd is None:
-                if raise_exception:
-                    raise SRAError(ErrorCode.WINDOW_NOT_FOUND, f"未找到窗口: {self.window_title}")
-                return None
-            if active_window and self._win is not None and not self._win.isActive:
-                self._win.activate()
-            region = self._get_client_region(hwnd)
-            if region is None:
-                if raise_exception:
-                    raise SRAError(
-                        ErrorCode.WINDOW_REGION_INVALID,
-                        f"无法获取窗口客户区区域 '{self.window_title}'", "窗口可能被最小化")
-                return None
-            return region
-        except Exception:  # NOQA
-            if raise_exception:
-                raise
-            return None
+    def get_win_region(self, active_window: bool = True) -> Region:
+        hwnd = self._get_hwnd()
+        if hwnd is None:
+            raise SRAError(ErrorCode.WINDOW_NOT_FOUND, f"未找到窗口: {self.window_title}")
+        if active_window and self._win is not None and not self._win.isActive: # type: ignore
+            self._win.activate()
+        region = self._get_client_region(hwnd)
+        if region is None:
+            raise SRAError(
+                ErrorCode.WINDOW_REGION_INVALID,
+                f"无法获取窗口客户区区域 '{self.window_title}'", "窗口可能被最小化")
+        return region
 
-    def _get_client_region(self, hwnd) -> Region | None:
+    def _get_client_region(self, hwnd: int) -> Region | None:
         """通过 Win32 API 获取窗口客户区的精确屏幕坐标"""
         client_rect = RECT()
         ctypes.windll.user32.GetClientRect(hwnd, ctypes.byref(client_rect))  # NOQA
@@ -95,31 +81,17 @@ class Operator(IOperator):
     def screenshot_in_region(self, region: Region | None = None):
         if region is None:
             region = self.get_win_region(active_window=True)
-            if region is None:# 兜底，并非重复判断
-                return pyscreeze.screenshot()
-        # 保护：避免出现宽或高为 0 的区域
-        if region.width <= 0 or region.height <= 0:
-            # 尝试使用未对齐的窗口区域重新计算
-            fallback = self.get_win_region(active_window=True)
-            if fallback and fallback.width > 0 and fallback.height > 0:
-                region = fallback
-            else:
-                # 返回整个屏幕截图作为最后回退，避免下游报错
-                return pyscreeze.screenshot()
         return pyscreeze.screenshot(region=region.tuple)
 
     def screenshot_in_tuple(self, from_x: float, from_y: float, to_x: float, to_y: float):
         region = self.get_win_region()
-        if region is None:
-            return pyscreeze.screenshot()
-        return pyscreeze.screenshot(region=region.sub_region(from_x,from_y,to_x,to_y).tuple)
+        return pyscreeze.screenshot(region=region.sub_region(from_x, from_y, to_x, to_y).tuple)
 
     def locate_in_region(self,
                          img_path: str,
                          region: Region | None = None,
                          confidence: float | None = None,
-                         trace: bool = True,
-                         **_) -> Box | None:
+                         trace: bool = True) -> Box | None:
         match_confidence = self.confidence if confidence is None else confidence
         try:
             if region is None:
@@ -145,10 +117,9 @@ class Operator(IOperator):
             return None
         return self.locate_in_region(
             templates,
-            cast(Region, region).sub_region(from_x, from_y, to_x, to_y),
+            region.sub_region(from_x, from_y, to_x, to_y),
             confidence,
-            trace,
-        )
+            trace)
 
     def locate_any_in_region(self, templates: list[str], region: Region | None = None, confidence: float | None = None,
                              trace: bool = True) -> tuple[int, Box | None]:
@@ -163,11 +134,7 @@ class Operator(IOperator):
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
             try:
                 box = pyscreeze.locate(img_path, screenshot, confidence=match_confidence)
-            except pyscreeze.ImageNotFoundException as e:
-                if trace:
-                    logger.trace(f"ImageNotFound: {img_path} -> {e}")
-                continue
-            except ValueError as e:
+            except (pyscreeze.ImageNotFoundException, ValueError) as e:
                 if trace:
                     logger.trace(f"ImageNotFound: {img_path} -> {e}")
                 continue
@@ -184,9 +151,9 @@ class Operator(IOperator):
             return -1, None
         return self.locate_any_in_region(
             templates,
-            cast(Region, region).sub_region(from_x, from_y, to_x, to_y),
+            region.sub_region(from_x, from_y, to_x, to_y),
             confidence,
-            trace,
+            trace
         )
 
     def locate_all_in_region(self, template: str, region: Region | None = None, confidence: float | None = None,
@@ -201,8 +168,8 @@ class Operator(IOperator):
             boxes = pyscreeze.locateAll(template, self.screenshot(region), confidence=match_confidence)
             result = []
             for box in boxes:
-                result.append(Box(box.left, box.top, box.width, box.height, source=template))
-            return result
+                result.append(Box(box.left, box.top, box.width, box.height, source=template)) # type: ignore
+            return result # type: ignore
         except Exception as e:
             if trace:
                 logger.trace(f"ImageNotFound: {template} -> {e}")
@@ -217,7 +184,7 @@ class Operator(IOperator):
             return None
         return self.locate_all_in_region(
             template,
-            cast(Region, region).sub_region(from_x, from_y, to_x, to_y),
+            region.sub_region(from_x, from_y, to_x, to_y),
             confidence,
             trace,
         )
@@ -280,7 +247,7 @@ class Operator(IOperator):
             logger.debug(f"Error moving cursor: {e}")
             return False
 
-    def move_to(self, x: int | float, y: int | float, duration: float = 0.0, trace:bool = True) -> bool:
+    def move_to(self, x: int | float, y: int | float, duration: float = 0.0, trace: bool = True) -> bool:
         try:
             if trace:
                 logger.debug(f"Move cursor to ({x}, {y}), duration: {duration}s")
@@ -316,7 +283,7 @@ class Operator(IOperator):
             logger.debug(f"Error pressing mouse button: {e}")
             return False
 
-    def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace:bool = True) -> bool:
+    def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace: bool = True) -> bool:
         try:
             if trace:
                 logger.debug("Mouse up")

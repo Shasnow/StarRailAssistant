@@ -179,7 +179,8 @@ class StartGameTask(BaseTask):
 
     def logout(self):
         logger.info("登出账号")
-        idx, box = self.operator.wait_ocr_any(["登出", "登入"], timeout=60, interval=1, from_x=0.9375, from_y=0.1204, to_x=0.96875, to_y=0.3935)
+        idx, box = self.operator.wait_ocr_any(["登出", "登入"], interval=1, timeout=60, from_x=0.9375, from_y=0.1204,
+                                              to_x=0.96875, to_y=0.3935)
         if idx==1:
             # 已经在登录界面，无需登出
             return True
@@ -191,11 +192,11 @@ class StartGameTask(BaseTask):
         return False
 
     def start_game_click(self):
-        result, _ = self.operator.wait_ocr_any(["开始游戏", "点击进入"], timeout=60, interval=1, from_x=0.44,
+        result, _ = self.operator.wait_ocr_any(["开始游戏", "点击进入"], interval=1, timeout=60, from_x=0.44,
                                                from_y=0.74, to_x=0.57, to_y=0.97)
         if result == 0:
             self.operator.click_point(0.5, 0.6, after_sleep=1.5)
-            self.operator.wait_ocr("点击进入", timeout=20, interval=1, from_x=0.44, from_y=0.74, to_x=0.57, to_y=0.97)
+            self.operator.wait_ocr("点击进入", interval=1, timeout=20, from_x=0.44, from_y=0.74, to_x=0.57, to_y=0.97)
             self.operator.click_point(0.5, 0.5)
             return True
         elif result == 1:

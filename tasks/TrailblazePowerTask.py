@@ -1,26 +1,12 @@
+import tomllib
 from typing import Any, Callable, TypedDict, cast
 
-import tomllib
-
-from SRACore.operators.model import Box
 from SRACore.task import BaseTask
 from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
 from tasks.img import IMG, TPIMG
 
 type TrailblazePowerFunc = Callable[..., bool]
-
-
-class TrailblazePowerArgs(TypedDict):
-    level: int
-    single_time: int
-    run_time: int
-
-
-class AutoDetectTask(TypedDict):
-    Name: str
-    Id: str
-    Level: int
 
 
 class SubtaskInfo(TypedDict, total=False):
@@ -37,11 +23,11 @@ class TrailblazePowerTask(BaseTask):
         with open(r"tasks/config/trailblaze_power.toml", "rb") as tf:
             self.task_config = tomllib.load(tf)
 
-        self.replenish_time: int = int(self.config.get('TrailblazePowerReplenishTimes', 0) or 0)
-        self.replenish_way: int = int(self.config.get('TrailblazePowerReplenishWay', 0) or 0)
-        self.replenish_flag: bool = bool(self.config.get('TrailblazePowerReplenishEnable', False))
-        self.manual_tasks: list[tuple[TrailblazePowerFunc, TrailblazePowerArgs]] = list()
-        self.auto_detect_tasks: list[AutoDetectTask] = list()
+        self.replenish_time: int = self.config.get('TrailblazePowerReplenishTimes', 0)
+        self.replenish_way: int = self.config.get('TrailblazePowerReplenishWay', 0)
+        self.replenish_flag: bool = self.config.get('TrailblazePowerReplenishEnable', False)
+        self.manual_tasks: list[tuple[TrailblazePowerFunc, dict[str, int]]] = list()
+        self.auto_detect_tasks: list[Any] = list()
 
     def run(self):
         self.manual_tasks.clear()
@@ -71,7 +57,7 @@ class TrailblazePowerTask(BaseTask):
         for task in tasklist:
             if task.get("AutoDetect", False):
                 self.auto_detect_tasks.append({
-                    "Name": cast(str, task.get("Name", task["Id"])),
+                    "Name": task.get("Name", task["Id"]),
                     "Id": cast(str, task["Id"]),
                     "Level": cast(int, task["Level"])
                 })
@@ -96,7 +82,7 @@ class TrailblazePowerTask(BaseTask):
         for box in boxes:
             self.operator.click_box(box, x_offset=-520, after_sleep=1)  # 点击体力图标左侧位置, 检测目标材料
             raw_res = self.operator.ocr(from_x=0.4, from_y=0.25, to_x=0.6, to_y=0.35)
-            if not raw_res:# OCR结果为空的处理逻辑仅参考
+            if not raw_res:  # OCR结果为空的处理逻辑仅参考
                 logger.warning("培养目标OCR识别为空，跳过当前目标")
                 self.operator.press_key('esc')
                 self.operator.sleep(1)
@@ -109,7 +95,7 @@ class TrailblazePowerTask(BaseTask):
 
         for obj in target_objects:
             # 从配置文件中匹配产物对应的副本任务
-            subtasks = cast(dict[str, SubtaskInfo] | None, self.task_config.get("subtasks"))
+            subtasks = self.task_config.get("subtasks")
             if subtasks is None:
                 logger.error(SRAError(ErrorCode.NO_BUILD_TARGET, "培养目标配置缺少 subtasks"))
                 return
@@ -140,7 +126,7 @@ class TrailblazePowerTask(BaseTask):
                 if found:
                     break
 
-    def detect_tasks(self) -> list[tuple[TrailblazePowerFunc, TrailblazePowerArgs]] | None:
+    def detect_tasks(self) -> list[tuple[TrailblazePowerFunc, dict[str, int]]] | None:
         """
         识别体力值并计算可执行的任务列表
         返回：任务列表（格式：[(任务对象, {"level": 等级, "single_time": 单次次数, "run_time": 执行轮数})]）
@@ -159,7 +145,7 @@ class TrailblazePowerTask(BaseTask):
                 return None
             # 过滤加号（兼容全角/空格变体）+ 空字符串
             exclude_chars = {'+', '十', '满'}
-            valid_res:list[str] = [r[1] for r in res if r[1] not in exclude_chars]
+            valid_res: list[str] = [r[1] for r in res if r[1] not in exclude_chars]
             reserve_tbp = int(valid_res[0].replace('满', ''))  # 后备开拓力，替换可能的错误字符
             current_tbp_str = valid_res[1].split('/')[0] if '/' in valid_res[1] else valid_res[1]
             current_tbp = int(current_tbp_str)
@@ -328,8 +314,8 @@ class TrailblazePowerTask(BaseTask):
                            run_time,
                            False,
                            single_time,
-                           x_add = 700,
-                           y_add = 0)
+                           x_add=700,
+                           y_add=0)
 
     def stagnant_shadow(self, level, single_time=1, run_time=1, **_):
         return self.battle("凝滞虚影",
@@ -467,7 +453,7 @@ class TrailblazePowerTask(BaseTask):
                     if not self.operator.click_img(TPIMG.QUIT_BATTLE):
                         logger.error(SRAError(ErrorCode.QUIT_BATTLE_FAILED, "退出战斗失败"))
                     logger.info("退出战斗")
-                    result, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER],timeout=10)
+                    result, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER], timeout=10)
                     if result == 0:
                         self.operator.press_key("esc", wait=1)
                     elif result == 1:
@@ -626,7 +612,7 @@ class TrailblazePowerTask(BaseTask):
             if way == 0:
                 if self.operator.locate(
                         TPIMG.RESERVED_TRAILBLAZE_POWER_ONCLICK) or self.operator.click_img(
-                        TPIMG.RESERVED_TRAILBLAZE_POWER):
+                    TPIMG.RESERVED_TRAILBLAZE_POWER):
                     # click('resources/img/count.png', x_add=200)
                     # if self.replenish_time>300:
                     #     write("300")
@@ -679,7 +665,7 @@ class TrailblazePowerTask(BaseTask):
             return True
         elif index == 1:
             # 生存索引页面，点击进入
-            self.operator.click_box(cast(Box, box))
+            self.operator.click_box(box)
             return self.operator.wait_img(IMG.SURVIVAL_INDEX_ONCLICK, timeout=10) is not None
         elif index == 0:
             # 主页面，按快捷键进入生存索引页面

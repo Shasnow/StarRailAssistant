@@ -19,7 +19,7 @@ StarRailAssistant 错误码定义
 """
 
 from enum import IntEnum
-from typing import Optional
+from typing import Any, Optional
 
 
 class ErrorLevel(IntEnum):
@@ -217,7 +217,7 @@ class SRAError(Exception):
             return f"[{self.error_code.value}] {self.message}: {self.details}"
         return f"[{self.error_code.value}] {self.message}"
     
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
         """转换为字典格式"""
         return {
             'error_code': self.error_code.value,

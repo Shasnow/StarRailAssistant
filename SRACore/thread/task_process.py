@@ -1,14 +1,16 @@
+# type: ignore
 import importlib
 
 import tomllib
+from typing import Any
 
 from SRACore.localization import Resource
 from SRACore.operators import Operator
 from SRACore.task import BaseTask
 from SRACore.util import (
-    encryption,  # NOQA 有动态用法，确保被打包
+    encryption,  # NOQA 有动态用法，确保被打包 # type: ignore
     notify,
-    sys_util,  # NOQA 有动态用法，确保被打包
+    sys_util,  # NOQA 有动态用法，确保被打包 # type: ignore
 )
 from SRACore.util.data_persister import load_cache, load_config
 from SRACore.util.logger import logger, setup_logger
@@ -41,7 +43,7 @@ class TaskManager:
                 self.task_list.append(_class)
         logger.debug(f"Successfully load task: {self.task_list}")
 
-    def run(self, *args):
+    def run(self, *args: Any) -> None:
         """
         进程主循环：
         1. 读取配置列表（单配置或多配置）
@@ -53,7 +55,7 @@ class TaskManager:
         try:
             if len(args)==0:
                 # 不指定配置时，加载缓存中的全部配置名称
-                config_list = load_cache().get("ConfigNames") or []
+                config_list = load_cache().get("ConfigNames", [])
             else:
                 # 指定配置名称
                 config_list = args
@@ -91,7 +93,7 @@ class TaskManager:
         finally:
             logger.debug("[Done]")
 
-    def get_tasks(self, config_name) -> list[BaseTask]:
+    def get_tasks(self, config_name: str) -> list[BaseTask]:
         """
         根据配置名称加载配置，并返回需要执行的任务实例列表。
 
@@ -120,8 +122,8 @@ class TaskManager:
 
         # 遍历 task_select，根据选择状态实例化对应任务
         for index, is_select in enumerate(task_select):
-            # 检查：1. 任务被选中 2. 索引在 task_list 范围内 3. 任务类不为 None
-            if is_select and index < len(self.task_list) and self.task_list[index] is not None:
+            # 检查：1. 任务被选中 2. 索引在 task_list 范围内
+            if is_select and index < len(self.task_list):
                 try:
                     # 实例化任务类
                     tasks.append(self.task_list[index](Operator(), config))
@@ -165,7 +167,7 @@ class TaskManager:
                 logger.error(Resource.task_taskFailed(str(task_instance)))
             else:
                 logger.info(Resource.task_taskCompleted(str(task_instance)))
-            return result if result is not None else False
+            return result
         except Exception as e:
             logger.exception(Resource.task_taskCrashed(task, str(e)))
             return False

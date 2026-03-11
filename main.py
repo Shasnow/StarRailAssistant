@@ -100,7 +100,7 @@ def main():
     #     cli_instance.do_host(args.port)
 
     # 统一处理子命令逻辑
-    def execute_subcommand(cmd_prefix: str, *args_parts:str) -> bool:
+    def execute_subcommand(cmd_prefix: str, *args_parts: str) -> bool:
         """
         拼接并执行子命令，返回是否需要退出
         :param cmd_prefix: 指令前缀（run/single）
@@ -121,7 +121,7 @@ def main():
     exit_program = False
     if args.subcommand == 'run':
         # 处理 run 子命令：config 是列表，拼接为空格分隔的字符串
-        exit_program = execute_subcommand('run', *args.config if args.config else [])
+        exit_program = execute_subcommand('run', *args.config if args.config else []) # type: ignore
     elif args.subcommand == 'single':
         # 处理 single 子命令：task-name + config（单个参数）
         exit_program = execute_subcommand('single', args.task_name, args.config)

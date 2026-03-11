@@ -10,7 +10,7 @@ import pynput
 @dataclasses.dataclass
 class KeyDownEvent:
     key: str
-    callback: Callable
+    callback: Callable[..., Any]
     args: Any = None
     is_triggered: bool = False  # 防抖标记
 
@@ -24,7 +24,7 @@ class EventListener:
     # 监听器线程实例
     _listener_thread: Optional[threading.Thread] = None
 
-    def register_key_event(self, key: str, callback: Callable, args) -> None:
+    def register_key_event(self, key: str, callback: Callable[..., Any], args: Any) -> None:
         """
         注册按键按下事件（线程安全）
         :param key: 按键字符串（如 'a'、'enter'、'ctrl'）
@@ -45,18 +45,19 @@ class EventListener:
         """监听器核心循环（内部方法，不直接调用）"""
 
         # 映射pynput的按键名称到字符串（适配原keyboard库的命名习惯）
-        def _key_to_str(key) -> str:
+        def _key_to_str(key: pynput.keyboard.Key | pynput.keyboard.KeyCode | None) -> str | None:
             try:
-                return key.char  # 普通按键（a、1、空格等）
+                return key.char  # type: ignore # 普通按键（a、1、空格等）
             except AttributeError:
                 return str(key).split('.')[-1]  # 特殊按键（enter、ctrl等）
 
         # 监听按键按下事件
-        def on_press(key):
+        def on_press(key: pynput.keyboard.Key | pynput.keyboard.KeyCode | None) -> None:
             if self.exit_event.is_set():
                 return  # 退出监听
             key_str = _key_to_str(key)
-
+            if key_str is None:
+                return
             with self._lock:
                 event = self._key_down_events.get(key_str)
                 if event is None or event.is_triggered:
@@ -70,11 +71,12 @@ class EventListener:
                     logger.error(f"回调执行失败 (按键={key_str}): {e}")
 
         # 监听按键释放事件（重置防抖标记）
-        def on_release(key):
+        def on_release(key: pynput.keyboard.Key | pynput.keyboard.KeyCode | None) -> None:
             if self.exit_event.is_set():
                 return
             key_str = _key_to_str(key)
-
+            if key_str is None:
+                return
             with self._lock:
                 event = self._key_down_events.get(key_str)
                 if event:

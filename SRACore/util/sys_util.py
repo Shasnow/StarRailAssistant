@@ -1,7 +1,9 @@
+from typing import Any
+
 import psutil
 from pathlib import Path
 
-def Popen(arg: str | Path | list[str], shell: bool = False, **kwargs) -> bool:  # NOQA
+def Popen(arg: str | Path | list[str], shell: bool = False, **kwargs: Any) -> bool:  # NOQA
     """
     Launches a process using the specified path.
 
@@ -23,7 +25,7 @@ def Popen(arg: str | Path | list[str], shell: bool = False, **kwargs) -> bool:  
         return False
 
 
-def is_process_running(process_name) -> bool:
+def is_process_running(process_name: str) -> bool:
     """
     Check if there is any running process that contains the given name string.
 

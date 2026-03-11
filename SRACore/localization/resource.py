@@ -1,3 +1,4 @@
+# type: ignore
 # -*- coding: utf-8 -*-
 ################################################################################
 ## Form generated from reading TOML file 'resource.toml'
