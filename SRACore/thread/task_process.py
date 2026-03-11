@@ -79,6 +79,7 @@ class TaskManager:
                         logger.exception(Resource.task_taskCrashed(str(task), str(e)))
                         break
                 logger.info(Resource.task_configCompleted(config_name))
+                logger.info("=" * 50)
             logger.info("All tasks completed.")
             notify.try_send_notification(Resource.task_notificationTitle, Resource.task_notificationMessage)
         except Exception as e:
