@@ -1,6 +1,6 @@
 from SRACore.task import BaseTask
 from SRACore.util.logger import logger
-from tasks.img import IMG, RRIMG
+from tasks.img import IMG, RRIMG, DUIMG
 
 
 class ReceiveRewardsTask(BaseTask):
@@ -280,7 +280,7 @@ class ReceiveRewardsTask(BaseTask):
             self.operator.sleep(2)
             self.operator.click_img(IMG.ENSURE)
             self.operator.sleep(3)
-            if self.operator.click_img(IMG.CLOSE):
+            if self.operator.click_img(DUIMG.CLOSE):
                 logger.info("合成完毕，返回领取奖励")
             self.operator.sleep(1.5)
             self.operator.press_key("esc",presses=1, interval=1.5)
@@ -311,7 +311,7 @@ class ReceiveRewardsTask(BaseTask):
                 return False
             self.operator.sleep(1)
             for _ in range(5):
-                if not self.operator.click_img(IMG.CLOSE):
+                if not self.operator.click_img(DUIMG.CLOSE):
                     self.operator.click_img(RRIMG.UPGRADE_MATERIALS)
                     logger.info("更换升级材料为四星及以下")
                     self.operator.sleep(1)
