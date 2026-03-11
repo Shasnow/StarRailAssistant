@@ -41,7 +41,7 @@ class CosmicStrifeTask(BaseTask):
             rs_task.load_strategy(strategy)
             rs_task.set_boss_affix(self.config.get("CwRsBossAffixes", ""))
             rs_task.set_invest_env(self.config.get("CwRsInvestEnvironments", ""))
-            rs_task.set_invest_strategy(self.config.get("CwRsInvestStrategies", ""), self.config.get("CwRsInvestStrategyStage"))
+            rs_task.set_invest_strategy(self.config.get("CwRsInvestStrategies", ""), self.config.get("CwRsInvestStrategyStage", 1))
             if not rs_task.run():
                 logger.error("旷宇纷争-货币战争刷开局任务失败")
                 return False

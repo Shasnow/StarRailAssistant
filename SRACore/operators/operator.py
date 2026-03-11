@@ -1,14 +1,17 @@
 import ctypes
-from ctypes.wintypes import RECT, POINT
+import time
+from ctypes.wintypes import POINT, RECT
 from pathlib import Path
+from typing import cast
 
-import cv2
 import pyautogui
 import pygetwindow
 import pyscreeze
 
-from SRACore.operators.ioperator import *
-from SRACore.util.errors import SRAError, ErrorCode
+from SRACore.operators.ioperator import IOperator
+from SRACore.operators.model import Box, Region
+from SRACore.util.errors import ErrorCode, SRAError
+from SRACore.util.logger import logger
 
 
 class Operator(IOperator):
@@ -92,6 +95,8 @@ class Operator(IOperator):
     def screenshot_in_region(self, region: Region | None = None):
         if region is None:
             region = self.get_win_region(active_window=True)
+            if region is None:# 兜底，并非重复判断
+                return pyscreeze.screenshot()
         # 保护：避免出现宽或高为 0 的区域
         if region.width <= 0 or region.height <= 0:
             # 尝试使用未对齐的窗口区域重新计算
@@ -105,6 +110,8 @@ class Operator(IOperator):
 
     def screenshot_in_tuple(self, from_x: float, from_y: float, to_x: float, to_y: float):
         region = self.get_win_region()
+        if region is None:
+            return pyscreeze.screenshot()
         return pyscreeze.screenshot(region=region.sub_region(from_x,from_y,to_x,to_y).tuple)
 
     def locate_in_region(self,
@@ -113,16 +120,16 @@ class Operator(IOperator):
                          confidence: float | None = None,
                          trace: bool = True,
                          **_) -> Box | None:
-        if confidence is None:
-            confidence = self.confidence
+        match_confidence = self.confidence if confidence is None else confidence
         try:
             if region is None:
                 region = self.get_win_region()
                 time.sleep(0.5)
             if not Path(img_path).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
-            img = cv2.imread(img_path)
-            box = pyscreeze.locate(img, self.screenshot(region), confidence=confidence)
+            box = pyscreeze.locate(img_path, self.screenshot(region), confidence=match_confidence)
+            if box is None:
+                return None
             return Box(box.left, box.top, box.width, box.height, source=img_path)
         except Exception as e:
             if trace:
@@ -136,12 +143,16 @@ class Operator(IOperator):
         except Exception as e:
             logger.trace(f"ImageNotFound: {templates} -> {e}")
             return None
-        return self.locate_in_region(templates, region.sub_region(from_x, from_y, to_x, to_y), confidence, trace)
+        return self.locate_in_region(
+            templates,
+            cast(Region, region).sub_region(from_x, from_y, to_x, to_y),
+            confidence,
+            trace,
+        )
 
     def locate_any_in_region(self, templates: list[str], region: Region | None = None, confidence: float | None = None,
                              trace: bool = True) -> tuple[int, Box | None]:
-        if confidence is None:
-            confidence = self.confidence
+        match_confidence = self.confidence if confidence is None else confidence
         try:
             screenshot = self.screenshot(region=region)
         except Exception as e:
@@ -150,9 +161,8 @@ class Operator(IOperator):
         for img_path in templates:
             if not Path(img_path).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
-            img = cv2.imread(img_path)
             try:
-                box = pyscreeze.locate(img, screenshot, confidence=confidence)
+                box = pyscreeze.locate(img_path, screenshot, confidence=match_confidence)
             except pyscreeze.ImageNotFoundException as e:
                 if trace:
                     logger.trace(f"ImageNotFound: {img_path} -> {e}")
@@ -172,20 +182,23 @@ class Operator(IOperator):
         except Exception as e:
             logger.trace(f"UnexceptedInterrupt: {templates} -> {e}")
             return -1, None
-        return self.locate_any_in_region(templates, region.sub_region(from_x, from_y, to_x, to_y), confidence, trace)
+        return self.locate_any_in_region(
+            templates,
+            cast(Region, region).sub_region(from_x, from_y, to_x, to_y),
+            confidence,
+            trace,
+        )
 
     def locate_all_in_region(self, template: str, region: Region | None = None, confidence: float | None = None,
                              trace: bool = True) -> list[Box] | None:
-        if confidence is None:
-            confidence = self.confidence
+        match_confidence = self.confidence if confidence is None else confidence
         try:
             if region is None:
                 region = self.get_win_region()
                 time.sleep(0.5)
             if not Path(template).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + template)
-            img = cv2.imread(template)
-            boxes = pyscreeze.locateAll(img, self.screenshot(region), confidence=confidence)
+            boxes = pyscreeze.locateAll(template, self.screenshot(region), confidence=match_confidence)
             result = []
             for box in boxes:
                 result.append(Box(box.left, box.top, box.width, box.height, source=template))
@@ -202,7 +215,12 @@ class Operator(IOperator):
         except Exception as e:
             logger.trace(f"ImageNotFound: {template} -> {e}")
             return None
-        return self.locate_all_in_region(template, region.sub_region(from_x, from_y, to_x, to_y), confidence, trace)
+        return self.locate_all_in_region(
+            template,
+            cast(Region, region).sub_region(from_x, from_y, to_x, to_y),
+            confidence,
+            trace,
+        )
 
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
                     after_sleep: float = 0, tag: str = "") -> bool:
@@ -301,7 +319,7 @@ class Operator(IOperator):
     def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace:bool = True) -> bool:
         try:
             if trace:
-                logger.debug(f"Mouse up")
+                logger.debug("Mouse up")
             pyautogui.mouseUp()
             return True
         except Exception as e:

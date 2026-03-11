@@ -6,7 +6,7 @@ import win32crypt
 def win_decryptor(entropy: str | None = None) -> str:
     """使用Windows DPAPI解密数据"""
 
-    if entropy == "":
+    if not entropy:
         return ""
     try:
         encrypted_bytes = base64.b64decode(entropy)
@@ -20,5 +20,5 @@ def win_decryptor(entropy: str | None = None) -> str:
         )[1]  # 返回元组，第2个元素是解密后的字节
         return decrypted_bytes.decode("utf-8")
 
-    except Exception as e:
+    except Exception:
         return ""
