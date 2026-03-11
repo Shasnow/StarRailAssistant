@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -23,6 +24,8 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     
     private const string BaseDownloadUrl2 =
         "https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant-{version}.zip";
+    private const string BaseSha256Url =
+        "https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant-{version}.sha256";
     
     private const string BaseCoreDownloadUrl =
         "https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant_Core_{version}.zip";
@@ -85,77 +88,68 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     /// <param name="versionResponse">版本响应模型</param>
     /// <param name="downloadChannel">下载渠道</param>
     /// <param name="statusProgress">下载状态回调</param>
-    /// <param name="proxies">代理列表</param>
     /// <param name="cancellationToken">取消下载Token</param>
     /// <returns>更新文件的路径</returns>
-    /// <exception cref="InvalidOperationException">下载地址无效或下载失败</exception>
     /// <exception cref="Exception"></exception>
     public async Task<string> DownloadUpdateAsync(
         VersionResponse versionResponse,
         int downloadChannel,
         IProgress<DownloadStatus> statusProgress,
-        IEnumerable<string>? proxies = null,
         CancellationToken cancellationToken = default
     )
     {
-        // 确定下载URL和保存路径
+        var version = versionResponse.Data.VersionName;
         var downloadUrl = GetDownloadUrl(versionResponse, downloadChannel);
-        if (string.IsNullOrEmpty(downloadUrl))
-            throw new InvalidOperationException("Could not determine download URL.");
+        var sha256 = await GetSha256Async(versionResponse, cancellationToken);
 
-        var saveFileName = $"update_{versionResponse.Data.VersionName}.zip";
+        var saveFileName = $"update_{version}.zip";
         var savePath = Path.Combine(PathString.TempSraDir, saveFileName);
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
 
-        // 下载候选地址（代理+直连）
-        var downloadCandidates = new List<string>();
-        if (downloadChannel==1)
+        // 1. 如果已有文件，则先校验
+        if (File.Exists(savePath))
         {
-            if (proxies is not null)
-                downloadCandidates.AddRange(proxies.Select(proxy =>
-                    $"{proxy.TrimEnd('/')}/{downloadUrl.TrimStart('/')}"));
+            logger.LogInformation("Found existing update file, verifying SHA256: {Path}", savePath);
+            if (await VerifyFileSha256Async(savePath, sha256, cancellationToken))
+            {
+                logger.LogInformation("Existing update file passed SHA256 verification, reuse it.");
+                return savePath;
+            }
+
+            logger.LogWarning("Existing update file failed SHA256 verification, deleting: {Path}", savePath);
+            File.Delete(savePath);
         }
-        downloadCandidates.Add(downloadUrl);
 
-        // 尝试下载
+        // 2. 下载文件
         var httpClient = httpClientFactory.CreateClient("GlobalClient");
-        var downloadSuccess = false;
-        Exception? lastException = null;
-        foreach (var candidateUrl in downloadCandidates)
-            try
-            {
-                logger.LogDebug("Try downloading update from: {Url} ", candidateUrl);
-                await DownloadUtil.DownloadFileWithDetailsAsync(
-                    httpClient,
-                    candidateUrl,
-                    savePath,
-                    statusProgress,
-                    cancellationToken
-                );
-                downloadSuccess = true;
-                break;
-            }
-            catch (Exception ex)
-            {
-                lastException = ex;
-                statusProgress.Report(new DownloadStatus { ProgressPercent = -1 }); // 代理失败标记
-                await Task.Delay(1000, cancellationToken);
-            }
+        logger.LogDebug("Downloading update");
+        await DownloadUtil.DownloadFileWithDetailsAsync(
+            httpClient,
+            downloadUrl,
+            savePath,
+            statusProgress,
+            cancellationToken
+        );
 
-        if (downloadSuccess) return savePath;
-        
-        if (File.Exists(savePath)) File.Delete(savePath);
-        throw lastException ?? new InvalidOperationException("Failed to download update.");
+        // 3. 下载后再校验一次
+        if (!await VerifyFileSha256Async(savePath, sha256, cancellationToken))
+        {
+            File.Delete(savePath);
+            throw new InvalidOperationException("Downloaded update file failed SHA256 verification.");
+        }
 
+        return savePath;
     }
 
+    /// <summary>
+    /// 异步下载热更新包，并在下载后进行 SHA256 校验（沿用主程序的 .sha256）。
+    /// </summary>
     public async Task<string> DownloadHotfixAsync(
         VersionResponse versionResponse,
         IProgress<DownloadStatus> statusProgress,
         CancellationToken cancellationToken = default
     )
     {
-        // 确定下载URL和保存路径
         var hotfixVersion = versionResponse.Data.VersionName;
         var downloadUrl = BaseCoreDownloadUrl.Replace("{version}", hotfixVersion);
         logger.LogDebug("Downloading hotfix from URL: {Url}", downloadUrl);
@@ -163,7 +157,6 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         var savePath = Path.Combine(PathString.TempSraDir, saveFileName);
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
 
-        // 尝试下载
         var httpClient = httpClientFactory.CreateClient("GlobalClient");
         await DownloadUtil.DownloadFileWithDetailsAsync(
             httpClient,
@@ -172,6 +165,14 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
             statusProgress,
             cancellationToken
         );
+
+        // 使用主程序的 sha256 校验热更包的一致性（如果服务端有单独的校验地址，可再扩展）
+        var sha256 = await GetSha256Async(versionResponse, cancellationToken);
+        if (!await VerifyFileSha256Async(savePath, sha256, cancellationToken))
+        {
+            File.Delete(savePath);
+            throw new InvalidOperationException("Downloaded hotfix file failed SHA256 verification.");
+        }
 
         return savePath;
     }
@@ -184,5 +185,41 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         if (downloadChannel == 1)
             return BaseDownloadUrl.Replace("{version}", versionResponse.Data.VersionName);
         return versionResponse.Data.Url;
+    }
+
+    /// <summary>
+    /// 获取指定版本的 SHA256 字符串。
+    /// </summary>
+    private async Task<string> GetSha256Async(VersionResponse versionResponse, CancellationToken cancellationToken)
+    {
+        if (!string.IsNullOrEmpty(versionResponse.Data.Sha256))
+            return versionResponse.Data.Sha256;
+        var url = BaseSha256Url.Replace("{version}", versionResponse.Data.VersionName);
+        var httpClient = httpClientFactory.CreateClient("GlobalClient");
+        logger.LogDebug("Fetching SHA256");
+        var response = await httpClient.GetAsync(url, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        // 服务器返回为纯哈希字符串，去掉首尾空白即可
+        return content.Trim().ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// 校验本地文件的 SHA256 是否与远端一致。
+    /// </summary>
+    private static async Task<bool> VerifyFileSha256Async(string filePath, string expectedSha256, CancellationToken cancellationToken)
+    {
+        if (!File.Exists(filePath)) return false;
+        if (string.IsNullOrEmpty(expectedSha256)) return true;
+
+        await using var stream = File.OpenRead(filePath);
+        using var sha256 = SHA256.Create();
+        var hash = await sha256.ComputeHashAsync(stream, cancellationToken);
+        var sb = new StringBuilder(hash.Length * 2);
+        foreach (var b in hash)
+            sb.Append(b.ToString("x2"));
+        var actual = sb.ToString().ToLowerInvariant();
+        return string.Equals(actual, expectedSha256, StringComparison.OrdinalIgnoreCase);
     }
 }
