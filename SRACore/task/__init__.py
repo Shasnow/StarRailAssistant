@@ -24,7 +24,7 @@ class BaseTask(Executable, ABC):
         pass
 
     @abstractmethod
-    def run(self):
+    def run(self) -> bool:
         pass
 
     def stop(self):

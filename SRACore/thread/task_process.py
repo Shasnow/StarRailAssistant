@@ -1,13 +1,16 @@
 import importlib
+
 import tomllib
 
 from SRACore.localization import Resource
 from SRACore.operators import Operator
 from SRACore.task import BaseTask
-from SRACore.util import encryption  # NOQA 有动态用法，确保被打包
-from SRACore.util import notify
-from SRACore.util import sys_util  # NOQA 有动态用法，确保被打包
-from SRACore.util.data_persister import load_config, load_cache
+from SRACore.util import (
+    encryption,  # NOQA 有动态用法，确保被打包
+    notify,
+    sys_util,  # NOQA 有动态用法，确保被打包
+)
+from SRACore.util.data_persister import load_cache, load_config
 from SRACore.util.logger import logger, setup_logger
 
 
@@ -161,7 +164,7 @@ class TaskManager:
                 logger.error(Resource.task_taskFailed(str(task_instance)))
             else:
                 logger.info(Resource.task_taskCompleted(str(task_instance)))
-            return bool(result)
+            return result if result is not None else False
         except Exception as e:
             logger.exception(Resource.task_taskCrashed(task, str(e)))
             return False

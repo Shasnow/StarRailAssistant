@@ -1,7 +1,8 @@
 import ctypes
 import time
-from ctypes.wintypes import RECT, POINT
+from ctypes.wintypes import POINT, RECT
 from pathlib import Path
+from typing import cast
 
 import pyautogui
 import pygetwindow
@@ -9,7 +10,7 @@ import pyscreeze
 
 from SRACore.operators.ioperator import IOperator
 from SRACore.operators.model import Box, Region
-from SRACore.util.errors import SRAError, ErrorCode
+from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
 
 
@@ -119,13 +120,11 @@ class Operator(IOperator):
                          confidence: float | None = None,
                          trace: bool = True,
                          **_) -> Box | None:
-        match_confidence = float(self.confidence if confidence is None else confidence)
+        match_confidence = self.confidence if confidence is None else confidence
         try:
             if region is None:
                 region = self.get_win_region()
                 time.sleep(0.5)
-            if region is None:
-                return None
             if not Path(img_path).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
             box = pyscreeze.locate(img_path, self.screenshot(region), confidence=match_confidence)
@@ -144,13 +143,16 @@ class Operator(IOperator):
         except Exception as e:
             logger.trace(f"ImageNotFound: {templates} -> {e}")
             return None
-        if region is None:
-            return None
-        return self.locate_in_region(templates, region.sub_region(from_x, from_y, to_x, to_y), confidence, trace)
+        return self.locate_in_region(
+            templates,
+            cast(Region, region).sub_region(from_x, from_y, to_x, to_y),
+            confidence,
+            trace,
+        )
 
     def locate_any_in_region(self, templates: list[str], region: Region | None = None, confidence: float | None = None,
                              trace: bool = True) -> tuple[int, Box | None]:
-        match_confidence = float(self.confidence if confidence is None else confidence)
+        match_confidence = self.confidence if confidence is None else confidence
         try:
             screenshot = self.screenshot(region=region)
         except Exception as e:
@@ -180,19 +182,20 @@ class Operator(IOperator):
         except Exception as e:
             logger.trace(f"UnexceptedInterrupt: {templates} -> {e}")
             return -1, None
-        if region is None:
-            return -1, None
-        return self.locate_any_in_region(templates, region.sub_region(from_x, from_y, to_x, to_y), confidence, trace)
+        return self.locate_any_in_region(
+            templates,
+            cast(Region, region).sub_region(from_x, from_y, to_x, to_y),
+            confidence,
+            trace,
+        )
 
     def locate_all_in_region(self, template: str, region: Region | None = None, confidence: float | None = None,
                              trace: bool = True) -> list[Box] | None:
-        match_confidence = float(self.confidence if confidence is None else confidence)
+        match_confidence = self.confidence if confidence is None else confidence
         try:
             if region is None:
                 region = self.get_win_region()
                 time.sleep(0.5)
-            if region is None:
-                return None
             if not Path(template).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + template)
             boxes = pyscreeze.locateAll(template, self.screenshot(region), confidence=match_confidence)
@@ -212,9 +215,12 @@ class Operator(IOperator):
         except Exception as e:
             logger.trace(f"ImageNotFound: {template} -> {e}")
             return None
-        if region is None:
-            return None
-        return self.locate_all_in_region(template, region.sub_region(from_x, from_y, to_x, to_y), confidence, trace)
+        return self.locate_all_in_region(
+            template,
+            cast(Region, region).sub_region(from_x, from_y, to_x, to_y),
+            confidence,
+            trace,
+        )
 
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
                     after_sleep: float = 0, tag: str = "") -> bool:
