@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
@@ -215,7 +216,8 @@ public class CommonModel(
         // var currentVersion = SemVerParser.Parse(Settings.Version)!;
         // var isHotfix = VersionHelper.IsHotfix(currentVersion, remoteVersion);
         var isHotfix = false; // 这是以后可能会用到的妙妙小工具
-        var (progressPanel, progressBar, sizeLabel) = BuildDownloadProgressUi();
+        var (progressPanel, progressBar, sizeLabel, cts) = BuildDownloadProgressUi();
+        
         var toastBuilder = CreateStandardToastBuilder("正在下载...", progressPanel, NotificationType.Information);
         var downloadToast = toastBuilder.Queue();
         // 禁用自动关闭
@@ -226,23 +228,29 @@ public class CommonModel(
             progressBar.Value = value.ProgressPercent;
             sizeLabel.Content = $"{value.FormattedDownloadedSize} / {value.FormattedTotalSize} {value.FormattedSpeed}";
         });
-        var proxies = settingsService.Settings.Proxies;
         var downloadChannel = settingsService.Settings.DownloadChannel;
         string downloadFilePath;
         try
         {
             downloadFilePath = isHotfix
-                ? await updateService.DownloadHotfixAsync(versionResponse, progressHandler)
-                : await updateService.DownloadUpdateAsync(versionResponse, downloadChannel, progressHandler,
-                    proxies);
-            toastManager.Dismiss(downloadToast);
+                ? await updateService.DownloadHotfixAsync(versionResponse, progressHandler, cts.Token)
+                : await updateService.DownloadUpdateAsync(versionResponse, downloadChannel, progressHandler, cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogInformation("Update download canceled by user");
+            ShowWarningToast("下载已取消", "您已取消更新包的下载");
+            return;
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error downloading update");
-            toastManager.Dismiss(downloadToast);
             ShowErrorToast("下载更新失败", $"发生错误：{e.Message}");
             return;
+        }
+        finally
+        {
+            toastManager.Dismiss(downloadToast);
         }
 
         ShowSuccessToast("下载完成", "更新包将在3秒后解压");
@@ -453,11 +461,22 @@ public class CommonModel(
     /// <summary>
     ///     构建下载进度 UI（代码复用）
     /// </summary>
-    private (StackPanel ProgressPanel, ProgressBar ProgressBar, Label SizeLabel) BuildDownloadProgressUi()
+    private (StackPanel ProgressPanel, ProgressBar ProgressBar, Label SizeLabel, CancellationTokenSource Cts) BuildDownloadProgressUi()
     {
         var progressBar = new ProgressBar { Value = 0, ShowProgressText = true };
         var sizeLabel = new Label { Content = "连接中..." };
-        var progressPanel = new StackPanel { Children = { sizeLabel, progressBar } };
-        return (progressPanel, progressBar, sizeLabel);
+        var cancelButton = new Button { Content = "取消下载" };
+        var cts = new CancellationTokenSource();
+        cancelButton.Click += (_, _) =>
+        {
+            if (!cts.IsCancellationRequested)
+            {
+                cts.Cancel();
+                sizeLabel.Content = "正在取消...";
+                cancelButton.IsEnabled = false;
+            }
+        };
+        var progressPanel = new StackPanel { Children = { sizeLabel, progressBar, cancelButton } };
+        return (progressPanel, progressBar, sizeLabel, cts);
     }
 }
