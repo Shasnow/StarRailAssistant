@@ -180,7 +180,10 @@ class StartGameTask(BaseTask):
 
     def logout(self):
         logger.info("登出账号")
-        box = self.operator.wait_ocr("登出", timeout=60, interval=1, from_x=0.9375, from_y=0.1204, to_x=0.96875, to_y=0.3935)
+        idx, box = self.operator.wait_ocr_any(["登出", "登入"], timeout=60, interval=1, from_x=0.9375, from_y=0.1204, to_x=0.96875, to_y=0.3935)
+        if idx==1:
+            # 已经在登录界面，无需登出
+            return True
         if box:
             self.operator.click_box(box, after_sleep=1)
             if not self.operator.click_img(IMG.QUIT2, after_sleep=1):
