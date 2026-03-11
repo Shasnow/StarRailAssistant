@@ -18,6 +18,8 @@
 🎮 崩坏星穹铁道自动化助手  
 如果您在使用的过程中遇到问题，请先阅读[问题排查](https://starrailassistant.top/trouble/having_trouble.html)。
 
+如果项目对您有帮助，欢迎点个Star⭐支持一下！
+
 ## ❓ 什么是SRA？
 
 🤖 一个基于图像识别的崩铁自动化程序，帮您完成从启动到退出的崩铁日常。

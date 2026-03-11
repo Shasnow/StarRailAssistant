@@ -91,15 +91,6 @@ public static class DownloadUtil
             ProgressPercent = 100
         });
     }
-    
-    public static bool Md5Check(string filePath, string expectedMd5)
-    {
-        using var md5 = System.Security.Cryptography.MD5.Create();
-        using var stream = File.OpenRead(filePath);
-        var hash = md5.ComputeHash(stream);
-        var fileMd5 = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-        return fileMd5.Equals(expectedMd5, StringComparison.InvariantCultureIgnoreCase);
-    }
 }
 
 /// <summary>
