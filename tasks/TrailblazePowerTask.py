@@ -1,12 +1,35 @@
+from typing import Any, Callable, TypedDict, cast
+
 import tomllib
-from typing import Any, Callable
 
+from SRACore.operators.model import Box
 from SRACore.task import BaseTask
-from SRACore.util.logger import logger
 from SRACore.util.errors import ErrorCode, SRAError
-from tasks.img import TPIMG, IMG
+from SRACore.util.logger import logger
+from tasks.img import IMG, TPIMG
 
-type TrailblazePowerFunc = Callable[[int, int, int], bool]
+type TrailblazePowerFunc = Callable[..., bool]
+
+
+class TrailblazePowerArgs(TypedDict):
+    level: int
+    single_time: int
+    run_time: int
+
+
+class AutoDetectTask(TypedDict):
+    Name: str
+    Id: str
+    Level: int
+
+
+class SubtaskInfo(TypedDict, total=False):
+    name: str
+    func: str
+    cost: int
+    max_count: int
+    levels: list[str]
+    results: list[str]
 
 
 class TrailblazePowerTask(BaseTask):
@@ -14,11 +37,11 @@ class TrailblazePowerTask(BaseTask):
         with open(r"tasks/config/trailblaze_power.toml", "rb") as tf:
             self.task_config = tomllib.load(tf)
 
-        self.replenish_time = self.config.get('TrailblazePowerReplenishTimes')
-        self.replenish_way = self.config.get('TrailblazePowerReplenishWay')
-        self.replenish_flag = self.config.get('TrailblazePowerReplenishEnable')
-        self.manual_tasks: list[tuple[TrailblazePowerFunc, dict[str, Any]]] = list()
-        self.auto_detect_tasks = list()
+        self.replenish_time: int = int(self.config.get('TrailblazePowerReplenishTimes', 0) or 0)
+        self.replenish_way: int = int(self.config.get('TrailblazePowerReplenishWay', 0) or 0)
+        self.replenish_flag: bool = bool(self.config.get('TrailblazePowerReplenishEnable', False))
+        self.manual_tasks: list[tuple[TrailblazePowerFunc, TrailblazePowerArgs]] = list()
+        self.auto_detect_tasks: list[AutoDetectTask] = list()
 
     def run(self):
         self.manual_tasks.clear()
@@ -44,16 +67,20 @@ class TrailblazePowerTask(BaseTask):
 
     def init_custom_tasklist(self):
         """初始化自定义任务清单"""
-        tasklist: list[dict[str, Any]] = self.config['TrailblazePowerTaskList']
+        tasklist = cast(list[dict[str, Any]], self.config['TrailblazePowerTaskList'])
         for task in tasklist:
             if task.get("AutoDetect", False):
-                self.auto_detect_tasks.append(task)
+                self.auto_detect_tasks.append({
+                    "Name": cast(str, task.get("Name", task["Id"])),
+                    "Id": cast(str, task["Id"]),
+                    "Level": cast(int, task["Level"])
+                })
             else:
                 self.manual_tasks.append((
-                    self.get_task_by_id(task["Id"]),
-                    {"level": task["Level"],
-                     "single_time": task["Count"],
-                     "run_time": task["RunTimes"]}
+                    self.get_task_by_id(cast(str, task["Id"])),
+                    {"level": cast(int, task["Level"]),
+                     "single_time": cast(int, task["Count"]),
+                     "run_time": cast(int, task["RunTimes"])}
                 ))
 
     def detect_build_target_tasklist(self):
@@ -69,6 +96,11 @@ class TrailblazePowerTask(BaseTask):
         for box in boxes:
             self.operator.click_box(box, x_offset=-520, after_sleep=1)  # 点击体力图标左侧位置, 检测目标材料
             raw_res = self.operator.ocr(from_x=0.4, from_y=0.25, to_x=0.6, to_y=0.35)
+            if not raw_res:# OCR结果为空的处理逻辑仅参考
+                logger.warning("培养目标OCR识别为空，跳过当前目标")
+                self.operator.press_key('esc')
+                self.operator.sleep(1)
+                continue
             res = "".join(t[1] for t in raw_res).replace('-', "一")  # OCR结果拼接并替换可能的错误字符
             logger.info(f"识别到所需物品: {res}")
             target_objects.append(res)
@@ -77,10 +109,12 @@ class TrailblazePowerTask(BaseTask):
 
         for obj in target_objects:
             # 从配置文件中匹配产物对应的副本任务
-            for subtask_id, subtask_info in self.task_config.get("subtasks").items():
-                subtask_results = subtask_info.get("results")
-                if subtask_results is None:
-                    continue
+            subtasks = cast(dict[str, SubtaskInfo] | None, self.task_config.get("subtasks"))
+            if subtasks is None:
+                logger.error(SRAError(ErrorCode.NO_BUILD_TARGET, "培养目标配置缺少 subtasks"))
+                return
+            for subtask_id, subtask_info in subtasks.items():
+                subtask_results = subtask_info.get("results", [])
                 found = False  # 标记是否找到对应结果
                 for index, r in enumerate(subtask_results):
                     if obj in r:
@@ -94,8 +128,9 @@ class TrailblazePowerTask(BaseTask):
                                 "run_time": 1
                             }))
                         else:
+                            task_name = subtask_info.get("name", subtask_id)
                             self.auto_detect_tasks.append(
-                                {"Name": subtask_info.get("name"),
+                                {"Name": task_name,
                                  "Id": subtask_id,
                                  "Level": index + 1
                                  })
@@ -105,7 +140,7 @@ class TrailblazePowerTask(BaseTask):
                 if found:
                     break
 
-    def detect_tasks(self) -> list[Any] | None:
+    def detect_tasks(self) -> list[tuple[TrailblazePowerFunc, TrailblazePowerArgs]] | None:
         """
         识别体力值并计算可执行的任务列表
         返回：任务列表（格式：[(任务对象, {"level": 等级, "single_time": 单次次数, "run_time": 执行轮数})]）
@@ -142,8 +177,13 @@ class TrailblazePowerTask(BaseTask):
             logger.warning(SRAError(ErrorCode.NO_POWER, "当前体力为0，无任务可执行"))
             return None
         # 计算每个任务的可执行次数
-        tasks_count = len(self.auto_detect_tasks)
-        task_cost_list = [self.get_cost_by_id(task.get("Id")) for task in self.auto_detect_tasks]  # 获取任务体力消耗列表
+        valid_auto_tasks = self.auto_detect_tasks
+        if not valid_auto_tasks:
+            logger.warning(SRAError(ErrorCode.NO_BUILD_TARGET, "未识别到可执行任务"))
+            return None
+
+        tasks_count = len(valid_auto_tasks)
+        task_cost_list = [self.get_cost_by_id(task["Id"]) for task in valid_auto_tasks]  # 获取任务体力消耗列表
         sum_cost = sum(task_cost_list)
         min_cost = min(task_cost_list)
         base = ava_current_tbp // sum_cost  # 基础可执行次数
@@ -165,7 +205,7 @@ class TrailblazePowerTask(BaseTask):
 
         # 生成最终任务列表
         tasks = []
-        for i, item in enumerate(self.auto_detect_tasks):
+        for i, item in enumerate(valid_auto_tasks):
             task_func = self.get_task_by_id(item["Id"])
             run_time = tasks_times[i]
             logger.info(f"任务 {item['Name']} ({item['Level']}) 将执行 {run_time} 次")
@@ -185,25 +225,33 @@ class TrailblazePowerTask(BaseTask):
                 run_time -= single_time
         return tasks if tasks else None
 
-    def _get_task_detail_by_id(self, detail: str, task_id: str):
+    def _get_subtask_info(self, task_id: str) -> SubtaskInfo:
         """任务ID转任务详情"""
         task_info = self.task_config.get("subtasks", {}).get(task_id)
-        if not task_info:
+        if task_info is None:
             raise RuntimeError("Invalid task ID")
-        return task_info.get(detail)
+        return task_info
 
     def get_task_by_id(self, task_id: str) -> TrailblazePowerFunc:
         """任务ID转任务函数"""
-        task_func = self._get_task_detail_by_id("func", task_id)
+        task_func = self._get_subtask_info(task_id).get("func")
+        if task_func is None:
+            raise RuntimeError("Invalid task func")
         return getattr(self, task_func)
 
-    def get_cost_by_id(self, task_id: str):
+    def get_cost_by_id(self, task_id: str) -> int:
         """任务ID转任务体力消耗"""
-        return self._get_task_detail_by_id("cost", task_id)
+        task_cost = self._get_subtask_info(task_id).get("cost")
+        if task_cost is None:
+            raise RuntimeError("Invalid task cost")
+        return task_cost
 
-    def get_max_count_by_id(self, task_id: str):
+    def get_max_count_by_id(self, task_id: str) -> int:
         """任务ID转任务最大单次执行次数"""
-        return self._get_task_detail_by_id("max_count", task_id)
+        max_count = self._get_subtask_info(task_id).get("max_count")
+        if max_count is None:
+            raise RuntimeError("Invalid task max_count")
+        return max_count
 
     def ornament_extraction(self, level, single_time: int | None = None, run_time=1, **_) -> bool:
         """Ornament extraction
@@ -338,7 +386,7 @@ class TrailblazePowerTask(BaseTask):
                 None
         """
         logger.info(f"执行任务：{mission_name}")
-        level_path = f"{TPIMG.BASE}/{level_belonging} ({level}).png"
+        level_path = TPIMG.level(level_belonging, level)
         if not self.find_session(level_belonging, scroll_flag):
             return False
         if not self.find_level(level_path):
@@ -419,8 +467,7 @@ class TrailblazePowerTask(BaseTask):
                     if not self.operator.click_img(TPIMG.QUIT_BATTLE):
                         logger.error(SRAError(ErrorCode.QUIT_BATTLE_FAILED, "退出战斗失败"))
                     logger.info("退出战斗")
-                    result, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER],
-                                                           timeout=10)
+                    result, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER],timeout=10)
                     if result == 0:
                         self.operator.press_key("esc", wait=1)
                     elif result == 1:
@@ -540,8 +587,8 @@ class TrailblazePowerTask(BaseTask):
         self.operator.click_img(IMG.ENSURE2, after_sleep=1)
 
     def find_session(self, name, scroll_flag=False):
-        name1 = f"{TPIMG.BASE}/{name}.png"
-        name2 = f"{TPIMG.BASE}/{name}_onclick.png"
+        name1 = TPIMG.session(name)
+        name2 = TPIMG.session(name, onclick=True)
         if not self.goto_survival_index():
             return False
         if scroll_flag:
@@ -632,7 +679,7 @@ class TrailblazePowerTask(BaseTask):
             return True
         elif index == 1:
             # 生存索引页面，点击进入
-            self.operator.click_box(box)
+            self.operator.click_box(cast(Box, box))
             return self.operator.wait_img(IMG.SURVIVAL_INDEX_ONCLICK, timeout=10) is not None
         elif index == 0:
             # 主页面，按快捷键进入生存索引页面

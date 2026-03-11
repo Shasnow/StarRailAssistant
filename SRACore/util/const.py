@@ -21,4 +21,5 @@ AppPath = Path(os.path.dirname(os.path.realpath(sys.argv[0])))
 VERSION = "2.8.0-beta.7"  # 版本号
 CORE = f"{VERSION} on {sys.platform}"  # 核心版本信息
 
-AppDataSraDir = Path(os.getenv("APPDATA") if sys.platform == "win32" else os.path.expanduser("~/.config")) / "SRA"
+_appdata_base = os.getenv("APPDATA") if sys.platform == "win32" else os.path.expanduser("~/.config")
+AppDataSraDir = Path(_appdata_base or os.path.expanduser("~/.config")) / "SRA"
