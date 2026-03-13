@@ -90,7 +90,14 @@
 
                             <StackPanel IsVisible="{Binding !IsCwNormalMode}" Margin="0,4,0,0" Spacing="4">
                                 <TextBlock Foreground="Gray"
-                                           Text="下方可配置需要的投资环境与投资策略（用空格分隔多个）。" />
+                                           Text="下方可配置Boss名称、Boss词条、投资环境与投资策略。Boss名称用分号分隔，其他项用空格分隔多个。" />
+
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label Content="Boss名称" />
+                                    <TextBox Width="320"
+                                             Text="{Binding CurrentConfig.CwRsBossNames}"
+                                             Watermark="例如：杰帕德;可可利亚;幻胧" />
+                                </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="Boss词条" />

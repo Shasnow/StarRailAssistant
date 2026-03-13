@@ -1,7 +1,7 @@
 from SRACore.util.logger import logger
+from tasks.img import CWIMG, IMG
 
 from .CurrencyWars import CurrencyWars
-from tasks.img import CWIMG, IMG
 
 
 class RerollStart(CurrencyWars):
@@ -10,6 +10,12 @@ class RerollStart(CurrencyWars):
     BOSS_AFFIX_FROM_Y = 0.861
     BOSS_AFFIX_TO_X = 0.625
     BOSS_AFFIX_TO_Y = 0.954
+
+    # Boss名称OCR区域（基于1920x1080截图坐标: 125,700-990,740）
+    BOSS_NAME_FROM_X = 0.065
+    BOSS_NAME_FROM_Y = 0.648
+    BOSS_NAME_TO_X = 0.516
+    BOSS_NAME_TO_Y = 0.685
 
     # 投资策略OCR区域（基于1920x1080截图坐标: 270,455-1650,510）
     INVEST_STRATEGY_OCR_FROM_X = 0.141
@@ -29,11 +35,16 @@ class RerollStart(CurrencyWars):
         self.wanted_invest_env = None  # 需要的投资环境
         self.optional_invest_env = None  # 可选的投资环境
         self.wanted_invest_strategy = None  # 必须出现的投资策略
+        self.wanted_boss_names = None  # 需要的Boss名称
         self.wanted_boss_affix = None  # 必须出现的boss词缀
         self.hate_boss_affix = None  # 讨厌的boss词缀，出现就重开
         self.invest_strategy_stage = 0  # 投资策略阶段
         self.invest_strategy_stage_limit = 2  # 投资策略阶段上限，超过后不再检测投资策略
         self.invest_strategy_satisfied = False  # 满意标志
+
+    @staticmethod
+    def _normalize_ocr_text(text: str) -> str:
+        return text.strip().replace("·", "").replace("•", "").replace("?", "").replace(" ", "")
 
     def set_invest_env(self, invest_env: str):
         """设置投资环境"""
@@ -49,9 +60,20 @@ class RerollStart(CurrencyWars):
     def set_invest_strategy(self, invest_strategy: str, invest_strategy_stage_limit: int = 2):
         """设置投资策略"""
         def clean_strategy(s):
-            return s.strip().replace("·", "").replace("•", "").replace("?", "")  # 去除常见的干扰字符
+            return self._normalize_ocr_text(s)  # 去除常见的干扰字符
         self.wanted_invest_strategy = list(map(clean_strategy, invest_strategy.split()))
         self.invest_strategy_stage_limit = invest_strategy_stage_limit
+
+    def set_boss_name(self, boss_names: str):
+        """
+        设置boss名称
+        格式：第一位面;第二位面;第三位面
+        """
+        boss_name_tokens = boss_names.split(";") if boss_names else []
+        normalized_boss_names = [self._normalize_ocr_text(item) for item in boss_name_tokens[:3]]
+        while len(normalized_boss_names) < 3:
+            normalized_boss_names.append("")
+        self.wanted_boss_names = normalized_boss_names if any(normalized_boss_names) else None
 
     def set_boss_affix(self, boss_affix: str):
         """设置boss词缀"""
@@ -60,12 +82,18 @@ class RerollStart(CurrencyWars):
         self.hate_boss_affix = list()
         for item in boss_affix_tokens:
             if item.startswith("!"):
-                self.hate_boss_affix.append(item[1:])
+                self.hate_boss_affix.append(self._normalize_ocr_text(item[1:]))
             else:
-                self.wanted_boss_affix.append(item)
+                self.wanted_boss_affix.append(self._normalize_ocr_text(item))
 
     def handle_boss_info(self) -> None:
-        if self.wanted_boss_affix or self.hate_boss_affix:
+        if self.wanted_boss_names:
+            logger.info("检测到开局，正在识别Boss名称...")
+            if not self._detect_boss_name():
+                logger.info("Boss名称不符合要求，准备重开...")
+                self.reroll = True
+
+        if not self.reroll and (self.wanted_boss_affix or self.hate_boss_affix):
             logger.info("检测到开局，正在识别Boss词缀...")
             if not self._detect_boss_affix():
                 logger.info("Boss词缀不符合要求，准备重开...")
@@ -169,7 +197,7 @@ class RerollStart(CurrencyWars):
         # 解析OCR结果：过滤空字符串，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
-            affix_text = str(item[1]).strip().replace("·", "").replace("•", "").replace("?", "")  # 去除常见的干扰字符
+            affix_text = self._normalize_ocr_text(str(item[1]))  # 去除常见的干扰字符
             detected_invest_strategy.append(affix_text)
 
         # 日志输出识别到的词缀，便于调试
@@ -203,7 +231,7 @@ class RerollStart(CurrencyWars):
         # 解析OCR结果：过滤空字符串+去重，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
-            affix_text = str(item[1]).strip()
+            affix_text = self._normalize_ocr_text(str(item[1]))
             if not affix_text:  # 过滤空字符串
                 continue
             detected_affixes.append(affix_text)
@@ -227,6 +255,46 @@ class RerollStart(CurrencyWars):
                     return False
         return True
 
+    def _detect_boss_name(self) -> bool:
+        """检测Boss名称是否符合筛选规则，顺序依次对应第一、二、三位面。"""
+        raw_results = self.operator.ocr(
+            from_x=self.BOSS_NAME_FROM_X,
+            from_y=self.BOSS_NAME_FROM_Y,
+            to_x=self.BOSS_NAME_TO_X,
+            to_y=self.BOSS_NAME_TO_Y
+        )
+        if not raw_results:
+            logger.warning("Boss名称OCR识别失败：无识别结果")
+            return False
+
+        sorted_results = sorted(raw_results, key=lambda item: item[0][0][0])
+        detected_boss_names = []
+        for item in sorted_results:
+            boss_name = self._normalize_ocr_text(str(item[1]))
+            if not boss_name:
+                continue
+            detected_boss_names.append(boss_name)
+
+        detected_boss_names = detected_boss_names[:3]
+        logger.info(f"识别到Boss名称：{detected_boss_names}")
+
+        if not self.wanted_boss_names:
+            return True
+
+        for i, wanted_boss_name in enumerate(self.wanted_boss_names):
+            if not wanted_boss_name:
+                continue
+            if i >= len(detected_boss_names):
+                logger.warning(f"第{i + 1}位面Boss名称缺失，期望【{wanted_boss_name}】")
+                return False
+            if detected_boss_names[i] != wanted_boss_name:
+                logger.warning(
+                    f"第{i + 1}位面Boss名称不符合要求，识别到【{detected_boss_names[i]}】，期望【{wanted_boss_name}】"
+                )
+                return False
+
+        return True
+
     def _detect_invest_env(self):
         detected_invest_env = []
 
@@ -244,7 +312,7 @@ class RerollStart(CurrencyWars):
         # 解析OCR结果：过滤空字符串+去重，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
-            affix_text = str(item[1]).strip()
+            affix_text = self._normalize_ocr_text(str(item[1]))
             detected_invest_env.append(affix_text)
 
         # 日志输出识别到的词缀，便于调试

@@ -39,6 +39,7 @@ class CosmicStrifeTask(BaseTask):
             # 刷开局难度选择：和标准模式使用同一个难度配置项
             rs_task.set_difficulty(difficulty)
             rs_task.load_strategy(strategy)
+            rs_task.set_boss_name(self.config.get("CwRsBossNames", ""))
             rs_task.set_boss_affix(self.config.get("CwRsBossAffixes", ""))
             rs_task.set_invest_env(self.config.get("CwRsInvestEnvironments", ""))
             rs_task.set_invest_strategy(self.config.get("CwRsInvestStrategies", ""), self.config.get("CwRsInvestStrategyStage", 1))
