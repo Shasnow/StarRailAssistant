@@ -967,7 +967,7 @@ class CurrencyWars(Executable):
             if c is None:
                 logger.warning(f"攻略角色不存在，跳过：{cn}")
                 continue
-            c.priority = 99 - i  # 确保攻略中的后台角色优先级都大于其他角色
+            c.priority = 95 - i  # 确保攻略中的后台角色优先级都大于其他角色
             c.position = Positioning.OffField
             self.strategy_characters[cn] = strategy_off_field[cn]
         logger.info(f"已加载攻略: {strategy_name}: {description}")
