@@ -279,4 +279,47 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     #endregion
+
+    // 开发者模式多击版本号逻辑
+    private int _versionClickCount;
+    private DateTime _versionFirstClickTime;
+    private const int VersionClickRequiredCount = 7;
+    private static readonly TimeSpan VersionClickTimeWindow = TimeSpan.FromSeconds(3);
+
+    [RelayCommand]
+    private void OnVersionClicked()
+    {
+        var now = DateTime.UtcNow;
+
+        if (_versionClickCount == 0 || now - _versionFirstClickTime > VersionClickTimeWindow)
+        {
+            _versionFirstClickTime = now;
+            _versionClickCount = 1;
+            return;
+        }
+
+        _versionClickCount++;
+
+        if (_versionClickCount < VersionClickRequiredCount)
+        {
+            if (_versionClickCount >3)
+            {
+                _commonModel.ShowInfoToast("开发者模式",
+                    Settings.IsDeveloperMode
+                        ? "您正处于开发者模式！"
+                        : $"只需再执行 {VersionClickRequiredCount - _versionClickCount} 次操作，即可进入开发者模式");
+            }
+            return;
+        }
+
+        _versionClickCount = 0;
+
+        // 只负责开启开发者模式，关闭仍然通过显式开关
+        if (!_settingsService.Settings.IsDeveloperMode)
+        {
+            _settingsService.Settings.IsDeveloperMode = true;
+            _settingsService.SaveSettings();
+        }
+        _commonModel.ShowInfoToast("开发者模式", "您正处于开发者模式！");
+    }
 }
