@@ -392,6 +392,15 @@
                                                Content="{x:Static lang:Resources.ResourceIntegrityCheckText}" />
                                         <Button Grid.Column="2" IsEnabled="False">Check</Button>
                                     </Grid>
+                                    <Expander Header="开发者选项" IsVisible="{Binding Settings.IsDeveloperMode}" IsExpanded="True">
+                                        <StackPanel>
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE5F4;</Label>
+                                                <Label Grid.Column="1" Content="启用开发者选项" />
+                                                <ToggleSwitch Grid.Column="2" IsChecked="{Binding Settings.IsDeveloperMode}"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Expander>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
                         </suki:SettingsLayoutItem>
@@ -399,9 +408,13 @@
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.AboutText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
+                                    <!-- ReSharper disable once Xaml.StyleClassNotFound -->
+                                    <Button Classes="Basic"
+                                            Command="{Binding VersionClickedCommand}">
+                                        <TextBlock>版本 / Version : <Run Text="{Binding VersionText}"/></TextBlock>
+                                    </Button>
                                     <TextBlock TextWrapping="Wrap" xml:space="preserve">
-版本 / Version : <Run Text="{Binding VersionText}" />
-© 2024-2025 StarRailAssistant, All rights reserved.
+© 2024-2026 StarRailAssistant, All rights reserved.
 
 链接 / Links :
 <Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="*,*" ColumnSpacing="20" RowSpacing="10">
