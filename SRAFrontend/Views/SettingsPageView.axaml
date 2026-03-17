@@ -395,7 +395,7 @@
                                     <Expander Header="开发者选项" IsVisible="{Binding Settings.IsDeveloperMode}" IsExpanded="True">
                                         <StackPanel>
                                             <Grid ColumnDefinitions="Auto, *, Auto">
-                                                <Label Classes="Icon">&#xE5F4;</Label>
+                                                <Label Classes="Icon">&#xE5F6;</Label>
                                                 <Label Grid.Column="1" Content="启用开发者选项" />
                                                 <ToggleSwitch Grid.Column="2" IsChecked="{Binding Settings.IsDeveloperMode}"/>
                                             </Grid>

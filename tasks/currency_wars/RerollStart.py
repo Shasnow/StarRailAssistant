@@ -1,3 +1,4 @@
+from SRACore.util.errors import SRAError, ErrorCode
 from SRACore.util.logger import logger
 from tasks.img import CWIMG, IMG
 
@@ -59,9 +60,9 @@ class RerollStart(CurrencyWars):
 
     def set_invest_strategy(self, invest_strategy: str, invest_strategy_stage_limit: int = 2):
         """设置投资策略"""
-        def clean_strategy(s):
-            return self._normalize_ocr_text(s)  # 去除常见的干扰字符
-        self.wanted_invest_strategy = list(map(clean_strategy, invest_strategy.split()))
+        if not invest_strategy:
+            return
+        self.wanted_invest_strategy = list(map(self._normalize_ocr_text, invest_strategy.split()))
         self.invest_strategy_stage_limit = invest_strategy_stage_limit
 
     def set_boss_name(self, boss_names: str):
@@ -69,6 +70,8 @@ class RerollStart(CurrencyWars):
         设置boss名称
         格式：第一位面;第二位面;第三位面
         """
+        if not boss_names:
+            return
         boss_name_tokens = boss_names.split(";") if boss_names else []
         normalized_boss_names = [self._normalize_ocr_text(item) for item in boss_name_tokens[:3]]
         while len(normalized_boss_names) < 3:
@@ -77,6 +80,8 @@ class RerollStart(CurrencyWars):
 
     def set_boss_affix(self, boss_affix: str):
         """设置boss词缀"""
+        if not boss_affix:
+            return
         boss_affix_tokens = boss_affix.split() if boss_affix else []
         self.wanted_boss_affix = list()
         self.hate_boss_affix = list()
@@ -267,7 +272,7 @@ class RerollStart(CurrencyWars):
             logger.warning("Boss名称OCR识别失败：无识别结果")
             return False
 
-        sorted_results = sorted(raw_results, key=lambda item: item[0][0][0])
+        sorted_results = sorted(raw_results, key=lambda _item: _item[0][0][0])
         detected_boss_names = []
         for item in sorted_results:
             boss_name = self._normalize_ocr_text(str(item[1]))
