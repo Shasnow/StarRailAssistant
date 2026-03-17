@@ -20,13 +20,13 @@
                     <taskViews:TrailblazePowerView />
                 </TabItem>
                 <TabItem Header="{x:Static lang:Resources.ReceiveRewardsText}">
-                    <taskViews:ReceiveRewardView />
+                    <taskViews:ReceiveRewardsView />
                 </TabItem>
                 <TabItem Header="{x:Static lang:Resources.CosmicStrifeText}">
                     <taskViews:CosmicStrife />
                 </TabItem>
                 <TabItem Header="{x:Static lang:Resources.InTheEndText}">
-                    <taskViews:AfterMissionView />
+                    <taskViews:MissionAccomplishView />
                 </TabItem>
             </TabControl>
         </Grid>
