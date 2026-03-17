@@ -14,7 +14,7 @@ public class ReportService(
     CacheService cacheService,
     ILogger<ReportService> logger)
 {
-    private const string ReportUrl = "https://shasnow.top/api/report";
+    private const string ReportUrl = "https://shasnow.top/s/api/report";
     private string? _deviceIdCache;
 
     private string GetDeviceId()
