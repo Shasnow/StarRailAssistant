@@ -2,9 +2,9 @@
 
 namespace SRAFrontend.Views.TaskViews;
 
-public partial class AfterMissionView : UserControl
+public partial class ReceiveRewardsView : UserControl
 {
-    public AfterMissionView()
+    public ReceiveRewardsView()
     {
         InitializeComponent();
     }

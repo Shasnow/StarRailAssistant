@@ -1,4 +1,3 @@
-from SRACore.util.errors import SRAError, ErrorCode
 from SRACore.util.logger import logger
 from tasks.img import CWIMG, IMG
 
