@@ -665,7 +665,7 @@ class TrailblazePowerTask(BaseTask):
             return True
         elif index == 1:
             # 生存索引页面，点击进入
-            self.operator.click_box(box)
+            self.operator.click_box(box)  # type: ignore
             return self.operator.wait_img(IMG.SURVIVAL_INDEX_ONCLICK, timeout=10) is not None
         elif index == 0:
             # 主页面，按快捷键进入生存索引页面
