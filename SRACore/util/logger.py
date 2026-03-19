@@ -1,3 +1,4 @@
+import os.path
 import sys
 from typing import Any
 
@@ -24,6 +25,9 @@ def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log", level: str = "TRACE",
         logger.add(queue.put, level=level,
                    format=log_format,
                    colorize=False, enqueue=True)
+
+    if not os.path.exists("log/ocr"):
+        os.makedirs("log/ocr")
 
 
 __all__ = ["logger", "setup_logger"]

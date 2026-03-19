@@ -1,14 +1,14 @@
 import time
 from abc import ABC, abstractmethod
-from typing import Any, Callable, cast
+from typing import Any, Callable
 
 # noinspection PyPackageRequirements
 # (pyperclip is in pyautogui requirements)
 import pyperclip
-from loguru import logger
 from PIL.Image import Image
+from loguru import logger
+from rapidocr_onnxruntime import RapidOCR  # type: ignore
 
-from rapidocr_onnxruntime import RapidOCR # type: ignore
 from SRACore.operators.model import Box, Region
 from SRACore.util.data_persister import load_settings
 
@@ -23,6 +23,8 @@ class IOperator(ABC):
         self.left = 0
         self.width = 0
         self.height = 0
+        self.is_developer_mode = self.settings.get('IsDeveloperMode', False)
+        self.is_save_ocr_image = self.settings.get('IsSaveOcrImage', False) if self.is_developer_mode else False
 
     @classmethod
     def _get_ocr_instance(cls):
@@ -352,7 +354,9 @@ class IOperator(ABC):
             if self.ocr_engine is None:
                 self.ocr_engine = IOperator._get_ocr_instance()
             screenshot = self.screenshot(region)
-            result, _ = self.ocr_engine(cast(Any, screenshot), use_det=True, use_cls=False, use_rec=True)  # NOQA
+            result, _ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA # type: ignore
+            if self.is_save_ocr_image:
+                screenshot.save(f"log/ocr/{region}_{int(time.time())}.png")
             if trace:
                 logger.debug(f"OCR Result: {result}")
             return result
