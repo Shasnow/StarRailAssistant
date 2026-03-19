@@ -55,6 +55,7 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private string _launchArgumentsAdvanced = ""; // 高级参数
     [ObservableProperty] private bool _launchWithCmd; // 使用 CMD 启动游戏
     [ObservableProperty] private bool _isDeveloperMode; // 开发者模式
+    [ObservableProperty] private bool _isSaveOcrImage; // 是否保存OCR截图
 
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
     [JsonPropertyName("EmailAuthCode")] public string EncryptedEmailAuthCode { get; set; } = "";
