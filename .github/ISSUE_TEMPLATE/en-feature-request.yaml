@@ -1,0 +1,83 @@
+name: Feature Request
+description: Suggest new features or improvements
+title: "[Enhancement]: "
+labels: ["enhancement"]
+assignees: ["Shasnow"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please search existing enhancement issues first to avoid duplicates:
+        https://github.com/Shasnow/StarRailAssistant/issues?q=label%3Aenhancement
+
+        It is recommended to check FAQ first:
+        https://github.com/Shasnow/StarRailAssistant/blob/main/faq.md
+
+        You can also discuss your idea in Discussions:
+        https://github.com/Shasnow/StarRailAssistant/discussions
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I searched existing issues and confirmed this is not a duplicate request
+          required: true
+        - label: I reviewed FAQ and Discussions and confirmed this request is not already covered
+          required: true
+        - label: I will provide clear context and screenshots when needed
+          required: false
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Feature Description
+      description: Clearly and concisely describe the feature or improvement you want
+      placeholder: "Example: Add support to auto-switch to the next account and send a notification after each task finishes"
+    validations:
+      required: true
+
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Use Case
+      description: In what scenario will this feature be used? What pain point does it solve?
+      placeholder: "Example: During multi-account automation, it helps quickly identify which account stopped unexpectedly"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: Describe your ideal interaction or expected result
+      placeholder: "Example: Add a toggle in task settings; when enabled, send a summary notification after each account finishes"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Describe any workaround or alternative method you currently use (optional)
+      placeholder: "Example: I currently check logs manually, which is inefficient"
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or Mockups
+      description: |
+        It is recommended to provide game screenshots or process mockups.
+        For example, for Expert Invitation adaptation, please provide a screenshot of the exact in-game screen where it appears.
+    validations:
+      required: false
+
+  - type: textarea
+    id: others
+    attributes:
+      label: Additional Information
+      description: Any other details that may help evaluate this request
+    validations:
+      required: false

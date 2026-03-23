@@ -1,0 +1,122 @@
+name: 报告 Bug
+description: 识别错误、操作异常、连接错误等问题反馈
+title: "[BUG]: "
+labels: ["bug"]
+assignees: ["Shasnow"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提交前请先搜索现有 Issue：
+        https://github.com/Shasnow/StarRailAssistant/issues
+
+        请先查看常见问题：
+        https://starrailassistant.top/faq.html
+
+        也可以先到讨论区确认：
+        https://github.com/Shasnow/StarRailAssistant/discussions
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我已搜索并确认该问题未在现有 Issue 中被报告
+          required: true
+        - label: 我已阅读常见问题并仍无法解决
+          required: true
+        - label: 我愿意提供日志、截图或录屏帮助定位问题
+          required: true
+
+  - type: textarea
+    id: describe
+    attributes:
+      label: 问题描述
+      description: 请清晰简洁地描述错误现象
+      placeholder: 例如：执行每日任务时，点击开始后 10 秒内直接停止并提示识别失败
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 请按顺序描述如何触发该问题
+      placeholder: |
+        1. 打开 SRA
+        2. 选择任务 X
+        3. 点击开始
+        4. 约 10 秒后报错
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reproducibility
+    attributes:
+      label: 是否必现
+      options:
+        - 是
+        - 否
+        - 大概率
+        - 小概率
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志和截图
+      description: 点击导出日志并上传，同时附上关键截图
+      placeholder: 请在提交前确认日志已导出并上传
+    validations:
+      required: true
+
+  - type: textarea
+    id: screen_record
+    attributes:
+      label: 录屏
+      description: 最好提供录屏，可上传至此处或在 QQ 群 @群主
+    validations:
+      required: false
+
+  - type: input
+    id: current_version
+    attributes:
+      label: SRA 出现 bug 的版本
+      placeholder: 例如 1.1.1
+    validations:
+      required: true
+
+  - type: input
+    id: last_good_version
+    attributes:
+      label: SRA 最近未出现 bug 的版本
+      placeholder: 例如 1.1.0
+    validations:
+      required: false
+
+  - type: textarea
+    id: pc_config
+    attributes:
+      label: 电脑配置
+      description: 请提供系统版本、CPU、内存、显卡等信息
+      placeholder: >
+        例如 Windows 11 Pro 23H2；CPU: i7-12700K；内存: 32GB；显卡: RTX 3060
+    validations:
+      required: true
+
+  - type: input
+    id: resolution
+    attributes:
+      label: 分辨率选择
+      placeholder: 例如 1920x1080，窗口化 / 全屏独占 / 全屏无边框
+    validations:
+      required: true
+
+  - type: textarea
+    id: others
+    attributes:
+      label: 其他补充
+      description: 任何有助于定位问题的附加信息
+    validations:
+      required: false

@@ -1,0 +1,83 @@
+name: 新功能建议
+description: 新功能增强与改进建议
+title: "[Enhancement]: "
+labels: ["enhancement"]
+assignees: ["Shasnow"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提交前请先搜索现有 Issue，避免重复：
+        https://github.com/Shasnow/StarRailAssistant/issues?q=label%3Aenhancement
+
+        建议先查看常见问题：
+        https://github.com/Shasnow/StarRailAssistant/blob/main/faq.md
+
+        也可以先在讨论区沟通：
+        https://github.com/Shasnow/StarRailAssistant/discussions
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我已搜索现有 Issue，确认不是重复建议
+          required: true
+        - label: 我已阅读常见问题与讨论区内容，确认该建议尚未被覆盖
+          required: true
+        - label: 我会尽可能提供清晰、完整的场景说明和必要截图
+          required: false
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: 功能建议描述
+      description: 请清晰简洁地描述你希望新增或改进的功能
+      placeholder: 例如：希望支持在任务完成后自动切换到下一账号并发送通知
+    validations:
+      required: true
+
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 使用场景
+      description: 这个功能会在什么场景下使用？能解决什么痛点？
+      placeholder: 例如：多账号连续托管时，需要更快地发现某个账号异常中断
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为
+      description: 请描述你理想中的交互方式或结果
+      placeholder: 例如：在任务列表中新增开关，开启后每次完成账号任务就推送一次摘要
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 备选方案
+      description: 是否有你当前使用的替代方式？可选填
+      placeholder: 例如：目前手动查看日志确认执行情况，效率较低
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截图或示意图
+      description: |
+        建议提供游戏界面截图或流程示意图。
+        例如：适配专家邀请函，请提供刷到专家邀请函时的界面截图。
+    validations:
+      required: false
+
+  - type: textarea
+    id: others
+    attributes:
+      label: 其他补充
+      description: 任何有助于评估该建议的信息
+    validations:
+      required: false
