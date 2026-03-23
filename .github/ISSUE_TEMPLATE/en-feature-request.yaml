@@ -1,6 +1,6 @@
 name: Feature Request
 description: Suggest new features or improvements
-title: "[Enhancement]: "
+title: "[Enhancement] "
 labels: ["enhancement"]
 assignees: ["Shasnow"]
 body:

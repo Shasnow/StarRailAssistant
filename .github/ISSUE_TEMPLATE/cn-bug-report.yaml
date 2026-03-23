@@ -1,6 +1,6 @@
 name: 报告 Bug
 description: 识别错误、操作异常、连接错误等问题反馈
-title: "[BUG]: "
+title: "[BUG] "
 labels: ["bug"]
 assignees: ["Shasnow"]
 body:
