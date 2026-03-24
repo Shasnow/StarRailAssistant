@@ -5,6 +5,7 @@
 # IDE / 编辑器
 /.vscode/
 **/.vs/
+/.idea
 
 # .NET 构建输出
 /SRAFrontend/bin/
@@ -14,6 +15,12 @@
 # Python 虚拟环境和缓存
 /.venv/
 **/__pycache__/
+
+# Coverage.py
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
 
 # 打包 / 安装输出
 /setup/output/

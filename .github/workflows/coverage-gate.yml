@@ -1,0 +1,56 @@
+name: Coverage Gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.py'
+      - '*.py'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*.py'
+      - '*.py'
+
+jobs:
+  check-coverage:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run tests with coverage
+        run: |
+          pytest tests/backend/ -v --cov=SRACore --cov=tasks --cov-report=xml --cov-report=term
+
+      - name: Check incremental coverage (diff-cover)
+        if: always()
+        run: |
+          $branch = if ("${{ github.event_name }}" -eq "pull_request") { "origin/${{ github.base_ref }}" } else { "HEAD~1" }
+          diff-cover coverage.xml --compare-branch=$branch --fail-under=60 --markdown-report=coverage-report.md
+
+      - name: Post coverage report to PR
+        if: always() && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: coverage-report.md
+
+      - name: Post coverage summary
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path coverage-report.md) {
+            Get-Content coverage-report.md >> $env:GITHUB_STEP_SUMMARY
+          }

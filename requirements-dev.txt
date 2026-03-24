@@ -1,0 +1,5 @@
+# 开发/测试依赖（不随生产环境安装）
+pytest==9.0.2
+pytest-cov==7.0.0
+pytest-mock==3.15.1
+diff-cover==9.2.4
