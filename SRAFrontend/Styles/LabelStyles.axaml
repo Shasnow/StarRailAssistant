@@ -12,6 +12,6 @@
     <Style Selector="Label.Icon">
         <Setter Property="FontFamily" Value="{DynamicResource Phosphor}" />
         <Setter Property="HorizontalAlignment" Value="Center"></Setter>
-        <Setter Property="FontSize" Value="18"></Setter>
+        <Setter Property="FontSize" Value="20"></Setter>
     </Style>
 </Styles>
