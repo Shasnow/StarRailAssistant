@@ -81,93 +81,7 @@ nothing to do with it.
 **自2.0.0版本后，SRA需要`.NET 8.0。`**
 
 * 🎯 **小白友好版**：在Release页面下载`StarRailAssistant_vX.X.X.zip`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`SRA.exe`即可！
-* 🔧 **开发者版**：从源码运行SRA，适合想要自定义或贡献代码的开发者。
-
-  ### 📋 **环境要求**
-  - **操作系统**：Windows 10 或 Windows 11 (推荐)
-  - **Python**：3.12 或更高版本（需添加到系统环境变量）
-  - **.NET SDK**：8.0 或更高版本（下载地址：[.NET 8.0 SDK](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0)）
-  - **Git**：用于克隆仓库（可选，但推荐）
-
-  ### 📥 **获取源码**
-  ```bash
-  # 克隆仓库（推荐）
-  git clone https://github.com/Shasnow/StarRailAssistant.git
-  cd StarRailAssistant
-  
-  # 或直接下载 ZIP 压缩包并解压
-  ```
-
-  ### 📦 **安装 Python 依赖**
-  ```bash
-  # 使用 pip 安装所有依赖
-  pip install -r requirements.txt
-  
-  # 如果遇到安装失败的情况，尝试使用以下命令
-  pip install -r requirements.txt --upgrade --no-cache-dir
-  
-  ```
-
-  ### 🏗️ **构建前端项目**
-  ```bash
-  # 进入前端目录
-  cd SRAFrontend
-  
-  # 还原 NuGet 依赖（首次构建时必须执行）
-  dotnet restore -r win-x64
-  
-  # 构建前端项目（Release 模式）
-  dotnet publish -c Release -r win-x64
-  
-  # 构建完成后，可执行文件将位于：
-  # ./SRAFrontend/bin/Release/net8.0/win-x64/publish/SRA.exe
-  
-  # 返回项目根目录
-  cd ..
-  ```
-
-  ### 🚀 **直接运行（开发模式）**
-  如果您不想构建可执行文件，可以直接运行：
-  ```bash
-  # 启动前端（开发模式）
-  cd SRAFrontend
-  dotnet run
-  
-  # 在另一个终端中启动后端
-  cd ..
-  python main.py
-  ```
-
-  ### 📦 **构建完整发布包**
-  ```bash
-  # 运行打包脚本
-  python ./package.py
-  
-  # 打包脚本会自动执行以下操作：
-  # 收集所有必要的文件（含前端构建输出，所以确保前端已构建）
-  # 创建 ZIP 压缩包
-  
-  # 完成后，发布包将位于项目根目录，命名格式为：StarRailAssistant_vX.X.X.zip
-  ```
-
-  ### 🎯 **运行构建后的应用**
-  1. 解压生成的 ZIP 压缩包
-  2. 运行 `SRA.exe` 启动应用程序
-
-  ### ⚠️ **常见问题与解决方案**
-  - **Python 依赖安装失败**：尝试使用国内镜像源，如：
-    ```bash
-    pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-    ```
-    
-  - **前端构建失败**：确保已安装 .NET 8.0 SDK，并尝试重新还原依赖：
-    ```bash
-    dotnet restore ./SRAFrontend/SRAFrontend.csproj -r win-x64 --force
-    ```
-    
-  - **运行时缺少 DLL 文件**：确保构建时使用了 `--self-contained true` 参数，或安装对应版本的 .NET 运行时。
-    
-  - **图像识别不准确**：确保游戏分辨率设置为 1920x1080（全屏或窗口模式），并检查 `resources/img/` 目录下的模板图片是否完整。
+* 🔧 **开发者版**：从源码运行SRA，请阅读 [贡献指南](CONTRIBUTING.md)。
 
 ### 😡 我不想安装 .NET 8.0 
 
@@ -199,6 +113,8 @@ nothing to do with it.
 │   ├── Utilities/         # 🛠️ 前端工具类
 │   ├── ViewModels/        # 🧠 ViewModel层
 │   └── Views/             # 🖥️ 视图层
+├── tests/                 # 🧪 自动化测试
+│   └── backend/           # 🐍 后端单元测试
 ├── main.py                # 🚪 程序入口文件
 ├── package.py             # 📦 打包脚本
 ├── rapidocr_onnxruntime/  # 👁️ OCR识别相关模型
@@ -216,6 +132,7 @@ nothing to do with it.
 - **SRACore/**: 🐍 包含程序的核心逻辑，包括任务管理、线程控制、触发器系统和工具函数等。
 - **SRAFrontend/**: 🎯 使用Avalonia框架开发的C#前端界面，实现用户交互和配置管理。
 - **tasks/**: 📋 各种自动化任务的具体实现，如启动游戏、领取奖励、清体力等。
+- **tests/**: 🧪 自动化测试目录，`tests/backend/` 存放后端 Python 单元测试。
 - **resources/**: 📁 存放程序所需的各种资源文件，包括图像识别所需的模板图片。
 
 ### 📄 关键文件说明
@@ -244,43 +161,7 @@ nothing to do with it.
 
 ## 🤝 想要为项目做出贡献
 
-### 参与后端开发：
-
-* 🐍 熟悉 `Python` 。
-* 🎮 正在游玩并将长期游玩`崩坏：星穹铁道` 。
-
-### 参与前端开发：
-
-* 🎯 熟悉 `C#` 以及 `Avalonia` 框架。
-
-### 本地化支持：
-
-为了减少工作量，SRA仅对日志级别高于或等于`INFO`的日志进行本地化支持。其他日志内容将保持英文。
-
-SRA 后端采用 `pyl10nc` 进行本地化支持，欢迎为SRA贡献更多语言的翻译！
-1. 克隆仓库并创建新的分支
-2. 在 `SRACore/localization/` 目录下编辑 `resource.toml` 文件，添加新的语言支持
-示例：
-```toml
-[cli.intro] # 资源键
-en-us = "SRA-cli {version} ({core})\nType 'help' or '?' to list commands." # 现有的英文翻译
-zh-cn = "SRA-cli {version} ({core})\n输入 'help' 或 '?' 来查看命令列表。" # 现有的中文翻译
-```
-新增语言键：
-```toml
-[cli.intro]
-# ......
-es-es = "SRA-cli {version} ({core})\nEscriba 'help' o '?' para listar los comandos." # 新增的西班牙语翻译
-```
-3. 提交 Pull Request
-
-SRA 前端采用 `ResX` 进行本地化支持，推荐使用 `Rider` 或 `Visual Studio` 进行编辑。
-
-### 另辟蹊径
-
-* 🎨 尝试为SRA绘制软件图标。`没有稿费`
-
-感谢您对SRA的支持！
+请阅读 [贡献指南](CONTRIBUTING.md)。
 
 ----------------------------------------------------------------------------------------------
 
