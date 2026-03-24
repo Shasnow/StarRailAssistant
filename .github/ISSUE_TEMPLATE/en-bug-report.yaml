@@ -1,0 +1,122 @@
+name: Report a Bug
+description: Report recognition errors, operation failures, connection issues, and other problems
+title: "[BUG] "
+labels: ["bug"]
+assignees: ["Shasnow"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please search existing issues first:
+        https://github.com/Shasnow/StarRailAssistant/issues
+
+        Please check FAQ before submitting:
+        https://starrailassistant.top/faq.html
+
+        You can also confirm in Discussions:
+        https://github.com/Shasnow/StarRailAssistant/discussions
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I searched existing issues and confirmed this problem has not been reported yet
+          required: true
+        - label: I checked the FAQ and still cannot resolve this issue
+          required: true
+        - label: I am willing to provide logs, screenshots, or screen recordings to help troubleshooting
+          required: true
+
+  - type: textarea
+    id: describe
+    attributes:
+      label: Bug Description
+      description: Clearly and concisely describe what went wrong
+      placeholder: "Example: When running daily tasks, SRA stops within 10 seconds after clicking Start and shows a recognition failure"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Provide step-by-step instructions to reproduce the issue
+      placeholder: |
+        1. Open SRA
+        2. Select task X
+        3. Click Start
+        4. Error appears after around 10 seconds
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reproducibility
+    attributes:
+      label: Reproducibility
+      options:
+        - Always
+        - Not always
+        - High probability
+        - Low probability
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and Screenshots
+      description: Export and upload logs, and attach relevant screenshots
+      placeholder: Please confirm logs are exported and uploaded before submitting
+    validations:
+      required: true
+
+  - type: textarea
+    id: screen_record
+    attributes:
+      label: Screen Recording
+      description: A screen recording is highly recommended. You may upload it here or mention the admin in the QQ group.
+    validations:
+      required: false
+
+  - type: input
+    id: current_version
+    attributes:
+      label: SRA Version Where the Bug Occurs
+      placeholder: "Example: 1.1.1"
+    validations:
+      required: true
+
+  - type: input
+    id: last_good_version
+    attributes:
+      label: Last SRA Version Without This Bug
+      placeholder: "Example: 1.1.0"
+    validations:
+      required: false
+
+  - type: textarea
+    id: pc_config
+    attributes:
+      label: PC Configuration
+      description: Provide OS version, CPU, memory, GPU, and related information
+      placeholder: |
+        Example: Windows 11 Pro 23H2; CPU: i7-12700K; Memory: 32GB; GPU: RTX 3060
+    validations:
+      required: true
+
+  - type: input
+    id: resolution
+    attributes:
+      label: Resolution and Display Mode
+      placeholder: "Example: 1920x1080, windowed / exclusive fullscreen / borderless fullscreen"
+    validations:
+      required: true
+
+  - type: textarea
+    id: others
+    attributes:
+      label: Additional Information
+      description: Any extra details that may help diagnose the issue
+    validations:
+      required: false
