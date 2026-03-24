@@ -18,6 +18,5 @@
              
     <Application.Resources>
         <FontFamily x:Key="Phosphor">/Assets/Phosphor.ttf#Phosphor</FontFamily>
-        <FontFamily x:Key="PhosphorFill">/Assets/Phosphor-Fill.ttf#Phosphor-Fill</FontFamily>
     </Application.Resources>
 </Application>

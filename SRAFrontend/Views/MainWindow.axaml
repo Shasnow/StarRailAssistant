@@ -18,11 +18,10 @@
         <suki:SukiToastHost Manager="{Binding ToastManager}" />
     </suki:SukiWindow.Hosts>
     <suki:SukiWindow.RightWindowTitleBarControls>
-        <!-- ReSharper disable once Xaml.StyleClassNotFound -->
+        <!-- ReSharper disable Xaml.StyleClassNotFound -->
         <Button Classes="WindowControlsButton" Command="{Binding SwitchLightModeCommand}" ToolTip.Tip="切换深/浅色模式">
             <Label Classes="Icon" Content="{Binding LightModeText}" />
         </Button>
-        <!-- ReSharper disable once Xaml.StyleClassNotFound -->
         <Button Classes="WindowControlsButton" Command="{Binding ShowAnnouncementBoardCommand}" ToolTip.Tip="公告">
             <Label Classes="Icon" Content="&#xE324;" />
         </Button>
@@ -84,11 +83,18 @@
                     <Label Classes="Icon">&#xE976;</Label>
                 </Button>
                 <Button Classes="Basic"
-                        CommandParameter="https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&amp;channel=stable&amp;source=sra-app"
+                        CommandParameter="https://starrailassistant.top/sponsor.html"
                         ToolTip.Tip="{x:Static lang:Resources.SponsorText}">
                     <Label Classes="Icon">&#xE2A8;</Label>
                 </Button>
+                <Button Classes="Basic"
+                        CommandParameter="https://starrailassistant.top/faq.html"
+                        ToolTip.Tip="常见问题">
+                    <Label Classes="Icon" Content="&#xE3E8;" />
+                </Button>
             </StackPanel>
         </suki:SukiSideMenu.FooterContent>
+        <!-- ReSharper restore Xaml.StyleClassNotFound -->
     </suki:SukiSideMenu>
+    
 </suki:SukiWindow>
