@@ -75,9 +75,6 @@ class DifferentialUniverse(Executable):
             self.operator.press_key("v")
 
         logger.info("等待战斗结束")
-        if not self.operator.wait_img(DUIMG.BLESSING_SELECT, timeout=120, interval=1):
-            logger.error("失败/超时")
-            return False
 
         return True
 
@@ -94,13 +91,13 @@ class DifferentialUniverse(Executable):
                 DUIMG.EQUATION_EXPANSION,
                 DUIMG.CLOSE,
                 DUIMG.DIVERGENT_UNIVERSE_QUIT
-            ], interval=0.5)
+            ], interval=0.5, timeout=300)
 
             if index==0 or index == 1 or index == 2 or index==3:  # 祝福选择或方程式选择或奇物选择
                 logger.info(var[index])
                 self.operator.sleep(0.5)
                 if not self.operator.click_img(DUIMG.COLLECTION):
-                    self.operator.click_point(0.5, 0.5, x_offset=-150)
+                    self.operator.click_point(0.5, 0.4, x_offset=-140)
                 self.operator.click_img(IMG.ENSURE2, after_sleep=1)
             elif index == 4 or index == 5:  # 方程式扩展或关闭
                 self.operator.press_key('esc')

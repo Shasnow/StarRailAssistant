@@ -541,7 +541,7 @@ class CurrencyWars(Executable):
         while target:
             self.operator.mouse_down(target.center[0], target.center[1])
             self.operator.mouse_up()
-            self.operator.sleep(0.5)
+            self.operator.sleep(1)
             self.operator.click_point(0.35, 0.20, after_sleep=0.5)
             target = self.operator.locate(CWIMG.OPEN)
         self._get_character_in_area(areas=self.in_hand_area, target_character_list=self.in_hand_character, force=force)
