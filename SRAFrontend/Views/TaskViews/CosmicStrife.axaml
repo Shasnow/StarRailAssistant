@@ -24,7 +24,7 @@
                     <suki:GlassCard>
                         <StackPanel>
                             <CheckBox IsChecked="{Binding CurrentConfig.DUEnable}"
-                                      Content="差分宇宙 - 千面英雄"/>
+                                      Content="差分宇宙 - 乐园漫记"/>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Label>模式</Label>
                                 <ComboBox SelectedIndex="{Binding CurrentConfig.DUMode}">
@@ -38,7 +38,7 @@
                             <ToggleSwitch OnContent="秘技速刷" IsChecked="{Binding CurrentConfig.DUUseTechnique}" />
                         </StackPanel>
                     </suki:GlassCard>
-                    <TextBlock>请先手动完成一次以清除所有新手提示</TextBlock>
+                    <TextBlock>请完成引导关卡I、引导关卡II，并清除所有新手提示</TextBlock>
                     <suki:GlassCard>
                         <StackPanel>
                             <CheckBox IsChecked="{Binding CurrentConfig.CurrencyWarsEnable}"

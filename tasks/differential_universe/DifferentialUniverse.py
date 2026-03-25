@@ -84,7 +84,7 @@ class DifferentialUniverse(Executable):
 
         while True:
             index, _ = self.operator.wait_any_img([
-                DUIMG.BASE_EFFECT_SELECT,
+                DUIMG.MASK_SELECT,
                 DUIMG.BLESSING_SELECT,
                 DUIMG.EQUATION_SELECT,
                 DUIMG.CURIOSITY_SELECT,
@@ -92,8 +92,12 @@ class DifferentialUniverse(Executable):
                 DUIMG.CLOSE,
                 DUIMG.DIVERGENT_UNIVERSE_QUIT
             ], interval=0.5, timeout=300)
-
-            if index==0 or index == 1 or index == 2 or index==3:  # 祝福选择或方程式选择或奇物选择
+            if index == 0:
+                self.operator.click_point(0.1713, 0.7065, tag="选择中间的面具")
+                confirm_btn = self.operator.wait_img(DUIMG.ENSURE)
+                if confirm_btn is not None:
+                    self.operator.click_box(confirm_btn)
+            elif index == 1 or index == 2 or index==3:  # 祝福选择或方程式选择或奇物选择
                 logger.info(var[index])
                 self.operator.sleep(0.5)
                 if not self.operator.click_img(DUIMG.COLLECTION):
@@ -142,7 +146,7 @@ class DifferentialUniverse(Executable):
             IMG.ENTER,
             DUIMG.DIFFERENTIAL_UNIVERSE_START,
             DUIMG.BONUS_POINTS
-        ], interval=0.5)
+        ], interval=1)
         if page == 0:
             self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
             if not self.operator.wait_img(IMG.F4, timeout=20):
