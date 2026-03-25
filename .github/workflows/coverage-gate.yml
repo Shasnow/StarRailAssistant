@@ -42,7 +42,7 @@ jobs:
           diff-cover coverage.xml --compare-branch=$branch --fail-under=60 --markdown-report=coverage-report.md
 
       - name: Post coverage report to PR
-        if: always() && github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           path: coverage-report.md
