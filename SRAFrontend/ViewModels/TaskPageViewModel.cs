@@ -80,6 +80,7 @@ public partial class TaskPageViewModel : PageViewModel
                 Levels = new[]
                 {
                     "---选择副本---",
+                    "鎏金追忆（朋克洛德/千星城）",
                     "西风丛中（翁法罗斯/天国@直播间）",
                     "月下朱殷（妖精/海隅）",
                     "纷争不休（拾骨地/巨树）",
