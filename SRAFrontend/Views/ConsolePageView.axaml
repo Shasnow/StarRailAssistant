@@ -17,7 +17,6 @@
                     <Button
                         Height="20"
                         Width="20"
-                        FontFamily="{DynamicResource Phosphor}"
                         Classes="Basic Icon"
                         Content="&#xE036;"
                         ToolTip.Tip="重新启动控制台"

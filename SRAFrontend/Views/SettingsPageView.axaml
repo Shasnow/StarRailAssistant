@@ -330,12 +330,14 @@
                                         <ToggleSwitch Grid.Column="2" IsChecked="{Binding Settings.EnableAutoUpdate}" />
                                     </Grid>
 
-                                    <Grid ColumnDefinitions="Auto, *, *">
+                                    <Grid ColumnDefinitions="Auto, *, Auto, *">
                                         <Label Classes="Icon">&#xed6a;</Label>
                                         <Label Grid.Column="1"
                                                Content="{x:Static lang:Resources.MirrorChyanText}"
                                                ToolTip.Tip="{x:Static lang:Resources.MirrorChyanTipText}" />
-                                        <StackPanel Grid.Column="2">
+                                        <Button Grid.Column="2" Classes="Icon" Content="&#xE036;"
+                                                Command="{Binding VerifyCdkCommand}"/>
+                                        <StackPanel Grid.Column="3">
                                             <TextBox
                                                 Watermark="Enter You CDK"
                                                 PasswordChar="*"
@@ -343,7 +345,6 @@
                                             <TextBlock Text="{Binding Cache.CdkStatus}"
                                                        Foreground="{Binding Cache.CdkStatusForeground}" />
                                         </StackPanel>
-
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto, *, *">
