@@ -265,6 +265,10 @@ class TrailblazePowerTask(BaseTask):
         if not self.operator.wait_img(TPIMG.ORNAMENT_EXTRACTION_PAGE, timeout=20):  # 等待传送
             logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待页面加载超时", f"当前关卡：{level}"))
             return False
+        if self.operator.locate(TPIMG.NO_SAVE):
+            logger.warning(SRAError(ErrorCode.NO_SAVE, "当前暂无可用存档，请前往[差分宇宙]获取存档"))
+            self.operator.press_key("esc", presses=2, interval=1)
+            return False
         if single_time is not None:
             for _ in range(single_time - 1):
                 self.operator.sleep(0.2)
