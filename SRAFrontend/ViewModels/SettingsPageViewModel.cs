@@ -137,14 +137,16 @@ public partial class SettingsPageViewModel : PageViewModel
             }
 
             // 长度正确时，触发异步验证（不阻塞setter）
-            _ = VerifyCdkAsync(value); // 使用_忽略未等待的Task（需确保异常处理）
+            _ = VerifyCdkAsync(); // 使用_忽略未等待的Task（需确保异常处理）
         }
     }
 
     public TopLevel? TopLevelObject { get; set; }
 
-    private async Task VerifyCdkAsync(string cdk)
+    [RelayCommand]
+    private async Task VerifyCdkAsync()
     {
+        var cdk = MirrorChyanCdk;
         // 显示"验证中"状态
         Cache.CdkStatus = "验证中...";
         Cache.CdkStatusForeground = "#FAAD14"; // 黄色表示处理中
@@ -162,7 +164,7 @@ public partial class SettingsPageViewModel : PageViewModel
         if (response.Code == 0)
         {
             var leastTime = DateTimeOffset.FromUnixTimeSeconds(response.Data.CdkExpiredTime);
-            Cache.CdkStatus = "有效的CDK" + $" 到期时间: {leastTime:yyyy-MM-dd HH:mm:ss}";
+            Cache.CdkStatus = $"CDK有效 至: {leastTime:yyyy-MM-dd HH:mm:ss}";
             Cache.CdkStatusForeground = "#279F27"; // 绿色表示成功
         }
         else
@@ -214,7 +216,6 @@ public partial class SettingsPageViewModel : PageViewModel
         Settings.GamePath = _registryService.GetGameInstallPath();
     }
 
-    [RelayCommand]
     private void SetGameResolution()
     {
         if (!Settings.LaunchArgumentsEnabled) return;
@@ -280,7 +281,7 @@ public partial class SettingsPageViewModel : PageViewModel
 
     #endregion
 
-    // 开发者模式多击版本号逻辑
+    #region 开发者模式多击版本号逻辑
     private int _versionClickCount;
     private DateTime _versionFirstClickTime;
     private const int VersionClickRequiredCount = 7;
@@ -322,4 +323,5 @@ public partial class SettingsPageViewModel : PageViewModel
         }
         _commonModel.ShowInfoToast("开发者模式", "您正处于开发者模式！");
     }
+    #endregion
 }

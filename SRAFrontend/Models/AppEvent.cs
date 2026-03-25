@@ -9,7 +9,7 @@ public class AppEvent
     [JsonPropertyName("eventType")]
     public string EventType { get; set; } = string.Empty;
     [JsonPropertyName("eventData")]
-    public string? EventData { get; set; }
+    public string EventData { get; set; } = string.Empty;
     [JsonPropertyName("appId")]
     public string AppId { get; set; } = string.Empty;
     [JsonPropertyName("appVersion")]

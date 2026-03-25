@@ -158,7 +158,7 @@ class ReceiveRewardsTask(BaseTask):
             logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待主界面超时"))
             return
         self.operator.press_key((self.settings.get('ActivityHotkey', 'f1')).lower())
-        self.operator.sleep(0.2)
+        self.operator.sleep(1)
         target=self.operator.ocr_match("巡星之礼")
         if target is None:
             logger.info("没有巡星之礼活动")
