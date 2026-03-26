@@ -31,7 +31,7 @@ public class ReportService(
         return _deviceIdCache;
     }
     
-    private AppEvent CreateAppEvent(string eventType, string? eventData)
+    private AppEvent CreateAppEvent(string eventType, string eventData)
     {
         var deviceId = GetDeviceId();
         var timestampNow = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -47,7 +47,7 @@ public class ReportService(
         };
     }
     
-    public async Task<bool> ReportAsync(string eventType, string? eventData)
+    public async Task<bool> ReportAsync(string eventType, string eventData)
     {
         logger.LogInformation("Start report event {EventType}.", eventType);
         var httpClient = httpClientFactory.CreateClient("GlobalClient");
@@ -66,7 +66,7 @@ public class ReportService(
         }
     }
 
-    public void Report(string eventType, string? eventData, int timeoutMs = 1000)
+    public void Report(string eventType, string eventData, int timeoutMs = 1000)
     {
         try
         {
