@@ -140,13 +140,14 @@ class RRIMG:
 class CWIMG:
     BASE = "resources/img/currency_wars"
     BACK_CURRENCY_WARS = f"{BASE}/back_currency_wars.png"
+    BACK_PREPARE_PAGE = f"{BASE}/back_prepare_page.png"
     BATTLE = f"{BASE}/battle.png" #依赖于目前的默认 灰度 CCOEFF 算法
     CANNOT_BE_FIELDED = f"{BASE}/cannot_be_fielded.png"
     CLICK_BLANK = f"{BASE}/click_blank.png"
     COLLECTION = f"{BASE}/collection.png"
     CONTINUE = f"{BASE}/continue.png"
     CONTINUE_PROGRESS = f"{BASE}/continue_progress.png"
-    CURRENCY_WARS_START = f"{BASE}/currency_wars_start.png"
+    START_CURRENCY_WARS = f"{BASE}/start_currency_wars.png"
     DOWN_ARROW = f"{BASE}/down_arrow.png"
     ENCOUNTER_NODE = f"{BASE}/encounter_node.png"
     ENTER_STANDARD = f"{BASE}/enter_standard.png"

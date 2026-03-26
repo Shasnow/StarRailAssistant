@@ -150,9 +150,16 @@ class RerollStart(CurrencyWars):
 
     def handle_invest_strategy(self):
         def default_invest_strategy_handler():
+            if self.invest_strategy_stage >= self.invest_strategy_stage_limit:
+                # 未匹配到投资策略需要重开时，直接重开，不进行选择和确定。
+                logger.info(f"已达到投资策略阶段 {self.invest_strategy_stage_limit}, 准备重开...")
+                self.operator.click_img(CWIMG.BACK_PREPARE_PAGE, after_sleep=0.5)
+                self.abort_and_return()
+                return
             if not self.operator.click_img(CWIMG.COLLECTION):  # 优先点击带有收集图标的策略
                 self.operator.click_point(0.5, 0.27)  # 无法点击时，点击中心点
             self.operator.click_img(IMG.ENSURE2, after_sleep=1)  # 确认选择
+
         self.invest_strategy_stage += 1
 
         for _ in range(3):
@@ -174,11 +181,6 @@ class RerollStart(CurrencyWars):
                 return
 
         default_invest_strategy_handler()
-
-        if self.invest_strategy_stage >= self.invest_strategy_stage_limit:
-            logger.info(f"已达到投资策略阶段 {self.invest_strategy_stage_limit}, 准备重开...")
-            self.reroll = True
-            return
 
     def handle_stage_transitioned(self) -> bool:
         if self.reroll:

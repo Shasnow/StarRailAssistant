@@ -121,7 +121,7 @@ class CurrencyWars(Executable):
         :return: CurrencyWarsPage 枚举值，表示当前所在页面；如果未识别到任何目标页面，则返回 CurrencyWarsPage.UNKNOWN
         """
         page, _ = self.operator.wait_any_img([IMG.ENTER,
-                                              CWIMG.CURRENCY_WARS_START,
+                                              CWIMG.START_CURRENCY_WARS,
                                               CWIMG.PREPARATION_STAGE], interval=0.5)
         if page == 0:
             logger.info("[页面定位] 正在定位到货币战争开始页面")
@@ -200,7 +200,7 @@ class CurrencyWars(Executable):
         """
         # 等待开始按钮
         start_box = self.operator.wait_img(
-            CWIMG.CURRENCY_WARS_START,
+            CWIMG.START_CURRENCY_WARS,
             timeout=30,
             interval=0.5
         )
@@ -434,7 +434,7 @@ class CurrencyWars(Executable):
             if run_times % 3 == 0:  # 每3轮更新一次场上角色，顺便穿戴装备
                 self.refresh_character()
                 self.sort_all_areas_by_priority()  # 优先级排序
-        # 任务结束，重置角色状态
+        # 游戏循环结束，重置角色状态
         self.reset_character()
         return True
 
@@ -682,6 +682,12 @@ class CurrencyWars(Executable):
                 '游戏结束',
                 self.handle_game_over,
                 True  # 挑战结束，终止状态
+            ),
+            (
+                CWIMG.START_CURRENCY_WARS,
+                '主界面',
+                lambda : setattr(self, 'is_game_over', True),
+                True
             )
         ]
 
