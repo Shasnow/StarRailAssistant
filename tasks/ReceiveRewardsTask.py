@@ -132,12 +132,13 @@ class ReceiveRewardsTask(BaseTask):
                     logger.error(SRAError(ErrorCode.MOUSE_CLICK_FAILED, "点击兑换码入口失败"))
             else:
                 logger.error(SRAError(ErrorCode.MOUSE_CLICK_FAILED, "点击更多功能入口失败"))
+        self.operator.sleep(1)
         logger.info("任务完成：领取兑换码")
 
     def mail(self):
         """Open mailbox and pick up mails."""
         logger.info("执行任务：领取邮件")
-        if self.operator.click_point(0.97,0.25, after_sleep=1.5):
+        if self.operator.click_point(0.97,0.25, after_sleep=1.5, tag="点击邮件"):
             if self.operator.click_img(RRIMG.CLAIM_ALL_MAIL):
                 self.operator.sleep(2)
                 self.operator.press_key("esc", presses=2, interval=1)
