@@ -22,4 +22,5 @@ VERSION = "2.9.0"  # 版本号
 CORE = f"{VERSION} on {sys.platform}"  # 核心版本信息
 
 _appdata_base = os.getenv("APPDATA") if sys.platform == "win32" else os.path.expanduser("~/.config")
-AppDataSraDir = Path(_appdata_base or os.path.expanduser("~/.config")) / "SRA"
+AppDataSraDir = Path(_appdata_base) / "SRA"
+ConfigsDir = AppDataSraDir / "configs"

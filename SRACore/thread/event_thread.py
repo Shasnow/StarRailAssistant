@@ -14,7 +14,8 @@ class KeyDownEvent:
     args: Any = None
     is_triggered: bool = False  # 防抖标记
 
-class EventListener:
+
+class KeyboardListener:
     # 退出信号：控制监听器线程退出
     exit_event = threading.Event()
     # 按键回调列表：(按键字符串, 回调函数, 是否已触发防抖)

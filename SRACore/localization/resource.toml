@@ -331,7 +331,7 @@ en-us = "Current config: {config_name}"
 
 [task.noSelectedTasks]
 zh-cn = "{config_name} 配置中没有选中的任务, 跳过执行。"
-en-us = "No tasks are selected in {config_name}, skipping execution."
+en-us = "No task is selected in {config_name}, skipping execution."
 
 [task.taskFailed]
 zh-cn = "任务 '{name}' 失败。停止进一步执行。"
