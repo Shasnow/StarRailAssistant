@@ -39,14 +39,33 @@ public partial class SraService(ILogger<SraService> logger)
             return;
         }
 
-        // 校验核心文件路径
+        // 解析后端启动方式：优先使用编译后的 SRA-cli.exe，找不到则回退到 python main.py（开发模式）
         var cliPath = Path.Combine(Environment.CurrentDirectory, "SRA-cli.exe");
-        if (!File.Exists(cliPath))
+        string fileName;
+        string processArgs;
+        // 开发模式下需要将工作目录设为项目根目录（main.py 所在目录），
+        // 否则后端内部的相对路径（如 SRACore/config.toml）无法解析。
+        string? workingDirectory = null;
+
+        if (File.Exists(cliPath))
         {
-            _logger.LogError("Could not find SRA-cli.exe at path: {Path}", cliPath);
-            var errorMsg = $"无法找到文件 SRA-cli.exe，请检查安装完整性。\n路径: {cliPath}";
-            Outputted?.Invoke(errorMsg);
-            return;
+            fileName = cliPath;
+            processArgs = arguments;
+        }
+        else
+        {
+            // 开发模式：向上查找 main.py 所在的项目根目录
+            var projectRoot = FindProjectRoot(Environment.CurrentDirectory);
+            if (projectRoot == null)
+            {
+                _logger.LogError("Could not find SRA-cli.exe or main.py at: {Path}", Environment.CurrentDirectory);
+                Outputted?.Invoke($"无法找到 SRA-cli.exe 或 main.py，请检查安装完整性。\n路径: {Environment.CurrentDirectory}");
+                return;
+            }
+            fileName = "python";
+            processArgs = string.IsNullOrEmpty(arguments) ? "main.py" : $"main.py {arguments}";
+            workingDirectory = projectRoot;
+            _logger.LogWarning("SRA-cli.exe not found, falling back to 'python main.py' (dev mode, cwd={Cwd})", projectRoot);
         }
 
         // 清理之前的进程资源（若有）
@@ -62,13 +81,14 @@ public partial class SraService(ILogger<SraService> logger)
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "SRA-cli.exe",
+                    FileName = fileName,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     RedirectStandardInput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true,
-                    Arguments = arguments
+                    Arguments = processArgs,
+                    WorkingDirectory = workingDirectory ?? Environment.CurrentDirectory
                 }
             };
 
@@ -305,6 +325,27 @@ public partial class SraService(ILogger<SraService> logger)
             DisposeProcess();
 
         _isDisposed = true;
+    }
+
+    #endregion
+
+    #region 开发模式辅助
+
+    /// <summary>
+    ///     从当前目录向上查找 main.py 所在的项目根目录。
+    ///     用于开发模式下定位 Python 后端入口。
+    /// </summary>
+    /// <returns>包含 main.py 的目录路径，未找到返回 null</returns>
+    private static string? FindProjectRoot(string startDir)
+    {
+        var dir = new DirectoryInfo(startDir);
+        while (dir != null)
+        {
+            if (File.Exists(Path.Combine(dir.FullName, "main.py")))
+                return dir.FullName;
+            dir = dir.Parent;
+        }
+        return null;
     }
 
     #endregion
