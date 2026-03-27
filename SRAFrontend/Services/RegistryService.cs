@@ -20,9 +20,9 @@ public class RegistryService(
      private static class RegistryKeys
      {
          // 分辨率相关子键
-         public const string GameResolutionSubKey = @"Software\miHoYo\崩坏：星穹铁道";
-         public const string GameGlobalResolutionSubKey = @"SOFTWARE\Cognosphere\Star Rail";
-
+         private const string CnGameRegistrySubKey = @"Software\miHoYo\崩坏：星穹铁道"; // 国服注册表路径
+         public const string GlobalGameRegistrySubKey = @"Software\Cognosphere\Star Rail"; // 国际服注册表路径
+         public static string GameRegistrySubKey = CnGameRegistrySubKey;
          // 分辨率相关值名称
          public const string GraphicsSettingsPcResolution = "GraphicsSettings_PCResolution_h431323223";
          public const string ScreenManagerResolutionWidth = "Screenmanager Resolution Width_h182942802";
@@ -31,9 +31,9 @@ public class RegistryService(
          // 游戏安装路径相关子键（优先级从高到低）
          public static readonly string[] GameInstallPathSubKeys =
          [
+             @"Software\Cognosphere\HYP\1_1\hkrpg_global",
              @"Software\miHoYo\HYP\standalone\14_0\hkrpg_cn\6P5gHMNyK3\hkrpg_cn",
-             @"Software\miHoYo\HYP\1_1\hkrpg_cn",
-             @"SOFTWARE\Cognosphere\HYP\1_0\hkrpg_global"
+             @"Software\miHoYo\HYP\1_1\hkrpg_cn"
          ];
      }
     // 提示文本常量
@@ -60,8 +60,9 @@ public class RegistryService(
             using var currentUserKey = Registry.CurrentUser;
 
             // 遍历所有可能的注册表路径，优先匹配第一个存在的
-            foreach (var subKeyPath in RegistryKeys.GameInstallPathSubKeys)
+            for (var index = 0; index < RegistryKeys.GameInstallPathSubKeys.Length; index++)
             {
+                var subKeyPath = RegistryKeys.GameInstallPathSubKeys[index];
                 using var gameSubKey = currentUserKey.OpenSubKey(subKeyPath);
                 if (gameSubKey == null)
                 {
@@ -76,6 +77,8 @@ public class RegistryService(
                     // 格式化路径（替换反斜杠为正斜杠，拼接可执行文件）
                     var fullExePath = $"{gameInstallPath.Replace('\\', '/')}/StarRail.exe";
                     logger.LogInformation("Game path detected successfully: {Path}", fullExePath);
+                    if (index == 0)
+                        RegistryKeys.GameRegistrySubKey = RegistryKeys.GlobalGameRegistrySubKey; // 如果是全球服路径，切换分辨率注册表路径
                     return fullExePath;
                 }
 
@@ -112,22 +115,15 @@ public class RegistryService(
         {
             using var currentUserKey = Registry.CurrentUser;
             using var gameResolutionKey = currentUserKey.OpenSubKey(
-                RegistryKeys.GameResolutionSubKey,
+                RegistryKeys.GameRegistrySubKey,
                 RegistryKeyPermissionCheck.ReadWriteSubTree,
-                RegistryRights.WriteKey | RegistryRights.ReadKey)
-                ?? currentUserKey.OpenSubKey(
-                    RegistryKeys.GameGlobalResolutionSubKey,
-                    RegistryKeyPermissionCheck.ReadWriteSubTree,
-                    RegistryRights.WriteKey | RegistryRights.ReadKey);
+                RegistryRights.WriteKey | RegistryRights.ReadKey);
 
             if (gameResolutionKey == null)
             {
-                logger.LogError("Registry key not found. Attempted keys: {defaultKey}, {globalKey}",
-                    RegistryKeys.GameResolutionSubKey,
-                    RegistryKeys.GameGlobalResolutionSubKey);
+                logger.LogError("Registry key not found: {key}", RegistryKeys.GameRegistrySubKey);
                 return false;
             }
-
             // 备份原有分辨率配置到缓存
             BackupCurrentResolution(gameResolutionKey);
 
@@ -199,22 +195,15 @@ public class RegistryService(
         {
             using var currentUserKey = Registry.CurrentUser;
             using var gameResolutionKey = currentUserKey.OpenSubKey(
-                RegistryKeys.GameResolutionSubKey,
+                RegistryKeys.GameRegistrySubKey,
                 RegistryKeyPermissionCheck.ReadWriteSubTree,
-                RegistryRights.WriteKey | RegistryRights.ReadKey)
-                ?? currentUserKey.OpenSubKey(
-                    RegistryKeys.GameGlobalResolutionSubKey,
-                    RegistryKeyPermissionCheck.ReadWriteSubTree,
-                    RegistryRights.WriteKey | RegistryRights.ReadKey);
+                RegistryRights.WriteKey | RegistryRights.ReadKey);
 
             if (gameResolutionKey == null)
             {
-                logger.LogError("Registry key not found. Attempted keys: {defaultKey}, {globalKey}",
-                    RegistryKeys.GameResolutionSubKey,
-                    RegistryKeys.GameGlobalResolutionSubKey);
+                logger.LogError("Registry key not found: {key}", RegistryKeys.GameRegistrySubKey);
                 return false;
             }
-
             // 写入缓存中的原有配置
             logger.LogInformation(
                 "Start restoring original resolution: Width={Width}, Height={Height}, FullscreenMode={Mode}",
