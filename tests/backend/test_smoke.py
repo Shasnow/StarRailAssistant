@@ -6,10 +6,15 @@
 避免单元测试的 conftest.py 中的 sys.modules mock 污染。
 """
 
+import os
 import subprocess
 import sys
 
 import pytest
+
+# CI 环境（Windows runner）默认编码为 cp1252，无法输出中文字符。
+# 强制所有子进程使用 UTF-8 编码，避免 UnicodeEncodeError。
+_UTF8_ENV = {**os.environ, "PYTHONUTF8": "1"}
 
 
 class TestCLISmoke:
@@ -19,18 +24,20 @@ class TestCLISmoke:
         """main.py --help 能正常输出"""
         result = subprocess.run(
             [sys.executable, "main.py", "--help"],
-            capture_output=True, text=True, timeout=10
+            capture_output=True, encoding="utf-8", errors="replace",
+            timeout=10, env=_UTF8_ENV
         )
-        assert result.returncode == 0
+        assert result.returncode == 0, f"--help 失败:\n{result.stderr}"
         assert "SRA-cli" in result.stdout or "usage" in result.stdout.lower()
 
     def test_main_version(self):
         """main.py --version 能正常输出版本号"""
         result = subprocess.run(
             [sys.executable, "main.py", "--version"],
-            capture_output=True, text=True, timeout=10
+            capture_output=True, encoding="utf-8", errors="replace",
+            timeout=10, env=_UTF8_ENV
         )
-        assert result.returncode == 0
+        assert result.returncode == 0, f"--version 失败:\n{result.stderr}"
 
 
 class TestTaskRegistrySmoke:
@@ -41,7 +48,8 @@ class TestTaskRegistrySmoke:
         """在独立子进程中执行验证代码，避免 conftest mock 污染"""
         return subprocess.run(
             [sys.executable, "-c", code],
-            capture_output=True, text=True, timeout=10
+            capture_output=True, encoding="utf-8", errors="replace",
+            timeout=10, env=_UTF8_ENV
         )
 
     def test_config_toml_loads(self):
