@@ -30,6 +30,7 @@ class MissionAccomplishTask(BaseTask):
         logger.info("退出游戏")
         try:
             sys_util.task_kill("StarRail.exe")
+            self.operator.sleep(2)
             return True
         except Exception as e:
             logger.debug(e)
