@@ -63,7 +63,7 @@
     "argparse.task_name_help": "Name or index of the task to run.",
     "argparse.once_help": "Exit SRA-cli after running the command.",
     "task.currentConfig": "Current config: {config_name}",
-    "task.noSelectedTasks": "No tasks are selected in {config_name}, skipping execution.",
+    "task.noSelectedTasks": "No task is selected in {config_name}, skipping execution.",
     "task.taskFailed": "Task '{name}' failed. Stopping further execution.",
     "task.taskCrashed": "Task '{name}' crashed due to an unexpected error: {error}",
     "task.taskCompleted": "Task '{name}' has been completed.",

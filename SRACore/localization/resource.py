@@ -1,4 +1,3 @@
-# type: ignore
 # -*- coding: utf-8 -*-
 ################################################################################
 ## Form generated from reading TOML file 'resource.toml'
@@ -15,8 +14,8 @@ import os
 class Localization:
     """Automatically generated localization class."""
     __normalized_data: dict[str, str] = None
-    lang: str = "en-us"
-    __available_languages = ['en-us', 'zh-cn']
+    lang: str = "zh-cn"
+    __available_languages = ['zh-cn', 'en-us']
     __data_loaded: bool = False
 
     def __init__(self):
@@ -73,12 +72,12 @@ class Localization:
         self.__ensure_data_loaded()
         return self.__normalized_data.get(key, key)
 
-    def cli_intro(self, version, core) -> str:
+    def cli_intro(self, core, version) -> str:
         """SRA-cli {version} ({core})\n输入 'help' 或 '?' 来查看命令列表。
 
         From cli.intro"""
         template = self.get_translation("cli.intro")
-        return template.format(version=version, core=core)
+        return template.format(core=core, version=version)
 
     @property
     def cli_noAdminWarning(self) -> str:
@@ -318,12 +317,12 @@ class Localization:
         template = self.get_translation("cli.trigger.attrNotFound")
         return template.format(trigger_name=trigger_name, attr=attr)
 
-    def cli_trigger_attrSet(self, trigger_name, attr, value) -> str:
+    def cli_trigger_attrSet(self, value, trigger_name, attr) -> str:
         """触发器 '{trigger_name}' 的属性 '{attr}' 已设置为 '{value}'。
 
         From cli.trigger.attrSet"""
         template = self.get_translation("cli.trigger.attrSet")
-        return template.format(trigger_name=trigger_name, attr=attr, value=value)
+        return template.format(value=value, trigger_name=trigger_name, attr=attr)
 
     def cli_trigger_unknownType(self, type) -> str:
         """未知属性类型: '{type}'，支持: 'int'，'float'，'bool'，'str'。
@@ -533,12 +532,12 @@ class Localization:
         template = self.get_translation("task.taskFailed")
         return template.format(name=name)
 
-    def task_taskCrashed(self, error, name) -> str:
+    def task_taskCrashed(self, name, error) -> str:
         """任务 '{name}' 因意外错误崩溃：{error}
 
         From task.taskCrashed"""
         template = self.get_translation("task.taskCrashed")
-        return template.format(error=error, name=name)
+        return template.format(name=name, error=error)
 
     def task_taskCompleted(self, name) -> str:
         """任务 '{name}' 已完成。
@@ -568,12 +567,12 @@ class Localization:
         From task.notificationMessage"""
         return self.get_translation("task.notificationMessage")
 
-    def task_instantiateFailed(self, error, name) -> str:
+    def task_instantiateFailed(self, name, error) -> str:
         """实例化任务 '{name}' 失败：{error}
 
         From task.instantiateFailed"""
         template = self.get_translation("task.instantiateFailed")
-        return template.format(error=error, name=name)
+        return template.format(name=name, error=error)
 
     def task_noSuchTask(self, identifier) -> str:
         """没有此任务：'{identifier}'
@@ -596,18 +595,18 @@ class Localization:
         template = self.get_translation("config.fileNotFound")
         return template.format(path=path)
 
-    def config_parseError(self, error, path) -> str:
+    def config_parseError(self, path, error) -> str:
         """解析文件 '{path}' 失败：{error}
 
         From config.parseError"""
         template = self.get_translation("config.parseError")
-        return template.format(error=error, path=path)
+        return template.format(path=path, error=error)
 
-    def config_exception(self, error, path) -> str:
+    def config_exception(self, path, error) -> str:
         """加载文件 '{path}' 时发生错误：{error}
 
         From config.exception"""
         template = self.get_translation("config.exception")
-        return template.format(error=error, path=path)
+        return template.format(path=path, error=error)
 
 Resource = Localization()

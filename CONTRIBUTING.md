@@ -112,7 +112,7 @@ python ./package.py
 
 ### 本地化支持
 
-SRA 后端采用 `pyl10nc` 进行本地化支持，欢迎贡献翻译！
+SRA 后端采用 [pyl10nc](https://github.com/Shasnow/pyl10nc) 进行本地化支持，欢迎贡献翻译！
 
 1. 克隆仓库并创建新的分支
 2. 在 `SRACore/localization/` 目录下编辑 `resource.toml` 文件，添加新的语言支持

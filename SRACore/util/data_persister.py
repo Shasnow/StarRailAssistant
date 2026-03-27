@@ -3,19 +3,19 @@ import json
 from typing import Any
 
 from SRACore.localization import Resource
-from SRACore.util.const import AppDataSraDir
+from SRACore.util.const import AppDataSraDir, ConfigsDir
 from SRACore.util.logger import logger
 
 
-def load_config(name:str) -> dict[str, Any] | None:
+def load_config(name: str) -> dict[str, Any] | None:
     path = ''
     try:
         if ".json" in name:
             path = name.replace('\"', '')
         else:
-            path = AppDataSraDir / f'configs/{name}.json'
+            path = ConfigsDir / f'{name}.json'
         with open(path, 'r') as f:
-           return json.load(f)
+            return json.load(f)
     except FileNotFoundError:
         logger.error(Resource.config_fileNotFound(path))
         return None
@@ -25,6 +25,7 @@ def load_config(name:str) -> dict[str, Any] | None:
     except Exception as e:
         logger.error(Resource.config_exception(path, str(e)))
         return None
+
 
 def load_data(typ: str) -> dict[Any, Any]:
     path = ''
@@ -38,7 +39,7 @@ def load_data(typ: str) -> dict[Any, Any]:
 
     try:
         with open(path, 'r') as f:
-           return json.load(f)
+            return json.load(f)
     except FileNotFoundError:
         logger.error(Resource.config_fileNotFound(path))
         return {}
@@ -49,11 +50,14 @@ def load_data(typ: str) -> dict[Any, Any]:
         logger.error(Resource.config_exception(path, str(e)))
         return {}
 
+
 def load_settings():
     return load_data('settings')
 
+
 def load_cache():
     return load_data('cache')
+
 
 def load_app_config():
     path = 'SRACore/config.toml'
