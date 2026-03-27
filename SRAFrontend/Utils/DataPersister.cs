@@ -1,4 +1,5 @@
-﻿using System.IO;
+using System;
+using System.IO;
 using System.Text.Json;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
@@ -20,12 +21,40 @@ public static class DataPersister
     {
         if (!Directory.Exists(PathString.AppDataSraDir)) Directory.CreateDirectory(PathString.AppDataSraDir);
         if (!Directory.Exists(PathString.ConfigsDir)) Directory.CreateDirectory(PathString.ConfigsDir);
-        // 仅创建目录，文件将在WriteAllText时创建
     }
+
+    /// <summary>
+    ///     原子写入文件：先写临时文件，再替换目标文件。
+    ///     写入过程中崩溃不会损坏原文件。
+    /// </summary>
+    private static void SafeWriteAllText(string path, string content)
+    {
+        var dir = Path.GetDirectoryName(path)!;
+        var tempPath = Path.Combine(dir, Path.GetRandomFileName());
+        try
+        {
+            File.WriteAllText(tempPath, content);
+            if (File.Exists(path))
+            {
+                File.Replace(tempPath, path, null);
+            }
+            else
+            {
+                File.Move(tempPath, path);
+            }
+        }
+        catch
+        {
+            if (File.Exists(tempPath)) File.Delete(tempPath);
+            throw;
+        }
+    }
+
+    #region Settings
 
     public static Settings LoadSettings()
     {
-        if (!File.Exists(PathString.SettingsJson)) return new Settings(); 
+        if (!File.Exists(PathString.SettingsJson)) return new Settings();
         var json = File.ReadAllText(PathString.SettingsJson);
         if (string.IsNullOrWhiteSpace(json)) return new Settings();
         return JsonSerializer.Deserialize<Settings>(json) ?? new Settings();
@@ -34,8 +63,12 @@ public static class DataPersister
     public static void SaveSettings(Settings settings)
     {
         var json = JsonSerializer.Serialize(settings, JsonSerializerOptions);
-        File.WriteAllText(PathString.SettingsJson, json);
+        SafeWriteAllText(PathString.SettingsJson, json);
     }
+
+    #endregion
+
+    #region Cache
 
     public static Cache LoadCache()
     {
@@ -48,8 +81,12 @@ public static class DataPersister
     public static void SaveCache(Cache cache)
     {
         var json = JsonSerializer.Serialize(cache, JsonSerializerOptions);
-        File.WriteAllText(PathString.CacheJson, json);
+        SafeWriteAllText(PathString.CacheJson, json);
     }
+
+    #endregion
+
+    #region Config
 
     public static Config LoadConfig(string name)
     {
@@ -65,6 +102,8 @@ public static class DataPersister
     {
         var configPath = Path.Combine(PathString.ConfigsDir, $"{config.Name}.json");
         var json = JsonSerializer.Serialize(config, JsonSerializerOptions);
-        File.WriteAllText(configPath, json);
+        SafeWriteAllText(configPath, json);
     }
+
+    #endregion
 }
