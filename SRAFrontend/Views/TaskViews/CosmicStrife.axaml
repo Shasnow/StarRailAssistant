@@ -11,7 +11,17 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="旷宇纷争" IsChecked="{Binding CurrentConfig.EnabledTasks[3]}"/>
+                    <CheckBox Content="旷宇纷争" IsChecked="{Binding IsCosmicStrifeEnabled}"/>
+                    <Button Content="&lt;" Height="24" Width="28" Padding="4,0"
+                            IsEnabled="{Binding IsCosmicStrifeCanMoveLeft}"
+                            Command="{Binding MoveTaskLeftCommand}"
+                            CommandParameter="CosmicStrifeTask"
+                            ToolTip.Tip="提前执行"/>
+                    <Button Content="&gt;" Height="24" Width="28" Padding="4,0"
+                            IsEnabled="{Binding IsCosmicStrifeCanMoveRight}"
+                            Command="{Binding MoveTaskRightCommand}"
+                            CommandParameter="CosmicStrifeTask"
+                            ToolTip.Tip="推后执行"/>
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="CosmicStrifeTask"
