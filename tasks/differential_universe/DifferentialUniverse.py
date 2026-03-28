@@ -61,7 +61,7 @@ class DifferentialUniverse(Executable):
     def _navigate_and_fight(self):
         """导航和战斗处理"""
         logger.info("移动")
-        self.operator.hold_key("w", duration=2.5)
+        self.operator.hold_key("w", duration=2)
 
         logger.info("进入战斗")
         if self.use_technique:
@@ -70,9 +70,7 @@ class DifferentialUniverse(Executable):
         self.operator.click_point(0.5, 0.5, after_sleep=0.1)
         self.operator.click_point(0.5, 0.5, after_sleep=0.1)
 
-        # 检查是否需要使用技能
-        if self.operator.wait_img(IMG.Q, timeout=10):
-            self.operator.press_key("v")
+        self.operator.sleep(3)
 
         logger.info("等待战斗结束")
 
