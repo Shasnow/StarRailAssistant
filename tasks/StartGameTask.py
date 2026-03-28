@@ -136,7 +136,8 @@ class StartGameTask(BaseTask):
             SGIMG.LOGIN_PAGE % channel,
             SGIMG.WELCOME % channel,
             IMG.QUIT,
-            IMG.ENTER
+            IMG.ENTER,
+            SGIMG.NEW_VERSION
         ], timeout=60, interval=1)
 
         if result == -1:
@@ -145,6 +146,10 @@ class StartGameTask(BaseTask):
         if result != 0:
             logger.info(f"登录状态 {result}")
             enable = self.config['StartGameAlwaysLogin']
+            if result == 4:
+                # 游戏需要更新
+                logger.error(SRAError(ErrorCode.UPDATE_REQUIRED, "游戏需要更新", "请手动更新游戏后重试"))
+                return -1
             if enable and result != 3:  # 是否启用退出账号
                 self.logout()  # 执行退出账号后执行下面的登录操作
             else:

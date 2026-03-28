@@ -60,6 +60,7 @@ class SGIMG:
     TRAIN_SUPPLY = f"{BASE}/train_supply.png"
     USERNAME_INPUT = f"{BASE}/%s/username_input.png"
     WELCOME = f"{BASE}/%s/welcome.png"
+    NEW_VERSION = f"{BASE}/new_version.png"
 # endregion
 
 # region 体力任务专用
