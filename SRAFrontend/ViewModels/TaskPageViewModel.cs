@@ -59,6 +59,13 @@ public partial class TaskPageViewModel : PageViewModel
             if (args.PropertyName != nameof(Cache.CurrentConfigIndex)) return;
             _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.CurrentConfigIndex]);
             CurrentConfig = _configService.Config!;
+            // 刷新任务启用状态绑定
+            OnPropertyChanged(nameof(IsStartGameEnabled));
+            OnPropertyChanged(nameof(IsTrailblazePowerEnabled));
+            OnPropertyChanged(nameof(IsReceiveRewardsEnabled));
+            OnPropertyChanged(nameof(IsCosmicStrifeEnabled));
+            OnPropertyChanged(nameof(IsMissionAccomplishEnabled));
+            RefreshTaskOrderItems();
         }
 
         _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
@@ -67,9 +74,161 @@ public partial class TaskPageViewModel : PageViewModel
         {
             RefreshStrategies();
         }
+
+        RefreshTaskOrderItems();
     }
 
     public ControlPanelViewModel ControlPanelViewModel { get; }
+
+    // ============================================================
+    // 任务启用状态计算属性（供 XAML CheckBox 绑定）
+    // ============================================================
+
+    public bool IsStartGameEnabled
+    {
+        get => CurrentConfig.IsTaskEnabled("StartGameTask");
+        set { CurrentConfig.SetTaskEnabled("StartGameTask", value); OnPropertyChanged(); RefreshTaskOrderItems(); }
+    }
+
+    public bool IsTrailblazePowerEnabled
+    {
+        get => CurrentConfig.IsTaskEnabled("TrailblazePowerTask");
+        set { CurrentConfig.SetTaskEnabled("TrailblazePowerTask", value); OnPropertyChanged(); RefreshTaskOrderItems(); }
+    }
+
+    public bool IsReceiveRewardsEnabled
+    {
+        get => CurrentConfig.IsTaskEnabled("ReceiveRewardsTask");
+        set { CurrentConfig.SetTaskEnabled("ReceiveRewardsTask", value); OnPropertyChanged(); RefreshTaskOrderItems(); }
+    }
+
+    public bool IsCosmicStrifeEnabled
+    {
+        get => CurrentConfig.IsTaskEnabled("CosmicStrifeTask");
+        set { CurrentConfig.SetTaskEnabled("CosmicStrifeTask", value); OnPropertyChanged(); RefreshTaskOrderItems(); }
+    }
+
+    public bool IsMissionAccomplishEnabled
+    {
+        get => CurrentConfig.IsTaskEnabled("MissionAccomplishTask");
+        set { CurrentConfig.SetTaskEnabled("MissionAccomplishTask", value); OnPropertyChanged(); RefreshTaskOrderItems(); }
+    }
+
+    // ============================================================
+    // 任务排序面板
+    // ============================================================
+
+    /// <summary>固定位置任务集合</summary>
+    private static readonly HashSet<string> FixedTasks = new() { "StartGameTask", "MissionAccomplishTask" };
+
+    // 各非 fixed 任务的可移动状态（供 XAML 绑定）
+    [ObservableProperty] private bool _isTrailblazePowerCanMoveLeft;
+    [ObservableProperty] private bool _isTrailblazePowerCanMoveRight;
+    [ObservableProperty] private bool _isReceiveRewardsCanMoveLeft;
+    [ObservableProperty] private bool _isReceiveRewardsCanMoveRight;
+    [ObservableProperty] private bool _isCosmicStrifeCanMoveLeft;
+    [ObservableProperty] private bool _isCosmicStrifeCanMoveRight;
+
+    /// <summary>按 TaskOrder 排列的 Tab 标题列表（供 TabControl 动态排序）</summary>
+    [ObservableProperty] private AvaloniaList<string> _orderedTabKeys = [];
+
+    /// <summary>根据 CurrentConfig.TaskOrder 刷新排序面板</summary>
+    private void RefreshTaskOrderItems()
+    {
+        var order = CurrentConfig.TaskOrder;
+
+        // 刷新 Tab 顺序：fixed 任务钉在首尾，非 fixed 任务按 TaskOrder 中的顺序排列，
+        // 未启用的非 fixed 任务追加在尾部（fixed last 任务之前）
+        var allTasks = new List<string> { "StartGameTask", "TrailblazePowerTask", "ReceiveRewardsTask", "CosmicStrifeTask", "MissionAccomplishTask" };
+        var newTabOrder = new List<string>();
+        // 先按 TaskOrder 中的非 fixed 任务顺序排，fixed 任务钉在首尾
+        var fixedFirst = allTasks.Where(t => t == "StartGameTask").ToList();
+        var fixedLast = allTasks.Where(t => t == "MissionAccomplishTask").ToList();
+        var orderedMiddle = order.Where(t => !FixedTasks.Contains(t) && allTasks.Contains(t)).ToList();
+        var unorderedMiddle = allTasks.Where(t => !FixedTasks.Contains(t) && !orderedMiddle.Contains(t)).ToList();
+        newTabOrder.AddRange(fixedFirst);
+        newTabOrder.AddRange(orderedMiddle);
+        newTabOrder.AddRange(unorderedMiddle);
+        newTabOrder.AddRange(fixedLast);
+        OrderedTabKeys = new AvaloniaList<string>(newTabOrder);
+
+        // 刷新可移动状态
+        for (var i = 0; i < order.Count; i++)
+        {
+            var name = order[i];
+            var isFixed = FixedTasks.Contains(name);
+            if (isFixed) continue;
+
+            // 向左找：跳过 fixed，看是否存在非 fixed 的邻居
+            var canLeft = false;
+            for (var j = i - 1; j >= 0; j--)
+            {
+                if (!FixedTasks.Contains(order[j])) { canLeft = true; break; }
+            }
+            // 向右找：跳过 fixed，看是否存在非 fixed 的邻居
+            var canRight = false;
+            for (var j = i + 1; j < order.Count; j++)
+            {
+                if (!FixedTasks.Contains(order[j])) { canRight = true; break; }
+            }
+
+            switch (name)
+            {
+                case "TrailblazePowerTask":
+                    IsTrailblazePowerCanMoveLeft = canLeft;
+                    IsTrailblazePowerCanMoveRight = canRight;
+                    break;
+                case "ReceiveRewardsTask":
+                    IsReceiveRewardsCanMoveLeft = canLeft;
+                    IsReceiveRewardsCanMoveRight = canRight;
+                    break;
+                case "CosmicStrifeTask":
+                    IsCosmicStrifeCanMoveLeft = canLeft;
+                    IsCosmicStrifeCanMoveRight = canRight;
+                    break;
+            }
+        }
+
+        if (!order.Contains("TrailblazePowerTask")) { IsTrailblazePowerCanMoveLeft = false; IsTrailblazePowerCanMoveRight = false; }
+        if (!order.Contains("ReceiveRewardsTask")) { IsReceiveRewardsCanMoveLeft = false; IsReceiveRewardsCanMoveRight = false; }
+        if (!order.Contains("CosmicStrifeTask")) { IsCosmicStrifeCanMoveLeft = false; IsCosmicStrifeCanMoveRight = false; }
+    }
+
+    [RelayCommand]
+    private void MoveTaskLeft(string taskClassName)
+    {
+        var order = CurrentConfig.TaskOrder;
+        var idx = order.IndexOf(taskClassName);
+        if (idx <= 0) return;
+
+        // 找左边第一个非 fixed 的位置交换
+        var targetIdx = idx - 1;
+        while (targetIdx >= 0 && FixedTasks.Contains(order[targetIdx]))
+            targetIdx--;
+        if (targetIdx < 0) return;
+
+        (order[idx], order[targetIdx]) = (order[targetIdx], order[idx]);
+        OnPropertyChanged(nameof(CurrentConfig));
+        RefreshTaskOrderItems();
+    }
+
+    [RelayCommand]
+    private void MoveTaskRight(string taskClassName)
+    {
+        var order = CurrentConfig.TaskOrder;
+        var idx = order.IndexOf(taskClassName);
+        if (idx < 0 || idx >= order.Count - 1) return;
+
+        // 找右边第一个非 fixed 的位置交换
+        var targetIdx = idx + 1;
+        while (targetIdx < order.Count && FixedTasks.Contains(order[targetIdx]))
+            targetIdx++;
+        if (targetIdx >= order.Count) return;
+
+        (order[idx], order[targetIdx]) = (order[targetIdx], order[idx]);
+        OnPropertyChanged(nameof(CurrentConfig));
+        RefreshTaskOrderItems();
+    }
 
     public AvaloniaList<TrailblazePowerTask> Tasks => [
             new(AddTaskItem)
