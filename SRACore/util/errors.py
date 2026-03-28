@@ -102,6 +102,7 @@ class ErrorCode(IntEnum):
     # 4100-4199: 启动游戏任务错误
     LOGIN_FAILED = 4101  # 登录失败
     LOGIN_TIMEOUT = 4102  # 登录超时
+    UPDATE_REQUIRED = 4103  # 需要更新游戏
 
     # 4200-4299: 体力任务错误
     NO_POWER = 4201  # 没有体力
