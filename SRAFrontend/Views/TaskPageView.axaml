@@ -12,7 +12,23 @@
     <Border Margin="10">
         <Grid RowDefinitions="Auto, *">
             <suki:GlassCard Content="{Binding ControlPanelViewModel}" />
-            <TabControl Grid.Row="1" x:Name="MainTabControl" />
+            <TabControl Grid.Row="1">
+                <TabItem Header="{x:Static lang:Resources.StartGameText}">
+                    <taskViews:StartGameView />
+                </TabItem>
+                <TabItem Header="{x:Static lang:Resources.TrailblazePowerText}">
+                    <taskViews:TrailblazePowerView />
+                </TabItem>
+                <TabItem Header="{x:Static lang:Resources.ReceiveRewardsText}">
+                    <taskViews:ReceiveRewardsView />
+                </TabItem>
+                <TabItem Header="{x:Static lang:Resources.CosmicStrifeText}">
+                    <taskViews:CosmicStrife />
+                </TabItem>
+                <TabItem Header="{x:Static lang:Resources.InTheEndText}">
+                    <taskViews:MissionAccomplishView />
+                </TabItem>
+            </TabControl>
         </Grid>
     </Border>
 </UserControl>

@@ -11,7 +11,7 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="任务完成后" IsChecked="{Binding IsMissionAccomplishEnabled}"/>
+                    <CheckBox Content="任务完成后" IsChecked="{Binding CurrentConfig.EnabledTasks[4]}"/>
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="MissionAccomplishTask"

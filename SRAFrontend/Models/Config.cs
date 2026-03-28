@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -14,13 +13,7 @@ public partial class Config : ObservableObject
     [ObservableProperty] private bool _afterLogout; // 任务完成后是否登出
     [ObservableProperty] private bool _afterShutdown; // 任务完成后关机
     [ObservableProperty] private bool _afterSleep; // 任务完成后睡眠
-
-    /// <summary>
-    ///     任务执行顺序：出现在列表中 = 启用，顺序 = 执行顺序。
-    ///     使用类名（如 "StartGameTask"）标识任务，不依赖索引。
-    ///     默认为空列表，由 DataPersister.LoadConfig 在迁移旧配置或新建配置时填充。
-    /// </summary>
-    [ObservableProperty] private List<string> _taskOrder = [];
+    [ObservableProperty] private bool[] _enabledTasks = [true, false, false, false, false]; // 各任务启用状态
 
     [ObservableProperty] private string _name = "Default"; // 配置名称，默认为 "Default"
     [ObservableProperty] private string _receiveRewardRedeemCodes = ""; // 兑换码列表
@@ -42,7 +35,7 @@ public partial class Config : ObservableObject
     [ObservableProperty] private int _currencyWarsRunTimes = 1; // 货币战争运行次数
     [ObservableProperty] private string _currencyWarsUsername = ""; // 货币战争用户名
     [ObservableProperty] private int _currencyWarsDifficulty; // 货币战争难度：0=最低难度，1=最高难度，2=当前难度（不切换难度）
-
+    
     // 货币战争 - 刷开局 ps: CwRs = Currency wars Reroll start
     [ObservableProperty] private string _cwRsInvestEnvironments = ""; // 刷开局 - 期望投资环境，空格分隔
     [ObservableProperty] private string _cwRsInvestStrategies = ""; // 刷开局 - 期望投资策略，空格分隔
@@ -62,7 +55,7 @@ public partial class Config : ObservableObject
 
     [ObservableProperty] [property: JsonIgnore]
     private string _startGameUsername = ""; // 游戏启动用户名
-
+    
     [ObservableProperty] private bool _trailblazePowerReplenishEnable; // 是否补充体力
     [ObservableProperty] private int _trailblazePowerReplenishTimes; // 补充体力次数
     [ObservableProperty] private int _trailblazePowerReplenishWay; // 补充体力方式
@@ -76,31 +69,5 @@ public partial class Config : ObservableObject
     [JsonPropertyName("StartGameUsername")] public string EncryptedStartGameUsername { get; set; } = "";
 
     public int Version { get; init; } = StaticVersion; // 配置版本号
-    public static int StaticVersion => 4;
-
-    /// <summary>
-    ///     检查指定任务是否在 TaskOrder 中（即是否启用）。
-    ///     供 XAML CheckBox 绑定使用。
-    /// </summary>
-    public bool IsTaskEnabled(string taskName)
-    {
-        return TaskOrder.Contains(taskName);
-    }
-
-    /// <summary>
-    ///     切换指定任务的启用状态：启用则加入 TaskOrder 末尾，禁用则移除。
-    ///     供 XAML CheckBox 绑定使用。
-    /// </summary>
-    public void SetTaskEnabled(string taskName, bool enabled)
-    {
-        if (enabled && !TaskOrder.Contains(taskName))
-        {
-            TaskOrder.Add(taskName);
-        }
-        else if (!enabled)
-        {
-            TaskOrder.Remove(taskName);
-        }
-        OnPropertyChanged(nameof(TaskOrder));
-    }
+    public static int StaticVersion => 3;
 }
