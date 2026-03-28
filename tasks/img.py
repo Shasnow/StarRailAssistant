@@ -150,7 +150,7 @@ class CWIMG:
     START_CURRENCY_WARS = f"{BASE}/start_currency_wars.png"
     DOWN_ARROW = f"{BASE}/down_arrow.png"
     ENCOUNTER_NODE = f"{BASE}/encounter_node.png"
-    ENTER_STANDARD = f"{BASE}/enter_standard.png"
+    ENTER_GAME = f"{BASE}/enter_game.png"
     EQUIP = f"{BASE}/equip.png"
     EQUIPMENT_RECOMMEND = f"{BASE}/equipment_recommend.png"
     FOLD = f"{BASE}/fold.png"
