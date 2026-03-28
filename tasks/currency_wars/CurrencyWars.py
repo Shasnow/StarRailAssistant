@@ -215,10 +215,15 @@ class CurrencyWars(Executable):
             interval=0.5,
             max_iterations=10
         )
+        self.operator.sleep(1)  # 等待界面响应
+        if self.is_overclock:
+            self.operator.click_point(0.15625, 0.4167, after_sleep=0.5, tag="点击超频博弈")
+        else:
+            self.operator.click_point(0.15625, 0.2315, after_sleep=0.5, tag="点击标准博弈")
 
         # 选择进入方式（标准进入/继续进度）
         enter_type, enter_box = self.operator.wait_any_img(
-            [CWIMG.ENTER_STANDARD, CWIMG.CONTINUE_PROGRESS],
+            [CWIMG.ENTER_GAME, CWIMG.CONTINUE_PROGRESS],
             timeout=10
         )
         if enter_type is None:
