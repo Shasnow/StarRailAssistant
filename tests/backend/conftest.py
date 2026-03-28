@@ -183,13 +183,12 @@ def build_import_side_effect(task_map: dict[str, type]):
 
 @pytest.fixture
 def config_toml_path(tmp_path):
-    """创建测试用 config.toml（5 个标准任务，含 fixed 字段）"""
+    """创建测试用 config.toml（5 个标准任务）"""
     content = """
 [[tasks]]
 name = "启动游戏"
 main = "StartGameTask"
 module = "tasks.StartGameTask"
-fixed = "first"
 
 [[tasks]]
 name = "清开拓力"
@@ -210,7 +209,6 @@ module = "tasks.CosmicStrifeTask"
 name = "任务完成"
 main = "MissionAccomplishTask"
 module = "tasks.MissionAccomplishTask"
-fixed = "last"
 """
     config_file = tmp_path / "config.toml"
     config_file.write_text(content, encoding="utf-8")
@@ -220,22 +218,23 @@ fixed = "last"
 @pytest.fixture
 def task_manager(config_toml_path):
     """创建使用测试配置的 TaskManager"""
-    from SRACore.thread.task_process import TaskManager, TaskMeta
+    from SRACore.thread.task_process import TaskManager
     with patch("importlib.import_module", side_effect=build_import_side_effect(TASK_MAP)):
         with patch("SRACore.thread.task_process.BaseTask", FakeBaseTask):
             mgr = TaskManager.__new__(TaskManager)
             mgr.log_level = "TRACE"
             mgr.log_queue = None
-            mgr.task_registry = {}
+            mgr.task_list = []
+            # 手动执行 __init__ 的核心逻辑
             import tomllib
             with open(config_toml_path, "rb") as f:
                 tasks = tomllib.load(f).get("tasks", [])
                 for task in tasks:
                     main_class = task.get("main")
+                    module_name = task.get("module")
+                    _module = MagicMock()
                     cls = TASK_MAP.get(main_class)
                     if cls:
-                        mgr.task_registry[main_class] = TaskMeta(
-                            task_class=cls,
-                            fixed=task.get("fixed"),
-                        )
+                        setattr(_module, main_class, cls)
+                    mgr.task_list.append(cls)
     return mgr

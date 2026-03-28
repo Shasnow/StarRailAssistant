@@ -12,17 +12,7 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="清体力" IsChecked="{Binding IsTrailblazePowerEnabled}"/>
-                    <Button Content="&lt;" Height="24" Width="28" Padding="4,0"
-                            IsEnabled="{Binding IsTrailblazePowerCanMoveLeft}"
-                            Command="{Binding MoveTaskLeftCommand}"
-                            CommandParameter="TrailblazePowerTask"
-                            ToolTip.Tip="提前执行"/>
-                    <Button Content="&gt;" Height="24" Width="28" Padding="4,0"
-                            IsEnabled="{Binding IsTrailblazePowerCanMoveRight}"
-                            Command="{Binding MoveTaskRightCommand}"
-                            CommandParameter="TrailblazePowerTask"
-                            ToolTip.Tip="推后执行"/>
+                    <CheckBox Content="清体力" IsChecked="{Binding CurrentConfig.EnabledTasks[1]}"/>
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="TrailblazePowerTask"

@@ -95,12 +95,7 @@ public static class DataPersister
         var json = File.ReadAllText(configPath);
         if (string.IsNullOrWhiteSpace(json)) return new Config { Name = name };
         var config = JsonSerializer.Deserialize<Config>(json);
-        if (config == null) return new Config { Name = name };
-
-        // 版本过旧的配置直接丢弃重建
-        if (config.Version < Config.StaticVersion) return new Config { Name = name };
-
-        return config;
+        return config == null || config.Version < Config.StaticVersion ? new Config { Name = name } : config;
     }
 
     public static void SaveConfig(Config config)
