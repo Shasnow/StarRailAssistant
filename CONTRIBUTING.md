@@ -69,17 +69,61 @@ cd ..
 
 ## 🚀 开发模式运行
 
-如果不想构建可执行文件，可以直接运行：
+SRA 采用前后端分离架构：前端（C# / Avalonia）通过 stdin/stdout 与后端（Python）子进程通信。开发模式下，前端会自动检测并回退到 `python main.py`，无需打包 `SRA-cli.exe`。
+
+根据你要调试的目标，选择对应的方式：
+
+### 调试前端 UI 或前后端交互
+
+适用场景：修改前端界面、验证前后端 IPC 通信、测试任务页面的配置绑定等。
 
 ```bash
-# 启动前端（开发模式）
 cd SRAFrontend
 dotnet run
-
-# 在另一个终端中启动后端
-cd ..
-python main.py
 ```
+
+前端启动时自动查找 `SRA-cli.exe`，找不到则回退到 `python main.py` 启动后端（日志中会输出 `falling back to 'python main.py' (dev mode)`）。后端作为子进程由前端管理，无需手动启动。
+
+### 调试后端任务逻辑
+
+适用场景：修改任务代码（`tasks/*.py`）、调试 TaskManager 流程、验证 OCR 识别等，不需要前端 UI。
+
+```bash
+python main.py
+sra> help                             # 查看可用命令
+sra> run Default                      # 运行 Default 配置中所有启用的任务
+sra> single StartGameTask Default     # 只运行启动游戏任务
+```
+
+> 这里的 `Default` 是配置名称，对应 `%APPDATA%/SRA/configs/Default.json`。你可以在前端 UI 中创建自己的配置（如 `dev`），然后用 `run dev` 执行。
+
+直接进入 CLI 交互模式，逐条执行命令观察输出。
+
+### 用前端编辑配置，手动触发后端执行
+
+适用场景：需要通过前端 UI 调整任务参数（选关卡、改次数等），然后手动控制后端执行时机。
+
+1. 启动前端 `dotnet run`，在 UI 中修改配置并保存
+2. 通过以下任一方式执行后端命令：
+
+**方式 A**：切到控制台页面，在底部输入框中直接输入：
+
+```
+run Default                      # 运行 Default 配置中所有启用的任务
+single StartGameTask Default     # 只运行启动游戏任务
+help                             # 查看所有可用命令
+```
+
+> 输入框直接连接后端 stdin，等同于在后端 CLI 中输入。
+
+**方式 B**：在独立终端中运行后端 CLI：
+
+```bash
+python main.py
+sra> run Default
+```
+
+> 配置名称对应 `%APPDATA%/SRA/configs/<名称>.json`，前端和后端读取同一份文件，可在前端 UI 中创建和管理。
 
 ## 📦 构建完整发布包
 
