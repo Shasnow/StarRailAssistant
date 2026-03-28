@@ -2,6 +2,7 @@
 name = "启动游戏"
 main = "StartGameTask"
 module = "tasks.StartGameTask"
+fixed = "first"
 
 [[tasks]]
 name = "清开拓力"
@@ -22,3 +23,4 @@ module = "tasks.CosmicStrifeTask"
 name = "任务完成"
 main = "MissionAccomplishTask"
 module = "tasks.MissionAccomplishTask"
+fixed = "last"

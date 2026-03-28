@@ -1,8 +1,9 @@
 # type: ignore
 import importlib
+from dataclasses import dataclass
+from typing import Any
 
 import tomllib
-from typing import Any
 
 from SRACore.localization import Resource
 from SRACore.operators import Operator
@@ -16,19 +17,24 @@ from SRACore.util.data_persister import load_cache, load_config
 from SRACore.util.logger import logger, setup_logger
 
 
+@dataclass
+class TaskMeta:
+    """任务元信息：存储任务类和固定位置约束"""
+    task_class: type
+    fixed: str | None = None  # "first" / "last" / None
+
+
 class TaskManager:
     """
-    任务管理器线程，负责按顺序执行多个任务（如启动游戏、体力刷取等）。
+    任务管理器，负责按顺序执行多个任务（如启动游戏、体力刷取等）。
     支持通过配置动态加载任务列表，并处理任务的中断和错误。
     """
 
     def __init__(self):
-        """
-        初始化任务管理器。
-        """
+        """初始化任务管理器，从 config.toml 加载任务注册表。"""
         self.log_level = "TRACE"
         self.log_queue = None
-        self.task_list: list[type] = []
+        self.task_registry: dict[str, TaskMeta] = {}
         with open("SRACore/config.toml", "rb") as f:
             tasks = tomllib.load(f).get("tasks", [])
             for task in tasks:
@@ -40,8 +46,12 @@ class TaskManager:
                     raise TypeError(f"Task class {main_class} does not inherit from BaseTask")
                 if not callable(getattr(_class, "run", None)):
                     raise TypeError(f"Task class {main_class} does not implement a callable 'run' method")
-                self.task_list.append(_class)
-        logger.debug(f"Successfully load task: {self.task_list}")
+                self.task_registry[main_class] = TaskMeta(
+                    task_class=_class,
+                    fixed=task.get("fixed"),
+                )
+        # 向后兼容：保留 task_list 供旧代码使用
+        logger.debug(f"Successfully load task: {list(self.task_registry.keys())}")
 
     def run(self, *args: Any) -> None:
         """
@@ -97,53 +107,57 @@ class TaskManager:
         """
         根据配置名称加载配置，并返回需要执行的任务实例列表。
 
-        Args:
-            config_name (str): 配置名称
-
-        Returns:
-            List[Executable]: 可执行任务实例列表（已过滤未选中的任务）
-
-        Raises:
-            Exception: 如果配置加载或任务实例化失败（异常会被上层捕获）
+        fixed="first" 的任务固定在最前，fixed="last" 的任务固定在最后。
+        配置版本不符（Version < StaticVersion）时由前端丢弃，后端不做迁移。
         """
         # 加载指定配置
         config = load_config(config_name)
         if config is None:
             return []
         print_config = config.copy()
-        print_config["StartGamePassword"] = "******"
+        if "StartGamePassword" in print_config:
+            print_config["StartGamePassword"] = "******"
         logger.debug('config: ' + str(print_config))
-        # 从配置中读取任务选择列表（如 [True, False, True]）
-        task_select = config.get("EnabledTasks")
-        logger.debug('task_select: ' + str(task_select))
-        if not task_select:
+
+        task_order = config.get("TaskOrder")
+        if not task_order:
             return []
-        tasks = []
 
-        # 遍历 task_select，根据选择状态实例化对应任务
-        for index, is_select in enumerate(task_select):
-            # 检查：1. 任务被选中 2. 索引在 task_list 范围内
-            if is_select and index < len(self.task_list):
-                try:
-                    # 实例化任务类
-                    tasks.append(self.task_list[index](Operator(), config))
-                except Exception as e:
-                    logger.exception(Resource.task_instantiateFailed(index, str(e)))
-        return tasks
+        logger.debug('task_order: ' + str(task_order))
 
-    def run_task(self, task: int | str, config_name: str | None = None) -> bool:
+        # 按 fixed 分组
+        first_tasks = []
+        ordered_tasks = []
+        last_tasks = []
+
+        for name in task_order:
+            meta = self.task_registry.get(name)
+            if meta is None:
+                logger.warning(f"未知任务: {name}，跳过")
+                continue
+            if meta.fixed == "first":
+                first_tasks.append(meta.task_class)
+            elif meta.fixed == "last":
+                last_tasks.append(meta.task_class)
+            else:
+                ordered_tasks.append(meta.task_class)
+
+        # 拼接：固定头 + 用户排序 + 固定尾
+        final_order = first_tasks + ordered_tasks + last_tasks
+
+        operator = Operator()
+        return [cls(operator, config) for cls in final_order]
+
+    def run_task(self, task: str, config_name: str | None = None) -> bool:
         """
-        根据配置名称和任务索引或名称执行单个任务。
+        根据配置名称和任务名称执行单个任务。
 
         Args:
-            task (int | str): 任务索引（int）或任务类名称（str）
-            config_name (str): 配置名称
+            task (str): 任务类名称（如 "StartGameTask"）
+            config_name (str | None): 配置名称，为 None 时从缓存读取当前配置
 
         Returns:
             bool: 任务执行结果（成功返回 True，失败返回 False）
-
-        Raises:
-            ValueError: 如果任务未找到或配置加载失败
         """
         setup_logger(level=self.log_level, queue=self.log_queue)
         logger.debug('[Start]')
@@ -180,27 +194,27 @@ class TaskManager:
 
         Args:
             config_name (str): 配置名称
-            task ( str): 任务索引或任务类名称（str）
+            task (str): 任务类名称（如 "StartGameTask"）
 
         Returns:
-            BaseTask: 任务实例
-
-        Raises:
-            ValueError: 如果任务未找到或配置加载失败
+            BaseTask | None: 任务实例，未找到或配置加载失败时返回 None
         """
-        # 根据参数类型获取任务类
+        # 从 task_registry 查找任务类
         task_class = None
-        if task.isdecimal():
-            index = int(task)
-            if 0 <= index < len(self.task_list):
-                task_class = self.task_list[index]
+        meta = self.task_registry.get(task)
+        if meta:
+            task_class = meta.task_class
         else:
-            for cls in self.task_list:
-                if cls.__name__.lower() == task.lower():
-                    task_class = cls
+            # 不区分大小写回退查找
+            for name, m in self.task_registry.items():
+                if name.lower() == task.lower():
+                    task_class = m.task_class
                     break
             else:
-                task_class = importlib.import_module(f"tasks.{task}").__getattribute__(task)
+                try:
+                    task_class = importlib.import_module(f"tasks.{task}").__getattribute__(task)
+                except (ModuleNotFoundError, AttributeError):
+                    return None
         if task_class is None:
             return None
         try:
@@ -209,8 +223,9 @@ class TaskManager:
             if config is None:
                 return None
             print_config = config.copy()
-            print_config["StartGamePassword"] = "******"
-            logger.debug('config: ' + str(config))
+            if "StartGamePassword" in print_config:
+                print_config["StartGamePassword"] = "******"
+            logger.debug('config: ' + str(print_config))
             # 实例化任务类
             return task_class(Operator(), config)
         except Exception as e:
