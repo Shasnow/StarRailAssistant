@@ -3,7 +3,7 @@ using SRAFrontend.Services;
 
 namespace SRAFrontend.ViewModels;
 
-public class ExtensionPageViewModel(SraService sraService) : PageViewModel(PageName.Extension, "\uE596")
+public class ExtensionPageViewModel(IBackendService backendService) : PageViewModel(PageName.Extension, "\uE596")
 {
     private bool _enableAutoPlot;
 
@@ -16,7 +16,7 @@ public class ExtensionPageViewModel(SraService sraService) : PageViewModel(PageN
         {
             _enableAutoPlot = value;
             OnPropertyChanged();
-            sraService.SendInput(value ? "trigger enable AutoPlotTrigger" : "trigger disable AutoPlotTrigger");
+            backendService.SendInput(value ? "trigger enable AutoPlotTrigger" : "trigger disable AutoPlotTrigger");
         }
     }
 
@@ -27,7 +27,7 @@ public class ExtensionPageViewModel(SraService sraService) : PageViewModel(PageN
         {
             _skipPlot = value;
             OnPropertyChanged();
-            sraService.SendInput($"trigger set-bool AutoPlotTrigger skip_plot {value}");
+            backendService.SendInput($"trigger set-bool AutoPlotTrigger skip_plot {value}");
         }
     }
 }

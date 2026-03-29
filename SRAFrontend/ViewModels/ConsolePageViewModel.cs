@@ -9,16 +9,16 @@ namespace SRAFrontend.ViewModels;
 
 public partial class ConsolePageViewModel : PageViewModel
 {
-    private readonly SraService _sraService;
+    private readonly IBackendService _backendService;
     private readonly AvaloniaList<string> _consoleLines = [];
     
     private const int MaxConsoleLines = 1000;
 
-    public ConsolePageViewModel(SraService sraService) : base(PageName.Console, "\uEAE8")
+    public ConsolePageViewModel(IBackendService backendService) : base(PageName.Console, "\uEAE8")
     {
-        _sraService = sraService;
-        _sraService.Outputted += AddConsoleLine;
-        _sraService.StartSraProcess("--inline");
+        _backendService = backendService;
+        _backendService.Outputted += AddConsoleLine;
+        _backendService.StartBackend("--inline");
         FilterOptions.CollectionChanged+= (_, _) => OnPropertyChanged(nameof(ConsoleLines));
     }
 
@@ -60,7 +60,7 @@ public partial class ConsolePageViewModel : PageViewModel
     
     private void HandleMessage(string message)
     {
-        _sraService.SendInput(message);
+        _backendService.SendInput(message);
     }
     
     private void HandleCommand(string line)
@@ -98,6 +98,6 @@ public partial class ConsolePageViewModel : PageViewModel
     private void RestartConsole()
     {
         _consoleLines.Clear();
-        _sraService.RestartSraProcess("--inline");
+        _backendService.RestartBackendAsync("--inline");
     }
 }
