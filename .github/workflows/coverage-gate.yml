@@ -1,11 +1,11 @@
 name: Coverage Gate
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '**/*.py'
-      - '*.py'
+#  push:
+#    branches: [main]
+#    paths:
+#      - '**/*.py'
+#      - '*.py'
   pull_request:
     branches: [main]
     paths:
