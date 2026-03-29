@@ -405,6 +405,28 @@
                                                 <Label Grid.Column="1" Content="保存OCR截图" />
                                                 <ToggleSwitch Grid.Column="2" IsChecked="{Binding Settings.IsSaveOcrImage}"/>
                                             </Grid>
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE47E;</Label>
+                                                <Label Grid.Column="1" Content="使用Python从源代码运行后端" />
+                                                <ToggleSwitch Grid.Column="2"
+                                                              IsChecked="{Binding Settings.IsUsingPython}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE1C2;</Label>
+                                                <Label Grid.Column="1" Content="Python 解释器" />
+                                                <TextBox Grid.Column="2"
+                                                         MinWidth="300"
+                                                         Watermark="/path/to/your/python.exe"
+                                                         Text="{Binding Settings.PythonPath}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xEB2C;</Label>
+                                                <Label Grid.Column="1" Content="主程序路径" />
+                                                <TextBox Grid.Column="2"
+                                                         MinWidth="300"
+                                                         Watermark="/path/to/your/main.py"
+                                                         Text="{Binding Settings.PythonMainPy}" />
+                                            </Grid>
                                         </StackPanel>
                                     </Expander>
                                 </StackPanel>
