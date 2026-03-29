@@ -43,7 +43,8 @@ public partial class Settings : ObservableObject
 
     [ObservableProperty] private bool _isAutoDetectGamePath = true; // 是否自动检测游戏安装路径
 
-    [ObservableProperty] private string _gamePath = ""; // 游戏安装路径
+    [ObservableProperty] private int _gamePathIndex; // 游戏安装路径
+    public AvaloniaList<string> GamePaths { get; set; } = []; // 可能的游戏安装路径列表
 
     [ObservableProperty] private double _zoom = 1; // 屏幕缩放比例
 

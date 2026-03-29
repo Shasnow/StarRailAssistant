@@ -37,9 +37,9 @@
                                                       Command="{Binding DetectGamePathCommand}"
                                                       Width="120"
                                                       ToolTip.Tip="开启以自动检测电脑中的游戏" />
-                                        <TextBox Grid.Column="3" Text="{Binding Settings.GamePath}"
-                                                 IsEnabled="{Binding !Settings.IsAutoDetectGamePath}"
-                                                 ToolTip.Tip="当使用自动检测时，无法手动修改" />
+                                        <ComboBox Grid.Column="3"
+                                                  ItemsSource="{Binding Settings.GamePaths}"
+                                                  SelectedIndex="{Binding Settings.GamePathIndex}"/>
                                         <Button Grid.Column="4" Classes="Icon"
                                                 FontFamily="{StaticResource Phosphor}"
                                                 Content="&#xE256;"
