@@ -12,13 +12,13 @@ public partial class ControlPanelViewModel : ViewModelBase
     private readonly CacheService _cacheService;
     private readonly ConfigService _configService;
     private readonly SettingsService _settingsService;
-    private readonly SraService _sraService;
+    private readonly IBackendService _backendService;
     private readonly CommonModel _commonModel;
     [ObservableProperty] private bool _isAddConfigOpen;
     [ObservableProperty] private string _newConfigName = "";
 
     public ControlPanelViewModel(
-        SraService sraService,
+        IBackendService backendService,
         CacheService cacheService,
         ConfigService configService,
         SettingsService settingsService,
@@ -26,12 +26,12 @@ public partial class ControlPanelViewModel : ViewModelBase
     {
         _settingsService = settingsService;
         _configService = configService;
-        _sraService = sraService;
+        _backendService = backendService;
         _cacheService = cacheService;
         _commonModel = commonModel;
-        _sraService.PropertyChanged += (_, args) =>
+        _backendService.PropertyChanged += (_, args) =>
         {
-            if (args.PropertyName == nameof(SraService.IsRunning)) OnPropertyChanged(nameof(CanStart));
+            if (args.PropertyName == nameof(IBackendService.IsTaskRunning)) OnPropertyChanged(nameof(CanStart));
         };
     }
 
@@ -49,7 +49,7 @@ public partial class ControlPanelViewModel : ViewModelBase
         }
     }
 
-    public bool CanStart => !_sraService.IsRunning;
+    public bool CanStart => !_backendService.IsTaskRunning;
 
     public Cache Cache => _cacheService.Cache;
 
@@ -67,14 +67,14 @@ public partial class ControlPanelViewModel : ViewModelBase
         {
             case "Current":
                 Save();
-                if (_sraService.TaskRun(Cache.CurrentConfigName))
+                if (_backendService.TaskRun(Cache.CurrentConfigName))
                     _commonModel.ShowSuccessToast("任务启动成功", $"已启动配置：{Cache.CurrentConfigName}");
                 else
                     _commonModel.ShowErrorToast("任务启动失败", $"无法启动配置：{Cache.CurrentConfigName}，请检查后端状态。");
                 break;
             case "All":
                 Save();
-                if (_sraService.TaskRun(null))
+                if (_backendService.TaskRun(null))
                     _commonModel.ShowSuccessToast("任务启动成功", "已启动所有配置任务。");
                 else
                     _commonModel.ShowErrorToast("任务启动失败", "无法启动所有配置任务，请检查后端状态。");
@@ -89,7 +89,7 @@ public partial class ControlPanelViewModel : ViewModelBase
     public void StartSingleTask(string configName)
     {
         Save();
-        if (_sraService.TaskSingle(configName))
+        if (_backendService.TaskSingle(configName))
             _commonModel.ShowSuccessToast("任务启动成功", "已启动任务");
         else
             _commonModel.ShowErrorToast("任务启动失败", "无法启动任务，请检查后端状态。");
@@ -98,7 +98,7 @@ public partial class ControlPanelViewModel : ViewModelBase
     [RelayCommand]
     private void StopButton()
     {
-        _sraService.TaskStop();
+        _backendService.TaskStop();
     }
 
     private void Save()

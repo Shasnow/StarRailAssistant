@@ -22,7 +22,7 @@ public class CommonModel(
     SettingsService settingsService,
     CacheService cacheService,
     UpdateService updateService,
-    SraService sraService,
+    IBackendService backendService,
     AnnouncementService announcementService,
     ILogger<CommonModel> logger,
     ISukiToastManager toastManager)
@@ -255,7 +255,7 @@ public class CommonModel(
 
         ShowSuccessToast("下载完成", "更新包将在3秒后解压");
         await Task.Delay(3000);
-        sraService.StopSraProcess();
+        backendService.StopBackend();
         if (isHotfix)
         {
             logger.LogDebug("Extracting hotfix: {Source} -> {Destination}", downloadFilePath, PathString.SourceCodeDir);
@@ -400,7 +400,7 @@ public class CommonModel(
         ShowInfoToast("发送测试邮件", "正在发送测试邮件...");
 
         // 使用SraService发送测试邮件命令
-        var success = sraService.SendInput("notify test-email");
+        var success = backendService.SendInput("notify test-email");
 
         if (!success)
         {
