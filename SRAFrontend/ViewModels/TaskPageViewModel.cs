@@ -21,7 +21,6 @@ public partial class TaskPageViewModel : PageViewModel
     private readonly CacheService _cacheService;
     private readonly ConfigService _configService;
     private readonly CommonModel _commonModel;
-    private readonly SraService _sraService;
 
     [ObservableProperty] private Config _currentConfig;
 
@@ -43,15 +42,13 @@ public partial class TaskPageViewModel : PageViewModel
         CommonModel commonModel,
         ControlPanelViewModel controlPanelViewModel,
         ConfigService configService,
-        CacheService cacheService,
-        SraService sraService) : base(
+        CacheService cacheService) : base(
         PageName.Task, "\uE1BC")
     {
         ControlPanelViewModel = controlPanelViewModel;
         _commonModel = commonModel;
         _configService = configService;
         _cacheService = cacheService;
-        _sraService = sraService;
         CurrentConfig = _configService.Config!;
 
         void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)

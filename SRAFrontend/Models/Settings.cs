@@ -57,6 +57,9 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private bool _launchWithCmd; // 使用 CMD 启动游戏
     [ObservableProperty] private bool _isDeveloperMode; // 开发者模式
     [ObservableProperty] private bool _isSaveOcrImage; // 是否保存OCR截图
+    [ObservableProperty] private bool _isUsingPython; // 是否使用Python版本后端
+    [ObservableProperty] private string _pythonPath = ""; // Python解释器路径
+    [ObservableProperty] private string _pythonMainPy = ""; // Python主程序路径
 
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
     [JsonPropertyName("EmailAuthCode")] public string EncryptedEmailAuthCode { get; set; } = "";

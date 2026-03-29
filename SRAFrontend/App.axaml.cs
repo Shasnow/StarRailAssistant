@@ -54,7 +54,7 @@ public partial class App : Application
                 serviceProvider.GetRequiredService<SettingsService>().SaveSettings();
                 serviceProvider.GetRequiredService<ConfigService>().SaveConfig();
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
-                serviceProvider.GetRequiredService<SraService>().StopSraProcess();
+                serviceProvider.GetRequiredService<IBackendService>().StopBackend();
                 serviceProvider.GetRequiredService<RegistryService>().RestoreUserPcResolution();
                 serviceProvider.GetRequiredService<ReportService>().Report("logout", null);
                 Log.CloseAndFlush();
@@ -85,7 +85,10 @@ public partial class App : Application
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
         services.AddSingleton<SettingsService>();
         services.AddSingleton<CacheService>();
-        services.AddSingleton<SraService>();
+        // Register backend implementations and proxy
+        services.AddSingleton<CliBackendService>();
+        services.AddSingleton<PyBackendService>();
+        services.AddSingleton<IBackendService, BackendServiceProxy>();
         services.AddSingleton<RegistryService>();
         services.AddSingleton<ConfigService>();
         services.AddSingleton<ReportService>();
