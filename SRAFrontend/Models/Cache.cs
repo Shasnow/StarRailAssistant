@@ -23,10 +23,8 @@ public partial class Cache : ObservableObject
 
     // 以下字段无UI绑定
     public string HotfixVersion { get; set; } = ""; // 热更版本号
-    public byte[]? UserGameResolution { get; set; } // 用户游戏分辨率设置的二进制数据
-    public int? UserGameResolutionWidth { get; set; } // 用户游戏分辨率宽度
-    public int? UserGameResolutionHeight { get; set; } // 用户游戏分辨率高度
-    public int? UserGameFullscreenMode { get; set; } // 用户游戏全屏模式
+    public ResolutionCache CnGameResolution { get; set; } = new ResolutionCache(); // 国服游戏分辨率设置
+    public ResolutionCache GlobalGameResolution { get; set; } = new ResolutionCache(); // 国际服游戏分辨率设置
     public bool NoNotifyForShortcut { get; set; } // 是否不再提示创建桌面快捷方式
     public long LastLaunchTimestamp { get; set; } // 上次启动时间戳
     public int LastViewAnnouncementId { get; set; } // 上次查看的公告ID
