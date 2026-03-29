@@ -206,14 +206,18 @@ public partial class SettingsPageViewModel : PageViewModel
         if (TopLevelObject is null) return;
         var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
         if (files.Count == 0) return;
-        Settings.GamePath = files[0].Path.LocalPath;
+        var localPath = files[0].Path.LocalPath;
+        Settings.GamePaths.Add(localPath);
+        Settings.GamePathIndex = Settings.GamePaths.Count - 1; // 切换到新添加的路径
     }
 
     [RelayCommand]
     private void DetectGamePath()
     {
         if (!Settings.IsAutoDetectGamePath) return;
-        Settings.GamePath = _registryService.GetGameInstallPath();
+        Settings.GamePaths.Clear();
+        Settings.GamePaths.AddRange(_registryService.GetGameInstallPaths());
+        Settings.GamePathIndex = 0; // 切换到第一个路径
     }
 
     private void SetGameResolution()
