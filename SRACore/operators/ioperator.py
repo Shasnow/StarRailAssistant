@@ -1,3 +1,4 @@
+import threading
 import time
 from abc import ABC, abstractmethod
 from typing import Any, Callable
@@ -25,6 +26,7 @@ class IOperator(ABC):
         self.height = 0
         self.is_developer_mode = self.settings.get('IsDeveloperMode', False)
         self.is_save_ocr_image = self.settings.get('IsSaveOcrImage', False) if self.is_developer_mode else False
+        self._stop_event: threading.Event | None = None
 
     @classmethod
     def _get_ocr_instance(cls):
@@ -535,7 +537,8 @@ class IOperator(ABC):
             box = self.ocr_match(text, confidence, *args, **kwargs)
             if box is not None:
                 return box
-            time.sleep(interval)
+            if self._stop_event and self._stop_event.wait(timeout=interval):
+                return None
         logger.debug(f"Timeout: '{text}' -> NotFound in {timeout} seconds")
         return None
 
@@ -564,7 +567,8 @@ class IOperator(ABC):
             index, box = self.ocr_match_any(texts, confidence, *args, **kwargs)
             if index != -1:
                 return index, box
-            time.sleep(interval)
+            if self._stop_event and self._stop_event.wait(timeout=interval):
+                return -1, None
         logger.debug(f"Timeout: '{texts}' -> NotFound in {timeout} seconds")
         return -1, None
 
@@ -642,7 +646,8 @@ class IOperator(ABC):
             box = self.locate(template)
             if box is not None:
                 return box
-            time.sleep(interval)
+            if self._stop_event and self._stop_event.wait(timeout=interval):
+                return None
         logger.debug(f"Timeout: {template} -> NotFound in {timeout} seconds")
         return None
 
@@ -663,7 +668,8 @@ class IOperator(ABC):
             index, box = self.locate_any(templates, trace = trace)
             if index != -1:
                 return index, box
-            time.sleep(interval)
+            if self._stop_event and self._stop_event.wait(timeout=interval):
+                return -1, None
         logger.debug(f"Timeout: {templates} -> NotFound in {timeout} seconds")
         return -1, None
 

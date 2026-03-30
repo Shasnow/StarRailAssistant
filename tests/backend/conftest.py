@@ -95,10 +95,17 @@ sys.modules["SRACore.util.data_persister"] = _mock_data_persister
 
 class FakeBaseTask(ABC):
     """BaseTask 替身"""
-    def __init__(self, operator, config: dict[str, Any]):
+    def __init__(self, operator, config: dict[str, Any], stop_event=None):
         self.operator = operator
+        self.settings = operator.settings
         self.config = config
-        self.stop_flag = False
+        self._stop_event = stop_event
+
+    @property
+    def should_stop(self) -> bool:
+        if self._stop_event is None:
+            return False
+        return self._stop_event.is_set()
 
     @abstractmethod
     def run(self) -> bool:
@@ -217,13 +224,15 @@ module = "tasks.MissionAccomplishTask"
 
 @pytest.fixture
 def task_manager(config_toml_path):
-    """创建使用测试配置的 TaskManager"""
+    """创建使用测试配置的 TaskManager（兼容 P1 stop_event）"""
     from SRACore.thread.task_process import TaskManager
     with patch("importlib.import_module", side_effect=build_import_side_effect(TASK_MAP)):
         with patch("SRACore.thread.task_process.BaseTask", FakeBaseTask):
             mgr = TaskManager.__new__(TaskManager)
             mgr.log_level = "TRACE"
             mgr.log_queue = None
+            mgr._stop_event = MagicMock()
+            mgr._stop_event.is_set.return_value = False
             mgr.task_list = []
             # 手动执行 __init__ 的核心逻辑
             import tomllib

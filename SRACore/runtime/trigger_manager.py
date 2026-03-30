@@ -42,4 +42,3 @@ class TriggerManager:
             logger.debug(f'trigger registered: {trigger}')
         else:
             logger.debug(f'trigger already registered: {trigger}')
-
