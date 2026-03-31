@@ -273,4 +273,22 @@
     <data name="AutoResolutionText" xml:space="preserve">
         <value>Auto Set Game Resolotion</value>
     </data>
+    <data name="DeveloperOptionsText" xml:space="preserve">
+        <value>Developer Options</value>
+    </data>
+    <data name="EnableDeveloperOptionsText" xml:space="preserve">
+        <value>Enable Developer Options</value>
+    </data>
+    <data name="SaveOcrImageText" xml:space="preserve">
+        <value>Save OCR Image</value>
+    </data>
+    <data name="UsingPythonText" xml:space="preserve">
+        <value>Use Python to run the backend</value>
+    </data>
+    <data name="PythonInterpreterText" xml:space="preserve">
+        <value>Python Interpreter</value>
+    </data>
+    <data name="MainPyText" xml:space="preserve">
+        <value>The Path to main.py</value>
+    </data>
 </root>

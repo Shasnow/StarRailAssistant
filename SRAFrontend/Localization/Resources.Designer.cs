@@ -339,6 +339,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Developer Options.
+        /// </summary>
+        public static string DeveloperOptionsText {
+            get {
+                return ResourceManager.GetString("DeveloperOptionsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Display.
         /// </summary>
         public static string DisplayText {
@@ -353,6 +362,15 @@ namespace SRAFrontend.Localization {
         public static string EmailNotificationText {
             get {
                 return ResourceManager.GetString("EmailNotificationText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable Developer Options.
+        /// </summary>
+        public static string EnableDeveloperOptionsText {
+            get {
+                return ResourceManager.GetString("EnableDeveloperOptionsText", resourceCulture);
             }
         }
         
@@ -483,6 +501,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Path to main.py.
+        /// </summary>
+        public static string MainPyText {
+            get {
+                return ResourceManager.GetString("MainPyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Map.
         /// </summary>
         public static string MapText {
@@ -546,6 +573,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Python Interpreter.
+        /// </summary>
+        public static string PythonInterpreterText {
+            get {
+                return ResourceManager.GetString("PythonInterpreterText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Receiver.
         /// </summary>
         public static string ReceiverEmailAddrText {
@@ -587,6 +623,15 @@ namespace SRAFrontend.Localization {
         public static string ResourceIntegrityCheckText {
             get {
                 return ResourceManager.GetString("ResourceIntegrityCheckText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save OCR Image.
+        /// </summary>
+        public static string SaveOcrImageText {
+            get {
+                return ResourceManager.GetString("SaveOcrImageText", resourceCulture);
             }
         }
         
@@ -794,6 +839,15 @@ namespace SRAFrontend.Localization {
         public static string UpdateText {
             get {
                 return ResourceManager.GetString("UpdateText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use Python to run the backend.
+        /// </summary>
+        public static string UsingPythonText {
+            get {
+                return ResourceManager.GetString("UsingPythonText", resourceCulture);
             }
         }
         
