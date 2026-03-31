@@ -8,14 +8,16 @@ using Microsoft.Extensions.Logging;
 
 namespace SRAFrontend.Services;
 
-public abstract partial class LocalBackendService(ILogger<LocalBackendService> logger) : ObservableObject, IBackendService
+public abstract partial class LocalBackendService(ILogger<LocalBackendService> logger)
+    : ObservableObject, IBackendService
 {
     private Process? _backendProcess;
+    [ObservableProperty] private bool _isTaskRunning;
     public abstract string FileName { get; set; }
     public abstract string WorkingDirectory { get; set; }
     public abstract string MainArgument { get; set; }
     public event Action<string>? Outputted;
-    [ObservableProperty] private bool _isTaskRunning;
+
     public bool SendInput(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -26,7 +28,8 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
 
         if (_backendProcess == null || _backendProcess.HasExited)
         {
-            logger.LogWarning("Attempted to send input to backend process, but it is not running. Input: {Input}", input);
+            logger.LogWarning("Attempted to send input to backend process, but it is not running. Input: {Input}",
+                input);
             Outputted?.Invoke($"发送失败: 进程未运行（输入: {input}）");
             return false;
         }
@@ -80,23 +83,6 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
             Dispatcher.UIThread.Post(() => Outputted?.Invoke($"启动失败: {e.Message}"));
             CleanupProcessResources();
         }
-        
-    }
-
-    private void OnBackendProcessExited(object? sender, EventArgs e)
-    {
-        var processId = _backendProcess?.Id ?? -1;
-        var exitCode = _backendProcess?.ExitCode ?? -1;
-        logger.LogInformation("Process exited (PID: {Pid}, Exit Code: {ExitCode})", processId, exitCode);
-
-        Dispatcher.UIThread.Post(() =>
-        {
-            IsTaskRunning = false;
-            Outputted?.Invoke($"进程已退出（PID: {processId}，退出代码为: {exitCode}）");
-        });
-
-        // 清理资源
-        CleanupProcessResources();
     }
 
     public void StopBackend()
@@ -142,6 +128,22 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
         return SendInput("task stop");
     }
 
+    private void OnBackendProcessExited(object? sender, EventArgs e)
+    {
+        var processId = _backendProcess?.Id ?? -1;
+        var exitCode = _backendProcess?.ExitCode ?? -1;
+        logger.LogInformation("Process exited (PID: {Pid}, Exit Code: {ExitCode})", processId, exitCode);
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            IsTaskRunning = false;
+            Outputted?.Invoke($"进程已退出（PID: {processId}，退出代码为: {exitCode}）");
+        });
+
+        // 清理资源
+        CleanupProcessResources();
+    }
+
     private void OnBackendProcessOutputDataReceived(object _, DataReceivedEventArgs args)
     {
         if (string.IsNullOrEmpty(args.Data)) return;
@@ -157,17 +159,14 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
             Outputted?.Invoke(args.Data);
         });
     }
-    
+
     private void OnBackendProcessErrorDataReceived(object _, DataReceivedEventArgs args)
     {
         if (string.IsNullOrEmpty(args.Data)) return;
 
-        Dispatcher.UIThread.Post(() =>
-        {
-            Outputted?.Invoke(args.Data);
-        });
+        Dispatcher.UIThread.Post(() => { Outputted?.Invoke(args.Data); });
     }
-    
+
     private void CleanupProcessResources()
     {
         if (_backendProcess == null) return;

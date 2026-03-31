@@ -19,7 +19,7 @@ using SukiUI.Toasts;
 
 namespace SRAFrontend;
 
-public partial class App : Application
+public class App : Application
 {
     public override void Initialize()
     {
@@ -56,7 +56,7 @@ public partial class App : Application
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
                 serviceProvider.GetRequiredService<IBackendService>().StopBackend();
                 serviceProvider.GetRequiredService<RegistryService>().RestoreUserPcResolution();
-                serviceProvider.GetRequiredService<ReportService>().Report("logout", null);
+                serviceProvider.GetRequiredService<ReportService>().Report("logout", string.Empty);
                 Log.CloseAndFlush();
             };
         }

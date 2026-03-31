@@ -26,11 +26,12 @@ public class ReportService(
             _deviceIdCache = File.ReadAllText(deviceIdFilePath).Trim();
             if (!string.IsNullOrEmpty(_deviceIdCache)) return _deviceIdCache;
         }
+
         _deviceIdCache = Guid.NewGuid().ToString();
         File.WriteAllText(deviceIdFilePath, _deviceIdCache);
         return _deviceIdCache;
     }
-    
+
     private AppEvent CreateAppEvent(string eventType, string eventData)
     {
         var deviceId = GetDeviceId();
@@ -43,10 +44,10 @@ public class ReportService(
             AppId = "SRA",
             AppVersion = Settings.Version,
             Timestamp = timestampNow,
-            SessionDuration = timestampNow - cacheService.Cache.LastLaunchTimestamp,
+            SessionDuration = timestampNow - cacheService.Cache.LastLaunchTimestamp
         };
     }
-    
+
     public async Task<bool> ReportAsync(string eventType, string eventData)
     {
         logger.LogInformation("Start report event {EventType}.", eventType);
@@ -73,7 +74,7 @@ public class ReportService(
             logger.LogInformation("Start report event {EventType}", eventType);
             var httpClient = httpClientFactory.CreateClient("GlobalClient");
             httpClient.Timeout = TimeSpan.FromMilliseconds(timeoutMs);
-        
+
             var appEvent = CreateAppEvent(eventType, eventData);
             var response = httpClient.PostAsJsonAsync(ReportUrl, appEvent).Result;
             response.EnsureSuccessStatusCode();
@@ -83,7 +84,7 @@ public class ReportService(
         {
             // 捕获Result的聚合异常，解析实际错误
             var innerEx = ex.InnerException ?? ex;
-            logger.LogError(innerEx, "Failed to report event {EventType}, inner error: {Msg}", 
+            logger.LogError(innerEx, "Failed to report event {EventType}, inner error: {Msg}",
                 eventType, innerEx.Message);
         }
         catch (Exception ex)
