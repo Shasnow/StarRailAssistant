@@ -51,6 +51,12 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
     public void StartBackend(string arguments)
     {
         if (_backendProcess is not null) return;
+        if (!File.Exists(FileName))
+        {
+            logger.LogError("Backend executable not found: {FileName}", FileName);
+            Dispatcher.UIThread.Post(() => Outputted?.Invoke($"启动失败: 未找到后端可执行文件（路径: {FileName}）"));
+            return;
+        }
         var fullArguments = $"{MainArgument} {arguments}".Trim();
         logger.LogInformation("Starting backend {fileName} with arguments: {Arguments}", FileName, fullArguments);
         try
