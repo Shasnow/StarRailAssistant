@@ -21,12 +21,13 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
 
     private const string BaseDownloadUrl =
         "https://github.com/Shasnow/StarRailAssistant/releases/download/{version}/StarRailAssistant_{version}.zip";
-    
+
     private const string BaseDownloadUrl2 =
         "https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant-{version}.zip";
+
     private const string BaseSha256Url =
         "https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant-{version}.sha256";
-    
+
     private const string BaseCoreDownloadUrl =
         "https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant_Core_{version}.zip";
 
@@ -83,7 +84,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     }
 
     /// <summary>
-    /// 异步下载更新包
+    ///     异步下载更新包
     /// </summary>
     /// <param name="versionResponse">版本响应模型</param>
     /// <param name="downloadChannel">下载渠道</param>
@@ -142,7 +143,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     }
 
     /// <summary>
-    /// 异步下载热更新包，并在下载后进行 SHA256 校验（沿用主程序的 .sha256）。
+    ///     异步下载热更新包，并在下载后进行 SHA256 校验（沿用主程序的 .sha256）。
     /// </summary>
     public async Task<string> DownloadHotfixAsync(
         VersionResponse versionResponse,
@@ -176,11 +177,11 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
 
         return savePath;
     }
-    
+
     // 辅助方法：获取下载URL
     private string GetDownloadUrl(VersionResponse versionResponse, int downloadChannel)
     {
-        if (versionResponse.Data.Url == "" || downloadChannel==2)
+        if (versionResponse.Data.Url == "" || downloadChannel == 2)
             return BaseDownloadUrl2.Replace("{version}", versionResponse.Data.VersionName);
         if (downloadChannel == 1)
             return BaseDownloadUrl.Replace("{version}", versionResponse.Data.VersionName);
@@ -188,7 +189,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     }
 
     /// <summary>
-    /// 获取指定版本的 SHA256 字符串。
+    ///     获取指定版本的 SHA256 字符串。
     /// </summary>
     private async Task<string> GetSha256Async(VersionResponse versionResponse, CancellationToken cancellationToken)
     {
@@ -206,9 +207,10 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     }
 
     /// <summary>
-    /// 校验本地文件的 SHA256 是否与远端一致。
+    ///     校验本地文件的 SHA256 是否与远端一致。
     /// </summary>
-    private static async Task<bool> VerifyFileSha256Async(string filePath, string expectedSha256, CancellationToken cancellationToken)
+    private static async Task<bool> VerifyFileSha256Async(string filePath, string expectedSha256,
+        CancellationToken cancellationToken)
     {
         if (!File.Exists(filePath)) return false;
         if (string.IsNullOrEmpty(expectedSha256)) return true;
