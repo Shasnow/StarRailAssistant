@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
+using SRAFrontend.Models;
 
 namespace SRAFrontend.Services;
 
@@ -12,12 +13,35 @@ public class BackendServiceProxy : IBackendService
     private readonly SettingsService _settingsService;
 
     private IBackendService _currentBackend;
+
+    private bool _isTaskRunning;
     private string _lastStartArguments = string.Empty; // 记录最近一次 StartBackend/RestartBackend 使用的参数
+
+    public BackendServiceProxy(CliBackendService cliBackendService, PyBackendService pyBackendService,
+        SettingsService settingsService)
+    {
+        _cliBackendService = cliBackendService;
+        _pyBackendService = pyBackendService;
+        _settingsService = settingsService;
+
+        // 初始化 Python 后端配置
+        ApplyPythonSettings();
+
+        // 根据设置决定初始后端
+        _currentBackend = _settingsService.Settings is { IsDeveloperMode: true, IsUsingPython: true }
+            ? _pyBackendService
+            : _cliBackendService;
+        AttachToCurrentBackend();
+        // 初始化镜像状态
+        IsTaskRunning = _currentBackend.IsTaskRunning;
+
+        // 监听设置变化，动态切换后端和更新 Python 配置
+        _settingsService.Settings.PropertyChanged += OnSettingsPropertyChanged;
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
     public event Action<string>? Outputted;
 
-    private bool _isTaskRunning;
     public bool IsTaskRunning
     {
         get => _isTaskRunning;
@@ -29,23 +53,41 @@ public class BackendServiceProxy : IBackendService
         }
     }
 
-    public BackendServiceProxy(CliBackendService cliBackendService, PyBackendService pyBackendService, SettingsService settingsService)
+    public bool SendInput(string input)
     {
-        _cliBackendService = cliBackendService;
-        _pyBackendService = pyBackendService;
-        _settingsService = settingsService;
+        return _currentBackend.SendInput(input);
+    }
 
-        // 初始化 Python 后端配置
-        ApplyPythonSettings();
+    public void StartBackend(string arguments)
+    {
+        _lastStartArguments = arguments;
+        _currentBackend.StartBackend(arguments);
+    }
 
-        // 根据设置决定初始后端
-        _currentBackend = _settingsService.Settings is { IsDeveloperMode: true, IsUsingPython: true } ? _pyBackendService : _cliBackendService;
-        AttachToCurrentBackend();
-        // 初始化镜像状态
-        IsTaskRunning = _currentBackend.IsTaskRunning;
+    public void StopBackend()
+    {
+        _currentBackend.StopBackend();
+    }
 
-        // 监听设置变化，动态切换后端和更新 Python 配置
-        _settingsService.Settings.PropertyChanged += OnSettingsPropertyChanged;
+    public async Task RestartBackendAsync(string arguments)
+    {
+        _lastStartArguments = arguments;
+        await _currentBackend.RestartBackendAsync(arguments);
+    }
+
+    public bool TaskRun(string? configName)
+    {
+        return _currentBackend.TaskRun(configName);
+    }
+
+    public bool TaskSingle(string taskName)
+    {
+        return _currentBackend.TaskSingle(taskName);
+    }
+
+    public bool TaskStop()
+    {
+        return _currentBackend.TaskStop();
     }
 
     private void ApplyPythonSettings()
@@ -67,7 +109,7 @@ public class BackendServiceProxy : IBackendService
     private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         // 后端选择
-        if (e.PropertyName == nameof(Models.Settings.IsUsingPython))
+        if (e.PropertyName == nameof(Settings.IsUsingPython))
         {
             var usePython = _settingsService.Settings.IsUsingPython;
             IBackendService target = usePython ? _pyBackendService : _cliBackendService;
@@ -75,10 +117,7 @@ public class BackendServiceProxy : IBackendService
         }
 
         // Python 配置变更时，同步到 PyBackendService
-        if (e.PropertyName is nameof(Models.Settings.PythonPath) or nameof(Models.Settings.PythonMainPy))
-        {
-            ApplyPythonSettings();
-        }
+        if (e.PropertyName is nameof(Settings.PythonPath) or nameof(Settings.PythonMainPy)) ApplyPythonSettings();
     }
 
     // 允许后续切换后端的扩展点
@@ -118,33 +157,9 @@ public class BackendServiceProxy : IBackendService
     private void OnBackendPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(IsTaskRunning) || string.IsNullOrEmpty(e.PropertyName))
-        {
             // 同步当前后端的运行状态到代理自身
             IsTaskRunning = _currentBackend.IsTaskRunning;
-        }
 
         // 如果未来代理公开更多与后端同名的属性，可在此决定是否转发其它属性变更
     }
-
-    public bool SendInput(string input) => _currentBackend.SendInput(input);
-
-    public void StartBackend(string arguments)
-    {
-        _lastStartArguments = arguments;
-        _currentBackend.StartBackend(arguments);
-    }
-
-    public void StopBackend() => _currentBackend.StopBackend();
-
-    public async Task RestartBackendAsync(string arguments)
-    {
-        _lastStartArguments = arguments;
-        await _currentBackend.RestartBackendAsync(arguments);
-    }
-
-    public bool TaskRun(string? configName) => _currentBackend.TaskRun(configName);
-
-    public bool TaskSingle(string taskName) => _currentBackend.TaskSingle(taskName);
-
-    public bool TaskStop() => _currentBackend.TaskStop();
 }

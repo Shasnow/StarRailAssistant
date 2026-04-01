@@ -12,37 +12,13 @@ using SRAFrontend.Models;
 namespace SRAFrontend.Services;
 
 /// <summary>
-/// Windows 注册表服务（星穹铁道分辨率/游戏路径管理）
+///     Windows 注册表服务（星穹铁道分辨率/游戏路径管理）
 /// </summary>
 public class RegistryService(
     ILogger<RegistryService> logger,
     CacheService cacheService,
     SettingsService settingsService)
 {
-    /// <summary>
-    /// 注册表常量配置
-    /// </summary>
-    private static class RegistryConfig
-    {
-        // 游戏服注册表路径
-        public const string CnGameRegPath = @"Software\miHoYo\崩坏：星穹铁道";
-        public const string GlobalGameRegPath = @"Software\Cognosphere\Star Rail";
-
-        // 分辨率键名
-        public const string GraphicsSettingsPcResolution = "GraphicsSettings_PCResolution_h431323223";
-        public const string ScreenManagerResolutionWidth = "Screenmanager Resolution Width_h182942802";
-        public const string ScreenManagerResolutionHeight = "Screenmanager Resolution Height_h2627697771";
-        public const string ScreenManagerFullscreenMode = "Screenmanager Fullscreen mode_h3630240806";
-
-        // 游戏安装路径搜索列表
-        public static readonly string[] GameInstallPathKeys =
-        [
-            @"Software\miHoYo\HYP\standalone\14_0\hkrpg_cn\6P5gHMNyK3\hkrpg_cn",
-            @"Software\miHoYo\HYP\1_1\hkrpg_cn",
-            @"Software\Cognosphere\HYP\1_1\hkrpg_global"
-        ];
-    }
-
     // 提示文本
     private const string MsgUnsupportedOs = "非Windows系统不支持注册表操作";
     private const string MsgGamePathNotFound = "无法自动检测游戏路径";
@@ -50,7 +26,7 @@ public class RegistryService(
     private const string MsgRegKeyNotFound = "未找到注册表项: {key}";
 
     /// <summary>
-    /// 获取星穹铁道游戏安装路径
+    ///     获取星穹铁道游戏安装路径
     /// </summary>
     public List<string> GetGameInstallPaths()
     {
@@ -64,7 +40,6 @@ public class RegistryService(
         }
 
         foreach (var path in RegistryConfig.GameInstallPathKeys)
-        {
             try
             {
                 using var subKey = Registry.CurrentUser.OpenSubKey(path);
@@ -99,13 +74,12 @@ public class RegistryService(
             {
                 logger.LogError(ex, "Failed to read the registry: {Path}", path);
             }
-        }
 
         return result;
     }
 
     /// <summary>
-    /// 统一设置国服+国际服分辨率
+    ///     统一设置国服+国际服分辨率
     /// </summary>
     public void SetTargetPcResolution()
     {
@@ -114,7 +88,7 @@ public class RegistryService(
     }
 
     /// <summary>
-    /// 统一恢复国服+国际服分辨率
+    ///     统一恢复国服+国际服分辨率
     /// </summary>
     public void RestoreUserPcResolution()
     {
@@ -123,7 +97,7 @@ public class RegistryService(
     }
 
     /// <summary>
-    /// 设置单个服的分辨率
+    ///     设置单个服的分辨率
     /// </summary>
     private void SetResolutionForServer(string regPath)
     {
@@ -177,7 +151,7 @@ public class RegistryService(
     }
 
     /// <summary>
-    /// 恢复单个服分辨率
+    ///     恢复单个服分辨率
     /// </summary>
     private void RestoreResolutionForServer(string regPath)
     {
@@ -212,7 +186,8 @@ public class RegistryService(
             key.SetValue(RegistryConfig.GraphicsSettingsPcResolution, cache.Resolution, RegistryValueKind.Binary);
             key.SetValue(RegistryConfig.ScreenManagerResolutionWidth, cache.Width.Value, RegistryValueKind.DWord);
             key.SetValue(RegistryConfig.ScreenManagerResolutionHeight, cache.Height.Value, RegistryValueKind.DWord);
-            key.SetValue(RegistryConfig.ScreenManagerFullscreenMode, cache.FullscreenMode.Value, RegistryValueKind.DWord);
+            key.SetValue(RegistryConfig.ScreenManagerFullscreenMode, cache.FullscreenMode.Value,
+                RegistryValueKind.DWord);
         }
         catch (SecurityException ex)
         {
@@ -225,7 +200,7 @@ public class RegistryService(
     }
 
     /// <summary>
-    /// 备份当前分辨率到缓存
+    ///     备份当前分辨率到缓存
     /// </summary>
     private void BackupResolution(string regPath, RegistryKey key)
     {
@@ -249,7 +224,7 @@ public class RegistryService(
     }
 
     /// <summary>
-    /// 打开可写注册表项
+    ///     打开可写注册表项
     /// </summary>
     private RegistryKey? OpenWritableKey(string path)
     {
@@ -261,7 +236,7 @@ public class RegistryService(
     }
 
     /// <summary>
-    /// 获取对应服的缓存
+    ///     获取对应服的缓存
     /// </summary>
     private ResolutionCache GetResolutionCache(string regPath)
     {
@@ -271,7 +246,7 @@ public class RegistryService(
     }
 
     /// <summary>
-    /// 保存缓存
+    ///     保存缓存
     /// </summary>
     private void SaveResolutionCache(string regPath, ResolutionCache cache)
     {
@@ -279,5 +254,29 @@ public class RegistryService(
             cacheService.Cache.CnGameResolution = cache;
         else
             cacheService.Cache.GlobalGameResolution = cache;
+    }
+
+    /// <summary>
+    ///     注册表常量配置
+    /// </summary>
+    private static class RegistryConfig
+    {
+        // 游戏服注册表路径
+        public const string CnGameRegPath = @"Software\miHoYo\崩坏：星穹铁道";
+        public const string GlobalGameRegPath = @"Software\Cognosphere\Star Rail";
+
+        // 分辨率键名
+        public const string GraphicsSettingsPcResolution = "GraphicsSettings_PCResolution_h431323223";
+        public const string ScreenManagerResolutionWidth = "Screenmanager Resolution Width_h182942802";
+        public const string ScreenManagerResolutionHeight = "Screenmanager Resolution Height_h2627697771";
+        public const string ScreenManagerFullscreenMode = "Screenmanager Fullscreen mode_h3630240806";
+
+        // 游戏安装路径搜索列表
+        public static readonly string[] GameInstallPathKeys =
+        [
+            @"Software\miHoYo\HYP\standalone\14_0\hkrpg_cn\6P5gHMNyK3\hkrpg_cn",
+            @"Software\miHoYo\HYP\1_1\hkrpg_cn",
+            @"Software\Cognosphere\HYP\1_1\hkrpg_global"
+        ];
     }
 }

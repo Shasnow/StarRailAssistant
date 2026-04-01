@@ -7,8 +7,8 @@ namespace SRAFrontend.Services;
 
 public class SettingsService
 {
-    public readonly Settings Settings;
     private readonly ILogger _logger;
+    public readonly Settings Settings;
 
     public SettingsService(ILogger<SettingsService> logger)
     {
@@ -31,6 +31,7 @@ public class SettingsService
                 _logger.LogError(e, "Failed to decrypt MirrorChyanCdk");
                 decryptedString = "";
             }
+
             Settings.MirrorChyanCdk = decryptedString;
         }
 
@@ -49,6 +50,7 @@ public class SettingsService
                 _logger.LogError(e, "Failed to decrypt EmailAuthCode");
                 decryptedAuthCode = "";
             }
+
             Settings.EmailAuthCode = decryptedAuthCode;
         }
     }
@@ -68,6 +70,7 @@ public class SettingsService
                 _logger.LogError(e, "Failed to encrypt MirrorChyanCdk");
                 encryptedString = "";
             }
+
         Settings.EncryptedMirrorChyanCdk = encryptedString;
 
         string encryptedAuthCode;
@@ -83,6 +86,7 @@ public class SettingsService
                 _logger.LogError(e, "Failed to encrypt EmailAuthCode");
                 encryptedAuthCode = "";
             }
+
         Settings.EncryptedEmailAuthCode = encryptedAuthCode;
 
         DataPersister.SaveSettings(Settings);
