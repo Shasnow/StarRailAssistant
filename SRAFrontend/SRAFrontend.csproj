@@ -35,6 +35,7 @@
         <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <PackageReference Include="SukiUI" Version="6.0.3" />
+        <PackageReference Include="System.CommandLine" Version="2.0.5" />
         <PackageReference Include="System.Management" Version="10.0.5" />
         <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.5" />
     </ItemGroup>

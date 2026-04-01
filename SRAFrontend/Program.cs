@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CommandLine;
 using System.IO;
 using System.Net.Http;
 using Avalonia;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using SRAFrontend.Controls;
 using SRAFrontend.Data;
+using SRAFrontend.Localization;
 using SRAFrontend.Services;
 using SRAFrontend.ViewModels;
 using SukiUI.Toasts;
@@ -21,12 +23,37 @@ sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        Option<bool> usingPythonOption = new("--using-python");
+        Option<string> pythonPathOption = new("--python");
+        Option<string> mainPathOption = new("--main");
+        RootCommand rootCommand = new("SRAFrontend")
+        {
+            usingPythonOption,
+            pythonPathOption,
+            mainPathOption
+        };
+        var parseResult = rootCommand.Parse(args);
+        parseResult.Invoke();
         InitializeSerilog();
         var serviceCollection = new ServiceCollection();
         ConfigureServices(serviceCollection);
         var serviceProvider = serviceCollection.BuildServiceProvider();
+        
+        var settingsService = serviceProvider.GetRequiredService<SettingsService>();
+        // 命令行参数优先级高于设置
+        if (parseResult.GetValue(usingPythonOption))
+        {
+            settingsService.Settings.IsUsingPython = true;
+        }
+
+        var pythonPath = parseResult.GetValue(pythonPathOption);
+        if (!string.IsNullOrEmpty(pythonPath))
+        {
+            settingsService.Settings.PythonPath = pythonPath;
+        }
+
         BuildAvaloniaApp(serviceProvider)
-            .StartWithClassicDesktopLifetime(args);
+                    .StartWithClassicDesktopLifetime(args);
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
@@ -92,7 +119,7 @@ sealed class Program
                 rollingInterval: RollingInterval.Day, // 按天拆分
                 retainedFileCountLimit: 7, // 保留 7 天日志
                 encoding: System.Text.Encoding.UTF8, // 避免中文乱码
-                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
             )
             .MinimumLevel.Debug()
             // 捕获异常时记录堆栈信息
@@ -105,4 +132,5 @@ sealed class Program
             Log.CloseAndFlush();
         };
     }
+    
 }
