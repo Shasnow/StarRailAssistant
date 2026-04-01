@@ -9,12 +9,11 @@ namespace SRAFrontend.Services;
 
 public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<AnnouncementService> logger)
 {
+    private const string RequestUrl = "https://gitee.com/yukikage/sraresource/raw/main/SRA/anno.json";
     private AnnouncementList? _cachedAnnouncements; // 缓存数据，避免重复请求
 
-    private const string RequestUrl = "https://gitee.com/yukikage/sraresource/raw/main/SRA/anno.json";
-
     /// <summary>
-    /// 获取公告列表（带缓存）
+    ///     获取公告列表（带缓存）
     /// </summary>
     public async Task<AnnouncementList?> GetAnnouncementsAsync()
     {
@@ -37,7 +36,7 @@ public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<A
     }
 
     /// <summary>
-    /// 强制刷新缓存（重新请求数据）
+    ///     强制刷新缓存（重新请求数据）
     /// </summary>
     public async Task<AnnouncementList?> RefreshAnnouncementsAsync()
     {

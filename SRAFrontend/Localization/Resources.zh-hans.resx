@@ -266,4 +266,22 @@
     <data name="AutoResolutionText" xml:space="preserve">
         <value>自动设置游戏分辨率</value>
     </data>
+    <data name="DeveloperOptionsText" xml:space="preserve">
+        <value>开发者选项</value>
+    </data>
+    <data name="EnableDeveloperOptionsText" xml:space="preserve">
+        <value>启用开发者选项</value>
+    </data>
+    <data name="SaveOcrImageText" xml:space="preserve">
+        <value>保存OCR截图</value>
+    </data>
+    <data name="UsingPythonText" xml:space="preserve">
+        <value>使用Python从源代码运行后端</value>
+    </data>
+    <data name="PythonInterpreterText" xml:space="preserve">
+        <value>Python 解释器</value>
+    </data>
+    <data name="MainPyText" xml:space="preserve">
+        <value>主程序路径</value>
+    </data>
 </root>
