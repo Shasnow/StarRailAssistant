@@ -63,7 +63,7 @@ public partial class Settings : ObservableObject
 
     [JsonPropertyName("MirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
     [JsonPropertyName("EmailAuthCode")] public string EncryptedEmailAuthCode { get; set; } = "";
-    public const string Version = "2.10.0"; // 应用版本号
+    public const string Version = "2.9.0"; // 应用版本号
 
     // 新增快捷键设置
     public string ActivityHotkey { get; set; } = "F1"; // 活动 默认 F1
@@ -73,5 +73,28 @@ public partial class Settings : ObservableObject
     public string MapHotkey { get; set; } = "M"; // 地图 默认 M
     public string TechniqueHotkey { get; set; } = "E"; // 秘技 默认 E
     public string StartStopHotkey { get; set; } = "F9"; // 启动/停止 默认 F9
+
+    // Webhook 通知
+    [ObservableProperty] private bool _allowWebhookNotifications;
+    [ObservableProperty] private string _webhookEndpoint = "";
+
+    // Telegram 通知
+    [ObservableProperty] private bool _allowTelegramNotifications;
+    [ObservableProperty] private string _telegramBotToken = "";
+    [ObservableProperty] private string _telegramChatId = "";
+    [ObservableProperty] private bool _telegramProxyEnabled;
+    [ObservableProperty] private string _telegramProxyUrl = "http://127.0.0.1:7890";
+    [ObservableProperty] private string _telegramApiBaseUrl = "";
+
+    // ServerChan 通知
+    [ObservableProperty] private bool _allowServerChanNotifications;
+    [ObservableProperty] private string _serverChanSendKey = "";
+
+    // OneBot 通知
+    [ObservableProperty] private bool _allowOneBotNotifications;
+    [ObservableProperty] private string _oneBotEndpoint = "";
+    [ObservableProperty] private string _oneBotUserId = "";
+    [ObservableProperty] private string _oneBotGroupId = "";
+    [ObservableProperty] private string _oneBotToken = "";
 
 }

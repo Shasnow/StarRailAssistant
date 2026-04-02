@@ -284,6 +284,149 @@
                                             </Expander>
                                         </StackPanel>
                                     </Expander>
+
+                                    <!-- Webhook 通知 -->
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <CheckBox Grid.Column="0"
+                                                  Content="Webhook 通知"
+                                                  IsChecked="{Binding Settings.AllowWebhookNotifications}" />
+                                        <Button Grid.Column="1"
+                                                Content="Check"
+                                                Margin="10,0,0,0"
+                                                Command="{Binding TestWebhookCommand}"
+                                                IsEnabled="{Binding Settings.AllowWebhookNotifications}" />
+                                    </Grid>
+                                    <Expander Header="Webhook 设置"
+                                              IsVisible="{Binding Settings.AllowWebhookNotifications}">
+                                        <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*">
+                                            <Label Grid.Row="0" Grid.Column="0"
+                                                   VerticalAlignment="Center"
+                                                   Content="推送地址" />
+                                            <TextBox Grid.Row="0" Grid.Column="1"
+                                                     Text="{Binding Settings.WebhookEndpoint}"
+                                                     Watermark="https://your-webhook-endpoint" />
+                                        </Grid>
+                                    </Expander>
+
+                                    <!-- Telegram 通知 -->
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <CheckBox Grid.Column="0"
+                                                  Content="Telegram 通知"
+                                                  IsChecked="{Binding Settings.AllowTelegramNotifications}" />
+                                        <Button Grid.Column="1"
+                                                Content="Check"
+                                                Margin="10,0,0,0"
+                                                Command="{Binding TestTelegramCommand}"
+                                                IsEnabled="{Binding Settings.AllowTelegramNotifications}" />
+                                    </Grid>
+                                    <Expander Header="Telegram 设置"
+                                              IsVisible="{Binding Settings.AllowTelegramNotifications}">
+                                        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*"
+                                              RowSpacing="6">
+                                            <Label Grid.Row="0" Grid.Column="0"
+                                                   VerticalAlignment="Center"
+                                                   Content="Bot Token" />
+                                            <TextBox Grid.Row="0" Grid.Column="1"
+                                                     Text="{Binding Settings.TelegramBotToken}"
+                                                     Watermark="1234567890:ABCdef..." />
+                                            <Label Grid.Row="1" Grid.Column="0"
+                                                   VerticalAlignment="Center"
+                                                   Content="Chat ID" />
+                                            <TextBox Grid.Row="1" Grid.Column="1"
+                                                     Text="{Binding Settings.TelegramChatId}"
+                                                     Watermark="-1001234567890" />
+                                            <Label Grid.Row="2" Grid.Column="0"
+                                                   VerticalAlignment="Center"
+                                                   Content="自定义 API 地址" />
+                                            <TextBox Grid.Row="2" Grid.Column="1"
+                                                     Text="{Binding Settings.TelegramApiBaseUrl}"
+                                                     Watermark="留空使用官方 API" />
+                                            <Label Grid.Row="3" Grid.Column="0"
+                                                   VerticalAlignment="Center"
+                                                   Content="启用代理" />
+                                            <ToggleSwitch Grid.Row="3" Grid.Column="1"
+                                                          IsChecked="{Binding Settings.TelegramProxyEnabled}" />
+                                            <Label Grid.Row="4" Grid.Column="0"
+                                                   VerticalAlignment="Center"
+                                                   IsVisible="{Binding Settings.TelegramProxyEnabled}"
+                                                   Content="代理地址" />
+                                            <TextBox Grid.Row="4" Grid.Column="1"
+                                                     IsVisible="{Binding Settings.TelegramProxyEnabled}"
+                                                     Text="{Binding Settings.TelegramProxyUrl}"
+                                                     Watermark="http://127.0.0.1:7890" />
+                                        </Grid>
+                                    </Expander>
+
+                                    <!-- ServerChan 通知 -->
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <CheckBox Grid.Column="0"
+                                                  Content="ServerChan 微信通知"
+                                                  IsChecked="{Binding Settings.AllowServerChanNotifications}" />
+                                        <Button Grid.Column="1"
+                                                Content="Check"
+                                                Margin="10,0,0,0"
+                                                Command="{Binding TestServerChanCommand}"
+                                                IsEnabled="{Binding Settings.AllowServerChanNotifications}" />
+                                    </Grid>
+                                    <Expander Header="ServerChan 设置"
+                                              IsVisible="{Binding Settings.AllowServerChanNotifications}">
+                                        <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*">
+                                            <Label Grid.Row="0" Grid.Column="0"
+                                                   VerticalAlignment="Center"
+                                                   Content="SendKey" />
+                                            <TextBox Grid.Row="0" Grid.Column="1"
+                                                     Text="{Binding Settings.ServerChanSendKey}"
+                                                     Watermark="SCT... 或 sctp..." />
+                                        </Grid>
+                                    </Expander>
+
+                                    <!-- OneBot 通知 -->
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <CheckBox Grid.Column="0"
+                                                  Content="OneBot QQ 通知"
+                                                  IsChecked="{Binding Settings.AllowOneBotNotifications}" />
+                                        <Button Grid.Column="1"
+                                                Content="Check"
+                                                Margin="10,0,0,0"
+                                                Command="{Binding TestOneBotCommand}"
+                                                IsEnabled="{Binding Settings.AllowOneBotNotifications}" />
+                                    </Grid>
+                                    <Expander Header="OneBot 设置"
+                                              IsVisible="{Binding Settings.AllowOneBotNotifications}">
+                                        <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*"
+                                              RowSpacing="6">
+                                            <Label Grid.Row="0" Grid.Column="0"
+                                                   VerticalAlignment="Center"
+                                                   Content="API 地址" />
+                                            <TextBox Grid.Row="0" Grid.Column="1"
+                                                     Text="{Binding Settings.OneBotEndpoint}"
+                                                     Watermark="http://127.0.0.1:3000" />
+                                            <Label Grid.Row="1" Grid.Column="0"
+                                                   VerticalAlignment="Center"
+                                                   Content="QQ 号（私聊）" />
+                                            <TextBox Grid.Row="1" Grid.Column="1"
+                                                     Text="{Binding Settings.OneBotUserId}"
+                                                     Watermark="留空则不发送私聊" />
+                                            <Label Grid.Row="2" Grid.Column="0"
+                                                   VerticalAlignment="Center"
+                                                   Content="群号（群聊）" />
+                                            <TextBox Grid.Row="2" Grid.Column="1"
+                                                     Text="{Binding Settings.OneBotGroupId}"
+                                                     Watermark="留空则不发送群聊" />
+                                            <Label Grid.Row="3" Grid.Column="0"
+                                                   VerticalAlignment="Center"
+                                                   Content="AccessToken" />
+                                            <TextBox Grid.Row="3" Grid.Column="1"
+                                                     Text="{Binding Settings.OneBotToken}"
+                                                     Watermark="留空则不使用认证" />
+                                        </Grid>
+                                    </Expander>
+
+                                    <!-- 通知设置保存按钮 -->
+                                    <Button Content="保存通知设置"
+                                            HorizontalAlignment="Left"
+                                            Command="{Binding SaveNotificationSettingsCommand}" />
+
                                     <!-- <Grid ColumnDefinitions="Auto,*,Auto"> -->
                                     <!-- <Label Grid.Column="0" Classes="Icon">&#xe0f4;</Label> -->
                                     <!-- <Label Grid.Column="1" Content="{x:Static lang:Resources.DefaultPageText}" /> -->

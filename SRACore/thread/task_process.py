@@ -88,10 +88,20 @@ class TaskManager:
                         if not task.run():
                             logger.debug('task failed: ' + str(task))
                             logger.error(Resource.task_taskFailed(str(task)))
+                            notify.try_send_notification(
+                                Resource.task_notificationTitle,
+                                Resource.task_taskFailed(str(task)),
+                                result="fail"
+                            )
                             return  # 终止当前配置的执行
                     except Exception as e:
                         # 捕获任务执行中的异常（如未处理的错误）
                         logger.exception(Resource.task_taskCrashed(str(task), str(e)))
+                        notify.try_send_notification(
+                            Resource.task_notificationTitle,
+                            Resource.task_taskCrashed(str(task), str(e)),
+                            result="fail"
+                        )
                         break
                 logger.info(Resource.task_configCompleted(config_name))
                 logger.info("=" * 50)
@@ -185,6 +195,11 @@ class TaskManager:
             return result
         except Exception as e:
             logger.exception(Resource.task_taskCrashed(task, str(e)))
+            notify.try_send_notification(
+                Resource.task_notificationTitle,
+                Resource.task_taskCrashed(str(task), str(e)),
+                result="fail"
+            )
             return False
         finally:
             logger.debug("[Done]")
