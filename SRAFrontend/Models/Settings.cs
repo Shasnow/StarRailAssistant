@@ -74,4 +74,27 @@ public partial class Settings : ObservableObject
     public string TechniqueHotkey { get; set; } = "E"; // 秘技 默认 E
     public string StartStopHotkey { get; set; } = "F9"; // 启动/停止 默认 F9
 
+    // Webhook 通知
+    [ObservableProperty] private bool _allowWebhookNotifications;
+    [ObservableProperty] private string _webhookEndpoint = "";
+
+    // Telegram 通知
+    [ObservableProperty] private bool _allowTelegramNotifications;
+    [ObservableProperty] private string _telegramBotToken = "";
+    [ObservableProperty] private string _telegramChatId = "";
+    [ObservableProperty] private bool _telegramProxyEnabled;
+    [ObservableProperty] private string _telegramProxyUrl = "http://127.0.0.1:7890";
+    [ObservableProperty] private string _telegramApiBaseUrl = "";
+
+    // ServerChan 通知
+    [ObservableProperty] private bool _allowServerChanNotifications;
+    [ObservableProperty] private string _serverChanSendKey = "";
+
+    // OneBot 通知
+    [ObservableProperty] private bool _allowOneBotNotifications;
+    [ObservableProperty] private string _oneBotEndpoint = "";
+    [ObservableProperty] private string _oneBotUserId = "";
+    [ObservableProperty] private string _oneBotGroupId = "";
+    [ObservableProperty] private string _oneBotToken = "";
+
 }

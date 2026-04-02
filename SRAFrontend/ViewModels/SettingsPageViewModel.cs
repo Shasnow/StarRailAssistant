@@ -18,6 +18,7 @@ public partial class SettingsPageViewModel : PageViewModel
     private readonly CommonModel _commonModel;
     private readonly AvaloniaList<CustomizableKey> _customizableKeys;
     private readonly RegistryService _registryService;
+    private readonly IBackendService _backendService;
 
     private readonly SettingsService _settingsService;
     private readonly UpdateService _updateService;
@@ -28,7 +29,8 @@ public partial class SettingsPageViewModel : PageViewModel
         UpdateService updateService,
         CacheService cacheService,
         CommonModel commonModel,
-        RegistryService registryService
+        RegistryService registryService,
+        IBackendService backendService
     ) : base(PageName.Setting,
         "\uE272")
     {
@@ -37,6 +39,7 @@ public partial class SettingsPageViewModel : PageViewModel
         _cacheService = cacheService;
         _registryService = registryService;
         _commonModel = commonModel;
+        _backendService = backendService;
         // 任务通用设置中的 启动/停止 快捷键（非游戏内快捷键分组）
         StartStopKey = new CustomizableKey(ListenKeyFor)
         {
@@ -230,6 +233,73 @@ public partial class SettingsPageViewModel : PageViewModel
     private async Task TestEmail()
     {
         await _commonModel.SendTestEmailAsync();
+    }
+
+    [RelayCommand]
+    private void TestWebhook()
+    {
+        var endpoint = Settings.WebhookEndpoint?.Trim();
+        if (string.IsNullOrEmpty(endpoint))
+        {
+            _commonModel.ShowErrorToast("Webhook 测试", "请先填写 Webhook 地址");
+            return;
+        }
+        _ = _backendService.SendInput("notify test webhook");
+        _commonModel.ShowInfoToast("Webhook 测试", $"测试请求已发送至：{endpoint}");
+    }
+
+    [RelayCommand]
+    private void TestTelegram()
+    {
+        if (string.IsNullOrEmpty(Settings.TelegramBotToken?.Trim()))
+        {
+            _commonModel.ShowErrorToast("Telegram 测试", "请先填写 Bot Token");
+            return;
+        }
+        if (string.IsNullOrEmpty(Settings.TelegramChatId?.Trim()))
+        {
+            _commonModel.ShowErrorToast("Telegram 测试", "请先填写 Chat ID");
+            return;
+        }
+        _ = _backendService.SendInput("notify test telegram");
+        _commonModel.ShowInfoToast("Telegram 测试", "测试消息已发送，请检查 Telegram");
+    }
+
+    [RelayCommand]
+    private void TestServerChan()
+    {
+        if (string.IsNullOrEmpty(Settings.ServerChanSendKey?.Trim()))
+        {
+            _commonModel.ShowErrorToast("ServerChan 测试", "请先填写 SendKey");
+            return;
+        }
+        _ = _backendService.SendInput("notify test serverchan");
+        _commonModel.ShowInfoToast("ServerChan 测试", "测试消息已发送，请检查微信");
+    }
+
+    [RelayCommand]
+    private void SaveNotificationSettings()
+    {
+        _settingsService.SaveSettings();
+        _commonModel.ShowSuccessToast("保存成功", "通知设置已保存");
+    }
+
+    [RelayCommand]
+    private void TestOneBot()
+    {
+        if (string.IsNullOrEmpty(Settings.OneBotEndpoint?.Trim()))
+        {
+            _commonModel.ShowErrorToast("OneBot 测试", "请先填写 API 地址");
+            return;
+        }
+        if (string.IsNullOrEmpty(Settings.OneBotUserId?.Trim()) &&
+            string.IsNullOrEmpty(Settings.OneBotGroupId?.Trim()))
+        {
+            _commonModel.ShowErrorToast("OneBot 测试", "请填写 QQ 号或群号（至少一个）");
+            return;
+        }
+        _ = _backendService.SendInput("notify test onebot");
+        _commonModel.ShowInfoToast("OneBot 测试", "测试消息已发送，请检查 QQ");
     }
 
     #region 快捷键监听修改逻辑

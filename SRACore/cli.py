@@ -268,7 +268,7 @@ class SRACli(cmd.Cmd):
         print(f"{VERSION}")
 
     def do_notify(self, arg: str):
-        """Notification command - support test email notification"""
+        """Notification command - support test email/webhook/telegram/serverchan/onebot notification"""
         args = arg.split()
         if not args:
             print(Resource.cli_invalidArguments('notify'))
@@ -278,6 +278,32 @@ class SRACli(cmd.Cmd):
         if command == 'test-email':
             from SRACore.util.notify import send_test_email
             send_test_email()
+        elif command == 'test' and len(args) >= 2:
+            channel = args[1]
+            from SRACore.util.data_persister import load_settings
+            from SRACore.util.notify import (
+                _build_notification_data,
+                send_webhook_notification,
+                send_telegram_notification,
+                send_serverchan_notification,
+                send_onebot_notification,
+            )
+            settings = load_settings()
+            data = _build_notification_data("notify.test", "这是一条测试通知", "success")
+            if channel == 'webhook':
+                result = send_webhook_notification(data, settings)
+                print("Webhook 测试通知发送" + ("成功" if result else "失败"))
+            elif channel == 'telegram':
+                result = send_telegram_notification(data, settings)
+                print("Telegram 测试通知发送" + ("成功" if result else "失败"))
+            elif channel == 'serverchan':
+                result = send_serverchan_notification(data, settings)
+                print("ServerChan 测试通知发送" + ("成功" if result else "失败"))
+            elif channel == 'onebot':
+                result = send_onebot_notification(data, settings)
+                print("OneBot 测试通知发送" + ("成功" if result else "失败"))
+            else:
+                print(Resource.cli_invalidArguments('notify'))
         else:
             print(Resource.cli_invalidArguments('notify'))
 
