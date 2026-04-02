@@ -11,6 +11,8 @@ class StartGameTask(BaseTask):
     def run(self):
         logger.info("启动游戏任务开始")
         self.launch_game()
+        if self.should_stop:
+            return False
         return self.login_and_enter_game()
 
     def login_and_enter_game(self):
@@ -181,6 +183,8 @@ class StartGameTask(BaseTask):
             self.operator.click_img(SGIMG.ENTER_GAME % channel)
         else:
             logger.info("未启用自动登录，请手动完成登录")
+        if self.should_stop:
+            return -1
         if self.operator.wait_img(SGIMG.WELCOME % channel, timeout=120):
             return 1
         else:

@@ -1,17 +1,15 @@
 # type: ignore
 import cmd
-import multiprocessing
 import threading
-import time
+from collections.abc import Callable
 from typing import Any
 
 from loguru import logger
 
 from SRACore.localization import Resource
-from SRACore.thread.event_thread import KeyboardListener
+from SRACore.runtime.event_listener import KeyboardListener
 from SRACore.thread.task_process import TaskManager
-from SRACore.thread.trigger_thread import TriggerManager
-from SRACore.util.data_persister import load_settings
+from SRACore.runtime.trigger_manager import TriggerManager
 from SRACore.util.const import VERSION, CORE
 
 
@@ -21,15 +19,16 @@ class SRACli(cmd.Cmd):
 
     def __init__(self, settings: dict = None):
         super().__init__()
+        settings = settings or {}
         self.task_manager = TaskManager()
-        self.task_process = None
+        self.task_thread = None
         self.trigger_manager = TriggerManager()
         self.trigger_thread = threading.Thread(target=self.trigger_manager.run, daemon=True)
         self.trigger_thread.start()
         if not self.is_admin():
             logger.warning(Resource.cli_noAdminWarning)
-        stop_hotkey:str = settings.get('StartStopHotkey', 'f9')
-        stop_hotkey=stop_hotkey.lower()  # 统一小写
+        stop_hotkey: str = settings.get('StartStopHotkey', 'f9')
+        stop_hotkey = stop_hotkey.lower()  # 统一小写
         if stop_hotkey == '':
             stop_hotkey = 'f9'
 
@@ -61,6 +60,77 @@ class SRACli(cmd.Cmd):
             return ""
         return help_text
 
+    def _run_task_target(self, target: Callable[..., Any], *target_args: str) -> None:
+        try:
+            target(*target_args)
+        except KeyboardInterrupt:
+            self.task_manager.request_stop()
+
+    def _start_task_thread(self, target: Callable[..., Any], *target_args: str) -> None:
+        self.task_thread = threading.Thread(
+            target=self._run_task_target,
+            daemon=True,
+            args=(target, *target_args)
+        )
+        self.task_thread.start()
+
+    def _stop_task_thread(self) -> None:
+        if self.task_thread is not None and self.task_thread.is_alive():
+            logger.warning(Resource.cli_task_interrupted)
+            self.task_manager.request_stop()
+            self.task_thread.join(timeout=30)
+            if self.task_thread.is_alive():
+                logger.warning(Resource.cli_task_timeout)
+            else:
+                logger.debug('[Done]')
+                logger.info(Resource.cli_task_stopped)
+        else:
+            print(Resource.cli_task_notRunning)
+
+    def _execute_task_command(self, command: str, command_args: tuple[str, ...], *, threaded: bool) -> None:
+        if command == 'run':
+            if threaded:
+                if self.task_thread is not None and self.task_thread.is_alive():
+                    print(Resource.cli_task_taskAlreadyRunning)
+                    return
+                self._start_task_thread(self.task_manager.run, *command_args)
+                return
+
+            print(Resource.cli_run_started)
+            try:
+                self.task_manager.run(*command_args)
+            except KeyboardInterrupt:
+                self.task_manager.request_stop()
+                return
+            print(Resource.cli_run_started)
+            return
+
+        if command == 'single':
+            if not command_args:
+                print(Resource.cli_invalidArguments('task' if threaded else 'single'))
+                return
+            if threaded:
+                if self.task_thread is not None and self.task_thread.is_alive():
+                    print(Resource.cli_task_taskAlreadyRunning)
+                    return
+                self._start_task_thread(self.task_manager.run_task, *command_args)
+                return
+
+            print(Resource.cli_run_started)
+            try:
+                self.task_manager.run_task(*command_args)
+            except KeyboardInterrupt:
+                self.task_manager.request_stop()
+                return
+            print(Resource.cli_run_started)
+            return
+
+        if command == 'stop' and threaded:
+            self._stop_task_thread()
+            return
+
+        print(Resource.cli_invalidArguments('task'))
+
     def do_EOF(self, arg: Any):  # NOQA
         """Ctrl+D exit command line tool"""
         print()
@@ -86,10 +156,10 @@ class SRACli(cmd.Cmd):
 
     def do_exit(self, _: Any):
         """Exit command line tool"""
-        if self.task_process and self.task_process.is_alive():
-            self.task_process.terminate()
-            self.task_process.join(timeout=5)
-            if self.task_process.is_alive():
+        self.task_manager.request_stop()
+        if self.task_thread and self.task_thread.is_alive():
+            self.task_thread.join(timeout=5)
+            if self.task_thread.is_alive():
                 logger.error(Resource.cli_exit_taskTimeout)
 
         if self.trigger_thread and self.trigger_thread.is_alive():
@@ -107,42 +177,7 @@ class SRACli(cmd.Cmd):
         if not args:
             print(Resource.cli_invalidArguments('task'))
             return
-        command = args[0]
-        if command == 'run':
-            if self.task_process is not None and self.task_process.is_alive():
-                print(Resource.cli_task_taskAlreadyRunning)
-                return
-            # 重新创建进程（避免重复启动已终止的进程）
-            config_names = args[1:] if len(args) > 1 else tuple()
-            self.task_process = multiprocessing.Process(target=self.task_manager.run, daemon=True, args=config_names)
-            self.task_process.start()
-            time.sleep(1)  # 确保进程有时间启动
-        elif command == 'stop':
-            if self.task_process is not None and self.task_process.is_alive():
-                logger.warning(Resource.cli_task_interrupted)
-                self.task_process.terminate()
-                self.task_process.join(timeout=5)  # 增加超时，避免阻塞
-                if self.task_process.is_alive():
-                    logger.error(Resource.cli_task_timeout)
-                else:
-                    logger.debug('[Done]')
-                    logger.info(Resource.cli_task_stopped)
-            else:
-                print(Resource.cli_task_notRunning)
-        elif command == 'single':
-            if len(args) < 2:
-                print(Resource.cli_invalidArguments('task'))
-                return
-            if self.task_process is not None and self.task_process.is_alive():
-                print(Resource.cli_task_taskAlreadyRunning)
-                return
-            sub_args = args[1:]
-            # 重新创建进程（避免重复启动已终止的进程）
-            self.task_process = multiprocessing.Process(target=self.task_manager.run_task, daemon=True, args=sub_args)
-            self.task_process.start()
-            time.sleep(1)  # 确保进程有时间启动
-        else:
-            print(Resource.cli_invalidArguments('task'))
+        self._execute_task_command(args[0], tuple(args[1:]), threaded=True)
 
     def do_trigger(self, arg: str):
         """Trigger manager command - support start/stop/configure triggers"""
@@ -155,14 +190,13 @@ class SRACli(cmd.Cmd):
             if self.trigger_thread.is_alive():
                 print(Resource.cli_trigger_alreadyRunning)
                 return
-            # 重新创建线程（避免重复启动已终止的线程）
             self.trigger_thread = threading.Thread(target=self.trigger_manager.run, daemon=True)
             self.trigger_thread.start()
             print(Resource.cli_trigger_started)
         elif command == 'stop':
             if self.trigger_thread.is_alive():
                 self.trigger_manager.stop()
-                self.trigger_thread.join(timeout=5)  # 增加超时
+                self.trigger_thread.join(timeout=5)
                 if self.trigger_thread.is_alive():
                     logger.error(Resource.cli_trigger_timeout)
                 else:
@@ -223,26 +257,11 @@ class SRACli(cmd.Cmd):
 
     def do_run(self, arg: str):
         """Run specified tasks, will block current command line until tasks complete"""
-        args = arg.split()
-        print(Resource.cli_run_started)
-        try:
-            self.task_manager.run(*args)
-        except KeyboardInterrupt:
-            return
-        print(Resource.cli_run_started)
+        self._execute_task_command('run', tuple(arg.split()), threaded=False)
 
     def do_single(self, arg: str):
         """Run a single specified task, will block current command line until task complete"""
-        args = arg.split()
-        if len(args) < 1:
-            print(Resource.cli_invalidArguments('single'))
-            return
-        print(Resource.cli_run_started)
-        try:
-            self.task_manager.run_task(*args)
-        except KeyboardInterrupt:
-            return
-        print(Resource.cli_run_started)
+        self._execute_task_command('single', tuple(arg.split()), threaded=False)
 
     def do_version(self, _):  # NOQA
         """Show version information"""
