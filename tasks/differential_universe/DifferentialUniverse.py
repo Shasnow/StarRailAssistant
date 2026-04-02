@@ -88,6 +88,7 @@ class DifferentialUniverse(Executable):
                 DUIMG.CURIOSITY_SELECT,
                 DUIMG.EQUATION_EXPANSION,
                 DUIMG.CLOSE,
+                DUIMG.STATION_SELECT,
                 DUIMG.DIVERGENT_UNIVERSE_QUIT
             ], interval=0.5, timeout=300)
             if index == 0:
@@ -104,6 +105,8 @@ class DifferentialUniverse(Executable):
             elif index == 4 or index == 5:  # 方程式扩展或关闭
                 self.operator.press_key('esc')
                 self.operator.sleep(0.5)
+            elif index == 6:
+                self.operator.click_img(DUIMG.ENSURE2, after_sleep=0.5)
             else:  # 退出
                 break
 
