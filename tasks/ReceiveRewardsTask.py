@@ -67,7 +67,7 @@ class ReceiveRewardsTask(BaseTask):
             return False
 
         for task, args in tasks:
-            if self.stop_flag:
+            if self.should_stop:
                 break
             task(*args)
         else:
@@ -79,7 +79,7 @@ class ReceiveRewardsTask(BaseTask):
     def _execute_tasks_without_args(self, tasks):
         """执行无参数的任务列表"""
         for task in tasks:
-            if self.stop_flag:
+            if self.should_stop:
                 break
             task()
         else:
@@ -118,6 +118,8 @@ class ReceiveRewardsTask(BaseTask):
         if len(redeem_code_list) == 0:
             logger.warning("未填写兑换码")
         for code in redeem_code_list:
+            if self.should_stop:
+                return
             self.operator.sleep(1)
             if self.operator.click_point(0.92, 0.10):
                 if self.operator.click_img(RRIMG.REDEEM_CODE):

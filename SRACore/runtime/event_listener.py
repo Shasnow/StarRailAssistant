@@ -1,9 +1,10 @@
 import dataclasses
 import threading
 import time
-from loguru import logger
 from threading import Lock
-from typing import Callable, Optional, Any
+from typing import Any, Callable, Optional
+
+from loguru import logger
 import pynput
 
 
@@ -101,7 +102,7 @@ class KeyboardListener:
         # 启动独立子线程
         self._listener_thread = threading.Thread(
             target=self._listener_loop,
-            daemon=True  # 守护线程，主线程退出时自动终止
+            daemon=True,  # 守护线程，主线程退出时自动终止
         )
         self._listener_thread.start()
         logger.debug("event listener started")

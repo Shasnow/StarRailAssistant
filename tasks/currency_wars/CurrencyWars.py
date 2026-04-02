@@ -1,5 +1,6 @@
 import enum
 import json
+import threading
 from typing import Any
 
 from loguru import logger
@@ -25,8 +26,8 @@ class CurrencyWarsPage(enum.IntEnum):
 
 
 class CurrencyWars(Executable):
-    def __init__(self, operator, runtimes):
-        super().__init__(operator)
+    def __init__(self, operator, runtimes, stop_event: threading.Event | None = None):
+        super().__init__(operator, stop_event)
         self.runtimes = runtimes
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
@@ -81,6 +82,9 @@ class CurrencyWars(Executable):
         if self.runtimes == 0:
             return True
         for i in range(self.runtimes):
+            if self.should_stop:
+                self.is_running = False
+                return False
             if not self.is_running:
                 break
             logger.info(f"第{i + 1}次进入货币战争，剩余{self.runtimes - i - 1}次")
@@ -90,7 +94,7 @@ class CurrencyWars(Executable):
             except Exception as e:
                 logger.error(e)
                 return False
-        return True
+        return not self.should_stop
 
     def reset_character(self):
         """ 重置所有角色信息 """
@@ -421,6 +425,9 @@ class CurrencyWars(Executable):
     def game_loop(self):
         run_times = 0
         while self.is_running:
+            if self.should_stop:
+                self.is_running = False
+                return False
             self.harvest_crystals()
             self.get_in_hand_area(True)  # 更新手牌信息
             self.handle_characters_updated()
@@ -441,7 +448,7 @@ class CurrencyWars(Executable):
                 self.sort_all_areas_by_priority()  # 优先级排序
         # 游戏循环结束，重置角色状态
         self.reset_character()
-        return True
+        return not self.should_stop
 
     def refresh_character(self):
         """ 刷新角色信息，确保手牌中未放置的角色状态正确。 """
@@ -625,7 +632,6 @@ class CurrencyWars(Executable):
         logger.info("出售操作完成")
 
     def battle(self) -> bool:
-        # self.operators.click_point(0.907, 0.714, after_sleep=1)
         battle_box = self.operator.wait_img(CWIMG.BATTLE, timeout=3, interval=0.5)
         if battle_box is None or not self.operator.click_box(battle_box, after_sleep=1.5):
             logger.error("未识别到战斗按钮")
@@ -703,6 +709,9 @@ class CurrencyWars(Executable):
         self.operator.sleep(1.5)
 
         while True:  # 用无限循环 + 内部break控制退出
+            if self.should_stop:
+                self.is_running = False
+                return False
             # 检查是否超时（未识别到任何状态）
             if stage_index == -1:
                 raise RuntimeError("关卡状态检测超时，未识别到任何图片")

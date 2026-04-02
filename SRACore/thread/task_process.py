@@ -1,5 +1,6 @@
 # type: ignore
 import importlib
+import threading
 
 import tomllib
 from typing import Any
@@ -28,6 +29,7 @@ class TaskManager:
         """
         self.log_level = "TRACE"
         self.log_queue = None
+        self._stop_event = threading.Event()
         self.task_list: list[type] = []
         with open("SRACore/config.toml", "rb") as f:
             tasks = tomllib.load(f).get("tasks", [])
@@ -43,6 +45,10 @@ class TaskManager:
                 self.task_list.append(_class)
         logger.debug(f"Successfully load task: {self.task_list}")
 
+    def request_stop(self) -> None:
+        """请求停止当前任务执行。"""
+        self._stop_event.set()
+
     def run(self, *args: Any) -> None:
         """
         进程主循环：
@@ -51,6 +57,7 @@ class TaskManager:
         3. 处理任务中断或失败的情况
         """
         setup_logger(level=self.log_level, queue=self.log_queue)
+        self._stop_event.clear()
         logger.debug('[Start]')
         try:
             if len(args)==0:
@@ -72,6 +79,9 @@ class TaskManager:
 
                 # 依次执行任务
                 for task in tasks_to_run:
+                    if self._stop_event.is_set():
+                        logger.info("用户请求停止，终止后续任务执行")
+                        break
                     try:
                         # 运行任务，如果返回 False 表示任务失败
                         logger.debug('running task: ' + str(task))
@@ -119,6 +129,8 @@ class TaskManager:
         if not task_select:
             return []
         tasks = []
+        operator = Operator()
+        operator._stop_event = self._stop_event
 
         # 遍历 task_select，根据选择状态实例化对应任务
         for index, is_select in enumerate(task_select):
@@ -126,7 +138,7 @@ class TaskManager:
             if is_select and index < len(self.task_list):
                 try:
                     # 实例化任务类
-                    tasks.append(self.task_list[index](Operator(), config))
+                    tasks.append(self.task_list[index](operator, config, self._stop_event))
                 except Exception as e:
                     logger.exception(Resource.task_instantiateFailed(index, str(e)))
         return tasks
@@ -146,6 +158,7 @@ class TaskManager:
             ValueError: 如果任务未找到或配置加载失败
         """
         setup_logger(level=self.log_level, queue=self.log_queue)
+        self._stop_event.clear()
         logger.debug('[Start]')
         try:
             if config_name is None:
@@ -159,6 +172,8 @@ class TaskManager:
             task_instance = self.get_task(config_name, task_name)
             if task_instance is None:
                 logger.error(Resource.task_noSuchTask(config_name))
+                return False
+            if self._stop_event.is_set():
                 return False
             logger.debug('running task: ' + str(task_instance.__class__.__name__))
             # 运行任务
@@ -212,7 +227,9 @@ class TaskManager:
             print_config["StartGamePassword"] = "******"
             logger.debug('config: ' + str(config))
             # 实例化任务类
-            return task_class(Operator(), config)
+            operator = Operator()
+            operator._stop_event = self._stop_event
+            return task_class(operator, config, self._stop_event)
         except Exception as e:
             logger.error(Resource.task_instantiateFailed(task, f'{e.__class__.__name__}: {e}'))
             return None
