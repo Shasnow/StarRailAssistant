@@ -182,6 +182,7 @@ class DUIMG:
     BASE_EFFECT_SELECT = f"{BASE}/base_effect_select.png"
     BLESSING_SELECT = f"{BASE}/blessing_select.png"
     MASK_SELECT = f"{BASE}/mask_select.png"
+    STATION_SELECT = f"{BASE}/station_select.png"
     BONUS_POINTS = f"{BASE}/bonus_points.png"
     CLOSE = f"{BASE}/close.png"
     COLLECTION = f"{BASE}/collection.png"
@@ -195,6 +196,7 @@ class DUIMG:
     PERIODIC_CALCULUS = f"{BASE}/periodic_calculus.png"
     RETURN = f"{BASE}/return.png"
     ENSURE = f"{BASE}/ensure.png"
+    ENSURE2 = f"{BASE}/ensure2.png"
 # endregion
 
 # region 任务完成专用
