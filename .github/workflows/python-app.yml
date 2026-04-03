@@ -73,7 +73,7 @@ jobs:
           
       - name: Built with package.py
         run: |
-          python package.py
+          python scripts/package.py
           
       - name: Read version
         id: read_version

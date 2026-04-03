@@ -10,11 +10,7 @@ class Executable:
         self.settings = operator.settings
         self.stop_event = self.operator.stop_event
 
-    @property
-    def should_stop(self) -> bool:
-        if self.stop_event is None:
-            return False
-        return self.stop_event.is_set()
+
 
     def stop(self):
         if self.stop_event is not None:
