@@ -30,7 +30,7 @@ from pathlib import Path
 
 if __name__ == "__main__":
 
-    root_path = Path(sys.argv[0]).resolve().parent
+    root_path = Path(sys.argv[0]).resolve().parent.parent
     with (root_path / "version.json").open(mode="r", encoding="utf-8") as f:
         version = json.load(f)
 
