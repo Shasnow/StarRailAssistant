@@ -76,12 +76,13 @@ class SRACli(cmd.Cmd):
 
     def _stop_task_thread(self) -> None:
         if self.task_thread is not None and self.task_thread.is_alive():
-            logger.warning(Resource.cli_task_requestStop)
+            logger.warning(Resource.cli_task_interrupted)
             self.task_manager.request_stop()
             self.task_thread.join(timeout=30)
             if self.task_thread.is_alive():
                 logger.warning(Resource.cli_task_timeout)
             else:
+                logger.debug('[Done]')
                 logger.info(Resource.cli_task_stopped)
         else:
             print(Resource.cli_task_notRunning)
@@ -267,7 +268,7 @@ class SRACli(cmd.Cmd):
         print(f"{VERSION}")
 
     def do_notify(self, arg: str):
-        """Notification command - support test email notification"""
+        """Notification command - support test email/webhook/telegram/serverchan/onebot notification"""
         args = arg.split()
         if not args:
             print(Resource.cli_invalidArguments('notify'))
@@ -277,6 +278,65 @@ class SRACli(cmd.Cmd):
         if command == 'test-email':
             from SRACore.util.notify import send_test_email
             send_test_email()
+        elif command == 'test' and len(args) >= 2:
+            channel = args[1]
+            from SRACore.util.data_persister import load_settings
+            import SRACore.util.notify as _notify_mod
+            from SRACore.util.notify import (
+                _build_notification_data,
+                _get_test_image_bytes,
+                send_webhook_notification,
+                send_telegram_notification,
+                send_serverchan_notification,
+                send_onebot_notification,
+                send_bark_notification,
+                send_feishu_notification,
+                send_wecom_notification,
+                send_dingtalk_notification,
+                send_discord_notification,
+                send_xxtui_notification,
+            )
+            settings = load_settings()
+            data = _build_notification_data("notify.test", "这是一条测试通知", "success")
+
+            # 支持图片的渠道：若开关开启则用 SRA 图标替代截图
+            _send_image_keys = {
+                "telegram": "TelegramSendImage",
+                "onebot":   "OneBotSendImage",
+                "wecom":    "WeComSendImage",
+                "discord":  "DiscordSendImage",
+            }
+            _orig_bytes  = _notify_mod._take_screenshot_bytes
+            _orig_base64 = _notify_mod._take_screenshot_base64
+            if channel in _send_image_keys and settings.get(_send_image_keys[channel], False):
+                _icon = _get_test_image_bytes()
+                if _icon:
+                    import base64 as _b64
+                    _notify_mod._take_screenshot_bytes  = lambda: _icon
+                    _notify_mod._take_screenshot_base64 = lambda: _b64.b64encode(_icon).decode()
+
+            _ch_map = {
+                "webhook":   (send_webhook_notification,   "Webhook"),
+                "telegram":  (send_telegram_notification,  "Telegram"),
+                "serverchan":(send_serverchan_notification, "ServerChan"),
+                "onebot":    (send_onebot_notification,     "OneBot"),
+                "bark":      (send_bark_notification,       "Bark"),
+                "feishu":    (send_feishu_notification,     "飞书"),
+                "wecom":     (send_wecom_notification,      "企业微信"),
+                "dingtalk":  (send_dingtalk_notification,   "钉钉"),
+                "discord":   (send_discord_notification,    "Discord"),
+                "xxtui":     (send_xxtui_notification,      "xxtui"),
+            }
+            if channel in _ch_map:
+                fn, label = _ch_map[channel]
+                result = fn(data, settings)
+                print(label + " 测试通知发送" + ("成功" if result else "失败"))
+            else:
+                print(Resource.cli_invalidArguments("notify"))
+
+            # 还原 screenshot 函数
+            _notify_mod._take_screenshot_bytes  = _orig_bytes
+            _notify_mod._take_screenshot_base64 = _orig_base64
         else:
             print(Resource.cli_invalidArguments('notify'))
 

@@ -74,4 +74,68 @@ public partial class Settings : ObservableObject
     public string TechniqueHotkey { get; set; } = "E"; // 秘技 默认 E
     public string StartStopHotkey { get; set; } = "F9"; // 启动/停止 默认 F9
 
+    // Webhook 通知
+    [ObservableProperty] private bool _allowWebhookNotifications;
+    [ObservableProperty] private string _webhookEndpoint = "";
+
+    // Telegram 通知
+    [ObservableProperty] private bool _allowTelegramNotifications;
+    [ObservableProperty] private string _telegramBotToken = "";
+    [ObservableProperty] private string _telegramChatId = "";
+    [ObservableProperty] private bool _telegramProxyEnabled;
+    [ObservableProperty] private string _telegramProxyUrl = "http://127.0.0.1:7890";
+    [ObservableProperty] private string _telegramApiBaseUrl = "";
+    [ObservableProperty] private bool _telegramSendImage;
+
+    // ServerChan 通知
+    [ObservableProperty] private bool _allowServerChanNotifications;
+    [ObservableProperty] private string _serverChanSendKey = "";
+
+    // OneBot 通知
+    [ObservableProperty] private bool _allowOneBotNotifications;
+    [ObservableProperty] private string _oneBotEndpoint = "";
+    [ObservableProperty] private string _oneBotUserId = "";
+    [ObservableProperty] private string _oneBotGroupId = "";
+    [ObservableProperty] private string _oneBotToken = "";
+    [ObservableProperty] private bool _oneBotSendImage;
+
+    // Bark 通知
+    [ObservableProperty] private bool _allowBarkNotifications;
+    [ObservableProperty] private string _barkDeviceKey = "";
+    [ObservableProperty] private string _barkServerUrl = "https://api.day.app";
+    [ObservableProperty] private string _barkLevel = "";
+    [ObservableProperty] private string _barkSound = "";
+    [ObservableProperty] private string _barkGroup = "StarRailAssistant";
+    [ObservableProperty] private string _barkIcon = "";
+    [ObservableProperty] private string _barkCiphertext = "";
+
+    // 飞书通知
+    [ObservableProperty] private bool _allowFeishuNotifications;
+    [ObservableProperty] private string _feishuWebhookUrl = "";
+    [ObservableProperty] private string _feishuAppId = "";
+    [ObservableProperty] private string _feishuAppSecret = "";
+    [ObservableProperty] private string _feishuReceiveId = "";
+    [ObservableProperty] private string _feishuReceiveIdType = "open_id";
+
+    // 企业微信通知
+    [ObservableProperty] private bool _allowWeComNotifications;
+    [ObservableProperty] private string _weComWebhookUrl = "";
+    [ObservableProperty] private bool _weComSendImage;
+
+    // 钉钉通知
+    [ObservableProperty] private bool _allowDingTalkNotifications;
+    [ObservableProperty] private string _dingTalkWebhookUrl = "";
+    [ObservableProperty] private string _dingTalkSecret = "";
+
+    // Discord 通知
+    [ObservableProperty] private bool _allowDiscordNotifications;
+    [ObservableProperty] private string _discordWebhookUrl = "";
+    [ObservableProperty] private bool _discordSendImage;
+
+    // xxtui 通知
+    [ObservableProperty] private bool _allowXxtuiNotifications;
+    [ObservableProperty] private string _xxtuiApiKey = "";
+    [ObservableProperty] private string _xxtuiSource = "";
+    [ObservableProperty] private string _xxtuiChannel = "";
+
 }
