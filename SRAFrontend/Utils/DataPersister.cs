@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using Serilog;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
 
@@ -54,10 +55,19 @@ public static class DataPersister
 
     public static Settings LoadSettings()
     {
-        if (!File.Exists(PathString.SettingsJson)) return new Settings();
-        var json = File.ReadAllText(PathString.SettingsJson);
-        if (string.IsNullOrWhiteSpace(json)) return new Settings();
-        return JsonSerializer.Deserialize<Settings>(json) ?? new Settings();
+        try
+        {
+            if (!File.Exists(PathString.SettingsJson)) return new Settings();
+            var json = File.ReadAllText(PathString.SettingsJson);
+            if (string.IsNullOrWhiteSpace(json)) return new Settings();
+            return JsonSerializer.Deserialize<Settings>(json) ?? new Settings();
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Error loading settings, using default settings");
+            return new Settings();
+        }
+        
     }
 
     public static void SaveSettings(Settings settings)
@@ -72,10 +82,18 @@ public static class DataPersister
 
     public static Cache LoadCache()
     {
-        if (!File.Exists(PathString.CacheJson)) return new Cache();
-        var json = File.ReadAllText(PathString.CacheJson);
-        if (string.IsNullOrWhiteSpace(json)) return new Cache();
-        return JsonSerializer.Deserialize<Cache>(json) ?? new Cache();
+        try
+        {
+            if (!File.Exists(PathString.CacheJson)) return new Cache();
+            var json = File.ReadAllText(PathString.CacheJson);
+            if (string.IsNullOrWhiteSpace(json)) return new Cache();
+            return JsonSerializer.Deserialize<Cache>(json) ?? new Cache();
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Error loading cache. using empty cache");
+            return new Cache();
+        }
     }
 
     public static void SaveCache(Cache cache)
@@ -90,12 +108,21 @@ public static class DataPersister
 
     public static Config LoadConfig(string name)
     {
-        var configPath = Path.Combine(PathString.ConfigsDir, $"{name}.json");
-        if (!File.Exists(configPath)) return new Config { Name = name };
-        var json = File.ReadAllText(configPath);
-        if (string.IsNullOrWhiteSpace(json)) return new Config { Name = name };
-        var config = JsonSerializer.Deserialize<Config>(json);
-        return config == null || config.Version < Config.StaticVersion ? new Config { Name = name } : config;
+        try
+        {
+            var configPath = Path.Combine(PathString.ConfigsDir, $"{name}.json");
+            if (!File.Exists(configPath)) return new Config { Name = name };
+            var json = File.ReadAllText(configPath);
+            if (string.IsNullOrWhiteSpace(json)) return new Config { Name = name };
+            var config = JsonSerializer.Deserialize<Config>(json);
+            return config == null || config.Version < Config.StaticVersion ? new Config { Name = name } : config;
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Error loading config {ConfigName}, using default config", name);
+            return new Config { Name = name };
+        }
+
     }
 
     public static void SaveConfig(Config config)

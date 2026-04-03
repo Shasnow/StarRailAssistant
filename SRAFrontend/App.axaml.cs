@@ -34,8 +34,6 @@ public class App : Application
                 serviceProvider.GetRequiredService<SettingsService>().Settings.Language == 0 ? "zh-CN" : "en-US");
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            if (desktop.Args is not null)
-                ParseArguments(desktop.Args, serviceProvider);
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
@@ -102,38 +100,6 @@ public class App : Application
             PooledConnectionLifetime = TimeSpan.FromMinutes(5),
             PooledConnectionIdleTimeout = TimeSpan.FromMinutes(1)
         });
-    }
-
-    private static void ParseArguments(string[] args, IServiceProvider serviceProvider)
-    {
-        Option<bool> usingPythonOption = new("--use-python");
-        Option<string> pythonPathOption = new("--python");
-        Option<string> mainPathOption = new("--main");
-        RootCommand rootCommand = new("SRAFrontend")
-        {
-            usingPythonOption,
-            pythonPathOption,
-            mainPathOption
-        };
-        var parseResult = rootCommand.Parse(args);
-        var settingsService = serviceProvider.GetRequiredService<SettingsService>();
-        // 命令行参数优先级高于设置
-        if (parseResult.GetValue(usingPythonOption))
-        {
-            settingsService.Settings.IsUsingPython = true;
-        }
-
-        var pythonPath = parseResult.GetValue(pythonPathOption);
-        if (!string.IsNullOrEmpty(pythonPath))
-        {
-            settingsService.Settings.PythonPath = pythonPath;
-        }
-        
-        var mainPath = parseResult.GetValue(mainPathOption);
-        if (!string.IsNullOrEmpty(mainPath))
-        {
-            settingsService.Settings.PythonMainPy = mainPath;
-        }
     }
 
     private static void InitializeSerilog()
