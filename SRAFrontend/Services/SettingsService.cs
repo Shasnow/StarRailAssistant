@@ -57,6 +57,7 @@ public class SettingsService
 
     public void SaveSettings()
     {
+        _logger.LogInformation("Saving settings");
         string encryptedString;
         if (string.IsNullOrWhiteSpace(Settings.MirrorChyanCdk))
             encryptedString = "";
