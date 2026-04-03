@@ -67,24 +67,18 @@ class ReceiveRewardsTask(BaseTask):
             return False
 
         for task, args in tasks:
-            if self.should_stop:
-                break
             task(*args)
         else:
             self.operator.sleep(2)  # 所有任务完成后等待2秒
             self.operator.press_key("esc")  # 关闭菜单
             return True
-        return False
 
     def _execute_tasks_without_args(self, tasks):
         """执行无参数的任务列表"""
         for task in tasks:
-            if self.should_stop:
-                break
             task()
         else:
             return True
-        return False
 
     def trailblazer_profile(self):
         """Mission trailblaze profile"""
@@ -118,8 +112,6 @@ class ReceiveRewardsTask(BaseTask):
         if len(redeem_code_list) == 0:
             logger.warning("未填写兑换码")
         for code in redeem_code_list:
-            if self.should_stop:
-                return
             self.operator.sleep(1)
             if self.operator.click_point(0.92, 0.10):
                 if self.operator.click_img(RRIMG.REDEEM_CODE):
