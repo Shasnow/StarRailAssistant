@@ -17,8 +17,6 @@ class DifferentialUniverse(Executable):
         logger.info("执行任务：差分宇宙-周期演算")
 
         for exe_time in range(self.run_times):
-            if self.should_stop:
-                return False
             if not self.page_locate():
                 return False
             if not self._start_differential_universe(exe_time):
@@ -32,8 +30,6 @@ class DifferentialUniverse(Executable):
             if not self._complete_mission():
                 return False
 
-        if self.should_stop:
-            return False
         self._return_to_main_menu()
         logger.info("Mission accomplished")
         return True
@@ -85,8 +81,6 @@ class DifferentialUniverse(Executable):
         var = ["选择基础效果", "选择祝福", "选择方程", "选择奇物"]
 
         while True:
-            if self.should_stop:
-                return False
             index, _ = self.operator.wait_any_img([
                 DUIMG.MASK_SELECT,
                 DUIMG.BLESSING_SELECT,
@@ -122,8 +116,6 @@ class DifferentialUniverse(Executable):
         """完成任务结算"""
         logger.info("退出并结算")
         for _ in range(30):
-            if self.should_stop:
-                return False
             if not self.operator.locate(DUIMG.END_AND_SETTLE):
                 self.operator.press_key("esc")
                 self.operator.sleep(1)
@@ -151,8 +143,6 @@ class DifferentialUniverse(Executable):
         定位到差分宇宙页面。
         :return: None
         """
-        if self.should_stop:
-            return False
         page, _ = self.operator.wait_any_img([
             IMG.ENTER,
             DUIMG.DIFFERENTIAL_UNIVERSE_START,
@@ -163,21 +153,15 @@ class DifferentialUniverse(Executable):
             if not self.operator.wait_img(IMG.F4, timeout=20):
                 logger.error(SRAError(errors.ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
                 self.operator.press_key("esc")
-            if self.should_stop:
-                return False
             self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙
             self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
             return True
         elif page == 1:
-            return not self.should_stop
+            return True
         elif page == 2:
             # 积分奖励页面
-            if self.should_stop:
-                return False
             self.operator.sleep(4)
-            if self.should_stop:
-                return False
             self.operator.press_key('esc')
             return True
         else:

@@ -81,9 +81,6 @@ class CurrencyWars(Executable):
         if self.runtimes == 0:
             return True
         for i in range(self.runtimes):
-            if self.should_stop:
-                self.is_running = False
-                return False
             if not self.is_running:
                 break
             logger.info(f"第{i + 1}次进入货币战争，剩余{self.runtimes - i - 1}次")
@@ -93,7 +90,7 @@ class CurrencyWars(Executable):
             except Exception as e:
                 logger.error(e)
                 return False
-        return not self.should_stop
+        return True
 
     def reset_character(self):
         """ 重置所有角色信息 """
@@ -423,9 +420,6 @@ class CurrencyWars(Executable):
     def game_loop(self):
         run_times = 0
         while self.is_running:
-            if self.should_stop:
-                self.is_running = False
-                return False
             self.harvest_crystals()
             self.get_in_hand_area(True)  # 更新手牌信息
             self.handle_characters_updated()
@@ -446,7 +440,7 @@ class CurrencyWars(Executable):
                 self.sort_all_areas_by_priority()  # 优先级排序
         # 游戏循环结束，重置角色状态
         self.reset_character()
-        return not self.should_stop
+        return True
 
     def refresh_character(self):
         """ 刷新角色信息，确保手牌中未放置的角色状态正确。 """
@@ -707,9 +701,6 @@ class CurrencyWars(Executable):
         self.operator.sleep(1.5)
 
         while True:  # 用无限循环 + 内部break控制退出
-            if self.should_stop:
-                self.is_running = False
-                return False
             # 检查是否超时（未识别到任何状态）
             if stage_index == -1:
                 raise RuntimeError("关卡状态检测超时，未识别到任何图片")
