@@ -14,7 +14,6 @@ from SRACore.util import (
     sys_util,  # NOQA 有动态用法，确保被打包 # type: ignore
 )
 from SRACore.util.data_persister import load_cache, load_config
-from SRACore.util.errors import SRAError, ThreadStoppedError
 from SRACore.util.logger import logger, setup_logger
 
 
@@ -31,7 +30,7 @@ class TaskManager:
         self.log_level = "TRACE"
         self.log_queue = None
         self._stop_event = threading.Event()
-        self.task_list: list[type[BaseTask]] = []
+        self.task_list: list[type] = []
         with open("SRACore/config.toml", "rb") as f:
             tasks = tomllib.load(f).get("tasks", [])
             for task in tasks:
@@ -57,6 +56,7 @@ class TaskManager:
         2. 对每个配置加载任务列表并执行
         3. 处理任务中断或失败的情况
         """
+        setup_logger(level=self.log_level, queue=self.log_queue)
         self._stop_event.clear()
         logger.debug('[Start]')
         try:
@@ -88,13 +88,20 @@ class TaskManager:
                         if not task.run():
                             logger.debug('task failed: ' + str(task))
                             logger.error(Resource.task_taskFailed(str(task)))
+                            notify.try_send_notification(
+                                Resource.task_notificationTitle,
+                                Resource.task_taskFailed(str(task)),
+                                result="fail"
+                            )
                             return  # 终止当前配置的执行
-                    except ThreadStoppedError as e:
-                        logger.error(e)
-                        break
                     except Exception as e:
                         # 捕获任务执行中的异常（如未处理的错误）
                         logger.exception(Resource.task_taskCrashed(str(task), str(e)))
+                        notify.try_send_notification(
+                            Resource.task_notificationTitle,
+                            Resource.task_taskCrashed(str(task), str(e)),
+                            result="fail"
+                        )
                         break
                 logger.info(Resource.task_configCompleted(config_name))
                 logger.info("=" * 50)
@@ -132,7 +139,8 @@ class TaskManager:
         if not task_select:
             return []
         tasks = []
-        operator = Operator(stop_event=self._stop_event)
+        operator = Operator()
+        operator._stop_event = self._stop_event
 
         # 遍历 task_select，根据选择状态实例化对应任务
         for index, is_select in enumerate(task_select):
@@ -140,7 +148,7 @@ class TaskManager:
             if is_select and index < len(self.task_list):
                 try:
                     # 实例化任务类
-                    tasks.append(self.task_list[index](operator, config))
+                    tasks.append(self.task_list[index](operator, config, self._stop_event))
                 except Exception as e:
                     logger.exception(Resource.task_instantiateFailed(index, str(e)))
         return tasks
@@ -187,6 +195,11 @@ class TaskManager:
             return result
         except Exception as e:
             logger.exception(Resource.task_taskCrashed(task, str(e)))
+            notify.try_send_notification(
+                Resource.task_notificationTitle,
+                Resource.task_taskCrashed(str(task), str(e)),
+                result="fail"
+            )
             return False
         finally:
             logger.debug("[Done]")
@@ -230,8 +243,8 @@ class TaskManager:
             logger.debug('config: ' + str(config))
             # 实例化任务类
             operator = Operator()
-            operator.stop_event = self._stop_event
-            return task_class(operator, config)
+            operator._stop_event = self._stop_event
+            return task_class(operator, config, self._stop_event)
         except Exception as e:
             logger.error(Resource.task_instantiateFailed(task, f'{e.__class__.__name__}: {e}'))
             return None
