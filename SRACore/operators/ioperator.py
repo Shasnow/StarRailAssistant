@@ -17,7 +17,7 @@ from SRACore.util.data_persister import load_settings
 class IOperator(ABC):
     ocr_engine = None
 
-    def __init__(self):
+    def __init__(self, stop_event: threading.Event | None = None):
         self.settings = load_settings()
         self.confidence:float = self.settings.get('ConfidenceThreshold', 0.9)
         self.top = 0
@@ -26,7 +26,7 @@ class IOperator(ABC):
         self.height = 0
         self.is_developer_mode = self.settings.get('IsDeveloperMode', False)
         self.is_save_ocr_image = self.settings.get('IsSaveOcrImage', False) if self.is_developer_mode else False
-        self._stop_event: threading.Event | None = None
+        self.stop_event = stop_event
 
     @classmethod
     def _get_ocr_instance(cls):
@@ -342,12 +342,9 @@ class IOperator(ABC):
             list[Any] | None:
                 OCR 引擎返回的原始结果（通常为列表，每项包含文本、坐标、置信度等信息）。
                 如果发生错误，返回 `None`。
-
-        Raises:
-            Exception:
-                如果 OCR 引擎初始化失败或截图失败，且 `trace=False`，异常会被捕获并返回 `None`。
-                如果 `trace=True`，错误会被记录到日志（`logger.trace`）。
         """
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise RuntimeError("Operation stopped")
         try:
             if trace:
                 logger.debug(f"OCR in region: {region}")
@@ -387,10 +384,6 @@ class IOperator(ABC):
         Returns:
           list[Any] | None:
                 OCR 引擎返回的原始结果。如果发生错误，返回 `None`。
-
-        Raises:
-            ValueError: 如果坐标比例不在 [0, 1] 范围内。
-            Exception: 如果窗口区域获取失败或 OCR 过程出错（根据 `trace` 参数决定是否记录日志）。
         """
         try:
             region = self.get_win_region()
@@ -537,8 +530,7 @@ class IOperator(ABC):
             box = self.ocr_match(text, confidence, *args, **kwargs)
             if box is not None:
                 return box
-            if self._stop_event and self._stop_event.wait(timeout=interval):
-                return None
+            time.sleep(interval)
         logger.debug(f"Timeout: '{text}' -> NotFound in {timeout} seconds")
         return None
 
@@ -567,8 +559,7 @@ class IOperator(ABC):
             index, box = self.ocr_match_any(texts, confidence, *args, **kwargs)
             if index != -1:
                 return index, box
-            if self._stop_event and self._stop_event.wait(timeout=interval):
-                return -1, None
+            time.sleep(interval)
         logger.debug(f"Timeout: '{texts}' -> NotFound in {timeout} seconds")
         return -1, None
 
@@ -646,8 +637,7 @@ class IOperator(ABC):
             box = self.locate(template)
             if box is not None:
                 return box
-            if self._stop_event and self._stop_event.wait(timeout=interval):
-                return None
+            time.sleep(interval)
         logger.debug(f"Timeout: {template} -> NotFound in {timeout} seconds")
         return None
 
@@ -668,8 +658,7 @@ class IOperator(ABC):
             index, box = self.locate_any(templates, trace = trace)
             if index != -1:
                 return index, box
-            if self._stop_event and self._stop_event.wait(timeout=interval):
-                return -1, None
+            time.sleep(interval)
         logger.debug(f"Timeout: {templates} -> NotFound in {timeout} seconds")
         return -1, None
 
@@ -712,7 +701,7 @@ class IOperator(ABC):
         Returns:
             None
         """
-        return time.sleep(seconds)
+        time.sleep(seconds)
 
     @staticmethod
     def copy(text: str) -> None:
@@ -724,7 +713,7 @@ class IOperator(ABC):
         Returns:
             None
         """
-        return pyperclip.copy(text)
+        pyperclip.copy(text)
 
     @abstractmethod
     def paste(self) -> None:

@@ -1,6 +1,5 @@
 import enum
 import json
-import threading
 from typing import Any
 
 from loguru import logger
@@ -26,8 +25,8 @@ class CurrencyWarsPage(enum.IntEnum):
 
 
 class CurrencyWars(Executable):
-    def __init__(self, operator, runtimes, stop_event: threading.Event | None = None):
-        super().__init__(operator, stop_event)
+    def __init__(self, operator, runtimes):
+        super().__init__(operator)
         self.runtimes = runtimes
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
@@ -211,10 +210,9 @@ class CurrencyWars(Executable):
         if not start_box:
             logger.error("[进入流程] 未识别到开始按钮")
             return False
-
         # 重试点击开始按钮直到LOGO消失
         self.operator.do_while(
-            lambda: self.operator.click_box(start_box, after_sleep=0.5),
+            lambda: self.operator.click_box(start_box, after_sleep=0.5),  # NOQA
             lambda: self.operator.locate(CWIMG.LOGO) is None,
             interval=0.5,
             max_iterations=10
@@ -608,7 +606,7 @@ class CurrencyWars(Executable):
         :param force: bool - 是否强制出售所有角色（包括已放置的角色）
         """
         # 创建需要出售的角色索引列表
-        characters_to_sell = []
+        characters_to_sell: list[tuple[int, Character]] = []
         for i, character in enumerate(self.in_hand_character):
             if character is None:
                 continue
@@ -1278,7 +1276,7 @@ class CurrencyWars(Executable):
                 continue
 
             # 找到目标位置当前的角色信息
-            target_current_info = None
+            target_current_info:dict[str, Any] | None = None
             for info in char_info_list:
                 if info['index'] == target_pos:
                     target_current_info = info
