@@ -1,0 +1,9 @@
+{
+  "name": "sra",
+  "version": "2.10.0",
+  "scripts": {
+    "dev": "python main.py",
+    "build": "python scripts/package.py",
+    "pyl10nc": "python scripts/pyl10nc/__main__.py SRACore/localization/resource.toml"
+  }
+}
