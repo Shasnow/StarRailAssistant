@@ -3,7 +3,9 @@
   "version": "2.10.0",
   "scripts": {
     "dev": "python main.py",
-    "build": "python scripts/package.py",
+    "build": "dotnet publish -c Release -r win-x64 SRAFrontend/SRAFrontend.csproj && python scripts/package.py",
+    "install": "pip install -r requirements.txt",
+    "frontend": "dotnet run --project SRAFrontend/SRAFrontend.csproj",
     "pyl10nc": "python scripts/pyl10nc/__main__.py SRACore/localization/resource.toml"
   }
 }
