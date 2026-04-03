@@ -132,9 +132,9 @@ en-us = "Manages tasks within SRA-cli, type 'help task' for more information."
 zh-cn = "任务已在运行中。"
 en-us = "Task is already running."
 
-[cli.task.interrupted]
-en-us = "Task execution interrupted by user."
-zh-cn = "任务执行被用户中断。"
+[cli.task.requestStop]
+zh-cn = "已请求停止正在运行的任务。"
+en-us = "Requested to stop running tasks."
 
 [cli.task.timeout]
 zh-cn = "等待任务完成时超时。"
