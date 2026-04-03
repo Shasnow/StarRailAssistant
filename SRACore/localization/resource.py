@@ -14,8 +14,8 @@ import os
 class Localization:
     """Automatically generated localization class."""
     __normalized_data: dict[str, str] = None
-    lang: str = "en-us"
-    __available_languages = ['en-us', 'zh-cn']
+    lang: str = "zh-cn"
+    __available_languages = ['zh-cn', 'en-us']
     __data_loaded: bool = False
 
     def __init__(self):
@@ -72,12 +72,12 @@ class Localization:
         self.__ensure_data_loaded()
         return self.__normalized_data.get(key, key)
 
-    def cli_intro(self, core, version) -> str:
+    def cli_intro(self, version, core) -> str:
         """SRA-cli {version} ({core})\n输入 'help' 或 '?' 来查看命令列表。
 
         From cli.intro"""
         template = self.get_translation("cli.intro")
-        return template.format(core=core, version=version)
+        return template.format(version=version, core=core)
 
     @property
     def cli_noAdminWarning(self) -> str:
@@ -310,19 +310,19 @@ class Localization:
         template = self.get_translation("cli.trigger.notFound")
         return template.format(trigger_name=trigger_name)
 
-    def cli_trigger_attrNotFound(self, attr, trigger_name) -> str:
+    def cli_trigger_attrNotFound(self, trigger_name, attr) -> str:
         """在触发器 '{trigger_name}' 中未找到属性 '{attr}'。
 
         From cli.trigger.attrNotFound"""
         template = self.get_translation("cli.trigger.attrNotFound")
-        return template.format(attr=attr, trigger_name=trigger_name)
+        return template.format(trigger_name=trigger_name, attr=attr)
 
-    def cli_trigger_attrSet(self, attr, value, trigger_name) -> str:
+    def cli_trigger_attrSet(self, trigger_name, attr, value) -> str:
         """触发器 '{trigger_name}' 的属性 '{attr}' 已设置为 '{value}'。
 
         From cli.trigger.attrSet"""
         template = self.get_translation("cli.trigger.attrSet")
-        return template.format(attr=attr, value=value, trigger_name=trigger_name)
+        return template.format(trigger_name=trigger_name, attr=attr, value=value)
 
     def cli_trigger_unknownType(self, type) -> str:
         """未知属性类型: '{type}'，支持: 'int'，'float'，'bool'，'str'。
