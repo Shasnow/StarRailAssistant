@@ -20,7 +20,7 @@
     "cli.exit.triggerTimeout": "等待触发器停止时超时。强制退出。",
     "cli.task.help": "管理 SRA-cli 中的任务，输入 'help task' 获取更多信息。",
     "cli.task.taskAlreadyRunning": "任务已在运行中。",
-    "cli.task.interrupted": "任务执行被用户中断。",
+    "cli.task.requestStop": "已请求停止正在运行的任务。",
     "cli.task.timeout": "等待任务完成时超时。",
     "cli.task.stopped": "所有正在运行的任务已停止。",
     "cli.task.notRunning": "当前没有任务在运行。",

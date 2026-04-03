@@ -20,7 +20,7 @@
     "cli.exit.triggerTimeout": "Timeout reached while waiting for triggers to stop. Forcing exit.",
     "cli.task.help": "Manages tasks within SRA-cli, type 'help task' for more information.",
     "cli.task.taskAlreadyRunning": "Task is already running.",
-    "cli.task.interrupted": "Task execution interrupted by user.",
+    "cli.task.requestStop": "Requested to stop running tasks.",
     "cli.task.timeout": "Timeout reached while waiting for tasks to complete.",
     "cli.task.stopped": "All running tasks have been stopped.",
     "cli.task.notRunning": "No tasks are currently running.",

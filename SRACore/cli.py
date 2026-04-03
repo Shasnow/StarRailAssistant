@@ -76,7 +76,7 @@ class SRACli(cmd.Cmd):
 
     def _stop_task_thread(self) -> None:
         if self.task_thread is not None and self.task_thread.is_alive():
-            logger.warning(Resource.cli_task_interrupted)
+            logger.warning(Resource.cli_task_requestStop)
             self.task_manager.request_stop()
             self.task_thread.join(timeout=30)
             if self.task_thread.is_alive():
