@@ -19,77 +19,67 @@ StarRailAssistant 错误码定义
 """
 
 from enum import IntEnum
-from typing import Any, Optional
-
-
-class ErrorLevel(IntEnum):
-    """错误级别枚举"""
-    CRITICAL = 1  # 致命错误
-    HIGH = 2  # 高级错误
-    MEDIUM = 3  # 中级错误
-    LOW = 4  # 低级错误
-    WARNING = 5  # 警告
-    INFO = 6  # 信息
+from typing import Any
 
 
 class ErrorCode(IntEnum):
     """错误码枚举"""
-    
+
     # ========== 1XXX: 系统级错误 ==========
     # 1000-1099: 系统初始化错误
     SYSTEM_INIT_FAILED = 1001  # 系统初始化失败
     SYSTEM_SHUTDOWN_FAILED = 1002  # 系统关闭失败
     SYSTEM_RESOURCE_EXHAUSTED = 1003  # 系统资源耗尽
-    
+
     # 1100-1199: 线程和进程错误
+    THREAD_STOPPED = 1100  # 线程已停止
     THREAD_CREATE_FAILED = 1101  # 线程创建失败
     THREAD_START_FAILED = 1102  # 线程启动失败
     THREAD_STOP_FAILED = 1103  # 线程停止失败
     PROCESS_CREATE_FAILED = 1104  # 进程创建失败
     PROCESS_KILL_FAILED = 1105  # 进程终止失败
-    
+
     # 1200-1299: 权限错误
     ADMIN_PRIVILEGES_REQUIRED = 1201  # 需要管理员权限
     FILE_ACCESS_DENIED = 1202  # 文件访问被拒绝
     REGISTRY_ACCESS_DENIED = 1203  # 注册表访问被拒绝
-    
+
     # ========== 2XXX: 配置错误 ==========
     # 2000-2099: 配置文件错误
     CONFIG_FILE_NOT_FOUND = 2001  # 配置文件未找到
     CONFIG_FILE_CORRUPTED = 2002  # 配置文件损坏
     CONFIG_PARSE_ERROR = 2003  # 配置文件解析错误
     CONFIG_INVALID_FORMAT = 2004  # 配置文件格式无效
-    
+
     # 2100-2199: 配置项错误
     CONFIG_ITEM_MISSING = 2101  # 配置项缺失
     CONFIG_ITEM_INVALID = 2102  # 配置项无效
     CONFIG_ITEM_OUT_OF_RANGE = 2103  # 配置项超出范围
     CONFIG_ITEM_TYPE_MISMATCH = 2104  # 配置项类型不匹配
-    
+
     # ========== 3XXX: 操作错误 ==========
     # 3000-3099: 窗口操作错误
     WINDOW_NOT_FOUND = 3001  # 窗口未找到
     WINDOW_INACTIVE = 3002  # 窗口未激活
     WINDOW_ACTIVATE_FAILED = 3003  # 窗口激活失败
     WINDOW_REGION_INVALID = 3004  # 窗口区域无效
-    
+
     # 3100-3199: OCR识别错误
     OCR_ENGINE_NOT_INITIALIZED = 3101  # OCR引擎未初始化
     OCR_RECOGNITION_FAILED = 3102  # OCR识别失败
 
-    
     # 3200-3299: 图像识别错误
     IMAGE_NOT_FOUND = 3201  # 图像未找到
     IMAGE_MATCH_FAILED = 3202  # 图像匹配失败
     IMAGE_LOAD_FAILED = 3203  # 图像加载失败
     IMAGE_INVALID_FORMAT = 3204  # 图像格式无效
-    
+
     # 3300-3399: 鼠标键盘操作错误
     MOUSE_MOVE_FAILED = 3301  # 鼠标移动失败
     MOUSE_CLICK_FAILED = 3302  # 鼠标点击失败
     KEYBOARD_INPUT_FAILED = 3303  # 键盘输入失败
     HOTKEY_CONFLICT = 3304  # 热键冲突
-    
+
     # ========== 4XXX: 任务错误 ==========
     # 4000-4099: 任务管理错误
     TASK_NOT_FOUND = 4001  # 任务未找到
@@ -143,18 +133,18 @@ class ErrorCode(IntEnum):
     HTTP_TIMEOUT = 5002  # HTTP请求超时
     HTTP_CONNECTION_ERROR = 5003  # HTTP连接错误
     HTTP_RESPONSE_ERROR = 5004  # HTTP响应错误
-    
+
     # 5100-5199: API错误
     API_NOT_AVAILABLE = 5101  # API不可用
     API_RATE_LIMIT_EXCEEDED = 5102  # API请求频率超限
     API_AUTH_FAILED = 5103  # API认证失败
     API_VERSION_MISMATCH = 5104  # API版本不匹配
-    
+
     # 5200-5299: 更新错误
     UPDATE_CHECK_FAILED = 5201  # 更新检查失败
     UPDATE_DOWNLOAD_FAILED = 5202  # 更新下载失败
     UPDATE_INSTALL_FAILED = 5203  # 更新安装失败
-    
+
     # ========== 6XXX: 资源错误 ==========
     # 6000-6099: 文件操作错误
     FILE_NOT_FOUND = 6001  # 文件未找到
@@ -162,42 +152,42 @@ class ErrorCode(IntEnum):
     FILE_WRITE_FAILED = 6003  # 文件写入失败
     FILE_DELETE_FAILED = 6004  # 文件删除失败
     FILE_COPY_FAILED = 6005  # 文件复制失败
-    
+
     # 6100-6199: 资源加载错误
     RESOURCE_LOAD_FAILED = 6101  # 资源加载失败
     RESOURCE_MISSING = 6102  # 资源缺失
     RESOURCE_CORRUPTED = 6103  # 资源损坏
     RESOURCE_VERSION_MISMATCH = 6104  # 资源版本不匹配
-    
+
     # ========== 7XXX: 逻辑错误 ==========
     # 7000-7099: 业务逻辑错误
     INVALID_OPERATION = 7001  # 无效操作
     OPERATION_NOT_SUPPORTED = 7002  # 不支持的操作
     OPERATION_CANCELLED = 7003  # 操作已取消
     OPERATION_IN_PROGRESS = 7004  # 操作正在进行中
-    
+
     # 7100-7199: 数据验证错误
     DATA_VALIDATION_FAILED = 7101  # 数据验证失败
     DATA_INCONSISTENT = 7102  # 数据不一致
     DATA_OUT_OF_RANGE = 7103  # 数据超出范围
     DATA_TYPE_MISMATCH = 7104  # 数据类型不匹配
-    
+
     # 7200-7299: 状态错误
     INVALID_STATE = 7201  # 无效状态
     STATE_TRANSITION_FAILED = 7202  # 状态转换失败
     STATE_NOT_READY = 7203  # 状态未就绪
-    
+
     # ========== 8XXX: 用户错误 ==========
     # 8000-8099: 用户输入错误
     INVALID_INPUT = 8001  # 无效输入
     INPUT_OUT_OF_RANGE = 8002  # 输入超出范围
     INPUT_FORMAT_INVALID = 8003  # 输入格式无效
-    
+
     # 8100-8199: 用户操作错误
     OPERATION_ABORTED = 8101  # 操作中止
     OPERATION_SKIPPED = 8102  # 操作跳过
     OPERATION_RETRY_EXCEEDED = 8103  # 操作重试次数超限
-    
+
     # ========== 9XXX: 其他错误 ==========
     UNKNOWN_ERROR = 9001  # 未知错误
     UNEXPECTED_ERROR = 9002  # 意外错误
@@ -206,18 +196,18 @@ class ErrorCode(IntEnum):
 
 class SRAError(Exception):
     """StarRailAssistant 基础异常类"""
-    
-    def __init__(self, error_code: ErrorCode, message: str, details: Optional[str] = None):
+
+    def __init__(self, error_code: ErrorCode, message: str, details: str | None = None):
         self.error_code = error_code
         self.message = message
         self.details = details
         super().__init__(f"[{error_code.value}] {message}")
-    
+
     def __str__(self):
         if self.details:
             return f"[{self.error_code.value}] {self.message}: {self.details}"
         return f"[{self.error_code.value}] {self.message}"
-    
+
     def to_dict(self) -> dict[str, Any]:
         """转换为字典格式"""
         return {
@@ -228,67 +218,9 @@ class SRAError(Exception):
         }
 
 
-class ConfigError(SRAError):
-    """配置错误"""
-    pass
-
-
-class OperationError(SRAError):
-    """操作错误"""
-    pass
-
-
-class TaskError(SRAError):
-    """任务错误"""
-    pass
-
-
-class NetworkError(SRAError):
-    """网络错误"""
-    pass
-
-
-class ResourceError(SRAError):
-    """资源错误"""
-    pass
-
-
-class LogicError(SRAError):
-    """逻辑错误"""
-    pass
-
-
-class UserError(SRAError):
-    """用户错误"""
-    pass
-
-
-class UnknownError(SRAError):
-    """其他错误"""
-    pass
-
-
-def get_error_level(error_code: ErrorCode) -> ErrorLevel:
-    """获取错误级别"""
-    code = error_code.value
-    if 1000 <= code < 2000:
-        return ErrorLevel.CRITICAL
-    elif 2000 <= code < 3000:
-        return ErrorLevel.HIGH
-    elif 3000 <= code < 4000:
-        return ErrorLevel.MEDIUM
-    elif 4000 <= code < 5000:
-        return ErrorLevel.MEDIUM
-    elif 5000 <= code < 6000:
-        return ErrorLevel.LOW
-    elif 6000 <= code < 7000:
-        return ErrorLevel.HIGH
-    elif 7000 <= code < 8000:
-        return ErrorLevel.MEDIUM
-    elif 8000 <= code < 9000:
-        return ErrorLevel.WARNING
-    else:
-        return ErrorLevel.INFO
+class ThreadStoppedError(SRAError):
+    def __init__(self, message: str, details: str | None = None):
+        super().__init__(ErrorCode.THREAD_STOPPED, message, details)
 
 
 def format_error(error: Exception) -> str:
@@ -300,17 +232,8 @@ def format_error(error: Exception) -> str:
 
 
 __all__ = [
-    'ErrorLevel',
     'ErrorCode',
     'SRAError',
-    'ConfigError',
-    'OperationError',
-    'TaskError',
-    'NetworkError',
-    'ResourceError',
-    'LogicError',
-    'UserError',
-    'UnknownError',
-    'get_error_level',
+    'ThreadStoppedError',
     'format_error'
 ]

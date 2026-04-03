@@ -1,15 +1,14 @@
 from loguru import logger
-import threading
 
+from SRACore.task import Executable
 from SRACore.util import errors
 from SRACore.util.errors import SRAError
 from tasks.img import DUIMG, IMG
-from SRACore.task import Executable
 
 
 class DifferentialUniverse(Executable):
-    def __init__(self, operator, run_times: int, use_technique: bool, stop_event: threading.Event | None = None):
-        super().__init__(operator, stop_event)
+    def __init__(self, operator, run_times: int, use_technique: bool):
+        super().__init__(operator)
         self.run_times = run_times
         self.use_technique = use_technique
 
@@ -47,7 +46,7 @@ class DifferentialUniverse(Executable):
         if box is None:
             logger.error(SRAError(errors.ErrorCode.IMAGE_NOT_FOUND, "未识别到差分宇宙开始按钮"))
             return False
-        self.operator.do_while(lambda : self.operator.click_box(box),
+        self.operator.do_while(lambda : self.operator.click_box(box),  # NOQA
                       lambda : self.operator.locate(DUIMG.PERIODIC_CALCULUS) is None,
                       interval=0.5, max_iterations=10)
         self.operator.click_img(DUIMG.PERIODIC_CALCULUS)

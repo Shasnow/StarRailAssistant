@@ -12,8 +12,7 @@ class CosmicStrifeTask(BaseTask):
             du_task = DifferentialUniverse(
                 self.operator,
                 self.config.get("DURunTimes", 0),
-                self.config.get("DUUseTechnique", False),
-                stop_event=self._stop_event)
+                self.config.get("DUUseTechnique", False))
             if not du_task.run():
                 logger.error("旷宇纷争-模拟宇宙任务失败")
                 return False
@@ -36,7 +35,7 @@ class CosmicStrifeTask(BaseTask):
         if cw_mode==2:
             logger.info("执行任务：旷宇纷争-货币战争 刷开局")
             from tasks.currency_wars import RerollStart
-            rs_task = RerollStart(operator=self.operator, runtimes=runtimes, stop_event=self._stop_event)
+            rs_task = RerollStart(operator=self.operator, runtimes=runtimes)
             # 刷开局难度选择：和标准模式使用同一个难度配置项
             rs_task.set_difficulty(difficulty)
             rs_task.load_strategy(strategy)
@@ -51,7 +50,7 @@ class CosmicStrifeTask(BaseTask):
         elif cw_mode==1 or cw_mode==0:
             logger.info("执行任务：旷宇纷争-货币战争 常规")
             from tasks.currency_wars import CurrencyWars
-            cw_task = CurrencyWars(operator=self.operator, runtimes=runtimes, stop_event=self._stop_event)
+            cw_task = CurrencyWars(operator=self.operator, runtimes=runtimes)
             cw_task.load_strategy(strategy)
             # 前端难度选择：0=最低难度，1=最高难度
             cw_task.set_difficulty(difficulty)

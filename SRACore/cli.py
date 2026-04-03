@@ -82,7 +82,6 @@ class SRACli(cmd.Cmd):
             if self.task_thread.is_alive():
                 logger.warning(Resource.cli_task_timeout)
             else:
-                logger.debug('[Done]')
                 logger.info(Resource.cli_task_stopped)
         else:
             print(Resource.cli_task_notRunning)

@@ -1,5 +1,6 @@
 
 import ctypes
+import threading
 import time
 from ctypes.wintypes import POINT, RECT
 from pathlib import Path
@@ -10,13 +11,13 @@ import pyscreeze
 
 from SRACore.operators.ioperator import IOperator
 from SRACore.operators.model import Box, Region
-from SRACore.util.errors import ErrorCode, SRAError
+from SRACore.util.errors import ErrorCode, SRAError, ThreadStoppedError
 from SRACore.util.logger import logger
 
 
 class Operator(IOperator):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, stop_event: threading.Event | None = None):
+        super().__init__(stop_event)
         self.window_title = "崩坏：星穹铁道"
         self.top = 0
         self.left = 0
@@ -81,6 +82,7 @@ class Operator(IOperator):
     def screenshot_in_region(self, region: Region | None = None):
         if region is None:
             region = self.get_win_region(active_window=True)
+        # noinspection PyUnresolvedReferences
         return pyscreeze.screenshot(region=region.tuple)
 
     def screenshot_in_tuple(self, from_x: float, from_y: float, to_x: float, to_y: float):
@@ -92,13 +94,16 @@ class Operator(IOperator):
                          region: Region | None = None,
                          confidence: float | None = None,
                          trace: bool = True) -> Box | None:
-        match_confidence = self.confidence if confidence is None else confidence
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("图像识别中断", "线程已停止")
+        match_confidence = confidence if confidence is not None else self.confidence
         try:
             if region is None:
                 region = self.get_win_region()
                 time.sleep(0.5)
             if not Path(img_path).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
+            # noinspection PyTypeChecker
             box = pyscreeze.locate(img_path, self.screenshot(region), confidence=match_confidence)
             if box is None:
                 return None
@@ -123,6 +128,8 @@ class Operator(IOperator):
 
     def locate_any_in_region(self, templates: list[str], region: Region | None = None, confidence: float | None = None,
                              trace: bool = True) -> tuple[int, Box | None]:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("图像识别中断", "线程已停止")
         match_confidence = self.confidence if confidence is None else confidence
         try:
             screenshot = self.screenshot(region=region)
@@ -133,6 +140,7 @@ class Operator(IOperator):
             if not Path(img_path).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + img_path)
             try:
+                # noinspection PyTypeChecker
                 box = pyscreeze.locate(img_path, screenshot, confidence=match_confidence)
             except (pyscreeze.ImageNotFoundException, ValueError) as e:
                 if trace:
@@ -158,6 +166,8 @@ class Operator(IOperator):
 
     def locate_all_in_region(self, template: str, region: Region | None = None, confidence: float | None = None,
                              trace: bool = True) -> list[Box] | None:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("图像识别中断", "线程已停止")
         match_confidence = self.confidence if confidence is None else confidence
         try:
             if region is None:
@@ -165,6 +175,7 @@ class Operator(IOperator):
                 time.sleep(0.5)
             if not Path(template).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + template)
+            # noinspection PyTypeChecker
             boxes = pyscreeze.locateAll(template, self.screenshot(region), confidence=match_confidence)
             result = []
             for box in boxes:
@@ -191,6 +202,8 @@ class Operator(IOperator):
 
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
                     after_sleep: float = 0, tag: str = "") -> bool:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("点击中断", "线程已停止")
         if isinstance(x_offset, float) and isinstance(y_offset, float):
             x_offset = int(self.width * x_offset)
             y_offset = int(self.height * y_offset)
@@ -211,6 +224,8 @@ class Operator(IOperator):
                 f"Invalid arguments: expected 'int, int' or 'float, float', got '{type(x).__name__}, {type(y).__name__}'")
 
     def press_key(self, key: str, presses: int = 1, interval: float = 0, wait: float = 0, trace: bool = True) -> bool:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("按键中断", "线程已停止")
         try:
             time.sleep(wait)
             if trace:
@@ -223,6 +238,8 @@ class Operator(IOperator):
             return False
 
     def hold_key(self, key: str, duration: float = 0) -> bool:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("按键中断", "线程已停止")
         try:
             logger.debug(f"Hold key {key}")
             pyautogui.keyDown(key)
@@ -234,12 +251,16 @@ class Operator(IOperator):
             return False
 
     def paste(self) -> None:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("粘贴中断", "线程已停止")
         pyautogui.keyDown("ctrl")
         pyautogui.keyDown("v")
         pyautogui.keyUp("v")
         pyautogui.keyUp("ctrl")
 
     def move_rel(self, x_offset: int, y_offset: int) -> bool:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("鼠标移动中断", "线程已停止")
         try:
             pyautogui.moveRel(x_offset, y_offset)
             return True
@@ -248,6 +269,8 @@ class Operator(IOperator):
             return False
 
     def move_to(self, x: int | float, y: int | float, duration: float = 0.0, trace: bool = True) -> bool:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("鼠标移动中断", "线程已停止")
         try:
             if trace:
                 logger.debug(f"Move cursor to ({x}, {y}), duration: {duration}s")
@@ -266,6 +289,8 @@ class Operator(IOperator):
             return False
 
     def mouse_down(self, x: int | float, y: int | float, trace: bool = True) -> bool:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("点击中断", "线程已停止")
         try:
             if trace:
                 logger.debug(f"Mouse down: ({x}, {y})")
@@ -284,6 +309,8 @@ class Operator(IOperator):
             return False
 
     def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace: bool = True) -> bool:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("点击中断", "线程已停止")
         try:
             if trace:
                 logger.debug("Mouse up")
@@ -294,6 +321,8 @@ class Operator(IOperator):
             return False
 
     def scroll(self, distance: int) -> bool:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("Error scrolling", "线程已停止")
         try:
             pyautogui.scroll(distance)
             return True
