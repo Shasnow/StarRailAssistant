@@ -19,8 +19,15 @@
                         Width="20"
                         Classes="Basic Icon"
                         Content="&#xE036;"
-                        ToolTip.Tip="重新启动控制台"
+                        ToolTip.Tip="重新启动后端"
                         Command="{Binding RestartConsoleCommand}"/>
+                    <Button
+                        Height="20"
+                        Width="20"
+                        Classes="Basic Icon"
+                        Content="&#xE3DE;"
+                        ToolTip.Tip="停止后端"
+                        Command="{Binding StopConsoleCommand}"/>
                 </StackPanel>
             </suki:GroupBox.Header>
             <Grid RowDefinitions="Auto,*,Auto">

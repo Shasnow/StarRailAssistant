@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -9,18 +10,29 @@ namespace SRAFrontend.ViewModels;
 
 public partial class ConsolePageViewModel : PageViewModel
 {
+    private const int MaxConsoleLines = 1000;
     private readonly IBackendService _backendService;
     private readonly AvaloniaList<string> _consoleLines = [];
-    
-    private const int MaxConsoleLines = 1000;
 
-    public ConsolePageViewModel(IBackendService backendService) : base(PageName.Console, "\uEAE8")
+    private readonly string[] _levelPrefixes = ["TRACE", "DEBUG", "INFO", "WARN", "ERROR"];
+    private readonly SettingsService _settingsService;
+
+    [ObservableProperty]
+    private AvaloniaList<bool> _filterOptions = [false, false, true, true, true]; // TRACE, DEBUG, INFO, WARN, ERROR
+
+    public ConsolePageViewModel(IBackendService backendService, SettingsService settingsService) : base(
+        PageName.Console, "\uEAE8")
     {
         _backendService = backendService;
+        _settingsService = settingsService;
         _backendService.Outputted += AddConsoleLine;
-        _backendService.StartBackend("--inline");
-        FilterOptions.CollectionChanged+= (_, _) => OnPropertyChanged(nameof(ConsoleLines));
+        _backendService.StartBackend(Arguments);
+        FilterOptions.CollectionChanged += (_, _) => OnPropertyChanged(nameof(ConsoleLines));
     }
+
+    private string Arguments => Environment.GetCommandLineArgs().Length > 1
+        ? string.Join(' ', Environment.GetCommandLineArgs()[1..])
+        : _settingsService.Settings.BackendArguments;
 
     public string ConsoleLines
     {
@@ -30,11 +42,9 @@ public partial class ConsolePageViewModel : PageViewModel
             {
                 // 1. 检查是否匹配已勾选的级别（标识可能在任意位置，用 Contains）
                 for (var i = 0; i < _levelPrefixes.Length; i++)
-                {
                     // 勾选了该级别，且日志行包含对应标识 → 保留
                     if (FilterOptions[i] && line.Contains(_levelPrefixes[i]))
                         return true;
-                }
                 // 2. 保留无任何级别标识的日志（无匹配级别时默认保留）
                 var hasAnyLevelPrefix = _levelPrefixes.Any(line.Contains);
                 return !hasAnyLevelPrefix;
@@ -43,11 +53,6 @@ public partial class ConsolePageViewModel : PageViewModel
         }
     }
 
-    private readonly string[] _levelPrefixes = ["TRACE", "DEBUG", "INFO", "WARN", "ERROR"];
-    
-    [ObservableProperty]
-    private AvaloniaList<bool> _filterOptions = [false, false, true, true, true]; // TRACE, DEBUG, INFO, WARN, ERROR
-    
     private void AddConsoleLine(string line)
     {
         // 添加新行到列表末尾
@@ -57,12 +62,12 @@ public partial class ConsolePageViewModel : PageViewModel
         // 触发UI更新
         OnPropertyChanged(nameof(ConsoleLines));
     }
-    
+
     private void HandleMessage(string message)
     {
         _backendService.SendInput(message);
     }
-    
+
     private void HandleCommand(string line)
     {
         var parts = line.Split(' ', 2);
@@ -85,19 +90,21 @@ public partial class ConsolePageViewModel : PageViewModel
     public void HandleInput(string input)
     {
         if (input.StartsWith('/'))
-        {
             HandleCommand(input[1..]);
-        }
         else
-        {
             HandleMessage(input);
-        }
     }
 
     [RelayCommand]
     private void RestartConsole()
     {
         _consoleLines.Clear();
-        _backendService.RestartBackendAsync("--inline");
+        _backendService.RestartBackendAsync(_settingsService.Settings.BackendArguments);
+    }
+
+    [RelayCommand]
+    private void StopConsole()
+    {
+        _backendService.StopBackend();
     }
 }
