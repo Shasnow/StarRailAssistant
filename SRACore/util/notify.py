@@ -14,6 +14,7 @@ from SRACore.util.image_util import compress_image_bytes
 # ===================== 核心分发 =====================
 
 _cached_game_screenshot_bytes: bytes | None = None
+_cached_game_screenshot_owner_id: int | None = None
 _active_notification_screenshot_bytes: bytes | None = None
 _notification_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="notify_batch")
 
@@ -24,7 +25,9 @@ def try_send_notification(title: str, message: str, result: str = "success", ope
         return
     screenshot_bytes = None
     if should_capture_notification_screenshot(setting):
-        screenshot_bytes = _cached_game_screenshot_bytes or _capture_game_window_bytes(operator)
+        screenshot_bytes = _capture_game_window_bytes(operator)
+        if not screenshot_bytes:
+            screenshot_bytes = _get_cached_game_screenshot_bytes(operator)
     data = _build_notification_data(title, message, result)
     clear_cached_game_screenshot()
     _notification_executor.submit(_dispatch_notification_batch, title, message, data, dict(setting), screenshot_bytes)
@@ -183,16 +186,28 @@ def should_capture_notification_screenshot(setting: dict[str, Any] | None = None
 
 
 def capture_game_screenshot(operator: Any | None = None) -> bytes | None:
-    global _cached_game_screenshot_bytes
+    global _cached_game_screenshot_bytes, _cached_game_screenshot_owner_id
     img_bytes = _capture_game_window_bytes(operator)
     if img_bytes:
         _cached_game_screenshot_bytes = img_bytes
+        _cached_game_screenshot_owner_id = id(operator) if operator is not None else None
     return img_bytes
 
 
 def clear_cached_game_screenshot() -> None:
-    global _cached_game_screenshot_bytes
+    global _cached_game_screenshot_bytes, _cached_game_screenshot_owner_id
     _cached_game_screenshot_bytes = None
+    _cached_game_screenshot_owner_id = None
+
+
+def _get_cached_game_screenshot_bytes(operator: Any | None = None) -> bytes | None:
+    if _cached_game_screenshot_bytes is None:
+        return None
+    if operator is None:
+        return _cached_game_screenshot_bytes
+    if _cached_game_screenshot_owner_id == id(operator):
+        return _cached_game_screenshot_bytes
+    return None
 
 
 def _capture_game_window_bytes(operator: Any | None = None) -> bytes | None:
@@ -213,8 +228,9 @@ def _take_screenshot_bytes() -> bytes | None:
     """优先返回缓存的游戏截图，否则尝试截取当前游戏窗口"""
     if _active_notification_screenshot_bytes:
         return _active_notification_screenshot_bytes
-    if _cached_game_screenshot_bytes:
-        return _cached_game_screenshot_bytes
+    cached = _get_cached_game_screenshot_bytes()
+    if cached:
+        return cached
     return capture_game_screenshot()
 
 
