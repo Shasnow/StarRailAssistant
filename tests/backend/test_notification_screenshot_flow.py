@@ -216,6 +216,31 @@ def test_try_send_notification_dispatches_channels_in_parallel():
         "WeComSendImage": False,
     }
 
+    completed = threading.Event()
+
+    def slow_dispatch(*_):
+        time.sleep(0.2)
+        completed.set()
+
+    start = time.perf_counter()
+    with patch.object(notify_module, "_dispatch_notification_batch", side_effect=slow_dispatch):
+        with patch.object(notify_module, "_capture_game_window_bytes", return_value=None):
+            notify_module.try_send_notification("title", "message")
+    elapsed = time.perf_counter() - start
+
+    assert elapsed < 0.1
+    assert completed.wait(1)
+
+
+def test_dispatch_notification_batch_runs_channels_in_parallel():
+    notify_module, _, _ = _import_notify_module()
+    setting = {
+        "AllowEmailNotifications": True,
+        "AllowWeComNotifications": True,
+        "WeComSendImage": False,
+    }
+    data = {"event": "title", "result": "success", "timestamp": "2026-04-04 00:00:00", "message": "message"}
+
     called = []
 
     def slow_mail(*_):
@@ -229,25 +254,25 @@ def test_try_send_notification_dispatches_channels_in_parallel():
     start = time.perf_counter()
     with patch.object(notify_module, "send_mail_notification", side_effect=slow_mail):
         with patch.object(notify_module, "send_wecom_notification", side_effect=slow_wecom):
-            notify_module.try_send_notification("title", "message")
+            notify_module._dispatch_notification_batch("title", "message", data, setting, None)
     elapsed = time.perf_counter() - start
 
     assert set(called) == {"mail", "wecom"}
     assert elapsed < 0.35
 
 
-def test_try_send_notification_continues_when_one_channel_raises():
-    notify_module, data_persister_module, _ = _import_notify_module()
-    data_persister_module.load_settings.return_value = {
-        "AllowNotifications": True,
+def test_dispatch_notification_batch_continues_when_one_channel_raises():
+    notify_module, _, _ = _import_notify_module()
+    setting = {
         "AllowEmailNotifications": True,
         "AllowWebhookNotifications": True,
     }
+    data = {"event": "title", "result": "success", "timestamp": "2026-04-04 00:00:00", "message": "message"}
 
     called = []
 
     with patch.object(notify_module, "send_mail_notification", side_effect=RuntimeError("boom")):
         with patch.object(notify_module, "send_webhook_notification", side_effect=lambda *_: called.append("webhook")):
-            notify_module.try_send_notification("title", "message")
+            notify_module._dispatch_notification_batch("title", "message", data, setting, None)
 
     assert called == ["webhook"]

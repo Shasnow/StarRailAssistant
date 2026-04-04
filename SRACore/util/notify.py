@@ -14,44 +14,20 @@ from SRACore.util.image_util import compress_image_bytes
 # ===================== 核心分发 =====================
 
 _cached_game_screenshot_bytes: bytes | None = None
+_active_notification_screenshot_bytes: bytes | None = None
+_notification_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="notify_batch")
 
 
 def try_send_notification(title: str, message: str, result: str = "success", operator: Any | None = None):
     setting = load_settings()
     if not setting.get("AllowNotifications", False):
         return
+    screenshot_bytes = None
     if should_capture_notification_screenshot(setting):
-        capture_game_screenshot(operator)
+        screenshot_bytes = _cached_game_screenshot_bytes or _capture_game_window_bytes(operator)
     data = _build_notification_data(title, message, result)
-    jobs: list[tuple[str, Callable[..., Any], tuple[Any, ...]]] = []
-    if setting.get("AllowSystemNotifications", False):
-        jobs.append(("系统", send_windows_notification, (title, message)))
-    if setting.get("AllowEmailNotifications", False):
-        jobs.append(("邮件", send_mail_notification, (title, message, setting)))
-    if setting.get("AllowWebhookNotifications", False):
-        jobs.append(("Webhook", send_webhook_notification, (data, setting)))
-    if setting.get("AllowTelegramNotifications", False):
-        jobs.append(("Telegram", send_telegram_notification, (data, setting)))
-    if setting.get("AllowServerChanNotifications", False):
-        jobs.append(("ServerChan", send_serverchan_notification, (data, setting)))
-    if setting.get("AllowOneBotNotifications", False):
-        jobs.append(("OneBot", send_onebot_notification, (data, setting)))
-    if setting.get("AllowBarkNotifications", False):
-        jobs.append(("Bark", send_bark_notification, (data, setting)))
-    if setting.get("AllowFeishuNotifications", False):
-        jobs.append(("飞书", send_feishu_notification, (data, setting)))
-    if setting.get("AllowWeComNotifications", False):
-        jobs.append(("企业微信", send_wecom_notification, (data, setting)))
-    if setting.get("AllowDingTalkNotifications", False):
-        jobs.append(("钉钉", send_dingtalk_notification, (data, setting)))
-    if setting.get("AllowDiscordNotifications", False):
-        jobs.append(("Discord", send_discord_notification, (data, setting)))
-    if setting.get("AllowXxtuiNotifications", False):
-        jobs.append(("xxtui", send_xxtui_notification, (data, setting)))
-    try:
-        _run_notification_jobs(jobs)
-    finally:
-        clear_cached_game_screenshot()
+    clear_cached_game_screenshot()
+    _notification_executor.submit(_dispatch_notification_batch, title, message, data, dict(setting), screenshot_bytes)
 
 
 # ===================== 工具函数 =====================
@@ -100,6 +76,54 @@ def _http_post_json(url: str, payload: dict, proxy_url: str | None = None) -> tu
             return resp.status, resp.read().decode("utf-8", errors="replace")
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode("utf-8", errors="replace")
+
+
+def _build_notification_jobs(
+        title: str,
+        message: str,
+        data: dict,
+        setting: dict[str, Any]) -> list[tuple[str, Callable[..., Any], tuple[Any, ...]]]:
+    jobs: list[tuple[str, Callable[..., Any], tuple[Any, ...]]] = []
+    if setting.get("AllowSystemNotifications", False):
+        jobs.append(("系统", send_windows_notification, (title, message)))
+    if setting.get("AllowEmailNotifications", False):
+        jobs.append(("邮件", send_mail_notification, (title, message, setting)))
+    if setting.get("AllowWebhookNotifications", False):
+        jobs.append(("Webhook", send_webhook_notification, (data, setting)))
+    if setting.get("AllowTelegramNotifications", False):
+        jobs.append(("Telegram", send_telegram_notification, (data, setting)))
+    if setting.get("AllowServerChanNotifications", False):
+        jobs.append(("ServerChan", send_serverchan_notification, (data, setting)))
+    if setting.get("AllowOneBotNotifications", False):
+        jobs.append(("OneBot", send_onebot_notification, (data, setting)))
+    if setting.get("AllowBarkNotifications", False):
+        jobs.append(("Bark", send_bark_notification, (data, setting)))
+    if setting.get("AllowFeishuNotifications", False):
+        jobs.append(("飞书", send_feishu_notification, (data, setting)))
+    if setting.get("AllowWeComNotifications", False):
+        jobs.append(("企业微信", send_wecom_notification, (data, setting)))
+    if setting.get("AllowDingTalkNotifications", False):
+        jobs.append(("钉钉", send_dingtalk_notification, (data, setting)))
+    if setting.get("AllowDiscordNotifications", False):
+        jobs.append(("Discord", send_discord_notification, (data, setting)))
+    if setting.get("AllowXxtuiNotifications", False):
+        jobs.append(("xxtui", send_xxtui_notification, (data, setting)))
+    return jobs
+
+
+def _dispatch_notification_batch(
+        title: str,
+        message: str,
+        data: dict,
+        setting: dict[str, Any],
+        screenshot_bytes: bytes | None) -> None:
+    global _active_notification_screenshot_bytes
+
+    _active_notification_screenshot_bytes = screenshot_bytes
+    try:
+        _run_notification_jobs(_build_notification_jobs(title, message, data, setting))
+    finally:
+        _active_notification_screenshot_bytes = None
 
 
 def _run_notification_job(channel_name: str, func: Callable[..., Any], args: tuple[Any, ...]) -> None:
@@ -187,6 +211,8 @@ def _capture_game_window_bytes(operator: Any | None = None) -> bytes | None:
 
 def _take_screenshot_bytes() -> bytes | None:
     """优先返回缓存的游戏截图，否则尝试截取当前游戏窗口"""
+    if _active_notification_screenshot_bytes:
+        return _active_notification_screenshot_bytes
     if _cached_game_screenshot_bytes:
         return _cached_game_screenshot_bytes
     return capture_game_screenshot()
