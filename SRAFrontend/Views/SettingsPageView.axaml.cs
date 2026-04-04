@@ -16,7 +16,6 @@ public partial class SettingsPageView : UserControl
         base.OnLoaded(e);
         if (DataContext is not SettingsPageViewModel viewModel) return;
         var topLevel = TopLevel.GetTopLevel(this);
-        viewModel.Settings.Zoom = topLevel?.RenderScaling ?? 1;
         viewModel.TopLevelObject = topLevel;
     }
 }
