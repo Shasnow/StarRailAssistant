@@ -140,6 +140,7 @@ class RRIMG:
 # region 货币战争
 class CWIMG:
     BASE = "resources/img/currency_wars"
+    APPLY_STRATEGY = f"{BASE}/apply_strategy.png"
     BACK_CURRENCY_WARS = f"{BASE}/back_currency_wars.png"
     BACK_PREPARE_PAGE = f"{BASE}/back_prepare_page.png"
     BATTLE = f"{BASE}/battle.png" #依赖于目前的默认 灰度 CCOEFF 算法
@@ -152,6 +153,7 @@ class CWIMG:
     DOWN_ARROW = f"{BASE}/down_arrow.png"
     ENCOUNTER_NODE = f"{BASE}/encounter_node.png"
     ENTER_GAME = f"{BASE}/enter_game.png"
+    ENTER_STRATEGY_CODE = f"{BASE}/enter_strategy_code.png"
     EQUIP = f"{BASE}/equip.png"
     EQUIPMENT_RECOMMEND = f"{BASE}/equipment_recommend.png"
     FOLD = f"{BASE}/fold.png"
@@ -171,6 +173,7 @@ class CWIMG:
     SELECT_INVEST_STRATEGY = f"{BASE}/select_invest_strategy.png"
     SETTLE = f"{BASE}/settle.png"
     START_GAME = f"{BASE}/start_game.png"
+    STRATEGY = f"{BASE}/strategy.png"
     SYNTHESIS = f"{BASE}/synthesis.png"
     THE_PLANET_OF_FESTIVITIES = f"{BASE}/ThePlanetOfFestivities.png"
     WITHDRAW_AND_SETTLE = f"{BASE}/withdraw_and_settle.png"
