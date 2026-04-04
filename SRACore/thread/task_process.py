@@ -88,6 +88,11 @@ class TaskManager:
                         if not task.run():
                             logger.debug('task failed: ' + str(task))
                             logger.error(Resource.task_taskFailed(str(task)))
+                            notify.try_send_notification(
+                                Resource.task_notificationTitle,
+                                Resource.task_taskFailed(str(task)),
+                                result="fail"
+                            )
                             return  # 终止当前配置的执行
                     except ThreadStoppedError as e:
                         logger.error(e)
@@ -95,6 +100,11 @@ class TaskManager:
                     except Exception as e:
                         # 捕获任务执行中的异常（如未处理的错误）
                         logger.exception(Resource.task_taskCrashed(str(task), str(e)))
+                        notify.try_send_notification(
+                            Resource.task_notificationTitle,
+                            Resource.task_taskCrashed(str(task), str(e)),
+                            result="fail"
+                        )
                         break
                 logger.info(Resource.task_configCompleted(config_name))
                 logger.info("=" * 50)
@@ -182,11 +192,21 @@ class TaskManager:
             result = task_instance.run()
             if not result:
                 logger.error(Resource.task_taskFailed(str(task_instance)))
+                notify.try_send_notification(
+                    Resource.task_notificationTitle,
+                    Resource.task_taskFailed(str(task_instance)),
+                    result="fail"
+                )
             else:
                 logger.info(Resource.task_taskCompleted(str(task_instance)))
             return result
         except Exception as e:
             logger.exception(Resource.task_taskCrashed(task, str(e)))
+            notify.try_send_notification(
+                Resource.task_notificationTitle,
+                Resource.task_taskCrashed(str(task), str(e)),
+                result="fail"
+            )
             return False
         finally:
             logger.debug("[Done]")
