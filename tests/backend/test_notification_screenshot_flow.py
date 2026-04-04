@@ -312,6 +312,87 @@ def test_dispatch_notification_batch_runs_channels_in_parallel():
     assert elapsed < 0.35
 
 
+def test_send_wecom_notification_uses_text_payload():
+    notify_module, _, _ = _import_notify_module()
+    data = {
+        "event": "title",
+        "result": "success",
+        "timestamp": "2026-04-04 00:00:00",
+        "message": "message",
+    }
+    captured = {}
+
+    def fake_post(url, payload, proxy_url=None):
+        captured["url"] = url
+        captured["payload"] = payload
+        captured["proxy_url"] = proxy_url
+        return 200, '{"errcode": 0, "errmsg": "ok"}'
+
+    ok = False
+    with patch.object(notify_module, "_http_post_json", side_effect=fake_post):
+        ok = notify_module.send_wecom_notification(data, {"WeComWebhookUrl": "https://example.test"})
+
+    assert ok is True
+    assert captured == {
+        "url": "https://example.test",
+        "payload": {
+            "msgtype": "text",
+            "text": {
+                "content": "[SRA 通知]\n事件: title\n结果: success\n时间: 2026-04-04 00:00:00\n消息: message",
+            },
+        },
+        "proxy_url": None,
+    }
+
+
+def test_send_wecom_notification_sends_image_after_text():
+    import base64
+    import hashlib
+
+    notify_module, _, _ = _import_notify_module()
+    data = {
+        "event": "title",
+        "result": "success",
+        "timestamp": "2026-04-04 00:00:00",
+        "message": "message",
+    }
+    payloads = []
+
+    def fake_post(_, payload, proxy_url=None):
+        payloads.append((payload, proxy_url))
+        return 200, '{"errcode": 0, "errmsg": "ok"}'
+
+    with patch.object(notify_module, "_http_post_json", side_effect=fake_post):
+        with patch.object(notify_module, "_take_screenshot_bytes", return_value=b"img"):
+            ok = notify_module.send_wecom_notification(
+                data,
+                {"WeComWebhookUrl": "https://example.test", "WeComSendImage": True},
+            )
+
+    assert ok is True
+    assert payloads == [
+        (
+            {
+                "msgtype": "text",
+                "text": {
+                    "content": "[SRA 通知]\n事件: title\n结果: success\n时间: 2026-04-04 00:00:00\n消息: message",
+                },
+            },
+            None,
+        ),
+        (
+            {
+                "msgtype": "image",
+                "image": {
+                    "base64": base64.b64encode(b"img").decode(),
+                    "md5": hashlib.md5(b"img").hexdigest(),
+                },
+            },
+            None,
+        ),
+    ]
+
+
 def test_dispatch_notification_batch_continues_when_one_channel_raises():
     notify_module, _, _ = _import_notify_module()
     setting = {

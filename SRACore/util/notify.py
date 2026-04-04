@@ -693,14 +693,7 @@ def send_wecom_notification(data: dict, configure: dict[str, Any] | None = None)
         logger.warning("企业微信通知发送失败: 未配置 WeComWebhookUrl")
         return False
 
-    md_lines = [
-        "**[SRA 通知]**",
-        "事件: " + data.get("event", ""),
-        "结果: " + data.get("result", ""),
-        "时间: " + data.get("timestamp", ""),
-        "消息: " + data.get("message", ""),
-    ]
-    payload = {"msgtype": "markdown", "markdown": {"content": "\n".join(md_lines)}}
+    payload = {"msgtype": "text", "text": {"content": _fmt_msg(data)}}
     try:
         status, body = _http_post_json(webhook_url, payload)
         ok, detail = _check_wecom_response(status, body)
