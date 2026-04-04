@@ -90,7 +90,7 @@ def _build_notification_jobs(
     if setting.get("AllowSystemNotifications", False):
         jobs.append(("系统", send_windows_notification, (title, message)))
     if setting.get("AllowEmailNotifications", False):
-        jobs.append(("邮件", send_mail_notification, (title, message, setting)))
+        jobs.append(("邮件", send_mail_notification, (data, setting)))
     if setting.get("AllowWebhookNotifications", False):
         jobs.append(("Webhook", send_webhook_notification, (data, setting)))
     if setting.get("AllowTelegramNotifications", False):
@@ -262,16 +262,25 @@ def send_windows_notification(title: str, message: str, timeout: int = 5):
 
 # ===================== 邮件通知 =====================
 
-def send_mail_notification(title: str = "SRA", message: str = "",
+def send_mail_notification(title: str | dict = "SRA", message: str | dict[str, Any] = "",
                            configure: dict[str, Any] | None = None):
-    config: dict[str, Any] = configure or {}
+    if isinstance(title, dict):
+        data = title
+        config: dict[str, Any] = message if isinstance(message, dict) and configure is None else (configure or {})
+        mail_title = str(data.get("title", "SRA")).strip() or "SRA"
+        mail_message = _fmt_msg(data)
+    else:
+        config = configure or {}
+        mail_title = title
+        mail_message = message if isinstance(message, str) else ""
+
     SMTP = config.get("SmtpServer", "")
     port = config.get("SmtpPort", 465)
     sender = config.get("EmailSender", "")
     auth_code = config.get("EmailAuthCode", "")
     password = encryption.win_decryptor(auth_code) if auth_code else ""
     receiver = config.get("EmailReceiver", "")
-    send_mail(title, "SRA通知", message, SMTP, port, sender, password, receiver)
+    send_mail(mail_title, "SRA通知", mail_message, SMTP, port, sender, password, receiver)
 
 
 def send_mail(title: str = "SRA", subject: str = "SRA通知", message: str = "",

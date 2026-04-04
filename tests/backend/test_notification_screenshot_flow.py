@@ -393,6 +393,44 @@ def test_send_wecom_notification_sends_image_after_text():
     ]
 
 
+def test_send_mail_notification_uses_text_template_for_notification_data():
+    notify_module, _, _ = _import_notify_module()
+    data = {
+        "title": "任务完成提醒",
+        "event": "任务完成提醒",
+        "result": "success",
+        "timestamp": "2026-04-04 21:32:25",
+        "message": "您的SRA任务运行完成。",
+    }
+    captured = {}
+
+    def fake_send_mail(title, subject, message, SMTP, port, sender, password, receiver):
+        captured["args"] = (title, subject, message, SMTP, port, sender, password, receiver)
+        return True
+
+    with patch.object(notify_module, "send_mail", side_effect=fake_send_mail):
+        notify_module.send_mail_notification(
+            data,
+            {
+                "SmtpServer": "smtp.example.test",
+                "SmtpPort": 465,
+                "EmailSender": "sender@example.test",
+                "EmailReceiver": "receiver@example.test",
+            },
+        )
+
+    assert captured["args"] == (
+        "任务完成提醒",
+        "SRA通知",
+        "[SRA 通知]\n事件: 任务完成提醒\n结果: success\n时间: 2026-04-04 21:32:25\n消息: 您的SRA任务运行完成。",
+        "smtp.example.test",
+        465,
+        "sender@example.test",
+        "",
+        "receiver@example.test",
+    )
+
+
 def test_dispatch_notification_batch_continues_when_one_channel_raises():
     notify_module, _, _ = _import_notify_module()
     setting = {
