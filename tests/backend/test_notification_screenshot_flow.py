@@ -1,6 +1,7 @@
 import importlib
 import sys
 import threading
+import time
 import types
 from pathlib import Path
 from unittest.mock import MagicMock, call, patch
@@ -95,6 +96,37 @@ def _import_mission_task_module():
     return module, util_parent
 
 
+def _import_notify_module():
+    util_package = types.ModuleType("SRACore.util")
+    util_package.__path__ = [str(Path(__file__).resolve().parents[2] / "SRACore" / "util")]
+
+    encryption_module = types.ModuleType("SRACore.util.encryption")
+    encryption_module.win_decryptor = MagicMock(return_value="")
+
+    data_persister_module = types.ModuleType("SRACore.util.data_persister")
+    data_persister_module.load_settings = MagicMock(return_value={})
+
+    logger_module = types.ModuleType("SRACore.util.logger")
+    logger_module.logger = MagicMock()
+
+    plyer_module = types.ModuleType("plyer")
+    plyer_module.notification = MagicMock()
+
+    sys.modules.pop("SRACore.util.notify", None)
+    with patch.dict(
+        sys.modules,
+        {
+            "SRACore.util": util_package,
+            "SRACore.util.encryption": encryption_module,
+            "SRACore.util.data_persister": data_persister_module,
+            "SRACore.util.logger": logger_module,
+            "plyer": plyer_module,
+        },
+    ):
+        module = importlib.import_module("SRACore.util.notify")
+    return module, data_persister_module, logger_module
+
+
 def test_run_failure_notification_passes_task_operator():
     mgr, task_process = _make_manager()
     operator = object()
@@ -173,3 +205,49 @@ def test_mission_quit_game_caches_game_frame_before_process_kill():
         call.notify.capture_game_screenshot(operator),
         call.sys_util.task_kill("StarRail.exe"),
     ]
+
+
+def test_try_send_notification_dispatches_channels_in_parallel():
+    notify_module, data_persister_module, _ = _import_notify_module()
+    data_persister_module.load_settings.return_value = {
+        "AllowNotifications": True,
+        "AllowEmailNotifications": True,
+        "AllowWeComNotifications": True,
+        "WeComSendImage": False,
+    }
+
+    called = []
+
+    def slow_mail(*_):
+        time.sleep(0.2)
+        called.append("mail")
+
+    def slow_wecom(*_):
+        time.sleep(0.2)
+        called.append("wecom")
+
+    start = time.perf_counter()
+    with patch.object(notify_module, "send_mail_notification", side_effect=slow_mail):
+        with patch.object(notify_module, "send_wecom_notification", side_effect=slow_wecom):
+            notify_module.try_send_notification("title", "message")
+    elapsed = time.perf_counter() - start
+
+    assert set(called) == {"mail", "wecom"}
+    assert elapsed < 0.35
+
+
+def test_try_send_notification_continues_when_one_channel_raises():
+    notify_module, data_persister_module, _ = _import_notify_module()
+    data_persister_module.load_settings.return_value = {
+        "AllowNotifications": True,
+        "AllowEmailNotifications": True,
+        "AllowWebhookNotifications": True,
+    }
+
+    called = []
+
+    with patch.object(notify_module, "send_mail_notification", side_effect=RuntimeError("boom")):
+        with patch.object(notify_module, "send_webhook_notification", side_effect=lambda *_: called.append("webhook")):
+            notify_module.try_send_notification("title", "message")
+
+    assert called == ["webhook"]
