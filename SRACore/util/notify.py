@@ -11,35 +11,43 @@ from SRACore.util.data_persister import load_settings
 
 # ===================== 核心分发 =====================
 
-def try_send_notification(title: str, message: str, result: str = "success"):
+_cached_game_screenshot_bytes: bytes | None = None
+
+
+def try_send_notification(title: str, message: str, result: str = "success", operator: Any | None = None):
     setting = load_settings()
     if not setting.get("AllowNotifications", False):
         return
+    if should_capture_notification_screenshot(setting):
+        capture_game_screenshot(operator)
     data = _build_notification_data(title, message, result)
-    if setting.get("AllowSystemNotifications", False):
-        send_windows_notification(title, message)
-    if setting.get("AllowEmailNotifications", False):
-        send_mail_notification(title, message, setting)
-    if setting.get("AllowWebhookNotifications", False):
-        send_webhook_notification(data, setting)
-    if setting.get("AllowTelegramNotifications", False):
-        send_telegram_notification(data, setting)
-    if setting.get("AllowServerChanNotifications", False):
-        send_serverchan_notification(data, setting)
-    if setting.get("AllowOneBotNotifications", False):
-        send_onebot_notification(data, setting)
-    if setting.get("AllowBarkNotifications", False):
-        send_bark_notification(data, setting)
-    if setting.get("AllowFeishuNotifications", False):
-        send_feishu_notification(data, setting)
-    if setting.get("AllowWeComNotifications", False):
-        send_wecom_notification(data, setting)
-    if setting.get("AllowDingTalkNotifications", False):
-        send_dingtalk_notification(data, setting)
-    if setting.get("AllowDiscordNotifications", False):
-        send_discord_notification(data, setting)
-    if setting.get("AllowXxtuiNotifications", False):
-        send_xxtui_notification(data, setting)
+    try:
+        if setting.get("AllowSystemNotifications", False):
+            send_windows_notification(title, message)
+        if setting.get("AllowEmailNotifications", False):
+            send_mail_notification(title, message, setting)
+        if setting.get("AllowWebhookNotifications", False):
+            send_webhook_notification(data, setting)
+        if setting.get("AllowTelegramNotifications", False):
+            send_telegram_notification(data, setting)
+        if setting.get("AllowServerChanNotifications", False):
+            send_serverchan_notification(data, setting)
+        if setting.get("AllowOneBotNotifications", False):
+            send_onebot_notification(data, setting)
+        if setting.get("AllowBarkNotifications", False):
+            send_bark_notification(data, setting)
+        if setting.get("AllowFeishuNotifications", False):
+            send_feishu_notification(data, setting)
+        if setting.get("AllowWeComNotifications", False):
+            send_wecom_notification(data, setting)
+        if setting.get("AllowDingTalkNotifications", False):
+            send_dingtalk_notification(data, setting)
+        if setting.get("AllowDiscordNotifications", False):
+            send_discord_notification(data, setting)
+        if setting.get("AllowXxtuiNotifications", False):
+            send_xxtui_notification(data, setting)
+    finally:
+        clear_cached_game_screenshot()
 
 
 # ===================== 工具函数 =====================
@@ -90,20 +98,52 @@ def _http_post_json(url: str, payload: dict, proxy_url: str | None = None) -> tu
         return e.code, e.read().decode("utf-8", errors="replace")
 
 
-def _take_screenshot_bytes() -> bytes | None:
-    """截取全屏，返回 PNG bytes；失败返回 None"""
+def should_capture_notification_screenshot(setting: dict[str, Any] | None = None) -> bool:
+    config = setting or load_settings()
+    return any([
+        config.get("AllowTelegramNotifications", False) and config.get("TelegramSendImage", False),
+        config.get("AllowOneBotNotifications", False) and config.get("OneBotSendImage", False),
+        config.get("AllowWeComNotifications", False) and config.get("WeComSendImage", False),
+        config.get("AllowDiscordNotifications", False) and config.get("DiscordSendImage", False),
+    ])
+
+
+def capture_game_screenshot(operator: Any | None = None) -> bytes | None:
+    global _cached_game_screenshot_bytes
+    img_bytes = _capture_game_window_bytes(operator)
+    if img_bytes:
+        _cached_game_screenshot_bytes = img_bytes
+    return img_bytes
+
+
+def clear_cached_game_screenshot() -> None:
+    global _cached_game_screenshot_bytes
+    _cached_game_screenshot_bytes = None
+
+
+def _capture_game_window_bytes(operator: Any | None = None) -> bytes | None:
     try:
         import io
-        import pyscreeze
+        if operator is None:
+            from SRACore.operators import Operator
+            operator = Operator()
+        screenshot = operator.screenshot()
         buf = io.BytesIO()
-        pyscreeze.screenshot().save(buf, format="PNG")
+        screenshot.save(buf, format="PNG")
         return buf.getvalue()
     except Exception:
         return None
 
 
+def _take_screenshot_bytes() -> bytes | None:
+    """优先返回缓存的游戏截图，否则尝试截取当前游戏窗口"""
+    if _cached_game_screenshot_bytes:
+        return _cached_game_screenshot_bytes
+    return capture_game_screenshot()
+
+
 def _take_screenshot_base64() -> str | None:
-    """截取全屏，返回 base64 字符串；失败返回 None"""
+    """返回通知截图的 base64 字符串；失败返回 None"""
     import base64
     raw = _take_screenshot_bytes()
     return base64.b64encode(raw).decode() if raw else None

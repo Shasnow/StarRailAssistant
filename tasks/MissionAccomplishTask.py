@@ -1,6 +1,6 @@
 from SRACore.task import BaseTask
+from SRACore.util import notify, sys_util
 from SRACore.util.errors import ErrorCode, SRAError
-from SRACore.util import sys_util
 from SRACore.util.logger import logger
 from tasks.img import IMG, MAIMG
 
@@ -15,6 +15,8 @@ class MissionAccomplishTask(BaseTask):
 
     def logout(self):
         logger.info("登出账号")
+        if notify.should_capture_notification_screenshot(self.settings):
+            notify.capture_game_screenshot(self.operator)
         if not self.operator.wait_img(IMG.ENTER):
             return False
         self.operator.press_key('esc')
@@ -29,6 +31,8 @@ class MissionAccomplishTask(BaseTask):
     def quit_game(self):
         logger.info("退出游戏")
         try:
+            if notify.should_capture_notification_screenshot(self.settings):
+                notify.capture_game_screenshot(self.operator)
             sys_util.task_kill("StarRail.exe")
             self.operator.sleep(2)
             return True
