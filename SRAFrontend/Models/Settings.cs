@@ -29,14 +29,6 @@ public partial class Settings : ObservableObject
     [ObservableProperty] [property: JsonIgnore]
     private string _emailAuthCode = ""; // 邮件授权码
 
-    [ObservableProperty] private AvaloniaList<string> _proxies =
-    [
-        "https://tvv.tw/",
-        "https://github.moeyy.xyz/",
-        "https://ghproxy.1888866.xyz/",
-        "https://github.chenc.dev/"
-    ]; // 代理列表
-
     [ObservableProperty] private int _smtpPort = 465; // SMTP服务器端口
 
     [ObservableProperty] private string _smtpServer = "smtp.qq.com"; // SMTP服务器地址
@@ -46,8 +38,6 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private int _gamePathIndex; // 游戏安装路径
     public AvaloniaList<string> GamePaths { get; set; } = []; // 可能的游戏安装路径列表
 
-    [ObservableProperty] private double _zoom = 1; // 屏幕缩放比例
-
     // 启动参数配置
     [ObservableProperty] private bool _launchArgumentsEnabled = true; // 是否启用启动参数
     [ObservableProperty] private string _launchArgumentsScreenSize = "1920x1080"; // 窗口尺寸
@@ -55,6 +45,8 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private bool _launchArgumentsPopupWindow; // 是否无边框窗口
     [ObservableProperty] private string _launchArgumentsAdvanced = ""; // 高级参数
     [ObservableProperty] private bool _launchWithCmd; // 使用 CMD 启动游戏
+    
+    // 开发者模式
     [ObservableProperty] private bool _isDeveloperMode; // 开发者模式
     [ObservableProperty] private bool _isSaveOcrImage; // 是否保存OCR截图
     [ObservableProperty] private bool _isUsingPython; // 是否使用Python版本后端
@@ -65,7 +57,7 @@ public partial class Settings : ObservableObject
     [JsonPropertyName("EmailAuthCode")] public string EncryptedEmailAuthCode { get; set; } = "";
     public const string Version = "2.10.0"; // 应用版本号
 
-    // 新增快捷键设置
+    // 快捷键设置
     public string ActivityHotkey { get; set; } = "F1"; // 活动 默认 F1
     public string ChronicleHotkey { get; set; } = "F2"; // 纪行 默认 F2
     public string WarpHotkey { get; set; } = "F3"; // 卡池 默认 F3

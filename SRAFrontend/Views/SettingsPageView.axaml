@@ -49,16 +49,6 @@
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto, *, Auto">
-                                        <Label Classes="Icon">&#xe310;</Label>
-                                        <Label Grid.Column="1"
-                                               Content="{x:Static lang:Resources.ZoomText}"
-                                               ToolTip.Tip="与系统显示设置的缩放对应。自动获取" />
-                                        <NumericUpDown Grid.Column="2" FormatString="0.00"
-                                                       Value="{Binding Settings.Zoom}"
-                                                       Increment="0.25" Minimum="0"
-                                                       Maximum="5" />
-                                    </Grid>
-                                    <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="Icon">&#xee60;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.ConfidenceText}" />
                                         <NumericUpDown Grid.Column="2" FormatString="0.00"
