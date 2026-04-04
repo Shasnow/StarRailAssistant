@@ -232,6 +232,57 @@ def test_try_send_notification_dispatches_channels_in_parallel():
     assert completed.wait(1)
 
 
+def test_try_send_notification_does_not_reuse_stale_cache_from_other_operator():
+    notify_module, data_persister_module, _ = _import_notify_module()
+    data_persister_module.load_settings.return_value = {
+        "AllowNotifications": True,
+        "AllowWeComNotifications": True,
+        "WeComSendImage": True,
+    }
+
+    stale_operator = object()
+    current_operator = object()
+    captured = {}
+
+    notify_module._cached_game_screenshot_bytes = b"stale"
+    notify_module._cached_game_screenshot_owner_id = id(stale_operator)
+
+    def record_dispatch(*args):
+        captured["screenshot"] = args[4]
+
+    with patch.object(notify_module, "_dispatch_notification_batch", side_effect=record_dispatch):
+        with patch.object(notify_module, "_capture_game_window_bytes", return_value=None):
+            notify_module.try_send_notification("title", "message", operator=current_operator)
+
+    time.sleep(0.1)
+    assert captured["screenshot"] is None
+
+
+def test_try_send_notification_reuses_matching_cached_screenshot_when_capture_fails():
+    notify_module, data_persister_module, _ = _import_notify_module()
+    data_persister_module.load_settings.return_value = {
+        "AllowNotifications": True,
+        "AllowWeComNotifications": True,
+        "WeComSendImage": True,
+    }
+
+    operator = object()
+    captured = {}
+
+    notify_module._cached_game_screenshot_bytes = b"cached"
+    notify_module._cached_game_screenshot_owner_id = id(operator)
+
+    def record_dispatch(*args):
+        captured["screenshot"] = args[4]
+
+    with patch.object(notify_module, "_dispatch_notification_batch", side_effect=record_dispatch):
+        with patch.object(notify_module, "_capture_game_window_bytes", return_value=None):
+            notify_module.try_send_notification("title", "message", operator=operator)
+
+    time.sleep(0.1)
+    assert captured["screenshot"] == b"cached"
+
+
 def test_dispatch_notification_batch_runs_channels_in_parallel():
     notify_module, _, _ = _import_notify_module()
     setting = {
