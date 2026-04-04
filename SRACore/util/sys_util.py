@@ -35,11 +35,13 @@ def is_process_running(process_name: str) -> bool:
         True if the process is running, otherwise False.
     """
     # Iterate over all running processes
-    for proc in psutil.process_iter(['name']):
+    for proc in psutil.process_iter(['name', 'status']):
         try:
-            # Check if the process name contains the given name string
             if process_name.lower() in proc.info['name'].lower():
-                return True
+                if proc.info['status'] == psutil.STATUS_ZOMBIE:
+                    continue
+                if proc.is_running() and proc.status() != psutil.STATUS_ZOMBIE:
+                    return True
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
     return False
