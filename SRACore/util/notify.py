@@ -7,6 +7,7 @@ from plyer import notification  # type: ignore
 
 from SRACore.util import encryption
 from SRACore.util.data_persister import load_settings
+from SRACore.util.image_util import compress_image_bytes
 
 
 # ===================== 核心分发 =====================
@@ -96,6 +97,33 @@ def _http_post_json(url: str, payload: dict, proxy_url: str | None = None) -> tu
             return resp.status, resp.read().decode("utf-8", errors="replace")
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode("utf-8", errors="replace")
+
+
+def _load_json_body(body: str) -> dict[str, Any] | None:
+    import json
+
+    if not body:
+        return None
+    try:
+        data = json.loads(body)
+    except Exception:
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _check_wecom_response(status: int, body: str) -> tuple[bool, str]:
+    if not (200 <= status < 300):
+        return False, "状态码: " + str(status)
+
+    data = _load_json_body(body)
+    if data is None:
+        return False, "响应解析失败: " + body[:200]
+
+    errcode = data.get("errcode")
+    errmsg = str(data.get("errmsg", ""))
+    if errcode == 0:
+        return True, errmsg or "ok"
+    return False, "errcode=" + str(errcode) + "; errmsg=" + errmsg
 
 
 def should_capture_notification_screenshot(setting: dict[str, Any] | None = None) -> bool:
@@ -611,32 +639,55 @@ def send_wecom_notification(data: dict, configure: dict[str, Any] | None = None)
     payload = {"msgtype": "markdown", "markdown": {"content": "\n".join(md_lines)}}
     try:
         status, body = _http_post_json(webhook_url, payload)
-        if not (200 <= status < 300):
-            logger.warning("企业微信通知发送失败，状态码: " + str(status))
+        ok, detail = _check_wecom_response(status, body)
+        if not ok:
+            logger.warning("企业微信通知发送失败: " + detail)
             return False
         logger.debug("企业微信通知发送成功")
     except Exception as e:
         logger.warning("企业微信通知发送失败: " + str(e))
         return False
 
+    success = True
     if send_image:
         img = _take_screenshot_bytes()
         if img:
             import base64
-            img_b64 = base64.b64encode(img).decode()
-            img_md5 = hashlib.md5(img).hexdigest()
+
+            target_size = 2 * 1024 * 1024
+            img_to_send = img
+            quality = -1
+
+            if len(img_to_send) > target_size:
+                compressed, _, quality = compress_image_bytes(img_to_send, target_size)
+                if not compressed:
+                    logger.warning("企业微信截图压缩失败，跳过图片发送")
+                    return False
+                img_to_send = compressed
+
+            img_b64 = base64.b64encode(img_to_send).decode()
+            img_md5 = hashlib.md5(img_to_send).hexdigest()
             try:
-                s2, _ = _http_post_json(webhook_url,
-                                        {"msgtype": "image", "image": {"base64": img_b64, "md5": img_md5}})
-                if 200 <= s2 < 300:
-                    logger.debug("企业微信截图发送成功")
+                s2, body2 = _http_post_json(
+                    webhook_url,
+                    {"msgtype": "image", "image": {"base64": img_b64, "md5": img_md5}},
+                )
+                ok, detail = _check_wecom_response(s2, body2)
+                if ok:
+                    if quality >= 0:
+                        logger.debug("企业微信截图发送成功（压缩质量 " + str(quality) + "）")
+                    else:
+                        logger.debug("企业微信截图发送成功")
                 else:
-                    logger.warning("企业微信截图发送失败，状态码: " + str(s2))
+                    logger.warning("企业微信截图发送失败: " + detail)
+                    success = False
             except Exception as e:
                 logger.warning("企业微信截图发送失败: " + str(e))
+                success = False
         else:
             logger.warning("企业微信截图失败，跳过图片发送")
-    return True
+            success = False
+    return success
 
 
 # ===================== 钉钉通知 =====================
