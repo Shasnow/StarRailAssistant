@@ -67,11 +67,14 @@ class TaskManager:
                 # 指定配置名称
                 config_list = args
 
+            last_operator = None
             for config_name in config_list:
                 logger.info(Resource.task_currentConfig(config_name))
 
                 # 获取当前配置需要执行的任务列表
                 tasks_to_run = self.get_tasks(config_name)
+                if tasks_to_run:
+                    last_operator = tasks_to_run[0].operator
                 logger.debug(f'tasks_to_run: {tasks_to_run}')
                 if not tasks_to_run:
                     logger.warning(Resource.task_noSelectedTasks(config_name))
@@ -91,7 +94,8 @@ class TaskManager:
                             notify.try_send_notification(
                                 Resource.task_notificationTitle,
                                 Resource.task_taskFailed(str(task)),
-                                result="fail"
+                                result="fail",
+                                operator=task.operator
                             )
                             return  # 终止当前配置的执行
                     except ThreadStoppedError as e:
@@ -103,13 +107,18 @@ class TaskManager:
                         notify.try_send_notification(
                             Resource.task_notificationTitle,
                             Resource.task_taskCrashed(str(task), str(e)),
-                            result="fail"
+                            result="fail",
+                            operator=task.operator
                         )
                         break
                 logger.info(Resource.task_configCompleted(config_name))
                 logger.info("=" * 50)
             logger.info("All tasks completed.")
-            notify.try_send_notification(Resource.task_notificationTitle, Resource.task_notificationMessage)
+            notify.try_send_notification(
+                Resource.task_notificationTitle,
+                Resource.task_notificationMessage,
+                operator=last_operator
+            )
         except Exception as e:
             # 捕获线程主循环中的异常（如配置加载失败）
             logger.exception(Resource.task_managerCrashed(str(e)))
@@ -195,7 +204,8 @@ class TaskManager:
                 notify.try_send_notification(
                     Resource.task_notificationTitle,
                     Resource.task_taskFailed(str(task_instance)),
-                    result="fail"
+                    result="fail",
+                    operator=task_instance.operator
                 )
             else:
                 logger.info(Resource.task_taskCompleted(str(task_instance)))
@@ -205,7 +215,8 @@ class TaskManager:
             notify.try_send_notification(
                 Resource.task_notificationTitle,
                 Resource.task_taskCrashed(str(task), str(e)),
-                result="fail"
+                result="fail",
+                operator=getattr(locals().get("task_instance", None), "operator", None)
             )
             return False
         finally:
