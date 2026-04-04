@@ -30,7 +30,6 @@ class CurrencyWars(Executable):
         self.runtimes = runtimes
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
-        self.strategy_external_control: bool = False  # 当外部（如刷开局流程）希望在“选择投资策略”页接管逻辑时，置为 True
         self.difficulty: int = Difficulty.LOWEST
         self.on_field_character: list[Character | None] = [None, None, None, None]  # 场上角色列表
         self.on_field_area: list[tuple[float, float]] = [
@@ -74,6 +73,7 @@ class CurrencyWars(Executable):
         self.min_level = 7  # 商店等级
         self.mid_level = 7  # 商店等级
         self.strategy_characters: dict[str, int] = dict()  # 在攻略中的角色及其预期购买数量
+        self.strategy_code = ""  # 当前使用的攻略代码
         self.is_overclock = False  # 超频博弈
 
     def run(self):
@@ -383,6 +383,17 @@ class CurrencyWars(Executable):
         Returns:
             True-继续执行后续初始化和游戏循环；False-中止进入流程
         """
+        if self.strategy_code:
+            self.operator.click_img(CWIMG.STRATEGY, after_sleep=1)
+            self.operator.move_to(0.5, 0.5)
+            self.operator.click_img(CWIMG.ENTER_STRATEGY_CODE, after_sleep=1)
+            self.operator.click_point(0.5, 0.5, after_sleep=1, tag="攻略码输入框")
+            self.operator.copy(self.strategy_code)
+            self.operator.paste()
+            self.operator.sleep(1)
+            self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+            self.operator.click_img(CWIMG.APPLY_STRATEGY, after_sleep=1)
+            self.operator.press_key('esc', presses=3, interval=1)
         return True
 
     def handle_game_initialized(self) -> bool:  # NOQA
@@ -435,7 +446,7 @@ class CurrencyWars(Executable):
             self.shopping()
 
             run_times += 1
-            if run_times % 3 == 0:  # 每3轮更新一次场上角色，顺便穿戴装备
+            if run_times % 2 == 0:  # 每2轮更新一次场上角色，顺便穿戴装备
                 self.refresh_character()
                 self.sort_all_areas_by_priority()  # 优先级排序
         # 游戏循环结束，重置角色状态
@@ -955,11 +966,12 @@ class CurrencyWars(Executable):
             path = f"tasks/currency_wars/strategies/{name}.json"
         with open(path, "r", encoding="utf-8") as f:
             strategy_data: dict[str, Any] = json.load(f)
-        strategy_name = strategy_data.get("name")
+        strategy_title = strategy_data.get("title")
         description = strategy_data.get("description")
         self.min_coins = strategy_data.get("min_coins", 40)
         self.min_level = strategy_data.get("min_level", 7)
         self.mid_level = strategy_data.get("mid_level", 7)
+        self.strategy_code = strategy_data.get("share_code", "")
         # 在攻略中的角色设置成最高优先级
         strategy_on_field: dict[str, int] = strategy_data.get("on_field", {})
         strategy_off_field: dict[str, int] = strategy_data.get("off_field", {})
@@ -979,7 +991,7 @@ class CurrencyWars(Executable):
             c.priority = 95 - i  # 确保攻略中的后台角色优先级都大于其他角色
             c.position = Positioning.OffField
             self.strategy_characters[cn] = strategy_off_field[cn]
-        logger.info(f"已加载攻略: {strategy_name}: {description}")
+        logger.info(f"已加载攻略: {strategy_title}: {description}")
 
     def unload_strategy(self):
         """卸载当前攻略，重置角色"""
@@ -989,6 +1001,7 @@ class CurrencyWars(Executable):
         self.min_level = 7
         self.mid_level = 7
         self.strategy_characters.clear()
+        self.strategy_code = ""
         logger.info("已卸载当前攻略，角色优先级已重置")
 
     def place_character(self) -> bool:
