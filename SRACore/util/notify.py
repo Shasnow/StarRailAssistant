@@ -1,7 +1,8 @@
 import smtplib
+from concurrent.futures import ThreadPoolExecutor
 from email.mime.text import MIMEText
 from email.utils import formataddr
-from typing import Any
+from typing import Any, Callable
 
 from plyer import notification  # type: ignore
 
@@ -22,31 +23,33 @@ def try_send_notification(title: str, message: str, result: str = "success", ope
     if should_capture_notification_screenshot(setting):
         capture_game_screenshot(operator)
     data = _build_notification_data(title, message, result)
+    jobs: list[tuple[str, Callable[..., Any], tuple[Any, ...]]] = []
+    if setting.get("AllowSystemNotifications", False):
+        jobs.append(("系统", send_windows_notification, (title, message)))
+    if setting.get("AllowEmailNotifications", False):
+        jobs.append(("邮件", send_mail_notification, (title, message, setting)))
+    if setting.get("AllowWebhookNotifications", False):
+        jobs.append(("Webhook", send_webhook_notification, (data, setting)))
+    if setting.get("AllowTelegramNotifications", False):
+        jobs.append(("Telegram", send_telegram_notification, (data, setting)))
+    if setting.get("AllowServerChanNotifications", False):
+        jobs.append(("ServerChan", send_serverchan_notification, (data, setting)))
+    if setting.get("AllowOneBotNotifications", False):
+        jobs.append(("OneBot", send_onebot_notification, (data, setting)))
+    if setting.get("AllowBarkNotifications", False):
+        jobs.append(("Bark", send_bark_notification, (data, setting)))
+    if setting.get("AllowFeishuNotifications", False):
+        jobs.append(("飞书", send_feishu_notification, (data, setting)))
+    if setting.get("AllowWeComNotifications", False):
+        jobs.append(("企业微信", send_wecom_notification, (data, setting)))
+    if setting.get("AllowDingTalkNotifications", False):
+        jobs.append(("钉钉", send_dingtalk_notification, (data, setting)))
+    if setting.get("AllowDiscordNotifications", False):
+        jobs.append(("Discord", send_discord_notification, (data, setting)))
+    if setting.get("AllowXxtuiNotifications", False):
+        jobs.append(("xxtui", send_xxtui_notification, (data, setting)))
     try:
-        if setting.get("AllowSystemNotifications", False):
-            send_windows_notification(title, message)
-        if setting.get("AllowEmailNotifications", False):
-            send_mail_notification(title, message, setting)
-        if setting.get("AllowWebhookNotifications", False):
-            send_webhook_notification(data, setting)
-        if setting.get("AllowTelegramNotifications", False):
-            send_telegram_notification(data, setting)
-        if setting.get("AllowServerChanNotifications", False):
-            send_serverchan_notification(data, setting)
-        if setting.get("AllowOneBotNotifications", False):
-            send_onebot_notification(data, setting)
-        if setting.get("AllowBarkNotifications", False):
-            send_bark_notification(data, setting)
-        if setting.get("AllowFeishuNotifications", False):
-            send_feishu_notification(data, setting)
-        if setting.get("AllowWeComNotifications", False):
-            send_wecom_notification(data, setting)
-        if setting.get("AllowDingTalkNotifications", False):
-            send_dingtalk_notification(data, setting)
-        if setting.get("AllowDiscordNotifications", False):
-            send_discord_notification(data, setting)
-        if setting.get("AllowXxtuiNotifications", False):
-            send_xxtui_notification(data, setting)
+        _run_notification_jobs(jobs)
     finally:
         clear_cached_game_screenshot()
 
@@ -97,6 +100,25 @@ def _http_post_json(url: str, payload: dict, proxy_url: str | None = None) -> tu
             return resp.status, resp.read().decode("utf-8", errors="replace")
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode("utf-8", errors="replace")
+
+
+def _run_notification_job(channel_name: str, func: Callable[..., Any], args: tuple[Any, ...]) -> None:
+    from SRACore.util.logger import logger
+
+    try:
+        func(*args)
+    except Exception as e:
+        logger.warning(channel_name + " 通知发送失败: " + str(e))
+
+
+def _run_notification_jobs(jobs: list[tuple[str, Callable[..., Any], tuple[Any, ...]]]) -> None:
+    if not jobs:
+        return
+
+    with ThreadPoolExecutor(max_workers=len(jobs), thread_name_prefix="notify") as executor:
+        futures = [executor.submit(_run_notification_job, channel_name, func, args) for channel_name, func, args in jobs]
+        for future in futures:
+            future.result()
 
 
 def _load_json_body(body: str) -> dict[str, Any] | None:
