@@ -39,7 +39,7 @@
                                                       ToolTip.Tip="开启以自动检测电脑中的游戏" />
                                         <ComboBox Grid.Column="3"
                                                   ItemsSource="{Binding Settings.GamePaths}"
-                                                  SelectedIndex="{Binding Settings.GamePathIndex}"/>
+                                                  SelectedIndex="{Binding Settings.GamePathIndex}" />
                                         <Button Grid.Column="4" Classes="Icon"
                                                 FontFamily="{StaticResource Phosphor}"
                                                 Content="&#xE256;"
@@ -243,7 +243,8 @@
                                                         Command="{Binding TestEmailCommand}"
                                                         IsEnabled="{Binding Settings.AllowEmailNotifications}" />
                                             </Grid>
-                                            <Expander Header="{x:Static lang:Resources.SmtpSettingsText}">
+                                            <Expander Header="{x:Static lang:Resources.SmtpSettingsText}"
+                                                      IsVisible="{Binding Settings.AllowEmailNotifications}">
                                                 <Grid RowDefinitions="Auto,*,*,*,*" ColumnDefinitions="*,*">
                                                     <Label Grid.Row="0" Grid.Column="0"
                                                            Content="{x:Static lang:Resources.SmtpServerText}" />
@@ -272,358 +273,383 @@
                                                              Watermark="123456@qq.com" />
                                                 </Grid>
                                             </Expander>
+                                            <!-- Webhook 通知 -->
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <CheckBox Grid.Column="0"
+                                                          Content="Webhook 通知"
+                                                          IsChecked="{Binding Settings.AllowWebhookNotifications}" />
+                                                <Button Grid.Column="1"
+                                                        Content="Check"
+                                                        Margin="10,0,0,0"
+                                                        Command="{Binding TestWebhookCommand}"
+                                                        IsEnabled="{Binding Settings.AllowWebhookNotifications}" />
+                                            </Grid>
+                                            <Expander Header="Webhook 设置"
+                                                      IsVisible="{Binding Settings.AllowWebhookNotifications}">
+                                                <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*">
+                                                    <Label Grid.Row="0" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="推送地址" />
+                                                    <TextBox Grid.Row="0" Grid.Column="1"
+                                                             Text="{Binding Settings.WebhookEndpoint}"
+                                                             Watermark="https://your-webhook-endpoint" />
+                                                </Grid>
+                                            </Expander>
+                                            <!-- Telegram 通知 -->
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <CheckBox Grid.Column="0"
+                                                          Content="Telegram 通知"
+                                                          IsChecked="{Binding Settings.AllowTelegramNotifications}" />
+                                                <Button Grid.Column="1"
+                                                        Content="Check"
+                                                        Margin="10,0,0,0"
+                                                        Command="{Binding TestTelegramCommand}"
+                                                        IsEnabled="{Binding Settings.AllowTelegramNotifications}" />
+                                            </Grid>
+                                            <Expander Header="Telegram 设置"
+                                                      IsVisible="{Binding Settings.AllowTelegramNotifications}">
+                                                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                                                      ColumnDefinitions="Auto,*"
+                                                      RowSpacing="6">
+                                                    <Label Grid.Row="0" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="Bot Token" />
+                                                    <TextBox Grid.Row="0" Grid.Column="1"
+                                                             Text="{Binding Settings.TelegramBotToken}"
+                                                             Watermark="1234567890:ABCdef..." />
+                                                    <Label Grid.Row="1" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="Chat ID" />
+                                                    <TextBox Grid.Row="1" Grid.Column="1"
+                                                             Text="{Binding Settings.TelegramChatId}"
+                                                             Watermark="-1001234567890" />
+                                                    <Label Grid.Row="2" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="自定义 API 地址" />
+                                                    <TextBox Grid.Row="2" Grid.Column="1"
+                                                             Text="{Binding Settings.TelegramApiBaseUrl}"
+                                                             Watermark="留空使用官方 API" />
+                                                    <Label Grid.Row="3" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="启用代理" />
+                                                    <ToggleSwitch Grid.Row="3" Grid.Column="1"
+                                                                  IsChecked="{Binding Settings.TelegramProxyEnabled}" />
+                                                    <Label Grid.Row="4" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           IsVisible="{Binding Settings.TelegramProxyEnabled}"
+                                                           Content="代理地址" />
+                                                    <TextBox Grid.Row="4" Grid.Column="1"
+                                                             IsVisible="{Binding Settings.TelegramProxyEnabled}"
+                                                             Text="{Binding Settings.TelegramProxyUrl}"
+                                                             Watermark="http://127.0.0.1:7890" />
+                                                    <Label Grid.Row="5" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="发送截图" />
+                                                    <ToggleSwitch Grid.Row="5" Grid.Column="1"
+                                                                  IsChecked="{Binding Settings.TelegramSendImage}"
+                                                                  OnContent="开" OffContent="关" />
+                                                </Grid>
+                                            </Expander>
+
+                                            <!-- ServerChan 通知 -->
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <CheckBox Grid.Column="0"
+                                                          Content="ServerChan 微信通知"
+                                                          IsChecked="{Binding Settings.AllowServerChanNotifications}" />
+                                                <Button Grid.Column="1"
+                                                        Content="Check"
+                                                        Margin="10,0,0,0"
+                                                        Command="{Binding TestServerChanCommand}"
+                                                        IsEnabled="{Binding Settings.AllowServerChanNotifications}" />
+                                            </Grid>
+                                            <Expander Header="ServerChan 设置"
+                                                      IsVisible="{Binding Settings.AllowServerChanNotifications}">
+                                                <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*">
+                                                    <Label Grid.Row="0" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="SendKey" />
+                                                    <TextBox Grid.Row="0" Grid.Column="1"
+                                                             Text="{Binding Settings.ServerChanSendKey}"
+                                                             Watermark="SCT... 或 sctp..." />
+                                                </Grid>
+                                            </Expander>
+
+                                            <!-- OneBot 通知 -->
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <CheckBox Grid.Column="0"
+                                                          Content="OneBot QQ 通知"
+                                                          IsChecked="{Binding Settings.AllowOneBotNotifications}" />
+                                                <Button Grid.Column="1"
+                                                        Content="Check"
+                                                        Margin="10,0,0,0"
+                                                        Command="{Binding TestOneBotCommand}"
+                                                        IsEnabled="{Binding Settings.AllowOneBotNotifications}" />
+                                            </Grid>
+                                            <Expander Header="OneBot 设置"
+                                                      IsVisible="{Binding Settings.AllowOneBotNotifications}">
+                                                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                                                      ColumnDefinitions="Auto,*"
+                                                      RowSpacing="6">
+                                                    <Label Grid.Row="0" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="API 地址" />
+                                                    <TextBox Grid.Row="0" Grid.Column="1"
+                                                             Text="{Binding Settings.OneBotEndpoint}"
+                                                             Watermark="http://127.0.0.1:3000" />
+                                                    <Label Grid.Row="1" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="QQ 号（私聊）" />
+                                                    <TextBox Grid.Row="1" Grid.Column="1"
+                                                             Text="{Binding Settings.OneBotUserId}"
+                                                             Watermark="留空则不发送私聊" />
+                                                    <Label Grid.Row="2" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="群号（群聊）" />
+                                                    <TextBox Grid.Row="2" Grid.Column="1"
+                                                             Text="{Binding Settings.OneBotGroupId}"
+                                                             Watermark="留空则不发送群聊" />
+                                                    <Label Grid.Row="3" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="AccessToken" />
+                                                    <TextBox Grid.Row="3" Grid.Column="1"
+                                                             Text="{Binding Settings.OneBotToken}"
+                                                             Watermark="留空则不使用认证" />
+                                                    <Label Grid.Row="4" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="发送截图" />
+                                                    <ToggleSwitch Grid.Row="4" Grid.Column="1"
+                                                                  IsChecked="{Binding Settings.OneBotSendImage}"
+                                                                  OnContent="开" OffContent="关" />
+                                                </Grid>
+                                            </Expander>
+
+                                            <!-- Bark 通知 -->
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <CheckBox Grid.Column="0"
+                                                          Content="Bark 通知（iOS）"
+                                                          IsChecked="{Binding Settings.AllowBarkNotifications}" />
+                                                <Button Grid.Column="1"
+                                                        Content="Check"
+                                                        Margin="10,0,0,0"
+                                                        Command="{Binding TestBarkCommand}"
+                                                        IsEnabled="{Binding Settings.AllowBarkNotifications}" />
+                                            </Grid>
+                                            <Expander Header="Bark 设置"
+                                                      IsVisible="{Binding Settings.AllowBarkNotifications}">
+                                                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                                                      ColumnDefinitions="Auto,*" RowSpacing="6">
+                                                    <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="设备 Key" />
+                                                    <TextBox Grid.Row="0" Grid.Column="1"
+                                                             Text="{Binding Settings.BarkDeviceKey}"
+                                                             Watermark="从 Bark App 复制，多个用逗号分隔" />
+                                                    <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="Bark API 端点" />
+                                                    <TextBox Grid.Row="1" Grid.Column="1"
+                                                             Text="{Binding Settings.BarkServerUrl}"
+                                                             Watermark="https://api.day.app" />
+                                                    <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="推送级别" />
+                                                    <TextBox Grid.Row="2" Grid.Column="1"
+                                                             Text="{Binding Settings.BarkLevel}"
+                                                             Watermark="active / timeSensitive / passive" />
+                                                    <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="通知声音" />
+                                                    <TextBox Grid.Row="3" Grid.Column="1"
+                                                             Text="{Binding Settings.BarkSound}"
+                                                             Watermark="minuet（可选）" />
+                                                    <Label Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="通知图标" />
+                                                    <TextBox Grid.Row="4" Grid.Column="1"
+                                                             Text="{Binding Settings.BarkIcon}"
+                                                             Watermark="图标 URL（可选）" />
+                                                    <Label Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="通知分组" />
+                                                    <TextBox Grid.Row="5" Grid.Column="1"
+                                                             Text="{Binding Settings.BarkGroup}"
+                                                             Watermark="StarRailAssistant" />
+                                                    <Label Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="加密密钥" />
+                                                    <TextBox Grid.Row="6" Grid.Column="1"
+                                                             Text="{Binding Settings.BarkCiphertext}"
+                                                             Watermark="加密内容（可选）" />
+                                                </Grid>
+                                            </Expander>
+
+                                            <!-- 飞书通知 -->
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <CheckBox Grid.Column="0"
+                                                          Content="飞书通知"
+                                                          IsChecked="{Binding Settings.AllowFeishuNotifications}" />
+                                                <Button Grid.Column="1"
+                                                        Content="Check"
+                                                        Margin="10,0,0,0"
+                                                        Command="{Binding TestFeishuCommand}"
+                                                        IsEnabled="{Binding Settings.AllowFeishuNotifications}" />
+                                            </Grid>
+                                            <Expander Header="飞书设置"
+                                                      IsVisible="{Binding Settings.AllowFeishuNotifications}">
+                                                <StackPanel Spacing="6">
+                                                    <TextBlock Text="方式一：群机器人 Webhook" FontWeight="Bold" />
+                                                    <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*">
+                                                        <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                                                               Content="飞书通知地址" />
+                                                        <TextBox Grid.Row="0" Grid.Column="1"
+                                                                 Text="{Binding Settings.FeishuWebhookUrl}"
+                                                                 Watermark="https://open.feishu.cn/open-apis/bot/v2/hook/..." />
+                                                    </Grid>
+                                                    <TextBlock Text="方式二：应用 API（可发给指定用户）" FontWeight="Bold"
+                                                               Margin="0,6,0,0" />
+                                                    <Grid RowDefinitions="Auto,Auto,Auto,Auto"
+                                                          ColumnDefinitions="Auto,*" RowSpacing="6">
+                                                        <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                                                               Content="飞书 AppId" />
+                                                        <TextBox Grid.Row="0" Grid.Column="1"
+                                                                 Text="{Binding Settings.FeishuAppId}"
+                                                                 Watermark="cli_..." />
+                                                        <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
+                                                               Content="飞书 AppSecret" />
+                                                        <TextBox Grid.Row="1" Grid.Column="1"
+                                                                 Text="{Binding Settings.FeishuAppSecret}"
+                                                                 Watermark="应用 AppSecret" />
+                                                        <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
+                                                               Content="接收者 ID" />
+                                                        <TextBox Grid.Row="2" Grid.Column="1"
+                                                                 Text="{Binding Settings.FeishuReceiveId}"
+                                                                 Watermark="open_id / user_id / chat_id" />
+                                                        <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"
+                                                               Content="ID 类型" />
+                                                        <TextBox Grid.Row="3" Grid.Column="1"
+                                                                 Text="{Binding Settings.FeishuReceiveIdType}"
+                                                                 Watermark="open_id（默认）" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Expander>
+
+                                            <!-- 企业微信通知 -->
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <CheckBox Grid.Column="0"
+                                                          Content="企业微信通知"
+                                                          IsChecked="{Binding Settings.AllowWeComNotifications}" />
+                                                <Button Grid.Column="1"
+                                                        Content="Check"
+                                                        Margin="10,0,0,0"
+                                                        Command="{Binding TestWeComCommand}"
+                                                        IsEnabled="{Binding Settings.AllowWeComNotifications}" />
+                                            </Grid>
+                                            <Expander Header="企业微信设置"
+                                                      IsVisible="{Binding Settings.AllowWeComNotifications}">
+                                                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
+                                                    <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="Webhook 地址" />
+                                                    <TextBox Grid.Row="0" Grid.Column="1"
+                                                             Text="{Binding Settings.WeComWebhookUrl}"
+                                                             Watermark="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..." />
+                                                    <Label Grid.Row="1" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="发送截图" />
+                                                    <ToggleSwitch Grid.Row="1" Grid.Column="1"
+                                                                  IsChecked="{Binding Settings.WeComSendImage}"
+                                                                  OnContent="开" OffContent="关" />
+                                                </Grid>
+                                            </Expander>
+
+                                            <!-- 钉钉通知 -->
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <CheckBox Grid.Column="0"
+                                                          Content="钉钉通知"
+                                                          IsChecked="{Binding Settings.AllowDingTalkNotifications}" />
+                                                <Button Grid.Column="1"
+                                                        Content="Check"
+                                                        Margin="10,0,0,0"
+                                                        Command="{Binding TestDingTalkCommand}"
+                                                        IsEnabled="{Binding Settings.AllowDingTalkNotifications}" />
+                                            </Grid>
+                                            <Expander Header="钉钉设置"
+                                                      IsVisible="{Binding Settings.AllowDingTalkNotifications}">
+                                                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*"
+                                                      RowSpacing="6">
+                                                    <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="Webhook 地址" />
+                                                    <TextBox Grid.Row="0" Grid.Column="1"
+                                                             Text="{Binding Settings.DingTalkWebhookUrl}"
+                                                             Watermark="https://oapi.dingtalk.com/robot/send?access_token=..." />
+                                                    <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="加签密钥" />
+                                                    <TextBox Grid.Row="1" Grid.Column="1"
+                                                             Text="{Binding Settings.DingTalkSecret}"
+                                                             Watermark="SEC... （可选）" />
+                                                </Grid>
+                                            </Expander>
+
+                                            <!-- Discord 通知 -->
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <CheckBox Grid.Column="0"
+                                                          Content="Discord Webhook 通知"
+                                                          IsChecked="{Binding Settings.AllowDiscordNotifications}" />
+                                                <Button Grid.Column="1"
+                                                        Content="Check"
+                                                        Margin="10,0,0,0"
+                                                        Command="{Binding TestDiscordCommand}"
+                                                        IsEnabled="{Binding Settings.AllowDiscordNotifications}" />
+                                            </Grid>
+                                            <Expander Header="Discord 设置"
+                                                      IsVisible="{Binding Settings.AllowDiscordNotifications}">
+                                                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
+                                                    <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="Webhook 地址" />
+                                                    <TextBox Grid.Row="0" Grid.Column="1"
+                                                             Text="{Binding Settings.DiscordWebhookUrl}"
+                                                             Watermark="https://discord.com/api/webhooks/..." />
+                                                    <Label Grid.Row="1" Grid.Column="0"
+                                                           VerticalAlignment="Center"
+                                                           Content="发送截图" />
+                                                    <ToggleSwitch Grid.Row="1" Grid.Column="1"
+                                                                  IsChecked="{Binding Settings.DiscordSendImage}"
+                                                                  OnContent="开" OffContent="关" />
+                                                </Grid>
+                                            </Expander>
+
+                                            <!-- xxtui 通知 -->
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <CheckBox Grid.Column="0"
+                                                          Content="xxtui 通知"
+                                                          IsChecked="{Binding Settings.AllowXxtuiNotifications}" />
+                                                <Button Grid.Column="1"
+                                                        Content="Check"
+                                                        Margin="10,0,0,0"
+                                                        Command="{Binding TestXxtuiCommand}"
+                                                        IsEnabled="{Binding Settings.AllowXxtuiNotifications}" />
+                                            </Grid>
+                                            <Expander Header="xxtui 设置"
+                                                      IsVisible="{Binding Settings.AllowXxtuiNotifications}">
+                                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,*"
+                                                      RowSpacing="6">
+                                                    <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="API 密钥" />
+                                                    <TextBox Grid.Row="0" Grid.Column="1"
+                                                             Text="{Binding Settings.XxtuiApiKey}"
+                                                             Watermark="从 xxtui.com 获取" />
+                                                    <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="通知来源" />
+                                                    <TextBox Grid.Row="1" Grid.Column="1"
+                                                             Text="{Binding Settings.XxtuiSource}"
+                                                             Watermark="如 StarRailAssistant（可选）" />
+                                                    <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
+                                                           Content="通知渠道" />
+                                                    <TextBox Grid.Row="2" Grid.Column="1"
+                                                             Text="{Binding Settings.XxtuiChannel}"
+                                                             Watermark="如 WX_MP（可选）" />
+                                                </Grid>
+                                            </Expander>
+
+                                            <!-- 通知设置保存按钮 -->
+                                            <Button Content="保存通知设置"
+                                                    HorizontalAlignment="Left"
+                                                    Command="{Binding SaveNotificationSettingsCommand}" />
                                         </StackPanel>
                                     </Expander>
 
-                                    <!-- Webhook 通知 -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <CheckBox Grid.Column="0"
-                                                  Content="Webhook 通知"
-                                                  IsChecked="{Binding Settings.AllowWebhookNotifications}" />
-                                        <Button Grid.Column="1"
-                                                Content="Check"
-                                                Margin="10,0,0,0"
-                                                Command="{Binding TestWebhookCommand}"
-                                                IsEnabled="{Binding Settings.AllowWebhookNotifications}" />
-                                    </Grid>
-                                    <Expander Header="Webhook 设置"
-                                              IsVisible="{Binding Settings.AllowWebhookNotifications}">
-                                        <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*">
-                                            <Label Grid.Row="0" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="推送地址" />
-                                            <TextBox Grid.Row="0" Grid.Column="1"
-                                                     Text="{Binding Settings.WebhookEndpoint}"
-                                                     Watermark="https://your-webhook-endpoint" />
-                                        </Grid>
-                                    </Expander>
-
-                                    <!-- Telegram 通知 -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <CheckBox Grid.Column="0"
-                                                  Content="Telegram 通知"
-                                                  IsChecked="{Binding Settings.AllowTelegramNotifications}" />
-                                        <Button Grid.Column="1"
-                                                Content="Check"
-                                                Margin="10,0,0,0"
-                                                Command="{Binding TestTelegramCommand}"
-                                                IsEnabled="{Binding Settings.AllowTelegramNotifications}" />
-                                    </Grid>
-                                    <Expander Header="Telegram 设置"
-                                              IsVisible="{Binding Settings.AllowTelegramNotifications}">
-                                        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*"
-                                              RowSpacing="6">
-                                            <Label Grid.Row="0" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="Bot Token" />
-                                            <TextBox Grid.Row="0" Grid.Column="1"
-                                                     Text="{Binding Settings.TelegramBotToken}"
-                                                     Watermark="1234567890:ABCdef..." />
-                                            <Label Grid.Row="1" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="Chat ID" />
-                                            <TextBox Grid.Row="1" Grid.Column="1"
-                                                     Text="{Binding Settings.TelegramChatId}"
-                                                     Watermark="-1001234567890" />
-                                            <Label Grid.Row="2" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="自定义 API 地址" />
-                                            <TextBox Grid.Row="2" Grid.Column="1"
-                                                     Text="{Binding Settings.TelegramApiBaseUrl}"
-                                                     Watermark="留空使用官方 API" />
-                                            <Label Grid.Row="3" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="启用代理" />
-                                            <ToggleSwitch Grid.Row="3" Grid.Column="1"
-                                                          IsChecked="{Binding Settings.TelegramProxyEnabled}" />
-                                            <Label Grid.Row="4" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   IsVisible="{Binding Settings.TelegramProxyEnabled}"
-                                                   Content="代理地址" />
-                                            <TextBox Grid.Row="4" Grid.Column="1"
-                                                     IsVisible="{Binding Settings.TelegramProxyEnabled}"
-                                                     Text="{Binding Settings.TelegramProxyUrl}"
-                                                     Watermark="http://127.0.0.1:7890" />
-                                            <Label Grid.Row="5" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="发送截图" />
-                                            <ToggleSwitch Grid.Row="5" Grid.Column="1"
-                                                          IsChecked="{Binding Settings.TelegramSendImage}"
-                                                          OnContent="开" OffContent="关" />
-                                        </Grid>
-                                    </Expander>
-
-                                    <!-- ServerChan 通知 -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <CheckBox Grid.Column="0"
-                                                  Content="ServerChan 微信通知"
-                                                  IsChecked="{Binding Settings.AllowServerChanNotifications}" />
-                                        <Button Grid.Column="1"
-                                                Content="Check"
-                                                Margin="10,0,0,0"
-                                                Command="{Binding TestServerChanCommand}"
-                                                IsEnabled="{Binding Settings.AllowServerChanNotifications}" />
-                                    </Grid>
-                                    <Expander Header="ServerChan 设置"
-                                              IsVisible="{Binding Settings.AllowServerChanNotifications}">
-                                        <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*">
-                                            <Label Grid.Row="0" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="SendKey" />
-                                            <TextBox Grid.Row="0" Grid.Column="1"
-                                                     Text="{Binding Settings.ServerChanSendKey}"
-                                                     Watermark="SCT... 或 sctp..." />
-                                        </Grid>
-                                    </Expander>
-
-                                    <!-- OneBot 通知 -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <CheckBox Grid.Column="0"
-                                                  Content="OneBot QQ 通知"
-                                                  IsChecked="{Binding Settings.AllowOneBotNotifications}" />
-                                        <Button Grid.Column="1"
-                                                Content="Check"
-                                                Margin="10,0,0,0"
-                                                Command="{Binding TestOneBotCommand}"
-                                                IsEnabled="{Binding Settings.AllowOneBotNotifications}" />
-                                    </Grid>
-                                    <Expander Header="OneBot 设置"
-                                              IsVisible="{Binding Settings.AllowOneBotNotifications}">
-                                        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*"
-                                              RowSpacing="6">
-                                            <Label Grid.Row="0" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="API 地址" />
-                                            <TextBox Grid.Row="0" Grid.Column="1"
-                                                     Text="{Binding Settings.OneBotEndpoint}"
-                                                     Watermark="http://127.0.0.1:3000" />
-                                            <Label Grid.Row="1" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="QQ 号（私聊）" />
-                                            <TextBox Grid.Row="1" Grid.Column="1"
-                                                     Text="{Binding Settings.OneBotUserId}"
-                                                     Watermark="留空则不发送私聊" />
-                                            <Label Grid.Row="2" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="群号（群聊）" />
-                                            <TextBox Grid.Row="2" Grid.Column="1"
-                                                     Text="{Binding Settings.OneBotGroupId}"
-                                                     Watermark="留空则不发送群聊" />
-                                            <Label Grid.Row="3" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="AccessToken" />
-                                            <TextBox Grid.Row="3" Grid.Column="1"
-                                                     Text="{Binding Settings.OneBotToken}"
-                                                     Watermark="留空则不使用认证" />
-                                            <Label Grid.Row="4" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="发送截图" />
-                                            <ToggleSwitch Grid.Row="4" Grid.Column="1"
-                                                          IsChecked="{Binding Settings.OneBotSendImage}"
-                                                          OnContent="开" OffContent="关" />
-                                        </Grid>
-                                    </Expander>
-
-                                    <!-- Bark 通知 -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <CheckBox Grid.Column="0"
-                                                  Content="Bark 通知（iOS）"
-                                                  IsChecked="{Binding Settings.AllowBarkNotifications}" />
-                                        <Button Grid.Column="1"
-                                                Content="Check"
-                                                Margin="10,0,0,0"
-                                                Command="{Binding TestBarkCommand}"
-                                                IsEnabled="{Binding Settings.AllowBarkNotifications}" />
-                                    </Grid>
-                                    <Expander Header="Bark 设置"
-                                              IsVisible="{Binding Settings.AllowBarkNotifications}">
-                                        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*" RowSpacing="6">
-                                            <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Content="设备 Key" />
-                                            <TextBox Grid.Row="0" Grid.Column="1"
-                                                     Text="{Binding Settings.BarkDeviceKey}"
-                                                     Watermark="从 Bark App 复制，多个用逗号分隔" />
-                                            <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Content="Bark API 端点" />
-                                            <TextBox Grid.Row="1" Grid.Column="1"
-                                                     Text="{Binding Settings.BarkServerUrl}"
-                                                     Watermark="https://api.day.app" />
-                                            <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Content="推送级别" />
-                                            <TextBox Grid.Row="2" Grid.Column="1"
-                                                     Text="{Binding Settings.BarkLevel}"
-                                                     Watermark="active / timeSensitive / passive" />
-                                            <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Content="通知声音" />
-                                            <TextBox Grid.Row="3" Grid.Column="1"
-                                                     Text="{Binding Settings.BarkSound}"
-                                                     Watermark="minuet（可选）" />
-                                            <Label Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Content="通知图标" />
-                                            <TextBox Grid.Row="4" Grid.Column="1"
-                                                     Text="{Binding Settings.BarkIcon}"
-                                                     Watermark="图标 URL（可选）" />
-                                            <Label Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Content="通知分组" />
-                                            <TextBox Grid.Row="5" Grid.Column="1"
-                                                     Text="{Binding Settings.BarkGroup}"
-                                                     Watermark="StarRailAssistant" />
-                                            <Label Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Content="加密密钥" />
-                                            <TextBox Grid.Row="6" Grid.Column="1"
-                                                     Text="{Binding Settings.BarkCiphertext}"
-                                                     Watermark="加密内容（可选）" />
-                                        </Grid>
-                                    </Expander>
-
-                                    <!-- 飞书通知 -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <CheckBox Grid.Column="0"
-                                                  Content="飞书通知"
-                                                  IsChecked="{Binding Settings.AllowFeishuNotifications}" />
-                                        <Button Grid.Column="1"
-                                                Content="Check"
-                                                Margin="10,0,0,0"
-                                                Command="{Binding TestFeishuCommand}"
-                                                IsEnabled="{Binding Settings.AllowFeishuNotifications}" />
-                                    </Grid>
-                                    <Expander Header="飞书设置"
-                                              IsVisible="{Binding Settings.AllowFeishuNotifications}">
-                                        <StackPanel Spacing="6">
-                                            <TextBlock Text="方式一：群机器人 Webhook" FontWeight="Bold" />
-                                            <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*">
-                                                <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Content="飞书通知地址" />
-                                                <TextBox Grid.Row="0" Grid.Column="1"
-                                                         Text="{Binding Settings.FeishuWebhookUrl}"
-                                                         Watermark="https://open.feishu.cn/open-apis/bot/v2/hook/..." />
-                                            </Grid>
-                                            <TextBlock Text="方式二：应用 API（可发给指定用户）" FontWeight="Bold" Margin="0,6,0,0" />
-                                            <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*" RowSpacing="6">
-                                                <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Content="飞书 AppId" />
-                                                <TextBox Grid.Row="0" Grid.Column="1"
-                                                         Text="{Binding Settings.FeishuAppId}"
-                                                         Watermark="cli_..." />
-                                                <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Content="飞书 AppSecret" />
-                                                <TextBox Grid.Row="1" Grid.Column="1"
-                                                         Text="{Binding Settings.FeishuAppSecret}"
-                                                         Watermark="应用 AppSecret" />
-                                                <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Content="接收者 ID" />
-                                                <TextBox Grid.Row="2" Grid.Column="1"
-                                                         Text="{Binding Settings.FeishuReceiveId}"
-                                                         Watermark="open_id / user_id / chat_id" />
-                                                <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Content="ID 类型" />
-                                                <TextBox Grid.Row="3" Grid.Column="1"
-                                                         Text="{Binding Settings.FeishuReceiveIdType}"
-                                                         Watermark="open_id（默认）" />
-                                            </Grid>
-                                        </StackPanel>
-                                    </Expander>
-
-                                    <!-- 企业微信通知 -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <CheckBox Grid.Column="0"
-                                                  Content="企业微信通知"
-                                                  IsChecked="{Binding Settings.AllowWeComNotifications}" />
-                                        <Button Grid.Column="1"
-                                                Content="Check"
-                                                Margin="10,0,0,0"
-                                                Command="{Binding TestWeComCommand}"
-                                                IsEnabled="{Binding Settings.AllowWeComNotifications}" />
-                                    </Grid>
-                                    <Expander Header="企业微信设置"
-                                              IsVisible="{Binding Settings.AllowWeComNotifications}">
-                                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
-                                            <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Content="Webhook 地址" />
-                                            <TextBox Grid.Row="0" Grid.Column="1"
-                                                     Text="{Binding Settings.WeComWebhookUrl}"
-                                                     Watermark="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..." />
-                                            <Label Grid.Row="1" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="发送截图" />
-                                            <ToggleSwitch Grid.Row="1" Grid.Column="1"
-                                                          IsChecked="{Binding Settings.WeComSendImage}"
-                                                          OnContent="开" OffContent="关" />
-                                        </Grid>
-                                    </Expander>
-
-                                    <!-- 钉钉通知 -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <CheckBox Grid.Column="0"
-                                                  Content="钉钉通知"
-                                                  IsChecked="{Binding Settings.AllowDingTalkNotifications}" />
-                                        <Button Grid.Column="1"
-                                                Content="Check"
-                                                Margin="10,0,0,0"
-                                                Command="{Binding TestDingTalkCommand}"
-                                                IsEnabled="{Binding Settings.AllowDingTalkNotifications}" />
-                                    </Grid>
-                                    <Expander Header="钉钉设置"
-                                              IsVisible="{Binding Settings.AllowDingTalkNotifications}">
-                                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*" RowSpacing="6">
-                                            <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Content="Webhook 地址" />
-                                            <TextBox Grid.Row="0" Grid.Column="1"
-                                                     Text="{Binding Settings.DingTalkWebhookUrl}"
-                                                     Watermark="https://oapi.dingtalk.com/robot/send?access_token=..." />
-                                            <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Content="加签密钥" />
-                                            <TextBox Grid.Row="1" Grid.Column="1"
-                                                     Text="{Binding Settings.DingTalkSecret}"
-                                                     Watermark="SEC... （可选）" />
-                                        </Grid>
-                                    </Expander>
-
-                                    <!-- Discord 通知 -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <CheckBox Grid.Column="0"
-                                                  Content="Discord Webhook 通知"
-                                                  IsChecked="{Binding Settings.AllowDiscordNotifications}" />
-                                        <Button Grid.Column="1"
-                                                Content="Check"
-                                                Margin="10,0,0,0"
-                                                Command="{Binding TestDiscordCommand}"
-                                                IsEnabled="{Binding Settings.AllowDiscordNotifications}" />
-                                    </Grid>
-                                    <Expander Header="Discord 设置"
-                                              IsVisible="{Binding Settings.AllowDiscordNotifications}">
-                                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
-                                            <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Content="Webhook 地址" />
-                                            <TextBox Grid.Row="0" Grid.Column="1"
-                                                     Text="{Binding Settings.DiscordWebhookUrl}"
-                                                     Watermark="https://discord.com/api/webhooks/..." />
-                                            <Label Grid.Row="1" Grid.Column="0"
-                                                   VerticalAlignment="Center"
-                                                   Content="发送截图" />
-                                            <ToggleSwitch Grid.Row="1" Grid.Column="1"
-                                                          IsChecked="{Binding Settings.DiscordSendImage}"
-                                                          OnContent="开" OffContent="关" />
-                                        </Grid>
-                                    </Expander>
-
-                                    <!-- xxtui 通知 -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <CheckBox Grid.Column="0"
-                                                  Content="xxtui 通知"
-                                                  IsChecked="{Binding Settings.AllowXxtuiNotifications}" />
-                                        <Button Grid.Column="1"
-                                                Content="Check"
-                                                Margin="10,0,0,0"
-                                                Command="{Binding TestXxtuiCommand}"
-                                                IsEnabled="{Binding Settings.AllowXxtuiNotifications}" />
-                                    </Grid>
-                                    <Expander Header="xxtui 设置"
-                                              IsVisible="{Binding Settings.AllowXxtuiNotifications}">
-                                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,*" RowSpacing="6">
-                                            <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Content="API 密钥" />
-                                            <TextBox Grid.Row="0" Grid.Column="1"
-                                                     Text="{Binding Settings.XxtuiApiKey}"
-                                                     Watermark="从 xxtui.com 获取" />
-                                            <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Content="通知来源" />
-                                            <TextBox Grid.Row="1" Grid.Column="1"
-                                                     Text="{Binding Settings.XxtuiSource}"
-                                                     Watermark="如 StarRailAssistant（可选）" />
-                                            <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Content="通知渠道" />
-                                            <TextBox Grid.Row="2" Grid.Column="1"
-                                                     Text="{Binding Settings.XxtuiChannel}"
-                                                     Watermark="如 WX_MP（可选）" />
-                                        </Grid>
-                                    </Expander>
-
-                                    <!-- 通知设置保存按钮 -->
-                                    <Button Content="保存通知设置"
-                                            HorizontalAlignment="Left"
-                                            Command="{Binding SaveNotificationSettingsCommand}" />
 
                                     <!-- <Grid ColumnDefinitions="Auto,*,Auto"> -->
                                     <!-- <Label Grid.Column="0" Classes="Icon">&#xe0f4;</Label> -->
@@ -677,7 +703,7 @@
                                                Content="{x:Static lang:Resources.MirrorChyanText}"
                                                ToolTip.Tip="{x:Static lang:Resources.MirrorChyanTipText}" />
                                         <Button Grid.Column="2" Classes="Icon" Content="&#xE036;"
-                                                Command="{Binding VerifyCdkCommand}"/>
+                                                Command="{Binding VerifyCdkCommand}" />
                                         <StackPanel Grid.Column="3">
                                             <TextBox
                                                 Watermark="Enter You CDK"
@@ -734,29 +760,41 @@
                                                Content="{x:Static lang:Resources.ResourceIntegrityCheckText}" />
                                         <Button Grid.Column="2" IsEnabled="False">Check</Button>
                                     </Grid>
+                                    <Grid ColumnDefinitions="Auto, Auto, *">
+                                        <Label Classes="Icon">&#xe184;</Label>
+                                        <Label Grid.Column="1"
+                                               Content="后端启动参数" />
+                                        <TextBox Grid.Column="2" Text="{Binding Settings.BackendArguments}" Watermark="--inline"/>
+                                    </Grid>
                                     <Expander Header="{x:Static lang:Resources.DeveloperOptionsText}"
                                               IsVisible="{Binding Settings.IsDeveloperMode}"
                                               IsExpanded="True">
                                         <StackPanel>
                                             <Grid ColumnDefinitions="Auto, *, Auto">
                                                 <Label Classes="Icon">&#xE5F6;</Label>
-                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.EnableDeveloperOptionsText}" />
-                                                <ToggleSwitch Grid.Column="2" IsChecked="{Binding Settings.IsDeveloperMode}"/>
+                                                <Label Grid.Column="1"
+                                                       Content="{x:Static lang:Resources.EnableDeveloperOptionsText}" />
+                                                <ToggleSwitch Grid.Column="2"
+                                                              IsChecked="{Binding Settings.IsDeveloperMode}" />
                                             </Grid>
                                             <Grid ColumnDefinitions="Auto, *, Auto">
                                                 <Label Classes="Icon">&#xE836;</Label>
-                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.SaveOcrImageText}" />
-                                                <ToggleSwitch Grid.Column="2" IsChecked="{Binding Settings.IsSaveOcrImage}"/>
+                                                <Label Grid.Column="1"
+                                                       Content="{x:Static lang:Resources.SaveOcrImageText}" />
+                                                <ToggleSwitch Grid.Column="2"
+                                                              IsChecked="{Binding Settings.IsSaveOcrImage}" />
                                             </Grid>
                                             <Grid ColumnDefinitions="Auto, *, Auto">
                                                 <Label Classes="Icon">&#xE47E;</Label>
-                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.UsingPythonText}" />
+                                                <Label Grid.Column="1"
+                                                       Content="{x:Static lang:Resources.UsingPythonText}" />
                                                 <ToggleSwitch Grid.Column="2"
                                                               IsChecked="{Binding Settings.IsUsingPython}" />
                                             </Grid>
                                             <Grid ColumnDefinitions="Auto, *, Auto">
                                                 <Label Classes="Icon">&#xE1C2;</Label>
-                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.PythonInterpreterText}" />
+                                                <Label Grid.Column="1"
+                                                       Content="{x:Static lang:Resources.PythonInterpreterText}" />
                                                 <TextBox Grid.Column="2"
                                                          MinWidth="300"
                                                          Watermark="/path/to/your/python.exe"
@@ -782,7 +820,7 @@
                                     <!-- ReSharper disable once Xaml.StyleClassNotFound -->
                                     <Button Classes="Basic"
                                             Command="{Binding VersionClickedCommand}">
-                                        <TextBlock>版本 / Version : <Run Text="{Binding VersionText}"/></TextBlock>
+                                        <TextBlock>版本 / Version : <Run Text="{Binding VersionText}" /></TextBlock>
                                     </Button>
                                     <TextBlock HorizontalAlignment="Center">© 2024-2026 StarRailAssistant, All rights reserved.</TextBlock>
                                     <TextBlock TextWrapping="Wrap" xml:space="preserve">

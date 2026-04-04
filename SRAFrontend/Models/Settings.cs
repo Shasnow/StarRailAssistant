@@ -46,6 +46,9 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private string _launchArgumentsAdvanced = ""; // 高级参数
     [ObservableProperty] private bool _launchWithCmd; // 使用 CMD 启动游戏
     
+    // 高级
+    [ObservableProperty] private string _backendArguments = "--inline"; // 后端启动参数
+    
     // 开发者模式
     [ObservableProperty] private bool _isDeveloperMode; // 开发者模式
     [ObservableProperty] private bool _isSaveOcrImage; // 是否保存OCR截图
