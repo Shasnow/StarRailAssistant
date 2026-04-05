@@ -57,14 +57,20 @@ def main():
     exit_program = False
     if args.subcommand == 'run':
         # 处理 run 子命令：config 是列表，拼接为空格分隔的字符串
+        logger.warning(f"Usage 'run --config {" ".join(args.config)}' is deprecated, use '--execute \"run {' '.join(args.config)}\"' instead.")
         exit_program = execute_subcommand('run', *args.config if args.config else []) # type: ignore
     elif args.subcommand == 'single':
         # 处理 single 子命令：task-name + config（单个参数）
+        logger.warning(f"Usage 'single --task-name {args.task_name} --config {args.config}' is deprecated, use '--execute \"single {args.task_name} {args.config}\"' instead.")
         exit_program = execute_subcommand('single', args.task_name, args.config)
 
     # 8. 退出或启动交互式命令行
     if exit_program:
         sys.exit(0)
+    if args.command:
+        commands = args.command.split('&')
+        for cmd in commands:
+            cli_instance.cmdqueue.append(cmd)
     cli_instance.cmdloop()
 
 def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
@@ -79,9 +85,14 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
         help=Resource.argparse_embed_help
     )
     parser.add_argument(
+         '--command', '-c', '--execute', '-e',
+        type=str,
+        help='The command to execute AFTER launch',
+    )
+    parser.add_argument(
         '--version',
         action='version',
-        version=f'SRA-cli {VERSION}',
+        version=f'{VERSION}',
         help=Resource.argparse_version_help
     )
     parser.add_argument(
