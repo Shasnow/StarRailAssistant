@@ -133,4 +133,16 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private string _xxtuiSource = "";
     [ObservableProperty] private string _xxtuiChannel = "";
 
+    // 任务通知配置（每个任务的开始/完成通知开关）
+    [ObservableProperty] private bool _startGameTaskNotifyOnStart;
+    [ObservableProperty] private bool _startGameTaskNotifyOnComplete;
+    [ObservableProperty] private bool _trailblazePowerTaskNotifyOnStart;
+    [ObservableProperty] private bool _trailblazePowerTaskNotifyOnComplete;
+    [ObservableProperty] private bool _receiveRewardsTaskNotifyOnStart;
+    [ObservableProperty] private bool _receiveRewardsTaskNotifyOnComplete;
+    [ObservableProperty] private bool _cosmicStrifeTaskNotifyOnStart;
+    [ObservableProperty] private bool _cosmicStrifeTaskNotifyOnComplete;
+    [ObservableProperty] private bool _missionAccomplishTaskNotifyOnStart;
+    [ObservableProperty] private bool _missionAccomplishTaskNotifyOnComplete;
+
 }
