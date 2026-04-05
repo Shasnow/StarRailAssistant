@@ -18,6 +18,28 @@ from SRACore.util.errors import SRAError, ThreadStoppedError
 from SRACore.util.logger import logger, setup_logger
 
 
+
+# 任务类名 -> settings 中对应的通知配置前缀
+_TASK_NOTIFY_KEY_MAP = {
+    "StartGameTask":         "StartGameTask",
+    "TrailblazePowerTask":   "TrailblazePowerTask",
+    "ReceiveRewardsTask":    "ReceiveRewardsTask",
+    "CosmicStrifeTask":      "CosmicStrifeTask",
+    "MissionAccomplishTask": "MissionAccomplishTask",
+}
+
+
+def _should_notify_task(task_class_name: str, event: str, setting: dict) -> bool:
+    """
+    判断某个任务在 event（'OnStart' 或 'OnComplete'）时是否应该发送通知。
+    从 settings 中读取对应的 bool 字段。
+    """
+    key_prefix = _TASK_NOTIFY_KEY_MAP.get(task_class_name)
+    if not key_prefix:
+        return False
+    field = key_prefix + "Notify" + event   # e.g. StartGameTaskNotifyOnStart
+    return bool(setting.get(field, False))
+
 class TaskManager:
     """
     任务管理器线程，负责按顺序执行多个任务（如启动游戏、体力刷取等）。
@@ -88,6 +110,15 @@ class TaskManager:
                     try:
                         # 运行任务，如果返回 False 表示任务失败
                         logger.debug('running task: ' + str(task))
+                        # 任务开始通知
+                        _setting = notify._load_settings_for_task_notify()
+                        if _should_notify_task(task.__class__.__name__, "OnStart", _setting):
+                            notify.try_send_notification(
+                                Resource.task_notificationTitle,
+                                "任务 '" + str(task) + "' 开始执行。",
+                                result="success",
+                                operator=task.operator
+                            )
                         if not task.run():
                             logger.debug('task failed: ' + str(task))
                             logger.error(Resource.task_taskFailed(str(task)))
@@ -98,6 +129,15 @@ class TaskManager:
                                 operator=task.operator
                             )
                             return  # 终止当前配置的执行
+                        # 任务完成通知
+                        _setting = notify._load_settings_for_task_notify()
+                        if _should_notify_task(task.__class__.__name__, "OnComplete", _setting):
+                            notify.try_send_notification(
+                                Resource.task_notificationTitle,
+                                Resource.task_taskCompleted(str(task)),
+                                result="success",
+                                operator=task.operator
+                            )
                     except ThreadStoppedError as e:
                         logger.error(e)
                         break
