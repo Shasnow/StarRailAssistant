@@ -237,6 +237,15 @@ class TaskManager:
             if self._stop_event.is_set():
                 return False
             logger.debug('running task: ' + str(task_instance.__class__.__name__))
+            # 单次运行：开始通知
+            _setting = notify._load_settings_for_task_notify()
+            if _should_notify_task(task_instance.__class__.__name__, "OnStart", _setting):
+                notify.try_send_notification(
+                    Resource.task_notificationTitle,
+                    "任务 '" + str(task_instance) + "' 开始执行。",
+                    result="success",
+                    operator=task_instance.operator
+                )
             # 运行任务
             result = task_instance.run()
             if not result:
@@ -249,6 +258,15 @@ class TaskManager:
                 )
             else:
                 logger.info(Resource.task_taskCompleted(str(task_instance)))
+                # 单次运行：完成通知
+                _setting = notify._load_settings_for_task_notify()
+                if _should_notify_task(task_instance.__class__.__name__, "OnComplete", _setting):
+                    notify.try_send_notification(
+                        Resource.task_notificationTitle,
+                        Resource.task_taskCompleted(str(task_instance)),
+                        result="success",
+                        operator=task_instance.operator
+                    )
             return result
         except Exception as e:
             logger.exception(Resource.task_taskCrashed(task, str(e)))
