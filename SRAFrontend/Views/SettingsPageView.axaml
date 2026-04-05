@@ -643,10 +643,6 @@
                                                 </Grid>
                                             </Expander>
 
-                                            <!-- 通知设置保存按钮 -->
-                                            <Button Content="保存通知设置"
-                                                    HorizontalAlignment="Left"
-                                                    Command="{Binding SaveNotificationSettingsCommand}" />
                                         </StackPanel>
                                     </Expander>
 
