@@ -1,45 +1,36 @@
 import smtplib
+from concurrent.futures import ThreadPoolExecutor
 from email.mime.text import MIMEText
 from email.utils import formataddr
-from typing import Any
+from typing import Any, Callable
 
 from plyer import notification  # type: ignore
 
 from SRACore.util import encryption
 from SRACore.util.data_persister import load_settings
+from SRACore.util.image_util import compress_image_bytes
 
 
 # ===================== 核心分发 =====================
 
-def try_send_notification(title: str, message: str, result: str = "success"):
+_cached_game_screenshot_bytes: bytes | None = None
+_cached_game_screenshot_owner_id: int | None = None
+_active_notification_screenshot_bytes: bytes | None = None
+_notification_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="notify_batch")
+
+
+def try_send_notification(title: str, message: str, result: str = "success", operator: Any | None = None):
     setting = load_settings()
     if not setting.get("AllowNotifications", False):
         return
+    screenshot_bytes = None
+    if should_capture_notification_screenshot(setting):
+        screenshot_bytes = _capture_game_window_bytes(operator)
+        if not screenshot_bytes:
+            screenshot_bytes = _get_cached_game_screenshot_bytes(operator)
     data = _build_notification_data(title, message, result)
-    if setting.get("AllowSystemNotifications", False):
-        send_windows_notification(title, message)
-    if setting.get("AllowEmailNotifications", False):
-        send_mail_notification(title, message, setting)
-    if setting.get("AllowWebhookNotifications", False):
-        send_webhook_notification(data, setting)
-    if setting.get("AllowTelegramNotifications", False):
-        send_telegram_notification(data, setting)
-    if setting.get("AllowServerChanNotifications", False):
-        send_serverchan_notification(data, setting)
-    if setting.get("AllowOneBotNotifications", False):
-        send_onebot_notification(data, setting)
-    if setting.get("AllowBarkNotifications", False):
-        send_bark_notification(data, setting)
-    if setting.get("AllowFeishuNotifications", False):
-        send_feishu_notification(data, setting)
-    if setting.get("AllowWeComNotifications", False):
-        send_wecom_notification(data, setting)
-    if setting.get("AllowDingTalkNotifications", False):
-        send_dingtalk_notification(data, setting)
-    if setting.get("AllowDiscordNotifications", False):
-        send_discord_notification(data, setting)
-    if setting.get("AllowXxtuiNotifications", False):
-        send_xxtui_notification(data, setting)
+    clear_cached_game_screenshot()
+    _notification_executor.submit(_dispatch_notification_batch, title, message, data, dict(setting), screenshot_bytes)
 
 
 # ===================== 工具函数 =====================
@@ -90,20 +81,161 @@ def _http_post_json(url: str, payload: dict, proxy_url: str | None = None) -> tu
         return e.code, e.read().decode("utf-8", errors="replace")
 
 
-def _take_screenshot_bytes() -> bytes | None:
-    """截取全屏，返回 PNG bytes；失败返回 None"""
+def _build_notification_jobs(
+        title: str,
+        message: str,
+        data: dict,
+        setting: dict[str, Any]) -> list[tuple[str, Callable[..., Any], tuple[Any, ...]]]:
+    jobs: list[tuple[str, Callable[..., Any], tuple[Any, ...]]] = []
+    if setting.get("AllowSystemNotifications", False):
+        jobs.append(("系统", send_windows_notification, (title, message)))
+    if setting.get("AllowEmailNotifications", False):
+        jobs.append(("邮件", send_mail_notification, (data, setting)))
+    if setting.get("AllowWebhookNotifications", False):
+        jobs.append(("Webhook", send_webhook_notification, (data, setting)))
+    if setting.get("AllowTelegramNotifications", False):
+        jobs.append(("Telegram", send_telegram_notification, (data, setting)))
+    if setting.get("AllowServerChanNotifications", False):
+        jobs.append(("ServerChan", send_serverchan_notification, (data, setting)))
+    if setting.get("AllowOneBotNotifications", False):
+        jobs.append(("OneBot", send_onebot_notification, (data, setting)))
+    if setting.get("AllowBarkNotifications", False):
+        jobs.append(("Bark", send_bark_notification, (data, setting)))
+    if setting.get("AllowFeishuNotifications", False):
+        jobs.append(("飞书", send_feishu_notification, (data, setting)))
+    if setting.get("AllowWeComNotifications", False):
+        jobs.append(("企业微信", send_wecom_notification, (data, setting)))
+    if setting.get("AllowDingTalkNotifications", False):
+        jobs.append(("钉钉", send_dingtalk_notification, (data, setting)))
+    if setting.get("AllowDiscordNotifications", False):
+        jobs.append(("Discord", send_discord_notification, (data, setting)))
+    if setting.get("AllowXxtuiNotifications", False):
+        jobs.append(("xxtui", send_xxtui_notification, (data, setting)))
+    return jobs
+
+
+def _dispatch_notification_batch(
+        title: str,
+        message: str,
+        data: dict,
+        setting: dict[str, Any],
+        screenshot_bytes: bytes | None) -> None:
+    global _active_notification_screenshot_bytes
+
+    _active_notification_screenshot_bytes = screenshot_bytes
+    try:
+        _run_notification_jobs(_build_notification_jobs(title, message, data, setting))
+    finally:
+        _active_notification_screenshot_bytes = None
+
+
+def _run_notification_job(channel_name: str, func: Callable[..., Any], args: tuple[Any, ...]) -> None:
+    from SRACore.util.logger import logger
+
+    try:
+        func(*args)
+    except Exception as e:
+        logger.warning(channel_name + " 通知发送失败: " + str(e))
+
+
+def _run_notification_jobs(jobs: list[tuple[str, Callable[..., Any], tuple[Any, ...]]]) -> None:
+    if not jobs:
+        return
+
+    with ThreadPoolExecutor(max_workers=len(jobs), thread_name_prefix="notify") as executor:
+        futures = [executor.submit(_run_notification_job, channel_name, func, args) for channel_name, func, args in jobs]
+        for future in futures:
+            future.result()
+
+
+def _load_json_body(body: str) -> dict[str, Any] | None:
+    import json
+
+    if not body:
+        return None
+    try:
+        data = json.loads(body)
+    except Exception:
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _check_wecom_response(status: int, body: str) -> tuple[bool, str]:
+    if not (200 <= status < 300):
+        return False, "状态码: " + str(status)
+
+    data = _load_json_body(body)
+    if data is None:
+        return False, "响应解析失败: " + body[:200]
+
+    errcode = data.get("errcode")
+    errmsg = str(data.get("errmsg", ""))
+    if errcode == 0:
+        return True, errmsg or "ok"
+    return False, "errcode=" + str(errcode) + "; errmsg=" + errmsg
+
+
+def should_capture_notification_screenshot(setting: dict[str, Any] | None = None) -> bool:
+    config = setting or load_settings()
+    return any([
+        config.get("AllowTelegramNotifications", False) and config.get("TelegramSendImage", False),
+        config.get("AllowOneBotNotifications", False) and config.get("OneBotSendImage", False),
+        config.get("AllowWeComNotifications", False) and config.get("WeComSendImage", False),
+        config.get("AllowDiscordNotifications", False) and config.get("DiscordSendImage", False),
+    ])
+
+
+def capture_game_screenshot(operator: Any | None = None) -> bytes | None:
+    global _cached_game_screenshot_bytes, _cached_game_screenshot_owner_id
+    img_bytes = _capture_game_window_bytes(operator)
+    if img_bytes:
+        _cached_game_screenshot_bytes = img_bytes
+        _cached_game_screenshot_owner_id = id(operator) if operator is not None else None
+    return img_bytes
+
+
+def clear_cached_game_screenshot() -> None:
+    global _cached_game_screenshot_bytes, _cached_game_screenshot_owner_id
+    _cached_game_screenshot_bytes = None
+    _cached_game_screenshot_owner_id = None
+
+
+def _get_cached_game_screenshot_bytes(operator: Any | None = None) -> bytes | None:
+    if _cached_game_screenshot_bytes is None:
+        return None
+    if operator is None:
+        return _cached_game_screenshot_bytes
+    if _cached_game_screenshot_owner_id == id(operator):
+        return _cached_game_screenshot_bytes
+    return None
+
+
+def _capture_game_window_bytes(operator: Any | None = None) -> bytes | None:
     try:
         import io
-        import pyscreeze
+        if operator is None:
+            from SRACore.operators import Operator
+            operator = Operator()
+        screenshot = operator.screenshot()
         buf = io.BytesIO()
-        pyscreeze.screenshot().save(buf, format="PNG")
+        screenshot.save(buf, format="PNG")
         return buf.getvalue()
     except Exception:
         return None
 
 
+def _take_screenshot_bytes() -> bytes | None:
+    """优先返回缓存的游戏截图，否则尝试截取当前游戏窗口"""
+    if _active_notification_screenshot_bytes:
+        return _active_notification_screenshot_bytes
+    cached = _get_cached_game_screenshot_bytes()
+    if cached:
+        return cached
+    return capture_game_screenshot()
+
+
 def _take_screenshot_base64() -> str | None:
-    """截取全屏，返回 base64 字符串；失败返回 None"""
+    """返回通知截图的 base64 字符串；失败返回 None"""
     import base64
     raw = _take_screenshot_bytes()
     return base64.b64encode(raw).decode() if raw else None
@@ -130,16 +262,25 @@ def send_windows_notification(title: str, message: str, timeout: int = 5):
 
 # ===================== 邮件通知 =====================
 
-def send_mail_notification(title: str = "SRA", message: str = "",
+def send_mail_notification(title: str | dict = "SRA", message: str | dict[str, Any] = "",
                            configure: dict[str, Any] | None = None):
-    config: dict[str, Any] = configure or {}
+    if isinstance(title, dict):
+        data = title
+        config: dict[str, Any] = message if isinstance(message, dict) and configure is None else (configure or {})
+        mail_title = str(data.get("title", "SRA")).strip() or "SRA"
+        mail_message = _fmt_msg(data)
+    else:
+        config = configure or {}
+        mail_title = title
+        mail_message = message if isinstance(message, str) else ""
+
     SMTP = config.get("SmtpServer", "")
     port = config.get("SmtpPort", 465)
     sender = config.get("EmailSender", "")
     auth_code = config.get("EmailAuthCode", "")
     password = encryption.win_decryptor(auth_code) if auth_code else ""
     receiver = config.get("EmailReceiver", "")
-    send_mail(title, "SRA通知", message, SMTP, port, sender, password, receiver)
+    send_mail(mail_title, "SRA通知", mail_message, SMTP, port, sender, password, receiver)
 
 
 def send_mail(title: str = "SRA", subject: str = "SRA通知", message: str = "",
@@ -561,42 +702,58 @@ def send_wecom_notification(data: dict, configure: dict[str, Any] | None = None)
         logger.warning("企业微信通知发送失败: 未配置 WeComWebhookUrl")
         return False
 
-    md_lines = [
-        "**[SRA 通知]**",
-        "事件: " + data.get("event", ""),
-        "结果: " + data.get("result", ""),
-        "时间: " + data.get("timestamp", ""),
-        "消息: " + data.get("message", ""),
-    ]
-    payload = {"msgtype": "markdown", "markdown": {"content": "\n".join(md_lines)}}
+    payload = {"msgtype": "text", "text": {"content": _fmt_msg(data)}}
     try:
         status, body = _http_post_json(webhook_url, payload)
-        if not (200 <= status < 300):
-            logger.warning("企业微信通知发送失败，状态码: " + str(status))
+        ok, detail = _check_wecom_response(status, body)
+        if not ok:
+            logger.warning("企业微信通知发送失败: " + detail)
             return False
         logger.debug("企业微信通知发送成功")
     except Exception as e:
         logger.warning("企业微信通知发送失败: " + str(e))
         return False
 
+    success = True
     if send_image:
         img = _take_screenshot_bytes()
         if img:
             import base64
-            img_b64 = base64.b64encode(img).decode()
-            img_md5 = hashlib.md5(img).hexdigest()
+
+            target_size = 2 * 1024 * 1024
+            img_to_send = img
+            quality = -1
+
+            if len(img_to_send) > target_size:
+                compressed, _, quality = compress_image_bytes(img_to_send, target_size)
+                if not compressed:
+                    logger.warning("企业微信截图压缩失败，跳过图片发送")
+                    return False
+                img_to_send = compressed
+
+            img_b64 = base64.b64encode(img_to_send).decode()
+            img_md5 = hashlib.md5(img_to_send).hexdigest()
             try:
-                s2, _ = _http_post_json(webhook_url,
-                                        {"msgtype": "image", "image": {"base64": img_b64, "md5": img_md5}})
-                if 200 <= s2 < 300:
-                    logger.debug("企业微信截图发送成功")
+                s2, body2 = _http_post_json(
+                    webhook_url,
+                    {"msgtype": "image", "image": {"base64": img_b64, "md5": img_md5}},
+                )
+                ok, detail = _check_wecom_response(s2, body2)
+                if ok:
+                    if quality >= 0:
+                        logger.debug("企业微信截图发送成功（压缩质量 " + str(quality) + "）")
+                    else:
+                        logger.debug("企业微信截图发送成功")
                 else:
-                    logger.warning("企业微信截图发送失败，状态码: " + str(s2))
+                    logger.warning("企业微信截图发送失败: " + detail)
+                    success = False
             except Exception as e:
                 logger.warning("企业微信截图发送失败: " + str(e))
+                success = False
         else:
             logger.warning("企业微信截图失败，跳过图片发送")
-    return True
+            success = False
+    return success
 
 
 # ===================== 钉钉通知 =====================

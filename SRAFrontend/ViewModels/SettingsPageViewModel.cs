@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Threading;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -22,6 +24,7 @@ public partial class SettingsPageViewModel : PageViewModel
 
     private readonly SettingsService _settingsService;
     private readonly UpdateService _updateService;
+    private CancellationTokenSource? _settingsSaveCts;
 
     /// <inheritdoc />
     public SettingsPageViewModel(
@@ -98,15 +101,8 @@ public partial class SettingsPageViewModel : PageViewModel
         DetectGamePath();
         SetGameResolution();
 
-        // 监听启动参数变化，自动更新注册表
-        _settingsService.Settings.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName is nameof(Settings.LaunchArgumentsScreenSize)
-                or nameof(Settings.LaunchArgumentsFullScreenMode))
-            {
-                SetGameResolution();
-            }
-        };
+        _settingsService.Settings.PropertyChanged += OnSettingsPropertyChanged;
+        _settingsService.Settings.GamePaths.CollectionChanged += (_, _) => DebounceSaveSettings();
     }
 
     public IAvaloniaReadOnlyList<CustomizableKey> CustomizableKeys => _customizableKeys;
@@ -359,13 +355,6 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void SaveNotificationSettings()
-    {
-        _settingsService.SaveSettings();
-        _commonModel.ShowSuccessToast("保存成功", "通知设置已保存");
-    }
-
-    [RelayCommand]
     private void TestOneBot()
     {
         if (string.IsNullOrEmpty(Settings.OneBotEndpoint?.Trim()))
@@ -480,4 +469,35 @@ public partial class SettingsPageViewModel : PageViewModel
         _commonModel.ShowInfoToast("开发者模式", "您正处于开发者模式！");
     }
     #endregion
+
+    private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(Settings.LaunchArgumentsScreenSize)
+            or nameof(Settings.LaunchArgumentsFullScreenMode))
+        {
+            SetGameResolution();
+        }
+
+        DebounceSaveSettings();
+    }
+
+    private void DebounceSaveSettings()
+    {
+        _settingsSaveCts?.Cancel();
+        _settingsSaveCts?.Dispose();
+        _settingsSaveCts = new CancellationTokenSource();
+        _ = SaveSettingsAsync(_settingsSaveCts.Token);
+    }
+
+    private async Task SaveSettingsAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(500, cancellationToken);
+            _settingsService.SaveSettings();
+        }
+        catch (TaskCanceledException)
+        {
+        }
+    }
 }
