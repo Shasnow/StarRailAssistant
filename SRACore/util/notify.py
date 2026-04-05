@@ -35,6 +35,11 @@ def try_send_notification(title: str, message: str, result: str = "success", ope
 
 # ===================== 工具函数 =====================
 
+
+def _load_settings_for_task_notify() -> dict:
+    """为任务通知配置读取设置（轻量调用，不触发截图）"""
+    return load_settings()
+
 def _build_notification_data(title: str, message: str, result: str = "success") -> dict:
     from datetime import datetime
     return {

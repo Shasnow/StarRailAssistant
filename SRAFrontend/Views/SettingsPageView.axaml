@@ -643,6 +643,61 @@
                                                 </Grid>
                                             </Expander>
 
+                                            <!-- 任务通知配置 -->
+                                            <Expander Header="任务通知配置"
+                                                      HorizontalAlignment="Stretch">
+                                                <StackPanel Spacing="4" Margin="0,4,0,0">
+                                                    <TextBlock Text="可为每个任务单独配置开始或完成时是否发送通知（截图由各渠道的发送截图开关控制）"
+                                                               FontSize="11" Opacity="0.6" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                                    <!-- 表头 -->
+                                                    <Grid ColumnDefinitions="*,80,80">
+                                                        <Label Grid.Column="0" Content="任务" FontWeight="Bold"/>
+                                                        <Label Grid.Column="1" Content="开始时" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                                        <Label Grid.Column="2" Content="完成时" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                                    </Grid>
+                                                    <!-- 启动游戏 -->
+                                                    <Grid ColumnDefinitions="*,80,80">
+                                                        <Label Grid.Column="0" Content="启动游戏" VerticalAlignment="Center"/>
+                                                        <CheckBox Grid.Column="1" HorizontalAlignment="Center"
+                                                                  IsChecked="{Binding Settings.StartGameTaskNotifyOnStart}"/>
+                                                        <CheckBox Grid.Column="2" HorizontalAlignment="Center"
+                                                                  IsChecked="{Binding Settings.StartGameTaskNotifyOnComplete}"/>
+                                                    </Grid>
+                                                    <!-- 清开拓力 -->
+                                                    <Grid ColumnDefinitions="*,80,80">
+                                                        <Label Grid.Column="0" Content="清开拓力" VerticalAlignment="Center"/>
+                                                        <CheckBox Grid.Column="1" HorizontalAlignment="Center"
+                                                                  IsChecked="{Binding Settings.TrailblazePowerTaskNotifyOnStart}"/>
+                                                        <CheckBox Grid.Column="2" HorizontalAlignment="Center"
+                                                                  IsChecked="{Binding Settings.TrailblazePowerTaskNotifyOnComplete}"/>
+                                                    </Grid>
+                                                    <!-- 领取奖励 -->
+                                                    <Grid ColumnDefinitions="*,80,80">
+                                                        <Label Grid.Column="0" Content="领取奖励" VerticalAlignment="Center"/>
+                                                        <CheckBox Grid.Column="1" HorizontalAlignment="Center"
+                                                                  IsChecked="{Binding Settings.ReceiveRewardsTaskNotifyOnStart}"/>
+                                                        <CheckBox Grid.Column="2" HorizontalAlignment="Center"
+                                                                  IsChecked="{Binding Settings.ReceiveRewardsTaskNotifyOnComplete}"/>
+                                                    </Grid>
+                                                    <!-- 旷宇纷争 -->
+                                                    <Grid ColumnDefinitions="*,80,80">
+                                                        <Label Grid.Column="0" Content="旷宇纷争" VerticalAlignment="Center"/>
+                                                        <CheckBox Grid.Column="1" HorizontalAlignment="Center"
+                                                                  IsChecked="{Binding Settings.CosmicStrifeTaskNotifyOnStart}"/>
+                                                        <CheckBox Grid.Column="2" HorizontalAlignment="Center"
+                                                                  IsChecked="{Binding Settings.CosmicStrifeTaskNotifyOnComplete}"/>
+                                                    </Grid>
+                                                    <!-- 任务完成 -->
+                                                    <Grid ColumnDefinitions="*,80,80">
+                                                        <Label Grid.Column="0" Content="任务完成" VerticalAlignment="Center"/>
+                                                        <CheckBox Grid.Column="1" HorizontalAlignment="Center"
+                                                                  IsChecked="{Binding Settings.MissionAccomplishTaskNotifyOnStart}"/>
+                                                        <CheckBox Grid.Column="2" HorizontalAlignment="Center"
+                                                                  IsChecked="{Binding Settings.MissionAccomplishTaskNotifyOnComplete}"/>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Expander>
+
                                         </StackPanel>
                                     </Expander>
 
