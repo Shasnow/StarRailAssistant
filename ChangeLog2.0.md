@@ -10,6 +10,7 @@
 - 前端支持向后端传递启动参数。
 - 货币战争支持自动应用攻略码功能。
 - SRA CLI工具新增“--execute”启动参数，可在启动时直接执行指定的命令。多个命令可以使用`&`符号分隔。
+- 新增“--use-python”参数，可以临时启用Python后端。
 
 ### 功能调整：
 - 攻略字段“name”已调整为“title”，请注意更新相关配置文件。
@@ -24,9 +25,11 @@
 - 示例：
     - 旧用法：`run --config Default`
     - 新用法：`--execute "run Default"`
-    - 旧用法：`run --config Default --once`  
+      -  或；`-e "run Default"`
+    - 旧用法：`run --config Default --once`（仅运行一次后退出）
     - 新用法：`--execute "run Default & exit"`
-- `--execute`与`-e`,`--command`,`-c`为等价参数
+      -  或：`-e "run Default & exit"`
+- `--execute`与`-e`,`--command`,`-c`为相同的参数
 
 #### 货币战争支自动应用攻略码
 - 攻略文件新增“share_code”字段，用于指定攻略码，如果该字段缺失或为空字符串，则不应用攻略码。
