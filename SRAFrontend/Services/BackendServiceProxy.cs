@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using SRAFrontend.Models;
 
@@ -26,9 +27,10 @@ public class BackendServiceProxy : IBackendService
 
         // 初始化 Python 后端配置
         ApplyPythonSettings();
-
+        var isUsingPython = Environment.GetCommandLineArgs().Contains("--use-python") || _settingsService.Settings is
+            { IsDeveloperMode: true, IsUsingPython: true };
         // 根据设置决定初始后端
-        _currentBackend = _settingsService.Settings is { IsDeveloperMode: true, IsUsingPython: true }
+        _currentBackend = isUsingPython
             ? _pyBackendService
             : _cliBackendService;
         AttachToCurrentBackend();

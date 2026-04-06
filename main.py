@@ -18,7 +18,7 @@ def main():
     )
     setup_argumentparser(parser)
     # 解析参数
-    args = parser.parse_args()
+    args = parser.parse_known_args()[0]
     # 延迟导入 SRACli
     from SRACore.util.logger import logger, setup_logger
     # 设置日志记录器
