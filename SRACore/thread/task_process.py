@@ -250,6 +250,9 @@ class TaskManager:
             else:
                 logger.info(Resource.task_taskCompleted(str(task_instance)))
             return result
+        except ThreadStoppedError as e:
+            logger.error(e)
+            return False
         except Exception as e:
             logger.exception(Resource.task_taskCrashed(task, str(e)))
             notify.try_send_notification(
