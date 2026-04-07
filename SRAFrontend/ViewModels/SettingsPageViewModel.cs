@@ -102,6 +102,8 @@ public partial class SettingsPageViewModel : PageViewModel
 
         DetectGamePath();
         SetGameResolution();
+        if (IsOverlayEnabled) _overlayService.ShowOverlay();
+        _overlayService.SetOverlayDebugInfoEnabled(Settings.IsOverlayDebugInfoEnabled);
 
         _settingsService.Settings.PropertyChanged += OnSettingsPropertyChanged;
         _settingsService.Settings.GamePaths.CollectionChanged += (_, _) => DebounceSaveSettings();
@@ -227,10 +229,27 @@ public partial class SettingsPageViewModel : PageViewModel
         _registryService.SetTargetPcResolution();
     }
 
-    [RelayCommand]
-    private void ShowOverlay()
+    public bool IsOverlayEnabled
     {
-        _overlayService.ShowOverlay();
+        get => Settings.IsOverlayEnabled;
+        set
+        {
+            Settings.IsOverlayEnabled = value;
+            if (value)
+                _overlayService.ShowOverlay();
+            else
+                _overlayService.CloseOverlay();
+        }
+    }
+    
+    public bool IsOverlayDebugInfoEnabled
+    {
+        get => Settings.IsOverlayDebugInfoEnabled;
+        set
+        {
+            Settings.IsOverlayDebugInfoEnabled = value;
+            _overlayService.SetOverlayDebugInfoEnabled(value);
+        }
     }
     
     #region 通知测试
@@ -243,7 +262,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestWebhook()
     {
-        var endpoint = Settings.WebhookEndpoint?.Trim();
+        var endpoint = Settings.WebhookEndpoint.Trim();
         if (string.IsNullOrEmpty(endpoint))
         {
             _commonModel.ShowErrorToast("Webhook 测试", "请先填写 Webhook 地址");
@@ -257,12 +276,12 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestTelegram()
     {
-        if (string.IsNullOrEmpty(Settings.TelegramBotToken?.Trim()))
+        if (string.IsNullOrEmpty(Settings.TelegramBotToken.Trim()))
         {
             _commonModel.ShowErrorToast("Telegram 测试", "请先填写 Bot Token");
             return;
         }
-        if (string.IsNullOrEmpty(Settings.TelegramChatId?.Trim()))
+        if (string.IsNullOrEmpty(Settings.TelegramChatId.Trim()))
         {
             _commonModel.ShowErrorToast("Telegram 测试", "请先填写 Chat ID");
             return;
@@ -275,7 +294,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestServerChan()
     {
-        if (string.IsNullOrEmpty(Settings.ServerChanSendKey?.Trim()))
+        if (string.IsNullOrEmpty(Settings.ServerChanSendKey.Trim()))
         {
             _commonModel.ShowErrorToast("ServerChan 测试", "请先填写 SendKey");
             return;
@@ -288,7 +307,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestBark()
     {
-        if (string.IsNullOrEmpty(Settings.BarkDeviceKey?.Trim()))
+        if (string.IsNullOrEmpty(Settings.BarkDeviceKey.Trim()))
         {
             _commonModel.ShowErrorToast("Bark 测试", "请先填写设备 Key");
             return;
@@ -301,7 +320,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestFeishu()
     {
-        if (string.IsNullOrEmpty(Settings.FeishuWebhookUrl?.Trim()))
+        if (string.IsNullOrEmpty(Settings.FeishuWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("飞书测试", "请先填写 Webhook 地址");
             return;
@@ -314,7 +333,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestWeCom()
     {
-        if (string.IsNullOrEmpty(Settings.WeComWebhookUrl?.Trim()))
+        if (string.IsNullOrEmpty(Settings.WeComWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("企业微信测试", "请先填写 Webhook 地址");
             return;
@@ -327,7 +346,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestDingTalk()
     {
-        if (string.IsNullOrEmpty(Settings.DingTalkWebhookUrl?.Trim()))
+        if (string.IsNullOrEmpty(Settings.DingTalkWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("钉钉测试", "请先填写 Webhook 地址");
             return;
@@ -340,7 +359,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestDiscord()
     {
-        if (string.IsNullOrEmpty(Settings.DiscordWebhookUrl?.Trim()))
+        if (string.IsNullOrEmpty(Settings.DiscordWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("Discord 测试", "请先填写 Webhook 地址");
             return;
@@ -353,7 +372,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestXxtui()
     {
-        if (string.IsNullOrEmpty(Settings.XxtuiApiKey?.Trim()))
+        if (string.IsNullOrEmpty(Settings.XxtuiApiKey.Trim()))
         {
             _commonModel.ShowErrorToast("xxtui 测试", "请先填写 API Key");
             return;
@@ -366,13 +385,13 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestOneBot()
     {
-        if (string.IsNullOrEmpty(Settings.OneBotEndpoint?.Trim()))
+        if (string.IsNullOrEmpty(Settings.OneBotEndpoint.Trim()))
         {
             _commonModel.ShowErrorToast("OneBot 测试", "请先填写 API 地址");
             return;
         }
-        if (string.IsNullOrEmpty(Settings.OneBotUserId?.Trim()) &&
-            string.IsNullOrEmpty(Settings.OneBotGroupId?.Trim()))
+        if (string.IsNullOrEmpty(Settings.OneBotUserId.Trim()) &&
+            string.IsNullOrEmpty(Settings.OneBotGroupId.Trim()))
         {
             _commonModel.ShowErrorToast("OneBot 测试", "请填写 QQ 号或群号（至少一个）");
             return;
