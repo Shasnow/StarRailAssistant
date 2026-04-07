@@ -18,7 +18,7 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private string _backgroundImagePath = ""; // 背景图路径
     [ObservableProperty] private double _confidenceThreshold = 0.9; // 识图置信度阈值
     [ObservableProperty] private int _defaultPage; // 启动时默认页面索引
-    [ObservableProperty] private int _downloadChannel = 1; // 0: Mirror, 1: GitHub
+    [ObservableProperty] private int _downloadChannel; // 0: Mirror, 1: GitHub
     [ObservableProperty] private string _emailReceiver = ""; // 接收邮件地址
     [ObservableProperty] private string _emailSender = ""; // 发送邮件地址
     [ObservableProperty] private bool _enableAutoUpdate = true; // 是否启用自动更新
