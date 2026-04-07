@@ -24,7 +24,15 @@ public partial class OverlayWindow : Window
     {
         base.OnOpened(e);
         SetMouseTransparent(); // 设置鼠标穿透
-        StartFollow(GetStarRailWindowHandle());
+        StartFollow(GetWindowHandle(ProcessName));
+    }
+
+    public string ProcessName { get; init; } = Process.GetCurrentProcess().ProcessName;
+
+    public bool EnabledMouseInfo
+    {
+        get => MousePosTextBlock.IsVisible;
+        set => MousePosTextBlock.IsVisible = value;
     }
 
     protected override void OnClosed(EventArgs e)
@@ -33,9 +41,9 @@ public partial class OverlayWindow : Window
         StopFollow();
     }
 
-    private static IntPtr GetStarRailWindowHandle()
+    private static IntPtr GetWindowHandle(string processName)
     {
-        var processes = Process.GetProcessesByName("StarRail");
+        var processes = Process.GetProcessesByName(processName);
 
         foreach (var process in processes)
         {
@@ -94,6 +102,18 @@ public partial class OverlayWindow : Window
         Position = new PixelPoint(x, y);
         Width = w/RenderScaling;
         Height = h/RenderScaling;
+        if (!EnabledMouseInfo) return;
+        User32.GetCursorPos(out var cursor);
+        var clientCursor = cursor;
+        User32.ScreenToClient(_targetHwnd, ref clientCursor);
+
+        // 限制在窗口内才显示
+        var inWindow = clientCursor is { X: >= 0, Y: >= 0 } &&
+                       clientCursor.X < w && clientCursor.Y < h;
+
+        MousePosTextBlock.Text = inWindow 
+            ? $"X:{clientCursor.X,4} Y:{clientCursor.Y,4}\nScale X:{clientCursor.X / (double)w:0.0000} Y:{clientCursor.Y / (double)h:0.0000}" 
+            : "鼠标不在游戏窗口";
     }
     
     // 日志最大保留行数
@@ -134,7 +154,7 @@ public partial class OverlayWindow : Window
     }
 }
 
-public static class User32
+internal static class User32
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct Rect
@@ -171,4 +191,10 @@ public static class User32
     
     [DllImport("user32.dll")]
     public static extern bool SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+    
+    [DllImport("user32.dll")]
+    public static extern bool GetCursorPos(out Point lpPoint);
+
+    [DllImport("user32.dll")]
+    public static extern bool ScreenToClient(IntPtr hWnd, ref Point lpPoint);
 }
