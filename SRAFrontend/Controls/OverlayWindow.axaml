@@ -1,0 +1,27 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="SRAFrontend.Controls.OverlayWindow"
+        Title="OverlayWindow"
+        Width="800" Height="600"
+        Background="Transparent"
+        SystemDecorations="None"
+        ShowActivated="False"
+        Topmost="True"
+        Focusable="False">
+    <Grid>
+        <!-- 示例：红色半透明边框，方便看效果 -->
+        <Border BorderBrush="#88ff0000" 
+                BorderThickness="3" 
+                CornerRadius="0"/>
+        <ScrollViewer>
+            <TextBlock Name="LogText"
+                       Foreground="White"
+                       FontSize="12"
+                       Padding="8"
+                       TextWrapping="Wrap" />
+        </ScrollViewer>
+    </Grid>
+</Window>

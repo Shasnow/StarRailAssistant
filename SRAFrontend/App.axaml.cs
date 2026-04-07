@@ -38,12 +38,9 @@ public class App : Application
             DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
-                DataContext = serviceProvider.GetRequiredService<MainWindowViewModel>()
+                DataContext = serviceProvider.GetRequiredService<MainWindowViewModel>(),
             };
-            desktop.Startup += (_, _) =>
-            {
-                Log.Information("Application is starting up.");
-            };
+            desktop.MainWindow.Closed += (_, _) => serviceProvider.GetRequiredService<OverlayService>().CloseOverlay();
             desktop.Exit += (_, _) =>
             {
                 Log.Information("Application is exiting. Saving settings and stopping SRA process.");
@@ -88,6 +85,7 @@ public class App : Application
         services.AddSingleton<RegistryService>();
         services.AddSingleton<ConfigService>();
         services.AddSingleton<ReportService>();
+        services.AddSingleton<OverlayService>();
         services.AddHttpClient("GlobalClient", client =>
         {
             client.Timeout = TimeSpan.FromSeconds(60);

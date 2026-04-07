@@ -24,6 +24,7 @@ public partial class SettingsPageViewModel : PageViewModel
 
     private readonly SettingsService _settingsService;
     private readonly UpdateService _updateService;
+    private readonly OverlayService _overlayService;
     private CancellationTokenSource? _settingsSaveCts;
 
     /// <inheritdoc />
@@ -33,8 +34,8 @@ public partial class SettingsPageViewModel : PageViewModel
         CacheService cacheService,
         CommonModel commonModel,
         RegistryService registryService,
-        IBackendService backendService
-    ) : base(PageName.Setting,
+        IBackendService backendService,
+        OverlayService overlayService) : base(PageName.Setting,
         "\uE272")
     {
         _settingsService = settingsService;
@@ -43,6 +44,7 @@ public partial class SettingsPageViewModel : PageViewModel
         _registryService = registryService;
         _commonModel = commonModel;
         _backendService = backendService;
+        _overlayService = overlayService;
         // 任务通用设置中的 启动/停止 快捷键（非游戏内快捷键分组）
         StartStopKey = new CustomizableKey(ListenKeyFor)
         {
@@ -226,11 +228,18 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     [RelayCommand]
+    private void ShowOverlay()
+    {
+        _overlayService.ShowOverlay();
+    }
+    
+    #region 通知测试
+    [RelayCommand]
     private async Task TestEmail()
     {
         await _commonModel.SendTestEmailAsync();
     }
-
+    
     [RelayCommand]
     private void TestWebhook()
     {
@@ -372,6 +381,7 @@ public partial class SettingsPageViewModel : PageViewModel
         _ = _backendService.SendInput("notify test onebot");
         _commonModel.ShowInfoToast("OneBot 测试", "测试消息已发送，请检查 QQ");
     }
+    #endregion
 
     #region 快捷键监听修改逻辑
 

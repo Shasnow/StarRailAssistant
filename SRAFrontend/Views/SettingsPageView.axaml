@@ -56,6 +56,7 @@
                                                        Increment="0.01" Minimum="0"
                                                        Maximum="1" />
                                     </Grid>
+                                    <Button Content="Overlay" Command="{Binding ShowOverlayCommand}"/>
                                     <!-- 启动/停止 快捷键（任务通用设置） -->
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="Icon">&#xE3E4;</Label>
