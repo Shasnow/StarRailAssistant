@@ -1,7 +1,7 @@
 plyer==2.1.0
 rapidocr-onnxruntime==1.4.4
 opencv-python==4.12.0.88
-pillow==12.0.0
+pillow==12.2.0
 pyscreeze==1.0.1
 pygetwindow==0.0.9
 pyautogui==0.9.54

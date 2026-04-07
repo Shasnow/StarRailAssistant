@@ -1,13 +1,15 @@
 
 import ctypes
+import sys
 import threading
 import time
 from ctypes.wintypes import POINT, RECT
 from pathlib import Path
 
 import pyautogui
-import pygetwindow # type: ignore
+import pygetwindow  # type: ignore
 import pyscreeze
+from PIL.Image import Image
 
 from SRACore.operators.ioperator import IOperator
 from SRACore.operators.model import Box, Region
@@ -24,15 +26,15 @@ class Operator(IOperator):
         self.width = 0
         self.height = 0
         self._win = None
-        self._hwnd: int | None = None
+        self._hwnd: int = 0
 
-    def _get_hwnd(self) -> int | None:
+    def _get_hwnd(self) -> int:
         """获取有效的窗口句柄，无效时自动刷新"""
         if self._hwnd is not None and ctypes.windll.user32.IsWindow(self._hwnd):  # NOQA
             return self._hwnd
 
         self._win = None
-        self._hwnd = None
+        self._hwnd = 0
         try:
             windows: list[pygetwindow.Win32Window] = pygetwindow.getWindowsWithTitle(self.window_title) # type: ignore
             for w in windows:
@@ -46,14 +48,12 @@ class Operator(IOperator):
 
     def is_window_active(self) -> bool:
         hwnd = self._get_hwnd()
-        if hwnd is None or self._win is None:
+        if not hwnd:
             return False
         return self._win.isActive # type: ignore
 
     def get_win_region(self, active_window: bool = True) -> Region:
         hwnd = self._get_hwnd()
-        if hwnd is None:
-            raise SRAError(ErrorCode.WINDOW_NOT_FOUND, f"未找到窗口: {self.window_title}")
         if active_window and self._win is not None and not self._win.isActive: # type: ignore
             self._win.activate()
         region = self._get_client_region(hwnd)
@@ -79,60 +79,150 @@ class Operator(IOperator):
         self.height = height
         return Region(self.left, self.top, self.width, self.height)
 
-    def screenshot_in_region(self, region: Region | None = None):
-        if region is None:
-            region = self.get_win_region(active_window=True)
-        # noinspection PyUnresolvedReferences
-        return pyscreeze.screenshot(region=region.tuple)
+    def screenshot(self, *,
+                   from_x: float | None = None,
+                   from_y: float | None = None,
+                   to_x: float | None = None,
+                   to_y: float | None = None) -> Image:
+        region = self.get_win_region(active_window=True)
+        img = self._screenshot(self._hwnd, region)
+        if img is None:
+            raise SRAError(ErrorCode.SCREENSHOT_FAILED, "无法截取窗口内容")
+        if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
+            left = from_x * self.width
+            upper = from_y * self.height
+            right = to_x * self.width
+            bottom = to_y * self.height
+            return img.crop((left, upper, right, bottom))
+        return img
 
-    def screenshot_in_tuple(self, from_x: float, from_y: float, to_x: float, to_y: float):
-        region = self.get_win_region()
-        return pyscreeze.screenshot(region=region.sub_region(from_x, from_y, to_x, to_y).tuple)
+    @staticmethod
+    def _screenshot(hwnd: int, region: Region):
+        """
+        后台截取指定窗口，不会被其他窗口遮挡
+        :param hwnd: 窗口句柄
+        :param region: (left, top, width, height) 客户区坐标
+        :return: PIL Image / None
+        """
+        if sys.platform == "win32":
+            import win32gui
+            import win32ui
+            import ctypes
+            from PIL import Image
 
-    def locate_in_region(self,
-                         img_path: str,
-                         region: Region | None = None,
-                         confidence: float | None = None,
-                         trace: bool = True) -> Box | None:
+            left, top, width, height = region.tuple
+
+            # 句柄无效直接返回
+            if not hwnd or width <= 0 or height <= 0:
+                return None
+
+            hwnd_dc = None
+            mfc_dc = None
+            save_dc = None
+            save_bit_map = None
+
+            try:
+                # === 获取窗口 DC ===
+                hwnd_dc = win32gui.GetWindowDC(hwnd)
+                mfc_dc = win32ui.CreateDCFromHandle(hwnd_dc)
+                save_dc = mfc_dc.CreateCompatibleDC()
+
+                # === 创建位图 ===
+                save_bit_map = win32ui.CreateBitmap()
+                save_bit_map.CreateCompatibleBitmap(mfc_dc, width, height)
+                save_dc.SelectObject(save_bit_map)
+
+                # === 后台截图核心===
+                PW_CLIENTONLY = 1  # NOQA
+                PW_RENDERFULLCONTENT = 2  # NOQA
+                flags = PW_CLIENTONLY | PW_RENDERFULLCONTENT  # 游戏通用
+
+                # noinspection PyUnresolvedReferences
+                result = ctypes.windll.user32.PrintWindow(
+                    hwnd,
+                    save_dc.GetSafeHdc(),
+                    flags
+                )
+
+                if result == 0:
+                    return None
+
+                # === 转 PIL Image（颜色正确、无偏移）===
+                bmp_info = save_bit_map.GetInfo()
+                bmp_data = save_bit_map.GetBitmapBits(True)
+
+                img = Image.frombuffer(
+                    "RGB",
+                    (bmp_info["bmWidth"], bmp_info["bmHeight"]),
+                    bmp_data,
+                    "raw",
+                    "BGRX",
+                    0,
+                    1
+                )
+
+                return img
+
+            finally:
+                # === 强制安全释放资源===
+                if save_bit_map:
+                    win32gui.DeleteObject(save_bit_map.GetHandle())
+                if save_dc:
+                    save_dc.DeleteDC()
+                if mfc_dc:
+                    mfc_dc.DeleteDC()
+                if hwnd_dc:
+                    win32gui.ReleaseDC(hwnd, hwnd_dc)
+        else:
+            return pyscreeze.screenshot(region=region.tuple)
+
+    def locate(self,
+               template: str,
+               *,
+               from_x: float | None = None,
+               from_y: float | None = None,
+               to_x: float | None = None,
+               to_y: float | None = None,
+               confidence: float | None = None,
+               trace: bool = True) -> Box | None:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("图像识别中断", "线程已停止")
-        match_confidence = confidence if confidence is not None else self.confidence
+        if confidence is not None:
+            match_confidence = confidence
+        else:
+            match_confidence = self.confidence
         try:
-            if region is None:
-                region = self.get_win_region()
-                time.sleep(0.5)
-            if not Path(img_path).exists():
-                raise FileNotFoundError("无法找到或读取文件 " + img_path)
-            # noinspection PyTypeChecker
-            box = pyscreeze.locate(img_path, self.screenshot(region), confidence=match_confidence)
+            if not Path(template).exists():
+                raise FileNotFoundError("无法找到或读取文件 " + template)
+            box = pyscreeze.locate(template,
+                                   self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y),
+                                   confidence=match_confidence)
             if box is None:
                 return None
-            return Box(box.left, box.top, box.width, box.height, source=img_path)
+            left, top, width, height = box
+            if from_x is not None and from_y is not None:
+                left += int(from_x * self.width)
+                top += int(from_y * self.height)
+            return Box(left, top, width, height, source=template)
         except Exception as e:
             if trace:
-                logger.trace(f"ImageNotFound: {img_path} -> {e}")
+                logger.trace(f"ImageNotFound: {template} -> {e}")
             return None
 
-    def locate_in_tuple(self, templates: str, from_x: float, from_y: float, to_x: float, to_y: float,
-                        confidence: float | None = None, trace: bool = True, **_) -> Box | None:
-        try:
-            region = self.get_win_region()
-        except Exception as e:
-            logger.trace(f"ImageNotFound: {templates} -> {e}")
-            return None
-        return self.locate_in_region(
-            templates,
-            region.sub_region(from_x, from_y, to_x, to_y),
-            confidence,
-            trace)
-
-    def locate_any_in_region(self, templates: list[str], region: Region | None = None, confidence: float | None = None,
-                             trace: bool = True) -> tuple[int, Box | None]:
+    def locate_any(self,
+                   templates: list[str],
+                   *,
+                   from_x: float | None = None,
+                   from_y: float | None = None,
+                   to_x: float | None = None,
+                   to_y: float | None = None,
+                   confidence: float | None = None,
+                   trace: bool = True) -> tuple[int, Box | None]:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("图像识别中断", "线程已停止")
         match_confidence = self.confidence if confidence is None else confidence
         try:
-            screenshot = self.screenshot(region=region)
+            screenshot = self.screenshot()
         except Exception as e:
             logger.trace(f"Error taking screenshot: {e}")
             return -1, None
@@ -147,58 +237,42 @@ class Operator(IOperator):
                     logger.trace(f"ImageNotFound: {img_path} -> {e}")
                 continue
             if box is not None:
-                return templates.index(img_path), Box(box.left, box.top, box.width, box.height, source=img_path)
+                left, top, width, height = box
+                if from_x is not None and from_y is not None:
+                    left += int(from_x * self.width)
+                    top += int(from_y * self.height)
+                return templates.index(img_path), Box(left, top, width, height, source=img_path)
         return -1, None
 
-    def locate_any_in_tuple(self, templates: list[str], from_x: float, from_y: float, to_x: float, to_y: float,
-                            confidence: float | None = None, trace: bool = False) -> tuple[int, Box | None]:
-        try:
-            region = self.get_win_region()
-        except Exception as e:
-            logger.trace(f"UnexceptedInterrupt: {templates} -> {e}")
-            return -1, None
-        return self.locate_any_in_region(
-            templates,
-            region.sub_region(from_x, from_y, to_x, to_y),
-            confidence,
-            trace
-        )
-
-    def locate_all_in_region(self, template: str, region: Region | None = None, confidence: float | None = None,
-                             trace: bool = True) -> list[Box] | None:
+    def locate_all(self,
+                   template: str,
+                   *,
+                   from_x: float | None = None,
+                   from_y: float | None = None,
+                   to_x: float | None = None,
+                   to_y: float | None = None,
+                   confidence: float | None = None,
+                   trace: bool = True) -> list[Box] | None:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("图像识别中断", "线程已停止")
         match_confidence = self.confidence if confidence is None else confidence
         try:
-            if region is None:
-                region = self.get_win_region()
-                time.sleep(0.5)
             if not Path(template).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + template)
             # noinspection PyTypeChecker
-            boxes = pyscreeze.locateAll(template, self.screenshot(region), confidence=match_confidence)
+            boxes = pyscreeze.locateAll(template, self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y), confidence=match_confidence)
             result = []
             for box in boxes:
-                result.append(Box(box.left, box.top, box.width, box.height, source=template)) # type: ignore
+                left, top, width, height = box
+                if from_x is not None and from_y is not None:
+                    left += int(from_x * self.width)
+                    top += int(from_y * self.height)
+                result.append(Box(left, top, width, height, source=template)) # type: ignore
             return result # type: ignore
         except Exception as e:
             if trace:
                 logger.trace(f"ImageNotFound: {template} -> {e}")
             return None
-
-    def locate_all_in_tuple(self, template: str, from_x: float, from_y: float, to_x: float, to_y: float,
-                            confidence: float | None = None, trace: bool = True) -> list[Box] | None:
-        try:
-            region = self.get_win_region()
-        except Exception as e:
-            logger.trace(f"ImageNotFound: {template} -> {e}")
-            return None
-        return self.locate_all_in_region(
-            template,
-            region.sub_region(from_x, from_y, to_x, to_y),
-            confidence,
-            trace,
-        )
 
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
                     after_sleep: float = 0, tag: str = "") -> bool:

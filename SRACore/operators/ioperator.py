@@ -54,49 +54,13 @@ class IOperator(ABC):
         ...
 
     @abstractmethod
-    def screenshot_in_region(self, region: Region | None = None) -> Image:
-        """截取指定区域的屏幕截图
-
-        Args:
-            region (Region | None, optional): 要截取的区域对象，包含left, top, width, height属性。
-                如果为None，则默认截取当前活动窗口的区域。默认为None。
-
-        Returns:
-            PIL.Image.Image: 返回截取的屏幕区域图像对象
-
-        Note:
-            当region为None时，会自动获取活动窗口区域
-        """
-        ...
-
-    @abstractmethod
-    def screenshot_in_tuple(self, from_x: float, from_y: float, to_x: float, to_y: float) -> Image:
-        """根据相对坐标比例截取窗口内区域
-
-        Args:
-            from_x (float): 起始点X坐标比例 (0-1)，相对于窗口左上角
-            from_y (float): 起始点Y坐标比例 (0-1)，相对于窗口左上角
-            to_x (float): 结束点X坐标比例 (0-1)，相对于窗口左上角
-            to_y (float): 结束点Y坐标比例 (0-1)，相对于窗口左上角
-
-        Returns:
-            PIL.Image.Image: 返回截取的屏幕区域图像对象
-
-        Note:
-            坐标比例是基于当前窗口区域计算的，会自动获取窗口区域并短暂延迟(0.5秒)
-        """
-        ...
-
-    def screenshot(self, region: Region | None = None,
-                   *,
+    def screenshot(self, *,
                    from_x: float | None = None,
                    from_y: float | None = None,
                    to_x: float | None = None,
                    to_y: float | None = None) -> Image:
         """截取屏幕截图
         Args:
-            region (Region | None, optional): 要截取的区域对象，包含left, top, width, height属性。
-                如果为None，则默认截取当前活动窗口的区域。默认为None。
             from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
             from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
             to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
@@ -104,133 +68,16 @@ class IOperator(ABC):
         Returns:
             PIL.Image.Image: 返回截取的屏幕区域图像对象
         Note:
-            - 当region为None时，会自动获取活动窗口区域
             - 坐标比例是基于当前窗口区域计算的
-            - 当传入完整的比例坐标时，region参数会被忽略
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
-        """
-        if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
-            return self.screenshot_in_tuple(from_x, from_y, to_x, to_y)
-        else:
-            return self.screenshot_in_region(region)
-
-    @abstractmethod
-    def locate_in_region(self, img_path: str,
-                         region: Region | None = None,
-                         confidence: float | None = None,
-                         trace: bool = True) -> Box | None:
-        """
-        在窗口内查找图片位置
-        :param img_path: 模板图片路径
-        :param region: 要查找的区域对象，包含left, top, width, height属性。
-        :param confidence: 匹配度, 0-1之间的浮点数, 默认为self.confidence
-        :param trace: 是否打印调试信息
-        :return: Box | None - 找到的图片位置，如果未找到则返回None
+            SRAError: 截图出现错误
         """
         ...
 
     @abstractmethod
-    def locate_in_tuple(self,
-                        templates: str,
-                        from_x: float,
-                        from_y: float,
-                        to_x: float,
-                        to_y: float,
-                        confidence: float | None = None,
-                        trace: bool = True) -> Box | None:
-        """
-        在窗口内查找图片位置，使用比例坐标
-        :param templates: 模板图片路径
-        :param from_x: 区域起始x坐标比例(0-1)
-        :param from_y: 区域起始y坐标比例(0-1)
-        :param to_x: 区域结束x坐标比例(0-1)
-        :param to_y: 区域结束y坐标比例(0-1)
-        :param confidence: 匹配度, 0-1之间的浮点数, 默认为self.confidence
-        :param trace: 是否打印调试信息
-        :return: Box | None - 找到的图片位置，如果未找到则返回None
-        """
-        ...
-
-    @abstractmethod
-    def locate_any_in_region(self,
-                             templates: list[str],
-                             region: Region | None = None,
-                             confidence: float | None = None,
-                             trace: bool = True) -> tuple[int, Box | None]:
-        """
-        在窗口内查找任意一张图片位置
-        :param templates: 模板图片路径列表
-        :param region: 要查找的区域对象
-        :param confidence: 匹配度, 0-1之间的浮点数, 默认为self.confidence
-        :param trace: 是否打印调试信息
-        :return: tuple[int, Box | None] - 找到的图片索引和位置，如果未找到则返回-1和None
-        """
-        ...
-
-    @abstractmethod
-    def locate_any_in_tuple(self,
-                            templates: list[str],
-                            from_x: float,
-                            from_y: float,
-                            to_x: float,
-                            to_y: float,
-                            confidence: float | None = None,
-                            trace: bool = False) -> tuple[int, Box | None]:
-        """
-        在窗口内查找任意一张图片位置，使用比例坐标
-        :param templates: 模板图片路径列表
-        :param from_x: 区域起始x坐标比例(0-1)
-        :param from_y: 区域起始y坐标比例(0-1)
-        :param to_x: 区域结束x坐标比例(0-1)
-        :param to_y: 区域结束y坐标比例(0-1)
-        :param confidence: 匹配度, 0-1之间的浮点数, 默认为self.confidence
-        :param trace: 是否打印调试信息
-        :return: tuple[int, Box | None] - 找到的图片索引和位置，如果未找到则返回-1和None
-        """
-        ...
-
-    @abstractmethod
-    def locate_all_in_region(self,
-                             template: str,
-                             region: Region | None = None,
-                             confidence: float | None = None,
-                             trace: bool = True) -> list[Box] | None:
-        """
-        在窗口内匹配所有图片位置
-        :param template: 模板图片路径
-        :param region: 要查找的区域对象
-        :param confidence: 置信度
-        :param trace: 是否打印调试信息
-        :return: list[Box] - 找到的所有图片位置列表，如果未找到则返回None
-        """
-        ...
-
-    @abstractmethod
-    def locate_all_in_tuple(self,
-                            template: str,
-                            from_x: float,
-                            from_y: float,
-                            to_x: float,
-                            to_y: float,
-                            confidence: float | None = None,
-                            trace: bool = True) -> list[Box] | None:
-        """
-        在窗口内匹配所有图片位置，使用比例坐标
-        :param template: 模板图片路径
-        :param from_x: 区域起始x坐标比例(0-1)
-        :param from_y: 区域起始y坐标比例(0-1)
-        :param to_x: 区域结束x坐标比例(0-1)
-        :param to_y: 区域结束y坐标比例(0-1)
-        :param confidence: 匹配度, 0-1之间的浮点数, 默认为self.confidence
-        :param trace: 是否打印调试信息
-        :return: list[Box] - 找到的所有图片位置列表，如果未找到则返回None
-        """
-        ...
-
     def locate_all(self,
                    template: str,
-                   region: Region | None = None,
                    *,
                    from_x: float | None = None,
                    from_y: float | None = None,
@@ -242,8 +89,6 @@ class IOperator(ABC):
 
         Args:
             template (str): 模板图片路径
-            region (Region | None, optional): 要查找的区域对象，包含left, top, width, height属性。
-                如果为None，则默认查找当前活动窗口的区域。默认为None。
             from_x (float, optional): 起始点X坐标比例 (0-1), 相对于窗口左上角
             from_y (float, optional): 起始点Y坐标比例 (0-1), 相对于窗口左上角
             to_x (float, optional): 结束点X坐标比例 (0-1), 相对于窗口左上角
@@ -255,14 +100,10 @@ class IOperator(ABC):
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
-            return self.locate_all_in_tuple(template, from_x, from_y, to_x, to_y, confidence, trace)
-        else:
-            return self.locate_all_in_region(template, region, confidence, trace)
+        ...
 
     def locate_any(self,
                    templates: list[str],
-                   region: Region | None = None,
                    *,
                    from_x: float | None = None,
                    from_y: float | None = None,
@@ -274,8 +115,6 @@ class IOperator(ABC):
         
         Args:
             templates (list[str]): 模板图片路径列表
-            region (Region | None, optional): 要查找的区域对象，包含left, top, width, height属性。
-                如果为None，则默认查找当前活动窗口的区域。默认为None。
             from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
             from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
             to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
@@ -287,14 +126,11 @@ class IOperator(ABC):
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
-            return self.locate_any_in_tuple(templates, from_x, from_y, to_x, to_y, confidence, trace)
-        else:
-            return self.locate_any_in_region(templates, region, confidence, trace)
+        ...
 
+    @abstractmethod
     def locate(self,
                template: str,
-               region: Region | None = None,
                *,
                from_x: float | None = None,
                from_y: float | None = None,
@@ -306,7 +142,6 @@ class IOperator(ABC):
 
         Args:
             template (str): 模板图片路径
-            region (Region | None, optional): 要查找的区域对象，包含left, top, width, height属性。
                 如果为None，则默认查找当前活动窗口的区域。默认为None。
             from_x (float, optional): 起始点X坐标比例 (0-1), 相对于窗口左上角
             from_y (float, optional): 起始点Y坐标比例 (0-1), 相对于窗口左上角
@@ -319,82 +154,9 @@ class IOperator(ABC):
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
-            return self.locate_in_tuple(template, from_x, from_y, to_x, to_y, confidence, trace)
-        else:
-            return self.locate_in_region(template, region, confidence, trace)
-
-    def ocr_in_region(
-            self,
-            region: Region | None = None,
-            trace: bool = True) -> list[Any] | None:
-        """
-        在窗口的指定区域内执行 OCR 文字识别，返回原始 OCR 结果（包含文本、坐标、置信度等）。
-
-        Args:
-            region (Optional[Region]):
-                要识别的区域坐标（`Region(left, top, width, height)`）。
-                如果为 `None`，则自动获取整个窗口区域。默认为 `None`。
-            trace (bool):
-                是否打印调试信息（如 OCR 错误）。默认为 `True`。
-
-        Returns:
-            list[Any] | None:
-                OCR 引擎返回的原始结果（通常为列表，每项包含文本、坐标、置信度等信息）。
-                如果发生错误，返回 `None`。
-        """
-        if self.stop_event is not None and self.stop_event.is_set():
-            raise RuntimeError("Operation stopped")
-        try:
-            if trace:
-                logger.debug(f"OCR in region: {region}")
-            if region is None:
-                region = self.get_win_region()
-            if self.ocr_engine is None:
-                self.ocr_engine = IOperator._get_ocr_instance()
-            screenshot = self.screenshot(region)
-            result, _ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA # type: ignore
-            if self.is_save_ocr_image:
-                screenshot.save(f"log/ocr/{region}_{int(time.time())}.png")
-            if trace:
-                logger.debug(f"OCR Result: {result}")
-            return result
-        except Exception as e:
-            if trace:
-                logger.trace(f"OCR Error: {e}")
-            return None
-
-    def ocr_in_tuple(
-            self,
-            from_x: float,
-            from_y: float,
-            to_x: float,
-            to_y: float,
-            trace: bool = True) -> list[Any] | None:
-        """
-        在窗口内通过比例坐标指定区域，并执行 OCR 文字识别。
-
-        Args:
-            from_x (float): 区域起始 X 坐标比例（0-1），相对于窗口左上角。
-            from_y (float): 区域起始 Y 坐标比例（0-1），相对于窗口左上角。
-            to_x (float): 区域结束 X 坐标比例（0-1），相对于窗口左上角。
-            to_y (float): 区域结束 Y 坐标比例（0-1），相对于窗口左上角。
-            trace (bool): 是否打印调试信息。默认为 `True`。
-
-        Returns:
-          list[Any] | None:
-                OCR 引擎返回的原始结果。如果发生错误，返回 `None`。
-        """
-        try:
-            region = self.get_win_region()
-        except Exception as e:
-            if trace:
-                logger.trace(f"OCR Error: {e}")
-            return None
-        return self.ocr_in_region(region.sub_region(from_x, from_y, to_x, to_y), trace)
+        ...
 
     def ocr(self,
-            region: Region | None = None,
             *,
             from_x: float | None = None,
             from_y: float | None = None,
@@ -405,8 +167,6 @@ class IOperator(ABC):
 
         考虑使用 ocr_match 或 ocr_match_any 方法来处理文本匹配和位置获取，而不是直接使用此方法。
         Args:
-            region (Region | None, optional): 要识别的区域对象，包含left, top, width, height属性。
-                如果为None，则默认识别当前活动窗口的区域。默认为None。如果传入完整的比例坐标时，region参数会被忽略
             from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
             from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
             to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
@@ -417,15 +177,28 @@ class IOperator(ABC):
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
-            return self.ocr_in_tuple(from_x, from_y, to_x, to_y, trace)
-        else:
-            return self.ocr_in_region(region, trace)
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise RuntimeError("Operation stopped")
+        try:
+            if self.ocr_engine is None:
+                self.ocr_engine = IOperator._get_ocr_instance()
+            screenshot = self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
+            if screenshot is None:
+                raise RuntimeError("Failed to capture screenshot for OCR")
+            result, _ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA # type: ignore
+            if self.is_save_ocr_image:
+                screenshot.save(f"log/ocr/{int(time.time())}.png")
+            if trace:
+                logger.debug(f"OCR Result: {result}")
+            return result
+        except Exception as e:
+            if trace:
+                logger.trace(f"OCR Error: {e}")
+            return None
 
     def ocr_match(self,
                   text: str,
                   confidence: float = 0.9,
-                  region: Region | None = None,
                   *,
                   from_x: float | None = None,
                   from_y: float | None = None,
@@ -439,7 +212,6 @@ class IOperator(ABC):
         Args:
             text (str): 要识别的文本
             confidence (float, optional): 识别置信度。默认为0.9。
-            region (Region | None, optional): 识别区域。如果为None，则默认识别当前活动窗口的区域。默认为None。
             from_x (float, optional): 识别区域起始x坐标比例(0-1)。
             from_y (float, optional): 识别区域起始y坐标比例(0-1)。
             to_x (float, optional): 识别区域结束x坐标比例(0-1)。
@@ -448,7 +220,7 @@ class IOperator(ABC):
         Returns:
             Box | None: 找到的文本位置，如果未找到则返回None。
         """
-        results = self.ocr(region, from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
+        results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
         if results is None:
             return None
         for result in results:
@@ -467,7 +239,6 @@ class IOperator(ABC):
     def ocr_match_any(self,
                       texts: list[str],
                       confidence: float = 0.9,
-                      region: Region | None = None,
                       *,
                       from_x: float | None = None,
                       from_y: float | None = None,
@@ -481,7 +252,6 @@ class IOperator(ABC):
         Args:
             texts (list[str]): 要识别的文本列表
             confidence (float, optional): 识别置信度。默认为0.9。
-            region (Region | None, optional): 识别区域。如果为None，则默认识别当前活动窗口的区域。默认为None。
             from_x (float, optional): 识别区域起始x坐标比例(0-1)。
             from_y (float, optional): 识别区域起始y坐标比例(0-1)。
             to_x (float, optional): 识别区域结束x坐标比例(0-1)。
@@ -490,7 +260,7 @@ class IOperator(ABC):
         Returns:
             tuple[int, Box | None]: 找到的文本索引和位置，如果未找到则返回-1和None
         """
-        results = self.ocr(region, from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
+        results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
         if results is None:
             return -1, None
         for index, text in enumerate(texts):

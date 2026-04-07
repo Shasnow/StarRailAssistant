@@ -73,6 +73,7 @@ class ErrorCode(IntEnum):
     IMAGE_MATCH_FAILED = 3202  # 图像匹配失败
     IMAGE_LOAD_FAILED = 3203  # 图像加载失败
     IMAGE_INVALID_FORMAT = 3204  # 图像格式无效
+    SCREENSHOT_FAILED = 3205  # 截图失败
 
     # 3300-3399: 鼠标键盘操作错误
     MOUSE_MOVE_FAILED = 3301  # 鼠标移动失败
