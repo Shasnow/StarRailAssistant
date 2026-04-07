@@ -86,6 +86,7 @@ class Operator(IOperator):
                    to_y: float | None = None) -> Image:
         region = self.get_win_region(active_window=True)
         img = self._screenshot(self._hwnd, region)
+        self.sleep(0.5)  # 截图疑似太快
         if img is None:
             raise SRAError(ErrorCode.SCREENSHOT_FAILED, "无法截取窗口内容")
         if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
