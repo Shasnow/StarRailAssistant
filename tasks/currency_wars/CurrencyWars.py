@@ -130,6 +130,7 @@ class CurrencyWars(Executable):
             if not self.operator.wait_img(IMG.F4, timeout=20):
                 logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
                 self.operator.press_key("esc")
+            self.operator.sleep(2)
             self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.30, after_sleep=0.8)  # 货币战争
             self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
@@ -209,16 +210,16 @@ class CurrencyWars(Executable):
             return False
         # 重试点击开始按钮直到LOGO消失
         self.operator.do_while(
-            lambda: self.operator.click_box(start_box, after_sleep=0.5),  # NOQA
+            lambda: self.operator.click_box(start_box, after_sleep=1),  # NOQA
             lambda: self.operator.locate(CWIMG.LOGO) is None,
-            interval=0.5,
+            interval=1,
             max_iterations=10
         )
         self.operator.sleep(1)  # 等待界面响应
         if self.is_overclock:
-            self.operator.click_point(0.15625, 0.4167, after_sleep=0.5, tag="点击超频博弈")
+            self.operator.click_point(0.15625, 0.4167, after_sleep=1, tag="点击超频博弈")
         else:
-            self.operator.click_point(0.15625, 0.2315, after_sleep=0.5, tag="点击标准博弈")
+            self.operator.click_point(0.15625, 0.2315, after_sleep=1, tag="点击标准博弈")
 
         # 选择进入方式（标准进入/继续进度）
         enter_type, enter_box = self.operator.wait_any_img(
