@@ -10,7 +10,11 @@ public class OverlayService(IBackendService backendService)
     {
         if (_overlayWindow == null)
         {
-            _overlayWindow = new OverlayWindow();
+            _overlayWindow = new OverlayWindow
+            {
+                ProcessName = "StarRail" ,
+                EnabledMouseInfo = true
+            };
             backendService.Outputted += BackendServiceOnOutputted;
             _overlayWindow.Closed += (_, _) =>
             {
@@ -19,11 +23,6 @@ public class OverlayService(IBackendService backendService)
             };
         }
         _overlayWindow.Show();
-    }
-    
-    public void HideOverlay()
-    {
-        _overlayWindow?.Hide();
     }
 
     public void CloseOverlay()

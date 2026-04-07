@@ -23,7 +23,7 @@ def main():
     from SRACore.util.logger import logger, setup_logger
     # 设置日志记录器
     setup_logger(level=args.log_level)
-    logger.debug(f"Current version: {VERSION}")
+    logger.info(f"Current version: {VERSION}")
     logger.debug(f"cwd: {os.getcwd()}")
     from SRACore.cli import SRACli
     cli_instance = SRACli(settings=settings)
