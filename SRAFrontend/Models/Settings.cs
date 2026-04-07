@@ -10,6 +10,8 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private bool _allowNotifications = true; // 是否允许通知
     [ObservableProperty] private bool _allowSystemNotifications = true; // 是否允许系统通知
     [ObservableProperty] private int _appChannel; // 0: stable, 1: beta
+    [ObservableProperty] private bool _isOverlayEnabled; // 是否启用叠加层
+    [ObservableProperty] private bool _isOverlayDebugInfoEnabled; // 是否启用叠加层鼠标信息
 
     [ObservableProperty] private double _backgroundOpacity = 0.9; // 背景图不透明度
     [ObservableProperty] private double _ctrlPanelOpacity = 0.9; // 控制面板不透明度

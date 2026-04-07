@@ -8,7 +8,7 @@ namespace SRAFrontend.Services;
 public class SettingsService
 {
     private readonly ILogger _logger;
-    public readonly Settings Settings;
+    public Settings Settings {get;}
 
     public SettingsService(ILogger<SettingsService> logger)
     {

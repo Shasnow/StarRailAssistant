@@ -56,7 +56,13 @@
                                                        Increment="0.01" Minimum="0"
                                                        Maximum="1" />
                                     </Grid>
-                                    <Button Content="Overlay" Command="{Binding ShowOverlayCommand}"/>
+                                    
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="Icon">&#xE0F8;</Label>
+                                        <Label Grid.Column="1" Content="启用叠加层" />
+                                        <ToggleSwitch Grid.Column="2"
+                                                      IsChecked="{Binding IsOverlayEnabled}"/>
+                                    </Grid>
                                     <!-- 启动/停止 快捷键（任务通用设置） -->
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="Icon">&#xE3E4;</Label>
@@ -223,7 +229,7 @@
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
                                     <Expander Header="{x:Static lang:Resources.NotificationText}"
-                                              HorizontalAlignment="Stretch" IsExpanded="True">
+                                              HorizontalAlignment="Stretch" IsExpanded="False">
                                         <StackPanel Spacing="10">
                                             <Grid ColumnDefinitions="Auto,*,Auto">
                                                 <Label Classes="Icon">&#xe0ce;</Label>
@@ -835,6 +841,13 @@
                                                        Content="{x:Static lang:Resources.SaveOcrImageText}" />
                                                 <ToggleSwitch Grid.Column="2"
                                                               IsChecked="{Binding Settings.IsSaveOcrImage}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE7C8;</Label>
+                                                <Label Grid.Column="1"
+                                                       Content="叠加层显示调试信息" />
+                                                <ToggleSwitch Grid.Column="2"
+                                                              IsChecked="{Binding IsOverlayDebugInfoEnabled}" />
                                             </Grid>
                                             <Grid ColumnDefinitions="Auto, *, Auto">
                                                 <Label Classes="Icon">&#xE47E;</Label>

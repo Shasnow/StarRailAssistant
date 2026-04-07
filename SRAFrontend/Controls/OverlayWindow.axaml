@@ -18,11 +18,11 @@
                    Foreground="White"
                    FontSize="14"
                    VerticalAlignment="Top"
-                   HorizontalAlignment="Left"/>
+                   HorizontalAlignment="Left" />
         <!-- 示例：红色半透明边框，方便看效果 -->
-        <Border BorderBrush="#88ff0000" 
-                BorderThickness="3" 
-                CornerRadius="0"/>
+        <Border BorderBrush="#88ff0000"
+                BorderThickness="3"
+                CornerRadius="0" />
         <ScrollViewer>
             <TextBlock Name="LogText"
                        Foreground="White"
