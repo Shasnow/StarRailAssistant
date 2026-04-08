@@ -185,23 +185,40 @@ class TaskManager:
         print_config = config.copy()
         print_config["StartGamePassword"] = "******"
         logger.debug('config: ' + str(print_config))
-        # 从配置中读取任务选择列表（如 [True, False, True]）
+        # 优先读取 TaskOrder（新格式），降级兼容 EnabledTasks（旧格式）
+        task_order = config.get("TaskOrder")
         task_select = config.get("EnabledTasks")
-        logger.debug('task_select: ' + str(task_select))
-        if not task_select:
-            return []
+
         tasks = []
         operator = Operator(stop_event=self._stop_event)
+        task_class_map = {cls.__name__: cls for cls in self.task_list}
+        original_indices = {cls.__name__: i for i, cls in enumerate(self.task_list)}
 
-        # 遍历 task_select，根据选择状态实例化对应任务
-        for index, is_select in enumerate(task_select):
-            # 检查：1. 任务被选中 2. 索引在 task_list 范围内
-            if is_select and index < len(self.task_list):
+        if task_order and isinstance(task_order, list):
+            logger.debug('task_order: ' + str(task_order))
+            for class_name in task_order:
+                task_class = task_class_map.get(class_name)
+                if task_class is None:
+                    logger.warning("TaskOrder 中包含未知任务类名: " + class_name)
+                    continue
+                orig_idx = original_indices.get(class_name, -1)
+                if orig_idx >= 0 and task_select and orig_idx < len(task_select):
+                    if not task_select[orig_idx]:
+                        continue
                 try:
-                    # 实例化任务类
-                    tasks.append(self.task_list[index](operator, config))
+                    tasks.append(task_class(operator, config))
                 except Exception as e:
-                    logger.exception(Resource.task_instantiateFailed(index, str(e)))
+                    logger.exception(Resource.task_instantiateFailed(class_name, str(e)))
+        elif task_select:
+            logger.debug('task_select (legacy): ' + str(task_select))
+            for index, is_select in enumerate(task_select):
+                if is_select and index < len(self.task_list):
+                    try:
+                        tasks.append(self.task_list[index](operator, config))
+                    except Exception as e:
+                        logger.exception(Resource.task_instantiateFailed(index, str(e)))
+        else:
+            return []
         return tasks
 
     def run_task(self, task: int | str, config_name: str | None = None) -> bool:
@@ -237,6 +254,15 @@ class TaskManager:
             if self._stop_event.is_set():
                 return False
             logger.debug('running task: ' + str(task_instance.__class__.__name__))
+            # 单次运行：开始通知
+            _setting = notify._load_settings_for_task_notify()
+            if _should_notify_task(task_instance.__class__.__name__, "OnStart", _setting):
+                notify.try_send_notification(
+                    Resource.task_notificationTitle,
+                    "任务 '" + str(task_instance) + "' 开始执行。",
+                    result="success",
+                    operator=task_instance.operator
+                )
             # 运行任务
             result = task_instance.run()
             if not result:
@@ -249,6 +275,15 @@ class TaskManager:
                 )
             else:
                 logger.info(Resource.task_taskCompleted(str(task_instance)))
+                # 单次运行：完成通知
+                _setting = notify._load_settings_for_task_notify()
+                if _should_notify_task(task_instance.__class__.__name__, "OnComplete", _setting):
+                    notify.try_send_notification(
+                        Resource.task_notificationTitle,
+                        Resource.task_taskCompleted(str(task_instance)),
+                        result="success",
+                        operator=task_instance.operator
+                    )
             return result
         except ThreadStoppedError as e:
             logger.error(e)

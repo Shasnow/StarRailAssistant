@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Avalonia.Data.Converters;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -16,6 +18,22 @@ using SRAFrontend.Services;
 
 namespace SRAFrontend.ViewModels;
 
+
+
+/// <summary>任务排序列表项，绑定到拖拽列表</summary>
+public partial class TaskOrderItem : ObservableObject
+{
+    [ObservableProperty] private bool _isEnabled;
+    [ObservableProperty] private bool _isSelected;
+    public string ClassName { get; set; } = "";
+    public string DisplayName { get; set; } = "";
+    /// <summary>固定位置，不可移动（启动游戏固定首位，任务完成固定末位）</summary>
+    public bool IsFixed { get; set; } = false;
+    public bool IsMovable => !IsFixed;
+    /// <summary>在 AllTaskDefs 中的原始索引（用于 EnabledTasks 绑定）</summary>
+    public int OriginalIndex { get; set; } = -1;
+}
+
 public partial class TaskPageViewModel : PageViewModel
 {
     private readonly CacheService _cacheService;
@@ -23,6 +41,8 @@ public partial class TaskPageViewModel : PageViewModel
     private readonly CommonModel _commonModel;
 
     [ObservableProperty] private Config _currentConfig;
+
+    [ObservableProperty] private AvaloniaList<TaskOrderItem> _taskOrderList = [];
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(EnableContextMenu))]
     private object? _selectedTaskItem;
@@ -56,6 +76,7 @@ public partial class TaskPageViewModel : PageViewModel
             if (args.PropertyName != nameof(Cache.CurrentConfigIndex)) return;
             _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.CurrentConfigIndex]);
             CurrentConfig = _configService.Config!;
+            InitTaskOrderList();
         }
 
         _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
@@ -64,6 +85,216 @@ public partial class TaskPageViewModel : PageViewModel
         {
             RefreshStrategies();
         }
+        InitTaskOrderList();
+    }
+
+    // 固定在首位/末位的任务类名
+    private static readonly string FixedFirstTask = "StartGameTask";
+    private static readonly string FixedLastTask  = "MissionAccomplishTask";
+
+    // 所有任务的静态定义（类名 -> 显示名）
+    private static readonly List<(string ClassName, string DisplayName)> AllTaskDefs =
+    [
+        ("StartGameTask",         "启动游戏"),
+        ("TrailblazePowerTask",   "清开拓力"),
+        ("ReceiveRewardsTask",    "领取奖励"),
+        ("CosmicStrifeTask",      "旷宇纷争"),
+        ("MissionAccomplishTask", "任务完成"),
+    ];
+
+    /// <summary>从 Config 初始化任务排序列表</summary>
+    private void InitTaskOrderList()
+    {
+        TaskOrderList.Clear();
+
+        // 构建中间任务的有序列表（排除首尾固定任务）
+        var middleDefs = AllTaskDefs.Where(d => d.ClassName != FixedFirstTask && d.ClassName != FixedLastTask).ToList();
+        var firstDef = AllTaskDefs.First(d => d.ClassName == FixedFirstTask);
+        var lastDef  = AllTaskDefs.First(d => d.ClassName == FixedLastTask);
+
+        List<(string ClassName, string DisplayName, bool Enabled)> middleItems;
+
+        if (CurrentConfig.TaskOrder.Count > 0)
+        {
+            // 新格式：从 TaskOrder 里提取中间任务的顺序和启用状态
+            var orderMap = new Dictionary<string, int>();
+            for (int i = 0; i < CurrentConfig.TaskOrder.Count; i++)
+                orderMap[CurrentConfig.TaskOrder[i]] = i;
+
+            var enabledMiddle = CurrentConfig.TaskOrder
+                .Where(c => c != FixedFirstTask && c != FixedLastTask)
+                .Select(c => (c, AllTaskDefs.FirstOrDefault(d => d.ClassName == c).DisplayName, true))
+                .Where(t => !string.IsNullOrEmpty(t.DisplayName))
+                .ToList();
+
+            var enabledSet = new HashSet<string>(enabledMiddle.Select(t => t.c));
+            var disabledMiddle = middleDefs
+                .Where(d => !enabledSet.Contains(d.ClassName))
+                .Select(d => (d.ClassName, d.DisplayName, false))
+                .ToList();
+
+            middleItems = enabledMiddle.Concat(disabledMiddle).ToList();
+        }
+        else
+        {
+            // 旧格式迁移：EnabledTasks bool 数组
+            middleItems = middleDefs.Select((d, i) =>
+            {
+                int origIdx = AllTaskDefs.FindIndex(x => x.ClassName == d.ClassName);
+                bool enabled = origIdx >= 0 && origIdx < CurrentConfig.EnabledTasks.Length && CurrentConfig.EnabledTasks[origIdx];
+                return (d.ClassName, d.DisplayName, enabled);
+            }).ToList();
+        }
+
+        // 首位固定任务（启动游戏）
+        bool firstEnabled = CurrentConfig.TaskOrder.Count > 0
+            ? CurrentConfig.TaskOrder.Contains(FixedFirstTask)
+            : (0 < CurrentConfig.EnabledTasks.Length && CurrentConfig.EnabledTasks[0]);
+        TaskOrderList.Add(new TaskOrderItem { ClassName = firstDef.ClassName, DisplayName = firstDef.DisplayName, IsEnabled = firstEnabled, IsFixed = true, OriginalIndex = AllTaskDefs.FindIndex(d => d.ClassName == firstDef.ClassName) });
+
+        // 中间可移动任务
+        foreach (var (className, displayName, enabled) in middleItems)
+            TaskOrderList.Add(new TaskOrderItem { ClassName = className, DisplayName = displayName, IsEnabled = enabled, IsFixed = false, OriginalIndex = AllTaskDefs.FindIndex(d => d.ClassName == className) });
+
+        // 末位固定任务（任务完成）
+        bool lastEnabled = CurrentConfig.TaskOrder.Count > 0
+            ? CurrentConfig.TaskOrder.Contains(FixedLastTask)
+            : (4 < CurrentConfig.EnabledTasks.Length && CurrentConfig.EnabledTasks[4]);
+        TaskOrderList.Add(new TaskOrderItem { ClassName = lastDef.ClassName, DisplayName = lastDef.DisplayName, IsEnabled = lastEnabled, IsFixed = true, OriginalIndex = AllTaskDefs.FindIndex(d => d.ClassName == lastDef.ClassName) });
+
+        // 监听每个 item 的 IsEnabled 变化，同步回 Config.TaskOrder
+        foreach (var item in TaskOrderList)
+            item.PropertyChanged += (_, _) => SyncTaskOrderToConfig();
+
+        // 初始化完成后立即同步一次，确保 TaskOrder 包含全部任务顺序
+        SyncTaskOrderToConfig();
+
+        // 初始化时通知一次
+        OnPropertyChanged(nameof(StartGameTaskEnabled));
+        OnPropertyChanged(nameof(TrailblazePowerTaskEnabled));
+        OnPropertyChanged(nameof(ReceiveRewardsTaskEnabled));
+        OnPropertyChanged(nameof(CosmicStrifeTaskEnabled));
+        OnPropertyChanged(nameof(MissionAccomplishTaskEnabled));
+
+        // 默认选中第一个任务
+        if (TaskOrderList.Count > 0)
+            SelectTask(TaskOrderList[0].ClassName);
+    }
+
+    /// <summary>根据 ClassName 获取 TaskOrderItem（供各 TaskView 绑定使用）</summary>
+    public TaskOrderItem? GetTaskItem(string className)
+        => TaskOrderList.FirstOrDefault(t => t.ClassName == className);
+
+    // 当前选中的任务 ClassName
+    private string _selectedClassName = "StartGameTask";
+
+    /// <summary>选中指定任务，更新 IsSelected 状态</summary>
+    public void SelectTask(string className)
+    {
+        _selectedClassName = className;
+        foreach (var item in TaskOrderList)
+            item.IsSelected = item.ClassName == className;
+        OnPropertyChanged(nameof(StartGameTaskSelected));
+        OnPropertyChanged(nameof(TrailblazePowerTaskSelected));
+        OnPropertyChanged(nameof(ReceiveRewardsTaskSelected));
+        OnPropertyChanged(nameof(CosmicStrifeTaskSelected));
+        OnPropertyChanged(nameof(MissionAccomplishTaskSelected));
+    }
+
+    // 各任务内容区域的显示控制
+    public bool StartGameTaskSelected         => _selectedClassName == "StartGameTask";
+    public bool TrailblazePowerTaskSelected   => _selectedClassName == "TrailblazePowerTask";
+    public bool ReceiveRewardsTaskSelected    => _selectedClassName == "ReceiveRewardsTask";
+    public bool CosmicStrifeTaskSelected      => _selectedClassName == "CosmicStrifeTask";
+    public bool MissionAccomplishTaskSelected => _selectedClassName == "MissionAccomplishTask";
+
+    // 各任务启用状态属性（供 TaskView 绑定，替代 EnabledTasks[n]）
+    public bool StartGameTaskEnabled
+    {
+        get => GetTaskItem("StartGameTask")?.IsEnabled ?? false;
+        set { var t = GetTaskItem("StartGameTask"); if (t != null) t.IsEnabled = value; }
+    }
+    public bool TrailblazePowerTaskEnabled
+    {
+        get => GetTaskItem("TrailblazePowerTask")?.IsEnabled ?? false;
+        set { var t = GetTaskItem("TrailblazePowerTask"); if (t != null) t.IsEnabled = value; }
+    }
+    public bool ReceiveRewardsTaskEnabled
+    {
+        get => GetTaskItem("ReceiveRewardsTask")?.IsEnabled ?? false;
+        set { var t = GetTaskItem("ReceiveRewardsTask"); if (t != null) t.IsEnabled = value; }
+    }
+    public bool CosmicStrifeTaskEnabled
+    {
+        get => GetTaskItem("CosmicStrifeTask")?.IsEnabled ?? false;
+        set { var t = GetTaskItem("CosmicStrifeTask"); if (t != null) t.IsEnabled = value; }
+    }
+    public bool MissionAccomplishTaskEnabled
+    {
+        get => GetTaskItem("MissionAccomplishTask")?.IsEnabled ?? false;
+        set { var t = GetTaskItem("MissionAccomplishTask"); if (t != null) t.IsEnabled = value; }
+    }
+
+    /// <summary>把当前列表状态同步回 Config.TaskOrder</summary>
+    private void SyncTaskOrderToConfig()
+    {
+        // TaskOrder 保存所有任务的顺序（不过滤启用状态）
+        // EnabledTasks 继续负责启用状态，由各 TaskView 的 CheckBox 直接绑定
+        CurrentConfig.TaskOrder.Clear();
+        foreach (var item in TaskOrderList)
+            CurrentConfig.TaskOrder.Add(item.ClassName);
+        // 通知各任务 IsEnabled 属性变化
+        OnPropertyChanged(nameof(StartGameTaskEnabled));
+        OnPropertyChanged(nameof(TrailblazePowerTaskEnabled));
+        OnPropertyChanged(nameof(ReceiveRewardsTaskEnabled));
+        OnPropertyChanged(nameof(CosmicStrifeTaskEnabled));
+        OnPropertyChanged(nameof(MissionAccomplishTaskEnabled));
+    }
+
+    [RelayCommand]
+    private void MoveTaskUp(TaskOrderItem item)
+    {
+        if (item.IsFixed) return;
+        var idx = TaskOrderList.IndexOf(item);
+        if (idx <= 0) return;
+        // 不能移到固定首位任务之前
+        var prev = TaskOrderList[idx - 1];
+        if (prev.IsFixed) return;
+        TaskOrderList.RemoveAt(idx);
+        TaskOrderList.Insert(idx - 1, item);
+        item.PropertyChanged += (_, _) => SyncTaskOrderToConfig();
+        SyncTaskOrderToConfig();
+    }
+
+    [RelayCommand]
+    private void MoveTaskDown(TaskOrderItem item)
+    {
+        if (item.IsFixed) return;
+        var idx = TaskOrderList.IndexOf(item);
+        if (idx < 0 || idx >= TaskOrderList.Count - 1) return;
+        // 不能移到固定末位任务之后
+        var next = TaskOrderList[idx + 1];
+        if (next.IsFixed) return;
+        TaskOrderList.RemoveAt(idx);
+        TaskOrderList.Insert(idx + 1, item);
+        item.PropertyChanged += (_, _) => SyncTaskOrderToConfig();
+        SyncTaskOrderToConfig();
+    }
+
+    /// <summary>拖拽时直接移动到指定索引位置</summary>
+    public void MoveTaskToIndex(TaskOrderItem item, int targetIndex)
+    {
+        if (item.IsFixed) return;
+        var idx = TaskOrderList.IndexOf(item);
+        if (idx < 0 || idx == targetIndex) return;
+        if (targetIndex < 0 || targetIndex >= TaskOrderList.Count) return;
+        // 不能越过固定任务的边界
+        var target = TaskOrderList[targetIndex];
+        if (target.IsFixed) return;
+        TaskOrderList.RemoveAt(idx);
+        TaskOrderList.Insert(targetIndex, item);
+        item.PropertyChanged += (_, _) => SyncTaskOrderToConfig();
+        SyncTaskOrderToConfig();
     }
 
     public ControlPanelViewModel ControlPanelViewModel { get; }
