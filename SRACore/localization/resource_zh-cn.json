@@ -68,7 +68,7 @@
     "task.taskCrashed": "任务 '{name}' 因意外错误崩溃：{error}",
     "task.taskCompleted": "任务 '{name}' 已完成。",
     "task.configCompleted": "配置 '{config_name}' 中的所有任务已完成。",
-    "task.notificationTitle": "任务完成提醒",
+    "task.notificationTitle": "任务通知",
     "task.notificationMessage": "您的SRA任务运行完成。",
     "task.instantiateFailed": "实例化任务 '{name}' 失败：{error}",
     "task.noSuchTask": "没有此任务：'{identifier}'",

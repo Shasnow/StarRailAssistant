@@ -68,7 +68,7 @@
     "task.taskCrashed": "Task '{name}' crashed due to an unexpected error: {error}",
     "task.taskCompleted": "Task '{name}' has been completed.",
     "task.configCompleted": "All tasks in config '{config_name}' have been completed.",
-    "task.notificationTitle": "Task Completion Reminder",
+    "task.notificationTitle": "Task Reminder",
     "task.notificationMessage": "Your SRA task has completed.",
     "task.instantiateFailed": "Failed to instantiate task '{name}': {error}",
     "task.noSuchTask": "No such task: '{identifier}'",
