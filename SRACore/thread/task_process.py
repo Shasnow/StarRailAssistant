@@ -207,6 +207,9 @@ class TaskManager:
                     logger.warning(Resource.task_noSelectedTasks(config_name))
                     continue
 
+                # 加载配置（通知判断需要）
+                config = load_config(config_name)
+
                 # 依次执行任务
                 for task in tasks_to_run:
                     if self._stop_event.is_set():
