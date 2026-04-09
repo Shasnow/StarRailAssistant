@@ -90,6 +90,8 @@ class CurrencyWars(Executable):
             except Exception as e:
                 logger.error(e)
                 return False
+        self.operator.wait_img(CWIMG.START_CURRENCY_WARS, timeout=30)
+        self.operator.press_key("esc")
         return True
 
     def reset_character(self):
@@ -387,6 +389,7 @@ class CurrencyWars(Executable):
         if self.strategy_code:
             self.operator.click_img(CWIMG.STRATEGY, after_sleep=1)
             self.operator.move_to(0.5, 0.5)
+            self.operator.sleep(0.5)
             self.operator.click_img(CWIMG.ENTER_STRATEGY_CODE, after_sleep=1)
             self.operator.click_point(0.5, 0.5, after_sleep=1, tag="攻略码输入框")
             self.operator.copy(self.strategy_code)

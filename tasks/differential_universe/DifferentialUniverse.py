@@ -1,8 +1,7 @@
 from loguru import logger
 
 from SRACore.task import Executable
-from SRACore.util import errors
-from SRACore.util.errors import SRAError
+from SRACore.util.errors import SRAError, ErrorCode
 from tasks.img import DUIMG, IMG
 
 
@@ -40,7 +39,7 @@ class DifferentialUniverse(Executable):
         box = self.operator.wait_img(DUIMG.DIFFERENTIAL_UNIVERSE_START)
         # 点击开始按钮
         if box is None:
-            logger.error(SRAError(errors.ErrorCode.IMAGE_NOT_FOUND, "未识别到差分宇宙开始按钮"))
+            logger.error(SRAError(ErrorCode.IMAGE_NOT_FOUND, "未识别到差分宇宙开始按钮"))
             return False
         self.operator.do_while(lambda : self.operator.click_box(box),  # NOQA
                       lambda : self.operator.locate(DUIMG.PERIODIC_CALCULUS) is None,
@@ -50,10 +49,10 @@ class DifferentialUniverse(Executable):
         launch_button_box = self.operator.wait_img(DUIMG.LAUNCH_DIFFERENTIAL_UNIVERSE)
         # 启动差分宇宙
         if launch_button_box is None:
-            logger.error(SRAError(errors.ErrorCode.IMAGE_NOT_FOUND, "未找到差分宇宙启动按钮"))
+            logger.error(SRAError(ErrorCode.IMAGE_NOT_FOUND, "未找到差分宇宙启动按钮"))
             return False
         if not self.operator.click_box(launch_button_box):
-            logger.error(SRAError(errors.ErrorCode.MOUSE_CLICK_FAILED, "点击差分宇宙启动按钮失败"))
+            logger.error(SRAError(ErrorCode.MOUSE_CLICK_FAILED, "点击差分宇宙启动按钮失败"))
             return False
 
         return True
@@ -61,7 +60,7 @@ class DifferentialUniverse(Executable):
     def _navigate_and_fight(self):
         """导航和战斗处理"""
         logger.info("移动")
-        self.operator.hold_key("w", duration=2)
+        self.operator.hold_key("w", duration=1.5)
 
         logger.info("进入战斗")
         if self.use_technique:
@@ -122,11 +121,16 @@ class DifferentialUniverse(Executable):
             else:
                 break
         else:
-            logger.error(SRAError(errors.ErrorCode.WAIT_TIMEOUT, "等待结算退出入口超时"))
+            logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待结算退出入口超时"))
             return False
 
-        self.operator.click_point(0.8, 0.9, after_sleep=0.5)
-        self.operator.click_img(IMG.ENSURE2, after_sleep=0.5)
+        self.operator.click_point(0.8, 0.9, after_sleep=0.5, tag="退出并结算")
+        box = self.operator.wait_img(IMG.ENSURE2)
+        if box is None:
+            logger.warning(SRAError(ErrorCode.IMAGE_NOT_FOUND, "未找到结算确认按钮"))
+            return False
+
+        self.operator.click_box(box)
 
         logger.info("返回主界面")
         if self.operator.wait_img(DUIMG.RETURN):
@@ -151,7 +155,7 @@ class DifferentialUniverse(Executable):
         if page == 0:
             self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
             if not self.operator.wait_img(IMG.F4, timeout=20):
-                logger.error(SRAError(errors.ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
+                logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
                 self.operator.press_key("esc")
             self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙
