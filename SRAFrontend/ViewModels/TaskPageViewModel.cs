@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using Avalonia.Data.Converters;
 using System.ComponentModel;
 using System.IO;
@@ -18,7 +19,27 @@ using SRAFrontend.Services;
 
 namespace SRAFrontend.ViewModels;
 
+/// <summary>已安装 -> 更新/安装 文字转换器</summary>
+public class BoolToInstallTextConverter : Avalonia.Data.Converters.IValueConverter
+{
+    public static readonly BoolToInstallTextConverter Instance = new();
+    public object? Convert(object? value, Type targetType, object? parameter,
+        System.Globalization.CultureInfo culture)
+        => value is true ? "更新" : "安装";
+    public object? ConvertBack(object? value, Type targetType, object? parameter,
+        System.Globalization.CultureInfo culture) => throw new NotImplementedException();
+}
 
+
+
+/// <summary>自定义任务的 ClassName 前缀，用于与内置任务区分</summary>
+public static class CustomTaskPrefix
+{
+    public const string Prefix = "CustomTask_";
+    public static string Make(string id) => Prefix + id;
+    public static bool IsCustom(string className) => className.StartsWith(Prefix);
+    public static string GetId(string className) => className.Replace(Prefix, "");
+}
 
 /// <summary>任务排序列表项，绑定到拖拽列表</summary>
 public partial class TaskOrderItem : ObservableObject
@@ -62,10 +83,12 @@ public partial class TaskPageViewModel : PageViewModel
         CommonModel commonModel,
         ControlPanelViewModel controlPanelViewModel,
         ConfigService configService,
-        CacheService cacheService) : base(
+        CacheService cacheService,
+        SRAFrontend.Services.ScriptService scriptService) : base(
         PageName.Task, "\uE1BC")
     {
         ControlPanelViewModel = controlPanelViewModel;
+        _scriptService = scriptService;
         _commonModel = commonModel;
         _configService = configService;
         _cacheService = cacheService;
@@ -123,11 +146,22 @@ public partial class TaskPageViewModel : PageViewModel
 
             var enabledMiddle = CurrentConfig.TaskOrder
                 .Where(c => c != FixedFirstTask && c != FixedLastTask)
-                .Select(c => (c, AllTaskDefs.FirstOrDefault(d => d.ClassName == c).DisplayName, true))
-                .Where(t => !string.IsNullOrEmpty(t.DisplayName))
+                .Select(c =>
+                {
+                    // 自定义任务：从 CustomTasks 找 DisplayName
+                    if (CustomTaskPrefix.IsCustom(c))
+                    {
+                        var id = CustomTaskPrefix.GetId(c);
+                        var entry = CurrentConfig.CustomTasks.FirstOrDefault(e => e.Id == id);
+                        return (c, entry?.Name ?? "自定义任务", true);
+                    }
+                    return (c, AllTaskDefs.FirstOrDefault(d => d.ClassName == c).DisplayName, true);
+                })
+                .Where(t => !string.IsNullOrEmpty(t.Item2))
                 .ToList();
 
             var enabledSet = new HashSet<string>(enabledMiddle.Select(t => t.c));
+            // 仅对内置任务补充禁用项，自定义任务不需要
             var disabledMiddle = middleDefs
                 .Where(d => !enabledSet.Contains(d.ClassName))
                 .Select(d => (d.ClassName, d.DisplayName, false))
@@ -156,6 +190,15 @@ public partial class TaskPageViewModel : PageViewModel
         foreach (var (className, displayName, enabled) in middleItems)
             TaskOrderList.Add(new TaskOrderItem { ClassName = className, DisplayName = displayName, IsEnabled = enabled, IsFixed = false, OriginalIndex = AllTaskDefs.FindIndex(d => d.ClassName == className) });
 
+        // 中间：插入 CustomTasks（按 TaskOrder 里的顺序，或按 CustomTasks 定义顺序）
+        foreach (var entry in CurrentConfig.CustomTasks)
+        {
+            var cClassName = CustomTaskPrefix.Make(entry.Id);
+            // 如果 TaskOrder 里没有，说明是新添加的，跳过（AddCustomTask 会处理）
+            if (TaskOrderList.Any(t => t.ClassName == cClassName)) continue;
+            // 已在上面的 TaskOrder 循环中添加了，此处跳过
+        }
+
         // 末位固定任务（任务完成）
         bool lastEnabled = CurrentConfig.TaskOrder.Count > 0
             ? CurrentConfig.TaskOrder.Contains(FixedLastTask)
@@ -179,14 +222,115 @@ public partial class TaskPageViewModel : PageViewModel
         // 默认选中第一个任务
         if (TaskOrderList.Count > 0)
             SelectTask(TaskOrderList[0].ClassName);
+
+        // 监听自定义任务集合变化，保持标签栏同步
+        CurrentConfig.CustomTasks.CollectionChanged += (_, _) => SyncCustomTaskLabels();
+
     }
 
     /// <summary>根据 ClassName 获取 TaskOrderItem（供各 TaskView 绑定使用）</summary>
     public TaskOrderItem? GetTaskItem(string className)
         => TaskOrderList.FirstOrDefault(t => t.ClassName == className);
 
+    private SRAFrontend.Services.ScriptService _scriptService = null!;
+
     // 当前选中的任务 ClassName
     private string _selectedClassName = "StartGameTask";
+
+    /// <summary>已安装脚本列表（供自定义任务选择）</summary>
+    public System.Collections.ObjectModel.ObservableCollection<SRAFrontend.Models.ScriptManifest> InstalledScripts { get; }
+        = new();
+
+
+
+    /// <summary>当前选中的自定义任务条目（仅当选中的是自定义任务时有值）</summary>
+    public SRAFrontend.Models.CustomTaskEntry? SelectedCustomTask
+        => CustomTaskPrefix.IsCustom(_selectedClassName)
+            ? CurrentConfig.CustomTasks.FirstOrDefault(t =>
+                CustomTaskPrefix.Make(t.Id) == _selectedClassName)
+            : null;
+
+    // ===== 已安装脚本选择 =====
+
+    private SRAFrontend.Models.ScriptManifest? _selectedInstalledScript;
+    public SRAFrontend.Models.ScriptManifest? SelectedInstalledScript
+    {
+        get => _selectedInstalledScript;
+        set
+        {
+            _selectedInstalledScript = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SelectedScriptTasks));
+            OnPropertyChanged(nameof(SelectedScriptHasMultipleTasks));
+            // 自动选中第一个任务
+            SelectedScriptTask = value?.Tasks.FirstOrDefault();
+            // 如果只有一个任务，直接应用
+            if (value != null && value.Tasks.Count == 1)
+                ApplyScriptSelection(value, value.Tasks[0]);
+        }
+    }
+
+    public System.Collections.Generic.List<SRAFrontend.Models.ScriptTaskDef> SelectedScriptTasks
+        => _selectedInstalledScript?.Tasks ?? [];
+
+    public bool SelectedScriptHasMultipleTasks
+        => (_selectedInstalledScript?.Tasks.Count ?? 0) > 1;
+
+    private SRAFrontend.Models.ScriptTaskDef? _selectedScriptTask;
+    public SRAFrontend.Models.ScriptTaskDef? SelectedScriptTask
+    {
+        get => _selectedScriptTask;
+        set
+        {
+            _selectedScriptTask = value;
+            OnPropertyChanged();
+            if (_selectedInstalledScript != null && value != null)
+                ApplyScriptSelection(_selectedInstalledScript, value);
+        }
+    }
+
+    /// <summary>把选中的脚本+任务写入当前 CustomTaskEntry</summary>
+    private void ApplyScriptSelection(SRAFrontend.Models.ScriptManifest script,
+        SRAFrontend.Models.ScriptTaskDef task)
+    {
+        if (SelectedCustomTask == null) return;
+        SelectedCustomTask.ScriptId = script.Id;
+        SelectedCustomTask.TaskEntry = task.Entry;
+        SelectedCustomTask.TaskClassName = task.Class;
+        // 如果任务名还是默认值，自动填任务名
+        if (SelectedCustomTask.Name.StartsWith("自定义任务"))
+            SelectedCustomTask.Name = task.Name;
+        // 同步标签栏显示名
+        var item = TaskOrderList.FirstOrDefault(t =>
+            t.ClassName == CustomTaskPrefix.Make(SelectedCustomTask.Id));
+        if (item != null) item.DisplayName = SelectedCustomTask.Name;
+        // 清空手动路径（避免混用）
+        SelectedCustomTask.ScriptPath = "";
+        OnPropertyChanged(nameof(SelectedCustomTask));
+        SyncTaskOrderToConfig();
+    }
+
+    [RelayCommand]
+    private void RefreshInstalledScripts()
+    {
+        var prev = _selectedInstalledScript?.Id;
+        InstalledScripts.Clear();
+        foreach (var s in _scriptService.GetInstalledScripts())
+            InstalledScripts.Add(s);
+        // 恢复之前的选中状态（如果当前有自定义任务已选了某个脚本）
+        if (SelectedCustomTask != null && !string.IsNullOrEmpty(SelectedCustomTask.ScriptId))
+        {
+            _selectedInstalledScript = InstalledScripts
+                .FirstOrDefault(s => s.Id == SelectedCustomTask.ScriptId);
+            OnPropertyChanged(nameof(SelectedInstalledScript));
+            OnPropertyChanged(nameof(SelectedScriptTasks));
+            OnPropertyChanged(nameof(SelectedScriptHasMultipleTasks));
+            if (_selectedInstalledScript != null)
+                _selectedScriptTask = _selectedInstalledScript.Tasks
+                    .FirstOrDefault(t => t.Entry == SelectedCustomTask.TaskEntry);
+            OnPropertyChanged(nameof(SelectedScriptTask));
+        }
+    }
 
     /// <summary>选中指定任务，更新 IsSelected 状态</summary>
     public void SelectTask(string className)
@@ -199,7 +343,15 @@ public partial class TaskPageViewModel : PageViewModel
         OnPropertyChanged(nameof(ReceiveRewardsTaskSelected));
         OnPropertyChanged(nameof(CosmicStrifeTaskSelected));
         OnPropertyChanged(nameof(MissionAccomplishTaskSelected));
+        OnPropertyChanged(nameof(CustomTaskSelected));
+        OnPropertyChanged(nameof(SelectedCustomTask));
+
+        // 切换到自定义任务时，恢复该任务对应的脚本选择状态
+        if (CustomTaskPrefix.IsCustom(className))
+            RefreshInstalledScripts();
     }
+
+    public bool CustomTaskSelected => CustomTaskPrefix.IsCustom(_selectedClassName);
 
     // 各任务内容区域的显示控制
     public bool StartGameTaskSelected         => _selectedClassName == "StartGameTask";
@@ -279,6 +431,87 @@ public partial class TaskPageViewModel : PageViewModel
         TaskOrderList.Insert(idx + 1, item);
         item.PropertyChanged += (_, _) => SyncTaskOrderToConfig();
         SyncTaskOrderToConfig();
+    }
+
+    [RelayCommand]
+    private void AddCustomTask()
+    {
+        RefreshInstalledScripts();
+        var entry = new SRAFrontend.Models.CustomTaskEntry
+        {
+            Name = $"自定义任务 {CurrentConfig.CustomTasks.Count + 1}",
+            ScriptId = "",
+            TaskEntry = "",
+            TaskClassName = "",
+            ScriptPath = "",
+            IsEnabled = true
+        };
+        CurrentConfig.CustomTasks.Add(entry);
+
+        // 插入到末位固定任务之前
+        var className = CustomTaskPrefix.Make(entry.Id);
+        var lastFixed = TaskOrderList.LastOrDefault(t => t.IsFixed);
+        var insertIdx = lastFixed != null ? TaskOrderList.IndexOf(lastFixed) : TaskOrderList.Count;
+        var newItem = new TaskOrderItem
+        {
+            ClassName = className,
+            DisplayName = entry.Name,
+            IsEnabled = true,
+            IsFixed = false,
+            OriginalIndex = -1
+        };
+        newItem.PropertyChanged += (_, _) => SyncTaskOrderToConfig();
+        TaskOrderList.Insert(insertIdx, newItem);
+        SyncTaskOrderToConfig();
+        SelectTask(className);
+    }
+
+    [RelayCommand]
+    private void RemoveCustomTask()
+    {
+        if (SelectedCustomTask == null) return;
+        var className = CustomTaskPrefix.Make(SelectedCustomTask.Id);
+        var item = TaskOrderList.FirstOrDefault(t => t.ClassName == className);
+        if (item != null) TaskOrderList.Remove(item);
+        CurrentConfig.CustomTasks.Remove(SelectedCustomTask);
+        SyncTaskOrderToConfig();
+        // 选中第一个任务
+        if (TaskOrderList.Count > 0) SelectTask(TaskOrderList[0].ClassName);
+    }
+
+    [RelayCommand]
+    private async System.Threading.Tasks.Task SelectCustomTaskScript()
+    {
+        if (SelectedCustomTask == null || TopLevelObject == null) return;
+        var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new Avalonia.Platform.Storage.FilePickerOpenOptions
+        {
+            Title = "选择 Python 脚本文件",
+            AllowMultiple = false,
+            FileTypeFilter = [new Avalonia.Platform.Storage.FilePickerFileType("Python 脚本") { Patterns = ["*.py"] }]
+        });
+        if (files.Count == 0) return;
+        SelectedCustomTask.ScriptPath = files[0].Path.LocalPath;
+        // 同步标签名（如果名称还是默认值）
+        var item = TaskOrderList.FirstOrDefault(t => t.ClassName == CustomTaskPrefix.Make(SelectedCustomTask.Id));
+        if (item != null) OnPropertyChanged(nameof(SelectedCustomTask));
+    }
+
+    [RelayCommand]
+    private void SingleCustomTask()
+    {
+        if (SelectedCustomTask == null) return;
+        var className = CustomTaskPrefix.Make(SelectedCustomTask.Id);
+        SingleTask(CustomTaskPrefix.Make(SelectedCustomTask.Id));
+    }
+
+    private void SyncCustomTaskLabels()
+    {
+        foreach (var entry in CurrentConfig.CustomTasks)
+        {
+            var className = CustomTaskPrefix.Make(entry.Id);
+            var item = TaskOrderList.FirstOrDefault(t => t.ClassName == className);
+            if (item != null) item.DisplayName = entry.Name;
+        }
     }
 
     /// <summary>拖拽时直接移动到指定索引位置</summary>

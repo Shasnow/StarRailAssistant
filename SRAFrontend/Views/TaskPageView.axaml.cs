@@ -106,6 +106,13 @@ public partial class TaskPageView : UserControl
     }
 
     // 固定任务标签点击
+    internal void AddCustomTask_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {
+        if (DataContext is not TaskPageViewModel vm) return;
+        vm.AddCustomTaskCommand.Execute(null);
+        e.Handled = true;
+    }
+
     internal void FixedTabHeader_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (DataContext is not TaskPageViewModel vm) return;
