@@ -91,57 +91,6 @@ nothing to do with it.
 
 除此之外并无其他区别。
 
-## 📁 项目结构
-
-```
-├── .github/               # 🔧 GitHub相关配置文件
-├── SRACore/               # 🐍 Python后端核心代码
-│   ├── localization/      # 🌐 本地化支持
-│   ├── task/              # 📋 任务相关代码
-│   ├── thread/            # 🧵 线程管理
-│   ├── triggers/          # ⚡ 触发器实现
-│   ├── ui/                # 🎨 UI相关代码
-│   └── util/              # 🛠️ 工具函数
-├── SRAFrontend/           # 🎯 C#前端代码 (Avalonia框架)
-│   ├── Assets/            # 📦 前端资源文件
-│   ├── Controls/          # 🎛️ 自定义控件
-│   ├── Data/              # 📊 数据模型
-│   ├── Localization/      # 🌐 前端本地化
-│   ├── Models/            # 📐 业务模型
-│   ├── Services/          # 💼 服务层
-│   ├── Styles/            # 🎨 样式定义
-│   ├── Utilities/         # 🛠️ 前端工具类
-│   ├── ViewModels/        # 🧠 ViewModel层
-│   └── Views/             # 🖥️ 视图层
-├── tests/                 # 🧪 自动化测试
-│   └── backend/           # 🐍 后端单元测试
-├── main.py                # 🚪 程序入口文件
-├── package.py             # 📦 打包脚本
-├── rapidocr_onnxruntime/  # 👁️ OCR识别相关模型
-├── requirements.txt       # 📋 Python依赖列表
-├── resources/             # 📁 资源文件目录
-│   ├── img/               # 🖼️ 图像资源
-│   ├── test/              # 🧪 测试资源
-├── setup/                 # 📦 安装包制作相关文件
-├── tasks/                 # 📋 任务实现目录
-└── version.json           # 🔢 版本信息
-```
-
-### 📁 主要目录说明
-
-- **SRACore/**: 🐍 包含程序的核心逻辑，包括任务管理、线程控制、触发器系统和工具函数等。
-- **SRAFrontend/**: 🎯 使用Avalonia框架开发的C#前端界面，实现用户交互和配置管理。
-- **tasks/**: 📋 各种自动化任务的具体实现，如启动游戏、领取奖励、清体力等。
-- **tests/**: 🧪 自动化测试目录，`tests/backend/` 存放后端 Python 单元测试。
-- **resources/**: 📁 存放程序所需的各种资源文件，包括图像识别所需的模板图片。
-
-### 📄 关键文件说明
-
-- **main.py**: 🚪 程序的入口点，负责解析命令行参数并启动后端服务。
-- **requirements.txt**: 📋 列出了项目所需的所有Python依赖包。
-- **package.py**: 📦 用于将项目打包为可执行文件的脚本。
-- **version.json**: 🔢 存储项目的版本信息。
-
 ## 🐛 你这代码保熟吗？
 
 我们无法保证代码能完美的运行，这便是 **`issues`** 存在的意义。
