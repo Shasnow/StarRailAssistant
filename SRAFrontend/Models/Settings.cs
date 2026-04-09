@@ -10,8 +10,6 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private bool _allowNotifications = true; // 是否允许通知
     [ObservableProperty] private bool _allowSystemNotifications = true; // 是否允许系统通知
     [ObservableProperty] private int _appChannel; // 0: stable, 1: beta
-    [ObservableProperty] private bool _isOverlayEnabled; // 是否启用叠加层
-    [ObservableProperty] private bool _isOverlayDebugInfoEnabled; // 是否启用叠加层鼠标信息
 
     [ObservableProperty] private double _backgroundOpacity = 0.9; // 背景图不透明度
     [ObservableProperty] private double _ctrlPanelOpacity = 0.9; // 控制面板不透明度
@@ -19,6 +17,8 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private double _confidenceThreshold = 0.9; // 识图置信度阈值
     [ObservableProperty] private int _defaultPage; // 启动时默认页面索引
     [ObservableProperty] private int _downloadChannel; // 0: Mirror, 1: GitHub
+    [ObservableProperty] private bool _isOverlayEnabled; // 是否启用叠加层
+    [ObservableProperty] private bool _isOverlayDebugInfoEnabled; // 是否启用叠加层鼠标信息
     [ObservableProperty] private string _emailReceiver = ""; // 接收邮件地址
     [ObservableProperty] private string _emailSender = ""; // 发送邮件地址
     [ObservableProperty] private bool _enableAutoUpdate = true; // 是否启用自动更新

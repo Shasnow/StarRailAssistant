@@ -1,27 +1,173 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
              xmlns:lang="clr-namespace:SRAFrontend.Localization"
              xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:models="clr-namespace:SRAFrontend.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="SRAFrontend.Views.ExtensionPageView"
              x:DataType="viewModels:ExtensionPageViewModel">
-    <suki:GlassCard>
-        <suki:GroupBox Header="{x:Static lang:Resources.ExtensionText}">
-            <StackPanel>
-                <suki:GlassCard >
-                    <Expander Header="自动对话" IsExpanded="True">
-                        <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto">
-                            <Label Grid.Row="0" Content="启用" />
-                            <ToggleSwitch Grid.Row="0" Grid.Column="1" IsChecked="{Binding EnableAutoPlot}"/>
-                            <Label Grid.Row="1" Grid.Column="0" Content="跳过对话" />
-                            <ToggleSwitch Grid.Row="1" Grid.Column="1" IsChecked="{Binding SkipPlot}"/>
-                        </Grid>
-                    </Expander>
-                </suki:GlassCard>
-            </StackPanel>
-        </suki:GroupBox>
-    </suki:GlassCard>
+    <ScrollViewer>
+        <StackPanel Spacing="10" Margin="10">
+
+            <!-- 自动对话 -->
+            <suki:GlassCard>
+                <Expander Header="自动对话" IsExpanded="False">
+                    <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto" Margin="0,8,0,0">
+                        <Label Grid.Row="0" Content="启用" />
+                        <ToggleSwitch Grid.Row="0" Grid.Column="1" IsChecked="{Binding EnableAutoPlot}"/>
+                        <Label Grid.Row="1" Grid.Column="0" Content="跳过对话" />
+                        <ToggleSwitch Grid.Row="1" Grid.Column="1" IsChecked="{Binding SkipPlot}"/>
+                    </Grid>
+                </Expander>
+            </suki:GlassCard>
+
+            <!-- 脚本仓库 -->
+            <suki:GlassCard>
+                <suki:GroupBox Header="脚本仓库">
+                    <Grid RowDefinitions="Auto,*" ColumnDefinitions="200,*" ColumnSpacing="10">
+
+                        <!-- 左侧：仓库列表 + 管理 -->
+                        <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+                            <TextBlock Text="仓库" FontWeight="Medium" FontSize="13"/>
+                            <ListBox ItemsSource="{Binding Repos}"
+                                     SelectedItem="{Binding SelectedRepo}"
+                                     MaxHeight="120">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:ScriptRepo">
+                                        <TextBlock Text="{Binding Name}" ToolTip.Tip="{Binding Url}"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Button Content="添加仓库" Command="{Binding OpenAddRepoCommand}"/>
+                                <Button Content="删除" Command="{Binding RemoveRepoCommand}"/>
+                            </StackPanel>
+
+                            <!-- 添加仓库表单 -->
+                            <StackPanel IsVisible="{Binding IsAddRepoOpen}" Spacing="6">
+                                <TextBox Text="{Binding NewRepoName}" Watermark="仓库名称"/>
+                                <TextBox Text="{Binding NewRepoUrl}" Watermark="GitHub 仓库地址或 repo.json 直链"/>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Button Content="确认" Command="{Binding ConfirmAddRepoCommand}"/>
+                                    <Button Content="取消" Command="{Binding CloseAddRepoCommand}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- 右侧：脚本列表 -->
+                        <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
+                            <Grid ColumnDefinitions="*,Auto,Auto">
+                                <TextBlock Text="脚本列表" FontWeight="Medium" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="刷新"
+                                        Command="{Binding FetchRepoScriptsCommand}"
+                                        IsEnabled="{Binding !IsLoading}"/>
+                                <Button Grid.Column="2" Content="检查更新"
+                                        Command="{Binding CheckUpdatesCommand}"
+                                        IsEnabled="{Binding !IsLoading}"
+                                        Margin="6,0,0,0"/>
+                            </Grid>
+
+                            <!-- 脚本列表 -->
+                            <ListBox ItemsSource="{Binding RepoScripts}"
+                                     SelectedItem="{Binding SelectedScript}"
+                                     MaxHeight="300">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:RepoScriptInfo">
+                                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                            <StackPanel Grid.Column="0">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <TextBlock Text="{Binding Name}"
+                                                               FontWeight="Medium"/>
+                                                    <Border CornerRadius="4"
+                                                            Background="{DynamicResource SukiAccentColor}"
+                                                            Padding="4,1"
+                                                            IsVisible="{Binding HasUpdate}">
+                                                        <TextBlock Text="有更新" FontSize="11"
+                                                                   Foreground="White"/>
+                                                    </Border>
+                                                    <Border CornerRadius="4"
+                                                            Background="{DynamicResource SukiLightBorderBrush}"
+                                                            Padding="4,1"
+                                                            IsVisible="{Binding IsInstalled}">
+                                                        <TextBlock Text="已安装" FontSize="11"/>
+                                                    </Border>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding Description}"
+                                                           FontSize="12" Opacity="0.6"
+                                                           TextWrapping="Wrap"/>
+                                                <TextBlock FontSize="11" Opacity="0.5">
+                                                    <Run Text="v"/>
+                                                    <Run Text="{Binding Version}"/>
+                                                    <Run Text=" · "/>
+                                                    <Run Text="{Binding Author}"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                            <Button Grid.Column="1"
+                                                    VerticalAlignment="Center"
+                                                    Command="{Binding $parent[ListBox].((viewModels:ExtensionPageViewModel)DataContext).InstallScriptCommand}"
+                                                    CommandParameter="{Binding}">
+                                                <TextBlock Text="{Binding IsInstalled,
+                                                    Converter={x:Static viewModels:BoolToInstallTextConverter.Instance}}"/>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <!-- 状态栏 -->
+                            <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsLoading}">
+                                <ProgressBar Grid.Column="0" Value="{Binding DownloadProgress}"
+                                             Maximum="100" Height="4"/>
+                            </Grid>
+                            <TextBlock Text="{Binding StatusMessage}"
+                                       FontSize="12" Opacity="0.6"/>
+                        </StackPanel>
+
+                    </Grid>
+                </suki:GroupBox>
+            </suki:GlassCard>
+
+            <!-- 已安装脚本 -->
+            <suki:GlassCard>
+                <suki:GroupBox Header="已安装脚本">
+                    <StackPanel Spacing="6">
+                        <Button Content="刷新列表" Command="{Binding RefreshInstalledCommand}"
+                                HorizontalAlignment="Left"/>
+                        <ListBox ItemsSource="{Binding InstalledScripts}" MaxHeight="200">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:ScriptManifest">
+                                    <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                        <StackPanel Grid.Column="0">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="{Binding Name}" FontWeight="Medium"/>
+                                                <TextBlock Text="{Binding Version}"
+                                                           FontSize="12" Opacity="0.5"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Description}"
+                                                       FontSize="12" Opacity="0.6"/>
+                                            <TextBlock FontSize="11" Opacity="0.5">
+                                                <Run Text="任务数: "/>
+                                                <Run Text="{Binding Tasks.Count}"/>
+                                                <Run Text=" · "/>
+                                                <Run Text="{Binding Author}"/>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Content="卸载"
+                                                VerticalAlignment="Center"
+                                                Command="{Binding $parent[ListBox].((viewModels:ExtensionPageViewModel)DataContext).UninstallScriptCommand}"
+                                                CommandParameter="{Binding}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </suki:GroupBox>
+            </suki:GlassCard>
+
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

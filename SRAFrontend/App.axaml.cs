@@ -84,6 +84,7 @@ public class App : Application
         services.AddSingleton<IBackendService, BackendServiceProxy>();
         services.AddSingleton<RegistryService>();
         services.AddSingleton<ConfigService>();
+        services.AddSingleton<ScriptService>();
         services.AddSingleton<ReportService>();
         services.AddSingleton<OverlayService>();
         services.AddHttpClient("GlobalClient", client =>

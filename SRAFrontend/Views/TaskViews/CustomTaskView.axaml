@@ -1,0 +1,136 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
+             xmlns:models="clr-namespace:SRAFrontend.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SRAFrontend.Views.TaskViews.CustomTaskView"
+             x:DataType="viewModels:TaskPageViewModel">
+    <suki:GlassCard>
+        <suki:GroupBox>
+            <suki:GroupBox.Header>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <CheckBox Content="{Binding SelectedCustomTask.Name, FallbackValue=自定义任务}"
+                              IsChecked="{Binding SelectedCustomTask.IsEnabled}"/>
+                    <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
+                            Command="{Binding SingleCustomTaskCommand}"
+                            ToolTip.Tip="单次运行"/>
+                </StackPanel>
+            </suki:GroupBox.Header>
+
+            <ScrollViewer>
+                <StackPanel Margin="10" Spacing="16">
+
+                    <!-- 任务名称 -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Label Grid.Column="0" Content="任务名称" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding SelectedCustomTask.Name}"
+                                 Watermark="输入任务名称"/>
+                    </Grid>
+
+                    <!-- 从已安装脚本选择 -->
+                    <suki:GlassCard>
+                        <StackPanel Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock FontWeight="Medium" Text="选择已安装脚本"
+                                           VerticalAlignment="Center"/>
+                                <Button Content="刷新" Classes="Flat"
+                                        FontSize="12" Height="24" Padding="8,0"
+                                        Command="{Binding RefreshInstalledScriptsCommand}"
+                                        ToolTip.Tip="刷新已安装脚本列表"/>
+                            </StackPanel>
+
+                            <!-- 脚本选择 -->
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" RowDefinitions="Auto,Auto" RowSpacing="8">
+                                <Label Grid.Row="0" Grid.Column="0" Content="脚本"
+                                       VerticalAlignment="Center"/>
+                                <ComboBox Grid.Row="0" Grid.Column="1"
+                                          ItemsSource="{Binding InstalledScripts}"
+                                          SelectedItem="{Binding SelectedInstalledScript}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:ScriptManifest">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Medium"/>
+                                                <TextBlock FontSize="11" Opacity="0.5">
+                                                    <Run Text="v"/>
+                                                    <Run Text="{Binding Version}"/>
+                                                    <Run Text=" · "/>
+                                                    <Run Text="{Binding Author}"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <!-- 任务选择（多任务脚本） -->
+                                <Label Grid.Row="1" Grid.Column="0" Content="任务"
+                                       VerticalAlignment="Center"
+                                       IsVisible="{Binding SelectedScriptHasMultipleTasks}"/>
+                                <ComboBox Grid.Row="1" Grid.Column="1"
+                                          ItemsSource="{Binding SelectedScriptTasks}"
+                                          SelectedItem="{Binding SelectedScriptTask}"
+                                          IsVisible="{Binding SelectedScriptHasMultipleTasks}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:ScriptTaskDef">
+                                            <TextBlock Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+
+                            <!-- 已选信息 -->
+                            <TextBlock FontSize="12" Opacity="0.6"
+                                       IsVisible="{Binding SelectedCustomTask.ScriptId, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                       TextWrapping="Wrap">
+                                <Run Text="已选："/>
+                                <Run Text="{Binding SelectedCustomTask.Name}"/>
+                                <Run Text=" · "/>
+                                <Run Text="{Binding SelectedCustomTask.TaskEntry}"/>
+                            </TextBlock>
+                        </StackPanel>
+                    </suki:GlassCard>
+
+                    <!-- 高级：手动指定路径 -->
+                    <Expander Header="高级：手动指定脚本路径" IsExpanded="False">
+                        <StackPanel Spacing="8" Margin="0,6,0,0">
+                            <TextBlock FontSize="12" Opacity="0.6" TextWrapping="Wrap"
+                                       Text="如果脚本未通过仓库安装，可直接指定 .py 文件路径。"/>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding SelectedCustomTask.ScriptPath}"
+                                         Watermark="选择 Python 脚本文件 (.py)"/>
+                                <Button Grid.Column="1" Classes="Icon"
+                                        FontFamily="{StaticResource Phosphor}"
+                                        Content="&#xE256;"
+                                        Command="{Binding SelectCustomTaskScriptCommand}"
+                                        ToolTip.Tip="选择脚本文件"/>
+                            </Grid>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- 说明 -->
+                    <suki:GlassCard>
+                        <StackPanel Spacing="4">
+                            <TextBlock FontWeight="Medium" Text="使用说明"/>
+                            <TextBlock TextWrapping="Wrap" Opacity="0.7" FontSize="12"
+                                       Text="在拓展页安装脚本后，在上方「选择已安装脚本」中选择。"/>
+                            <TextBlock TextWrapping="Wrap" Opacity="0.7" FontSize="12"
+                                       Text="任务通知开关请在「设置 → 任务通知配置」中单独配置。"/>
+                        </StackPanel>
+                    </suki:GlassCard>
+
+                    <!-- 删除按钮 -->
+                    <Button Content="删除此自定义任务"
+                            Classes="Danger"
+                            HorizontalAlignment="Left"
+                            Command="{Binding RemoveCustomTaskCommand}"/>
+                </StackPanel>
+            </ScrollViewer>
+        </suki:GroupBox>
+    </suki:GlassCard>
+</UserControl>

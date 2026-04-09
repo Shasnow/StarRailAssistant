@@ -13,7 +13,13 @@ public partial class Config : ObservableObject
     [ObservableProperty] private bool _afterLogout; // 任务完成后是否登出
     [ObservableProperty] private bool _afterShutdown; // 任务完成后关机
     [ObservableProperty] private bool _afterSleep; // 任务完成后睡眠
-    [ObservableProperty] private bool[] _enabledTasks = [true, false, false, false, false]; // 各任务启用状态
+    [ObservableProperty] private bool[] _enabledTasks = [true, false, false, false, false]; // 各任务启用状态（旧格式，保留向后兼容）
+
+    // 新格式：任务类名有序列表，优先于 EnabledTasks 使用
+    [ObservableProperty] private AvaloniaList<string> _taskOrder = [];
+
+    // 自定义任务列表
+    [ObservableProperty] private AvaloniaList<CustomTaskEntry> _customTasks = [];
 
     [ObservableProperty] private string _name = "Default"; // 配置名称，默认为 "Default"
     [ObservableProperty] private string _receiveRewardRedeemCodes = ""; // 兑换码列表
@@ -70,4 +76,34 @@ public partial class Config : ObservableObject
 
     public int Version { get; init; } = StaticVersion; // 配置版本号
     public static int StaticVersion => 3;
+}
+
+/// <summary>自定义任务条目</summary>
+public class CustomTaskEntry
+{
+    public string Name { get; set; } = "自定义任务";
+
+    // 新方式：引用已安装脚本（优先）
+    public string ScriptId { get; set; } = "";        // 脚本 ID（对应 scripts/{id}/）
+    public string TaskEntry { get; set; } = "";       // 任务入口文件名（manifest.tasks[n].entry）
+    public string TaskClassName { get; set; } = "";   // 任务类名
+
+    // 旧方式：直接指定路径（向后兼容）
+    public string ScriptPath { get; set; } = "";
+
+    public bool IsEnabled { get; set; } = true;
+    public bool NotifyOnStart { get; set; } = false;
+    public bool NotifyOnComplete { get; set; } = false;
+
+    private string _id = "";
+    public string Id
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(_id))
+                _id = System.Guid.NewGuid().ToString("N")[..8];
+            return _id;
+        }
+        set => _id = value;
+    }
 }

@@ -25,6 +25,7 @@ public partial class SettingsPageViewModel : PageViewModel
     private readonly SettingsService _settingsService;
     private readonly UpdateService _updateService;
     private readonly OverlayService _overlayService;
+    private readonly ConfigService _configService;
     private CancellationTokenSource? _settingsSaveCts;
 
     /// <inheritdoc />
@@ -35,7 +36,8 @@ public partial class SettingsPageViewModel : PageViewModel
         CommonModel commonModel,
         RegistryService registryService,
         IBackendService backendService,
-        OverlayService overlayService) : base(PageName.Setting,
+        OverlayService overlayService,
+        ConfigService configService) : base(PageName.Setting,
         "\uE272")
     {
         _settingsService = settingsService;
@@ -45,6 +47,7 @@ public partial class SettingsPageViewModel : PageViewModel
         _commonModel = commonModel;
         _backendService = backendService;
         _overlayService = overlayService;
+        _configService = configService;
         // 任务通用设置中的 启动/停止 快捷键（非游戏内快捷键分组）
         StartStopKey = new CustomizableKey(ListenKeyFor)
         {
@@ -228,6 +231,8 @@ public partial class SettingsPageViewModel : PageViewModel
         if (!Settings.LaunchArgumentsEnabled) return;
         _registryService.SetTargetPcResolution();
     }
+
+    public Config? CurrentConfig => _configService.Config;
 
     public bool IsOverlayEnabled
     {

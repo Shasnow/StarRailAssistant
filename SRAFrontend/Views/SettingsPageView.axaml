@@ -702,6 +702,23 @@
                                                         <CheckBox Grid.Column="2" HorizontalAlignment="Center"
                                                                   IsChecked="{Binding Settings.MissionAccomplishTaskNotifyOnComplete}"/>
                                                     </Grid>
+                                                    <!-- 自定义任务（动态，每个任务独立控制） -->
+                                                    <ItemsControl ItemsSource="{Binding CurrentConfig.CustomTasks}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:CustomTaskEntry">
+                                                                <Grid ColumnDefinitions="*,80,80">
+                                                                    <Label Grid.Column="0"
+                                                                           Content="{Binding Name}"
+                                                                           VerticalAlignment="Center"/>
+                                                                    <CheckBox Grid.Column="1" HorizontalAlignment="Center"
+                                                                              IsChecked="{Binding NotifyOnStart}"/>
+                                                                    <CheckBox Grid.Column="2" HorizontalAlignment="Center"
+                                                                              IsChecked="{Binding NotifyOnComplete}"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+
                                                 </StackPanel>
                                             </Expander>
 
