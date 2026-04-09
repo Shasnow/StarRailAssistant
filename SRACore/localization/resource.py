@@ -555,7 +555,7 @@ class Localization:
 
     @property
     def task_notificationTitle(self) -> str:
-        """任务完成提醒
+        """任务通知
 
         From task.notificationTitle"""
         return self.get_translation("task.notificationTitle")

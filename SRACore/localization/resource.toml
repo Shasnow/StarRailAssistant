@@ -350,8 +350,8 @@ zh-cn = "配置 '{config_name}' 中的所有任务已完成。"
 en-us = "All tasks in config '{config_name}' have been completed."
 
 [task.notificationTitle]
-zh-cn = "任务完成提醒"
-en-us = "Task Completion Reminder"
+zh-cn = "任务通知"
+en-us = "Task Reminder"
 
 [task.notificationMessage]
 zh-cn = "您的SRA任务运行完成。"
