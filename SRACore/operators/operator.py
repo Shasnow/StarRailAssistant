@@ -86,7 +86,6 @@ class Operator(IOperator):
                    to_y: float | None = None) -> Image:
         region = self.get_win_region(active_window=True)
         img = self._screenshot(self._hwnd, region)
-        self.sleep(0.5)  # 截图疑似太快
         if img is None:
             raise SRAError(ErrorCode.SCREENSHOT_FAILED, "无法截取窗口内容")
         if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
@@ -204,6 +203,7 @@ class Operator(IOperator):
             if from_x is not None and from_y is not None:
                 left += int(from_x * self.width)
                 top += int(from_y * self.height)
+            self.sleep(0.5)
             return Box(left, top, width, height, source=template)
         except Exception as e:
             if trace:
@@ -224,6 +224,7 @@ class Operator(IOperator):
         match_confidence = self.confidence if confidence is None else confidence
         try:
             screenshot = self.screenshot()
+            self.sleep(0.5)
         except Exception as e:
             logger.trace(f"Error taking screenshot: {e}")
             return -1, None
@@ -262,6 +263,7 @@ class Operator(IOperator):
                 raise FileNotFoundError("无法找到或读取文件 " + template)
             # noinspection PyTypeChecker
             boxes = pyscreeze.locateAll(template, self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y), confidence=match_confidence)
+            self.sleep(0.5)
             result = []
             for box in boxes:
                 left, top, width, height = box

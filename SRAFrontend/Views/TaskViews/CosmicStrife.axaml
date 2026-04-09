@@ -28,7 +28,7 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Label>模式</Label>
                                 <ComboBox SelectedIndex="{Binding CurrentConfig.DUMode}">
-                                    <ComboBoxItem>刷单层</ComboBoxItem>
+                                    <ComboBoxItem>刷第一关</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="10">
