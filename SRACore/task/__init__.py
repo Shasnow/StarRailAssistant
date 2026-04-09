@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, final
 
+from SRACore.localization import Resource
 from SRACore.operators import IOperator
+from SRACore.util import notify
 
 
 class Executable:
@@ -9,8 +11,6 @@ class Executable:
         self.operator = operator
         self.settings = operator.settings
         self.stop_event = self.operator.stop_event
-
-
 
     def stop(self):
         if self.stop_event is not None:
@@ -30,9 +30,40 @@ class BaseTask(Executable, ABC):
         """子类可重写此方法以进行额外初始化"""
         pass
 
+    @final
+    def start(self) -> None:
+        self.on_start()
+
     @abstractmethod
     def run(self) -> bool:
         pass
+
+    @final
+    def finish(self) -> None:
+        self.on_finish()
+
+    @final
+    def fail(self) -> None:
+        self.on_failure()
+
+    def send_notification(self, message: str, result: str) -> None:
+        notify.try_send_notification(
+            Resource.task_notificationTitle,
+            message,
+            result=result,
+            operator=self.operator
+        )
+
+    def on_start(self) -> None:
+        if self.settings.get(f"{self.__class__.__name__}NotifyOnStart", False):
+            self.send_notification(f"任务 {self.__class__.__name__} 开始执行。", "success")
+
+    def on_finish(self) -> None:
+        if self.settings.get(f"{self.__class__.__name__}NotifyOnComplete", False):
+            self.send_notification(f"任务 {self.__class__.__name__} 执行完成。", "success")
+
+    def on_failure(self) -> None:
+        self.send_notification(f"任务 {self.__class__.__name__} 执行失败。", "error")
 
     def __str__(self):
         return f"{self.__class__.__name__}"
