@@ -19,14 +19,14 @@ class IOperator(ABC):
 
     def __init__(self, stop_event: threading.Event | None = None):
         self.settings = load_settings()
-        self.confidence:float = self.settings.get('ConfidenceThreshold', 0.9)
+        self.confidence: float = self.settings.get('ConfidenceThreshold', 0.9)
         self.top = 0
         self.left = 0
         self.width = 0
         self.height = 0
-        self.is_developer_mode = self.settings.get('IsDeveloperMode', False)
-        self.is_save_ocr_image = self.settings.get('IsSaveOcrImage', False) if self.is_developer_mode else False
-        self.stop_event = stop_event
+        self.is_developer_mode: bool = self.settings.get('IsDeveloperMode', False)
+        self.is_save_ocr_image: bool = self.settings.get('IsSaveOcrImage', False) if self.is_developer_mode else False
+        self.stop_event: threading.Event | None = stop_event
 
     @classmethod
     def _get_ocr_instance(cls):
@@ -69,6 +69,7 @@ class IOperator(ABC):
             PIL.Image.Image: 返回截取的屏幕区域图像对象
         Note:
             - 坐标比例是基于当前窗口区域计算的
+            - 如果不提供坐标参数，则截取整个窗口
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
             SRAError: 截图出现错误
@@ -142,7 +143,6 @@ class IOperator(ABC):
 
         Args:
             template (str): 模板图片路径
-                如果为None，则默认查找当前活动窗口的区域。默认为None。
             from_x (float, optional): 起始点X坐标比例 (0-1), 相对于窗口左上角
             from_y (float, optional): 起始点Y坐标比例 (0-1), 相对于窗口左上角
             to_x (float, optional): 结束点X坐标比例 (0-1), 相对于窗口左上角
@@ -208,7 +208,6 @@ class IOperator(ABC):
         """
         OCR识别并匹配指定文本，返回文本位置
 
-        当提供完整4个比例坐标时，region参数会被忽略。
         Args:
             text (str): 要识别的文本
             confidence (float, optional): 识别置信度。默认为0.9。
@@ -248,7 +247,6 @@ class IOperator(ABC):
         """
         OCR识别并匹配任意指定文本，返回文本索引和位置
 
-        当提供完整4个比例坐标时，region参数会被忽略。
         Args:
             texts (list[str]): 要识别的文本列表
             confidence (float, optional): 识别置信度。默认为0.9。
