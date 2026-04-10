@@ -1,4 +1,3 @@
-
 import ctypes
 import sys
 import threading
@@ -105,7 +104,8 @@ class Operator(IOperator):
         :return: PIL Image / None
         """
         if sys.platform == "win32":
-            import win32gui
+            # noinspection PyPackageRequirements
+            import win32gui # (in pywin32)
             import win32ui
             import ctypes
             from PIL import Image
