@@ -7,6 +7,6 @@
     "install": "pip install -r requirements.txt",
     "frontend": "dotnet run --project SRAFrontend/SRAFrontend.csproj",
     "pyl10nc": "python scripts/pyl10nc/__main__.py SRACore/localization/resource.toml",
-    "version": "python scripts/update_version.py"
+    "ver": "python scripts/update_version.py"
   }
 }
