@@ -1,8 +1,3 @@
-﻿# SRA已更新到 2.x
-## Full Changelog：
-- 更新日期：
-- 版本：2.11
-
 ### 主要更新内容:
 - 货币战争支持自动应用攻略码。
 - 新增Webhook、Telegram、Server 酱、OneBot等10个外部通知渠道。
