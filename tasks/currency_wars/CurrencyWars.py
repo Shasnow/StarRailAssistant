@@ -90,9 +90,13 @@ class CurrencyWars(Executable):
             except Exception as e:
                 logger.error(e)
                 return False
+        self.handle_ending()
+        return True
+
+    def handle_ending(self):
+        """ 处理游戏结束逻辑，默认退出货币战争页面 """
         self.operator.wait_img(CWIMG.START_CURRENCY_WARS, timeout=30)
         self.operator.press_key("esc")
-        return True
 
     def reset_character(self):
         """ 重置所有角色信息 """
@@ -561,7 +565,7 @@ class CurrencyWars(Executable):
             self.operator.mouse_down(target.center[0], target.center[1])
             self.operator.mouse_up()
             self.operator.sleep(1)
-            self.operator.click_point(0.35, 0.20, after_sleep=0.5)
+            self.operator.click_point(0.75, 0.25, after_sleep=1)
             target = self.operator.locate(CWIMG.OPEN)
         self._get_character_in_area(areas=self.in_hand_area, target_character_list=self.in_hand_character, force=force)
         logger.info(f"当前手牌角色：{self.in_hand_character}")

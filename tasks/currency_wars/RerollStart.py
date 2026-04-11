@@ -42,6 +42,10 @@ class RerollStart(CurrencyWars):
         self.invest_strategy_stage_limit = 2  # 投资策略阶段上限，超过后不再检测投资策略
         self.invest_strategy_satisfied = False  # 满意标志
 
+    def handle_ending(self):
+        # 刷开局不需要结束游戏
+        pass
+
     @staticmethod
     def _normalize_ocr_text(text: str) -> str:
         return text.strip().replace("·", "").replace("•", "").replace("?", "").replace(" ", "")
