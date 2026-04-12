@@ -7,6 +7,7 @@ from loguru import logger
 from SRACore.task import Executable
 from SRACore.util.errors import ErrorCode, SRAError
 from tasks.currency_wars.characters import Character, Characters, Positioning
+from tasks.currency_wars.placement_logic import build_placement_plan, should_auto_equip_character
 from tasks.currency_wars.sell_logic import build_sell_plan, settle_sold_character
 from tasks.img import CWIMG, IMG
 
@@ -74,6 +75,8 @@ class CurrencyWars(Executable):
         self.min_level = 7  # 商店等级
         self.mid_level = 7  # 商店等级
         self.strategy_characters: dict[str, int] = dict()  # 在攻略中的角色及其预期购买数量
+        self.strategy_on_field_characters: set[str] = set()
+        self.strategy_off_field_characters: set[str] = set()
         self.strategy_code = ""  # 当前使用的攻略代码
         self.is_overclock = False  # 超频博弈
 
@@ -522,7 +525,10 @@ class CurrencyWars(Executable):
                     if char is None:
                         logger.warning("OCR识别到角色名称：{}，但未在角色列表中找到匹配项".format(name))
                     target_character_list[index] = char
-                    if equip:
+                    if equip and should_auto_equip_character(
+                        char.name if char is not None else None,
+                        self.strategy_characters,
+                    ):
                         self.operator.click_img(CWIMG.EQUIPMENT_RECOMMEND, after_sleep=1)
                         _, box = self.operator.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS], confidence=0.8)
                         if box:
@@ -996,6 +1002,8 @@ class CurrencyWars(Executable):
         # 在攻略中的角色设置成最高优先级
         strategy_on_field: dict[str, int] = strategy_data.get("on_field", {})
         strategy_off_field: dict[str, int] = strategy_data.get("off_field", {})
+        self.strategy_on_field_characters = set(strategy_on_field.keys())
+        self.strategy_off_field_characters = set(strategy_off_field.keys())
         for i, cn in enumerate(strategy_on_field.keys()):
             c = Characters.get_character(cn)
             if c is None:
@@ -1022,6 +1030,8 @@ class CurrencyWars(Executable):
         self.min_level = 7
         self.mid_level = 7
         self.strategy_characters.clear()
+        self.strategy_on_field_characters.clear()
+        self.strategy_off_field_characters.clear()
         self.strategy_code = ""
         logger.info("已卸载当前攻略，角色优先级已重置")
 
@@ -1031,9 +1041,30 @@ class CurrencyWars(Executable):
         队伍不满时优先放空位，队伍满时仅替换低priority角色
         :return: 至少有一个角色放置成功返回 True，否则返回 False
         """
-        # 第一次遍历：仅处理前台角色（Positioning.OnField / OnOffField），优先占满编队
+        hand_entries = []
+        for character in self.in_hand_character:
+            if character is None:
+                hand_entries.append((None, "on", False))
+                continue
+
+            if character.position == Positioning.OnField:
+                position = "on"
+            elif character.position == Positioning.OffField:
+                position = "off"
+            else:
+                position = "both"
+
+            hand_entries.append((character.name, position, character.is_placed))
+
+        front_plan, back_plan = build_placement_plan(
+            hand_entries,
+            self.strategy_on_field_characters,
+            self.strategy_off_field_characters,
+        )
+
         logger.info("=== 放置前台角色 ===")
-        for i, character in enumerate(self.in_hand_character):
+        for i in front_plan:
+            character = self.in_hand_character[i]
             if character is None or character.is_placed:
                 continue
             if character.position == Positioning.OffField:
@@ -1042,9 +1073,9 @@ class CurrencyWars(Executable):
                 self.operator.sleep(1)
                 self._handle_special_event()
 
-        # 第二次遍历：仅处理后台角色（Positioning.OffField），填充剩余空位或替换
         logger.info("=== 放置后台角色 ===")
-        for i, character in enumerate(self.in_hand_character):
+        for i in back_plan:
+            character = self.in_hand_character[i]
             if character is None or character.is_placed:
                 continue
             if character.position == Positioning.OnField:
