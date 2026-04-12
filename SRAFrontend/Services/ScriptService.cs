@@ -142,7 +142,20 @@ public class ScriptService
             {
                 var json = File.ReadAllText(manifestPath);
                 var m = JsonSerializer.Deserialize<ScriptManifest>(json, _json);
-                if (m != null) result.Add(m);
+                if (m == null) continue;
+                // 加载 settings.json -> LoadedParams
+                var settingsPath = Path.Combine(dir, "settings.json");
+                if (File.Exists(settingsPath))
+                {
+                    try
+                    {
+                        var defs = JsonSerializer.Deserialize<List<ScriptParamDef>>(
+                            File.ReadAllText(settingsPath), _json);
+                        if (defs != null) m.LoadedParams.AddRange(defs);
+                    }
+                    catch { /* 忽略解析失败 */ }
+                }
+                result.Add(m);
             }
             catch (Exception e)
             {

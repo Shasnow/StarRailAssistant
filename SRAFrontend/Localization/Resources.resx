@@ -36,6 +36,9 @@
     <data name="ResourceIntegrityCheckText" xml:space="preserve">
         <value>Resource integrity check</value>
     </data>
+    <data name="ScriptStoreText" xml:space="preserve">
+        <value>Scripts</value>
+    </data>
     <data name="ExtensionText" xml:space="preserve">
         <value>Extension</value>
     </data>

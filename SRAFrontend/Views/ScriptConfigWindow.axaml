@@ -1,0 +1,104 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:SRAFrontend.ViewModels"
+        x:Class="SRAFrontend.Views.ScriptConfigWindow"
+        x:DataType="vm:ScriptConfigWindowViewModel"
+        Title="{Binding Title}"
+        Width="520" MinWidth="400"
+        SizeToContent="Height"
+        MaxHeight="700"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <ScrollViewer Grid.Row="0" Padding="24,20,24,0">
+            <StackPanel Spacing="0">
+
+                <!-- 无配置 -->
+                <TextBlock IsVisible="{Binding !HasParams}"
+                           Text="{Binding NoParamsMessage}"
+                           Opacity="0.55" FontSize="13" TextWrapping="Wrap"
+                           Margin="0,40,0,0" TextAlignment="Center"/>
+
+                <!-- 参数列表 -->
+                <ItemsControl IsVisible="{Binding HasParams}"
+                              ItemsSource="{Binding ParamGroups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ScriptParamGroupViewModel">
+                            <StackPanel Margin="0,0,0,4">
+
+                                <!-- 分组标题 -->
+                                <StackPanel IsVisible="{Binding HasGroupName}" Margin="0,12,0,8">
+                                    <TextBlock Text="{Binding GroupName}"
+                                               FontWeight="SemiBold" FontSize="14"/>
+                                    <Separator Margin="0,4,0,0" Opacity="0.15"/>
+                                </StackPanel>
+
+                                <!-- 该组的参数 -->
+                                <ItemsControl ItemsSource="{Binding Params}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:ScriptParamValueViewModel">
+                                            <StackPanel Margin="0,0,0,14" Spacing="4">
+
+                                                <!-- 标签 -->
+                                                <TextBlock Text="{Binding Label}"
+                                                           FontSize="13"/>
+                                                <!-- 说明 -->
+                                                <TextBlock Text="{Binding Description}"
+                                                           FontSize="12" Opacity="0.55"
+                                                           TextWrapping="Wrap"
+                                                           IsVisible="{Binding HasDescription}"/>
+
+                                                <!-- string / int -->
+                                                <TextBox IsVisible="{Binding IsText}"
+                                                         Text="{Binding Value}"
+                                                         Watermark="{Binding DefaultValue}"/>
+
+                                                <!-- bool -->
+                                                <ToggleSwitch IsVisible="{Binding IsBool}"
+                                                              IsChecked="{Binding BoolValue}"
+                                                              OnContent="" OffContent=""
+                                                              HorizontalAlignment="Left"/>
+
+                                                <!-- select -->
+                                                <ComboBox IsVisible="{Binding IsSelect}"
+                                                          ItemsSource="{Binding Options}"
+                                                          SelectedItem="{Binding Value}"
+                                                          HorizontalAlignment="Stretch"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- 底部 -->
+        <Border Grid.Row="1"
+                BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource SukiBorderBrush}"
+                Padding="24,12">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
+                <Button Grid.Column="0"
+                        Content="打开目录" Classes="Flat" FontSize="12"
+                        IsVisible="{Binding HasParams}"
+                        Command="{Binding OpenFolderCommand}"/>
+                <Button Grid.Column="2"
+                        Content="关闭" Classes="Flat" FontSize="12"
+                        Click="CloseButton_Click"/>
+                <Button Grid.Column="3"
+                        Content="保存" Classes="Accent" FontSize="12"
+                        Padding="20,0"
+                        Command="{Binding SaveCommand}"
+                        IsVisible="{Binding HasParams}"/>
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>

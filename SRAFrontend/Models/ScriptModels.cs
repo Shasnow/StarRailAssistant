@@ -1,62 +1,65 @@
 using System.Collections.Generic;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SRAFrontend.Models;
 
 /// <summary>脚本仓库配置</summary>
-public class ScriptRepo
+public partial class ScriptRepo : ObservableObject
 {
-    public string Name { get; set; } = "";
-    public string Url { get; set; } = "";
-    public bool Enabled { get; set; } = true;
+    [ObservableProperty] private string _name = "";
+    [ObservableProperty] private string _url = "";
+    [ObservableProperty] private bool _enabled = true;
 }
 
-/// <summary>脚本 manifest.json 中的单个任务定义</summary>
-public class ScriptTaskDef
+/// <summary>脚本内的单个任务定义</summary>
+public partial class ScriptTaskDef : ObservableObject
 {
-    public string Name { get; set; } = "";
-    public string Entry { get; set; } = "";   // .py 文件名
-    public string Class { get; set; } = "";   // 类名
+    [ObservableProperty] private string _name = "";
+    [ObservableProperty] private string _entry = "";
+    /// <summary>Python 类名（对应 manifest.json 中的 "class" 字段）</summary>
+    [ObservableProperty] private string _class = "";
+    /// <summary>兼容旧字段名 ClassName</summary>
+    public string ClassName { get => Class; set => Class = value; }
+    /// <summary>任务级参数定义（manifest.json tasks[].params）</summary>
+    public List<ScriptParamDef> Params { get; set; } = [];
 }
 
-/// <summary>脚本 manifest.json</summary>
-public class ScriptManifest
+/// <summary>本地脚本的 manifest.json 模型</summary>
+public partial class ScriptManifest : ObservableObject
 {
-    public string Id { get; set; } = "";
-    public string Name { get; set; } = "";
-    public string Version { get; set; } = "0.0.0";
-    public string Description { get; set; } = "";
-    public string Author { get; set; } = "";
-    public List<ScriptTaskDef> Tasks { get; set; } = [];
+    [ObservableProperty] private string _id = "";
+    [ObservableProperty] private string _name = "";
+    [ObservableProperty] private string _version = "";
+    [ObservableProperty] private string _description = "";
+    [ObservableProperty] private string _author = "";
+    [ObservableProperty] private List<ScriptTaskDef> _tasks = [];
+    /// <summary>从脚本目录 settings.json 加载的参数定义（优先于 tasks[].params）</summary>
+    public List<ScriptParamDef> LoadedParams { get; set; } = [];
 }
 
-/// <summary>仓库 repo.json 中的脚本条目（含安装状态）</summary>
-public class RepoScriptInfo
+/// <summary>仓库索引中的脚本信息</summary>
+public partial class RepoScriptInfo : ObservableObject
 {
-    public string Id { get; set; } = "";
-    public string Name { get; set; } = "";
-    public string Version { get; set; } = "0.0.0";
-    public string Description { get; set; } = "";
-    public string Author { get; set; } = "";
-    public string DownloadUrl { get; set; } = "";
-    public string RepoPath { get; set; } = "";       // 脚本在仓库 zip 中的子目录路径
-    public string LastUpdated { get; set; } = "";
-    public List<ScriptTaskDef> Tasks { get; set; } = [];
-    // 由前端填充
-    public string? InstalledVersion { get; set; }
-    public bool HasUpdate => InstalledVersion != null && InstalledVersion != Version;
+    [ObservableProperty] private string _id = "";
+    [ObservableProperty] private string _name = "";
+    [ObservableProperty] private string _version = "";
+    [ObservableProperty] private string _description = "";
+    [ObservableProperty] private string _author = "";
+    [ObservableProperty] private string _lastUpdated = "";
+    [ObservableProperty] private string _downloadUrl = "";
+    [ObservableProperty] private string? _installedVersion;
+    [ObservableProperty] private bool _hasUpdate;
+
     public bool IsInstalled => InstalledVersion != null;
 }
 
-/// <summary>仓库 repo.json 根结构</summary>
-public class RepoIndex
+/// <summary>settings.json 中单个参数的定义</summary>
+public class ScriptParamDef
 {
-    public string Name { get; set; } = "";
-    public string Version { get; set; } = "";
-    public List<RepoScriptInfo> Scripts { get; set; } = [];
-}
-
-/// <summary>仓库配置文件根结构</summary>
-public class ScriptReposConfig
-{
-    public List<ScriptRepo> Repos { get; set; } = [];
+    public string Key { get; set; } = "";
+    public string? Label { get; set; }
+    public string? Type { get; set; }
+    public string? Default { get; set; }
+    public string? Description { get; set; }
+    public List<string>? Options { get; set; }
 }

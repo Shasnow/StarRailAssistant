@@ -195,6 +195,7 @@ class TaskManager:
                 config_list = args
 
             last_operator = None
+            config = None   # 确保 config 在循环前已定义
             for config_name in config_list:
                 logger.info(Resource.task_currentConfig(config_name))
 

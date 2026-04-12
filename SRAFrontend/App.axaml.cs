@@ -69,6 +69,7 @@ public class App : Application
         services.AddTransient<PageViewModel, HomePageViewModel>();
         services.AddTransient<PageViewModel, TaskPageViewModel>();
         services.AddTransient<PageViewModel, ExtensionPageViewModel>();
+        services.AddTransient<PageViewModel, ScriptStorePageViewModel>();
         services.AddTransient<PageViewModel, ConsolePageViewModel>();
         services.AddTransient<PageViewModel, SettingsPageViewModel>();
         services.AddTransient<UpdateService>();
@@ -85,6 +86,7 @@ public class App : Application
         services.AddSingleton<RegistryService>();
         services.AddSingleton<ConfigService>();
         services.AddSingleton<ScriptService>();
+        services.AddTransient<ScriptConfigWindowViewModel>();
         services.AddSingleton<ReportService>();
         services.AddSingleton<OverlayService>();
         services.AddHttpClient("GlobalClient", client =>

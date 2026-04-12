@@ -10,7 +10,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-import requests
 
 from SRACore.util.const import AppDataSraDir
 from SRACore.util.logger import logger
@@ -152,6 +151,7 @@ class ScriptManager:
     def fetch_repo_scripts(self, repo: ScriptRepo) -> list[RepoScriptInfo]:
         """从仓库拉取脚本列表，并与本地版本对比"""
         try:
+            import requests
             resp = requests.get(repo.url, timeout=15)
             resp.raise_for_status()
             data = resp.json()
@@ -218,6 +218,7 @@ class ScriptManager:
             if on_progress:
                 on_progress(0, f"正在下载 {info.name}...")
 
+            import requests
             resp = requests.get(info.download_url, timeout=60, stream=True)
             resp.raise_for_status()
             total = int(resp.headers.get("content-length", 0))

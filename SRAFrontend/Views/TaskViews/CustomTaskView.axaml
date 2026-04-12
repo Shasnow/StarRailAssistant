@@ -7,7 +7,8 @@
              xmlns:models="clr-namespace:SRAFrontend.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SRAFrontend.Views.TaskViews.CustomTaskView"
-             x:DataType="viewModels:TaskPageViewModel">
+             x:DataType="viewModels:TaskPageViewModel"
+             xmlns:views="clr-namespace:SRAFrontend.Views">
     <suki:GlassCard>
         <suki:GroupBox>
             <suki:GroupBox.Header>
@@ -112,6 +113,25 @@
                             </Grid>
                         </StackPanel>
                     </Expander>
+
+                    <!-- 任务通知开关 -->
+                    <suki:GlassCard>
+                        <StackPanel Spacing="10">
+                            <TextBlock FontWeight="Medium" Text="任务通知"/>
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" RowDefinitions="Auto,Auto" RowSpacing="8">
+                                <Label Grid.Row="0" Grid.Column="0" Content="开始时通知" VerticalAlignment="Center"/>
+                                <ToggleSwitch Grid.Row="0" Grid.Column="1"
+                                              IsChecked="{Binding SelectedCustomTask.NotifyOnStart}"
+                                              OnContent="" OffContent=""
+                                              HorizontalAlignment="Left"/>
+                                <Label Grid.Row="1" Grid.Column="0" Content="完成时通知" VerticalAlignment="Center"/>
+                                <ToggleSwitch Grid.Row="1" Grid.Column="1"
+                                              IsChecked="{Binding SelectedCustomTask.NotifyOnComplete}"
+                                              OnContent="" OffContent=""
+                                              HorizontalAlignment="Left"/>
+                            </Grid>
+                        </StackPanel>
+                    </suki:GlassCard>
 
                     <!-- 说明 -->
                     <suki:GlassCard>
