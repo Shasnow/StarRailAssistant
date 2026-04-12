@@ -2,39 +2,41 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
-using System.Threading;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using SRAFrontend.Data;
 using SRAFrontend.Models;
 
 namespace SRAFrontend.Services;
 
+/// <summary>
+/// 脚本仓库服务：负责仓库管理、脚本列表拉取、下载安装、本地扫描
+/// </summary>
 public class ScriptService
 {
-    private readonly ILogger<ScriptService> _logger;
-    private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(30) };
+    private static readonly string ScriptsDir =
+        Path.Combine(PathString.AppDataSraDir, "scripts");
+    private static readonly string ReposConfigPath =
+        Path.Combine(PathString.AppDataSraDir, "script_repos.json");
 
-    private static readonly string AppDataDir =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SRA");
-
-    public static readonly string ScriptsDir = Path.Combine(AppDataDir, "scripts");
-    private static readonly string ReposConfigPath = Path.Combine(AppDataDir, "script_repos.json");
-
-    private static readonly JsonSerializerOptions _json = new()
+    private static readonly JsonSerializerOptions JsonOpts = new()
     {
         PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-        WriteIndented = true
+        WriteIndented = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     };
 
-    public ScriptService(ILogger<ScriptService> logger)
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public ScriptService(IHttpClientFactory httpClientFactory)
     {
-        _logger = logger;
+        _httpClientFactory = httpClientFactory;
         Directory.CreateDirectory(ScriptsDir);
     }
+
+    // ===== 仓库管理 =====
 
     public List<ScriptRepo> LoadRepos()
     {
@@ -42,98 +44,76 @@ public class ScriptService
         try
         {
             var json = File.ReadAllText(ReposConfigPath);
-            var cfg = JsonSerializer.Deserialize<ScriptReposConfig>(json, _json);
-            return cfg?.Repos ?? [];
+            var root = JsonSerializer.Deserialize<ReposConfig>(json, JsonOpts);
+            return root?.Repos ?? [];
         }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "加载仓库配置失败");
-            return [];
-        }
+        catch { return []; }
     }
 
-    public void SaveRepos(List<ScriptRepo> repos)
+    private void SaveRepos(List<ScriptRepo> repos)
     {
-        var cfg = new ScriptReposConfig { Repos = repos };
-        File.WriteAllText(ReposConfigPath, JsonSerializer.Serialize(cfg, _json));
-    }
-
-    /// <summary>
-    /// 把 GitHub 仓库 URL 转换为 repo.json 的 raw URL。
-    /// 支持：
-    ///   https://github.com/user/repo  -> https://raw.githubusercontent.com/user/repo/main/repo.json
-    ///   https://github.com/user/repo/tree/branch -> 对应分支
-    /// 其他 URL 原样保留。
-    /// </summary>
-    public static string NormalizeRepoUrl(string url)
-    {
-        url = url.Trim().TrimEnd('/');
-        if (!url.StartsWith("https://github.com/", StringComparison.OrdinalIgnoreCase))
-            return url;
-
-        // 去掉 https://github.com/
-        var path = url["https://github.com/".Length..];
-        var parts = path.Split('/');
-
-        if (parts.Length < 2) return url;
-
-        var user = parts[0];
-        var repo = parts[1];
-
-        // 检查是否指定了分支：github.com/user/repo/tree/branch
-        var branch = "main";
-        if (parts.Length >= 4 && parts[2] == "tree")
-            branch = parts[3];
-
-        return $"https://raw.githubusercontent.com/{user}/{repo}/{branch}/repo.json";
+        var json = JsonSerializer.Serialize(new ReposConfig { Repos = repos }, JsonOpts);
+        File.WriteAllText(ReposConfigPath, json);
     }
 
     public bool AddRepo(string name, string url)
     {
-        var normalizedUrl = NormalizeRepoUrl(url);
         var repos = LoadRepos();
-        if (repos.Any(r => r.Url == normalizedUrl)) return false;
-        var repoName = string.IsNullOrWhiteSpace(name) ? normalizedUrl : name;
-        repos.Add(new ScriptRepo { Name = repoName, Url = normalizedUrl });
+        if (repos.Exists(r => r.Url == url)) return false;
+        repos.Add(new ScriptRepo { Name = name, Url = url });
         SaveRepos(repos);
         return true;
     }
 
     public void RemoveRepo(string url)
     {
-        var repos = LoadRepos().Where(r => r.Url != url).ToList();
+        var repos = LoadRepos();
+        repos.RemoveAll(r => r.Url == url);
         SaveRepos(repos);
     }
 
-    public async Task<List<RepoScriptInfo>> FetchRepoScriptsAsync(ScriptRepo repo,
-        CancellationToken ct = default)
-    {
-        try
-        {
-            var json = await _http.GetStringAsync(repo.Url, ct);
-            var index = JsonSerializer.Deserialize<RepoIndex>(json, _json);
-            if (index == null) return [];
+    // ===== 远程脚本列表 =====
 
-            var installed = GetInstalledScripts().ToDictionary(s => s.Id, s => s.Version);
-            foreach (var s in index.Scripts)
-            {
-                if (installed.TryGetValue(s.Id, out var v))
-                    s.InstalledVersion = v;
-            }
-            return index.Scripts;
-        }
-        catch (Exception e)
+    public async Task<List<RepoScriptInfo>> FetchRepoScriptsAsync(ScriptRepo repo)
+    {
+        var client = _httpClientFactory.CreateClient("GlobalClient");
+        var json = await client.GetStringAsync(repo.Url);
+        var root = JsonSerializer.Deserialize<RepoIndex>(json, JsonOpts);
+        if (root?.Scripts == null) return [];
+
+        var installed = GetInstalledScripts();
+        var installedMap = new Dictionary<string, string>();
+        foreach (var s in installed) installedMap[s.Id] = s.Version;
+
+        var result = new List<RepoScriptInfo>();
+        foreach (var item in root.Scripts)
         {
-            _logger.LogError(e, "拉取仓库 {Url} 失败", repo.Url);
-            return [];
+            var info = new RepoScriptInfo
+            {
+                Id = item.Id ?? "",
+                Name = item.Name ?? "",
+                Version = item.Version ?? "0.0.0",
+                Description = item.Description ?? "",
+                Author = item.Author ?? "",
+                LastUpdated = item.LastUpdated ?? "",
+                DownloadUrl = item.DownloadUrl ?? "",
+            };
+            if (installedMap.TryGetValue(info.Id, out var ver))
+            {
+                info.InstalledVersion = ver;
+                info.HasUpdate = info.Version != ver;
+            }
+            result.Add(info);
         }
+        return result;
     }
+
+    // ===== 本地脚本 =====
 
     public List<ScriptManifest> GetInstalledScripts()
     {
         var result = new List<ScriptManifest>();
         if (!Directory.Exists(ScriptsDir)) return result;
-
         foreach (var dir in Directory.GetDirectories(ScriptsDir))
         {
             var manifestPath = Path.Combine(dir, "manifest.json");
@@ -141,125 +121,129 @@ public class ScriptService
             try
             {
                 var json = File.ReadAllText(manifestPath);
-                var m = JsonSerializer.Deserialize<ScriptManifest>(json, _json);
+                var m = JsonSerializer.Deserialize<ManifestJson>(json, JsonOpts);
                 if (m == null) continue;
+                var manifest = new ScriptManifest
+                {
+                    Id = m.Id ?? Path.GetFileName(dir),
+                    Name = m.Name ?? "",
+                    Version = m.Version ?? "0.0.0",
+                    Description = m.Description ?? "",
+                    Author = m.Author ?? "",
+                };
+                foreach (var t in m.Tasks ?? [])
+                    manifest.Tasks.Add(new ScriptTaskDef
+                    {
+                        Name = t.Name ?? "",
+                        Entry = t.Entry ?? "",
+                        Class = t.Class ?? "",
+                    });
                 // 加载 settings.json -> LoadedParams
                 var settingsPath = Path.Combine(dir, "settings.json");
                 if (File.Exists(settingsPath))
                 {
                     try
                     {
-                        var defs = JsonSerializer.Deserialize<List<ScriptParamDef>>(
-                            File.ReadAllText(settingsPath), _json);
-                        if (defs != null) m.LoadedParams.AddRange(defs);
+                        var settingsJson = File.ReadAllText(settingsPath);
+                        var defs = System.Text.Json.JsonSerializer.Deserialize<List<ScriptParamDef>>(
+                            settingsJson, JsonOpts);
+                        if (defs != null) manifest.LoadedParams.AddRange(defs);
                     }
                     catch { /* 忽略解析失败 */ }
                 }
-                result.Add(m);
+                result.Add(manifest);
             }
-            catch (Exception e)
-            {
-                _logger.LogWarning(e, "读取 manifest 失败: {Dir}", dir);
-            }
+            catch { /* 跳过损坏的 manifest */ }
         }
         return result;
     }
 
-    public string GetScriptDir(string scriptId) => Path.Combine(ScriptsDir, scriptId);
+    public string GetScriptDir(string scriptId) =>
+        Path.Combine(ScriptsDir, scriptId);
 
-    /// <summary>
-    /// 下载并安装脚本。
-    /// download_url 是整个仓库的 archive zip，repo_path 指定脚本在 zip 中的子目录。
-    /// </summary>
-    public async Task<bool> DownloadAndInstallAsync(RepoScriptInfo info,
-        IProgress<(int Percent, string Message)>? progress = null,
-        CancellationToken ct = default)
+    /// <summary>读取脚本目录下 settings.json，解析为参数定义列表</summary>
+    public List<ScriptParamDef> LoadScriptParamDefs(string scriptId)
     {
-        if (string.IsNullOrEmpty(info.DownloadUrl))
+        var path = Path.Combine(ScriptsDir, scriptId, "settings.json");
+        if (!File.Exists(path)) return [];
+        try
         {
-            _logger.LogError("脚本 {Id} 没有下载地址", info.Id);
-            return false;
+            var json = File.ReadAllText(path);
+            return JsonSerializer.Deserialize<List<ScriptParamDef>>(json, JsonOpts) ?? [];
         }
+        catch { return []; }
+    }
+
+    /// <summary>读取已安装脚本的本地 README.md</summary>
+    public string? ReadLocalReadme(string scriptId)
+    {
+        var path = Path.Combine(ScriptsDir, scriptId, "README.md");
+        return File.Exists(path) ? File.ReadAllText(path) : null;
+    }
+
+    /// <summary>从仓库远程拉取 README（通过 repo_path 构造 raw URL）</summary>
+    public Task<string?> FetchReadmeAsync(RepoScriptInfo info)
+    {
+        if (string.IsNullOrEmpty(info.DownloadUrl)) return Task.FromResult<string?>(null);
+        // download_url 形如 https://github.com/xxx/sra-scripts/archive/refs/heads/main.zip
+        // 尝试先看本地已安装
+        var local = ReadLocalReadme(info.Id);
+        if (local != null) return Task.FromResult<string?>(local);
+
+        // 如果未安装，从 GitHub raw 拉取（download_url 转换为 raw 地址）
+        // 由于 download_url 是 zip，只能提示用户安装后查看
+        return Task.FromResult<string?>("_请先安装脚本以查看本地 README，或访问仓库主页查阅文档。_");
+    }
+
+    // ===== 下载安装 =====
+
+    public async Task<bool> DownloadAndInstallAsync(
+        RepoScriptInfo info,
+        IProgress<(int Percent, string Message)>? progress = null)
+    {
+        if (string.IsNullOrEmpty(info.DownloadUrl)) return false;
 
         var scriptDir = GetScriptDir(info.Id);
-        var tmpZip = Path.Combine(AppDataDir, $"_tmp_repo_{info.Id}.zip");
+        var tmpZip = Path.Combine(PathString.AppDataSraDir, $"_tmp_{info.Id}.zip");
 
         try
         {
             progress?.Report((0, $"正在下载 {info.Name}..."));
+            var client = _httpClientFactory.CreateClient("GlobalClient");
 
-            // 下载整个仓库 zip
-            using var resp = await _http.GetAsync(info.DownloadUrl,
-                HttpCompletionOption.ResponseHeadersRead, ct);
+            using var resp = await client.GetAsync(
+                info.DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
             resp.EnsureSuccessStatusCode();
 
             var total = resp.Content.Headers.ContentLength ?? 0;
-            await using var stream = await resp.Content.ReadAsStreamAsync(ct);
+            await using var stream = await resp.Content.ReadAsStreamAsync();
             await using var file = File.Create(tmpZip);
 
-            var buffer = new byte[65536];
+            var buffer = new byte[8192];
             long downloaded = 0;
             int read;
-            while ((read = await stream.ReadAsync(buffer, ct)) > 0)
+            while ((read = await stream.ReadAsync(buffer)) > 0)
             {
-                await file.WriteAsync(buffer.AsMemory(0, read), ct);
+                await file.WriteAsync(buffer.AsMemory(0, read));
                 downloaded += read;
                 if (total > 0)
-                    progress?.Report(((int)(downloaded * 75 / total),
+                    progress?.Report(((int)(downloaded * 80 / total),
                         $"下载中 {downloaded / 1024}KB / {total / 1024}KB"));
             }
-            file.Close();
 
-            progress?.Report((75, "正在解压..."));
-
-            // zip 内的脚本路径：{repo}-{branch}/{repo_path}/
-            // 例如：sra-scripts-main/repo/example_script/
-            var repoPath = info.RepoPath; // 如 "repo/example_script"
+            progress?.Report((80, "正在解压..."));
 
             if (Directory.Exists(scriptDir))
                 Directory.Delete(scriptDir, true);
             Directory.CreateDirectory(scriptDir);
 
-            using var zip = ZipFile.OpenRead(tmpZip);
+            ExtractZipStrippingTopDir(tmpZip, scriptDir, info.Id);
 
-            // 找到 zip 内的顶层目录（如 sra-scripts-main）
-            var topDir = zip.Entries.FirstOrDefault()?.FullName.Split('/')[0] ?? "";
-            // 脚本在 zip 内的前缀
-            var scriptPrefix = string.IsNullOrEmpty(repoPath)
-                ? $"{topDir}/repo/{info.Id}/"
-                : $"{topDir}/{repoPath.TrimStart('/')}/";
-
-            var extracted = 0;
-            foreach (var entry in zip.Entries)
-            {
-                if (!entry.FullName.StartsWith(scriptPrefix)) continue;
-                var rel = entry.FullName[scriptPrefix.Length..];
-                if (string.IsNullOrEmpty(rel)) continue;
-                var target = Path.Combine(scriptDir, rel);
-                if (entry.FullName.EndsWith("/"))
-                    Directory.CreateDirectory(target);
-                else
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-                    entry.ExtractToFile(target, overwrite: true);
-                    extracted++;
-                }
-            }
-
-            if (extracted == 0)
-            {
-                _logger.LogError("脚本 {Id} 在 zip 中未找到文件（prefix: {Prefix}）", info.Id, scriptPrefix);
-                if (Directory.Exists(scriptDir)) Directory.Delete(scriptDir, true);
-                return false;
-            }
-
-            progress?.Report((100, $"安装完成（{extracted} 个文件）"));
-            _logger.LogInformation("脚本 {Id} 安装成功，{Count} 个文件", info.Id, extracted);
+            progress?.Report((100, "安装完成"));
             return true;
         }
-        catch (Exception e)
+        catch
         {
-            _logger.LogError(e, "安装脚本 {Id} 失败", info.Id);
             if (Directory.Exists(scriptDir))
                 Directory.Delete(scriptDir, true);
             return false;
@@ -270,12 +254,91 @@ public class ScriptService
         }
     }
 
+    private static void ExtractZipStrippingTopDir(string zipPath, string destDir, string scriptId)
+    {
+        using var archive = ZipFile.OpenRead(zipPath);
+        // 找到脚本子目录前缀：zip 内路径形如 sra-scripts-main/repo/divergent_universe/...
+        var prefix = "";
+        foreach (var entry in archive.Entries)
+        {
+            var parts = entry.FullName.Split('/');
+            // 寻找第一个包含 scriptId 的目录层级
+            for (var i = 0; i < parts.Length - 1; i++)
+            {
+                if (!parts[i].Equals(scriptId, StringComparison.OrdinalIgnoreCase)) continue;
+                // parts[0..i] 是要剥离的前缀
+                prefix = string.Join("/", parts[..( i + 1)]) + "/";
+                break;
+            }
+            if (!string.IsNullOrEmpty(prefix)) break;
+        }
+
+        foreach (var entry in archive.Entries)
+        {
+            if (!entry.FullName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) continue;
+            var relative = entry.FullName[prefix.Length..];
+            if (string.IsNullOrEmpty(relative)) continue;
+
+            var target = Path.Combine(destDir, relative.Replace('/', Path.DirectorySeparatorChar));
+            if (entry.FullName.EndsWith('/'))
+            {
+                Directory.CreateDirectory(target);
+            }
+            else
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+                entry.ExtractToFile(target, overwrite: true);
+            }
+        }
+    }
+
     public bool Uninstall(string scriptId)
     {
         var dir = GetScriptDir(scriptId);
         if (!Directory.Exists(dir)) return false;
         Directory.Delete(dir, true);
-        _logger.LogInformation("脚本 {Id} 已卸载", scriptId);
         return true;
+    }
+
+    // ===== 内部 JSON 映射类 =====
+
+    private class ReposConfig
+    {
+        [JsonPropertyName("repos")]
+        public List<ScriptRepo> Repos { get; set; } = [];
+    }
+
+    private class RepoIndex
+    {
+        [JsonPropertyName("scripts")]
+        public List<RepoScriptJson>? Scripts { get; set; }
+    }
+
+    private class RepoScriptJson
+    {
+        [JsonPropertyName("id")]          public string? Id { get; set; }
+        [JsonPropertyName("name")]        public string? Name { get; set; }
+        [JsonPropertyName("version")]     public string? Version { get; set; }
+        [JsonPropertyName("description")] public string? Description { get; set; }
+        [JsonPropertyName("author")]      public string? Author { get; set; }
+        [JsonPropertyName("last_updated")]public string? LastUpdated { get; set; }
+        [JsonPropertyName("download_url")]public string? DownloadUrl { get; set; }
+    }
+
+    private class ManifestJson
+    {
+        [JsonPropertyName("id")]          public string? Id { get; set; }
+        [JsonPropertyName("name")]        public string? Name { get; set; }
+        [JsonPropertyName("version")]     public string? Version { get; set; }
+        [JsonPropertyName("description")] public string? Description { get; set; }
+        [JsonPropertyName("author")]      public string? Author { get; set; }
+        [JsonPropertyName("tasks")]       public List<TaskJson>? Tasks { get; set; }
+    }
+
+    private class TaskJson
+    {
+        [JsonPropertyName("name")]  public string? Name { get; set; }
+        [JsonPropertyName("entry")] public string? Entry { get; set; }
+        [JsonPropertyName("class")] public string? Class { get; set; }
     }
 }

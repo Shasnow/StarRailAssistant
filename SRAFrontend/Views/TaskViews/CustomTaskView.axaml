@@ -44,8 +44,8 @@
                                         ToolTip.Tip="刷新已安装脚本列表"/>
                             </StackPanel>
 
-                            <!-- 脚本选择 -->
-                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" RowDefinitions="Auto,Auto" RowSpacing="8">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12"
+                                  RowDefinitions="Auto,Auto" RowSpacing="8">
                                 <Label Grid.Row="0" Grid.Column="0" Content="脚本"
                                        VerticalAlignment="Center"/>
                                 <ComboBox Grid.Row="0" Grid.Column="1"
@@ -67,7 +67,6 @@
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
 
-                                <!-- 任务选择（多任务脚本） -->
                                 <Label Grid.Row="1" Grid.Column="0" Content="任务"
                                        VerticalAlignment="Center"
                                        IsVisible="{Binding SelectedScriptHasMultipleTasks}"/>
@@ -84,7 +83,6 @@
                                 </ComboBox>
                             </Grid>
 
-                            <!-- 已选信息 -->
                             <TextBlock FontSize="12" Opacity="0.6"
                                        IsVisible="{Binding SelectedCustomTask.ScriptId, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                        TextWrapping="Wrap">
@@ -95,6 +93,15 @@
                             </TextBlock>
                         </StackPanel>
                     </suki:GlassCard>
+
+                    <!-- 修改脚本配置按钮 -->
+                    <Button IsVisible="{Binding SelectedCustomTask.ScriptId, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                            Classes="Flat"
+                            Content="修改脚本配置"
+                            HorizontalAlignment="Left"
+                            FontSize="13"
+                            Height="32" Padding="14,0"
+                            Command="{Binding OpenScriptConfigCommand}"/>
 
                     <!-- 高级：手动指定路径 -->
                     <Expander Header="高级：手动指定脚本路径" IsExpanded="False">
@@ -133,14 +140,12 @@
                         </StackPanel>
                     </suki:GlassCard>
 
-                    <!-- 说明 -->
+                    <!-- 使用说明 -->
                     <suki:GlassCard>
                         <StackPanel Spacing="4">
                             <TextBlock FontWeight="Medium" Text="使用说明"/>
                             <TextBlock TextWrapping="Wrap" Opacity="0.7" FontSize="12"
                                        Text="在拓展页安装脚本后，在上方「选择已安装脚本」中选择。"/>
-                            <TextBlock TextWrapping="Wrap" Opacity="0.7" FontSize="12"
-                                       Text="任务通知开关请在「设置 → 任务通知配置」中单独配置。"/>
                         </StackPanel>
                     </suki:GlassCard>
 

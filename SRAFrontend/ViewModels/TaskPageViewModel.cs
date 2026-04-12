@@ -1,21 +1,22 @@
-﻿using System;
+using Avalonia.Collections;
+using Avalonia.Controls;
+using Avalonia.Data.Converters;
+using Avalonia.Platform.Storage;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
+using SRAFrontend.Controls;
+using SRAFrontend.Data;
+using SRAFrontend.Models;
+using SRAFrontend.Services;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using Avalonia.Data.Converters;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Avalonia.Collections;
-using Avalonia.Controls;
-using Avalonia.Platform.Storage;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using SRAFrontend.Controls;
-using SRAFrontend.Data;
-using SRAFrontend.Models;
-using SRAFrontend.Services;
+using System;
 
 namespace SRAFrontend.ViewModels;
 
@@ -29,8 +30,6 @@ public class BoolToInstallTextConverter : Avalonia.Data.Converters.IValueConvert
     public object? ConvertBack(object? value, Type targetType, object? parameter,
         System.Globalization.CultureInfo culture) => throw new NotImplementedException();
 }
-
-
 
 /// <summary>自定义任务的 ClassName 前缀，用于与内置任务区分</summary>
 public static class CustomTaskPrefix
@@ -53,6 +52,27 @@ public partial class TaskOrderItem : ObservableObject
     public bool IsMovable => !IsFixed;
     /// <summary>在 AllTaskDefs 中的原始索引（用于 EnabledTasks 绑定）</summary>
     public int OriginalIndex { get; set; } = -1;
+}
+
+/// <summary>
+/// 包装 ScriptParamDef + 当前值，供 UI 双向绑定
+/// </summary>
+public partial class ScriptParamViewModel : ObservableObject
+{
+    private readonly Action<string, string> _onChanged;
+    public ScriptParamDef Def { get; }
+    [ObservableProperty]
+    private string _value = "";
+    public ScriptParamViewModel(ScriptParamDef def, string currentValue, Action<string, string> onChanged)
+    {
+        Def = def;
+        _value = currentValue;
+        _onChanged = onChanged;
+    }
+    partial void OnValueChanged(string value)
+    {
+        _onChanged(Def.Key, value);
+    }
 }
 
 public partial class TaskPageViewModel : PageViewModel
@@ -84,11 +104,13 @@ public partial class TaskPageViewModel : PageViewModel
         ControlPanelViewModel controlPanelViewModel,
         ConfigService configService,
         CacheService cacheService,
-        SRAFrontend.Services.ScriptService scriptService) : base(
+        SRAFrontend.Services.ScriptService scriptService,
+        ILogger<ScriptConfigEditorViewModel> configEditorLogger) : base(
         PageName.Task, "\uE1BC")
     {
         ControlPanelViewModel = controlPanelViewModel;
         _scriptService = scriptService;
+        ScriptConfigEditor = new ScriptConfigEditorViewModel(configEditorLogger);
         _commonModel = commonModel;
         _configService = configService;
         _cacheService = cacheService;
@@ -241,7 +263,11 @@ public partial class TaskPageViewModel : PageViewModel
     public System.Collections.ObjectModel.ObservableCollection<SRAFrontend.Models.ScriptManifest> InstalledScripts { get; }
         = new();
 
+    public AvaloniaList<ScriptParamViewModel> ScriptParams { get; } = new();
 
+    public bool HasScriptParams => ScriptParams.Count > 0;
+
+    public ScriptConfigEditorViewModel ScriptConfigEditor { get; }
 
     /// <summary>当前选中的自定义任务条目（仅当选中的是自定义任务时有值）</summary>
     public SRAFrontend.Models.CustomTaskEntry? SelectedCustomTask
@@ -308,10 +334,85 @@ public partial class TaskPageViewModel : PageViewModel
         SelectedCustomTask.ScriptPath = "";
         OnPropertyChanged(nameof(SelectedCustomTask));
         SyncTaskOrderToConfig();
+
+        // 加载参数定义（BGI 风格 settings.json 优先）
+        ScriptParams.Clear();
+        OnPropertyChanged(nameof(HasScriptParams));
+        var paramDefs = script.LoadedParams.Count > 0 ? script.LoadedParams : task.Params;
+        foreach (var p in paramDefs)
+        {
+            if (SelectedCustomTask.Params == null)
+                SelectedCustomTask.Params = new System.Collections.Generic.Dictionary<string, string>();
+            if (!SelectedCustomTask.Params.ContainsKey(p.Key))
+                SelectedCustomTask.Params[p.Key] = p.Default ?? "";
+            var vm = new ScriptParamViewModel(p, SelectedCustomTask.Params.GetValueOrDefault(p.Key, ""),
+                (key, val) => {
+                    if (SelectedCustomTask.Params == null)
+                        SelectedCustomTask.Params = new System.Collections.Generic.Dictionary<string, string>();
+                    SelectedCustomTask.Params[key] = val;
+                    _configService.SaveConfig();
+                });
+            ScriptParams.Add(vm);
+        }
+
+        OnPropertyChanged(nameof(HasScriptParams));
+        // 加载脚本的 config.json 编辑器
+        ScriptConfigEditor.Load(script.Id);
+    }
+
+    /// <summary>设置当前任务的参数值</summary>
+    public void SetParam(string key, string value)
+    {
+        if (SelectedCustomTask == null) return;
+        if (SelectedCustomTask.Params == null)
+            SelectedCustomTask.Params = new System.Collections.Generic.Dictionary<string, string>();
+        SelectedCustomTask.Params[key] = value;
+        _configService.SaveConfig();
+    }
+
+    /// <summary>获取当前任务的参数值（供 UI 绑定用）</summary>
+    public string GetParam(string key)
+    {
+        if (SelectedCustomTask?.Params?.TryGetValue(key, out var v) == true)
+            return v ?? "";
+        // 返回 manifest 中定义的默认值
+        var def = ScriptParams.FirstOrDefault(p => p.Def.Key == key);
+        return def?.Def.Default ?? "";
     }
 
     [RelayCommand]
-    private void RefreshInstalledScripts()
+    private void OpenScriptConfig()
+    {
+        if (SelectedCustomTask == null || string.IsNullOrEmpty(SelectedCustomTask.ScriptId)) return;
+
+        var scriptId = SelectedCustomTask.ScriptId;
+        var appData = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+        var configDir = System.IO.Path.Combine(appData, "SRA", "scripts", scriptId);
+
+        // 收集参数定义：settings.json 优先，其次 manifest params
+        var paramDefs = new System.Collections.Generic.List<SRAFrontend.Models.ScriptParamDef>();
+
+        // 检查 settings.json 是否存在
+        var settingsPath = System.IO.Path.Combine(configDir, "settings.json");
+        bool hasSettingsFile = System.IO.File.Exists(settingsPath);
+
+        var manifest = InstalledScripts.FirstOrDefault(s => s.Id == scriptId);
+        if (manifest != null)
+        {
+            if (manifest.LoadedParams.Count > 0)
+                paramDefs.AddRange(manifest.LoadedParams);
+            else if (!hasSettingsFile)
+                foreach (var task in manifest.Tasks)
+                    paramDefs.AddRange(task.Params);
+        }
+
+        var vm = new ScriptConfigWindowViewModel(scriptId, configDir, paramDefs);
+        var win = new SRAFrontend.Views.ScriptConfigWindow { DataContext = vm };
+        win.Show();
+    }
+
+    [RelayCommand]
+    public void RefreshInstalledScripts()
     {
         var prev = _selectedInstalledScript?.Id;
         InstalledScripts.Clear();

@@ -77,4 +77,3 @@ public partial class Config : ObservableObject
     public int Version { get; init; } = StaticVersion; // 配置版本号
     public static int StaticVersion => 3;
 }
-}
