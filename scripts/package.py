@@ -31,9 +31,11 @@ from pathlib import Path
 if __name__ == "__main__":
 
     root_path = Path(sys.argv[0]).resolve().parent.parent
-    with (root_path / "version.json").open(mode="r", encoding="utf-8") as f:
-        version = json.load(f)
-
+    with (root_path / "package.json").open(mode="r", encoding="utf-8") as f:
+        data = json.load(f)
+    version = data["version"]
+    with (root_path / "ChangeLog2.0.md").open(mode="r", encoding="utf-8") as f:
+        changelog = f.read()
     print("Packaging Python program...")
 
     os.system(
@@ -41,8 +43,8 @@ if __name__ == "__main__":
         " --windows-console-mode=force --windows-uac-admin"
         " --windows-icon-from-ico=resources\\SRAicon.ico"
         " --company-name='StarRailAssistant Team' --product-name=StarRailAssistant"
-        f" --file-version={version['version'].split('-')[0]}"
-        f" --product-version={version['version'].split('-')[0]}"
+        f" --file-version={version.split('-')[0]}"
+        f" --product-version={version.split('-')[0]}"
         " --file-description='StarRailAssistant Component'"
         " --copyright='Copyright © 2024 Shasnow'"
         " --assume-yes-for-downloads --output-filename=SRA-cli"
@@ -55,7 +57,6 @@ if __name__ == "__main__":
     shutil.copy(root_path / "SRACore/config.toml", root_path / "main.dist/SRACore/config.toml")
     shutil.copy(root_path / "LICENSE", root_path / "main.dist/LICENSE")
     shutil.copy(root_path / "README.md", root_path / "main.dist/README.md")
-    shutil.copy(root_path / "version.json", root_path / "main.dist/version.json")
     shutil.copytree(root_path / "resources", root_path / "main.dist/resources")
     os.makedirs(root_path / "main.dist/SRACore/localization", exist_ok=True)
     for dirpath, dirnames, filenames in os.walk(root_path / "SRACore/localization"):
@@ -67,7 +68,7 @@ if __name__ == "__main__":
 
     print("Start to compress Core package ...")
     shutil.make_archive(
-        base_name=str(root_path / f"StarRailAssistant_Core_v{version['version']}"),
+        base_name=str(root_path / f"StarRailAssistant_Core_v{version}"),
         format="zip",
         root_dir=root_path / "main.dist",
         base_dir=".",
@@ -77,7 +78,7 @@ if __name__ == "__main__":
 
     print("Start to compressing Lite package ...")
     shutil.make_archive(
-        base_name=str(root_path / f"StarRailAssistant_Lite_v{version['version']}"),
+        base_name=str(root_path / f"StarRailAssistant_Lite_v{version}"),
         format="zip",
         root_dir=root_path / "SRAFrontend/bin/Release/net8.0/win-x64/publish",
         base_dir=".",
@@ -85,7 +86,7 @@ if __name__ == "__main__":
 
     print("Start to compressing Full package ...")
     shutil.make_archive(
-        base_name=str(root_path / f"StarRailAssistant_v{version['version']}"),
+        base_name=str(root_path / f"StarRailAssistant_v{version}"),
         format="zip",
         root_dir=root_path / "main.dist",
         base_dir=".",
@@ -95,5 +96,5 @@ if __name__ == "__main__":
     print("SRA program packaging completed !")
 
     (root_path / "version_info.txt").write_text(
-        f"v{version['version']}\n\n{version['Announcement'][0]['content']}", encoding="utf-8"
+        f"v{version}\n\n{changelog}", encoding="utf-8"
     )
