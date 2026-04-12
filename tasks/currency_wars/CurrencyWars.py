@@ -8,6 +8,7 @@ from SRACore.task import Executable
 from SRACore.util.errors import ErrorCode, SRAError
 from tasks.currency_wars.characters import Character, Characters, Positioning
 from tasks.currency_wars.placement_logic import build_placement_plan, should_auto_equip_character
+from tasks.currency_wars.sell_logic import build_sell_plan, settle_sold_character
 from tasks.img import CWIMG, IMG
 
 
@@ -93,9 +94,13 @@ class CurrencyWars(Executable):
             except Exception as e:
                 logger.error(e)
                 return False
+        self.handle_ending()
+        return True
+
+    def handle_ending(self):
+        """ 处理游戏结束逻辑，默认退出货币战争页面 """
         self.operator.wait_img(CWIMG.START_CURRENCY_WARS, timeout=30)
         self.operator.press_key("esc")
-        return True
 
     def reset_character(self):
         """ 重置所有角色信息 """
@@ -398,7 +403,7 @@ class CurrencyWars(Executable):
             self.operator.copy(self.strategy_code)
             self.operator.paste()
             self.operator.sleep(1)
-            self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+            self.operator.click_img(IMG.ENSURE2, after_sleep=5)
             self.operator.click_img(CWIMG.APPLY_STRATEGY, after_sleep=1)
             self.operator.press_key('esc', presses=3, interval=1)
         return True
@@ -567,7 +572,7 @@ class CurrencyWars(Executable):
             self.operator.mouse_down(target.center[0], target.center[1])
             self.operator.mouse_up()
             self.operator.sleep(1)
-            self.operator.click_point(0.35, 0.20, after_sleep=0.5)
+            self.operator.click_point(0.75, 0.25, after_sleep=1)
             target = self.operator.locate(CWIMG.OPEN)
         self._get_character_in_area(areas=self.in_hand_area, target_character_list=self.in_hand_character, force=force)
         logger.info(f"当前手牌角色：{self.in_hand_character}")
@@ -620,27 +625,39 @@ class CurrencyWars(Executable):
         角色出售逻辑
         :param force: bool - 是否强制出售所有角色（包括已放置的角色）
         """
-        # 创建需要出售的角色索引列表
-        characters_to_sell: list[tuple[int, Character]] = []
-        for i, character in enumerate(self.in_hand_character):
-            if character is None:
-                continue
-            if force:
-                characters_to_sell.append((i, character))
-            elif not character.is_placed:
-                characters_to_sell.append((i, character))
+        characters_to_sell = build_sell_plan(
+            self.in_hand_character,
+            self.strategy_characters,
+            force=force,
+        )
 
-        # 执行出售操作
+        if not characters_to_sell:
+            logger.info("当前没有可出售的角色")
+            return
+
         for i, character in characters_to_sell:
+            logger.info(
+                f"计划出售角色[{i}]：{character.name} "
+                f"(攻略角色={character.name in self.strategy_characters}, "
+                f"已上场={character.is_placed}, priority={character.priority})"
+            )
             # 由于商店区域没有角色列表，直接执行拖拽
             sell_area = (0.05, 0.86)  # 出售区域
             source = self.in_hand_area[i]
             self.operator.drag_to(source[0], source[1], sell_area[0], sell_area[1])
             # 更新手牌状态
             self.in_hand_character[i] = None
-            if character:
-                character.is_placed = False
+            refunded = settle_sold_character(
+                character,
+                self.strategy_characters,
+                self.on_field_character,
+                self.off_field_character,
+            )
             logger.info(f"已出售角色：{character.name}")
+            if refunded:
+                logger.info(
+                    f"已回补攻略角色 {character.name} 的购买次数，当前剩余可购买次数：{self.strategy_characters[character.name]}"
+                )
             self.operator.sleep(0.5)
         logger.info("出售操作完成")
 
