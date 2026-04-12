@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, final
 import json
 import os
 
+from SRACore.localization import Resource
 from SRACore.operators import IOperator
+from SRACore.util import notify
 
 
 class Executable:
