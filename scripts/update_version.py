@@ -15,7 +15,6 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FILES = {
     'Settings.cs': os.path.join(PROJECT_ROOT, 'SRAFrontend', 'Models', 'Settings.cs'),
     'const.py': os.path.join(PROJECT_ROOT, 'SRACore', 'util', 'const.py'),
-    'version.json': os.path.join(PROJECT_ROOT, 'version.json'),
     'package.json': os.path.join(PROJECT_ROOT, 'package.json')
 }
 
@@ -77,15 +76,15 @@ def update_file_version(file_path, version):
 
 def get_current_version():
     """从文件中获取当前版本号"""
-    # 从 version.json 文件中获取当前版本号
-    version_json_path = FILES['version.json']
+    # 从 package.json 文件中获取当前版本号
+    version_json_path = FILES['package.json']
     if os.path.exists(version_json_path):
         with open(version_json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         if 'version' in data:
             return data['version']
     
-    # 如果 version.json 不存在或没有版本号，尝试从其他文件获取
+    # 如果 package.json 不存在或没有版本号，尝试从其他文件获取
     const_py_path = FILES['const.py']
     if os.path.exists(const_py_path):
         with open(const_py_path, 'r', encoding='utf-8') as f:
@@ -213,7 +212,6 @@ def main():
     # 更新各个文件
     update_file_version(FILES['Settings.cs'], version)
     update_file_version(FILES['const.py'], version)
-    update_file_version(FILES['version.json'], version)
     update_file_version(FILES['package.json'], version)
     
     print("=" * 50)
