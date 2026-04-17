@@ -65,6 +65,7 @@ class Character:
     position: Positioning | None = None  # 实际站位（适配攻略的特殊情况）
     priority: int | None = None  # 优先级
     is_placed: bool = False  # 是否已放置
+    stars: int = 0  # 角色星级
 
     def __post_init__(self):
         if self.priority is None:
@@ -225,7 +226,7 @@ class Characters:
         '爻光': YaoGuang,
         '火花': Sparxie,
     }
-    username = '开拓者'  # 请将此处改为你的角色名称
+    username = '开拓者'  # 角色名称
 
     @classmethod
     def get_character(cls, name: str) -> Character | None:
