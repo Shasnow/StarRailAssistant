@@ -4,6 +4,7 @@ from typing import Any
 
 from loguru import logger
 
+from SRACore.operators.model import Box
 from SRACore.task import Executable
 from SRACore.util.errors import ErrorCode, SRAError
 from tasks.currency_wars.characters import Character, Characters, Positioning
@@ -72,7 +73,7 @@ class CurrencyWars(Executable):
         self.min_coins = 40  # 最小金币数
         self.min_level = 7  # 商店等级
         self.mid_level = 7  # 商店等级
-        self.strategy_characters: dict[str, int] = dict()  # 在攻略中的角色及其预期购买数量
+        self.strategy_characters: dict[str, int] = dict()  # 在攻略中的角色及其预期星级
         self.strategy_code = ""  # 当前使用的攻略代码
         self.is_overclock = False  # 超频博弈
 
@@ -103,14 +104,17 @@ class CurrencyWars(Executable):
         for i, c in enumerate(self.on_field_character):
             if c is not None:
                 c.is_placed = False  # 重置放置状态
+                c.stars = 1  # 重置星级
             self.on_field_character[i] = None  # 重置角色信息
         for i, c in enumerate(self.off_field_character):
             if c is not None:
                 c.is_placed = False
+                c.stars = 1
             self.off_field_character[i] = None
         for i, c in enumerate(self.in_hand_character):
             if c is not None:
                 c.is_placed = False
+                c.stars = 1
             self.in_hand_character[i] = None
 
     def set_difficulty(self, mode: int):
@@ -484,16 +488,31 @@ class CurrencyWars(Executable):
         else:
             return 0
 
-    def _get_character_in_area(self, areas, target_character_list, force=False, equip=False):
+    def _get_character_in_area(self, areas, target_character_list, force=False, equip=False, count_stars=False):
         """
         通用方法：获取指定区域的角色信息
         :param areas: 区域坐标列表（如 off_field_area）
         :param target_character_list: 目标角色列表（如 off_field_character，将被更新）
         :param force: 强制更新角色信息，默认False（即已有角色则跳过）
         :param equip: 是否顺便穿戴装备
+        :param count_stars: 是否获取角色星级
         :return: 更新后的角色列表
         """
-        # 默认OCR区域（如果未指定）
+        def get_stars(merge: int) -> int:
+            # 获取角色星级 merge: 当 box 之间的距离小于此值时，将它们视为同一个box
+            boxes = self.operator.locate_all(CWIMG.STAR, from_x=0.83, from_y=0.15, to_x=0.87, to_y=0.17)
+            if not boxes:
+                return 0
+            valid_boxes: list[Box] = []
+            for b in boxes:
+                for vb in valid_boxes:
+                    if vb.distance(b) < merge:
+                        break
+                else:
+                    valid_boxes.append(b)
+            return len(valid_boxes)
+
+        # 角色名称OCR区域
         ocr_from_x, ocr_from_y, ocr_to_x, ocr_to_y = (0.775, 0.175, 0.880, 0.2315)
 
         for index, area in enumerate(areas):
@@ -520,8 +539,13 @@ class CurrencyWars(Executable):
                     char = Characters.get_character(name)
                     if char is None:
                         logger.warning("OCR识别到角色名称：{}，但未在角色列表中找到匹配项".format(name))
+                        continue
+                    if count_stars:
+                        char.stars = get_stars(3)
                     target_character_list[index] = char
                     if equip:
+                        if char.name not in self.strategy_characters.keys():
+                            continue  # 不给不在攻略中的角色穿戴装备
                         self.operator.click_img(CWIMG.EQUIPMENT_RECOMMEND, after_sleep=1)
                         _, box = self.operator.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS], confidence=0.8)
                         if box:
@@ -542,7 +566,8 @@ class CurrencyWars(Executable):
         """获取场下角色信息"""
         self._get_character_in_area(areas=self.off_field_area, target_character_list=self.off_field_character,
                                     equip=True,
-                                    force=force)
+                                    force=force,
+                                    count_stars=True)
         for char in self.off_field_character:
             if char is not None:
                 char.is_placed = True
@@ -552,7 +577,8 @@ class CurrencyWars(Executable):
         """获取场上角色信息"""
         self._get_character_in_area(areas=self.on_field_area, target_character_list=self.on_field_character,
                                     equip=True,
-                                    force=force)
+                                    force=force,
+                                    count_stars=True)
         for char in self.on_field_character:
             if char is not None:
                 char.is_placed = True
@@ -560,6 +586,7 @@ class CurrencyWars(Executable):
 
     def get_in_hand_area(self, force=False):
         """获取手牌角色信息"""
+        # 打开武器箱或专家邀请函
         target = self.operator.locate(CWIMG.OPEN)
         while target:
             self.operator.mouse_down(target.center[0], target.center[1])
@@ -624,8 +651,16 @@ class CurrencyWars(Executable):
             if character is None:
                 continue
             if force:
+                # 强制出售
+                logger.info(f"强制出售角色：{character.name}")
                 characters_to_sell.append((i, character))
-            elif not character.is_placed:
+            elif character.name not in self.strategy_characters.keys():
+                # 不在攻略中的角色
+                logger.info(f"出售非攻略角色：{character.name}")
+                characters_to_sell.append((i, character))
+            elif character.stars >= self.strategy_characters[character.name]:
+                # 已满足攻略要求的角色
+                logger.info(f"出售满足攻略要求的角色：{character.name}")
                 characters_to_sell.append((i, character))
 
         # 执行出售操作
@@ -695,8 +730,8 @@ class CurrencyWars(Executable):
             ),
             (
                 CWIMG.CLICK_BLANK,
-                '强敌来袭',
-                self.handle_boss_preview,
+                '点击空白处关闭',
+                self.handle_click_blank,
                 False
             ),
             (
@@ -780,7 +815,7 @@ class CurrencyWars(Executable):
         self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击返回货币战争")
         self.is_game_over = True  # 标记游戏结束
 
-    def handle_boss_preview(self) -> None:
+    def handle_click_blank(self) -> None:
         """处理Boss预览界面的逻辑"""
         self.operator.click_point(0.5, 0.70, after_sleep=1)
 
@@ -819,7 +854,6 @@ class CurrencyWars(Executable):
             self.handle_the_planet_of_festivities()
             return self._handle_special_event()  # 可能连续触发事件，递归处理
         elif event == 1:  # 命运卜者事件
-            logger.info("触发命运卜者事件")
             self.handle_fortune_teller()
             return self._handle_special_event()  # 可能连续触发事件，递归处理
         else:
@@ -827,7 +861,7 @@ class CurrencyWars(Executable):
             return True
 
     def shopping(self):
-        def scan_characters_in_store() -> list[Character]:
+        def scan_characters_in_store() -> list[Character] | None:
             """扫描商店中的角色"""
             results = self.operator.ocr(from_x=0.19, from_y=0.26, to_x=0.88, to_y=0.31)
             chars = []
@@ -843,7 +877,7 @@ class CurrencyWars(Executable):
                 if name.isdecimal():  # 跳过价格识别结果
                     continue
                 if '备' in name:  # 备战席已满
-                    return []
+                    return None
                 char = Characters.get_character(name)
                 if char is not None:
                     chars.append(char)
@@ -860,13 +894,12 @@ class CurrencyWars(Executable):
             """
             for i, c in enumerate(characters):
                 if c.name in self.strategy_characters.keys():  # 角色在攻略列表中
-                    if self.strategy_characters[c.name] <= 0:
-                        continue  # 已达购买上限，跳过
+                    if c.stars >= self.strategy_characters[c.name]:
+                        continue  # 已达目标星级
                     # 执行购买操作
                     target = self.store_area[i]
                     self.operator.click_point(*target, after_sleep=0.5)
-                    logger.info(f"购买角色：{c.name}，剩余可购买次数：{self.strategy_characters[c.name] - 1}")
-                    self.strategy_characters[c.name] -= 1  # 购买次数减一
+                    logger.info(f"购买角色：{c.name}")
                     self.operator.move_to(0.5, 0.5)  # 移动鼠标避免遮挡
 
             logger.info("当前商店无目标角色可购买")
@@ -999,6 +1032,12 @@ class CurrencyWars(Executable):
             c.priority = 95 - i  # 确保攻略中的后台角色优先级都大于其他角色
             c.position = Positioning.OffField
             self.strategy_characters[cn] = strategy_off_field[cn]
+        # 兼容旧配置: 1 -> 1星，3 -> 2星，9 -> 3星
+        for sc in self.strategy_characters.keys():
+            if 3 < self.strategy_characters[sc] < 9:
+                self.strategy_characters[sc] = 2
+            elif self.strategy_characters[sc] >= 9:
+                self.strategy_characters[sc] = 3
         logger.info(f"已加载攻略: {strategy_title}: {description}")
 
     def unload_strategy(self):
