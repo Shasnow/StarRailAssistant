@@ -172,6 +172,7 @@ class CWIMG:
     RIGHT = f"{BASE}/right.png"
     SELECT_INVEST_STRATEGY = f"{BASE}/select_invest_strategy.png"
     SETTLE = f"{BASE}/settle.png"
+    STAR = f"{BASE}/star.png"
     START_GAME = f"{BASE}/start_game.png"
     STRATEGY = f"{BASE}/strategy.png"
     SYNTHESIS = f"{BASE}/synthesis.png"
