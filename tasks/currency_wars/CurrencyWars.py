@@ -7,6 +7,15 @@ from loguru import logger
 from SRACore.task import Executable
 from SRACore.util.errors import ErrorCode, SRAError
 from tasks.currency_wars.characters import Character, Characters, Positioning
+from tasks.currency_wars.shopping_logic import (
+    analyze_purchase_candidates,
+    evaluate_purchase_attempt,
+    get_pre_refresh_exit_reason,
+    is_store_scan_valid,
+    store_has_reserve_full_marker,
+)
+from tasks.currency_wars.placement_logic import build_placement_plan, should_auto_equip_character
+from tasks.currency_wars.sell_logic import build_sell_plan, settle_sold_character
 from tasks.img import CWIMG, IMG
 
 
@@ -73,6 +82,8 @@ class CurrencyWars(Executable):
         self.min_level = 7  # 商店等级
         self.mid_level = 7  # 商店等级
         self.strategy_characters: dict[str, int] = dict()  # 在攻略中的角色及其预期购买数量
+        self.strategy_on_field_characters: set[str] = set()
+        self.strategy_off_field_characters: set[str] = set()
         self.strategy_code = ""  # 当前使用的攻略代码
         self.is_overclock = False  # 超频博弈
 
@@ -399,7 +410,7 @@ class CurrencyWars(Executable):
             self.operator.copy(self.strategy_code)
             self.operator.paste()
             self.operator.sleep(1)
-            self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+            self.operator.click_img(IMG.ENSURE2, after_sleep=5)
             self.operator.click_img(CWIMG.APPLY_STRATEGY, after_sleep=1)
             self.operator.press_key('esc', presses=3, interval=1)
         return True
@@ -521,7 +532,10 @@ class CurrencyWars(Executable):
                     if char is None:
                         logger.warning("OCR识别到角色名称：{}，但未在角色列表中找到匹配项".format(name))
                     target_character_list[index] = char
-                    if equip:
+                    if equip and should_auto_equip_character(
+                        char.name if char is not None else None,
+                        self.strategy_characters,
+                    ):
                         self.operator.click_img(CWIMG.EQUIPMENT_RECOMMEND, after_sleep=1)
                         _, box = self.operator.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS], confidence=0.8)
                         if box:
@@ -618,27 +632,39 @@ class CurrencyWars(Executable):
         角色出售逻辑
         :param force: bool - 是否强制出售所有角色（包括已放置的角色）
         """
-        # 创建需要出售的角色索引列表
-        characters_to_sell: list[tuple[int, Character]] = []
-        for i, character in enumerate(self.in_hand_character):
-            if character is None:
-                continue
-            if force:
-                characters_to_sell.append((i, character))
-            elif not character.is_placed:
-                characters_to_sell.append((i, character))
+        characters_to_sell = build_sell_plan(
+            self.in_hand_character,
+            self.strategy_characters,
+            force=force,
+        )
 
-        # 执行出售操作
+        if not characters_to_sell:
+            logger.info("当前没有可出售的角色")
+            return
+
         for i, character in characters_to_sell:
+            logger.info(
+                f"计划出售角色[{i}]：{character.name} "
+                f"(攻略角色={character.name in self.strategy_characters}, "
+                f"已上场={character.is_placed}, priority={character.priority})"
+            )
             # 由于商店区域没有角色列表，直接执行拖拽
             sell_area = (0.05, 0.86)  # 出售区域
             source = self.in_hand_area[i]
             self.operator.drag_to(source[0], source[1], sell_area[0], sell_area[1])
             # 更新手牌状态
             self.in_hand_character[i] = None
-            if character:
-                character.is_placed = False
+            refunded = settle_sold_character(
+                character,
+                self.strategy_characters,
+                self.on_field_character,
+                self.off_field_character,
+            )
             logger.info(f"已出售角色：{character.name}")
+            if refunded:
+                logger.info(
+                    f"已回补攻略角色 {character.name} 的购买次数，当前剩余可购买次数：{self.strategy_characters[character.name]}"
+                )
             self.operator.sleep(0.5)
         logger.info("出售操作完成")
 
@@ -827,12 +853,17 @@ class CurrencyWars(Executable):
             return True
 
     def shopping(self):
-        def scan_characters_in_store() -> list[Character]:
+        def open_store_interface() -> None:
+            self.operator.click_point(0.8438, 0.8481, after_sleep=1, tag="打开商店界面")
+
+        def scan_characters_in_store() -> tuple[list[Character], bool, bool]:
             """扫描商店中的角色"""
             results = self.operator.ocr(from_x=0.19, from_y=0.26, to_x=0.88, to_y=0.31)
             chars = []
+            reserve_full = store_has_reserve_full_marker(results)
+            store_scan_valid = is_store_scan_valid(results)
             if not results:
-                return []
+                return [], False, False
             for item in results:
                 name_raw = item[1]
                 if not isinstance(name_raw, str):
@@ -843,14 +874,94 @@ class CurrencyWars(Executable):
                 if name.isdecimal():  # 跳过价格识别结果
                     continue
                 if '备' in name:  # 备战席已满
-                    return []
+                    continue
                 char = Characters.get_character(name)
                 if char is not None:
                     chars.append(char)
                     logger.info(f"商店中发现角色：{char.name}，P: {char.priority}")
                 else:
                     logger.info(f"商店中发现未知角色：{name}")
-            return chars
+            return chars, reserve_full, store_scan_valid
+
+        def clear_reserve_for_retry() -> None:
+            logger.info("尝试清理备战区后重试购买")
+            self.get_in_hand_area(True)
+            self.place_character()
+            self.sell_character()
+            self.get_in_hand_area(True)
+            open_store_interface()
+
+        def rescan_store_with_reopen() -> tuple[list[Character], bool, bool]:
+            refreshed_characters, reserve_full, store_scan_valid = scan_characters_in_store()
+            if not store_scan_valid:
+                logger.info("当前不在有效商店页面，重新打开商店界面")
+                open_store_interface()
+                refreshed_characters, reserve_full, store_scan_valid = scan_characters_in_store()
+            return refreshed_characters, reserve_full, store_scan_valid
+
+        def attempt_verified_purchase(index: int, character: Character, remaining: int) -> bool:
+            self.operator.click_point(*self.store_area[index], after_sleep=0.5)
+            self.operator.move_to(0.5, 0.5)
+
+            refreshed_characters, reserve_full, store_scan_valid = rescan_store_with_reopen()
+            evaluation = evaluate_purchase_attempt(
+                index,
+                character.name,
+                refreshed_characters,
+                reserve_full,
+                store_scan_valid,
+            )
+
+            if evaluation.succeeded:
+                logger.info(f"购买角色：{character.name}，剩余可购买次数：{remaining - 1}")
+                self.strategy_characters[character.name] -= 1
+                return True
+
+            if evaluation.should_reopen_store:
+                logger.warning(f"购买角色失败：{character.name}，商店页面识别无效，未消耗购买次数")
+                return False
+
+            logger.warning(f"购买角色失败：{character.name}，未消耗购买次数")
+
+            if evaluation.should_clear_reserve:
+                logger.info("检测到备战席已满，优先清理备战区")
+                clear_reserve_for_retry()
+                refreshed_characters, _, _ = rescan_store_with_reopen()
+                retry_candidates, _ = analyze_purchase_candidates(
+                    refreshed_characters,
+                    self.strategy_characters,
+                )
+                for retry_index, retry_character, retry_remaining in retry_candidates:
+                    if retry_character.name != character.name:
+                        continue
+
+                    self.operator.click_point(*self.store_area[retry_index], after_sleep=0.5)
+                    self.operator.move_to(0.5, 0.5)
+                    retry_scan, retry_reserve_full, retry_store_scan_valid = rescan_store_with_reopen()
+                    retry_evaluation = evaluate_purchase_attempt(
+                        retry_index,
+                        retry_character.name,
+                        retry_scan,
+                        retry_reserve_full,
+                        retry_store_scan_valid,
+                    )
+                    if retry_evaluation.succeeded:
+                        logger.info(
+                            f"购买角色：{retry_character.name}，剩余可购买次数：{retry_remaining - 1}"
+                        )
+                        self.strategy_characters[retry_character.name] -= 1
+                        return True
+
+                    if retry_evaluation.should_reopen_store:
+                        logger.warning(
+                            f"重试购买角色失败：{retry_character.name}，商店页面识别无效，未消耗购买次数"
+                        )
+                        break
+
+                    logger.warning(f"重试购买角色失败：{retry_character.name}，未消耗购买次数")
+                    break
+
+            return False
 
         def purchase_target_character(characters: list[Character]) -> bool:
             """
@@ -858,49 +969,69 @@ class CurrencyWars(Executable):
             :param characters: 商店中扫描到的角色列表
             :return: True-购买成功，False-无目标角色可买
             """
-            for i, c in enumerate(characters):
-                if c.name in self.strategy_characters.keys():  # 角色在攻略列表中
-                    if self.strategy_characters[c.name] <= 0:
-                        continue  # 已达购买上限，跳过
-                    # 执行购买操作
-                    target = self.store_area[i]
-                    self.operator.click_point(*target, after_sleep=0.5)
-                    logger.info(f"购买角色：{c.name}，剩余可购买次数：{self.strategy_characters[c.name] - 1}")
-                    self.strategy_characters[c.name] -= 1  # 购买次数减一
-                    self.operator.move_to(0.5, 0.5)  # 移动鼠标避免遮挡
+            purchasable, exhausted = analyze_purchase_candidates(
+                characters,
+                self.strategy_characters,
+            )
 
-            logger.info("当前商店无目标角色可购买")
-            return False
+            for _, c, remaining in exhausted:
+                logger.info(f"跳过购买角色：{c.name}，剩余可购买次数已耗尽（{remaining}）")
+
+            if not purchasable:
+                logger.info("当前商店无目标角色可购买")
+                return False
+
+            purchased = False
+            for i, c, remaining in purchasable:
+                purchased = attempt_verified_purchase(i, c, remaining) or purchased
+
+            return purchased
 
         # ==================== 优先完成首次购买（利用免费刷新） ====================
         # 1. 首次购买阶段：强制利用商店打开时的免费刷新，完成一次购买尝试
         # 扫描商店角色
-        initial_chars = scan_characters_in_store()
+        initial_chars, _, _ = scan_characters_in_store()
         if initial_chars:
             # 尝试购买目标角色（优先完成首次购买）
             purchase_target_character(initial_chars)
 
         # ==================== 原有循环逻辑：首次购买后，执行后续刷新/购买 ====================
+        pending_post_refresh_scan = False
         while True:
             purchased = False
             coins = self.get_coins()
             level = self.get_level()
 
-            # 1. 基础退出条件：金币不足4（无法购买/刷新）
-            if coins < 4:
-                logger.info(f"金币不足4（当前{coins}），退出购物循环")
+            exit_reason = get_pre_refresh_exit_reason(
+                coins,
+                self.min_coins,
+                self.is_overclock,
+                pending_post_refresh_scan,
+            )
+            if exit_reason is not None:
+                logger.info(exit_reason)
                 break
 
-            # 2. 非超频模式：检查金币是否满足保留要求（预判刷新后结果）
-            if not self.is_overclock:
-                # 最小保留数校验：当前金币 < 最小保留数 → 直接退出
-                if coins < self.min_coins:
-                    logger.info(f"当前金币 {coins} 小于最低保留数量 {self.min_coins}，退出购物循环")
+            if pending_post_refresh_scan:
+                cs, _, _ = scan_characters_in_store()
+                if cs:
+                    purchased = purchase_target_character(cs)
+                pending_post_refresh_scan = False
+
+                if coins < 4:
+                    logger.info(f"刷新后已检查商店，金币不足4（当前{coins}），退出购物循环")
                     break
-                # 预判刷新后金币：若刷新后 < 最小保留数 → 退出
-                coins_after_refresh = coins - 6
-                if coins_after_refresh < self.min_coins:
+                if not self.is_overclock and coins < self.min_coins:
+                    logger.info(
+                        f"刷新后已检查商店，当前金币 {coins} 小于最低保留数量 {self.min_coins}，退出购物循环"
+                    )
                     break
+
+                if level < self.mid_level and not purchased:
+                    logger.info(f"等级{level}<中级等级{self.mid_level}且未购买角色，执行升级操作")
+                    self.operator.press_key('f')
+                    self.operator.sleep(0.5)
+                continue
 
             # 3. 等级<最低等级：持续升级（原有逻辑）
             if level < self.min_level:
@@ -910,7 +1041,7 @@ class CurrencyWars(Executable):
                 continue
 
             # 4. 扫描商店角色并尝试购买
-            cs = scan_characters_in_store()
+            cs, _, _ = scan_characters_in_store()
             if cs:
                 purchased = purchase_target_character(cs)
 
@@ -918,12 +1049,7 @@ class CurrencyWars(Executable):
             logger.info(f"当前金币{coins}，执行刷新商店操作（消耗2金币）")
             self.operator.press_key('d')
             self.operator.sleep(0.5)
-
-            # 6. 等级<中级等级且未购买：升级（原有逻辑）
-            if level < self.mid_level and not purchased:
-                logger.info(f"等级{level}<中级等级{self.mid_level}且未购买角色，执行升级操作")
-                self.operator.press_key('f')
-                self.operator.sleep(0.5)
+            pending_post_refresh_scan = True
         # 关闭商店
         self.operator.click_point(0.5, 0.55, after_sleep=1.5)
         logger.info("购物流程结束，关闭商店")
@@ -983,6 +1109,8 @@ class CurrencyWars(Executable):
         # 在攻略中的角色设置成最高优先级
         strategy_on_field: dict[str, int] = strategy_data.get("on_field", {})
         strategy_off_field: dict[str, int] = strategy_data.get("off_field", {})
+        self.strategy_on_field_characters = set(strategy_on_field.keys())
+        self.strategy_off_field_characters = set(strategy_off_field.keys())
         for i, cn in enumerate(strategy_on_field.keys()):
             c = Characters.get_character(cn)
             if c is None:
@@ -1009,6 +1137,8 @@ class CurrencyWars(Executable):
         self.min_level = 7
         self.mid_level = 7
         self.strategy_characters.clear()
+        self.strategy_on_field_characters.clear()
+        self.strategy_off_field_characters.clear()
         self.strategy_code = ""
         logger.info("已卸载当前攻略，角色优先级已重置")
 
@@ -1018,9 +1148,30 @@ class CurrencyWars(Executable):
         队伍不满时优先放空位，队伍满时仅替换低priority角色
         :return: 至少有一个角色放置成功返回 True，否则返回 False
         """
-        # 第一次遍历：仅处理前台角色（Positioning.OnField / OnOffField），优先占满编队
+        hand_entries = []
+        for character in self.in_hand_character:
+            if character is None:
+                hand_entries.append((None, "on", False))
+                continue
+
+            if character.position == Positioning.OnField:
+                position = "on"
+            elif character.position == Positioning.OffField:
+                position = "off"
+            else:
+                position = "both"
+
+            hand_entries.append((character.name, position, character.is_placed))
+
+        front_plan, back_plan = build_placement_plan(
+            hand_entries,
+            self.strategy_on_field_characters,
+            self.strategy_off_field_characters,
+        )
+
         logger.info("=== 放置前台角色 ===")
-        for i, character in enumerate(self.in_hand_character):
+        for i in front_plan:
+            character = self.in_hand_character[i]
             if character is None or character.is_placed:
                 continue
             if character.position == Positioning.OffField:
@@ -1029,9 +1180,9 @@ class CurrencyWars(Executable):
                 self.operator.sleep(1)
                 self._handle_special_event()
 
-        # 第二次遍历：仅处理后台角色（Positioning.OffField），填充剩余空位或替换
         logger.info("=== 放置后台角色 ===")
-        for i, character in enumerate(self.in_hand_character):
+        for i in back_plan:
+            character = self.in_hand_character[i]
             if character is None or character.is_placed:
                 continue
             if character.position == Positioning.OnField:

@@ -14,9 +14,136 @@ from SRACore.util import (
     sys_util,  # NOQA 有动态用法，确保被打包 # type: ignore
 )
 from SRACore.util.data_persister import load_cache, load_config
-from SRACore.util.errors import ThreadStoppedError
-from SRACore.util.logger import logger
+from SRACore.util.errors import SRAError, ThreadStoppedError
+from SRACore.util.logger import logger, setup_logger
 
+
+
+# 自定义任务的 ClassName 前缀（与前端保持一致）
+_CUSTOM_TASK_PREFIX = "CustomTask_"
+
+
+def _resolve_custom_task_script_path(entry: dict) -> tuple[str, str] | None:
+    """
+    从任务条目解析脚本文件路径和类名。
+    支持两种方式：
+    1. ScriptId + TaskEntry（推荐，从已安装脚本目录加载）
+    2. ScriptPath（旧方式，直接指定路径）
+    返回 (script_path, class_name) 或 None
+    """
+    import os
+    from SRACore.util.const import AppDataSraDir
+
+    script_id = entry.get("ScriptId", "").strip()
+    task_entry = entry.get("TaskEntry", "").strip()
+    task_class = entry.get("TaskClassName", "").strip()
+
+    if script_id and task_entry:
+        # 新方式：从已安装脚本目录加载
+        scripts_dir = AppDataSraDir / "scripts"
+        script_path = str(scripts_dir / script_id / task_entry)
+        if not os.path.isfile(script_path):
+            logger.error(f"脚本文件不存在: {script_path}")
+            return None
+        return script_path, task_class
+
+    # 旧方式：直接指定路径
+    script_path = entry.get("ScriptPath", "").strip()
+    if not script_path:
+        logger.warning(f"自定义任务 '{entry.get('Name')}' 未配置脚本路径")
+        return None
+    if not os.path.isfile(script_path):
+        logger.error(f"脚本文件不存在: {script_path}")
+        return None
+    return script_path, task_class
+
+
+def _load_custom_task(class_name: str, config: dict):
+    """
+    根据 ClassName 从 config 的 CustomTasks 列表里找到对应条目，
+    动态加载脚本文件并返回任务类。
+    class_name 格式: CustomTask_{id}
+    """
+    import importlib.util, os
+
+    task_id = class_name.replace(_CUSTOM_TASK_PREFIX, "", 1)
+    custom_tasks = config.get("CustomTasks", [])
+    entry = next((t for t in custom_tasks if t.get("Id") == task_id), None)
+    if entry is None:
+        logger.warning(f"未找到自定义任务条目: id={task_id}")
+        return None
+
+    result = _resolve_custom_task_script_path(entry)
+    if result is None:
+        return None
+    script_path, hint_class = result
+
+    try:
+        spec = importlib.util.spec_from_file_location("_custom_task_" + task_id, script_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        # 优先用 manifest 里指定的类名
+        task_class = getattr(module, hint_class, None) if hint_class else None
+
+        if task_class is None:
+            # fallback：文件名转驼峰
+            class_guess = os.path.splitext(os.path.basename(script_path))[0]
+            class_guess = "".join(w.capitalize() for w in class_guess.split("_"))
+            task_class = getattr(module, class_guess, None)
+
+        if task_class is None:
+            # fallback：找第一个 BaseTask 子类
+            from SRACore.task import BaseTask
+            for attr in dir(module):
+                obj = getattr(module, attr)
+                if isinstance(obj, type) and issubclass(obj, BaseTask) and obj is not BaseTask:
+                    task_class = obj
+                    break
+
+        if task_class is None:
+            logger.error(f"在脚本 {script_path} 中未找到 BaseTask 子类")
+            return None
+        return task_class
+    except Exception as e:
+        logger.exception(f"加载自定义任务脚本失败: {script_path}, {e}")
+        return None
+
+
+# 任务类名 -> settings 中对应的通知配置前缀
+_TASK_NOTIFY_KEY_MAP = {
+    "StartGameTask":         "StartGameTask",
+    "TrailblazePowerTask":   "TrailblazePowerTask",
+    "ReceiveRewardsTask":    "ReceiveRewardsTask",
+    "CosmicStrifeTask":      "CosmicStrifeTask",
+    "MissionAccomplishTask": "MissionAccomplishTask",
+}
+
+
+def _should_notify_task(task_class_name: str, event: str, setting: dict,
+                        config: dict | None = None) -> bool:
+    """
+    判断某个任务在 event（'OnStart' 或 'OnComplete'）时是否应该发送通知。
+    内置任务从 settings 中读取，自定义任务从 config.CustomTasks 条目中读取。
+    task_class_name 对自定义任务传 'CustomTask_{id}'，对内置任务传类名。
+    """
+    # 自定义任务：从 config.CustomTasks 条目读取独立开关
+    if task_class_name.startswith(_CUSTOM_TASK_PREFIX):
+        if config is None:
+            return False
+        task_id = task_class_name.replace(_CUSTOM_TASK_PREFIX, "", 1)
+        custom_tasks = config.get("CustomTasks", [])
+        entry = next((t for t in custom_tasks if t.get("Id") == task_id), None)
+        if entry is None:
+            return False
+        field = "NotifyOn" + event  # NotifyOnStart / NotifyOnComplete
+        return bool(entry.get(field, False))
+    # 内置任务：从 settings 读
+    key_prefix = _TASK_NOTIFY_KEY_MAP.get(task_class_name)
+    if not key_prefix:
+        return False
+    field = key_prefix + "Notify" + event   # e.g. StartGameTaskNotifyOnStart
+    return bool(setting.get(field, False))
 
 class TaskManager:
     """
@@ -68,6 +195,7 @@ class TaskManager:
                 config_list = args
 
             last_operator = None
+            config = None   # 确保 config 在循环前已定义
             for config_name in config_list:
                 logger.info(Resource.task_currentConfig(config_name))
 
@@ -80,27 +208,58 @@ class TaskManager:
                     logger.warning(Resource.task_noSelectedTasks(config_name))
                     continue
 
+                # 加载配置（通知判断需要）
+                config = load_config(config_name)
+
                 # 依次执行任务
                 for task in tasks_to_run:
+                    if self._stop_event.is_set():
+                        logger.info("用户请求停止，终止后续任务执行")
+                        break
                     try:
                         # 运行任务，如果返回 False 表示任务失败
                         logger.debug('running task: ' + str(task))
-                        # 任务开始
-                        task.start()
+                        # 任务开始通知
+                        _setting = notify._load_settings_for_task_notify()
+                        _task_cn = getattr(task, "_custom_class_name", task.__class__.__name__)
+                        if _should_notify_task(_task_cn, "OnStart", _setting, config):
+                            notify.try_send_notification(
+                                Resource.task_notificationTitle,
+                                "任务 '" + str(task) + "' 开始执行。",
+                                result="success",
+                                operator=task.operator
+                            )
                         if not task.run():
                             logger.debug('task failed: ' + str(task))
                             logger.error(Resource.task_taskFailed(str(task)))
-                            task.fail()
+                            notify.try_send_notification(
+                                Resource.task_notificationTitle,
+                                Resource.task_taskFailed(str(task)),
+                                result="fail",
+                                operator=task.operator
+                            )
                             return  # 终止当前配置的执行
-                        # 任务完成
-                        task.finish()
+                        # 任务完成通知
+                        _setting = notify._load_settings_for_task_notify()
+                        if _should_notify_task(_task_cn, "OnComplete", _setting, config):
+                            notify.try_send_notification(
+                                Resource.task_notificationTitle,
+                                Resource.task_taskCompleted(str(task)),
+                                result="success",
+                                operator=task.operator
+                            )
                     except ThreadStoppedError as e:
                         logger.error(e)
                         break
                     except Exception as e:
                         # 捕获任务执行中的异常（如未处理的错误）
                         logger.exception(Resource.task_taskCrashed(str(task), str(e)))
-                        task.fail()
+                        notify.try_send_notification(
+                            Resource.task_notificationTitle,
+                            Resource.task_taskCrashed(str(task), str(e)),
+                            result="fail",
+                            operator=task.operator
+                        )
                         break
                 logger.info(Resource.task_configCompleted(config_name))
                 logger.info("=" * 50)
@@ -136,23 +295,59 @@ class TaskManager:
         print_config = config.copy()
         print_config["StartGamePassword"] = "******"
         logger.debug('config: ' + str(print_config))
-        # 从配置中读取任务选择列表（如 [True, False, True]）
+        # 优先读取 TaskOrder（新格式），降级兼容 EnabledTasks（旧格式）
+        task_order = config.get("TaskOrder")
         task_select = config.get("EnabledTasks")
-        logger.debug('task_select: ' + str(task_select))
-        if not task_select:
-            return []
+
         tasks = []
         operator = Operator(stop_event=self._stop_event)
+        task_class_map = {cls.__name__: cls for cls in self.task_list}
+        original_indices = {cls.__name__: i for i, cls in enumerate(self.task_list)}
 
-        # 遍历 task_select，根据选择状态实例化对应任务
-        for index, is_select in enumerate(task_select):
-            # 检查：1. 任务被选中 2. 索引在 task_list 范围内
-            if is_select and index < len(self.task_list):
+        if task_order and isinstance(task_order, list):
+            logger.debug('task_order: ' + str(task_order))
+            for class_name in task_order:
+                # 自定义任务：动态加载
+                if class_name.startswith(_CUSTOM_TASK_PREFIX):
+                    task_class = _load_custom_task(class_name, config)
+                    if task_class is None:
+                        continue
+                    # 检查 IsEnabled
+                    task_id = class_name.replace(_CUSTOM_TASK_PREFIX, "", 1)
+                    custom_tasks = config.get("CustomTasks", [])
+                    entry = next((t for t in custom_tasks if t.get("Id") == task_id), None)
+                    if entry and not entry.get("IsEnabled", True):
+                        continue
+                    try:
+                        instance = task_class(operator, config)
+                        instance._custom_class_name = class_name  # CustomTask_{id}
+                        tasks.append(instance)
+                    except Exception as e:
+                        logger.exception(Resource.task_instantiateFailed(class_name, str(e)))
+                    continue
+                # 内置任务
+                task_class = task_class_map.get(class_name)
+                if task_class is None:
+                    logger.warning("TaskOrder 中包含未知任务类名: " + class_name)
+                    continue
+                orig_idx = original_indices.get(class_name, -1)
+                if orig_idx >= 0 and task_select and orig_idx < len(task_select):
+                    if not task_select[orig_idx]:
+                        continue
                 try:
-                    # 实例化任务类
-                    tasks.append(self.task_list[index](operator, config))
+                    tasks.append(task_class(operator, config))
                 except Exception as e:
-                    logger.exception(Resource.task_instantiateFailed(index, str(e)))
+                    logger.exception(Resource.task_instantiateFailed(class_name, str(e)))
+        elif task_select:
+            logger.debug('task_select (legacy): ' + str(task_select))
+            for index, is_select in enumerate(task_select):
+                if is_select and index < len(self.task_list):
+                    try:
+                        tasks.append(self.task_list[index](operator, config))
+                    except Exception as e:
+                        logger.exception(Resource.task_instantiateFailed(index, str(e)))
+        else:
+            return []
         return tasks
 
     def run_task(self, task: int | str, config_name: str | None = None) -> bool:
@@ -169,40 +364,78 @@ class TaskManager:
         Raises:
             ValueError: 如果任务未找到或配置加载失败
         """
-        logger.debug('[Start]')
-        if config_name is None:
-            # 不指定配置时，使用缓存中的当前配置名称
-            config_name = load_cache().get("CurrentConfigName")
-        if config_name is None:
-            return False
-        task_name = str(task)
-        logger.debug(f"run single task: config={config_name}, task={task}")
-        # 获取任务实例
-        task_instance = self.get_task(config_name, task_name)
-        if task_instance is None:
-            logger.error(Resource.task_noSuchTask(config_name))
-            return False
+        setup_logger(level=self.log_level, queue=self.log_queue)
         self._stop_event.clear()
+        logger.debug('[Start]')
         try:
+            if config_name is None:
+                # 不指定配置时，使用缓存中的当前配置名称
+                config_name = load_cache().get("CurrentConfigName")
+            if config_name is None:
+                return False
+            task_name = str(task)
+            logger.debug(f"run single task: config={config_name}, task={task}")
+            # 加载配置（自定义任务和通知都需要）
+            config = load_config(config_name)
+            # 自定义任务：直接动态加载
+            if task_name.startswith(_CUSTOM_TASK_PREFIX):
+                task_class = _load_custom_task(task_name, config)
+                if task_class is None:
+                    return False
+                operator = Operator(stop_event=self._stop_event)
+                task_instance = task_class(operator, config)
+            else:
+                # 获取任务实例
+                task_instance = self.get_task(config_name, task_name)
+            if task_instance is None:
+                logger.error(Resource.task_noSuchTask(config_name))
+                return False
+            if self._stop_event.is_set():
+                return False
             logger.debug('running task: ' + str(task_instance.__class__.__name__))
             # 单次运行：开始通知
-            task_instance.start()
+            _setting = notify._load_settings_for_task_notify()
+            _notify_cn = task_name if task_name.startswith(_CUSTOM_TASK_PREFIX) else task_instance.__class__.__name__
+            if _should_notify_task(_notify_cn, "OnStart", _setting, config):
+                notify.try_send_notification(
+                    Resource.task_notificationTitle,
+                    "任务 '" + str(task_instance) + "' 开始执行。",
+                    result="success",
+                    operator=task_instance.operator
+                )
             # 运行任务
             result = task_instance.run()
             if not result:
                 logger.error(Resource.task_taskFailed(str(task_instance)))
-                task_instance.fail()
+                notify.try_send_notification(
+                    Resource.task_notificationTitle,
+                    Resource.task_taskFailed(str(task_instance)),
+                    result="fail",
+                    operator=task_instance.operator
+                )
             else:
                 logger.info(Resource.task_taskCompleted(str(task_instance)))
-                # 单次运行：完成
-                task_instance.finish()
+                # 单次运行：完成通知
+                _setting = notify._load_settings_for_task_notify()
+                if _should_notify_task(_notify_cn, "OnComplete", _setting, config):
+                    notify.try_send_notification(
+                        Resource.task_notificationTitle,
+                        Resource.task_taskCompleted(str(task_instance)),
+                        result="success",
+                        operator=task_instance.operator
+                    )
             return result
         except ThreadStoppedError as e:
             logger.error(e)
             return False
         except Exception as e:
             logger.exception(Resource.task_taskCrashed(task, str(e)))
-            task_instance.fail()
+            notify.try_send_notification(
+                Resource.task_notificationTitle,
+                Resource.task_taskCrashed(str(task), str(e)),
+                result="fail",
+                operator=getattr(locals().get("task_instance", None), "operator", None)
+            )
             return False
         finally:
             logger.debug("[Done]")

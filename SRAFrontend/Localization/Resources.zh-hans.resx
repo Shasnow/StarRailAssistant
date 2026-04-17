@@ -29,6 +29,9 @@
     <data name="ResourceIntegrityCheckText" xml:space="preserve">
         <value>资源完整性检查</value>
     </data>
+    <data name="ScriptStoreText" xml:space="preserve">
+        <value>脚本仓库</value>
+    </data>
     <data name="ExtensionText" xml:space="preserve">
         <value>拓展</value>
     </data>

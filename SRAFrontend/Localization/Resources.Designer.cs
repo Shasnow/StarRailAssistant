@@ -402,6 +402,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Scripts.
+        /// </summary>
+        public static string ScriptStoreText {
+            get {
+                return ResourceManager.GetString("ScriptStoreText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Frontend logs folder.
         /// </summary>
         public static string FeLogsFolder {
