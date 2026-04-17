@@ -1,4 +1,5 @@
 import dataclasses
+from math import sqrt
 
 
 @dataclasses.dataclass
@@ -48,3 +49,8 @@ class Box:
         center_x = int(self.left + self.width // 2)
         center_y = int(self.top + self.height // 2)
         return center_x, center_y
+
+    def distance(self, other: 'Box'):
+        x1, y1 = self.center
+        x2, y2 = other.center
+        return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
