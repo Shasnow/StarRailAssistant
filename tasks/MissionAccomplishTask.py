@@ -25,7 +25,9 @@ class MissionAccomplishTask(BaseTask):
         self.operator.click_img(IMG.ENSURE)
         if self.operator.wait_img(MAIMG.LOGOUT, timeout=60):
             self.operator.click_img(MAIMG.LOGOUT)
-        self.operator.click_img(IMG.QUIT2)
+        box = self.operator.wait_img(IMG.QUIT2)
+        if box:
+            self.operator.click_box(box)
         return True
 
     def quit_game(self):
