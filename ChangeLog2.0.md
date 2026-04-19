@@ -4,6 +4,7 @@
 ### 功能调整：
 - 货币战争攻略模板语义调整，"角色名称": 数量 -> "角色名称": 星级。
 - 货币战争现在只会给在攻略中的角色穿戴装备。
+- 后端启动参数调整，现在`-e`参数无需使用引号包裹命令。使用`+`替代`&`来连接多个命令。
 
 ### 问题修复：
 - 修复了在星际和平指南中点击差分宇宙前往参与时未直接进入差分宇宙界面导致无法进行差分宇宙任务的问题。
@@ -13,9 +14,14 @@
 - 后端启动参数“run”和“single”将在未来版本中被移除，请尽快更新相关用法。
 - 示例：
     - 旧用法：`run --config Default`
-    - 新用法：`--execute "run Default"`
-      -  或；`-e "run Default"`
+    - 新用法：`--execute run Default`
+      -  或；`-e run Default`
     - 旧用法：`run --config Default --once`（仅运行一次后退出）
-    - 新用法：`--execute "run Default & exit"`
-      -  或：`-e "run Default & exit"`
+    - 新用法：`--execute run Default + exit`
+      -  或：`-e run Default + exit`
 - `--execute`与`-e`,`--command`,`-c`为相同的参数
+
+#### -e参数示例：
+- 阻塞式运行默认配置并在完成后退出：`-e run Default + exit`
+- 阻塞式运行默认配置并在完成后进入交互式命令行：`-e run Default`
+- 非阻塞式运行默认配置：`-e task run Default`
