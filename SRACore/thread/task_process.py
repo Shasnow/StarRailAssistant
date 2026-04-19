@@ -28,7 +28,6 @@ class TaskManager:
         """
         初始化任务管理器。
         """
-        self.log_level = "TRACE"
         self.log_queue = None
         self._stop_event = threading.Event()
         self.task_list: list[type[BaseTask]] = []
