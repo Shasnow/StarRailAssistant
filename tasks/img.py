@@ -61,6 +61,7 @@ class SGIMG:
     USERNAME_INPUT = f"{BASE}/%s/username_input.png"
     WELCOME = f"{BASE}/%s/welcome.png"
     NEW_VERSION = f"{BASE}/new_version.png"
+    SETTINGS = f"{BASE}/settings.png"
 # endregion
 
 # region 体力任务专用

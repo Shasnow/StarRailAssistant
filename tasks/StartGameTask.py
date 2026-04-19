@@ -140,7 +140,7 @@ class StartGameTask(BaseTask):
         result, _ = self.operator.wait_any_img([
             SGIMG.LOGIN_PAGE % channel,
             SGIMG.WELCOME % channel,
-            IMG.QUIT,
+            SGIMG.SETTINGS,
             IMG.ENTER,
             SGIMG.NEW_VERSION
         ], timeout=60, interval=1)
