@@ -134,6 +134,7 @@ class TaskManager:
             return []
         print_config = config.copy()
         print_config["StartGamePassword"] = "******"
+        print_config["StartGameUsername"] = "******"
         logger.debug('config: ' + str(print_config))
         # 从配置中读取任务选择列表（如 [True, False, True]）
         task_select = config.get("EnabledTasks")
@@ -242,6 +243,7 @@ class TaskManager:
                 return None
             print_config = config.copy()
             print_config["StartGamePassword"] = "******"
+            print_config["StartGameUsername"] = "******"
             logger.debug('config: ' + str(config))
             # 实例化任务类
             operator = Operator()
