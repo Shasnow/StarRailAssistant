@@ -27,7 +27,6 @@ def main():
     logger.debug(f"cwd: {os.getcwd()}")
     from SRACore.cli import SRACli
     cli_instance = SRACli(settings=settings)
-    cli_instance.task_manager.log_level = args.log_level
     # 配置交互式模式（隐藏提示符）
     if args.inline or args.embed:
         cli_instance.intro = ''
@@ -68,7 +67,8 @@ def main():
     if exit_program:
         sys.exit(0)
     if args.command:
-        commands = args.command.split('&')
+        cmd_str = " ".join(args.command).replace('&', '+')
+        commands = cmd_str.split('+')
         for cmd in commands:
             cli_instance.cmdqueue.append(cmd)
     cli_instance.cmdloop()
@@ -86,6 +86,7 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
     )
     parser.add_argument(
          '--command', '-c', '--execute', '-e',
+        nargs='*',
         type=str,
         help='The command to execute AFTER launch',
     )
