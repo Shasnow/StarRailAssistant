@@ -203,6 +203,7 @@ class DUIMG:
     RETURN = f"{BASE}/return.png"
     ENSURE = f"{BASE}/ensure.png"
     ENSURE2 = f"{BASE}/ensure2.png"
+    SELECT_GRAND_MIRACLE = f"{BASE}/select_grand_miracle.png"
 # endregion
 
 # region 任务完成专用

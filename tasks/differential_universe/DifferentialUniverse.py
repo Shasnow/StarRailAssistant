@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 from loguru import logger
 
 from SRACore.task import Executable
@@ -20,11 +22,11 @@ class DifferentialUniverse(Executable):
                 return False
             if not self._start_differential_universe(exe_time):
                 return False
-            if not self._select():
+            if not self.select():
                 return False
             if not self._navigate_and_fight():
                 return False
-            if not self._select():
+            if not self.select():
                 return False
             if not self._complete_mission():
                 return False
@@ -79,41 +81,69 @@ class DifferentialUniverse(Executable):
 
         return True
 
-    def _select(self):
+    def select(self):
         """选择祝福"""
-        var = ["选择基础效果", "选择祝福", "选择方程", "选择奇物"]
+        selections: list[tuple[str, str, Callable[[], None] | None, bool]] = [
+            ("选择面具", DUIMG.MASK_SELECT, self.handle_mask_select, False),
+            ("选择祝福", DUIMG.BLESSING_SELECT, self.handle_blessing_select, False),
+            ("选择方程", DUIMG.EQUATION_SELECT, self.handle_equation_select, False),
+            ("选择奇物", DUIMG.CURIOSITY_SELECT, self.handle_curiosity_select, False),
+            ("方程展开", DUIMG.EQUATION_EXPANSION, self.handle_equation_expand, False),
+            ("选择站点卡", DUIMG.STATION_SELECT, self.handle_station_select, False),
+            ("选择惊世奇迹", DUIMG.SELECT_GRAND_MIRACLE, self.handle_miracle_select, False),
+            ("点击空白处关闭", DUIMG.CLOSE, self.handle_close, False),
+            ('', DUIMG.DIFFERENTIAL_UNIVERSE_QUIT, None, True),
+        ]
 
+        template_list = [s[1] for s in selections]
+        selection_index, _ = self.operator.wait_any_img(template_list, timeout=60)
         while True:
-            index, _ = self.operator.wait_any_img([
-                DUIMG.MASK_SELECT,
-                DUIMG.BLESSING_SELECT,
-                DUIMG.EQUATION_SELECT,
-                DUIMG.CURIOSITY_SELECT,
-                DUIMG.EQUATION_EXPANSION,
-                DUIMG.CLOSE,
-                DUIMG.STATION_SELECT,
-                DUIMG.DIFFERENTIAL_UNIVERSE_QUIT
-            ], interval=0.5, timeout=300)
-            if index == 0:
-                self.operator.click_point(0.1713, 0.7065, tag="选择中间的面具")
-                confirm_btn = self.operator.wait_img(DUIMG.ENSURE)
-                if confirm_btn is not None:
-                    self.operator.click_box(confirm_btn)
-            elif index == 1 or index == 2 or index == 3:  # 祝福选择或方程式选择或奇物选择
-                logger.info(var[index])
-                self.operator.sleep(0.5)
-                if not self.operator.click_img(DUIMG.COLLECTION):
-                    self.operator.click_point(0.5, 0.4, x_offset=-140)
-                self.operator.click_img(IMG.ENSURE2, after_sleep=1)
-            elif index == 4 or index == 5:  # 方程式扩展或关闭
-                self.operator.press_key('esc')
-                self.operator.sleep(0.5)
-            elif index == 6:
-                self.operator.click_img(DUIMG.ENSURE2, after_sleep=0.5)
-            else:  # 退出
+            if selection_index == -1:
+                raise RuntimeError("未匹配到任何选择界面")
+
+            selection_name, _, handler, is_terminal = selections[selection_index]
+            logger.info(f"检测到选择界面: {selection_name}")
+            if handler:
+                try:
+                    handler()
+                except Exception as e:
+                    logger.error(SRAError(ErrorCode.UNKNOWN_ERROR, f"处理{selection_name}时发生错误: {e}"))
+                    return False
+            if is_terminal:
                 break
+            self.operator.sleep(1)
+            selection_index, _ = self.operator.wait_any_img(template_list, timeout=30)
 
         return True
+
+    def handle_mask_select(self):
+        self.operator.click_point(0.1713, 0.82, tag="选择下面的面具")
+        confirm_btn = self.operator.wait_img(DUIMG.ENSURE)
+        if confirm_btn is not None:
+            self.operator.click_box(confirm_btn)
+
+    def handle_blessing_select(self):
+        if not self.operator.click_img(DUIMG.COLLECTION):
+            self.operator.click_point(0.5, 0.4, x_offset=-140)
+        self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+
+    def handle_equation_select(self):
+        self.handle_blessing_select()
+
+    def handle_curiosity_select(self):
+        self.handle_blessing_select()
+
+    def handle_close(self):
+        self.operator.press_key('esc')
+
+    def handle_equation_expand(self):
+        self.handle_close()
+
+    def handle_station_select(self):
+        self.operator.click_img(DUIMG.ENSURE2, after_sleep=0.5)
+
+    def handle_miracle_select(self):
+        self.handle_blessing_select()
 
     def _complete_mission(self):
         """完成任务结算"""

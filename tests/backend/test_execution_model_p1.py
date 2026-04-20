@@ -499,7 +499,7 @@ def test_differential_universe_select_stops_before_waiting_when_stop_requested()
     operator = MagicMock()
     task = DifferentialUniverse(operator, 1, False, stop_event)
 
-    assert task._select() is False
+    assert task.select() is False
     operator.wait_any_img.assert_not_called()
 
 
