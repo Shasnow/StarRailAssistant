@@ -50,6 +50,17 @@ class Positioning(enum.IntEnum):
     OffField = 2  # 后台
     OnOffField = 3  # 前后兼备
 
+    def __add__(self, other) -> 'Positioning':
+        if not isinstance(other, Positioning):
+            return NotImplemented
+
+        # 相同 → 返回自己
+        if self == other:
+            return self
+
+        # 不同 → 合并为前后台兼备
+        return Positioning.OnOffField
+
 
 @dataclasses.dataclass
 class Character:

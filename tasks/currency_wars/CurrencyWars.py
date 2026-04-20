@@ -550,10 +550,9 @@ class CurrencyWars(Executable):
                         _, box = self.operator.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS], confidence=0.8)
                         if box:
                             self.operator.click_box(box, after_sleep=0.5)
+                    self.operator.click_point(0.5, 0.5)  # 点击空白处关闭信息框
                 else:
                     target_character_list[index] = None  # 未识别到角色
-
-                self.operator.click_point(0.5, 0.5)  # 点击空白处关闭信息框
 
             except Exception as e:
                 # 捕获点击或OCR异常（如坐标错误、识别失败）
@@ -658,7 +657,7 @@ class CurrencyWars(Executable):
                 # 不在攻略中的角色
                 logger.info(f"出售非攻略角色：{character.name}")
                 characters_to_sell.append((i, character))
-            elif character.stars >= self.strategy_characters[character.name]:
+            elif character.stars >= self.strategy_characters[character.name] and character.is_placed:
                 # 已满足攻略要求的角色
                 logger.info(f"出售满足攻略要求的角色：{character.name}")
                 characters_to_sell.append((i, character))
@@ -916,39 +915,33 @@ class CurrencyWars(Executable):
         # ==================== 原有循环逻辑：首次购买后，执行后续刷新/购买 ====================
         while True:
             purchased = False
-            coins = self.get_coins()
             level = self.get_level()
+            coins = self.get_coins()
 
-            # 1. 基础退出条件：金币不足4（无法购买/刷新）
+            # 基础退出条件：金币不足4
             if coins < 4:
                 logger.info(f"金币不足4（当前{coins}），退出购物循环")
                 break
-
-            # 2. 非超频模式：检查金币是否满足保留要求（预判刷新后结果）
-            if not self.is_overclock:
-                # 最小保留数校验：当前金币 < 最小保留数 → 直接退出
-                if coins < self.min_coins:
-                    logger.info(f"当前金币 {coins} 小于最低保留数量 {self.min_coins}，退出购物循环")
-                    break
-                # 预判刷新后金币：若刷新后 < 最小保留数 → 退出
-                coins_after_refresh = coins - 6
-                if coins_after_refresh < self.min_coins:
-                    break
-
-            # 3. 等级<最低等级：持续升级（原有逻辑）
+            # 等级<最低等级：升级
             if level < self.min_level:
                 logger.info(f"等级{level}<最低等级{self.min_level}，执行升级操作")
                 self.operator.press_key('f')
                 self.operator.sleep(0.5)
                 continue
 
-            # 4. 扫描商店角色并尝试购买
+            # 扫描商店角色并尝试购买
             cs = scan_characters_in_store()
             if cs:
                 purchased = purchase_target_character(cs)
 
-            # 5. 执行刷新（仅当预判后金币足够时才会走到这里）
-            logger.info(f"当前金币{coins}，执行刷新商店操作（消耗2金币）")
+            # 非超频模式：检查金币是否满足保留要求（预判刷新后结果）
+            if not self.is_overclock:
+                # 最小保留数校验：当前金币 < 最小保留数 → 直接退出
+                if coins < self.min_coins:
+                    logger.info(f"当前金币 {coins} 小于最低保留数量 {self.min_coins}，退出购物循环")
+                    break
+
+            # 执行刷新（仅当预判后金币足够时才会走到这里）
             self.operator.press_key('d')
             self.operator.sleep(0.5)
 
@@ -957,6 +950,7 @@ class CurrencyWars(Executable):
                 logger.info(f"等级{level}<中级等级{self.mid_level}且未购买角色，执行升级操作")
                 self.operator.press_key('f')
                 self.operator.sleep(0.5)
+
         # 关闭商店
         self.operator.click_point(0.5, 0.55, after_sleep=1.5)
         logger.info("购物流程结束，关闭商店")
@@ -1029,9 +1023,12 @@ class CurrencyWars(Executable):
             if c is None:
                 logger.warning(f"攻略角色不存在，跳过：{cn}")
                 continue
-            c.priority = 95 - i  # 确保攻略中的后台角色优先级都大于其他角色
-            c.position = Positioning.OffField
-            self.strategy_characters[cn] = strategy_off_field[cn]
+            c.priority = 99 - i  # 确保攻略中的后台角色优先级都大于其他角色
+            if cn in strategy_on_field:
+                c.position = Positioning.OnOffField
+            else:
+                c.position = Positioning.OffField
+                self.strategy_characters[cn] = strategy_off_field[cn]
         # 兼容旧配置: 1 -> 1星，3 -> 2星，9 -> 3星
         for sc in self.strategy_characters.keys():
             if 3 < self.strategy_characters[sc] < 9:
