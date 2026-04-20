@@ -3,6 +3,7 @@ import json
 from typing import Any
 
 from loguru import logger
+from PIL import Image
 
 from SRACore.operators.model import Box
 from SRACore.task import Executable
@@ -76,6 +77,12 @@ class CurrencyWars(Executable):
         self.strategy_characters: dict[str, int] = dict()  # 在攻略中的角色及其预期星级
         self.strategy_code = ""  # 当前使用的攻略代码
         self.is_overclock = False  # 超频博弈
+
+    CHARACTER_NAME_REGION = (0.78, 0.175, 0.880, 0.2315)
+    CHARACTER_NAME_BATCH_GAP = 24
+    CHARACTER_NAME_CAPTURE_SLEEP = 0.4
+    CHARACTER_NAME_DISMISS_SLEEP = 0.2
+    CHARACTER_NAME_DISMISS_POINT = (0.5, 0.5)
 
     def run(self):
         self.is_running = True
@@ -488,6 +495,104 @@ class CurrencyWars(Executable):
         else:
             return 0
 
+    @staticmethod
+    def _read_character_name_piece(item: Any) -> str:
+        if isinstance(item, (list, tuple)) and len(item) >= 2 and isinstance(item[1], str | int | float):
+            return str(item[1])
+        if isinstance(item, str | int | float):
+            return str(item)
+        return ""
+
+    @staticmethod
+    def _read_character_name_piece_box(item: Any) -> tuple[int, int, int, int] | None:
+        if not isinstance(item, (list, tuple)) or not item:
+            return None
+        box = item[0]
+        if not isinstance(box, (list, tuple)) or not box:
+            return None
+        if all(isinstance(point, (list, tuple)) and len(point) >= 2 for point in box):
+            xs = [int(point[0]) for point in box]
+            ys = [int(point[1]) for point in box]
+            left = min(xs)
+            top = min(ys)
+            return left, top, max(xs) - left, max(ys) - top
+        return None
+
+    @classmethod
+    def _compose_character_name_strip_image(cls, captures: list[dict[str, Any]]) -> tuple[Image.Image, list[dict[str, int]]]:
+        if not captures:
+            return Image.new("RGB", (1, 1), color="white"), []
+
+        converted = [capture["image"].convert("RGB") for capture in captures]
+        width = max(image.width for image in converted)
+        total_height = sum(image.height for image in converted) + cls.CHARACTER_NAME_BATCH_GAP * (len(converted) - 1)
+        strip = Image.new("RGB", (width, total_height), color="white")
+        layouts: list[dict[str, int]] = []
+        cursor_y = 0
+        for capture, image in zip(captures, converted, strict=False):
+            strip.paste(image, (0, cursor_y))
+            layouts.append({
+                "index": int(capture["index"]),
+                "top": cursor_y,
+                "bottom": cursor_y + image.height,
+            })
+            cursor_y += image.height + cls.CHARACTER_NAME_BATCH_GAP
+        return strip, layouts
+
+    @staticmethod
+    def _find_character_name_layout(layouts: list[dict[str, int]], *, center_y: float) -> dict[str, int] | None:
+        for index, layout in enumerate(layouts):
+            if layout["top"] <= center_y < layout["bottom"]:
+                return layout
+            if index == len(layouts) - 1 and center_y == layout["bottom"]:
+                return layout
+        return None
+
+    @classmethod
+    def _map_character_name_pieces(cls, layouts: list[dict[str, int]], pieces: list[Any]) -> dict[int, str | None]:
+        grouped: dict[int, list[tuple[int, int, int, str]]] = {layout["index"]: [] for layout in layouts}
+        for order, piece in enumerate(pieces):
+            text = cls._read_character_name_piece(piece).strip()
+            if not text:
+                continue
+            bounds = cls._read_character_name_piece_box(piece)
+            if bounds is None:
+                continue
+            left, top, width, height = bounds
+            layout = cls._find_character_name_layout(layouts, center_y=top + (height / 2))
+            if layout is None:
+                continue
+            grouped[layout["index"]].append((top, left, order, text))
+
+        names: dict[int, str | None] = {}
+        for layout in layouts:
+            entries = grouped[layout["index"]]
+            entries.sort(key=lambda item: (item[0], item[1], item[2]))
+            names[layout["index"]] = "".join(text for _, _, _, text in entries).strip() or None
+        return names
+
+    def _batch_read_character_names(self, areas, target_character_list, *, force: bool) -> dict[int, str | None]:
+        from_x, from_y, to_x, to_y = self.CHARACTER_NAME_REGION
+        captures: list[dict[str, Any]] = []
+        self.operator.click_point(*self.CHARACTER_NAME_DISMISS_POINT, after_sleep=self.CHARACTER_NAME_DISMISS_SLEEP, tag="收起角色信息")
+        for index, area in enumerate(areas):
+            if target_character_list[index] is not None and not force:
+                continue
+            self.operator.click_point(*area, after_sleep=self.CHARACTER_NAME_CAPTURE_SLEEP, tag=f"读取角色名 {index}")
+            captures.append({
+                "index": index,
+                "image": self.operator.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y),
+            })
+            self.operator.click_point(*self.CHARACTER_NAME_DISMISS_POINT, after_sleep=self.CHARACTER_NAME_DISMISS_SLEEP, tag="关闭角色信息")
+
+        if not captures:
+            return {}
+        strip, layouts = self._compose_character_name_strip_image(captures)
+        if self.operator.ocr_engine is None:
+            self.operator.ocr_engine = self.operator._get_ocr_instance()
+        pieces, _ = self.operator.ocr_engine(strip, use_det=True, use_cls=False, use_rec=True)  # type: ignore[misc]
+        return self._map_character_name_pieces(layouts, pieces or [])
+
     def _get_character_in_area(self, areas, target_character_list, force=False, equip=False, count_stars=False):
         """
         通用方法：获取指定区域的角色信息
@@ -512,45 +617,36 @@ class CurrencyWars(Executable):
                     valid_boxes.append(b)
             return len(valid_boxes)
 
-        # 角色名称OCR区域
-        ocr_from_x, ocr_from_y, ocr_to_x, ocr_to_y = (0.775, 0.175, 0.880, 0.2315)
+        names_by_index = self._batch_read_character_names(areas, target_character_list, force=force)
 
         for index, area in enumerate(areas):
             try:
                 # 点击区域（带延迟，确保界面响应）
                 if target_character_list[index] is not None and not force:
                     continue  # 已有角色则跳过
-                self.operator.click_point(*area, after_sleep=0.2)
-
-                # OCR识别角色名称
-                character_names = self.operator.ocr(
-                    from_x=ocr_from_x,
-                    from_y=ocr_from_y,
-                    to_x=ocr_to_x,
-                    to_y=ocr_to_y
-                )
+                name = names_by_index.get(index)
 
                 # 更新角色列表
-                if character_names and len(character_names) > 0:
-                    name = ''
-                    # OCR可能会将角色名称分成多行或多个部分，需拼接后再识别
-                    for char_name in character_names:
-                        name += char_name[1]
+                if name:
                     char = Characters.get_character(name)
                     if char is None:
                         logger.warning("OCR识别到角色名称：{}，但未在角色列表中找到匹配项".format(name))
+                        target_character_list[index] = None
                         continue
-                    if count_stars:
-                        char.stars = get_stars(3)
                     target_character_list[index] = char
-                    if equip:
-                        if char.name not in self.strategy_characters.keys():
-                            continue  # 不给不在攻略中的角色穿戴装备
-                        self.operator.click_img(CWIMG.EQUIPMENT_RECOMMEND, after_sleep=1)
-                        _, box = self.operator.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS], confidence=0.8)
-                        if box:
-                            self.operator.click_box(box, after_sleep=0.5)
-                    self.operator.click_point(0.5, 0.5)  # 点击空白处关闭信息框
+                    if count_stars or equip:
+                        self.operator.click_point(*area, after_sleep=self.CHARACTER_NAME_CAPTURE_SLEEP, tag=f"更新角色详情 {index}")
+                        if count_stars:
+                            char.stars = get_stars(3)
+                        if equip:
+                            if char.name not in self.strategy_characters.keys():
+                                self.operator.click_point(*self.CHARACTER_NAME_DISMISS_POINT, after_sleep=self.CHARACTER_NAME_DISMISS_SLEEP, tag="关闭角色详情")
+                                continue  # 不给不在攻略中的角色穿戴装备
+                            self.operator.click_img(CWIMG.EQUIPMENT_RECOMMEND, after_sleep=1)
+                            _, box = self.operator.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS], confidence=0.8)
+                            if box:
+                                self.operator.click_box(box, after_sleep=0.5)
+                        self.operator.click_point(*self.CHARACTER_NAME_DISMISS_POINT, after_sleep=self.CHARACTER_NAME_DISMISS_SLEEP, tag="关闭角色详情")
                 else:
                     target_character_list[index] = None  # 未识别到角色
 
