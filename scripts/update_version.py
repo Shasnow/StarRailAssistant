@@ -99,27 +99,60 @@ def get_current_version():
 
 def increment_version(version, level='patch'):
     """递增版本号
-    
+
     Args:
         version: 当前版本号
-        level: 递增级别，可选值: 'patch'(默认), 'minor', 'major'
+        level: 递增级别，可选值: 'patch'(默认), 'minor', 'major', 'prerelease'
+
+    Behavior:
+        - 'major', 'minor', 'patch' 操作仍然作用于核心版本号，保持现有的后缀（如果有）
+        - 'prerelease' 在存在后缀时递增后缀中最后一个数字部分（例如 beta.1 -> beta.2）;
+          如果后缀中无数字则追加 '.1'；如果没有后缀则默认添加 'beta.1'
     """
     # 分离版本号的核心部分和后缀部分（如 -beta.1）
     core_version = version
     suffix = ''
     if '-' in version:
         core_version, suffix = version.split('-', 1)
-    
+
     # 解析核心版本号为数字列表
     parts = core_version.split('.')
     # 确保至少有三个部分
     while len(parts) < 3:
         parts.append('0')
-    
-    # 转换为整数
+
+    # 转换为整数（只针对核心部分）
     parts = [int(part) for part in parts]
-    
-    # 根据级别递增
+
+    # 处理 prerelease 单独逻辑
+    if level == 'prerelease':
+        # 如果没有后缀，默认添加 beta.1
+        if not suffix:
+            return f"{core_version}-beta.1"
+
+        # 尝试将后缀按 '.' 分割，找到最后一个数字段并递增
+        idents = suffix.split('.')
+        for i in range(len(idents) - 1, -1, -1):
+            if re.fullmatch(r"\d+", idents[i]):
+                idents[i] = str(int(idents[i]) + 1)
+                new_suffix = '.'.join(idents)
+                return f"{core_version}-{new_suffix}"
+
+        # 如果没有纯数字段，尝试在最后一段尾部寻找数字并递增（例如 beta1 -> beta2）
+        m = re.match(r"^(.*?)(\d+)$", idents[-1])
+        if m:
+            prefix = m.group(1)
+            num = m.group(2)
+            idents[-1] = f"{prefix}{int(num) + 1}"
+            new_suffix = '.'.join(idents)
+            return f"{core_version}-{new_suffix}"
+
+        # 如果完全没有数字段，则追加 .1
+        idents.append('1')
+        new_suffix = '.'.join(idents)
+        return f"{core_version}-{new_suffix}"
+
+    # 根据级别递增核心版本号
     if level == 'major':
         parts[0] += 1
         parts[1] = 0
@@ -129,15 +162,14 @@ def increment_version(version, level='patch'):
         parts[2] = 0
     else:  # patch (默认)
         parts[2] += 1
-    
-    # 重新组合版本号
+
+    # 重新组合版本号并保留后缀（如果有）
     new_core_version = '.'.join(map(str, parts))
     if suffix:
-        new_version = f"{new_core_version}-{suffix}"
-    else:
-        new_version = new_core_version
-    
-    return new_version
+        return f"{new_core_version}-{suffix}"
+    return new_core_version
+
+
 
 def main():
     """主函数"""
@@ -159,9 +191,10 @@ def main():
         '--increment', '-i',
         nargs='?',
         const='patch',
-        choices=['patch', 'minor', 'major'],
-        help='递增版本号，可选级别: patch (默认), minor, major\n'
-             '例如: --increment minor 将 2.10.0 递增为 2.11.0'
+        choices=['patch', 'minor', 'major', 'prerelease'],
+        help='递增版本号，可选级别: patch (默认), minor, major, prerelease\n'
+             "例如: --increment minor 将 2.10.0 递增为 2.11.0；"
+             "--increment prerelease 将 2.12.0-beta.1 递增为 2.12.0-beta.2"
     )
     
     # 添加 --release 选项：转换为正式版
