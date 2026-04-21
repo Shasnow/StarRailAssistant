@@ -99,3 +99,45 @@ def test_get_character_in_area_skips_existing_slots_when_force_false():
         (0.3, 0.4, CurrencyWars.CHARACTER_NAME_CAPTURE_SLEEP, "读取角色名 1"),
         (0.5, 0.5, CurrencyWars.CHARACTER_NAME_DISMISS_SLEEP, "关闭角色信息"),
     ]
+
+
+def test_get_character_in_area_keeps_single_open_flow_when_detail_is_required():
+    CurrencyWars = import_task_module("tasks.currency_wars.CurrencyWars").CurrencyWars
+
+    class FakeOperator:
+        def __init__(self):
+            self.settings = {}
+            self.stop_event = None
+            self.clicks: list[tuple[float, float, float, str]] = []
+            self.ocr_calls: list[tuple[float, float, float, float]] = []
+            self.ocr_engine_calls: list[tuple[int, int]] = []
+            self.ocr_engine = self._ocr_engine
+
+        def click_point(self, x, y, after_sleep=0, tag=""):
+            self.clicks.append((x, y, after_sleep, tag))
+            return True
+
+        def ocr(self, *, from_x=None, from_y=None, to_x=None, to_y=None, trace=True):
+            del trace
+            self.ocr_calls.append((from_x, from_y, to_x, to_y))
+            return [
+                ([[8, 8], [57, 8], [57, 34], [8, 34]], "佩拉", 0.99),
+            ]
+
+        def _ocr_engine(self, image, *, use_det=True, use_cls=False, use_rec=True):
+            self.ocr_engine_calls.append(image.size)
+            return [], None
+
+        def locate_all(self, *args, **kwargs):
+            del args, kwargs
+            return []
+
+    operator = FakeOperator()
+    task = CurrencyWars(operator, 1)
+    target = [None]
+
+    task._get_character_in_area([(0.1, 0.2)], target, force=False, count_stars=True)
+
+    assert [character.name if character is not None else None for character in target] == ["佩拉"]
+    assert operator.ocr_calls == [CurrencyWars.CHARACTER_NAME_REGION]
+    assert operator.ocr_engine_calls == []

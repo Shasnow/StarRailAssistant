@@ -617,14 +617,29 @@ class CurrencyWars(Executable):
                     valid_boxes.append(b)
             return len(valid_boxes)
 
-        names_by_index = self._batch_read_character_names(areas, target_character_list, force=force)
+        from_x, from_y, to_x, to_y = self.CHARACTER_NAME_REGION
+        use_batch_name_read = not equip and not count_stars
+        names_by_index = self._batch_read_character_names(areas, target_character_list, force=force) if use_batch_name_read else {}
 
         for index, area in enumerate(areas):
             try:
                 # 点击区域（带延迟，确保界面响应）
                 if target_character_list[index] is not None and not force:
                     continue  # 已有角色则跳过
-                name = names_by_index.get(index)
+                if use_batch_name_read:
+                    name = names_by_index.get(index)
+                else:
+                    self.operator.click_point(*area, after_sleep=0.2)
+                    character_names = self.operator.ocr(
+                        from_x=from_x,
+                        from_y=from_y,
+                        to_x=to_x,
+                        to_y=to_y,
+                    )
+                    name = ''
+                    for char_name in character_names or []:
+                        name += char_name[1]
+                    name = name.strip() or None
 
                 # 更新角色列表
                 if name:
@@ -632,9 +647,23 @@ class CurrencyWars(Executable):
                     if char is None:
                         logger.warning("OCR识别到角色名称：{}，但未在角色列表中找到匹配项".format(name))
                         target_character_list[index] = None
+                        if not use_batch_name_read:
+                            self.operator.click_point(*self.CHARACTER_NAME_DISMISS_POINT, after_sleep=self.CHARACTER_NAME_DISMISS_SLEEP, tag="关闭角色详情")
                         continue
                     target_character_list[index] = char
-                    if count_stars or equip:
+                    if not use_batch_name_read:
+                        if count_stars:
+                            char.stars = get_stars(3)
+                        if equip:
+                            if char.name not in self.strategy_characters.keys():
+                                self.operator.click_point(*self.CHARACTER_NAME_DISMISS_POINT, after_sleep=self.CHARACTER_NAME_DISMISS_SLEEP, tag="关闭角色详情")
+                                continue  # 不给不在攻略中的角色穿戴装备
+                            self.operator.click_img(CWIMG.EQUIPMENT_RECOMMEND, after_sleep=1)
+                            _, box = self.operator.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS], confidence=0.8)
+                            if box:
+                                self.operator.click_box(box, after_sleep=0.5)
+                        self.operator.click_point(*self.CHARACTER_NAME_DISMISS_POINT, after_sleep=self.CHARACTER_NAME_DISMISS_SLEEP, tag="关闭角色详情")
+                    elif count_stars or equip:
                         self.operator.click_point(*area, after_sleep=self.CHARACTER_NAME_CAPTURE_SLEEP, tag=f"更新角色详情 {index}")
                         if count_stars:
                             char.stars = get_stars(3)
