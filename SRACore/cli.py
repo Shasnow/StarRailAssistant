@@ -1,9 +1,9 @@
 # type: ignore
 import cmd
+import pprint
 import threading
 from collections.abc import Callable
 from typing import Any
-from rich import print
 from loguru import logger
 
 from SRACore.localization import Resource
@@ -45,9 +45,9 @@ class SRACli(cmd.Cmd):
 
     def do_config(self, name):
         if name == 'settings':
-            print(self.settings)
+            pprint.pprint(self.settings)
         else:
-            print(load_config(name))
+            pprint.pprint(load_config(name))
 
     def _get_command_help(self, cmd_name: str, detail: bool = False) -> str:
         """
