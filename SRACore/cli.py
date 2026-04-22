@@ -3,7 +3,7 @@ import cmd
 import threading
 from collections.abc import Callable
 from typing import Any
-
+from rich import print
 from loguru import logger
 
 from SRACore.localization import Resource
@@ -11,6 +11,7 @@ from SRACore.runtime.event_listener import KeyboardListener
 from SRACore.thread.task_process import TaskManager
 from SRACore.runtime.trigger_manager import TriggerManager
 from SRACore.util.const import VERSION, CORE
+from SRACore.util.data_persister import load_config
 
 
 class SRACli(cmd.Cmd):
@@ -19,7 +20,7 @@ class SRACli(cmd.Cmd):
 
     def __init__(self, settings: dict = None):
         super().__init__()
-        settings = settings or {}
+        self.settings = settings or {}
         self.task_manager = TaskManager()
         self.task_thread = None
         self.trigger_manager = TriggerManager()
@@ -41,6 +42,12 @@ class SRACli(cmd.Cmd):
 
     def emptyline(self) -> bool:
         return False
+
+    def do_config(self, name):
+        if name == 'settings':
+            print(self.settings)
+        else:
+            print(load_config(name))
 
     def _get_command_help(self, cmd_name: str, detail: bool = False) -> str:
         """

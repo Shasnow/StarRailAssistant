@@ -142,6 +142,7 @@ public partial class TaskPageViewModel : PageViewModel
                     "智识之钥（智识）",
                     "天外乐章（同谐）",
                     "群星乐章（同谐）",
+                    "法吉娜之心（虚无）",
                     "焚天之魔（虚无）",
                     "沉沦黑曜（虚无）",
                     "阿赖耶华（记忆）",
