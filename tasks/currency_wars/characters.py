@@ -102,7 +102,7 @@ class Characters:
     """
     Cyrene = Character('昔涟', 5, Positioning.OnField)
     DanHeng_PermansorTerrae = Character('丹恒·腾荒', 2, Positioning.OffField)
-    Evernight = Character('长夜月', 3, Positioning.OnOffField)
+    Evernight = Character('长夜月', 4, Positioning.OnOffField)
     Cerydra = Character('刻律德菈', 3, Positioning.OnOffField)
     Hysilens = Character('海瑟音', 4, Positioning.OnField)
     Archer = Character('Archer', 5, Positioning.OnField)
@@ -120,7 +120,7 @@ class Characters:
     Fugue = Character('忘归人', 3, Positioning.OffField)
     Rappa = Character('乱破', 1, Positioning.OnField)
     Lingsha = Character('灵砂', 2, Positioning.OnField)
-    Feixiao = Character('飞霄', 2, Positioning.OnField)
+    Feixiao = Character('飞霄', 1, Positioning.OnField)
     Moze = Character('貊泽', 1, Positioning.OffField)
     Jiaoqiu = Character('椒丘', 1, Positioning.OnField)
     Yunli = Character('云璃', 5, Positioning.OffField)
@@ -136,7 +136,7 @@ class Characters:
     DrRatio = Character('真理医生', 3, Positioning.OnField)
     RuanMei = Character('阮·梅', 2, Positioning.OffField)
     Argenti = Character('银枝', 2, Positioning.OnField)
-    Huohuo = Character('荷藿', 2, Positioning.OnOffField)
+    Huohuo = Character('藿藿', 2, Positioning.OnOffField)
     TopazAndNumby = Character('托帕&账账', 5, Positioning.OffField)
     Jingliu = Character('镜流', 3, Positioning.OffField)
     FuXuan = Character('符玄', 4, Positioning.OffField)
@@ -164,6 +164,9 @@ class Characters:
     TheDahlia = Character('大丽花', 1, Positioning.OnOffField)
     YaoGuang = Character('爻光', 1, Positioning.OnOffField)
     Sparxie = Character('火花', 4, Positioning.OnField)
+    Ashveil = Character('不死途', 2, Positioning.OnOffField)
+    SilverWolfLV999 = Character('银狼LV.999', 5, Positioning.OnOffField)
+    Evanescia = Character('绯英', 2, Positioning.OnOffField)
 
     # 角色列表
     characters: dict[str, Character] = {
@@ -234,6 +237,9 @@ class Characters:
         '光': YaoGuang,
         '爻光': YaoGuang,
         '火花': Sparxie,
+        '不死途': Ashveil,
+        '银狼LV.999': SilverWolfLV999,
+        '绯英': Evanescia,
     }
     username = '开拓者'  # 角色名称
 
