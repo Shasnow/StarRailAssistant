@@ -11,7 +11,7 @@ def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log", level: str = "TRACE",
     log_format = "<green>{time:HH:mm:ss}</green> | <level>{level:5}</level> | <level>{message}</level>"
     logger.add(sys.stdout, level=level,
                format=log_format,
-               enqueue=True)
+               enqueue=True, colorize=sys.stdout.isatty())
     logger.add(path, level=level,
                format=log_format,
                colorize=False, retention=7, enqueue=True,
