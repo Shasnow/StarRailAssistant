@@ -270,8 +270,9 @@ class TrailblazePowerTask(BaseTask):
                 self.operator.sleep(0.2)
                 self.operator.click_img(TPIMG.PLUS)
             self.operator.sleep(1)
-        if self.config["TrailblazePowerUseAssistant"]:
-            self.support()
+        # if self.config["TrailblazePowerUseAssistant"]:
+        #     self.support()
+        # 支援逻辑又不通用了
         if self.operator.click_img(TPIMG.BATTLE_STAR, after_sleep=1):
             if self.operator.locate(TPIMG.LIMIT):
                 logger.warning(SRAError(ErrorCode.RELICS_LIMIT, "背包内遗器数量超过限制，请先清理"))
@@ -286,6 +287,9 @@ class TrailblazePowerTask(BaseTask):
                     logger.info("体力不足")
                     self.operator.press_key("esc", interval=1, presses=3)
                     return False
+            box = self.operator.locate(IMG.ENSURE2)
+            if box:
+                self.operator.click_box(box)
             if not self.operator.wait_img(IMG.F3, timeout=240):
                 pass
             self.operator.hold_key("w", 2.5)
