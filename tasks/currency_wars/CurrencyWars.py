@@ -609,6 +609,7 @@ class CurrencyWars(Executable):
         self.operator.sleep(0.3)
         self.operator.drag_to(0.68, 0.40, 0.83, 0.40, trace=False)
         self.operator.sleep(0.3)
+        self.detect_silver_wolf_lv999()  # 也许开出银狼了
 
     def sell_character(self):
         """
@@ -828,6 +829,7 @@ class CurrencyWars(Executable):
         """处理补给阶段的逻辑"""
         self.operator.click_point(0.53, 0.52, after_sleep=1)  # 选择固定位置
         self.operator.click_point(0.88, 0.91, after_sleep=1)  # 点击确认按钮
+        self.detect_silver_wolf_lv999()  # 也许选到银狼了
 
     def handle_encounter_node(self):
         """处理遭遇节点的逻辑"""
@@ -843,6 +845,12 @@ class CurrencyWars(Executable):
         """处理盛会之星事件的逻辑"""
         self.operator.click_point(0.5, 0.25, after_sleep=1)  # 选择第一个选项
         self.operator.click_point(0.77, 0.521, after_sleep=1)  # 点击确认按钮
+
+    def detect_silver_wolf_lv999(self):
+        """处理银狼LV.999 2星事件的逻辑"""
+        if self.operator.locate(CWIMG.SILVER_WOLF_LV999):
+            self.operator.click_point(0.60, 0.34, after_sleep=1)  # 选择第二个选项
+            self.operator.click_point(0.77, 0.55, after_sleep=1)  # 点击确认按钮
 
     def _handle_special_event(self):
         event, _ = self.operator.locate_any([
@@ -899,6 +907,9 @@ class CurrencyWars(Executable):
                     target = self.store_area[i]
                     self.operator.click_point(*target, after_sleep=0.5)
                     logger.info(f"购买角色：{c.name}")
+                    # 特殊处理
+                    if c.name == Characters.SilverWolfLV999.name:
+                        self.detect_silver_wolf_lv999()
                     self.operator.move_to(0.5, 0.5)  # 移动鼠标避免遮挡
 
             logger.info("当前商店无目标角色可购买")
