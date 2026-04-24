@@ -849,13 +849,17 @@ class CurrencyWars(Executable):
     def detect_silver_wolf_lv999(self):
         """处理银狼LV.999 2星事件的逻辑"""
         if self.operator.locate(CWIMG.SILVER_WOLF_LV999):
-            self.operator.click_point(0.60, 0.34, after_sleep=1)  # 选择第二个选项
-            self.operator.click_point(0.77, 0.55, after_sleep=1)  # 点击确认按钮
+            self.handle_silver_wolf_lv999()
+
+    def handle_silver_wolf_lv999(self):
+        self.operator.click_point(0.60, 0.34, after_sleep=1)  # 选择第二个选项
+        self.operator.click_point(0.77, 0.55, after_sleep=1)  # 点击确认按钮
 
     def _handle_special_event(self):
         event, _ = self.operator.locate_any([
             CWIMG.THE_PLANET_OF_FESTIVITIES,
-            CWIMG.FORTUNE_TELLER
+            CWIMG.FORTUNE_TELLER,
+            CWIMG.SILVER_WOLF_LV999
         ])
         if event == 0:  # 盛会之星事件
             self.handle_the_planet_of_festivities()
@@ -863,6 +867,9 @@ class CurrencyWars(Executable):
         elif event == 1:  # 命运卜者事件
             self.handle_fortune_teller()
             return self._handle_special_event()  # 可能连续触发事件，递归处理
+        elif event == 2:
+            self.handle_silver_wolf_lv999()
+            return True
         else:
             # 未检测到特殊事件，正常返回
             return True
