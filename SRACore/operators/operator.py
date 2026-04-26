@@ -3,7 +3,6 @@ import sys
 import threading
 import time
 from ctypes.wintypes import POINT, RECT
-from pathlib import Path
 
 import pyautogui
 import pygetwindow  # type: ignore
@@ -11,7 +10,7 @@ import pyscreeze
 from PIL.Image import Image
 
 from SRACore.operators.ioperator import IOperator
-from SRACore.operators.model import Box, Region
+from SRACore.operators.model import Region
 from SRACore.util.errors import ErrorCode, SRAError, ThreadStoppedError
 from SRACore.util.logger import logger
 
@@ -176,109 +175,8 @@ class Operator(IOperator):
         else:
             return pyscreeze.screenshot(region=region.tuple)
 
-    def locate(self,
-               template: str,
-               *,
-               from_x: float | None = None,
-               from_y: float | None = None,
-               to_x: float | None = None,
-               to_y: float | None = None,
-               confidence: float | None = None,
-               trace: bool = True) -> Box | None:
-        if self.stop_event is not None and self.stop_event.is_set():
-            raise ThreadStoppedError("图像识别中断", "线程已停止")
-        if confidence is not None:
-            match_confidence = confidence
-        else:
-            match_confidence = self.confidence
-        try:
-            if not Path(template).exists():
-                raise FileNotFoundError("无法找到或读取文件 " + template)
-            box = pyscreeze.locate(template,
-                                   self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y),
-                                   confidence=match_confidence)
-            if box is None:
-                return None
-            left, top, width, height = box
-            if from_x is not None and from_y is not None:
-                left += int(from_x * self.width)
-                top += int(from_y * self.height)
-            self.sleep(0.5)
-            return Box(left, top, width, height, source=template)
-        except Exception as e:
-            if trace:
-                logger.trace(f"ImageNotFound: {template} -> {e}")
-            return None
-
-    def locate_any(self,
-                   templates: list[str],
-                   *,
-                   from_x: float | None = None,
-                   from_y: float | None = None,
-                   to_x: float | None = None,
-                   to_y: float | None = None,
-                   confidence: float | None = None,
-                   trace: bool = True) -> tuple[int, Box | None]:
-        if self.stop_event is not None and self.stop_event.is_set():
-            raise ThreadStoppedError("图像识别中断", "线程已停止")
-        match_confidence = self.confidence if confidence is None else confidence
-        try:
-            screenshot = self.screenshot()
-            self.sleep(0.5)
-        except Exception as e:
-            logger.trace(f"Error taking screenshot: {e}")
-            return -1, None
-        for img_path in templates:
-            if not Path(img_path).exists():
-                raise FileNotFoundError("无法找到或读取文件 " + img_path)
-            try:
-                # noinspection PyTypeChecker
-                box = pyscreeze.locate(img_path, screenshot, confidence=match_confidence)
-            except (pyscreeze.ImageNotFoundException, ValueError) as e:
-                if trace:
-                    logger.trace(f"ImageNotFound: {img_path} -> {e}")
-                continue
-            if box is not None:
-                left, top, width, height = box
-                if from_x is not None and from_y is not None:
-                    left += int(from_x * self.width)
-                    top += int(from_y * self.height)
-                return templates.index(img_path), Box(left, top, width, height, source=img_path)
-        return -1, None
-
-    def locate_all(self,
-                   template: str,
-                   *,
-                   from_x: float | None = None,
-                   from_y: float | None = None,
-                   to_x: float | None = None,
-                   to_y: float | None = None,
-                   confidence: float | None = None,
-                   trace: bool = True) -> list[Box] | None:
-        if self.stop_event is not None and self.stop_event.is_set():
-            raise ThreadStoppedError("图像识别中断", "线程已停止")
-        match_confidence = self.confidence if confidence is None else confidence
-        try:
-            if not Path(template).exists():
-                raise FileNotFoundError("无法找到或读取文件 " + template)
-            # noinspection PyTypeChecker
-            boxes = pyscreeze.locateAll(template, self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y), confidence=match_confidence)
-            self.sleep(0.5)
-            result = []
-            for box in boxes:
-                left, top, width, height = box
-                if from_x is not None and from_y is not None:
-                    left += int(from_x * self.width)
-                    top += int(from_y * self.height)
-                result.append(Box(left, top, width, height, source=template)) # type: ignore
-            return result # type: ignore
-        except Exception as e:
-            if trace:
-                logger.trace(f"ImageNotFound: {template} -> {e}")
-            return None
-
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
-                    after_sleep: float = 0, tag: str = "") -> bool:
+                    after_sleep: float = 0, tag: str = "", trace: bool = False) -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("点击中断", "线程已停止")
         if isinstance(x_offset, float) and isinstance(y_offset, float):
@@ -292,7 +190,8 @@ class Operator(IOperator):
         elif isinstance(x, float) and isinstance(y, float):
             x = int(self.left + self.width * x + x_offset)
             y = int(self.top + self.height * y + y_offset)
-            logger.debug(f"Click point: ({x}, {y}), tag: {tag}")
+            if trace:
+                logger.debug(f"Click point: ({x}, {y}), tag: {tag}")
             pyautogui.click(x, y)
             self.sleep(after_sleep)
             return True

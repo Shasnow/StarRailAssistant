@@ -1,23 +1,27 @@
 import threading
 import time
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Any, Callable
 
 # noinspection PyPackageRequirements
 # (pyperclip is in pyautogui requirements)
 import pyperclip
+import pyscreeze
 from PIL.Image import Image
 from loguru import logger
 from rapidocr_onnxruntime import RapidOCR  # type: ignore
 
-from SRACore.operators.model import Box, Region
+from SRACore.operators.model import Box
 from SRACore.util.data_persister import load_settings
+from SRACore.util.errors import ThreadStoppedError
 
 
 class IOperator(ABC):
     ocr_engine = None
 
     def __init__(self, stop_event: threading.Event | None = None):
+        self.type = "Local"
         self.settings = load_settings()
         self.confidence: float = self.settings.get('ConfidenceThreshold', 0.9)
         self.top = 0
@@ -38,19 +42,6 @@ class IOperator(ABC):
     @abstractmethod
     def is_window_active(self) -> bool:
         """检查目标窗口是否为当前活动窗口"""
-        ...
-
-    @abstractmethod
-    def get_win_region(self, active_window: bool = True) -> Region:
-        """获取目标窗口的区域坐标
-
-        Args:
-            active_window (bool | None, optional): 是否在获取窗口区域前激活窗口。
-        Returns:
-            Region: 返回窗口区域对象
-        Raises:
-            SRAError: 如果无法获取窗口区域，或窗口未找到
-        """
         ...
 
     @abstractmethod
@@ -76,7 +67,6 @@ class IOperator(ABC):
         """
         ...
 
-    @abstractmethod
     def locate_all(self,
                    template: str,
                    *,
@@ -101,7 +91,27 @@ class IOperator(ABC):
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        ...
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("图像识别中断", "线程已停止")
+        match_confidence = self.confidence if confidence is None else confidence
+        try:
+            if not Path(template).exists():
+                raise FileNotFoundError("无法找到或读取文件 " + template)
+            # noinspection PyTypeChecker
+            boxes = pyscreeze.locateAll(template, self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y), confidence=match_confidence)
+            self.sleep(0.5)
+            result = []
+            for box in boxes:
+                left, top, width, height = box
+                if from_x is not None and from_y is not None:
+                    left += int(from_x * self.width)
+                    top += int(from_y * self.height)
+                result.append(Box(left, top, width, height, source=template)) # type: ignore
+            return result # type: ignore
+        except Exception as e:
+            if trace:
+                logger.trace(f"ImageNotFound: {template} -> {e}")
+            return None
 
     def locate_any(self,
                    templates: list[str],
@@ -127,9 +137,33 @@ class IOperator(ABC):
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        ...
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("图像识别中断", "线程已停止")
+        match_confidence = self.confidence if confidence is None else confidence
+        try:
+            screenshot = self.screenshot(from_x=from_x, from_y=from_y,to_x=to_x, to_y=to_y)
+            self.sleep(0.5)
+        except Exception as e:
+            logger.trace(f"Error taking screenshot: {e}")
+            return -1, None
+        for img_path in templates:
+            if not Path(img_path).exists():
+                raise FileNotFoundError("无法找到或读取文件 " + img_path)
+            try:
+                # noinspection PyTypeChecker
+                box = pyscreeze.locate(img_path, screenshot, confidence=match_confidence)
+            except (pyscreeze.ImageNotFoundException, ValueError) as e:
+                if trace:
+                    logger.trace(f"ImageNotFound: {img_path} -> {e}")
+                continue
+            if box is not None:
+                left, top, width, height = box
+                if from_x is not None and from_y is not None:
+                    left += int(from_x * self.width)
+                    top += int(from_y * self.height)
+                return templates.index(img_path), Box(left, top, width, height, source=img_path)
+        return -1, None
 
-    @abstractmethod
     def locate(self,
                template: str,
                *,
@@ -154,7 +188,30 @@ class IOperator(ABC):
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
-        ...
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("图像识别中断", "线程已停止")
+        if confidence is not None:
+            match_confidence = confidence
+        else:
+            match_confidence = self.confidence
+        try:
+            if not Path(template).exists():
+                raise FileNotFoundError("无法找到或读取文件 " + template)
+            box = pyscreeze.locate(template,
+                                   self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y),
+                                   confidence=match_confidence)
+            if box is None:
+                return None
+            left, top, width, height = box
+            if from_x is not None and from_y is not None:
+                left += int(from_x * self.width)
+                top += int(from_y * self.height)
+            self.sleep(0.5)
+            return Box(left, top, width, height, source=template)
+        except Exception as e:
+            if trace:
+                logger.trace(f"ImageNotFound: {template} -> {e}")
+            return None
 
     def ocr(self,
             *,
@@ -333,7 +390,7 @@ class IOperator(ABC):
 
     @abstractmethod
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
-                    after_sleep: float = 0, tag: str = "") -> bool:
+                    after_sleep: float = 0, tag: str = "", trace: bool = False) -> bool:
         """
         点击指定位置
 
@@ -346,6 +403,7 @@ class IOperator(ABC):
             y_offset (int | float, optional): y偏移量(px)或百分比(float)。默认值为0。
             after_sleep (float, optional): 点击后等待时间，单位秒。默认值为0。
             tag (str, optional): 日志标记。默认值为空字符串。
+            trace (bool): 是否打印日志
         Returns:
             bool: 点击成功返回True，否则返回False
         """
@@ -605,6 +663,7 @@ class IOperator(ABC):
         """
         iterations = 0
         action()
+        time.sleep(interval)
         while condition() and iterations < max_iterations:
             action()
             time.sleep(interval)

@@ -222,7 +222,7 @@ class CurrencyWars(Executable):
         self.operator.do_while(
             lambda: self.operator.click_box(start_box, after_sleep=1),  # NOQA
             lambda: self.operator.locate(CWIMG.LOGO) is None,
-            interval=1,
+            interval=2,
             max_iterations=10
         )
         self.operator.sleep(1)  # 等待界面响应
@@ -599,16 +599,23 @@ class CurrencyWars(Executable):
     def harvest_crystals(self):
         # 实现水晶收集逻辑
         logger.info("收集水晶")
-        self.operator.drag_to(0.68, 0.18, 0.82, 0.18, trace=False)
-        self.operator.sleep(0.3)
-        self.operator.drag_to(0.68, 0.25, 0.82, 0.25, trace=False)
-        self.operator.sleep(0.3)
-        self.operator.drag_to(0.68, 0.30, 0.83, 0.30, trace=False)
-        self.operator.sleep(0.3)
-        self.operator.drag_to(0.68, 0.35, 0.84, 0.35, trace=False)
-        self.operator.sleep(0.3)
-        self.operator.drag_to(0.68, 0.40, 0.83, 0.40, trace=False)
-        self.operator.sleep(0.3)
+        if self.operator.type == "Local":
+            self.operator.drag_to(0.68, 0.20, 0.82, 0.18, trace=False)
+            self.operator.sleep(0.3)
+            self.operator.drag_to(0.68, 0.25, 0.82, 0.25, trace=False)
+            self.operator.sleep(0.3)
+            self.operator.drag_to(0.68, 0.30, 0.83, 0.30, trace=False)
+            self.operator.sleep(0.3)
+            self.operator.drag_to(0.68, 0.35, 0.84, 0.35, trace=False)
+            self.operator.sleep(0.3)
+            self.operator.drag_to(0.68, 0.40, 0.83, 0.40, trace=False)
+            self.operator.sleep(0.3)
+        else:
+            # 浏览器不支持滑动，拖动可能无法正确触发收集
+            for x in range(66, 85, 2):
+                for y in range(20, 41, 5):
+                    self.operator.click_point(x / 100, y / 100, trace = False)
+
         self.detect_silver_wolf_lv999()  # 也许开出银狼了
 
     def sell_character(self):

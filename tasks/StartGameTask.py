@@ -55,6 +55,9 @@ class StartGameTask(BaseTask):
 
     def launch_game(self):
         """启动游戏"""
+        if hasattr(self.operator, 'driver'):
+            self.operator.launch_browser()
+            return
         if sys_util.is_process_running("StarRail.exe"):  # 检查游戏是否已在运行
             logger.info("游戏已在运行中")
             return
@@ -97,9 +100,8 @@ class StartGameTask(BaseTask):
         use_cmd = self.settings.get('LaunchWithCmd', False)
         if use_cmd:
             logger.info("使用 CMD 启动游戏")
-            import subprocess
             cmd = f'start "" "{path}" {" ".join(launch_args)}'
-            subprocess.Popen(cmd, shell=True, cwd=path.parent)
+            sys_util.Popen(cmd, shell=True, cwd=path.parent)
         else:
             sys_util.Popen([str(path)] + launch_args, cwd=path.parent)
         logger.info("游戏启动命令已执行")
@@ -126,6 +128,10 @@ class StartGameTask(BaseTask):
 
 
     def login(self):
+        if hasattr(self.operator, 'driver'):
+            user = encryption.win_decryptor(self.config['StartGameUsername'])
+            passwd = encryption.win_decryptor(self.config['StartGamePassword'])
+            return self.operator.login(user, passwd)
         channel = None
         match self.config['StartGameChannel']:
             case 0:
