@@ -284,4 +284,7 @@
     <data name="MainPyText" xml:space="preserve">
         <value>主程序路径</value>
     </data>
+    <data name="CloudGameText" xml:space="preserve">
+        <value>使用云·星穹铁道</value>
+    </data>
 </root>

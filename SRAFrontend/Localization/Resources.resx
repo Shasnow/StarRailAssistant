@@ -291,4 +291,7 @@
     <data name="MainPyText" xml:space="preserve">
         <value>The Path to main.py</value>
     </data>
+    <data name="CloudGameText" xml:space="preserve">
+        <value>Use StarRail Cloud Game</value>
+    </data>
 </root>

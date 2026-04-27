@@ -231,6 +231,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Use StarRail Cloud Game.
+        /// </summary>
+        public static string CloudGameText {
+            get {
+                return ResourceManager.GetString("CloudGameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Image Recognition Confidence.
         /// </summary>
         public static string ConfidenceText {

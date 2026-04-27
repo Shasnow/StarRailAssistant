@@ -40,6 +40,10 @@ public partial class GeneralSettings : ObservableObject
     private bool _isAutoDetectGamePath = true;
 
     [ObservableProperty]
+    [property: JsonPropertyName("cloudGame.enable")]
+    private bool _isCloudGameEnable = false;
+    
+    [ObservableProperty]
     [property: JsonPropertyName("templateMatchConfidence")]
     private double _templateMatchConfidence = 0.9;
 

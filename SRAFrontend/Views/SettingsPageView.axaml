@@ -47,6 +47,12 @@
                                                 IsVisible="{Binding !GeneralSettings.IsAutoDetectGamePath}"
                                                 ToolTip.Tip="浏览并选择文件" />
                                     </Grid>
+                                    
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="Icon">&#xE1AA;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.CloudGameText}" />
+                                        <ToggleSwitch Grid.Column="2" IsChecked="{Binding GeneralSettings.IsCloudGameEnable}"/>
+                                    </Grid>
 
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="Icon">&#xee60;</Label>
