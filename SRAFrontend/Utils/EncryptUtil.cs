@@ -8,6 +8,7 @@ public static class EncryptUtil
 {
     public static string EncryptString(string input)
     {
+        if (string.IsNullOrEmpty(input)) return string.Empty;
         var inputBytes = Encoding.UTF8.GetBytes(input);
         byte[] encryptedBytes;
         if (OperatingSystem.IsWindows())
@@ -24,6 +25,7 @@ public static class EncryptUtil
 
     public static string DecryptString(string input)
     {
+        if (string.IsNullOrEmpty(input)) return string.Empty;
         var encryptedBytes = Convert.FromBase64String(input);
         byte[] decryptedBytes;
         if (OperatingSystem.IsWindows())
