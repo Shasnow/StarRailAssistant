@@ -27,8 +27,8 @@ public class BackendServiceProxy : IBackendService
 
         // 初始化 Python 后端配置
         ApplyPythonSettings();
-        var isUsingPython = Environment.GetCommandLineArgs().Contains("--use-python") || _settingsService.Settings is
-            { IsDeveloperMode: true, IsUsingPython: true };
+        var isUsingPython = Environment.GetCommandLineArgs().Contains("--use-python") || _settingsService.Settings.Advanced is
+            { IsDeveloperModeEnabled: true, IsUsePython: true };
         // 根据设置决定初始后端
         _currentBackend = isUsingPython
             ? _pyBackendService
@@ -38,7 +38,7 @@ public class BackendServiceProxy : IBackendService
         IsTaskRunning = _currentBackend.IsTaskRunning;
 
         // 监听设置变化，动态切换后端和更新 Python 配置
-        _settingsService.Settings.PropertyChanged += OnSettingsPropertyChanged;
+        _settingsService.SettingsPropertyChanged += OnSettingsPropertyChanged;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -95,8 +95,8 @@ public class BackendServiceProxy : IBackendService
     private void ApplyPythonSettings()
     {
         // 将当前 Settings 中的 Python 配置同步到 PyBackendService
-        var pythonPath = _settingsService.Settings.PythonPath;
-        var mainPy = _settingsService.Settings.PythonMainPy;
+        var pythonPath = _settingsService.Settings.Advanced.PythonPath;
+        var mainPy = _settingsService.Settings.Advanced.PythonMain;
 
         if (!string.IsNullOrWhiteSpace(pythonPath))
             _pyBackendService.FileName = pythonPath;
@@ -113,7 +113,7 @@ public class BackendServiceProxy : IBackendService
         // 后端选择
         if (e.PropertyName == nameof(Settings.IsUsingPython))
         {
-            var usePython = _settingsService.Settings.IsUsingPython;
+            var usePython = _settingsService.Settings.Advanced.IsUsePython;
             IBackendService target = usePython ? _pyBackendService : _cliBackendService;
             SetCurrentBackend(target);
         }

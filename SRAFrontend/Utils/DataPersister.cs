@@ -51,33 +51,6 @@ public static class DataPersister
         }
     }
 
-    #region Settings
-
-    public static Settings LoadSettings()
-    {
-        try
-        {
-            if (!File.Exists(PathString.SettingsJson)) return new Settings();
-            var json = File.ReadAllText(PathString.SettingsJson);
-            if (string.IsNullOrWhiteSpace(json)) return new Settings();
-            return JsonSerializer.Deserialize<Settings>(json) ?? new Settings();
-        }
-        catch (Exception e)
-        {
-            Log.Error(e, "Error loading settings, using default settings");
-            return new Settings();
-        }
-        
-    }
-
-    public static void SaveSettings(Settings settings)
-    {
-        var json = JsonSerializer.Serialize(settings, JsonSerializerOptions);
-        SafeWriteAllText(PathString.SettingsJson, json);
-    }
-
-    #endregion
-
     #region Cache
 
     public static Cache LoadCache()

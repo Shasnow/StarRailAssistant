@@ -28,9 +28,11 @@ public class App : Application
         var serviceCollection = new ServiceCollection();
         ConfigureServices(serviceCollection);
         var serviceProvider = serviceCollection.BuildServiceProvider();
+        var settingsService = serviceProvider.GetRequiredService<SettingsService>();
+        settingsService.Load();
         Localization.Resources.Culture =
             new CultureInfo(
-                serviceProvider.GetRequiredService<SettingsService>().Settings.Language == 0 ? "zh-CN" : "en-US");
+                settingsService.Settings.Display.Language == 0 ? "zh-CN" : "en-US");
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
@@ -44,7 +46,7 @@ public class App : Application
             desktop.Exit += (_, _) =>
             {
                 Log.Information("Application is exiting. Saving settings and stopping SRA process.");
-                serviceProvider.GetRequiredService<SettingsService>().SaveSettings();
+                // settingsService.Save(); 设置有自动保存
                 serviceProvider.GetRequiredService<ConfigService>().SaveConfig();
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
                 serviceProvider.GetRequiredService<IBackendService>().StopBackend();
@@ -128,7 +130,7 @@ public class App : Application
         };
     }
     
-    
+
     private void DisableAvaloniaDataAnnotationValidation()
     {
         // Get an array of plugins to remove

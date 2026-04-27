@@ -66,8 +66,8 @@ public class CommonModel(
     
     public async Task CheckForUpdatesAsync()
     {
-        var cdk = settingsService.Settings.MirrorChyanCdk;
-        var channel = settingsService.Settings.AppChannel == 0 ? "stable" : "beta";
+        var cdk = settingsService.Settings.Update.MirrorChyanCdk;
+        var channel = settingsService.Settings.Update.UpdateChannel == 0 ? "stable" : "beta";
 
         var currentVersion = SemVerParser.Parse(Settings.Version);
         logger.LogDebug("Checking for updates: {Version}", currentVersion);
@@ -103,7 +103,7 @@ public class CommonModel(
             return;
         }
 
-        if (settingsService.Settings.EnableAutoUpdate)
+        if (settingsService.Settings.Update.IsAutoUpdate)
         {
             ShowInfoToast("发现新版本", $"正在自动下载更新包：{response.Data.VersionName}");
             _ = HandleUpdateAsync(response, remoteVersion);
@@ -228,7 +228,7 @@ public class CommonModel(
             progressBar.Value = value.ProgressPercent;
             sizeLabel.Content = $"{value.FormattedDownloadedSize} / {value.FormattedTotalSize} {value.FormattedSpeed}";
         });
-        var downloadChannel = settingsService.Settings.DownloadChannel;
+        var downloadChannel = settingsService.Settings.Update.DownloadChannel;
         string downloadFilePath;
         try
         {

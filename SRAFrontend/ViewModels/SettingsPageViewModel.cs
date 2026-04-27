@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.ComponentModel;
-using System.Threading;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -25,7 +24,6 @@ public partial class SettingsPageViewModel : PageViewModel
     private readonly SettingsService _settingsService;
     private readonly UpdateService _updateService;
     private readonly OverlayService _overlayService;
-    private CancellationTokenSource? _settingsSaveCts;
 
     /// <inheritdoc />
     public SettingsPageViewModel(
@@ -51,8 +49,8 @@ public partial class SettingsPageViewModel : PageViewModel
             IconText = "\uE3E4",
             DisplayText = Resources.StopHotkeyText,
             DefaultKey = "F9"
-        }.Bind(() => settingsService.Settings.StartStopHotkey,
-            value => settingsService.Settings.StartStopHotkey = value);
+        }.Bind(() => Settings.General.HotkeyStop,
+            value => Settings.General.HotkeyStop = value);
 
         _customizableKeys =
         [
@@ -61,69 +59,72 @@ public partial class SettingsPageViewModel : PageViewModel
                 IconText = "\uE1F6",
                 DisplayText = Resources.ActivityText,
                 DefaultKey = "F1"
-            }.Bind(() => settingsService.Settings.ActivityHotkey,
-                value => settingsService.Settings.ActivityHotkey = value),
+            }.Bind(() => Settings.General.HotkeyF1,
+                value => Settings.General.HotkeyF1 = value),
             new CustomizableKey(ListenKeyFor)
             {
                 IconText = "\uE320",
                 DisplayText = Resources.ChronicleText,
                 DefaultKey = "F2"
-            }.Bind(() => settingsService.Settings.ChronicleHotkey,
-                value => settingsService.Settings.ChronicleHotkey = value),
+            }.Bind(() => Settings.General.HotkeyF2,
+                value => Settings.General.HotkeyF2 = value),
             new CustomizableKey(ListenKeyFor)
             {
                 IconText = "\uE77E",
                 DisplayText = Resources.WarpText,
                 DefaultKey = "F3"
-            }.Bind(() => settingsService.Settings.WarpHotkey,
-                value => settingsService.Settings.WarpHotkey = value),
+            }.Bind(() => Settings.General.HotkeyF3,
+                value => Settings.General.HotkeyF3 = value),
             new CustomizableKey(ListenKeyFor)
             {
                 IconText = "\uE0E4",
                 DisplayText = Resources.GuideText,
                 DefaultKey = "F4"
-            }.Bind(() => settingsService.Settings.GuideHotkey,
-                value => settingsService.Settings.GuideHotkey = value),
+            }.Bind(() => Settings.General.HotkeyF4,
+                value => Settings.General.HotkeyF4 = value),
             new CustomizableKey(ListenKeyFor)
             {
                 IconText = "\uE1C6",
                 DisplayText = Resources.MapText,
                 DefaultKey = "M"
-            }.Bind(() => settingsService.Settings.MapHotkey,
-                value => settingsService.Settings.MapHotkey = value),
+            }.Bind(() => Settings.General.HotkeyM,
+                value => Settings.General.HotkeyM = value),
             new CustomizableKey(ListenKeyFor)
             {
                 IconText = "\uE5E4",
                 DisplayText = Resources.TechniqueText,
                 DefaultKey = "E"
-            }.Bind(() => settingsService.Settings.TechniqueHotkey,
-                value => settingsService.Settings.TechniqueHotkey = value)
+            }.Bind(() => Settings.General.HotkeyE,
+                value => Settings.General.HotkeyE = value)
         ];
 
         DetectGamePath();
         SetGameResolution();
         if (IsOverlayEnabled) _overlayService.ShowOverlay();
-        _overlayService.SetOverlayDebugInfoEnabled(Settings.IsOverlayDebugInfoEnabled);
+        _overlayService.SetOverlayDebugInfoEnabled(Settings.Advanced.IsDebugOverlayEnabled);
 
-        _settingsService.Settings.PropertyChanged += OnSettingsPropertyChanged;
-        _settingsService.Settings.GamePaths.CollectionChanged += (_, _) => DebounceSaveSettings();
+        _settingsService.SettingsPropertyChanged += OnSettingsPropertyChanged;
     }
 
     public IAvaloniaReadOnlyList<CustomizableKey> CustomizableKeys => _customizableKeys;
     public CustomizableKey StartStopKey { get; }
 
-    public Settings Settings => _settingsService.Settings;
+    private AppSettings Settings => _settingsService.Settings;
+    public GeneralSettings GeneralSettings => Settings.General;
+    public DisplaySettings DisplaySettings => Settings.Display;
+    public NotificationSettings NotificationSettings => Settings.Notifications;
+    public UpdateSettings UpdateSettings => Settings.Update;
+    public AdvancedSettings AdvancedSettings => Settings.Advanced;
     public Cache Cache => _cacheService.Cache;
-    public string VersionText => Settings.Version;
+    public static string VersionText => AppSettings.Version;
 
     public string MirrorChyanCdk
     {
-        get => Settings.MirrorChyanCdk;
+        get => Settings.Update.MirrorChyanCdk;
         set
         {
             // 先更新存储的值（即使后续验证失败，也保留用户输入便于修改）
-            Settings.MirrorChyanCdk = value;
-            OnPropertyChanged(); // 通知UI属性已变更
+            Settings.Update.MirrorChyanCdk = value;
             if (value == "")
             {
                 Cache.CdkStatus = "";
@@ -210,65 +211,68 @@ public partial class SettingsPageViewModel : PageViewModel
         var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
         if (files.Count == 0) return;
         var localPath = files[0].Path.LocalPath;
-        Settings.GamePaths.Add(localPath);
-        Settings.GamePathIndex = Settings.GamePaths.Count - 1; // 切换到新添加的路径
+        Settings.General.GamePaths.Add(localPath);
+        Settings.General.GamePathIndex = Settings.General.GamePaths.Count - 1; // 切换到新添加的路径
     }
 
     [RelayCommand]
     private void DetectGamePath()
     {
-        if (!Settings.IsAutoDetectGamePath) return;
-        Settings.GamePaths.Clear();
-        Settings.GamePaths.AddRange(_registryService.GetGameInstallPaths());
-        Settings.GamePathIndex = 0; // 切换到第一个路径
+        if (!Settings.General.IsAutoDetectGamePath) return;
+        Settings.General.GamePaths.Clear();
+        foreach (var gameInstallPath in _registryService.GetGameInstallPaths())
+        {
+            Settings.General.GamePaths.Add(gameInstallPath);
+        }
+        Settings.General.GamePathIndex = 0; // 切换到第一个路径
     }
 
     private void SetGameResolution()
     {
-        if (!Settings.LaunchArgumentsEnabled) return;
+        if (!Settings.General.IsGameArgsEnabled) return;
         _registryService.SetTargetPcResolution();
     }
 
     public bool IsOverlayEnabled
     {
-        get => Settings.IsOverlayEnabled;
+        get => Settings.General.IsOverlayEnabled;
         set
         {
-            Settings.IsOverlayEnabled = value;
+            Settings.General.IsOverlayEnabled = value;
             if (value)
                 _overlayService.ShowOverlay();
             else
                 _overlayService.CloseOverlay();
         }
     }
-    
+
     public bool IsOverlayDebugInfoEnabled
     {
-        get => Settings.IsOverlayDebugInfoEnabled;
+        get => Settings.Advanced.IsDebugOverlayEnabled;
         set
         {
-            Settings.IsOverlayDebugInfoEnabled = value;
+            Settings.Advanced.IsDebugOverlayEnabled = value;
             _overlayService.SetOverlayDebugInfoEnabled(value);
         }
     }
-    
+
     #region 通知测试
     [RelayCommand]
     private async Task TestEmail()
     {
         await _commonModel.SendTestEmailAsync();
     }
-    
+
     [RelayCommand]
     private void TestWebhook()
     {
-        var endpoint = Settings.WebhookEndpoint.Trim();
+        var endpoint = Settings.Notifications.WebhookUrl.Trim();
         if (string.IsNullOrEmpty(endpoint))
         {
             _commonModel.ShowErrorToast("Webhook 测试", "请先填写 Webhook 地址");
             return;
         }
-        _settingsService.SaveSettings();
+        _settingsService.Save();
         _ = _backendService.SendInput("notify test webhook");
         _commonModel.ShowInfoToast("Webhook 测试", $"测试请求已发送至：{endpoint}");
     }
@@ -276,17 +280,17 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestTelegram()
     {
-        if (string.IsNullOrEmpty(Settings.TelegramBotToken.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notifications.TelegramBotToken.Trim()))
         {
             _commonModel.ShowErrorToast("Telegram 测试", "请先填写 Bot Token");
             return;
         }
-        if (string.IsNullOrEmpty(Settings.TelegramChatId.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notifications.TelegramChatId.Trim()))
         {
             _commonModel.ShowErrorToast("Telegram 测试", "请先填写 Chat ID");
             return;
         }
-        _settingsService.SaveSettings();
+        _settingsService.Save();
         _ = _backendService.SendInput("notify test telegram");
         _commonModel.ShowInfoToast("Telegram 测试", "测试消息已发送，请检查 Telegram");
     }
@@ -294,12 +298,12 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestServerChan()
     {
-        if (string.IsNullOrEmpty(Settings.ServerChanSendKey.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notifications.ServerChanSendKey.Trim()))
         {
             _commonModel.ShowErrorToast("ServerChan 测试", "请先填写 SendKey");
             return;
         }
-        _settingsService.SaveSettings();
+        _settingsService.Save();
         _ = _backendService.SendInput("notify test serverchan");
         _commonModel.ShowInfoToast("ServerChan 测试", "测试消息已发送，请检查微信");
     }
@@ -307,12 +311,12 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestBark()
     {
-        if (string.IsNullOrEmpty(Settings.BarkDeviceKey.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notifications.BarkDeviceKey.Trim()))
         {
             _commonModel.ShowErrorToast("Bark 测试", "请先填写设备 Key");
             return;
         }
-        _settingsService.SaveSettings();
+        _settingsService.Save();
         _ = _backendService.SendInput("notify test bark");
         _commonModel.ShowInfoToast("Bark 测试", "测试消息已发送，请检查 iPhone");
     }
@@ -320,12 +324,12 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestFeishu()
     {
-        if (string.IsNullOrEmpty(Settings.FeishuWebhookUrl.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notifications.FeishuWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("飞书测试", "请先填写 Webhook 地址");
             return;
         }
-        _settingsService.SaveSettings();
+        _settingsService.Save();
         _ = _backendService.SendInput("notify test feishu");
         _commonModel.ShowInfoToast("飞书测试", "测试消息已发送，请检查飞书");
     }
@@ -333,12 +337,12 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestWeCom()
     {
-        if (string.IsNullOrEmpty(Settings.WeComWebhookUrl.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notifications.WecomWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("企业微信测试", "请先填写 Webhook 地址");
             return;
         }
-        _settingsService.SaveSettings();
+        _settingsService.Save();
         _ = _backendService.SendInput("notify test wecom");
         _commonModel.ShowInfoToast("企业微信测试", "测试消息已发送，请检查企业微信");
     }
@@ -346,12 +350,12 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestDingTalk()
     {
-        if (string.IsNullOrEmpty(Settings.DingTalkWebhookUrl.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notifications.DingTalkWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("钉钉测试", "请先填写 Webhook 地址");
             return;
         }
-        _settingsService.SaveSettings();
+        _settingsService.Save();
         _ = _backendService.SendInput("notify test dingtalk");
         _commonModel.ShowInfoToast("钉钉测试", "测试消息已发送，请检查钉钉");
     }
@@ -359,12 +363,12 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestDiscord()
     {
-        if (string.IsNullOrEmpty(Settings.DiscordWebhookUrl.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notifications.DiscordWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("Discord 测试", "请先填写 Webhook 地址");
             return;
         }
-        _settingsService.SaveSettings();
+        _settingsService.Save();
         _ = _backendService.SendInput("notify test discord");
         _commonModel.ShowInfoToast("Discord 测试", "测试消息已发送，请检查 Discord");
     }
@@ -372,12 +376,12 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestXxtui()
     {
-        if (string.IsNullOrEmpty(Settings.XxtuiApiKey.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notifications.XxtuiApiKey.Trim()))
         {
             _commonModel.ShowErrorToast("xxtui 测试", "请先填写 API Key");
             return;
         }
-        _settingsService.SaveSettings();
+        _settingsService.Save();
         _ = _backendService.SendInput("notify test xxtui");
         _commonModel.ShowInfoToast("xxtui 测试", "测试消息已发送");
     }
@@ -385,18 +389,18 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestOneBot()
     {
-        if (string.IsNullOrEmpty(Settings.OneBotEndpoint.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notifications.OneBotUrl.Trim()))
         {
             _commonModel.ShowErrorToast("OneBot 测试", "请先填写 API 地址");
             return;
         }
-        if (string.IsNullOrEmpty(Settings.OneBotUserId.Trim()) &&
-            string.IsNullOrEmpty(Settings.OneBotGroupId.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notifications.OneBotUserId.Trim()) &&
+            string.IsNullOrEmpty(Settings.Notifications.OneBotGroupId.Trim()))
         {
             _commonModel.ShowErrorToast("OneBot 测试", "请填写 QQ 号或群号（至少一个）");
             return;
         }
-        _settingsService.SaveSettings();
+        _settingsService.Save();
         _ = _backendService.SendInput("notify test onebot");
         _commonModel.ShowInfoToast("OneBot 测试", "测试消息已发送，请检查 QQ");
     }
@@ -480,7 +484,7 @@ public partial class SettingsPageViewModel : PageViewModel
             if (_versionClickCount >3)
             {
                 _commonModel.ShowInfoToast("开发者模式",
-                    Settings.IsDeveloperMode
+                    Settings.Advanced.IsDeveloperModeEnabled
                         ? "您正处于开发者模式！"
                         : $"只需再执行 {VersionClickRequiredCount - _versionClickCount} 次操作，即可进入开发者模式");
             }
@@ -490,10 +494,9 @@ public partial class SettingsPageViewModel : PageViewModel
         _versionClickCount = 0;
 
         // 只负责开启开发者模式，关闭仍然通过显式开关
-        if (!_settingsService.Settings.IsDeveloperMode)
+        if (!Settings.Advanced.IsDeveloperModeEnabled)
         {
-            _settingsService.Settings.IsDeveloperMode = true;
-            _settingsService.SaveSettings();
+            Settings.Advanced.IsDeveloperModeEnabled = true;
         }
         _commonModel.ShowInfoToast("开发者模式", "您正处于开发者模式！");
     }
@@ -501,32 +504,10 @@ public partial class SettingsPageViewModel : PageViewModel
 
     private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(Settings.LaunchArgumentsScreenSize)
-            or nameof(Settings.LaunchArgumentsFullScreenMode))
+        if (e.PropertyName is nameof(Settings.General.GameArgsWindowSize)
+            or nameof(Settings.General.GameArgsFullScreenMode))
         {
             SetGameResolution();
-        }
-
-        DebounceSaveSettings();
-    }
-
-    private void DebounceSaveSettings()
-    {
-        _settingsSaveCts?.Cancel();
-        _settingsSaveCts?.Dispose();
-        _settingsSaveCts = new CancellationTokenSource();
-        _ = SaveSettingsAsync(_settingsSaveCts.Token);
-    }
-
-    private async Task SaveSettingsAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            await Task.Delay(500, cancellationToken);
-            _settingsService.SaveSettings();
-        }
-        catch (TaskCanceledException)
-        {
         }
     }
 }

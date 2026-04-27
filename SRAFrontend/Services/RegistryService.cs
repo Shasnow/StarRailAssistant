@@ -120,11 +120,11 @@ public class RegistryService(
             BackupResolution(regPath, key);
 
             // 读取目标配置
-            var size = settingsService.Settings.LaunchArgumentsScreenSize.Split('x');
+            var size = settingsService.Settings.General.GameArgsWindowSize.Split('x');
             var w = int.TryParse(size[0], out var width) ? width : 1920;
             var h = int.TryParse(size[1], out var height) ? height : 1080;
 
-            var fullscreenMode = settingsService.Settings.LaunchArgumentsFullScreenMode == "全屏" ? 1 : 3;
+            var fullscreenMode = settingsService.Settings.General.GameArgsFullScreenMode == "全屏" ? 1 : 3;
             var isFull = fullscreenMode != 3;
 
             logger.LogInformation("Write resolution {W}x{H} Fullscreen:{Full}", w, h, isFull);
@@ -281,3 +281,4 @@ public class RegistryService(
         ];
     }
 }
+
