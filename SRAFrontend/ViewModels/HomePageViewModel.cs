@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Microsoft.Extensions.Logging;
@@ -11,34 +13,57 @@ namespace SRAFrontend.ViewModels;
 public partial class HomePageViewModel(
     ControlPanelViewModel controlPanelViewModel,
     SettingsService settingsService,
-    ILogger<HomePageViewModel> logger)
+    ILogger<HomePageViewModel> logger,
+    IHttpClientFactory httpClientFactory)
     : PageViewModel(PageName.Home, "\uE2C2")
 {
-    private readonly Uri _defaultImagePath = new("avares://SRA/Assets/background-lt.jpg");
+    private static readonly Uri DefaultImagePath = new("avares://SRA/Assets/background-lt.jpg");
+    private readonly Bitmap _defaultImage = new(AssetLoader.Open(DefaultImagePath));
+    private readonly Dictionary<string, Bitmap> _imageCache = new();
 
     public Bitmap BackgroundImage
     {
         get
         {
-            var backgroundImagePath = settingsService.Settings.BackgroundImagePath;
-            Bitmap bitmap;
+            var backgroundImagePath = settingsService.Settings.Display.BackgroundImageUri;
+
+            if (string.IsNullOrEmpty(backgroundImagePath))
+                return _defaultImage;
+
+            if (_imageCache.TryGetValue(backgroundImagePath, out var image))
+                return image;
+
             try
             {
-                bitmap = string.IsNullOrEmpty(backgroundImagePath)
-                    ? new Bitmap(AssetLoader.Open(_defaultImagePath))
-                    : new Bitmap(backgroundImagePath.Replace("\"", ""));
+                var rawUri = backgroundImagePath.Replace("\"", "").Trim();
+                Bitmap bmp;
+                if (rawUri.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                {
+                    using var httpClient = httpClientFactory.CreateClient("GlobalClient");
+                    using var response = httpClient.GetAsync(rawUri).GetAwaiter().GetResult();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        using var stream = response.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
+                        bmp = new Bitmap(stream);
+                        _imageCache[backgroundImagePath] = bmp;
+                        return bmp;
+                    }
+                }
+                bmp = new Bitmap(rawUri);
+                _imageCache[backgroundImagePath] = bmp;
+                return bmp;
             }
             catch (Exception e)
             {
-                logger.LogError("Failed to load background image from {BackgroundImagePath}: {ErrorMessage}",
-                    backgroundImagePath, e.Message);
-                bitmap = new Bitmap(AssetLoader.Open(_defaultImagePath));
+                logger.LogError("Error loading background: {Message}", e.Message);
             }
-            return bitmap;
+
+            return _defaultImage;
         }
     }
 
-    public double ImageOpacity => settingsService.Settings.BackgroundOpacity;
-    public double GlassCardOpacity => settingsService.Settings.CtrlPanelOpacity;
+    public double ImageOpacity => settingsService.Settings.Display.BackgroundOpacity;
+    public double GlassCardOpacity => settingsService.Settings.Display.ControlPanelOpacity;
     public ControlPanelViewModel ControlPanelViewModel => controlPanelViewModel;
 }
