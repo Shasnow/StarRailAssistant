@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Controls;
 using SRAFrontend.Data;
@@ -18,49 +20,56 @@ public partial class HomePageViewModel(
     : PageViewModel(PageName.Home, "\uE2C2")
 {
     private static readonly Uri DefaultImagePath = new("avares://SRA/Assets/background-lt.jpg");
-    private readonly Bitmap _defaultImage = new(AssetLoader.Open(DefaultImagePath));
+    private static readonly Bitmap DefaultImage = new(AssetLoader.Open(DefaultImagePath));
     private readonly Dictionary<string, Bitmap> _imageCache = new();
+    
+    [ObservableProperty] private Bitmap? _backgroundImage;
+    [ObservableProperty] private bool _isLoadingImage;
 
-    public Bitmap BackgroundImage
+    public async Task UpdateBackgroundImageAsync()
     {
-        get
+        IsLoadingImage = true;
+        BackgroundImage = await GetBackgroundImageAsync();
+        IsLoadingImage = false;
+    }
+
+    private async Task<Bitmap> GetBackgroundImageAsync()
+    {
+        var backgroundImagePath = settingsService.Settings.Display.BackgroundImageUri;
+
+        if (string.IsNullOrEmpty(backgroundImagePath))
+            return DefaultImage;
+
+        if (_imageCache.TryGetValue(backgroundImagePath, out var image))
+            return image;
+
+        try
         {
-            var backgroundImagePath = settingsService.Settings.Display.BackgroundImageUri;
-
-            if (string.IsNullOrEmpty(backgroundImagePath))
-                return _defaultImage;
-
-            if (_imageCache.TryGetValue(backgroundImagePath, out var image))
-                return image;
-
-            try
+            var rawUri = backgroundImagePath.Replace("\"", "").Trim();
+            Bitmap bmp;
+            if (rawUri.StartsWith("http", StringComparison.OrdinalIgnoreCase))
             {
-                var rawUri = backgroundImagePath.Replace("\"", "").Trim();
-                Bitmap bmp;
-                if (rawUri.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                using var httpClient = httpClientFactory.CreateClient("GlobalClient");
+                using var response = await httpClient.GetAsync(rawUri);
+
+                if (response.IsSuccessStatusCode)
                 {
-                    using var httpClient = httpClientFactory.CreateClient("GlobalClient");
-                    using var response = httpClient.GetAsync(rawUri).GetAwaiter().GetResult();
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        using var stream = response.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
-                        bmp = new Bitmap(stream);
-                        _imageCache[backgroundImagePath] = bmp;
-                        return bmp;
-                    }
+                    await using var stream = await response.Content.ReadAsStreamAsync();
+                    bmp = new Bitmap(stream);
+                    _imageCache[backgroundImagePath] = bmp;
+                    return bmp;
                 }
-                bmp = new Bitmap(rawUri);
-                _imageCache[backgroundImagePath] = bmp;
-                return bmp;
             }
-            catch (Exception e)
-            {
-                logger.LogError("Error loading background: {Message}", e.Message);
-            }
-
-            return _defaultImage;
+            bmp = new Bitmap(rawUri);
+            _imageCache[backgroundImagePath] = bmp;
+            return bmp;
         }
+        catch (Exception e)
+        {
+            logger.LogError("Error loading background: {Message}", e.Message);
+        }
+
+        return DefaultImage;
     }
 
     public double ImageOpacity => settingsService.Settings.Display.BackgroundOpacity;
