@@ -20,8 +20,8 @@ _notification_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="n
 
 
 def try_send_notification(title: str, message: str, result: str = "success", operator: Any | None = None):
-    setting = load_settings()
-    if not setting.get("AllowNotifications", False):
+    setting = load_settings("notifications")
+    if not setting.get("enabled", False):
         return
     screenshot_bytes = None
     if should_capture_notification_screenshot(setting):
@@ -34,12 +34,6 @@ def try_send_notification(title: str, message: str, result: str = "success", ope
 
 
 # ===================== 工具函数 =====================
-
-
-def _load_settings_for_task_notify() -> dict:
-    """为任务通知配置读取设置（轻量调用，不触发截图）"""
-    return load_settings()
-
 def _build_notification_data(title: str, message: str, result: str = "success") -> dict:
     from datetime import datetime
     return {
@@ -92,29 +86,29 @@ def _build_notification_jobs(
         data: dict,
         setting: dict[str, Any]) -> list[tuple[str, Callable[..., Any], tuple[Any, ...]]]:
     jobs: list[tuple[str, Callable[..., Any], tuple[Any, ...]]] = []
-    if setting.get("AllowSystemNotifications", False):
+    if setting.get("system.enabled", False):
         jobs.append(("系统", send_windows_notification, (title, message)))
-    if setting.get("AllowEmailNotifications", False):
+    if setting.get("email.enabled", False):
         jobs.append(("邮件", send_mail_notification, (data, setting)))
-    if setting.get("AllowWebhookNotifications", False):
+    if setting.get("webhook.enabled", False):
         jobs.append(("Webhook", send_webhook_notification, (data, setting)))
-    if setting.get("AllowTelegramNotifications", False):
+    if setting.get("telegram.enabled", False):
         jobs.append(("Telegram", send_telegram_notification, (data, setting)))
-    if setting.get("AllowServerChanNotifications", False):
+    if setting.get("serverChan.enabled", False):
         jobs.append(("ServerChan", send_serverchan_notification, (data, setting)))
-    if setting.get("AllowOneBotNotifications", False):
+    if setting.get("oneBot.enabled", False):
         jobs.append(("OneBot", send_onebot_notification, (data, setting)))
-    if setting.get("AllowBarkNotifications", False):
+    if setting.get("bark.enabled", False):
         jobs.append(("Bark", send_bark_notification, (data, setting)))
-    if setting.get("AllowFeishuNotifications", False):
+    if setting.get("feishu.enabled", False):
         jobs.append(("飞书", send_feishu_notification, (data, setting)))
-    if setting.get("AllowWeComNotifications", False):
+    if setting.get("weCom.enabled", False):
         jobs.append(("企业微信", send_wecom_notification, (data, setting)))
-    if setting.get("AllowDingTalkNotifications", False):
+    if setting.get("dingTalk.enabled", False):
         jobs.append(("钉钉", send_dingtalk_notification, (data, setting)))
-    if setting.get("AllowDiscordNotifications", False):
+    if setting.get("discord.enabled", False):
         jobs.append(("Discord", send_discord_notification, (data, setting)))
-    if setting.get("AllowXxtuiNotifications", False):
+    if setting.get("xxtui.enabled", False):
         jobs.append(("xxtui", send_xxtui_notification, (data, setting)))
     return jobs
 
@@ -183,10 +177,10 @@ def _check_wecom_response(status: int, body: str) -> tuple[bool, str]:
 def should_capture_notification_screenshot(setting: dict[str, Any] | None = None) -> bool:
     config = setting or load_settings()
     return any([
-        config.get("AllowTelegramNotifications", False) and config.get("TelegramSendImage", False),
-        config.get("AllowOneBotNotifications", False) and config.get("OneBotSendImage", False),
-        config.get("AllowWeComNotifications", False) and config.get("WeComSendImage", False),
-        config.get("AllowDiscordNotifications", False) and config.get("DiscordSendImage", False),
+        config.get("telegram.enabled", False) and config.get("telegram.sendImage", False),
+        config.get("oneBot.enabled", False) and config.get("oneBot.sendImage", False),
+        config.get("weCom.enabled", False) and config.get("weCom.sendImage", False),
+        config.get("discord.enabled", False) and config.get("discordSendImage", False),
     ])
 
 
@@ -310,7 +304,7 @@ def send_mail(title: str = "SRA", subject: str = "SRA通知", message: str = "",
 def send_test_email() -> bool:
     try:
         settings = load_settings()
-        if not settings.get("AllowEmailNotifications", False):
+        if not settings.get("AllowEmail.enabled", False):
             print("邮件通知未启用")
             return False
         required = ["SmtpServer", "EmailSender", "EmailAuthCode", "EmailReceiver"]
@@ -344,7 +338,7 @@ def send_test_email() -> bool:
 def send_webhook_notification(data: dict, configure: dict[str, Any] | None = None) -> bool:
     from SRACore.util.logger import logger
     config = configure or {}
-    endpoint = config.get("WebhookEndpoint", "").strip()
+    endpoint = config.get("webhook.url", "").strip()
     if not endpoint:
         logger.warning("Webhook 通知发送失败: 未配置 WebhookEndpoint")
         return False
@@ -369,12 +363,12 @@ def send_telegram_notification(data: dict, configure: dict[str, Any] | None = No
     """
     from SRACore.util.logger import logger
     config = configure or {}
-    bot_token = config.get("TelegramBotToken", "").strip()
-    chat_id = config.get("TelegramChatId", "").strip()
-    proxy_url = config.get("TelegramProxyUrl", "").strip()
-    proxy_enabled = config.get("TelegramProxyEnabled", False)
-    api_base = config.get("TelegramApiBaseUrl", "").strip()
-    send_image = config.get("TelegramSendImage", False)
+    bot_token = config.get("telegram.botToken", "").strip()
+    chat_id = config.get("telegram.chatId", "").strip()
+    proxy_url = config.get("telegram.proxyUrl", "").strip()
+    proxy_enabled = config.get("telegram.proxyEnabled", False)
+    api_base = config.get("telegram.apiBaseUrl", "").strip()
+    send_image = config.get("telegram.sendImage", False)
 
     if not bot_token:
         logger.warning("Telegram 通知发送失败: 未配置 TelegramBotToken")
@@ -460,7 +454,7 @@ def send_serverchan_notification(data: dict, configure: dict[str, Any] | None = 
     import re
     from SRACore.util.logger import logger
     config = configure or {}
-    send_key = config.get("ServerChanSendKey", "").strip()
+    send_key = config.get("serverChan.sendKey", "").strip()
     if not send_key:
         logger.warning("ServerChan 通知发送失败: 未配置 ServerChanSendKey")
         return False
@@ -527,11 +521,11 @@ def send_onebot_notification(data: dict, configure: dict[str, Any] | None = None
     """
     from SRACore.util.logger import logger
     config = configure or {}
-    endpoint = config.get("OneBotEndpoint", "").strip().rstrip("/")
-    user_id = config.get("OneBotUserId", "").strip()
-    group_id = config.get("OneBotGroupId", "").strip()
-    token = config.get("OneBotToken", "").strip()
-    send_image = config.get("OneBotSendImage", False)
+    endpoint = config.get("oneBot.url", "").strip().rstrip("/")
+    user_id = config.get("oneBot.userId", "").strip()
+    group_id = config.get("oneBot.groupId", "").strip()
+    token = config.get("oneBot.token", "").strip()
+    send_image = config.get("oneBot.sendImage", False)
 
     if not endpoint:
         logger.warning("OneBot 通知发送失败: 未配置 OneBotEndpoint")
@@ -575,8 +569,8 @@ def send_bark_notification(data: dict, configure: dict[str, Any] | None = None) 
     """
     from SRACore.util.logger import logger
     config = configure or {}
-    device_key_raw = config.get("BarkDeviceKey", "").strip()
-    server_url = config.get("BarkServerUrl", "https://api.day.app").strip().rstrip("/")
+    device_key_raw = config.get("bark.deviceKey", "").strip()
+    server_url = config.get("bark.serverUrl", "https://api.day.app").strip().rstrip("/")
     if not device_key_raw:
         logger.warning("Bark 通知发送失败: 未配置 BarkDeviceKey")
         return False
@@ -584,18 +578,18 @@ def send_bark_notification(data: dict, configure: dict[str, Any] | None = None) 
     payload: dict = {
         "title": "SRA 通知",
         "body": _fmt_msg(data),
-        "group": config.get("BarkGroup", "StarRailAssistant").strip() or "StarRailAssistant",
+        "group": config.get("bark.group", "StarRailAssistant").strip() or "StarRailAssistant",
     }
-    level = config.get("BarkLevel", "").strip()
+    level = config.get("bark.level", "").strip()
     if level in ("active", "timeSensitive", "passive"):
         payload["level"] = level
-    sound = config.get("BarkSound", "").strip()
+    sound = config.get("bark.sound", "").strip()
     if sound:
         payload["sound"] = sound
-    icon = config.get("BarkIcon", "").strip()
+    icon = config.get("bark.icon", "").strip()
     if icon:
         payload["icon"] = icon
-    ciphertext = config.get("BarkCiphertext", "").strip()
+    ciphertext = config.get("bark.ciphertext", "").strip()
     if ciphertext:
         payload["ciphertext"] = ciphertext
 
@@ -624,15 +618,15 @@ def send_feishu_notification(data: dict, configure: dict[str, Any] | None = None
     """
     from SRACore.util.logger import logger
     config = configure or {}
-    app_id = config.get("FeishuAppId", "").strip()
-    app_secret = config.get("FeishuAppSecret", "").strip()
-    webhook_url = config.get("FeishuWebhookUrl", "").strip()
+    app_id = config.get("feishu.appId", "").strip()
+    app_secret = config.get("feishu.appSecret", "").strip()
+    webhook_url = config.get("feishu.webhookUrl", "").strip()
     msg = _fmt_msg(data)
 
     # 方式二：应用 API
     if app_id and app_secret:
-        receive_id = config.get("FeishuReceiveId", "").strip()
-        id_type = config.get("FeishuReceiveIdType", "open_id").strip() or "open_id"
+        receive_id = config.get("feishu.receiveId", "").strip()
+        id_type = config.get("feishu.receiveIdType", "open_id").strip() or "open_id"
         if not receive_id:
             logger.warning("飞书通知发送失败: 未配置 FeishuReceiveId")
             return False
@@ -701,8 +695,8 @@ def send_wecom_notification(data: dict, configure: dict[str, Any] | None = None)
     import hashlib
     from SRACore.util.logger import logger
     config = configure or {}
-    webhook_url = config.get("WeComWebhookUrl", "").strip()
-    send_image = config.get("WeComSendImage", False)
+    webhook_url = config.get("weCom.webhookUrl", "").strip()
+    send_image = config.get("weCom.sendImage", False)
     if not webhook_url:
         logger.warning("企业微信通知发送失败: 未配置 WeComWebhookUrl")
         return False
@@ -772,8 +766,8 @@ def send_dingtalk_notification(data: dict, configure: dict[str, Any] | None = No
     import urllib.parse
     from SRACore.util.logger import logger
     config = configure or {}
-    webhook_url = config.get("DingTalkWebhookUrl", "").strip()
-    secret = config.get("DingTalkSecret", "").strip()
+    webhook_url = config.get("dingTalk.webhookUrl", "").strip()
+    secret = config.get("dingTalk.secret", "").strip()
     if not webhook_url:
         logger.warning("钉钉通知发送失败: 未配置 DingTalkWebhookUrl")
         return False
@@ -814,8 +808,8 @@ def send_discord_notification(data: dict, configure: dict[str, Any] | None = Non
     import urllib.request
     from SRACore.util.logger import logger
     config = configure or {}
-    webhook_url = config.get("DiscordWebhookUrl", "").strip()
-    send_image = config.get("DiscordSendImage", False)
+    webhook_url = config.get("discord.webhookUrl", "").strip()
+    send_image = config.get("discord.sendImage", False)
     if not webhook_url:
         logger.warning("Discord 通知发送失败: 未配置 DiscordWebhookUrl")
         return False
@@ -890,15 +884,15 @@ def send_xxtui_notification(data: dict, configure: dict[str, Any] | None = None)
     """支持字段：XxtuiApiKey, XxtuiSource（可选）, XxtuiChannel（可选）"""
     from SRACore.util.logger import logger
     config = configure or {}
-    api_key = config.get("XxtuiApiKey", "").strip()
+    api_key = config.get("xxtui.apiKey", "").strip()
     if not api_key:
         logger.warning("xxtui 通知发送失败: 未配置 XxtuiApiKey")
         return False
     payload: dict = {"title": "SRA 通知", "content": _fmt_msg(data)}
-    source = config.get("XxtuiSource", "").strip()
+    source = config.get("xxtui.source", "").strip()
     if source:
         payload["source"] = source
-    channel = config.get("XxtuiChannel", "").strip()
+    channel = config.get("xxtui.channel", "").strip()
     if channel:
         payload["channel"] = channel
     try:

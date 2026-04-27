@@ -51,8 +51,12 @@ def load_data(typ: str) -> dict[Any, Any]:
         return {}
 
 
-def load_settings():
-    return load_data('settings')
+def load_settings(group: str | None = None) -> dict[str, Any]:
+    data = load_data("settings")
+    if group:
+        return data.get(group, {})
+    else:
+        return data
 
 
 def load_cache():

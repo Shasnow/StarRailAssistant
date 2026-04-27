@@ -41,7 +41,7 @@ public partial class GeneralSettings : ObservableObject
 
     [ObservableProperty]
     [property: JsonPropertyName("cloudGame.enable")]
-    private bool _isCloudGameEnable = false;
+    private bool _isCloudGameEnable;
     
     [ObservableProperty]
     [property: JsonPropertyName("templateMatchConfidence")]
@@ -204,27 +204,27 @@ public partial class NotificationSettings : ObservableObject
     private string _serverChanSendKey = "";
 
     [ObservableProperty]
-    [property: JsonPropertyName("onebot.enabled")]
+    [property: JsonPropertyName("oneBot.enabled")]
     private bool _isOneBotEnabled;
 
     [ObservableProperty]
-    [property: JsonPropertyName("onebot.url")]
+    [property: JsonPropertyName("oneBot.url")]
     private string _oneBotUrl = "";
 
     [ObservableProperty]
-    [property: JsonPropertyName("onebot.userId")]
+    [property: JsonPropertyName("oneBot.userId")]
     private string _oneBotUserId = "";
 
     [ObservableProperty]
-    [property: JsonPropertyName("onebot.groupId")]
+    [property: JsonPropertyName("oneBot.groupId")]
     private string _oneBotGroupId = "";
 
     [ObservableProperty]
-    [property: JsonPropertyName("onebot.token")]
+    [property: JsonPropertyName("oneBot.token")]
     private string _oneBotToken = "";
 
     [ObservableProperty]
-    [property: JsonPropertyName("onebot.sendImage")]
+    [property: JsonPropertyName("oneBot.sendImage")]
     private bool _isOneBotSendImage;
 
     [ObservableProperty]
@@ -238,6 +238,18 @@ public partial class NotificationSettings : ObservableObject
     [ObservableProperty]
     [property: JsonPropertyName("bark.deviceKey")]
     private string _barkDeviceKey = "";
+    
+    [ObservableProperty]
+    [property: JsonPropertyName("bark.group")]
+    private string _barkGroup = "StarRailAssistant";
+    
+    [ObservableProperty]
+    [property: JsonPropertyName("bark.level")]
+    private string _barkLevel = "";
+    
+    [ObservableProperty]
+    [property: JsonPropertyName("bark.sound")]
+    private string _barkSound = "";
 
     [ObservableProperty]
     [property: JsonPropertyName("bark.icon")]
@@ -272,16 +284,16 @@ public partial class NotificationSettings : ObservableObject
     private string _feishuReceiveIdType = "";
 
     [ObservableProperty]
-    [property: JsonPropertyName("wecom.enabled")]
-    private bool _isWecomEnabled;
+    [property: JsonPropertyName("weCom.enabled")]
+    private bool _isWeComEnabled;
 
     [ObservableProperty]
-    [property: JsonPropertyName("wecom.webhookUrl")]
-    private string _wecomWebhookUrl = "";
+    [property: JsonPropertyName("weCom.webhookUrl")]
+    private string _weComWebhookUrl = "";
 
     [ObservableProperty]
-    [property: JsonPropertyName("wecom.sendImage")]
-    private bool _isWecomSendImage;
+    [property: JsonPropertyName("weCom.sendImage")]
+    private bool _isWeComSendImage;
 
     [ObservableProperty]
     [property: JsonPropertyName("dingTalk.enabled")]
