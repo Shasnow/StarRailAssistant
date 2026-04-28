@@ -7,6 +7,7 @@
     "install": "pip install -r requirements.txt",
     "frontend": "dotnet run --project SRAFrontend/SRAFrontend.csproj",
     "pyl10nc": "python scripts/pyl10nc/__main__.py SRACore/localization/resource.toml",
-    "ver": "python scripts/update_version.py"
+    "ver": "python scripts/update_version.py",
+    "model-gen": "python scripts/model_gen.py SRAFrontend/Models/AppSettings.cs -o SRACore/models/app_settings.py"
   }
 }
