@@ -40,7 +40,7 @@ public partial class GeneralSettings : ObservableObject
     private bool _isAutoDetectGamePath = true;
 
     [ObservableProperty]
-    [property: JsonPropertyName("cloudGame.enable")]
+    [property: JsonPropertyName("cloudGame.enabled")]
     private bool _isCloudGameEnable;
     
     [ObservableProperty]
@@ -48,7 +48,7 @@ public partial class GeneralSettings : ObservableObject
     private double _templateMatchConfidence = 0.9;
 
     [ObservableProperty]
-    [property: JsonPropertyName("overlayEnabled")]
+    [property: JsonPropertyName("overlay.enabled")]
     private bool _isOverlayEnabled;
 
     [ObservableProperty]
@@ -340,8 +340,8 @@ public partial class NotificationSettings : ObservableObject
     private List<string> _onStart = [];
 
     [ObservableProperty]
-    [property: JsonPropertyName("onStop")]
-    private List<string> _onStop = [];
+    [property: JsonPropertyName("onComplete")]
+    private List<string> _onComplete = [];
 }
 
 public partial class UpdateSettings : ObservableObject

@@ -546,26 +546,26 @@
                                             <Grid ColumnDefinitions="*,Auto">
                                                 <CheckBox Grid.Column="0"
                                                           Content="企业微信通知"
-                                                          IsChecked="{Binding NotificationSettings.IsWecomEnabled}" />
+                                                          IsChecked="{Binding NotificationSettings.IsWeComEnabled}" />
                                                 <Button Grid.Column="1"
                                                         Content="Check"
                                                         Margin="10,0,0,0"
                                                         Command="{Binding TestWeComCommand}"
-                                                        IsEnabled="{Binding NotificationSettings.IsWecomEnabled}" />
+                                                        IsEnabled="{Binding NotificationSettings.IsWeComEnabled}" />
                                             </Grid>
                                             <Expander Header="企业微信设置"
-                                                      IsVisible="{Binding NotificationSettings.IsWecomEnabled}">
+                                                      IsVisible="{Binding NotificationSettings.IsWeComEnabled}">
                                                 <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
                                                     <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="Webhook 地址" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
-                                                             Text="{Binding NotificationSettings.WecomWebhookUrl}"
+                                                             Text="{Binding NotificationSettings.WeComWebhookUrl}"
                                                              Watermark="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..." />
                                                     <Label Grid.Row="1" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="发送截图" />
                                                     <ToggleSwitch Grid.Row="1" Grid.Column="1"
-                                                                  IsChecked="{Binding NotificationSettings.IsWecomSendImage}"
+                                                                  IsChecked="{Binding NotificationSettings.IsWeComSendImage}"
                                                                   OnContent="开" OffContent="关" />
                                                 </Grid>
                                             </Expander>

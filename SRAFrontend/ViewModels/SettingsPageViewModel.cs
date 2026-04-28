@@ -337,7 +337,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestWeCom()
     {
-        if (string.IsNullOrEmpty(Settings.Notifications.WecomWebhookUrl.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notifications.WeComWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("企业微信测试", "请先填写 Webhook 地址");
             return;
