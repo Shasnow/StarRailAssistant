@@ -103,9 +103,6 @@ public class App : Application
 
     private static void InitializeSerilog()
     {
-        // 日志文件路径（存到 ApplicationData/SRA/logs 目录）
-        Directory.CreateDirectory(PathString.FrontendLogsDir); // 确保目录存在
-
         // 配置 Serilog
         Log.Logger = new LoggerConfiguration()
             // 输出到控制台（开发环境调试用）

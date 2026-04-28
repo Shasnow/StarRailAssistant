@@ -104,7 +104,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         var sha256 = await GetSha256Async(versionResponse, cancellationToken);
 
         var saveFileName = $"update_{version}.zip";
-        var savePath = Path.Combine(PathString.TempSraDir, saveFileName);
+        var savePath = Path.Combine(PathString.TempDir, saveFileName);
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
 
         // 1. 如果已有文件，则先校验
@@ -155,7 +155,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         var downloadUrl = BaseCoreDownloadUrl.Replace("{version}", hotfixVersion);
         logger.LogDebug("Downloading hotfix from URL: {Url}", downloadUrl);
         var saveFileName = $"core_update_{hotfixVersion}.zip";
-        var savePath = Path.Combine(PathString.TempSraDir, saveFileName);
+        var savePath = Path.Combine(PathString.TempDir, saveFileName);
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
 
         var httpClient = httpClientFactory.CreateClient("GlobalClient");

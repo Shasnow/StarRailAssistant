@@ -13,16 +13,6 @@ public static class DataPersister
     {
         WriteIndented = true
     };
-    static DataPersister()
-    {
-        EnsurePath();
-    }
-
-    private static void EnsurePath()
-    {
-        if (!Directory.Exists(PathString.AppDataSraDir)) Directory.CreateDirectory(PathString.AppDataSraDir);
-        if (!Directory.Exists(PathString.ConfigsDir)) Directory.CreateDirectory(PathString.ConfigsDir);
-    }
 
     /// <summary>
     ///     原子写入文件：先写临时文件，再替换目标文件。

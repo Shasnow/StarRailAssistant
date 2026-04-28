@@ -4,60 +4,81 @@ using System.Runtime.InteropServices;
 
 namespace SRAFrontend.Data;
 
-/// <summary>
-/// 路径字符串常量
-/// </summary>
 public static class PathString
 {
-    public static readonly string AppDataSraDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SRA");
-    public static readonly string TempSraDir = Path.Combine(Path.GetTempPath(), "SRA");
-    public static readonly string SettingsJson = Path.Combine(AppDataSraDir, "settings.json");
-    public static readonly string CacheJson = Path.Combine(AppDataSraDir, "cache.json");
-    public static readonly string ConfigsDir = Path.Combine(AppDataSraDir, "configs");
-    public static readonly string FrontendLogsDir = Path.Combine(AppDataSraDir, "logs");
-    public static readonly string BackendLogsDir = Path.Combine(Environment.CurrentDirectory, "log");
-    public static readonly string ReportsDir = "reports";
-    public static readonly string SourceCodeDir = Path.Combine(Environment.CurrentDirectory, "SRA");
-    public static readonly string StrategiesDir = Path.Combine(Environment.CurrentDirectory, "tasks", "currency_wars", "strategies");
+    private static readonly string AppRoot = AppContext.BaseDirectory;
 
-    public static string SraExecutablePath
+    public static readonly string AppDataDir = GetAppDataDirectory();
+
+    public static readonly string TempDir = Path.Combine(Path.GetTempPath(), "SRA");
+
+    public static readonly string SettingsJson = Path.Combine(AppDataDir, "settings.json");
+    public static readonly string CacheJson = Path.Combine(AppDataDir, "cache.json");
+
+    public static readonly string ConfigsDir = Path.Combine(AppDataDir, "configs");
+    public static readonly string FrontendLogsDir = Path.Combine(AppDataDir, "logs");
+    public static readonly string BackendLogsDir = Path.Combine(AppRoot, "log");
+    public static readonly string ReportsDir = Path.Combine(AppRoot, "reports");
+    public static readonly string SourceCodeDir = Path.Combine(AppRoot, "SRA");
+    public static readonly string StrategiesDir = Path.Combine(AppRoot, "tasks", "currency_wars", "strategies");
+
+    public static readonly string SraExecutablePath = GetSraExecutablePath();
+    public static readonly string SraOldExecutablePath = GetSraOldExecutablePath();
+    public static readonly string DesktopShortcutPath = GetDesktopShortcutPath();
+
+    static PathString()
     {
-        get
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                return Path.Combine(Environment.CurrentDirectory, "SRA.exe");
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                return Path.Combine(Environment.CurrentDirectory, "SRA");
-            throw new PlatformNotSupportedException("SRA executable is only supported on Windows and Linux.");
-        }
+        EnsureDirectoryExists(AppDataDir);
+        EnsureDirectoryExists(TempDir);
+        EnsureDirectoryExists(ConfigsDir);
+        EnsureDirectoryExists(FrontendLogsDir);
+        // EnsureDirectoryExists(BackendLogsDir);
+        // EnsureDirectoryExists(ReportsDir);
     }
 
-    public static string SraOldExecutablePath
+    private static string GetAppDataDirectory()
     {
-        get
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                return  Path.Combine(Environment.CurrentDirectory, "SRA_old.exe");
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                return Path.Combine(Environment.CurrentDirectory, "SRA_old");
-            throw new PlatformNotSupportedException("SRA old executable is only supported on Windows and Linux.");
-        }
-    }
-    
-    public static string DesktopShortcutPath
-    {
-        get
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                return Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SRA.lnk");
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                return Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SRA.desktop");
-            }
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "SRA");
 
-            throw new PlatformNotSupportedException("Desktop shortcut is only supported on Windows and Linux.");
-        }
+        // Linux: ~/.config/sra
+        return Path.Combine(AppRoot, ".sra");
+    }
+
+    private static string GetSraExecutablePath()
+    {
+        var exeName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? "SRA.exe"
+            : "SRA";
+        return Path.Combine(AppRoot, exeName);
+    }
+
+    private static string GetSraOldExecutablePath()
+    {
+        var exeName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? "SRA_old.exe"
+            : "SRA_old";
+        return Path.Combine(AppRoot, exeName);
+    }
+
+    private static string GetDesktopShortcutPath()
+    {
+        var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            return Path.Combine(desktop, "SRA.lnk");
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            return Path.Combine(desktop, "SRA.desktop");
+
+        throw new PlatformNotSupportedException();
+    }
+
+    private static void EnsureDirectoryExists(string path)
+    {
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
     }
 }

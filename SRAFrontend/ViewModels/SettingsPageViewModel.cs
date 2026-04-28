@@ -198,7 +198,7 @@ public partial class SettingsPageViewModel : PageViewModel
             "backendLogs" => PathString.BackendLogsDir,
             "frontendLogs" => PathString.FrontendLogsDir,
             "configs" => PathString.ConfigsDir,
-            "appdata" => PathString.AppDataSraDir,
+            "appdata" => PathString.AppDataDir,
             _ => "."
         };
         _commonModel.OpenFolderInExplorer(folderPath);
