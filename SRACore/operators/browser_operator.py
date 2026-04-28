@@ -27,8 +27,8 @@ from SRACore.util.errors import ThreadStoppedError
 class BrowserOperator(IOperator):
     def __init__(self, stop_event: threading.Event | None = None):
         super().__init__(stop_event)
-        # noinspection PyTypeChecker
         self.type = "Browser"
+        # noinspection PyTypeChecker
         self.driver: WebDriver = None
         self.height = 1080
         self.width = 1920

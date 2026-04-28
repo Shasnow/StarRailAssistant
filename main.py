@@ -9,7 +9,7 @@ from SRACore.util.data_persister import load_settings
 
 def main():
     settings = load_settings()
-    language: int = settings.get('Language', 0)
+    language: int = settings.get('general', {}).get('language', 0)
     Resource.set_language(language)
     parser = argparse.ArgumentParser(
         description=Resource.argparse_description,

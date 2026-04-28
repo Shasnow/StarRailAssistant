@@ -56,11 +56,13 @@ class BaseTask(Executable, ABC):
         )
 
     def on_start(self) -> None:
-        if self.settings.get(f"{self.__class__.__name__}NotifyOnStart", False):
+        on_start = self.settings.Notification.onStart
+        if self.__class__.__name__ in on_start:
             self.send_notification(f"任务 {self.__class__.__name__} 开始执行。", "success")
 
     def on_finish(self) -> None:
-        if self.settings.get(f"{self.__class__.__name__}NotifyOnComplete", False):
+        on_complete = self.settings.Notification.onComplete
+        if self.__class__.__name__ in on_complete:
             self.send_notification(f"任务 {self.__class__.__name__} 执行完成。", "success")
 
     def on_failure(self) -> None:

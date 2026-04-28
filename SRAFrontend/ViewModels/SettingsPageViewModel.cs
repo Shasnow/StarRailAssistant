@@ -112,7 +112,7 @@ public partial class SettingsPageViewModel : PageViewModel
     private AppSettings Settings => _settingsService.Settings;
     public GeneralSettings GeneralSettings => Settings.General;
     public DisplaySettings DisplaySettings => Settings.Display;
-    public NotificationSettings NotificationSettings => Settings.Notifications;
+    public NotificationSettings NotificationSettings => Settings.Notification;
     public UpdateSettings UpdateSettings => Settings.Update;
     public AdvancedSettings AdvancedSettings => Settings.Advanced;
     public Cache Cache => _cacheService.Cache;
@@ -266,7 +266,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestWebhook()
     {
-        var endpoint = Settings.Notifications.WebhookUrl.Trim();
+        var endpoint = Settings.Notification.WebhookUrl.Trim();
         if (string.IsNullOrEmpty(endpoint))
         {
             _commonModel.ShowErrorToast("Webhook 测试", "请先填写 Webhook 地址");
@@ -280,12 +280,12 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestTelegram()
     {
-        if (string.IsNullOrEmpty(Settings.Notifications.TelegramBotToken.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notification.TelegramBotToken.Trim()))
         {
             _commonModel.ShowErrorToast("Telegram 测试", "请先填写 Bot Token");
             return;
         }
-        if (string.IsNullOrEmpty(Settings.Notifications.TelegramChatId.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notification.TelegramChatId.Trim()))
         {
             _commonModel.ShowErrorToast("Telegram 测试", "请先填写 Chat ID");
             return;
@@ -298,7 +298,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestServerChan()
     {
-        if (string.IsNullOrEmpty(Settings.Notifications.ServerChanSendKey.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notification.ServerChanSendKey.Trim()))
         {
             _commonModel.ShowErrorToast("ServerChan 测试", "请先填写 SendKey");
             return;
@@ -311,7 +311,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestBark()
     {
-        if (string.IsNullOrEmpty(Settings.Notifications.BarkDeviceKey.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notification.BarkDeviceKey.Trim()))
         {
             _commonModel.ShowErrorToast("Bark 测试", "请先填写设备 Key");
             return;
@@ -324,7 +324,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestFeishu()
     {
-        if (string.IsNullOrEmpty(Settings.Notifications.FeishuWebhookUrl.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notification.FeishuWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("飞书测试", "请先填写 Webhook 地址");
             return;
@@ -337,7 +337,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestWeCom()
     {
-        if (string.IsNullOrEmpty(Settings.Notifications.WeComWebhookUrl.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notification.WeComWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("企业微信测试", "请先填写 Webhook 地址");
             return;
@@ -350,7 +350,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestDingTalk()
     {
-        if (string.IsNullOrEmpty(Settings.Notifications.DingTalkWebhookUrl.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notification.DingTalkWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("钉钉测试", "请先填写 Webhook 地址");
             return;
@@ -363,7 +363,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestDiscord()
     {
-        if (string.IsNullOrEmpty(Settings.Notifications.DiscordWebhookUrl.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notification.DiscordWebhookUrl.Trim()))
         {
             _commonModel.ShowErrorToast("Discord 测试", "请先填写 Webhook 地址");
             return;
@@ -376,7 +376,7 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestXxtui()
     {
-        if (string.IsNullOrEmpty(Settings.Notifications.XxtuiApiKey.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notification.XxtuiApiKey.Trim()))
         {
             _commonModel.ShowErrorToast("xxtui 测试", "请先填写 API Key");
             return;
@@ -389,13 +389,13 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private void TestOneBot()
     {
-        if (string.IsNullOrEmpty(Settings.Notifications.OneBotUrl.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notification.OneBotUrl.Trim()))
         {
             _commonModel.ShowErrorToast("OneBot 测试", "请先填写 API 地址");
             return;
         }
-        if (string.IsNullOrEmpty(Settings.Notifications.OneBotUserId.Trim()) &&
-            string.IsNullOrEmpty(Settings.Notifications.OneBotGroupId.Trim()))
+        if (string.IsNullOrEmpty(Settings.Notification.OneBotUserId.Trim()) &&
+            string.IsNullOrEmpty(Settings.Notification.OneBotGroupId.Trim()))
         {
             _commonModel.ShowErrorToast("OneBot 测试", "请填写 QQ 号或群号（至少一个）");
             return;

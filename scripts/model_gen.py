@@ -115,13 +115,12 @@ def get_default_value(python_type: str) -> str:
     return defaults.get(python_type, 'None')
 
 
-def generate_python_class(class_info: dict) -> str:
+def generate_python_class(class_info: dict, class_names: list[str]) -> str:
     """生成Python类代码（使用dataclass）"""
-    lines = []
-    lines.append('@dataclass')
-    lines.append(f'class {class_info["name"]}:')
-    lines.append(f'    """自动生成的 {class_info["name"]} 类"""')
-    lines.append('')
+    lines = ['@dataclass',
+             f'class {class_info["name"]}:',
+             f'    """自动生成的 {class_info["name"]} 类"""',
+             '']
 
     for prop in class_info['properties']:
         if prop['python_type'].startswith('list'):
@@ -133,21 +132,43 @@ def generate_python_class(class_info: dict) -> str:
     lines.append('')
     lines.append('    def to_dict(self) -> dict:')
     lines.append('        """转换为字典"""')
+
+    # 生成to_dict方法的内容，处理子对象的递归转换
+    to_dict_lines = []
+    for prop in class_info['properties']:
+        json_name = prop['json_name']
+        prop_name = prop['name']
+        prop_type = prop['python_type']
+
+        # 如果属性类型是另一个自定义类，则调用其to_dict方法
+        if prop_type in class_names:
+            to_dict_lines.append(f'"{json_name}": self.{prop_name}.to_dict()')
+        else:
+            to_dict_lines.append(f'"{json_name}": self.{prop_name}')
+
     lines.append('        return {')
-    lines.append('            ' + ',\n            '.join(
-        f'"{p["json_name"]}": self.{p["name"]}'
-        for p in class_info['properties']
-    ))
+    lines.append('            ' + ',\n            '.join(to_dict_lines))
     lines.append('        }')
     lines.append('')
     lines.append('    @classmethod')
     lines.append('    def from_dict(cls, data: dict):')
     lines.append('        """从字典创建对象"""')
+
+    # 生成from_dict方法的内容，处理子对象的实例化
+    from_dict_lines = []
+    for prop in class_info['properties']:
+        json_name = prop['json_name']
+        prop_name = prop['name']
+        prop_type = prop['python_type']
+
+        # 如果属性类型是另一个自定义类，则调用其from_dict方法
+        if prop_type in class_names:
+            from_dict_lines.append(f'"{prop_name}": {prop_type}.from_dict(data.get("{json_name}", \u007b\u007d))')
+        else:
+            from_dict_lines.append(f'"{prop_name}": data.get("{json_name}")')
+
     lines.append('        return cls(**{')
-    lines.append('            ' + ',\n            '.join(
-        f'"{p["name"]}": data.get("{p["json_name"]}")'
-        for p in class_info['properties']
-    ))
+    lines.append('            ' + ',\n            '.join(from_dict_lines))
     lines.append('        })')
 
     return '\n'.join(lines)
@@ -183,8 +204,11 @@ def main():
     classes = parse_csharp_file(args.input)
     output_lines = generate_header(args.input)
 
+    # 获取所有类名，用于在from_dict中判断是否需要递归实例化
+    class_names = [c['name'] for c in classes]
+
     for class_info in classes:
-        output_lines.append(generate_python_class(class_info))
+        output_lines.append(generate_python_class(class_info, class_names))
         output_lines.append('')
 
     output = '\n'.join(output_lines)

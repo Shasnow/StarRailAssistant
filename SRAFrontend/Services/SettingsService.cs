@@ -49,7 +49,7 @@ public class SettingsService(ILogger<SettingsService> logger)
             _logger.LogError("Failed to load settings, using default settings");
         }
         Subscribe(Settings.General);
-        Subscribe(Settings.Notifications);
+        Subscribe(Settings.Notification);
         Subscribe(Settings.Update);
         Subscribe(Settings.Display);
         Subscribe(Settings.Advanced);
@@ -73,13 +73,13 @@ public class SettingsService(ILogger<SettingsService> logger)
     private void EncryptSensitiveFields()
     {
         Settings.Update.EncryptedMirrorChyanCdk = EncryptUtil.EncryptString(Settings.Update.MirrorChyanCdk);
-        Settings.Notifications.EncryptedSmtpAuthCode = EncryptUtil.EncryptString(Settings.Notifications.SmtpAuthCode);
+        Settings.Notification.EncryptedSmtpAuthCode = EncryptUtil.EncryptString(Settings.Notification.SmtpAuthCode);
     }
 
     private void DecryptSensitiveFields()
     {
         Settings.Update.MirrorChyanCdk = EncryptUtil.DecryptString(Settings.Update.EncryptedMirrorChyanCdk);
-        Settings.Notifications.SmtpAuthCode = EncryptUtil.DecryptString(Settings.Notifications.EncryptedSmtpAuthCode);
+        Settings.Notification.SmtpAuthCode = EncryptUtil.DecryptString(Settings.Notification.EncryptedSmtpAuthCode);
     }
 
     private void Subscribe(INotifyPropertyChanged notify)

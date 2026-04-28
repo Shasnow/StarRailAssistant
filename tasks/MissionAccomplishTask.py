@@ -15,7 +15,7 @@ class MissionAccomplishTask(BaseTask):
 
     def logout(self):
         logger.info("登出账号")
-        if notify.should_capture_notification_screenshot(self.settings):
+        if notify.should_capture_notification_screenshot():
             notify.capture_game_screenshot(self.operator)
         if not self.operator.wait_img(IMG.ENTER):
             return False
@@ -33,7 +33,7 @@ class MissionAccomplishTask(BaseTask):
     def quit_game(self):
         logger.info("退出游戏")
         try:
-            if notify.should_capture_notification_screenshot(self.settings):
+            if notify.should_capture_notification_screenshot():
                 notify.capture_game_screenshot(self.operator)
             sys_util.task_kill("StarRail.exe")
             self.operator.sleep(2)

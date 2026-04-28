@@ -20,11 +20,11 @@ _notification_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="n
 
 
 def try_send_notification(title: str, message: str, result: str = "success", operator: Any | None = None):
-    setting = load_settings("notifications")
+    setting = load_settings("notification")
     if not setting.get("enabled", False):
         return
     screenshot_bytes = None
-    if should_capture_notification_screenshot(setting):
+    if should_capture_notification_screenshot():
         screenshot_bytes = _capture_game_window_bytes(operator)
         if not screenshot_bytes:
             screenshot_bytes = _get_cached_game_screenshot_bytes(operator)
@@ -174,8 +174,8 @@ def _check_wecom_response(status: int, body: str) -> tuple[bool, str]:
     return False, "errcode=" + str(errcode) + "; errmsg=" + errmsg
 
 
-def should_capture_notification_screenshot(setting: dict[str, Any] | None = None) -> bool:
-    config = setting or load_settings()
+def should_capture_notification_screenshot() -> bool:
+    config = load_settings("notification")
     return any([
         config.get("telegram.enabled", False) and config.get("telegram.sendImage", False),
         config.get("oneBot.enabled", False) and config.get("oneBot.sendImage", False),
@@ -273,12 +273,12 @@ def send_mail_notification(title: str | dict = "SRA", message: str | dict[str, A
         mail_title = title
         mail_message = message if isinstance(message, str) else ""
 
-    SMTP = config.get("SmtpServer", "")
-    port = config.get("SmtpPort", 465)
-    sender = config.get("EmailSender", "")
-    auth_code = config.get("EmailAuthCode", "")
+    SMTP = config.get("email.smtpServer", "")
+    port = config.get("email.smtpPort", 465)
+    sender = config.get("email.smtpSender", "")
+    auth_code = config.get("email.smtpAuthCode", "")
     password = encryption.win_decryptor(auth_code) if auth_code else ""
-    receiver = config.get("EmailReceiver", "")
+    receiver = config.get("email.smtpReceiver", "")
     send_mail(mail_title, "SRA通知", mail_message, SMTP, port, sender, password, receiver)
 
 
@@ -303,11 +303,11 @@ def send_mail(title: str = "SRA", subject: str = "SRA通知", message: str = "",
 
 def send_test_email() -> bool:
     try:
-        settings = load_settings()
-        if not settings.get("AllowEmail.enabled", False):
+        settings = load_settings("notification")
+        if not settings.get("email.enabled", False):
             print("邮件通知未启用")
             return False
-        required = ["SmtpServer", "EmailSender", "EmailAuthCode", "EmailReceiver"]
+        required = ["email.smtpServer", "email.smtpSender", "email.smtpAuthCode", "email.smtpReceiver"]
         missing = [f for f in required if not settings.get(f)]
         if missing:
             print("邮件配置不完整，缺少: " + ", ".join(missing))
@@ -318,10 +318,10 @@ def send_test_email() -> bool:
             "如果您收到此邮件，说明邮件通知功能配置正确。",
             "",
             "配置信息：",
-            "- SMTP服务器: " + str(settings.get("SmtpServer")),
-            "- 端口: " + str(settings.get("SmtpPort", 465)),
-            "- 发送邮箱: " + str(settings.get("EmailSender")),
-            "- 接收邮箱: " + str(settings.get("EmailReceiver")),
+            "- SMTP服务器: " + str(settings.get("email.smtpServer")),
+            "- 端口: " + str(settings.get("email.smtpPort", 465)),
+            "- 发送邮箱: " + str(settings.get("email.smtpSender")),
+            "- 接收邮箱: " + str(settings.get("email.smtpReceiver")),
             "",
             "感谢您使用 StarRailAssistant！",
         ]

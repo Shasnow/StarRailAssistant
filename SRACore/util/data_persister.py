@@ -3,6 +3,7 @@ import json
 from typing import Any
 
 from SRACore.localization import Resource
+from SRACore.models.app_settings import AppSettings
 from SRACore.util.const import AppDataSraDir, ConfigsDir
 from SRACore.util.logger import logger
 
@@ -57,6 +58,11 @@ def load_settings(group: str | None = None) -> dict[str, Any]:
         return data.get(group, {})
     else:
         return data
+
+
+def load_app_settings() -> AppSettings:
+    data = load_settings()
+    return AppSettings.from_dict(data)
 
 
 def load_cache():

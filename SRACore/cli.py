@@ -28,7 +28,7 @@ class SRACli(cmd.Cmd):
         self.trigger_thread.start()
         if not self.is_admin():
             logger.warning(Resource.cli_noAdminWarning)
-        stop_hotkey: str = settings.get('StartStopHotkey', 'f9')
+        stop_hotkey: str = settings.get("general").get("keybindings.stop")
         stop_hotkey = stop_hotkey.lower()  # 统一小写
         if stop_hotkey == '':
             stop_hotkey = 'f9'

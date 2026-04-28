@@ -154,7 +154,7 @@ class ReceiveRewardsTask(BaseTask):
         if not self.operator.wait_img(IMG.ENTER, timeout=30):
             logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待主界面超时"))
             return
-        self.operator.press_key((self.settings.get('ActivityHotkey', 'f1')).lower())
+        self.operator.press_key(self.settings.General.hotkeyF1.lower())
         self.operator.sleep(1)
         target=self.operator.ocr_match("巡星之礼")
         if target is None:
@@ -201,7 +201,7 @@ class ReceiveRewardsTask(BaseTask):
         if not self.operator.wait_img(IMG.ENTER):
             logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待主界面超时"))
             return
-        self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
+        self.operator.press_key(self.settings.General.hotkeyF4.lower())
         if not self.operator.wait_img(IMG.F4, timeout=20):
             logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
             self.operator.press_key("esc")
@@ -233,7 +233,7 @@ class ReceiveRewardsTask(BaseTask):
         if not self.operator.wait_img(IMG.ENTER):
             logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待主界面超时"))
             return
-        self.operator.press_key((self.settings.get('ChronicleHotkey', 'f2')).lower())
+        self.operator.press_key(self.settings.General.hotkeyF2.lower())
         if not self.operator.wait_img(IMG.F2, timeout=20):
             logger.warning(SRAError(ErrorCode.WAIT_TIMEOUT, "等待纪行界面超时"))
             if not self.operator.locate(IMG.ENTER):

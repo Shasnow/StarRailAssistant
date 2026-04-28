@@ -54,7 +54,7 @@ public static class SettingsMigrator
                 PythonPath = old.PythonPath,
                 PythonMain = old.PythonMainPy,
             },
-            Notifications = new NotificationSettings
+            Notification = new NotificationSettings
             {
                 IsEnabled = old.AllowNotifications,
                 IsSystemEnabled = old.AllowSystemNotifications,

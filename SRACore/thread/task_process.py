@@ -7,13 +7,14 @@ from typing import Any
 
 from SRACore.localization import Resource
 from SRACore.operators import Operator
+from SRACore.operators.browser_operator import BrowserOperator
 from SRACore.task import BaseTask
 from SRACore.util import (
     encryption,  # NOQA 有动态用法，确保被打包 # type: ignore
     notify,
     sys_util,  # NOQA 有动态用法，确保被打包 # type: ignore
 )
-from SRACore.util.data_persister import load_cache, load_config
+from SRACore.util.data_persister import load_cache, load_config, load_settings
 from SRACore.util.errors import ThreadStoppedError
 from SRACore.util.logger import logger
 
@@ -142,7 +143,10 @@ class TaskManager:
         if not task_select:
             return []
         tasks = []
-        operator = Operator(stop_event=self._stop_event)
+        if load_settings("general").get("cloudGame.enabled"):
+            operator = BrowserOperator(stop_event=self._stop_event)
+        else:
+            operator = Operator(stop_event=self._stop_event)
 
         # 遍历 task_select，根据选择状态实例化对应任务
         for index, is_select in enumerate(task_select):
@@ -246,8 +250,10 @@ class TaskManager:
             print_config["StartGameUsername"] = "******"
             logger.debug('config: ' + str(config))
             # 实例化任务类
-            operator = Operator()
-            operator.stop_event = self._stop_event
+            if load_settings("general").get("cloudGame.enabled"):
+                operator = BrowserOperator(stop_event=self._stop_event)
+            else:
+                operator = Operator(stop_event=self._stop_event)
             return task_class(operator, config)
         except Exception as e:
             logger.error(Resource.task_instantiateFailed(task, f'{e.__class__.__name__}: {e}'))

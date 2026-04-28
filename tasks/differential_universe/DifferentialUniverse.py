@@ -186,7 +186,7 @@ class DifferentialUniverse(Executable):
             DUIMG.DIFFERENTIAL_UNIVERSE_START,
         ], interval=1)
         if page == 0:
-            self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
+            self.operator.press_key(self.settings.General.hotkeyF4)
             if not self.operator.wait_img(IMG.F4, timeout=20):
                 logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
                 self.operator.press_key("esc")

@@ -13,7 +13,7 @@ from loguru import logger
 from rapidocr_onnxruntime import RapidOCR  # type: ignore
 
 from SRACore.operators.model import Box
-from SRACore.util.data_persister import load_settings
+from SRACore.util.data_persister import load_app_settings
 from SRACore.util.errors import ThreadStoppedError
 
 
@@ -22,14 +22,14 @@ class IOperator(ABC):
 
     def __init__(self, stop_event: threading.Event | None = None):
         self.type = "Local"
-        self.settings = load_settings()
-        self.confidence: float = self.settings.get('ConfidenceThreshold', 0.9)
+        self.settings = load_app_settings()
+        self.confidence: float = self.settings.General.templateMatchConfidence
         self.top = 0
         self.left = 0
         self.width = 0
         self.height = 0
-        self.is_developer_mode: bool = self.settings.get('IsDeveloperMode', False)
-        self.is_save_ocr_image: bool = self.settings.get('IsSaveOcrImage', False) if self.is_developer_mode else False
+        self.is_developer_mode: bool = self.settings.Advanced.isDeveloperModeEnabled
+        self.is_save_ocr_image: bool = self.settings.Advanced.isSaveOcrImage if self.is_developer_mode else False
         self.stop_event: threading.Event | None = stop_event
 
     @classmethod

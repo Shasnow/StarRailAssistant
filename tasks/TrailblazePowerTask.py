@@ -296,7 +296,7 @@ class TrailblazePowerTask(BaseTask):
             for i in range(1, 5):
                 self.operator.press_key(str(i))
                 self.operator.sleep(0.5)
-                self.operator.press_key(self.settings.get('TechniqueHotkey', 'e').lower())
+                self.operator.press_key(self.settings.General.hotkeyE.lower())
                 self.operator.sleep(2)
             self.operator.click_point(0.5, 0.5)
             self.battle_star(run_time)
@@ -673,7 +673,7 @@ class TrailblazePowerTask(BaseTask):
             return self.operator.wait_img(IMG.SURVIVAL_INDEX_ONCLICK, timeout=10) is not None
         elif index == 0:
             # 主页面，按快捷键进入生存索引页面
-            self.operator.press_key(self.settings.get('GuideHotkey', 'f4').lower())
+            self.operator.press_key(self.settings.General.hotkeyF4.lower())
             self.operator.sleep(1.5)
             return self.goto_survival_index()  # 递归调用，直到进入生存索引页面
         else:

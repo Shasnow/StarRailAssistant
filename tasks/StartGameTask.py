@@ -55,15 +55,15 @@ class StartGameTask(BaseTask):
 
     def launch_game(self):
         """启动游戏"""
-        if hasattr(self.operator, 'driver'):
+        if self.operator.type == "Browser":
             self.operator.launch_browser()
             return
         if sys_util.is_process_running("StarRail.exe"):  # 检查游戏是否已在运行
             logger.info("游戏已在运行中")
             return
         if self.config.get("StartGameUseGlobalPath", True):
-            game_path_index = self.settings.get('GamePathIndex', 0)
-            game_paths:list[str] = self.settings.get('GamePaths', [])
+            game_path_index = self.settings.General.gamePathIndex
+            game_paths:list[str] = self.settings.General.gamePaths
             raw_path = game_paths[game_path_index] if game_path_index < len(game_paths) else None
         else:
             raw_path = self.config.get('StartGamePath')
@@ -88,16 +88,16 @@ class StartGameTask(BaseTask):
 
         # 构建启动参数
         launch_args = []
-        if self.settings.get('LaunchArgumentsPopupWindow', False):
+        if self.settings.General.isGameArgsPopupWindow:
             launch_args.append('-popupwindow')
 
         # 添加高级参数
-        advanced_args = self.settings.get('LaunchArgumentsAdvanced', '').strip()
+        advanced_args = self.settings.General.gameArgsAdvanced.strip()
         if advanced_args:
             launch_args.extend(advanced_args.split())
 
         # 根据配置选择启动方式
-        use_cmd = self.settings.get('LaunchWithCmd', False)
+        use_cmd = self.settings.General.isUseCmd
         if use_cmd:
             logger.info("使用 CMD 启动游戏")
             cmd = f'start "" "{path}" {" ".join(launch_args)}'

@@ -19,8 +19,8 @@ public class AppSettings
     [JsonPropertyName("advanced")]
     public AdvancedSettings Advanced { get; set; } = new();
 
-    [JsonPropertyName("notifications")]
-    public NotificationSettings Notifications { get; set; } = new();
+    [JsonPropertyName("notification")]
+    public NotificationSettings Notification { get; set; } = new();
     
     public const string Version = "2.12.2"; // 应用版本号
 }

@@ -135,7 +135,7 @@ class CurrencyWars(Executable):
                                               CWIMG.PREPARATION_STAGE], interval=0.5)
         if page == 0:
             logger.info("[页面定位] 正在定位到货币战争开始页面")
-            guide_hotkey = self.settings.get('GuideHotkey', 'f4')
+            guide_hotkey = self.settings.General.hotkeyF4
             self.operator.press_key(str(guide_hotkey).lower())
             if not self.operator.wait_img(IMG.F4, timeout=20):
                 logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
