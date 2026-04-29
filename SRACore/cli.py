@@ -7,6 +7,7 @@ from typing import Any
 from loguru import logger
 
 from SRACore.localization import Resource
+from SRACore.models.app_settings import AppSettings
 from SRACore.runtime.event_listener import KeyboardListener
 from SRACore.thread.task_process import TaskManager
 from SRACore.runtime.trigger_manager import TriggerManager
@@ -18,7 +19,7 @@ class SRACli(cmd.Cmd):
     intro = Resource.cli_intro(version=VERSION, core=CORE)
     prompt = "sra> "
 
-    def __init__(self, settings: dict = None):
+    def __init__(self, settings: AppSettings):
         super().__init__()
         self.settings = settings or {}
         self.task_manager = TaskManager()
@@ -28,8 +29,7 @@ class SRACli(cmd.Cmd):
         self.trigger_thread.start()
         if not self.is_admin():
             logger.warning(Resource.cli_noAdminWarning)
-        stop_hotkey: str = settings.get("general").get("keybindings.stop")
-        stop_hotkey = stop_hotkey.lower()  # 统一小写
+        stop_hotkey: str = settings.General.hotkeyStop
         if stop_hotkey == '':
             stop_hotkey = 'f9'
 

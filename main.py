@@ -4,12 +4,12 @@ import sys
 
 from SRACore.localization import Resource
 from SRACore.util.const import VERSION
-from SRACore.util.data_persister import load_settings
+from SRACore.util.data_persister import load_settings, load_app_settings
 
 
 def main():
-    settings = load_settings()
-    language: int = settings.get('general', {}).get('language', 0)
+    settings = load_app_settings()
+    language: int = settings.Display.language
     Resource.set_language(language)
     parser = argparse.ArgumentParser(
         description=Resource.argparse_description,
