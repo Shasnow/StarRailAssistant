@@ -49,9 +49,12 @@ class BrowserOperator(IOperator):
 
     def login(self, account, password):
         wait = WebDriverWait(self.driver, 60)
-        if os.path.exists(f"{account}_cookies.json"):
+        if not CacheDir.exists():
+            CacheDir.mkdir()
+        cookies_path = CacheDir / f"{account}_cookies.json"
+        if cookies_path.exists():
             self.driver.delete_all_cookies()
-            with open(f"{account}_cookies.json", "r") as f:
+            with open(cookies_path, "r") as f:
                 cookies = json.load(f)
             for cookie in cookies:
                 self.driver.add_cookie(cookie)
@@ -71,7 +74,7 @@ class BrowserOperator(IOperator):
             self.driver.switch_to.default_content()
         wait.until(expected_conditions.presence_of_element_located(
             (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div[1]/div/div[2]/div[2]')))  # 等待开始游戏按钮出现
-        self.save_cookies(account)
+        self.save_cookies(cookies_path)
         self.load_initial_local_storage()
         try:
             self.driver.find_element(By.XPATH, '/html/body/div[6]/div[3]/button[1]').click()  # 下次再说
@@ -89,11 +92,9 @@ class BrowserOperator(IOperator):
         else:
             return -1
 
-    def save_cookies(self, account: str):
+    def save_cookies(self, path):
         cookies = self.driver.get_cookies()
-        if not CacheDir.exists():
-            CacheDir.mkdir()
-        with open(f"{account}_cookies.json", "w") as f:
+        with open(path, "w") as f:
             json.dump(cookies, f)
 
     def confirm(self):
@@ -164,6 +165,8 @@ class BrowserOperator(IOperator):
                 poll_interval = 5  # 每5秒检测一次
                 start_time = time.time()
                 while time.time() - start_time < timeout:
+                    if self.stop_event and self.stop_event.is_set():
+                        raise ThreadStoppedError("排队等待中断", "线程已停止")
                     # 检查是否已退出排队
                     if not self.driver.find_elements(By.CSS_SELECTOR, in_queue_selector):
                         logger.info("排队成功，正在进入游戏")
@@ -223,7 +226,7 @@ class BrowserOperator(IOperator):
             action.pointer_action.move_to_location(x + x_offset, y + y_offset)
             action.pointer_action.click()
             action.perform()
-            self.sleep(after_sleep+0.5)
+            self.sleep(after_sleep+0.2)
             return True
         elif isinstance(x, float) and isinstance(y, float):
             x = int(self.left + self.width * x + x_offset)
@@ -234,7 +237,7 @@ class BrowserOperator(IOperator):
             action.pointer_action.move_to_location(x, y)
             action.pointer_action.click()
             action.perform()
-            self.sleep(after_sleep+0.5)
+            self.sleep(after_sleep+0.2)
             return True
         else:
             raise ValueError(

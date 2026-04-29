@@ -160,6 +160,8 @@ class ReceiveRewardsTask(BaseTask):
         if target is None:
             logger.info("没有巡星之礼活动")
             self.operator.press_key("esc")
+            if not self.operator.wait_img(IMG.ENTER, timeout=4):
+                self.operator.press_key("esc")  # 有时需要再按一次
             return
         if self.operator.click_img(RRIMG.GIFT_RECEIVE) or self.operator.click_img(RRIMG.GIFT_RECEIVE2):
             logger.info("领取成功")
