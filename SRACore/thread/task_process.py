@@ -14,6 +14,7 @@ from SRACore.util import (
     notify,
     sys_util,  # NOQA 有动态用法，确保被打包 # type: ignore
 )
+from SRACore.util.const import AppRootDir
 from SRACore.util.data_persister import load_cache, load_config, load_settings
 from SRACore.util.errors import ThreadStoppedError
 from SRACore.util.logger import logger
@@ -32,7 +33,7 @@ class TaskManager:
         self.log_queue = None
         self._stop_event = threading.Event()
         self.task_list: list[type[BaseTask]] = []
-        with open("SRACore/config.toml", "rb") as f:
+        with open(AppRootDir / "SRACore/config.toml", "rb") as f:
             tasks = tomllib.load(f).get("tasks", [])
             for task in tasks:
                 main_class = task.get("main")

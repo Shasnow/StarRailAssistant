@@ -21,6 +21,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from SRACore.operators import IOperator
 from SRACore.operators.model import Region
+from SRACore.util.const import CacheDir
 from SRACore.util.errors import ThreadStoppedError
 
 
@@ -36,7 +37,6 @@ class BrowserOperator(IOperator):
 
     def launch_browser(self):
         url = "https://sr.mihoyo.com/cloud"
-        service = Service("msedgedriver.exe")
         edge_options = Options()
         edge_options.add_argument("--disable-infobars")
         edge_options.add_argument("--lang=zh-CN")
@@ -44,11 +44,11 @@ class BrowserOperator(IOperator):
         edge_options.add_argument(f"--app={url}")
         edge_options.add_argument("--disable-blink-features=AutomationControlled")
         edge_options.add_argument("--force-device-scale-factor=1")
-        self.driver = webdriver.Edge(options=edge_options, service=service)
+        self.driver = webdriver.Edge(options=edge_options)
         self.driver.set_window_size(1936, 1162)  # 1920x1080 + 边框
 
     def login(self, account, password):
-        wait = WebDriverWait(self.driver, 10)
+        wait = WebDriverWait(self.driver, 60)
         if os.path.exists(f"{account}_cookies.json"):
             self.driver.delete_all_cookies()
             with open(f"{account}_cookies.json", "r") as f:
@@ -91,6 +91,8 @@ class BrowserOperator(IOperator):
 
     def save_cookies(self, account: str):
         cookies = self.driver.get_cookies()
+        if not CacheDir.exists():
+            CacheDir.mkdir()
         with open(f"{account}_cookies.json", "w") as f:
             json.dump(cookies, f)
 

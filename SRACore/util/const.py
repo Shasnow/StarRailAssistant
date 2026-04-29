@@ -17,10 +17,12 @@ import sys
 from pathlib import Path
 
 # 基础的常量定义
-AppPath = Path(os.path.dirname(os.path.realpath(sys.argv[0])))
 VERSION = "2.12.2"  # 版本号
 CORE = f"{VERSION} on {sys.platform}"  # 核心版本信息
 
-_appdata_base = os.getenv("APPDATA") if sys.platform == "win32" else os.path.expanduser("~/.config")
-AppDataSraDir = Path(_appdata_base) / "SRA"
-ConfigsDir = AppDataSraDir / "configs"
+AppRootDir = Path(sys.argv[0]).parent.absolute()
+# _appdata_base = os.getenv("APPDATA")
+_appdata_base = None
+AppDataDir = AppRootDir / ".sra" if not _appdata_base else Path(_appdata_base) / "SRA"
+ConfigsDir = AppDataDir / "configs"
+CacheDir = AppDataDir / "cache"
