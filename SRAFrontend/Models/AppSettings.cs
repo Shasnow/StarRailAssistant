@@ -33,7 +33,7 @@ public partial class GeneralSettings : ObservableObject
 
     [ObservableProperty]
     [property: JsonPropertyName("gamePath.index")]
-    private int _gamePathIndex = -1;
+    private int _gamePathIndex;
 
     [ObservableProperty]
     [property: JsonPropertyName("gamePath.autoDetect")]

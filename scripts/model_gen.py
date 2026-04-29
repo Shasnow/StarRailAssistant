@@ -85,34 +85,75 @@ def parse_csharp_file(file_path: str) -> list[dict]:
 
 
 def parse_properties(class_content: str) -> list[dict]:
-    """从类内容中解析属性"""
-    property_pattern = r'\[(?:property:\s*)?JsonPropertyName\("([^"]+)"\)\]\s*\n?\s*(?:private|public)\s+([^\s<>]+(?:<[^>]+>)?)\s+[_]?(\w+)'
+    """从类内容中解析属性，包括默认值"""
+    # 匹配属性定义，支持两种格式：
+    # 格式1：[property: JsonPropertyName("xxx")]\nprivate Type _name = value;
+    # 格式2：[JsonPropertyName("xxx")]\npublic Type Name { get; set; } = value;
+    # 支持有默认值和没有默认值的情况
+    property_pattern = r'\[(?:property:\s*)?JsonPropertyName\("([^"]+)"\)\]\s*\n?\s*(?:private|public)\s+([^\s<>]+(?:<[^>]+>)?)\s+[_]?(\w+)\s*(?:\{[^}]+\})?(?:\s*=\s*([^;]+))?;?'
     prop_matches = re.findall(property_pattern, class_content, re.DOTALL)
 
     properties = []
-    for json_name, csharp_type, prop_name in prop_matches:
+    for match in prop_matches:
+        json_name = match[0]
+        csharp_type = match[1]
+        prop_name = match[2]
+        csharp_default = match[3].strip() if match[3] else None
+        
         properties.append({
             'name': prop_name,
             'json_name': json_name,
             'csharp_type': csharp_type,
-            'python_type': convert_csharp_type(csharp_type)
+            'python_type': convert_csharp_type(csharp_type),
+            'csharp_default': csharp_default
         })
 
     return properties
 
 
-def get_default_value(python_type: str) -> str:
-    """根据Python类型获取默认值"""
-    defaults = {
-        'str': '""',
-        'int': '0',
-        'bool': 'False',
-        'float': '0.0',
-    }
+def convert_csharp_default(csharp_default: str | None, python_type: str) -> str:
+    """将C#默认值转换为Python默认值"""
+    # 如果没有默认值，使用类型默认值
+    if csharp_default is None:
+        defaults = {
+            'str': '""',
+            'int': '0',
+            'bool': 'False',
+            'float': '0.0',
+        }
+        if python_type.startswith('list'):
+            return 'field(default_factory=list)'
+        return defaults.get(python_type, 'None')
 
-    if python_type.startswith('list'):
-        return '[]'
-    return defaults.get(python_type, 'None')
+    if csharp_default == 'true':
+        return 'True'
+    elif csharp_default == 'false':
+        return 'False'
+    elif csharp_default == '[]':
+        return 'field(default_factory=list)'
+    elif csharp_default.startswith('new('):
+        return 'None'
+    elif csharp_default.startswith('"') and csharp_default.endswith('"'):
+        return csharp_default
+    elif csharp_default.startswith("'") and csharp_default.endswith("'"):
+        return csharp_default
+    elif '.' in csharp_default and csharp_default.replace('.', '').isdigit():
+        return csharp_default
+    elif csharp_default.isdigit():
+        return csharp_default
+    elif csharp_default.startswith('[') and csharp_default.endswith(']'):
+        return 'field(default_factory=list)'
+    else:
+        # 如果无法识别，使用类型默认值
+        defaults = {
+            'str': '""',
+            'int': '0',
+            'bool': 'False',
+            'float': '0.0',
+        }
+        if python_type.startswith('list'):
+            return 'field(default_factory=list)'
+        return defaults.get(python_type, 'None')
 
 
 def generate_python_class(class_info: dict, class_names: list[str]) -> str:
@@ -123,11 +164,9 @@ def generate_python_class(class_info: dict, class_names: list[str]) -> str:
              '']
 
     for prop in class_info['properties']:
-        if prop['python_type'].startswith('list'):
-            lines.append(f'    {prop["name"]}: {prop["python_type"]} = field(default_factory=list)')
-        else:
-            default_value = get_default_value(prop['python_type'])
-            lines.append(f'    {prop["name"]}: {prop["python_type"]} = {default_value}')
+        # 使用从C#代码中提取的实际默认值
+        default_value = convert_csharp_default(prop['csharp_default'], prop['python_type'])
+        lines.append(f'    {prop["name"]}: {prop["python_type"]} = {default_value}')
 
     lines.append('')
     lines.append('    def to_dict(self) -> dict:')
@@ -140,7 +179,7 @@ def generate_python_class(class_info: dict, class_names: list[str]) -> str:
         prop_name = prop['name']
         prop_type = prop['python_type']
 
-        # 如果属性类型是另一个自定义类，则调用其to_dict方法
+        # 如果属性类型是另一个自定义类，则调用其to_dict方法，添加空值检查
         if prop_type in class_names:
             to_dict_lines.append(f'"{json_name}": self.{prop_name}.to_dict()')
         else:
@@ -165,7 +204,10 @@ def generate_python_class(class_info: dict, class_names: list[str]) -> str:
         if prop_type in class_names:
             from_dict_lines.append(f'"{prop_name}": {prop_type}.from_dict(data.get("{json_name}", \u007b\u007d))')
         else:
-            from_dict_lines.append(f'"{prop_name}": data.get("{json_name}")')
+            default_value = convert_csharp_default(prop['csharp_default'], prop['python_type'])
+            if default_value == "field(default_factory=list)":
+                default_value = 'list()'
+            from_dict_lines.append(f'"{prop_name}": data.get("{json_name}", {default_value})')
 
     lines.append('        return cls(**{')
     lines.append('            ' + ',\n            '.join(from_dict_lines))
