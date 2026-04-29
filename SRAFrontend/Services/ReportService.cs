@@ -42,7 +42,7 @@ public class ReportService(
             EventType = eventType,
             EventData = eventData,
             AppId = "SRA",
-            AppVersion = Settings.Version,
+            AppVersion = AppSettings.Version,
             Timestamp = timestampNow,
             SessionDuration = timestampNow - cacheService.Cache.LastLaunchTimestamp
         };

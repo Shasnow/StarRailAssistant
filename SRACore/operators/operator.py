@@ -23,7 +23,7 @@ class Operator(IOperator):
         self.left = 0
         self.width = 0
         self.height = 0
-        self._win = None
+        self._win: pygetwindow.Win32Window | None = None
         self._hwnd: int = 0
 
     def _get_hwnd(self) -> int:
@@ -83,6 +83,7 @@ class Operator(IOperator):
                    to_x: float | None = None,
                    to_y: float | None = None) -> Image:
         region = self.get_win_region(active_window=True)
+        self.sleep(0.5)
         img = self._screenshot(self._hwnd, region)
         if img is None:
             raise SRAError(ErrorCode.SCREENSHOT_FAILED, "无法截取窗口内容")

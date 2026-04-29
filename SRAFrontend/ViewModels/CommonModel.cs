@@ -69,11 +69,11 @@ public class CommonModel(
         var cdk = settingsService.Settings.Update.MirrorChyanCdk;
         var channel = settingsService.Settings.Update.UpdateChannel == 0 ? "stable" : "beta";
 
-        var currentVersion = SemVerParser.Parse(Settings.Version);
+        var currentVersion = SemVerParser.Parse(AppSettings.Version);
         logger.LogDebug("Checking for updates: {Version}", currentVersion);
         if (currentVersion == null)
         {
-            logger.LogError("Failed to parse current version: {Version}", Settings.Version);
+            logger.LogError("Failed to parse current version: {Version}", AppSettings.Version);
             ShowErrorToast("检查更新失败", "当前版本号格式无效");
             return;
         }

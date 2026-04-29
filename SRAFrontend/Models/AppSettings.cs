@@ -22,7 +22,7 @@ public class AppSettings
     [JsonPropertyName("notification")]
     public NotificationSettings Notification { get; set; } = new();
     
-    public const string Version = "2.12.2"; // 应用版本号
+    public const string Version = "2.13.0-beta.1"; // 应用版本号
 }
 
 public partial class GeneralSettings : ObservableObject

@@ -13,7 +13,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # 要更新的文件路径
 FILES = {
-    'Settings.cs': os.path.join(PROJECT_ROOT, 'SRAFrontend', 'Models', 'Settings.cs'),
+    'cs': os.path.join(PROJECT_ROOT, 'SRAFrontend', 'Models', 'AppSettings.cs'),
     'const.py': os.path.join(PROJECT_ROOT, 'SRACore', 'util', 'const.py'),
     'package.json': os.path.join(PROJECT_ROOT, 'package.json')
 }
@@ -243,7 +243,7 @@ def main():
             sys.exit(1)
     
     # 更新各个文件
-    update_file_version(FILES['Settings.cs'], version)
+    update_file_version(FILES['cs'], version)
     update_file_version(FILES['const.py'], version)
     update_file_version(FILES['package.json'], version)
     

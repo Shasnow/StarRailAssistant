@@ -119,12 +119,6 @@
                                              Text="{Binding CurrentConfig.CwRsInvestStrategies}"
                                              Watermark="例如：砂里淘金" />
                                 </StackPanel>
-
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Label Content="策略阶段" />
-                                    <NumericUpDown Width="120" FormatString="0" Minimum="1" Maximum="2"
-                                                   Value="{Binding CurrentConfig.CwRsInvestStrategyStage}"/>
-                                </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </suki:GlassCard>

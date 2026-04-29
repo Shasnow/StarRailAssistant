@@ -13,6 +13,7 @@ from loguru import logger
 from rapidocr_onnxruntime import RapidOCR  # type: ignore
 
 from SRACore.operators.model import Box
+from SRACore.util.const import AppRootDir
 from SRACore.util.data_persister import load_app_settings
 from SRACore.util.errors import ThreadStoppedError
 
@@ -36,7 +37,7 @@ class IOperator(ABC):
     def _get_ocr_instance(cls):
         """获取OCR引擎实例"""
         if cls.ocr_engine is None:
-            cls.ocr_engine = RapidOCR(config_path='rapidocr_onnxruntime/config.yaml')
+            cls.ocr_engine = RapidOCR(config_path= AppRootDir / 'rapidocr_onnxruntime/config.yaml')
         return cls.ocr_engine
 
     @abstractmethod
