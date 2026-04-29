@@ -159,6 +159,7 @@ class RerollStart(CurrencyWars):
                 logger.info(f"已达到投资策略阶段 {self.invest_strategy_stage_limit}, 准备重开...")
                 self.operator.click_img(CWIMG.BACK_PREPARE_PAGE, after_sleep=0.5)
                 self.abort_and_return()
+                self.invest_strategy_stage = 0  # 重置投资策略阶段计数器
                 return
             if not self.operator.click_img(CWIMG.COLLECTION):  # 优先点击带有收集图标的策略
                 self.operator.click_point(0.5, 0.27)  # 无法点击时，点击中心点
