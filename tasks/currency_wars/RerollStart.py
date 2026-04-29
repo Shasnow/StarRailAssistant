@@ -34,12 +34,11 @@ class RerollStart(CurrencyWars):
         self.reroll = False  # 重开标志
         self.wanted_invest_env = None  # 需要的投资环境
         self.optional_invest_env = None  # 可选的投资环境
-        self.wanted_invest_strategies = None  # 必须出现的投资策略
+        self.wanted_invest_strategies = None  # 各阶段需要的投资策略（列表，按阶段顺序）
         self.wanted_boss_names = None  # 需要的Boss名称
         self.wanted_boss_affixes = None  # 必须出现的boss词缀
         self.hate_boss_affixes = None  # 讨厌的boss词缀，出现就重开
         self.invest_strategy_stage = 0  # 投资策略阶段
-        self.invest_strategy_stage_limit = 2  # 投资策略阶段上限，超过后不再检测投资策略
         self.invest_strategy_satisfied = False  # 满意标志
 
     def handle_ending(self):
@@ -68,12 +67,24 @@ class RerollStart(CurrencyWars):
             else:
                 self.wanted_invest_env.append(item)
 
-    def set_invest_strategy(self, invest_strategy: str, invest_strategy_stage_limit: int = 2):
-        """设置投资策略"""
+    def set_invest_strategy(self, invest_strategy: str):
+        """设置投资策略
+        
+        投资策略使用分号分隔，按照顺序分别对应阶段1、阶段2...
+        留空表示该阶段无要求。
+        例如：
+        - "策略1;策略2"：阶段1需要策略1，阶段2需要策略2
+        - ";策略2"：阶段1无要求，阶段2需要策略2
+        - "策略1;"：阶段1需要策略1，阶段2无要求，阶段1满足后立即结束
+        """
         if not invest_strategy:
             return
-        self.wanted_invest_strategies = list(map(self._normalize_ocr_text, invest_strategy.split()))
-        self.invest_strategy_stage_limit = invest_strategy_stage_limit
+        # 使用分号分隔各阶段的投资策略要求
+        stages = invest_strategy.replace("；", ";").split(";")
+        # 去除末尾空字符串（如"策略1;"会分割为["策略1", ""]）
+        while stages and stages[-1] == "":
+            stages.pop()
+        self.wanted_invest_strategies = [self._normalize_ocr_text(s) for s in stages]
 
     def set_boss_name(self, boss_names: str):
         """
@@ -82,7 +93,7 @@ class RerollStart(CurrencyWars):
         """
         if not boss_names:
             return
-        boss_name_tokens = boss_names.split(";") if boss_names else []
+        boss_name_tokens = boss_names.replace("；", ";").split(";") if boss_names else []
         normalized_boss_names = [self._normalize_ocr_text(item) for item in boss_name_tokens[:3]]
         while len(normalized_boss_names) < 3:
             normalized_boss_names.append("")
@@ -150,13 +161,18 @@ class RerollStart(CurrencyWars):
             logger.info("已刷到满足要求的开局，停止刷开局")
             self.is_running = False
             return False
+        # 检查当前阶段是否有投资策略要求，无要求则立即结束
+        if self.invest_strategy_stage >= len(self.wanted_invest_strategies):
+            logger.info("所有阶段投资策略已满足，停止刷开局")
+            self.is_running = False
+            return False
         return True
 
     def handle_invest_strategy(self):
         def default_invest_strategy_handler():
-            if self.invest_strategy_stage >= self.invest_strategy_stage_limit:
+            if self.invest_strategy_stage >= len(self.wanted_invest_strategies):
                 # 未匹配到投资策略需要重开时，直接重开，不进行选择和确定。
-                logger.info(f"已达到投资策略阶段 {self.invest_strategy_stage_limit}, 准备重开...")
+                logger.info(f"已达到投资策略阶段, 准备重开...")
                 self.operator.click_img(CWIMG.BACK_PREPARE_PAGE, after_sleep=0.5)
                 self.abort_and_return()
                 self.invest_strategy_stage = 0  # 重置投资策略阶段计数器
@@ -165,11 +181,31 @@ class RerollStart(CurrencyWars):
                 self.operator.click_point(0.5, 0.27)  # 无法点击时，点击中心点
             self.operator.click_img(IMG.ENSURE2, after_sleep=1)  # 确认选择
 
+        current_stage_index = self.invest_strategy_stage
         self.invest_strategy_stage += 1
 
+        # 检查当前阶段是否有投资策略要求
+        if not self.wanted_invest_strategies or current_stage_index >= len(self.wanted_invest_strategies):
+            # 没有更多要求，直接结束刷开局
+            logger.info(f"阶段{self.invest_strategy_stage}无投资策略要求，所有阶段已满足，停止刷开局")
+            self.is_running = False
+            return
+        
+        wanted_strategy = self.wanted_invest_strategies[current_stage_index]
+        if not wanted_strategy:
+            # 当前阶段无要求，直接继续下一阶段
+            logger.info(f"阶段{self.invest_strategy_stage}无投资策略要求，继续游戏...")
+            self.operator.click_point(0.5, 0.27)  # 点击中心点选择任意策略
+            self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+            # 检查下一阶段是否还有要求，若无则结束
+            if current_stage_index + 1 >= len(self.wanted_invest_strategies):
+                logger.info("所有阶段投资策略已满足，停止刷开局")
+                self.is_running = False
+            return
+
         for _ in range(3):
-            logger.info("正在识别投资策略...")
-            result = self._detect_invest_strategy()
+            logger.info(f"阶段{self.invest_strategy_stage}正在识别投资策略...")
+            result = self._detect_invest_strategy(wanted_strategy)
             if result == -1:
                 logger.info("投资策略不符合要求，正在刷新...")
                 boxs = self.operator.locate_all(CWIMG.INVEST_STRATEGY_REFRESH)
@@ -182,7 +218,10 @@ class RerollStart(CurrencyWars):
                 logger.info("投资策略符合要求，继续游戏...")
                 self.operator.click_point(0.25 * (result + 1), 0.27, tag="投资策略")  # 根据投资策略的位置计算点击坐标，每个策略占屏幕宽度的25%
                 self.operator.click_img(IMG.ENSURE2, after_sleep=1)
-                self.invest_strategy_satisfied = True
+                # 检查下一阶段是否还有要求，若无则结束
+                if current_stage_index + 1 >= len(self.wanted_invest_strategies):
+                    logger.info("当前阶段满足且无后续要求，停止刷开局")
+                    self.is_running = False
                 return
 
         default_invest_strategy_handler()
@@ -192,14 +231,15 @@ class RerollStart(CurrencyWars):
             self.abort_and_return()
             self.reroll = False
             return False
-        if self.invest_strategy_satisfied:
-            # 如果已经满足投资策略要求，则中止刷开局
-            logger.info("已刷到满足要求的开局，停止刷开局")
-            self.is_running = False
-            return False
-        return True
+        return self.is_running
 
-    def _detect_invest_strategy(self):
+    def _detect_invest_strategy(self, wanted_strategy: str = None):
+        """
+        检测投资策略是否符合要求
+        
+        :param wanted_strategy: 当前阶段需要的投资策略，如果为None则使用全部期望策略
+        :return: 匹配的投资策略索引，-1表示未匹配
+        """
         detected_invest_strategy = list()
         raw_results = self.operator.ocr(
             from_x=self.INVEST_STRATEGY_OCR_FROM_X,
@@ -221,12 +261,13 @@ class RerollStart(CurrencyWars):
         # 日志输出识别到的词缀，便于调试
         logger.info(f"识别到投资策略：{detected_invest_strategy}")
 
-        for i, invest_strategy in enumerate(detected_invest_strategy):
-            # 使用子字符串匹配：只要任一期望策略是识别结果的子串（或反过来），即视为匹配
-            for want in self.wanted_invest_strategies:
-                if self._is_substring(want, invest_strategy):
-                    logger.info(f"检测到需要的投资策略 {invest_strategy} (匹配: {want})")
+        # 使用指定的当前阶段策略进行匹配
+        if wanted_strategy:
+            for i, invest_strategy in enumerate(detected_invest_strategy):
+                if self._is_substring(wanted_strategy, invest_strategy):
+                    logger.info(f"检测到需要的投资策略 {invest_strategy} (匹配: {wanted_strategy})")
                     return i
+            return -1
         return -1
 
     def _detect_boss_affix(self) -> bool:
