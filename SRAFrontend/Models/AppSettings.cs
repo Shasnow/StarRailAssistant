@@ -8,21 +8,21 @@ namespace SRAFrontend.Models;
 public class AppSettings
 {
     [JsonPropertyName("general")] 
-    public GeneralSettings General { get; set; } = new();
+    public GeneralSettings General { get; init; } = new();
 
     [JsonPropertyName("display")]
-    public DisplaySettings Display { get; set; } = new();
+    public DisplaySettings Display { get; init; } = new();
 
     [JsonPropertyName("update")]
-    public UpdateSettings Update { get; set; } = new();
+    public UpdateSettings Update { get; init; } = new();
 
     [JsonPropertyName("advanced")]
-    public AdvancedSettings Advanced { get; set; } = new();
+    public AdvancedSettings Advanced { get; init; } = new();
 
     [JsonPropertyName("notification")]
-    public NotificationSettings Notification { get; set; } = new();
+    public NotificationSettings Notification { get; init; } = new();
     
-    public const string Version = "2.13.0-beta.1"; // 应用版本号
+    public const string Version = "2.13.0-beta.2"; // 应用版本号
 }
 
 public partial class GeneralSettings : ObservableObject
