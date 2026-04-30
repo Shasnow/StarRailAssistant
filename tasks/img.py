@@ -162,6 +162,7 @@ class CWIMG:
     INVEST_ENVIRONMENT = f"{BASE}/invest_environment.png"
     INVEST_ENV_REFRESH = f"{BASE}/invest_env_refresh.png"
     INVEST_STRATEGY_REFRESH = f"{BASE}/invest_strategy_refresh.png"
+    INSTRUCTIONS = f"{BASE}/instructions.png"
     LOGO = f"{BASE}/logo.png"
     NEXT_PAGE = f"{BASE}/next_page.png"
     NEXT_STEP = f"{BASE}/next_step.png"

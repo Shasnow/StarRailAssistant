@@ -210,17 +210,20 @@ class CurrencyWars(Executable):
         :return: True-进入成功，False-进入失败
         """
         # 等待开始按钮
-        start_box = self.operator.wait_img(
-            CWIMG.START_CURRENCY_WARS,
+        index, box = self.operator.wait_any_img(
+            [CWIMG.START_CURRENCY_WARS, CWIMG.INSTRUCTIONS],
             timeout=30,
             interval=0.5
         )
-        if not start_box:
+        if index == -1:
             logger.error("[进入流程] 未识别到开始按钮")
             return False
+        if index == 1:
+            self.operator.press_key("esc")  # 赛季扩充说明
+            box = self.operator.wait_img(CWIMG.START_CURRENCY_WARS, timeout=30)  # 重新获取开始游戏按钮
         # 重试点击开始按钮直到LOGO消失
         self.operator.do_while(
-            lambda: self.operator.click_box(start_box, after_sleep=1),  # NOQA
+            lambda: self.operator.click_box(box),  # NOQA
             lambda: self.operator.locate(CWIMG.LOGO) is None,
             interval=2,
             max_iterations=10
@@ -394,7 +397,7 @@ class CurrencyWars(Executable):
         Returns:
             True-继续执行后续初始化和游戏循环；False-中止进入流程
         """
-        if self.strategy_code:
+        if self.strategy_code and not self.is_continue:
             self.operator.click_img(CWIMG.STRATEGY, after_sleep=1)
             self.operator.move_to(0.5, 0.5)
             self.operator.sleep(0.5)
