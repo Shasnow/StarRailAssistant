@@ -10,18 +10,27 @@
              x:DataType="viewModels:ExtensionPageViewModel">
     <suki:GlassCard>
         <suki:GroupBox Header="{x:Static lang:Resources.ExtensionText}">
-            <StackPanel>
-                <suki:GlassCard >
-                    <Expander Header="自动对话" IsExpanded="True">
+            <Grid ColumnDefinitions="Auto, Auto" RowDefinitions="Auto" ColumnSpacing="12">
+                <suki:GlassCard Grid.Column="0" Grid.Row="0" Width="200">
+                    <suki:GroupBox Header="自动对话">
                         <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto">
                             <Label Grid.Row="0" Content="启用" />
                             <ToggleSwitch Grid.Row="0" Grid.Column="1" IsChecked="{Binding EnableAutoPlot}"/>
                             <Label Grid.Row="1" Grid.Column="0" Content="跳过对话" />
                             <ToggleSwitch Grid.Row="1" Grid.Column="1" IsChecked="{Binding SkipPlot}"/>
                         </Grid>
-                    </Expander>
+                    </suki:GroupBox>
                 </suki:GlassCard>
-            </StackPanel>
+                <suki:GlassCard Grid.Column="1" Grid.Row="0" Width="200">
+                    <suki:GroupBox Header="猫猫糕友人帐">
+                        <StackPanel Spacing="4">
+                            <Label Content="查询对应猫猫糕UID"/>
+                            <Button Content="寻找猫猫糕"
+                                    Click="Button_OnClick"/>
+                        </StackPanel>
+                    </suki:GroupBox>
+                </suki:GlassCard>
+            </Grid>
         </suki:GroupBox>
     </suki:GlassCard>
 </UserControl>
