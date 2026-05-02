@@ -43,8 +43,9 @@ public static class PathString
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "SRA");
 
-        // Linux: ~/.config/sra
-        return Path.Combine(AppRoot, ".sra");
+        return Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            ".config", "SRA");
     }
 
     private static string GetSraExecutablePath()

@@ -21,7 +21,9 @@ VERSION = "2.13.0-beta.2"  # 版本号
 CORE = f"{VERSION} on {sys.platform}"  # 核心版本信息
 
 AppRootDir = Path(__file__).parent.parent.parent.absolute()
-_appdata_base = os.getenv("APPDATA")
-AppDataDir = AppRootDir / ".sra" if not _appdata_base else Path(_appdata_base) / "SRA"
+if sys.platform == "win32":
+    AppDataDir = Path(os.getenv("APPDATA", "")) / "SRA"
+else:
+    AppDataDir = Path.home() / ".config" / "SRA"
 ConfigsDir = AppDataDir / "configs"
 CacheDir = AppDataDir / "cache"
