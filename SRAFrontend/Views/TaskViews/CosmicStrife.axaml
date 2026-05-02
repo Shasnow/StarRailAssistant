@@ -79,6 +79,7 @@
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
                                 <Button Command="{Binding RefreshStrategiesCommand}">刷新</Button>
+                                <HyperlinkButton Content="攻略站" NavigateUri="https://starrailassistant.top/sra-strategy-site/"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Spacing="10">
