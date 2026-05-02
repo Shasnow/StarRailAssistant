@@ -1,3 +1,4 @@
+import sys
 from typing import Any
 
 import psutil
@@ -73,9 +74,27 @@ def shutdown(time: int):
     """
     if time < 0:
         time = 0
-    Popen(f"shutdown -s -t {time}", shell=True)
+    if sys.platform == "win32":
+        Popen(f"shutdown -s -t {time}", shell=True)
+    elif sys.platform == "linux":
+        Popen(f"shutdown -h +{time // 60 if time >= 60 else 0}", shell=True)
+    else:
+        Popen("shutdown -h now", shell=True)
 
 
 def shutdown_cancel():
     """取消关机"""
-    Popen("shutdown -a", shell=True)
+    if sys.platform == "win32":
+        Popen("shutdown -a", shell=True)
+    elif sys.platform == "linux":
+        Popen("shutdown -c", shell=True)
+
+
+def sleep_system():
+    """将系统置于睡眠状态"""
+    if sys.platform == "win32":
+        Popen(["rundll32.exe", "powrprof.dll,SetSuspendState", "0,1,0"])
+    elif sys.platform == "linux":
+        Popen("systemctl suspend", shell=True)
+    else:
+        Popen("pm-suspend", shell=True)
