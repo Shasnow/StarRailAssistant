@@ -67,6 +67,7 @@ public partial class MainWindowViewModel(
         await commonModel.CheckForUpdatesAsync();
         await commonModel.CheckDesktopShortcut();
         await commonModel.CheckAnnouncementAsync();
+        await commonModel.CheckPythonEnvironmentAsync();
     }
 
     [RelayCommand]

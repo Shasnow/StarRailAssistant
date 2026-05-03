@@ -14,6 +14,7 @@
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="10">
                     <TextBlock Text="{x:Static lang:Resources.ConsoleText}" VerticalAlignment="Center" />
+                    <!-- ReSharper disable once Xaml.StyleClassNotFound -->
                     <Button
                         Height="20"
                         Width="20"
@@ -21,6 +22,7 @@
                         Content="&#xE036;"
                         ToolTip.Tip="重新启动后端"
                         Command="{Binding RestartConsoleCommand}"/>
+                    <!-- ReSharper disable once Xaml.StyleClassNotFound -->
                     <Button
                         Height="20"
                         Width="20"
@@ -28,6 +30,7 @@
                         Content="&#xE3DE;"
                         ToolTip.Tip="停止后端"
                         Command="{Binding StopConsoleCommand}"/>
+                    <TextBlock Text="如果要反馈问题，请发送日志文件，而不是这个页面的照片或截图"/>
                 </StackPanel>
             </suki:GroupBox.Header>
             <Grid RowDefinitions="Auto,*,Auto">

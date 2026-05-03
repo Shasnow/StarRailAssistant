@@ -21,10 +21,14 @@ public static class PathString
     public static readonly string ReportsDir = Path.Combine(AppRoot, "reports");
     public static readonly string SourceCodeDir = Path.Combine(AppRoot, "SRA");
     public static readonly string StrategiesDir = Path.Combine(AppRoot, "tasks", "currency_wars", "strategies");
+    public static readonly string PythonDir = GetPythonDir();
 
     public static readonly string SraExecutablePath = GetSraExecutablePath();
     public static readonly string SraOldExecutablePath = GetSraOldExecutablePath();
     public static readonly string DesktopShortcutPath = GetDesktopShortcutPath();
+    public static string PythonExe => RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        ? Path.Combine(PythonDir, "python.exe")
+        : Path.Combine(PythonDir, "bin", "python3");
 
     static PathString()
     {
@@ -32,6 +36,7 @@ public static class PathString
         EnsureDirectoryExists(TempDir);
         EnsureDirectoryExists(ConfigsDir);
         EnsureDirectoryExists(FrontendLogsDir);
+        EnsureDirectoryExists(PythonDir);
         // EnsureDirectoryExists(BackendLogsDir);
         // EnsureDirectoryExists(ReportsDir);
     }
@@ -81,5 +86,10 @@ public static class PathString
     {
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
+    }
+
+    private static string GetPythonDir()
+    {
+        return Path.Combine(AppRoot, "python");
     }
 }
