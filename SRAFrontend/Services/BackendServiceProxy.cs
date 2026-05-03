@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using SRAFrontend.Models;
 
@@ -15,7 +14,6 @@ public class BackendServiceProxy : IBackendService
 
     private IBackendService _currentBackend;
 
-    private bool _isTaskRunning;
     private string _lastStartArguments = string.Empty; // 记录最近一次 StartBackend/RestartBackend 使用的参数
 
     public BackendServiceProxy(CliBackendService cliBackendService, PyBackendService pyBackendService,
@@ -27,8 +25,8 @@ public class BackendServiceProxy : IBackendService
 
         // 初始化 Python 后端配置
         ApplyPythonSettings();
-        var isUsingPython = Environment.GetCommandLineArgs().Contains("--use-python") || _settingsService.Settings.Advanced is
-            { IsDeveloperModeEnabled: true, IsUsePython: true };
+        var isUsingPython = Environment.GetCommandLineArgs().Contains("--use-python") ||
+                            _settingsService.Settings.Advanced.IsBackendUsePython;
         // 根据设置决定初始后端
         _currentBackend = isUsingPython
             ? _pyBackendService
@@ -46,11 +44,11 @@ public class BackendServiceProxy : IBackendService
 
     public bool IsTaskRunning
     {
-        get => _isTaskRunning;
+        get;
         set
         {
-            if (_isTaskRunning == value) return;
-            _isTaskRunning = value;
+            if (field == value) return;
+            field = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsTaskRunning)));
         }
     }
@@ -111,15 +109,15 @@ public class BackendServiceProxy : IBackendService
     private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         // 后端选择
-        if (e.PropertyName == nameof(Settings.IsUsingPython))
+        if (e.PropertyName == nameof(AdvancedSettings.IsBackendUsePython))
         {
-            var usePython = _settingsService.Settings.Advanced.IsUsePython;
+            var usePython = _settingsService.Settings.Advanced.IsBackendUsePython;
             IBackendService target = usePython ? _pyBackendService : _cliBackendService;
             SetCurrentBackend(target);
         }
 
         // Python 配置变更时，同步到 PyBackendService
-        if (e.PropertyName is nameof(Settings.PythonPath) or nameof(Settings.PythonMainPy)) ApplyPythonSettings();
+        if (e.PropertyName is nameof(AdvancedSettings.PythonPath) or nameof(AdvancedSettings.PythonMain)) ApplyPythonSettings();
     }
 
     // 允许后续切换后端的扩展点

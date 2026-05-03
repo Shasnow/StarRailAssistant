@@ -44,10 +44,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Install .NET 8.0 Core
+      - name: Install .NET 10.0
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '10.0.x'
         
       - name: Publish win-x64
         run: |
@@ -186,7 +186,7 @@ jobs:
           - StarRailAssistant_vX.X.X.zip - 全量压缩包、免安装
           - StarRailAssistant_vX.X.X_Setup.exe - 全量安装包
 
-          除了核心包以外的包都需要安装 [.NET Desktop Runtime 8](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0) 才能运行
+          除了核心包以外的包都需要安装 [.NET Desktop Runtime 10.0](https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0) 才能运行
           首次使用建议下载全量压缩包或全量安装包
           **看准文件名再下载！**
 
@@ -212,7 +212,7 @@ jobs:
           - StarRailAssistant_vX.X.X.zip - 全量压缩包、免安装
           - StarRailAssistant_vX.X.X_Setup.exe - 全量安装包
 
-          除了核心包以外的包都需要安装 [.NET Desktop Runtime 8](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0) 才能运行
+          除了核心包以外的包都需要安装 [.NET Desktop Runtime 10.0](https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0) 才能运行
           首次使用建议下载全量压缩包或全量安装包
           **看准文件名再下载！**
 

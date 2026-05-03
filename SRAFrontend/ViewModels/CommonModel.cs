@@ -67,6 +67,7 @@ public class CommonModel(
     
     public async Task CheckPythonEnvironmentAsync()
     {
+        if (!settingsService.Settings.Advanced.IsBackendUsePython) return;
         if (PythonService.IsEnvironmentReady()) return;
         var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {

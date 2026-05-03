@@ -788,6 +788,13 @@
                                                Content="后端启动参数" />
                                         <TextBox Grid.Column="2" Text="{Binding AdvancedSettings.BackendLaunchArgs}" Watermark="--inline"/>
                                     </Grid>
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="Icon">&#xE47E;</Label>
+                                        <Label Grid.Column="1"
+                                               Content="{x:Static lang:Resources.UsingPythonText}" />
+                                        <ToggleSwitch Grid.Column="2"
+                                                      IsChecked="{Binding AdvancedSettings.IsBackendUsePython}" />
+                                    </Grid>
                                     <Expander Header="{x:Static lang:Resources.DeveloperOptionsText}"
                                               IsVisible="{Binding AdvancedSettings.IsDeveloperModeEnabled}"
                                               IsExpanded="True">
@@ -812,13 +819,6 @@
                                                        Content="叠加层显示调试信息" />
                                                 <ToggleSwitch Grid.Column="2"
                                                               IsChecked="{Binding IsOverlayDebugInfoEnabled}" />
-                                            </Grid>
-                                            <Grid ColumnDefinitions="Auto, *, Auto">
-                                                <Label Classes="Icon">&#xE47E;</Label>
-                                                <Label Grid.Column="1"
-                                                       Content="{x:Static lang:Resources.UsingPythonText}" />
-                                                <ToggleSwitch Grid.Column="2"
-                                                              IsChecked="{Binding AdvancedSettings.IsUsePython}" />
                                             </Grid>
                                             <Grid ColumnDefinitions="Auto, *, Auto">
                                                 <Label Classes="Icon">&#xE1C2;</Label>

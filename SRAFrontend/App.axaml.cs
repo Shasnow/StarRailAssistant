@@ -88,6 +88,7 @@ public class App : Application
         services.AddSingleton<ConfigService>();
         services.AddSingleton<ReportService>();
         services.AddSingleton<OverlayService>();
+        services.AddSingleton<PythonService>();
         services.AddHttpClient("GlobalClient", client =>
         {
             client.Timeout = TimeSpan.FromSeconds(60);

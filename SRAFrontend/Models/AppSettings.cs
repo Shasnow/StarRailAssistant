@@ -373,8 +373,12 @@ public partial class UpdateSettings : ObservableObject
 public partial class AdvancedSettings : ObservableObject
 {
     [ObservableProperty]
-    [property: JsonPropertyName("backendLaunchArgs")]
-    private string _backendLaunchArgs = "";
+    [property: JsonPropertyName("backend.launchArgs")]
+    private string _backendLaunchArgs = "--inline";
+    
+    [ObservableProperty]
+    [property: JsonPropertyName("backend.usePython")]
+    private bool _isBackendUsePython = true;
 
     [ObservableProperty]
     [property: JsonPropertyName("developerMode.enabled")]
@@ -387,10 +391,6 @@ public partial class AdvancedSettings : ObservableObject
     [ObservableProperty]
     [property: JsonPropertyName("developerMode.overlay")]
     private bool _isDebugOverlayEnabled;
-
-    [ObservableProperty]
-    [property: JsonPropertyName("developerMode.usePython")]
-    private bool _isUsePython;
 
     [ObservableProperty]
     [property: JsonPropertyName("developerMode.pythonPath")]

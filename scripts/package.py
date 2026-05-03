@@ -30,7 +30,7 @@ from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 
 ROOT_PATH = Path(__file__).resolve().parent.parent
-WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "bin" / "Release" / "net8.0" / "win-x64" / "publish"
+WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
 DIST_DIR = ROOT_PATH / "main.dist"
 
 

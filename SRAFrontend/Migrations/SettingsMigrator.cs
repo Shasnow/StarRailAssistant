@@ -49,7 +49,6 @@ public static class SettingsMigrator
                 BackendLaunchArgs = old.BackendArguments,
                 IsDeveloperModeEnabled = old.IsDeveloperMode,
                 IsSaveOcrImage = old.IsSaveOcrImage,
-                IsUsePython = old.IsUsingPython,
                 IsDebugOverlayEnabled = old.IsOverlayDebugInfoEnabled,
                 PythonPath = old.PythonPath,
                 PythonMain = old.PythonMainPy,
