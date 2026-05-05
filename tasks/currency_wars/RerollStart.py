@@ -170,16 +170,11 @@ class RerollStart(CurrencyWars):
 
     def handle_invest_strategy(self):
         def default_invest_strategy_handler():
-            if self.invest_strategy_stage >= len(self.wanted_invest_strategies):
-                # 未匹配到投资策略需要重开时，直接重开，不进行选择和确定。
-                logger.info(f"已达到投资策略阶段, 准备重开...")
-                self.operator.click_img(CWIMG.BACK_PREPARE_PAGE, after_sleep=0.5)
-                self.abort_and_return()
-                self.invest_strategy_stage = 0  # 重置投资策略阶段计数器
-                return
-            if not self.operator.click_img(CWIMG.COLLECTION):  # 优先点击带有收集图标的策略
-                self.operator.click_point(0.5, 0.27)  # 无法点击时，点击中心点
-            self.operator.click_img(IMG.ENSURE2, after_sleep=1)  # 确认选择
+            # 当前阶段的必需策略未匹配到，直接重开
+            logger.info(f"阶段{self.invest_strategy_stage}投资策略未满足要求，准备重开...")
+            self.operator.click_img(CWIMG.BACK_PREPARE_PAGE, after_sleep=0.5,)
+            self.abort_and_return()
+            self.invest_strategy_stage = 0
 
         current_stage_index = self.invest_strategy_stage
         self.invest_strategy_stage += 1
@@ -195,7 +190,7 @@ class RerollStart(CurrencyWars):
         if not wanted_strategy:
             # 当前阶段无要求，直接继续下一阶段
             logger.info(f"阶段{self.invest_strategy_stage}无投资策略要求，继续游戏...")
-            self.operator.click_point(0.5, 0.27)  # 点击中心点选择任意策略
+            self.operator.click_point(0.5, 0.27, tag="选择中间的投资策略")  # 点击中心点选择任意策略
             self.operator.click_img(IMG.ENSURE2, after_sleep=1)
             # 检查下一阶段是否还有要求，若无则结束
             if current_stage_index + 1 >= len(self.wanted_invest_strategies):
