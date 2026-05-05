@@ -6,7 +6,7 @@ namespace SRAFrontend.Data;
 
 public static class PathString
 {
-    private static readonly string AppRoot = AppContext.BaseDirectory;
+    public static readonly string AppRoot = AppContext.BaseDirectory;
 
     public static readonly string AppDataDir = GetAppDataDirectory();
 
