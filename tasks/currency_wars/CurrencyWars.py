@@ -8,7 +8,7 @@ from SRACore.operators.model import Box
 from SRACore.task import Executable
 from SRACore.util.errors import ErrorCode, SRAError
 from tasks.currency_wars.characters import Character, Characters, Positioning
-from tasks.img import CWIMG, IMG
+from tasks.img import CWIMG, IMG, DUIMG
 
 
 class Difficulty(enum.IntEnum):
@@ -132,7 +132,8 @@ class CurrencyWars(Executable):
         """
         page, _ = self.operator.wait_any_img([IMG.ENTER,
                                               CWIMG.START_CURRENCY_WARS,
-                                              CWIMG.PREPARATION_STAGE], interval=0.5)
+                                              CWIMG.PREPARATION_STAGE,
+                                              DUIMG.BONUS_POINTS], interval=0.5)
         if page == 0:
             logger.info("[页面定位] 正在定位到货币战争开始页面")
             guide_hotkey = self.settings.General.hotkeyF4
@@ -144,14 +145,16 @@ class CurrencyWars(Executable):
             self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.30, after_sleep=0.8)  # 货币战争
             self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
-            logger.info("[页面定位] 引导流程完成，进入开始页面")
-            return CurrencyWarsPage.START
+            return self.page_locate()
         elif page == 1:
             logger.info("[页面定位] 已定位到货币战争开始页面")
             return CurrencyWarsPage.START
         elif page == 2:
             logger.info("[页面定位] 已定位到货币战争准备阶段")
             return CurrencyWarsPage.PREPARATION
+        elif page == 3:
+            self.operator.press_key("esc")
+            return CurrencyWarsPage.START
         else:
             logger.error("[页面定位] 检测超时，未识别到任何目标页面")
             return CurrencyWarsPage.UNKNOWN
