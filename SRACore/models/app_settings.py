@@ -352,22 +352,22 @@ class UpdateSettings:
 class AdvancedSettings:
     """自动生成的 AdvancedSettings 类"""
 
-    backendLaunchArgs: str = ""
+    backendLaunchArgs: str = "--inline"
+    isBackendUsePython: bool = True
     isDeveloperModeEnabled: bool = False
     isSaveOcrImage: bool = False
     isDebugOverlayEnabled: bool = False
-    isUsePython: bool = False
     pythonPath: str = ""
     pythonMain: str = ""
 
     def to_dict(self) -> dict:
         """转换为字典"""
         return {
-            "backendLaunchArgs": self.backendLaunchArgs,
+            "backend.launchArgs": self.backendLaunchArgs,
+            "backend.usePython": self.isBackendUsePython,
             "developerMode.enabled": self.isDeveloperModeEnabled,
             "developerMode.saveOcrImage": self.isSaveOcrImage,
             "developerMode.overlay": self.isDebugOverlayEnabled,
-            "developerMode.usePython": self.isUsePython,
             "developerMode.pythonPath": self.pythonPath,
             "developerMode.pythonMain": self.pythonMain
         }
@@ -376,11 +376,11 @@ class AdvancedSettings:
     def from_dict(cls, data: dict):
         """从字典创建对象"""
         return cls(**{
-            "backendLaunchArgs": data.get("backendLaunchArgs", ""),
+            "backendLaunchArgs": data.get("backend.launchArgs", "--inline"),
+            "isBackendUsePython": data.get("backend.usePython", True),
             "isDeveloperModeEnabled": data.get("developerMode.enabled", False),
             "isSaveOcrImage": data.get("developerMode.saveOcrImage", False),
             "isDebugOverlayEnabled": data.get("developerMode.overlay", False),
-            "isUsePython": data.get("developerMode.usePython", False),
             "pythonPath": data.get("developerMode.pythonPath", ""),
             "pythonMain": data.get("developerMode.pythonMain", "")
         })
