@@ -8,7 +8,7 @@ from typing import Any
 from SRACore.localization import Resource
 from SRACore.operators import Operator
 from SRACore.operators.browser_operator import BrowserOperator
-from SRACore.task import BaseTask
+from SRACore.task import BaseTask, get_tasks
 from SRACore.util import (
     encryption,  # NOQA 有动态用法，确保被打包 # type: ignore
     notify,
@@ -32,19 +32,7 @@ class TaskManager:
         """
         self.log_queue = None
         self._stop_event = threading.Event()
-        self.task_list: list[type[BaseTask]] = []
-        with open(AppRootDir / "SRACore/config.toml", "rb") as f:
-            tasks = tomllib.load(f).get("tasks", [])
-            for task in tasks:
-                main_class = task.get("main")
-                module = task.get("module")
-                _module = importlib.import_module(module)
-                _class = getattr(_module, main_class)
-                if not issubclass(_class, BaseTask):
-                    raise TypeError(f"Task class {main_class} does not inherit from BaseTask")
-                if not callable(getattr(_class, "run", None)):
-                    raise TypeError(f"Task class {main_class} does not implement a callable 'run' method")
-                self.task_list.append(_class)
+        self.task_list: list[type[BaseTask]] = get_tasks()
         logger.debug(f"Successfully load task: {self.task_list}")
 
     def request_stop(self) -> None:
