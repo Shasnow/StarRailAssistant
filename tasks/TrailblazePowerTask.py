@@ -1,13 +1,12 @@
 import tomllib
 from typing import Any, Callable, TypedDict, cast
 
-from SRACore.task import BaseTask
+from SRACore.task import BaseTask, task
 from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
 from tasks.img import IMG, TPIMG
 
 type TrailblazePowerFunc = Callable[..., bool]
-
 
 class SubtaskInfo(TypedDict, total=False):
     name: str
@@ -18,6 +17,7 @@ class SubtaskInfo(TypedDict, total=False):
     results: list[str]
 
 
+@task(order=1)
 class TrailblazePowerTask(BaseTask):
     def _post_init(self):
         with open(r"tasks/config/trailblaze_power.toml", "rb") as tf:

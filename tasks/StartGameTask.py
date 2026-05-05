@@ -1,12 +1,12 @@
 from pathlib import Path
 
-from SRACore.task import BaseTask
+from SRACore.task import BaseTask, task
 from SRACore.util import sys_util, encryption
 from SRACore.util.errors import SRAError, ErrorCode
 from SRACore.util.logger import logger
 from tasks.img import IMG, SGIMG
 
-
+@task(order=0)
 class StartGameTask(BaseTask):
     def run(self):
         logger.info("启动游戏任务开始")

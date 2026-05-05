@@ -1,9 +1,9 @@
-from SRACore.task import BaseTask
+from SRACore.task import BaseTask, task
 from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
 from tasks.img import DUIMG, IMG, RRIMG
 
-
+@task(order=2)
 class ReceiveRewardsTask(BaseTask):
     def _post_init(self):
         self.config_name=self.config.get('Name', 'unknown')

@@ -1,12 +1,12 @@
 import os
-
-from SRACore.task import BaseTask
+from SRACore.task import BaseTask, task
 from SRACore.util import notify, sys_util
 from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
 from tasks.img import IMG, MAIMG
 
 
+@task(order=4)
 class MissionAccomplishTask(BaseTask):
     def run(self):
         if self.config["AfterLogout"]:

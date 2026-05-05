@@ -1,8 +1,8 @@
-from SRACore.task import BaseTask
+from SRACore.task import BaseTask, task
 from SRACore.util.logger import logger
 from tasks.currency_wars.characters import Characters
 
-
+@task(order=3)
 class CosmicStrifeTask(BaseTask):
     def run(self):
         """主任务执行函数"""
