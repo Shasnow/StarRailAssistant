@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 # 基础的常量定义
-VERSION = "2.13.0"  # 版本号
+VERSION = "2.14.0-beta.1"  # 版本号
 CORE = f"{VERSION} on {sys.platform}"  # 核心版本信息
 
 AppRootDir = Path(__file__).parent.parent.parent.absolute()
