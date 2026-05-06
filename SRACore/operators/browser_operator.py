@@ -48,32 +48,19 @@ class BrowserOperator(IOperator):
         self.driver.set_window_size(1936, 1162)  # 1920x1080 + 边框
 
     def login(self, account, password):
-        wait = WebDriverWait(self.driver, 60)
         if not CacheDir.exists():
             CacheDir.mkdir()
         cookies_path = CacheDir / f"{account}_cookies.json"
-        if cookies_path.exists():
-            self.driver.delete_all_cookies()
-            with open(cookies_path, "r") as f:
-                cookies = json.load(f)
-            for cookie in cookies:
-                self.driver.add_cookie(cookie)
-        else:
-            wait.until(expected_conditions.presence_of_element_located((By.TAG_NAME, "iframe")))
-            self.driver.switch_to.frame("mihoyo-login-platform-iframe")
-            login_with_passwd = self.driver.find_element(By.ID, "tab-password")
-            login_with_passwd.click()
-            username = self.driver.find_element(By.ID, "username")
-            passwd = self.driver.find_element(By.ID, "password")
-            username.send_keys(account)
-            passwd.send_keys(password)
-            read_checkbox = self.driver.find_element(By.XPATH, '//*[@id="app"]/div/div/form/label/span[1]')
-            read_checkbox.click()
-            login_button = self.driver.find_element(By.XPATH, '//*[@id="app"]/div/div/form/button')
-            login_button.click()
-            self.driver.switch_to.default_content()
-        wait.until(expected_conditions.presence_of_element_located(
-            (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div[1]/div/div[2]/div[2]')))  # 等待开始游戏按钮出现
+        start_btn_xpath = '//*[@id="app"]/div[1]/div[3]/div[1]/div/div[2]/div[2]'
+
+        logged_in = self._try_cookie_login(cookies_path, start_btn_xpath)
+        if not logged_in:
+            logged_in = self._password_login(account, password, start_btn_xpath)
+
+        if not logged_in:
+            logger.error("登录失败")
+            return -1
+
         self.save_cookies(cookies_path)
         self.load_initial_local_storage()
         try:
@@ -91,6 +78,46 @@ class BrowserOperator(IOperator):
             return 1
         else:
             return -1
+
+    def _try_cookie_login(self, cookies_path, start_btn_xpath) -> bool:
+        if not cookies_path.exists():
+            return False
+        try:
+            self.driver.delete_all_cookies()
+            with open(cookies_path, "r") as f:
+                cookies = json.load(f)
+            for cookie in cookies:
+                self.driver.add_cookie(cookie)
+            self.driver.refresh()
+            WebDriverWait(self.driver, 10).until(
+                expected_conditions.presence_of_element_located((By.XPATH, start_btn_xpath)))
+            logger.info("Cookie 登录成功")
+            return True
+        except Exception as e:
+            logger.warning(f"Cookie 已失效，将使用账号密码重新登录: {e}")
+            cookies_path.unlink(missing_ok=True)
+            self.driver.refresh()
+            return False
+
+    def _password_login(self, account, password, start_btn_xpath) -> bool:
+        logger.info("使用账号密码登录...")
+        try:
+            wait = WebDriverWait(self.driver, 60)
+            wait.until(expected_conditions.presence_of_element_located((By.TAG_NAME, "iframe")))
+            self.driver.switch_to.frame("mihoyo-login-platform-iframe")
+            self.driver.find_element(By.ID, "tab-password").click()
+            username = self.driver.find_element(By.ID, "username")
+            passwd = self.driver.find_element(By.ID, "password")
+            username.send_keys(account)
+            passwd.send_keys(password)
+            self.driver.find_element(By.XPATH, '//*[@id="app"]/div/div/form/label/span[1]').click()
+            self.driver.find_element(By.XPATH, '//*[@id="app"]/div/div/form/button').click()
+            self.driver.switch_to.default_content()
+            wait.until(expected_conditions.presence_of_element_located((By.XPATH, start_btn_xpath)))
+            return True
+        except Exception as e:
+            logger.error(f"账号密码登录失败: {e}")
+            return False
 
     def save_cookies(self, path):
         cookies = self.driver.get_cookies()
