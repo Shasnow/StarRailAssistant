@@ -34,6 +34,8 @@ class StartGameTask(BaseTask):
             SGIMG.RESTART_FOR_UPDATE
         ], timeout=120, interval=2)
         if res == 0:
+            if self.operator.type == "Browser":
+                self.operator.change_auto_battle(self, True)  # 云游戏需要在进入游戏后切换自动战斗模式
             return True
         elif res == 1:
             # 领取月卡

@@ -85,6 +85,7 @@ public class RegistryService(
     {
         SetResolutionForServer(RegistryConfig.CnGameRegPath);
         SetResolutionForServer(RegistryConfig.GlobalGameRegPath);
+        SetAutoBattleSettings(true, true);
     }
 
     /// <summary>
@@ -92,8 +93,41 @@ public class RegistryService(
     /// </summary>
     public void RestoreUserPcResolution()
     {
+        if (!cacheService.Cache.IsGameResolutionChanged) return;
         RestoreResolutionForServer(RegistryConfig.CnGameRegPath);
         RestoreResolutionForServer(RegistryConfig.GlobalGameRegPath);
+    }
+
+    private void SetAutoBattleSettings(bool isEnabled, bool isSaveSpeed)
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            logger.LogWarning(MsgUnsupportedOs);
+            return;
+        }
+
+        try
+        {
+            using var key = OpenWritableKey(RegistryConfig.CnGameRegPath);
+            if (key == null)
+            {
+                logger.LogError(MsgRegKeyNotFound, RegistryConfig.CnGameRegPath);
+                return;
+            }
+
+            key.SetValue(RegistryConfig.OtherSettingsAutoBattleOpen, isEnabled ? 1 : 0, RegistryValueKind.DWord);
+            key.SetValue(RegistryConfig.OtherSettingsIsSaveBattleSpeed, isSaveSpeed ? 1 : 0, RegistryValueKind.DWord);
+
+            logger.LogInformation("Set auto battle settings: Enabled={Enabled}, SaveSpeed={SaveSpeed}", isEnabled, isSaveSpeed);
+        }
+        catch (SecurityException ex)
+        {
+            logger.LogError(ex, MsgAccessDenied);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to set auto battle settings");
+        }
     }
 
     /// <summary>
@@ -155,8 +189,6 @@ public class RegistryService(
     /// </summary>
     private void RestoreResolutionForServer(string regPath)
     {
-        if (!cacheService.Cache.IsGameResolutionChanged) return;
-
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             logger.LogWarning(MsgUnsupportedOs);
@@ -270,7 +302,11 @@ public class RegistryService(
         public const string ScreenManagerResolutionWidth = "Screenmanager Resolution Width_h182942802";
         public const string ScreenManagerResolutionHeight = "Screenmanager Resolution Height_h2627697771";
         public const string ScreenManagerFullscreenMode = "Screenmanager Fullscreen mode_h3630240806";
-
+        
+        // 自动战斗设置键
+        public const string OtherSettingsAutoBattleOpen = "OtherSettings_AutoBattleOpen_h1164514826";
+        public const string OtherSettingsIsSaveBattleSpeed = "OtherSettings_IsSaveBattleSpeed_h3606297293";
+        
         // 游戏安装路径搜索列表
         public static readonly string[] GameInstallPathKeys =
         [

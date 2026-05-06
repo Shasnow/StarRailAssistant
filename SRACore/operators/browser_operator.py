@@ -1,5 +1,4 @@
 import json
-import os
 import threading
 import time
 from io import BytesIO
@@ -224,6 +223,34 @@ class BrowserOperator(IOperator):
         except Exception as e:
             logger.error(f"等待排队异常: {e}")
         return False
+
+    def change_auto_battle(self, status: bool) -> None:
+        """从 local storage 中读取并修改 auto battle"""
+        ls = json.loads(self.driver.execute_script("return JSON.stringify(localStorage)"))
+        cloud = json.loads(ls.get("cg_hkrpg_cn_cloudData", "{}"))
+        cloud.setdefault("value", {})
+        save = json.loads(cloud["value"].get("RPGCloudSave", "{}") or "{}")
+        int_dicts = save.get("IntDicts", {})
+
+        int_dicts["OtherSettings_AutoBattleOpen"] = int(status)
+        logger.debug(f"设置自动战斗为 {'开启' if status else '关闭'}")
+        int_dicts["OtherSettings_IsSaveBattleSpeed"] = int(status)
+        logger.debug(f"设置自动战斗状态为 {'保存' if status else '不保存'}")
+
+        # 如果存在 App_LastUserID，添加 User_{UID}_SpeedUpOpen 配置
+        uid = int_dicts.get("App_LastUserID")
+        if uid:
+            int_dicts[f"User_{uid}_SpeedUpOpen"] = int(status)
+            logger.debug(f"设置战斗二倍速为 {'开启' if status else '关闭'}")
+        else:
+            logger.debug("未检测到 UID，跳过设置战斗二倍速")
+
+        save["IntDicts"] = int_dicts
+        cloud["value"]["RPGCloudSave"] = json.dumps(save)
+        ls["cg_hkrpg_cn_cloudData"] = json.dumps(cloud)
+
+        for k, v in ls.items():
+            self.driver.execute_script(f"localStorage.setItem('{k}', arguments[0]);", v)
 
     def is_window_active(self) -> bool:
         return True
