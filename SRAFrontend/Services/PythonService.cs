@@ -301,7 +301,7 @@ public class PythonService(ILogger<PythonService> logger, IHttpClientFactory htt
         return (missing, mismatched);
     }
 
-    private List<PackageInfo> ParseRequirements()
+    private static List<PackageInfo> ParseRequirements()
     {
         var packages = new List<PackageInfo>();
         if (!File.Exists(RequirementsTxt))

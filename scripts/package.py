@@ -84,7 +84,6 @@ def nuitka_build(version: str):
 def copy_core_resources(dist: Path):
     print("正在复制资源文件 ...")
     dist.mkdir(parents=True, exist_ok=True)
-    (dist / "SRACore").mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT_PATH / "LICENSE", dist / "LICENSE")
     shutil.copy2(ROOT_PATH / "README.md", dist / "README.md")
     shutil.copy2(ROOT_PATH / "requirements.txt", dist / "requirements.txt")
