@@ -123,77 +123,120 @@ class TrailblazePowerTask(BaseTask):
                     break
 
     def detect_tasks(self) -> list[tuple[TrailblazePowerFunc, dict[str, int]]] | None:
-        """
-        识别体力值并计算可执行的任务列表
-        返回：任务列表（格式：[(任务对象, {"level": 等级, "single_time": 单次次数, "run_time": 执行轮数})]）
-        失败返回None
+        """识别体力值，计算并返回可执行的任务列表。
+
+        流程：
+            1. 跳转到生存索引页面
+            2. OCR 识别当前开拓力
+            3. 根据体力按比例分配各任务的执行次数
+            4. 将执行次数转换为可执行的任务列表
+
+        Returns:
+            任务列表，每项为 (任务函数, 参数字典)，失败返回 None。
         """
         if not self.goto_survival_index():
             logger.error(SRAError(ErrorCode.GO_TO_SURVIVAL_INDEX_FAILED, "跳转到生存索引页面失败"))
             return None
-        self.operator.sleep(0.5)  # 等待页面加载
+        self.operator.sleep(0.5)
+
+        # OCR 识别开拓力，向下取整到 10 的倍数（最低消耗单位）
+        current_tbp = self._ocr_power()
+        if current_tbp is None:
+            return None
+        ava_current_tbp = (current_tbp // 10) * 10
+        if ava_current_tbp <= 0:
+            logger.warning(SRAError(ErrorCode.NO_POWER, "当前体力为0，无任务可执行"))
+            return None
+
+        if not self.auto_detect_tasks:
+            logger.warning(SRAError(ErrorCode.NO_BUILD_TARGET, "未识别到可执行任务"))
+            return None
+
+        # 根据体力分配各任务执行次数，再转换为实际任务列表
+        tasks_times = self._calc_task_times(ava_current_tbp)
+        return self._build_task_list(tasks_times)
+
+    def _ocr_power(self) -> int | None:
+        """OCR 识别页面上的体力值区域。
+
+        识别结果依次为：后备开拓力、当前开拓力、沉浸器。
+        返回当前开拓力，识别失败返回 None。
+        """
         try:
-            # OCR识别体力值并过滤无效字符
             res = self.operator.ocr(from_x=0.65625, from_y=0.0417, to_x=0.908, to_y=0.076)
             if not res:
                 logger.error(SRAError(ErrorCode.OCR_RECOGNITION_FAILED, "OCR识别结果为空"))
-                self.operator.press_key("esc")
                 return None
-            # 过滤加号（兼容全角/空格变体）+ 空字符串
+            # 过滤 OCR 噪音字符（+、十、满），保留有效数字
             exclude_chars = {'+', '十', '满'}
             valid_res: list[str] = [r[1] for r in res if r[1] not in exclude_chars]
-            reserve_tbp = int(valid_res[0].replace('满', ''))  # 后备开拓力，替换可能的错误字符
+            reserve_tbp = int(valid_res[0].replace('满', ''))
+            # "当前/上限" 格式只取斜杠前的部分
             current_tbp_str = valid_res[1].split('/')[0] if '/' in valid_res[1] else valid_res[1]
             current_tbp = int(current_tbp_str)
             immersion_dev_str = valid_res[2].split('/')[0] if '/' in valid_res[2] else valid_res[2]
             immersion_dev = int(immersion_dev_str)
         except (ValueError, IndexError) as e:
             logger.error(SRAError(ErrorCode.POWER_DETECTION_FAILED, "识别到的体力值格式错误", str(e)))
-            self.operator.press_key("esc")
             return None
 
         logger.info(f"当前后备开拓力: {reserve_tbp}, 当前开拓力: {current_tbp}, 沉浸器: {immersion_dev}")
-        # 计算可用体力, 向下取整到10的倍数，且确保大于0
-        ava_current_tbp = (current_tbp // 10) * 10
-        if ava_current_tbp <= 0:
-            logger.warning(SRAError(ErrorCode.NO_POWER, "当前体力为0，无任务可执行"))
-            return None
-        # 计算每个任务的可执行次数
-        valid_auto_tasks = self.auto_detect_tasks
-        if not valid_auto_tasks:
-            logger.warning(SRAError(ErrorCode.NO_BUILD_TARGET, "未识别到可执行任务"))
-            return None
+        return current_tbp
 
-        tasks_count = len(valid_auto_tasks)
-        task_cost_list = [self.get_cost_by_id(task["Id"]) for task in valid_auto_tasks]  # 获取任务体力消耗列表
+    def _calc_task_times(self, available_power: int) -> list[int]:
+        """根据可用体力计算每个自动任务的执行次数。
+
+        分配策略：
+            1. 按所有任务总消耗做等分，得到基础次数
+            2. 剩余体力从小消耗任务开始逐个追加，优先让低消耗任务多跑
+
+        Args:
+            available_power: 可用体力值（已取整到 10 的倍数）
+
+        Returns:
+            与 auto_detect_tasks 等长的执行次数列表。
+        """
+        tasks_count = len(self.auto_detect_tasks)
+        task_cost_list = [self.get_cost_by_id(task["Id"]) for task in self.auto_detect_tasks]
         sum_cost = sum(task_cost_list)
         min_cost = min(task_cost_list)
-        base = ava_current_tbp // sum_cost  # 基础可执行次数
-        remain = ava_current_tbp % sum_cost  # 剩余体力
+        base = available_power // sum_cost
+        remain = available_power % sum_cost
         logger.info(f"每个任务基础可执行次数: {base}, 剩余体力: {remain}")
-        tasks_times = [base for _ in range(tasks_count)]  # 初始化每个任务的执行次数列表
-        # 分配剩余体力
-        # 将任务按体力升序排序，保留原始索引 (体力值, 原索引)
+
+        tasks_times = [base for _ in range(tasks_count)]
+        # 按体力消耗升序排列，保留原始索引，优先分配给低消耗任务
         sorted_tasks = sorted((val, idx) for idx, val in enumerate(task_cost_list))
-        # 分配剩余体力：小体力任务优先，尽可能多分配
         while remain >= min_cost:
             for val, idx in sorted_tasks:
                 if remain >= val:
                     tasks_times[idx] += 1
                     remain -= val
-                # 剩余体力不足，直接退出
                 if remain < min_cost:
                     break
+        return tasks_times
 
-        # 生成最终任务列表
+    def _build_task_list(self, tasks_times: list[int]) -> list[tuple[TrailblazePowerFunc, dict[str, int]]] | None:
+        """将执行次数列表转换为可调度的任务列表。
+
+        单次执行有上限（max_count），超出部分拆分为多次任务。
+        例如：需执行 7 次，max_count=5 → 拆为 5+2 两条任务。
+
+        Args:
+            tasks_times: 与 auto_detect_tasks 等长的执行次数列表
+
+        Returns:
+            任务列表，每项为 (任务函数, 参数字典)，无有效任务返回 None。
+        """
         tasks = []
-        for i, item in enumerate(valid_auto_tasks):
+        for i, item in enumerate(self.auto_detect_tasks):
             task_func = self.get_task_by_id(item["Id"])
             run_time = tasks_times[i]
             logger.info(f"任务 {item['Name']} ({item['Level']}) 将执行 {run_time} 次")
             if run_time == 0:
-                continue  # 跳过执行次数为0的任务
+                continue
             max_single_time = self.get_max_count_by_id(item["Id"])
+            # 按单次上限拆分为多轮执行
             while run_time > 0:
                 single_time = min(run_time, max_single_time)
                 tasks.append((
