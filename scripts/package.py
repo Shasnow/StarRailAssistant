@@ -38,7 +38,7 @@ def add_to_zip(zipf: ZipFile, path: Path, base_path: Path = None):
     if base_path is None:
         base_path = path.parent
     if not path.exists():
-        print(f"  [WARN] 跳过不存在的路径: {path}")
+        print(f"  [WARN] Skipping non-existent path: {path}")
         return
     if path.is_file():
         zipf.write(path, path.relative_to(base_path))
@@ -56,7 +56,7 @@ def copy_json_tree(src: Path, dst: Path):
 
 def nuitka_build(version: str):
     file_version = version.split("-")[0]
-    print("正在编译 Python 程序 (Nuitka) ...")
+    print("Building Python program with Nuitka ...")
     cmd = [
         sys.executable, "-m", "nuitka",
         "--standalone", "--mingw64",
@@ -76,13 +76,13 @@ def nuitka_build(version: str):
     ]
     result = subprocess.run(cmd, cwd=ROOT_PATH)
     if result.returncode != 0:
-        print(f"[ERROR] Nuitka 编译失败 (exit code: {result.returncode})")
+        print(f"[ERROR] Nuitka build failed (exit code: {result.returncode})")
         sys.exit(1)
-    print("[OK] Python 程序编译完成")
+    print("[OK] Python program built successfully")
 
 
 def copy_core_resources(dist: Path):
-    print("正在复制资源文件 ...")
+    print("Copying resources ...")
     dist.mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT_PATH / "LICENSE", dist / "LICENSE")
     shutil.copy2(ROOT_PATH / "README.md", dist / "README.md")
@@ -92,31 +92,31 @@ def copy_core_resources(dist: Path):
     shutil.copytree(ROOT_PATH / "resources", dist / "resources")
     shutil.copytree(ROOT_PATH / "rapidocr_onnxruntime", dist / "rapidocr_onnxruntime")
     shutil.copytree(ROOT_PATH / "tasks", dist / "tasks")
-    print("[OK] 资源文件复制完成")
+    print("[OK] Resources copied")
 
 
 def package_core(version: str):
-    print("正在打包 Core 包 ...")
+    print("Packaging Core ...")
     core_zip_path = ROOT_PATH / f"StarRailAssistant_Core_v{version}.zip"
     with ZipFile(core_zip_path, "w", compression=ZIP_DEFLATED) as zipf:
         for item in DIST_DIR.iterdir():
             add_to_zip(zipf, item)
-    print(f"[OK] Core 包: {core_zip_path.name}")
+    print(f"[OK] Core package: {core_zip_path.name}")
 
 
 def package_code(version: str):
-    print("正在打包 Code 包 ...")
+    print("Packaging Code ...")
     code_zip_path = ROOT_PATH / f"StarRailAssistant_Code_v{version}.zip"
     with ZipFile(code_zip_path, "w", compression=ZIP_DEFLATED) as zipf:
         for item in ["SRACore", "tasks", "resources"]:
             add_to_zip(zipf, ROOT_PATH / item)
         for file in ["main.py", "README.md", "LICENSE", "requirements.txt"]:
             add_to_zip(zipf, ROOT_PATH / file)
-    print(f"[OK] Code 包: {code_zip_path.name}")
+    print(f"[OK] Code package: {code_zip_path.name}")
 
 
 def package_lite(version: str):
-    print("正在打包 Lite 包 ...")
+    print("Packaging Lite ...")
     lite_zip_path = ROOT_PATH / f"StarRailAssistant_Lite_v{version}.zip"
     with ZipFile(lite_zip_path, "w", compression=ZIP_DEFLATED) as zipf:
         for file in WIN_X64_PUBLISH_PATH.iterdir():
@@ -125,17 +125,17 @@ def package_lite(version: str):
             add_to_zip(zipf, ROOT_PATH / item)
         for file in ["main.py", "README.md", "LICENSE", "requirements.txt"]:
             add_to_zip(zipf, ROOT_PATH / file)
-    print(f"[OK] Lite 包: {lite_zip_path.name}")
+    print(f"[OK] Lite package: {lite_zip_path.name}")
 
 
 def package_full(version: str):
     shutil.copytree(WIN_X64_PUBLISH_PATH, DIST_DIR, dirs_exist_ok=True)
-    print("正在打包 Full 包 ...")
+    print("Packaging Full ...")
     full_zip_path = ROOT_PATH / f"StarRailAssistant_v{version}.zip"
     with ZipFile(full_zip_path, "w", compression=ZIP_DEFLATED) as zipf:
         for file in DIST_DIR.iterdir():
             add_to_zip(zipf, file)
-    print(f"[OK] Full 包: {full_zip_path.name}")
+    print(f"[OK] Full package: {full_zip_path.name}")
 
 
 if __name__ == "__main__":
@@ -158,4 +158,4 @@ if __name__ == "__main__":
         shutil.rmtree(DIST_DIR)
 
     (ROOT_PATH / "version_info.txt").write_text(f"v{version}\n\n{changelog}", encoding="utf-8")
-    print(f"\n打包完成! 版本: v{version}")
+    print(f"\nPackaging completed! Version: v{version}")
