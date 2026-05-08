@@ -26,7 +26,7 @@ public partial class Config : ObservableObject
     [ObservableProperty] private int _dUMode; // 模拟宇宙模式选择
     [ObservableProperty] private int _dUPolicy; // 0=每次任务次数 1=每周总上限+每日尝试 2=刷满周期(OCR)+每日尝试
     [ObservableProperty] private int _dURunTimes = 1; // 策略1：每次任务次数；策略2/3：自然日内每日最多尝试次数
-    [ObservableProperty] private int _dUWeeklyTotalCap = 9999; // 策略2：ISO 周内累计执行上限（达到则跳过）
+    [ObservableProperty] private int _dUWeeklyTotalCap = 20; // 策略2：ISO 周内累计执行上限（达到则跳过）
     [ObservableProperty] private bool _dUUseTechnique; // 差分宇宙是否使用秘技
     [ObservableProperty] private bool _currencyWarsEnable; // 是否启用货币战争任务
     /// <summary>0=刷等级,1=刷开局</summary>
@@ -39,7 +39,7 @@ public partial class Config : ObservableObject
     [ObservableProperty] private int _currencyWarsStrategyIndex;
     [ObservableProperty] private int _currencyWarsPolicy; // 0=每次任务局数 1=每周总上限+每日尝试 2=刷满周期(OCR)+每日尝试
     [ObservableProperty] private int _currencyWarsRunTimes = 1; // 策略1：每次任务局数；策略2/3：自然日内每日最多尝试局数
-    [ObservableProperty] private int _currencyWarsWeeklyTotalCap = 9999; // 策略2：ISO 周内累计局数上限
+    [ObservableProperty] private int _currencyWarsWeeklyTotalCap = 3; // 策略2：ISO 周内累计局数上限
     [ObservableProperty] private string _currencyWarsUsername = ""; // 货币战争用户名
     [ObservableProperty] private int _currencyWarsDifficulty; // 货币战争难度：0=最低难度，1=最高难度，2=当前难度（不切换难度）
     
