@@ -8,80 +8,28 @@ from tasks.img import DUIMG, IMG
 
 
 class DifferentialUniverse(Executable):
-    def __init__(
-        self,
-        operator,
-        run_times: int,
-        use_technique: bool,
-        *,
-        on_run_completed: Callable[[], None] | None = None,
-    ):
+    def __init__(self, operator, run_times: int, use_technique: bool):
         super().__init__(operator)
         self.run_times = run_times
         self.use_technique = use_technique
-        self._on_run_completed = on_run_completed
 
     def run(self):
         """主任务执行函数"""
         logger.info("执行任务：差分宇宙-周期演算")
 
-        completed = 0
-        target = self.run_times
-        consecutive_failures = 0
-        max_consecutive_failures = 5
-        while completed < target:
+        for exe_time in range(self.run_times):
             if not self.page_locate():
-                consecutive_failures += 1
-                logger.warning(f"[差分宇宙] 页面定位失败，不消耗本轮次，将重试... ({consecutive_failures}/{max_consecutive_failures})")
-                if consecutive_failures >= max_consecutive_failures:
-                    logger.error("[差分宇宙] 连续失败次数达到上限，终止任务")
-                    return False
-                self.operator.sleep(1.0)
-                continue
-            if not self._start_differential_universe(completed):
-                consecutive_failures += 1
-                logger.warning(f"[差分宇宙] 进入流程失败，不消耗本轮次，将重试... ({consecutive_failures}/{max_consecutive_failures})")
-                if consecutive_failures >= max_consecutive_failures:
-                    logger.error("[差分宇宙] 连续失败次数达到上限，终止任务")
-                    return False
-                self.operator.sleep(1.0)
-                continue
+                return False
+            if not self._start_differential_universe(exe_time):
+                return False
             if not self.select():
-                consecutive_failures += 1
-                logger.warning(f"[差分宇宙] 选择流程失败，不消耗本轮次，将重试... ({consecutive_failures}/{max_consecutive_failures})")
-                if consecutive_failures >= max_consecutive_failures:
-                    logger.error("[差分宇宙] 连续失败次数达到上限，终止任务")
-                    return False
-                self.operator.sleep(1.0)
-                continue
+                return False
             if not self._navigate_and_fight():
-                consecutive_failures += 1
-                logger.warning(f"[差分宇宙] 战斗或移动失败，不消耗本轮次，将重试... ({consecutive_failures}/{max_consecutive_failures})")
-                if consecutive_failures >= max_consecutive_failures:
-                    logger.error("[差分宇宙] 连续失败次数达到上限，终止任务")
-                    return False
-                self.operator.sleep(1.0)
-                continue
+                return False
             if not self.select():
-                consecutive_failures += 1
-                logger.warning(f"[差分宇宙] 选择流程失败，不消耗本轮次，将重试... ({consecutive_failures}/{max_consecutive_failures})")
-                if consecutive_failures >= max_consecutive_failures:
-                    logger.error("[差分宇宙] 连续失败次数达到上限，终止任务")
-                    return False
-                self.operator.sleep(1.0)
-                continue
+                return False
             if not self._complete_mission():
-                consecutive_failures += 1
-                logger.warning(f"[差分宇宙] 结算失败，不消耗本轮次，将重试... ({consecutive_failures}/{max_consecutive_failures})")
-                if consecutive_failures >= max_consecutive_failures:
-                    logger.error("[差分宇宙] 连续失败次数达到上限，终止任务")
-                    return False
-                self.operator.sleep(1.0)
-                continue
-            if self._on_run_completed is not None:
-                self._on_run_completed()
-            completed += 1
-            consecutive_failures = 0
+                return False
 
         self._return_to_main_menu()
         logger.info("Mission accomplished")
