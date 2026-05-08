@@ -1,5 +1,6 @@
 import enum
 import json
+from collections.abc import Callable
 from typing import Any
 
 from loguru import logger
@@ -26,9 +27,16 @@ class CurrencyWarsPage(enum.IntEnum):
 
 
 class CurrencyWars(Executable):
-    def __init__(self, operator, runtimes):
+    def __init__(
+        self,
+        operator,
+        runtimes,
+        *,
+        on_run_completed: Callable[[], None] | None = None,
+    ):
         super().__init__(operator)
         self.runtimes = runtimes
+        self._on_run_completed = on_run_completed
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
         self.difficulty: int = Difficulty.LOWEST
@@ -81,13 +89,32 @@ class CurrencyWars(Executable):
         self.is_running = True
         if self.runtimes == 0:
             return True
-        for i in range(self.runtimes):
+        completed = 0
+        target = self.runtimes
+        consecutive_start_failures = 0
+        max_consecutive_start_failures = 5
+        while completed < target:
             if not self.is_running:
                 break
-            logger.info(f"第{i + 1}次进入货币战争，剩余{self.runtimes - i - 1}次")
+            remaining = target - completed
+            logger.info(f"第{completed + 1}/{target}局（剩余可完成 {remaining} 局）")
             try:
                 if self.start_game():
                     self.game_loop()
+                    if self._on_run_completed is not None:
+                        self._on_run_completed()
+                    completed += 1
+                    consecutive_start_failures = 0
+                else:
+                    consecutive_start_failures += 1
+                    logger.warning(
+                        f"[货币战争] 对局启动失败，不消耗局数，将重新尝试... "
+                        f"({consecutive_start_failures}/{max_consecutive_start_failures})"
+                    )
+                    if consecutive_start_failures >= max_consecutive_start_failures:
+                        logger.error("[货币战争] 连续启动失败次数达到上限，终止任务")
+                        return False
+                    self.operator.sleep(1.0)
             except Exception as e:
                 logger.error(e)
                 return False
