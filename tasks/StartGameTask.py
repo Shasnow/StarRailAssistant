@@ -131,8 +131,8 @@ class StartGameTask(BaseTask):
 
     def login(self):
         if hasattr(self.operator, 'driver'):
-            user = encryption.win_decryptor(self.config['StartGameUsername'])
-            passwd = encryption.win_decryptor(self.config['StartGamePassword'])
+            user = encryption.decryptor(self.config['StartGameUsername'])
+            passwd = encryption.decryptor(self.config['StartGamePassword'])
             return self.operator.login(user, passwd)
         channel = None
         match self.config['StartGameChannel']:
@@ -171,8 +171,8 @@ class StartGameTask(BaseTask):
         self.operator.click_img(SGIMG.LOGIN_OTHER % channel, after_sleep=1)
         self.operator.click_img(SGIMG.LOGIN_WITH_ACCOUNT % channel, after_sleep=1)
         if self.config['StartGameAutoLogin']:
-            user = encryption.win_decryptor(self.config['StartGameUsername'])
-            passwd = encryption.win_decryptor(self.config['StartGamePassword'])
+            user = encryption.decryptor(self.config['StartGameUsername'])
+            passwd = encryption.decryptor(self.config['StartGamePassword'])
             if user == "" or passwd == "":
                 logger.error(SRAError(ErrorCode.INVALID_INPUT, "自动登录账号或密码未设置", "请检查配置中的自动登录账号和密码"))
                 return -1
