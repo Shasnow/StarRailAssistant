@@ -277,7 +277,7 @@ def send_mail_notification(title: str | dict = "SRA", message: str | dict[str, A
     port = config.get("email.smtpPort", 465)
     sender = config.get("email.smtpSender", "")
     auth_code = config.get("email.smtpAuthCode", "")
-    password = encryption.win_decryptor(auth_code) if auth_code else ""
+    password = encryption.decryptor(auth_code) if auth_code else ""
     receiver = config.get("email.smtpReceiver", "")
     send_mail(mail_title, "SRA通知", mail_message, SMTP, port, sender, password, receiver)
 
