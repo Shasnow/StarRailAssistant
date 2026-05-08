@@ -22,19 +22,26 @@ public partial class TaskPageViewModel : PageViewModel
     private readonly ConfigService _configService;
     private readonly CommonModel _commonModel;
 
-    [ObservableProperty] private Config _currentConfig;
-
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CosmicStrifeConfig), nameof(MissionAccomplishedConfig), nameof(ReceiveRewardsConfig), nameof(StartGameConfig), nameof(TrailblazePowerConfig))]
+    private TasksConfig _currentConfig;
+    public CosmicStrifeConfig CosmicStrifeConfig => CurrentConfig.CosmicStrife;
+    public MissionAccomplishedConfig MissionAccomplishedConfig => CurrentConfig.MissionAccomplished;
+    public ReceiveRewardsConfig ReceiveRewardsConfig => CurrentConfig.ReceiveRewards;
+    public StartGameConfig StartGameConfig => CurrentConfig.StartGame;
+    public TrailblazePowerConfig TrailblazePowerConfig => CurrentConfig.TrailblazePower;
+    
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(EnableContextMenu))]
     private object? _selectedTaskItem;
 
     public int CurrencyWarsStrategyIndex
     {
-        get => CurrentConfig.CurrencyWarsStrategyIndex;
+        get => CosmicStrifeConfig.CurrencyWarsStrategyIndex;
         set
         {
-            CurrentConfig.CurrencyWarsStrategyIndex = value;
+            CosmicStrifeConfig.CurrencyWarsStrategyIndex = value;
             OnPropertyChanged();
-            CurrentConfig.CurrencyWarsStrategy = Cache.Strategies.ElementAtOrDefault(value)?.FileName ?? "";
+            CosmicStrifeConfig.CurrencyWarsStrategy = Cache.Strategies.ElementAtOrDefault(value)?.FileName ?? "";
         }
     }
 
@@ -49,13 +56,13 @@ public partial class TaskPageViewModel : PageViewModel
         _commonModel = commonModel;
         _configService = configService;
         _cacheService = cacheService;
-        CurrentConfig = _configService.Config!;
+        CurrentConfig = _configService.TaskConfig!;
 
         void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)
         {
             if (args.PropertyName != nameof(Cache.CurrentConfigIndex)) return;
             _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.CurrentConfigIndex]);
-            CurrentConfig = _configService.Config!;
+            CurrentConfig = _configService.TaskConfig!;
         }
 
         _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
@@ -246,15 +253,15 @@ public partial class TaskPageViewModel : PageViewModel
 
     public int CurrencyWarsModeIndex
     {
-        get => CurrentConfig.CurrencyWarsMode;
+        get => CosmicStrifeConfig.CurrencyWarsMode;
         set
         {
-            CurrentConfig.CurrencyWarsMode = value;
+            CosmicStrifeConfig.CurrencyWarsMode = value;
             OnPropertyChanged(nameof(IsCwNormalMode));
         }
     }
 
-    public bool IsCwNormalMode => CurrentConfig.CurrencyWarsMode != 2;
+    public bool IsCwNormalMode => CosmicStrifeConfig.CurrencyWarsMode != 2;
 
     public Cache Cache => _cacheService.Cache;
 
@@ -294,13 +301,13 @@ public partial class TaskPageViewModel : PageViewModel
         if (TopLevelObject is null) return;
         var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
         if (files.Count == 0) return;
-        CurrentConfig.StartGamePath = files[0].Path.LocalPath;
+        StartGameConfig.GamePath = files[0].Path.LocalPath;
     }
 
     [RelayCommand]
     private void DeleteSelectedTaskItem()
     {
-        if (SelectedTaskItem is TrailblazePowerTaskItem item) CurrentConfig.TrailblazePowerTaskList.Remove(item);
+        if (SelectedTaskItem is TrailblazePowerTaskItem item) TrailblazePowerConfig.TaskList.Remove(item);
     }
 
     private void AddTaskItem(TrailblazePowerTask task)
@@ -311,7 +318,7 @@ public partial class TaskPageViewModel : PageViewModel
             return;
         }
 
-        CurrentConfig.TrailblazePowerTaskList.Add(new TrailblazePowerTaskItem
+        TrailblazePowerConfig.TaskList.Add(new TrailblazePowerTaskItem
         {
             Name = task.Title,
             Id = task.Id,

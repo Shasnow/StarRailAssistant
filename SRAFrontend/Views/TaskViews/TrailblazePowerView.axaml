@@ -12,7 +12,7 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="清体力" IsChecked="{Binding CurrentConfig.EnabledTasks[1]}"/>
+                    <CheckBox Content="清体力" IsChecked="{Binding TrailblazePowerConfig.IsEnabled}"/>
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="TrailblazePowerTask"
@@ -26,13 +26,13 @@
                         <suki:GlassCard IsInteractive="True">
                             <StackPanel>
                                 <CheckBox
-                                    IsChecked="{Binding CurrentConfig.TrailblazePowerReplenishEnable}"
+                                    IsChecked="{Binding TrailblazePowerConfig.IsReplenishEnabled}"
                                     Content="补充体力" />
                                 <Grid
                                     ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="10">
                                     <Label Grid.Column="0" Content="使用" />
                                     <ComboBox Grid.Column="1"
-                                              SelectedIndex="{Binding CurrentConfig.TrailblazePowerReplenishWay}">
+                                              SelectedIndex="{Binding TrailblazePowerConfig.ReplenishWay}">
                                         <ComboBoxItem Content="后备开拓力" />
                                         <ComboBoxItem Content="燃料" />
                                         <ComboBoxItem Content="星琼" />
@@ -40,15 +40,15 @@
                                     <Label Grid.Column="2" Content="补充" />
                                     <NumericUpDown Grid.Column="3" Minimum="1" Maximum="99" FormatString="0"
                                                    Height="20"
-                                                   Value="{Binding CurrentConfig.TrailblazePowerReplenishTimes}" />
+                                                   Value="{Binding TrailblazePowerConfig.ReplenishTimes}" />
                                     <Label Grid.Column="4" Content="次" />
                                 </Grid>
 
                                 <ToggleSwitch
-                                    IsChecked="{Binding CurrentConfig.TrailblazePowerUseAssistant}"
+                                    IsChecked="{Binding TrailblazePowerConfig.IsUseAssistant}"
                                     OnContent="使用支援角色" />
                                 <ToggleSwitch
-                                    IsChecked="{Binding CurrentConfig.TrailblazePowerUseBuildTarget}"
+                                    IsChecked="{Binding TrailblazePowerConfig.IsUseBuildTarget}"
                                     OnContent="启用培养目标" />
                             </StackPanel>
                         </suki:GlassCard>
@@ -107,7 +107,7 @@
                 </ScrollViewer>
                 <suki:GlassCard Grid.Column="1">
                     <suki:GroupBox Header="任务清单">
-                        <ListBox ItemsSource="{Binding CurrentConfig.TrailblazePowerTaskList}"
+                        <ListBox ItemsSource="{Binding TrailblazePowerConfig.TaskList}"
                                  SelectedItem="{Binding SelectedTaskItem}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>

@@ -11,7 +11,7 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="旷宇纷争" IsChecked="{Binding CurrentConfig.EnabledTasks[3]}"/>
+                    <CheckBox Content="旷宇纷争" IsChecked="{Binding CosmicStrifeConfig.IsEnabled}"/>
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="CosmicStrifeTask"
@@ -23,31 +23,31 @@
                 <StackPanel Margin="10">
                     <suki:GlassCard>
                         <StackPanel>
-                            <CheckBox IsChecked="{Binding CurrentConfig.DUEnable}"
+                            <CheckBox IsChecked="{Binding CosmicStrifeConfig.IsDifferentialUniverseEnabled}"
                                       Content="差分宇宙 - 乐园漫记"/>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Label>模式</Label>
-                                <ComboBox SelectedIndex="{Binding CurrentConfig.DUMode}">
+                                <ComboBox SelectedIndex="{Binding CosmicStrifeConfig.DifferentialUniverseMode}">
                                     <ComboBoxItem>刷第一关</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="10">
                                 <Label>次数</Label>
-                                <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.DURunTimes}" Minimum="1" Maximum="99999" />
+                                <NumericUpDown FormatString="0" Value="{Binding CosmicStrifeConfig.DifferentialUniverseRuntimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
-                            <ToggleSwitch OnContent="秘技速刷" IsChecked="{Binding CurrentConfig.DUUseTechnique}" />
+                            <ToggleSwitch OnContent="秘技速刷" IsChecked="{Binding CosmicStrifeConfig.IsDifferentialUniverseUseTechnique}" />
                         </StackPanel>
                     </suki:GlassCard>
                     <TextBlock>请完成引导关卡I、引导关卡II，并清除所有新手提示</TextBlock>
                     <suki:GlassCard>
                         <StackPanel>
-                            <CheckBox IsChecked="{Binding CurrentConfig.CurrencyWarsEnable}"
+                            <CheckBox IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsEnabled}"
                                       Content="货币战争 - 零和博弈" />
                             <Grid ColumnDefinitions="Auto, Auto">
                                 <Label Content="开拓者名称 " />
                                 <TextBox Grid.Column="1"
                                          Width="200"
-                                         Text="{Binding CurrentConfig.CurrencyWarsUsername}"
+                                         Text="{Binding CosmicStrifeConfig.CurrencyWarsUsername}"
                                          Watermark="请输入开拓者角色名"/>
                             </Grid>
                             
@@ -61,7 +61,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Label>难度</Label>
-                                <ComboBox SelectedIndex="{Binding CurrentConfig.CurrencyWarsDifficulty}" Width="200">
+                                <ComboBox SelectedIndex="{Binding CosmicStrifeConfig.CurrencyWarsDifficulty}" Width="200">
                                     <ComboBoxItem>最低难度</ComboBoxItem>
                                     <ComboBoxItem>最高难度</ComboBoxItem>
                                     <ComboBoxItem>当前难度</ComboBoxItem>
@@ -84,7 +84,7 @@
 
                             <StackPanel Orientation="Horizontal" Spacing="10">
                                 <Label>运行次数</Label>
-                                <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.CurrencyWarsRunTimes}" Minimum="1" Maximum="99999" />
+                                <NumericUpDown FormatString="0" Value="{Binding CosmicStrifeConfig.CurrencyWarsRuntimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
                             
                             <Separator/>
@@ -96,28 +96,28 @@
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="Boss名称" />
                                     <TextBox Width="320"
-                                             Text="{Binding CurrentConfig.CwRsBossNames}"
+                                             Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollBossNames}"
                                              Watermark="例如：杰帕德;可可利亚;幻胧" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="Boss词条" />
                                     <TextBox Width="320"
-                                             Text="{Binding CurrentConfig.CwRsBossAffixes}"
+                                             Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollBossAffixes}"
                                              Watermark="例如：决战在即" />
                                 </StackPanel>
                                 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="投资环境" />
                                     <TextBox Width="320"
-                                             Text="{Binding CurrentConfig.CwRsInvestEnvironments}"
+                                             Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollInvestEnvironments}"
                                              Watermark="例如：长线利好 轮岗" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="投资策略" />
                                     <TextBox Width="320"
-                                             Text="{Binding CurrentConfig.CwRsInvestStrategies}"
+                                             Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollInvestStrategies}"
                                              Watermark="例如：砂里淘金" />
                                 </StackPanel>
                             </StackPanel>

@@ -6,26 +6,26 @@ from tasks.currency_wars.characters import Characters
 class CosmicStrifeTask(BaseTask):
     def run(self):
         """主任务执行函数"""
-        if self.config.get("DUEnable", False):
+        if self.config.CosmicStrife.isDifferentialUniverseEnabled:
             logger.info("执行任务：旷宇纷争-模拟宇宙")
             from tasks.differential_universe import DifferentialUniverse
             du_task = DifferentialUniverse(
                 self.operator,
-                self.config.get("DURunTimes", 0),
-                self.config.get("DUUseTechnique", False))
+                self.config.CosmicStrife.differentialUniverseRuntimes,
+                self.config.CosmicStrife.isDifferentialUniverseUseTechnique)
             if not du_task.run():
                 logger.error("旷宇纷争-模拟宇宙任务失败")
                 return False
         # 互斥：货币战争常规 vs 刷开局
-        cw_enable = self.config.get("CurrencyWarsEnable", False)
+        cw_enable = self.config.CosmicStrife.isCurrencyWarsEnabled
         if not cw_enable:
             logger.info("旷宇纷争任务全部完成")
             return True
-        cw_mode = self.config.get("CurrencyWarsMode", 0)
-        username = self.config.get("CurrencyWarsUsername", "")
-        strategy = self.config.get("CurrencyWarsStrategy", "template")
-        runtimes = self.config.get("CurrencyWarsRunTimes", 0)
-        difficulty = self.config.get("CurrencyWarsDifficulty", 0)
+        cw_mode = self.config.CosmicStrife.currencyWarsMode
+        username = self.config.CosmicStrife.currencyWarsUsername
+        strategy = self.config.CosmicStrife.currencyWarsStrategy
+        runtimes = self.config.CosmicStrife.currencyWarsRuntimes
+        difficulty = self.config.CosmicStrife.currencyWarsDifficulty
 
         if username is None or username.strip() == "":
             logger.error("货币战争开拓者名称为空，请在前端配置中填写。")
@@ -39,10 +39,10 @@ class CosmicStrifeTask(BaseTask):
             # 刷开局难度选择：和标准模式使用同一个难度配置项
             rs_task.set_difficulty(difficulty)
             rs_task.load_strategy(strategy)
-            rs_task.set_boss_name(self.config.get("CwRsBossNames", ""))
-            rs_task.set_boss_affix(self.config.get("CwRsBossAffixes", ""))
-            rs_task.set_invest_env(self.config.get("CwRsInvestEnvironments", ""))
-            rs_task.set_invest_strategy(self.config.get("CwRsInvestStrategies", ""))
+            rs_task.set_boss_name(self.config.CosmicStrife.currencyWarsRerollBossNames)
+            rs_task.set_boss_affix(self.config.CosmicStrife.currencyWarsRerollBossAffixes)
+            rs_task.set_invest_env(self.config.CosmicStrife.currencyWarsRerollInvestEnvironments)
+            rs_task.set_invest_strategy(self.config.CosmicStrife.currencyWarsRerollInvestStrategies)
             if not rs_task.run():
                 logger.error("旷宇纷争-货币战争刷开局任务失败")
                 return False

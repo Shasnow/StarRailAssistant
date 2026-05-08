@@ -135,12 +135,16 @@ class TaskManager:
         config = load_config(config_name)
         if config is None:
             return []
-        print_config = config.copy()
-        print_config["StartGamePassword"] = "******"
-        print_config["StartGameUsername"] = "******"
+        print_config = config.to_dict()
+        print_config["startGame"]["password"] = "******"
+        print_config["StartGame"]["username"] = "******"
         logger.debug('config: ' + str(print_config))
         # 从配置中读取任务选择列表（如 [True, False, True]）
-        task_select = config.get("EnabledTasks")
+        task_select = [config.StartGame.isEnabled,
+                       config.TrailblazePower.isEnabled,
+                       config.ReceiveRewards.isEnabled,
+                       config.CosmicStrife.isEnabled,
+                       config.MissionAccomplished.isEnabled]
         logger.debug('task_select: ' + str(task_select))
         if not task_select:
             return []
@@ -244,10 +248,10 @@ class TaskManager:
             config = load_config(config_name)
             if config is None:
                 return None
-            print_config = config.copy()
-            print_config["StartGamePassword"] = "******"
-            print_config["StartGameUsername"] = "******"
-            logger.debug('config: ' + str(config))
+            print_config = config.to_dict()
+            print_config["startGame"]["password"] = "******"
+            print_config["StartGame"]["username"] = "******"
+            logger.debug('config: ' + str(print_config))
             # 实例化任务类
             operator = self.get_operator()
             return task_class(operator, config)

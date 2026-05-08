@@ -9,15 +9,15 @@ from tasks.img import IMG, MAIMG
 @task(order=4)
 class MissionAccomplishTask(BaseTask):
     def run(self):
-        if self.config["AfterLogout"]:
+        if self.config.MissionAccomplished.isLogout:
             self.logout()
-        if self.config["AfterExitGame"]:
+        if self.config.MissionAccomplished.isExitGame:
             self.quit_game()
-        if self.config["AfterShutdown"]:
+        if self.config.MissionAccomplished.isShutdown:
             self.shutdown()
-        elif self.config["AfterSleep"]:
+        elif self.config.MissionAccomplished.isSleep:
             self.sleep()
-        elif self.config["AfterExitApp"]:
+        elif self.config.MissionAccomplished.isExitApp:
             self.exit_app()
         return True
 

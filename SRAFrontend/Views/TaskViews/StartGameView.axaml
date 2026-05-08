@@ -12,7 +12,7 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="启动游戏" IsChecked="{Binding CurrentConfig.EnabledTasks[0]}"/>
+                    <CheckBox Content="启动游戏" IsChecked="{Binding StartGameConfig.IsEnabled}"/>
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="StartGameTask"
@@ -23,7 +23,7 @@
                 <StackPanel Margin="10">
                     <Grid Margin="0,0,0,15" ColumnDefinitions="Auto, Auto">
                         <TextBlock Text="渠道" VerticalAlignment="Center" />
-                        <ComboBox Grid.Column="1" SelectedIndex="{Binding CurrentConfig.StartGameChannel}">
+                        <ComboBox Grid.Column="1" SelectedIndex="{Binding StartGameConfig.GameChannel}">
                             <ComboBoxItem>官服</ComboBoxItem>
                             <ComboBoxItem>b服</ComboBoxItem>
                             <ComboBoxItem>国际服</ComboBoxItem>
@@ -34,34 +34,34 @@
                         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="12">
                             <Label Content="{x:Static lang:Resources.GamePathText}"/>
                             <ToggleSwitch OnContent="使用全局设置"
-                                          IsChecked="{Binding CurrentConfig.StartGameUseGlobalPath}"/>
+                                          IsChecked="{Binding StartGameConfig.IsUseGlobalGamePath}"/>
                         </StackPanel>
                         <TextBox Grid.Row="1" Grid.Column="0" x:Name="PathTextBox"
-                                 Text="{Binding CurrentConfig.StartGamePath}"
-                                 IsEnabled="{Binding !CurrentConfig.StartGameUseGlobalPath}"/>
+                                 Text="{Binding StartGameConfig.GamePath}"
+                                 IsEnabled="{Binding !StartGameConfig.IsUseGlobalGamePath}"/>
                         <Button Grid.Row="1" Grid.Column="1"
                                 Classes="Icon"
                                 FontFamily="{StaticResource Phosphor}"
                                 Content="&#xE256;"
                                 Command="{Binding SelectedPathCommand}"
-                                IsEnabled="{Binding !CurrentConfig.StartGameUseGlobalPath}"/>
+                                IsEnabled="{Binding !StartGameConfig.IsUseGlobalGamePath}"/>
                     </Grid>
 
                     <StackPanel Margin="0,15,0,15">
-                        <CheckBox x:Name="AutoLoginCheckBox" Content="自动登录" IsChecked="{Binding CurrentConfig.StartGameAutoLogin}" />
+                        <CheckBox x:Name="AutoLoginCheckBox" Content="自动登录" IsChecked="{Binding StartGameConfig.IsAutoLogin}" />
                         <TextBlock Margin="25,5,0,0" FontSize="12" Foreground="Gray" TextWrapping="Wrap">
                             勾选自动登录表明您已阅读并同意《用户协议》和《隐私政策》
                         </TextBlock>
-                        <CheckBox Content="总是重新登录" Margin="0,10,0,0" IsChecked="{Binding CurrentConfig.StartGameAlwaysLogin}"/>
+                        <CheckBox Content="总是重新登录" Margin="0,10,0,0" IsChecked="{Binding StartGameConfig.IsReLogin}"/>
                     </StackPanel>
                     
                     <Grid RowDefinitions="*, *" ColumnDefinitions="Auto, *, Auto" Width="400" HorizontalAlignment="Left">
                         <Label Grid.Row="0" Grid.Column="0" Content="账号：" />
-                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CurrentConfig.StartGameUsername}"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding StartGameConfig.Username}"/>
                         <Label Grid.Row="1" Grid.Column="0" Content="密码：" />
                         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
                         <TextBox Grid.Row="1" Grid.Column="1" Classes="revealPasswordButton" PasswordChar="*"
-                                 Text="{Binding CurrentConfig.StartGamePassword}"/> 
+                                 Text="{Binding StartGameConfig.Password}"/> 
                     </Grid>
                 </StackPanel>
             </ScrollViewer>

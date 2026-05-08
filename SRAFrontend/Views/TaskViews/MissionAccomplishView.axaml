@@ -11,7 +11,7 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="任务完成后" IsChecked="{Binding CurrentConfig.EnabledTasks[4]}"/>
+                    <CheckBox Content="任务完成后" IsChecked="{Binding MissionAccomplishedConfig.IsEnabled}"/>
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="MissionAccomplishTask"
@@ -21,11 +21,11 @@
             </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Margin="10" Spacing="20">
-                    <CheckBox IsChecked="{Binding CurrentConfig.AfterLogout}" Content="登出当前账号" />
-                    <CheckBox IsChecked="{Binding CurrentConfig.AfterExitGame}" Content="退出游戏" />
-                    <CheckBox IsChecked="{Binding CurrentConfig.AfterExitApp}" Content="关闭程序" />
-                    <RadioButton IsChecked="{Binding CurrentConfig.AfterShutdown}" Content="关机" />
-                    <RadioButton IsChecked="{Binding CurrentConfig.AfterSleep}" Content="休眠" />
+                    <CheckBox IsChecked="{Binding MissionAccomplishedConfig.IsLogout}" Content="登出当前账号" />
+                    <CheckBox IsChecked="{Binding MissionAccomplishedConfig.IsExitGame}" Content="退出游戏" />
+                    <CheckBox IsChecked="{Binding MissionAccomplishedConfig.IsExitApp}" Content="关闭程序" />
+                    <RadioButton IsChecked="{Binding MissionAccomplishedConfig.IsShutdown}" Content="关机" />
+                    <RadioButton IsChecked="{Binding MissionAccomplishedConfig.IsSleep}" Content="休眠" />
                     <RadioButton Content="无动作" />
                 </StackPanel>
             </ScrollViewer>

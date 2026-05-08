@@ -1,6 +1,7 @@
 import tomllib
-from typing import Any, Callable, TypedDict, cast
+from typing import Any, Callable, TypedDict
 
+from SRACore.models.tasks_config import TrailblazePowerTaskItem
 from SRACore.task import BaseTask, task
 from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
@@ -23,46 +24,42 @@ class TrailblazePowerTask(BaseTask):
         with open(r"tasks/config/trailblaze_power.toml", "rb") as tf:
             self.task_config = tomllib.load(tf)
 
-        self.replenish_time: int = self.config.get('TrailblazePowerReplenishTimes', 0)
-        self.replenish_way: int = self.config.get('TrailblazePowerReplenishWay', 0)
-        self.replenish_flag: bool = self.config.get('TrailblazePowerReplenishEnable', False)
+        self.replenish_time: int = self.config.TrailblazePower.replenishTimes
+        self.replenish_way: int = self.config.TrailblazePower.replenishWay
+        self.replenish_flag: bool = self.config.TrailblazePower.isReplenishEnabled
         self.manual_tasks: list[tuple[TrailblazePowerFunc, dict[str, int]]] = list()
-        self.auto_detect_tasks: list[Any] = list()
+        self.auto_detect_tasks: list[TrailblazePowerTaskItem] = list()
 
     def run(self):
         self.manual_tasks.clear()
         self.auto_detect_tasks.clear()
-        use_build_target = self.config.get('TrailblazePowerUseBuildTarget')
+        use_build_target = self.config.TrailblazePower.isUseBuildTarget
         if use_build_target:
             self.detect_build_target_tasklist()
         else:
             self.init_custom_tasklist()
-        for task, kwargs in self.manual_tasks:
-            task(**kwargs)
+        for func, kwargs in self.manual_tasks:
+            func(**kwargs)
         if len(self.auto_detect_tasks) > 0:
             detected_tasks = self.detect_tasks()
             if detected_tasks is None:
                 return self.operator.press_key('esc')  # 退出生存索引页面
-            for task, kwargs in detected_tasks:
-                task(**kwargs)
+            for func, kwargs in detected_tasks:
+                func(**kwargs)
         return True
 
     def init_custom_tasklist(self):
         """初始化自定义任务清单"""
-        tasklist = cast(list[dict[str, Any]], self.config['TrailblazePowerTaskList'])
-        for task in tasklist:
-            if task.get("AutoDetect", False):
-                self.auto_detect_tasks.append({
-                    "Name": task.get("Name", task["Id"]),
-                    "Id": cast(str, task["Id"]),
-                    "Level": cast(int, task["Level"])
-                })
+        tasklist = self.config.TrailblazePower.TaskList
+        for t in tasklist:
+            if t.AutoDetect:
+                self.auto_detect_tasks.append(t)
             else:
                 self.manual_tasks.append((
-                    self.get_task_by_id(cast(str, task["Id"])),
-                    {"level": cast(int, task["Level"]),
-                     "single_time": cast(int, task["Count"]),
-                     "run_time": cast(int, task["RunTimes"])}
+                    self.get_task_by_id(t.Id),
+                    {"level": t.Level,
+                     "single_time": t.Count,
+                     "run_time": t.RunTimes}
                 ))
 
     def detect_build_target_tasklist(self):
@@ -112,10 +109,12 @@ class TrailblazePowerTask(BaseTask):
                         else:
                             task_name = subtask_info.get("name", subtask_id)
                             self.auto_detect_tasks.append(
-                                {"Name": task_name,
-                                 "Id": subtask_id,
-                                 "Level": index + 1
+                                TrailblazePowerTaskItem.from_dict({
+                                    "Name": task_name,
+                                    "Id": subtask_id,
+                                    "Level": index + 1
                                  })
+                                )
                         break
                 else:
                     logger.debug(f"Could not find {obj} in subtask results of {subtask_id}")
@@ -197,7 +196,7 @@ class TrailblazePowerTask(BaseTask):
             与 auto_detect_tasks 等长的执行次数列表。
         """
         tasks_count = len(self.auto_detect_tasks)
-        task_cost_list = [self.get_cost_by_id(task["Id"]) for task in self.auto_detect_tasks]
+        task_cost_list = [self.get_cost_by_id(t.Id) for t in self.auto_detect_tasks]
         sum_cost = sum(task_cost_list)
         min_cost = min(task_cost_list)
         base = available_power // sum_cost
@@ -230,19 +229,19 @@ class TrailblazePowerTask(BaseTask):
         """
         tasks = []
         for i, item in enumerate(self.auto_detect_tasks):
-            task_func = self.get_task_by_id(item["Id"])
+            task_func = self.get_task_by_id(item.Id)
             run_time = tasks_times[i]
-            logger.info(f"任务 {item['Name']} ({item['Level']}) 将执行 {run_time} 次")
+            logger.info(f"任务 {item.Name} ({item.Level}) 将执行 {run_time} 次")
             if run_time == 0:
                 continue
-            max_single_time = self.get_max_count_by_id(item["Id"])
+            max_single_time = self.get_max_count_by_id(item.Id)
             # 按单次上限拆分为多轮执行
             while run_time > 0:
                 single_time = min(run_time, max_single_time)
                 tasks.append((
                     task_func,
                     {
-                        "level": item["Level"],
+                        "level": item.Level,
                         "single_time": single_time,
                         "run_time": 1
                     }
@@ -456,7 +455,7 @@ class TrailblazePowerTask(BaseTask):
                 logger.info("体力不足")
                 self.operator.press_key("esc", interval=1, presses=3)
                 return False
-        if self.config["TrailblazePowerUseAssistant"]:
+        if self.config.TrailblazePower.isUseAssistant:
             self.support()
         if not self.operator.click_img(TPIMG.BATTLE_STAR, after_sleep=1):
             logger.warning(SRAError(ErrorCode.CLICK_BATTLE_STAR_FAILED, "点击开始挑战按钮失败"))
@@ -506,7 +505,7 @@ class TrailblazePowerTask(BaseTask):
                     elif result == 1:
                         pass
                     break
-            if self.config["TrailblazePowerUseAssistant"]:
+            if self.config.TrailblazePower.isUseAssistant:
                 self.support()
 
             run_time -= 1
