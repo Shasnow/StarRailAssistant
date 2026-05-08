@@ -104,7 +104,7 @@ public partial class ControlPanelViewModel : ViewModelBase
     private void Save()
     {
         _cacheService.SaveCache();
-        _configService.SaveConfig();
+        _configService.Save();
         _settingsService.Save();
     }
 

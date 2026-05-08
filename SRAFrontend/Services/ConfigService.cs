@@ -1,85 +1,75 @@
-﻿using System;
+﻿using System.IO;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using SRAFrontend.Data;
 using SRAFrontend.Models;
 using SRAFrontend.Utils;
 
 namespace SRAFrontend.Services;
 
-public class ConfigService
+public class ConfigService(CacheService cacheService, ILogger<ConfigService> logger)
 {
-    private readonly CacheService _cacheService;
-    private readonly ILogger<ConfigService> _logger;
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new() { WriteIndented = true };
 
-    public ConfigService(CacheService cacheService, ILogger<ConfigService> logger)
+    public TasksConfig? TaskConfig { get; private set; }
+
+    public void Load()
     {
-        _cacheService = cacheService;
-        _logger = logger;
-        var currentConfigName = _cacheService.Cache.CurrentConfigName;
-        LoadConfig(currentConfigName);
+        var configName = cacheService.Cache.CurrentConfigName;
+        Load(configName);
     }
 
-    public Config? Config { get; private set; }
-
-    public void SaveConfig()
+    private void Load(string configName)
     {
-        _logger.LogInformation("Saving config: {name}", Config?.Name);
-        if (Config is null) throw new InvalidOperationException("Config is null");
-        if (!string.IsNullOrEmpty(Config.StartGamePassword))
-            try
-            {
-                Config.EncryptedStartGamePassword = EncryptUtil.EncryptString(Config.StartGamePassword);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to encrypt StartGamePassword");
-                Config.EncryptedStartGamePassword = "";
-            }
+        logger.LogInformation("Loading config: {ConfigName}", configName);
+        var configPath = Path.Combine(PathString.ConfigsDir, $"{configName}.json");
+        if (!File.Exists(configPath))
+        {
+            logger.LogWarning("Config file not found: {ConfigPath}, use default config", configPath);
+            TaskConfig = new TasksConfig { Name = configName };
+            return;
+        }
 
-        if (!string.IsNullOrEmpty(Config.StartGameUsername))
-            try
-            {
-                Config.EncryptedStartGameUsername = EncryptUtil.EncryptString(Config.StartGameUsername);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to encrypt StartGameUsername");
-                Config.EncryptedStartGameUsername = "";
-            }
+        var configJson = File.ReadAllText(configPath);
+        var config = JsonSerializer.Deserialize<TasksConfig>(configJson)!;
+        if (config.Version < TasksConfig.StaticVersion)
+        {
+            logger.LogWarning("Config version {Version} is deprecated. Use default config instead", config.Version);
+            TaskConfig = new TasksConfig { Name = configName };
+            return;
+        }
 
-        DataPersister.SaveConfig(Config);
+        TaskConfig = config;
+        TaskConfig.Name = configName;
+        DecryptSensitiveFields();
     }
 
-    private void LoadConfig(string configName)
+    public void Save()
     {
-        _logger.LogInformation("Loading config: {ConfigName}", configName);
-        Config = DataPersister.LoadConfig(configName);
-        if (!string.IsNullOrEmpty(Config.EncryptedStartGamePassword))
-            try
-            {
-                Config.StartGamePassword = EncryptUtil.DecryptString(Config.EncryptedStartGamePassword);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to decrypt StartGamePassword");
-                Config.StartGamePassword = "";
-            }
+        logger.LogInformation("Saving config: {ConfigName}", TaskConfig?.Name);
+        EncryptSensitiveFields();
+        var configJson = JsonSerializer.Serialize(TaskConfig, _jsonSerializerOptions);
+        File.WriteAllText(Path.Combine(PathString.ConfigsDir, $"{TaskConfig?.Name}.json"), configJson);
+    }
 
-        if (!string.IsNullOrEmpty(Config.EncryptedStartGameUsername))
-            try
-            {
-                Config.StartGameUsername = EncryptUtil.DecryptString(Config.EncryptedStartGameUsername);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to decrypt StartGameUsername");
-                Config.StartGameUsername = "";
-            }
+    private void EncryptSensitiveFields()
+    {
+        if (TaskConfig is null) return;
+        TaskConfig.StartGame.EncryptedUsername = EncryptUtil.EncryptString(TaskConfig.StartGame.Username);
+        TaskConfig.StartGame.EncryptedPassword = EncryptUtil.EncryptString(TaskConfig.StartGame.Password);
+    }
+
+    private void DecryptSensitiveFields()
+    {
+        if (TaskConfig is null) return;
+        TaskConfig.StartGame.Username = EncryptUtil.DecryptString(TaskConfig.StartGame.EncryptedUsername);
+        TaskConfig.StartGame.Password = EncryptUtil.DecryptString(TaskConfig.StartGame.EncryptedPassword);
     }
 
     public void SwitchConfig(string configName)
     {
-        SaveConfig();
-        LoadConfig(configName);
-        _cacheService.Cache.CurrentConfigName = configName;
+        Save();
+        Load(configName);
+        cacheService.Cache.CurrentConfigName = configName;
     }
 }

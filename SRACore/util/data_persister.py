@@ -4,11 +4,12 @@ from typing import Any
 
 from SRACore.localization import Resource
 from SRACore.models.app_settings import AppSettings
+from SRACore.models.tasks_config import TasksConfig
 from SRACore.util.const import AppDataDir, ConfigsDir
 from SRACore.util.logger import logger
 
 
-def load_config(name: str) -> dict[str, Any] | None:
+def load_config(name: str) -> TasksConfig:
     path = ''
     try:
         if ".json" in name:
@@ -16,7 +17,7 @@ def load_config(name: str) -> dict[str, Any] | None:
         else:
             path = ConfigsDir / f'{name}.json'
         with open(path, 'r') as f:
-            return json.load(f)
+            return TasksConfig.from_dict(json.load(f))
     except FileNotFoundError:
         logger.error(Resource.config_fileNotFound(path))
         return None
@@ -26,7 +27,6 @@ def load_config(name: str) -> dict[str, Any] | None:
     except Exception as e:
         logger.error(Resource.config_exception(path, str(e)))
         return None
-
 
 def load_data(typ: str) -> dict[Any, Any]:
     path = ''

@@ -11,7 +11,7 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="领取奖励" IsChecked="{Binding CurrentConfig.EnabledTasks[2]}"/>
+                    <CheckBox Content="领取奖励" IsChecked="{Binding ReceiveRewardsConfig.IsEnabled}"/>
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="ReceiveRewardsTask"
@@ -21,14 +21,14 @@
             </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Margin="10" Spacing="20">
-                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[0]}" Content="漫游签证" />
-                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[1]}" Content="派遣" />
-                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[2]}" Content="邮件" />
-                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[3]}" Content="每日实训" />
-                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[4]}" Content="无名勋礼" />
-                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[5]}" Content="巡星之礼" />
-                    <CheckBox IsChecked="{Binding CurrentConfig.ReceiveRewards[6]}" Content="兑换码" />
-                    <TextBox Text="{Binding CurrentConfig.ReceiveRewardRedeemCodes}" Watermark="兑换码填写处"></TextBox>
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.Rewards[0]}" Content="漫游签证" />
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.Rewards[1]}" Content="派遣" />
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.Rewards[2]}" Content="邮件" />
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.Rewards[3]}" Content="每日实训" />
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.Rewards[4]}" Content="无名勋礼" />
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.Rewards[5]}" Content="巡星之礼" />
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.Rewards[6]}" Content="兑换码" />
+                    <TextBox Text="{Binding ReceiveRewardsConfig.RedeemCodes}" Watermark="兑换码填写处"></TextBox>
                 </StackPanel>
             </ScrollViewer>
         </suki:GroupBox>

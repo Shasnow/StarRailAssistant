@@ -29,6 +29,7 @@ public class App : Application
         var serviceProvider = serviceCollection.BuildServiceProvider();
         var settingsService = serviceProvider.GetRequiredService<SettingsService>();
         settingsService.Load();
+        serviceProvider.GetRequiredService<ConfigService>().Load();
         Localization.Resources.Culture =
             new CultureInfo(
                 settingsService.Settings.Display.Language == 0 ? "zh-CN" : "en-US");
@@ -46,7 +47,7 @@ public class App : Application
             {
                 Log.Information("Application is exiting. Saving settings and stopping SRA process.");
                 // settingsService.Save(); 设置有自动保存
-                serviceProvider.GetRequiredService<ConfigService>().SaveConfig();
+                serviceProvider.GetRequiredService<ConfigService>().Save();
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
                 serviceProvider.GetRequiredService<IBackendService>().StopBackend();
                 serviceProvider.GetRequiredService<RegistryService>().RestoreUserPcResolution();

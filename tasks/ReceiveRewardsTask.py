@@ -6,7 +6,7 @@ from tasks.img import DUIMG, IMG, RRIMG
 @task(order=2)
 class ReceiveRewardsTask(BaseTask):
     def _post_init(self):
-        self.config_name=self.config.get('Name', 'unknown')
+        self.config_name=self.config.Name
 
     def run(self):
         # 初始化任务
@@ -29,7 +29,7 @@ class ReceiveRewardsTask(BaseTask):
     def _init_tasks(self):
         """根据配置初始化任务列表"""
         tasks = []
-        item_select = self.config['ReceiveRewards']
+        item_select = self.config.ReceiveRewards.Rewards
 
         # 主任务列表（需要传参的任务）esc界面完成的
         if item_select[0]:
@@ -37,7 +37,7 @@ class ReceiveRewardsTask(BaseTask):
         if item_select[1]:
             tasks.append((self.assignments_reward, ()))
         if item_select[6]:
-            tasks.append((self.redeem_code, (self.config["ReceiveRewardRedeemCodes"],)))
+            tasks.append((self.redeem_code, (self.config.ReceiveRewards.redeemCodes,)))
         if item_select[2]:
             tasks.append((self.mail, ()))
 

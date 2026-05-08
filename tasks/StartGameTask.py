@@ -63,19 +63,19 @@ class StartGameTask(BaseTask):
         if sys_util.is_process_running("StarRail.exe"):  # 检查游戏是否已在运行
             logger.info("游戏已在运行中")
             return
-        if self.config.get("StartGameUseGlobalPath", True):
+        if self.config.StartGame.isUseGlobalGamePath:
             game_path_index = self.settings.General.gamePathIndex
             game_paths:list[str] = self.settings.General.gamePaths
             raw_path = game_paths[game_path_index] if game_path_index < len(game_paths) else None
         else:
-            raw_path = self.config.get('StartGamePath')
+            raw_path = self.config.StartGame.gamePath
         if not raw_path:
             logger.error("未设置游戏启动路径")
             raise SRAError(ErrorCode.INVALID_INPUT, "未设置游戏启动路径")
         path = Path(str(raw_path))
         logger.debug(f"游戏启动路径: {path}")
         # 根据配置选择游戏路径
-        match self.config.get('StartGameChannel'):
+        match self.config.StartGame.gameChannel:
             case 0:
                 logger.info("正在启动官服游戏客户端...")
                 self.change_config_ini(path, 1, 1)
@@ -86,7 +86,7 @@ class StartGameTask(BaseTask):
                 logger.info("正在启动国际服游戏客户端...")
             case _:
                 logger.error("未知的游戏渠道配置")
-                raise SRAError(ErrorCode.INVALID_INPUT, "未知的游戏渠道配置", f"当前配置值 {self.config.get('StartGameChannel')}")
+                raise SRAError(ErrorCode.INVALID_INPUT, "未知的游戏渠道配置", f"当前配置值 {self.config.StartGame.gameChannel}")
 
         # 构建启动参数
         launch_args = []
@@ -131,11 +131,11 @@ class StartGameTask(BaseTask):
 
     def login(self):
         if hasattr(self.operator, 'driver'):
-            user = encryption.decryptor(self.config['StartGameUsername'])
-            passwd = encryption.decryptor(self.config['StartGamePassword'])
+            user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
+            passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
             return self.operator.login(user, passwd)
         channel = None
-        match self.config['StartGameChannel']:
+        match self.config.StartGame.gameChannel:
             case 0:
                 channel = 'cn'
             case 1:
@@ -143,7 +143,7 @@ class StartGameTask(BaseTask):
             case 2:
                 channel = 'gb'
             case _:
-                raise SRAError(ErrorCode.INVALID_INPUT, "未知的游戏渠道配置", f"当前配置值 {self.config['StartGameChannel']}")
+                raise SRAError(ErrorCode.INVALID_INPUT, "未知的游戏渠道配置", f"当前配置值 {self.config.StartGame.gameChannel}")
 
         result, _ = self.operator.wait_any_img([
             SGIMG.LOGIN_PAGE % channel,
@@ -158,7 +158,7 @@ class StartGameTask(BaseTask):
             return -1
         if result != 0:
             logger.info(f"登录状态 {result}")
-            enable = self.config['StartGameAlwaysLogin']
+            enable = self.config.StartGame.isReLogin
             if result == 4:
                 # 游戏需要更新
                 logger.error(SRAError(ErrorCode.UPDATE_REQUIRED, "游戏需要更新", "请手动更新游戏后重试"))
@@ -170,9 +170,9 @@ class StartGameTask(BaseTask):
 
         self.operator.click_img(SGIMG.LOGIN_OTHER % channel, after_sleep=1)
         self.operator.click_img(SGIMG.LOGIN_WITH_ACCOUNT % channel, after_sleep=1)
-        if self.config['StartGameAutoLogin']:
-            user = encryption.decryptor(self.config['StartGameUsername'])
-            passwd = encryption.decryptor(self.config['StartGamePassword'])
+        if self.config.StartGame.isAutoLogin:
+            user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
+            passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
             if user == "" or passwd == "":
                 logger.error(SRAError(ErrorCode.INVALID_INPUT, "自动登录账号或密码未设置", "请检查配置中的自动登录账号和密码"))
                 return -1
