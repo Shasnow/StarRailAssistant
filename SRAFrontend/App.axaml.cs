@@ -83,7 +83,6 @@ public class App : Application
         services.AddSingleton<CliBackendService>();
         services.AddSingleton<PyBackendService>();
         services.AddSingleton<IBackendService, BackendServiceProxy>();
-        services.AddSingleton<CosmicStrifePolicyStateService>();
         services.AddSingleton<RegistryService>();
         services.AddSingleton<ConfigService>();
         services.AddSingleton<ReportService>();

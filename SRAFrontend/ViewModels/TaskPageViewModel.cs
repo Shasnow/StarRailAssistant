@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -22,15 +21,8 @@ public partial class TaskPageViewModel : PageViewModel
     private readonly CacheService _cacheService;
     private readonly ConfigService _configService;
     private readonly CommonModel _commonModel;
-    private readonly CosmicStrifePolicyStateService _cosmicStrifePolicyStateService;
-    private readonly IBackendService _backendService;
-
-    private DateTime _lastCosmicCounterRefreshUtc = DateTime.MinValue;
 
     [ObservableProperty] private Config _currentConfig;
-    [ObservableProperty] private int _cosmicStrifeDuWeeklyRuns;
-    [ObservableProperty] private int _cosmicStrifeCwWeeklyRuns;
-    [ObservableProperty] private string _cosmicStrifeWeekKey = "";
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(EnableContextMenu))]
     private object? _selectedTaskItem;
@@ -50,17 +42,13 @@ public partial class TaskPageViewModel : PageViewModel
         CommonModel commonModel,
         ControlPanelViewModel controlPanelViewModel,
         ConfigService configService,
-        CacheService cacheService,
-        CosmicStrifePolicyStateService cosmicStrifePolicyStateService,
-        IBackendService backendService) : base(
+        CacheService cacheService) : base(
         PageName.Task, "\uE1BC")
     {
         ControlPanelViewModel = controlPanelViewModel;
         _commonModel = commonModel;
         _configService = configService;
         _cacheService = cacheService;
-        _cosmicStrifePolicyStateService = cosmicStrifePolicyStateService;
-        _backendService = backendService;
         CurrentConfig = _configService.Config!;
 
         void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)
@@ -76,43 +64,9 @@ public partial class TaskPageViewModel : PageViewModel
         {
             RefreshStrategies();
         }
-
-        _backendService.Outputted += line =>
-        {
-            if (line.Contains(IBackendService.DoneMarker))
-                RefreshCosmicCountersThrottled();
-        };
-
-        _backendService.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName != nameof(IBackendService.IsTaskRunning)) return;
-            if (!_backendService.IsTaskRunning)
-                RefreshCosmicCountersThrottled();
-        };
-
-        RefreshCosmicStrifeCounters();
-    }
-
-    private void RefreshCosmicCountersThrottled()
-    {
-        var now = DateTime.UtcNow;
-        // 同一次任务“Done标记”和“Exited退出”可能在短时间内触发两次，做个轻量去重。
-        if ((now - _lastCosmicCounterRefreshUtc).TotalMilliseconds < 1000) return;
-        _lastCosmicCounterRefreshUtc = now;
-        RefreshCosmicStrifeCounters();
     }
 
     public ControlPanelViewModel ControlPanelViewModel { get; }
-
-    [RelayCommand]
-    private void RefreshCosmicStrifeCounters()
-    {
-        _cosmicStrifePolicyStateService.Refresh();
-        var s = _cosmicStrifePolicyStateService.State;
-        CosmicStrifeDuWeeklyRuns = s.Du.WeeklyRuns;
-        CosmicStrifeCwWeeklyRuns = s.Cw.WeeklyRuns;
-        CosmicStrifeWeekKey = s.Du.WeekKey == s.Cw.WeekKey ? s.Du.WeekKey : $"{s.Du.WeekKey}/{s.Cw.WeekKey}";
-    }
 
     public AvaloniaList<TrailblazePowerTask> Tasks => [
             new(AddTaskItem)
@@ -289,6 +243,18 @@ public partial class TaskPageViewModel : PageViewModel
     public TopLevel? TopLevelObject { get; set; }
 
     public bool EnableContextMenu => SelectedTaskItem is not null;
+
+    public int CurrencyWarsModeIndex
+    {
+        get => CurrentConfig.CurrencyWarsMode;
+        set
+        {
+            CurrentConfig.CurrencyWarsMode = value;
+            OnPropertyChanged(nameof(IsCwNormalMode));
+        }
+    }
+
+    public bool IsCwNormalMode => CurrentConfig.CurrencyWarsMode != 2;
 
     public Cache Cache => _cacheService.Cache;
 
