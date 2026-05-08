@@ -1,6 +1,6 @@
 import time
+import sys
 
-from SRACore.operators import Operator
 from SRACore.triggers import AutoPlotTrigger
 from SRACore.triggers.BaseTrigger import BaseTrigger
 from SRACore.util.logger import logger
@@ -13,7 +13,9 @@ class TriggerManager:
         self.isRunning = False
         super().__init__()
         self.triggers: list[BaseTrigger] = []
-        self.register(AutoPlotTrigger(Operator()))
+        if sys.platform == 'win32':
+            from SRACore.operators.operator import Operator
+            self.register(AutoPlotTrigger(Operator()))
 
     def run(self):
         self.isRunning = True

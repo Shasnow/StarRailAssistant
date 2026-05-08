@@ -1,21 +1,18 @@
-# type: ignore
 import importlib
+import sys
 import threading
-
-import tomllib
 from typing import Any
 
 from SRACore.localization import Resource
-from SRACore.operators import Operator
-from SRACore.operators.browser_operator import BrowserOperator
+from SRACore.models.app_settings import AppSettings
+from SRACore.operators.ioperator import IOperator
 from SRACore.task import BaseTask, get_tasks
 from SRACore.util import (
     encryption,  # NOQA 有动态用法，确保被打包 # type: ignore
     notify,
     sys_util,  # NOQA 有动态用法，确保被打包 # type: ignore
 )
-from SRACore.util.const import AppRootDir
-from SRACore.util.data_persister import load_cache, load_config, load_settings
+from SRACore.util.data_persister import load_cache, load_config
 from SRACore.util.errors import ThreadStoppedError
 from SRACore.util.logger import logger
 
@@ -26,18 +23,34 @@ class TaskManager:
     支持通过配置动态加载任务列表，并处理任务的中断和错误。
     """
 
-    def __init__(self):
+    def __init__(self, settings: AppSettings):
         """
         初始化任务管理器。
         """
         self.log_queue = None
         self._stop_event = threading.Event()
         self.task_list: list[type[BaseTask]] = get_tasks()
+        self.settings: AppSettings = settings
         logger.debug(f"Successfully load task: {self.task_list}")
 
     def request_stop(self) -> None:
         """请求停止当前任务执行。"""
         self._stop_event.set()
+
+    def get_operator(self) -> IOperator:
+        if sys.platform == "win32":
+            # Windows平台根据设置选择操作器类型（本地或云游戏）
+            cloud_game_enabled = self.settings.General.isCloudGameEnable
+            if cloud_game_enabled:
+                from SRACore.operators.browser_operator import BrowserOperator
+                return BrowserOperator(stop_event=self._stop_event)
+            else:
+                from SRACore.operators.operator import Operator
+                return Operator(stop_event=self._stop_event)
+        else:
+            # 其他平台只支持云游戏
+            from SRACore.operators.browser_operator import BrowserOperator
+            return BrowserOperator(stop_event=self._stop_event)
 
     def run(self, *args: Any) -> None:
         """
@@ -132,10 +145,7 @@ class TaskManager:
         if not task_select:
             return []
         tasks = []
-        if load_settings("general").get("cloudGame.enabled"):
-            operator = BrowserOperator(stop_event=self._stop_event)
-        else:
-            operator = Operator(stop_event=self._stop_event)
+        operator = self.get_operator()
 
         # 遍历 task_select，根据选择状态实例化对应任务
         for index, is_select in enumerate(task_select):
@@ -239,10 +249,7 @@ class TaskManager:
             print_config["StartGameUsername"] = "******"
             logger.debug('config: ' + str(config))
             # 实例化任务类
-            if load_settings("general").get("cloudGame.enabled"):
-                operator = BrowserOperator(stop_event=self._stop_event)
-            else:
-                operator = Operator(stop_event=self._stop_event)
+            operator = self.get_operator()
             return task_class(operator, config)
         except Exception as e:
             logger.error(Resource.task_instantiateFailed(task, f'{e.__class__.__name__}: {e}'))

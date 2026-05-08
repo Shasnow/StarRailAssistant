@@ -4,9 +4,6 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Callable
 
-# noinspection PyPackageRequirements
-# (pyperclip is in pyautogui requirements)
-import pyperclip
 import pyscreeze
 from PIL.Image import Image
 from loguru import logger
@@ -530,8 +527,8 @@ class IOperator(ABC):
         """
         time.sleep(seconds)
 
-    @staticmethod
-    def copy(text: str) -> None:
+    @abstractmethod
+    def copy(self, text: str) -> None:
         """
         Copy the text to clipboard.
         
@@ -540,7 +537,7 @@ class IOperator(ABC):
         Returns:
             None
         """
-        pyperclip.copy(text)
+        ...
 
     @abstractmethod
     def paste(self) -> None:

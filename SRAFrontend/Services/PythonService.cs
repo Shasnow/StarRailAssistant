@@ -22,7 +22,8 @@ public class PythonService(ILogger<PythonService> logger, IHttpClientFactory htt
 
     private static readonly string EnvOkMarker = Path.Combine(PathString.PythonDir, ".python_env_ok");
     private static readonly string EnvVersionJson = Path.Combine(PathString.PythonDir, "python_env_version.json");
-    private static readonly string RequirementsTxt = Path.Combine(AppContext.BaseDirectory, "requirements.txt");
+    private static readonly string RequirementsTxt = Path.Combine(AppContext.BaseDirectory,
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "requirements-win.txt" : "requirements-linux.txt");
 
     public static bool IsEnvironmentReady()
     {
@@ -110,7 +111,21 @@ public class PythonService(ILogger<PythonService> logger, IHttpClientFactory htt
         {
             logger.LogInformation("Detected system Python at {Path}, creating virtual environment", systemPython);
             progress.Report($"检测到系统 Python: {systemPython}，创建虚拟环境...");
-            return await CreateVenvAsync(systemPython, progress, cancellationToken);
+
+            var created = await CreateVenvAsync(systemPython, progress, cancellationToken);
+            if (!created)
+                return false;
+
+            // 确保虚拟环境中有 pip，否则安装 pip，然后安装依赖
+            var pipCheck = await RunProcessAsync(PathString.PythonExe, "-m pip --version", cancellationToken);
+            if (pipCheck.ExitCode != 0)
+            {
+                progress.Report("虚拟环境中未检测到 pip，正在安装 pip...");
+                if (!await InstallPipAsync(progress, cancellationToken))
+                    return false;
+            }
+
+            return await EnsureDependenciesAsync(progress, cancellationToken);
         }
 
         // ③ 下载 embeddable 便携包
@@ -148,7 +163,21 @@ public class PythonService(ILogger<PythonService> logger, IHttpClientFactory htt
         {
             logger.LogInformation("Detected system Python at {Path}", systemPython);
             progress.Report($"检测到系统 Python: {systemPython}，创建虚拟环境...");
-            return await CreateVenvAsync(systemPython, progress, cancellationToken);
+
+            var created = await CreateVenvAsync(systemPython, progress, cancellationToken);
+            if (!created)
+                return false;
+
+            // 确保虚拟环境中有 pip，否则安装 pip，然后安装依赖
+            var pipCheck = await RunProcessAsync(PathString.PythonExe, "-m pip --version", cancellationToken);
+            if (pipCheck.ExitCode != 0)
+            {
+                progress.Report("虚拟环境中未检测到 pip，正在安装 pip...");
+                if (!await InstallPipAsync(progress, cancellationToken))
+                    return false;
+            }
+
+            return await EnsureDependenciesAsync(progress, cancellationToken);
         }
 
         progress.Report("未检测到系统 Python 3.12.x，请先安装 Python 3.12");
@@ -166,8 +195,8 @@ public class PythonService(ILogger<PythonService> logger, IHttpClientFactory htt
         var result = await RunProcessAsync(systemPython, $"-m venv \"{PathString.PythonDir}\"", cancellationToken);
         if (result.ExitCode != 0)
         {
-            logger.LogError("Failed to create virtual environment: {Error}", result.Error);
-            progress.Report($"创建虚拟环境失败: {result.Error}");
+            logger.LogError("Failed to create virtual environment: \n{Output} {Error}", result.Output, result.Error);
+            progress.Report($"创建虚拟环境失败: {result.Output} {result.Error}");
             return false;
         }
 

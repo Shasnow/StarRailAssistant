@@ -4,7 +4,6 @@ import time
 from io import BytesIO
 
 import PIL
-import pyperclip
 from PIL.Image import Image
 from loguru import logger
 from selenium import webdriver
@@ -13,12 +12,11 @@ from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options
-from selenium.webdriver.edge.service import Service
 from selenium.webdriver.edge.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-from SRACore.operators import IOperator
+from SRACore.operators.ioperator import IOperator
 from SRACore.operators.model import Region
 from SRACore.util.const import CacheDir
 from SRACore.util.errors import ThreadStoppedError
@@ -33,6 +31,7 @@ class BrowserOperator(IOperator):
         self.height = 1080
         self.width = 1920
         self.fixed_region = Region(0, 0, 1920, 1080)
+        self.clipboard = None
 
     def launch_browser(self):
         url = "https://sr.mihoyo.com/cloud"
@@ -338,8 +337,11 @@ class BrowserOperator(IOperator):
             logger.debug(f"Failed to hold key: {e}")
             return False
 
+    def copy(self, text: str) -> None:
+        self.clipboard = text
+
     def paste(self) -> None:
-        content = pyperclip.paste()
+        content = self.clipboard
         ActionChains(self.driver).send_keys(content).perform()
 
     def move_rel(self, x_offset: int, y_offset: int) -> bool:

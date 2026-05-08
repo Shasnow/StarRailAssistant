@@ -6,6 +6,7 @@ from ctypes.wintypes import POINT, RECT
 
 import pyautogui
 import pygetwindow  # type: ignore
+import pyperclip
 import pyscreeze
 from PIL.Image import Image
 
@@ -226,6 +227,9 @@ class Operator(IOperator):
         except Exception as e:
             logger.debug(f"Failed to hold key: {e}")
             return False
+
+    def copy(self, text: str) -> None:
+        pyperclip.copy(text)
 
     def paste(self) -> None:
         if self.stop_event is not None and self.stop_event.is_set():
