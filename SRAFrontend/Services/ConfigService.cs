@@ -53,16 +53,6 @@ public class ConfigService
     {
         _logger.LogInformation("Loading config: {ConfigName}", configName);
         Config = DataPersister.LoadConfig(configName);
-        CosmicStrifePolicyMigration.Apply(Config);
-        CurrencyWarsPlayStyleMigration.Apply(Config);
-
-        // 避免仅依赖属性变更事件：载入后立刻校正刷开局的入口规则，
-        // 并确保打包后的 CurrencyWarsMode 与之同步。
-        if (Config.CurrencyWarsObjective == 1)
-        {
-            Config.CurrencyWarsRuleset = 0;
-            Config.CurrencyWarsMode = Config.CurrencyWarsObjective * 2 + Config.CurrencyWarsRuleset;
-        }
         if (!string.IsNullOrEmpty(Config.EncryptedStartGamePassword))
             try
             {
