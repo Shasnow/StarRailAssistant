@@ -6,7 +6,6 @@ pyperclip、win32 等），确保测试可在无 GUI、无游戏、无硬件的 
 """
 
 import sys
-import types
 from abc import ABC, abstractmethod
 from typing import Any
 from unittest.mock import MagicMock
@@ -15,7 +14,10 @@ from unittest.mock import MagicMock
 # 1. Mock 掉所有重依赖模块（模块级，先于被测代码导入）
 # ============================================================
 
-# Operator 相关依赖（package 形态，否则 tasks 链上 `from SRACore.util.errors import …` 会失败）
+# Operator 相关依赖
+_mock_operators = MagicMock()
+
+
 class MockOperatorSettings:
     """Operator.settings 的替身"""
     pass
@@ -33,27 +35,16 @@ class MockIOperator:
         self.settings = MockOperatorSettings()
 
 
-_mock_operators_pkg = types.ModuleType("SRACore.operators")
-_mock_operators_pkg.__path__ = []
-_mock_operators_pkg.Operator = MockOperator
-_mock_operators_pkg.IOperator = MockIOperator
-sys.modules.setdefault("SRACore.operators", _mock_operators_pkg)
-_mock_browser_operator_mod = types.ModuleType("SRACore.operators.browser_operator")
-_mock_browser_operator_mod.BrowserOperator = MockOperator
-sys.modules.setdefault("SRACore.operators.browser_operator", _mock_browser_operator_mod)
+_mock_operators.Operator = MockOperator
+_mock_operators.IOperator = MockIOperator
+
+sys.modules.setdefault("SRACore.operators", _mock_operators)
 sys.modules.setdefault("SRACore.operators.ioperator", MagicMock())
 sys.modules.setdefault("SRACore.operators.operator", MagicMock())
 sys.modules.setdefault("SRACore.operators.model", MagicMock())
 
-# util：`SRACore.util` 不能是 MagicMock，否则无法作为包加载 `SRACore.util.errors`
-_mock_util_pkg = types.ModuleType("SRACore.util")
-_mock_util_pkg.__path__ = []
-_mock_util_errors_mod = types.ModuleType("SRACore.util.errors")
-_mock_util_errors_mod.ThreadStoppedError = RuntimeError
-_mock_util_errors_mod.ErrorCode = MagicMock()
-_mock_util_errors_mod.SRAError = RuntimeError
-sys.modules.setdefault("SRACore.util", _mock_util_pkg)
-sys.modules.setdefault("SRACore.util.errors", _mock_util_errors_mod)
+# util 子模块（encryption 依赖 win32 DPAPI，notify 依赖邮件等）
+sys.modules.setdefault("SRACore.util", MagicMock())
 sys.modules.setdefault("SRACore.util.encryption", MagicMock())
 sys.modules.setdefault("SRACore.util.notify", MagicMock())
 sys.modules.setdefault("SRACore.util.sys_util", MagicMock())
