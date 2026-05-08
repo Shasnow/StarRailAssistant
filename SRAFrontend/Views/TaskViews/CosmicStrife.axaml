@@ -3,14 +3,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
-             xmlns:utils="clr-namespace:SRAFrontend.Utils"
              xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SRAFrontend.Views.TaskViews.CosmicStrife"
              x:DataType="viewModels:TaskPageViewModel">
-    <UserControl.Resources>
-        <utils:IntEqualsToBoolConverter x:Key="IntEqualsToBool" />
-    </UserControl.Resources>
     <suki:GlassCard>
         <suki:GroupBox>
             <suki:GroupBox.Header>
@@ -19,184 +15,111 @@
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="CosmicStrifeTask"
-                            ToolTip.Tip="仅运行旷宇纷争任务一次"/>
+                            ToolTip.Tip="单次运行"/>
                 </StackPanel>
+                
             </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Margin="10">
                     <suki:GlassCard>
-                        <StackPanel Spacing="10">
+                        <StackPanel>
                             <CheckBox IsChecked="{Binding CurrentConfig.DUEnable}"
                                       Content="差分宇宙 - 乐园漫记"/>
-                            <Grid ColumnDefinitions="128,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto"
-                                  RowSpacing="8" ColumnSpacing="12">
-                                <Label Grid.Row="0" VerticalAlignment="Center">模式</Label>
-                                <ComboBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center"
-                                          HorizontalAlignment="Left" MinWidth="280" MaxWidth="360"
-                                          SelectedIndex="{Binding CurrentConfig.DUMode}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Label>模式</Label>
+                                <ComboBox SelectedIndex="{Binding CurrentConfig.DUMode}">
                                     <ComboBoxItem>刷第一关</ComboBoxItem>
                                 </ComboBox>
-
-                                <Label Grid.Row="1" VerticalAlignment="Center">策略</Label>
-                                <ComboBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center"
-                                          HorizontalAlignment="Left" MinWidth="280" MaxWidth="360"
-                                          SelectedIndex="{Binding CurrentConfig.DUPolicy}"
-                                          ToolTip.Tip="固定次数：按下方次数。每周上限：本周累计达上限则跳过。刷满周期：左下角积分未满则继续，已满则跳过。">
-                                    <ComboBoxItem Content="固定次数"/>
-                                    <ComboBoxItem Content="每周固定次数"/>
-                                    <ComboBoxItem Content="刷满周期奖励"/>
-                                </ComboBox>
-
-                                <Label Grid.Row="3" VerticalAlignment="Center">运行次数</Label>
-                                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                                    <NumericUpDown VerticalAlignment="Center"
-                                                   HorizontalAlignment="Left" MinWidth="160" MaxWidth="240"
-                                                   FormatString="0" Value="{Binding CurrentConfig.DURunTimes}" Minimum="1" Maximum="99999" />
-                                </StackPanel>
-
-                                <Label Grid.Row="4" VerticalAlignment="Center"
-                                       IsVisible="{Binding CurrentConfig.DUPolicy, Converter={StaticResource IntEqualsToBool}, ConverterParameter=1}">
-                                    每周总执行次数
-                                </Label>
-                                <NumericUpDown Grid.Row="4" Grid.Column="1" VerticalAlignment="Center"
-                                               HorizontalAlignment="Left" MinWidth="160" MaxWidth="240"
-                                               FormatString="0" Value="{Binding CurrentConfig.DUWeeklyTotalCap}" Minimum="1" Maximum="99999"
-                                               ToolTip.Tip="本周累计达到该次数后，本周不再运行差分。"
-                                               IsVisible="{Binding CurrentConfig.DUPolicy, Converter={StaticResource IntEqualsToBool}, ConverterParameter=1}" />
-                            </Grid>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Label>次数</Label>
+                                <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.DURunTimes}" Minimum="1" Maximum="99999" />
+                            </StackPanel>
                             <ToggleSwitch OnContent="秘技速刷" IsChecked="{Binding CurrentConfig.DUUseTechnique}" />
                         </StackPanel>
                     </suki:GlassCard>
                     <TextBlock>请完成引导关卡I、引导关卡II，并清除所有新手提示</TextBlock>
                     <suki:GlassCard>
-                        <StackPanel Spacing="10">
+                        <StackPanel>
                             <CheckBox IsChecked="{Binding CurrentConfig.CurrencyWarsEnable}"
                                       Content="货币战争 - 零和博弈" />
-                            <Grid ColumnDefinitions="128,*" ColumnSpacing="12">
-                                <Label VerticalAlignment="Center">开拓者名称</Label>
-                                <TextBox Grid.Column="1" VerticalAlignment="Center"
-                                         HorizontalAlignment="Left" MinWidth="320" MaxWidth="480"
+                            <Grid ColumnDefinitions="Auto, Auto">
+                                <Label Content="开拓者名称 " />
+                                <TextBox Grid.Column="1"
+                                         Width="200"
                                          Text="{Binding CurrentConfig.CurrencyWarsUsername}"
                                          Watermark="请输入开拓者角色名"/>
                             </Grid>
-
-                            <Grid ColumnDefinitions="128,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
-                                  RowSpacing="8" ColumnSpacing="12">
-                                <Label Grid.Row="0" VerticalAlignment="Center">玩法</Label>
-                                <ComboBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center"
-                                          HorizontalAlignment="Left" MinWidth="280" MaxWidth="360"
-                                          SelectedIndex="{Binding CurrentConfig.CurrencyWarsObjective}"
-                                          ToolTip.Tip="刷等级：整局打完。刷开局：按筛选反复重开（标准入口）。">
-                                    <ComboBoxItem Content="刷等级"/>
-                                    <ComboBoxItem Content="刷开局"/>
+                            
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Label>类型</Label>
+                                <ComboBox SelectedIndex="{Binding CurrencyWarsModeIndex}" Width="200" HorizontalAlignment="Left">
+                                    <ComboBoxItem>标准博弈</ComboBoxItem>
+                                    <ComboBoxItem>超频博弈</ComboBoxItem>
+                                    <ComboBoxItem>刷开局</ComboBoxItem>
                                 </ComboBox>
-
-                                <Label Grid.Row="1" VerticalAlignment="Center"
-                                       IsVisible="{Binding CurrentConfig.CurrencyWarsObjective, Converter={StaticResource IntEqualsToBool}, ConverterParameter=0}">入口</Label>
-                                <ComboBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center"
-                                          HorizontalAlignment="Left" MinWidth="280" MaxWidth="360"
-                                          SelectedIndex="{Binding CurrentConfig.CurrencyWarsRuleset}"
-                                          IsVisible="{Binding CurrentConfig.CurrencyWarsObjective, Converter={StaticResource IntEqualsToBool}, ConverterParameter=0}"
-                                          ToolTip.Tip="对应游戏内「标准博弈」或「超频博弈」入口。">
-                                    <ComboBoxItem Content="标准博弈"/>
-                                    <ComboBoxItem Content="超频博弈"/>
-                                </ComboBox>
-
-                                <Label Grid.Row="2" VerticalAlignment="Center">难度</Label>
-                                <ComboBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center"
-                                          HorizontalAlignment="Left" MinWidth="280" MaxWidth="360"
-                                          SelectedIndex="{Binding CurrentConfig.CurrencyWarsDifficulty}">
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Label>难度</Label>
+                                <ComboBox SelectedIndex="{Binding CurrentConfig.CurrencyWarsDifficulty}" Width="200">
                                     <ComboBoxItem>最低难度</ComboBoxItem>
                                     <ComboBoxItem>最高难度</ComboBoxItem>
                                     <ComboBoxItem>当前难度</ComboBoxItem>
                                 </ComboBox>
+                            </StackPanel>
 
-                                <Label Grid.Row="3" VerticalAlignment="Center">攻略</Label>
-                                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="10"
-                                            VerticalAlignment="Center">
-                                    <ComboBox ItemsSource="{Binding Cache.Strategies}"
-                                              MinWidth="200" MaxWidth="300"
-                                              HorizontalAlignment="Left"
-                                              SelectedIndex="{Binding CurrencyWarsStrategyIndex}">
-                                        <ComboBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding Title}"/>
-                                            </DataTemplate>
-                                        </ComboBox.ItemTemplate>
-                                    </ComboBox>
-                                    <Button VerticalAlignment="Center" Command="{Binding RefreshStrategiesCommand}">刷新</Button>
-                                    <HyperlinkButton VerticalAlignment="Center" Content="攻略站"
-                                                     NavigateUri="https://starrailassistant.top/sra-strategy-site/"/>
-                                </StackPanel>
-
-                                <Label Grid.Row="4" VerticalAlignment="Center"
-                                       IsVisible="{Binding CurrentConfig.CurrencyWarsObjective, Converter={StaticResource IntEqualsToBool}, ConverterParameter=0}">策略</Label>
-                                <ComboBox Grid.Row="4" Grid.Column="1" VerticalAlignment="Center"
-                                          HorizontalAlignment="Left" MinWidth="280" MaxWidth="360"
-                                          IsVisible="{Binding CurrentConfig.CurrencyWarsObjective, Converter={StaticResource IntEqualsToBool}, ConverterParameter=0}"
-                                          SelectedIndex="{Binding CurrentConfig.CurrencyWarsPolicy}"
-                                          ToolTip.Tip="固定次数：按下方局数。每周上限：本周累计达上限则跳过。刷满周期：大厅积分未满则继续，已满则跳过。">
-                                    <ComboBoxItem Content="固定次数"/>
-                                    <ComboBoxItem Content="每周固定次数"/>
-                                    <ComboBoxItem Content="刷满周期奖励"/>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Label>攻略</Label>
+                                <ComboBox ItemsSource="{Binding Cache.Strategies}"
+                                          SelectedIndex="{Binding CurrencyWarsStrategyIndex}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Title}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
                                 </ComboBox>
+                                <Button Command="{Binding RefreshStrategiesCommand}">刷新</Button>
+                                <HyperlinkButton Content="攻略站" NavigateUri="https://starrailassistant.top/sra-strategy-site/"/>
+                            </StackPanel>
 
-                                <Label Grid.Row="6" VerticalAlignment="Center"
-                                       IsVisible="{Binding CurrentConfig.CurrencyWarsObjective, Converter={StaticResource IntEqualsToBool}, ConverterParameter=0}">运行次数</Label>
-                                <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center"
-                                            IsVisible="{Binding CurrentConfig.CurrencyWarsObjective, Converter={StaticResource IntEqualsToBool}, ConverterParameter=0}">
-                                    <NumericUpDown VerticalAlignment="Center"
-                                                   HorizontalAlignment="Left" MinWidth="160" MaxWidth="240"
-                                                   FormatString="0" Value="{Binding CurrentConfig.CurrencyWarsRunTimes}" Minimum="1" Maximum="99999" />
-                                </StackPanel>
-
-                                <StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal"
-                                            Spacing="12"
-                                            IsVisible="{Binding CurrentConfig.CurrencyWarsObjective, Converter={StaticResource IntEqualsToBool}, ConverterParameter=0}">
-                                    <StackPanel Orientation="Horizontal" Spacing="10"
-                                                IsVisible="{Binding CurrentConfig.CurrencyWarsPolicy, Converter={StaticResource IntEqualsToBool}, ConverterParameter=1}">
-                                        <Label Width="128" VerticalAlignment="Center">每周总局数上限</Label>
-                                        <NumericUpDown VerticalAlignment="Center"
-                                                       HorizontalAlignment="Left" MinWidth="160" MaxWidth="240"
-                                                       FormatString="0" Value="{Binding CurrentConfig.CurrencyWarsWeeklyTotalCap}" Minimum="1" Maximum="99999"
-                                                       ToolTip.Tip="本周累计达到该局数后，本周不再运行货币战争。" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </Grid>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Label>运行次数</Label>
+                                <NumericUpDown FormatString="0" Value="{Binding CurrentConfig.CurrencyWarsRunTimes}" Minimum="1" Maximum="99999" />
+                            </StackPanel>
+                            
                             <Separator/>
 
-                            <StackPanel IsVisible="{Binding CurrentConfig.CurrencyWarsObjective, Converter={StaticResource IntEqualsToBool}, ConverterParameter=1}" Spacing="8">
-                                <TextBlock Foreground="Gray" TextWrapping="Wrap"
+                            <StackPanel IsVisible="{Binding !IsCwNormalMode}" Margin="0,4,0,0" Spacing="4">
+                                <TextBlock Foreground="Gray"
                                            Text="下方可配置Boss名称、Boss词条、投资环境与投资策略。Boss名称用分号分隔，其他项用空格分隔多个。" />
 
-                                <Grid ColumnDefinitions="128,*" ColumnSpacing="12">
-                                    <Label VerticalAlignment="Center">Boss名称</Label>
-                                    <TextBox Grid.Column="1" VerticalAlignment="Center"
-                                             HorizontalAlignment="Left" MinWidth="320" MaxWidth="480"
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label Content="Boss名称" />
+                                    <TextBox Width="320"
                                              Text="{Binding CurrentConfig.CwRsBossNames}"
                                              Watermark="例如：杰帕德;可可利亚;幻胧" />
-                                </Grid>
-                                <Grid ColumnDefinitions="128,*" ColumnSpacing="12">
-                                    <Label VerticalAlignment="Center">Boss词条</Label>
-                                    <TextBox Grid.Column="1" VerticalAlignment="Center"
-                                             HorizontalAlignment="Left" MinWidth="320" MaxWidth="480"
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label Content="Boss词条" />
+                                    <TextBox Width="320"
                                              Text="{Binding CurrentConfig.CwRsBossAffixes}"
                                              Watermark="例如：决战在即" />
-                                </Grid>
-                                <Grid ColumnDefinitions="128,*" ColumnSpacing="12">
-                                    <Label VerticalAlignment="Center">投资环境</Label>
-                                    <TextBox Grid.Column="1" VerticalAlignment="Center"
-                                             HorizontalAlignment="Left" MinWidth="320" MaxWidth="480"
+                                </StackPanel>
+                                
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label Content="投资环境" />
+                                    <TextBox Width="320"
                                              Text="{Binding CurrentConfig.CwRsInvestEnvironments}"
                                              Watermark="例如：长线利好 轮岗" />
-                                </Grid>
-                                <Grid ColumnDefinitions="128,*" ColumnSpacing="12">
-                                    <Label VerticalAlignment="Center">投资策略</Label>
-                                    <TextBox Grid.Column="1" VerticalAlignment="Center"
-                                             HorizontalAlignment="Left" MinWidth="320" MaxWidth="480"
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label Content="投资策略" />
+                                    <TextBox Width="320"
                                              Text="{Binding CurrentConfig.CwRsInvestStrategies}"
                                              Watermark="例如：砂里淘金" />
-                                </Grid>
+                                </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </suki:GlassCard>
