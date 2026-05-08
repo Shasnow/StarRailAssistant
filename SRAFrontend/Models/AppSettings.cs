@@ -44,8 +44,16 @@ public partial class GeneralSettings : ObservableObject
     private bool _isCloudGameEnable;
     
     [ObservableProperty]
+    [property: JsonPropertyName("cloudGame.browser")]
+    private string _cloudGameBrowser = "Microsoft Edge";
+    
+    [ObservableProperty]
     [property: JsonPropertyName("templateMatchConfidence")]
     private double _templateMatchConfidence = 0.9;
+    
+    [ObservableProperty]
+    [property: JsonPropertyName("ocrMatchConfidence")]
+    private double _ocrMatchConfidence = 0.7;
 
     [ObservableProperty]
     [property: JsonPropertyName("overlay.enabled")]

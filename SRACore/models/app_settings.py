@@ -46,7 +46,9 @@ class GeneralSettings:
     gamePathIndex: int = 0
     isAutoDetectGamePath: bool = True
     isCloudGameEnable: bool = False
+    cloudGameBrowser: str = "Microsoft Edge"
     templateMatchConfidence: float = 0.9
+    ocrMatchConfidence: float = 0.7
     isOverlayEnabled: bool = False
     isGameArgsEnabled: bool = False
     gameArgsWindowSize: str = "1920x1080"
@@ -69,7 +71,9 @@ class GeneralSettings:
             "gamePath.index": self.gamePathIndex,
             "gamePath.autoDetect": self.isAutoDetectGamePath,
             "cloudGame.enabled": self.isCloudGameEnable,
+            "cloudGame.browser": self.cloudGameBrowser,
             "templateMatchConfidence": self.templateMatchConfidence,
+            "ocrMatchConfidence": self.ocrMatchConfidence,
             "overlay.enabled": self.isOverlayEnabled,
             "gameArgs.enabled": self.isGameArgsEnabled,
             "gameArgs.windowSize": self.gameArgsWindowSize,
@@ -94,7 +98,9 @@ class GeneralSettings:
             "gamePathIndex": data.get("gamePath.index", 0),
             "isAutoDetectGamePath": data.get("gamePath.autoDetect", True),
             "isCloudGameEnable": data.get("cloudGame.enabled", False),
+            "cloudGameBrowser": data.get("cloudGame.browser", "Microsoft Edge"),
             "templateMatchConfidence": data.get("templateMatchConfidence", 0.9),
+            "ocrMatchConfidence": data.get("ocrMatchConfidence", 0.7),
             "isOverlayEnabled": data.get("overlay.enabled", False),
             "isGameArgsEnabled": data.get("gameArgs.enabled", False),
             "gameArgsWindowSize": data.get("gameArgs.windowSize", "1920x1080"),
