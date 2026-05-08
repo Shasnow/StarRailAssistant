@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -24,22 +24,15 @@ public partial class Config : ObservableObject
     // du - DifferentialUniverse 差分宇宙
     [ObservableProperty] private bool _dUEnable; // 是否启用模拟宇宙任务
     [ObservableProperty] private int _dUMode; // 模拟宇宙模式选择
-    [ObservableProperty] private int _dUPolicy; // 0=每次任务次数 1=每周总上限+每日尝试 2=刷满周期(OCR)+每日尝试
-    [ObservableProperty] private int _dURunTimes = 5; // 策略1：每次任务次数；策略2/3：自然日内每日最多尝试次数
-    [ObservableProperty] private int _dUWeeklyTotalCap = 20; // 策略2：ISO 周内累计执行上限（达到则跳过）
+    [ObservableProperty] private int _dUPolicy; // 模拟宇宙策略
+    [ObservableProperty] private int _dURunTimes = 1; // 模拟宇宙运行次数
     [ObservableProperty] private bool _dUUseTechnique; // 差分宇宙是否使用秘技
     [ObservableProperty] private bool _currencyWarsEnable; // 是否启用货币战争任务
-    /// <summary>0=刷等级,1=刷开局</summary>
-    [ObservableProperty] private int _currencyWarsObjective;
-    /// <summary>0=标准博弈入口,1=超频博弈入口</summary>
-    [ObservableProperty] private int _currencyWarsRuleset;
-    /// <summary>打包：Objective×2+Ruleset（0 刷等级标准 … 3 刷开局超频），供后端与旧配置兼容</summary>
-    [ObservableProperty] private int _currencyWarsMode;
+    [ObservableProperty] private int _currencyWarsMode; // 货币战争模式：0=标准博弈,1=超频博弈,2=刷开局（对应后端 CurrencyWarsMode）
     [ObservableProperty] private string _currencyWarsStrategy = "template"; // 货币战争攻略
     [ObservableProperty] private int _currencyWarsStrategyIndex;
-    [ObservableProperty] private int _currencyWarsPolicy; // 0=每次任务局数 1=每周总上限+每日尝试 2=刷满周期(OCR)+每日尝试
-    [ObservableProperty] private int _currencyWarsRunTimes = 1; // 策略1：每次任务局数；策略2/3：自然日内每日最多尝试局数
-    [ObservableProperty] private int _currencyWarsWeeklyTotalCap = 3; // 策略2：ISO 周内累计局数上限
+    [ObservableProperty] private int _currencyWarsPolicy; // 货币战争策略
+    [ObservableProperty] private int _currencyWarsRunTimes = 1; // 货币战争运行次数
     [ObservableProperty] private string _currencyWarsUsername = ""; // 货币战争用户名
     [ObservableProperty] private int _currencyWarsDifficulty; // 货币战争难度：0=最低难度，1=最高难度，2=当前难度（不切换难度）
     
@@ -75,8 +68,6 @@ public partial class Config : ObservableObject
 
     [JsonPropertyName("StartGameUsername")] public string EncryptedStartGameUsername { get; set; } = "";
 
-    /// <summary>配置架构版本；&lt;4 时载入会按 <see cref="SRAFrontend.Utils.CosmicStrifePolicyMigration"/> 将旧四档策略索引并入三档。</summary>
-    public int Version { get; set; } = StaticVersion;
-
-    public static int StaticVersion => 4;
+    public int Version { get; init; } = StaticVersion; // 配置版本号
+    public static int StaticVersion => 3;
 }
