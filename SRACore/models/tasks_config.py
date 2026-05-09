@@ -90,7 +90,6 @@ class TrailblazePowerConfig:
 
     isEnabled: bool = False
     isReplenishEnabled: bool = False
-    replenishMode: int = 0
     replenishTimes: int = 0
     replenishWay: int = 0
     isUseAssistant: bool = False
@@ -102,7 +101,6 @@ class TrailblazePowerConfig:
         return {
             "enabled": self.isEnabled,
             "replenish.enabled": self.isReplenishEnabled,
-            "replenish.mode": self.replenishMode,
             "replenish.times": self.replenishTimes,
             "replenish.way": self.replenishWay,
             "useAssistant": self.isUseAssistant,
@@ -116,7 +114,6 @@ class TrailblazePowerConfig:
         return cls(**{
             "isEnabled": data.get("enabled", False),
             "isReplenishEnabled": data.get("replenish.enabled", False),
-            "replenishMode": data.get("replenish.mode", 0),
             "replenishTimes": data.get("replenish.times", 0),
             "replenishWay": data.get("replenish.way", 0),
             "isUseAssistant": data.get("useAssistant", False),

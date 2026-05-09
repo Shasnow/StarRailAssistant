@@ -66,34 +66,4 @@ public static class DataPersister
     }
 
     #endregion
-
-    #region Config
-
-    public static Config LoadConfig(string name)
-    {
-        try
-        {
-            var configPath = Path.Combine(PathString.ConfigsDir, $"{name}.json");
-            if (!File.Exists(configPath)) return new Config { Name = name };
-            var json = File.ReadAllText(configPath);
-            if (string.IsNullOrWhiteSpace(json)) return new Config { Name = name };
-            var config = JsonSerializer.Deserialize<Config>(json);
-            return config == null || config.Version < Config.StaticVersion ? new Config { Name = name } : config;
-        }
-        catch (Exception e)
-        {
-            Log.Error(e, "Error loading config {ConfigName}, using default config", name);
-            return new Config { Name = name };
-        }
-
-    }
-
-    public static void SaveConfig(Config config)
-    {
-        var configPath = Path.Combine(PathString.ConfigsDir, $"{config.Name}.json");
-        var json = JsonSerializer.Serialize(config, JsonSerializerOptions);
-        SafeWriteAllText(configPath, json);
-    }
-
-    #endregion
 }

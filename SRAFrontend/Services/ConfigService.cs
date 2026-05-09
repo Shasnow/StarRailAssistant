@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
+using SRAFrontend.Migrations;
 using SRAFrontend.Models;
 using SRAFrontend.Utils;
 
@@ -21,27 +23,59 @@ public class ConfigService(CacheService cacheService, ILogger<ConfigService> log
 
     private void Load(string configName)
     {
+        if (string.IsNullOrWhiteSpace(configName))
+            configName = "Default";
+
         logger.LogInformation("Loading config: {ConfigName}", configName);
         var configPath = Path.Combine(PathString.ConfigsDir, $"{configName}.json");
+
+        // 不存在 → 新建
         if (!File.Exists(configPath))
         {
-            logger.LogWarning("Config file not found: {ConfigPath}, use default config", configPath);
+            logger.LogWarning("Config file not found, creating default: {ConfigName}", configName);
             TaskConfig = new TasksConfig { Name = configName };
             return;
         }
 
-        var configJson = File.ReadAllText(configPath);
-        var config = JsonSerializer.Deserialize<TasksConfig>(configJson)!;
-        if (config.Version < TasksConfig.StaticVersion)
+        try
         {
-            logger.LogWarning("Config version {Version} is deprecated. Use default config instead", config.Version);
-            TaskConfig = new TasksConfig { Name = configName };
-            return;
-        }
+            var configJson = File.ReadAllText(configPath);
+            TasksConfig? newConfig = null;
 
-        TaskConfig = config;
-        TaskConfig.Name = configName;
-        DecryptSensitiveFields();
+            // 旧格式迁移
+            if (configJson.Contains("AfterExitApp"))
+            {
+                logger.LogInformation("Migrating OLD config format...");
+                var oldConfig = JsonSerializer.Deserialize<Config>(configJson);
+                if (oldConfig != null)
+                {
+                    newConfig = ConfigMigrator.MigrateOldToNew(oldConfig);
+                }
+            }
+            else
+            {
+                newConfig = JsonSerializer.Deserialize<TasksConfig>(configJson);
+            }
+
+            // 加载失败 / 版本过低 → 使用默认
+            if (newConfig == null || newConfig.Version < TasksConfig.StaticVersion)
+            {
+                if (newConfig != null)
+                    logger.LogWarning("Config version deprecated, using default");
+
+                newConfig = new TasksConfig { Version = TasksConfig.StaticVersion };
+            }
+
+            newConfig.Name = configName;
+            TaskConfig = newConfig;
+
+            DecryptSensitiveFields();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to load config, using default");
+            TaskConfig = new TasksConfig { Name = configName, Version = TasksConfig.StaticVersion };
+        }
     }
 
     public void Save()
