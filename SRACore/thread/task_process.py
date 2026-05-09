@@ -250,7 +250,7 @@ class TaskManager:
                 return None
             print_config = config.to_dict()
             print_config["startGame"]["password"] = "******"
-            print_config["StartGame"]["username"] = "******"
+            print_config["startGame"]["username"] = "******"
             logger.debug('config: ' + str(print_config))
             # 实例化任务类
             operator = self.get_operator()

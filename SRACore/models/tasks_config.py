@@ -154,10 +154,11 @@ class CosmicStrifeConfig:
     """自动生成的 CosmicStrifeConfig 类"""
 
     isEnabled: bool = False
-    isDifferentialUniverseEnabled: bool = False
-    differentialUniverseMode: int = 0
-    differentialUniverseRuntimes: int = 0
-    isDifferentialUniverseUseTechnique: bool = False
+    isPointRewardsEnabled: bool = False
+    isDivergentUniverseEnabled: bool = False
+    divergentUniverseMode: int = 0
+    divergentUniverseRuntimes: int = 0
+    isDivergentUniverseUseTechnique: bool = False
     isCurrencyWarsEnabled: bool = False
     currencyWarsMode: int = 0
     currencyWarsDifficulty: int = 0
@@ -175,10 +176,11 @@ class CosmicStrifeConfig:
         """转换为字典"""
         return {
             "enabled": self.isEnabled,
-            "differentialUniverse.enabled": self.isDifferentialUniverseEnabled,
-            "differentialUniverse.mode": self.differentialUniverseMode,
-            "differentialUniverse.runtimes": self.differentialUniverseRuntimes,
-            "differentialUniverse.useTechnique": self.isDifferentialUniverseUseTechnique,
+            "pointRewards.enabled": self.isPointRewardsEnabled,
+            "divergentUniverse.enabled": self.isDivergentUniverseEnabled,
+            "divergentUniverse.mode": self.divergentUniverseMode,
+            "divergentUniverse.runtimes": self.divergentUniverseRuntimes,
+            "divergentUniverse.useTechnique": self.isDivergentUniverseUseTechnique,
             "currencyWars.enabled": self.isCurrencyWarsEnabled,
             "currencyWars.mode": self.currencyWarsMode,
             "currencyWars.difficulty": self.currencyWarsDifficulty,
@@ -198,10 +200,11 @@ class CosmicStrifeConfig:
         """从字典创建对象"""
         return cls(**{
             "isEnabled": data.get("enabled", False),
-            "isDifferentialUniverseEnabled": data.get("differentialUniverse.enabled", False),
-            "differentialUniverseMode": data.get("differentialUniverse.mode", 0),
-            "differentialUniverseRuntimes": data.get("differentialUniverse.runtimes", 0),
-            "isDifferentialUniverseUseTechnique": data.get("differentialUniverse.useTechnique", False),
+            "isPointRewardsEnabled": data.get("pointRewards.enabled", False),
+            "isDivergentUniverseEnabled": data.get("divergentUniverse.enabled", False),
+            "divergentUniverseMode": data.get("divergentUniverse.mode", 0),
+            "divergentUniverseRuntimes": data.get("divergentUniverse.runtimes", 0),
+            "isDivergentUniverseUseTechnique": data.get("divergentUniverse.useTechnique", False),
             "isCurrencyWarsEnabled": data.get("currencyWars.enabled", False),
             "currencyWarsMode": data.get("currencyWars.mode", 0),
             "currencyWarsDifficulty": data.get("currencyWars.difficulty", 0),

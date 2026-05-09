@@ -22,7 +22,7 @@ class SRACli(cmd.Cmd):
     def __init__(self, settings: AppSettings):
         super().__init__()
         self.settings = settings or {}
-        self.task_manager = TaskManager()
+        self.task_manager = TaskManager(settings)
         self.task_thread = None
         self.trigger_manager = TriggerManager()
         self.trigger_thread = threading.Thread(target=self.trigger_manager.run, daemon=True)
