@@ -6,14 +6,15 @@
 
 ```
 ├── .github/               # 🔧 GitHub相关配置文件
-├── SRACore/               # 🐍 Python后端核心代码
+├── scripts/               # 🛠️ 各种脚本文件（如打包脚本）
+├── SRACore/               # 🐍 Python后端核心代码 ⭐
 │   ├── localization/      # 🌐 本地化支持
 │   ├── task/              # 📋 任务相关代码
 │   ├── thread/            # 🧵 线程管理
 │   ├── triggers/          # ⚡ 触发器实现
 │   ├── ui/                # 🎨 UI相关代码
 │   └── util/              # 🛠️ 工具函数
-├── SRAFrontend/           # 🎯 C#前端代码 (Avalonia框架)
+├── SRAFrontend/           # 🎯 C#前端代码 (Avalonia框架) ⭐
 │   ├── Assets/            # 📦 前端资源文件
 │   ├── Controls/          # 🎛️ 自定义控件
 │   ├── Data/              # 📊 数据模型
@@ -27,37 +28,20 @@
 ├── tests/                 # 🧪 自动化测试
 │   └── backend/           # 🐍 后端单元测试
 ├── main.py                # 🚪 程序入口文件
-├── package.py             # 📦 打包脚本
 ├── rapidocr_onnxruntime/  # 👁️ OCR识别相关模型
 ├── requirements.txt       # 📋 Python依赖列表
 ├── resources/             # 📁 资源文件目录
 │   ├── img/               # 🖼️ 图像资源
 │   ├── test/              # 🧪 测试资源
 ├── setup/                 # 📦 安装包制作相关文件
-├── tasks/                 # 📋 任务实现目录
-└── version.json           # 🔢 版本信息
+├── tasks/                 # 📋 任务实现目录 ⭐
 ```
-
-### 📁 主要目录说明
-
-- **SRACore/**: 🐍 包含程序的核心逻辑，包括任务管理、线程控制、触发器系统和工具函数等。
-- **SRAFrontend/**: 🎯 使用Avalonia框架开发的C#前端界面，实现用户交互和配置管理。
-- **tasks/**: 📋 各种自动化任务的具体实现，如启动游戏、领取奖励、清体力等。
-- **tests/**: 🧪 自动化测试目录，`tests/backend/` 存放后端 Python 单元测试。
-- **resources/**: 📁 存放程序所需的各种资源文件，包括图像识别所需的模板图片。
-
-### 📄 关键文件说明
-
-- **main.py**: 🚪 程序的入口点，负责解析命令行参数并启动后端服务。
-- **requirements.txt**: 📋 列出了项目所需的所有Python依赖包。
-- **package.py**: 📦 用于将项目打包为可执行文件的脚本。
-- **version.json**: 🔢 存储项目的版本信息。
 
 ## 📋 环境要求
 
 - **操作系统**：Windows 10 或 Windows 11 (推荐)
 - **Python**：3.12 或更高版本（需添加到系统环境变量）
-- **.NET SDK**：8.0（下载地址：[.NET 8.0 SDK](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0)）
+- **.NET SDK**：10.0（下载地址：[.NET 10.0 SDK](https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0)）
 - **Git**：用于克隆仓库（可选，但推荐）
 - **Node.js**：用于执行 npm 脚本（可选）
 
@@ -156,6 +140,8 @@ sra> single StartGameTask Default     # 只运行启动游戏任务
 
 直接进入 CLI 交互模式，逐条执行命令观察输出。
 
+接下来：参见[SRACLI](https://starrailassistant.top/getstarted/advance.html#sracli)文档，了解所有可用命令和参数。
+
 ### 用前端编辑配置，手动触发后端执行
 
 适用场景：需要通过前端 UI 调整任务参数（选关卡、改次数等），然后手动控制后端执行时机。
@@ -206,6 +192,13 @@ npm run build
 ```
 
 完成后，发布包将位于项目根目录，命名格式为：StarRailAssistant_vX.X.X.zip、StarRailAssistant_Lite_vX.X.X.zip、StarRailAssistant_Core_vX.X.X.zip
+
+## 辅助脚本
+```bash
+npm run pyl10nc # 运行 pyl10nc 本地化工具，编辑 SRACore/localization/resource.toml 文件以添加/修改翻译
+npm run model-gen # 运行模型生成脚本，根据 C# 业务模型生成对应的 Python 数据类，保持前后端数据结构一致
+npm run build # 构建项目，包括前端发布包和后端可执行文件，并生成完整的发布包
+```
 
 ## 🧪 运行测试
 
