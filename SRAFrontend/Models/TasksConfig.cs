@@ -60,9 +60,6 @@ public partial class TrailblazePowerConfig : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("replenish.enabled")]
     private bool _isReplenishEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("replenish.mode")]
-    private int _replenishMode;
-
     [ObservableProperty] [property: JsonPropertyName("replenish.times")]
     private int _replenishTimes;
 
@@ -88,7 +85,7 @@ public partial class ReceiveRewardsConfig : ObservableObject
     private string _redeemCodes = "";
 
     [JsonPropertyName("rewards")]
-    public ObservableCollection<bool> Rewards { get; set; } = [true, true, true, true, true, true, false];
+    public ObservableCollection<bool> Rewards { get; init; } = [true, true, true, true, true, true, false];
 }
 
 public partial class CosmicStrifeConfig : ObservableObject
