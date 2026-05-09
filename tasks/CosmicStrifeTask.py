@@ -6,13 +6,14 @@ from tasks.currency_wars.characters import Characters
 class CosmicStrifeTask(BaseTask):
     def run(self):
         """主任务执行函数"""
-        if self.config.CosmicStrife.isDifferentialUniverseEnabled:
+        if self.config.CosmicStrife.isDivergentUniverseEnabled:
             logger.info("执行任务：旷宇纷争-模拟宇宙")
-            from tasks.differential_universe import DifferentialUniverse
-            du_task = DifferentialUniverse(
+            from tasks.divergent_universe import DivergentUniverse
+            du_task = DivergentUniverse(
                 self.operator,
-                self.config.CosmicStrife.differentialUniverseRuntimes,
-                self.config.CosmicStrife.isDifferentialUniverseUseTechnique)
+                self.config.CosmicStrife.divergentUniverseRuntimes,
+                self.config.CosmicStrife.isDivergentUniverseUseTechnique,
+                self.config.CosmicStrife.isPointRewardsEnabled)
             if not du_task.run():
                 logger.error("旷宇纷争-模拟宇宙任务失败")
                 return False

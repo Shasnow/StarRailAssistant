@@ -6,7 +6,7 @@ from loguru import logger
 
 from SRACore.localization import Resource
 from SRACore.models.tasks_config import TasksConfig
-from SRACore.operators import IOperator
+from SRACore.operators.ioperator import IOperator
 from SRACore.util import notify
 
 

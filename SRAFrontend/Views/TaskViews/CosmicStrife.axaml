@@ -23,19 +23,20 @@
                 <StackPanel Margin="10">
                     <suki:GlassCard>
                         <StackPanel>
-                            <CheckBox IsChecked="{Binding CosmicStrifeConfig.IsDifferentialUniverseEnabled}"
+                            <CheckBox IsChecked="{Binding CosmicStrifeConfig.IsDivergentUniverseEnabled}"
                                       Content="差分宇宙 - 乐园漫记"/>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Label>模式</Label>
-                                <ComboBox SelectedIndex="{Binding CosmicStrifeConfig.DifferentialUniverseMode}">
+                                <ComboBox SelectedIndex="{Binding CosmicStrifeConfig.DivergentUniverseMode}">
                                     <ComboBoxItem>刷第一关</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="10">
                                 <Label>次数</Label>
-                                <NumericUpDown FormatString="0" Value="{Binding CosmicStrifeConfig.DifferentialUniverseRuntimes}" Minimum="1" Maximum="99999" />
+                                <NumericUpDown FormatString="0" Value="{Binding CosmicStrifeConfig.DivergentUniverseRuntimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
-                            <ToggleSwitch OnContent="秘技速刷" IsChecked="{Binding CosmicStrifeConfig.IsDifferentialUniverseUseTechnique}" />
+                            <ToggleSwitch OnContent="秘技速刷" IsChecked="{Binding CosmicStrifeConfig.IsDivergentUniverseUseTechnique}" />
+                            <ToggleSwitch OnContent="启用积分奖励" IsChecked="{Binding CosmicStrifeConfig.IsPointRewardsEnabled}" />
                         </StackPanel>
                     </suki:GlassCard>
                     <TextBlock>请完成引导关卡I、引导关卡II，并清除所有新手提示</TextBlock>

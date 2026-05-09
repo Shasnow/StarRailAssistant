@@ -7,11 +7,12 @@ from SRACore.util.errors import SRAError, ErrorCode
 from tasks.img import DUIMG, IMG
 
 
-class DifferentialUniverse(Executable):
-    def __init__(self, operator, run_times: int, use_technique: bool):
+class DivergentUniverse(Executable):
+    def __init__(self, operator, run_times: int = 1, use_technique: bool = False, point_rewards: bool = False):
         super().__init__(operator)
         self.run_times = run_times
         self.use_technique = use_technique
+        self.point_rewards = point_rewards
 
     def run(self):
         """主任务执行函数"""
@@ -20,6 +21,8 @@ class DifferentialUniverse(Executable):
         for exe_time in range(self.run_times):
             if not self.page_locate():
                 return False
+            if self.point_rewards and self.check_point_rewards():
+                break
             if not self._start_differential_universe(exe_time):
                 return False
             if not self.select():
@@ -30,7 +33,8 @@ class DifferentialUniverse(Executable):
                 return False
             if not self._complete_mission():
                 return False
-
+        if self.point_rewards:
+            self.receive_point_rewards()
         self._return_to_main_menu()
         logger.info("Mission accomplished")
         return True
@@ -174,7 +178,11 @@ class DifferentialUniverse(Executable):
 
     def _return_to_main_menu(self):
         """返回主菜单"""
-        self.operator.press_key("esc", presses=2, interval=1)
+        self.operator.do_while(
+            lambda : self.operator.press_key("esc"),
+            lambda : self.operator.locate(IMG.ENTER) is None,
+            interval=1, max_iterations=10
+        )
 
     def page_locate(self):
         """
@@ -193,9 +201,24 @@ class DifferentialUniverse(Executable):
             self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙
             self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
-            return True
+            return self.operator.wait_img(DUIMG.DIFFERENTIAL_UNIVERSE_START, timeout=10) is not None
         elif page == 1:
             return True
         else:
             logger.error("检测超时")
             return False
+
+    def check_point_rewards(self):
+        result = self.operator.ocr(from_x=0.1, from_y=0.9, to_x=0.21, to_y=0.96)
+        # 格式 x/18000
+        if result:
+            current = result[0][1]
+            logger.info(f"当前积分奖励: {current}")
+            if current == '18000/18000':
+                return True
+        return False
+
+    def receive_point_rewards(self):
+        self.operator.click_point(0.15, 0.93, tag="领取积分奖励", after_sleep=1)
+        if self.operator.click_img(DUIMG.RECEIVE, after_sleep=1):
+            self.operator.press_key("esc")

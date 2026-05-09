@@ -95,18 +95,21 @@ public partial class CosmicStrifeConfig : ObservableObject
 {
     [ObservableProperty] [property: JsonPropertyName("enabled")]
     private bool _isEnabled;
+    
+    [ObservableProperty] [property: JsonPropertyName("pointRewards.enabled")]
+    private bool _isPointRewardsEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("differentialUniverse.enabled")]
-    private bool _isDifferentialUniverseEnabled;
+    [ObservableProperty] [property: JsonPropertyName("divergentUniverse.enabled")]
+    private bool _isDivergentUniverseEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("differentialUniverse.mode")]
-    private int _differentialUniverseMode;
+    [ObservableProperty] [property: JsonPropertyName("divergentUniverse.mode")]
+    private int _divergentUniverseMode;
 
-    [ObservableProperty] [property: JsonPropertyName("differentialUniverse.runtimes")]
-    private int _differentialUniverseRuntimes;
+    [ObservableProperty] [property: JsonPropertyName("divergentUniverse.runtimes")]
+    private int _divergentUniverseRuntimes;
 
-    [ObservableProperty] [property: JsonPropertyName("differentialUniverse.useTechnique")]
-    private bool _isDifferentialUniverseUseTechnique;
+    [ObservableProperty] [property: JsonPropertyName("divergentUniverse.useTechnique")]
+    private bool _isDivergentUniverseUseTechnique;
 
     [ObservableProperty] [property: JsonPropertyName("currencyWars.enabled")]
     private bool _isCurrencyWarsEnabled;
