@@ -87,6 +87,8 @@ def copy_core_resources(dist: Path):
     shutil.copy2(ROOT_PATH / "LICENSE", dist / "LICENSE")
     shutil.copy2(ROOT_PATH / "README.md", dist / "README.md")
     shutil.copy2(ROOT_PATH / "requirements.txt", dist / "requirements.txt")
+    shutil.copy2(ROOT_PATH / "requirements-win.txt", dist / "requirements-win.txt")
+    shutil.copy2(ROOT_PATH / "requirements-linux.txt", dist / "requirements-linux.txt")
     shutil.copy2(ROOT_PATH / "main.py", dist / "main.py")
     shutil.copytree(ROOT_PATH / "SRACore", dist / "SRACore")
     shutil.copytree(ROOT_PATH / "resources", dist / "resources")
@@ -110,7 +112,7 @@ def package_code(version: str):
     with ZipFile(code_zip_path, "w", compression=ZIP_DEFLATED) as zipf:
         for item in ["SRACore", "tasks", "resources"]:
             add_to_zip(zipf, ROOT_PATH / item)
-        for file in ["main.py", "README.md", "LICENSE", "requirements.txt"]:
+        for file in ["main.py", "README.md", "LICENSE", "requirements.txt", "requirements-win.txt", "requirements-linux.txt"]:
             add_to_zip(zipf, ROOT_PATH / file)
     print(f"[OK] Code package: {code_zip_path.name}")
 
@@ -123,7 +125,7 @@ def package_lite(version: str):
             add_to_zip(zipf, file)
         for item in ["SRACore", "tasks", "resources"]:
             add_to_zip(zipf, ROOT_PATH / item)
-        for file in ["main.py", "README.md", "LICENSE", "requirements.txt"]:
+        for file in ["main.py", "README.md", "LICENSE", "requirements.txt", "requirements-win.txt", "requirements-linux.txt"]:
             add_to_zip(zipf, ROOT_PATH / file)
     print(f"[OK] Lite package: {lite_zip_path.name}")
 
