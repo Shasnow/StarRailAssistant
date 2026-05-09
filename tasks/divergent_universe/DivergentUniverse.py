@@ -23,7 +23,7 @@ class DivergentUniverse(Executable):
                 return False
             if self.point_rewards and self.check_point_rewards():
                 break
-            if not self._start_differential_universe(exe_time):
+            if not self._start_divergent_universe(exe_time):
                 return False
             if not self.select():
                 return False
@@ -39,16 +39,16 @@ class DivergentUniverse(Executable):
         logger.info("Mission accomplished")
         return True
 
-    def _start_differential_universe(self, exe_time):
+    def _start_divergent_universe(self, exe_time):
         """开始差分宇宙任务"""
         logger.info(f"第{exe_time + 1}次进入差分宇宙，少女祈祷中…")
-        index, box = self.operator.wait_any_img([DUIMG.DIFFERENTIAL_UNIVERSE, DUIMG.DIFFERENTIAL_UNIVERSE_START])
+        index, box = self.operator.wait_any_img([DUIMG.DIVERGENT_UNIVERSE, DUIMG.DIVERGENT_UNIVERSE_START])
         if index == -1:
             logger.error(SRAError(ErrorCode.IMAGE_NOT_FOUND, "未找到差分宇宙入口"))
             return False
         if index == 0:  # 差分宇宙门口
             self.operator.press_key("f")
-            box = self.operator.wait_img(DUIMG.DIFFERENTIAL_UNIVERSE_START)
+            box = self.operator.wait_img(DUIMG.DIVERGENT_UNIVERSE_START)
         # index=1, 已经在差分宇宙界面，box为开始按钮
         # 点击开始按钮直到进入
         self.operator.do_while(lambda: self.operator.click_box(box),  # NOQA
@@ -56,7 +56,7 @@ class DivergentUniverse(Executable):
                                interval=1, max_iterations=10)
         self.operator.click_img(DUIMG.PERIODIC_CALCULUS)
 
-        launch_button_box = self.operator.wait_img(DUIMG.LAUNCH_DIFFERENTIAL_UNIVERSE)
+        launch_button_box = self.operator.wait_img(DUIMG.LAUNCH_DIVERGENT_UNIVERSE)
         # 启动差分宇宙
         if launch_button_box is None:
             logger.error(SRAError(ErrorCode.IMAGE_NOT_FOUND, "未找到差分宇宙启动按钮"))
@@ -96,7 +96,7 @@ class DivergentUniverse(Executable):
             ("选择站点卡", DUIMG.STATION_SELECT, self.handle_station_select, False),
             ("选择惊世奇迹", DUIMG.SELECT_GRAND_MIRACLE, self.handle_miracle_select, False),
             ("点击空白处关闭", DUIMG.CLOSE, self.handle_close, False),
-            ('', DUIMG.DIFFERENTIAL_UNIVERSE_QUIT, None, True),
+            ('', DUIMG.DIVERGENT_UNIVERSE_QUIT, None, True),
         ]
 
         template_list = [s[1] for s in selections]
@@ -191,7 +191,7 @@ class DivergentUniverse(Executable):
         """
         page, _ = self.operator.wait_any_img([
             IMG.ENTER,
-            DUIMG.DIFFERENTIAL_UNIVERSE_START,
+            DUIMG.DIVERGENT_UNIVERSE_START,
         ], interval=1)
         if page == 0:
             self.operator.press_key(self.settings.General.hotkeyF4)
@@ -201,7 +201,7 @@ class DivergentUniverse(Executable):
             self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙
             self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
-            return self.operator.wait_img(DUIMG.DIFFERENTIAL_UNIVERSE_START, timeout=10) is not None
+            return self.operator.wait_img(DUIMG.DIVERGENT_UNIVERSE_START, timeout=10) is not None
         elif page == 1:
             return True
         else:
