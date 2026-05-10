@@ -137,7 +137,7 @@ class TaskManager:
             return []
         print_config = config.to_dict()
         print_config["startGame"]["password"] = "******"
-        print_config["StartGame"]["username"] = "******"
+        print_config["startGame"]["username"] = "******"
         logger.debug('config: ' + str(print_config))
         # 从配置中读取任务选择列表（如 [True, False, True]）
         task_select = [config.StartGame.isEnabled,
