@@ -109,11 +109,11 @@ class TrailblazePowerTask(BaseTask):
                         else:
                             task_name = subtask_info.get("name", subtask_id)
                             self.auto_detect_tasks.append(
-                                TrailblazePowerTaskItem.from_dict({
-                                    "Name": task_name,
-                                    "Id": subtask_id,
-                                    "Level": index + 1
-                                 })
+                                TrailblazePowerTaskItem(
+                                    Name = task_name,
+                                    Id = subtask_id,
+                                    Level = index + 1
+                                 )
                                 )
                         break
                 else:
