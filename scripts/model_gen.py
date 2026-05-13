@@ -56,6 +56,18 @@ def convert_csharp_type(csharp_type: str) -> str:
     return csharp_type
 
 
+def is_list_type(python_type: str) -> bool:
+    """判断是否为列表类型"""
+    return python_type.startswith('list[') and python_type.endswith(']')
+
+
+def get_list_inner_type(python_type: str) -> str:
+    """获取列表元素类型"""
+    if not is_list_type(python_type):
+        return python_type
+    return python_type[len('list['):-1].strip()
+
+
 def parse_csharp_file(file_path: str) -> list[dict]:
     """解析C#文件，提取类信息"""
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -124,6 +136,13 @@ def convert_csharp_default(csharp_default: str | None, python_type: str) -> str:
         if python_type.startswith('list'):
             return 'field(default_factory=list)'
         return defaults.get(python_type, 'None')
+
+    if python_type.startswith('list') and (
+        csharp_default in ('[]', 'new()')
+        or csharp_default.startswith('new ')
+        or csharp_default.startswith('new(')
+    ):
+        return 'field(default_factory=list)'
 
     if csharp_default == 'true':
         return 'True'
@@ -202,7 +221,15 @@ def generate_python_class(class_info: dict, class_names: list[str]) -> str:
 
         # 如果属性类型是另一个自定义类，则调用其from_dict方法
         if prop_type in class_names:
-            from_dict_lines.append(f'"{prop_name}": {prop_type}.from_dict(data.get("{json_name}", \u007b\u007d))')
+            from_dict_lines.append(f'"{prop_name}": {prop_type}.from_dict(data.get("{json_name}", {{}}))')
+        elif is_list_type(prop_type):
+            inner_type = get_list_inner_type(prop_type)
+            if inner_type in class_names:
+                from_dict_lines.append(
+                    f'"{prop_name}": [{inner_type}.from_dict(item) for item in data.get("{json_name}", list())]'
+                )
+            else:
+                from_dict_lines.append(f'"{prop_name}": data.get("{json_name}", list())')
         else:
             default_value = convert_csharp_default(prop['csharp_default'], prop['python_type'])
             if default_value == "field(default_factory=list)":
