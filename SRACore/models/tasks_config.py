@@ -118,7 +118,7 @@ class TrailblazePowerConfig:
             "replenishWay": data.get("replenish.way", 0),
             "isUseAssistant": data.get("useAssistant", False),
             "isUseBuildTarget": data.get("useBuildTarget", False),
-            "TaskList": data.get("tasklist", list())
+            "TaskList": [TrailblazePowerTaskItem.from_dict(item) for item in data.get("tasklist", list())]
         })
 
 @dataclass
