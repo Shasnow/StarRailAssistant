@@ -2,7 +2,7 @@ name: 新功能建议
 description: 新功能增强与改进建议
 title: "[Enhancement] "
 labels: ["enhancement"]
-assignees: ["Shasnow"]
+assignees: []
 body:
   - type: markdown
     attributes:

@@ -2,7 +2,7 @@ name: Report a Bug
 description: Report recognition errors, operation failures, connection issues, and other problems
 title: "[BUG] "
 labels: ["bug"]
-assignees: ["Shasnow"]
+assignees: []
 body:
   - type: markdown
     attributes:
