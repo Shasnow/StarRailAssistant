@@ -1,0 +1,35 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
+             x:Class="SRAFrontend.Controls.TpAddTaskControl"
+             x:DataType="viewModels:TaskPageViewModel"
+             Width="400" Height="400">
+    <StackPanel>
+        <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                <Label Grid.Row="0" Grid.Column="0" Content="类型"/>
+                <ComboBox Grid.Row="0" Grid.Column="1"
+                          Width="300"
+                          ItemsSource="{Binding TpTaskNames}"
+                          SelectedIndex="{Binding SelectedTpTaskIndex}"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="关卡"/>
+                <ComboBox Grid.Row="1" Grid.Column="1"
+                          Width="300"
+                          ItemsSource="{Binding CurrentTpTaskLevels}"
+                          SelectedIndex="{Binding SelectedTpTaskLevelIndex}"/>
+                <Label Grid.Row="2" Grid.Column="0" Content="单次次数"/>
+                <NumericUpDown Grid.Row="2" Grid.Column="1" Minimum="1" Maximum="{Binding CurrentTpTaskMaxSingleTimes}" FormatString="0"
+                               Width="290"
+                               Value="{Binding TpTaskSingleTimes}"/>
+                <Label Grid.Row="3" Grid.Column="0" Content="运行次数"/>
+                <NumericUpDown Grid.Row="3" Grid.Column="1" Minimum="1" Maximum="99" FormatString="0"
+                               Width="290"
+                               Value="{Binding TpTaskRunTimes}"/>
+                <Label Grid.Row="4" Grid.Column="0" Content="自动检测"/>
+                <ToggleSwitch Grid.Row="4" Grid.Column="1" IsChecked="{Binding IsTpTaskAutoDetect}"/>
+            </Grid>
+        <Button Content="ensure" Command="{Binding AddTaskItemCommand}"></Button>
+    </StackPanel>
+</UserControl>
