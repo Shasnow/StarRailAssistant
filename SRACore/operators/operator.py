@@ -59,7 +59,7 @@ class Operator(IOperator):
         if region is None:
             raise SRAError(
                 ErrorCode.WINDOW_REGION_INVALID,
-                f"无法获取窗口客户区区域 '{self.window_title}'", "窗口可能被最小化")
+                f"无法获取窗口客户区域 '{self.window_title}' 句柄 '{hwnd}'", "窗口可能被最小化")
         return region
 
     def _get_client_region(self, hwnd: int) -> Region | None:

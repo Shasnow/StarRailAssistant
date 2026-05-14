@@ -1,0 +1,47 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="500"
+             x:Class="SRAFrontend.Controls.TpTaskListControl"
+             x:DataType="viewModels:TaskPageViewModel"
+             Width="400" Height="500">
+    <Grid RowDefinitions="*, Auto">
+        <ListBox Grid.Row="0" ItemsSource="{Binding TrailblazePowerConfig.TaskList}"
+                 SelectedItem="{Binding SelectedTaskItem}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid RowDefinitions="*,*,*" ColumnDefinitions="Auto,*">
+                            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                   Content="{Binding Name}" HorizontalAlignment="Center" />
+                            <Label Grid.Row="1" Grid.Column="0">关卡名称</Label>
+                            <Label Grid.Row="1" Grid.Column="1" Content="{Binding LevelName}" />
+                            <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                   Content="自动检测"
+                                   IsVisible="{Binding AutoDetect}" />
+                            <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                  RowDefinitions="*, *" ColumnDefinitions="Auto, *"
+                                  IsVisible="{Binding !AutoDetect}">
+                                <Label Grid.Row="0" Grid.Column="0" Content="单次次数" />
+                                <Label Grid.Row="0" Grid.Column="1" Content="{Binding Count}" />
+                                <Label Grid.Row="1" Grid.Column="0" Content="执行次数" />
+                                <Label Grid.Row="1" Grid.Column="1" Content="{Binding RunTimes}" />
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Delete" IsEnabled="{Binding EnableContextMenu}"
+                                  Command="{Binding DeleteSelectedTaskItemCommand}">
+                            <MenuItem.Icon>
+                                <Label Classes="Icon" Content="&#xE4A6;" FontSize="10" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+            </ListBox>
+        <Button Grid.Row="1" Content="Add" Command="{Binding ShowAddTaskControlCommand}"/>
+    </Grid>
+</UserControl>
