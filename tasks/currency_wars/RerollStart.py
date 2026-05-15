@@ -62,7 +62,7 @@ class RerollStart(CurrencyWars):
         self.wanted_invest_env = list()
         self.optional_invest_env = list()
         for item in invest_env_tokens:
-            if item.startswith("?"):
+            if item.startswith(("?", "？")):
                 self.optional_invest_env.append(item[1:])
             else:
                 self.wanted_invest_env.append(item)
@@ -82,7 +82,7 @@ class RerollStart(CurrencyWars):
         # 使用分号分隔各阶段的投资策略要求
         stages = invest_strategy.replace("；", ";").split(";")
         # 去除末尾空字符串（如"策略1;"会分割为["策略1", ""]）
-        while stages and stages[-1] == "":
+        if stages[-1] == "":
             stages.pop()
         self.wanted_invest_strategies = [self._normalize_ocr_text(s) for s in stages]
 
@@ -107,7 +107,7 @@ class RerollStart(CurrencyWars):
         self.wanted_boss_affixes = list()
         self.hate_boss_affixes = list()
         for item in boss_affix_tokens:
-            if item.startswith("!"):
+            if item.startswith(("!", "！")):
                 self.hate_boss_affixes.append(self._normalize_ocr_text(item[1:]))
             else:
                 self.wanted_boss_affixes.append(self._normalize_ocr_text(item))
