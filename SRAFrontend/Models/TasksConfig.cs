@@ -74,6 +74,21 @@ public partial class TrailblazePowerConfig : ObservableObject
 
     [JsonPropertyName("tasklist")]
     public ObservableCollection<TrailblazePowerTaskItem> TaskList { get; init; } = [];
+    
+    [ObservableProperty] [property: JsonPropertyName("activity.enabled")]
+    private bool _isActivityEnabled;
+    
+    [ObservableProperty] [property: JsonPropertyName("activity.gardenOfPlenty.level1")]
+    private int _gardenOfPlentyLevel1;
+    
+    [ObservableProperty] [property: JsonPropertyName("activity.gardenOfPlenty.level2")]
+    private int _gardenOfPlentyLevel2;
+    
+    [ObservableProperty] [property: JsonPropertyName("activity.planarFissure.level")]
+    private int _planarFissureLevel;
+    
+    [ObservableProperty] [property: JsonPropertyName("activity.realmOfTheStrange.level")]
+    private int _realmOfTheStrangeLevel;
 }
 
 public partial class ReceiveRewardsConfig : ObservableObject

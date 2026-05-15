@@ -23,13 +23,22 @@
                        Foreground="White"
                        FontSize="14"
                        VerticalAlignment="Top"
-                       HorizontalAlignment="Left" />
+                       HorizontalAlignment="Left">
+                <TextBlock.Effect>
+                    <DropShadowEffect Color="Black" BlurRadius="4" Opacity="1" OffsetX="0" OffsetY="0"/>
+                </TextBlock.Effect>
+            </TextBlock>
             <ScrollViewer>
                 <TextBlock Name="LogText"
                            Foreground="White"
                            FontSize="12"
                            Padding="8"
-                           TextWrapping="Wrap" />
+                           TextWrapping="Wrap">
+                    <TextBlock.Effect>
+                        <DropShadowEffect Color="Black" BlurRadius="4" Opacity="1" OffsetX="0" OffsetY="0"/>
+                    </TextBlock.Effect>
+                    当控制台输出日志时，这里会显示日志内容。
+                </TextBlock>
             </ScrollViewer>
         </StackPanel>
 

@@ -21,8 +21,16 @@
             </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Spacing="10">
+                    <suki:GlassCard>
+                        <suki:GroupBox Header="任务清单">
+                            <Grid ColumnDefinitions="Auto,*, Auto">
+                                <Label Grid.Column="1" Content="{Binding TaskListText}"/>
+                                <Button Grid.Column="2" Content="配置" Command="{Binding ShowTaskListControlCommand}"/>
+                            </Grid>
+                        </suki:GroupBox>
+                    </suki:GlassCard>
                     <suki:GlassCard IsInteractive="True">
-                        <StackPanel>
+                        <StackPanel >
                             <CheckBox
                                 IsChecked="{Binding TrailblazePowerConfig.IsReplenishEnabled}"
                                 Content="补充体力" />
@@ -51,16 +59,47 @@
                         </StackPanel>
                     </suki:GlassCard>
                     <suki:GlassCard>
-                        <suki:GroupBox Header="任务清单">
-                            <Grid ColumnDefinitions="Auto,*, Auto">
-                                <Label Grid.Column="1" Content="{Binding TaskListText}"/>
-                                <Button Grid.Column="2" Content="配置" Command="{Binding ShowTaskListControlCommand}"/>
-                            </Grid>
+                        <suki:GroupBox>
+                            <suki:GroupBox.Header>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="启用多倍活动检测" VerticalAlignment="Center"/>
+                                    <ToggleSwitch IsChecked="{Binding TrailblazePowerConfig.IsActivityEnabled}"/>
+                                </StackPanel>
+                            </suki:GroupBox.Header>
+                            <StackPanel>
+                                <Grid ColumnDefinitions="Auto, Auto,*" RowDefinitions="Auto, Auto">
+                                    <Label Grid.Row="0" Grid.Column="0" Content="花藏繁生"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Width="180" VerticalAlignment="Center" TextAlignment="Center"
+                                        Text="拟造花萼（金）"/>
+                                    <ComboBox Grid.Row="0" Grid.Column="2"
+                                              SelectedIndex="{Binding TrailblazePowerConfig.GardenOfPlentyLevel1}"
+                                              ItemsSource="{Binding GardenOfPlentyLevels1}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Width="180" VerticalAlignment="Center" TextAlignment="Center"
+                                               Text="拟造花萼（赤）"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="2"
+                                              SelectedIndex="{Binding TrailblazePowerConfig.GardenOfPlentyLevel2}"
+                                              ItemsSource="{Binding GardenOfPlentyLevels2}"/>
+                                </Grid>
+                                <Grid ColumnDefinitions="Auto, Auto,*">
+                                    <Label Grid.Column="0" Content="异器盈界"/>
+                                    <TextBlock Grid.Column="1" Width="180" Text="侵蚀隧洞" VerticalAlignment="Center" TextAlignment="Center"/>
+                                    <ComboBox Grid.Column="2"
+                                              SelectedIndex="{Binding TrailblazePowerConfig.RealmOfTheStrangeLevel}"
+                                              ItemsSource="{Binding RealmOfTheStrangeLevels}"/>
+                                </Grid>
+                                <Grid ColumnDefinitions="Auto, Auto,*">
+                                    <Label Grid.Column="0" Content="位面分裂"/>
+                                    <TextBlock Grid.Column="1" Width="180" Text="饰品提取" VerticalAlignment="Center" TextAlignment="Center"/>
+                                    <ComboBox Grid.Column="2"
+                                              SelectedIndex="{Binding TrailblazePowerConfig.PlanarFissureLevel}"
+                                              ItemsSource="{Binding PlanarFissureLevels}"/>
+                                </Grid>
+                            </StackPanel>
+                            
                         </suki:GroupBox>
                     </suki:GlassCard>
                 </StackPanel>
             </ScrollViewer>
         </suki:GroupBox>
     </suki:GlassCard>
-
 </UserControl>

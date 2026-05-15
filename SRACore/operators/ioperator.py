@@ -14,6 +14,7 @@ from SRACore.util.const import AppRootDir
 from SRACore.util.data_persister import load_app_settings
 from SRACore.util.errors import ThreadStoppedError
 
+type Waitable = Callable[[], Box | None]
 
 class IOperator(ABC):
     ocr_engine = None
@@ -21,7 +22,8 @@ class IOperator(ABC):
     def __init__(self, stop_event: threading.Event | None = None):
         self.type = "Local"
         self.settings = load_app_settings()
-        self.confidence: float = self.settings.General.templateMatchConfidence
+        self.tm_confidence: float = self.settings.General.templateMatchConfidence
+        self.ocr_confidence: float = self.settings.General.ocrMatchConfidence
         self.top = 0
         self.left = 0
         self.width = 0
@@ -91,7 +93,7 @@ class IOperator(ABC):
         """
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("图像识别中断", "线程已停止")
-        match_confidence = self.confidence if confidence is None else confidence
+        match_confidence = self.tm_confidence if confidence is None else confidence
         try:
             if not Path(template).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + template)
@@ -137,7 +139,7 @@ class IOperator(ABC):
         """
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("图像识别中断", "线程已停止")
-        match_confidence = self.confidence if confidence is None else confidence
+        match_confidence = self.tm_confidence if confidence is None else confidence
         try:
             screenshot = self.screenshot(from_x=from_x, from_y=from_y,to_x=to_x, to_y=to_y)
             self.sleep(0.5)
@@ -188,10 +190,7 @@ class IOperator(ABC):
         """
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("图像识别中断", "线程已停止")
-        if confidence is not None:
-            match_confidence = confidence
-        else:
-            match_confidence = self.confidence
+        match_confidence = self.tm_confidence if confidence is None else confidence
         try:
             if not Path(template).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + template)
@@ -253,7 +252,7 @@ class IOperator(ABC):
 
     def ocr_match(self,
                   text: str,
-                  confidence: float = 0.9,
+                  confidence: float | None = None,
                   *,
                   from_x: float | None = None,
                   from_y: float | None = None,
@@ -274,11 +273,12 @@ class IOperator(ABC):
         Returns:
             Box | None: 找到的文本位置，如果未找到则返回None。
         """
+        ocr_confidence = self.ocr_confidence if confidence is None else confidence
         results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
         if results is None:
             return None
         for result in results:
-            if result[2] >= confidence and text in result[1]:
+            if result[2] >= ocr_confidence and text in result[1]:
                 left, top = result[0][0]
                 width = result[0][2][0] - left
                 height = result[0][2][1] - top
@@ -292,7 +292,7 @@ class IOperator(ABC):
 
     def ocr_match_any(self,
                       texts: list[str],
-                      confidence: float = 0.9,
+                      confidence: float | None = None,
                       *,
                       from_x: float | None = None,
                       from_y: float | None = None,
@@ -313,12 +313,13 @@ class IOperator(ABC):
         Returns:
             tuple[int, Box | None]: 找到的文本索引和位置，如果未找到则返回-1和None
         """
+        ocr_confidence = self.ocr_confidence if confidence is None else confidence
         results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
         if results is None:
             return -1, None
         for index, text in enumerate(texts):
             for result in results:
-                if result[2] >= confidence and text in result[1]:
+                if result[2] >= ocr_confidence and text in result[1]:
                     left, top = result[0][0]
                     width = result[0][2][0] - left
                     height = result[0][2][1] - top
@@ -330,7 +331,7 @@ class IOperator(ABC):
         return -1, None
 
     def wait_ocr(self, text: str,
-                 confidence: float = 0.9,
+                 confidence: float | None = None,
                  interval: float = 0.2,
                  timeout: float = 10,
                  *args: Any,
@@ -359,7 +360,7 @@ class IOperator(ABC):
 
     def wait_ocr_any(self,
                      texts: list[str],
-                     confidence: float = 0.9,
+                     confidence: float | None = None,
                      interval: float = 0.2,
                      timeout: float = 10,
                      *args: Any,
@@ -484,6 +485,18 @@ class IOperator(ABC):
                 return index, box
             time.sleep(interval)
         logger.debug(f"Timeout: {templates} -> NotFound in {timeout} seconds")
+        return -1, None
+
+    @staticmethod
+    def wait_any(conditions: list[Waitable], timeout: int = 10, interval: float = 0.5) -> tuple[int, Box | None]:
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            for index, condition in enumerate(conditions):
+                box = condition()
+                if box is not None:
+                    return index, box
+            time.sleep(interval)
+        logger.debug(f"Timeout: wait_any conditions -> NotFound in {timeout} seconds")
         return -1, None
 
     @abstractmethod
@@ -667,3 +680,4 @@ class IOperator(ABC):
             time.sleep(interval)
             iterations += 1
         return iterations != max_iterations
+
