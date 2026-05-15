@@ -360,6 +360,7 @@ class AdvancedSettings:
 
     backendLaunchArgs: str = "--inline"
     isBackendUsePython: bool = True
+    pythonPipIndex: str = ""
     isDeveloperModeEnabled: bool = False
     isSaveOcrImage: bool = False
     isDebugOverlayEnabled: bool = False
@@ -371,6 +372,7 @@ class AdvancedSettings:
         return {
             "backend.launchArgs": self.backendLaunchArgs,
             "backend.usePython": self.isBackendUsePython,
+            "python.pipIndex": self.pythonPipIndex,
             "developerMode.enabled": self.isDeveloperModeEnabled,
             "developerMode.saveOcrImage": self.isSaveOcrImage,
             "developerMode.overlay": self.isDebugOverlayEnabled,
@@ -384,6 +386,7 @@ class AdvancedSettings:
         return cls(**{
             "backendLaunchArgs": data.get("backend.launchArgs", "--inline"),
             "isBackendUsePython": data.get("backend.usePython", True),
+            "pythonPipIndex": data.get("python.pipIndex", ""),
             "isDeveloperModeEnabled": data.get("developerMode.enabled", False),
             "isSaveOcrImage": data.get("developerMode.saveOcrImage", False),
             "isDebugOverlayEnabled": data.get("developerMode.overlay", False),
