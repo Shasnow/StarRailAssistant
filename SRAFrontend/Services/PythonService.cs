@@ -14,7 +14,10 @@ using SRAFrontend.Data;
 
 namespace SRAFrontend.Services;
 
-public class PythonService(ILogger<PythonService> logger, IHttpClientFactory httpClientFactory)
+public class PythonService(
+    ILogger<PythonService> logger,
+    IHttpClientFactory httpClientFactory,
+    SettingsService settingsService)
 {
     private const string PythonVersion = "3.12.10";
     private const string PythonVersionTag = "3.12.10";
@@ -242,9 +245,16 @@ public class PythonService(ILogger<PythonService> logger, IHttpClientFactory htt
         }
     }
 
+    private string GetPipIndexArgument()
+    {
+        var pipIndex = settingsService.Settings.Advanced.PythonPipIndex.Trim();
+        return string.IsNullOrWhiteSpace(pipIndex) ? string.Empty : $" --index-url \"{pipIndex}\"";
+    }
+
     private async Task<bool> InstallPipAsync(IProgress<string> progress, CancellationToken cancellationToken)
     {
         var getPipPath = Path.Combine(PathString.TempDir, "get-pip.py");
+        var pipIndexArgument = GetPipIndexArgument();
 
         using var client = httpClientFactory.CreateClient();
         progress.Report("正在下载 get-pip.py...");
@@ -262,7 +272,7 @@ public class PythonService(ILogger<PythonService> logger, IHttpClientFactory htt
 
         progress.Report("正在安装基础构建工具...");
         result = await RunProcessAsync(PathString.PythonExe,
-            "-m pip install setuptools wheel --no-cache-dir --disable-pip-version-check", cancellationToken);
+            $"-m pip install setuptools wheel --no-cache-dir --disable-pip-version-check{pipIndexArgument}", cancellationToken);
         if (result.ExitCode == 0) return true;
         logger.LogError("Failed to install setuptools/wheel: {Error}", result.Error);
         progress.Report($"安装 setuptools/wheel 失败: {result.Error}");
@@ -292,8 +302,9 @@ public class PythonService(ILogger<PythonService> logger, IHttpClientFactory htt
         if (mismatched.Count > 0)
             progress.Report($"正在更新版本不匹配的依赖: {string.Join(", ", mismatched.Select(m => m.Name))}");
 
+        var pipIndexArgument = GetPipIndexArgument();
         var result = await RunProcessAsync(PathString.PythonExe,
-            $"-m pip install -r \"{RequirementsTxt}\" --disable-pip-version-check --no-cache-dir",
+            $"-m pip install -r \"{RequirementsTxt}\" --disable-pip-version-check --no-cache-dir{pipIndexArgument}",
             cancellationToken);
         if (result.ExitCode != 0)
         {

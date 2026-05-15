@@ -387,6 +387,10 @@ public partial class AdvancedSettings : ObservableObject
     [ObservableProperty]
     [property: JsonPropertyName("backend.usePython")]
     private bool _isBackendUsePython = true;
+    
+    [ObservableProperty]
+    [property: JsonPropertyName("python.pipIndex")]
+    private string _pythonPipIndex = "";
 
     [ObservableProperty]
     [property: JsonPropertyName("developerMode.enabled")]
