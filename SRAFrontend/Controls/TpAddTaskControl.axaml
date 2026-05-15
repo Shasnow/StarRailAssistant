@@ -30,6 +30,6 @@
                 <Label Grid.Row="4" Grid.Column="0" Content="自动检测"/>
                 <ToggleSwitch Grid.Row="4" Grid.Column="1" IsChecked="{Binding IsTpTaskAutoDetect}"/>
             </Grid>
-        <Button Content="ensure" Command="{Binding AddTaskItemCommand}"></Button>
+        <Button Content="确认" Command="{Binding AddTaskItemCommand}"/>
     </StackPanel>
 </UserControl>

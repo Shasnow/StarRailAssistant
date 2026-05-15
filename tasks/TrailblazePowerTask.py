@@ -9,6 +9,7 @@ from tasks.img import IMG, TPIMG
 
 type TrailblazePowerFunc = Callable[..., bool]
 
+
 class SubtaskInfo(TypedDict, total=False):
     name: str
     func: str
@@ -33,6 +34,8 @@ class TrailblazePowerTask(BaseTask):
     def run(self):
         self.manual_tasks.clear()
         self.auto_detect_tasks.clear()
+        if self.config.TrailblazePower.isActivityEnabled:
+            self.detect_multiple_activity()
         use_build_target = self.config.TrailblazePower.isUseBuildTarget
         if use_build_target:
             self.detect_build_target_tasklist()
@@ -88,10 +91,7 @@ class TrailblazePowerTask(BaseTask):
 
         for obj in target_objects:
             # 从配置文件中匹配产物对应的副本任务
-            subtasks:dict[str, Any] = self.task_config.get("subtasks", {})
-            if subtasks is None:
-                logger.error(SRAError(ErrorCode.NO_BUILD_TARGET, "培养目标配置缺少 subtasks"))
-                return
+            subtasks: dict[str, Any] = self.task_config.get("subtasks", {})
             for subtask_id, subtask_info in subtasks.items():
                 subtask_results = subtask_info.get("results", [])
                 found = False  # 标记是否找到对应结果
@@ -110,11 +110,11 @@ class TrailblazePowerTask(BaseTask):
                             task_name = subtask_info.get("name", subtask_id)
                             self.auto_detect_tasks.append(
                                 TrailblazePowerTaskItem(
-                                    Name = task_name,
-                                    Id = subtask_id,
-                                    Level = index + 1
-                                 )
+                                    Name=task_name,
+                                    Id=subtask_id,
+                                    Level=index + 1
                                 )
+                            )
                         break
                 else:
                     logger.debug(f"Could not find {obj} in subtask results of {subtask_id}")
@@ -126,9 +126,10 @@ class TrailblazePowerTask(BaseTask):
 
         流程：
             1. 跳转到生存索引页面
-            2. OCR 识别当前开拓力
+            2. OCR 识别当前开拓力和沉浸器
             3. 根据体力按比例分配各任务的执行次数
-            4. 将执行次数转换为可执行的任务列表
+            4. 将沉浸器数量加到饰品提取任务的可执行次数中
+            5. 将执行次数转换为可执行的任务列表
 
         Returns:
             任务列表，每项为 (任务函数, 参数字典)，失败返回 None。
@@ -138,28 +139,96 @@ class TrailblazePowerTask(BaseTask):
             return None
         self.operator.sleep(0.5)
 
-        # OCR 识别开拓力，向下取整到 10 的倍数（最低消耗单位）
-        current_tbp = self._ocr_power()
-        if current_tbp is None:
+        # OCR 识别开拓力和沉浸器
+        power_result = self._ocr_power()
+        if power_result is None:
             return None
+        current_tbp, immersion_dev = power_result
+        
+        # 开拓力向下取整到 10 的倍数（最低消耗单位）
         ava_current_tbp = (current_tbp // 10) * 10
-        if ava_current_tbp <= 0:
-            logger.warning(SRAError(ErrorCode.NO_POWER, "当前体力为0，无任务可执行"))
-            return None
-
+        
         if not self.auto_detect_tasks:
             logger.warning(SRAError(ErrorCode.NO_BUILD_TARGET, "未识别到可执行任务"))
             return None
 
-        # 根据体力分配各任务执行次数，再转换为实际任务列表
+        # 如果体力和沉浸器都为0，返回None
+        if ava_current_tbp <= 0 and immersion_dev <= 0:
+            logger.warning(SRAError(ErrorCode.NO_POWER, "当前体力和沉浸器都为0，无任务可执行"))
+            return None
+
+        # 根据体力分配各任务执行次数
         tasks_times = self._calc_task_times(ava_current_tbp)
+        
+        # 将沉浸器数量加到 ornament_extraction 任务的可执行次数中
+        for i, task_item in enumerate(self.auto_detect_tasks):
+            if task_item.Id == "ornament_extraction":
+                tasks_times[i] += immersion_dev
+                logger.info(f"饰品提取任务追加 {immersion_dev} 次（来自沉浸器）")
+                break
+
         return self._build_task_list(tasks_times)
 
-    def _ocr_power(self) -> int | None:
+    def detect_multiple_activity(self):
+        """检测多倍奖励活动，优先打指定关卡
+        """
+
+        def get_remaining(name: str):
+            if name == "花藏繁生":
+                ocr_area = (0.91, 0.66, 0.97, 0.71)
+            else:
+                ocr_area = (0.91, 0.76, 0.97, 0.81)
+
+            ocr_result = self.operator.ocr(from_x=ocr_area[0], from_y=ocr_area[1], to_x=ocr_area[2], to_y=ocr_area[3])
+            if not ocr_result:
+                logger.warning("获取奖励剩余次数失败")
+                return 0
+            try:
+                r, _ = tuple(map(int, ocr_result[0][1].split('/')))
+                return r
+            except Exception as e:
+                logger.warning(SRAError(ErrorCode.OCR_RECOGNITION_FAILED, "OCR识别结果格式错误", str(e)))
+                return 0
+
+        logger.info("获取活动信息")
+        self.goto_activity_page()
+        target_activities: list[str] = ["花藏繁生", "异器盈界", "位面分裂"]
+        index, box = self.operator.ocr_match_any(target_activities, from_x=0.02, from_y=0.10,
+                                                 to_x=0.12, to_y=0.86)
+        if box is None:
+            return
+        self.operator.click_box(box, after_sleep=0.2)  # 点击活动页面
+        activity = target_activities[index]
+        remaining = get_remaining(activity)
+        logger.info(f"奖励剩余次数：{remaining}")
+        if remaining == 0:
+            return
+        if activity == "花藏繁生":
+            g1 = self.config.TrailblazePower.gardenOfPlentyLevel1
+            if g1 != 0:
+                self.auto_detect_tasks.append(TrailblazePowerTaskItem(Name="拟造花萼（金）", Id="calyx_golden", Level=g1))
+            g2 = self.config.TrailblazePower.gardenOfPlentyLevel2
+            if g2 != 0:
+                self.auto_detect_tasks.append(
+                    TrailblazePowerTaskItem(Name="拟造花萼（赤）", Id="calyx_crimson", Level=g2))
+        elif activity == "异器盈界":
+            l = self.config.TrailblazePower.realmOfTheStrangeLevel
+            if l != 0:
+                self.auto_detect_tasks.append(
+                    TrailblazePowerTaskItem(Name="侵蚀隧洞", Id="caver_of_corrosion", Level=l))
+        elif activity == "位面分裂":
+            l = self.config.TrailblazePower.planarFissureLevel
+            if l != 0:
+                self.auto_detect_tasks.append(
+                    TrailblazePowerTaskItem(Name="饰品提取", Id="ornament_extraction", Level=l))
+
+        self.operator.press_key("esc")
+
+    def _ocr_power(self) -> tuple[int, int] | None:
         """OCR 识别页面上的体力值区域。
 
         识别结果依次为：后备开拓力、当前开拓力、沉浸器。
-        返回当前开拓力，识别失败返回 None。
+        返回 (当前开拓力, 沉浸器)，识别失败返回 None。
         """
         try:
             res = self.operator.ocr(from_x=0.65625, from_y=0.0417, to_x=0.908, to_y=0.076)
@@ -180,7 +249,7 @@ class TrailblazePowerTask(BaseTask):
             return None
 
         logger.info(f"当前后备开拓力: {reserve_tbp}, 当前开拓力: {current_tbp}, 沉浸器: {immersion_dev}")
-        return current_tbp
+        return current_tbp, immersion_dev
 
     def _calc_task_times(self, available_power: int) -> list[int]:
         """根据可用体力计算每个自动任务的执行次数。
@@ -341,7 +410,7 @@ class TrailblazePowerTask(BaseTask):
                 self.operator.press_key(self.settings.General.hotkeyE.lower())
                 self.operator.sleep(2)
             self.operator.click_point(0.5, 0.5)
-            self.battle_star(run_time)
+            self.battle_start(run_time)
         logger.info("任务完成：饰品提取")
         return True
 
@@ -441,7 +510,6 @@ class TrailblazePowerTask(BaseTask):
             return False
         if multi is not None and multi > 1:
             for _ in range(multi - 1):
-                self.operator.sleep(0.2)
                 self.operator.click_img(TPIMG.PLUS)
             self.operator.sleep(1)
         if not self.operator.click_img(TPIMG.BATTLE, after_sleep=1):
@@ -470,10 +538,10 @@ class TrailblazePowerTask(BaseTask):
             logger.info("编队中存在无法战斗的角色")
             self.operator.press_key("esc", presses=3, interval=1.5)
             return False
-        self.battle_star(run_time)
+        self.battle_start(run_time)
         return True
 
-    def battle_star(self, run_time: int):
+    def battle_start(self, run_time: int):
         logger.info("开始战斗")
         if self.operator.wait_img(IMG.Q):
             self.operator.press_key("v")
@@ -718,5 +786,23 @@ class TrailblazePowerTask(BaseTask):
             self.operator.press_key(self.settings.General.hotkeyF4.lower())
             self.operator.sleep(1.5)
             return self.goto_survival_index()  # 递归调用，直到进入生存索引页面
+        else:
+            return False
+
+    def goto_activity_page(self) -> bool:
+        """前往活动页面"""
+        logger.info("前往活动页面")
+        index, box = self.operator.wait_any([
+            lambda : self.operator.locate(IMG.ENTER),
+            lambda : self.operator.ocr_match("旅情事记", from_x=0.05, from_y=0.02, to_x=0.11, to_y=0.09),
+        ], timeout=30, interval=0.5)
+        if index == 1:
+            # 已经在活动页面
+            return True
+        elif index == 0:
+            # 主页面，按快捷键进入活动页面
+            self.operator.press_key(self.settings.General.hotkeyF1.lower())
+            self.operator.sleep(1.5)
+            return self.goto_activity_page()  # 递归调用，直到进入活动页面
         else:
             return False

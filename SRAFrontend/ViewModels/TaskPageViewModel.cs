@@ -69,6 +69,10 @@ public partial class TaskPageViewModel : PageViewModel
 
     public string[] TpTaskNames => TpTaskItems.TpTaskNames;
     public string[] CurrentTpTaskLevels => TpTaskItems.GetLevelsByIndex(SelectedTpTaskIndex);
+    public string[] GardenOfPlentyLevels1 => TpTaskItems.GetLevelsByIndex(1);
+    public string[] GardenOfPlentyLevels2 => TpTaskItems.GetLevelsByIndex(2);
+    public string[] PlanarFissureLevels => TpTaskItems.GetLevelsByIndex(0);
+    public string[] RealmOfTheStrangeLevels => TpTaskItems.GetLevelsByIndex(4);
     public int CurrentTpTaskMaxSingleTimes => TpTaskItems.GetMaxSingleTimesByIndex(SelectedTpTaskIndex);
     
     public string TaskListText =>

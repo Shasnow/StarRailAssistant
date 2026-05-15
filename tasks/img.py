@@ -25,6 +25,7 @@ class SRAIMG:
 # region 通用
 class IMG:
     BASE = "resources/img"
+    ACTIVITY = f"{BASE}/activity.png"
     COSMIC_STRIFE = f"{BASE}/cosmic_strife.png"
     DIALOG = f"{BASE}/dialog.png"
     ENTER = f"{BASE}/enter.png"
