@@ -795,6 +795,13 @@
                                         <ToggleSwitch Grid.Column="2"
                                                       IsChecked="{Binding AdvancedSettings.IsBackendUsePython}" />
                                     </Grid>
+                                    <Grid ColumnDefinitions="Auto, Auto, *">
+                                        <Label Classes="Icon">&#xe184;</Label>
+                                        <Label Grid.Column="1"
+                                               Content="pip 下载源" />
+                                        <TextBox Grid.Column="2" Text="{Binding AdvancedSettings.PythonPipIndex}" Watermark=""/>
+                                    </Grid>
+                                    
                                     <Expander Header="{x:Static lang:Resources.DeveloperOptionsText}"
                                               IsVisible="{Binding AdvancedSettings.IsDeveloperModeEnabled}"
                                               IsExpanded="True">
