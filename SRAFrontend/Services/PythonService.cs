@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
+using SRAFrontend.Utils;
 
 namespace SRAFrontend.Services;
 
@@ -206,16 +207,13 @@ public class PythonService(
 
         Directory.CreateDirectory(PathString.TempDir);
 
+        var progressHandler = new Progress<DownloadStatus>(value =>
+        {
+            progress.Report(
+                $"正在下载 Python 便携包... \n{value.ProgressPercent:F}% ({value.FormattedDownloadedSize} / {value.FormattedTotalSize})");
+        });
         using var client = httpClientFactory.CreateClient();
-        client.Timeout = TimeSpan.FromMinutes(5);
-
-        progress.Report($"正在下载 Python {PythonVersion}...");
-        var response = await client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-        response.EnsureSuccessStatusCode();
-
-        await using var fs = new FileStream(zipPath, FileMode.Create, FileAccess.Write, FileShare.None);
-        await response.Content.CopyToAsync(fs, cancellationToken);
-        await fs.FlushAsync(cancellationToken);
+        await DownloadUtil.DownloadFileWithDetailsAsync(client, downloadUrl, zipPath, progressHandler, cancellationToken);
 
         progress.Report("下载完成，正在校验文件...");
         return true;
@@ -249,10 +247,17 @@ public class PythonService(
         var getPipPath = Path.Combine(PathString.TempDir, "get-pip.py");
         var pipIndexArgument = GetPipIndexArgument();
 
-        using var client = httpClientFactory.CreateClient();
         progress.Report("正在下载 get-pip.py...");
-        var getPipContent = await client.GetStringAsync("https://bootstrap.pypa.io/get-pip.py", cancellationToken);
-        await File.WriteAllTextAsync(getPipPath, getPipContent, cancellationToken);
+        var progressHandler = new Progress<DownloadStatus>(value =>
+        {
+            progress.Report($"正在下载 get-pip.py... \n{value.ProgressPercent:F}% ({value.FormattedDownloadedSize} / {value.FormattedDownloadedSize})");
+        });
+        using var client = httpClientFactory.CreateClient();
+        await DownloadUtil.DownloadFileWithDetailsAsync(
+            client, "https://bootstrap.pypa.io/get-pip.py",
+            getPipPath,
+            progressHandler,
+            cancellationToken);
 
         progress.Report("正在安装 pip...");
         var result = await RunProcessAsync(PathString.PythonExe, $"\"{getPipPath}\"", cancellationToken);
@@ -265,7 +270,7 @@ public class PythonService(
 
         progress.Report("正在安装基础构建工具...");
         result = await RunProcessAsync(PathString.PythonExe,
-            $"-m pip install setuptools wheel --no-cache-dir --disable-pip-version-check{pipIndexArgument}", cancellationToken);
+            $"-m pip install setuptools wheel --no-cache-dir --disable-pip-version-check{pipIndexArgument}", progress, cancellationToken);
         if (result.ExitCode == 0) return true;
         logger.LogError("Failed to install setuptools/wheel: {Error}", result.Error);
         progress.Report($"安装 setuptools/wheel 失败: {result.Error}");
@@ -298,7 +303,7 @@ public class PythonService(
         var pipIndexArgument = GetPipIndexArgument();
         var result = await RunProcessAsync(PathString.PythonExe,
             $"-m pip install -r \"{RequirementsTxt}\" --disable-pip-version-check --no-cache-dir{pipIndexArgument}",
-            cancellationToken);
+            progress, cancellationToken);
         if (result.ExitCode != 0)
         {
             logger.LogError("Failed to install dependencies: {Error}", result.Error);
@@ -437,7 +442,7 @@ public class PythonService(
 
         return null;
     }
-
+    
     private async Task<ProcessResult> RunProcessAsync(string fileName, string arguments,
         CancellationToken cancellationToken)
     {
@@ -450,8 +455,7 @@ public class PythonService(
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
-                CreateNoWindow = true,
-                WorkingDirectory = PathString.PythonDir
+                CreateNoWindow = true
             };
 
             using var process = new Process();
@@ -464,6 +468,52 @@ public class PythonService(
             await process.WaitForExitAsync(cancellationToken);
 
             return new ProcessResult(process.ExitCode, await outputTask, await errorTask);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to run process: {FileName} {Arguments}", fileName, arguments);
+            return new ProcessResult(-1, string.Empty, ex.Message);
+        }
+    }
+
+    private async Task<ProcessResult> RunProcessAsync(string fileName, string arguments, IProgress<string> progressHandler,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var stdout = new StringWriter();
+            var stderr = new StringWriter();
+            var psi = new ProcessStartInfo
+            {
+                FileName = fileName,
+                Arguments = arguments,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = new Process();
+            process.StartInfo = psi;
+            process.OutputDataReceived += (_, e) =>
+            {
+                if (string.IsNullOrEmpty(e.Data)) return;
+                stdout.WriteLine(e.Data);
+                progressHandler.Report(e.Data);
+            };
+            process.ErrorDataReceived += (_, e) =>
+            {
+                if (string.IsNullOrEmpty(e.Data)) return;
+                stderr.WriteLine(e.Data);
+                progressHandler.Report(e.Data);
+            };
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            await process.WaitForExitAsync(cancellationToken);
+
+            return new ProcessResult(process.ExitCode, stdout.ToString(), stderr.ToString());
         }
         catch (Exception ex)
         {

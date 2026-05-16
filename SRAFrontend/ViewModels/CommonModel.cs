@@ -505,8 +505,8 @@ public class CommonModel(
     /// </summary>
     private (StackPanel ProgressPanel, Label ProgressLabel, ProgressBar progressBar, CancellationTokenSource Cts) BuildDownloadProgressUi()
     {
-        var progressBar = new ProgressBar { Value = 0, ShowProgressText = true };
         var progressLabel = new Label { Content = "连接中..." };
+        var progressBar = new ProgressBar { Value = 0, ShowProgressText = true };
         var cancelButton = new Button { Content = "取消下载" };
         var cts = new CancellationTokenSource();
         cancelButton.Click += (_, _) =>
