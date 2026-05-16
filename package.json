@@ -1,6 +1,6 @@
 {
   "name": "sra",
-  "version": "2.14.0",
+  "version": "2.14.1",
   "scripts": {
     "dev": "python main.py",
     "build": "dotnet publish -c Release -r win-x64 SRAFrontend/SRAFrontend.csproj && python scripts/package.py",
@@ -8,6 +8,7 @@
     "frontend": "dotnet run --project SRAFrontend/SRAFrontend.csproj",
     "pyl10nc": "python scripts/pyl10nc/__main__.py SRACore/localization/resource.toml",
     "ver:release": "python scripts/update_version.py -r",
+    "ver:patch": "python scripts/update_version.py -i",
     "modelgen": "python scripts/model_gen.py SRAFrontend/Models/AppSettings.cs -o SRACore/models/app_settings.py && python scripts/model_gen.py SRAFrontend/Models/TasksConfig.cs -o SRACore/models/tasks_config.py"
   }
 }

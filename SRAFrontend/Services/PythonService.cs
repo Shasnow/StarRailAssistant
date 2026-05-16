@@ -21,7 +21,7 @@ public class PythonService(
 {
     private const string PythonVersion = "3.12.10";
     private const string PythonVersionTag = "3.12.10";
-    private static readonly string ExpectedPythonVersionPrefix = "3.12";
+    private const string ExpectedPythonVersionPrefix = "3.12";
 
     private static readonly string EnvOkMarker = Path.Combine(PathString.PythonDir, ".python_env_ok");
     private static readonly string EnvVersionJson = Path.Combine(PathString.PythonDir, "python_env_version.json");
@@ -35,14 +35,7 @@ public class PythonService(
 
     public async Task<bool> EnsureEnvironmentAsync(IProgress<string> progress, CancellationToken cancellationToken = default)
     {
-        if (File.Exists(EnvOkMarker))
-        {
-            logger.LogInformation("Python environment marker found, skipping initialization");
-            progress.Report("Python 环境已就绪，跳过初始化");
-            return true;
-        }
-
-        logger.LogInformation("Python environment marker not found, starting initialization");
+        logger.LogInformation("Starting Python environment initialization");
         progress.Report("开始初始化 Python 环境...");
         try
         {
