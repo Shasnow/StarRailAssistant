@@ -390,7 +390,7 @@ public partial class AdvancedSettings : ObservableObject
     
     [ObservableProperty]
     [property: JsonPropertyName("python.pipIndex")]
-    private string _pythonPipIndex = "";
+    private string _pythonPipIndex = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple";
 
     [ObservableProperty]
     [property: JsonPropertyName("developerMode.enabled")]
