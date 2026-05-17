@@ -6,9 +6,9 @@ pyscreeze==1.0.1
 pygetwindow==0.0.9
 pyautogui==0.9.54
 pyperclip==1.11.0
-pynput==1.8.1
-pywin32
+pynput==1.8.2
+pywin32==311
 psutil==7.2.2
 rich==15.0.0
 loguru==0.7.3
-selenium
+selenium==4.44.0
