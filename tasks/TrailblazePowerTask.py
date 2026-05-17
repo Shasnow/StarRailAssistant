@@ -196,6 +196,8 @@ class TrailblazePowerTask(BaseTask):
         index, box = self.operator.ocr_match_any(target_activities, from_x=0.02, from_y=0.10,
                                                  to_x=0.12, to_y=0.86)
         if box is None:
+            self.operator.press_key("esc")
+            self.operator.sleep(0.2)
             return
         self.operator.click_box(box, after_sleep=0.2)  # 点击活动页面
         activity = target_activities[index]
