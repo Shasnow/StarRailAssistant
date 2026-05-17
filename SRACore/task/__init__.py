@@ -81,13 +81,13 @@ class BaseTask(Executable, ABC):
         return f"<{self.__class__.__name__}>"
 
 
-registry:list[tuple[int, type[BaseTask]]] = list()
+registry: list[tuple[int, type[BaseTask]]] = list()
 
 
-def _ensure_task_modules_loaded() -> None:
+def _ensure_task_modules_loaded(module="tasks") -> None:
     """确保任务模块已被导入，从而触发装饰器注册。"""
     try:
-        importlib.import_module("tasks")
+        importlib.import_module(module)
     except ModuleNotFoundError:
         # 运行环境可能没有顶层 tasks 包；此时仅依赖显式导入的注册结果。
         pass
@@ -97,6 +97,7 @@ def task(_cls: type[BaseTask] | None = None, *, order: int | None = None):
     """
     任务注册装饰器，用于将任务类注册到全局任务列表中，并指定执行顺序。
     """
+
     def decorator(cls: type[BaseTask]) -> type[BaseTask]:
         if not issubclass(cls, BaseTask):
             raise TypeError("只能注册 BaseTask 的子类")
@@ -107,6 +108,7 @@ def task(_cls: type[BaseTask] | None = None, *, order: int | None = None):
     if _cls is None:
         return decorator
     return decorator(_cls)
+
 
 def get_tasks() -> list[type[BaseTask]]:
     _ensure_task_modules_loaded()
