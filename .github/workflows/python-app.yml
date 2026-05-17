@@ -256,7 +256,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Update Auto-MAS
         run: |
-          VERSION="v$(node -p \"require('./package.json').version\")"
+          VERSION=$(node -p '"v" + require("./package.json").version')
           CHANNEL=$([[ "$VERSION" == *"-beta"* ]] && echo "beta" || echo "stable")
           curl -X POST -H "Content-Type: application/json" \
             -d "{\"version\":\"$VERSION\",\"res_id\":\"StarRailAssistant\",\"channel\":\"$CHANNEL\"}" \
