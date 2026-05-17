@@ -266,6 +266,6 @@ jobs:
           path: ./version_info
       - name: Update Auto-MAS
         run: |
-          VERSION=$(sed 's/\r$//g' <(head -n 1 version_info/version_info.txt))
+          VERSION=$(npm pkg get version)
           CHANNEL=$([[ "$VERSION" == *"-beta"* ]] && echo "beta" || echo "stable")
-          curl -X POST -H "Content-Type: application/json" -d '{"version": "'"$VERSION"'", "res_id": "StarRailAssistant", "channel": "'"$CHANNEL"'"}' "${{ secrets.UPDATE_URL }}"
+          curl -X POST -H "Content-Type: application/json" -d '{"version": "$VERSION", "res_id": "StarRailAssistant", "channel": "'"$CHANNEL"'"}' "${{ secrets.UPDATE_URL }}"
