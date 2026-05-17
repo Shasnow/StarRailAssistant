@@ -32,6 +32,8 @@ from zipfile import ZipFile, ZIP_DEFLATED
 ROOT_PATH = Path(__file__).resolve().parent.parent
 WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
 DIST_DIR = ROOT_PATH / "main.dist"
+PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
+GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
 
 
 def add_to_zip(zipf: ZipFile, path: Path, base_path: Path = None):
@@ -80,6 +82,32 @@ def nuitka_build(version: str):
         sys.exit(1)
     print("[OK] Python program built successfully")
 
+
+def embed_python():
+    print("Embedding Python ...")
+    import requests
+    from io import BytesIO
+
+    Path.mkdir(DIST_DIR, parents=True, exist_ok=True)
+    print("Downing Python embedded package ...")
+    response = requests.get(PYTHON31210_URL)
+    response.raise_for_status()
+    with ZipFile(BytesIO(response.content)) as zipf:
+        zipf.extractall(DIST_DIR / "python")
+    print("Enabling site...")
+    with open(DIST_DIR / "python" / "python312._pth", "w", encoding="utf-8") as file:
+        file.write("python312.zip\n.\n\n# Uncomment to run site.main() automatically\nimport site\n")
+    print("Downing get-pip.py")
+    response = requests.get(GET_PIP_URL)
+    with open("get-pip.py", "wb") as file:
+        file.write(response.content)
+    print("Installing pip...")
+    subprocess.run([DIST_DIR / "python" / "python.exe", "get-pip.py"], check=True)
+    subprocess.run([DIST_DIR / "python" / "python.exe", "-m", "pip", "install", "--upgrade", "pip"], check=True)
+    print("Installing dependencies ...")
+    subprocess.run([DIST_DIR / "python" / "python.exe", "-m", "pip", "install", "setuptools", "wheel"], check=True)
+    subprocess.run([DIST_DIR / "python" / "python.exe", "-m", "pip", "install", "-r", "requirements.txt"], check=True)
+    print("[OK]")
 
 def copy_core_resources(dist: Path):
     print("Copying resources ...")
@@ -148,7 +176,8 @@ if __name__ == "__main__":
     with (ROOT_PATH / "ChangeLog2.0.md").open(encoding="utf-8") as f:
         changelog = f.read()
 
-    nuitka_build(version)
+    # nuitka_build(version)
+    embed_python()
     copy_core_resources(DIST_DIR)
 
     package_core(version)
