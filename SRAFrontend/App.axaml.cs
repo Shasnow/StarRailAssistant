@@ -9,6 +9,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
 using SRAFrontend.Controls;
 using SRAFrontend.Data;
 using SRAFrontend.Services;
@@ -91,7 +92,7 @@ public class App : Application
         services.AddSingleton<PythonService>();
         services.AddHttpClient("GlobalClient", client =>
         {
-            client.Timeout = TimeSpan.FromSeconds(60);
+            client.Timeout = TimeSpan.FromSeconds(300);
             client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0");
         });
     }
@@ -111,6 +112,7 @@ public class App : Application
                 outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
             )
             .MinimumLevel.Debug()
+            .MinimumLevel.Override("Microsoft.Extensions.Http.DefaultHttpClientFactory", LogEventLevel.Information)
             // 捕获异常时记录堆栈信息
             .Enrich.FromLogContext()
             .CreateLogger();

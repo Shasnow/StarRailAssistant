@@ -213,7 +213,7 @@ public class RegistryService(
                 return;
             }
 
-            logger.LogInformation("Restore resolution: {W}x{H}", cache.Width, cache.Height);
+            logger.LogInformation("Restore resolution: {W}x{H}, FullscreenMode: {m}", cache.Width, cache.Height, cache.FullscreenMode);
 
             key.SetValue(RegistryConfig.GraphicsSettingsPcResolution, cache.Resolution, RegistryValueKind.Binary);
             key.SetValue(RegistryConfig.ScreenManagerResolutionWidth, cache.Width.Value, RegistryValueKind.DWord);

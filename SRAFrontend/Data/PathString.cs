@@ -26,7 +26,7 @@ public static class PathString
     public static readonly string SraExecutablePath = GetSraExecutablePath();
     public static readonly string SraOldExecutablePath = GetSraOldExecutablePath();
     public static readonly string DesktopShortcutPath = GetDesktopShortcutPath();
-    public static string PythonExe => GetPythonExe();
+    public static readonly string PythonExe = Path.Combine(PythonDir, "python.exe");
 
     static PathString()
     {

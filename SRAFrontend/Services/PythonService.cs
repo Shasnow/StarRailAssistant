@@ -31,7 +31,7 @@ public class PythonService(
 
     public static bool IsEnvironmentReady()
     {
-        return File.Exists(EnvOkMarker);
+        return File.Exists(PathString.PythonExe);
     }
 
     public async Task<bool> EnsureEnvironmentAsync(IProgress<string> progress, CancellationToken cancellationToken = default)
@@ -81,14 +81,14 @@ public class PythonService(
 
     private async Task<bool> InitializeAsync(IProgress<string> progress, CancellationToken cancellationToken)
     {
-        // ① 检查本地内置 Python
+        // 检查本地内置 Python
         if (File.Exists(PathString.PythonExe))
         {
             logger.LogInformation("Found existing Python executable, verifying version and dependencies");
             progress.Report("检测到本地内置 Python，进入环境维护流程...");
             if (await VerifyPythonVersionAsync(cancellationToken))
             {
-                return await EnsureDependenciesAsync(progress, cancellationToken);
+                return await EnsurePipAndInstallDependenciesAsync(progress, cancellationToken);
             }
             logger.LogInformation("Existing Python version mismatch, reinitialization needed");
             progress.Report("Python 版本不匹配，需要重新初始化");
@@ -102,7 +102,7 @@ public class PythonService(
 
     private async Task<bool> InitializeWindowsAsync(IProgress<string> progress, CancellationToken cancellationToken)
     {
-        // ② 检查系统 Python
+        // 检查系统 Python
         var systemPython = FindSystemPython();
         if (systemPython != null)
         {
@@ -114,42 +114,28 @@ public class PythonService(
                 return false;
 
             // 确保虚拟环境中有 pip，否则安装 pip，然后安装依赖
-            var pipCheck = await RunProcessAsync(PathString.PythonExe, "-m pip --version", cancellationToken);
-            if (pipCheck.ExitCode != 0)
-            {
-                progress.Report("虚拟环境中未检测到 pip，正在安装 pip...");
-                if (!await InstallPipAsync(progress, cancellationToken))
-                    return false;
-            }
-
-            return await EnsureDependenciesAsync(progress, cancellationToken);
+            return await EnsurePipAndInstallDependenciesAsync(progress, cancellationToken);
         }
 
-        // ③ 下载 embeddable 便携包
+        // 下载 embeddable 便携包
         logger.LogInformation("No suitable system Python found, downloading embeddable package");
-        progress.Report("未检测到系统 Python，开始下载 Python 便携包...");
+        progress.Report("未检测到合适的系统 Python，开始下载 Python 便携包...");
         var zipPath = Path.Combine(PathString.TempDir, $"python-{PythonVersion}-embed-amd64.zip");
         if (!await DownloadPythonAsync(zipPath, progress, cancellationToken))
             return false;
 
-        // ④ 解压便携包
+        // 解压便携包
         logger.LogInformation("Extracting Python embeddable package to {Destination}", PathString.PythonDir);
         progress.Report("正在解压 Python 便携包...");
         ExtractZip(zipPath, PathString.PythonDir);
 
-        // ⑤ 修复 python312._pth
+        // 修复 python312._pth
         logger.LogInformation("Fixing Python configuration files");
         progress.Report("修复 Python 配置文件...");
         FixPthFile();
 
-        // ⑥ 安装 pip
-        logger.LogInformation("Installing pip in the Python environment");
-        progress.Report("正在安装 pip...");
-        if (!await InstallPipAsync(progress, cancellationToken))
-            return false;
-
-        // ⑦ 安装依赖
-        return await EnsureDependenciesAsync(progress, cancellationToken);
+        // 安装依赖（确保 pip 可用并安装）
+        return await EnsurePipAndInstallDependenciesAsync(progress, cancellationToken);
     }
 
     private async Task<bool> InitializeLinuxAsync(IProgress<string> progress, CancellationToken cancellationToken)
@@ -166,15 +152,7 @@ public class PythonService(
                 return false;
 
             // 确保虚拟环境中有 pip，否则安装 pip，然后安装依赖
-            var pipCheck = await RunProcessAsync(PathString.PythonExe, "-m pip --version", cancellationToken);
-            if (pipCheck.ExitCode != 0)
-            {
-                progress.Report("虚拟环境中未检测到 pip，正在安装 pip...");
-                if (!await InstallPipAsync(progress, cancellationToken))
-                    return false;
-            }
-
-            return await EnsureDependenciesAsync(progress, cancellationToken);
+            return await EnsurePipAndInstallDependenciesAsync(progress, cancellationToken);
         }
 
         progress.Report("未检测到系统 Python 3.12.x，请先安装 Python 3.12");
@@ -212,7 +190,7 @@ public class PythonService(
             progress.Report(
                 $"正在下载 Python 便携包... \n{value.ProgressPercent:F}% ({value.FormattedDownloadedSize} / {value.FormattedTotalSize})");
         });
-        using var client = httpClientFactory.CreateClient();
+        using var client = httpClientFactory.CreateClient("GlobalClient");
         await DownloadUtil.DownloadFileWithDetailsAsync(client, downloadUrl, zipPath, progressHandler, cancellationToken);
 
         progress.Report("下载完成，正在校验文件...");
@@ -252,9 +230,9 @@ public class PythonService(
         {
             progress.Report($"正在下载 get-pip.py... \n{value.ProgressPercent:F}% ({value.FormattedDownloadedSize} / {value.FormattedDownloadedSize})");
         });
-        using var client = httpClientFactory.CreateClient();
+        using var client = httpClientFactory.CreateClient("GlobalClient");
         await DownloadUtil.DownloadFileWithDetailsAsync(
-            client, "https://bootstrap.pypa.io/get-pip.py",
+            client, "https://download.auto-mas.top/d/AUTO-MAS/Environment/get-pip.py",
             getPipPath,
             progressHandler,
             cancellationToken);
@@ -276,6 +254,41 @@ public class PythonService(
         progress.Report($"安装 setuptools/wheel 失败: {result.Error}");
         return false;
 
+    }
+
+    /// <summary>
+    /// Ensure pip is available in the current Python environment, try ensurepip first then fallback to get-pip.py,
+    /// and finally install requirements.
+    /// </summary>
+    private async Task<bool> EnsurePipAndInstallDependenciesAsync(IProgress<string> progress, CancellationToken cancellationToken)
+    {
+        // 检查 pip
+        var pipCheck = await RunProcessAsync(PathString.PythonExe, "-m pip --version", cancellationToken);
+        if (pipCheck.ExitCode != 0)
+        {
+            progress.Report("虚拟环境中未检测到 pip，尝试使用 ensurepip 安装...");
+            // 先尝试 ensurepip（无需网络）
+            var ensureResult = await RunProcessAsync(PathString.PythonExe, "-m ensurepip --upgrade", progress, cancellationToken);
+            if (ensureResult.ExitCode != 0)
+            {
+                progress.Report("ensurepip 安装失败，尝试使用 get-pip.py 安装 pip...");
+                // fallback to network installer
+                if (!await InstallPipAsync(progress, cancellationToken))
+                    return false;
+            }
+        }
+
+        // 再次验证 pip
+        pipCheck = await RunProcessAsync(PathString.PythonExe, "-m pip --version", cancellationToken);
+        if (pipCheck.ExitCode != 0)
+        {
+            logger.LogError("pip is not available after installation attempts: {Output} {Error}", pipCheck.Output, pipCheck.Error);
+            progress.Report("无法安装 pip，请手动检查环境");
+            return false;
+        }
+
+        // 安装依赖
+        return await EnsureDependenciesAsync(progress, cancellationToken);
     }
 
     private async Task<bool> EnsureDependenciesAsync(IProgress<string> progress, CancellationToken cancellationToken)
@@ -431,7 +444,7 @@ public class PythonService(
                 if (process == null) continue;
                 process.WaitForExit(5000);
                 var output = process.StandardOutput.ReadToEnd().Trim();
-                if (output.Contains(ExpectedPythonVersionPrefix) && process.ExitCode == 0)
+                if (output.Contains(PythonVersionTag) && process.ExitCode == 0)
                     return candidate;
             }
             catch
@@ -446,80 +459,64 @@ public class PythonService(
     private async Task<ProcessResult> RunProcessAsync(string fileName, string arguments,
         CancellationToken cancellationToken)
     {
-        try
+        var psi = new ProcessStartInfo
         {
-            var psi = new ProcessStartInfo
-            {
-                FileName = fileName,
-                Arguments = arguments,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+            FileName = fileName,
+            Arguments = arguments,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
 
-            using var process = new Process();
-            process.StartInfo = psi;
-            process.Start();
+        using var process = new Process();
+        process.StartInfo = psi;
+        process.Start();
 
-            var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
-            var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
+        var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
+        var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
 
-            await process.WaitForExitAsync(cancellationToken);
+        await process.WaitForExitAsync(cancellationToken);
 
-            return new ProcessResult(process.ExitCode, await outputTask, await errorTask);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to run process: {FileName} {Arguments}", fileName, arguments);
-            return new ProcessResult(-1, string.Empty, ex.Message);
-        }
+        return new ProcessResult(process.ExitCode, await outputTask, await errorTask);
     }
 
     private async Task<ProcessResult> RunProcessAsync(string fileName, string arguments, IProgress<string> progressHandler,
         CancellationToken cancellationToken)
     {
-        try
+        var stdout = new StringWriter();
+        var stderr = new StringWriter();
+        var psi = new ProcessStartInfo
         {
-            var stdout = new StringWriter();
-            var stderr = new StringWriter();
-            var psi = new ProcessStartInfo
-            {
-                FileName = fileName,
-                Arguments = arguments,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+            FileName = fileName,
+            Arguments = arguments,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
 
-            using var process = new Process();
-            process.StartInfo = psi;
-            process.OutputDataReceived += (_, e) =>
-            {
-                if (string.IsNullOrEmpty(e.Data)) return;
-                stdout.WriteLine(e.Data);
-                progressHandler.Report(e.Data);
-            };
-            process.ErrorDataReceived += (_, e) =>
-            {
-                if (string.IsNullOrEmpty(e.Data)) return;
-                stderr.WriteLine(e.Data);
-                progressHandler.Report(e.Data);
-            };
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-
-            await process.WaitForExitAsync(cancellationToken);
-
-            return new ProcessResult(process.ExitCode, stdout.ToString(), stderr.ToString());
-        }
-        catch (Exception ex)
+        using var process = new Process();
+        process.StartInfo = psi;
+        process.OutputDataReceived += (_, e) =>
         {
-            logger.LogError(ex, "Failed to run process: {FileName} {Arguments}", fileName, arguments);
-            return new ProcessResult(-1, string.Empty, ex.Message);
-        }
+            if (string.IsNullOrEmpty(e.Data)) return;
+            stdout.WriteLine(e.Data);
+            progressHandler.Report(e.Data);
+        };
+        process.ErrorDataReceived += (_, e) =>
+        {
+            if (string.IsNullOrEmpty(e.Data)) return;
+            stderr.WriteLine(e.Data);
+            progressHandler.Report(e.Data);
+        };
+        process.Start();
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+
+        await process.WaitForExitAsync(cancellationToken);
+
+        return new ProcessResult(process.ExitCode, stdout.ToString(), stderr.ToString());
     }
 
     private async Task WriteEnvMarkerAsync()
