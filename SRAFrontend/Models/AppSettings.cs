@@ -385,30 +385,26 @@ public partial class AdvancedSettings : ObservableObject
     private string _backendLaunchArgs = "--inline";
     
     [ObservableProperty]
-    [property: JsonPropertyName("backend.usePython")]
-    private bool _isBackendUsePython = true;
-    
-    [ObservableProperty]
-    [property: JsonPropertyName("python.pipIndex")]
-    private string _pythonPipIndex = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple";
-
-    [ObservableProperty]
     [property: JsonPropertyName("developerMode.enabled")]
     private bool _isDeveloperModeEnabled;
-    
+
     [ObservableProperty]
     [property: JsonPropertyName("developerMode.saveOcrImage")]
     private bool _isSaveOcrImage;
-    
+
     [ObservableProperty]
     [property: JsonPropertyName("developerMode.overlay")]
     private bool _isDebugOverlayEnabled;
 
     [ObservableProperty]
-    [property: JsonPropertyName("developerMode.pythonPath")]
+    [property: JsonPropertyName("developerMode.python.enabled")]
+    private bool _isPythonEnabled;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("developerMode.python.path")]
     private string _pythonPath = "";
 
     [ObservableProperty]
-    [property: JsonPropertyName("developerMode.pythonMain")]
+    [property: JsonPropertyName("developerMode.python.main")]
     private string _pythonMain = "";
 }

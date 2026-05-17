@@ -24,7 +24,6 @@ public class CommonModel(
     UpdateService updateService,
     IBackendService backendService,
     AnnouncementService announcementService,
-    PythonService pythonService,
     ILogger<CommonModel> logger,
     ISukiToastManager toastManager)
 {
@@ -63,53 +62,6 @@ public class CommonModel(
         // 检查是否有新公告, 自动弹出公告栏
         if (cacheService.Cache.LastViewAnnouncementId != _announcementList.Id)
             ShowAnnouncementBoard();
-    }
-    
-    public async Task CheckPythonEnvironmentAsync()
-    {
-        if (!settingsService.Settings.Advanced.IsBackendUsePython) return;
-        if (PythonService.IsEnvironmentReady()) return;
-        var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
-        {
-            Header = "Python 环境未准备好",
-            Content = "检测到 Python 环境未准备好，是否现在安装？",
-            ActionButtonsSource =
-            [
-                SukiMessageBoxButtonsFactory.CreateButton("安装", SukiMessageBoxResult.Yes, "Flat"),
-                SukiMessageBoxButtonsFactory.CreateButton("取消", SukiMessageBoxResult.Cancel)
-            ]
-        });
-        if (result is SukiMessageBoxResult.Yes)
-        {
-            var (progressPanel, progressLabel, progressBar,  cts) = BuildDownloadProgressUi();
-            progressBar.IsVisible = false; // 安装过程没有明确的进度百分比，先隐藏进度条
-            var progressHandler = new Progress<string>(s => progressLabel.Content = s);
-            var toast = CreateStandardToastBuilder("正在安装 Python 环境", progressPanel, NotificationType.Information)
-                .Queue();
-            toast.CanDismissByClicking = false;
-            toast.CanDismissByTime = false;
-            try
-            {
-                var ensureResult = await pythonService.EnsureEnvironmentAsync(progressHandler, cts.Token);
-                toastManager.Dismiss(toast);
-                if (!ensureResult)
-                    ShowErrorToast("Python 环境安装失败", "无法完成 Python 环境的安装，请查看日志获取更多信息");
-                else
-                    ShowSuccessToast("Python 环境安装完成", "现在可以使用相关功能了");
-            }
-            catch (OperationCanceledException)
-            {
-                toastManager.Dismiss(toast);
-                logger.LogWarning("Python environment installation canceled by user");
-                ShowWarningToast("安装已取消", "您已取消 Python 环境的安装");
-            }
-            catch (Exception e)
-            {
-                toastManager.Dismiss(toast);
-                logger.LogError(e, "Error installing Python environment");
-                ShowErrorToast("Python 环境安装失败", $"发生错误：{e.Message}");
-            }
-        }
     }
 
     public async Task CheckForUpdatesAsync()

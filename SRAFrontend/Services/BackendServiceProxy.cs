@@ -26,7 +26,7 @@ public class BackendServiceProxy : IBackendService
         // 初始化 Python 后端配置
         ApplyPythonSettings();
         var isUsingPython = Environment.GetCommandLineArgs().Contains("--use-python") ||
-                            _settingsService.Settings.Advanced.IsBackendUsePython;
+                            _settingsService.Settings.Advanced is { IsDeveloperModeEnabled: true, IsPythonEnabled: true };
         // 根据设置决定初始后端
         _currentBackend = isUsingPython
             ? _pyBackendService
@@ -109,9 +109,9 @@ public class BackendServiceProxy : IBackendService
     private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         // 后端选择
-        if (e.PropertyName == nameof(AdvancedSettings.IsBackendUsePython))
+        if (e.PropertyName == nameof(AdvancedSettings.IsPythonEnabled))
         {
-            var usePython = _settingsService.Settings.Advanced.IsBackendUsePython;
+            var usePython = _settingsService.Settings.Advanced.IsPythonEnabled;
             IBackendService target = usePython ? _pyBackendService : _cliBackendService;
             SetCurrentBackend(target);
         }
