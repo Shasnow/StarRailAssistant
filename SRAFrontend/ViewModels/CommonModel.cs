@@ -97,6 +97,12 @@ public class CommonModel(
                 else
                     ShowSuccessToast("Python 环境安装完成", "现在可以使用相关功能了");
             }
+            catch (OperationCanceledException)
+            {
+                toastManager.Dismiss(toast);
+                logger.LogWarning("Python environment installation canceled by user");
+                ShowWarningToast("安装已取消", "您已取消 Python 环境的安装");
+            }
             catch (Exception e)
             {
                 toastManager.Dismiss(toast);
