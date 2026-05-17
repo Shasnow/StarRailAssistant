@@ -13,4 +13,4 @@ jobs:
           npm pkg get version
           VERSION=$(npm pkg get version)
           CHANNEL=$([[ "$VERSION" == *"-beta"* ]] && echo "beta" || echo "stable")
-          curl -X POST -H "Content-Type: application/json" -d '{"version": "$VERSION", "res_id": "StarRailAssistant", "channel": "'"$CHANNEL"'"}' "${{ secrets.UPDATE_URL }}"
+          curl -X POST -H "Content-Type: application/json" -d '{"version": $VERSION, "res_id": "StarRailAssistant", "channel": "'"$CHANNEL"'"}' "${{ secrets.UPDATE_URL }}"
