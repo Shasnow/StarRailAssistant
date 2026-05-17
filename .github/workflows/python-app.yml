@@ -119,25 +119,13 @@ jobs:
           name: StarRailAssistant_Lite_${{ env.version }}
           path: StarRailAssistant_Lite_${{ env.version }}.zip
           
-      - name: Upload Core zip Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: StarRailAssistant_Core_${{ env.version }}
-          path: StarRailAssistant_Core_${{ env.version }}.zip
-          
       - name: Upload Version_Info Artifact
         uses: actions/upload-artifact@v4
         with:
           name: version_info
           path: version_info.txt
-          
-      - name: Upload to R2
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: |
-          aws s3 cp StarRailAssistant_${{ env.version }}.zip s3://sra/ --endpoint-url=https://955e419b52a8b9fa05c04e29cfb0b17f.r2.cloudflarestorage.com --checksum-algorithm CRC32 --force
-          
+
+
   publish_release:
     name: Publish release
     needs: build
@@ -230,37 +218,37 @@ jobs:
 #        env:
 #          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
-#  mirrorchyan:
-#    needs: publish_release
-#    runs-on: macos-latest
-#    if: ${{ github.repository_owner == 'Shasnow' }}
-#    steps:
-#      - name: upload
-#        uses: MirrorChyan/uploading-action@v1
-#        with:
-#          filetype: latest-release
-#          filename: "StarRailAssistant_v*.zip"
-#          mirrorchyan_rid: StarRailAssistant
-#
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#          owner: ${{ github.repository_owner }}
-#          repo: ${{ github.event.repository.name }}
-#          upload_token: ${{ secrets.MirrorChyanUploadToken }}
-#
-#      - name: release note
-#        uses: MirrorChyan/release-note-action@v1
-#        with:
-#          mirrorchyan_rid: StarRailAssistant
-#
-#          upload_token: ${{ secrets.MirrorChyanUploadToken }}
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#
-#  auto_mas:
-#    runs-on: ubuntu-latest
-#    needs: mirrorchyan
-#    steps:
-#      - name: Update Auto-MAS
-#        run: |
-#          VERSION=$(npm pkg get version)
-#          CHANNEL=$([[ "$VERSION" == *"-beta"* ]] && echo "beta" || echo "stable")
-#          curl -X POST -H "Content-Type: application/json" -d '{"version": "$VERSION", "res_id": "StarRailAssistant", "channel": "'"$CHANNEL"'"}' "${{ secrets.UPDATE_URL }}"
+  mirrorchyan:
+    needs: publish_release
+    runs-on: macos-latest
+    if: ${{ github.repository_owner == 'Shasnow' }}
+    steps:
+      - name: upload
+        uses: MirrorChyan/uploading-action@v1
+        with:
+          filetype: latest-release
+          filename: "StarRailAssistant_v*.zip"
+          mirrorchyan_rid: StarRailAssistant
+
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          upload_token: ${{ secrets.MirrorChyanUploadToken }}
+
+      - name: release note
+        uses: MirrorChyan/release-note-action@v1
+        with:
+          mirrorchyan_rid: StarRailAssistant
+
+          upload_token: ${{ secrets.MirrorChyanUploadToken }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  auto_mas:
+    runs-on: ubuntu-latest
+    needs: mirrorchyan
+    steps:
+      - name: Update Auto-MAS
+        run: |
+          VERSION=$(npm pkg get version)
+          CHANNEL=$([[ "$VERSION" == *"-beta"* ]] && echo "beta" || echo "stable")
+          curl -X POST -H "Content-Type: application/json" -d '{"version": "$VERSION", "res_id": "StarRailAssistant", "channel": "'"$CHANNEL"'"}' "${{ secrets.UPDATE_URL }}"
