@@ -28,6 +28,7 @@ import subprocess
 import sys
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
+from urllib.request import urlopen
 
 ROOT_PATH = Path(__file__).resolve().parent.parent
 WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
@@ -85,22 +86,20 @@ def nuitka_build(version: str):
 
 def embed_python():
     print("Embedding Python ...")
-    import requests
     from io import BytesIO
 
     Path.mkdir(DIST_DIR, parents=True, exist_ok=True)
     print("Downing Python embedded package ...")
-    response = requests.get(PYTHON31210_URL)
-    response.raise_for_status()
-    with ZipFile(BytesIO(response.content)) as zipf:
-        zipf.extractall(DIST_DIR / "python")
+    with urlopen(PYTHON31210_URL) as response:
+        with ZipFile(BytesIO(response.read())) as zipf:
+            zipf.extractall(DIST_DIR / "python")
     print("Enabling site...")
     with open(DIST_DIR / "python" / "python312._pth", "w", encoding="utf-8") as file:
         file.write("python312.zip\n.\n\n# Uncomment to run site.main() automatically\nimport site\n")
     print("Downing get-pip.py")
-    response = requests.get(GET_PIP_URL)
-    with open("get-pip.py", "wb") as file:
-        file.write(response.content)
+    with urlopen(GET_PIP_URL) as response:
+        with open("get-pip.py", "wb") as file:
+            file.write(response.read())
     print("Installing pip...")
     subprocess.run([DIST_DIR / "python" / "python.exe", "get-pip.py"], check=True)
     subprocess.run([DIST_DIR / "python" / "python.exe", "-m", "pip", "install", "--upgrade", "pip"], check=True)
