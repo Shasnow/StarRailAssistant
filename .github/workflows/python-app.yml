@@ -112,7 +112,12 @@ jobs:
         with:
           name: StarRailAssistant_${{ env.version }}
           path: StarRailAssistant_${{ env.version }}.zip
-          
+      - name: Upload Core zip Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: StarRailAssistant_Core_${{ env.version }}
+          path: StarRailAssistant_Core_${{ env.version }}.zip
+
       - name: Upload Lite zip Artifact
         uses: actions/upload-artifact@v4
         with:
