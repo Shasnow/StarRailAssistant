@@ -410,6 +410,7 @@ class CurrencyWars(Executable):
             self.operator.paste()
             self.operator.sleep(1)
             self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+            self.operator.wait_img(CWIMG.APPLY_STRATEGY)
             self.operator.click_img(CWIMG.APPLY_STRATEGY, after_sleep=1)
             self.operator.press_key('esc', presses=3, interval=1)
         return True
