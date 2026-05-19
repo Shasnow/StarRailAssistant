@@ -6,7 +6,7 @@ from typing import Any
 from SRACore.localization import Resource
 from SRACore.models.app_settings import AppSettings
 from SRACore.operators.ioperator import IOperator
-from SRACore.task import BaseTask, get_tasks
+from SRACore.task import BaseTask, get_task_classes
 from SRACore.util import (
     encryption,  # NOQA 有动态用法，确保被打包 # type: ignore
     notify,
@@ -29,7 +29,7 @@ class TaskManager:
         """
         self.log_queue = None
         self._stop_event = threading.Event()
-        self.task_list: list[type[BaseTask]] = get_tasks()
+        self.task_list: list[type[BaseTask]] = get_task_classes()
         self.settings: AppSettings = settings
         logger.debug(f"Successfully load task: {self.task_list}")
 
