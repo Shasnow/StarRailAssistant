@@ -1,6 +1,7 @@
 import importlib
 from abc import ABC, abstractmethod
 from typing import final
+from pathlib import Path
 
 from loguru import logger
 
@@ -84,10 +85,12 @@ class BaseTask(Executable, ABC):
 registry: list[tuple[int, type[BaseTask]]] = list()
 
 
-def _ensure_task_modules_loaded(module="tasks") -> None:
+def _ensure_task_modules_loaded(package="tasks") -> None:
     """确保任务模块已被导入，从而触发装饰器注册。"""
     try:
-        importlib.import_module(module)
+        # 扫描 tasks 包下的所有 .py 文件，导入每个模块
+        for file in Path(package).glob("*.py"):
+            importlib.import_module(f"{package}.{file.stem}")
     except ModuleNotFoundError:
         # 运行环境可能没有顶层 tasks 包；此时仅依赖显式导入的注册结果。
         pass
@@ -110,6 +113,6 @@ def task(_cls: type[BaseTask] | None = None, *, order: int | None = None):
     return decorator(_cls)
 
 
-def get_tasks() -> list[type[BaseTask]]:
+def get_task_classes() -> list[type[BaseTask]]:
     _ensure_task_modules_loaded()
     return [cls for order, cls in sorted(registry, key=lambda x: x[0])]
