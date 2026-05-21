@@ -1,4 +1,5 @@
-import os
+import sys
+
 from SRACore.task import BaseTask, task
 from SRACore.util import notify, sys_util
 from SRACore.util.errors import ErrorCode, SRAError
@@ -56,7 +57,8 @@ class MissionAccomplishTask(BaseTask):
         try:
             if notify.should_capture_notification_screenshot():
                 notify.capture_game_screenshot(self.operator)
-            os._exit(0)
+            sys_util.task_kill("SRA.exe")
+            sys.exit(0)
         except Exception as e:
             logger.debug(e)
             logger.error(SRAError(ErrorCode.PROCESS_KILL_FAILED, "退出程序失败", str(e)))
