@@ -36,6 +36,11 @@ levels = [
     "回忆之蕾（雅利洛VI）",
     "以太之蕾（雅利洛VI）",
     "珍藏之蕾（雅利洛VI）"]
+results = [
+    "漫游指南",
+    "提纯以太",
+    "信用点"
+]
 
 [subtasks.calyx_crimson]
 name = "拟造花萼（赤）"
