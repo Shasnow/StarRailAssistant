@@ -218,7 +218,7 @@ diff-cover coverage.xml --compare-branch=origin/main --fail-under=60
 
 ## ⚠️ 常见问题
 
-- **前端构建失败**：确保已安装 .NET 8.0 SDK，并尝试重新还原依赖：
+- **前端构建失败**：确保已安装 .NET 10.0 SDK，并尝试重新还原依赖：
   ```bash
   dotnet restore ./SRAFrontend/SRAFrontend.csproj -r win-x64 --force
   ```
