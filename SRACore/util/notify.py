@@ -6,8 +6,9 @@ from typing import Any, Callable
 
 from plyer import notification  # type: ignore
 
+from SRACore.models.app_settings import NotificationSettings
 from SRACore.util import encryption
-from SRACore.util.data_persister import load_settings
+from SRACore.util.data_persister import load_app_settings
 from SRACore.util.image_util import compress_image_bytes
 
 
@@ -19,9 +20,14 @@ _active_notification_screenshot_bytes: bytes | None = None
 _notification_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="notify_batch")
 
 
+def _load_notification_settings() -> NotificationSettings:
+    settings = load_app_settings()
+    return settings.Notification or NotificationSettings()
+
+
 def try_send_notification(title: str, message: str, result: str = "success", operator: Any | None = None):
-    setting = load_settings("notification")
-    if not setting.get("enabled", False):
+    setting = _load_notification_settings()
+    if not setting.isEnabled:
         return
     screenshot_bytes = None
     if should_capture_notification_screenshot():
@@ -30,7 +36,7 @@ def try_send_notification(title: str, message: str, result: str = "success", ope
             screenshot_bytes = _get_cached_game_screenshot_bytes(operator)
     data = _build_notification_data(title, message, result)
     clear_cached_game_screenshot()
-    _notification_executor.submit(_dispatch_notification_batch, title, message, data, dict(setting), screenshot_bytes)
+    _notification_executor.submit(_dispatch_notification_batch, title, message, data, setting, screenshot_bytes)
 
 
 # ===================== 工具函数 =====================
@@ -84,31 +90,31 @@ def _build_notification_jobs(
         title: str,
         message: str,
         data: dict,
-        setting: dict[str, Any]) -> list[tuple[str, Callable[..., Any], tuple[Any, ...]]]:
+        setting: NotificationSettings) -> list[tuple[str, Callable[..., Any], tuple[Any, ...]]]:
     jobs: list[tuple[str, Callable[..., Any], tuple[Any, ...]]] = []
-    if setting.get("system.enabled", False):
+    if setting.isSystemEnabled:
         jobs.append(("系统", send_windows_notification, (title, message)))
-    if setting.get("email.enabled", False):
+    if setting.isEmailEnabled:
         jobs.append(("邮件", send_mail_notification, (data, setting)))
-    if setting.get("webhook.enabled", False):
+    if setting.isWebhookEnabled:
         jobs.append(("Webhook", send_webhook_notification, (data, setting)))
-    if setting.get("telegram.enabled", False):
+    if setting.isTelegramEnabled:
         jobs.append(("Telegram", send_telegram_notification, (data, setting)))
-    if setting.get("serverChan.enabled", False):
+    if setting.isServerChanEnabled:
         jobs.append(("ServerChan", send_serverchan_notification, (data, setting)))
-    if setting.get("oneBot.enabled", False):
+    if setting.isOneBotEnabled:
         jobs.append(("OneBot", send_onebot_notification, (data, setting)))
-    if setting.get("bark.enabled", False):
+    if setting.isBarkEnabled:
         jobs.append(("Bark", send_bark_notification, (data, setting)))
-    if setting.get("feishu.enabled", False):
+    if setting.isFeishuEnabled:
         jobs.append(("飞书", send_feishu_notification, (data, setting)))
-    if setting.get("weCom.enabled", False):
+    if setting.isWeComEnabled:
         jobs.append(("企业微信", send_wecom_notification, (data, setting)))
-    if setting.get("dingTalk.enabled", False):
+    if setting.isDingTalkEnabled:
         jobs.append(("钉钉", send_dingtalk_notification, (data, setting)))
-    if setting.get("discord.enabled", False):
+    if setting.isDiscordEnabled:
         jobs.append(("Discord", send_discord_notification, (data, setting)))
-    if setting.get("xxtui.enabled", False):
+    if setting.isXxtuiEnabled:
         jobs.append(("xxtui", send_xxtui_notification, (data, setting)))
     return jobs
 
@@ -117,7 +123,7 @@ def _dispatch_notification_batch(
         title: str,
         message: str,
         data: dict,
-        setting: dict[str, Any],
+        setting: NotificationSettings,
         screenshot_bytes: bytes | None) -> None:
     global _active_notification_screenshot_bytes
 
@@ -175,12 +181,12 @@ def _check_wecom_response(status: int, body: str) -> tuple[bool, str]:
 
 
 def should_capture_notification_screenshot() -> bool:
-    config = load_settings("notification")
+    config = _load_notification_settings()
     return any([
-        config.get("telegram.enabled", False) and config.get("telegram.sendImage", False),
-        config.get("oneBot.enabled", False) and config.get("oneBot.sendImage", False),
-        config.get("weCom.enabled", False) and config.get("weCom.sendImage", False),
-        config.get("discord.enabled", False) and config.get("discordSendImage", False),
+        config.isTelegramEnabled and config.isTelegramSendImage,
+        config.isOneBotEnabled and config.isOneBotSendImage,
+        config.isWeComEnabled and config.isWeComSendImage,
+        config.isDiscordEnabled and config.isDiscordSendImage,
     ])
 
 
@@ -262,23 +268,23 @@ def send_windows_notification(title: str, message: str, timeout: int = 5):
 # ===================== 邮件通知 =====================
 
 def send_mail_notification(title: str | dict = "SRA", message: str | dict[str, Any] = "",
-                           configure: dict[str, Any] | None = None):
+                           configure: NotificationSettings | None = None):
     if isinstance(title, dict):
         data = title
-        config: dict[str, Any] = message if isinstance(message, dict) and configure is None else (configure or {})
+        config = configure or (message if isinstance(message, NotificationSettings) else None) or _load_notification_settings()
         mail_title = str(data.get("title", "SRA")).strip() or "SRA"
         mail_message = _fmt_msg(data)
     else:
-        config = configure or {}
+        config = configure or _load_notification_settings()
         mail_title = title
         mail_message = message if isinstance(message, str) else ""
 
-    SMTP = config.get("email.smtpServer", "")
-    port = config.get("email.smtpPort", 465)
-    sender = config.get("email.smtpSender", "")
-    auth_code = config.get("email.smtpAuthCode", "")
+    SMTP = config.smtpServer
+    port = config.smtpPort
+    sender = config.smtpSender
+    auth_code = config.EncryptedSmtpAuthCode
     password = encryption.decryptor(auth_code) if auth_code else ""
-    receiver = config.get("email.smtpReceiver", "")
+    receiver = config.smtpReceiver
     send_mail(mail_title, "SRA通知", mail_message, SMTP, port, sender, password, receiver)
 
 
@@ -303,14 +309,12 @@ def send_mail(title: str = "SRA", subject: str = "SRA通知", message: str = "",
 
 def send_test_email() -> bool:
     try:
-        settings = load_settings("notification")
-        if not settings.get("email.enabled", False):
+        settings = _load_notification_settings()
+        if not settings.isEmailEnabled:
             print("邮件通知未启用")
             return False
-        required = ["email.smtpServer", "email.smtpSender", "email.smtpAuthCode", "email.smtpReceiver"]
-        missing = [f for f in required if not settings.get(f)]
-        if missing:
-            print("邮件配置不完整，缺少: " + ", ".join(missing))
+        if not all([settings.smtpServer, settings.smtpSender, settings.EncryptedSmtpAuthCode, settings.smtpReceiver]):
+            print("邮件配置不完整")
             return False
         body_lines = [
             "这是一条测试信息。",
@@ -318,10 +322,10 @@ def send_test_email() -> bool:
             "如果您收到此邮件，说明邮件通知功能配置正确。",
             "",
             "配置信息：",
-            "- SMTP服务器: " + str(settings.get("email.smtpServer")),
-            "- 端口: " + str(settings.get("email.smtpPort", 465)),
-            "- 发送邮箱: " + str(settings.get("email.smtpSender")),
-            "- 接收邮箱: " + str(settings.get("email.smtpReceiver")),
+            "- SMTP服务器: " + str(settings.smtpServer),
+            "- 端口: " + str(settings.smtpPort),
+            "- 发送邮箱: " + str(settings.smtpSender),
+            "- 接收邮箱: " + str(settings.smtpReceiver),
             "",
             "感谢您使用 StarRailAssistant！",
         ]
@@ -337,8 +341,8 @@ def send_test_email() -> bool:
 
 def send_webhook_notification(data: dict, configure: dict[str, Any] | None = None) -> bool:
     from SRACore.util.logger import logger
-    config = configure or {}
-    endpoint = config.get("webhook.url", "").strip()
+    config = configure or _load_notification_settings()
+    endpoint = config.webhookUrl.strip()
     if not endpoint:
         logger.warning("Webhook 通知发送失败: 未配置 WebhookEndpoint")
         return False
@@ -357,18 +361,16 @@ def send_webhook_notification(data: dict, configure: dict[str, Any] | None = Non
 # ===================== Telegram 通知 =====================
 
 def send_telegram_notification(data: dict, configure: dict[str, Any] | None = None) -> bool:
-    """
-    支持字段：TelegramBotToken, TelegramChatId, TelegramProxyEnabled,
-              TelegramProxyUrl, TelegramApiBaseUrl, TelegramSendImage
-    """
+    # 支持字段：TelegramBotToken, TelegramChatId, TelegramProxyEnabled,
+    #           TelegramProxyUrl, TelegramApiBaseUrl, TelegramSendImage
     from SRACore.util.logger import logger
-    config = configure or {}
-    bot_token = config.get("telegram.botToken", "").strip()
-    chat_id = config.get("telegram.chatId", "").strip()
-    proxy_url = config.get("telegram.proxyUrl", "").strip()
-    proxy_enabled = config.get("telegram.proxyEnabled", False)
-    api_base = config.get("telegram.apiBaseUrl", "").strip()
-    send_image = config.get("telegram.sendImage", False)
+    config = configure or _load_notification_settings()
+    bot_token = config.telegramBotToken.strip()
+    chat_id = config.telegramChatId.strip()
+    proxy_url = config.telegramProxyUrl.strip()
+    proxy_enabled = config.isTelegramProxyEnabled
+    api_base = config.telegramApiBaseUrl.strip()
+    send_image = config.isTelegramSendImage
 
     if not bot_token:
         logger.warning("Telegram 通知发送失败: 未配置 TelegramBotToken")
@@ -453,8 +455,8 @@ def _telegram_send_photo(api_base, bot_token, chat_id, img_bytes, proxy_url, log
 def send_serverchan_notification(data: dict, configure: dict[str, Any] | None = None) -> bool:
     import re
     from SRACore.util.logger import logger
-    config = configure or {}
-    send_key = config.get("serverChan.sendKey", "").strip()
+    config = configure or _load_notification_settings()
+    send_key = config.serverChanSendKey.strip()
     if not send_key:
         logger.warning("ServerChan 通知发送失败: 未配置 ServerChanSendKey")
         return False
@@ -516,16 +518,14 @@ def _onebot_send(url: str, payload: dict, token: str) -> bool:
 
 
 def send_onebot_notification(data: dict, configure: dict[str, Any] | None = None) -> bool:
-    """
-    支持字段：OneBotEndpoint, OneBotUserId, OneBotGroupId, OneBotToken, OneBotSendImage
-    """
+    # 支持字段：OneBotEndpoint, OneBotUserId, OneBotGroupId, OneBotToken, OneBotSendImage
     from SRACore.util.logger import logger
-    config = configure or {}
-    endpoint = config.get("oneBot.url", "").strip().rstrip("/")
-    user_id = config.get("oneBot.userId", "").strip()
-    group_id = config.get("oneBot.groupId", "").strip()
-    token = config.get("oneBot.token", "").strip()
-    send_image = config.get("oneBot.sendImage", False)
+    config = configure or _load_notification_settings()
+    endpoint = config.oneBotUrl.strip().rstrip("/")
+    user_id = config.oneBotUserId.strip()
+    group_id = config.oneBotGroupId.strip()
+    token = config.oneBotToken.strip()
+    send_image = config.isOneBotSendImage
 
     if not endpoint:
         logger.warning("OneBot 通知发送失败: 未配置 OneBotEndpoint")
@@ -563,14 +563,12 @@ def send_onebot_notification(data: dict, configure: dict[str, Any] | None = None
 # ===================== Bark 通知 =====================
 
 def send_bark_notification(data: dict, configure: dict[str, Any] | None = None) -> bool:
-    """
-    支持字段：BarkDeviceKey（逗号分隔多设备）, BarkServerUrl,
-              BarkLevel, BarkSound, BarkGroup, BarkIcon, BarkCiphertext
-    """
+    # 支持字段：BarkDeviceKey（逗号分隔多设备）, BarkServerUrl,
+    #           BarkLevel, BarkSound, BarkGroup, BarkIcon, BarkCiphertext
     from SRACore.util.logger import logger
-    config = configure or {}
-    device_key_raw = config.get("bark.deviceKey", "").strip()
-    server_url = config.get("bark.serverUrl", "https://api.day.app").strip().rstrip("/")
+    config = configure or _load_notification_settings()
+    device_key_raw = config.barkDeviceKey.strip()
+    server_url = config.barkServerUrl.strip().rstrip("/")
     if not device_key_raw:
         logger.warning("Bark 通知发送失败: 未配置 BarkDeviceKey")
         return False
@@ -578,18 +576,18 @@ def send_bark_notification(data: dict, configure: dict[str, Any] | None = None) 
     payload: dict = {
         "title": "SRA 通知",
         "body": _fmt_msg(data),
-        "group": config.get("bark.group", "StarRailAssistant").strip() or "StarRailAssistant",
+        "group": config.barkGroup.strip() or "StarRailAssistant",
     }
-    level = config.get("bark.level", "").strip()
+    level = config.barkLevel.strip()
     if level in ("active", "timeSensitive", "passive"):
         payload["level"] = level
-    sound = config.get("bark.sound", "").strip()
+    sound = config.barkSound.strip()
     if sound:
         payload["sound"] = sound
-    icon = config.get("bark.icon", "").strip()
+    icon = config.barkIcon.strip()
     if icon:
         payload["icon"] = icon
-    ciphertext = config.get("bark.ciphertext", "").strip()
+    ciphertext = config.barkCiphertext.strip()
     if ciphertext:
         payload["ciphertext"] = ciphertext
 
@@ -612,21 +610,19 @@ def send_bark_notification(data: dict, configure: dict[str, Any] | None = None) 
 # ===================== 飞书通知 =====================
 
 def send_feishu_notification(data: dict, configure: dict[str, Any] | None = None) -> bool:
-    """
-    方式一（Webhook）：FeishuWebhookUrl
-    方式二（应用 API）：FeishuAppId, FeishuAppSecret, FeishuReceiveId, FeishuReceiveIdType
-    """
+    # 方式一（Webhook）：FeishuWebhookUrl
+    # 方式二（应用 API）：FeishuAppId, FeishuAppSecret, FeishuReceiveId, FeishuReceiveIdType
     from SRACore.util.logger import logger
-    config = configure or {}
-    app_id = config.get("feishu.appId", "").strip()
-    app_secret = config.get("feishu.appSecret", "").strip()
-    webhook_url = config.get("feishu.webhookUrl", "").strip()
+    config = configure or _load_notification_settings()
+    app_id = config.feishuAppId.strip()
+    app_secret = config.feishuAppSecret.strip()
+    webhook_url = config.feishuWebhookUrl.strip()
     msg = _fmt_msg(data)
 
     # 方式二：应用 API
     if app_id and app_secret:
-        receive_id = config.get("feishu.receiveId", "").strip()
-        id_type = config.get("feishu.receiveIdType", "open_id").strip() or "open_id"
+        receive_id = config.feishuReceiveId.strip()
+        id_type = config.feishuReceiveIdType.strip() or "open_id"
         if not receive_id:
             logger.warning("飞书通知发送失败: 未配置 FeishuReceiveId")
             return False
@@ -694,9 +690,9 @@ def send_wecom_notification(data: dict, configure: dict[str, Any] | None = None)
     """支持字段：WeComWebhookUrl, WeComSendImage"""
     import hashlib
     from SRACore.util.logger import logger
-    config = configure or {}
-    webhook_url = config.get("weCom.webhookUrl", "").strip()
-    send_image = config.get("weCom.sendImage", False)
+    config = configure or _load_notification_settings()
+    webhook_url = config.weComWebhookUrl.strip()
+    send_image = config.isWeComSendImage
     if not webhook_url:
         logger.warning("企业微信通知发送失败: 未配置 WeComWebhookUrl")
         return False
@@ -765,9 +761,9 @@ def send_dingtalk_notification(data: dict, configure: dict[str, Any] | None = No
     import time
     import urllib.parse
     from SRACore.util.logger import logger
-    config = configure or {}
-    webhook_url = config.get("dingTalk.webhookUrl", "").strip()
-    secret = config.get("dingTalk.secret", "").strip()
+    config = configure or _load_notification_settings()
+    webhook_url = config.dingTalkWebhookUrl.strip()
+    secret = config.dingTalkSecret.strip()
     if not webhook_url:
         logger.warning("钉钉通知发送失败: 未配置 DingTalkWebhookUrl")
         return False
@@ -807,9 +803,9 @@ def send_discord_notification(data: dict, configure: dict[str, Any] | None = Non
     import json
     import urllib.request
     from SRACore.util.logger import logger
-    config = configure or {}
-    webhook_url = config.get("discord.webhookUrl", "").strip()
-    send_image = config.get("discord.sendImage", False)
+    config = configure or _load_notification_settings()
+    webhook_url = config.discordWebhookUrl.strip()
+    send_image = config.isDiscordSendImage
     if not webhook_url:
         logger.warning("Discord 通知发送失败: 未配置 DiscordWebhookUrl")
         return False
@@ -883,16 +879,16 @@ def send_discord_notification(data: dict, configure: dict[str, Any] | None = Non
 def send_xxtui_notification(data: dict, configure: dict[str, Any] | None = None) -> bool:
     """支持字段：XxtuiApiKey, XxtuiSource（可选）, XxtuiChannel（可选）"""
     from SRACore.util.logger import logger
-    config = configure or {}
-    api_key = config.get("xxtui.apiKey", "").strip()
+    config = configure or _load_notification_settings()
+    api_key = config.xxtuiApiKey.strip()
     if not api_key:
         logger.warning("xxtui 通知发送失败: 未配置 XxtuiApiKey")
         return False
     payload: dict = {"title": "SRA 通知", "content": _fmt_msg(data)}
-    source = config.get("xxtui.source", "").strip()
+    source = config.xxtuiSource.strip()
     if source:
         payload["source"] = source
-    channel = config.get("xxtui.channel", "").strip()
+    channel = config.xxtuiChannel.strip()
     if channel:
         payload["channel"] = channel
     try:
