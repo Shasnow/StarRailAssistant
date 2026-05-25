@@ -286,7 +286,7 @@ class SRACli(cmd.Cmd):
             send_test_email()
         elif command == 'test' and len(args) >= 2:
             channel = args[1]
-            from SRACore.util.data_persister import load_settings
+            from SRACore.util.data_persister import load_app_settings
             import SRACore.util.notify as _notify_mod
             from SRACore.util.notify import (
                 _build_notification_data,
@@ -302,24 +302,26 @@ class SRACli(cmd.Cmd):
                 send_discord_notification,
                 send_xxtui_notification,
             )
-            settings = load_settings("notifications")
+            settings = load_app_settings().Notification
             data = _build_notification_data("notify.test", "这是一条测试通知", "success")
 
             # 支持图片的渠道：若开关开启则用 SRA 图标替代截图
-            _send_image_keys = {
-                "telegram": "telegram.sendImage",
-                "onebot":   "onebot.sendImage",
-                "wecom":    "wecom.sendImage",
-                "discord":  "discord.sendImage",
-            }
             _orig_bytes  = _notify_mod._take_screenshot_bytes
             _orig_base64 = _notify_mod._take_screenshot_base64
-            if channel in _send_image_keys and settings.get(_send_image_keys[channel], False):
+            if channel == "telegram" and settings.isTelegramSendImage:
                 _icon = _get_test_image_bytes()
-                if _icon:
-                    import base64 as _b64
-                    _notify_mod._take_screenshot_bytes  = lambda: _icon
-                    _notify_mod._take_screenshot_base64 = lambda: _b64.b64encode(_icon).decode()
+            elif channel == "onebot" and settings.isOneBotSendImage:
+                _icon = _get_test_image_bytes()
+            elif channel == "wecom" and settings.isWeComSendImage:
+                _icon = _get_test_image_bytes()
+            elif channel == "discord" and settings.isDiscordSendImage:
+                _icon = _get_test_image_bytes()
+            else:
+                _icon = None
+            if _icon:
+                import base64 as _b64
+                _notify_mod._take_screenshot_bytes  = lambda: _icon
+                _notify_mod._take_screenshot_base64 = lambda: _b64.b64encode(_icon).decode()
 
             _ch_map = {
                 "webhook":   (send_webhook_notification,   "Webhook"),
