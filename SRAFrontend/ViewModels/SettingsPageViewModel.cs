@@ -260,7 +260,17 @@ public partial class SettingsPageViewModel : PageViewModel
     [RelayCommand]
     private async Task TestEmail()
     {
-        await _commonModel.SendTestEmailAsync();
+        var success = _backendService.SendInput("notify test email");
+
+        if (!success)
+        {
+            _commonModel.ShowErrorToast("测试邮件发送失败", "无法连接到后端服务，请确保后端正在运行");
+            return;
+        }
+
+        // 等待一段时间让命令执行
+        await Task.Delay(2000);
+        _commonModel.ShowSuccessToast("测试邮件发送成功", "请检查您的邮箱");
     }
 
     [RelayCommand]

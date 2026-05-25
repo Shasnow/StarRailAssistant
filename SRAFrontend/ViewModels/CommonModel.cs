@@ -393,27 +393,6 @@ public class CommonModel(
     }
 
     /// <summary>
-    ///     发送测试邮件
-    /// </summary>
-    public async Task SendTestEmailAsync()
-    {
-        ShowInfoToast("发送测试邮件", "正在发送测试邮件...");
-
-        // 使用SraService发送测试邮件命令
-        var success = backendService.SendInput("notify test-email");
-
-        if (!success)
-        {
-            ShowErrorToast("测试邮件发送失败", "无法连接到后端服务，请确保后端正在运行");
-            return;
-        }
-
-        // 等待一段时间让命令执行
-        await Task.Delay(2000);
-        ShowSuccessToast("测试邮件发送成功", "请检查您的邮箱");
-    }
-
-    /// <summary>
     ///     显示成功 Toast
     /// </summary>
     public void ShowSuccessToast(string title, string content)

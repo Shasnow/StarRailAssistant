@@ -281,70 +281,15 @@ class SRACli(cmd.Cmd):
             return
 
         command = args[0]
-        if command == 'test-email':
-            from SRACore.util.notify import send_test_email
-            send_test_email()
-        elif command == 'test' and len(args) >= 2:
+        if command == 'test' and len(args) >= 2:
             channel = args[1]
-            from SRACore.util.data_persister import load_app_settings
-            import SRACore.util.notify as _notify_mod
-            from SRACore.util.notify import (
-                _build_notification_data,
-                _get_test_image_bytes,
-                send_webhook_notification,
-                send_telegram_notification,
-                send_serverchan_notification,
-                send_onebot_notification,
-                send_bark_notification,
-                send_feishu_notification,
-                send_wecom_notification,
-                send_dingtalk_notification,
-                send_discord_notification,
-                send_xxtui_notification,
-            )
-            settings = load_app_settings().Notification
-            data = _build_notification_data("notify.test", "这是一条测试通知", "success")
+            from SRACore.notification import send_channel_test_notification
 
-            # 支持图片的渠道：若开关开启则用 SRA 图标替代截图
-            _orig_bytes  = _notify_mod._take_screenshot_bytes
-            _orig_base64 = _notify_mod._take_screenshot_base64
-            if channel == "telegram" and settings.isTelegramSendImage:
-                _icon = _get_test_image_bytes()
-            elif channel == "onebot" and settings.isOneBotSendImage:
-                _icon = _get_test_image_bytes()
-            elif channel == "wecom" and settings.isWeComSendImage:
-                _icon = _get_test_image_bytes()
-            elif channel == "discord" and settings.isDiscordSendImage:
-                _icon = _get_test_image_bytes()
-            else:
-                _icon = None
-            if _icon:
-                import base64 as _b64
-                _notify_mod._take_screenshot_bytes  = lambda: _icon
-                _notify_mod._take_screenshot_base64 = lambda: _b64.b64encode(_icon).decode()
-
-            _ch_map = {
-                "webhook":   (send_webhook_notification,   "Webhook"),
-                "telegram":  (send_telegram_notification,  "Telegram"),
-                "serverchan":(send_serverchan_notification, "ServerChan"),
-                "onebot":    (send_onebot_notification,     "OneBot"),
-                "bark":      (send_bark_notification,       "Bark"),
-                "feishu":    (send_feishu_notification,     "飞书"),
-                "wecom":     (send_wecom_notification,      "企业微信"),
-                "dingtalk":  (send_dingtalk_notification,   "钉钉"),
-                "discord":   (send_discord_notification,    "Discord"),
-                "xxtui":     (send_xxtui_notification,      "xxtui"),
-            }
-            if channel in _ch_map:
-                fn, label = _ch_map[channel]
-                result = fn(data, settings)
-                print(label + " 测试通知发送" + ("成功" if result else "失败"))
+            label, result = send_channel_test_notification(channel)
+            if label:
+                print(label + "测试通知发送" + ("成功" if result else "失败"))
             else:
                 print(Resource.cli_invalidArguments("notify"))
-
-            # 还原 screenshot 函数
-            _notify_mod._take_screenshot_bytes  = _orig_bytes
-            _notify_mod._take_screenshot_base64 = _orig_base64
         else:
             print(Resource.cli_invalidArguments('notify'))
 
