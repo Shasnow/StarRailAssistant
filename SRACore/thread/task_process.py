@@ -5,11 +5,11 @@ from typing import Any
 
 from SRACore.localization import Resource
 from SRACore.models.app_settings import AppSettings
+from SRACore.notification import try_send_notification
 from SRACore.operators.ioperator import IOperator
 from SRACore.task import BaseTask, get_task_classes
 from SRACore.util import (
     encryption,  # NOQA 有动态用法，确保被打包 # type: ignore
-    notify,
     sys_util,  # NOQA 有动态用法，确保被打包 # type: ignore
 )
 from SRACore.util.data_persister import load_cache, load_config
@@ -107,7 +107,7 @@ class TaskManager:
                 logger.info(Resource.task_configCompleted(config_name))
                 logger.info("=" * 50)
             logger.info("All tasks completed.")
-            notify.try_send_notification(
+            try_send_notification(
                 Resource.task_notificationTitle,
                 Resource.task_notificationMessage,
                 operator=last_operator

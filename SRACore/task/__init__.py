@@ -7,8 +7,8 @@ from loguru import logger
 
 from SRACore.localization import Resource
 from SRACore.models.tasks_config import TasksConfig
+from SRACore.notification import try_send_notification
 from SRACore.operators.ioperator import IOperator
-from SRACore.util import notify
 
 
 class Executable:
@@ -52,7 +52,7 @@ class BaseTask(Executable, ABC):
         self.on_failure()
 
     def send_notification(self, message: str, result: str) -> None:
-        notify.try_send_notification(
+        try_send_notification(
             Resource.task_notificationTitle,
             message,
             result=result,

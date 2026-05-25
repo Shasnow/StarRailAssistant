@@ -1,7 +1,7 @@
 import sys
 
 from SRACore.task import BaseTask, task
-from SRACore.util import notify, sys_util
+from SRACore.util import sys_util
 from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
 from tasks.img import IMG, MAIMG
@@ -24,8 +24,6 @@ class MissionAccomplishTask(BaseTask):
 
     def logout(self):
         logger.info("登出账号")
-        if notify.should_capture_notification_screenshot():
-            notify.capture_game_screenshot(self.operator)
         if not self.operator.wait_img(IMG.ENTER):
             return False
         self.operator.press_key('esc')
@@ -42,8 +40,6 @@ class MissionAccomplishTask(BaseTask):
     def quit_game(self):
         logger.info("退出游戏")
         try:
-            if notify.should_capture_notification_screenshot():
-                notify.capture_game_screenshot(self.operator)
             sys_util.task_kill("StarRail.exe")
             self.operator.sleep(2)
             return True
@@ -55,8 +51,6 @@ class MissionAccomplishTask(BaseTask):
     def exit_app(self):
         logger.info("退出程序")
         try:
-            if notify.should_capture_notification_screenshot():
-                notify.capture_game_screenshot(self.operator)
             sys_util.task_kill("SRA.exe")
             sys.exit(0)
         except Exception as e:
@@ -67,8 +61,6 @@ class MissionAccomplishTask(BaseTask):
     def shutdown(self):
         logger.info("正在关机...")
         try:
-            if notify.should_capture_notification_screenshot():
-                notify.capture_game_screenshot(self.operator)
             sys_util.shutdown(time=10)
             return True
         except Exception as e:
@@ -79,8 +71,6 @@ class MissionAccomplishTask(BaseTask):
     def sleep(self):
         logger.info("正在睡眠...")
         try:
-            if notify.should_capture_notification_screenshot():
-                notify.capture_game_screenshot(self.operator)
             sys_util.sleep_system()
             return True
         except Exception as e:
