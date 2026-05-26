@@ -52,7 +52,7 @@ public class App : Application
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
                 serviceProvider.GetRequiredService<IBackendService>().StopBackend();
                 serviceProvider.GetRequiredService<RegistryService>().RestoreUserPcResolution();
-                // serviceProvider.GetRequiredService<ReportService>().Report("logout", string.Empty);
+                serviceProvider.GetRequiredService<ReportService>().Report("logout", string.Empty);
                 Log.CloseAndFlush();
             };
         }
