@@ -95,7 +95,7 @@ class TaskManager:
                             task.fail()
                             return  # 终止当前配置的执行
                         # 任务完成
-                        task.finish()
+                        task.complete()
                     except ThreadStoppedError as e:
                         logger.error(e)
                         break
@@ -202,7 +202,7 @@ class TaskManager:
             else:
                 logger.info(Resource.task_taskCompleted(str(task_instance)))
                 # 单次运行：完成
-                task_instance.finish()
+                task_instance.complete()
             return result
         except ThreadStoppedError as e:
             logger.error(e)

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -102,10 +101,6 @@ public partial class GeneralSettings : ObservableObject
     [ObservableProperty]
     [property: JsonPropertyName("keybindings.f4")]
     private string _hotkeyF4 = "F4";
-    
-    [ObservableProperty]
-    [property: JsonPropertyName("keybindings.m")]
-    private string _hotkeyM = "M";
     
     [ObservableProperty]
     [property: JsonPropertyName("keybindings.e")]
@@ -345,11 +340,11 @@ public partial class NotificationSettings : ObservableObject
 
     [ObservableProperty]
     [property: JsonPropertyName("onStart")]
-    private List<string> _onStart = [];
+    private ObservableCollection<string> _onStart = [];
 
     [ObservableProperty]
-    [property: JsonPropertyName("onComplete")]
-    private List<string> _onComplete = [];
+    [property: JsonPropertyName("onCompleted")]
+    private ObservableCollection<string> _onCompleted = [];
 }
 
 public partial class UpdateSettings : ObservableObject

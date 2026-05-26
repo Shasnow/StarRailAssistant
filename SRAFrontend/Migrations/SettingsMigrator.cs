@@ -28,7 +28,6 @@ public static class SettingsMigrator
                 HotkeyF3 = old.WarpHotkey,
                 HotkeyF4 = old.GuideHotkey,
                 HotkeyE = old.TechniqueHotkey,
-                HotkeyM = old.MapHotkey
             },
             Display = new DisplaySettings
             {

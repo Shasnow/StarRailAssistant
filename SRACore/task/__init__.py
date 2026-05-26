@@ -44,12 +44,12 @@ class BaseTask(Executable, ABC):
         pass
 
     @final
-    def finish(self) -> None:
-        self.on_finish()
+    def complete(self) -> None:
+        self.on_completed()
 
     @final
     def fail(self) -> None:
-        self.on_failure()
+        self.on_failed()
 
     def send_notification(self, message: str, result: str) -> None:
         try_send_notification(
@@ -64,12 +64,12 @@ class BaseTask(Executable, ABC):
         if self.__class__.__name__ in on_start:
             self.send_notification(f"任务 {self.__class__.__name__} 开始执行。", "success")
 
-    def on_finish(self) -> None:
-        on_complete = self.settings.Notification.onComplete
+    def on_completed(self) -> None:
+        on_complete = self.settings.Notification.onCompleted
         if self.__class__.__name__ in on_complete:
             self.send_notification(f"任务 {self.__class__.__name__} 执行完成。", "success")
 
-    def on_failure(self) -> None:
+    def on_failed(self) -> None:
         if self.operator.width != 1920 and self.operator.height != 1080:
             logger.warning(
                 f"可能的失败原因：游戏分辨率不符合要求：1920x1080，当前：{self.operator.width}x{self.operator.height}。")
