@@ -79,7 +79,6 @@ class TPIMG:
     LIGHT_CONE = f"{BASE}/light_cone.png"
     LIMIT = f"{BASE}/limit.png"
     ORNAMENT_EXTRACTION = f"{BASE}/ornament_extraction (%s).png"
-    ORNAMENT_EXTRACTION_NO_SAVE = f"{BASE}/ornament_extraction_no_save.png"
     NO_SAVE = f"{BASE}/no_save.png"
     ORNAMENT_EXTRACTION_PAGE = f"{BASE}/ornament_extraction_page.png"
     PLUS = f"{BASE}/plus.png"

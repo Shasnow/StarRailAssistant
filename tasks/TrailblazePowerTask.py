@@ -362,10 +362,6 @@ class TrailblazePowerTask(BaseTask):
         level = TPIMG.ORNAMENT_EXTRACTION % level
         if not self.find_session("ornament_extraction"):
             return False
-        if self.operator.locate(TPIMG.ORNAMENT_EXTRACTION_NO_SAVE):
-            logger.warning(SRAError(ErrorCode.NO_SAVE, "当前暂无可用存档，请前往[差分宇宙]获取存档"))
-            self.operator.press_key("esc")
-            return False
         if not self.find_level(level):
             return False
         if not self.operator.click_img(level, x_offset=700):
