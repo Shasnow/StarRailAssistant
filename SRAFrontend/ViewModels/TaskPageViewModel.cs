@@ -154,23 +154,6 @@ public partial class TaskPageViewModel : PageViewModel
         CurrencyWarsStrategyIndex = 0;
     }
 
-        // 遍历攻略文件夹中的json文件，反序列化成Strategy对象，并更新Cache中的Strategies列表
-        var strategies = new List<Strategy>();
-        foreach (var file in Directory.GetFiles(PathString.StrategiesDir))
-        {
-            if (!file.EndsWith(".json")) continue;
-            var json = File.ReadAllText(file);
-            var strategy = JsonSerializer.Deserialize<Strategy>(json);
-            if (strategy is null) continue;
-            strategy.FileName = Path.GetFileNameWithoutExtension(file);
-            strategies.Add(strategy);
-        }
-
-        Cache.Strategies.Clear();
-        Cache.Strategies.AddRange(strategies);
-        CurrencyWarsStrategyIndex = 0;
-    }
-
     [RelayCommand]
     private async Task SelectedPath()
     {
