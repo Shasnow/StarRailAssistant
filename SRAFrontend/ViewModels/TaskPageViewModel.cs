@@ -122,7 +122,8 @@ public partial class TaskPageViewModel : PageViewModel
         ControlPanelViewModel.StartSingleTask(taskName);
     }
 
-    [RelayCommand]    private void RefreshStrategies()
+    [RelayCommand]
+    private void RefreshStrategies()
     {
         if (!Directory.Exists(PathString.StrategiesDir))
         {
