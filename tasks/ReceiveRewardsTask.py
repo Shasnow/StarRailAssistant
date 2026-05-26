@@ -245,7 +245,7 @@ class ReceiveRewardsTask(BaseTask):
 
         if self.operator.click_img(RRIMG.NAMELESS_HONOR_TASK, after_sleep=2):
             self.operator.click_img(RRIMG.NAMELESS_HONOR_TASK_RECEIVE, after_sleep=2)
-            self.operator.press_key("esc")
+            self.operator.click_point(0.5, 0.5)
             self.operator.click_img(RRIMG.NAMELESS_HONOR_REWARD, after_sleep=2)
         if self.operator.click_img(RRIMG.NAMELESS_HONOR_REWARD_RECEIVE, after_sleep=2):
             logger.info("领取了无名勋礼奖励")
