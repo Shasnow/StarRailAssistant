@@ -61,7 +61,6 @@ class GeneralSettings:
     hotkeyF2: str = "F2"
     hotkeyF3: str = "F3"
     hotkeyF4: str = "F4"
-    hotkeyM: str = "M"
     hotkeyE: str = "E"
 
     def to_dict(self) -> dict:
@@ -86,7 +85,6 @@ class GeneralSettings:
             "keybindings.f2": self.hotkeyF2,
             "keybindings.f3": self.hotkeyF3,
             "keybindings.f4": self.hotkeyF4,
-            "keybindings.m": self.hotkeyM,
             "keybindings.e": self.hotkeyE
         }
 
@@ -113,7 +111,6 @@ class GeneralSettings:
             "hotkeyF2": data.get("keybindings.f2", "F2"),
             "hotkeyF3": data.get("keybindings.f3", "F3"),
             "hotkeyF4": data.get("keybindings.f4", "F4"),
-            "hotkeyM": data.get("keybindings.m", "M"),
             "hotkeyE": data.get("keybindings.e", "E")
         })
 
@@ -202,7 +199,7 @@ class NotificationSettings:
     xxtuiSource: str = ""
     xxtuiChannel: str = ""
     onStart: list[str] = field(default_factory=list)
-    onComplete: list[str] = field(default_factory=list)
+    onCompleted: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         """转换为字典"""
@@ -260,7 +257,7 @@ class NotificationSettings:
             "xxtui.source": self.xxtuiSource,
             "xxtui.channel": self.xxtuiChannel,
             "onStart": self.onStart,
-            "onComplete": self.onComplete
+            "onCompleted": self.onCompleted
         }
 
     @classmethod
@@ -320,7 +317,7 @@ class NotificationSettings:
             "xxtuiSource": data.get("xxtui.source", ""),
             "xxtuiChannel": data.get("xxtui.channel", ""),
             "onStart": data.get("onStart", list()),
-            "onComplete": data.get("onComplete", list())
+            "onCompleted": data.get("onCompleted", list())
         })
 
 @dataclass
@@ -359,11 +356,10 @@ class AdvancedSettings:
     """自动生成的 AdvancedSettings 类"""
 
     backendLaunchArgs: str = "--inline"
-    isBackendUsePython: bool = True
-    pythonPipIndex: str = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
     isDeveloperModeEnabled: bool = False
     isSaveOcrImage: bool = False
     isDebugOverlayEnabled: bool = False
+    isPythonEnabled: bool = False
     pythonPath: str = ""
     pythonMain: str = ""
 
@@ -371,13 +367,12 @@ class AdvancedSettings:
         """转换为字典"""
         return {
             "backend.launchArgs": self.backendLaunchArgs,
-            "backend.usePython": self.isBackendUsePython,
-            "python.pipIndex": self.pythonPipIndex,
             "developerMode.enabled": self.isDeveloperModeEnabled,
             "developerMode.saveOcrImage": self.isSaveOcrImage,
             "developerMode.overlay": self.isDebugOverlayEnabled,
-            "developerMode.pythonPath": self.pythonPath,
-            "developerMode.pythonMain": self.pythonMain
+            "developerMode.python.enabled": self.isPythonEnabled,
+            "developerMode.python.path": self.pythonPath,
+            "developerMode.python.main": self.pythonMain
         }
 
     @classmethod
@@ -385,11 +380,10 @@ class AdvancedSettings:
         """从字典创建对象"""
         return cls(**{
             "backendLaunchArgs": data.get("backend.launchArgs", "--inline"),
-            "isBackendUsePython": data.get("backend.usePython", True),
-            "pythonPipIndex": data.get("python.pipIndex", "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"),
             "isDeveloperModeEnabled": data.get("developerMode.enabled", False),
             "isSaveOcrImage": data.get("developerMode.saveOcrImage", False),
             "isDebugOverlayEnabled": data.get("developerMode.overlay", False),
-            "pythonPath": data.get("developerMode.pythonPath", ""),
-            "pythonMain": data.get("developerMode.pythonMain", "")
+            "isPythonEnabled": data.get("developerMode.python.enabled", False),
+            "pythonPath": data.get("developerMode.python.path", ""),
+            "pythonMain": data.get("developerMode.python.main", "")
         })

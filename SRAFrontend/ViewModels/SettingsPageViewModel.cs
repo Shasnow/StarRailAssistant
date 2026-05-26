@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -15,15 +16,15 @@ namespace SRAFrontend.ViewModels;
 
 public partial class SettingsPageViewModel : PageViewModel
 {
+    private readonly IBackendService _backendService;
     private readonly CacheService _cacheService;
     private readonly CommonModel _commonModel;
     private readonly AvaloniaList<CustomizableKey> _customizableKeys;
+    private readonly OverlayService _overlayService;
     private readonly RegistryService _registryService;
-    private readonly IBackendService _backendService;
 
     private readonly SettingsService _settingsService;
     private readonly UpdateService _updateService;
-    private readonly OverlayService _overlayService;
 
     /// <inheritdoc />
     public SettingsPageViewModel(
@@ -84,13 +85,6 @@ public partial class SettingsPageViewModel : PageViewModel
                 value => Settings.General.HotkeyF4 = value),
             new CustomizableKey(ListenKeyFor)
             {
-                IconText = "\uE1C6",
-                DisplayText = Resources.MapText,
-                DefaultKey = "M"
-            }.Bind(() => Settings.General.HotkeyM,
-                value => Settings.General.HotkeyM = value),
-            new CustomizableKey(ListenKeyFor)
-            {
                 IconText = "\uE5E4",
                 DisplayText = Resources.TechniqueText,
                 DefaultKey = "E"
@@ -117,6 +111,86 @@ public partial class SettingsPageViewModel : PageViewModel
     public AdvancedSettings AdvancedSettings => Settings.Advanced;
     public Cache Cache => _cacheService.Cache;
     public static string VersionText => AppSettings.Version;
+
+    #region 任务通知配置
+    // 启动游戏
+    public bool StartGameOnStart
+    {
+        get => Settings.Notification.OnStart.Contains("StartGameTask");
+        set => ToggleNotification("StartGameTask", value, Settings.Notification.OnStart);
+    }
+    
+    public bool StartGameOnComplete
+    {
+        get => Settings.Notification.OnCompleted.Contains("StartGameTask");
+        set => ToggleNotification("StartGameTask", value, Settings.Notification.OnCompleted);
+    }
+    
+    // 清体力
+    public bool TrailblazePowerOnStart
+    {
+        get => Settings.Notification.OnStart.Contains("TrailblazePowerTask");
+        set => ToggleNotification("TrailblazePowerTask", value, Settings.Notification.OnStart);
+    }
+    
+    public bool TrailblazePowerOnComplete
+    {
+        get => Settings.Notification.OnCompleted.Contains("TrailblazePowerTask");
+        set => ToggleNotification("TrailblazePowerTask", value, Settings.Notification.OnCompleted);
+    }
+    
+    // 领取奖励
+    public bool ReceiveRewardsOnStart
+    {
+        get => Settings.Notification.OnStart.Contains("ReceiveRewardsTask");
+        set => ToggleNotification("ReceiveRewardsTask", value, Settings.Notification.OnStart);
+    }
+    
+    public bool ReceiveRewardsOnComplete
+    {
+        get => Settings.Notification.OnCompleted.Contains("ReceiveRewardsTask");
+        set => ToggleNotification("ReceiveRewardsTask", value, Settings.Notification.OnCompleted);
+    }
+    
+    // 旷宇纷争
+    public bool CosmicStrifeOnStart
+    {
+        get => Settings.Notification.OnStart.Contains("CosmicStrifeTask");
+        set => ToggleNotification("CosmicStrifeTask", value, Settings.Notification.OnStart);
+    }
+    
+    public bool CosmicStrifeOnComplete
+    {
+        get => Settings.Notification.OnCompleted.Contains("CosmicStrifeTask");
+        set => ToggleNotification("CosmicStrifeTask", value, Settings.Notification.OnCompleted);
+    }
+    
+    // 任务完成
+    public bool MissionAccomplishOnStart
+    {
+        get => Settings.Notification.OnStart.Contains("MissionAccomplishTask");
+        set => ToggleNotification("MissionAccomplishTask", value, Settings.Notification.OnStart);
+    }
+    
+    public bool MissionAccomplishOnComplete
+    {
+        get => Settings.Notification.OnCompleted.Contains("MissionAccomplishTask");
+        set => ToggleNotification("MissionAccomplishTask", value, Settings.Notification.OnCompleted);
+    }
+    
+    private void ToggleNotification(string taskName, bool value, ObservableCollection<string> collection)
+    {
+        if (value)
+        {
+            if (!collection.Contains(taskName))
+                collection.Add(taskName);
+        }
+        else
+        {
+            collection.Remove(taskName);
+        }
+    }
+    #endregion
 
     public string MirrorChyanCdk
     {
@@ -146,6 +220,29 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     public TopLevel? TopLevelObject { get; set; }
+
+    public bool IsOverlayEnabled
+    {
+        get => Settings.General.IsOverlayEnabled;
+        set
+        {
+            Settings.General.IsOverlayEnabled = value;
+            if (value)
+                _overlayService.ShowOverlay();
+            else
+                _overlayService.CloseOverlay();
+        }
+    }
+
+    public bool IsOverlayDebugInfoEnabled
+    {
+        get => Settings.Advanced.IsDebugOverlayEnabled;
+        set
+        {
+            Settings.Advanced.IsDebugOverlayEnabled = value;
+            _overlayService.SetOverlayDebugInfoEnabled(value);
+        }
+    }
 
     [RelayCommand]
     private async Task VerifyCdkAsync()
@@ -221,9 +318,7 @@ public partial class SettingsPageViewModel : PageViewModel
         if (!Settings.General.IsAutoDetectGamePath) return;
         Settings.General.GamePaths.Clear();
         foreach (var gameInstallPath in _registryService.GetGameInstallPaths())
-        {
             Settings.General.GamePaths.Add(gameInstallPath);
-        }
         Settings.General.GamePathIndex = 0; // 切换到第一个路径
     }
 
@@ -233,187 +328,169 @@ public partial class SettingsPageViewModel : PageViewModel
         _registryService.SetTargetPcResolution();
     }
 
-    public bool IsOverlayEnabled
+    private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        get => Settings.General.IsOverlayEnabled;
-        set
-        {
-            Settings.General.IsOverlayEnabled = value;
-            if (value)
-                _overlayService.ShowOverlay();
-            else
-                _overlayService.CloseOverlay();
-        }
-    }
-
-    public bool IsOverlayDebugInfoEnabled
-    {
-        get => Settings.Advanced.IsDebugOverlayEnabled;
-        set
-        {
-            Settings.Advanced.IsDebugOverlayEnabled = value;
-            _overlayService.SetOverlayDebugInfoEnabled(value);
-        }
+        if (e.PropertyName is nameof(Settings.General.GameArgsWindowSize)
+            or nameof(Settings.General.GameArgsFullScreenMode))
+            SetGameResolution();
     }
 
     #region 通知测试
+
     [RelayCommand]
-    private async Task TestEmail()
+    private void TestEmail()
     {
-        var success = _backendService.SendInput("notify test email");
-
-        if (!success)
-        {
-            _commonModel.ShowErrorToast("测试邮件发送失败", "无法连接到后端服务，请确保后端正在运行");
-            return;
-        }
-
-        // 等待一段时间让命令执行
-        await Task.Delay(2000);
-        _commonModel.ShowSuccessToast("测试邮件发送成功", "请检查您的邮箱");
+        SendTestNotification(
+            "邮件测试",
+            () => !string.IsNullOrEmpty(Settings.Notification.SmtpServer.Trim()) &&
+                  Settings.Notification.SmtpPort > 0 &&
+                  !string.IsNullOrEmpty(Settings.Notification.SmtpSender.Trim()) &&
+                  !string.IsNullOrEmpty(Settings.Notification.SmtpAuthCode.Trim()) &&
+                  !string.IsNullOrEmpty(Settings.Notification.SmtpReceiver.Trim()),
+            "请先完成 SMTP 相关设置",
+            "notify test email",
+            "测试邮件已发送，请检查收件箱");
     }
 
     [RelayCommand]
     private void TestWebhook()
     {
-        var endpoint = Settings.Notification.WebhookUrl.Trim();
-        if (string.IsNullOrEmpty(endpoint))
-        {
-            _commonModel.ShowErrorToast("Webhook 测试", "请先填写 Webhook 地址");
-            return;
-        }
-        _settingsService.Save();
-        _ = _backendService.SendInput("notify test webhook");
-        _commonModel.ShowInfoToast("Webhook 测试", $"测试请求已发送至：{endpoint}");
+        SendTestNotification(
+            "Webhook 测试",
+            () => !string.IsNullOrEmpty(Settings.Notification.WebhookUrl.Trim()),
+            "请先填写 Webhook 地址",
+            "notify test webhook",
+            $"测试请求已发送至：{Settings.Notification.WebhookUrl.Trim()}");
     }
 
     [RelayCommand]
     private void TestTelegram()
     {
-        if (string.IsNullOrEmpty(Settings.Notification.TelegramBotToken.Trim()))
-        {
-            _commonModel.ShowErrorToast("Telegram 测试", "请先填写 Bot Token");
-            return;
-        }
-        if (string.IsNullOrEmpty(Settings.Notification.TelegramChatId.Trim()))
-        {
-            _commonModel.ShowErrorToast("Telegram 测试", "请先填写 Chat ID");
-            return;
-        }
-        _settingsService.Save();
-        _ = _backendService.SendInput("notify test telegram");
-        _commonModel.ShowInfoToast("Telegram 测试", "测试消息已发送，请检查 Telegram");
+        SendTestNotification(
+            "Telegram 测试",
+            () => !string.IsNullOrEmpty(Settings.Notification.TelegramBotToken.Trim()) &&
+                  !string.IsNullOrEmpty(Settings.Notification.TelegramChatId.Trim()),
+            "请先填写 Bot Token 和 Chat ID",
+            "notify test telegram",
+            "测试消息已发送，请检查 Telegram");
     }
 
     [RelayCommand]
     private void TestServerChan()
     {
-        if (string.IsNullOrEmpty(Settings.Notification.ServerChanSendKey.Trim()))
-        {
-            _commonModel.ShowErrorToast("ServerChan 测试", "请先填写 SendKey");
-            return;
-        }
-        _settingsService.Save();
-        _ = _backendService.SendInput("notify test serverchan");
-        _commonModel.ShowInfoToast("ServerChan 测试", "测试消息已发送，请检查微信");
+        SendTestNotification(
+            "ServerChan 测试",
+            () => !string.IsNullOrEmpty(Settings.Notification.ServerChanSendKey.Trim()),
+            "请先填写 SendKey",
+            "notify test serverchan",
+            "测试消息已发送，请检查微信");
     }
 
     [RelayCommand]
     private void TestBark()
     {
-        if (string.IsNullOrEmpty(Settings.Notification.BarkDeviceKey.Trim()))
-        {
-            _commonModel.ShowErrorToast("Bark 测试", "请先填写设备 Key");
-            return;
-        }
-        _settingsService.Save();
-        _ = _backendService.SendInput("notify test bark");
-        _commonModel.ShowInfoToast("Bark 测试", "测试消息已发送，请检查 iPhone");
+        SendTestNotification(
+            "Bark 测试",
+            () => !string.IsNullOrEmpty(Settings.Notification.BarkDeviceKey.Trim()),
+            "请先填写设备 Key",
+            "notify test bark",
+            "测试消息已发送，请检查 iPhone");
     }
 
     [RelayCommand]
     private void TestFeishu()
     {
-        if (string.IsNullOrEmpty(Settings.Notification.FeishuWebhookUrl.Trim()))
-        {
-            _commonModel.ShowErrorToast("飞书测试", "请先填写 Webhook 地址");
-            return;
-        }
-        _settingsService.Save();
-        _ = _backendService.SendInput("notify test feishu");
-        _commonModel.ShowInfoToast("飞书测试", "测试消息已发送，请检查飞书");
+        SendTestNotification(
+            "飞书测试",
+            () => !string.IsNullOrEmpty(Settings.Notification.FeishuWebhookUrl.Trim()),
+            "请先填写 Webhook 地址",
+            "notify test feishu",
+            "测试消息已发送，请检查飞书");
     }
 
     [RelayCommand]
     private void TestWeCom()
     {
-        if (string.IsNullOrEmpty(Settings.Notification.WeComWebhookUrl.Trim()))
-        {
-            _commonModel.ShowErrorToast("企业微信测试", "请先填写 Webhook 地址");
-            return;
-        }
-        _settingsService.Save();
-        _ = _backendService.SendInput("notify test wecom");
-        _commonModel.ShowInfoToast("企业微信测试", "测试消息已发送，请检查企业微信");
+        SendTestNotification(
+            "企业微信测试",
+            () => !string.IsNullOrEmpty(Settings.Notification.WeComWebhookUrl.Trim()),
+            "请先填写 Webhook 地址",
+            "notify test wecom",
+            "测试消息已发送，请检查企业微信");
     }
 
     [RelayCommand]
     private void TestDingTalk()
     {
-        if (string.IsNullOrEmpty(Settings.Notification.DingTalkWebhookUrl.Trim()))
-        {
-            _commonModel.ShowErrorToast("钉钉测试", "请先填写 Webhook 地址");
-            return;
-        }
-        _settingsService.Save();
-        _ = _backendService.SendInput("notify test dingtalk");
-        _commonModel.ShowInfoToast("钉钉测试", "测试消息已发送，请检查钉钉");
+        SendTestNotification(
+            "钉钉测试",
+            () => !string.IsNullOrEmpty(Settings.Notification.DingTalkWebhookUrl.Trim()),
+            "请先填写 Webhook 地址",
+            "notify test dingtalk",
+            "测试消息已发送，请检查钉钉");
     }
 
     [RelayCommand]
     private void TestDiscord()
     {
-        if (string.IsNullOrEmpty(Settings.Notification.DiscordWebhookUrl.Trim()))
-        {
-            _commonModel.ShowErrorToast("Discord 测试", "请先填写 Webhook 地址");
-            return;
-        }
-        _settingsService.Save();
-        _ = _backendService.SendInput("notify test discord");
-        _commonModel.ShowInfoToast("Discord 测试", "测试消息已发送，请检查 Discord");
+        SendTestNotification(
+            "Discord 测试",
+            () => !string.IsNullOrEmpty(Settings.Notification.DiscordWebhookUrl.Trim()),
+            "请先填写 Webhook 地址",
+            "notify test discord",
+            "测试消息已发送，请检查 Discord");
     }
 
     [RelayCommand]
     private void TestXxtui()
     {
-        if (string.IsNullOrEmpty(Settings.Notification.XxtuiApiKey.Trim()))
-        {
-            _commonModel.ShowErrorToast("xxtui 测试", "请先填写 API Key");
-            return;
-        }
-        _settingsService.Save();
-        _ = _backendService.SendInput("notify test xxtui");
-        _commonModel.ShowInfoToast("xxtui 测试", "测试消息已发送");
+        SendTestNotification(
+            "xxtui 测试",
+            () => !string.IsNullOrEmpty(Settings.Notification.XxtuiApiKey.Trim()),
+            "请先填写 API Key",
+            "notify test xxtui",
+            "测试消息已发送");
     }
 
     [RelayCommand]
     private void TestOneBot()
     {
-        if (string.IsNullOrEmpty(Settings.Notification.OneBotUrl.Trim()))
-        {
-            _commonModel.ShowErrorToast("OneBot 测试", "请先填写 API 地址");
-            return;
-        }
-        if (string.IsNullOrEmpty(Settings.Notification.OneBotUserId.Trim()) &&
-            string.IsNullOrEmpty(Settings.Notification.OneBotGroupId.Trim()))
-        {
-            _commonModel.ShowErrorToast("OneBot 测试", "请填写 QQ 号或群号（至少一个）");
-            return;
-        }
-        _settingsService.Save();
-        _ = _backendService.SendInput("notify test onebot");
-        _commonModel.ShowInfoToast("OneBot 测试", "测试消息已发送，请检查 QQ");
+        SendTestNotification(
+            "OneBot 测试",
+            () => !string.IsNullOrEmpty(Settings.Notification.OneBotUrl.Trim()) &&
+                  (!string.IsNullOrEmpty(Settings.Notification.OneBotUserId.Trim()) ||
+                   !string.IsNullOrEmpty(Settings.Notification.OneBotGroupId.Trim())),
+            "请填写 API 地址以及 QQ 号或群号（至少一个）",
+            "notify test onebot",
+            "测试消息已发送，请检查 QQ");
     }
+
+    /// <summary>
+    ///     发送测试通知的通用方法
+    /// </summary>
+    /// <param name="title">测试标题</param>
+    /// <param name="validation">验证条件，返回 true 表示验证通过；对于需要提前发送命令的情况，可在此执行命令</param>
+    /// <param name="errorMessage">验证失败时显示的错误消息</param>
+    /// <param name="command">要发送到后端的命令（可选，为 null 或空时不发送）</param>
+    /// <param name="successMessage">发送成功后显示的消息</param>
+    private void SendTestNotification(string title, Func<bool> validation,
+        string errorMessage, string command,
+        string successMessage)
+    {
+        if (!validation())
+        {
+            _commonModel.ShowErrorToast(title, errorMessage);
+            return;
+        }
+        
+        var success = _backendService.SendInput(command);
+
+        if (success)
+            _commonModel.ShowSuccessToast(title, successMessage);
+        else
+            _commonModel.ShowErrorToast(title, errorMessage);
+    }
+
     #endregion
 
     #region 快捷键监听修改逻辑
@@ -470,6 +547,7 @@ public partial class SettingsPageViewModel : PageViewModel
     #endregion
 
     #region 开发者模式多击版本号逻辑
+
     private int _versionClickCount;
     private DateTime _versionFirstClickTime;
     private const int VersionClickRequiredCount = 7;
@@ -491,33 +569,20 @@ public partial class SettingsPageViewModel : PageViewModel
 
         if (_versionClickCount < VersionClickRequiredCount)
         {
-            if (_versionClickCount >3)
-            {
+            if (_versionClickCount > 3)
                 _commonModel.ShowInfoToast("开发者模式",
                     Settings.Advanced.IsDeveloperModeEnabled
                         ? "您正处于开发者模式！"
                         : $"只需再执行 {VersionClickRequiredCount - _versionClickCount} 次操作，即可进入开发者模式");
-            }
             return;
         }
 
         _versionClickCount = 0;
 
         // 只负责开启开发者模式，关闭仍然通过显式开关
-        if (!Settings.Advanced.IsDeveloperModeEnabled)
-        {
-            Settings.Advanced.IsDeveloperModeEnabled = true;
-        }
+        if (!Settings.Advanced.IsDeveloperModeEnabled) Settings.Advanced.IsDeveloperModeEnabled = true;
         _commonModel.ShowInfoToast("开发者模式", "您正处于开发者模式！");
     }
-    #endregion
 
-    private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(Settings.General.GameArgsWindowSize)
-            or nameof(Settings.General.GameArgsFullScreenMode))
-        {
-            SetGameResolution();
-        }
-    }
+    #endregion
 }

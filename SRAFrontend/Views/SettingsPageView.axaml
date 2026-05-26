@@ -662,11 +662,36 @@
                                             <!-- 任务通知配置 -->
                                             <Expander Header="任务通知配置"
                                                       HorizontalAlignment="Stretch">
-                                                <TextBlock Margin="0,6,0,0"
-                                                           Text="当前版本任务级通知配置已迁移，后续将在新配置结构中提供可视化设置。"
-                                                           FontSize="11"
-                                                           Opacity="0.7"
-                                                           TextWrapping="Wrap" />
+                                                <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                                                    <Label Grid.Row="0" Grid.Column="0" Content="任务名称"/>
+                                                    <Label Grid.Row="0" Grid.Column="1" Content="任务开始时通知"/>
+                                                    <Label Grid.Row="0" Grid.Column="2" Content="任务结束后通知"/>
+                                                    <Label Grid.Row="1" Grid.Column="0" Content="启动游戏"/>
+                                                    <CheckBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center"
+                                                              IsChecked="{Binding StartGameOnStart}"/>
+                                                    <CheckBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center"
+                                                              IsChecked="{Binding StartGameOnComplete}"/>
+                                                    <Label Grid.Row="2" Grid.Column="0" Content="清体力"/>
+                                                    <CheckBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center"
+                                                              IsChecked="{Binding TrailblazePowerOnStart}"/>
+                                                    <CheckBox Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center"
+                                                              IsChecked="{Binding TrailblazePowerOnComplete}"/>
+                                                    <Label Grid.Row="3" Grid.Column="0" Content="领取奖励"/>
+                                                    <CheckBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center"
+                                                              IsChecked="{Binding ReceiveRewardsOnStart}"/>
+                                                    <CheckBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center"
+                                                              IsChecked="{Binding ReceiveRewardsOnComplete}"/>
+                                                    <Label Grid.Row="4" Grid.Column="0" Content="旷宇纷争"/>
+                                                    <CheckBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Center"
+                                                              IsChecked="{Binding CosmicStrifeOnStart}"/>
+                                                    <CheckBox Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center"
+                                                              IsChecked="{Binding CosmicStrifeOnComplete}"/>
+                                                    <Label Grid.Row="5" Grid.Column="0" Content="任务完成"/>
+                                                    <CheckBox Grid.Row="5" Grid.Column="1" HorizontalAlignment="Center"
+                                                              IsChecked="{Binding MissionAccomplishOnStart}"/>
+                                                    <CheckBox Grid.Row="5" Grid.Column="2" HorizontalAlignment="Center"
+                                                              IsChecked="{Binding MissionAccomplishOnComplete}"/>
+                                                </Grid>
                                             </Expander>
 
                                         </StackPanel>
