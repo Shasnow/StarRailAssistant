@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Data;
@@ -45,50 +44,50 @@ public partial class SettingsPageViewModel : PageViewModel
         _backendService = backendService;
         _overlayService = overlayService;
         // 任务通用设置中的 启动/停止 快捷键（非游戏内快捷键分组）
-        StartStopKey = new CustomizableKey(ListenKeyFor)
+        StartStopKey = new CustomizableKey
         {
             IconText = "\uE3E4",
             DisplayText = Resources.StopHotkeyText,
             DefaultKey = "F9"
-        }.Bind(() => Settings.General.HotkeyStop,
+        }.Configure(() => Settings.General.HotkeyStop,
             value => Settings.General.HotkeyStop = value);
 
         _customizableKeys =
         [
-            new CustomizableKey(ListenKeyFor)
+            new CustomizableKey
             {
                 IconText = "\uE1F6",
                 DisplayText = Resources.ActivityText,
                 DefaultKey = "F1"
-            }.Bind(() => Settings.General.HotkeyF1,
+            }.Configure(() => Settings.General.HotkeyF1,
                 value => Settings.General.HotkeyF1 = value),
-            new CustomizableKey(ListenKeyFor)
+            new CustomizableKey
             {
                 IconText = "\uE320",
                 DisplayText = Resources.ChronicleText,
                 DefaultKey = "F2"
-            }.Bind(() => Settings.General.HotkeyF2,
+            }.Configure(() => Settings.General.HotkeyF2,
                 value => Settings.General.HotkeyF2 = value),
-            new CustomizableKey(ListenKeyFor)
+            new CustomizableKey
             {
                 IconText = "\uE77E",
                 DisplayText = Resources.WarpText,
                 DefaultKey = "F3"
-            }.Bind(() => Settings.General.HotkeyF3,
+            }.Configure(() => Settings.General.HotkeyF3,
                 value => Settings.General.HotkeyF3 = value),
-            new CustomizableKey(ListenKeyFor)
+            new CustomizableKey
             {
                 IconText = "\uE0E4",
                 DisplayText = Resources.GuideText,
                 DefaultKey = "F4"
-            }.Bind(() => Settings.General.HotkeyF4,
+            }.Configure(() => Settings.General.HotkeyF4,
                 value => Settings.General.HotkeyF4 = value),
-            new CustomizableKey(ListenKeyFor)
+            new CustomizableKey
             {
                 IconText = "\uE5E4",
                 DisplayText = Resources.TechniqueText,
                 DefaultKey = "E"
-            }.Bind(() => Settings.General.HotkeyE,
+            }.Configure(() => Settings.General.HotkeyE,
                 value => Settings.General.HotkeyE = value)
         ];
 
@@ -219,7 +218,22 @@ public partial class SettingsPageViewModel : PageViewModel
         }
     }
 
-    public TopLevel? TopLevelObject { get; set; }
+    public TopLevel? TopLevelObject
+    {
+        get;
+        set
+        {
+            field = value;
+            if (value is not null) InitializeKeyBindings(value);
+        }
+    }
+
+    private void InitializeKeyBindings(TopLevel topLevel)
+    {
+        StartStopKey.AttachTopLevel(topLevel);
+        foreach (var key in _customizableKeys)
+            key.AttachTopLevel(topLevel);
+    }
 
     public bool IsOverlayEnabled
     {
@@ -493,58 +507,7 @@ public partial class SettingsPageViewModel : PageViewModel
 
     #endregion
 
-    #region 快捷键监听修改逻辑
 
-    private CustomizableKey? _currentListeningKey; // 正在监听的快捷键
-    private bool _isChanged; // 是否已更改快捷键
-    private string _tempKey = ""; // 临时存储原快捷键以防取消
-
-    /// <summary>
-    ///     开始监听指定的快捷键
-    /// </summary>
-    private void ListenKeyFor(CustomizableKey customizableKey)
-    {
-        if (TopLevelObject is null) return;
-        if (_currentListeningKey is not null) ReleaseListening();
-        _currentListeningKey = customizableKey;
-        _isChanged = false;
-        _tempKey = customizableKey.CurrentKey;
-        customizableKey.CurrentKey = "按键盘设置快捷键";
-        TopLevelObject.KeyUp += KeyUpHandler;
-        TopLevelObject.PointerPressed += PointerPressedHandler;
-    }
-
-    /// <summary>
-    ///     停止监听快捷键, 并根据是否更改决定是否保存新快捷键
-    /// </summary>
-    private void ReleaseListening()
-    {
-        if (TopLevelObject is null) return;
-        if (!_isChanged && _currentListeningKey != null) _currentListeningKey.CurrentKey = _tempKey;
-        TopLevelObject.KeyUp -= KeyUpHandler;
-        TopLevelObject.PointerPressed -= PointerPressedHandler;
-        _currentListeningKey = null;
-    }
-
-    private void PointerPressedHandler(object? sender, PointerPressedEventArgs e)
-    {
-        ReleaseListening();
-    }
-
-    private void KeyUpHandler(object? sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Escape)
-        {
-            ReleaseListening();
-            return; // 退出方法，不执行后续修改逻辑
-        }
-
-        if (_currentListeningKey != null) _currentListeningKey.CurrentKey = e.Key.ToString();
-        _isChanged = true;
-        ReleaseListening();
-    }
-
-    #endregion
 
     #region 开发者模式多击版本号逻辑
 
