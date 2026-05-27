@@ -19,7 +19,7 @@ public partial class HomePageViewModel(
     IHttpClientFactory httpClientFactory)
     : PageViewModel(PageName.Home, "\uE2C2")
 {
-    private static readonly Uri DefaultImagePath = new("avares://SRA/Assets/background-lt.jpg");
+    private static readonly Uri DefaultImagePath = new("avares://SRA/Assets/background/default.jpg");
     private static readonly Bitmap DefaultImage = new(AssetLoader.Open(DefaultImagePath));
     private readonly Dictionary<string, Bitmap> _imageCache = new();
     
@@ -36,16 +36,17 @@ public partial class HomePageViewModel(
     private async Task<Bitmap> GetBackgroundImageAsync()
     {
         var backgroundImagePath = settingsService.Settings.Display.BackgroundImageUri;
-
-        if (string.IsNullOrEmpty(backgroundImagePath))
+        var rawUri = backgroundImagePath.Replace("\"", "").Trim();
+        if (string.IsNullOrEmpty(rawUri))
             return DefaultImage;
+        if (string.Equals(rawUri, "shasnow", StringComparison.OrdinalIgnoreCase))
+            return new Bitmap(AssetLoader.Open(new Uri("avares://SRA/Assets/background/shasnow.png")));
 
-        if (_imageCache.TryGetValue(backgroundImagePath, out var image))
+        if (_imageCache.TryGetValue(rawUri, out var image))
             return image;
 
         try
         {
-            var rawUri = backgroundImagePath.Replace("\"", "").Trim();
             Bitmap bmp;
             if (rawUri.StartsWith("http", StringComparison.OrdinalIgnoreCase))
             {
@@ -56,12 +57,12 @@ public partial class HomePageViewModel(
                 {
                     await using var stream = await response.Content.ReadAsStreamAsync();
                     bmp = new Bitmap(stream);
-                    _imageCache[backgroundImagePath] = bmp;
+                    _imageCache[rawUri] = bmp;
                     return bmp;
                 }
             }
             bmp = new Bitmap(rawUri);
-            _imageCache[backgroundImagePath] = bmp;
+            _imageCache[rawUri] = bmp;
             return bmp;
         }
         catch (Exception e)
