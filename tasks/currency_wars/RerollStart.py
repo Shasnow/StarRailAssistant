@@ -51,10 +51,10 @@ class RerollStart(CurrencyWars):
 
     @staticmethod
     def _is_substring(a: str, b: str) -> bool:
-        """Return True if `a` is a substring of `b`."""
+        """Return True if `a` is a substring of `b` or `b` is a substring of `a`."""
         if not a or not b:
             return False
-        return a in b
+        return a in b or b in a
 
     def set_invest_env(self, invest_env: str):
         """设置投资环境"""
