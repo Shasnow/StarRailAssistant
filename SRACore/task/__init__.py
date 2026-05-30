@@ -1,5 +1,6 @@
 import importlib
 from abc import ABC, abstractmethod
+import time
 from typing import final
 from pathlib import Path
 
@@ -74,6 +75,10 @@ class BaseTask(Executable, ABC):
             logger.warning(
                 f"可能的失败原因：游戏分辨率不符合要求：1920x1080，当前：{self.operator.width}x{self.operator.height}。")
         self.send_notification(f"任务 {self.__class__.__name__} 执行失败。", "error")
+        try:
+            self.operator.screenshot().save(f"log/screenshot/{self.__class__.__name__}_failed_{time.time()}.png")
+        except Exception:
+            pass
 
     def __str__(self):
         return f"{self.__class__.__name__}"

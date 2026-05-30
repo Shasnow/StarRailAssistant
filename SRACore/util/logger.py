@@ -23,6 +23,8 @@ def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log", level: str = "TRACE",
 
     if not os.path.exists("log/ocr"):
         os.makedirs("log/ocr")
+    if not os.path.exists("log/screenshot"):
+        os.makedirs("log/screenshot")
 
 
 __all__ = ["logger", "setup_logger"]

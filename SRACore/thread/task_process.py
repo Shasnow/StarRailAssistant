@@ -143,7 +143,6 @@ class TaskManager:
                         # 任务开始
                         task.start()
                         if not task.run():
-                            logger.debug('task failed: ' + str(task))
                             logger.error(Resource.task_taskFailed(str(task)))
                             task.fail()
                             return  # 终止所有配置的执行
@@ -156,7 +155,7 @@ class TaskManager:
                         # 捕获任务执行中的异常（如未处理的错误）
                         logger.exception(Resource.task_taskCrashed(str(task), str(e)))
                         task.fail()
-                        break
+                        return  # 终止所有配置的执行
                 logger.info(Resource.task_configCompleted(config_name))
                 logger.info("=" * 50)
             logger.info("All tasks completed.")
