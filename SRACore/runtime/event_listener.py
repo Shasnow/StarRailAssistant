@@ -26,7 +26,7 @@ class KeyboardListener:
     # 监听器线程实例
     _listener_thread: Optional[threading.Thread] = None
 
-    def register_key_event(self, key: str, callback: Callable[..., Any], args: Any) -> None:
+    def register_key_event(self, key: str, callback: Callable[..., Any], args: Any | None = None) -> None:
         """
         注册按键按下事件（线程安全）
         :param key: 按键字符串（如 'a'、'enter'、'ctrl'）
