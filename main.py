@@ -39,12 +39,14 @@ def main():
         for cmd in commands:
             sys.argv.append(cmd)
         print(sys.argv)
-
+    inline = args.inline
+    if inline:
+        sys.argv.remove('--inline')
     # 延迟导入 SRACli
     from SRACore.cli2 import SRACli
     cli_instance = SRACli(settings=settings)
     # 配置交互式模式（隐藏提示符）
-    if args.inline:
+    if inline:
         cli_instance.intro = ''
         cli_instance.prompt = ''
     cli_instance.cmdloop()
