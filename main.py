@@ -1,5 +1,6 @@
 import argparse
 import os
+import subprocess
 import sys
 from SRACore.localization import Resource
 from SRACore.util.const import VERSION
@@ -18,58 +19,34 @@ def main():
     setup_argumentparser(parser)
     # 解析参数
     args = parser.parse_known_args()[0]
-    # 延迟导入 SRACli
+    if not is_admin():
+        if args.no_admin:
+            sys.argv.remove('--no-admin')  # 移除参数，不向下传递
+            print(Resource.cli_noAdminWarning)
+        else:
+            restart_as_admin()
     from SRACore.util.logger import logger, setup_logger
     # 设置日志记录器
     setup_logger(level=args.log_level)
     logger.info(f"Current version: {VERSION}")
     logger.debug(f"cwd: {os.getcwd()}")
-    from SRACore.cli import SRACli
-    cli_instance = SRACli(settings=settings)
-    # 配置交互式模式（隐藏提示符）
-    if args.inline or args.embed:
-        cli_instance.intro = ''
-        cli_instance.prompt = ''
-    # if args.host:
-    #     cli_instance.do_host(args.port)
 
-    # 统一处理子命令逻辑
-    def execute_subcommand(cmd_prefix: str, *args_parts: str) -> bool:
-        """
-        拼接并执行子命令，返回是否需要退出
-        :param cmd_prefix: 指令前缀（run/single）
-        :param args_parts: 指令参数列表
-        :return: 是否退出（onecmd返回True 或 指定--once）
-        """
-        # 拼接指令
-        cmd_str = f"{cmd_prefix} {' '.join(arg for arg in args_parts if arg)}"
-        if not cmd_str:
-            return False
-        # 执行指令
-        logger.info(cmd_str)
-        exit_flag = cli_instance.onecmd(cmd_str)
-        # 判断是否需要退出
-        return exit_flag or args.once
-
-    # 7. 处理子命令
-    exit_program = False
-    if args.subcommand == 'run':
-        # 处理 run 子命令：config 是列表，拼接为空格分隔的字符串
-        logger.warning(f"Usage 'run --config {" ".join(args.config)}' is deprecated, use '--execute \"run {' '.join(args.config)}\"' instead.")
-        exit_program = execute_subcommand('run', *args.config if args.config else []) # type: ignore
-    elif args.subcommand == 'single':
-        # 处理 single 子命令：task-name + config（单个参数）
-        logger.warning(f"Usage 'single --task-name {args.task_name} --config {args.config}' is deprecated, use '--execute \"single {args.task_name} {args.config}\"' instead.")
-        exit_program = execute_subcommand('single', args.task_name, args.config)
-
-    # 8. 退出或启动交互式命令行
-    if exit_program:
-        sys.exit(0)
     if args.command:
+        for cmd in args.command:
+            sys.argv.remove(cmd)  # 移除命令参数, 避免重复执行
         cmd_str = " ".join(args.command).replace('&', '+')
         commands = cmd_str.split('+')
         for cmd in commands:
-            cli_instance.cmdqueue.append(cmd)
+            sys.argv.append(cmd)
+        print(sys.argv)
+
+    # 延迟导入 SRACli
+    from SRACore.cli2 import SRACli
+    cli_instance = SRACli(settings=settings)
+    # 配置交互式模式（隐藏提示符）
+    if args.inline:
+        cli_instance.intro = ''
+        cli_instance.prompt = ''
     cli_instance.cmdloop()
 
 def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
@@ -79,18 +56,13 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
         help=Resource.argparse_inline_help
     )
     parser.add_argument(
-        '--embed',
-        action='store_true',
-        help=Resource.argparse_embed_help
-    )
-    parser.add_argument(
          '--command', '-c', '--execute', '-e',
         nargs='*',
         type=str,
         help='The command to execute AFTER launch',
     )
     parser.add_argument(
-        '--version',
+        '-v', '--version',
         action='version',
         version=f'{VERSION}',
         help=Resource.argparse_version_help
@@ -102,51 +74,34 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
         default='TRACE',
         help=Resource.argparse_log_level_help
     )
-    # 子命令解析器
-    subparsers = parser.add_subparsers(
-        dest='subcommand',
-        title='subcommands',
-    )
-    # 子命令：run
-    run_parser = subparsers.add_parser(
-        'run',
-        help=Resource.argparse_run_help,
-        description=Resource.argparse_run_description
-    )
-    run_parser.add_argument(
-        '--config',
-        nargs='*',
-        help=Resource.argparse_config_help
-    )
-    run_parser.add_argument(
-        '--once',
+    parser.add_argument(
+        '--no-admin',
         action='store_true',
-        help=Resource.argparse_once_help
+        help="Do not require admin privileges"
     )
 
-    # 子命令：single
-    single_parser = subparsers.add_parser(
-        'single',
-        help=Resource.argparse_single_help,
-        description=Resource.argparse_single_description
-    )
-    single_parser.add_argument(
-        '--task-name', '-t',
-        type=str,
-        required=True,
-        help=Resource.argparse_task_name_help
-    )
-    single_parser.add_argument(
-        '--config',
-        nargs='?',  # 0或1个参数
-        help=Resource.argparse_config_help
-    )
-    single_parser.add_argument(
-        '--once',
-        action='store_true',
-        help=Resource.argparse_once_help
-    )
+def restart_as_admin():
+    """
+    以管理员权限重启当前进程
+    """
+    if sys.platform == 'win32' and not is_admin():
+        import ctypes
+        cmdline = subprocess.list2cmdline(sys.argv)
+        result = ctypes.windll.shell32.ShellExecuteW(None, 'runas', 'wt.exe', f'"{sys.executable}" {cmdline}', None, 1)
+        if result > 32:
+            sys.exit(0)
+        else:
+            result = ctypes.windll.shell32.ShellExecuteW(None, 'runas', sys.executable, cmdline, None, 1)
+            sys.exit(result)
 
+def is_admin() -> bool:
+    """检查当前用户是否具有管理员权限（仅限 Windows）"""
+    try:
+        import ctypes
+        return ctypes.windll.shell32.IsUserAnAdmin() != 0  # NOQA
+    except Exception as e:
+        print(f"Error checking administrator privileges: {e}")
+        return False
 
 if __name__ == '__main__':
     main()
