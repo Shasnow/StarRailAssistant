@@ -29,6 +29,7 @@ class TaskManager:
         """
         self.log_queue = None
         self._stop_event = threading.Event()
+        self._thread: threading.Thread | None = None
         self.task_list: list[type[BaseTask]] = get_task_classes()
         self.settings: AppSettings = settings
         logger.debug(f"Successfully load task: {self.task_list}")
@@ -36,6 +37,58 @@ class TaskManager:
     def request_stop(self) -> None:
         """请求停止当前任务执行。"""
         self._stop_event.set()
+
+    def is_thread_running(self) -> bool:
+        """检查任务线程是否正在运行"""
+        return self._thread is not None and self._thread.is_alive()
+
+    def _run_target(self, target, *args):
+        """线程执行目标函数的包装器"""
+        try:
+            target(*args)
+        except KeyboardInterrupt:
+            self.request_stop()
+
+    def start_thread(self, target, *args):
+        """启动任务线程"""
+        if self.is_thread_running():
+            logger.warning("Task thread is already running")
+            return False
+        self._thread = threading.Thread(
+            target=self._run_target,
+            daemon=True,
+            args=(target, *args)
+        )
+        self._thread.start()
+        logger.info("Task thread started")
+        return True
+
+    def stop_thread(self, timeout: float = 30.0):
+        """停止任务线程"""
+        if not self.is_thread_running():
+            return
+        logger.warning(Resource.cli_task_requestStop)
+        self.request_stop()
+        self._thread.join(timeout=timeout)
+        if self._thread.is_alive():
+            logger.warning(Resource.cli_task_timeout)
+        else:
+            logger.info(Resource.cli_task_stopped)
+        self._thread = None
+
+    def run_in_thread(self, *args: Any) -> bool:
+        """在线程中运行任务（非阻塞）"""
+        if self.is_thread_running():
+            logger.warning(Resource.cli_task_taskAlreadyRunning)
+            return False
+        return self.start_thread(self.run, *args)
+
+    def run_task_in_thread(self, task: int | str, config_name: str | None = None) -> bool:
+        """在线程中运行单个任务（非阻塞）"""
+        if self.is_thread_running():
+            logger.warning(Resource.cli_task_taskAlreadyRunning)
+            return False
+        return self.start_thread(self.run_task, task, config_name)
 
     def get_operator(self) -> IOperator:
         if sys.platform == "win32":
@@ -93,12 +146,12 @@ class TaskManager:
                             logger.debug('task failed: ' + str(task))
                             logger.error(Resource.task_taskFailed(str(task)))
                             task.fail()
-                            return  # 终止当前配置的执行
+                            return  # 终止所有配置的执行
                         # 任务完成
                         task.complete()
                     except ThreadStoppedError as e:
                         logger.error(e)
-                        break
+                        return  # 终止所有配置的执行
                     except Exception as e:
                         # 捕获任务执行中的异常（如未处理的错误）
                         logger.exception(Resource.task_taskCrashed(str(task), str(e)))
@@ -162,13 +215,13 @@ class TaskManager:
                     logger.exception(Resource.task_instantiateFailed(index, str(e)))
         return tasks
 
-    def run_task(self, task: int | str, config_name: str | None = None) -> bool:
+    def run_task(self, task: int | str, config: str | None = None) -> bool:
         """
         根据配置名称和任务索引或名称执行单个任务。
 
         Args:
             task (int | str): 任务索引（int）或任务类名称（str）
-            config_name (str): 配置名称
+            config (str): 配置名称
 
         Returns:
             bool: 任务执行结果（成功返回 True，失败返回 False）
@@ -177,17 +230,17 @@ class TaskManager:
             ValueError: 如果任务未找到或配置加载失败
         """
         logger.debug('[Start]')
-        if config_name is None:
+        if config is None:
             # 不指定配置时，使用缓存中的当前配置名称
-            config_name = load_cache().get("CurrentConfigName")
-        if config_name is None:
+            config = load_cache().get("CurrentConfigName")
+        if config is None:
             return False
         task_name = str(task)
-        logger.debug(f"run single task: config={config_name}, task={task}")
+        logger.debug(f"run single task: config={config}, task={task}")
         # 获取任务实例
-        task_instance = self.get_task(config_name, task_name)
+        task_instance = self.get_task(config, task_name)
         if task_instance is None:
-            logger.error(Resource.task_noSuchTask(config_name))
+            logger.error(Resource.task_noSuchTask(config))
             return False
         self._stop_event.clear()
         try:
@@ -214,12 +267,12 @@ class TaskManager:
         finally:
             logger.debug("[Done]")
 
-    def get_task(self, config_name: str, task: str) -> BaseTask | None:
+    def get_task(self, config: str, task: str) -> BaseTask | None:
         """
         根据配置名称和任务索引或名称获取单个任务实例。
 
         Args:
-            config_name (str): 配置名称
+            config (str): 配置名称
             task ( str): 任务索引或任务类名称（str）
 
         Returns:
@@ -245,7 +298,7 @@ class TaskManager:
             return None
         try:
             # 加载指定配置
-            config = load_config(config_name)
+            config = load_config(config)
             if config is None:
                 return None
             print_config = config.to_dict()
