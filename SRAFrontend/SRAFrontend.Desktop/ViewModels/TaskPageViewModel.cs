@@ -151,7 +151,8 @@ public partial class TaskPageViewModel : PageViewModel
         }
 
         Cache.Strategies.Clear();
-        Cache.Strategies.AddRange(strategies);
+        foreach (var strategy in strategies)
+            Cache.Strategies.Add(strategy);
         CurrencyWarsStrategyIndex = 0;
     }
 

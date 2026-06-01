@@ -1,4 +1,4 @@
-﻿using Avalonia.Collections;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SRAFrontend.Models;
@@ -17,9 +17,9 @@ public partial class Cache : ObservableObject
 
     [ObservableProperty] private string _startMode = "Current"; // 当前启动模式, "Current" 或 "All" 或 "Save Only"
     
-    public AvaloniaList<string> ConfigNames { get; set; } = ["Default"]; // 配置名称列表
+    public ObservableCollection<string> ConfigNames { get; set; } = ["Default"]; // 配置名称列表
     
-    public AvaloniaList<Strategy> Strategies { get; set; } = []; // 攻略列表
+    public ObservableCollection<Strategy> Strategies { get; set; } = []; // 攻略列表
 
     // 以下字段无UI绑定
     public string HotfixVersion { get; set; } = ""; // 热更版本号

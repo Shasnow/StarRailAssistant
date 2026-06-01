@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using Avalonia.Collections;
+using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SRAFrontend.Models;
@@ -19,7 +19,7 @@ public partial class Config : ObservableObject
     [ObservableProperty] private string _receiveRewardRedeemCodes = ""; // 兑换码列表
 
     [ObservableProperty]
-    private AvaloniaList<bool> _receiveRewards = [true, true, true, true, true, true, false]; // 各任务奖励领取状态
+    private ObservableCollection<bool> _receiveRewards = [true, true, true, true, true, true, false]; // 各任务奖励领取状态
 
     // du - DifferentialUniverse 差分宇宙
     [ObservableProperty] private bool _dUEnable; // 是否启用模拟宇宙任务
@@ -60,7 +60,7 @@ public partial class Config : ObservableObject
     [ObservableProperty] private int _trailblazePowerReplenishTimes; // 补充体力次数
     [ObservableProperty] private int _trailblazePowerReplenishWay; // 补充体力方式
 
-    [ObservableProperty] private AvaloniaList<TrailblazePowerTaskItem> _trailblazePowerTaskList = [];
+    [ObservableProperty] private ObservableCollection<TrailblazePowerTaskItem> _trailblazePowerTaskList = [];
     [ObservableProperty] private bool _trailblazePowerUseAssistant; // 是否使用助理
     [ObservableProperty] private bool _trailblazePowerUseBuildTarget; // 是否使用培养目标
 

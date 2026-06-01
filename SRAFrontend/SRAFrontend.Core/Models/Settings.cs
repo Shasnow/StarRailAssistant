@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using Avalonia.Collections;
+using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SRAFrontend.Models;
@@ -38,7 +38,7 @@ public partial class Settings : ObservableObject
     [ObservableProperty] private bool _isAutoDetectGamePath = true; // 是否自动检测游戏安装路径
 
     [ObservableProperty] private int _gamePathIndex; // 游戏安装路径
-    public AvaloniaList<string> GamePaths { get; set; } = []; // 可能的游戏安装路径列表
+    public ObservableCollection<string> GamePaths { get; set; } = []; // 可能的游戏安装路径列表
 
     // 启动参数配置
     [ObservableProperty] private bool _launchArgumentsEnabled = true; // 是否启用启动参数
