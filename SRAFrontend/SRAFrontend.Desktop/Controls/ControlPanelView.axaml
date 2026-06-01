@@ -1,9 +1,9 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:SRAFrontend.Controls"
-             xmlns:lang="clr-namespace:SRAFrontend.Localization"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend.Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="50"
              x:Class="SRAFrontend.Controls.ControlPanelView"
              x:DataType="controls:ControlPanelViewModel">

@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 
@@ -54,7 +53,7 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
         if (!File.Exists(FileName))
         {
             logger.LogError("Backend executable not found: {FileName}", FileName);
-            Dispatcher.UIThread.Post(() => Outputted?.Invoke($"启动失败: 未找到后端可执行文件（路径: {FileName}）"));
+            Outputted?.Invoke($"启动失败: 未找到后端可执行文件（路径: {FileName}）");
             return;
         }
         var fullArguments = $"{MainArgument} {arguments}".Trim();
@@ -86,7 +85,7 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
         catch (Exception e)
         {
             logger.LogError(e, "Fail to start SRA: {Message}", e.Message);
-            Dispatcher.UIThread.Post(() => Outputted?.Invoke($"启动失败: {e.Message}"));
+            Outputted?.Invoke($"启动失败: {e.Message}");
             CleanupProcessResources();
         }
     }
@@ -140,11 +139,8 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
         var exitCode = _backendProcess?.ExitCode ?? -1;
         logger.LogInformation("Process exited (PID: {Pid}, Exit Code: {ExitCode})", processId, exitCode);
 
-        Dispatcher.UIThread.Post(() =>
-        {
-            IsTaskRunning = false;
-            Outputted?.Invoke($"进程已退出（PID: {processId}，退出代码为: {exitCode}）");
-        });
+        IsTaskRunning = false;
+        Outputted?.Invoke($"进程已退出（PID: {processId}，退出代码为: {exitCode}）");
 
         // 清理资源
         CleanupProcessResources();
@@ -154,23 +150,20 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
     {
         if (string.IsNullOrEmpty(args.Data)) return;
 
-        Dispatcher.UIThread.Post(() =>
-        {
-            // 更新运行状态
-            if (args.Data.Contains(IBackendService.StartMarker))
-                IsTaskRunning = true;
-            else if (args.Data.Contains(IBackendService.DoneMarker))
-                IsTaskRunning = false;
+        // 更新运行状态
+        if (args.Data.Contains(IBackendService.StartMarker))
+            IsTaskRunning = true;
+        else if (args.Data.Contains(IBackendService.DoneMarker))
+            IsTaskRunning = false;
 
-            Outputted?.Invoke(args.Data);
-        });
+        Outputted?.Invoke(args.Data);
     }
 
     private void OnBackendProcessErrorDataReceived(object _, DataReceivedEventArgs args)
     {
         if (string.IsNullOrEmpty(args.Data)) return;
 
-        Dispatcher.UIThread.Post(() => { Outputted?.Invoke(args.Data); });
+        Outputted?.Invoke(args.Data);
     }
 
     private void CleanupProcessResources()
