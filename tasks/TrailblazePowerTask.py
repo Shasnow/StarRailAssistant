@@ -144,10 +144,10 @@ class TrailblazePowerTask(BaseTask):
         if power_result is None:
             return None
         current_tbp, immersion_dev = power_result
-        
+
         # 开拓力向下取整到 10 的倍数（最低消耗单位）
         ava_current_tbp = (current_tbp // 10) * 10
-        
+
         if not self.auto_detect_tasks:
             logger.warning(SRAError(ErrorCode.NO_BUILD_TARGET, "未识别到可执行任务"))
             return None
@@ -159,7 +159,7 @@ class TrailblazePowerTask(BaseTask):
 
         # 根据体力分配各任务执行次数
         tasks_times = self._calc_task_times(ava_current_tbp)
-        
+
         # 将沉浸器数量加到 ornament_extraction 任务的可执行次数中
         for i, task_item in enumerate(self.auto_detect_tasks):
             if task_item.Id == "ornament_extraction":
@@ -427,8 +427,7 @@ class TrailblazePowerTask(BaseTask):
                            run_time,
                            False,
                            single_time,
-                           x_add=700,
-                           y_add=0)
+                           x_add=700)
 
     def stagnant_shadow(self, level, single_time=1, run_time=1, **_):
         return self.battle("凝滞虚影",
@@ -436,7 +435,8 @@ class TrailblazePowerTask(BaseTask):
                            level,
                            run_time,
                            True,
-                           single_time)
+                           single_time,
+                           x_add=700)
 
     def caver_of_corrosion(self, level, single_time=1, run_time=1, **_):
         return self.battle("侵蚀隧洞",
