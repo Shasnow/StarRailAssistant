@@ -31,7 +31,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from urllib.request import urlopen
 
 ROOT_PATH = Path(__file__).resolve().parent.parent
-WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
+WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Desktop" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
 DIST_DIR = ROOT_PATH / "main.dist"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
