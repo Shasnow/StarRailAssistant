@@ -135,7 +135,16 @@ public partial class OverlayWindow : Window
         foreach (var line in _logLines)
             sb.AppendLine(line);
 
-        LogText.Text = sb.ToString();
+        var text = sb.ToString();
+
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            LogText.Text = text;
+        }
+        else
+        {
+            Dispatcher.UIThread.Invoke(() => LogText.Text = text);
+        }
     }
 
     /// <summary>
