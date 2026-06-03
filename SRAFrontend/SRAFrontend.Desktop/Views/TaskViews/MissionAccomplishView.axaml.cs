@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 
-namespace SRAFrontend.Views.TaskViews;
+namespace SRAFrontend.Desktop.Views.TaskViews;
 
 public partial class MissionAccomplishView : UserControl
 {

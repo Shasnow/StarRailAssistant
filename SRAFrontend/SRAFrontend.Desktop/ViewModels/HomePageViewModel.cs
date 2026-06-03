@@ -6,11 +6,11 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
-using SRAFrontend.Controls;
 using SRAFrontend.Data;
+using SRAFrontend.Desktop.Controls;
 using SRAFrontend.Services;
 
-namespace SRAFrontend.ViewModels;
+namespace SRAFrontend.Desktop.ViewModels;
 
 public partial class HomePageViewModel(
     ControlPanelViewModel controlPanelViewModel,

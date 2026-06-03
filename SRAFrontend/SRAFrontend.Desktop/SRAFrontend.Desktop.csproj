@@ -2,7 +2,7 @@
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <AssemblyName>SRA</AssemblyName>
-        <RootNamespace>SRAFrontend</RootNamespace>
+        <RootNamespace>SRAFrontend.Desktop</RootNamespace>
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
@@ -37,6 +37,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SRAFrontend.Core\SRAFrontend.Core.csproj" />
+        <ProjectReference Include="..\SRAFrontend\SRAFrontend.csproj" />
     </ItemGroup>
 </Project>

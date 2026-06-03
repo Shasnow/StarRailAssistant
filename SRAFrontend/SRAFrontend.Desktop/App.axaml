@@ -1,13 +1,14 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="SRAFrontend.App"
+             x:Class="SRAFrontend.Desktop.App"
              xmlns:sukiUi="clr-namespace:SukiUI;assembly=SukiUI"
              xmlns:sraFrontend="clr-namespace:SRAFrontend"
+             xmlns:desktop="clr-namespace:SRAFrontend.Desktop"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
-        <sraFrontend:ViewLocator/>
+        <desktop:ViewLocator/>
     </Application.DataTemplates>
   
     <Application.Styles>

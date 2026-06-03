@@ -5,12 +5,11 @@
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
              xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
-             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
-             xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend.Core"
-             xmlns:models="clr-namespace:SRAFrontend.Models;assembly=SRAFrontend.Core"
-             xmlns:desktopModels="clr-namespace:SRAFrontend.Models"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend"
+             xmlns:desktopModels="clr-namespace:SRAFrontend.Desktop.Models"
+             xmlns:viewModels="clr-namespace:SRAFrontend.Desktop.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SRAFrontend.Views.SettingsPageView"
+             x:Class="SRAFrontend.Desktop.Views.SettingsPageView"
              x:DataType="viewModels:SettingsPageViewModel"
              FontSize="16">
     <suki:SukiStackPage>

@@ -6,9 +6,9 @@
   <assemblyIdentity version="2.0.0.0" name="SRAFrontend.Desktop"/>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
    <security>
-     <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
-       <requestedExecutionLevel level="requireAdministrator" uiAccess="false"/>
-     </requestedPrivileges>
+<!--     <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">-->
+<!--       <requestedExecutionLevel level="requireAdministrator" uiAccess="false"/>-->
+<!--     </requestedPrivileges>-->
    </security>
   </trustInfo>
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">

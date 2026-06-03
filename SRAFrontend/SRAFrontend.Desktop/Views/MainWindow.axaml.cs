@@ -1,8 +1,8 @@
 using Avalonia.Interactivity;
-using SRAFrontend.ViewModels;
+using SRAFrontend.Desktop.ViewModels;
 using SukiUI.Controls;
 
-namespace SRAFrontend.Views;
+namespace SRAFrontend.Desktop.Views;
 
 public partial class MainWindow : SukiWindow
 {

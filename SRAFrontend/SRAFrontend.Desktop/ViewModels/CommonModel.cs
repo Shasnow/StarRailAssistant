@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Microsoft.Extensions.Logging;
-using SRAFrontend.Controls;
 using SRAFrontend.Data;
+using SRAFrontend.Desktop.Controls;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 using SRAFrontend.Utils;
@@ -16,7 +16,7 @@ using SukiUI.Controls;
 using SukiUI.MessageBox;
 using SukiUI.Toasts;
 
-namespace SRAFrontend.ViewModels;
+namespace SRAFrontend.Desktop.ViewModels;
 
 public class CommonModel(
     SettingsService settingsService,

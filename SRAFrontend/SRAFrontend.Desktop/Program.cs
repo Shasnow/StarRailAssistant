@@ -1,7 +1,7 @@
 ﻿using System;
 using Avalonia;
 
-namespace SRAFrontend;
+namespace SRAFrontend.Desktop;
 
 sealed class Program
 {

@@ -5,7 +5,7 @@ using Avalonia.VisualTree;
 using ColorTextBlock.Avalonia;
 using Markdown.Avalonia;
 
-namespace SRAFrontend.Controls;
+namespace SRAFrontend.Desktop.Controls;
 
 /// <summary>
 /// 修复了暗色主题下标题颜色问题的 MarkdownScrollViewer

@@ -10,14 +10,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
-using SRAFrontend.Controls;
 using SRAFrontend.Data;
+using SRAFrontend.Desktop.Controls;
+using SRAFrontend.Desktop.Services;
+using SRAFrontend.Desktop.ViewModels;
+using SRAFrontend.Desktop.Views;
 using SRAFrontend.Services;
-using SRAFrontend.ViewModels;
-using SRAFrontend.Views;
 using SukiUI.Toasts;
 
-namespace SRAFrontend;
+namespace SRAFrontend.Desktop;
 
 public class App : Application
 {

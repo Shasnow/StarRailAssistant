@@ -1,14 +1,14 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:SRAFrontend.Controls"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
-             xmlns:models="clr-namespace:SRAFrontend.Models;assembly=SRAFrontend.Core"
-             x:Class="SRAFrontend.Controls.AnnouncementBoardView"
-             x:DataType="local:AnnouncementBoardViewModel"
+             xmlns:models="clr-namespace:SRAFrontend.Models;assembly=SRAFrontend"
+             xmlns:controls="clr-namespace:SRAFrontend.Desktop.Controls"
+             x:Class="SRAFrontend.Desktop.Controls.AnnouncementBoardView"
+             x:DataType="controls:AnnouncementBoardViewModel"
              Width="600"
              Height="400">
     <Design.DataContext>
-        <local:AnnouncementBoardViewModel />
+        <controls:AnnouncementBoardViewModel />
     </Design.DataContext>
     <suki:BusyArea BusyText="Loading Announcements..." IsBusy="{Binding IsLoading}">
         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
@@ -20,7 +20,7 @@
             </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
                 <DataTemplate DataType="{x:Type models:Announcement}">
-                    <local:ThemedMarkdownScrollViewer Markdown="{Binding Content}" />
+                    <controls:ThemedMarkdownScrollViewer Markdown="{Binding Content}" />
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>

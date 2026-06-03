@@ -8,14 +8,14 @@ using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SRAFrontend.Controls;
 using SRAFrontend.Data;
+using SRAFrontend.Desktop.Controls;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 using SukiUI.Controls;
 using SukiUI.MessageBox;
 
-namespace SRAFrontend.ViewModels;
+namespace SRAFrontend.Desktop.ViewModels;
 
 public partial class TaskPageViewModel : PageViewModel
 {
@@ -185,7 +185,7 @@ public partial class TaskPageViewModel : PageViewModel
             Name = TpTaskItems.TpTaskNames[SelectedTpTaskIndex],
             Id = TpTaskItems.TaskItems[SelectedTpTaskIndex].Id,
             Level = SelectedTpTaskLevelIndex,
-            LevelName = CurrentTpTaskLevels.ElementAtOrDefault(SelectedTpTaskLevelIndex) ?? "",
+            LevelName = Enumerable.ElementAtOrDefault(CurrentTpTaskLevels, (int)SelectedTpTaskLevelIndex) ?? "",
             Count = TpTaskSingleTimes,
             RunTimes = TpTaskRunTimes,
             AutoDetect = IsTpTaskAutoDetect

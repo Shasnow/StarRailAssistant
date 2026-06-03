@@ -3,10 +3,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
-             xmlns:viewModels="clr-namespace:SRAFrontend.ViewModels"
-             xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend.Core"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend"
+             xmlns:viewModels="clr-namespace:SRAFrontend.Desktop.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SRAFrontend.Views.TaskViews.StartGameView"
+             x:Class="SRAFrontend.Desktop.Views.TaskViews.StartGameView"
              x:DataType="viewModels:TaskPageViewModel">
     <suki:GlassCard>
         <suki:GroupBox>

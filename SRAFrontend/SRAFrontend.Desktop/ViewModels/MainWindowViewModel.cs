@@ -9,7 +9,7 @@ using SRAFrontend.Utils;
 using SukiUI;
 using SukiUI.Toasts;
 
-namespace SRAFrontend.ViewModels;
+namespace SRAFrontend.Desktop.ViewModels;
 
 public partial class MainWindowViewModel(
     IEnumerable<PageViewModel> pages,

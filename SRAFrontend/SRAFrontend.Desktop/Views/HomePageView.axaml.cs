@@ -1,8 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
-using SRAFrontend.ViewModels;
+using SRAFrontend.Desktop.ViewModels;
 
-namespace SRAFrontend.Views;
+namespace SRAFrontend.Desktop.Views;
 
 public partial class HomePageView : UserControl
 {

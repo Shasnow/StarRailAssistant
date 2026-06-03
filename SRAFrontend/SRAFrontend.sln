@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRAFrontend.Core", "SRAFrontend.Core\SRAFrontend.Core.csproj", "{69B3DED0-951D-44FC-9CA7-EFE48095018B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRAFrontend", "SRAFrontend\SRAFrontend.csproj", "{69B3DED0-951D-44FC-9CA7-EFE48095018B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRAFrontend.Desktop", "SRAFrontend.Desktop\SRAFrontend.Desktop.csproj", "{28F3BEC2-915A-49A4-95C5-172E0F53769F}"
 EndProject
