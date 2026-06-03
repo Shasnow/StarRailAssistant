@@ -7,11 +7,13 @@ using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Data;
+using SRAFrontend.Desktop.Services;
 using SRAFrontend.Localization;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
+using CustomizableKey = SRAFrontend.Desktop.Models.CustomizableKey;
 
-namespace SRAFrontend.ViewModels;
+namespace SRAFrontend.Desktop.ViewModels;
 
 public partial class SettingsPageViewModel : PageViewModel
 {

@@ -1,7 +1,7 @@
 ﻿using SRAFrontend.Data;
 using SRAFrontend.Localization;
 
-namespace SRAFrontend.ViewModels;
+namespace SRAFrontend.Desktop.ViewModels;
 
 public partial class PageViewModel(PageName pageName, string iconText) : ViewModelBase
 {

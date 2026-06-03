@@ -1,6 +1,7 @@
-﻿using SRAFrontend.Controls;
+﻿using SRAFrontend.Desktop.Controls;
+using SRAFrontend.Services;
 
-namespace SRAFrontend.Services;
+namespace SRAFrontend.Desktop.Services;
 
 public class OverlayService(IBackendService backendService)
 {

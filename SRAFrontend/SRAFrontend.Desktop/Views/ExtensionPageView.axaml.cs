@@ -2,7 +2,7 @@
 using Avalonia.Interactivity;
 using SRAFrontend.Utils;
 
-namespace SRAFrontend.Views;
+namespace SRAFrontend.Desktop.Views;
 
 public partial class ExtensionPageView : UserControl
 {

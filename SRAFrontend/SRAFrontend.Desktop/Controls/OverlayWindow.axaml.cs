@@ -8,7 +8,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 
-namespace SRAFrontend.Controls;
+namespace SRAFrontend.Desktop.Controls;
 
 public partial class OverlayWindow : Window
 {
@@ -143,7 +143,7 @@ public partial class OverlayWindow : Window
         }
         else
         {
-            Dispatcher.UIThread.Invoke(() => LogText.Text = text);
+            Dispatcher.UIThread.Invoke<string>(() => LogText.Text = text);
         }
     }
 

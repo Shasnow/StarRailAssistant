@@ -1,9 +1,9 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using SRAFrontend.ViewModels;
+using SRAFrontend.Desktop.ViewModels;
 
-namespace SRAFrontend;
+namespace SRAFrontend.Desktop;
 
 public class ViewLocator : IDataTemplate
 {

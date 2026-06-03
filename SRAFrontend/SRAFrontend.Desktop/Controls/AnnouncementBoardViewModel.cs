@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using SRAFrontend.Desktop.ViewModels;
 using SRAFrontend.Models;
-using SRAFrontend.ViewModels;
 
-namespace SRAFrontend.Controls;
+namespace SRAFrontend.Desktop.Controls;
 
-public class AnnouncementBoardViewModel:ViewModelBase
+public class AnnouncementBoardViewModel : ViewModelBase
 {
     public List<Announcement>? Announcements { get; set; }
     public bool IsLoading { get; set; }

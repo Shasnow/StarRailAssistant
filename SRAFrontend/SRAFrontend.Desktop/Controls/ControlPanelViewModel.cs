@@ -1,11 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SRAFrontend.Desktop.ViewModels;
 using SRAFrontend.Localization;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
-using SRAFrontend.ViewModels;
 
-namespace SRAFrontend.Controls;
+namespace SRAFrontend.Desktop.Controls;
 
 public partial class ControlPanelViewModel : ViewModelBase
 {

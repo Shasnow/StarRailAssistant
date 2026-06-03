@@ -1,8 +1,6 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
+﻿using Avalonia.Controls;
 
-namespace SRAFrontend.Controls;
+namespace SRAFrontend.Desktop.Controls;
 
 public partial class TpAddTaskControl : UserControl
 {

@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Data;
 using SRAFrontend.Services;
 
-namespace SRAFrontend.ViewModels;
+namespace SRAFrontend.Desktop.ViewModels;
 
 public partial class ConsolePageViewModel : PageViewModel
 {

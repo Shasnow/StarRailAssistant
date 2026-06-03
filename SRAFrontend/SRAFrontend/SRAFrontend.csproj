@@ -2,8 +2,8 @@
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <RootNamespace>SRAFrontend</RootNamespace>
-        <AssemblyName>SRAFrontend.Core</AssemblyName>
         <Nullable>enable</Nullable>
+        <PackageId>SRAFrontend</PackageId>
     </PropertyGroup>
 
     <ItemGroup>

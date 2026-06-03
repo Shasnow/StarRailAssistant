@@ -1,7 +1,7 @@
 ﻿using SRAFrontend.Data;
 using SRAFrontend.Services;
 
-namespace SRAFrontend.ViewModels;
+namespace SRAFrontend.Desktop.ViewModels;
 
 public class ExtensionPageViewModel(IBackendService backendService) : PageViewModel(PageName.Extension, "\uE596")
 {

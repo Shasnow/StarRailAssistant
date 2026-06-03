@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 
-namespace SRAFrontend.Controls;
+namespace SRAFrontend.Desktop.Controls;
 
 public partial class TpTaskListControl : UserControl
 {
