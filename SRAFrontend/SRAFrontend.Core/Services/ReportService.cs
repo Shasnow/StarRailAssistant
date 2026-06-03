@@ -67,7 +67,7 @@ public class ReportService(
         }
     }
 
-    public void Report(string eventType, string eventData, int timeoutMs = 1000)
+    public void Report(string eventType, string eventData, int timeoutMs = 2000)
     {
         try
         {
