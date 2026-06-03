@@ -3,7 +3,6 @@
              xmlns:local="clr-namespace:SRAFrontend.Controls"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
              xmlns:models="clr-namespace:SRAFrontend.Models;assembly=SRAFrontend.Core"
-             xmlns:mdxaml="https://github.com/whistyun/Markdown.Avalonia.Tight"
              x:Class="SRAFrontend.Controls.AnnouncementBoardView"
              x:DataType="local:AnnouncementBoardViewModel"
              Width="600"
