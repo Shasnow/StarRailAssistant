@@ -1,8 +1,10 @@
+using System;
 using Avalonia.Interactivity;
 using Avalonia;
 using SRAFrontend.Services;
-using SRAFrontend.ViewModels;
+using SRAFrontend.Desktop.ViewModels;
 using SukiUI.Controls;
+using Avalonia.Controls;
 
 namespace SRAFrontend.Desktop.Views;
 
@@ -10,11 +12,10 @@ public partial class MainWindow : SukiWindow
 {
     private readonly SettingsService _settingsService;
 
-    public MainWindow()
+    public MainWindow(SettingsService settingsService)
     {
         InitializeComponent();
-        _settingsService = App.ServiceProvider?.GetService<SettingsService>() 
-            ?? throw new InvalidOperationException("SettingsService not available");
+        _settingsService = settingsService;
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
@@ -46,7 +47,7 @@ public partial class MainWindow : SukiWindow
     {
         var settings = _settingsService.Settings.Display;
 
-        var bounds = WindowState == WindowState.Normal ? new Rect(Position.X, Position.Y, Width, Height) : RestoreBounds;
+        var bounds = WindowState == WindowState.Normal ? new Rect(Position.X, Position.Y, Width, Height) : new Rect(Position.X, Position.Y, Width, Height);
         
         // 保存窗口位置
         settings.WindowPositionX = bounds.X;
