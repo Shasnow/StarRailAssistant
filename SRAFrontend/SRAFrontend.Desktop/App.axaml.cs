@@ -48,7 +48,7 @@ public class App : Application
             desktop.Exit += (_, _) =>
             {
                 Log.Information("Application is exiting. Saving settings and stopping SRA process.");
-                // settingsService.Save(); 设置有自动保存
+                settingsService.Save();
                 serviceProvider.GetRequiredService<ConfigService>().Save();
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
                 serviceProvider.GetRequiredService<IBackendService>().StopBackend();
