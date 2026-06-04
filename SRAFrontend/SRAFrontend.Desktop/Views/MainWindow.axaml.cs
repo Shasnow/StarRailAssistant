@@ -4,7 +4,7 @@ using SRAFrontend.Services;
 using SRAFrontend.ViewModels;
 using SukiUI.Controls;
 
-namespace SRAFrontend.Views;
+namespace SRAFrontend.Desktop.Views;
 
 public partial class MainWindow : SukiWindow
 {
