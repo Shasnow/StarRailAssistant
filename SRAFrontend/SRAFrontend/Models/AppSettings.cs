@@ -140,6 +140,10 @@ public partial class DisplaySettings : ObservableObject
     [ObservableProperty]
     [property: JsonPropertyName("window.height")]
     private double _windowHeight;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("window.rememberSizeAndPosition")]
+    private bool _isRememberWindowSizeAndPosition = true;
 }
 
 public partial class NotificationSettings : ObservableObject
