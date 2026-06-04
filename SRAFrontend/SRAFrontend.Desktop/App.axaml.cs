@@ -40,10 +40,8 @@ public class App : Application
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = serviceProvider.GetRequiredService<MainWindowViewModel>(),
-            };
+            desktop.MainWindow = serviceProvider.GetRequiredService<MainWindow>();
+            desktop.MainWindow.DataContext = serviceProvider.GetRequiredService<MainWindowViewModel>();
             desktop.MainWindow.Closed += (_, _) => serviceProvider.GetRequiredService<OverlayService>().CloseOverlay();
             desktop.Exit += (_, _) =>
             {
@@ -69,6 +67,7 @@ public class App : Application
             loggingBuilder.AddSerilog(dispose: true);
         });
         // Register your services here
+        services.AddTransient<MainWindow>();
         services.AddTransient<MainWindowViewModel>();
         services.AddTransient<PageViewModel, HomePageViewModel>();
         services.AddTransient<PageViewModel, TaskPageViewModel>();

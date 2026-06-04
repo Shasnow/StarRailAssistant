@@ -124,6 +124,22 @@ public partial class DisplaySettings : ObservableObject
     [ObservableProperty]
     [property: JsonPropertyName("language")]
     private int _language;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("window.position.x")]
+    private double _windowPositionX;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("window.position.y")]
+    private double _windowPositionY;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("window.width")]
+    private double _windowWidth;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("window.height")]
+    private double _windowHeight;
 }
 
 public partial class NotificationSettings : ObservableObject
