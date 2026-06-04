@@ -231,7 +231,7 @@
                                         <Label Grid.Column="0" Classes="Icon">&#xE5CA;</Label>
                                         <Label Grid.Column="1" Content="记忆窗口大小和位置" />
                                         <ToggleSwitch Grid.Column="2"
-                                                      IsChecked="{Binding DisplaySettings.IsRememberWindowSizeAndPosition}"
+                                                      IsChecked="{Binding DisplaySettings.IsRememberWindow}"
                                                       ToolTip.Tip="启用后，SRA会记住窗口的位置和大小，下次启动时恢复" />
                                     </Grid>
                                 </StackPanel>

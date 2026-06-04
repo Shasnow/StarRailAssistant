@@ -22,7 +22,7 @@ public partial class MainWindow : SukiWindow
     {
         base.OnLoaded(e);
         var displaySettings = _settingsService.Settings.Display;
-        if (displaySettings.IsRememberWindowSizeAndPosition)
+        if (displaySettings.IsRememberWindow)
         {
             if (displaySettings.WindowWidth > 0 && displaySettings.WindowHeight > 0)
             {
@@ -42,7 +42,7 @@ public partial class MainWindow : SukiWindow
     private void OnClosed(object? sender, EventArgs e)
     {
         var displaySettings = _settingsService.Settings.Display;
-        if (displaySettings.IsRememberWindowSizeAndPosition)
+        if (displaySettings.IsRememberWindow)
         {
             displaySettings.WindowPositionX = Position.X;
             displaySettings.WindowPositionY = Position.Y;
