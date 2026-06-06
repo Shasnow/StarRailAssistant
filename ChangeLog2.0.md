@@ -7,7 +7,7 @@
 - `IBackendService` 接口中的 `TaskRun`、`TaskSingle`、`TaskStop`、`SendInput` 等方法已重构为异步方法。
 
 ### 问题修复：
-- none
+- 修复了SRA无法将游戏窗口移动到前台的问题。
 
 ### 更新说明：
 

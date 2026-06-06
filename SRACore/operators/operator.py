@@ -54,6 +54,7 @@ class Operator(IOperator):
     def get_win_region(self, active_window: bool = True) -> Region:
         hwnd = self._get_hwnd()
         if active_window and self._win is not None and not self._win.isActive: # type: ignore
+            self.press_key("esc")  # 通过模拟键使系统认为是“用户操作”，从而允许 SetForegroundWindow
             self._win.activate()
         region = self._get_client_region(hwnd)
         if region is None:
