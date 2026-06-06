@@ -13,7 +13,6 @@ public class HostedService(
         settingsService.Load();
         cacheService.Load();
         configService.Load();
-        backendService.Initialize();
         return Task.CompletedTask;
     }
 

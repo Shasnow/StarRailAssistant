@@ -1,135 +1,101 @@
-# 🌟 StarRailAssistant 前端项目
+# StarRailAssistant 前端项目
 
-## 📋 项目概述
+## 概述
 
-StarRailAssistant (SRA) 前端是一个基于 Avalonia 框架开发的跨平台桌面应用程序，为崩坏星穹铁道玩家提供自动化任务管理界面。前端负责用户交互、配置管理和与后端 Python 服务的通信。
+StarRailAssistant (SRA) 前端是一个模块化的 .NET 解决方案，负责 SRA 的 UI 和 API 层，分为三个项目：
 
-## 🛠️ 技术栈
+- **SRAFrontend** - 共享核心库（模型、服务、工具类，无 UI 依赖）
+- **SRAFrontend.Desktop** - Avalonia 桌面应用
+- **SRAFrontend.Server** - ASP.NET Core HTTP API 服务
 
-- **框架**: Avalonia UI (跨平台 .NET UI 框架)
-- **语言**: C# 10+
-- **架构**: MVVM (Model-View-ViewModel)
-- **构建工具**: .NET 8.0 SDK
-- **依赖管理**: NuGet
+## 技术栈
 
-## 📁 项目结构
+- .NET 10 / C# 13
+- Avalonia UI（桌面端）
+- ASP.NET Core（服务端）
+- CommunityToolkit.Mvvm
+- SukiUI
+
+## 项目结构
 
 ```
-├── Assets/                # 资源文件
-│   ├── Phosphor.ttf       # 图标字体
-│   ├── SRAicon.ico        # 应用图标
-│   └── background-lt.jpg  # 背景图片
-├── Controls/              # 自定义控件
-├── Data/                  # 数据模型定义
-├── Localization/          # 本地化资源
-├── Models/                # 业务模型
-├── Services/              # 服务层
-├── Styles/                # 样式定义
-├── Utilities/             # 工具类
-├── ViewModels/            # MVVM ViewModel 层
-├── Views/                 # MVVM View 层
-│   └── TaskViews/         # 任务相关视图
-├── App.axaml              # 应用入口 XAML
-├── App.axaml.cs           # 应用入口代码
-├── MainWindow.axaml       # 主窗口 XAML
-├── MainWindow.axaml.cs    # 主窗口代码
-├── Program.cs             # 程序启动点
-├── SRAFrontend.csproj     # 项目文件
-└── SRAFrontend.sln        # 解决方案文件
+SRAFrontend/
+├── SRAFrontend.sln
+
+├── SRAFrontend/                     # 核心库（平台无关）
+│   ├── Data/                        # PageName, DataPath
+│   ├── Localization/                # 本地化资源（en, zh）
+│   ├── Migrations/                  # 配置/设置版本迁移
+│   ├── Models/                      # 数据实体
+│   │   ├── AppSettings.cs
+│   │   ├── Cache.cs
+│   │   ├── TasksConfig.cs
+│   │   └── ...
+│   ├── Services/                    # 业务逻辑
+│   │   ├── IBackendService.cs
+│   │   ├── BackendServiceProxy.cs
+│   │   ├── ConfigService.cs
+│   │   ├── SettingsService.cs
+│   │   ├── CacheService.cs
+│   │   └── ...
+│   └── Utils/                       # 工具类
+
+├── SRAFrontend.Desktop/             # Avalonia 桌面应用
+│   ├── Assets/                      # 图标、字体、背景
+│   ├── Controls/                    # 自定义控件
+│   ├── Models/                      # 桌面端专用模型
+│   ├── Services/                    # 桌面端专用服务（OverlayService）
+│   ├── Styles/                      # 样式
+│   ├── ViewModels/                  # MVVM 视图模型
+│   ├── Views/                       # 视图
+│   ├── App.axaml                    # 应用入口
+│   ├── Program.cs                   # 启动点
+│   └── ViewLocator.cs
+
+└── SRAFrontend.Server/              # ASP.NET Core API 服务
+    ├── Controllers/
+    │   ├── TaskController.cs        # 任务运行/停止/状态/日志（SSE）
+    │   ├── ConfigsController.cs     # 配置 CRUD（RESTful）
+    │   └── SettingsController.cs    # 设置
+    ├── Services/
+    │   ├── HostedService.cs         # 生命周期管理
+    │   └── LogStreamService.cs      # SSE 日志推送
+    └── Program.cs
 ```
 
-## 🚀 开发环境要求
+## 构建与运行
 
-- .NET 8.0 SDK 或更高版本
-- Rider (推荐) 或 Visual Studio 2022 或 Visual Studio Code
-- Avalonia 扩展 (推荐)
+### 环境要求
 
-## 🔧 构建和运行
+- .NET 10 SDK
 
-### 1. 克隆仓库
+### 构建全部项目
 
 ```bash
-git clone https://github.com/Shasnow/StarRailAssistant.git
-cd StarRailAssistant/SRAFrontend
+cd SRAFrontend
+dotnet build
 ```
 
-### 2. 还原依赖
+### 运行桌面端
 
 ```bash
-dotnet restore
+dotnet run --project SRAFrontend.Desktop
+# 开启调试控制台：
+dotnet run --project SRAFrontend.Desktop
 ```
 
-### 3. 构建项目
+### 运行服务端
 
 ```bash
-dotnet build -c Debug
-# 或发布版本
-dotnet build -c Release
+dotnet run --project SRAFrontend.Server
 ```
 
-### 4. 运行项目
+## API 接口
 
-```bash
-dotnet run
-```
+运行服务端后，您可以在`http://localhost:5000/swagger`查看API文档。
 
-### 5. 发布项目
+## 架构说明
 
-```bash
-dotnet publish -c Release -r win-x64 --self-contained
-```
-
-## 📐 架构说明
-
-### MVVM 架构
-
-项目采用标准 MVVM 架构，将关注点分离：
-
-- **Models**: 数据实体和业务逻辑
-- **Views**: UI 界面 (XAML)
-- **ViewModels**: 连接 View 和 Model 的中间层，处理 UI 逻辑
-
-### 服务层
-
-服务层提供各种功能支持：
-
-- **ConfigService**: 配置管理
-- **SettingsService**: 设置管理
-- **SraService**: 与后端 Python 服务通信
-- **UpdateService**: 更新检查和安装
-- **AnnouncementService**: 公告服务
-
-### 本地化支持
-
-项目支持多语言，本地化资源文件位于 `Localization/` 目录：
-
-- `Resources.resx`: 默认语言 (英语)
-- `Resources.zh-hans.resx`: 简体中文
-
-## 🌍 本地化
-
-要添加新语言支持：
-
-1. 在 `Localization/` 目录下创建新的资源文件 (如 `Resources.ja.resx`)
-2. 翻译所有字符串资源
-3. 在 `App.axaml.cs` 中配置新语言
-
-## 🎨 自定义样式
-
-项目样式定义位于 `Styles/` 目录，可以通过修改这些文件来自定义应用外观。
-
-## 🤝 贡献指南
-
-### 开发规范
-
-1. 遵循 C# 编码规范
-2. 使用 PascalCase 命名类和方法
-3. 使用 camelCase 命名变量和字段
-4. 为所有公共方法和类添加 XML 注释
-5. 保持 MVVM 模式的一致性
-
-### 提交代码
-
-1. 创建新分支
-2. 实现功能或修复 bug
-3. 提交 PR 到主分支
+- **服务初始化**：所有服务采用两阶段模式 — DI 容器构造后，显式调用 `Load()`/`Initialize()` 方法，避免依赖顺序问题。
+- **事件订阅**：`ConfigService` 和 `SettingsService` 通过 `INotifyPropertyChanged`/`INotifyCollectionChanged` 实现属性变更自动保存，切换配置时正确取消/重新订阅事件。
+- **后端抽象**：`IBackendService` 接口配合 `BackendServiceProxy`，支持根据设置运行时切换 CLI 和 Python 后端。

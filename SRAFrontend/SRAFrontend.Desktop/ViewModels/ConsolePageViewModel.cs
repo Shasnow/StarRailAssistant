@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -65,7 +66,7 @@ public partial class ConsolePageViewModel : PageViewModel
 
     private void HandleMessage(string message)
     {
-        _backendService.SendInput(message);
+        _ = _backendService.SendInputAsync(message);
     }
 
     private void HandleCommand(string line)
@@ -96,10 +97,10 @@ public partial class ConsolePageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void RestartConsole()
+    private async Task RestartConsole()
     {
         _consoleLines.Clear();
-        _backendService.RestartBackendAsync(_settingsService.Settings.Advanced.BackendLaunchArgs);
+        await _backendService.RestartBackendAsync(_settingsService.Settings.Advanced.BackendLaunchArgs);
     }
 
     [RelayCommand]

@@ -820,6 +820,22 @@
                                                Content="后端启动参数" />
                                         <TextBox Grid.Column="2" Text="{Binding AdvancedSettings.BackendLaunchArgs}" Watermark="--inline"/>
                                     </Grid>
+
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="Icon">&#xED74;</Label>
+                                        <Label Grid.Column="1" Content="使用远程后端" />
+                                        <ToggleSwitch Grid.Column="2"
+                                                      IsChecked="{Binding AdvancedSettings.IsRemoteEnabled}" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto, *, Auto"
+                                          IsVisible="{Binding AdvancedSettings.IsRemoteEnabled}">
+                                        <Label Classes="Icon">&#xE0AC;</Label>
+                                        <Label Grid.Column="1" Content="远程服务器地址" />
+                                        <TextBox Grid.Column="2"
+                                                 MinWidth="300"
+                                                 Watermark="http://localhost:5000"
+                                                 Text="{Binding AdvancedSettings.RemoteBaseUrl}" />
+                                    </Grid>
                                     
                                     <Expander Header="{x:Static lang:Resources.DeveloperOptionsText}"
                                               IsVisible="{Binding AdvancedSettings.IsDeveloperModeEnabled}"

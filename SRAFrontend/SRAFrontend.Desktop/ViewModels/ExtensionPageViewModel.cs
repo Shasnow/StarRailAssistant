@@ -1,4 +1,4 @@
-﻿using SRAFrontend.Data;
+using SRAFrontend.Data;
 using SRAFrontend.Services;
 
 namespace SRAFrontend.Desktop.ViewModels;
@@ -16,7 +16,7 @@ public class ExtensionPageViewModel(IBackendService backendService) : PageViewMo
         {
             _enableAutoPlot = value;
             OnPropertyChanged();
-            backendService.SendInput(value ? "trigger enable AutoPlotTrigger" : "trigger disable AutoPlotTrigger");
+            _ = backendService.SendInputAsync(value ? "trigger enable AutoPlotTrigger" : "trigger disable AutoPlotTrigger");
         }
     }
 
@@ -27,7 +27,7 @@ public class ExtensionPageViewModel(IBackendService backendService) : PageViewMo
         {
             _skipPlot = value;
             OnPropertyChanged();
-            backendService.SendInput($"trigger set --type AutoPlotTrigger skip_plot {value}");
+            _ = backendService.SendInputAsync($"trigger set --type AutoPlotTrigger skip_plot {value}");
         }
     }
 }
