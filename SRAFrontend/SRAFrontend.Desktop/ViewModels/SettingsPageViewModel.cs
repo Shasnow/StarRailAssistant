@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
@@ -354,9 +354,9 @@ public partial class SettingsPageViewModel : PageViewModel
     #region 通知测试
 
     [RelayCommand]
-    private void TestEmail()
+    private async Task TestEmailAsync()
     {
-        SendTestNotification(
+        await SendTestNotificationAsync(
             "邮件测试",
             () => !string.IsNullOrEmpty(Settings.Notification.SmtpServer.Trim()) &&
                   Settings.Notification.SmtpPort > 0 &&
@@ -369,9 +369,9 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void TestWebhook()
+    private async Task TestWebhookAsync()
     {
-        SendTestNotification(
+        await SendTestNotificationAsync(
             "Webhook 测试",
             () => !string.IsNullOrEmpty(Settings.Notification.WebhookUrl.Trim()),
             "请先填写 Webhook 地址",
@@ -380,9 +380,9 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void TestTelegram()
+    private async Task TestTelegramAsync()
     {
-        SendTestNotification(
+        await SendTestNotificationAsync(
             "Telegram 测试",
             () => !string.IsNullOrEmpty(Settings.Notification.TelegramBotToken.Trim()) &&
                   !string.IsNullOrEmpty(Settings.Notification.TelegramChatId.Trim()),
@@ -392,9 +392,9 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void TestServerChan()
+    private async Task TestServerChanAsync()
     {
-        SendTestNotification(
+        await SendTestNotificationAsync(
             "ServerChan 测试",
             () => !string.IsNullOrEmpty(Settings.Notification.ServerChanSendKey.Trim()),
             "请先填写 SendKey",
@@ -403,9 +403,9 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void TestBark()
+    private async Task TestBarkAsync()
     {
-        SendTestNotification(
+        await SendTestNotificationAsync(
             "Bark 测试",
             () => !string.IsNullOrEmpty(Settings.Notification.BarkDeviceKey.Trim()),
             "请先填写设备 Key",
@@ -414,9 +414,9 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void TestFeishu()
+    private async Task TestFeishuAsync()
     {
-        SendTestNotification(
+        await SendTestNotificationAsync(
             "飞书测试",
             () => !string.IsNullOrEmpty(Settings.Notification.FeishuWebhookUrl.Trim()),
             "请先填写 Webhook 地址",
@@ -425,9 +425,9 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void TestWeCom()
+    private async Task TestWeComAsync()
     {
-        SendTestNotification(
+        await SendTestNotificationAsync(
             "企业微信测试",
             () => !string.IsNullOrEmpty(Settings.Notification.WeComWebhookUrl.Trim()),
             "请先填写 Webhook 地址",
@@ -436,9 +436,9 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void TestDingTalk()
+    private async Task TestDingTalkAsync()
     {
-        SendTestNotification(
+        await SendTestNotificationAsync(
             "钉钉测试",
             () => !string.IsNullOrEmpty(Settings.Notification.DingTalkWebhookUrl.Trim()),
             "请先填写 Webhook 地址",
@@ -447,9 +447,9 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void TestDiscord()
+    private async Task TestDiscordAsync()
     {
-        SendTestNotification(
+        await SendTestNotificationAsync(
             "Discord 测试",
             () => !string.IsNullOrEmpty(Settings.Notification.DiscordWebhookUrl.Trim()),
             "请先填写 Webhook 地址",
@@ -458,9 +458,9 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void TestXxtui()
+    private async Task TestXxtuiAsync()
     {
-        SendTestNotification(
+        await SendTestNotificationAsync(
             "xxtui 测试",
             () => !string.IsNullOrEmpty(Settings.Notification.XxtuiApiKey.Trim()),
             "请先填写 API Key",
@@ -469,9 +469,9 @@ public partial class SettingsPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void TestOneBot()
+    private async Task TestOneBotAsync()
     {
-        SendTestNotification(
+        await SendTestNotificationAsync(
             "OneBot 测试",
             () => !string.IsNullOrEmpty(Settings.Notification.OneBotUrl.Trim()) &&
                   (!string.IsNullOrEmpty(Settings.Notification.OneBotUserId.Trim()) ||
@@ -489,7 +489,7 @@ public partial class SettingsPageViewModel : PageViewModel
     /// <param name="errorMessage">验证失败时显示的错误消息</param>
     /// <param name="command">要发送到后端的命令（可选，为 null 或空时不发送）</param>
     /// <param name="successMessage">发送成功后显示的消息</param>
-    private void SendTestNotification(string title, Func<bool> validation,
+    private async Task SendTestNotificationAsync(string title, Func<bool> validation,
         string errorMessage, string command,
         string successMessage)
     {
@@ -499,7 +499,7 @@ public partial class SettingsPageViewModel : PageViewModel
             return;
         }
         
-        var success = _backendService.SendInput(command);
+        var success = await _backendService.SendInputAsync(command);
 
         if (success)
             _commonModel.ShowSuccessToast(title, successMessage);

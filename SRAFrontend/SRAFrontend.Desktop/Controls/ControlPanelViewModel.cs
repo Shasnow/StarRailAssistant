@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Desktop.ViewModels;
 using SRAFrontend.Localization;
@@ -61,20 +62,20 @@ public partial class ControlPanelViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void StartButton()
+    private async Task StartButton()
     {
         switch (Cache.StartMode)
         {
             case "Current":
                 Save();
-                if (_backendService.TaskRun(Cache.CurrentConfigName))
+                if (await _backendService.TaskRunAsync(Cache.CurrentConfigName))
                     _commonModel.ShowSuccessToast("任务启动成功", $"已启动配置：{Cache.CurrentConfigName}");
                 else
                     _commonModel.ShowErrorToast("任务启动失败", $"无法启动配置：{Cache.CurrentConfigName}，请检查后端状态。");
                 break;
             case "All":
                 Save();
-                if (_backendService.TaskRun(null))
+                if (await _backendService.TaskRunAsync(null))
                     _commonModel.ShowSuccessToast("任务启动成功", "已启动所有配置任务。");
                 else
                     _commonModel.ShowErrorToast("任务启动失败", "无法启动所有配置任务，请检查后端状态。");
@@ -86,19 +87,19 @@ public partial class ControlPanelViewModel : ViewModelBase
         }
     }
     
-    public void StartSingleTask(string configName)
+    public async Task StartSingleTask(string configName)
     {
         Save();
-        if (_backendService.TaskSingle(configName))
+        if (await _backendService.TaskSingleAsync(configName))
             _commonModel.ShowSuccessToast("任务启动成功", "已启动任务");
         else
             _commonModel.ShowErrorToast("任务启动失败", "无法启动任务，请检查后端状态。");
     }
 
     [RelayCommand]
-    private void StopButton()
+    private async Task StopButton()
     {
-        _backendService.TaskStop();
+        await _backendService.TaskStopAsync();
     }
 
     private void Save()

@@ -305,6 +305,12 @@ public partial class AdvancedSettings : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("backend.launchArgs")]
     private string _backendLaunchArgs = "--inline";
 
+    [ObservableProperty] [property: JsonPropertyName("backend.remote.enabled")]
+    private bool _isRemoteEnabled;
+
+    [ObservableProperty] [property: JsonPropertyName("backend.remote.baseUrl")]
+    private string _remoteBaseUrl = "http://localhost:5000";
+
     [ObservableProperty] [property: JsonPropertyName("developerMode.overlay")]
     private bool _isDebugOverlayEnabled;
 

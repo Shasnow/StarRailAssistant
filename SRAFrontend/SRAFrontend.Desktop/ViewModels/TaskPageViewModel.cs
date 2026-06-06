@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -118,9 +118,9 @@ public partial class TaskPageViewModel : PageViewModel
     public Cache Cache => _cacheService.Cache;
 
     [RelayCommand]
-    private void SingleTask(string taskName)
+    private async Task SingleTask(string taskName)
     {
-        ControlPanelViewModel.StartSingleTask(taskName);
+        await ControlPanelViewModel.StartSingleTask(taskName);
     }
 
     [RelayCommand]

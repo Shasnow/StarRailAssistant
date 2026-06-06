@@ -1,22 +1,32 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 
 namespace SRAFrontend.Services;
 
-public abstract partial class LocalBackendService(ILogger<LocalBackendService> logger)
-    : ObservableObject, IBackendService
+public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
+    : IBackendService
 {
     private Process? _backendProcess;
-    [ObservableProperty] private bool _isTaskRunning;
-    public virtual void Initialize() { }
     public abstract string FileName { get; set; }
     public abstract string WorkingDirectory { get; set; }
     public abstract string MainArgument { get; set; }
+    public event PropertyChangedEventHandler? PropertyChanged;
     public event Action<string>? Outputted;
+
+    public bool IsTaskRunning
+    {
+        get;
+        set
+        {
+            if (field == value) return;
+            field = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsTaskRunning)));
+        }
+    }
 
     public bool SendInput(string input)
     {
@@ -48,6 +58,36 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
         }
     }
 
+    public async Task<bool> SendInputAsync(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            logger.LogWarning("Attempted to send empty input to backend process.");
+            return false;
+        }
+
+        if (_backendProcess == null || _backendProcess.HasExited)
+        {
+            logger.LogWarning("Attempted to send input to backend process, but it is not running. Input: {Input}",
+                input);
+            Outputted?.Invoke($"发送失败: 进程未运行（输入: {input}）");
+            return false;
+        }
+
+        try
+        {
+            logger.LogInformation("Sending input to backend process: {Input}", input);
+            await _backendProcess.StandardInput.WriteLineAsync(input);
+            return true;
+        }
+        catch (IOException e)
+        {
+            logger.LogError(e, "Fail to send input to backend process: {Message}", e.Message);
+            Outputted?.Invoke($"发送失败: {e.Message}（输入: {input}）");
+            return false;
+        }
+    }
+
     public void StartBackend(string arguments)
     {
         if (_backendProcess is not null) return;
@@ -57,6 +97,7 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
             Outputted?.Invoke($"启动失败: 未找到后端可执行文件（路径: {FileName}）");
             return;
         }
+
         var fullArguments = $"{MainArgument} {arguments}".Trim();
         logger.LogInformation("Starting backend {fileName} with arguments: {Arguments}", FileName, fullArguments);
         try
@@ -119,19 +160,19 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
         StartBackend(arguments);
     }
 
-    public bool TaskRun(string? configName)
+    public Task<bool> TaskRunAsync(string? configName)
     {
-        return SendInput(string.IsNullOrEmpty(configName) ? "task run" : $"task run {configName}");
+        return SendInputAsync(string.IsNullOrEmpty(configName) ? "task run" : $"task run {configName}");
     }
 
-    public bool TaskSingle(string taskName)
+    public Task<bool> TaskSingleAsync(string taskName)
     {
-        return SendInput($"task single {taskName}");
+        return SendInputAsync($"task single {taskName}");
     }
 
-    public bool TaskStop()
+    public Task<bool> TaskStopAsync()
     {
-        return SendInput("task stop");
+        return SendInputAsync("task stop");
     }
 
     private void OnBackendProcessExited(object? sender, EventArgs e)

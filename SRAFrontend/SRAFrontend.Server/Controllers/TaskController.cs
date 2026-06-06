@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
@@ -19,14 +19,15 @@ public class TaskController(
 
     [HttpPost("run")]
     [EndpointSummary("运行任务")]
-    [EndpointDescription("运行任务。支持两种方式: 1) 通过 ConfigName 指定本地已保存的配置; 2) 通过 Config 对象直接传入完整配置。若使用 Config 对象，可通过 Persist 参数控制是否持久化到磁盘。")]
+    [EndpointDescription(
+        "运行任务。支持三种方式: 1) 不传 ConfigName 和 Config → 运行全部配置; 2) 通过 Config 传入完整配置，根据 Persist 决定是否持久化; 3) 通过 ConfigName 加载本地已保存的配置。")]
     [ProducesResponseType(200, Description = "任务运行成功")]
     [ProducesResponseType(400, Description = "请求参数无效")]
     [ProducesResponseType(409, Description = "任务已在运行")]
     [ProducesResponseType(500, Description = "发送运行命令失败")]
     public async Task<IActionResult> RunTask([FromBody] RunRequest request)
     {
-        backendService.StartBackend("--no-admin --inline"); // 确保后端已启动，才能处理后续逻辑
+        backendService.StartBackend("--no-admin --inline"); // 确保后端已启动
 
         if (backendService.IsTaskRunning)
             return Conflict(new R(false, "A task is already running"));
@@ -35,18 +36,11 @@ public class TaskController(
 
         if (request.Config is not null)
         {
-            // 使用请求体中的完整配置
-            configName = string.IsNullOrWhiteSpace(request.Config.Name)
-                ? $"_api_{Guid.NewGuid():N}"
-                : request.Config.Name;
+            // 情况 2：携带完整配置 → 运行该配置
+            configName = request.Persist
+                ? request.Config.Name
+                : $"_api_{Guid.NewGuid():N}";
 
-            if (!request.Persist)
-            {
-                // 不持久化 → 使用临时名称
-                configName = $"_api_{Guid.NewGuid():N}";
-            }
-
-            // 写入磁盘供 CLI 加载
             Directory.CreateDirectory(DataPath.ConfigsDir);
             var configPath = Path.Combine(DataPath.ConfigsDir, $"{configName}.json");
             var json = JsonSerializer.Serialize(request.Config, JsonOptions);
@@ -57,14 +51,15 @@ public class TaskController(
         }
         else if (!string.IsNullOrWhiteSpace(request.ConfigName))
         {
-            // 使用本地已保存的配置
+            // 情况 3：指定配置名 → 加载本地配置
             configName = request.ConfigName;
             var configPath = Path.Combine(DataPath.ConfigsDir, $"{configName}.json");
             if (!System.IO.File.Exists(configPath))
                 return BadRequest(new R(false, $"Config '{configName}' not found"));
         }
+        // 情况 1：两者都为空 → configName 为 null，运行全部配置
 
-        var ok = backendService.TaskRun(configName);
+        var ok = await backendService.TaskRunAsync(configName);
         return ok
             ? Ok(new R(true, "Task started"))
             : StatusCode(500, new R(false, "Failed to send run command"));
@@ -74,12 +69,12 @@ public class TaskController(
     [EndpointSummary("停止任务")]
     [EndpointDescription("停止当前运行的任务")]
     [ProducesResponseType(200, Type = typeof(R))]
-    public IActionResult StopTask()
+    public async Task<IActionResult> StopTask()
     {
         if (!backendService.IsTaskRunning)
             return Ok(new R(false, "No task is running"));
 
-        backendService.TaskStop();
+        await backendService.TaskStopAsync();
         return Ok(new R(true, "Stop signal sent"));
     }
 
