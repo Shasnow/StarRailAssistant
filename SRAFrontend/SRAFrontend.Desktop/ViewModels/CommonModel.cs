@@ -145,7 +145,7 @@ public class CommonModel(
     public async Task CheckDesktopShortcut(bool forceCheck = false)
     {
         if (cacheService.Cache.NoNotifyForShortcut && !forceCheck) return;
-        if (File.Exists(PathString.DesktopShortcutPath))
+        if (File.Exists(DataPath.DesktopShortcutPath))
         {
             if (forceCheck) ShowSuccessToast("快捷方式已存在", "快捷方式已存在于桌面");
             return;
@@ -168,7 +168,7 @@ public class CommonModel(
                 cacheService.Cache.NoNotifyForShortcut = true;
                 break;
             case SukiMessageBoxResult.Yes:
-                if (CreateDesktopShortcut(PathString.DesktopShortcutPath, PathString.SraExecutablePath))
+                if (CreateDesktopShortcut(DataPath.DesktopShortcutPath, DataPath.SraExecutablePath))
                     ShowSuccessToast("快捷方式创建成功", "已在桌面创建 SRA 快捷方式");
                 else
                     ShowErrorToast("快捷方式创建失败", "查看日志以获取更多信息");
@@ -178,10 +178,10 @@ public class CommonModel(
 
     public async Task CleanupOldExeAsync()
     {
-        if (File.Exists(PathString.SraOldExecutablePath))
+        if (File.Exists(DataPath.SraOldExecutablePath))
         {
             logger.LogDebug("Cleaning up old executable file: SRA_old.exe");
-            await Task.Run(() => File.Delete(PathString.SraOldExecutablePath));
+            await Task.Run(() => File.Delete(DataPath.SraOldExecutablePath));
         }
     }
 
@@ -258,8 +258,8 @@ public class CommonModel(
         backendService.StopBackend();
         if (isHotfix)
         {
-            logger.LogDebug("Extracting hotfix: {Source} -> {Destination}", downloadFilePath, PathString.SourceCodeDir);
-            ZipUtil.UnzipExternal(downloadFilePath, PathString.SourceCodeDir);
+            logger.LogDebug("Extracting hotfix: {Source} -> {Destination}", downloadFilePath, DataPath.SourceCodeDir);
+            ZipUtil.UnzipExternal(downloadFilePath, DataPath.SourceCodeDir);
             // 保存热修复版本（直接用已解析的 Version，避免重复转换）
             cacheService.Cache.HotfixVersion = remoteVersion.ToString();
             logger.LogDebug("Hotfix applied successfully: {Version}", remoteVersion);
@@ -275,7 +275,7 @@ public class CommonModel(
             try
             {
                 // 重命名当前可执行文件（以防更新过程中被占用）
-                File.Move(PathString.SraExecutablePath, PathString.SraOldExecutablePath);
+                File.Move(DataPath.SraExecutablePath, DataPath.SraOldExecutablePath);
                 // 解压更新包
                 await Task.Run(() => ZipUtil.Unzip(downloadFilePath, Environment.CurrentDirectory));
                 toastManager.Dismiss(unzipToast);
@@ -308,7 +308,7 @@ public class CommonModel(
 
     private void RestartApplication()
     {
-        var exePath = PathString.SraExecutablePath;
+        var exePath = DataPath.SraExecutablePath;
         try
         {
             Process.Start(new ProcessStartInfo

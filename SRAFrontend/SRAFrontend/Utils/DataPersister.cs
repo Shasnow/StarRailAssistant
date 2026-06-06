@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using Serilog;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
 
@@ -47,14 +46,13 @@ public static class DataPersister
     {
         try
         {
-            if (!File.Exists(PathString.CacheJson)) return new Cache();
-            var json = File.ReadAllText(PathString.CacheJson);
+            if (!File.Exists(DataPath.CacheJson)) return new Cache();
+            var json = File.ReadAllText(DataPath.CacheJson);
             if (string.IsNullOrWhiteSpace(json)) return new Cache();
             return JsonSerializer.Deserialize<Cache>(json) ?? new Cache();
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            Log.Error(e, "Error loading cache. using empty cache");
             return new Cache();
         }
     }
@@ -62,7 +60,7 @@ public static class DataPersister
     public static void SaveCache(Cache cache)
     {
         var json = JsonSerializer.Serialize(cache, JsonSerializerOptions);
-        SafeWriteAllText(PathString.CacheJson, json);
+        SafeWriteAllText(DataPath.CacheJson, json);
     }
 
     #endregion

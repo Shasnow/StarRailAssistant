@@ -308,10 +308,10 @@ public partial class SettingsPageViewModel : PageViewModel
     {
         var folderPath = folder switch
         {
-            "backendLogs" => PathString.BackendLogsDir,
-            "frontendLogs" => PathString.FrontendLogsDir,
-            "configs" => PathString.ConfigsDir,
-            "appdata" => PathString.AppDataDir,
+            "backendLogs" => DataPath.BackendLogsDir,
+            "frontendLogs" => DataPath.FrontendLogsDir,
+            "configs" => DataPath.ConfigsDir,
+            "appdata" => DataPath.AppDataDir,
             _ => "."
         };
         _commonModel.OpenFolderInExplorer(folderPath);

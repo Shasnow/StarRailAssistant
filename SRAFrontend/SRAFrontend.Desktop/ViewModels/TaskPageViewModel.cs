@@ -53,13 +53,13 @@ public partial class TaskPageViewModel : PageViewModel
         _commonModel = commonModel;
         _configService = configService;
         _cacheService = cacheService;
-        CurrentConfig = _configService.TaskConfig!;
+        CurrentConfig = _configService.TasksConfig!;
 
         void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)
         {
             if (args.PropertyName != nameof(Cache.CurrentConfigIndex)) return;
             _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.CurrentConfigIndex]);
-            CurrentConfig = _configService.TaskConfig!;
+            CurrentConfig = _configService.TasksConfig!;
         }
 
         _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
@@ -125,7 +125,7 @@ public partial class TaskPageViewModel : PageViewModel
     [RelayCommand]
     private void RefreshStrategies()
     {
-        if (!Directory.Exists(PathString.StrategiesDir))
+        if (!Directory.Exists(DataPath.StrategiesDir))
         {
             _commonModel.ShowErrorToast("Error", "未找到攻略文件夹，无法刷新");
             return;
@@ -133,7 +133,7 @@ public partial class TaskPageViewModel : PageViewModel
 
         // 遍历攻略文件夹中的json文件，反序列化成Strategy对象，并更新Cache中的Strategies列表
         var strategies = new List<Strategy>();
-        foreach (var file in Directory.GetFiles(PathString.StrategiesDir))
+        foreach (var file in Directory.GetFiles(DataPath.StrategiesDir))
         {
             if (!file.EndsWith(".json")) continue;
             var json = File.ReadAllText(file);

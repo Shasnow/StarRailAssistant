@@ -46,7 +46,7 @@ public class App : Application
             desktop.Exit += (_, _) =>
             {
                 Log.Information("Application is exiting. Saving settings and stopping SRA process.");
-                // settingsService.Save(); 设置有自动保存
+                settingsService.Save();
                 serviceProvider.GetRequiredService<ConfigService>().Save();
                 serviceProvider.GetRequiredService<CacheService>().SaveCache();
                 serviceProvider.GetRequiredService<IBackendService>().StopBackend();
@@ -104,7 +104,7 @@ public class App : Application
             .WriteTo.Console()
             // 输出到文件（按日期拆分，保留 7 天）
             .WriteTo.File(
-                path: Path.Combine(PathString.FrontendLogsDir, "sra.log"),
+                path: Path.Combine(DataPath.FrontendLogsDir, "sra.log"),
                 rollingInterval: RollingInterval.Day, // 按天拆分
                 retainedFileCountLimit: 7, // 保留 7 天日志
                 encoding: System.Text.Encoding.UTF8, // 避免中文乱码
