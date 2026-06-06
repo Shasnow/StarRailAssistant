@@ -2,7 +2,7 @@
 <p align="center">
     <img src="https://img.shields.io/badge/platform-Windows-blue" alt="platform">
     <img alt="Static Badge" src="https://img.shields.io/badge/python-3.12-skyblue">
-    <img alt="Static Badge" src="https://img.shields.io/badge/.NET-8.0-purple">
+    <img alt="Static Badge" src="https://img.shields.io/badge/.NET-10.0-purple">
     <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/Shasnow/StarRailAssistant/total">
     <img alt="GitHub Release" src="https://img.shields.io/github/v/release/Shasnow/StarRailAssistant">
     <a href="https://mirrorchyan.com/zh/projects?rid=StarRailAssistant">
