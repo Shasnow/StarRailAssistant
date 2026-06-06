@@ -2,6 +2,7 @@
 - 记忆窗口大小和位置：在设置中启用后，SRA会记住您上次关闭窗口时的大小和位置。
 - SRA-server：新增了一个新的服务端应用，您可以通过http协议与SRA进行通信。
 - 远程后端支持：桌面端可以通过HTTP连接远程SRA服务端，实现跨设备任务管理。
+- 更新了问候语。
 
 ### 功能调整：
 - `IBackendService` 接口中的 `TaskRun`、`TaskSingle`、`TaskStop`、`SendInput` 等方法已重构为异步方法。
