@@ -228,7 +228,7 @@
                                         </ComboBox>
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto, *, Auto">
-                                        <Label Grid.Column="0" Classes="Icon">&#xE5CA;</Label>
+                                        <Label Grid.Column="0" Classes="Icon">&#xE5DA;</Label>
                                         <Label Grid.Column="1" Content="记忆窗口大小和位置" />
                                         <ToggleSwitch Grid.Column="2"
                                                       IsChecked="{Binding DisplaySettings.IsRememberWindow}"
