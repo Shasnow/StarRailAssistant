@@ -31,7 +31,9 @@ public class App : Application
         var serviceProvider = serviceCollection.BuildServiceProvider();
         var settingsService = serviceProvider.GetRequiredService<SettingsService>();
         settingsService.Load();
+        serviceProvider.GetRequiredService<CacheService>().Load();
         serviceProvider.GetRequiredService<ConfigService>().Load();
+        serviceProvider.GetRequiredService<IBackendService>().Initialize();
         Localization.Resources.Culture =
             new CultureInfo(
                 settingsService.Settings.Display.Language == 0 ? "zh-CN" : "en-US");

@@ -55,16 +55,17 @@ public partial class TaskPageViewModel : PageViewModel
         _cacheService = cacheService;
         CurrentConfig = _configService.TasksConfig!;
 
+        _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
+
+        if (Cache.Strategies.Count == 0) RefreshStrategies();
+        return;
+
         void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)
         {
             if (args.PropertyName != nameof(Cache.CurrentConfigIndex)) return;
             _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.CurrentConfigIndex]);
             CurrentConfig = _configService.TasksConfig!;
         }
-
-        _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
-
-        if (Cache.Strategies.Count == 0) RefreshStrategies();
     }
 
     public string[] TpTaskNames => TpTaskItems.TpTaskNames;
@@ -185,7 +186,7 @@ public partial class TaskPageViewModel : PageViewModel
             Name = TpTaskItems.TpTaskNames[SelectedTpTaskIndex],
             Id = TpTaskItems.TaskItems[SelectedTpTaskIndex].Id,
             Level = SelectedTpTaskLevelIndex,
-            LevelName = Enumerable.ElementAtOrDefault(CurrentTpTaskLevels, (int)SelectedTpTaskLevelIndex) ?? "",
+            LevelName = CurrentTpTaskLevels.ElementAtOrDefault(SelectedTpTaskLevelIndex) ?? "",
             Count = TpTaskSingleTimes,
             RunTimes = TpTaskRunTimes,
             AutoDetect = IsTpTaskAutoDetect

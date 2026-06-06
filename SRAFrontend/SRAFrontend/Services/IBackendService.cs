@@ -10,6 +10,7 @@ public interface IBackendService : INotifyPropertyChanged
     const string DoneMarker = "[Done]";
     bool IsTaskRunning { get; set; }
     event Action<string>? Outputted;
+    void Initialize();
     bool SendInput(string input);
     void StartBackend(string arguments);
     void StopBackend();

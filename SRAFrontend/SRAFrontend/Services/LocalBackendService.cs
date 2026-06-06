@@ -12,6 +12,7 @@ public abstract partial class LocalBackendService(ILogger<LocalBackendService> l
 {
     private Process? _backendProcess;
     [ObservableProperty] private bool _isTaskRunning;
+    public virtual void Initialize() { }
     public abstract string FileName { get; set; }
     public abstract string WorkingDirectory { get; set; }
     public abstract string MainArgument { get; set; }

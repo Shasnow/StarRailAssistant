@@ -1,21 +1,24 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using SRAFrontend.Models;
 using SRAFrontend.Utils;
 
 namespace SRAFrontend.Services;
 
-public class CacheService
+public class CacheService(ILogger<CacheService> logger)
 {
-    public CacheService()
-    {
-        Cache = DataPersister.LoadCache();
-        Cache.LastLaunchTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(); // 记录当前启动时间戳
-    }
+    public Cache Cache { get; private set; } = new();
 
-    public Cache Cache { get; }
+    public void Load()
+    {
+        logger.LogInformation("Loading cache...");
+        Cache = DataPersister.LoadCache();
+        Cache.LastLaunchTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+    }
 
     public void SaveCache()
     {
+        logger.LogInformation("Saving cache...");
         DataPersister.SaveCache(Cache);
     }
 }
