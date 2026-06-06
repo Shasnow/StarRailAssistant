@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
@@ -12,8 +12,7 @@ namespace SRAFrontend.Services;
 public class ConfigService(CacheService cacheService, ILogger<ConfigService> logger)
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions = new() { WriteIndented = true };
-
-    public TasksConfig? TasksConfig { get; private set; }
+    public TasksConfig? TasksConfig { get; set; }
 
     public void Load()
     {
@@ -47,10 +46,7 @@ public class ConfigService(CacheService cacheService, ILogger<ConfigService> log
             {
                 logger.LogInformation("Migrating OLD config format...");
                 var oldConfig = JsonSerializer.Deserialize<Config>(configJson);
-                if (oldConfig != null)
-                {
-                    newConfig = ConfigMigrator.MigrateOldToNew(oldConfig);
-                }
+                if (oldConfig != null) newConfig = ConfigMigrator.MigrateOldToNew(oldConfig);
             }
             else
             {
