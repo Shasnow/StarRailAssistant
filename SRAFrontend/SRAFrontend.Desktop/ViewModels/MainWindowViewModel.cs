@@ -27,7 +27,10 @@ public partial class MainWindowViewModel(
         "飞荧扑火，向死而生",
         "跨越寰宇终抵黯淡星外",
         "立志成为崩铁糕手",
-        "Bon voyage"
+        "Bon voyage",
+        "May your path be clear",
+        "May you get to where\ndreams are all\ncrystalline and sweet",
+        "我们将在过去篆刻未来"
     ];
 
     private static readonly List<string> GreetingsEn =
@@ -37,7 +40,10 @@ public partial class MainWindowViewModel(
         "not\n'Sequence Read Archive'",
         "Launcher launching launcher",
         "-1073741819",
-        "Bon voyage"
+        "Bon voyage",
+        "May your path be clear",
+        "May you get to where\ndreams are all\ncrystalline and sweet",
+        "We will mark the past with the future"
     ];
 
     [ObservableProperty] private string _lightModeText =
