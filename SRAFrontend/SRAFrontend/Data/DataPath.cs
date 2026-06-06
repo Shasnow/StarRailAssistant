@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace SRAFrontend.Data;
 
-public static class PathString
+public static class DataPath
 {
     public static readonly string AppRoot = AppContext.BaseDirectory;
 
@@ -28,7 +28,7 @@ public static class PathString
     public static readonly string DesktopShortcutPath = GetDesktopShortcutPath();
     public static readonly string PythonExe = Path.Combine(PythonDir, "python.exe");
 
-    static PathString()
+    static DataPath()
     {
         EnsureDirectoryExists(AppDataDir);
         EnsureDirectoryExists(TempDir);

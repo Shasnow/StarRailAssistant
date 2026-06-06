@@ -28,12 +28,12 @@ public class SettingsService(ILogger<SettingsService> logger)
     public void Load()
     {
         _logger.LogInformation("Loading settings...");
-        if (!File.Exists(PathString.SettingsJson))
+        if (!File.Exists(DataPath.SettingsJson))
         {
             _logger.LogInformation("Settings file not found, using default settings");
             return;
         }
-        var settingsJson = File.ReadAllText(PathString.SettingsJson);
+        var settingsJson = File.ReadAllText(DataPath.SettingsJson);
         try
         {
             if (settingsJson.Contains("EmailAuthCode"))  // 旧格式标志字段
@@ -67,14 +67,14 @@ public class SettingsService(ILogger<SettingsService> logger)
         _logger.LogInformation("Saving settings...");
         EncryptSensitiveFields();
         var settingsJson = JsonSerializer.Serialize(Settings, _jsonSerializerOptions);
-        File.WriteAllText(PathString.SettingsJson, settingsJson);
+        File.WriteAllText(DataPath.SettingsJson, settingsJson);
     }
 
     private async Task SaveAsync()
     {
         EncryptSensitiveFields();
         var settingsJson = JsonSerializer.Serialize(Settings, _jsonSerializerOptions);
-        await File.WriteAllTextAsync(PathString.SettingsJson, settingsJson);
+        await File.WriteAllTextAsync(DataPath.SettingsJson, settingsJson);
     }
 
     private void EncryptSensitiveFields()

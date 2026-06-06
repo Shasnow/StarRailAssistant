@@ -13,7 +13,7 @@ public class ConfigService(CacheService cacheService, ILogger<ConfigService> log
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions = new() { WriteIndented = true };
 
-    public TasksConfig? TaskConfig { get; private set; }
+    public TasksConfig? TasksConfig { get; private set; }
 
     public void Load()
     {
@@ -21,19 +21,19 @@ public class ConfigService(CacheService cacheService, ILogger<ConfigService> log
         Load(configName);
     }
 
-    private void Load(string configName)
+    public void Load(string configName)
     {
         if (string.IsNullOrWhiteSpace(configName))
             configName = "Default";
 
         logger.LogInformation("Loading config: {ConfigName}", configName);
-        var configPath = Path.Combine(PathString.ConfigsDir, $"{configName}.json");
+        var configPath = Path.Combine(DataPath.ConfigsDir, $"{configName}.json");
 
         // 不存在 → 新建
         if (!File.Exists(configPath))
         {
             logger.LogWarning("Config file not found, creating default: {ConfigName}", configName);
-            TaskConfig = new TasksConfig { Name = configName };
+            TasksConfig = new TasksConfig { Name = configName };
             return;
         }
 
@@ -67,37 +67,37 @@ public class ConfigService(CacheService cacheService, ILogger<ConfigService> log
             }
 
             newConfig.Name = configName;
-            TaskConfig = newConfig;
+            TasksConfig = newConfig;
 
             DecryptSensitiveFields();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to load config, using default");
-            TaskConfig = new TasksConfig { Name = configName, Version = TasksConfig.StaticVersion };
+            TasksConfig = new TasksConfig { Name = configName, Version = TasksConfig.StaticVersion };
         }
     }
 
     public void Save()
     {
-        logger.LogInformation("Saving config: {ConfigName}", TaskConfig?.Name);
+        logger.LogInformation("Saving config: {ConfigName}", TasksConfig?.Name);
         EncryptSensitiveFields();
-        var configJson = JsonSerializer.Serialize(TaskConfig, _jsonSerializerOptions);
-        File.WriteAllText(Path.Combine(PathString.ConfigsDir, $"{TaskConfig?.Name}.json"), configJson);
+        var configJson = JsonSerializer.Serialize(TasksConfig, _jsonSerializerOptions);
+        File.WriteAllText(Path.Combine(DataPath.ConfigsDir, $"{TasksConfig?.Name}.json"), configJson);
     }
 
     private void EncryptSensitiveFields()
     {
-        if (TaskConfig is null) return;
-        TaskConfig.StartGame.EncryptedUsername = EncryptUtil.EncryptString(TaskConfig.StartGame.Username);
-        TaskConfig.StartGame.EncryptedPassword = EncryptUtil.EncryptString(TaskConfig.StartGame.Password);
+        if (TasksConfig is null) return;
+        TasksConfig.StartGame.EncryptedUsername = EncryptUtil.EncryptString(TasksConfig.StartGame.Username);
+        TasksConfig.StartGame.EncryptedPassword = EncryptUtil.EncryptString(TasksConfig.StartGame.Password);
     }
 
     private void DecryptSensitiveFields()
     {
-        if (TaskConfig is null) return;
-        TaskConfig.StartGame.Username = EncryptUtil.DecryptString(TaskConfig.StartGame.EncryptedUsername);
-        TaskConfig.StartGame.Password = EncryptUtil.DecryptString(TaskConfig.StartGame.EncryptedPassword);
+        if (TasksConfig is null) return;
+        TasksConfig.StartGame.Username = EncryptUtil.DecryptString(TasksConfig.StartGame.EncryptedUsername);
+        TasksConfig.StartGame.Password = EncryptUtil.DecryptString(TasksConfig.StartGame.EncryptedPassword);
     }
 
     public void SwitchConfig(string configName)
