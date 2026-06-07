@@ -72,6 +72,7 @@ def should_capture_notification_screenshot(config: NotificationSettings | None =
         cfg.isOneBotEnabled and cfg.isOneBotSendImage,
         cfg.isWeComEnabled and cfg.isWeComSendImage,
         cfg.isDiscordEnabled and cfg.isDiscordSendImage,
+        cfg.isSystemEnabled
     ])
 
 

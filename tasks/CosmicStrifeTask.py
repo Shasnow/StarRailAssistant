@@ -1,6 +1,8 @@
 from SRACore.task import BaseTask, task
+from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
 from tasks.currency_wars.characters import Characters
+from tasks.img import DUIMG, IMG
 
 @task(order=3)
 class CosmicStrifeTask(BaseTask):
@@ -62,3 +64,18 @@ class CosmicStrifeTask(BaseTask):
                 return False
         logger.info("旷宇纷争任务全部完成")
         return True
+
+    def on_completed(self) -> None:
+        on_complete = self.settings.Notification.onCompleted
+        if self.__class__.__name__ in on_complete:
+            guide_hotkey = self.settings.General.hotkeyF4
+            self.operator.press_key(str(guide_hotkey).lower())
+            if not self.operator.wait_img(IMG.F4, timeout=20):
+                logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
+                self.operator.press_key("esc")
+            self.operator.sleep(2)
+            self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
+            self.operator.click_point(0.235, 0.81, after_sleep=1)  # 打开积分奖励面板
+            self.operator.wait_img(DUIMG.BONUS_POINTS, timeout=5)
+            self.send_notification(f"任务 {self.__class__.__name__} 执行完成。", "success")
+            self.operator.press_key('esc', presses=2, interval=1)
