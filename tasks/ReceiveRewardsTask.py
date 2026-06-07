@@ -330,6 +330,13 @@ class ReceiveRewardsTask(BaseTask):
             logger.info("未能找到升级遗器任务")
             return False
 
+    def on_completed(self) -> None:
+        on_complete = self.settings.Notification.onCompleted
+        if self.__class__.__name__ in on_complete:
+            self.operator.press_key("b")  # 打开背包
+            self.operator.wait_ocr("背包", from_x=0.05, from_y=0.03, to_x=0.1, to_y=0.08, interval=0.5)
+            self.send_notification(f"任务 {self.__class__.__name__} 执行完成。", "success")
+            self.operator.press_key('esc')
 
 
 

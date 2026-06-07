@@ -74,7 +74,7 @@ class CurrencyWars(Executable):
         self.min_level = 7  # 商店等级
         self.mid_level = 7  # 商店等级
         self.strategy_characters: dict[str, int] = dict()  # 在攻略中的角色及其预期星级
-        self.strategy_code = ""  # 当前使用的攻略代码
+        self.strategy_code = ""  # 当前使用的攻略代码·
         self.is_overclock = False  # 超频博弈
 
     def run(self):
@@ -226,7 +226,7 @@ class CurrencyWars(Executable):
             box = self.operator.wait_img(CWIMG.START_CURRENCY_WARS, timeout=30)  # 重新获取开始游戏按钮
         # 重试点击开始按钮直到LOGO消失
         self.operator.do_while(
-            lambda: self.operator.click_box(box),  # NOQA
+            lambda: self.operator.click_box(box),  # NOQA  # pyright: ignore[reportArgumentType]
             lambda: self.operator.locate(CWIMG.LOGO) is None,
             interval=2,
             max_iterations=10
