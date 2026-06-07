@@ -13,7 +13,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # 要更新的文件路径
 FILES = {
-    'cs': os.path.join(PROJECT_ROOT, 'SRAFrontend', 'SRAFrontend.Core', 'Models', 'AppSettings.cs'),
+    'cs': os.path.join(PROJECT_ROOT, 'SRAFrontend', 'SRAFrontend', 'Models', 'AppSettings.cs'),
     'const.py': os.path.join(PROJECT_ROOT, 'SRACore', 'util', 'const.py'),
     'package.json': os.path.join(PROJECT_ROOT, 'package.json')
 }

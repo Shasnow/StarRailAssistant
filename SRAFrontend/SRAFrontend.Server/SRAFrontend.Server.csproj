@@ -4,6 +4,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <AssemblyName>SRA-server</AssemblyName>
+        <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>false</SelfContained>
     </PropertyGroup>
 
     <ItemGroup>
