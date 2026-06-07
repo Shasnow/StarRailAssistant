@@ -21,11 +21,17 @@ public class AppSettings
 
 public partial class GeneralSettings : ObservableObject
 {
-    [ObservableProperty] [property: JsonPropertyName("cloudGame.browser")]
-    private string _cloudGameBrowser = "Microsoft Edge";
+    [ObservableProperty] [property: JsonPropertyName("gamePath.index")]
+    private int _gamePathIndex;
 
-    [ObservableProperty] [property: JsonPropertyName("gameArgs.advanced")]
-    private string _gameArgsAdvanced = "";
+    [ObservableProperty] [property: JsonPropertyName("gamePath.uris")]
+    private ObservableCollection<string> _gamePaths = [];
+
+    [ObservableProperty] [property: JsonPropertyName("gamePath.autoDetect")]
+    private bool _isAutoDetectGamePath = true;
+
+    [ObservableProperty] [property: JsonPropertyName("gameArgs.enabled")]
+    private bool _isGameArgsEnabled;
 
     [ObservableProperty] [property: JsonPropertyName("gameArgs.fullScreenMode")]
     private string _gameArgsFullScreenMode = "窗口化";
@@ -33,11 +39,20 @@ public partial class GeneralSettings : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("gameArgs.windowSize")]
     private string _gameArgsWindowSize = "1920x1080";
 
-    [ObservableProperty] [property: JsonPropertyName("gamePath.index")]
-    private int _gamePathIndex;
+    [ObservableProperty] [property: JsonPropertyName("gameArgs.popupWindow")]
+    private bool _isGameArgsPopupWindow;
 
-    [ObservableProperty] [property: JsonPropertyName("gamePath.uris")]
-    private ObservableCollection<string> _gamePaths = [];
+    [ObservableProperty] [property: JsonPropertyName("gameArgs.useCmd")]
+    private bool _isUseCmd;
+
+    [ObservableProperty] [property: JsonPropertyName("gameArgs.advanced")]
+    private string _gameArgsAdvanced = "";
+
+    [ObservableProperty] [property: JsonPropertyName("cloudGame.enabled")]
+    private bool _isCloudGameEnable;
+
+    [ObservableProperty] [property: JsonPropertyName("cloudGame.browser")]
+    private string _cloudGameBrowser = "Microsoft Edge";
 
     [ObservableProperty] [property: JsonPropertyName("keybindings.e")]
     private string _hotkeyE = "E";
@@ -57,23 +72,8 @@ public partial class GeneralSettings : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("keybindings.stop")]
     private string _hotkeyStop = "F9";
 
-    [ObservableProperty] [property: JsonPropertyName("gamePath.autoDetect")]
-    private bool _isAutoDetectGamePath = true;
-
-    [ObservableProperty] [property: JsonPropertyName("cloudGame.enabled")]
-    private bool _isCloudGameEnable;
-
-    [ObservableProperty] [property: JsonPropertyName("gameArgs.enabled")]
-    private bool _isGameArgsEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("gameArgs.popupWindow")]
-    private bool _isGameArgsPopupWindow;
-
     [ObservableProperty] [property: JsonPropertyName("overlay.enabled")]
     private bool _isOverlayEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("gameArgs.useCmd")]
-    private bool _isUseCmd;
 
     [ObservableProperty] [property: JsonPropertyName("ocrMatchConfidence")]
     private double _ocrMatchConfidence = 0.7;
@@ -93,11 +93,11 @@ public partial class DisplaySettings : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("controlPanel.opacity")]
     private double _controlPanelOpacity = 0.9;
 
-    [ObservableProperty] [property: JsonPropertyName("window.remember")]
-    private bool _isRememberWindow;
-
     [ObservableProperty] [property: JsonPropertyName("language")]
     private int _language;
+
+    [ObservableProperty] [property: JsonPropertyName("window.remember")]
+    private bool _isRememberWindow;
 
     [JsonPropertyName("window.state")] public int WindowState { get; set; }
 
@@ -114,6 +114,15 @@ public partial class DisplaySettings : ObservableObject
 
 public partial class NotificationSettings : ObservableObject
 {
+    [ObservableProperty] [property: JsonPropertyName("enabled")]
+    private bool _isEnabled;
+
+    [ObservableProperty] [property: JsonPropertyName("system.enabled")]
+    private bool _isSystemEnabled;
+
+    [ObservableProperty] [property: JsonPropertyName("bark.enabled")]
+    private bool _isBarkEnabled;
+
     [ObservableProperty] [property: JsonPropertyName("bark.ciphertext")]
     private string _barkCiphertext = "";
 
@@ -135,14 +144,26 @@ public partial class NotificationSettings : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("bark.sound")]
     private string _barkSound = "";
 
+    [ObservableProperty] [property: JsonPropertyName("dingTalk.enabled")]
+    private bool _isDingTalkEnabled;
+
     [ObservableProperty] [property: JsonPropertyName("dingTalk.secret")]
     private string _dingTalkSecret = "";
 
     [ObservableProperty] [property: JsonPropertyName("dingTalk.webhookUrl")]
     private string _dingTalkWebhookUrl = "";
 
+    [ObservableProperty] [property: JsonPropertyName("discord.enabled")]
+    private bool _isDiscordEnabled;
+
+    [ObservableProperty] [property: JsonPropertyName("discord.sendImage")]
+    private bool _isDiscordSendImage;
+
     [ObservableProperty] [property: JsonPropertyName("discord.webhookUrl")]
     private string _discordWebhookUrl = "";
+
+    [ObservableProperty] [property: JsonPropertyName("feishu.enabled")]
+    private bool _isFeishuEnabled;
 
     [ObservableProperty] [property: JsonPropertyName("feishu.appId")]
     private string _feishuAppId = "";
@@ -159,62 +180,11 @@ public partial class NotificationSettings : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("feishu.webhookUrl")]
     private string _feishuWebhookUrl = "";
 
-    [ObservableProperty] [property: JsonPropertyName("bark.enabled")]
-    private bool _isBarkEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("dingTalk.enabled")]
-    private bool _isDingTalkEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("discord.enabled")]
-    private bool _isDiscordEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("discord.sendImage")]
-    private bool _isDiscordSendImage;
-
-    [ObservableProperty] [property: JsonPropertyName("email.enabled")]
-    private bool _isEmailEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("enabled")]
-    private bool _isEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("feishu.enabled")]
-    private bool _isFeishuEnabled;
-
     [ObservableProperty] [property: JsonPropertyName("oneBot.enabled")]
     private bool _isOneBotEnabled;
 
     [ObservableProperty] [property: JsonPropertyName("oneBot.sendImage")]
     private bool _isOneBotSendImage;
-
-    [ObservableProperty] [property: JsonPropertyName("serverChan.enabled")]
-    private bool _isServerChanEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("system.enabled")]
-    private bool _isSystemEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("telegram.enabled")]
-    private bool _isTelegramEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("telegram.proxyEnabled")]
-    private bool _isTelegramProxyEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("telegram.sendImage")]
-    private bool _isTelegramSendImage;
-
-    [ObservableProperty] [property: JsonPropertyName("webhook.enabled")]
-    private bool _isWebhookEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("weCom.enabled")]
-    private bool _isWeComEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("weCom.sendImage")]
-    private bool _isWeComSendImage;
-
-    [ObservableProperty] [property: JsonPropertyName("xxtui.enabled")]
-    private bool _isXxtuiEnabled;
-
-    [ObservableProperty] [property: JsonPropertyName("onCompleted")]
-    private ObservableCollection<string> _onCompleted = [];
 
     [ObservableProperty] [property: JsonPropertyName("oneBot.groupId")]
     private string _oneBotGroupId = "";
@@ -228,14 +198,41 @@ public partial class NotificationSettings : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("oneBot.userId")]
     private string _oneBotUserId = "";
 
-    [ObservableProperty] [property: JsonPropertyName("onStart")]
-    private ObservableCollection<string> _onStart = [];
+    [ObservableProperty] [property: JsonPropertyName("serverChan.enabled")]
+    private bool _isServerChanEnabled;
 
     [ObservableProperty] [property: JsonPropertyName("serverChan.sendKey")]
     private string _serverChanSendKey = "";
 
-    [ObservableProperty] [property: JsonIgnore]
-    private string _smtpAuthCode = "";
+    [ObservableProperty] [property: JsonPropertyName("telegram.enabled")]
+    private bool _isTelegramEnabled;
+
+    [ObservableProperty] [property: JsonPropertyName("telegram.proxyEnabled")]
+    private bool _isTelegramProxyEnabled;
+
+    [ObservableProperty] [property: JsonPropertyName("telegram.sendImage")]
+    private bool _isTelegramSendImage;
+
+    [ObservableProperty] [property: JsonPropertyName("weCom.enabled")]
+    private bool _isWeComEnabled;
+
+    [ObservableProperty] [property: JsonPropertyName("weCom.sendImage")]
+    private bool _isWeComSendImage;
+
+    [ObservableProperty] [property: JsonPropertyName("weCom.webhookUrl")]
+    private string _weComWebhookUrl = "";
+
+    [ObservableProperty] [property: JsonPropertyName("webhook.enabled")]
+    private bool _isWebhookEnabled;
+
+    [ObservableProperty] [property: JsonPropertyName("webhook.url")]
+    private string _webhookUrl = "";
+
+    [ObservableProperty] [property: JsonPropertyName("xxtui.enabled")]
+    private bool _isXxtuiEnabled;
+
+    [ObservableProperty] [property: JsonPropertyName("email.enabled")]
+    private bool _isEmailEnabled;
 
     [ObservableProperty] [property: JsonPropertyName("email.smtpPort")]
     private int _smtpPort = 465;
@@ -249,6 +246,12 @@ public partial class NotificationSettings : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("email.smtpServer")]
     private string _smtpServer = "";
 
+    [JsonPropertyName("email.smtpAuthCode")]
+    public string EncryptedSmtpAuthCode { get; set; } = "";
+
+    [ObservableProperty] [property: JsonIgnore]
+    private string _smtpAuthCode = "";
+
     [ObservableProperty] [property: JsonPropertyName("telegram.apiBaseUrl")]
     private string _telegramApiBaseUrl = "https://api.telegram.org";
 
@@ -261,12 +264,6 @@ public partial class NotificationSettings : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("telegram.proxyUrl")]
     private string _telegramProxyUrl = "http://127.0.0.1:7890";
 
-    [ObservableProperty] [property: JsonPropertyName("webhook.url")]
-    private string _webhookUrl = "";
-
-    [ObservableProperty] [property: JsonPropertyName("weCom.webhookUrl")]
-    private string _weComWebhookUrl = "";
-
     [ObservableProperty] [property: JsonPropertyName("xxtui.apiKey")]
     private string _xxtuiApiKey = "";
 
@@ -275,9 +272,12 @@ public partial class NotificationSettings : ObservableObject
 
     [ObservableProperty] [property: JsonPropertyName("xxtui.source")]
     private string _xxtuiSource = "";
+    
+    [ObservableProperty] [property: JsonPropertyName("onCompleted")]
+    private ObservableCollection<string> _onCompleted = [];
 
-    [JsonPropertyName("email.smtpAuthCode")]
-    public string EncryptedSmtpAuthCode { get; set; } = "";
+    [ObservableProperty] [property: JsonPropertyName("onStart")]
+    private ObservableCollection<string> _onStart = [];
 }
 
 public partial class UpdateSettings : ObservableObject
