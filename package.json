@@ -1,12 +1,13 @@
 {
   "name": "sra",
-  "version": "2.16.1",
+  "version": "2.17.0-beta.1",
   "scripts": {
     "dev": "python main.py",
-    "build": "dotnet publish -c Release -r win-x64 SRAFrontend/SRAFrontend.csproj && python scripts/package.py",
+    "build": "dotnet publish -c Release -r win-x64 SRAFrontend/SRAFrontend.sln && python scripts/package.py",
     "install": "pip install -r requirements.txt",
-    "frontend": "dotnet run --project SRAFrontend/SRAFrontend.csproj",
+    "frontend": "dotnet run --project SRAFrontend/SRAFrontend.Desktop/SRAFrontend.Desktop.csproj",
     "pyl10nc": "python scripts/pyl10nc/__main__.py SRACore/localization/resource.toml",
+    "ver": "python scripts/update_version.py",
     "ver:release": "python scripts/update_version.py -r",
     "ver:patch": "python scripts/update_version.py -i",
     "modelgen": "python scripts/model_gen.py SRAFrontend/SRAFrontend/Models/AppSettings.cs -o SRACore/models/app_settings.py && python scripts/model_gen.py SRAFrontend/SRAFrontend/Models/TasksConfig.cs -o SRACore/models/tasks_config.py",

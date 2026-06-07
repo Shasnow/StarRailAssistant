@@ -28,10 +28,10 @@ import subprocess
 import sys
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
-from urllib.request import urlopen
 
 ROOT_PATH = Path(__file__).resolve().parent.parent
-WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Desktop" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
+DESKTOP_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Desktop" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
+SERVER_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
 DIST_DIR = ROOT_PATH / "main.dist"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
@@ -51,10 +51,40 @@ def add_to_zip(zipf: ZipFile, path: Path, base_path: Path | None = None):
             zipf.write(file, file.relative_to(base_path))
 
 
-def copy_json_tree(src: Path, dst: Path):
-    dst.mkdir(parents=True, exist_ok=True)
-    for json_file in src.glob("*.json"):
-        shutil.copy2(json_file, dst / json_file.name)
+class ZipBuilder:
+    """增量构建 zip：收集文件条目，不同阶段快照写入不同 zip。"""
+
+    def __init__(self):
+        self._entries: dict[str, Path] = {}  # arcname -> source path
+
+    def add(self, path: Path, base_path: Path | None = None):
+        if base_path is None:
+            base_path = path.parent
+        if not path.exists():
+            print(f"  [WARN] Skipping non-existent path: {path}")
+            return
+        if path.is_file():
+            self._entries[str(path.relative_to(base_path))] = path
+            return
+        for file in sorted(path.rglob("*")):
+            if file.is_file():
+                self._entries[str(file.relative_to(base_path))] = file
+
+    def add_file(self, file: Path, arcname: str):
+        self._entries[arcname] = file
+
+    def snapshot(self, zip_path: Path):
+        """将当前所有条目写入 zip 文件。"""
+        with ZipFile(zip_path, "w", compression=ZIP_DEFLATED) as zipf:
+            for arcname, src in self._entries.items():
+                zipf.write(src, arcname)
+        print(f"[OK] {zip_path.name} ({len(self._entries)} files)")
+
+
+def collect_core_files(builder: ZipBuilder):
+    """收集 Core 层文件：Nuitka 产物 + 资源文件。"""
+    for item in DIST_DIR.iterdir():
+        builder.add(item)
 
 
 def nuitka_build(version: str):
@@ -83,31 +113,6 @@ def nuitka_build(version: str):
         sys.exit(1)
     print("[OK] Python program built successfully")
 
-
-def embed_python():
-    print("Embedding Python ...")
-    from io import BytesIO
-
-    Path.mkdir(DIST_DIR, parents=True, exist_ok=True)
-    print("Downing Python embedded package ...")
-    with urlopen(PYTHON31210_URL) as response:
-        with ZipFile(BytesIO(response.read())) as zipf:
-            zipf.extractall(DIST_DIR / "python")
-    print("Enabling site...")
-    with open(DIST_DIR / "python" / "python312._pth", "w", encoding="utf-8") as file:
-        file.write("python312.zip\n.\n\n# Uncomment to run site.main() automatically\nimport site\n")
-    print("Downing get-pip.py")
-    with urlopen(GET_PIP_URL) as response:
-        with open("get-pip.py", "wb") as file:
-            file.write(response.read())
-    print("Installing pip...")
-    subprocess.run([DIST_DIR / "python" / "python.exe", "get-pip.py"], check=True)
-    subprocess.run([DIST_DIR / "python" / "python.exe", "-m", "pip", "install", "--upgrade", "pip"], check=True)
-    print("Installing dependencies ...")
-    subprocess.run([DIST_DIR / "python" / "python.exe", "-m", "pip", "install", "setuptools", "wheel"], check=True)
-    subprocess.run([DIST_DIR / "python" / "python.exe", "-m", "pip", "install", "-r", "requirements.txt"], check=True)
-    print("[OK]")
-
 def copy_core_resources(dist: Path):
     print("Copying resources ...")
     dist.mkdir(parents=True, exist_ok=True)
@@ -126,36 +131,17 @@ def copy_core_resources(dist: Path):
     print("[OK] Resources copied")
 
 
-def package_core(version: str):
-    print("Packaging Core ...")
-    core_zip_path = ROOT_PATH / f"StarRailAssistant_Core_v{version}.zip"
-    with ZipFile(core_zip_path, "w", compression=ZIP_DEFLATED) as zipf:
-        for item in DIST_DIR.iterdir():
-            add_to_zip(zipf, item)
-    print(f"[OK] Core package: {core_zip_path.name}")
-
-
 def package_lite(version: str):
     print("Packaging Lite ...")
     lite_zip_path = ROOT_PATH / f"StarRailAssistant_Lite_v{version}.zip"
     with ZipFile(lite_zip_path, "w", compression=ZIP_DEFLATED) as zipf:
-        for file in WIN_X64_PUBLISH_PATH.iterdir():
+        for file in DESKTOP_WIN_X64_PUBLISH_PATH.iterdir():
             add_to_zip(zipf, file)
         for item in ["SRACore", "tasks", "resources"]:
             add_to_zip(zipf, ROOT_PATH / item)
         for file in ["main.py", "README.md", "LICENSE", "requirements.txt", "requirements-linux.txt"]:
             add_to_zip(zipf, ROOT_PATH / file)
     print(f"[OK] Lite package: {lite_zip_path.name}")
-
-
-def package_full(version: str):
-    shutil.copytree(WIN_X64_PUBLISH_PATH, DIST_DIR, dirs_exist_ok=True)
-    print("Packaging Full ...")
-    full_zip_path = ROOT_PATH / f"StarRailAssistant_v{version}.zip"
-    with ZipFile(full_zip_path, "w", compression=ZIP_DEFLATED) as zipf:
-        for file in DIST_DIR.iterdir():
-            add_to_zip(zipf, file)
-    print(f"[OK] Full package: {full_zip_path.name}")
 
 
 if __name__ == "__main__":
@@ -167,12 +153,35 @@ if __name__ == "__main__":
         changelog = f.read()
 
     nuitka_build(version)
-    # embed_python()
     copy_core_resources(DIST_DIR)
 
-    package_core(version)
+    # Lite（独立流程，不使用 ZipBuilder）
     package_lite(version)
-    package_full(version)
+
+    # Core → Basic → Full 增量构建
+    builder = ZipBuilder()
+
+    print("Packaging Core ...")
+    collect_core_files(builder)
+    builder.snapshot(ROOT_PATH / f"StarRailAssistant_Core_v{version}.zip")
+
+    print("Packaging Basic ...")
+    builder.add(DESKTOP_WIN_X64_PUBLISH_PATH, DESKTOP_WIN_X64_PUBLISH_PATH)
+    builder.snapshot(ROOT_PATH / f"StarRailAssistant_v{version}.zip")
+
+    print("Packaging Full ...")
+    builder.add(SERVER_WIN_X64_PUBLISH_PATH, SERVER_WIN_X64_PUBLISH_PATH)
+    builder.snapshot(ROOT_PATH / f"StarRailAssistant_Full_v{version}.zip")
+
+    print("Packaging ServerDLC ...")
+    server_dlc = ZipBuilder()
+    server_dlc.add(SERVER_WIN_X64_PUBLISH_PATH, SERVER_WIN_X64_PUBLISH_PATH)
+    server_dlc.snapshot(ROOT_PATH / f"StarRailAssistant_ServerDLC_v{version}.zip")
+
+    print("Packaging DesktopDLC ...")
+    desktop_dlc = ZipBuilder()
+    desktop_dlc.add(DESKTOP_WIN_X64_PUBLISH_PATH, DESKTOP_WIN_X64_PUBLISH_PATH)
+    desktop_dlc.snapshot(ROOT_PATH / f"StarRailAssistant_DesktopDLC_v{version}.zip")
 
     if DIST_DIR.exists():
         shutil.rmtree(DIST_DIR)
