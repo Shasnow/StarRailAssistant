@@ -81,55 +81,6 @@ nothing to do with it.
 
 ⬇️ 下载链接：[SRA](https://github.com/Shasnow/StarRailAssistant/releases/latest)
 
-<div style="display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: linear-gradient(to right, #2F3F4C, #576574); border-radius: 8px;">
-  <div>
-    <h3 style="margin: 0; color: #FFFFFF;">下载 StarRailAssistant 标准版</h3>
-    <p style="margin: 0; color: #8BC53F;">包含1件物品：
-      <span style="color: #B0AEA3;">StarRailAssistant_Core</span>
-    </p>
-  </div>
-  <div style="display: flex; align-items: center; margin-left: auto; gap: 12px;">
-    <div style="display: flex; align-items: stretch;">
-      <span style="background-color: #4C6B22; font-weight: bold; color: #BEEE11; padding: 6px 8px; border-radius: 4px 0 0 4px;">-100%</span>
-      <span style="font-weight: bold; color: #BEEE11; background-color: #344654; padding: 6px 8px; border-radius: 0 4px 4px 0;">￥0.00</span>
-    </div>
-    <a href="https://github.com/Shasnow/StarRailAssistant/releases/latest" style="background: linear-gradient(to right, #75B022, #588A1B); color: #D2EFA9; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; white-space: nowrap;">添加至购物车</a>
-  </div>
-</div>
-<div style="display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: linear-gradient(to right, #2F3F4C, #576574); border-radius: 8px;">
-  <div>
-    <h3 style="margin: 0; color: #FFFFFF;">下载 StarRailAssistant 豪华版</h3>
-    <p style="margin: 0; color: #8BC53F;">包含2件物品：
-      <span style="color: #B0AEA3;">StarRailAssistant_Core</span>
-      <span style="color: #B0AEA3;">StarRailAssistant_DesktopDLC</span>
-    </p>
-  </div>
-  <div style="display: flex; align-items: center; margin-left: auto; gap: 12px;">
-    <div style="display: flex; align-items: stretch;">
-      <span style="background-color: #4C6B22; font-weight: bold; color: #BEEE11; padding: 6px 8px; border-radius: 4px 0 0 4px;">-100%</span>
-      <span style="font-weight: bold; color: #BEEE11; background-color: #344654; padding: 6px 8px; border-radius: 0 4px 4px 0;">￥0.00</span>
-    </div>
-    <a href="https://github.com/Shasnow/StarRailAssistant/releases/latest" style="background: linear-gradient(to right, #75B022, #588A1B); color: #D2EFA9; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; white-space: nowrap;">添加至购物车</a>
-  </div>
-</div>
-<div style="display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: linear-gradient(to right, #2F3F4C, #576574); border-radius: 8px;">
-  <div>
-    <h3 style="margin: 0; color: #FFFFFF;">下载 StarRailAssistant 尊享版</h3>
-    <p style="margin: 0; color: #8BC53F;">包含3件物品：
-      <span style="color: #B0AEA3;">StarRailAssistant_Core</span>
-      <span style="color: #B0AEA3;">StarRailAssistant_DesktopDLC</span>
-      <span style="color: #B0AEA3;">StarRailAssistant_ServerDLC</span>
-    </p>
-  </div>
-  <div style="display: flex; align-items: center; margin-left: auto; gap: 12px;">
-    <div style="display: flex; align-items: stretch;">
-      <span style="background-color: #4C6B22; font-weight: bold; color: #BEEE11; padding: 6px 8px; border-radius: 4px 0 0 4px;">-100%</span>
-      <span style="font-weight: bold; color: #BEEE11; background-color: #344654; padding: 6px 8px; border-radius: 0 4px 4px 0;">￥0.00</span>
-    </div>
-    <a href="https://github.com/Shasnow/StarRailAssistant/releases/latest" style="background: linear-gradient(to right, #75B022, #588A1B); color: #D2EFA9; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; white-space: nowrap;">添加至购物车</a>
-  </div>
-</div>
-
 下载说明: [ChangeLog2.0.md](ChangeLog2.0.md)
 
 运行时要求：
