@@ -9,7 +9,7 @@
     "pyl10nc": "python scripts/pyl10nc/__main__.py SRACore/localization/resource.toml",
     "ver:release": "python scripts/update_version.py -r",
     "ver:patch": "python scripts/update_version.py -i",
-    "modelgen": "python scripts/model_gen.py SRAFrontend/Models/AppSettings.cs -o SRACore/models/app_settings.py && python scripts/model_gen.py SRAFrontend/Models/TasksConfig.cs -o SRACore/models/tasks_config.py",
+    "modelgen": "python scripts/model_gen.py SRAFrontend/SRAFrontend/Models/AppSettings.cs -o SRACore/models/app_settings.py && python scripts/model_gen.py SRAFrontend/SRAFrontend/Models/TasksConfig.cs -o SRACore/models/tasks_config.py",
     "clean": "python scripts/clean.py"
   }
 }

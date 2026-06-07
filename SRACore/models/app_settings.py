@@ -42,76 +42,76 @@ class AppSettings:
 class GeneralSettings:
     """自动生成的 GeneralSettings 类"""
 
-    gamePaths: list[str] = field(default_factory=list)
     gamePathIndex: int = 0
+    gamePaths: list[str] = field(default_factory=list)
     isAutoDetectGamePath: bool = True
+    isGameArgsEnabled: bool = False
+    gameArgsFullScreenMode: str = "窗口化"
+    gameArgsWindowSize: str = "1920x1080"
+    isGameArgsPopupWindow: bool = False
+    isUseCmd: bool = False
+    gameArgsAdvanced: str = ""
     isCloudGameEnable: bool = False
     cloudGameBrowser: str = "Microsoft Edge"
-    templateMatchConfidence: float = 0.9
-    ocrMatchConfidence: float = 0.7
-    isOverlayEnabled: bool = False
-    isGameArgsEnabled: bool = False
-    gameArgsWindowSize: str = "1920x1080"
-    gameArgsFullScreenMode: str = "窗口化"
-    isGameArgsPopupWindow: bool = False
-    gameArgsAdvanced: str = ""
-    isUseCmd: bool = False
-    hotkeyStop: str = "F9"
+    hotkeyE: str = "E"
     hotkeyF1: str = "F1"
     hotkeyF2: str = "F2"
     hotkeyF3: str = "F3"
     hotkeyF4: str = "F4"
-    hotkeyE: str = "E"
+    hotkeyStop: str = "F9"
+    isOverlayEnabled: bool = False
+    ocrMatchConfidence: float = 0.7
+    templateMatchConfidence: float = 0.9
 
     def to_dict(self) -> dict:
         """转换为字典"""
         return {
-            "gamePath.uris": self.gamePaths,
             "gamePath.index": self.gamePathIndex,
+            "gamePath.uris": self.gamePaths,
             "gamePath.autoDetect": self.isAutoDetectGamePath,
+            "gameArgs.enabled": self.isGameArgsEnabled,
+            "gameArgs.fullScreenMode": self.gameArgsFullScreenMode,
+            "gameArgs.windowSize": self.gameArgsWindowSize,
+            "gameArgs.popupWindow": self.isGameArgsPopupWindow,
+            "gameArgs.useCmd": self.isUseCmd,
+            "gameArgs.advanced": self.gameArgsAdvanced,
             "cloudGame.enabled": self.isCloudGameEnable,
             "cloudGame.browser": self.cloudGameBrowser,
-            "templateMatchConfidence": self.templateMatchConfidence,
-            "ocrMatchConfidence": self.ocrMatchConfidence,
-            "overlay.enabled": self.isOverlayEnabled,
-            "gameArgs.enabled": self.isGameArgsEnabled,
-            "gameArgs.windowSize": self.gameArgsWindowSize,
-            "gameArgs.fullScreenMode": self.gameArgsFullScreenMode,
-            "gameArgs.popupWindow": self.isGameArgsPopupWindow,
-            "gameArgs.advanced": self.gameArgsAdvanced,
-            "gameArgs.useCmd": self.isUseCmd,
-            "keybindings.stop": self.hotkeyStop,
+            "keybindings.e": self.hotkeyE,
             "keybindings.f1": self.hotkeyF1,
             "keybindings.f2": self.hotkeyF2,
             "keybindings.f3": self.hotkeyF3,
             "keybindings.f4": self.hotkeyF4,
-            "keybindings.e": self.hotkeyE
+            "keybindings.stop": self.hotkeyStop,
+            "overlay.enabled": self.isOverlayEnabled,
+            "ocrMatchConfidence": self.ocrMatchConfidence,
+            "templateMatchConfidence": self.templateMatchConfidence
         }
 
     @classmethod
     def from_dict(cls, data: dict):
         """从字典创建对象"""
         return cls(**{
-            "gamePaths": data.get("gamePath.uris", list()),
             "gamePathIndex": data.get("gamePath.index", 0),
+            "gamePaths": data.get("gamePath.uris", list()),
             "isAutoDetectGamePath": data.get("gamePath.autoDetect", True),
+            "isGameArgsEnabled": data.get("gameArgs.enabled", False),
+            "gameArgsFullScreenMode": data.get("gameArgs.fullScreenMode", "窗口化"),
+            "gameArgsWindowSize": data.get("gameArgs.windowSize", "1920x1080"),
+            "isGameArgsPopupWindow": data.get("gameArgs.popupWindow", False),
+            "isUseCmd": data.get("gameArgs.useCmd", False),
+            "gameArgsAdvanced": data.get("gameArgs.advanced", ""),
             "isCloudGameEnable": data.get("cloudGame.enabled", False),
             "cloudGameBrowser": data.get("cloudGame.browser", "Microsoft Edge"),
-            "templateMatchConfidence": data.get("templateMatchConfidence", 0.9),
-            "ocrMatchConfidence": data.get("ocrMatchConfidence", 0.7),
-            "isOverlayEnabled": data.get("overlay.enabled", False),
-            "isGameArgsEnabled": data.get("gameArgs.enabled", False),
-            "gameArgsWindowSize": data.get("gameArgs.windowSize", "1920x1080"),
-            "gameArgsFullScreenMode": data.get("gameArgs.fullScreenMode", "窗口化"),
-            "isGameArgsPopupWindow": data.get("gameArgs.popupWindow", False),
-            "gameArgsAdvanced": data.get("gameArgs.advanced", ""),
-            "isUseCmd": data.get("gameArgs.useCmd", False),
-            "hotkeyStop": data.get("keybindings.stop", "F9"),
+            "hotkeyE": data.get("keybindings.e", "E"),
             "hotkeyF1": data.get("keybindings.f1", "F1"),
             "hotkeyF2": data.get("keybindings.f2", "F2"),
             "hotkeyF3": data.get("keybindings.f3", "F3"),
             "hotkeyF4": data.get("keybindings.f4", "F4"),
-            "hotkeyE": data.get("keybindings.e", "E")
+            "hotkeyStop": data.get("keybindings.stop", "F9"),
+            "isOverlayEnabled": data.get("overlay.enabled", False),
+            "ocrMatchConfidence": data.get("ocrMatchConfidence", 0.7),
+            "templateMatchConfidence": data.get("templateMatchConfidence", 0.9)
         })
 
 @dataclass
@@ -122,6 +122,12 @@ class DisplaySettings:
     backgroundOpacity: float = 1
     controlPanelOpacity: float = 0.9
     language: int = 0
+    isRememberWindow: bool = False
+    WindowState: int = 0
+    WindowPositionX: int = 0
+    WindowPositionY: int = 0
+    WindowWidth: float = 0.0
+    WindowHeight: float = 0.0
 
     def to_dict(self) -> dict:
         """转换为字典"""
@@ -129,7 +135,13 @@ class DisplaySettings:
             "backgroundImage.uri": self.backgroundImageUri,
             "backgroundImage.opacity": self.backgroundOpacity,
             "controlPanel.opacity": self.controlPanelOpacity,
-            "language": self.language
+            "language": self.language,
+            "window.remember": self.isRememberWindow,
+            "window.state": self.WindowState,
+            "window.position.x": self.WindowPositionX,
+            "window.position.y": self.WindowPositionY,
+            "window.width": self.WindowWidth,
+            "window.height": self.WindowHeight
         }
 
     @classmethod
@@ -139,7 +151,13 @@ class DisplaySettings:
             "backgroundImageUri": data.get("backgroundImage.uri", ""),
             "backgroundOpacity": data.get("backgroundImage.opacity", 1),
             "controlPanelOpacity": data.get("controlPanel.opacity", 0.9),
-            "language": data.get("language", 0)
+            "language": data.get("language", 0),
+            "isRememberWindow": data.get("window.remember", False),
+            "WindowState": data.get("window.state", 0),
+            "WindowPositionX": data.get("window.position.x", 0),
+            "WindowPositionY": data.get("window.position.y", 0),
+            "WindowWidth": data.get("window.width", 0.0),
+            "WindowHeight": data.get("window.height", 0.0)
         })
 
 @dataclass
@@ -148,116 +166,116 @@ class NotificationSettings:
 
     isEnabled: bool = False
     isSystemEnabled: bool = False
-    isEmailEnabled: bool = False
-    smtpServer: str = ""
-    smtpPort: int = 465
-    smtpSender: str = ""
-    EncryptedSmtpAuthCode: str = ""
-    smtpReceiver: str = ""
-    isWebhookEnabled: bool = False
-    webhookUrl: str = ""
-    isTelegramEnabled: bool = False
-    telegramBotToken: str = ""
-    telegramChatId: str = ""
-    isTelegramProxyEnabled: bool = False
-    telegramProxyUrl: str = "http://127.0.0.1:7890"
-    telegramApiBaseUrl: str = "https://api.telegram.org"
-    isTelegramSendImage: bool = False
-    isServerChanEnabled: bool = False
-    serverChanSendKey: str = ""
-    isOneBotEnabled: bool = False
-    oneBotUrl: str = ""
-    oneBotUserId: str = ""
-    oneBotGroupId: str = ""
-    oneBotToken: str = ""
-    isOneBotSendImage: bool = False
     isBarkEnabled: bool = False
-    barkServerUrl: str = "https://api.day.app"
+    barkCiphertext: str = ""
     barkDeviceKey: str = ""
     barkGroup: str = "StarRailAssistant"
-    barkLevel: str = ""
-    barkSound: str = ""
     barkIcon: str = ""
-    barkCiphertext: str = ""
+    barkLevel: str = ""
+    barkServerUrl: str = "https://api.day.app"
+    barkSound: str = ""
+    isDingTalkEnabled: bool = False
+    dingTalkSecret: str = ""
+    dingTalkWebhookUrl: str = ""
+    isDiscordEnabled: bool = False
+    isDiscordSendImage: bool = False
+    discordWebhookUrl: str = ""
     isFeishuEnabled: bool = False
-    feishuWebhookUrl: str = ""
     feishuAppId: str = ""
     feishuAppSecret: str = ""
     feishuReceiveId: str = ""
     feishuReceiveIdType: str = ""
+    feishuWebhookUrl: str = ""
+    isOneBotEnabled: bool = False
+    isOneBotSendImage: bool = False
+    oneBotGroupId: str = ""
+    oneBotToken: str = ""
+    oneBotUrl: str = ""
+    oneBotUserId: str = ""
+    isServerChanEnabled: bool = False
+    serverChanSendKey: str = ""
+    isTelegramEnabled: bool = False
+    isTelegramProxyEnabled: bool = False
+    isTelegramSendImage: bool = False
     isWeComEnabled: bool = False
-    weComWebhookUrl: str = ""
     isWeComSendImage: bool = False
-    isDingTalkEnabled: bool = False
-    dingTalkWebhookUrl: str = ""
-    dingTalkSecret: str = ""
-    isDiscordEnabled: bool = False
-    discordWebhookUrl: str = ""
-    isDiscordSendImage: bool = False
+    weComWebhookUrl: str = ""
+    isWebhookEnabled: bool = False
+    webhookUrl: str = ""
     isXxtuiEnabled: bool = False
+    isEmailEnabled: bool = False
+    smtpPort: int = 465
+    smtpReceiver: str = ""
+    smtpSender: str = ""
+    smtpServer: str = ""
+    EncryptedSmtpAuthCode: str = ""
+    telegramApiBaseUrl: str = "https://api.telegram.org"
+    telegramBotToken: str = ""
+    telegramChatId: str = ""
+    telegramProxyUrl: str = "http://127.0.0.1:7890"
     xxtuiApiKey: str = ""
-    xxtuiSource: str = ""
     xxtuiChannel: str = ""
-    onStart: list[str] = field(default_factory=list)
+    xxtuiSource: str = ""
     onCompleted: list[str] = field(default_factory=list)
+    onStart: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         """转换为字典"""
         return {
             "enabled": self.isEnabled,
             "system.enabled": self.isSystemEnabled,
-            "email.enabled": self.isEmailEnabled,
-            "email.smtpServer": self.smtpServer,
-            "email.smtpPort": self.smtpPort,
-            "email.smtpSender": self.smtpSender,
-            "email.smtpAuthCode": self.EncryptedSmtpAuthCode,
-            "email.smtpReceiver": self.smtpReceiver,
-            "webhook.enabled": self.isWebhookEnabled,
-            "webhook.url": self.webhookUrl,
-            "telegram.enabled": self.isTelegramEnabled,
-            "telegram.botToken": self.telegramBotToken,
-            "telegram.chatId": self.telegramChatId,
-            "telegram.proxyEnabled": self.isTelegramProxyEnabled,
-            "telegram.proxyUrl": self.telegramProxyUrl,
-            "telegram.apiBaseUrl": self.telegramApiBaseUrl,
-            "telegram.sendImage": self.isTelegramSendImage,
-            "serverChan.enabled": self.isServerChanEnabled,
-            "serverChan.sendKey": self.serverChanSendKey,
-            "oneBot.enabled": self.isOneBotEnabled,
-            "oneBot.url": self.oneBotUrl,
-            "oneBot.userId": self.oneBotUserId,
-            "oneBot.groupId": self.oneBotGroupId,
-            "oneBot.token": self.oneBotToken,
-            "oneBot.sendImage": self.isOneBotSendImage,
             "bark.enabled": self.isBarkEnabled,
-            "bark.serverUrl": self.barkServerUrl,
+            "bark.ciphertext": self.barkCiphertext,
             "bark.deviceKey": self.barkDeviceKey,
             "bark.group": self.barkGroup,
-            "bark.level": self.barkLevel,
-            "bark.sound": self.barkSound,
             "bark.icon": self.barkIcon,
-            "bark.ciphertext": self.barkCiphertext,
+            "bark.level": self.barkLevel,
+            "bark.serverUrl": self.barkServerUrl,
+            "bark.sound": self.barkSound,
+            "dingTalk.enabled": self.isDingTalkEnabled,
+            "dingTalk.secret": self.dingTalkSecret,
+            "dingTalk.webhookUrl": self.dingTalkWebhookUrl,
+            "discord.enabled": self.isDiscordEnabled,
+            "discord.sendImage": self.isDiscordSendImage,
+            "discord.webhookUrl": self.discordWebhookUrl,
             "feishu.enabled": self.isFeishuEnabled,
-            "feishu.webhookUrl": self.feishuWebhookUrl,
             "feishu.appId": self.feishuAppId,
             "feishu.appSecret": self.feishuAppSecret,
             "feishu.receiveId": self.feishuReceiveId,
             "feishu.receiveIdType": self.feishuReceiveIdType,
+            "feishu.webhookUrl": self.feishuWebhookUrl,
+            "oneBot.enabled": self.isOneBotEnabled,
+            "oneBot.sendImage": self.isOneBotSendImage,
+            "oneBot.groupId": self.oneBotGroupId,
+            "oneBot.token": self.oneBotToken,
+            "oneBot.url": self.oneBotUrl,
+            "oneBot.userId": self.oneBotUserId,
+            "serverChan.enabled": self.isServerChanEnabled,
+            "serverChan.sendKey": self.serverChanSendKey,
+            "telegram.enabled": self.isTelegramEnabled,
+            "telegram.proxyEnabled": self.isTelegramProxyEnabled,
+            "telegram.sendImage": self.isTelegramSendImage,
             "weCom.enabled": self.isWeComEnabled,
-            "weCom.webhookUrl": self.weComWebhookUrl,
             "weCom.sendImage": self.isWeComSendImage,
-            "dingTalk.enabled": self.isDingTalkEnabled,
-            "dingTalk.webhookUrl": self.dingTalkWebhookUrl,
-            "dingTalk.secret": self.dingTalkSecret,
-            "discord.enabled": self.isDiscordEnabled,
-            "discord.webhookUrl": self.discordWebhookUrl,
-            "discord.sendImage": self.isDiscordSendImage,
+            "weCom.webhookUrl": self.weComWebhookUrl,
+            "webhook.enabled": self.isWebhookEnabled,
+            "webhook.url": self.webhookUrl,
             "xxtui.enabled": self.isXxtuiEnabled,
+            "email.enabled": self.isEmailEnabled,
+            "email.smtpPort": self.smtpPort,
+            "email.smtpReceiver": self.smtpReceiver,
+            "email.smtpSender": self.smtpSender,
+            "email.smtpServer": self.smtpServer,
+            "email.smtpAuthCode": self.EncryptedSmtpAuthCode,
+            "telegram.apiBaseUrl": self.telegramApiBaseUrl,
+            "telegram.botToken": self.telegramBotToken,
+            "telegram.chatId": self.telegramChatId,
+            "telegram.proxyUrl": self.telegramProxyUrl,
             "xxtui.apiKey": self.xxtuiApiKey,
-            "xxtui.source": self.xxtuiSource,
             "xxtui.channel": self.xxtuiChannel,
-            "onStart": self.onStart,
-            "onCompleted": self.onCompleted
+            "xxtui.source": self.xxtuiSource,
+            "onCompleted": self.onCompleted,
+            "onStart": self.onStart
         }
 
     @classmethod
@@ -266,89 +284,89 @@ class NotificationSettings:
         return cls(**{
             "isEnabled": data.get("enabled", False),
             "isSystemEnabled": data.get("system.enabled", False),
-            "isEmailEnabled": data.get("email.enabled", False),
-            "smtpServer": data.get("email.smtpServer", ""),
-            "smtpPort": data.get("email.smtpPort", 465),
-            "smtpSender": data.get("email.smtpSender", ""),
-            "EncryptedSmtpAuthCode": data.get("email.smtpAuthCode", ""),
-            "smtpReceiver": data.get("email.smtpReceiver", ""),
-            "isWebhookEnabled": data.get("webhook.enabled", False),
-            "webhookUrl": data.get("webhook.url", ""),
-            "isTelegramEnabled": data.get("telegram.enabled", False),
-            "telegramBotToken": data.get("telegram.botToken", ""),
-            "telegramChatId": data.get("telegram.chatId", ""),
-            "isTelegramProxyEnabled": data.get("telegram.proxyEnabled", False),
-            "telegramProxyUrl": data.get("telegram.proxyUrl", "http://127.0.0.1:7890"),
-            "telegramApiBaseUrl": data.get("telegram.apiBaseUrl", "https://api.telegram.org"),
-            "isTelegramSendImage": data.get("telegram.sendImage", False),
-            "isServerChanEnabled": data.get("serverChan.enabled", False),
-            "serverChanSendKey": data.get("serverChan.sendKey", ""),
-            "isOneBotEnabled": data.get("oneBot.enabled", False),
-            "oneBotUrl": data.get("oneBot.url", ""),
-            "oneBotUserId": data.get("oneBot.userId", ""),
-            "oneBotGroupId": data.get("oneBot.groupId", ""),
-            "oneBotToken": data.get("oneBot.token", ""),
-            "isOneBotSendImage": data.get("oneBot.sendImage", False),
             "isBarkEnabled": data.get("bark.enabled", False),
-            "barkServerUrl": data.get("bark.serverUrl", "https://api.day.app"),
+            "barkCiphertext": data.get("bark.ciphertext", ""),
             "barkDeviceKey": data.get("bark.deviceKey", ""),
             "barkGroup": data.get("bark.group", "StarRailAssistant"),
-            "barkLevel": data.get("bark.level", ""),
-            "barkSound": data.get("bark.sound", ""),
             "barkIcon": data.get("bark.icon", ""),
-            "barkCiphertext": data.get("bark.ciphertext", ""),
+            "barkLevel": data.get("bark.level", ""),
+            "barkServerUrl": data.get("bark.serverUrl", "https://api.day.app"),
+            "barkSound": data.get("bark.sound", ""),
+            "isDingTalkEnabled": data.get("dingTalk.enabled", False),
+            "dingTalkSecret": data.get("dingTalk.secret", ""),
+            "dingTalkWebhookUrl": data.get("dingTalk.webhookUrl", ""),
+            "isDiscordEnabled": data.get("discord.enabled", False),
+            "isDiscordSendImage": data.get("discord.sendImage", False),
+            "discordWebhookUrl": data.get("discord.webhookUrl", ""),
             "isFeishuEnabled": data.get("feishu.enabled", False),
-            "feishuWebhookUrl": data.get("feishu.webhookUrl", ""),
             "feishuAppId": data.get("feishu.appId", ""),
             "feishuAppSecret": data.get("feishu.appSecret", ""),
             "feishuReceiveId": data.get("feishu.receiveId", ""),
             "feishuReceiveIdType": data.get("feishu.receiveIdType", ""),
+            "feishuWebhookUrl": data.get("feishu.webhookUrl", ""),
+            "isOneBotEnabled": data.get("oneBot.enabled", False),
+            "isOneBotSendImage": data.get("oneBot.sendImage", False),
+            "oneBotGroupId": data.get("oneBot.groupId", ""),
+            "oneBotToken": data.get("oneBot.token", ""),
+            "oneBotUrl": data.get("oneBot.url", ""),
+            "oneBotUserId": data.get("oneBot.userId", ""),
+            "isServerChanEnabled": data.get("serverChan.enabled", False),
+            "serverChanSendKey": data.get("serverChan.sendKey", ""),
+            "isTelegramEnabled": data.get("telegram.enabled", False),
+            "isTelegramProxyEnabled": data.get("telegram.proxyEnabled", False),
+            "isTelegramSendImage": data.get("telegram.sendImage", False),
             "isWeComEnabled": data.get("weCom.enabled", False),
-            "weComWebhookUrl": data.get("weCom.webhookUrl", ""),
             "isWeComSendImage": data.get("weCom.sendImage", False),
-            "isDingTalkEnabled": data.get("dingTalk.enabled", False),
-            "dingTalkWebhookUrl": data.get("dingTalk.webhookUrl", ""),
-            "dingTalkSecret": data.get("dingTalk.secret", ""),
-            "isDiscordEnabled": data.get("discord.enabled", False),
-            "discordWebhookUrl": data.get("discord.webhookUrl", ""),
-            "isDiscordSendImage": data.get("discord.sendImage", False),
+            "weComWebhookUrl": data.get("weCom.webhookUrl", ""),
+            "isWebhookEnabled": data.get("webhook.enabled", False),
+            "webhookUrl": data.get("webhook.url", ""),
             "isXxtuiEnabled": data.get("xxtui.enabled", False),
+            "isEmailEnabled": data.get("email.enabled", False),
+            "smtpPort": data.get("email.smtpPort", 465),
+            "smtpReceiver": data.get("email.smtpReceiver", ""),
+            "smtpSender": data.get("email.smtpSender", ""),
+            "smtpServer": data.get("email.smtpServer", ""),
+            "EncryptedSmtpAuthCode": data.get("email.smtpAuthCode", ""),
+            "telegramApiBaseUrl": data.get("telegram.apiBaseUrl", "https://api.telegram.org"),
+            "telegramBotToken": data.get("telegram.botToken", ""),
+            "telegramChatId": data.get("telegram.chatId", ""),
+            "telegramProxyUrl": data.get("telegram.proxyUrl", "http://127.0.0.1:7890"),
             "xxtuiApiKey": data.get("xxtui.apiKey", ""),
-            "xxtuiSource": data.get("xxtui.source", ""),
             "xxtuiChannel": data.get("xxtui.channel", ""),
-            "onStart": data.get("onStart", list()),
-            "onCompleted": data.get("onCompleted", list())
+            "xxtuiSource": data.get("xxtui.source", ""),
+            "onCompleted": data.get("onCompleted", list()),
+            "onStart": data.get("onStart", list())
         })
 
 @dataclass
 class UpdateSettings:
     """自动生成的 UpdateSettings 类"""
 
-    isCheckForUpdates: bool = True
-    isAutoUpdate: bool = False
-    EncryptedMirrorChyanCdk: str = ""
     downloadChannel: int = 0
+    isAutoUpdate: bool = False
+    isCheckForUpdates: bool = True
     updateChannel: int = 0
+    EncryptedMirrorChyanCdk: str = ""
 
     def to_dict(self) -> dict:
         """转换为字典"""
         return {
-            "checkForUpdates": self.isCheckForUpdates,
-            "autoUpdate": self.isAutoUpdate,
-            "mirrorChyanCdk": self.EncryptedMirrorChyanCdk,
             "downloadChannel": self.downloadChannel,
-            "updateChannel": self.updateChannel
+            "autoUpdate": self.isAutoUpdate,
+            "checkForUpdates": self.isCheckForUpdates,
+            "updateChannel": self.updateChannel,
+            "mirrorChyanCdk": self.EncryptedMirrorChyanCdk
         }
 
     @classmethod
     def from_dict(cls, data: dict):
         """从字典创建对象"""
         return cls(**{
-            "isCheckForUpdates": data.get("checkForUpdates", True),
-            "isAutoUpdate": data.get("autoUpdate", False),
-            "EncryptedMirrorChyanCdk": data.get("mirrorChyanCdk", ""),
             "downloadChannel": data.get("downloadChannel", 0),
-            "updateChannel": data.get("updateChannel", 0)
+            "isAutoUpdate": data.get("autoUpdate", False),
+            "isCheckForUpdates": data.get("checkForUpdates", True),
+            "updateChannel": data.get("updateChannel", 0),
+            "EncryptedMirrorChyanCdk": data.get("mirrorChyanCdk", "")
         })
 
 @dataclass
@@ -356,23 +374,27 @@ class AdvancedSettings:
     """自动生成的 AdvancedSettings 类"""
 
     backendLaunchArgs: str = "--inline"
-    isDeveloperModeEnabled: bool = False
-    isSaveOcrImage: bool = False
+    isRemoteEnabled: bool = False
+    remoteBaseUrl: str = "http://localhost:5000"
     isDebugOverlayEnabled: bool = False
+    isDeveloperModeEnabled: bool = False
     isPythonEnabled: bool = False
-    pythonPath: str = ""
+    isSaveOcrImage: bool = False
     pythonMain: str = ""
+    pythonPath: str = ""
 
     def to_dict(self) -> dict:
         """转换为字典"""
         return {
             "backend.launchArgs": self.backendLaunchArgs,
-            "developerMode.enabled": self.isDeveloperModeEnabled,
-            "developerMode.saveOcrImage": self.isSaveOcrImage,
+            "backend.remote.enabled": self.isRemoteEnabled,
+            "backend.remote.baseUrl": self.remoteBaseUrl,
             "developerMode.overlay": self.isDebugOverlayEnabled,
+            "developerMode.enabled": self.isDeveloperModeEnabled,
             "developerMode.python.enabled": self.isPythonEnabled,
-            "developerMode.python.path": self.pythonPath,
-            "developerMode.python.main": self.pythonMain
+            "developerMode.saveOcrImage": self.isSaveOcrImage,
+            "developerMode.python.main": self.pythonMain,
+            "developerMode.python.path": self.pythonPath
         }
 
     @classmethod
@@ -380,10 +402,12 @@ class AdvancedSettings:
         """从字典创建对象"""
         return cls(**{
             "backendLaunchArgs": data.get("backend.launchArgs", "--inline"),
-            "isDeveloperModeEnabled": data.get("developerMode.enabled", False),
-            "isSaveOcrImage": data.get("developerMode.saveOcrImage", False),
+            "isRemoteEnabled": data.get("backend.remote.enabled", False),
+            "remoteBaseUrl": data.get("backend.remote.baseUrl", "http://localhost:5000"),
             "isDebugOverlayEnabled": data.get("developerMode.overlay", False),
+            "isDeveloperModeEnabled": data.get("developerMode.enabled", False),
             "isPythonEnabled": data.get("developerMode.python.enabled", False),
-            "pythonPath": data.get("developerMode.python.path", ""),
-            "pythonMain": data.get("developerMode.python.main", "")
+            "isSaveOcrImage": data.get("developerMode.saveOcrImage", False),
+            "pythonMain": data.get("developerMode.python.main", ""),
+            "pythonPath": data.get("developerMode.python.path", "")
         })
