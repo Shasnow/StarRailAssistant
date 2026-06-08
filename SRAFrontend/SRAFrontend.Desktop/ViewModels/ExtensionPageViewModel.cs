@@ -27,7 +27,7 @@ public class ExtensionPageViewModel(IBackendService backendService) : PageViewMo
         {
             _skipPlot = value;
             OnPropertyChanged();
-            _ = backendService.SendInputAsync($"trigger set --type AutoPlotTrigger skip_plot {value}");
+            _ = backendService.SendInputAsync($"trigger set AutoPlotTrigger skip_plot --type bool {value}");
         }
     }
 }
