@@ -128,6 +128,7 @@ class RRIMG:
     NAMELESS_HONOR_REWARD_RECEIVE = f"{BASE}/nameless_honor_reward_receive.png"
     NAMELESS_HONOR_TASK = f"{BASE}/nameless_honor_task.png"
     NAMELESS_HONOR_TASK_RECEIVE = f"{BASE}/nameless_honor_task_receive.png"
+    NAMELESS_HONOR_START = f"{BASE}/nameless_honor_start.png"
     NEXT_CODE = f"{BASE}/next_code.png"
     ORDER = f"{BASE}/order.png"
     REDEEM_CODE = f"{BASE}/redeem_code.png"

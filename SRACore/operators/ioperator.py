@@ -232,7 +232,7 @@ class IOperator(ABC):
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
         if self.stop_event is not None and self.stop_event.is_set():
-            raise RuntimeError("Operation stopped")
+            raise ThreadStoppedError("Operation stopped")
         try:
             if self.ocr_engine is None:
                 self.ocr_engine = IOperator._get_ocr_instance()
@@ -408,7 +408,7 @@ class IOperator(ABC):
         """
         ...
 
-    def click_box(self, box: Box, x_offset: int | float = 0, y_offset: int | float = 0, after_sleep: float = 0) -> bool:
+    def click_box(self, box: Box | None, x_offset: int | float = 0, y_offset: int | float = 0, after_sleep: float = 0) -> bool:
         """
         点击Box区域中心
         
@@ -421,6 +421,9 @@ class IOperator(ABC):
         Returns:
             bool: 点击成功返回True，否则返回False
         """
+        if box is None:
+            logger.debug("Click box failed: Box is None")
+            return False
         x, y = box.center
         logger.debug(
             f"Click box center:({x}, {y}), source: {box.source}, offset:({x_offset}, {y_offset}), wait {after_sleep}s")

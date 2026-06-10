@@ -3,18 +3,16 @@ from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
 from tasks.img import DUIMG, IMG, RRIMG
 
+
 @task(order=2)
 class ReceiveRewardsTask(BaseTask):
     def _post_init(self):
-        self.config_name=self.config.Name
+        self.config_name = self.config.Name
 
     def run(self):
         # 初始化任务
         tasks, tasks2 = self._init_tasks()
         logger.info("领取奖励")
-        # 校验界面状态
-        if not self._prepare_ui():
-            return False
 
         # 执行任务组1（esc界面完成）
         if tasks and not self._execute_tasks_with_args(tasks):
@@ -62,12 +60,11 @@ class ReceiveRewardsTask(BaseTask):
     def _execute_tasks_with_args(self, tasks):
         """执行需要传参的任务列表"""
         # 打开ESC菜单
-        self.operator.press_key("esc")
-        if not self.operator.wait_ocr("开拓", timeout=20, from_x=0.656, from_y=0.222, to_x=0.740, to_y=0.278):
+        if not self.goto_esc():
             return False
 
-        for task, args in tasks:
-            task(*args)
+        for t, args in tasks:
+            t(*args)
             self.operator.sleep(1)
         else:
             self.operator.sleep(2)  # 所有任务完成后等待2秒
@@ -76,8 +73,8 @@ class ReceiveRewardsTask(BaseTask):
 
     def _execute_tasks_without_args(self, tasks):
         """执行无参数的任务列表"""
-        for task in tasks:
-            task()
+        for t in tasks:
+            t()
             self.operator.sleep(1)
         else:
             return True
@@ -85,8 +82,8 @@ class ReceiveRewardsTask(BaseTask):
     def trailblazer_profile(self):
         """Mission trailblaze profile"""
         logger.info("执行任务：签证奖励")
-        if self.operator.click_point(0.92,0.10, after_sleep=1):
-            if self.operator.click_point(0.82,0.13, after_sleep=1):
+        if self.operator.click_point(0.92, 0.10, after_sleep=1):
+            if self.operator.click_point(0.82, 0.13, after_sleep=1):
                 if self.operator.click_img(RRIMG.ASSISTANCE_REWARD):
                     self.operator.sleep(1)
                     self.operator.press_key("esc", presses=2, interval=1.2)
@@ -99,7 +96,7 @@ class ReceiveRewardsTask(BaseTask):
             logger.info("没有可领取的奖励3")
         logger.info("任务完成：签证奖励")
 
-    def redeem_code(self, redeem_codes:str):
+    def redeem_code(self, redeem_codes: str):
         """Fills in redeem code and redeems them.
 
         Note:
@@ -110,7 +107,7 @@ class ReceiveRewardsTask(BaseTask):
             None
         """
         logger.info("执行任务：领取兑换码")
-        redeem_code_list=redeem_codes.split()
+        redeem_code_list = redeem_codes.split()
         if len(redeem_code_list) == 0:
             logger.warning("未填写兑换码")
         for code in redeem_code_list:
@@ -134,7 +131,7 @@ class ReceiveRewardsTask(BaseTask):
     def mail(self):
         """Open mailbox and pick up mails."""
         logger.info("执行任务：领取邮件")
-        if self.operator.click_point(0.97,0.25, after_sleep=1.5, tag="点击邮件"):
+        if self.operator.click_point(0.97, 0.25, after_sleep=1.5, tag="点击邮件"):
             if self.operator.click_img(RRIMG.CLAIM_ALL_MAIL):
                 self.operator.sleep(2)
                 self.operator.press_key("esc", presses=2, interval=1)
@@ -156,7 +153,7 @@ class ReceiveRewardsTask(BaseTask):
             return
         self.operator.press_key(self.settings.General.hotkeyF1.lower())
         self.operator.sleep(1)
-        target=self.operator.ocr_match("巡星之礼")
+        target = self.operator.ocr_match("巡星之礼")
         if target is None:
             logger.info("没有巡星之礼活动")
             self.operator.press_key("esc")
@@ -229,18 +226,48 @@ class ReceiveRewardsTask(BaseTask):
         self.operator.press_key("esc")
         logger.info("任务完成：领取每日实训奖励")
 
+    def goto_f2(self) -> bool:
+        logger.info("前往无名勋礼页面")
+        max_attempts = 5
+        for _ in range(max_attempts):
+            index, box = self.operator.wait_any_img([IMG.ENTER, IMG.F2, RRIMG.NAMELESS_HONOR_START], timeout=20)
+            if index == 0:
+                self.operator.press_key(self.settings.General.hotkeyF2.lower())
+            elif index == 1:
+                return True  # 到达F2页面
+            elif index == 2:
+                self.operator.click_box(box)  # 新一期无名勋礼的开启提示
+            else:
+                logger.info("前往无名勋礼页面超时")
+                return False
+        logger.info("前往无名勋礼页面超过最大尝试次数")
+        return False
+
+    def goto_esc(self) -> bool:
+        logger.info("前往ESC界面")
+        max_attempts = 5
+        for _ in range(max_attempts):
+            index, box = self.operator.wait_any([
+                lambda : self.operator.locate(IMG.ENTER),
+                lambda : self.operator.ocr_match("开拓", from_x=0.656, from_y=0.222, to_x=0.740, to_y=0.278)],
+                timeout=20, interval=1
+            )
+            if index == 0:
+                self.operator.press_key("esc")
+                self.operator.sleep(0.5)
+            elif index == 1:
+                return True  # 到达ESC界面
+            else:
+                logger.info("前往ESC界面超时")
+                return False
+        logger.info("前往ESC界面超过最大尝试次数")
+        return False
+
     def nameless_honor(self):
         """Receive nameless honor reward"""
         logger.info("执行任务：领取无名勋礼奖励")
-        if not self.operator.wait_img(IMG.ENTER):
-            logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待主界面超时"))
-            return
-        self.operator.press_key(self.settings.General.hotkeyF2.lower())
-        if not self.operator.wait_img(IMG.F2, timeout=20):
-            logger.warning(SRAError(ErrorCode.WAIT_TIMEOUT, "等待纪行界面超时"))
-            if not self.operator.locate(IMG.ENTER):
-                self.operator.press_key("esc")
-            return
+        if not self.goto_f2():
+            return False
         self.operator.sleep(1)
 
         if self.operator.click_img(RRIMG.NAMELESS_HONOR_TASK, after_sleep=2):
@@ -253,6 +280,7 @@ class ReceiveRewardsTask(BaseTask):
         self.operator.sleep(1)
         self.operator.press_key("esc")
         logger.info("完成任务：领取无名勋礼奖励")
+        return True
 
     def synthesis(self):
         if self.operator.click_img(RRIMG.SYNTHESIS, y_offset=330):
@@ -273,7 +301,7 @@ class ReceiveRewardsTask(BaseTask):
             if self.operator.click_img(DUIMG.CLOSE):
                 logger.info("合成完毕，返回领取奖励")
             self.operator.sleep(1.5)
-            self.operator.press_key("esc",presses=1, interval=1.5)
+            self.operator.press_key("esc", presses=1, interval=1.5)
             self.operator.sleep(1)
             self.operator.click_img(RRIMG.DAILY_REWARD, after_sleep=0.5)
             logger.info("领取奖励")
@@ -319,7 +347,7 @@ class ReceiveRewardsTask(BaseTask):
                 logger.info("未能找到升级材料")
                 return False
             self.operator.sleep(2)
-            self.operator.press_key("esc",presses=2, interval=1.5)
+            self.operator.press_key("esc", presses=2, interval=1.5)
             self.operator.sleep(1)
             logger.info("升级完毕，准备返回领取奖励")
             self.operator.click_img(RRIMG.DAILY_REWARD, after_sleep=0.5)
@@ -337,7 +365,3 @@ class ReceiveRewardsTask(BaseTask):
             self.operator.wait_ocr("背包", from_x=0.05, from_y=0.03, to_x=0.1, to_y=0.08, interval=0.5)
             self.send_notification(f"任务 {self.__class__.__name__} 执行完成。", "success")
             self.operator.press_key('esc')
-
-
-
-
