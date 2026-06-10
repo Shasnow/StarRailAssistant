@@ -2,6 +2,7 @@ import tomllib
 from typing import Any, Callable, TypedDict
 
 from SRACore.models.tasks_config import TrailblazePowerTaskItem
+from SRACore.operators.model import Box
 from SRACore.task import BaseTask, task
 from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
@@ -488,9 +489,11 @@ class TrailblazePowerTask(BaseTask):
         level_path = TPIMG.level(level_belonging, level)
         if not self.find_session(level_belonging, scroll_flag):
             return False
-        if not self.find_level(level_path):
+        level_box = self.find_level(level_path)
+        if not level_box:
             return False
-        if self.operator.click_img(level_path, x_offset=x_add, y_offset=y_add):
+        if self.operator.click_box(level_box, x_offset=x_add, y_offset=y_add):
+            self.operator.click_img(IMG.ENSURE2)  # 确认切换视角
             if not self._battle_after_enter(multi, run_time):
                 return False
         logger.info(f"任务完成：{mission_name}")
@@ -618,7 +621,7 @@ class TrailblazePowerTask(BaseTask):
             logger.info("战斗结束")
             return index
 
-    def find_level(self, level: str) -> bool:
+    def find_level(self, level: str) -> Box | None:
         """Fine battle level
 
         Returns:
@@ -629,10 +632,11 @@ class TrailblazePowerTask(BaseTask):
         while True:
             times += 1
             if times == 20:
-                return False
+                return None
             self.operator.sleep(0.5)
-            if self.operator.locate(level):
-                return True
+            box = self.operator.locate(level)
+            if box:
+                return box
             else:
                 for _ in range(12):
                     self.operator.scroll(-1)
