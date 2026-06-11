@@ -31,6 +31,7 @@ public class SettingsService(ILogger<SettingsService> logger)
         if (!File.Exists(DataPath.SettingsJson))
         {
             _logger.LogInformation("Settings file not found, using default settings");
+            Save();  // 立即创建设置文件
             return;
         }
         var settingsJson = File.ReadAllText(DataPath.SettingsJson);
