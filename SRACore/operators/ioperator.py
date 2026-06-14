@@ -36,7 +36,10 @@ class IOperator(ABC):
     def _get_ocr_instance(cls):
         """获取OCR引擎实例"""
         if cls.ocr_engine is None:
-            cls.ocr_engine = RapidOCR(config_path= AppRootDir / 'rapidocr_onnxruntime/config.yaml')
+            config_path = AppRootDir / 'rapidocr_onnxruntime' / 'config.yaml'
+            if not config_path.exists():
+                config_path = None
+            cls.ocr_engine = RapidOCR(config_path = config_path)
         return cls.ocr_engine
 
     @abstractmethod

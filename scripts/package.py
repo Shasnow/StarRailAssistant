@@ -35,6 +35,7 @@ SERVER_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" /
 DIST_DIR = ROOT_PATH / "main.dist"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
+SITE_PACKAGES_DIR = Path(sys.executable).parent.parent / "Lib" / "site-packages"
 
 
 def add_to_zip(zipf: ZipFile, path: Path, base_path: Path | None = None):
@@ -126,7 +127,9 @@ def copy_core_resources(dist: Path):
     shutil.copy2(ROOT_PATH / "SRACore" / "localization" / "resource_en-us.json", DIST_DIR / "SRACore" / "localization" / "resource_en-us.json")
     shutil.copy2(ROOT_PATH / "SRACore" / "localization" / "resource_zh-cn.json", DIST_DIR / "SRACore" / "localization" / "resource_zh-cn.json")
     shutil.copytree(ROOT_PATH / "resources", dist / "resources")
-    shutil.copytree(ROOT_PATH / "rapidocr_onnxruntime", dist / "rapidocr_onnxruntime")
+    (dist / "rapidocr_onnxruntime").mkdir(parents=True, exist_ok=True)
+    shutil.copytree(SITE_PACKAGES_DIR / "rapidocr_onnxruntime" / "models", dist / "rapidocr_onnxruntime" / "models")
+    shutil.copy2(SITE_PACKAGES_DIR / "rapidocr_onnxruntime" / "config.yaml", dist / "rapidocr_onnxruntime" / "config.yaml")
     shutil.copytree(ROOT_PATH / "tasks", dist / "tasks")
     print("[OK] Resources copied")
 
