@@ -35,8 +35,14 @@ SERVER_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" /
 DIST_DIR = ROOT_PATH / "main.dist"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
-SITE_PACKAGES_DIR = Path(sys.executable).parent.parent / "Lib" / "site-packages"
-
+SITE_PACKAGES_DIR = None
+for p in sys.path[1:]:
+    if p.endswith("site-packages"):
+        SITE_PACKAGES_DIR = Path(p)
+        break
+if SITE_PACKAGES_DIR is None:
+    print(f"[ERROR] Could not find site-packages directory in sys.path: {sys.path}")
+    sys.exit(1)
 
 def add_to_zip(zipf: ZipFile, path: Path, base_path: Path | None = None):
     if base_path is None:
