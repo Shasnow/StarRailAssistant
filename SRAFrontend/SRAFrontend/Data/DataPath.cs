@@ -21,7 +21,7 @@ public static class DataPath
     public static readonly string ReportsDir = Path.Combine(AppRoot, "reports");
     public static readonly string SourceCodeDir = Path.Combine(AppRoot, "SRA");
     public static readonly string StrategiesDir = Path.Combine(AppRoot, "tasks", "currency_wars", "strategies");
-    public static readonly string PythonDir = Path.Combine(AppRoot, "python");
+    private static readonly string PythonDir = Path.Combine(AppRoot, "python");
 
     public static readonly string SraExecutablePath = GetSraExecutablePath();
     public static readonly string SraOldExecutablePath = GetSraOldExecutablePath();
@@ -77,6 +77,9 @@ public static class DataPath
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             return Path.Combine(desktop, "SRA.desktop");
 
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            return Path.Combine(desktop, "SRA.dylib");
+        
         throw new PlatformNotSupportedException();
     }
 
@@ -84,12 +87,5 @@ public static class DataPath
     {
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
-    }
-
-    private static string GetPythonExe()
-    {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return Path.Combine(PythonDir, "bin", "python3");
-        var venv = Path.Combine(PythonDir, "Scripts", "python.exe");
-        return File.Exists(venv) ? venv : Path.Combine(PythonDir, "python.exe");
     }
 }
