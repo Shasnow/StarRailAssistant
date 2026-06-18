@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -21,37 +22,57 @@ public class AppSettings
 
 public partial class GeneralSettings : ObservableObject
 {
-    [ObservableProperty] [property: JsonPropertyName("gamePath.index")]
+    [ObservableProperty]
+    [property: JsonPropertyName("gamePath.index")]
+    [property: Description("游戏路径索引，指向 gamePath.uris 中的一个 URI")]
     private int _gamePathIndex;
 
-    [ObservableProperty] [property: JsonPropertyName("gamePath.uris")]
+    [ObservableProperty]
+    [property: JsonPropertyName("gamePath.uris")]
+    [property: Description("游戏路径列表，支持多个路径以便快速切换")]
     private ObservableCollection<string> _gamePaths = [];
 
-    [ObservableProperty] [property: JsonPropertyName("gamePath.autoDetect")]
+    [ObservableProperty]
+    [property: JsonPropertyName("gamePath.autoDetect")]
+    [property: Description("是否自动检测游戏路径，启用后将扫描常见安装位置以找到游戏路径")]
     private bool _isAutoDetectGamePath = true;
 
-    [ObservableProperty] [property: JsonPropertyName("gameArgs.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("gameArgs.enabled")]
+    [property: Description("是否启用游戏启动参数，启用后将使用下面的参数启动游戏")]
     private bool _isGameArgsEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("gameArgs.fullScreenMode")]
+    [ObservableProperty]
+    [property: JsonPropertyName("gameArgs.fullScreenMode")]
     private string _gameArgsFullScreenMode = "窗口化";
 
-    [ObservableProperty] [property: JsonPropertyName("gameArgs.windowSize")]
+    [ObservableProperty]
+    [property: JsonPropertyName("gameArgs.windowSize")]
     private string _gameArgsWindowSize = "1920x1080";
 
-    [ObservableProperty] [property: JsonPropertyName("gameArgs.popupWindow")]
+    [ObservableProperty]
+    [property: JsonPropertyName("gameArgs.popupWindow")]
+    [property: Description("是否使用无边框游戏窗口")]
     private bool _isGameArgsPopupWindow;
 
-    [ObservableProperty] [property: JsonPropertyName("gameArgs.useCmd")]
+    [ObservableProperty]
+    [property: JsonPropertyName("gameArgs.useCmd")]
+    [property: Description("是否使用命令行启动游戏（避免一些直接启动导致的问题）")]
     private bool _isUseCmd;
 
-    [ObservableProperty] [property: JsonPropertyName("gameArgs.advanced")]
+    [ObservableProperty]
+    [property: JsonPropertyName("gameArgs.advanced")]
+    [property: Description("高级启动参数，直接传递给游戏进程，覆盖其他参数设置")]
     private string _gameArgsAdvanced = "";
 
-    [ObservableProperty] [property: JsonPropertyName("cloudGame.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("cloudGame.enabled")]
+    [property: Description("是否使用云游戏")]
     private bool _isCloudGameEnable;
 
-    [ObservableProperty] [property: JsonPropertyName("cloudGame.browser")]
+    [ObservableProperty]
+    [property: JsonPropertyName("cloudGame.browser")]
+    [property: Description("云游戏使用的浏览器")]
     private string _cloudGameBrowser = "Microsoft Edge";
 
     [ObservableProperty] [property: JsonPropertyName("keybindings.e")]
@@ -72,34 +93,54 @@ public partial class GeneralSettings : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("keybindings.stop")]
     private string _hotkeyStop = "F9";
 
-    [ObservableProperty] [property: JsonPropertyName("overlay.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("overlay.enabled")]
+    [property: Description("是否启用叠加层")]
     private bool _isOverlayEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("ocrMatchConfidence")]
+    [ObservableProperty]
+    [property: JsonPropertyName("ocrMatchConfidence")]
+    [property: Description("OCR 识图置信度，范围 0-1，数值越高越严格")]
+    [property: DefaultValue(0.7)]
     private double _ocrMatchConfidence = 0.7;
 
-    [ObservableProperty] [property: JsonPropertyName("templateMatchConfidence")]
+    [ObservableProperty]
+    [property: JsonPropertyName("templateMatchConfidence")]
+    [property: Description("模板匹配置信度（识图置信度），范围 0-1，数值越高越严格")]
+    [property: DefaultValue(0.9)]
     private double _templateMatchConfidence = 0.9;
 }
 
 public partial class DisplaySettings : ObservableObject
 {
-    [ObservableProperty] [property: JsonPropertyName("backgroundImage.uri")]
+    [ObservableProperty]
+    [property: JsonPropertyName("backgroundImage.uri")]
+    [property: Description("背景图片 URI，可以是本地路径或网络 URL")]
     private string _backgroundImageUri = "";
 
-    [ObservableProperty] [property: JsonPropertyName("backgroundImage.opacity")]
+    [ObservableProperty]
+    [property: JsonPropertyName("backgroundImage.opacity")]
+    [property: Description("背景图片不透明度，范围 0-1")]
     private double _backgroundOpacity = 1;
 
-    [ObservableProperty] [property: JsonPropertyName("controlPanel.opacity")]
+    [ObservableProperty]
+    [property: JsonPropertyName("controlPanel.opacity")]
+    [property: Description("控制面板不透明度，范围 0-1")]
     private double _controlPanelOpacity = 0.9;
 
-    [ObservableProperty] [property: JsonPropertyName("language")]
+    [ObservableProperty]
+    [property: JsonPropertyName("language")]
+    [property: Description("界面语言，0=中文, 2=English")]
     private int _language;
 
-    [ObservableProperty] [property: JsonPropertyName("window.remember")]
+    [ObservableProperty]
+    [property: JsonPropertyName("window.remember")]
+    [property: Description("是否记住窗口位置和大小")]
     private bool _isRememberWindow;
 
-    [JsonPropertyName("window.state")] public int WindowState { get; set; }
+    [JsonPropertyName("window.state")]
+    [Description("窗口状态，0=正常, 1=最小化, 2=最大化")]
+    public int WindowState { get; set; }
 
     [JsonPropertyName("window.position.x")]
     public int WindowPositionX { get; set; }
@@ -282,50 +323,80 @@ public partial class NotificationSettings : ObservableObject
 
 public partial class UpdateSettings : ObservableObject
 {
-    [ObservableProperty] [property: JsonPropertyName("downloadChannel")]
+    [ObservableProperty]
+    [property: JsonPropertyName("downloadChannel")]
+    [property: Description("下载渠道，0=Mirror Chyan, 1=Github Release, 2=AUTO-MAS")]
     private int _downloadChannel;
 
-    [ObservableProperty] [property: JsonPropertyName("autoUpdate")]
+    [ObservableProperty]
+    [property: JsonPropertyName("autoUpdate")]
+    [property: Description("是否启用自动更新: 将在有更新时直接开始下载")]
     private bool _isAutoUpdate;
 
-    [ObservableProperty] [property: JsonPropertyName("checkForUpdates")]
+    [ObservableProperty]
+    [property: JsonPropertyName("checkForUpdates")]
+    [property: Description("是否启用检查更新功能: 将在启动时检查更新并提示用户")]
     private bool _isCheckForUpdates = true;
 
-    [ObservableProperty] [property: JsonIgnore]
+    [ObservableProperty]
+    [property: JsonIgnore]
     private string _mirrorChyanCdk = "";
 
-    [ObservableProperty] [property: JsonPropertyName("updateChannel")]
+    [ObservableProperty]
+    [property: JsonPropertyName("updateChannel")]
+    [property: Description("更新频道，0=Stable, 1=Beta")]
     private int _updateChannel;
 
-    [JsonPropertyName("mirrorChyanCdk")] public string EncryptedMirrorChyanCdk { get; set; } = "";
+    [JsonPropertyName("mirrorChyanCdk")]
+    [Description("Mirror Chyan 下载渠道的授权码，敏感信息将被加密存储")]
+    public string EncryptedMirrorChyanCdk { get; set; } = "";
 }
 
 public partial class AdvancedSettings : ObservableObject
 {
-    [ObservableProperty] [property: JsonPropertyName("backend.launchArgs")]
+    [ObservableProperty]
+    [property: JsonPropertyName("backend.launchArgs")]
+    [property: Description("后端启动参数")]
+    [property: DefaultValue("--inline")]
     private string _backendLaunchArgs = "--inline";
 
-    [ObservableProperty] [property: JsonPropertyName("backend.remote.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("backend.remote.enabled")]
+    [property: Description("是否使用远程后端")]
     private bool _isRemoteEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("backend.remote.baseUrl")]
+    [ObservableProperty]
+    [property: JsonPropertyName("backend.remote.baseUrl")]
+    [property: Description("远程后端地址")]
     private string _remoteBaseUrl = "http://localhost:5000";
 
-    [ObservableProperty] [property: JsonPropertyName("developerMode.overlay")]
+    [ObservableProperty]
+    [property: JsonPropertyName("developerMode.overlay")]
+    [property: Description("是否在叠加层显示调试信息")]
     private bool _isDebugOverlayEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("developerMode.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("developerMode.enabled")]
+    [property: Description("是否启用开发者模式")]
     private bool _isDeveloperModeEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("developerMode.python.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("developerMode.python.enabled")]
+    [property: Description("是否启用 Python 后端")]
     private bool _isPythonEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("developerMode.saveOcrImage")]
+    [ObservableProperty]
+    [property: JsonPropertyName("developerMode.saveOcrImage")]
+    [property: Description("是否保存 OCR 截图以便调试")]
     private bool _isSaveOcrImage;
 
-    [ObservableProperty] [property: JsonPropertyName("developerMode.python.main")]
+    [ObservableProperty]
+    [property: JsonPropertyName("developerMode.python.main")]
+    [property: Description("Python 后端主脚本路径，通常为 main.py")]
     private string _pythonMain = "";
 
-    [ObservableProperty] [property: JsonPropertyName("developerMode.python.path")]
+    [ObservableProperty]
+    [property: JsonPropertyName("developerMode.python.path")]
+    [property: Description("Python 解释器路径，通常为 python.exe 的路径")]
     private string _pythonPath = "";
 }

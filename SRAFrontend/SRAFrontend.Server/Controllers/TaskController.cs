@@ -21,10 +21,9 @@ public class TaskController(
     [EndpointSummary("运行任务")]
     [EndpointDescription(
         "运行任务。支持三种方式: 1) 不传 ConfigName 和 Config → 运行全部配置; 2) 通过 Config 传入完整配置，根据 Persist 决定是否持久化; 3) 通过 ConfigName 加载本地已保存的配置。")]
-    [ProducesResponseType(200, Description = "任务运行成功")]
+    [ProducesResponseType(200, Description = "已请求任务运行")]
     [ProducesResponseType(400, Description = "请求参数无效")]
     [ProducesResponseType(409, Description = "任务已在运行")]
-    [ProducesResponseType(500, Description = "发送运行命令失败")]
     public async Task<IActionResult> RunTask([FromBody] RunRequest request)
     {
         backendService.StartBackend("--no-admin --inline"); // 确保后端已启动
@@ -59,10 +58,8 @@ public class TaskController(
         }
         // 情况 1：两者都为空 → configName 为 null，运行全部配置
 
-        var ok = await backendService.TaskRunAsync(configName);
-        return ok
-            ? Ok(new R(true, "Task started"))
-            : StatusCode(500, new R(false, "Failed to send run command"));
+        await backendService.TaskRunAsync(configName);
+        return Ok(new R(true, "Task started"));
     }
 
     [HttpPost("stop")]
@@ -81,7 +78,7 @@ public class TaskController(
     [HttpGet("status")]
     [EndpointSummary("获取任务状态")]
     [EndpointDescription("获取当前任务是否正在运行")]
-    [ProducesResponseType(200, Type = typeof(bool))]
+    [ProducesResponseType(200, Type = typeof(bool), Description = "如果任务正在运行返回 true，否则返回 false")]
     public IActionResult GetStatus()
     {
         return Ok(backendService.IsTaskRunning);
@@ -90,7 +87,7 @@ public class TaskController(
     [HttpGet("logs")]
     [EndpointSummary("获取最近日志")]
     [EndpointDescription("获取最近的任务日志条目（默认100条）")]
-    [ProducesResponseType(200, Type = typeof(List<string>))]
+    [ProducesResponseType(200, Type = typeof(List<string>), Description = "一个字符串列表，每个元素为一条完整日志")]
     public IActionResult GetRecentLogs([FromQuery] int count = 100)
     {
         return Ok(logStream.GetRecentLogs(count));

@@ -30,7 +30,8 @@ public partial class MainWindowViewModel(
         "Bon voyage",
         "May your path be clear",
         "May you get to where\ndreams are all\ncrystalline and sweet",
-        "我们将在过去篆刻未来"
+        "我们将在过去篆刻未来",
+        "铁花飞，飘逸不残灰"
     ];
 
     private static readonly List<string> GreetingsEn =
