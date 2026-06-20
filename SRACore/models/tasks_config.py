@@ -174,7 +174,6 @@ class CosmicStrifeConfig:
     isCurrencyWarsEnabled: bool = False
     currencyWarsMode: int = 0
     currencyWarsDifficulty: int = 0
-    currencyWarsPolicy: int = 0
     currencyWarsRerollBossAffixes: str = ""
     currencyWarsRerollBossNames: str = ""
     currencyWarsRerollInvestEnvironments: str = ""
@@ -196,7 +195,6 @@ class CosmicStrifeConfig:
             "currencyWars.enabled": self.isCurrencyWarsEnabled,
             "currencyWars.mode": self.currencyWarsMode,
             "currencyWars.difficulty": self.currencyWarsDifficulty,
-            "currencyWars.policy": self.currencyWarsPolicy,
             "currencyWars.reroll.bossAffixes": self.currencyWarsRerollBossAffixes,
             "currencyWars.reroll.bossNames": self.currencyWarsRerollBossNames,
             "currencyWars.reroll.investEnvironments": self.currencyWarsRerollInvestEnvironments,
@@ -220,7 +218,6 @@ class CosmicStrifeConfig:
             "isCurrencyWarsEnabled": data.get("currencyWars.enabled", False),
             "currencyWarsMode": data.get("currencyWars.mode", 0),
             "currencyWarsDifficulty": data.get("currencyWars.difficulty", 0),
-            "currencyWarsPolicy": data.get("currencyWars.policy", 0),
             "currencyWarsRerollBossAffixes": data.get("currencyWars.reroll.bossAffixes", ""),
             "currencyWarsRerollBossNames": data.get("currencyWars.reroll.bossNames", ""),
             "currencyWarsRerollInvestEnvironments": data.get("currencyWars.reroll.investEnvironments", ""),

@@ -48,7 +48,6 @@ public static class ConfigMigrator
                 IsDivergentUniverseUseTechnique = config.DUUseTechnique,
                 IsCurrencyWarsEnabled = config.CurrencyWarsEnable,
                 CurrencyWarsMode = config.CurrencyWarsMode,
-                CurrencyWarsPolicy = config.CurrencyWarsPolicy,
                 CurrencyWarsRuntimes = config.CurrencyWarsRunTimes,
                 CurrencyWarsStrategy = config.CurrencyWarsStrategy,
                 CurrencyWarsStrategyIndex = config.CurrencyWarsStrategyIndex,
