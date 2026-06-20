@@ -102,7 +102,7 @@ def parse_properties(class_content: str) -> list[dict]:
     # 格式1：[property: JsonPropertyName("xxx")]\nprivate Type _name = value;
     # 格式2：[JsonPropertyName("xxx")]\npublic Type Name { get; set; } = value;
     # 支持有默认值和没有默认值的情况
-    property_pattern = r'\[(?:property:\s*)?JsonPropertyName\("([^"]+)"\)\]\s*\n?\s*(?:private|public)\s+([^\s<>]+(?:<[^>]+>)?)\s+[_]?(\w+)\s*(?:\{[^}]+\})?(?:\s*=\s*([^;]+))?;?'
+    property_pattern = r'\[(?:property:\s*)?JsonPropertyName\("([^"]+)"\)\](?:\s*\n\s*\[[^\]]*\])*\s*\n?\s*(?:private|public)\s+([^\s<>]+(?:<[^>]+>)?)\s+[_]?(\w+)\s*(?:\{[^}]+\})?(?:\s*=\s*([^;]+))?;?'
     prop_matches = re.findall(property_pattern, class_content, re.DOTALL)
 
     properties = []
