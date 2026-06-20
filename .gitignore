@@ -5,7 +5,7 @@
 # IDE / 编辑器
 /.vscode/
 **/.vs/
-/.idea
+**/.idea/
 
 # .NET 构建输出
 **/bin/
