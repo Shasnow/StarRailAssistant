@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Mvc.Authorization;
 using SRAFrontend.Server.Services;
+using SRAFrontend.Server.Utils;
 using SRAFrontend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,19 +14,39 @@ builder.Services.AddSingleton<CacheService>();
 builder.Services.AddSingleton<ConfigService>();
 builder.Services.AddSingleton<LogStreamService>();
 builder.Services.AddHostedService<HostedService>();
-builder.Services.AddControllers();
+
+// API Key 认证
+var apiKey = builder.Configuration["ApiKey"];
+var authEnabled = !string.IsNullOrWhiteSpace(apiKey);
+builder.Services.AddAuthentication(ApiKeyAuthenticationOptions.DefaultScheme)
+    .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
+        ApiKeyAuthenticationOptions.DefaultScheme, _ => { });
+if (authEnabled)
+    builder.Services.AddAuthorization();
+
+builder.Services.AddControllers(options =>
+{
+    if (authEnabled)
+        options.Filters.Add(new AuthorizeFilter());
+});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+if (!authEnabled)
+    app.Logger.LogWarning("ApiKey is not set; server is unsecured.");
+
 // Configure the HTTP request pipeline.
 app.MapOpenApi();
-app.UseSwaggerUI(options => { options.SwaggerEndpoint("/openapi/v1.json", "v1"); });
 
 // app.UseHttpsRedirection();
 
-app.UseAuthorization();
+if (authEnabled)
+{
+    app.UseAuthentication();
+    app.UseAuthorization();
+}
 
 app.MapControllers();
 
