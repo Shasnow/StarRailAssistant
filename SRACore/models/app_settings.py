@@ -16,6 +16,7 @@ class AppSettings:
     Update: UpdateSettings = None
     Advanced: AdvancedSettings = None
     Notification: NotificationSettings = None
+    WarpForecast: WarpForecastSettings = None
 
     def to_dict(self) -> dict:
         """转换为字典"""
@@ -24,7 +25,8 @@ class AppSettings:
             "display": self.Display.to_dict(),
             "update": self.Update.to_dict(),
             "advanced": self.Advanced.to_dict(),
-            "notification": self.Notification.to_dict()
+            "notification": self.Notification.to_dict(),
+            "warpForecast": self.WarpForecast.to_dict()
         }
 
     @classmethod
@@ -35,7 +37,8 @@ class AppSettings:
             "Display": DisplaySettings.from_dict(data.get("display", {})),
             "Update": UpdateSettings.from_dict(data.get("update", {})),
             "Advanced": AdvancedSettings.from_dict(data.get("advanced", {})),
-            "Notification": NotificationSettings.from_dict(data.get("notification", {}))
+            "Notification": NotificationSettings.from_dict(data.get("notification", {})),
+            "WarpForecast": WarpForecastSettings.from_dict(data.get("warpForecast", {}))
         })
 
 @dataclass
@@ -410,4 +413,101 @@ class AdvancedSettings:
             "isSaveOcrImage": data.get("developerMode.saveOcrImage", False),
             "pythonMain": data.get("developerMode.python.main", ""),
             "pythonPath": data.get("developerMode.python.path", "")
+        })
+
+@dataclass
+class WarpForecastSettings:
+    """自动生成的 WarpForecastSettings 类"""
+
+    versionStartDate: str = ""
+    versionDays: int = 42
+    previewBeforeEndDays: int = 12
+    previewStatus: str = "auto"
+    endgameRefreshIntervalDays: int = 14
+    endgameFirstRefreshOffsetDays: int = 0
+    endgameRefreshCountOverride: int = -1
+    includeTodayEndgame: bool = True
+    weeklyResetWeekday: int = 0
+    weeklyCountOverride: int = -1
+    includeTodayWeekly: bool = True
+    versionCompensationJade: int = 600
+    hasMonthlyCard: bool = False
+    dailyJadeWithoutCard: int = 60
+    dailyJadeWithCard: int = 150
+    endgameJadePerRefresh: int = 800
+    weeklyUniverseJade: int = 225
+    previewJade: int = 300
+    scanBag: bool = True
+    manualCurrentJade: int = 0
+    manualSpecialPass: int = 0
+    manualNormalPass: int = 0
+    scanEventGuide: bool = True
+    eventRewardType: str = "auto"
+    manualEventJade: int = 0
+    manualEventSpecialPass: int = 0
+    manualEventNormalPass: int = 0
+
+    def to_dict(self) -> dict:
+        """转换为字典"""
+        return {
+            "version.startDate": self.versionStartDate,
+            "version.days": self.versionDays,
+            "preview.beforeEndDays": self.previewBeforeEndDays,
+            "preview.status": self.previewStatus,
+            "endgame.refreshIntervalDays": self.endgameRefreshIntervalDays,
+            "endgame.firstRefreshOffsetDays": self.endgameFirstRefreshOffsetDays,
+            "endgame.refreshCountOverride": self.endgameRefreshCountOverride,
+            "endgame.includeToday": self.includeTodayEndgame,
+            "weekly.resetWeekday": self.weeklyResetWeekday,
+            "weekly.countOverride": self.weeklyCountOverride,
+            "weekly.includeToday": self.includeTodayWeekly,
+            "version.compensationJade": self.versionCompensationJade,
+            "monthlyCard.enabled": self.hasMonthlyCard,
+            "daily.jadeWithoutCard": self.dailyJadeWithoutCard,
+            "daily.jadeWithCard": self.dailyJadeWithCard,
+            "endgame.jadePerRefresh": self.endgameJadePerRefresh,
+            "weekly.universeJade": self.weeklyUniverseJade,
+            "preview.jade": self.previewJade,
+            "scan.bag": self.scanBag,
+            "manual.currentJade": self.manualCurrentJade,
+            "manual.specialPass": self.manualSpecialPass,
+            "manual.normalPass": self.manualNormalPass,
+            "scan.eventGuide": self.scanEventGuide,
+            "event.rewardType": self.eventRewardType,
+            "manual.eventJade": self.manualEventJade,
+            "manual.eventSpecialPass": self.manualEventSpecialPass,
+            "manual.eventNormalPass": self.manualEventNormalPass
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        """从字典创建对象"""
+        return cls(**{
+            "versionStartDate": data.get("version.startDate", ""),
+            "versionDays": data.get("version.days", 42),
+            "previewBeforeEndDays": data.get("preview.beforeEndDays", 12),
+            "previewStatus": data.get("preview.status", "auto"),
+            "endgameRefreshIntervalDays": data.get("endgame.refreshIntervalDays", 14),
+            "endgameFirstRefreshOffsetDays": data.get("endgame.firstRefreshOffsetDays", 0),
+            "endgameRefreshCountOverride": data.get("endgame.refreshCountOverride", -1),
+            "includeTodayEndgame": data.get("endgame.includeToday", True),
+            "weeklyResetWeekday": data.get("weekly.resetWeekday", 0),
+            "weeklyCountOverride": data.get("weekly.countOverride", -1),
+            "includeTodayWeekly": data.get("weekly.includeToday", True),
+            "versionCompensationJade": data.get("version.compensationJade", 600),
+            "hasMonthlyCard": data.get("monthlyCard.enabled", False),
+            "dailyJadeWithoutCard": data.get("daily.jadeWithoutCard", 60),
+            "dailyJadeWithCard": data.get("daily.jadeWithCard", 150),
+            "endgameJadePerRefresh": data.get("endgame.jadePerRefresh", 800),
+            "weeklyUniverseJade": data.get("weekly.universeJade", 225),
+            "previewJade": data.get("preview.jade", 300),
+            "scanBag": data.get("scan.bag", True),
+            "manualCurrentJade": data.get("manual.currentJade", 0),
+            "manualSpecialPass": data.get("manual.specialPass", 0),
+            "manualNormalPass": data.get("manual.normalPass", 0),
+            "scanEventGuide": data.get("scan.eventGuide", True),
+            "eventRewardType": data.get("event.rewardType", "auto"),
+            "manualEventJade": data.get("manual.eventJade", 0),
+            "manualEventSpecialPass": data.get("manual.eventSpecialPass", 0),
+            "manualEventNormalPass": data.get("manual.eventNormalPass", 0)
         })

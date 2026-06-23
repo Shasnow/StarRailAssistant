@@ -68,6 +68,7 @@ public class SettingsController(SettingsService settingsService, ILogger<Setting
             "update" => settings.Update,
             "advanced" => settings.Advanced,
             "notification" => settings.Notification,
+            "warpForecast" => settings.WarpForecast,
             _ => null
         };
     }
