@@ -141,6 +141,12 @@ jobs:
         with:
           name: StarRailAssistant_DesktopDLC_${{ env.version }}
           path: StarRailAssistant_DesktopDLC_${{ env.version }}.zip
+
+      - name: Upload Resources zip Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: StarRailAssistant_Resources_${{ env.version }}
+          path: StarRailAssistant_Resources_${{ env.version }}.zip
           
       - name: Upload Version_Info Artifact
         uses: actions/upload-artifact@v4

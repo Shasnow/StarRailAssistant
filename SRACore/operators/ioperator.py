@@ -10,7 +10,7 @@ from loguru import logger
 from rapidocr_onnxruntime import RapidOCR  # type: ignore
 
 from SRACore.operators.model import Box
-from SRACore.util.const import AppRootDir
+from SRACore.util.const import AppRootDir, LogsOCRDir
 from SRACore.util.data_persister import load_app_settings
 from SRACore.util.errors import ThreadStoppedError
 
@@ -244,7 +244,7 @@ class IOperator(ABC):
                 raise RuntimeError("Failed to capture screenshot for OCR")
             result, _ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA # type: ignore
             if self.is_save_ocr_image:
-                screenshot.save(f"log/ocr/{int(time.time())}.png")
+                screenshot.save(LogsOCRDir / f"{int(time.time())}.png")
             if trace:
                 logger.debug(f"OCR Result: {result}")
             return result

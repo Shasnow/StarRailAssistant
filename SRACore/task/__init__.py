@@ -10,6 +10,7 @@ from SRACore.localization import Resource
 from SRACore.models.tasks_config import TasksConfig
 from SRACore.notification import try_send_notification
 from SRACore.operators.ioperator import IOperator
+from SRACore.util.const import LogsScreenshotDir
 
 
 class Executable:
@@ -76,7 +77,7 @@ class BaseTask(Executable, ABC):
                 f"可能的失败原因：游戏分辨率不符合要求：1920x1080，当前：{self.operator.width}x{self.operator.height}。")
         self.send_notification(f"任务 {self.__class__.__name__} 执行失败。", "error")
         try:
-            self.operator.screenshot().save(f"log/screenshot/{self.__class__.__name__}_failed_{time.time()}.png")
+            self.operator.screenshot().save(LogsScreenshotDir / f"{self.__class__.__name__}_failed_{time.time()}.png")
         except Exception:
             pass
 

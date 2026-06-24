@@ -7,7 +7,7 @@ from plyer import notification  # type: ignore
 
 from SRACore.notification.channels.base import NotificationChannel
 from SRACore.notification.models import NotificationContext
-from SRACore.util.const import AppRootDir
+from SRACore.util.const import LogsScreenshotDir
 
 
 class SystemChannel(NotificationChannel):
@@ -21,6 +21,6 @@ class SystemChannel(NotificationChannel):
         if context.screenshot_bytes is not None:
             # 保存截图到 AppRootDir/log/screenshot/ 目录
             filename = context.message.replace(" ", "_").replace("/", "_").replace("\\", "_").replace("。","")
-            PIL.Image.open(io.BytesIO(context.screenshot_bytes)).save(f"{AppRootDir}/log/screenshot/{filename}.png")
+            PIL.Image.open(io.BytesIO(context.screenshot_bytes)).save(LogsScreenshotDir / f"{filename}.png")
         return True
 

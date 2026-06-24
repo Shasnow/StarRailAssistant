@@ -192,6 +192,13 @@ if __name__ == "__main__":
     desktop_dlc.add(DESKTOP_WIN_X64_PUBLISH_PATH, DESKTOP_WIN_X64_PUBLISH_PATH)
     desktop_dlc.snapshot(ROOT_PATH / f"StarRailAssistant_DesktopDLC_v{version}.zip")
 
+    print("Packaging Resources ...")
+    resources_zip = ZipBuilder()
+    resources_zip.add(ROOT_PATH / "tasks", ROOT_PATH / "tasks")
+    resources_zip.add(ROOT_PATH / "resources", ROOT_PATH / "resources")
+    resources_zip.add_file(ROOT_PATH / "package.json", "package.json")
+    resources_zip.snapshot(ROOT_PATH / f"StarRailAssistant_Resources_v{version}.zip")
+
     if DIST_DIR.exists():
         shutil.rmtree(DIST_DIR)
 

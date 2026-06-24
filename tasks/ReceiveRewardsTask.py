@@ -1,4 +1,5 @@
 from SRACore.task import BaseTask, task
+from SRACore.util.const import LogsScreenshotDir
 from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
 from tasks.img import DUIMG, IMG, RRIMG
@@ -222,7 +223,7 @@ class ReceiveRewardsTask(BaseTask):
                     self.operator.sleep(0.5)
             else:
                 logger.info("没有可领取的奖励")
-        self.operator.screenshot().save(f"log/daily_training_reward-{self.config_name}.png")
+        self.operator.screenshot().save( LogsScreenshotDir / f"daily_training_reward-{self.config_name}.png")
         self.operator.press_key("esc")
         logger.info("任务完成：领取每日实训奖励")
 
