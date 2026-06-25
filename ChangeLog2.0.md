@@ -21,7 +21,7 @@
 #### PyPI 上的 SRA
 - SRA-cli 已发布到 PyPI，提供更方便的使用方式。
 - 系统要求：
-  - Python 3.12 或更高版本
+  - Python 3.12
   - pipx 或 uv （可选）
   - 以管理员权限运行终端
 - 安装方法：
@@ -38,6 +38,7 @@
   - pipx 更新：`pipx upgrade starrailassistant`
   - uv 更新：`uv tool upgrade starrailassistant`
   - 更新后可能需要重新运行`init`命令以应用新配置。
+- 其他：请参阅 [SRA-cli 文档](https://starrailassistant.top/getstarted/advance.html#sracli)
 
 [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
 
