@@ -10,27 +10,85 @@
              x:DataType="viewModels:ExtensionPageViewModel">
     <suki:GlassCard>
         <suki:GroupBox Header="{x:Static lang:Resources.ExtensionText}">
-            <Grid ColumnDefinitions="Auto, Auto" RowDefinitions="Auto" ColumnSpacing="12">
-                <suki:GlassCard Grid.Column="0" Grid.Row="0" Width="200">
-                    <suki:GroupBox Header="自动对话">
-                        <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto">
-                            <Label Grid.Row="0" Content="启用" />
-                            <ToggleSwitch Grid.Row="0" Grid.Column="1" IsChecked="{Binding EnableAutoPlot}"/>
-                            <Label Grid.Row="1" Grid.Column="0" Content="跳过对话" />
-                            <ToggleSwitch Grid.Row="1" Grid.Column="1" IsChecked="{Binding SkipPlot}"/>
-                        </Grid>
-                    </suki:GroupBox>
-                </suki:GlassCard>
-                <suki:GlassCard Grid.Column="1" Grid.Row="0" Width="200">
-                    <suki:GroupBox Header="猫猫糕友人帐">
-                        <StackPanel Spacing="4">
-                            <Label Content="查询对应猫猫糕UID"/>
-                            <Button Content="寻找猫猫糕"
-                                    Click="Button_OnClick"/>
-                        </StackPanel>
-                    </suki:GroupBox>
-                </suki:GlassCard>
-            </Grid>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <Grid ColumnDefinitions="Auto, Auto, Auto" RowDefinitions="Auto" ColumnSpacing="12">
+                    <suki:GlassCard Grid.Column="0" Grid.Row="0" Width="200">
+                        <suki:GroupBox Header="自动对话">
+                            <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto">
+                                <Label Grid.Row="0" Content="启用" />
+                                <ToggleSwitch Grid.Row="0" Grid.Column="1" IsChecked="{Binding EnableAutoPlot}"/>
+                                <Label Grid.Row="1" Grid.Column="0" Content="跳过对话" />
+                                <ToggleSwitch Grid.Row="1" Grid.Column="1" IsChecked="{Binding SkipPlot}"/>
+                            </Grid>
+                        </suki:GroupBox>
+                    </suki:GlassCard>
+                    <suki:GlassCard Grid.Column="1" Grid.Row="0" Width="200">
+                        <suki:GroupBox Header="猫猫糕友人帐">
+                            <StackPanel Spacing="4">
+                                <Label Content="查询对应猫猫糕UID"/>
+                                <Button Content="寻找猫猫糕"
+                                        Click="Button_OnClick"/>
+                            </StackPanel>
+                        </suki:GroupBox>
+                    </suki:GlassCard>
+                    <suki:GlassCard Grid.Column="2" Grid.Row="0" Width="360">
+                        <suki:GroupBox Header="抽卡资源预测">
+                            <StackPanel Spacing="8">
+                                <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="6">
+                                    <Label Grid.Row="0" Content="版本起始日" VerticalAlignment="Center"
+                                           ToolTip.Tip="填写任意一个已知版本的起始日期，格式为 YYYY-MM-DD；SRA 会按版本天数自动推算当前版本。" />
+                                    <TextBox Grid.Row="0" Grid.Column="1"
+                                             Watermark="YYYY-MM-DD"
+                                             ToolTip.Tip="例如 2026-06-03。版本开始当天算作第 1 天。"
+                                             Text="{Binding WarpForecastSettings.VersionStartDate}" />
+
+                                    <Label Grid.Row="1" Content="版本天数" VerticalAlignment="Center"
+                                           ToolTip.Tip="每个版本持续天数，默认 42 天。" />
+                                    <NumericUpDown Grid.Row="1" Grid.Column="1" Minimum="1" Maximum="999"
+                                                   FormatString="0"
+                                                   ToolTip.Tip="用于从版本起始日推算版本结束日。"
+                                                   Value="{Binding WarpForecastSettings.VersionDays}" />
+
+                                    <Label Grid.Row="2" Content="月卡" VerticalAlignment="Center"
+                                           ToolTip.Tip="开启后使用有小月卡的每日星琼估算值，默认每日 150 星琼；关闭则默认每日 60 星琼。" />
+                                    <ToggleSwitch Grid.Row="2" Grid.Column="1"
+                                                  ToolTip.Tip="只影响未来每日星琼估算，不会修改游戏或账号数据。"
+                                                  IsChecked="{Binding WarpForecastSettings.HasMonthlyCard}" />
+
+                                    <Label Grid.Row="3" Content="背包扫描" VerticalAlignment="Center"
+                                           ToolTip.Tip="开启后自动识别背包第一排的星琼、星轨专票和星轨通票。" />
+                                    <ToggleSwitch Grid.Row="3" Grid.Column="1"
+                                                  ToolTip.Tip="关闭后使用手动兜底值参与计算。"
+                                                  IsChecked="{Binding WarpForecastSettings.ScanBag}" />
+
+                                    <Label Grid.Row="4" Content="奖励指南扫描" VerticalAlignment="Center"
+                                           ToolTip.Tip="开启后自动打开奖励指南并向下滑动，扫描仍可获得的奖励资源。" />
+                                    <ToggleSwitch Grid.Row="4" Grid.Column="1"
+                                                  ToolTip.Tip="关闭后使用奖励指南的手动兜底值参与计算。"
+                                                  IsChecked="{Binding WarpForecastSettings.ScanEventGuide}" />
+
+                                    <Label Grid.Row="5" Content="深渊刷新覆写" VerticalAlignment="Center"
+                                           ToolTip.Tip="手动指定当前版本剩余的深渊类刷新次数。-1 表示按版本起始日、刷新间隔和版本结束日自动计算。" />
+                                    <NumericUpDown Grid.Row="5" Grid.Column="1" Minimum="-1" Maximum="99"
+                                                   FormatString="0"
+                                                   ToolTip.Tip="深渊类玩法包括周期性刷新的末日幻影、虚构叙事、混沌回忆等；每次默认按 800 星琼估算。"
+                                                   Value="{Binding WarpForecastSettings.EndgameRefreshCountOverride}" />
+
+                                    <Label Grid.Row="6" Content="周常次数覆写" VerticalAlignment="Center"
+                                           ToolTip.Tip="手动指定当前版本剩余的周常奖励次数。-1 表示按周常刷新日和版本结束日自动计算。" />
+                                    <NumericUpDown Grid.Row="6" Grid.Column="1" Minimum="-1" Maximum="99"
+                                                   FormatString="0"
+                                                   ToolTip.Tip="周常奖励默认按每周 225 星琼估算，覆盖模拟宇宙、差分宇宙或货币战争等奖励来源。"
+                                                   Value="{Binding WarpForecastSettings.WeeklyCountOverride}" />
+                                </Grid>
+                                <Button Content="运行预测"
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding RunWarpForecastCommand}" />
+                            </StackPanel>
+                        </suki:GroupBox>
+                    </suki:GlassCard>
+                </Grid>
+            </ScrollViewer>
         </suki:GroupBox>
     </suki:GlassCard>
 </UserControl>

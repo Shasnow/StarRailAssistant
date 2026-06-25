@@ -18,6 +18,8 @@ public class AppSettings
     [JsonPropertyName("advanced")] public AdvancedSettings Advanced { get; init; } = new();
 
     [JsonPropertyName("notification")] public NotificationSettings Notification { get; init; } = new();
+
+    [JsonPropertyName("warpForecast")] public WarpForecastSettings WarpForecast { get; init; } = new();
 }
 
 public partial class GeneralSettings : ObservableObject
@@ -399,4 +401,142 @@ public partial class AdvancedSettings : ObservableObject
     [property: JsonPropertyName("developerMode.python.path")]
     [property: Description("Python 解释器路径，通常为 python.exe 的路径")]
     private string _pythonPath = "";
+}
+
+public partial class WarpForecastSettings : ObservableObject
+{
+    [ObservableProperty]
+    [property: JsonPropertyName("version.startDate")]
+    [property: Description("版本基准起始日期，格式为 YYYY-MM-DD；程序会按版本天数自动推算当前版本")]
+    private string _versionStartDate = "";
+
+    [ObservableProperty]
+    [property: JsonPropertyName("version.days")]
+    [property: Description("每个版本持续天数，默认 42 天")]
+    private int _versionDays = 42;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("preview.beforeEndDays")]
+    [property: Description("前瞻直播距离版本结束的天数，默认版本结束前 12 天")]
+    private int _previewBeforeEndDays = 12;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("preview.status")]
+    [property: Description("前瞻兑换码状态：auto 自动判断，done 已进行，not_done 未进行")]
+    private string _previewStatus = "auto";
+
+    [ObservableProperty]
+    [property: JsonPropertyName("endgame.refreshIntervalDays")]
+    [property: Description("深渊类玩法刷新间隔天数，默认 14 天")]
+    private int _endgameRefreshIntervalDays = 14;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("endgame.firstRefreshOffsetDays")]
+    [property: Description("版本起始日到首次深渊类玩法刷新的偏移天数")]
+    private int _endgameFirstRefreshOffsetDays;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("endgame.refreshCountOverride")]
+    [property: Description("剩余深渊类玩法刷新次数覆写，-1 表示自动计算")]
+    private int _endgameRefreshCountOverride = -1;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("endgame.includeToday")]
+    [property: Description("计算深渊类玩法刷新时是否包含今天")]
+    private bool _includeTodayEndgame = true;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("weekly.resetWeekday")]
+    [property: Description("周常奖励刷新星期，0=周一，6=周日")]
+    private int _weeklyResetWeekday;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("weekly.countOverride")]
+    [property: Description("剩余周常奖励次数覆写，-1 表示自动计算")]
+    private int _weeklyCountOverride = -1;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("weekly.includeToday")]
+    [property: Description("计算周常奖励时是否包含今天")]
+    private bool _includeTodayWeekly = true;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("version.compensationJade")]
+    [property: Description("版本更新补偿星琼数量，默认 600")]
+    private int _versionCompensationJade = 600;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("monthlyCard.enabled")]
+    [property: Description("是否持有小月卡，用于选择每日星琼估算值")]
+    private bool _hasMonthlyCard;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("daily.jadeWithoutCard")]
+    [property: Description("无小月卡时每日可获得星琼估算值，默认 60")]
+    private int _dailyJadeWithoutCard = 60;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("daily.jadeWithCard")]
+    [property: Description("有小月卡时每日可获得星琼估算值，默认 150")]
+    private int _dailyJadeWithCard = 150;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("endgame.jadePerRefresh")]
+    [property: Description("每次深渊类玩法刷新可获得星琼估算值，默认 800")]
+    private int _endgameJadePerRefresh = 800;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("weekly.universeJade")]
+    [property: Description("每次模拟宇宙、差分宇宙或货币战争周常可获得星琼估算值，默认 225")]
+    private int _weeklyUniverseJade = 225;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("preview.jade")]
+    [property: Description("下一版本前瞻兑换码可获得星琼估算值，默认 300")]
+    private int _previewJade = 300;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("scan.bag")]
+    [property: Description("是否自动扫描背包中的星琼、星轨专票和星轨通票")]
+    private bool _scanBag = true;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("manual.currentJade")]
+    [property: Description("当前星琼手动兜底值，自动扫描失败时使用")]
+    private int _manualCurrentJade;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("manual.specialPass")]
+    [property: Description("当前星轨专票手动兜底值，自动扫描失败时使用")]
+    private int _manualSpecialPass;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("manual.normalPass")]
+    [property: Description("当前星轨通票手动兜底值，自动扫描失败时使用")]
+    private int _manualNormalPass;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("scan.eventGuide")]
+    [property: Description("是否自动扫描奖励指南中的剩余奖励")]
+    private bool _scanEventGuide = true;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("event.rewardType")]
+    [property: Description("奖励指南奖励类型：auto 自动识别，jade 星琼，special_pass 星轨专票，normal_pass 星轨通票")]
+    private string _eventRewardType = "auto";
+
+    [ObservableProperty]
+    [property: JsonPropertyName("manual.eventJade")]
+    [property: Description("奖励指南剩余星琼手动兜底值")]
+    private int _manualEventJade;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("manual.eventSpecialPass")]
+    [property: Description("奖励指南剩余星轨专票手动兜底值")]
+    private int _manualEventSpecialPass;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("manual.eventNormalPass")]
+    [property: Description("奖励指南剩余星轨通票手动兜底值")]
+    private int _manualEventNormalPass;
 }

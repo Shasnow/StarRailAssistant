@@ -1,13 +1,18 @@
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Data;
+using SRAFrontend.Models;
 using SRAFrontend.Services;
 
 namespace SRAFrontend.Desktop.ViewModels;
 
-public class ExtensionPageViewModel(IBackendService backendService) : PageViewModel(PageName.Extension, "\uE596")
+public partial class ExtensionPageViewModel(IBackendService backendService, SettingsService settingsService) : PageViewModel(PageName.Extension, "\uE596")
 {
     private bool _enableAutoPlot;
 
     private bool _skipPlot;
+
+    public WarpForecastSettings WarpForecastSettings => settingsService.Settings.WarpForecast;
 
     public bool EnableAutoPlot
     {
@@ -29,5 +34,11 @@ public class ExtensionPageViewModel(IBackendService backendService) : PageViewMo
             OnPropertyChanged();
             _ = backendService.SendInputAsync($"trigger set AutoPlotTrigger skip_plot --type bool {value}");
         }
+    }
+
+    [RelayCommand]
+    private async Task RunWarpForecastAsync()
+    {
+        await backendService.TaskSingleAsync("WarpForecastTask");
     }
 }

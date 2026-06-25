@@ -57,6 +57,7 @@ public class SettingsService(ILogger<SettingsService> logger)
         Subscribe(Settings.Update);
         Subscribe(Settings.Display);
         Subscribe(Settings.Advanced);
+        Subscribe(Settings.WarpForecast);
         
         // 订阅所有 ObservableCollection 的 CollectionChanged 事件
         SubscribeObservableCollection(Settings.Notification.OnStart);
