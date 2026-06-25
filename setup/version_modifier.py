@@ -1,41 +1,63 @@
 import argparse
 import io
+import re
 import sys
 from pathlib import Path
+
+
+def to_numeric_version(version: str) -> str:
+    """将版本号转为 Inno Setup 要求的 x.x.x.x 纯数字格式"""
+    cleaned = version.lstrip('v')
+    # 去掉预发布后缀，如 -beta.1, -rc.2
+    cleaned = re.split(r'[-+]', cleaned)[0]
+    parts = cleaned.split('.')
+    # 补齐到 4 段
+    while len(parts) < 4:
+        parts.append('0')
+    return '.'.join(parts[:4])
 
 
 def modify_version(file_path, new_version):
     """
     修改Inno Setup脚本中的版本号
-    
+
     Args:
         file_path (str): Inno Setup脚本路径
         new_version (str): 新版本号
     """
     try:
-        # 读取文件内容
+        numeric_version = to_numeric_version(new_version)
+
         with open(file_path, 'r', encoding='utf-8') as file:
             content = file.readlines()
-        
-        # 查找并替换版本号定义行
-        modified = False
+
+        modified_version = False
+        modified_numeric = False
         for i, line in enumerate(content):
             if line.startswith('#define MyAppVersion'):
                 content[i] = f'#define MyAppVersion "{new_version}"\n'
-                modified = True
-                break
-        
-        if not modified:
+                modified_version = True
+            elif line.startswith('#define MyAppNumericVersion'):
+                content[i] = f'#define MyAppNumericVersion "{numeric_version}"\n'
+                modified_numeric = True
+
+        if not modified_version:
             print("Warning: Could not find '#define MyAppVersion' definition")
             return False
-        
-        # 写入修改后的内容
+
+        # 如果没有 MyAppNumericVersion 定义，在 MyAppVersion 后插入
+        if not modified_numeric:
+            for i, line in enumerate(content):
+                if line.startswith('#define MyAppVersion'):
+                    content.insert(i + 1, f'#define MyAppNumericVersion "{numeric_version}"\n')
+                    break
+
         with open(file_path, 'w', encoding='utf-8') as file:
             file.writelines(content)
-        
-        print(f"Successfully updated version to: {new_version}")
+
+        print(f"Successfully updated version to: {new_version} (numeric: {numeric_version})")
         return True
-        
+
     except FileNotFoundError:
         print(f"Error: Cannot find file {file_path}")
         return False

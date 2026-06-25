@@ -12,6 +12,10 @@ on:
   release:
     types: [released]
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g. 2.17.0)'
+        required: true
 
 
 permissions:
@@ -24,13 +28,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            TAG="${{ github.event.release.tag_name }}"
+            VERSION="${TAG#v}"
+          else
+            VERSION="${{ github.event.inputs.version }}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Resolved version: $VERSION"
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+      - name: Update version in pyproject.toml
+        run: |
+          sed -i 's/^version = .*/version = "${{ steps.version.outputs.version }}"/' pyproject.toml
+          echo "Updated pyproject.toml:"
+          grep '^version' pyproject.toml
+
       - name: Build release distributions
         run: |
-          # NOTE: put your own distribution build steps here.
           python -m pip install build
           python -m build
 

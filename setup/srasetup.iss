@@ -1,5 +1,6 @@
 #define MyAppName "StarRailAssistant"
 #define MyAppVersion "unknown"
+#define MyAppNumericVersion "0.0.0.0"
 #define MyAppPublisher "Shasnow"
 #define MyAppURL "https://starrailassistant.top/"
 #define MyAppExeName "SRA.exe"
@@ -9,7 +10,7 @@
 AppId={#MyAppId}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-VersionInfoVersion={#MyAppVersion}.0
+VersionInfoVersion={#MyAppNumericVersion}
 UninstallDisplayName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
