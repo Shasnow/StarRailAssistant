@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "starrailassistant"
+version = "2.17.0"
+description = "崩坏：星穹铁道自动化助手"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+requires-python = ">=3.12, <3.13"
+authors = [
+    { name = "Shasnow", email = "yukikage@qq.com" },
+]
+keywords = ["starrail", "automation", "assistant"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Games/Entertainment",
+]
+dependencies = [
+    "plyer==2.1.0",
+    "opencv-python==4.13.0.92",
+    "pillow==12.2.0",
+    "pyscreeze==1.0.1",
+    "pynput==1.8.2",
+    "psutil==7.2.2",
+    "rich==15.0.0",
+    "loguru==0.7.3",
+    "selenium==4.44.0",
+    "cmd2==3.5.1",
+    "rapidocr-onnxruntime==1.4.4",
+    "pyautogui==0.9.54; os_name == 'nt'",
+    "pyperclip==1.11.0; os_name == 'nt'",
+    "pywin32==311; os_name == 'nt'",
+    "pygetwindow==0.0.9; os_name == 'nt'",
+]
+
+[project.scripts]
+sra-cli = "SRACore.__main__:main"
+
+[project.urls]
+Homepage = "https://starrailassistant.top"
+Repository = "https://github.com/Shasnow/StarRailAssistant"
+Issues = "https://github.com/Shasnow/StarRailAssistant/issues"
+
+[tool.setuptools.packages.find]
+include = ["SRACore*"]
+
+[tool.setuptools.package-data]
+SRACore = [
+    "localization/*.toml",
+    "localization/*.json"
+]

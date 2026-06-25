@@ -1,33 +1,43 @@
 ### 主要更新内容:
-- 记忆窗口大小和位置：在设置中启用后，SRA会记住您上次关闭窗口时的大小和位置。
-- SRA-server：新增了一个新的服务端应用，您可以通过http协议与SRA进行通信。
-- 远程后端支持：桌面端可以通过HTTP连接远程SRA服务端，实现跨设备任务管理。
+- SRA-Server 新增 API Key 认证，保护服务器安全。
+- SRA-cli 已发布到 PyPI，可直接安装使用。
 
 ### 功能调整：
 - 新增抽卡资源预测扩展，可根据当前资源、奖励指南、版本周期、月卡、深渊类刷新、周常奖励和前瞻兑换码估算当前版本结束前可获得的抽卡资源。
 - 更新了任务结束后通知的截图页面，增加截图信息量。 #198
 - 更新了问候语。
+- 移除废弃的 `CurrencyWarsPolicy` 配置项。
 
 ### 问题修复：
-- 修复了SRA无法将游戏窗口移动到前台的问题。
-- 修复了云游戏模式启动游戏任务中途失败的问题。
-- 执行体力清理时被切换视角的提示卡住
-- 修复了无名勋礼更新时卡在奖励预览页面的问题。
-- 修复了首次使用SRA时，报错提示未找到settings.json的问题。
+- none
 
 ### 更新说明：
 
-#### SRA-server
-- 新增了一个新的服务端应用，您可以通过http协议与SRA进行通信。
-- 服务端应用的端口号为5000，通过`--port`选项可以自定义端口号。
-- 访问`http://localhost:5000/swagger`可以查看API文档。
+#### SRA-Server
+- 新增基于密钥的认证机制：在 `appsettings.json` 中配置 `ApiKey` 后启用，未配置时允许匿名访问。
+- 认证方式：请求头 `X-Api-Key: <your-key>`。
+- 启动时若未配置 ApiKey，会打印警告日志 `ApiKey is not set; server is unsecured.`。
 
-#### 远程后端
-- 桌面端新增远程后端模式，可通过HTTP连接远程SRA服务端执行任务。
-- 在高级设置中可启用远程后端并配置服务器地址（默认 `http://localhost:5000`）。
-- 连接后自动订阅服务端SSE日志流，实时显示远程任务输出。
-- 支持通过 `Task/run` 和 `Task/stop` API 启动和停止远程任务。
-- SSE断线后自动重连（3秒间隔）。
+#### PyPI 上的 SRA
+- SRA-cli 已发布到 PyPI，提供更方便的使用方式。
+- 系统要求：
+  - Python 3.12 或更高版本
+  - pipx 或 uv （可选）
+  - 以管理员权限运行终端
+- 安装方法：
+  - 在虚拟环境中安装：`pip install starrailassistant`
+  - 安装为全局工具：`pipx install starrailassistant`
+  - 安装为全局工具：`uv tool install starrailassistant`
+- 首次使用：
+  - 创建SRA专用文件夹：`mkdir -p starrailassistant` (如果你在虚拟环境中安装，不需要这一步)
+  - 运行初始化命令：`cd starrailassistant && sra-cli init`
+- 启动应用：
+  - 运行应用：`cd starrailassistant && sra-cli`
+- 更新应用：
+  - pip 更新：`cd starrailassistant && pip install --upgrade starrailassistant`
+  - pipx 更新：`pipx upgrade starrailassistant`
+  - uv 更新：`uv tool upgrade starrailassistant`
+  - 更新后可能需要重新运行`init`命令以应用新配置。
 
 [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
 

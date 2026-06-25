@@ -1,8 +1,8 @@
-import os.path
 import sys
 from typing import Any
 
 from loguru import logger
+from SRACore.util.const import LogsOCRDir, LogsScreenshotDir
 
 
 # 设置日志记录器
@@ -21,10 +21,8 @@ def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log", level: str = "TRACE",
                    format=log_format,
                    colorize=False, enqueue=True)
 
-    if not os.path.exists("log/ocr"):
-        os.makedirs("log/ocr")
-    if not os.path.exists("log/screenshot"):
-        os.makedirs("log/screenshot")
+    LogsOCRDir.mkdir(parents=True, exist_ok=True)
+    LogsScreenshotDir.mkdir(parents=True, exist_ok=True)
 
 
 __all__ = ["logger", "setup_logger"]

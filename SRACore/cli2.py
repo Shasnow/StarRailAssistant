@@ -1,5 +1,4 @@
 import argparse
-from re import S
 
 import cmd2
 from loguru import logger
@@ -246,6 +245,60 @@ class SRACli(cmd2.Cmd):
     # endregion
 
     # region 其他命令
+    def do_init(self, _: str):
+        """Initialize the application: download resources and create default settings/config."""
+        import io
+        import json
+        import os
+        import zipfile
+        from urllib.error import URLError, HTTPError
+        from urllib.request import Request, urlopen
+
+        from SRACore.models.tasks_config import TasksConfig
+        from SRACore.util.const import AppDataDir, ConfigsDir
+
+        # url = f"https://github.com/Shasnow/StarRailAssistant/releases/download/v{VERSION}/StarRailAssistant_Resources_v{VERSION}.zip"
+        url = f"https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant_Resource_v{VERSION}.zip"
+        self.poutput(f"Downloading resources from {url} ...")
+        try:
+            req = Request(url, headers={"User-Agent": "SRA-cli"})
+            with urlopen(req) as resp:
+                data = resp.read()
+        except (URLError, HTTPError) as e:
+            self.poutput(f"Failed to download resources: {e}")
+            return
+
+        self.poutput("Extracting resources ...")
+        cwd = os.getcwd()
+        with zipfile.ZipFile(io.BytesIO(data)) as zf:
+            zf.extractall(cwd)
+        self.poutput(f"Resources extracted to {cwd}")
+
+        # 创建设置文件
+        AppDataDir.mkdir(parents=True, exist_ok=True)
+        settings_path = AppDataDir / "settings.json"
+        if not settings_path.exists():
+            settings = AppSettings.from_dict({})
+            with open(settings_path, "w", encoding="utf-8") as f:
+                json.dump(settings.to_dict(), f, indent=2, ensure_ascii=False)
+            self.poutput(f"Created settings file: {settings_path}")
+        else:
+            self.poutput(f"Settings file already exists: {settings_path}")
+
+        # 创建默认配置文件
+        ConfigsDir.mkdir(parents=True, exist_ok=True)
+        config_path = ConfigsDir / "Default.json"
+        if not config_path.exists():
+            config = TasksConfig.from_dict({"name": "Default"})
+            with open(config_path, "w", encoding="utf-8") as f:
+                json.dump(config.to_dict(), f, indent=2, ensure_ascii=False)
+            self.poutput(f"Created default config: {config_path}")
+        else:
+            self.poutput(f"Default config already exists: {config_path}")
+
+        self.poutput("Initialization completed.")
+        return True
+
     def do_version(self, _: str):
         """Show version information"""
         self.poutput(f"{VERSION}")

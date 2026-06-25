@@ -27,3 +27,6 @@ else:
     AppDataDir = Path.home() / ".config" / "SRA"
 ConfigsDir = AppDataDir / "configs"
 CacheDir = AppDataDir / "cache"
+LogsDir = Path("log")
+LogsOCRDir = LogsDir / "ocr"
+LogsScreenshotDir = LogsDir / "screenshot"
