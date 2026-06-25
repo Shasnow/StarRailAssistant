@@ -60,7 +60,6 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 [Code]
 const
   WM_SETTINGCHANGE = $001A;
-  HWND_BROADCAST = $FFFF;
 
 procedure BroadcastEnvironmentChange;
 begin
