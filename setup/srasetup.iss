@@ -43,7 +43,7 @@ Name: "chinesesimplified"; MessagesFile: "ChineseSimplified.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "addtopath"; Description: "Add to PATH (global access via SRA.exe)"; GroupDescription: "Environment:"; Flags: unchecked
+Name: "addtopath"; Description: "{cm:AddToPath}"; GroupDescription: "{cm:AddToPathGroup}"
 
 [Files]
 Source: "SRA\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -63,8 +63,7 @@ const
 
 procedure BroadcastEnvironmentChange;
 begin
-  SendMessage(HWND_BROADCAST, WM_SETTINGCHANGE, 0,
-    CastIntegerToLParam(CreateMsgRecipientParam('Environment')));
+  PostMessage(HWND_BROADCAST, WM_SETTINGCHANGE, 0, 0);
 end;
 
 procedure AddToPath(PathToAdd: string);
@@ -129,4 +128,3 @@ begin
   if CurUninstallStep = usUninstall then
     RemoveFromPath(ExpandConstant('{app}'));
 end;
-

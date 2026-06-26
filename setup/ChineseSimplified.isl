@@ -404,3 +404,7 @@ AssocingFileExtension=正在将 %1 与 %2 文件扩展名关联...
 AutoStartProgramGroupDescription=启动:
 AutoStartProgram=自动启动 %1
 AddonHostProgramNotFound=在您选择的文件夹中找不到 %1。%n%n您是否仍要继续？
+
+; StarRailAssistant 自定义消息
+AddToPath=添加到 PATH (全局可用)
+AddToPathGroup=环境变量:
