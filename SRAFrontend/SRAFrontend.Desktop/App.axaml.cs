@@ -78,10 +78,12 @@ public class App : Application
         services.AddTransient<UpdateService>();
         services.AddTransient<AnnouncementService>();
         services.AddTransient<CommonModel>();
+        services.AddSingleton<WebUiAutostartService>();
         services.AddSingleton<ControlPanelViewModel>();
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
         services.AddSingleton<SettingsService>();
         services.AddSingleton<CacheService>();
+        services.AddSingleton<RuntimeTaskService>();
         // Register backend implementations and proxy
         services.AddSingleton<CliBackendService>();
         services.AddSingleton<PyBackendService>();

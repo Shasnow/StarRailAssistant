@@ -27,6 +27,10 @@ htmlcov/
 /setup/SRA/
 /setup/install_info.txt
 /main.dist/
+SRAFrontend/webui-frontend/node_modules/
+SRAFrontend/webui-frontend/tsconfig.tsbuildinfo
+SRAFrontend/SRAFrontend.Server/wwwroot/*
+!SRAFrontend/SRAFrontend.Server/wwwroot/.gitkeep
 *.zip
 
 # 构建产物

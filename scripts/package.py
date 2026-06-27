@@ -23,6 +23,7 @@
 """
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -30,8 +31,12 @@ from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 
 ROOT_PATH = Path(__file__).resolve().parent.parent
+DOTNET_EXE = os.environ.get("DOTNET_EXE", "dotnet")
+PNPM_EXE = os.environ.get("PNPM_EXE", "pnpm")
 DESKTOP_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Desktop" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
-SERVER_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
+SERVER_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "bin" / "Release" / "net10.0-windows" / "win-x64" / "publish"
+WEBUI_FRONTEND_PATH = ROOT_PATH / "SRAFrontend" / "webui-frontend"
+WEBUI_WWWROOT_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "wwwroot"
 DIST_DIR = ROOT_PATH / "main.dist"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
@@ -94,6 +99,15 @@ def collect_core_files(builder: ZipBuilder):
         builder.add(item)
 
 
+def collect_webui_files(builder: ZipBuilder):
+    """收集 WebUI 独立资源包。"""
+    if not WEBUI_WWWROOT_PATH.exists():
+        print(f"[ERROR] WebUI output not found: {WEBUI_WWWROOT_PATH}")
+        sys.exit(1)
+
+    builder.add(WEBUI_WWWROOT_PATH, WEBUI_WWWROOT_PATH.parent)
+
+
 def nuitka_build(version: str):
     file_version = version.split("-")[0]
     print("Building Python program with Nuitka ...")
@@ -110,7 +124,6 @@ def nuitka_build(version: str):
         "--copyright=Copyright 2024 Shasnow",
         "--assume-yes-for-downloads",
         "--output-filename=SRA-cli",
-        "--include-module=selenium.webdriver.common.action_chains",
         "--remove-output",
         "main.py",
     ]
@@ -133,9 +146,17 @@ def copy_core_resources(dist: Path):
     shutil.copy2(ROOT_PATH / "SRACore" / "localization" / "resource_en-us.json", DIST_DIR / "SRACore" / "localization" / "resource_en-us.json")
     shutil.copy2(ROOT_PATH / "SRACore" / "localization" / "resource_zh-cn.json", DIST_DIR / "SRACore" / "localization" / "resource_zh-cn.json")
     shutil.copytree(ROOT_PATH / "resources", dist / "resources")
-    (dist / "rapidocr_onnxruntime").mkdir(parents=True, exist_ok=True)
-    shutil.copytree(SITE_PACKAGES_DIR / "rapidocr_onnxruntime" / "models", dist / "rapidocr_onnxruntime" / "models")
-    shutil.copy2(SITE_PACKAGES_DIR / "rapidocr_onnxruntime" / "config.yaml", dist / "rapidocr_onnxruntime" / "config.yaml")
+    rapidocr_pkg = SITE_PACKAGES_DIR / "rapidocr_onnxruntime"
+    if rapidocr_pkg.exists():
+        (dist / "rapidocr_onnxruntime").mkdir(parents=True, exist_ok=True)
+        models_dir = rapidocr_pkg / "models"
+        if models_dir.exists():
+            shutil.copytree(models_dir, dist / "rapidocr_onnxruntime" / "models")
+        config_path = rapidocr_pkg / "config.yaml"
+        if config_path.exists():
+            shutil.copy2(config_path, dist / "rapidocr_onnxruntime" / "config.yaml")
+    else:
+        print(f"  [WARN] rapidocr_onnxruntime not found in {SITE_PACKAGES_DIR}, skipping OCR model copy")
     shutil.copytree(ROOT_PATH / "tasks", dist / "tasks")
     print("[OK] Resources copied")
 
@@ -153,6 +174,38 @@ def package_lite(version: str):
     print(f"[OK] Lite package: {lite_zip_path.name}")
 
 
+def build_webui():
+    print("Building WebUI ...")
+    cmd = [PNPM_EXE, "build"]
+    result = subprocess.run(cmd, cwd=WEBUI_FRONTEND_PATH)
+    if result.returncode != 0:
+        print(f"[ERROR] WebUI build failed (exit code: {result.returncode})")
+        sys.exit(1)
+    print("[OK] WebUI built successfully")
+
+
+def publish_dotnet_projects():
+    print("Publishing .NET projects ...")
+    commands = [
+        [DOTNET_EXE, "publish", "-c", "Release", "-r", "win-x64", "SRAFrontend\\SRAFrontend.Desktop\\SRAFrontend.Desktop.csproj"],
+        [DOTNET_EXE, "publish", "-c", "Release", "-r", "win-x64", "SRAFrontend\\SRAFrontend.Server\\SRAFrontend.Server.csproj"],
+    ]
+    for cmd in commands:
+        result = subprocess.run(cmd, cwd=ROOT_PATH)
+        if result.returncode != 0:
+            print(f"[ERROR] dotnet publish failed (exit code: {result.returncode})")
+            sys.exit(1)
+    print("[OK] .NET projects published successfully")
+
+
+def package_webui(version: str):
+    print("Packaging WebUI resources ...")
+    webui_zip_path = ROOT_PATH / f"StarRailAssistant_WebUI_v{version}.zip"
+    builder = ZipBuilder()
+    collect_webui_files(builder)
+    builder.snapshot(webui_zip_path)
+
+
 if __name__ == "__main__":
     with (ROOT_PATH / "package.json").open(encoding="utf-8") as f:
         data = json.load(f)
@@ -161,6 +214,8 @@ if __name__ == "__main__":
     with (ROOT_PATH / "ChangeLog2.0.md").open(encoding="utf-8") as f:
         changelog = f.read()
 
+    build_webui()
+    publish_dotnet_projects()
     nuitka_build(version)
     copy_core_resources(DIST_DIR)
 
@@ -181,6 +236,8 @@ if __name__ == "__main__":
     print("Packaging Full ...")
     builder.add(SERVER_WIN_X64_PUBLISH_PATH, SERVER_WIN_X64_PUBLISH_PATH)
     builder.snapshot(ROOT_PATH / f"StarRailAssistant_Full_v{version}.zip")
+
+    package_webui(version)
 
     print("Packaging ServerDLC ...")
     server_dlc = ZipBuilder()

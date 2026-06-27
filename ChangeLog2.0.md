@@ -48,9 +48,12 @@
 - StarRailAssistant_Lite*.zip - 试玩版（需要手动安装和配置 Python 环境）
 - StarRailAssistant_ServerDLC*.zip - 服务器DLC（需要标准版，提供http接口）
 - StarRailAssistant_DesktopDLC*.zip - 桌面DLC（需要标准版，提供UI界面）
-- StarRailAssistant_vX.X.X.zip - 豪华版（推荐）
-- StarRailAssistant_vX.X.X_Setup.exe - 豪华版, 但是以exe形式安装（推荐）
+- StarRailAssistant_WebUI*.zip - 独立 WebUI 包（需要解压到 SRA 根目录）
+- StarRailAssistant_vX.X.X.zip - 主程序包（推荐）
+- StarRailAssistant_vX.X.X_Setup.exe - 主程序安装包（推荐）
 
 需要安装 [.NET 桌面运行时 10.0](https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0) 才能运行
 首次使用建议下载豪华版
 **看准文件名再下载！**
+
+WebUI 包解压后需要与主程序放在同一个 SRA 根目录中，并配合 ServerDLC 或完整包提供服务端，才能通过 `SRA.exe` 访问对应功能。

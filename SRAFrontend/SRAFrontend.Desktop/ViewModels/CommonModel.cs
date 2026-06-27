@@ -9,6 +9,7 @@ using Avalonia.Controls.Notifications;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
 using SRAFrontend.Desktop.Controls;
+using SRAFrontend.Desktop.Services;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 using SRAFrontend.Utils;
@@ -24,6 +25,7 @@ public class CommonModel(
     UpdateService updateService,
     IBackendService backendService,
     AnnouncementService announcementService,
+    WebUiAutostartService webUiAutostartService,
     ILogger<CommonModel> logger,
     ISukiToastManager toastManager)
 {
@@ -174,6 +176,22 @@ public class CommonModel(
                     ShowErrorToast("快捷方式创建失败", "查看日志以获取更多信息");
                 break;
         }
+    }
+
+    public async Task ApplyWebUiAutostartAsync()
+    {
+        await webUiAutostartService.ApplyAsync();
+    }
+
+    public void ApplyWebUiRemoteConnection()
+    {
+        if (settingsService.Settings.Advanced.IsWebUiRemoteConnectionEnabled)
+        {
+            webUiAutostartService.StartServer();
+            return;
+        }
+
+        webUiAutostartService.StopServer();
     }
 
     public async Task CleanupOldExeAsync()
