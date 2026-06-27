@@ -821,9 +821,65 @@
                                         <TextBox Grid.Column="2" Text="{Binding AdvancedSettings.BackendLaunchArgs}" Watermark="--inline"/>
                                     </Grid>
 
+                                    <Expander Header="远程连接" IsExpanded="True">
+                                        <StackPanel Spacing="8">
+                                            <TextBlock TextWrapping="Wrap"
+                                                       Text="{Binding WebUiRemoteUrl, StringFormat='开启后会在本机后台启动 WebUI 服务，默认地址：{0}。配合内网穿透/打洞工具后，手机可通过公网或隧道地址连接到这台电脑。'}" />
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xED74;</Label>
+                                                <StackPanel Grid.Column="1">
+                                                    <Label Content="远程连接服务" />
+                                                    <TextBlock FontSize="12"
+                                                               Opacity="0.72"
+                                                               Text="{Binding WebUiRemoteStatus}" />
+                                                </StackPanel>
+                                                <Button Grid.Column="2"
+                                                        MinWidth="150"
+                                                        Content="{Binding WebUiRemoteButtonText}"
+                                                        Command="{Binding ToggleWebUiRemoteConnectionCommand}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE586;</Label>
+                                                <StackPanel Grid.Column="1">
+                                                    <Label Content="远程连接自启动" />
+                                                    <TextBlock FontSize="12"
+                                                               Opacity="0.72"
+                                                               Text="{Binding WebUiRemoteAutostartStatus}" />
+                                                </StackPanel>
+                                                <Button Grid.Column="2"
+                                                        MinWidth="150"
+                                                        Content="{Binding WebUiRemoteAutostartButtonText}"
+                                                        Command="{Binding ToggleWebUiRemoteAutostartCommand}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto, *, 260">
+                                                <Label Classes="Icon">&#xE72E;</Label>
+                                                <StackPanel Grid.Column="1">
+                                                    <Label Content="WebUI 访问令牌" />
+                                                    <TextBlock FontSize="12"
+                                                               Opacity="0.72"
+                                                               Text="打开网页、手机或外网访问 WebUI 时需要输入此令牌。默认 starrailassistant，建议改成自己的口令。" />
+                                                </StackPanel>
+                                                <TextBox Grid.Column="2"
+                                                         MinWidth="220"
+                                                         PasswordChar="*"
+                                                         Watermark="starrailassistant"
+                                                         Text="{Binding AdvancedSettings.WebUiRemoteToken}" />
+                                            </Grid>
+                                            <TextBlock FontSize="12"
+                                                       Opacity="0.72"
+                                                       TextWrapping="Wrap"
+                                                       Text="说明：开启远程连接只启动本机 WebUI 服务，不会自动配置公网访问；如需手机外网访问，请再配合开源内网穿透/打洞工具。自启动使用当前 Windows 用户的启动文件夹，登录后静默启动。"/>
+                                        </StackPanel>
+                                    </Expander>
+
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="Icon">&#xED74;</Label>
-                                        <Label Grid.Column="1" Content="使用远程后端" />
+                                        <StackPanel Grid.Column="1">
+                                            <Label Content="使用外部 SRA 后端" />
+                                            <TextBlock FontSize="12"
+                                                       Opacity="0.72"
+                                                       Text="高级选项：让 SRA.exe 连接另一台机器或另一个进程提供的 SRA 后端服务。普通 WebUI 手机访问不需要开启。" />
+                                        </StackPanel>
                                         <ToggleSwitch Grid.Column="2"
                                                       IsChecked="{Binding AdvancedSettings.IsRemoteEnabled}" />
                                     </Grid>
