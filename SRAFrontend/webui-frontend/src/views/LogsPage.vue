@@ -22,6 +22,7 @@ import type { ScrollbarInstance } from 'element-plus'
 import { Tickets } from '@element-plus/icons-vue'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
+import { baseURL } from '@/api/request'
 
 const app = useAppStore()
 const auth = useAuthStore()
@@ -43,7 +44,7 @@ function toggleStream() {
   closeStream()
   if (!app.streaming) return
 
-  eventSource = new EventSource('/Task/logs/stream?access_token=' + encodeURIComponent(auth.token))
+  eventSource = new EventSource(`${baseURL}/Task/logs/stream?access_token=` + encodeURIComponent(auth.token))
   eventSource.onmessage = async (event) => {
     app.logs.push(event.data)
     if (app.logs.length > 600) app.logs.splice(0, app.logs.length - 600)

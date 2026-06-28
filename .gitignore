@@ -16,10 +16,6 @@
 /.venv/
 **/__pycache__/
 
-# unplugin auto generate dts
-auto-imports.d.ts
-components.d.ts
-
 # 打包 / 安装输出
 /setup/output/
 /setup/SRA/

@@ -16,8 +16,10 @@ export function configureRequest(opts: {
   if (opts.baseURL !== undefined) request.defaults.baseURL = opts.baseURL
 }
 
+export const baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
+
 const request = axios.create({
-  baseURL: '/api',
+  baseURL,
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' }
 })
