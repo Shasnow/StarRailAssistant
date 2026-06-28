@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
-        <TargetFramework>net10.0-windows</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <AssemblyName>SRA-server</AssemblyName>
         <ImplicitUsings>enable</ImplicitUsings>
         <PublishSingleFile>true</PublishSingleFile>
         <SelfContained>false</SelfContained>
-        <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>..\SRAFrontend.Desktop\Assets\SRAicon.ico</ApplicationIcon>
     </PropertyGroup>
 
