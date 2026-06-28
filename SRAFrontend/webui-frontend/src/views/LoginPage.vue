@@ -1,10 +1,15 @@
 <template>
-  <section class="login-page">
+  <section class="login-page" :style="{ '--login-bg': `url(${loginBackground})` }">
     <div class="login-card panel">
-      <img class="login-avatar" :src="avatar" alt="" />
-      <p class="eyebrow">StarRailAssistant WebUI</p>
-      <h1>远程控制台</h1>
-      <p class="login-desc">请输入在 SRA.exe 设置中配置的 WebUI 访问令牌。</p>
+      <div class="login-hero">
+        <img class="login-avatar" :src="avatar" alt="" />
+        <div>
+          <p class="eyebrow">StarRailAssistant WebUI</p>
+          <h1>远程控制台</h1>
+          <p class="login-desc">输入在 SRA.exe 中设置的访问令牌后进入页面。</p>
+        </div>
+      </div>
+      <p class="login-note">令牌不会在页面上明文展示，也不会预填默认值。</p>
       <el-input
         :model-value="token"
         class="login-input"
@@ -20,11 +25,14 @@
       </el-button>
       <p v-if="error" class="login-error">{{ error }}</p>
     </div>
+    <p class="login-quote">{{ greeting }}</p>
   </section>
 </template>
 
 <script setup lang="ts">
 import { Connection } from '@element-plus/icons-vue'
+import loginBackground from '@/assets/bg-login.jpg'
+import { randomGreeting } from '@/constants/greetings'
 
 defineProps<{
   avatar: string
@@ -37,5 +45,7 @@ defineEmits<{
   'update:token': [value: string]
   login: []
 }>()
+
+const greeting = randomGreeting()
 </script>
 

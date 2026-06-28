@@ -1,6 +1,6 @@
 <template>
-  <section class="workspace">
-    <aside class="rail">
+  <section class="desktop-layout">
+    <aside class="desktop-rail">
       <RuntimeCard
         :status="app.sraStatus"
         :health-ok="app.health.ok"
@@ -32,7 +32,7 @@
       </section>
     </aside>
 
-    <section class="main-grid">
+    <section class="desktop-stage">
       <TaskEditor
         v-model:task-tab="taskTab"
         v-model:config-text="app.configText"

@@ -23,7 +23,7 @@ public class WebUiAutostartService(SettingsService settingsService, ILogger<WebU
 {
     private const string TaskName = "StarRailAssistant WebUI";
     private const int WebUiPort = 5074;
-    private static readonly string ServerExecutableName = "SRAFrontend.Server.exe";
+    private static readonly string ServerExecutableName = "SRA-server.exe";
 
     public bool IsEnabled => settingsService.Settings.Advanced.IsWebUiRemoteAutostartEnabled;
 
