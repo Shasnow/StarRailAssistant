@@ -79,7 +79,7 @@ app.MapOpenApi();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapGroup("/api").MapControllers();
 app.MapGet("/api/health", (IBackendService backendService, RuntimeTaskService runtimeTaskService) =>
 {
     var status = runtimeTaskService.GetStatus();

@@ -1,14 +1,14 @@
 <template>
-  <header :class="mobile ? 'mobile-top' : 'topbar'">
-    <div :class="mobile ? 'mobile-brand' : 'brand'">
-      <img :class="mobile ? 'mobile-avatar' : 'brand-avatar'" :src="avatar" alt="" />
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-avatar" :src="avatar" alt="" />
       <div>
         <p class="eyebrow">StarRailAssistant WebUI</p>
         <h1>远程控制台</h1>
       </div>
     </div>
 
-    <div :class="mobile ? 'mobile-status-row' : 'top-status'">
+    <div class="top-status">
       <el-tag round :type="healthTag" effect="light">
         <el-icon><Connection /></el-icon>
         {{ healthLabel }}
@@ -25,19 +25,15 @@
 <script setup lang="ts">
 import { Connection, Monitor } from '@element-plus/icons-vue'
 
-withDefaults(defineProps<{
+defineProps<{
   avatar: string
   healthLabel: string
   runningLabel: string
   healthTag: 'success' | 'danger'
   runningTag: 'success' | 'info'
-  mobile?: boolean
-}>(), {
-  mobile: false
-})
+}>()
 
 defineEmits<{
   logout: []
 }>()
 </script>
-

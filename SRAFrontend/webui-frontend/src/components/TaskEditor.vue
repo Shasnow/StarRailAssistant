@@ -1,5 +1,5 @@
 <template>
-  <section :class="mobile ? 'mobile-card mobile-editor-card' : 'panel editor-panel'">
+  <section class="panel editor-panel">
     <div class="section-head">
       <div>
         <p class="eyebrow">Mission Setup</p>
@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <el-tabs v-model="localTaskTab" :class="['task-tabs', { 'mobile-tabs': mobile }]">
+    <el-tabs v-model="localTaskTab" class="task-tabs">
       <el-tab-pane name="start" label="启动游戏">
         <section v-if="configModel" class="form-section">
           <TaskHeader title="启动游戏" desc="配置渠道、路径与登录行为。" v-model="configModel.startGame.enabled" />
@@ -274,9 +274,9 @@
               <span>关机与休眠互斥</span>
             </div>
             <el-radio-group v-model="localPowerAction" class="power-actions">
-              <el-radio-button label="none">无动作</el-radio-button>
-              <el-radio-button label="shutdown">关机</el-radio-button>
-              <el-radio-button label="sleep">休眠</el-radio-button>
+              <el-radio-button value="none">无动作</el-radio-button>
+              <el-radio-button value="shutdown">关机</el-radio-button>
+              <el-radio-button value="sleep">休眠</el-radio-button>
             </el-radio-group>
           </div>
         </section>
@@ -302,9 +302,9 @@
 import { computed } from 'vue'
 import { Check, Delete, Plus, Refresh } from '@element-plus/icons-vue'
 import { TaskHeader, SwitchField } from './formBits'
-import type { NewPowerTask, PowerTaskItem, TaskConfig, TpTaskDefinition } from '../types'
+import type { NewPowerTask, PowerTaskItem, TaskConfig, TpTaskDefinition } from '@/types'
 
-const props = withDefaults(defineProps<{
+const props = defineProps<{
   configModel: TaskConfig | null
   selectedConfig: string
   taskDefinitions: TpTaskDefinition[]
@@ -314,10 +314,7 @@ const props = withDefaults(defineProps<{
   configText: string
   startUsername: string
   startPassword: string
-  mobile?: boolean
-}>(), {
-  mobile: false
-})
+}>()
 
 const emit = defineEmits<{
   'update:taskTab': [value: string]

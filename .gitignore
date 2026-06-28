@@ -16,11 +16,9 @@
 /.venv/
 **/__pycache__/
 
-# Coverage.py
-.coverage
-.coverage.*
-coverage.xml
-htmlcov/
+# unplugin auto generate dts
+auto-imports.d.ts
+components.d.ts
 
 # 打包 / 安装输出
 /setup/output/

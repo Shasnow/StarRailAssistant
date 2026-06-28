@@ -1,4 +1,4 @@
-import type { TaskConfig } from '../types'
+import type { TaskConfig } from '@/types'
 
 type Credentials = {
   username?: string

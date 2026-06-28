@@ -1,4 +1,4 @@
-import type { SettingsModel } from '../types'
+import type { SettingsModel } from '@/types'
 
 export function createSettingsModel(source: unknown): SettingsModel {
   const raw = source && typeof source === 'object' ? (source as Partial<SettingsModel>) : {}
