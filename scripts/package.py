@@ -33,7 +33,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 ROOT_PATH = Path(__file__).resolve().parent.parent
 DOTNET_EXE = os.environ.get("DOTNET_EXE", "dotnet")
 PNPM_EXE = os.environ.get("PNPM_EXE", "pnpm")
-DESKTOP_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Desktop" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
+DESKTOP_WIN_X64_OUTPUT_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Desktop" / "bin" / "Release" / "net10.0" / "win-x64"
 SERVER_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "bin" / "Release" / "net10.0-windows" / "win-x64" / "publish"
 WEBUI_FRONTEND_PATH = ROOT_PATH / "SRAFrontend" / "webui-frontend"
 WEBUI_WWWROOT_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "wwwroot"
@@ -165,7 +165,7 @@ def package_lite(version: str):
     print("Packaging Lite ...")
     lite_zip_path = ROOT_PATH / f"StarRailAssistant_Lite_v{version}.zip"
     with ZipFile(lite_zip_path, "w", compression=ZIP_DEFLATED) as zipf:
-        for file in DESKTOP_WIN_X64_PUBLISH_PATH.iterdir():
+        for file in DESKTOP_WIN_X64_OUTPUT_PATH.iterdir():
             add_to_zip(zipf, file)
         for item in ["SRACore", "tasks", "resources"]:
             add_to_zip(zipf, ROOT_PATH / item)
@@ -230,7 +230,7 @@ if __name__ == "__main__":
     builder.snapshot(ROOT_PATH / f"StarRailAssistant_Core_v{version}.zip")
 
     print("Packaging Basic ...")
-    builder.add(DESKTOP_WIN_X64_PUBLISH_PATH, DESKTOP_WIN_X64_PUBLISH_PATH)
+    builder.add(DESKTOP_WIN_X64_OUTPUT_PATH, DESKTOP_WIN_X64_OUTPUT_PATH)
     builder.snapshot(ROOT_PATH / f"StarRailAssistant_v{version}.zip")
 
     print("Packaging Full ...")
@@ -246,7 +246,7 @@ if __name__ == "__main__":
 
     print("Packaging DesktopDLC ...")
     desktop_dlc = ZipBuilder()
-    desktop_dlc.add(DESKTOP_WIN_X64_PUBLISH_PATH, DESKTOP_WIN_X64_PUBLISH_PATH)
+    desktop_dlc.add(DESKTOP_WIN_X64_OUTPUT_PATH, DESKTOP_WIN_X64_OUTPUT_PATH)
     desktop_dlc.snapshot(ROOT_PATH / f"StarRailAssistant_DesktopDLC_v{version}.zip")
 
     print("Packaging Resources ...")
