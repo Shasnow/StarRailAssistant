@@ -21,6 +21,7 @@ coverage
 *.suo
 *.ntvs*
 *.njsproj
+*.sln
 *.sw?
 
 *.tsbuildinfo
@@ -36,7 +37,5 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
-
-# unplugin auto generate dts
-auto-imports.d.ts
-components.d.ts
+/src/auto-imports.d.ts
+/src/components.d.ts
