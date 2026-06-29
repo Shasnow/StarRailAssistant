@@ -229,6 +229,13 @@ h3 {
   isolation: isolate;
 }
 
+.workspace-hero-bg-stack {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
 .workspace-hero-bg {
   position: absolute;
   inset: 0;
@@ -236,8 +243,26 @@ h3 {
   height: 100%;
   object-fit: cover;
   object-position: center;
+  opacity: 0;
   filter: saturate(1.08) contrast(1.04);
-  transform: scale(1.04);
+  transform: scale(1);
+  transition: opacity 1200ms ease;
+  will-change: opacity, transform;
+}
+
+.workspace-hero-bg.active {
+  opacity: 1;
+  animation: hero-kenburns 10s ease-out both;
+}
+
+@keyframes hero-kenburns {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.08);
+  }
 }
 
 .workspace-hero-overlay {
@@ -519,23 +544,62 @@ h3 {
   z-index: 3;
   width: 100%;
   height: 118px;
+  overflow: hidden;
   pointer-events: none;
+  transform: translateZ(0);
 }
 
-.hero-waves use {
+.wave-svg {
+  position: absolute;
+  bottom: 0;
+  left: -50%;
+  width: 200%;
+  height: 128px;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+.wave-svg path {
   fill: #fff;
 }
 
-.wave-one {
+.wave-back {
+  bottom: -22px;
   opacity: 0.32;
+  animation: wave-run-left 28s linear infinite;
 }
 
-.wave-two {
-  opacity: 0.56;
+.wave-mid {
+  bottom: -30px;
+  opacity: 0.58;
+  animation: wave-run-right 20s linear infinite;
 }
 
-.wave-three {
-  opacity: 0.95;
+.wave-front {
+  bottom: -36px;
+  opacity: 0.94;
+  animation: wave-run-left 14s linear infinite;
+}
+
+@keyframes wave-run-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-25%, 0, 0);
+  }
+}
+
+@keyframes wave-run-right {
+  from {
+    transform: translate3d(-25%, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .workspace-shell {

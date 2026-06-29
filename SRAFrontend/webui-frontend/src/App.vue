@@ -24,7 +24,16 @@
       </div>
 
       <header class="workspace-hero">
-        <img class="workspace-hero-bg" :src="heroBanner" alt="" />
+        <div class="workspace-hero-bg-stack" aria-hidden="true">
+          <img
+            v-for="(src, index) in heroSlides"
+            :key="src"
+            class="workspace-hero-bg"
+            :class="{ active: heroSlideIndex === index }"
+            :src="src"
+            alt=""
+          />
+        </div>
         <div class="workspace-hero-overlay"></div>
 
         <div class="workspace-hero-nav hero-glassbar">
@@ -78,16 +87,17 @@
         </a>
 
         <div class="hero-cut" aria-hidden="true"></div>
-        <svg class="hero-waves" viewBox="0 24 150 28" preserveAspectRatio="none" aria-hidden="true">
-          <defs>
-            <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s58 18 88 18 58-18 88-18 58 18 88 18v44h-352z" />
-          </defs>
-          <g class="wave-layer">
-            <use href="#gentle-wave" x="48" y="0" class="wave-one" />
-            <use href="#gentle-wave" x="48" y="3" class="wave-two" />
-            <use href="#gentle-wave" x="48" y="6" class="wave-three" />
-          </g>
-        </svg>
+        <div class="hero-waves" aria-hidden="true">
+          <svg class="wave-svg wave-back" viewBox="0 0 2400 140" preserveAspectRatio="none">
+            <path d="M0 74c120-42 220-42 340 0s220 42 340 0 220-42 340 0 220 42 340 0 220-42 340 0 220 42 340 0 360 0 360 0v66H0z" />
+          </svg>
+          <svg class="wave-svg wave-mid" viewBox="0 0 2400 140" preserveAspectRatio="none">
+            <path d="M0 68c132-30 230-26 360 8s228 34 360-8 230-42 360 0 228 42 360 0 230-38 360-4 600 4 600 4v72H0z" />
+          </svg>
+          <svg class="wave-svg wave-front" viewBox="0 0 2400 140" preserveAspectRatio="none">
+            <path d="M0 54c116 0 178 46 300 46s184-46 300-46 178 46 300 46 184-46 300-46 178 46 300 46 184-42 300-42 194 34 300 34 300-24 300-24v72H0z" />
+          </svg>
+        </div>
       </header>
 
       <section id="workspace-content" class="workspace-shell">
@@ -99,11 +109,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import consoleAvatar from './assets/console-avatar.jpg'
 import heroBanner from './assets/hero-banner.jpg'
 import bgExtensions from './assets/bg-extensions.jpg'
+import bgLogin from './assets/bg-login.jpg'
 import bgLogs from './assets/bg-logs.jpg'
 import bgSettings from './assets/bg-settings.jpg'
 import bgTasks from './assets/bg-tasks.jpg'
@@ -121,6 +132,7 @@ const route = useRoute()
 
 const loginToken = ref(auth.token)
 const webuiGreeting = randomGreeting()
+const heroSlideIndex = ref(0)
 
 const backgroundItems: Array<{ page: PageKey; src: string }> = [
   { page: 'tasks', src: bgTasks },
@@ -128,6 +140,8 @@ const backgroundItems: Array<{ page: PageKey; src: string }> = [
   { page: 'extensions', src: bgExtensions },
   { page: 'logs', src: bgLogs }
 ]
+const heroSlides = [heroBanner, bgTasks, bgSettings, bgExtensions, bgLogs, bgLogin]
+let heroSlideTimer: number | undefined
 
 const activePage = computed<PageKey>(() => {
   const page = String(route.path).replace('/', '') as PageKey
@@ -179,10 +193,18 @@ function logout() {
 }
 
 onMounted(async () => {
+  heroSlideTimer = window.setInterval(() => {
+    heroSlideIndex.value = (heroSlideIndex.value + 1) % heroSlides.length
+  }, 10000)
+
   const ok = await auth.verifyStoredToken()
   if (ok) {
     loginToken.value = auth.token
     await app.refreshAll()
   }
+})
+
+onUnmounted(() => {
+  if (heroSlideTimer !== undefined) window.clearInterval(heroSlideTimer)
 })
 </script>
