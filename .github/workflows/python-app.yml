@@ -72,7 +72,7 @@ jobs:
           pip install flake8 pytest
           pip install nuitka
           pip install -r requirements.txt
-          cd SRAFrontend\webui-frontend
+          cd SRAFrontend\srafrontend-webui
           pnpm install
 
       - name: Lint with flake8
