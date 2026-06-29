@@ -81,7 +81,7 @@
           </section>
         </div>
 
-        <a class="hero-scroll-cue" href="#workspace-content" aria-label="进入控制台">
+        <a class="hero-scroll-cue" href="#" aria-label="进入控制台" @click.prevent="scrollToWorkspace">
           <span>进入控制台</span>
           <i></i>
         </a>
@@ -190,6 +190,10 @@ async function login() {
 function logout() {
   auth.logout()
   loginToken.value = ''
+}
+
+function scrollToWorkspace() {
+  document.getElementById('workspace-content')?.scrollIntoView({ behavior: 'smooth' })
 }
 
 onMounted(async () => {
