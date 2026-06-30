@@ -147,6 +147,24 @@ public class TaskController(
         }
     }
 
+    [HttpGet("screenshot")]
+    [EndpointSummary("截取游戏窗口")]
+    [ProducesResponseType(200, Type = typeof(FileResult))]
+    [ProducesResponseType(404)]
+    public IActionResult GetScreenshot()
+    {
+        // Server 与游戏运行在同一台机器，直接通过 Win32 抓取游戏窗口客户区。
+        // 仅 Windows 可用；其它平台返回 404。
+        if (!OperatingSystem.IsWindows())
+            return NotFound(new R(false, "Screenshot is only supported on Windows."));
+
+        var png = Server.Utils.GameScreenshot.CaptureGameWindowPng();
+        if (png is null || png.Length == 0)
+            return NotFound(new R(false, "Game window not found or capture failed."));
+
+        return File(png, "image/png");
+    }
+
     private async Task<bool> WaitForBackendReadyAsync()
     {
         var deadline = DateTimeOffset.UtcNow + BackendStartTimeout;
