@@ -245,8 +245,6 @@ h3 {
   object-position: center;
   opacity: 0;
   filter: saturate(1.08) contrast(1.04);
-  transform: scale(1);
-  transition: opacity 1200ms ease;
   will-change: opacity, transform;
 }
 
