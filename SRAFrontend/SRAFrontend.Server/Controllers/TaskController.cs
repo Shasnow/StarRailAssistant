@@ -1,4 +1,6 @@
 using System.Text.Json;
+using System.Runtime.Versioning;
+using System.Security.Principal;
 using Microsoft.AspNetCore.Mvc;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
@@ -11,22 +13,38 @@ namespace SRAFrontend.Server.Controllers;
 [Route("[controller]")]
 public class TaskController(
     IBackendService backendService,
+    RuntimeTaskService runtimeTaskService,
     LogStreamService logStream,
     IHostApplicationLifetime lifetime,
     ILogger<TaskController> logger) : Controller
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+    private static readonly TimeSpan BackendStartTimeout = TimeSpan.FromSeconds(3);
 
     [HttpPost("run")]
     [EndpointSummary("运行任务")]
-    [EndpointDescription(
-        "运行任务。支持三种方式: 1) 不传 ConfigName 和 Config → 运行全部配置; 2) 通过 Config 传入完整配置，根据 Persist 决定是否持久化; 3) 通过 ConfigName 加载本地已保存的配置。")]
-    [ProducesResponseType(200, Description = "已请求任务运行")]
-    [ProducesResponseType(400, Description = "请求参数无效")]
-    [ProducesResponseType(409, Description = "任务已在运行")]
+    [ProducesResponseType(200, Type = typeof(R))]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(409)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> RunTask([FromBody] RunRequest request)
     {
-        backendService.StartBackend("--no-admin --inline"); // 确保后端已启动
+        // SRA-cli automates the game window and needs elevated permission in the
+        // same way as the desktop frontend.  Detecting this before startup gives
+        // WebUI users a direct error instead of a task that appears to hang.
+        if (OperatingSystem.IsWindows() && !IsAdministrator())
+            return StatusCode(500, new R(false, "WebUI must be running as administrator before it can start SRA-cli tasks."));
+
+        // RuntimeTaskService also sees tasks started by SRA.exe, not only tasks
+        // launched through this controller.
+        if (runtimeTaskService.IsRunning())
+            return Conflict(new R(false, "A task is already running"));
+
+        // The server is the HTTP/control host.  The CLI remains the task control
+        // endpoint, so WebUI uses the same command path as SRA.exe.
+        backendService.StartBackend("--inline");
+        if (!await WaitForBackendReadyAsync())
+            return StatusCode(500, new R(false, "Backend failed to start. Check WebUI logs for details."));
 
         if (backendService.IsTaskRunning)
             return Conflict(new R(false, "A task is already running"));
@@ -35,7 +53,9 @@ public class TaskController(
 
         if (request.Config is not null)
         {
-            // 情况 2：携带完整配置 → 运行该配置
+            // WebUI can either persist an edited config or create a throwaway
+            // config for one run.  The CLI still receives a config name, keeping
+            // the backend command contract unchanged.
             configName = request.Persist
                 ? request.Config.Name
                 : $"_api_{Guid.NewGuid():N}";
@@ -50,52 +70,59 @@ public class TaskController(
         }
         else if (!string.IsNullOrWhiteSpace(request.ConfigName))
         {
-            // 情况 3：指定配置名 → 加载本地配置
             configName = request.ConfigName;
             var configPath = Path.Combine(DataPath.ConfigsDir, $"{configName}.json");
             if (!System.IO.File.Exists(configPath))
                 return BadRequest(new R(false, $"Config '{configName}' not found"));
         }
-        // 情况 1：两者都为空 → configName 为 null，运行全部配置
 
-        await backendService.TaskRunAsync(configName);
+        var sent = await backendService.TaskRunAsync(configName);
+        if (!sent)
+            return StatusCode(500, new R(false, "Failed to send task command to backend."));
+
         return Ok(new R(true, "Task started"));
     }
 
     [HttpPost("stop")]
     [EndpointSummary("停止任务")]
-    [EndpointDescription("停止当前运行的任务")]
     [ProducesResponseType(200, Type = typeof(R))]
     public async Task<IActionResult> StopTask()
     {
+        // Prefer cooperative cross-process stop first.  It works even when the
+        // task was started from SRA.exe because the Python runner polls the same
+        // stop.request file.
+        if (runtimeTaskService.RequestStop("webui"))
+            return Ok(new R(true, "Stop signal sent"));
+
+        // Fallback for older/non-session backend states owned by this server.
         if (!backendService.IsTaskRunning)
             return Ok(new R(false, "No task is running"));
 
-        await backendService.TaskStopAsync();
-        return Ok(new R(true, "Stop signal sent"));
+        var sent = await backendService.TaskStopAsync();
+        return Ok(sent ? new R(true, "Stop signal sent") : new R(false, "Failed to send stop signal"));
     }
 
     [HttpGet("status")]
     [EndpointSummary("获取任务状态")]
-    [EndpointDescription("获取当前任务是否正在运行")]
-    [ProducesResponseType(200, Type = typeof(bool), Description = "如果任务正在运行返回 true，否则返回 false")]
+    [ProducesResponseType(200, Type = typeof(bool))]
     public IActionResult GetStatus()
     {
-        return Ok(backendService.IsTaskRunning);
+        return Ok(runtimeTaskService.GetStatus());
     }
 
     [HttpGet("logs")]
     [EndpointSummary("获取最近日志")]
-    [EndpointDescription("获取最近的任务日志条目（默认100条）")]
-    [ProducesResponseType(200, Type = typeof(List<string>), Description = "一个字符串列表，每个元素为一条完整日志")]
+    [ProducesResponseType(200, Type = typeof(List<string>))]
     public IActionResult GetRecentLogs([FromQuery] int count = 100)
     {
+        var fileLogs = ReadRecentBackendLogLines(count);
+        if (fileLogs.Count > 0)
+            return Ok(fileLogs);
         return Ok(logStream.GetRecentLogs(count));
     }
 
     [HttpGet("logs/stream")]
     [EndpointSummary("SSE 日志流")]
-    [EndpointDescription("通过 Server-Sent Events 实时推送任务日志")]
     [Produces("text/event-stream")]
     public async Task StreamLogs(CancellationToken cancellationToken)
     {
@@ -103,7 +130,6 @@ public class TaskController(
         Response.Headers.CacheControl = "no-cache";
         Response.Headers.Connection = "keep-alive";
 
-        // 合并请求取消令牌和应用停止令牌
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
             cancellationToken, lifetime.ApplicationStopping);
 
@@ -117,20 +143,80 @@ public class TaskController(
         }
         catch (OperationCanceledException)
         {
-            // 客户端断开连接或服务器关闭，正常退出
+            // Client disconnected or the host is shutting down.
         }
+    }
+
+    [HttpGet("screenshot")]
+    [EndpointSummary("截取游戏窗口")]
+    [ProducesResponseType(200, Type = typeof(FileResult))]
+    [ProducesResponseType(404)]
+    public IActionResult GetScreenshot()
+    {
+        // Server 与游戏运行在同一台机器，直接通过 Win32 抓取游戏窗口客户区。
+        // 仅 Windows 可用；其它平台返回 404。
+        if (!OperatingSystem.IsWindows())
+            return NotFound(new R(false, "Screenshot is only supported on Windows."));
+
+        var png = Server.Utils.GameScreenshot.CaptureGameWindowPng();
+        if (png is null || png.Length == 0)
+            return NotFound(new R(false, "Game window not found or capture failed."));
+
+        return File(png, "image/png");
+    }
+
+    private async Task<bool> WaitForBackendReadyAsync()
+    {
+        var deadline = DateTimeOffset.UtcNow + BackendStartTimeout;
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            // There is no dedicated readiness endpoint for the CLI process, so a
+            // harmless built-in command is used as the readiness probe.
+            if (await backendService.SendInputAsync("help"))
+                return true;
+
+            await Task.Delay(150);
+        }
+
+        return false;
+    }
+
+    private static List<string> ReadRecentBackendLogLines(int count)
+    {
+        count = Math.Clamp(count, 1, 1000);
+        try
+        {
+            if (!Directory.Exists(DataPath.BackendLogsDir))
+                return [];
+            // File logs cover tasks started outside this server process.  When no
+            // file is available, the caller falls back to in-memory server logs.
+            var file = Directory.GetFiles(DataPath.BackendLogsDir, "SRA*.log")
+                .Select(path => new FileInfo(path))
+                .OrderByDescending(info => info.LastWriteTimeUtc)
+                .FirstOrDefault();
+            if (file is null)
+                return [];
+            return System.IO.File.ReadLines(file.FullName).TakeLast(count).ToList();
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static bool IsAdministrator()
+    {
+        using var identity = WindowsIdentity.GetCurrent();
+        var principal = new WindowsPrincipal(identity);
+        return principal.IsInRole(WindowsBuiltInRole.Administrator);
     }
 }
 
 public class RunRequest
 {
-    /// <summary>本地已保存的配置名称</summary>
     public string? ConfigName { get; set; }
-
-    /// <summary>请求体中携带的完整配置</summary>
     public TasksConfig? Config { get; set; }
-
-    /// <summary>是否持久化内联配置到磁盘（仅当 Config 不为 null 时有效）</summary>
     public bool Persist { get; set; }
 }
 

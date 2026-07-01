@@ -2,18 +2,24 @@
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
         <AssemblyName>SRA-server</AssemblyName>
+        <ImplicitUsings>enable</ImplicitUsings>
         <PublishSingleFile>true</PublishSingleFile>
         <SelfContained>false</SelfContained>
+        <ApplicationIcon>..\SRAFrontend.Desktop\Assets\SRAicon.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0"/>
+        <PackageReference Include="System.Drawing.Common" Version="9.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\SRAFrontend\SRAFrontend.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\SRAFrontend.Desktop\Assets\SRAicon.ico" Link="SRAicon.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
 
 </Project>

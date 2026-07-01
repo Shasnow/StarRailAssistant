@@ -21,17 +21,23 @@ public class SettingsService(ILogger<SettingsService> logger)
     private const int AutoSaveDelayMs = 800;
     
     private CancellationTokenSource? _autoSaveCts;
+    private bool _loaded;
     public AppSettings Settings { get; private set; } = new ();
     public event PropertyChangedEventHandler? SettingsPropertyChanged;
     public event NotifyCollectionChangedEventHandler? SettingsCollectionChanged;
 
     public void Load()
     {
+        if (_loaded)
+            return;
+
         _logger.LogInformation("Loading settings...");
         if (!File.Exists(DataPath.SettingsJson))
         {
             _logger.LogInformation("Settings file not found, using default settings");
             Save();  // 立即创建设置文件
+            SubscribeAll();
+            _loaded = true;
             return;
         }
         var settingsJson = File.ReadAllText(DataPath.SettingsJson);
@@ -52,16 +58,8 @@ public class SettingsService(ILogger<SettingsService> logger)
         {
             _logger.LogError("Failed to load settings, using default settings");
         }
-        Subscribe(Settings.General);
-        Subscribe(Settings.Notification);
-        Subscribe(Settings.Update);
-        Subscribe(Settings.Display);
-        Subscribe(Settings.Advanced);
-        Subscribe(Settings.WarpForecast);
-        
-        // 订阅所有 ObservableCollection 的 CollectionChanged 事件
-        SubscribeObservableCollection(Settings.Notification.OnStart);
-        SubscribeObservableCollection(Settings.Notification.OnCompleted);
+        SubscribeAll();
+        _loaded = true;
     }
 
     public void Save()
@@ -89,6 +87,20 @@ public class SettingsService(ILogger<SettingsService> logger)
     {
         Settings.Update.MirrorChyanCdk = EncryptUtil.DecryptString(Settings.Update.EncryptedMirrorChyanCdk);
         Settings.Notification.SmtpAuthCode = EncryptUtil.DecryptString(Settings.Notification.EncryptedSmtpAuthCode);
+    }
+
+    private void SubscribeAll()
+    {
+        Subscribe(Settings.General);
+        Subscribe(Settings.Notification);
+        Subscribe(Settings.Update);
+        Subscribe(Settings.Display);
+        Subscribe(Settings.Advanced);
+        Subscribe(Settings.WarpForecast);
+
+        // 订阅所有 ObservableCollection 的 CollectionChanged 事件
+        SubscribeObservableCollection(Settings.Notification.OnStart);
+        SubscribeObservableCollection(Settings.Notification.OnCompleted);
     }
 
     private void Subscribe(INotifyPropertyChanged notify)
