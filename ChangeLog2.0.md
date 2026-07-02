@@ -14,9 +14,8 @@
 ### 更新说明：
 
 #### SRA-Server
-- 新增基于密钥的认证机制：在 `appsettings.json` 中配置 `ApiKey` 后启用，未配置时允许匿名访问。
-- 认证方式：请求头 `X-Api-Key: <your-key>`。
-- 启动时若未配置 ApiKey，会打印警告日志 `ApiKey is not set; server is unsecured.`。
+- 新增基于密钥的认证机制：在 `appsettings.json` 中配置 `AccessToken` 后启用，未配置时允许匿名访问。
+- 认证方式：请求头 `X-Access-Token: <your-token>`。
 
 #### PyPI 上的 SRA
 - SRA-cli 已发布到 PyPI，提供更方便的使用方式。
