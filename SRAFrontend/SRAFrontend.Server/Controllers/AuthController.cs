@@ -36,7 +36,7 @@ public class AuthController(SettingsService settingsService, IConfiguration conf
 
         var legacyApiKey = configuration["ApiKey"];
         return string.IsNullOrWhiteSpace(legacyApiKey)
-            ? ApiKeyAuthenticationOptions.DefaultToken
+            ? TokenAuthenticationOptions.DefaultToken
             : legacyApiKey;
     }
 }

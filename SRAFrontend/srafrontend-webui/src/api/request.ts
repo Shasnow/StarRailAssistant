@@ -27,7 +27,7 @@ const request = axios.create({
 
 request.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = getToken()
-  if (token) config.headers.set('X-Api-Key', token)
+  if (token) config.headers.set('X-Access-Token', token)
   return config
 })
 

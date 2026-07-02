@@ -5,42 +5,7 @@ using SRAFrontend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// SRAFrontend.Server is the single HTTP host for both the API and the optional
-// WebUI static files.  Keeping them on one port makes LAN/relay access simple:
-// users only need to expose 5074, and token authentication protects the API
-// endpoints behind the same origin as the page.
-var hasExplicitUrls =
-    !string.IsNullOrWhiteSpace(builder.Configuration["urls"]) ||
-    !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ASPNETCORE_URLS"));
-if (!hasExplicitUrls)
-{
-    var webUiPort = builder.Configuration.GetValue("WebUi:Port", 5074);
-    var remoteAccess = builder.Configuration.GetValue("WebUi:RemoteAccess", true);
-    var webUiHost = remoteAccess
-        ? "0.0.0.0"
-        : builder.Configuration.GetValue("WebUi:Host", "0.0.0.0");
-    builder.WebHost.UseUrls($"http://{webUiHost}:{webUiPort}");
-}
-
-var webUiEnabled = builder.Configuration.GetValue("WebUi:Enabled", true);
-// --webui / --no-webui only toggles static page hosting.  API endpoints stay
-// available because SRA.exe and other tools can use the server without shipping
-// or enabling the browser UI bundle.
-foreach (var arg in args)
-{
-    if (arg.Equals("--no-webui", StringComparison.OrdinalIgnoreCase) ||
-        arg.Equals("--disable-webui", StringComparison.OrdinalIgnoreCase) ||
-        arg.Equals("--webui=false", StringComparison.OrdinalIgnoreCase))
-    {
-        webUiEnabled = false;
-    }
-    else if (arg.Equals("--webui", StringComparison.OrdinalIgnoreCase) ||
-             arg.Equals("--enable-webui", StringComparison.OrdinalIgnoreCase) ||
-             arg.Equals("--webui=true", StringComparison.OrdinalIgnoreCase))
-    {
-        webUiEnabled = true;
-    }
-}
+var webUiEnabled = !args.Contains("--no-webui", StringComparer.OrdinalIgnoreCase);
 
 builder.Services.AddSingleton<PyBackendService>();
 builder.Services.AddSingleton<CliBackendService>();
@@ -53,9 +18,9 @@ builder.Services.AddSingleton<LogStreamService>();
 builder.Services.AddHostedService<HostedService>();
 builder.Services.AddHttpClient();
 
-builder.Services.AddAuthentication(ApiKeyAuthenticationOptions.DefaultScheme)
-    .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
-        ApiKeyAuthenticationOptions.DefaultScheme, _ => { });
+builder.Services.AddAuthentication(TokenAuthenticationOptions.DefaultScheme)
+    .AddScheme<TokenAuthenticationOptions, TokenAuthenticationHandler>(
+        TokenAuthenticationOptions.DefaultScheme, _ => { });
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers(options =>
