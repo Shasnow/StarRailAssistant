@@ -1,19 +1,14 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import TasksPage from '@/views/TasksPage.vue'
-import SettingsPage from '@/views/SettingsPage.vue'
-import ExtensionsPage from '@/views/ExtensionsPage.vue'
-import LogsPage from '@/views/LogsPage.vue'
-import LoginPage from '@/views/LoginPage.vue'
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     { path: '/', redirect: '/tasks' },
-    { path: '/login', component: LoginPage },
-    { path: '/tasks', component: TasksPage, meta: { requiresAuth: true } },
-    { path: '/settings', component: SettingsPage, meta: { requiresAuth: true } },
-    { path: '/extensions', component: ExtensionsPage, meta: { requiresAuth: true } },
-    { path: '/logs', component: LogsPage, meta: { requiresAuth: true } }
+    { path: '/login', component: () => import('@/views/LoginPage.vue') },
+    { path: '/tasks', component: () => import('@/views/TasksPage.vue'), meta: { requiresAuth: true } },
+    { path: '/settings', component: () => import('@/views/SettingsPage.vue'), meta: { requiresAuth: true } },
+    { path: '/extensions', component: () => import('@/views/ExtensionsPage.vue'), meta: { requiresAuth: true } },
+    { path: '/logs', component: () => import('@/views/LogsPage.vue'), meta: { requiresAuth: true } }
   ]
 })
 
