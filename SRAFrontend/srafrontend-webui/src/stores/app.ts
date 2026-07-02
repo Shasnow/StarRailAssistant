@@ -1,7 +1,8 @@
 import {defineStore} from 'pinia'
 import {computed, reactive, ref} from 'vue'
 import {ElMessage} from 'element-plus'
-import {useAuthStore} from './auth'
+import {configureRequest} from '@/api/request'
+import {verifyToken} from '@/api/auth'
 import * as configsApi from '@/api/configs'
 import * as settingsApi from '@/api/settings'
 import * as taskApi from '@/api/task'
@@ -11,7 +12,55 @@ import {createSettingsModel, prepareSettingsForSave} from '@/models/settings'
 import type {SettingsModel, SraStatus, TaskConfig, TpTaskDefinition} from '@/types'
 
 export const useAppStore = defineStore('app', () => {
-  const auth = useAuthStore()
+  // Auth
+  const token = ref(localStorage.getItem('sra-webui-token') ?? '')
+  const isAuthed = ref(false)
+  const checking = ref(false)
+  const authError = ref('')
+
+  configureRequest({
+    getToken: () => token.value,
+    onUnauthorized: () => logout()
+  })
+
+  async function login(inputToken: string) {
+    checking.value = true
+    authError.value = ''
+    try {
+      const trimmed = inputToken.trim()
+      if (!trimmed) throw new Error('请输入访问令牌')
+      await verifyToken(trimmed)
+      token.value = trimmed
+      localStorage.setItem('sra-webui-token', trimmed)
+      isAuthed.value = true
+    } catch (e) {
+      authError.value = e instanceof Error ? e.message : '登录失败'
+      throw e
+    } finally {
+      checking.value = false
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('sra-webui-token')
+    token.value = ''
+    isAuthed.value = false
+  }
+
+  async function verifyStoredToken() {
+    if (!token.value) return false
+    checking.value = true
+    try {
+      await verifyToken(token.value)
+      isAuthed.value = true
+      return true
+    } catch {
+      logout()
+      return false
+    } finally {
+      checking.value = false
+    }
+  }
 
   // Status
   const health = ref({ ok: false })
@@ -144,9 +193,9 @@ export const useAppStore = defineStore('app', () => {
       const body = prepareSettingsForSave(settingsModel.value, emailAuthCodeDraft.value)
       await settingsApi.saveSettings(body)
       settingsText.value = JSON.stringify(body, null, 2)
-      if (body.advanced?.['webui.remote.token'] && body.advanced['webui.remote.token'] !== auth.token) {
-        auth.token = String(body.advanced['webui.remote.token'])
-        localStorage.setItem('sra-webui-token', auth.token)
+      if (body.advanced?.['webui.remote.token'] && body.advanced['webui.remote.token'] !== token.value) {
+        token.value = String(body.advanced['webui.remote.token'])
+        localStorage.setItem('sra-webui-token', token.value)
       }
       await Promise.allSettled([loadStatus(), loadLogs()])
     }, '设置已保存')
@@ -234,6 +283,9 @@ export const useAppStore = defineStore('app', () => {
   }
 
   return {
+    // Auth
+    token, isAuthed, checking, authError,
+    login, logout, verifyStoredToken,
     // Status
     health, sraStatus, healthLabel, healthTag, runningLabel, runningTag,
     // Configs

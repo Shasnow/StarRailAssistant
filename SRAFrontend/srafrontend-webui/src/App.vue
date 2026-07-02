@@ -2,7 +2,7 @@
   <main class="app-shell" :class="`page-${activePage}`">
     <AppAtmosphere />
 
-    <template v-if="auth.isAuthed">
+    <template v-if="app.isAuthed">
       <div class="page-background-stack" aria-hidden="true">
         <img
           v-for="item in pageBackgrounds"
@@ -40,14 +40,12 @@
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import theme from './configs/theme'
-import { useAuthStore } from './stores/auth'
 import { useAppStore } from './stores/app'
 import AppAtmosphere from './components/AppAtmosphere.vue'
 import WorkspaceHero from './components/WorkspaceHero.vue'
 import { randomGreeting } from './constants/greetings'
 import type { PageKey } from './types'
 
-const auth = useAuthStore()
 const app = useAppStore()
 const route = useRoute()
 const router = useRouter()
@@ -94,12 +92,12 @@ const pageDescription = computed(() => {
 })
 
 function logout() {
-  auth.logout()
+  app.logout()
   router.push('/login')
 }
 
 onMounted(async () => {
-  await auth.verifyStoredToken()
-  if (auth.isAuthed) await app.refreshAll()
+  await app.verifyStoredToken()
+  if (app.isAuthed) await app.refreshAll()
 })
 </script>

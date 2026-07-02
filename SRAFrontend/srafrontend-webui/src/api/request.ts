@@ -1,4 +1,5 @@
 import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
+import { ElMessage } from 'element-plus'
 
 type TokenGetter = () => string
 type UnauthorizedHandler = () => void
@@ -40,6 +41,7 @@ request.interceptors.response.use(
     const data = error.response?.data
     const fieldErrors = data?.errors ? Object.values(data.errors).flat().join('；') : ''
     const message = data?.message ?? data?.Message ?? fieldErrors ?? data?.title ?? error.message
+    ElMessage.error(message)
     return Promise.reject(new Error(message))
   }
 )

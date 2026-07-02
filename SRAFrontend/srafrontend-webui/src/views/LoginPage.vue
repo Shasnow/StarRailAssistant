@@ -19,10 +19,10 @@
         placeholder="请输入访问令牌"
         @keyup.enter="login"
       />
-      <el-button :icon="Connection" type="primary" size="large" :loading="auth.checking" @click="login">
+      <el-button :icon="Connection" type="primary" size="large" :loading="app.checking" @click="login">
         进入 WebUI
       </el-button>
-      <p v-if="auth.error" class="login-error">{{ auth.error }}</p>
+      <p v-if="app.authError" class="login-error">{{ app.authError }}</p>
     </div>
     <p class="login-quote">{{ greeting }}</p>
   </section>
@@ -32,25 +32,23 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Connection } from '@element-plus/icons-vue'
-import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 import theme from '@/configs/theme'
 import { randomGreeting } from '@/constants/greetings'
 
 const router = useRouter()
-const auth = useAuthStore()
 const app = useAppStore()
 
-const tokenDraft = ref(auth.token)
+const tokenDraft = ref(app.token)
 const greeting = randomGreeting()
 
 async function login() {
   try {
-    await auth.login(tokenDraft.value)
+    await app.login(tokenDraft.value)
     await app.refreshAll()
     router.push('/tasks')
   } catch {
-    // Error is already set in auth store
+    // Error is already set in app store
   }
 }
 </script>
