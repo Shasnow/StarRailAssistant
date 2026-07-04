@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onUnmounted, ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { ScrollbarInstance } from 'element-plus'
 import { Tickets } from '@element-plus/icons-vue'
 import { useAppStore } from '@/stores/app'
@@ -55,6 +55,11 @@ function toggleStream() {
 }
 
 watch(() => app.logs, () => scrollLogsToBottom(), { deep: true })
+
+onMounted(async () => {
+  await app.loadLogs()
+  if (app.streaming) toggleStream()
+})
 
 onUnmounted(closeStream)
 </script>
