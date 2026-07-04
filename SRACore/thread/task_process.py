@@ -10,12 +10,8 @@ from SRACore.localization import Resource
 from SRACore.models.app_settings import AppSettings
 from SRACore.notification import try_send_notification
 from SRACore.operators.ioperator import IOperator
-from SRACore.runtime.shared_runtime import RuntimeSession
 from SRACore.task import BaseTask, get_task_classes
-from SRACore.util import (
-    encryption,  # NOQA 有动态用法，确保被打包 # type: ignore
-    sys_util,  # NOQA 有动态用法，确保被打包 # type: ignore
-)
+from SRACore.util import sys_util # NOQA
 from SRACore.util.data_persister import load_cache, load_config
 from SRACore.util.errors import ThreadStoppedError
 from SRACore.util.logger import logger
@@ -41,8 +37,6 @@ class TaskManager:
         """
         self.log_queue = None
         self._stop_event = threading.Event()
-        self._runtime_watcher_stop = threading.Event()
-        self._runtime_watcher_thread: threading.Thread | None = None
         self._thread: threading.Thread | None = None
         self.info = TaskInfo()
         self.task_list: list[type[BaseTask]] = get_task_classes()
@@ -52,26 +46,6 @@ class TaskManager:
     def request_stop(self) -> None:
         """请求停止当前任务执行。"""
         self._stop_event.set()
-
-    def _start_runtime_watcher(self, session: RuntimeSession) -> None:
-        self._runtime_watcher_stop.clear()
-
-        def watch() -> None:
-            while not self._runtime_watcher_stop.wait(1.0):
-                session.heartbeat()
-                if session.stop_requested():
-                    logger.warning(Resource.cli_task_requestStop)
-                    session.mark_stopping()
-                    self.request_stop()
-
-        self._runtime_watcher_thread = threading.Thread(target=watch, daemon=True)
-        self._runtime_watcher_thread.start()
-
-    def _stop_runtime_watcher(self) -> None:
-        self._runtime_watcher_stop.set()
-        if self._runtime_watcher_thread is not None:
-            self._runtime_watcher_thread.join(timeout=2.0)
-            self._runtime_watcher_thread = None
 
     def is_thread_running(self) -> bool:
         """检查任务线程是否正在运行"""
