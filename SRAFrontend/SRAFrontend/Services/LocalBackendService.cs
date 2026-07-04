@@ -16,7 +16,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
     public abstract string MainArgument { get; set; }
     public event PropertyChangedEventHandler? PropertyChanged;
     public event Action<string>? Outputted;
-
+    private TaskCompletionSource<string>? _outputTcs;
     public bool IsTaskRunning
     {
         get;
@@ -175,6 +175,19 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         return SendInputAsync("task stop");
     }
 
+    public async Task<string> GetTaskStatusAsync()
+    {
+        if (_backendProcess == null || _backendProcess.HasExited)
+        {
+            logger.LogWarning("Attempted to get task status, but backend process is not running.");
+            return string.Empty;
+        }
+        var tcs = new TaskCompletionSource<string>();
+        _outputTcs = tcs;
+        await SendInputAsync("task status --json");
+        return await tcs.Task;
+    }
+
     private void OnBackendProcessExited(object? sender, EventArgs e)
     {
         var processId = _backendProcess?.Id ?? -1;
@@ -192,19 +205,23 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
     {
         if (string.IsNullOrEmpty(args.Data)) return;
 
-        // 更新运行状态
-        if (args.Data.Contains(IBackendService.StartMarker))
-            IsTaskRunning = true;
-        else if (args.Data.Contains(IBackendService.DoneMarker))
-            IsTaskRunning = false;
-
         Outputted?.Invoke(args.Data);
+
+        // 完成等待中的输出请求
+        if (_outputTcs?.TrySetResult(args.Data) == true)
+            _outputTcs = null; // 释放引用
     }
 
     private void OnBackendProcessErrorDataReceived(object _, DataReceivedEventArgs args)
     {
         if (string.IsNullOrEmpty(args.Data)) return;
-
+        
+        // 更新运行状态
+        if (args.Data.Contains(IBackendService.StartMarker))
+            IsTaskRunning = true;
+        else if (args.Data.Contains(IBackendService.DoneMarker))
+            IsTaskRunning = false;
+        
         Outputted?.Invoke(args.Data);
     }
 

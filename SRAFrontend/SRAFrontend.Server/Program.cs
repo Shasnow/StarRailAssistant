@@ -13,19 +13,22 @@ builder.Services.AddSingleton<IBackendService, BackendServiceProxy>();
 builder.Services.AddSingleton<SettingsService>();
 builder.Services.AddSingleton<CacheService>();
 builder.Services.AddSingleton<ConfigService>();
-builder.Services.AddSingleton<RuntimeTaskService>();
 builder.Services.AddSingleton<LogStreamService>();
 builder.Services.AddHostedService<HostedService>();
 builder.Services.AddHttpClient();
+var isAuthEnabled = !string.IsNullOrWhiteSpace(builder.Configuration["AccessToken"]);
 
-builder.Services.AddAuthentication(TokenAuthenticationOptions.DefaultScheme)
-    .AddScheme<TokenAuthenticationOptions, TokenAuthenticationHandler>(
-        TokenAuthenticationOptions.DefaultScheme, _ => { });
-builder.Services.AddAuthorization();
+if (isAuthEnabled)
+{
+    builder.Services.AddAuthentication(TokenAuthenticationOptions.DefaultScheme)
+        .AddScheme<TokenAuthenticationOptions, TokenAuthenticationHandler>(
+            TokenAuthenticationOptions.DefaultScheme, _ => { });
+    builder.Services.AddAuthorization();
+}
 
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add(new AuthorizeFilter());
+    if (isAuthEnabled) options.Filters.Add(new AuthorizeFilter());
 });
 builder.Services.AddOpenApi();
 
@@ -39,40 +42,13 @@ if (webUiEnabled)
     app.UseDefaultFiles();
     app.UseStaticFiles();
 }
-app.MapOpenApi();
 
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapGroup("/api").MapControllers();
-app.MapGet("/api/health", (IBackendService backendService, RuntimeTaskService runtimeTaskService) =>
+if (isAuthEnabled)
 {
-    var status = runtimeTaskService.GetStatus();
-    return Results.Ok(new
-    {
-        ok = true,
-        service = "SRAFrontend.Server",
-        webUiEnabled,
-        sra = new
-        {
-            running = status.Running || backendService.IsTaskRunning,
-            pid = status.Pid,
-            port = 5074,
-            detail = status.Detail,
-            state = status.State,
-            owner = status.Owner,
-            mode = status.Mode,
-            taskName = status.TaskName,
-            configNames = status.ConfigNames,
-            startedAt = status.StartedAt,
-            lastHeartbeat = status.LastHeartbeat
-        }
-    });
-}).RequireAuthorization();
-
-if (webUiEnabled)
-{
-    app.MapFallbackToFile("index.html");
+    app.UseAuthentication();
+    app.UseAuthorization();
 }
 
+app.MapGroup("/api").MapControllers();
+app.MapOpenApi();
 app.Run();

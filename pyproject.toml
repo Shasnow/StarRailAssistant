@@ -30,7 +30,7 @@ dependencies = [
     "rich==15.0.0",
     "loguru==0.7.3",
     "selenium==4.44.0",
-    "cmd2==3.5.1",
+    "cmd2==4.0.0",
     "rapidocr-onnxruntime==1.4.4",
     "pyautogui==0.9.54; os_name == 'nt'",
     "pyperclip==1.11.0; os_name == 'nt'",
