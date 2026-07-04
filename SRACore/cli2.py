@@ -1,4 +1,5 @@
 import argparse
+import dataclasses
 
 import cmd2
 from loguru import logger
@@ -43,21 +44,20 @@ class SRACli(cmd2.Cmd):
 
     # region 任务管理
     @staticmethod
-    def _build_task_parser() -> argparse.ArgumentParser:
+    def _build_task_parser() -> cmd2.Cmd2ArgumentParser:
         task_description = Text.assemble(Resource.task_description)
-        task_parser = cmd2.argparse_custom.DEFAULT_ARGUMENT_PARSER(description=task_description)
+        task_parser = cmd2.Cmd2ArgumentParser(description=task_description)
         task_parser.add_subparsers(metavar="SUBCOMMAND", required=True)
         return task_parser
 
     @cmd2.with_argparser(_build_task_parser(), preserve_quotes=True)
     def do_task(self, args: argparse.Namespace) -> None:
-        handler = args.cmd2_handler.get()
-        handler(args)
+        args.cmd2_subcommand_func(args)
 
     @staticmethod
     def _build_task_run_parser() -> cmd2.Cmd2ArgumentParser:
         task_run_description = Text.assemble(Resource.run_description)
-        task_run_parser = cmd2.argparse_custom.DEFAULT_ARGUMENT_PARSER(description=task_run_description)
+        task_run_parser = cmd2.Cmd2ArgumentParser(description=task_run_description)
         task_run_parser.add_argument('config', nargs='*', help=Resource.run_configHelp)
         return task_run_parser
 
@@ -71,7 +71,7 @@ class SRACli(cmd2.Cmd):
     @staticmethod
     def _build_task_single_parser() -> cmd2.Cmd2ArgumentParser:
         task_single_description = Text.assemble(Resource.single_description)
-        task_single_parser = cmd2.argparse_custom.DEFAULT_ARGUMENT_PARSER(description=task_single_description)
+        task_single_parser = cmd2.Cmd2ArgumentParser(description=task_single_description)
         task_single_parser.add_argument('task', help=Resource.single_taskHelp)
         task_single_parser.add_argument('--config', help=Resource.single_configHelp)
         return task_single_parser
@@ -87,7 +87,7 @@ class SRACli(cmd2.Cmd):
     @staticmethod
     def _build_task_stop_parser() -> cmd2.Cmd2ArgumentParser:
         task_stop_description = Text.assemble(Resource.stop_description)
-        return cmd2.argparse_custom.DEFAULT_ARGUMENT_PARSER(description=task_stop_description)
+        return cmd2.Cmd2ArgumentParser(description=task_stop_description)
         
     @cmd2.as_subcommand_to("task", "stop", _build_task_stop_parser(), help=Resource.stop_description)
     def _task_stop(self, _) -> None:
@@ -98,9 +98,30 @@ class SRACli(cmd2.Cmd):
             self.poutput(Resource.cli_task_notRunning)
 
     @staticmethod
+    def _build_task_status_parser() -> cmd2.Cmd2ArgumentParser:
+        task_status_description = "Show current task status"
+        task_status_parser = cmd2.Cmd2ArgumentParser(description=task_status_description)
+        task_status_parser.add_argument('--json', action='store_true', help='Output in JSON format')
+        return task_status_parser
+
+    @cmd2.as_subcommand_to("task", "status", _build_task_status_parser(), help="Show current task status")
+    def _task_status(self, args: argparse.Namespace) -> None:
+        import json
+        info = self.task_manager.info
+        if args.json:
+            self.poutput(json.dumps(dataclasses.asdict(info)))
+        else:
+            self.poutput(f"Session ID: {info.sessionId}")
+            self.poutput(f"PID: {info.pid}")
+            self.poutput(f"Mode: {info.mode}")
+            self.poutput(f"Configs: {', '.join(info.configs) if info.configs else 'N/A'}")
+            self.poutput(f"Task: {info.task}")
+            self.poutput(f"Status: {info.status}")
+
+    @staticmethod
     def _build_run_parser() -> cmd2.Cmd2ArgumentParser:
         run_description = Text.assemble(Resource.run_description)
-        run_parser = cmd2.argparse_custom.DEFAULT_ARGUMENT_PARSER(description=run_description)
+        run_parser = cmd2.Cmd2ArgumentParser(description=run_description)
         run_parser.add_argument('config', nargs='*', help=Resource.run_configHelp)
         return run_parser
 
@@ -116,7 +137,7 @@ class SRACli(cmd2.Cmd):
     @staticmethod
     def _build_single_parser() -> cmd2.Cmd2ArgumentParser:
         single_description = Text.assemble(Resource.single_description)
-        single_parser = cmd2.argparse_custom.DEFAULT_ARGUMENT_PARSER(description=single_description)
+        single_parser = cmd2.Cmd2ArgumentParser(description=single_description)
         single_parser.add_argument('task', help=Resource.single_taskHelp)
         single_parser.add_argument('--config', help=Resource.single_configHelp)
         return single_parser
@@ -135,21 +156,20 @@ class SRACli(cmd2.Cmd):
     # region 触发器管理
 
     @staticmethod
-    def _build_trigger_parser() -> argparse.ArgumentParser:
+    def _build_trigger_parser() -> cmd2.Cmd2ArgumentParser:
         trigger_description = Text.assemble(Resource.trigger_description)
-        trigger_parser = cmd2.argparse_custom.DEFAULT_ARGUMENT_PARSER(description=trigger_description)
+        trigger_parser = cmd2.Cmd2ArgumentParser(description=trigger_description)
         trigger_parser.add_subparsers(metavar="SUBCOMMAND", required=True)
         return trigger_parser
 
     @cmd2.with_argparser(_build_trigger_parser(), preserve_quotes=True)
     def do_trigger(self, args: argparse.Namespace) -> None:
-        handler = args.cmd2_handler.get()
-        handler(args)
+        args.cmd2_subcommand_func(args)
 
     @staticmethod
     def _build_trigger_run_parser() -> cmd2.Cmd2ArgumentParser:
         trigger_run_description = Text.assemble(Resource.trigger_run_description)
-        return cmd2.argparse_custom.DEFAULT_ARGUMENT_PARSER(description=trigger_run_description)
+        return cmd2.Cmd2ArgumentParser(description=trigger_run_description)
 
     @cmd2.as_subcommand_to("trigger", "run", _build_trigger_run_parser(), help=Resource.trigger_run_description)
     def _trigger_run(self, _) -> None:
@@ -165,7 +185,7 @@ class SRACli(cmd2.Cmd):
     @staticmethod
     def _build_trigger_stop_parser() -> cmd2.Cmd2ArgumentParser:
         trigger_stop_description = Text.assemble(Resource.trigger_stop_description)
-        return cmd2.argparse_custom.DEFAULT_ARGUMENT_PARSER(description=trigger_stop_description)
+        return cmd2.Cmd2ArgumentParser(description=trigger_stop_description)
 
     @cmd2.as_subcommand_to("trigger", "stop", _build_trigger_stop_parser(), help=Resource.trigger_stop_description)
     def _trigger_stop(self, _) -> None:
@@ -178,7 +198,7 @@ class SRACli(cmd2.Cmd):
     @staticmethod
     def _build_trigger_enable_parser() -> cmd2.Cmd2ArgumentParser:
         trigger_enable_description = Text.assemble(Resource.trigger_enable_description)
-        trigger_enable_parser = cmd2.argparse_custom.DEFAULT_ARGUMENT_PARSER(description=trigger_enable_description)
+        trigger_enable_parser = cmd2.Cmd2ArgumentParser(description=trigger_enable_description)
         trigger_enable_parser.add_argument('name', help=Resource.trigger_enable_nameHelp)
         return trigger_enable_parser
 
@@ -195,7 +215,7 @@ class SRACli(cmd2.Cmd):
     @staticmethod
     def _build_trigger_disable_parser() -> cmd2.Cmd2ArgumentParser:
         trigger_disable_description = Text.assemble(Resource.trigger_disable_description)
-        trigger_disable_parser = cmd2.argparse_custom.DEFAULT_ARGUMENT_PARSER(description=trigger_disable_description)
+        trigger_disable_parser = cmd2.Cmd2ArgumentParser(description=trigger_disable_description)
         trigger_disable_parser.add_argument('name', help=Resource.trigger_disable_nameHelp)
         return trigger_disable_parser
 
@@ -212,7 +232,7 @@ class SRACli(cmd2.Cmd):
     @staticmethod
     def _build_trigger_set_parser() -> cmd2.Cmd2ArgumentParser:
         trigger_set_description = Text.assemble(Resource.trigger_set_description)
-        trigger_set_parser = cmd2.argparse_custom.DEFAULT_ARGUMENT_PARSER(description=trigger_set_description)
+        trigger_set_parser = cmd2.Cmd2ArgumentParser(description=trigger_set_description)
         trigger_set_parser.add_argument('name', help=Resource.trigger_set_nameHelp)
         trigger_set_parser.add_argument('attr', help=Resource.trigger_set_attrHelp)
         trigger_set_parser.add_argument('value', help=Resource.trigger_set_valueHelp)

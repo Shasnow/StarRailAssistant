@@ -1,6 +1,4 @@
 using System.Text.Json;
-using System.Runtime.Versioning;
-using System.Security.Principal;
 using Microsoft.AspNetCore.Mvc;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
@@ -13,7 +11,6 @@ namespace SRAFrontend.Server.Controllers;
 [Route("[controller]")]
 public class TaskController(
     IBackendService backendService,
-    RuntimeTaskService runtimeTaskService,
     LogStreamService logStream,
     IHostApplicationLifetime lifetime,
     ILogger<TaskController> logger) : Controller
@@ -29,26 +26,17 @@ public class TaskController(
     [ProducesResponseType(500)]
     public async Task<IActionResult> RunTask([FromBody] RunRequest request)
     {
-        // SRA-cli automates the game window and needs elevated permission in the
-        // same way as the desktop frontend.  Detecting this before startup gives
-        // WebUI users a direct error instead of a task that appears to hang.
-        if (OperatingSystem.IsWindows() && !IsAdministrator())
-            return StatusCode(500, new R(false, "WebUI must be running as administrator before it can start SRA-cli tasks."));
-
         // RuntimeTaskService also sees tasks started by SRA.exe, not only tasks
         // launched through this controller.
-        if (runtimeTaskService.IsRunning())
+        if (backendService.IsTaskRunning)
             return Conflict(new R(false, "A task is already running"));
 
         // The server is the HTTP/control host.  The CLI remains the task control
         // endpoint, so WebUI uses the same command path as SRA.exe.
-        backendService.StartBackend("--inline");
+        backendService.StartBackend("--inline --no-admin");
         if (!await WaitForBackendReadyAsync())
             return StatusCode(500, new R(false, "Backend failed to start. Check WebUI logs for details."));
-
-        if (backendService.IsTaskRunning)
-            return Conflict(new R(false, "A task is already running"));
-
+        
         string? configName = null;
 
         if (request.Config is not null)
@@ -88,13 +76,6 @@ public class TaskController(
     [ProducesResponseType(200, Type = typeof(R))]
     public async Task<IActionResult> StopTask()
     {
-        // Prefer cooperative cross-process stop first.  It works even when the
-        // task was started from SRA.exe because the Python runner polls the same
-        // stop.request file.
-        if (runtimeTaskService.RequestStop("webui"))
-            return Ok(new R(true, "Stop signal sent"));
-
-        // Fallback for older/non-session backend states owned by this server.
         if (!backendService.IsTaskRunning)
             return Ok(new R(false, "No task is running"));
 
@@ -104,10 +85,18 @@ public class TaskController(
 
     [HttpGet("status")]
     [EndpointSummary("获取任务状态")]
-    [ProducesResponseType(200, Type = typeof(bool))]
-    public IActionResult GetStatus()
+    [ProducesResponseType(200, Type = typeof(JsonDocument))]
+    public async Task<IActionResult> GetTaskStatus()
     {
-        return Ok(runtimeTaskService.GetStatus());
+        var json = await backendService.GetTaskStatusAsync();
+        try
+        {
+            return Ok(JsonDocument.Parse(json));
+        }
+        catch (JsonException)
+        {
+            return StatusCode(500, new R(false, "Failed to parse task status JSON"));
+        }
     }
 
     [HttpGet("logs")]
@@ -115,9 +104,6 @@ public class TaskController(
     [ProducesResponseType(200, Type = typeof(List<string>))]
     public IActionResult GetRecentLogs([FromQuery] int count = 100)
     {
-        var fileLogs = ReadRecentBackendLogLines(count);
-        if (fileLogs.Count > 0)
-            return Ok(fileLogs);
         return Ok(logStream.GetRecentLogs(count));
     }
 
@@ -180,37 +166,6 @@ public class TaskController(
 
         return false;
     }
-
-    private static List<string> ReadRecentBackendLogLines(int count)
-    {
-        count = Math.Clamp(count, 1, 1000);
-        try
-        {
-            if (!Directory.Exists(DataPath.BackendLogsDir))
-                return [];
-            // File logs cover tasks started outside this server process.  When no
-            // file is available, the caller falls back to in-memory server logs.
-            var file = Directory.GetFiles(DataPath.BackendLogsDir, "SRA*.log")
-                .Select(path => new FileInfo(path))
-                .OrderByDescending(info => info.LastWriteTimeUtc)
-                .FirstOrDefault();
-            if (file is null)
-                return [];
-            return System.IO.File.ReadLines(file.FullName).TakeLast(count).ToList();
-        }
-        catch
-        {
-            return [];
-        }
-    }
-
-    [SupportedOSPlatform("windows")]
-    private static bool IsAdministrator()
-    {
-        using var identity = WindowsIdentity.GetCurrent();
-        var principal = new WindowsPrincipal(identity);
-        return principal.IsInRole(WindowsBuiltInRole.Administrator);
-    }
 }
 
 public class RunRequest
@@ -220,4 +175,4 @@ public class RunRequest
     public bool Persist { get; set; }
 }
 
-public record R(bool Success, string Message);
+public record R(bool Success, string Message, object? Data = null);

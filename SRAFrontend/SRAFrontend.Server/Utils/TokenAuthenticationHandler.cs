@@ -28,10 +28,10 @@ public class TokenAuthenticationHandler(
         if (string.IsNullOrWhiteSpace(providedToken) ||
             !string.Equals(providedToken, configuredToken, StringComparison.Ordinal))
         {
-            return Task.FromResult(AuthenticateResult.Fail("Invalid WebUI token"));
+            return Task.FromResult(AuthenticateResult.Fail("Invalid Access token"));
         }
 
-        var claims = new[] { new Claim(ClaimTypes.Name, "WebUiUser") };
+        var claims = new[] { new Claim(ClaimTypes.Name, "User") };
         var identity = new ClaimsIdentity(claims, Scheme.Name);
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);

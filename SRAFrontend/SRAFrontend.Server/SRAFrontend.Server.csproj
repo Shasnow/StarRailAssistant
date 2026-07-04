@@ -22,4 +22,8 @@
       <Content Include="..\SRAFrontend.Desktop\Assets\SRAicon.ico" Link="SRAicon.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\swagger\" />
+    </ItemGroup>
+
 </Project>
