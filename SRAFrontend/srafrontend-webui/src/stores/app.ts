@@ -118,9 +118,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   async function loadStatus() {
-    const payload = await taskApi.getHealth()
-    health.value.ok = payload.ok
-    if (payload.sra) sraStatus.value = payload.sra
+    sraStatus.value = await taskApi.getHealth()
   }
 
   async function loadConfigs() {
@@ -223,6 +221,7 @@ export const useAppStore = defineStore('app', () => {
   async function stopTask() {
     await runAction(async () => {
       await taskApi.stopTask()
+      await new Promise(resolve => setTimeout(resolve, 200))
       await loadStatus()
     }, '已发送停止指令')
   }
