@@ -255,7 +255,7 @@ class BrowserOperator(IOperator):
         return True
 
     def screenshot(self, *, from_x: float | None = None, from_y: float | None = None, to_x: float | None = None,
-                   to_y: float | None = None) -> Image:
+                   to_y: float | None = None, background: bool = True) -> Image:
         png = self.driver.get_screenshot_as_png()
         img = PIL.Image.open(BytesIO(png))
         if from_x is not None and from_y is not None and to_x is not None and to_y is not None:

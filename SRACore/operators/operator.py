@@ -54,7 +54,7 @@ class Operator(IOperator):
     def get_win_region(self, active_window: bool = True) -> Region:
         hwnd = self._get_hwnd()
         if active_window and self._win is not None and not self._win.isActive: # type: ignore
-            self.press_key("esc")  # 通过模拟键使系统认为是“用户操作”，从而允许 SetForegroundWindow
+            self.press_key("ctrl")  # 通过模拟键使系统认为是“用户操作”，从而允许 SetForegroundWindow
             self._win.activate()
         region = self._get_client_region(hwnd)
         if region is None:
@@ -87,7 +87,7 @@ class Operator(IOperator):
                    background: bool = False) -> Image:
         region = self.get_win_region(active_window=not background)
         self.sleep(0.5)
-        img = self._screenshot(self._hwnd, region)
+        img = self._screenshot(self._hwnd, region, self.screenshot_background)
         if img is None:
             raise SRAError(ErrorCode.SCREENSHOT_FAILED, "无法截取窗口内容")
         if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
@@ -99,14 +99,14 @@ class Operator(IOperator):
         return img
 
     @staticmethod
-    def _screenshot(hwnd: int, region: Region):
+    def _screenshot(hwnd: int, region: Region, background: bool = True) -> Image | None:
         """
         后台截取指定窗口，不会被其他窗口遮挡
         :param hwnd: 窗口句柄
         :param region: (left, top, width, height) 客户区坐标
         :return: PIL Image / None
         """
-        if sys.platform == "win32":
+        if background and sys.platform == "win32":
             # noinspection PyPackageRequirements
             import win32gui # (in pywin32)
             import win32ui

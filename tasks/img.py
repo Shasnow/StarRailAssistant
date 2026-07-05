@@ -52,6 +52,7 @@ class IMG:
 class SGIMG:
     BASE = "resources/img/sg"
     AGREE = f"{BASE}/%s/agree.png"
+    AGREE1 = f"{BASE}/bl/agree1.png"
     ENTER_GAME = f"{BASE}/%s/enter_game.png"
     LOGIN_OTHER = f"{BASE}/%s/login_other.png"
     LOGIN_PAGE = f"{BASE}/%s/login_page.png"

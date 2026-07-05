@@ -31,6 +31,7 @@ class IOperator(ABC):
         self.is_developer_mode: bool = self.settings.Advanced.isDeveloperModeEnabled
         self.is_save_ocr_image: bool = self.settings.Advanced.isSaveOcrImage if self.is_developer_mode else False
         self.stop_event: threading.Event | None = stop_event
+        self.screenshot_background = True
 
     @classmethod
     def _get_ocr_instance(cls):

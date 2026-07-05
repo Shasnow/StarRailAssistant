@@ -14,7 +14,10 @@ class StartGameTask(BaseTask):
         return self.login_and_enter_game()
 
     def login_and_enter_game(self):
-        match self.login():
+        self.operator.screenshot_background = False  # 暂时关闭后台截图
+        login_result = self.login()
+        self.operator.screenshot_background = True
+        match login_result:
             case -1 | 0:
                 logger.warning("登录失败")
                 return False
@@ -150,12 +153,16 @@ class StartGameTask(BaseTask):
             SGIMG.WELCOME % channel,
             SGIMG.SETTINGS,
             IMG.ENTER,
-            SGIMG.NEW_VERSION
+            SGIMG.NEW_VERSION,
+            SGIMG.AGREE1
         ], timeout=60, interval=1)
 
         if result == -1:
             logger.error(SRAError(ErrorCode.LOGIN_TIMEOUT, "等待登录界面超时", "请检查游戏状态"))
             return -1
+        if result == 5:
+            self.operator.click_box(_, after_sleep=1)
+            result = 0
         if result != 0:
             logger.info(f"登录状态 {result}")
             enable = self.config.StartGame.isReLogin
