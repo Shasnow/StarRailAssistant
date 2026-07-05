@@ -188,6 +188,27 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         return await tcs.Task;
     }
 
+    public async Task<byte[]> GetGameScreenshotBytesAsync()
+    {
+        if (_backendProcess == null || _backendProcess.HasExited)
+        {
+            logger.LogWarning("Attempted to screenshot, but backend process is not running.");
+            return [];
+        }
+        var screenshotPath = Path.Combine(WorkingDirectory, "screenshot.png");
+        var tcs = new TaskCompletionSource<string>();
+        _outputTcs = tcs;
+        await SendInputAsync($"game screenshot --background --save {screenshotPath}");
+        var result = await tcs.Task; // 等待输出完成
+        if (result.StartsWith("Failed"))
+        {
+            logger.LogError("Failed to create screenshot.");
+            return [];
+        }
+        var screenshotBytes = await File.ReadAllBytesAsync(screenshotPath);
+        return screenshotBytes;
+    }
+
     private void OnBackendProcessExited(object? sender, EventArgs e)
     {
         var processId = _backendProcess?.Id ?? -1;

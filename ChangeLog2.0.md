@@ -2,6 +2,9 @@
 - SRA-Server 新增 API Key 认证，保护服务器安全。
 - SRA-cli 已发布到 PyPI，可直接安装使用。
 - 新增抽卡资源预测扩展，可根据当前资源、奖励指南、版本周期、月卡、深渊类刷新、周常奖励和前瞻兑换码估算当前版本结束前可获得的抽卡资源。 #208
+- 新增获取游戏截图功能，支持保存截图到指定路径。 #209
+- 新增获取任务状态功能，可查询当前任务状态。
+- SRA-server 新增WebUI。
 
 ### 功能调整：
 - 更新了任务结束后通知的截图页面，增加截图信息量。 #198
@@ -15,7 +18,23 @@
 
 #### SRA-Server
 - 新增基于密钥的认证机制：在 `appsettings.json` 中配置 `AccessToken` 后启用，未配置时允许匿名访问。
-- 认证方式：请求头 `X-Access-Token: <your-token>`。
+- 认证方式：请求头添加 `X-Access-Token: <your-token>`。
+
+#### 获取游戏截图
+- 新增获取游戏截图功能，支持保存截图到指定路径。
+  cli: `sra-cli game screenshot [--save <path>] [--background] [--show]`
+  server: GET `/api/game/screenshot`
+  详请参阅 [SRA 文档](https://starrailassistant.top/getstarted/advance.html) 中相关部分。
+
+#### 获取任务状态
+- 新增获取任务状态功能，可查询当前任务状态。
+  cli: `sra-cli task status`
+  server: GET `/api/task/status`
+  详请参阅 [SRA 文档](https://starrailassistant.top/getstarted/advance.html) 中相关部分。
+
+#### SRA-server 新增WebUI
+- 新增WebUI界面，提供任务状态查询、游戏截图获取等功能。
+  详情请参阅 [SRA 文档](https://starrailassistant.top/getstarted/advance.html) 中相关部分。
 
 #### PyPI 上的 SRA
 - SRA-cli 已发布到 PyPI，提供更方便的使用方式。

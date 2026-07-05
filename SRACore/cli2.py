@@ -88,7 +88,7 @@ class SRACli(cmd2.Cmd):
     def _build_task_stop_parser() -> cmd2.Cmd2ArgumentParser:
         task_stop_description = Text.assemble(Resource.stop_description)
         return cmd2.Cmd2ArgumentParser(description=task_stop_description)
-        
+
     @cmd2.as_subcommand_to("task", "stop", _build_task_stop_parser(), help=Resource.stop_description)
     def _task_stop(self, _) -> None:
         if self.task_manager.is_thread_running():
@@ -202,7 +202,8 @@ class SRACli(cmd2.Cmd):
         trigger_enable_parser.add_argument('name', help=Resource.trigger_enable_nameHelp)
         return trigger_enable_parser
 
-    @cmd2.as_subcommand_to("trigger", "enable", _build_trigger_enable_parser(), help=Resource.trigger_enable_description)
+    @cmd2.as_subcommand_to("trigger", "enable", _build_trigger_enable_parser(),
+                           help=Resource.trigger_enable_description)
     def _trigger_enable(self, args: argparse.Namespace) -> None:
         for trigger in self.trigger_manager.triggers:
             if trigger.__class__.__name__.lower() == args.name.lower():
@@ -219,7 +220,8 @@ class SRACli(cmd2.Cmd):
         trigger_disable_parser.add_argument('name', help=Resource.trigger_disable_nameHelp)
         return trigger_disable_parser
 
-    @cmd2.as_subcommand_to("trigger", "disable", _build_trigger_disable_parser(), help=Resource.trigger_disable_description)
+    @cmd2.as_subcommand_to("trigger", "disable", _build_trigger_disable_parser(),
+                           help=Resource.trigger_disable_description)
     def _trigger_disable(self, args: argparse.Namespace) -> None:
         for trigger in self.trigger_manager.triggers:
             if trigger.__class__.__name__.lower() == args.name.lower():
@@ -264,6 +266,46 @@ class SRACli(cmd2.Cmd):
 
     # endregion
 
+    # region 游戏操作
+    @staticmethod
+    def _build_game_parser() -> cmd2.Cmd2ArgumentParser:
+        game_description = Text.assemble("管理游戏")
+        game_parser = cmd2.Cmd2ArgumentParser(description=game_description)
+        game_parser.add_subparsers(metavar="SUBCOMMAND", required=True)
+        return game_parser
+
+    @cmd2.with_argparser(_build_game_parser())
+    def do_game(self, args: argparse.Namespace) -> None:
+        args.cmd2_subcommand_func(args)
+
+    @staticmethod
+    def _build_game_screenshot_parser() -> cmd2.Cmd2ArgumentParser:
+        game_screenshot_description = Text.assemble("截取游戏截图")
+        game_screenshot_parser = cmd2.Cmd2ArgumentParser(description=game_screenshot_description)
+        game_screenshot_parser.add_argument('--save', nargs='?', const='screenshot.png', default=None,
+                                            help="保存截图到指定路径（默认 screenshot.png）")
+        game_screenshot_parser.add_argument('--show', action="store_true", help="显示截图")
+        game_screenshot_parser.add_argument('--background', action="store_true", help="在后台截取截图")
+        return game_screenshot_parser
+
+    @cmd2.as_subcommand_to("game", "screenshot", _build_game_screenshot_parser(), help="截取游戏截图")
+    def _game_screenshot(self, args: argparse.Namespace) -> None:
+        if not args.save and not args.show:
+            self.poutput("--save or --show is required")
+            return
+        try:
+            img = self.task_manager.get_operator().screenshot(background=args.background)
+        except Exception as e:
+            self.poutput(f"Failed to take screenshot: {e}")
+            return
+        if args.save:
+            img.save(args.save)
+            self.poutput(f"Screenshot saved to {args.save}")
+        if args.show:
+            img.show()
+
+    # endregion
+
     # region 其他命令
     def do_init(self, _: str):
         """Initialize the application: download resources and create default settings/config."""
@@ -286,7 +328,7 @@ class SRACli(cmd2.Cmd):
                 data = resp.read()
         except (URLError, HTTPError) as e:
             self.poutput(f"Failed to download resources: {e}")
-            return
+            return True
 
         self.poutput("Extracting resources ...")
         cwd = os.getcwd()
@@ -329,6 +371,7 @@ class SRACli(cmd2.Cmd):
         # Return True to stop the command loop
         self.last_result = True
         return True
+
     do_exit = do_quit
 
     def do_notify(self, arg: str):

@@ -83,8 +83,9 @@ class Operator(IOperator):
                    from_x: float | None = None,
                    from_y: float | None = None,
                    to_x: float | None = None,
-                   to_y: float | None = None) -> Image:
-        region = self.get_win_region(active_window=True)
+                   to_y: float | None = None,
+                   background: bool = False) -> Image:
+        region = self.get_win_region(active_window=not background)
         self.sleep(0.5)
         img = self._screenshot(self._hwnd, region)
         if img is None:

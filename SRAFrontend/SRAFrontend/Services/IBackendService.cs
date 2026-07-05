@@ -19,4 +19,5 @@ public interface IBackendService : INotifyPropertyChanged
     Task<bool> TaskSingleAsync(string taskName);
     Task<bool> TaskStopAsync();
     Task<string> GetTaskStatusAsync();
+    Task<byte[]> GetGameScreenshotBytesAsync();
 }
