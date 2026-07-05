@@ -114,6 +114,11 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         return _currentBackend.GetTaskStatusAsync();
     }
 
+    public Task<byte[]> GetGameScreenshotBytesAsync()
+    {
+        return _currentBackend.GetGameScreenshotBytesAsync();
+    }
+
     private void ApplyPythonSettings()
     {
         var pythonPath = settingsService.Settings.Advanced.PythonPath;

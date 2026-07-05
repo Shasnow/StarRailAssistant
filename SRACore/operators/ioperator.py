@@ -52,13 +52,15 @@ class IOperator(ABC):
                    from_x: float | None = None,
                    from_y: float | None = None,
                    to_x: float | None = None,
-                   to_y: float | None = None) -> Image:
+                   to_y: float | None = None,
+                   background: bool = False) -> Image:
         """截取屏幕截图
         Args:
             from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
             from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
             to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
             to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
+            background (bool): 是否在后台截取屏幕截图，默认为False
         Returns:
             PIL.Image.Image: 返回截取的屏幕区域图像对象
         Note:

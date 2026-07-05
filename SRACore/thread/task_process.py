@@ -41,6 +41,7 @@ class TaskManager:
         self.info = TaskInfo()
         self.task_list: list[type[BaseTask]] = get_task_classes()
         self.settings: AppSettings = settings
+        self._operator: IOperator | None = None
         logger.debug(f"Successfully load task: {self.task_list}")
 
     def request_stop(self) -> None:
@@ -100,6 +101,8 @@ class TaskManager:
         return self.start_thread(self.run_task, task, config_name)
 
     def get_operator(self) -> IOperator:
+        if self._operator is not None:
+            return self._operator
         if sys.platform == "win32":
             # Windows平台根据设置选择操作器类型（本地或云游戏）
             cloud_game_enabled = self.settings.General.isCloudGameEnable
