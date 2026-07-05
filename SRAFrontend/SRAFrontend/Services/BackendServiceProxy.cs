@@ -61,11 +61,13 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
 
     public Task<bool> SendInputAsync(string input)
     {
+        if (!_initialized) Initialize();
         return _currentBackend.SendInputAsync(input);
     }
 
     public bool SendInput(string input)
     {
+        if (!_initialized) Initialize();
         return _currentBackend.SendInput(input);
     }
 
@@ -78,28 +80,43 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
 
     public void StopBackend()
     {
+        if (!_initialized) return;
         _currentBackend.StopBackend();
     }
 
     public Task RestartBackendAsync(string arguments)
     {
+        if (!_initialized) Initialize();
         _lastStartArguments = arguments;
         return _currentBackend.RestartBackendAsync(arguments);
     }
 
     public Task<bool> TaskRunAsync(string? configName)
     {
+        if (!_initialized) Initialize();
         return _currentBackend.TaskRunAsync(configName);
     }
 
     public Task<bool> TaskSingleAsync(string taskName)
     {
+        if (!_initialized) Initialize();
         return _currentBackend.TaskSingleAsync(taskName);
     }
 
     public Task<bool> TaskStopAsync()
     {
+        if (!_initialized) Initialize();
         return _currentBackend.TaskStopAsync();
+    }
+
+    public Task<string> GetTaskStatusAsync()
+    {
+        return _currentBackend.GetTaskStatusAsync();
+    }
+
+    public Task<byte[]> GetGameScreenshotBytesAsync()
+    {
+        return _currentBackend.GetGameScreenshotBytesAsync();
     }
 
     private void ApplyPythonSettings()

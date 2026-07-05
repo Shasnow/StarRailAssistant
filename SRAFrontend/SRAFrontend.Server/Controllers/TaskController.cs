@@ -16,26 +16,30 @@ public class TaskController(
     ILogger<TaskController> logger) : Controller
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+    private static readonly TimeSpan BackendStartTimeout = TimeSpan.FromSeconds(3);
 
     [HttpPost("run")]
     [EndpointSummary("运行任务")]
-    [EndpointDescription(
-        "运行任务。支持三种方式: 1) 不传 ConfigName 和 Config → 运行全部配置; 2) 通过 Config 传入完整配置，根据 Persist 决定是否持久化; 3) 通过 ConfigName 加载本地已保存的配置。")]
-    [ProducesResponseType(200, Description = "已请求任务运行")]
-    [ProducesResponseType(400, Description = "请求参数无效")]
-    [ProducesResponseType(409, Description = "任务已在运行")]
+    [ProducesResponseType(200, Type = typeof(R))]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(409)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> RunTask([FromBody] RunRequest request)
     {
-        backendService.StartBackend("--no-admin --inline"); // 确保后端已启动
-
         if (backendService.IsTaskRunning)
             return Conflict(new R(false, "A task is already running"));
 
+        backendService.StartBackend("--inline --no-admin");
+        if (!await WaitForBackendReadyAsync())
+            return StatusCode(500, new R(false, "Backend failed to start. Check WebUI logs for details."));
+        
         string? configName = null;
 
         if (request.Config is not null)
         {
-            // 情况 2：携带完整配置 → 运行该配置
+            // WebUI can either persist an edited config or create a throwaway
+            // config for one run.  The CLI still receives a config name, keeping
+            // the backend command contract unchanged.
             configName = request.Persist
                 ? request.Config.Name
                 : $"_api_{Guid.NewGuid():N}";
@@ -50,44 +54,50 @@ public class TaskController(
         }
         else if (!string.IsNullOrWhiteSpace(request.ConfigName))
         {
-            // 情况 3：指定配置名 → 加载本地配置
             configName = request.ConfigName;
             var configPath = Path.Combine(DataPath.ConfigsDir, $"{configName}.json");
             if (!System.IO.File.Exists(configPath))
                 return BadRequest(new R(false, $"Config '{configName}' not found"));
         }
-        // 情况 1：两者都为空 → configName 为 null，运行全部配置
 
-        await backendService.TaskRunAsync(configName);
+        var sent = await backendService.TaskRunAsync(configName);
+        if (!sent)
+            return StatusCode(500, new R(false, "Failed to send task command to backend."));
+
         return Ok(new R(true, "Task started"));
     }
 
     [HttpPost("stop")]
     [EndpointSummary("停止任务")]
-    [EndpointDescription("停止当前运行的任务")]
     [ProducesResponseType(200, Type = typeof(R))]
     public async Task<IActionResult> StopTask()
     {
         if (!backendService.IsTaskRunning)
             return Ok(new R(false, "No task is running"));
 
-        await backendService.TaskStopAsync();
-        return Ok(new R(true, "Stop signal sent"));
+        var sent = await backendService.TaskStopAsync();
+        return Ok(sent ? new R(true, "Stop signal sent") : new R(false, "Failed to send stop signal"));
     }
 
     [HttpGet("status")]
     [EndpointSummary("获取任务状态")]
-    [EndpointDescription("获取当前任务是否正在运行")]
-    [ProducesResponseType(200, Type = typeof(bool), Description = "如果任务正在运行返回 true，否则返回 false")]
-    public IActionResult GetStatus()
+    [ProducesResponseType(200, Type = typeof(JsonDocument))]
+    public async Task<IActionResult> GetTaskStatus()
     {
-        return Ok(backendService.IsTaskRunning);
+        var json = await backendService.GetTaskStatusAsync();
+        try
+        {
+            return Ok(JsonDocument.Parse(json));
+        }
+        catch (JsonException)
+        {
+            return StatusCode(500, new R(false, "Failed to parse task status JSON"));
+        }
     }
 
     [HttpGet("logs")]
     [EndpointSummary("获取最近日志")]
-    [EndpointDescription("获取最近的任务日志条目（默认100条）")]
-    [ProducesResponseType(200, Type = typeof(List<string>), Description = "一个字符串列表，每个元素为一条完整日志")]
+    [ProducesResponseType(200, Type = typeof(List<string>))]
     public IActionResult GetRecentLogs([FromQuery] int count = 100)
     {
         return Ok(logStream.GetRecentLogs(count));
@@ -95,7 +105,6 @@ public class TaskController(
 
     [HttpGet("logs/stream")]
     [EndpointSummary("SSE 日志流")]
-    [EndpointDescription("通过 Server-Sent Events 实时推送任务日志")]
     [Produces("text/event-stream")]
     public async Task StreamLogs(CancellationToken cancellationToken)
     {
@@ -103,7 +112,6 @@ public class TaskController(
         Response.Headers.CacheControl = "no-cache";
         Response.Headers.Connection = "keep-alive";
 
-        // 合并请求取消令牌和应用停止令牌
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
             cancellationToken, lifetime.ApplicationStopping);
 
@@ -117,21 +125,32 @@ public class TaskController(
         }
         catch (OperationCanceledException)
         {
-            // 客户端断开连接或服务器关闭，正常退出
+            // Client disconnected or the host is shutting down.
         }
+    }
+
+    private async Task<bool> WaitForBackendReadyAsync()
+    {
+        var deadline = DateTimeOffset.UtcNow + BackendStartTimeout;
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            // There is no dedicated readiness endpoint for the CLI process, so a
+            // harmless built-in command is used as the readiness probe.
+            if (await backendService.SendInputAsync("help"))
+                return true;
+
+            await Task.Delay(150);
+        }
+
+        return false;
     }
 }
 
 public class RunRequest
 {
-    /// <summary>本地已保存的配置名称</summary>
     public string? ConfigName { get; set; }
-
-    /// <summary>请求体中携带的完整配置</summary>
     public TasksConfig? Config { get; set; }
-
-    /// <summary>是否持久化内联配置到磁盘（仅当 Config 不为 null 时有效）</summary>
     public bool Persist { get; set; }
 }
 
-public record R(bool Success, string Message);
+public record R(bool Success, string Message, object? Data = null);

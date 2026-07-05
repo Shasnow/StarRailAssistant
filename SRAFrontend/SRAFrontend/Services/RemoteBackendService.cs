@@ -139,6 +139,18 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         }
     }
 
+    public Task<string> GetTaskStatusAsync()
+    {
+        logger.LogWarning("GetTaskStatus is not implemented for remote backend");
+        return Task.FromResult(string.Empty);
+    }
+
+    public Task<byte[]> GetGameScreenshotBytesAsync()
+    {
+        logger.LogWarning("GetGameScreenshotBytes is not implemented for remote backend");
+        return Task.FromResult(Array.Empty<byte>());
+    }
+
     public Task<bool> SendInputAsync(string input)
     {
         logger.LogWarning("SendInput is not implemented for remote backend");

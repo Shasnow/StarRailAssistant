@@ -5,7 +5,8 @@ using SRAFrontend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var webUiEnabled = !args.Contains("--no-webui", StringComparer.OrdinalIgnoreCase);
+
 builder.Services.AddSingleton<PyBackendService>();
 builder.Services.AddSingleton<CliBackendService>();
 builder.Services.AddSingleton<IBackendService, BackendServiceProxy>();
@@ -14,40 +15,40 @@ builder.Services.AddSingleton<CacheService>();
 builder.Services.AddSingleton<ConfigService>();
 builder.Services.AddSingleton<LogStreamService>();
 builder.Services.AddHostedService<HostedService>();
+builder.Services.AddHttpClient();
+var isAuthEnabled = !string.IsNullOrWhiteSpace(builder.Configuration["AccessToken"]);
 
-// API Key 认证
-var apiKey = builder.Configuration["ApiKey"];
-var authEnabled = !string.IsNullOrWhiteSpace(apiKey);
-builder.Services.AddAuthentication(ApiKeyAuthenticationOptions.DefaultScheme)
-    .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
-        ApiKeyAuthenticationOptions.DefaultScheme, _ => { });
-if (authEnabled)
+if (isAuthEnabled)
+{
+    builder.Services.AddAuthentication(TokenAuthenticationOptions.DefaultScheme)
+        .AddScheme<TokenAuthenticationOptions, TokenAuthenticationHandler>(
+            TokenAuthenticationOptions.DefaultScheme, _ => { });
     builder.Services.AddAuthorization();
+}
 
 builder.Services.AddControllers(options =>
 {
-    if (authEnabled)
-        options.Filters.Add(new AuthorizeFilter());
+    if (isAuthEnabled) options.Filters.Add(new AuthorizeFilter());
 });
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-if (!authEnabled)
-    app.Logger.LogWarning("ApiKey is not set; server is unsecured.");
+if (webUiEnabled)
+{
+    // The Vue build output is copied into wwwroot by packaging.  ASP.NET Core
+    // then serves it as static files while the controllers below provide the
+    // actual SRA operations.
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+}
 
-// Configure the HTTP request pipeline.
-app.MapOpenApi();
-
-// app.UseHttpsRedirection();
-
-if (authEnabled)
+if (isAuthEnabled)
 {
     app.UseAuthentication();
     app.UseAuthorization();
 }
 
-app.MapControllers();
-
+app.MapGroup("/api").MapControllers();
+app.MapOpenApi();
 app.Run();

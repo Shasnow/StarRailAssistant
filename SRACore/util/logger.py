@@ -9,9 +9,9 @@ from SRACore.util.const import LogsOCRDir, LogsScreenshotDir
 def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log", level: str = "TRACE", queue: Any = None) -> None:
     logger.remove()
     log_format = "<green>{time:HH:mm:ss}</green> | <level>{level:5}</level> | <level>{message}</level>"
-    logger.add(sys.stdout, level=level,
+    logger.add(sys.stderr, level=level,
                format=log_format,
-               enqueue=True, colorize=sys.stdout.isatty())
+               enqueue=True, colorize=sys.stderr.isatty())
     logger.add(path, level=level,
                format=log_format,
                colorize=False, retention=7, enqueue=True,

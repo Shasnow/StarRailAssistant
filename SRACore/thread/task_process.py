@@ -1,6 +1,9 @@
+import dataclasses
 import importlib
+import os
 import sys
 import threading
+import uuid
 from typing import Any
 
 from SRACore.localization import Resource
@@ -8,14 +11,19 @@ from SRACore.models.app_settings import AppSettings
 from SRACore.notification import try_send_notification
 from SRACore.operators.ioperator import IOperator
 from SRACore.task import BaseTask, get_task_classes
-from SRACore.util import (
-    encryption,  # NOQA 有动态用法，确保被打包 # type: ignore
-    sys_util,  # NOQA 有动态用法，确保被打包 # type: ignore
-)
+from SRACore.util import sys_util # NOQA
 from SRACore.util.data_persister import load_cache, load_config
 from SRACore.util.errors import ThreadStoppedError
 from SRACore.util.logger import logger
 
+@dataclasses.dataclass
+class TaskInfo:
+    sessionId: str = uuid.uuid4().hex
+    pid: int = os.getpid()
+    mode: str = "unknown"
+    configs: tuple[str, ...] = dataclasses.field(default_factory=tuple)
+    task: str = "unknown"
+    status: str = "stop"
 
 class TaskManager:
     """
@@ -30,8 +38,10 @@ class TaskManager:
         self.log_queue = None
         self._stop_event = threading.Event()
         self._thread: threading.Thread | None = None
+        self.info = TaskInfo()
         self.task_list: list[type[BaseTask]] = get_task_classes()
         self.settings: AppSettings = settings
+        self._operator: IOperator | None = None
         logger.debug(f"Successfully load task: {self.task_list}")
 
     def request_stop(self) -> None:
@@ -91,6 +101,8 @@ class TaskManager:
         return self.start_thread(self.run_task, task, config_name)
 
     def get_operator(self) -> IOperator:
+        if self._operator is not None:
+            return self._operator
         if sys.platform == "win32":
             # Windows平台根据设置选择操作器类型（本地或云游戏）
             cloud_game_enabled = self.settings.General.isCloudGameEnable
@@ -105,7 +117,7 @@ class TaskManager:
             from SRACore.operators.browser_operator import BrowserOperator
             return BrowserOperator(stop_event=self._stop_event)
 
-    def run(self, *args: Any) -> None:
+    def run(self, *args: str) -> None:
         """
         进程主循环：
         1. 读取配置列表（单配置或多配置）
@@ -114,6 +126,8 @@ class TaskManager:
         """
         self._stop_event.clear()
         logger.debug('[Start]')
+        self.info.mode = "run"
+        self.info.status = "running"
         try:
             if len(args)==0:
                 # 不指定配置时，加载缓存中的全部配置名称
@@ -121,9 +135,11 @@ class TaskManager:
             else:
                 # 指定配置名称
                 config_list = args
-
+            self.info.configs = config_list
             last_operator = None
             for config_name in config_list:
+                if self._stop_event.is_set():
+                    return
                 logger.info(Resource.task_currentConfig(config_name))
 
                 # 获取当前配置需要执行的任务列表
@@ -140,6 +156,7 @@ class TaskManager:
                     try:
                         # 运行任务，如果返回 False 表示任务失败
                         logger.debug('running task: ' + str(task))
+                        self.info.task = str(task)
                         # 任务开始
                         task.start()
                         if not task.run():
@@ -168,6 +185,8 @@ class TaskManager:
             # 捕获线程主循环中的异常（如配置加载失败）
             logger.exception(Resource.task_managerCrashed(str(e)))
         finally:
+            final_state = "stopped" if self._stop_event.is_set() else "completed"
+            self.info.status = final_state
             logger.debug("[Done]")
 
     def get_tasks(self, config_name: str) -> list[BaseTask]:
@@ -236,6 +255,7 @@ class TaskManager:
             return False
         task_name = str(task)
         logger.debug(f"run single task: config={config}, task={task}")
+        self.info.mode = "single"
         # 获取任务实例
         task_instance = self.get_task(config, task_name)
         if task_instance is None:
@@ -264,6 +284,8 @@ class TaskManager:
             task_instance.fail()
             return False
         finally:
+            final_state = "stopped" if self._stop_event.is_set() else "completed"
+            self.info.status = final_state
             logger.debug("[Done]")
 
     def get_task(self, config: str, task: str) -> BaseTask | None:

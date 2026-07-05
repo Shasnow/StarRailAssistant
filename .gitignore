@@ -16,17 +16,13 @@
 /.venv/
 **/__pycache__/
 
-# Coverage.py
-.coverage
-.coverage.*
-coverage.xml
-htmlcov/
-
 # 打包 / 安装输出
 /setup/output/
 /setup/SRA/
 /setup/install_info.txt
 /main.dist/
+SRAFrontend/SRAFrontend.Server/wwwroot/*
+!SRAFrontend/SRAFrontend.Server/wwwroot/.gitkeep
 *.zip
 
 # 构建产物
