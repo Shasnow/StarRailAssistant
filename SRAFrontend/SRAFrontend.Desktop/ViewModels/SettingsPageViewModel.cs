@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
@@ -97,7 +96,6 @@ public partial class SettingsPageViewModel : PageViewModel
         SetGameResolution();
         if (IsOverlayEnabled) _overlayService.ShowOverlay();
         _overlayService.SetOverlayDebugInfoEnabled(Settings.Advanced.IsDebugOverlayEnabled);
-        UpdateWebUiRemoteState();
 
         _settingsService.SettingsPropertyChanged += OnSettingsPropertyChanged;
     }
@@ -113,11 +111,6 @@ public partial class SettingsPageViewModel : PageViewModel
     public AdvancedSettings AdvancedSettings => Settings.Advanced;
     public Cache Cache => _cacheService.Cache;
     public static string VersionText => AppSettings.Version;
-    public string WebUiRemoteUrl => "http://127.0.0.1:5074/";
-    public string WebUiRemoteStatus => Settings.Advanced.IsWebUiRemoteConnectionEnabled ? "当前状态：已开启" : "当前状态：未开启";
-    public string WebUiRemoteButtonText => Settings.Advanced.IsWebUiRemoteConnectionEnabled ? "关闭远程连接" : "开启远程连接";
-    public string WebUiRemoteAutostartStatus => Settings.Advanced.IsWebUiRemoteAutostartEnabled ? "自启动状态：已启用" : "自启动状态：未启用";
-    public string WebUiRemoteAutostartButtonText => Settings.Advanced.IsWebUiRemoteAutostartEnabled ? "关闭远程连接自启动" : "启用远程连接自启动";
 
     #region 任务通知配置
     // 启动游戏
@@ -308,41 +301,7 @@ public partial class SettingsPageViewModel : PageViewModel
     {
         _ = _commonModel.CheckDesktopShortcut(true);
     }
-
-    [RelayCommand]
-    private void ToggleWebUiRemoteConnection()
-    {
-        var previousState = Settings.Advanced.IsWebUiRemoteConnectionEnabled;
-        var nextState = !previousState;
-
-        try
-        {
-            Settings.Advanced.IsWebUiRemoteConnectionEnabled = nextState;
-            _commonModel.ApplyWebUiRemoteConnection();
-            _settingsService.Save();
-            UpdateWebUiRemoteState();
-            _commonModel.ShowSuccessToast("远程连接", Settings.Advanced.IsWebUiRemoteConnectionEnabled ? "WebUI 已启用。" : "WebUI 已关闭。");
-        }
-        catch (Exception ex)
-        {
-            Settings.Advanced.IsWebUiRemoteConnectionEnabled = previousState;
-            _settingsService.Save();
-            UpdateWebUiRemoteState();
-            _commonModel.ShowErrorToast("远程连接", $"同步 WebUI 服务失败：{ex.Message}");
-        }
-    }
-
-    [RelayCommand]
-    private void ToggleWebUiRemoteAutostart()
-    {
-        Settings.Advanced.IsWebUiRemoteAutostartEnabled = !Settings.Advanced.IsWebUiRemoteAutostartEnabled;
-        _settingsService.Save();
-        OnPropertyChanged(nameof(WebUiRemoteAutostartStatus));
-        OnPropertyChanged(nameof(WebUiRemoteAutostartButtonText));
-        _ = ApplyWebUiAutostartAsync();
-        _commonModel.ShowSuccessToast("远程连接自启动", Settings.Advanced.IsWebUiRemoteAutostartEnabled ? "已启用 WebUI 自启动。" : "已关闭 WebUI 自启动。");
-    }
-
+    
     [RelayCommand]
     private void OpenFolder(string folder)
     {
@@ -389,40 +348,6 @@ public partial class SettingsPageViewModel : PageViewModel
         if (e.PropertyName is nameof(Settings.General.GameArgsWindowSize)
             or nameof(Settings.General.GameArgsFullScreenMode))
             SetGameResolution();
-    }
-
-    private void StartWebUiRemoteConnection()
-    {
-        Settings.Advanced.IsWebUiRemoteConnectionEnabled = true;
-        _settingsService.Save();
-        UpdateWebUiRemoteState();
-    }
-
-    private void StopWebUiRemoteConnection()
-    {
-        Settings.Advanced.IsWebUiRemoteConnectionEnabled = false;
-        _settingsService.Save();
-        UpdateWebUiRemoteState();
-    }
-
-    private void UpdateWebUiRemoteState()
-    {
-        OnPropertyChanged(nameof(WebUiRemoteStatus));
-        OnPropertyChanged(nameof(WebUiRemoteButtonText));
-        OnPropertyChanged(nameof(WebUiRemoteAutostartStatus));
-        OnPropertyChanged(nameof(WebUiRemoteAutostartButtonText));
-    }
-
-    private async Task ApplyWebUiAutostartAsync()
-    {
-        try
-        {
-            await _commonModel.ApplyWebUiAutostartAsync();
-        }
-        catch (Exception ex)
-        {
-            _commonModel.ShowErrorToast("远程连接自启动", $"同步计划任务失败：{ex.Message}");
-        }
     }
 
     [RelayCommand]

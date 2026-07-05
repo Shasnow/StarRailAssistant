@@ -147,7 +147,9 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         if (e.PropertyName == nameof(AdvancedSettings.IsRemoteEnabled) && _remoteBackendService is not null)
         {
             var useRemote = settingsService.Settings.Advanced.IsRemoteEnabled;
-            IBackendService target = useRemote ? _remoteBackendService : cliBackendService;
+            IBackendService target = useRemote
+                ? _remoteBackendService
+                : settingsService.Settings.Advanced.IsPythonEnabled ? pyBackendService : cliBackendService;
             SetCurrentBackend(target);
         }
 

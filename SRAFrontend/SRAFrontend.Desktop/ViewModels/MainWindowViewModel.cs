@@ -73,22 +73,6 @@ public partial class MainWindowViewModel(
         await commonModel.CleanupOldExeAsync();
         await commonModel.CheckForUpdatesAsync();
         await commonModel.CheckDesktopShortcut();
-        try
-        {
-            commonModel.ApplyWebUiRemoteConnection();
-        }
-        catch
-        {
-            // WebUI 服务端是可选 DLC，启动失败时不阻断主界面启动。
-        }
-        try
-        {
-            await commonModel.ApplyWebUiAutostartAsync();
-        }
-        catch
-        {
-            // WebUI 计划任务同步失败时不阻断主界面启动。
-        }
         await commonModel.CheckAnnouncementAsync();
     }
 
