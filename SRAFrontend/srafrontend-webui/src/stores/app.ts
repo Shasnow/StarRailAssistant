@@ -2,7 +2,7 @@ import {defineStore} from 'pinia'
 import {computed, reactive, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import {configureRequest} from '@/api/request'
-import {verifyToken} from '@/api/auth'
+import {auth} from '@/api/auth'
 import * as configsApi from '@/api/configs'
 import * as settingsApi from '@/api/settings'
 import * as taskApi from '@/api/task'
@@ -29,7 +29,7 @@ export const useAppStore = defineStore('app', () => {
     try {
       const trimmed = inputToken.trim()
       if (!trimmed) throw new Error('请输入访问令牌')
-      await verifyToken(trimmed)
+      await auth(trimmed)
       token.value = trimmed
       localStorage.setItem('sra-webui-token', trimmed)
       isAuthed.value = true
@@ -51,7 +51,7 @@ export const useAppStore = defineStore('app', () => {
     if (!token.value) return false
     checking.value = true
     try {
-      await verifyToken(token.value)
+      await auth(token.value)
       isAuthed.value = true
       return true
     } catch {

@@ -8,10 +8,10 @@ namespace SRAFrontend.Server.Controllers;
 public class AuthController(IConfiguration configuration) : Controller
 {
     [AllowAnonymous]
-    [HttpPost("verify")]
+    [HttpPost]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]
-    public IActionResult Verify([FromBody] TokenRequest request)
+    public IActionResult Auth([FromBody] TokenRequest request)
     {
         var token = request.Token?.Trim() ?? "";
         var configuredToken = configuration["AccessToken"];
