@@ -33,14 +33,12 @@ request.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 
 request.interceptors.response.use(
   (res: AxiosResponse) => res.data,
-  (error: AxiosError<{ message?: string; Message?: string; errors?: Record<string, string[]>; title?: string }>) => {
+  (error: AxiosError) => {
     if (error.response?.status === 401) {
       onUnauthorized()
       return Promise.reject(new Error('访问令牌不正确或已失效'))
     }
-    const data = error.response?.data
-    const fieldErrors = data?.errors ? Object.values(data.errors).flat().join('；') : ''
-    const message = data?.message ?? data?.Message ?? fieldErrors ?? data?.title ?? error.message
+    const message = error.message
     ElMessage.error(message)
     return Promise.reject(new Error(message))
   }

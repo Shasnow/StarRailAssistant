@@ -10,24 +10,25 @@
     </div>
     <div class="status-list">
       <div>
-        <span>WebUI</span>
-        <strong>{{ healthOk ? '在线' : '离线' }}</strong>
-      </div>
-      <div>
-        <span>SRA</span>
-        <strong>{{ status.running ? '运行中' : '未运行' }}</strong>
-      </div>
-      <div>
-        <span>端口</span>
-        <strong>{{ status.port ?? '-' }}</strong>
-      </div>
-      <div>
         <span>PID</span>
         <strong>{{ status.pid ?? '-' }}</strong>
       </div>
-    </div>
-    <div class="path-line" :title="status.executablePath || '-'">
-      {{ status.executablePath || '等待后端状态' }}
+      <div>
+        <span>模式</span>
+        <strong>{{ status.mode ?? '-' }}</strong>
+      </div>
+      <div>
+        <span>配置</span>
+        <strong>{{ status.configs }}</strong>
+      </div>
+      <div>
+        <span>任务</span>
+        <strong>{{ status.task }}</strong>
+      </div>
+      <div>
+        <span>状态</span>
+        <strong>{{ status.status==='running' ? '运行中' : '未运行' }}</strong>
+      </div>
     </div>
   </section>
 </template>
