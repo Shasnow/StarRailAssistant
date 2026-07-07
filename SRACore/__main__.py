@@ -103,12 +103,10 @@ def restart_as_admin():
 
 def is_admin() -> bool:
     """检查当前用户是否具有管理员权限（仅限 Windows）"""
-    try:
+    if sys.platform == 'win32':
         import ctypes
         return ctypes.windll.shell32.IsUserAnAdmin() != 0  # NOQA
-    except Exception as e:
-        print(f"Error checking administrator privileges: {e}")
-        return False
+    return True
 
 
 if __name__ == '__main__':
