@@ -9,6 +9,7 @@ import pygetwindow  # type: ignore
 import pyperclip
 import pyscreeze
 from PIL.Image import Image
+from rapidocr import RapidOCR
 
 from SRACore.operators.ioperator import IOperator
 from SRACore.operators.model import Region
@@ -17,8 +18,8 @@ from SRACore.util.logger import logger
 
 
 class Operator(IOperator):
-    def __init__(self, stop_event: threading.Event | None = None):
-        super().__init__(stop_event)
+    def __init__(self, ocr_engine: RapidOCR, stop_event: threading.Event | None = None):
+        super().__init__(ocr_engine, stop_event)
         self.window_title = "崩坏：星穹铁道"
         self.top = 0
         self.left = 0

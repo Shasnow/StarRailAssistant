@@ -54,7 +54,7 @@ class GeneralSettings:
     isGameArgsPopupWindow: bool = False
     isUseCmd: bool = False
     gameArgsAdvanced: str = ""
-    isCloudGameEnable: bool = False
+    isCloudGameEnabled: bool = False
     cloudGameBrowser: str = "Microsoft Edge"
     hotkeyE: str = "E"
     hotkeyF1: str = "F1"
@@ -78,7 +78,7 @@ class GeneralSettings:
             "gameArgs.popupWindow": self.isGameArgsPopupWindow,
             "gameArgs.useCmd": self.isUseCmd,
             "gameArgs.advanced": self.gameArgsAdvanced,
-            "cloudGame.enabled": self.isCloudGameEnable,
+            "cloudGame.enabled": self.isCloudGameEnabled,
             "cloudGame.browser": self.cloudGameBrowser,
             "keybindings.e": self.hotkeyE,
             "keybindings.f1": self.hotkeyF1,
@@ -104,7 +104,7 @@ class GeneralSettings:
             "isGameArgsPopupWindow": data.get("gameArgs.popupWindow", False),
             "isUseCmd": data.get("gameArgs.useCmd", False),
             "gameArgsAdvanced": data.get("gameArgs.advanced", ""),
-            "isCloudGameEnable": data.get("cloudGame.enabled", False),
+            "isCloudGameEnabled": data.get("cloudGame.enabled", False),
             "cloudGameBrowser": data.get("cloudGame.browser", "Microsoft Edge"),
             "hotkeyE": data.get("keybindings.e", "E"),
             "hotkeyF1": data.get("keybindings.f1", "F1"),

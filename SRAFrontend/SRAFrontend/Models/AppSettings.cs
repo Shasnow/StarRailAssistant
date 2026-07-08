@@ -70,7 +70,7 @@ public partial class GeneralSettings : ObservableObject
     [ObservableProperty]
     [property: JsonPropertyName("cloudGame.enabled")]
     [property: Description("是否使用云游戏")]
-    private bool _isCloudGameEnable;
+    private bool _isCloudGameEnabled;
 
     [ObservableProperty]
     [property: JsonPropertyName("cloudGame.browser")]

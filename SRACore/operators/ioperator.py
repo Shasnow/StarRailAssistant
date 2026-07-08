@@ -7,7 +7,8 @@ from typing import Any, Callable
 import pyscreeze
 from PIL.Image import Image
 from loguru import logger
-from rapidocr_onnxruntime import RapidOCR  # type: ignore
+from rapidocr import RapidOCR  # type: ignore
+from rapidocr.utils.output import RapidOCROutput
 
 from SRACore.operators.model import Box
 from SRACore.util.const import AppRootDir, LogsOCRDir
@@ -17,9 +18,8 @@ from SRACore.util.errors import ThreadStoppedError
 type Waitable = Callable[[], Box | None]
 
 class IOperator(ABC):
-    ocr_engine = None
 
-    def __init__(self, stop_event: threading.Event | None = None):
+    def __init__(self, ocr_engine: RapidOCR, stop_event: threading.Event | None = None):
         self.type = "Local"
         self.settings = load_app_settings()
         self.tm_confidence: float = self.settings.General.templateMatchConfidence
@@ -31,17 +31,8 @@ class IOperator(ABC):
         self.is_developer_mode: bool = self.settings.Advanced.isDeveloperModeEnabled
         self.is_save_ocr_image: bool = self.settings.Advanced.isSaveOcrImage if self.is_developer_mode else False
         self.stop_event: threading.Event | None = stop_event
+        self.ocr_engine: RapidOCR = ocr_engine
         self.screenshot_background = True
-
-    @classmethod
-    def _get_ocr_instance(cls):
-        """获取OCR引擎实例"""
-        if cls.ocr_engine is None:
-            config_path = AppRootDir / 'rapidocr_onnxruntime' / 'config.yaml'
-            if not config_path.exists():
-                config_path = None
-            cls.ocr_engine = RapidOCR(config_path = config_path)
-        return cls.ocr_engine
 
     @abstractmethod
     def is_window_active(self) -> bool:
@@ -240,12 +231,14 @@ class IOperator(ABC):
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("Operation stopped")
         try:
-            if self.ocr_engine is None:
-                self.ocr_engine = IOperator._get_ocr_instance()
             screenshot = self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
             if screenshot is None:
                 raise RuntimeError("Failed to capture screenshot for OCR")
-            result, _ = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA # type: ignore
+            rapid_output:RapidOCROutput = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA # type: ignore
+            if rapid_output.txts is None:
+                result = None
+            else:
+                result = [(box.tolist(), text, scores) for box, text, scores in zip(rapid_output.boxes, rapid_output.txts, rapid_output.scores)]  # NOQA
             if self.is_save_ocr_image:
                 screenshot.save(LogsOCRDir / f"{int(time.time())}.png")
             if trace:

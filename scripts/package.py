@@ -146,17 +146,17 @@ def copy_core_resources(dist: Path):
     shutil.copy2(ROOT_PATH / "SRACore" / "localization" / "resource_en-us.json", DIST_DIR / "SRACore" / "localization" / "resource_en-us.json")
     shutil.copy2(ROOT_PATH / "SRACore" / "localization" / "resource_zh-cn.json", DIST_DIR / "SRACore" / "localization" / "resource_zh-cn.json")
     shutil.copytree(ROOT_PATH / "resources", dist / "resources")
-    rapidocr_pkg = SITE_PACKAGES_DIR / "rapidocr_onnxruntime"
+    rapidocr_pkg = SITE_PACKAGES_DIR / "rapidocr"
     if rapidocr_pkg.exists():
-        (dist / "rapidocr_onnxruntime").mkdir(parents=True, exist_ok=True)
+        (dist / "rapidocr").mkdir(parents=True, exist_ok=True)
         models_dir = rapidocr_pkg / "models"
         if models_dir.exists():
-            shutil.copytree(models_dir, dist / "rapidocr_onnxruntime" / "models")
+            shutil.copytree(models_dir, dist / "rapidocr" / "models")
         config_path = rapidocr_pkg / "config.yaml"
         if config_path.exists():
-            shutil.copy2(config_path, dist / "rapidocr_onnxruntime" / "config.yaml")
+            shutil.copy2(config_path, dist / "rapidocr" / "config.yaml")
     else:
-        print(f"  [WARN] rapidocr_onnxruntime not found in {SITE_PACKAGES_DIR}, skipping OCR model copy")
+        print(f"  [WARN] rapidocr not found in {SITE_PACKAGES_DIR}, skipping OCR model copy")
     shutil.copytree(ROOT_PATH / "tasks", dist / "tasks")
     print("[OK] Resources copied")
 

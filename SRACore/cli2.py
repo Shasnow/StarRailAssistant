@@ -7,6 +7,7 @@ from rich.text import Text
 
 from SRACore.localization import Resource
 from SRACore.models.app_settings import AppSettings
+from SRACore.operators.factory import OperatorFactory
 from SRACore.runtime.event_listener import KeyboardListener
 from SRACore.runtime.trigger_manager import TriggerManager
 from SRACore.thread.task_process import TaskManager
@@ -288,13 +289,13 @@ class SRACli(cmd2.Cmd):
         game_screenshot_parser.add_argument('--background', action="store_true", help="在后台截取截图")
         return game_screenshot_parser
 
-    @cmd2.as_subcommand_to("game", "screenshot", _build_game_screenshot_parser(), help="截取游戏截图")
+    @cmd2.as_subcommand_to("game", "screenshot", _build_game_screenshot_parser, help="截取游戏截图")
     def _game_screenshot(self, args: argparse.Namespace) -> None:
         if not args.save and not args.show:
             self.poutput("--save or --show is required")
             return
         try:
-            img = self.task_manager.get_operator().screenshot(background=args.background)
+            img = OperatorFactory.get_operator("Local").screenshot(background=args.background)
         except Exception as e:
             self.poutput(f"Failed to take screenshot: {e}")
             return
@@ -303,6 +304,35 @@ class SRACli(cmd2.Cmd):
             self.poutput(f"Screenshot saved to {args.save}")
         if args.show:
             img.show()
+
+    @staticmethod
+    def _build_game_ocr_parser() -> cmd2.Cmd2ArgumentParser:
+        game_ocr_description = Text.assemble("执行 OCR 文字识别")
+        game_ocr_parser = cmd2.Cmd2ArgumentParser(description=game_ocr_description)
+        game_ocr_parser.add_argument('--region', nargs=4, type=float, metavar=('X1', 'Y1', 'X2', 'Y2'),
+                                     help="识别区域坐标比例 (0-1)，格式: X1 Y1 X2 Y2")
+        game_ocr_parser.add_argument('--json', action='store_true', help="以 JSON 格式输出")
+        return game_ocr_parser
+
+    @cmd2.as_subcommand_to("game", "ocr", _build_game_ocr_parser, help="执行 OCR 文字识别")
+    def _game_ocr(self, args: argparse.Namespace) -> None:
+        import json
+        try:
+            operator = OperatorFactory.get_operator("Local")
+            region = args.region
+            result = operator.ocr(
+                from_x=region[0] if region else None,
+                from_y=region[1] if region else None,
+                to_x=region[2] if region else None,
+                to_y=region[3] if region else None
+            )
+            if args.json:
+                self.poutput(json.dumps(result, ensure_ascii=False))
+            else:
+                self.poutput(result)
+        except Exception as e:
+            self.poutput(f"OCR Error: {e}")
+
 
     # endregion
 

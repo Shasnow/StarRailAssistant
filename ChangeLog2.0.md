@@ -5,6 +5,7 @@
 - 新增获取游戏截图功能，支持保存截图到指定路径。 #209
 - 新增获取任务状态功能，可查询当前任务状态。
 - SRA-server 新增WebUI。
+- 更换rapidocr_onnxruntime库为rapidocr。 
 
 ### 功能调整：
 - 更新了问候语。

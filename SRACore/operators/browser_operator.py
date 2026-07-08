@@ -6,6 +6,7 @@ from io import BytesIO
 import PIL
 from PIL.Image import Image
 from loguru import logger
+from rapidocr import RapidOCR
 from selenium import webdriver
 from selenium.common import NoSuchElementException
 from selenium.webdriver import ActionChains, Keys
@@ -23,8 +24,8 @@ from SRACore.util.errors import ThreadStoppedError
 
 
 class BrowserOperator(IOperator):
-    def __init__(self, stop_event: threading.Event | None = None):
-        super().__init__(stop_event)
+    def __init__(self, ocr_engine:RapidOCR, stop_event: threading.Event | None = None):
+        super().__init__(ocr_engine, stop_event)
         self.type = "Browser"
         # noinspection PyTypeChecker
         self.driver: WebDriver = None
