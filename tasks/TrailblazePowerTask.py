@@ -1,5 +1,5 @@
 import tomllib
-from typing import Any, Callable, TypedDict
+from typing import Callable, TypedDict
 
 from SRACore.models.tasks_config import TrailblazePowerTaskItem
 from SRACore.operators.model import Box
@@ -11,21 +11,26 @@ from tasks.img import IMG, TPIMG
 type TrailblazePowerFunc = Callable[..., bool]
 
 
-class SubtaskInfo(TypedDict, total=False):
+class LevelInfo(TypedDict):
+    id: int  # 关卡id
+    name: str  # 关卡名称
+    result: str  # 关卡产出
+
+
+class SubtaskInfo(TypedDict):
     name: str
     func: str
     cost: int
     max_count: int
-    levels: list[str]
-    results: list[str]
+    levels: list[LevelInfo]
 
 
 @task(order=1)
 class TrailblazePowerTask(BaseTask):
     def _post_init(self):
         with open(r"tasks/config/trailblaze_power.toml", "rb") as tf:
-            self.task_config = tomllib.load(tf)
-
+            task_config = tomllib.load(tf)
+        self.sub_tasks: dict[str, SubtaskInfo] = task_config.get("subtasks", {})
         self.replenish_time: int = self.config.TrailblazePower.replenishTimes
         self.replenish_way: int = self.config.TrailblazePower.replenishWay
         self.replenish_flag: bool = self.config.TrailblazePower.isReplenishEnabled
@@ -92,33 +97,32 @@ class TrailblazePowerTask(BaseTask):
 
         for obj in target_objects:
             # 从配置文件中匹配产物对应的副本任务
-            subtasks: dict[str, Any] = self.task_config.get("subtasks", {})
-            for subtask_id, subtask_info in subtasks.items():
-                subtask_results = subtask_info.get("results", [])
+            for id, subtask in self.sub_tasks.items():
+                subtask_levels = subtask["levels"]
                 found = False  # 标记是否找到对应结果
-                for index, r in enumerate(subtask_results):
-                    if obj in r:
-                        logger.info(f"{obj} 需要刷取 {subtask_info.get('name')} 的关卡 {index + 1}")
+                for level in subtask_levels:
+                    if obj in level["result"]:
+                        logger.info(f"{obj} 需要刷取 {subtask.get('name')} 的关卡 {level["id"]}")
                         found = True
-                        if subtask_id == "echo_of_war":
+                        if id == "echo_of_war":
                             # 历战余响特殊处理
-                            self.manual_tasks.append((self.get_task_by_id(subtask_id), {
-                                "level": index + 1,
+                            self.manual_tasks.append((self.get_task_by_id(id), {
+                                "level": level["id"],
                                 "single_time": 3,
                                 "run_time": 1
                             }))
                         else:
-                            task_name = subtask_info.get("name", subtask_id)
+                            task_name = subtask.get("name", id)
                             self.auto_detect_tasks.append(
                                 TrailblazePowerTaskItem(
                                     Name=task_name,
-                                    Id=subtask_id,
-                                    Level=index + 1
+                                    Id=id,
+                                    Level=level["id"]
                                 )
                             )
                         break
                 else:
-                    logger.debug(f"Could not find {obj} in subtask results of {subtask_id}")
+                    logger.debug(f"Could not find {obj} in subtask results of {id}")
                 if found:
                     break
 
@@ -321,30 +325,23 @@ class TrailblazePowerTask(BaseTask):
                 run_time -= single_time
         return tasks if tasks else None
 
-    def _get_subtask_info(self, task_id: str) -> SubtaskInfo:
-        """任务ID转任务详情"""
-        task_info = self.task_config.get("subtasks", {}).get(task_id)
-        if task_info is None:
-            raise RuntimeError("Invalid task ID")
-        return task_info
-
     def get_task_by_id(self, task_id: str) -> TrailblazePowerFunc:
         """任务ID转任务函数"""
-        task_func = self._get_subtask_info(task_id).get("func")
+        task_func = self.sub_tasks[task_id].get("func")
         if task_func is None:
             raise RuntimeError("Invalid task func")
         return getattr(self, task_func)
 
     def get_cost_by_id(self, task_id: str) -> int:
         """任务ID转任务体力消耗"""
-        task_cost = self._get_subtask_info(task_id).get("cost")
+        task_cost = self.sub_tasks[task_id].get("cost")
         if task_cost is None:
             raise RuntimeError("Invalid task cost")
         return task_cost
 
     def get_max_count_by_id(self, task_id: str) -> int:
         """任务ID转任务最大单次执行次数"""
-        max_count = self._get_subtask_info(task_id).get("max_count")
+        max_count = self.sub_tasks[task_id].get("max_count")
         if max_count is None:
             raise RuntimeError("Invalid task max_count")
         return max_count
@@ -795,8 +792,8 @@ class TrailblazePowerTask(BaseTask):
         """前往活动页面"""
         logger.info("前往活动页面")
         index, box = self.operator.wait_any([
-            lambda : self.operator.locate(IMG.ENTER),
-            lambda : self.operator.ocr_match("旅情事记", from_x=0.05, from_y=0.02, to_x=0.11, to_y=0.09),
+            lambda: self.operator.locate(IMG.ENTER),
+            lambda: self.operator.ocr_match("旅情事记", from_x=0.05, from_y=0.02, to_x=0.11, to_y=0.09),
         ], timeout=30, interval=0.5)
         if index == 1:
             # 已经在活动页面
