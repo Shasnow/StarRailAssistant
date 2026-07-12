@@ -34,7 +34,7 @@ public static class DataPath
         EnsureDirectoryExists(TempDir);
         EnsureDirectoryExists(ConfigsDir);
         EnsureDirectoryExists(FrontendLogsDir);
-        EnsureDirectoryExists(PythonDir);
+        // EnsureDirectoryExists(PythonDir);
         // EnsureDirectoryExists(BackendLogsDir);
         // EnsureDirectoryExists(ReportsDir);
     }

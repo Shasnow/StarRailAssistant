@@ -7,7 +7,7 @@ namespace SRAFrontend.Models;
 
 public class AppSettings
 {
-    public const string Version = "2.18.0-beta.2"; // 应用版本号
+    public const string Version = "2.18.0"; // 应用版本号
 
     [JsonPropertyName("general")] public GeneralSettings General { get; init; } = new();
 

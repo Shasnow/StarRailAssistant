@@ -15,7 +15,8 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FILES = {
     'cs': os.path.join(PROJECT_ROOT, 'SRAFrontend', 'SRAFrontend', 'Models', 'AppSettings.cs'),
     'const.py': os.path.join(PROJECT_ROOT, 'SRACore', 'util', 'const.py'),
-    'package.json': os.path.join(PROJECT_ROOT, 'package.json')
+    'package.json': os.path.join(PROJECT_ROOT, 'package.json'),
+    'pyproject.toml': os.path.join(PROJECT_ROOT, 'pyproject.toml')
 }
 
 def update_file_version(file_path, version):
@@ -34,19 +35,30 @@ def update_file_version(file_path, version):
             file_type = 'cs'
         elif file_ext == '.py':
             file_type = 'py'
+        elif file_ext == '.toml':
+            file_type = 'toml'
         else:
             print(f"[ERROR] 不支持的文件类型: {file_ext}")
             return
         
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        
+
         if file_type == 'json':
             # 处理 JSON 文件
             data = json.loads(content)
             if 'version' in data:
                 data['version'] = version
                 new_content = json.dumps(data, indent=2, ensure_ascii=False)
+                updated = True
+            else:
+                updated = False
+        elif file_type == 'toml':
+            # 处理 TOML 文件（pyproject.toml）
+            pattern = r'^version\s*=\s*"[^"]+"'
+            replacement = f'version = "{version}"'
+            if re.search(pattern, content, re.MULTILINE):
+                new_content = re.sub(pattern, replacement, content, count=1)
                 updated = True
             else:
                 updated = False
@@ -246,6 +258,7 @@ def main():
     update_file_version(FILES['cs'], version)
     update_file_version(FILES['const.py'], version)
     update_file_version(FILES['package.json'], version)
+    update_file_version(FILES['pyproject.toml'], version)
     
     print("=" * 50)
     print("版本号更新完成！")
