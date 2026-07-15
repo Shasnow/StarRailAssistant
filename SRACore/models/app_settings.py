@@ -56,6 +56,8 @@ class GeneralSettings:
     gameArgsAdvanced: str = ""
     isCloudGameEnabled: bool = False
     cloudGameBrowser: str = "Microsoft Edge"
+    cloudGameBrowserPath: str = ""
+    cloudGameBrowserHeadless: bool = False
     hotkeyE: str = "E"
     hotkeyF1: str = "F1"
     hotkeyF2: str = "F2"
@@ -80,6 +82,8 @@ class GeneralSettings:
             "gameArgs.advanced": self.gameArgsAdvanced,
             "cloudGame.enabled": self.isCloudGameEnabled,
             "cloudGame.browser": self.cloudGameBrowser,
+            "cloudGame.browser.path": self.cloudGameBrowserPath,
+            "cloudGame.browser.headless": self.cloudGameBrowserHeadless,
             "keybindings.e": self.hotkeyE,
             "keybindings.f1": self.hotkeyF1,
             "keybindings.f2": self.hotkeyF2,
@@ -106,6 +110,8 @@ class GeneralSettings:
             "gameArgsAdvanced": data.get("gameArgs.advanced", ""),
             "isCloudGameEnabled": data.get("cloudGame.enabled", False),
             "cloudGameBrowser": data.get("cloudGame.browser", "Microsoft Edge"),
+            "cloudGameBrowserPath": data.get("cloudGame.browser.path", ""),
+            "cloudGameBrowserHeadless": data.get("cloudGame.browser.headless", False),
             "hotkeyE": data.get("keybindings.e", "E"),
             "hotkeyF1": data.get("keybindings.f1", "F1"),
             "hotkeyF2": data.get("keybindings.f2", "F2"),

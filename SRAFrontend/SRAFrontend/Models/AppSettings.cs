@@ -76,6 +76,16 @@ public partial class GeneralSettings : ObservableObject
     [property: JsonPropertyName("cloudGame.browser")]
     [property: Description("云游戏使用的浏览器")]
     private string _cloudGameBrowser = "Microsoft Edge";
+    
+    [ObservableProperty]
+    [property: JsonPropertyName("cloudGame.browser.path")]
+    [property: Description("云游戏使用的浏览器路径")]
+    private string _cloudGameBrowserPath = "";
+    
+    [ObservableProperty]
+    [property: JsonPropertyName("cloudGame.browser.headless")]
+    [property: Description("云游戏使用的浏览器是否无头模式")]
+    private bool _cloudGameBrowserHeadless;
 
     [ObservableProperty] [property: JsonPropertyName("keybindings.e")]
     private string _hotkeyE = "E";
