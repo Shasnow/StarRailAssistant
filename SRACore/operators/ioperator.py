@@ -11,7 +11,7 @@ from rapidocr import RapidOCR  # type: ignore
 from rapidocr.utils.output import RapidOCROutput
 
 from SRACore.operators.model import Box
-from SRACore.util.const import AppRootDir, LogsOCRDir
+from SRACore.util.const import LogsOCRDir
 from SRACore.util.data_persister import load_app_settings
 from SRACore.util.errors import ThreadStoppedError
 
@@ -37,6 +37,22 @@ class IOperator(ABC):
     @abstractmethod
     def is_window_active(self) -> bool:
         """检查目标窗口是否为当前活动窗口"""
+        ...
+
+    def launch(self, channel: int, path: str):
+        """
+        启动目标应用程序
+
+        Args:
+            channel: 启动渠道，可能是应用程序路径或其他标识符
+            path: 启动路径，可能是应用程序的工作目录或其他相关路径
+
+        Returns:
+            bool: 如果启动成功则返回 True，否则返回 False
+        """
+        ...
+
+    def login(self, account, password):
         ...
 
     @abstractmethod

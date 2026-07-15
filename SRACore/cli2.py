@@ -295,7 +295,7 @@ class SRACli(cmd2.Cmd):
             self.poutput("--save or --show is required")
             return
         try:
-            img = OperatorFactory.get_operator("Local").screenshot(background=args.background)
+            img = OperatorFactory.get_operator().screenshot(background=args.background)
         except Exception as e:
             self.poutput(f"Failed to take screenshot: {e}")
             return
@@ -318,7 +318,7 @@ class SRACli(cmd2.Cmd):
     def _game_ocr(self, args: argparse.Namespace) -> None:
         import json
         try:
-            operator = OperatorFactory.get_operator("Local")
+            operator = OperatorFactory.get_operator()
             region = args.region
             result = operator.ocr(
                 from_x=region[0] if region else None,
@@ -349,8 +349,8 @@ class SRACli(cmd2.Cmd):
         from SRACore.models.tasks_config import TasksConfig
         from SRACore.util.const import AppDataDir, ConfigsDir
 
-        # url = f"https://github.com/Shasnow/StarRailAssistant/releases/download/v{VERSION}/StarRailAssistant_Resources_v{VERSION}.zip"
-        url = f"https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant_Resource_v{VERSION}.zip"
+        url = f"https://github.com/Shasnow/StarRailAssistant/releases/download/v{VERSION}/StarRailAssistant_Resources_v{VERSION}.zip"
+        # url = f"https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant_Resource_v{VERSION}.zip"
         self.poutput(f"Downloading resources from {url} ...")
         try:
             req = Request(url, headers={"User-Agent": "SRA-cli"})

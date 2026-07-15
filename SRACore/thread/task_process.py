@@ -9,7 +9,6 @@ from SRACore.localization import Resource
 from SRACore.models.app_settings import AppSettings
 from SRACore.notification import try_send_notification
 from SRACore.operators.factory import OperatorFactory, OperatorType
-from SRACore.operators.ioperator import IOperator
 from SRACore.task import BaseTask, get_task_classes
 from SRACore.util import sys_util  # NOQA
 from SRACore.util.data_persister import load_cache, load_config

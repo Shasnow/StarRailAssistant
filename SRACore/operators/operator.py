@@ -3,6 +3,7 @@ import sys
 import threading
 import time
 from ctypes.wintypes import POINT, RECT
+from pathlib import Path
 
 import pyautogui
 import pygetwindow  # type: ignore
@@ -13,6 +14,7 @@ from rapidocr import RapidOCR
 
 from SRACore.operators.ioperator import IOperator
 from SRACore.operators.model import Region
+from SRACore.util import sys_util
 from SRACore.util.errors import ErrorCode, SRAError, ThreadStoppedError
 from SRACore.util.logger import logger
 
@@ -21,10 +23,11 @@ class Operator(IOperator):
     def __init__(self, ocr_engine: RapidOCR, stop_event: threading.Event | None = None):
         super().__init__(ocr_engine, stop_event)
         self.window_title = "崩坏：星穹铁道"
+        self.executable = "StarRail.exe"
         self.top = 0
         self.left = 0
-        self.width = 0
-        self.height = 0
+        self.width = pyautogui.size()[0]
+        self.height = pyautogui.size()[1]
         self._win: pygetwindow.Win32Window | None = None
         self._hwnd: int = 0
 
@@ -51,6 +54,68 @@ class Operator(IOperator):
         if not hwnd:
             return False
         return self._win.isActive # type: ignore
+
+    def launch(self, channel, path):
+        if sys_util.is_process_running(self.executable):
+            logger.info("游戏已在运行中")
+            return True
+
+        path = Path(str(path))
+        logger.debug(f"游戏启动路径: {path}")
+        # 根据配置选择游戏路径
+        match channel:
+            case 0:
+                logger.info("正在启动官服游戏客户端...")
+                self.change_config_ini(path, 1, 1)
+            case 1:
+                logger.info("正在启动B站服游戏客户端...")
+                self.change_config_ini(path, 14, 0)
+            case 2:
+                logger.info("正在启动国际服游戏客户端...")
+            case _:
+                logger.error("未知的游戏渠道配置")
+                raise ValueError("未知的游戏渠道配置")
+
+        # 构建启动参数
+        launch_args = []
+        if self.settings.General.isGameArgsPopupWindow:
+            launch_args.append('-popupwindow')
+
+        # 添加高级参数
+        advanced_args = self.settings.General.gameArgsAdvanced.strip()
+        if advanced_args:
+            launch_args.extend(advanced_args.split())
+
+        # 根据配置选择启动方式
+        use_cmd = self.settings.General.isUseCmd
+        if use_cmd:
+            logger.info("使用 CMD 启动游戏")
+            cmd = f'start "" "{path}" {" ".join(launch_args)}'
+            sys_util.Popen(cmd, shell=True, cwd=path.parent)
+        else:
+            sys_util.Popen([str(path)] + launch_args, cwd=path.parent)
+        logger.info("游戏启动命令已执行")
+        return True
+
+    @staticmethod
+    def change_config_ini(path: Path, channel, sub_channel):
+        """修改配置文件"""
+        root_path = path.parent
+        config_file = root_path / 'config.ini'
+        try:
+            with open(config_file, 'r') as f:
+                lines = f.readlines()
+            for line in lines:
+                if line.startswith('channel='):
+                    lines[lines.index(line)] = f'channel={channel}\n'
+                elif line.startswith('sub_channel='):
+                    lines[lines.index(line)] = f'sub_channel={sub_channel}\n'
+            with open(config_file, 'w') as f:
+                f.writelines(lines)
+        except FileNotFoundError:
+            logger.error(SRAError(ErrorCode.FILE_NOT_FOUND, "配置文件未找到", f"路径: {config_file}"))
+        except Exception as e:
+            logger.error(SRAError(ErrorCode.UNKNOWN_ERROR, "修改配置文件时发生未知错误", str(e)))
 
     def get_win_region(self, active_window: bool = True) -> Region:
         hwnd = self._get_hwnd()

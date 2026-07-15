@@ -1,7 +1,5 @@
-from pathlib import Path
-
 from SRACore.task import BaseTask, task
-from SRACore.util import sys_util, encryption
+from SRACore.util import encryption
 from SRACore.util.errors import SRAError, ErrorCode
 from SRACore.util.logger import logger
 from tasks.img import IMG, SGIMG
@@ -61,10 +59,7 @@ class StartGameTask(BaseTask):
     def launch_game(self):
         """启动游戏"""
         if self.operator.type == "Browser":
-            self.operator.launch_browser()
-            return
-        if sys_util.is_process_running("StarRail.exe"):  # 检查游戏是否已在运行
-            logger.info("游戏已在运行中")
+            self.operator.launch(0,"")
             return
         if self.config.StartGame.isUseGlobalGamePath:
             game_path_index = self.settings.General.gamePathIndex
@@ -75,62 +70,7 @@ class StartGameTask(BaseTask):
         if not raw_path:
             logger.error("未设置游戏启动路径")
             raise SRAError(ErrorCode.INVALID_INPUT, "未设置游戏启动路径")
-        path = Path(str(raw_path))
-        logger.debug(f"游戏启动路径: {path}")
-        # 根据配置选择游戏路径
-        match self.config.StartGame.gameChannel:
-            case 0:
-                logger.info("正在启动官服游戏客户端...")
-                self.change_config_ini(path, 1, 1)
-            case 1:
-                logger.info("正在启动B站服游戏客户端...")
-                self.change_config_ini(path, 14, 0)
-            case 2:
-                logger.info("正在启动国际服游戏客户端...")
-            case _:
-                logger.error("未知的游戏渠道配置")
-                raise SRAError(ErrorCode.INVALID_INPUT, "未知的游戏渠道配置", f"当前配置值 {self.config.StartGame.gameChannel}")
-
-        # 构建启动参数
-        launch_args = []
-        if self.settings.General.isGameArgsPopupWindow:
-            launch_args.append('-popupwindow')
-
-        # 添加高级参数
-        advanced_args = self.settings.General.gameArgsAdvanced.strip()
-        if advanced_args:
-            launch_args.extend(advanced_args.split())
-
-        # 根据配置选择启动方式
-        use_cmd = self.settings.General.isUseCmd
-        if use_cmd:
-            logger.info("使用 CMD 启动游戏")
-            cmd = f'start "" "{path}" {" ".join(launch_args)}'
-            sys_util.Popen(cmd, shell=True, cwd=path.parent)
-        else:
-            sys_util.Popen([str(path)] + launch_args, cwd=path.parent)
-        logger.info("游戏启动命令已执行")
-
-    @staticmethod
-    def change_config_ini(path: Path, channel, sub_channel):
-        """修改配置文件"""
-        root_path = path.parent
-        config_file = root_path / 'config.ini'
-        try:
-            with open(config_file, 'r') as f:
-                lines = f.readlines()
-            for line in lines:
-                if line.startswith('channel='):
-                    lines[lines.index(line)] = f'channel={channel}\n'
-                elif line.startswith('sub_channel='):
-                    lines[lines.index(line)] = f'sub_channel={sub_channel}\n'
-            with open(config_file, 'w') as f:
-                f.writelines(lines)
-        except FileNotFoundError:
-            logger.error(SRAError(ErrorCode.FILE_NOT_FOUND, "配置文件未找到", f"路径: {config_file}"))
-        except Exception as e:
-            logger.error(SRAError(ErrorCode.UNKNOWN_ERROR, "修改配置文件时发生未知错误", str(e)))
-
+        self.operator.launch(channel=self.config.StartGame.gameChannel, path=raw_path)
 
     def login(self):
         if hasattr(self.operator, 'driver'):

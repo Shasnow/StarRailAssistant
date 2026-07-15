@@ -10,10 +10,10 @@ from rapidocr import RapidOCR
 from selenium import webdriver
 from selenium.common import NoSuchElementException
 from selenium.webdriver import ActionChains, Keys
+from selenium.webdriver.common.webdriver import LocalWebDriver as WebDriver
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.by import By
-from selenium.webdriver.edge.options import Options
-from selenium.webdriver.edge.webdriver import WebDriver
+from selenium.webdriver.common.options import ArgOptions as Options
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -34,17 +34,47 @@ class BrowserOperator(IOperator):
         self.fixed_region = Region(0, 0, 1920, 1080)
         self.clipboard = None
 
-    def launch_browser(self):
-        url = "https://sr.mihoyo.com/cloud"
-        edge_options = Options()
-        edge_options.add_argument("--disable-infobars")
-        edge_options.add_argument("--lang=zh-CN")
-        edge_options.add_argument("--log-level=3")
-        edge_options.add_argument(f"--app={url}")
-        edge_options.add_argument("--disable-blink-features=AutomationControlled")
-        edge_options.add_argument("--force-device-scale-factor=1")
+    def launch(self, channel: str, path: str):
+        match self.settings.General.cloudGameBrowser:
+            case "Microsoft Edge":
+                self.launch_edge()
+            case "Chrome for Testing":
+                self.launch_chrome()
+            case "Firefox":
+                self.launch_firefox()
+            case _:
+                raise ValueError("Unsupported browser type")
+
+    def launch_edge(self):
+        edge_options = webdriver.EdgeOptions()
+        self.setup_option(edge_options)
         self.driver = webdriver.Edge(options=edge_options)
-        self.driver.set_window_size(1936, 1162)  # 1920x1080 + 边框
+        self.driver.set_window_size(1936, 1164)  # 1920x1080 + 边框
+
+    def launch_chrome(self):
+        chrome_options = webdriver.ChromeOptions()
+        self.setup_option(chrome_options)
+        self.driver = webdriver.Chrome(options=chrome_options)
+        self.driver.set_window_size(1936, 1112)
+
+    def launch_firefox(self):
+        firefox_options = webdriver.FirefoxOptions()
+        self.setup_option(firefox_options)
+        self.driver = webdriver.Firefox(options=firefox_options)
+        self.driver.set_window_size(1936, 1112)
+
+    def setup_option(self, browser_options: Options):
+        url = "https://sr.mihoyo.com/cloud"
+        if self.settings.General.cloudGameBrowserPath:
+            browser_options.binary_location = self.settings.General.cloudGameBrowserPath
+        if self.settings.General.cloudGameBrowserHeadless:
+            browser_options.add_argument("--headless")
+        browser_options.add_argument("--disable-infobars")
+        browser_options.add_argument("--lang=zh-CN")
+        browser_options.add_argument("--log-level=3")
+        browser_options.add_argument(f"--app={url}")
+        browser_options.add_argument("--disable-blink-features=AutomationControlled")
+        browser_options.add_argument("--force-device-scale-factor=1")
 
     def login(self, account, password):
         if not CacheDir.exists():
