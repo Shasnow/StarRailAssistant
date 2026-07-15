@@ -167,6 +167,11 @@ class Characters:
     Ashveil = Character('不死途', 2, Positioning.OnOffField)
     SilverWolfLV999 = Character('银狼LV.999', 5, Positioning.OnOffField)
     Evanescia = Character('绯英', 2, Positioning.OnOffField)
+    Himoko_Nova = Character('姬子·启行', 3, Positioning.OnField)
+    Mortenax_Blade = Character('千冶·刃', 2, Positioning.OffField)
+    Rin_Tohsaka = Character('远坂凛', 1, Positioning.OnOffField)
+    Gilgamesh = Character('吉尔伽美什', 2, Positioning.OnOffField)
+
 
     # 角色列表
     characters: dict[str, Character] = {
@@ -240,6 +245,10 @@ class Characters:
         '不死途': Ashveil,
         '银狼LV.999': SilverWolfLV999,
         '绯英': Evanescia,
+        '姬子·启行': Himoko_Nova,
+        '千冶·刃': Mortenax_Blade,
+        '远坂凛': Rin_Tohsaka,
+        '吉尔伽美什': Gilgamesh,
     }
     username = '开拓者'  # 角色名称
 

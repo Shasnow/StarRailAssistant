@@ -4,7 +4,7 @@ func = "ornament_extraction"
 cost = 40
 max_count = 6
 levels = [
-    { id = 14, name = "placeholder", result = "坠星启航地/寰宇生研院" },
+    { id = 14, name = "虫虫来袭", result = "坠星启航地/寰宇生研院" },
     { id = 1, name = "鎏金追忆", result = "零号关卡朋克洛德/千星荟萃之城" },
     { id = 2, name = "西风丛中", result = "永恒之地翁法罗斯/天国@直播间" },
     { id = 3, name = "月下朱殷", result = "妖精织梦的乐园/沉欢醉饮的海隅" },
@@ -136,13 +136,13 @@ func = "echo_of_war"
 cost = 30
 max_count = 3
 levels = [
-    { id = 1, name = "伪觉者的期许", result = "伪觉者的期许" },
-    { id = 2, name = "灭流绝溢的缄默", result = "灭流绝溢的缄默" },
-    { id = 3, name = "阳雷的遥想", result = "阳雷的遥想" },
-    { id = 4, name = "吉光片羽", result = "吉光片羽" },
-    { id = 5, name = "同愿的遗音", result = "同愿的遗音" },
-    { id = 6, name = "蛀星孕灾的旧恶", result = "蛀星孕灾的旧恶" },
-    { id = 7, name = "无穷假身的遗恨", result = "无穷假身的遗恨" },
-    { id = 8, name = "守护者的悲愿", result = "守护者的悲愿" },
-    { id = 9, name = "毁灭者的末路", result = "毁灭者的末路" }
+    { id = 9, name = "伪觉者的期许", result = "伪觉者的期许" },
+    { id = 1, name = "灭流绝溢的缄默", result = "灭流绝溢的缄默" },
+    { id = 2, name = "阳雷的遥想", result = "阳雷的遥想" },
+    { id = 3, name = "吉光片羽", result = "吉光片羽" },
+    { id = 4, name = "同愿的遗音", result = "同愿的遗音" },
+    { id = 5, name = "蛀星孕灾的旧恶", result = "蛀星孕灾的旧恶" },
+    { id = 6, name = "无穷假身的遗恨", result = "无穷假身的遗恨" },
+    { id = 7, name = "守护者的悲愿", result = "守护者的悲愿" },
+    { id = 8, name = "毁灭者的末路", result = "毁灭者的末路" }
 ]
