@@ -1,5 +1,6 @@
 plyer==2.1.0
 rapidocr==3.9.1
+onnxruntime==1.27.0
 opencv-python==4.13.0.92
 pillow==12.2.0
 pyscreeze==1.0.1
