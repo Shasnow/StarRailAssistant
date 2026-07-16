@@ -252,7 +252,7 @@
         <value>配置文件文件夹</value>
     </data>
     <data name="AppDataFolder" xml:space="preserve">
-        <value>应用程序文件夹</value>
+        <value>应用数据文件夹</value>
     </data>
     <data name="GamePathText" xml:space="preserve">
         <value>游戏路径</value>

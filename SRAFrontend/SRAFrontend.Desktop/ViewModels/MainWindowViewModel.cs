@@ -71,9 +71,9 @@ public partial class MainWindowViewModel(
     public async Task InitializeAsync()
     {
         await commonModel.CleanupOldExeAsync();
+        await commonModel.CheckAnnouncementAsync();
         await commonModel.CheckForUpdatesAsync();
         await commonModel.CheckDesktopShortcut();
-        await commonModel.CheckAnnouncementAsync();
     }
 
     [RelayCommand]

@@ -154,6 +154,7 @@ def copy_core_resources(dist: Path):
         config_path = rapidocr_pkg / "config.yaml"
         if config_path.exists():
             shutil.copy2(config_path, dist / "rapidocr" / "config.yaml")
+            shutil.copy2(rapidocr_pkg / "default_models.yaml", dist / "rapidocr" / "default_models.yaml")
     else:
         print(f"  [WARN] rapidocr not found in {SITE_PACKAGES_DIR}, skipping OCR model copy")
     shutil.copytree(ROOT_PATH / "tasks", dist / "tasks")
