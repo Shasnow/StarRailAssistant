@@ -184,14 +184,18 @@ class DivergentUniverse(Executable):
             interval=1, max_iterations=10
         )
 
-    def page_locate(self):
+    def page_locate(self, depth = 0):
         """
         定位到差分宇宙页面。
         :return: None
         """
+        if depth >=10:
+            logger.error("差分宇宙页面定位超时")
+            return False
         page, _ = self.operator.wait_any_img([
             IMG.ENTER,
             DUIMG.DIVERGENT_UNIVERSE_START,
+            DUIMG.BONUS_POINTS
         ], interval=1)
         if page == 0:
             self.operator.press_key(self.settings.General.hotkeyF4)
@@ -201,15 +205,18 @@ class DivergentUniverse(Executable):
             self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙
             self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
-            return self.operator.wait_img(DUIMG.DIVERGENT_UNIVERSE_START, timeout=10) is not None
+            return self.page_locate(depth + 1)
         elif page == 1:
             return True
+        elif page == 2:
+            self.operator.press_key("esc")
+            return self.page_locate(depth + 1)
         else:
             logger.error("检测超时")
             return False
 
     def check_point_rewards(self):
-        result = self.operator.ocr(from_x=0.1, from_y=0.9, to_x=0.21, to_y=0.96)
+        result = self.operator.ocr(from_x=0.1, from_y=0.89, to_x=0.21, to_y=0.96)
         # 格式 x/18000
         if result:
             current = result[0][1]
