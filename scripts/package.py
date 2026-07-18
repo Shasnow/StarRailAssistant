@@ -124,6 +124,9 @@ def nuitka_build(version: str):
         "--assume-yes-for-downloads",
         "--output-filename=SRA-cli",
         "--remove-output",
+        "--include-package=selenium.webdriver.edge",
+        "--include-package=selenium.webdriver.firefox",
+        "--include-package=selenium.webdriver.chrome",
         "main.py",
     ]
     result = subprocess.run(cmd, cwd=ROOT_PATH)

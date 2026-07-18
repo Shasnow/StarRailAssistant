@@ -9,11 +9,11 @@ from loguru import logger
 from rapidocr import RapidOCR
 from selenium import webdriver
 from selenium.common import NoSuchElementException
-from selenium.webdriver import ActionChains, Keys
-from selenium.webdriver.common.webdriver import LocalWebDriver as WebDriver
+from selenium.webdriver import Keys, ActionChains
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.options import ArgOptions as Options
+from selenium.webdriver.common.webdriver import LocalWebDriver as WebDriver
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -46,19 +46,22 @@ class BrowserOperator(IOperator):
                 raise ValueError("Unsupported browser type")
 
     def launch_edge(self):
-        edge_options = webdriver.EdgeOptions()
+        from selenium.webdriver.edge.options import Options
+        edge_options = Options()
         self.setup_option(edge_options)
         self.driver = webdriver.Edge(options=edge_options)
         self.driver.set_window_size(1936, 1164)  # 1920x1080 + 边框
 
     def launch_chrome(self):
-        chrome_options = webdriver.ChromeOptions()
+        from selenium.webdriver.chrome.options import Options
+        chrome_options = Options()
         self.setup_option(chrome_options)
         self.driver = webdriver.Chrome(options=chrome_options)
         self.driver.set_window_size(1936, 1112)
 
     def launch_firefox(self):
-        firefox_options = webdriver.FirefoxOptions()
+        from selenium.webdriver.firefox.options import Options
+        firefox_options = Options()
         self.setup_option(firefox_options)
         self.driver = webdriver.Firefox(options=firefox_options)
         self.driver.set_window_size(1936, 1112)
