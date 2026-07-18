@@ -10,6 +10,10 @@ en-us = "Invalid arguments for command '{command}'. Type 'help {command}' for us
 zh-cn = "{} 不是一个有效命令、别名、或宏。"
 en-us = "{} is not a recognized command, alias, or macro."
 
+[cli.run.started]
+zh-cn = "已启动任务执行。"
+en-us = "Task execution started."
+
 [cli.task.taskAlreadyRunning]
 zh-cn = "任务已在运行中。"
 en-us = "Task is already running."

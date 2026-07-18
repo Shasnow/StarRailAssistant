@@ -2,6 +2,7 @@
     "cli.noAdminWarning": "您没有以管理员权限运行 SRA-cli。某些命令可能无法正常工作。",
     "cli.invalidArguments": "命令 '{command}' 的参数无效。输入 'help {command}' 获取用法说明。",
     "cli.defaultError": "{} 不是一个有效命令、别名、或宏。",
+    "cli.run.started": "已启动任务执行。",
     "cli.task.taskAlreadyRunning": "任务已在运行中。",
     "cli.task.requestStop": "已请求停止正在运行的任务。",
     "cli.task.timeout": "等待任务完成时超时。",

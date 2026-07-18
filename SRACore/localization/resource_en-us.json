@@ -2,6 +2,7 @@
     "cli.noAdminWarning": "You are not running SRA-cli with administrative privileges. Some commands may not work as expected.",
     "cli.invalidArguments": "Invalid arguments for command '{command}'. Type 'help {command}' for usage.",
     "cli.defaultError": "{} is not a recognized command, alias, or macro.",
+    "cli.run.started": "Task execution started.",
     "cli.task.taskAlreadyRunning": "Task is already running.",
     "cli.task.requestStop": "Requested to stop running tasks.",
     "cli.task.timeout": "Timeout reached while waiting for tasks to complete.",

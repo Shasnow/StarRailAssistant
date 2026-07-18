@@ -100,6 +100,13 @@ class Localization:
         return self.get_translation("cli.defaultError")
 
     @property
+    def cli_run_started(self) -> str:
+        """已启动任务执行。
+
+        From cli.run.started"""
+        return self.get_translation("cli.run.started")
+
+    @property
     def cli_task_taskAlreadyRunning(self) -> str:
         """任务已在运行中。
 
