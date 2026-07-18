@@ -1,99 +1,145 @@
+import enum
 import json
 import threading
 import time
 from io import BytesIO
 
-import PIL
-from PIL.Image import Image
+from PIL import Image
 from loguru import logger
 from rapidocr import RapidOCR
 from selenium import webdriver
-from selenium.common import NoSuchElementException
+from selenium.common import NoSuchElementException, TimeoutException
 from selenium.webdriver import Keys, ActionChains
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.options import ArgOptions as Options
 from selenium.webdriver.common.webdriver import LocalWebDriver as WebDriver
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
 from SRACore.operators.ioperator import IOperator
-from SRACore.operators.model import Region
 from SRACore.util.const import CacheDir
 from SRACore.util.errors import ThreadStoppedError
 
 
+class BrowserType(enum.StrEnum):
+    EDGE = "Microsoft Edge"
+    CHROME = "Chrome for Testing"
+    FIREFOX = "Firefox"
+
+
+class WebDriverManager:
+    # 多浏览器驱动缓存池
+    _driver_pool: dict[BrowserType, WebDriver] = {}
+    # 全局常量统一管理
+    CLOUD_URL = "https://sr.mihoyo.com/cloud"
+    WINDOW_SIZE = {
+        BrowserType.EDGE: (1936, 1164),
+        BrowserType.CHROME: (1936, 1112),
+        BrowserType.FIREFOX: (1936, 1112),
+    }
+    COMMON_CLI_ARGS = [
+        "--disable-infobars",
+        "--lang=zh-CN",
+        "--log-level=3",
+        "--disable-blink-features=AutomationControlled",
+        "--force-device-scale-factor=1",
+        '--user-data-dir=' + str(CacheDir / "selenium_profile")
+    ]
+
+    @classmethod
+    def get_driver(cls, browser: BrowserType, binary_path: str = "", headless: bool = False) -> WebDriver:
+        # 复用已存在的驱动实例
+        if browser in cls._driver_pool:
+            return cls._driver_pool[browser]
+
+        match browser:
+            case BrowserType.EDGE:
+                from selenium.webdriver.edge.options import Options
+                opt = Options()
+                cls._build_options(opt, binary_path, headless)
+                width, height = cls.WINDOW_SIZE[browser]
+                driver = webdriver.Edge(options=opt)
+                driver.set_window_size(width, height)
+            case BrowserType.CHROME:
+                from selenium.webdriver.chrome.options import Options
+                opt = Options()
+                cls._build_options(opt, binary_path, headless)
+                width, height = cls.WINDOW_SIZE[browser]
+                driver = webdriver.Chrome(options=opt)
+                driver.set_window_size(width, height)
+            case BrowserType.FIREFOX:
+                from selenium.webdriver.firefox.options import Options
+                opt = Options()
+                cls._build_options(opt, binary_path, headless)
+                width, height = cls.WINDOW_SIZE[browser]
+                driver = webdriver.Firefox(options=opt)
+                driver.set_window_size(width, height)
+            case _:
+                raise ValueError(f"未知浏览器类型 {browser}")
+        # 加入缓存池
+        cls._driver_pool[browser] = driver
+        return driver
+
+    @staticmethod
+    def _build_options(opt: webdriver.EdgeOptions | webdriver.ChromeOptions | webdriver.FirefoxOptions, binary_path: str, headless: bool):
+        if binary_path:
+            opt.binary_location = binary_path
+        if headless:
+            opt.add_argument("--headless")
+        # 公共参数批量添加
+        for arg in WebDriverManager.COMMON_CLI_ARGS:
+            opt.add_argument(arg)
+        opt.add_argument(f"--app={WebDriverManager.CLOUD_URL}")
+
+    @classmethod
+    def close_browser(cls, browser: BrowserType):
+        """关闭单个浏览器进程"""
+        if browser not in cls._driver_pool:
+            return
+        drv = cls._driver_pool.pop(browser)
+        drv.quit()
+
+    @classmethod
+    def dispose_all(cls):
+        for drv in cls._driver_pool.values():
+            drv.quit()
+        cls._driver_pool.clear()
+
+
 class BrowserOperator(IOperator):
-    def __init__(self, ocr_engine:RapidOCR, stop_event: threading.Event | None = None):
+    def __init__(self, ocr_engine: RapidOCR, stop_event: threading.Event | None = None):
         super().__init__(ocr_engine, stop_event)
         self.type = "Browser"
-        # noinspection PyTypeChecker
-        self.driver: WebDriver = None
         self.height = 1080
         self.width = 1920
-        self.fixed_region = Region(0, 0, 1920, 1080)
-        self.clipboard = None
+        self.clipboard: str = ""
+        # noinspection PyTypeChecker
+        self._driver: WebDriver = None  # pyright: ignore[reportAttributeAccessIssue]
 
-    def launch(self, channel: str, path: str):
-        match self.settings.General.cloudGameBrowser:
-            case "Microsoft Edge":
-                self.launch_edge()
-            case "Chrome for Testing":
-                self.launch_chrome()
-            case "Firefox":
-                self.launch_firefox()
-            case _:
-                raise ValueError("Unsupported browser type")
 
-    def launch_edge(self):
-        from selenium.webdriver.edge.options import Options
-        edge_options = Options()
-        self.setup_option(edge_options)
-        self.driver = webdriver.Edge(options=edge_options)
-        self.driver.set_window_size(1936, 1164)  # 1920x1080 + 边框
-
-    def launch_chrome(self):
-        from selenium.webdriver.chrome.options import Options
-        chrome_options = Options()
-        self.setup_option(chrome_options)
-        self.driver = webdriver.Chrome(options=chrome_options)
-        self.driver.set_window_size(1936, 1112)
-
-    def launch_firefox(self):
-        from selenium.webdriver.firefox.options import Options
-        firefox_options = Options()
-        self.setup_option(firefox_options)
-        self.driver = webdriver.Firefox(options=firefox_options)
-        self.driver.set_window_size(1936, 1112)
-
-    def setup_option(self, browser_options: Options):
-        url = "https://sr.mihoyo.com/cloud"
-        if self.settings.General.cloudGameBrowserPath:
-            browser_options.binary_location = self.settings.General.cloudGameBrowserPath
-        if self.settings.General.cloudGameBrowserHeadless:
-            browser_options.add_argument("--headless")
-        browser_options.add_argument("--disable-infobars")
-        browser_options.add_argument("--lang=zh-CN")
-        browser_options.add_argument("--log-level=3")
-        browser_options.add_argument(f"--app={url}")
-        browser_options.add_argument("--disable-blink-features=AutomationControlled")
-        browser_options.add_argument("--force-device-scale-factor=1")
+    @property
+    def driver(self):
+        if self._driver is None:
+            browser_type = self.settings.General.cloudGameBrowser
+            binary_path = self.settings.General.cloudGameBrowserPath
+            headless = self.settings.General.cloudGameBrowserHeadless
+            self._driver = WebDriverManager.get_driver(BrowserType(browser_type), binary_path, headless)
+        return self._driver
 
     def login(self, account, password):
-        if not CacheDir.exists():
-            CacheDir.mkdir()
-        cookies_path = CacheDir / f"{account}_cookies.json"
         start_btn_xpath = '//*[@id="app"]/div[1]/div[3]/div[1]/div/div[2]/div[2]'
-
-        logged_in = self._try_cookie_login(cookies_path, start_btn_xpath)
-        if not logged_in:
+        try:
+            WebDriverWait(self.driver, 10).until(
+                expected_conditions.presence_of_element_located((By.XPATH, start_btn_xpath)))
+            logger.info("检测到已登录状态")
+            logged_in = True
+        except Exception:
             logged_in = self._password_login(account, password, start_btn_xpath)
 
         if not logged_in:
             logger.error("登录失败")
             return -1
 
-        self.save_cookies(cookies_path)
         self.load_initial_local_storage()
         try:
             self.driver.find_element(By.XPATH, '/html/body/div[6]/div[3]/button[1]').click()  # 下次再说
@@ -110,26 +156,6 @@ class BrowserOperator(IOperator):
             return 1
         else:
             return -1
-
-    def _try_cookie_login(self, cookies_path, start_btn_xpath) -> bool:
-        if not cookies_path.exists():
-            return False
-        try:
-            self.driver.delete_all_cookies()
-            with open(cookies_path, "r") as f:
-                cookies = json.load(f)
-            for cookie in cookies:
-                self.driver.add_cookie(cookie)
-            self.driver.refresh()
-            WebDriverWait(self.driver, 10).until(
-                expected_conditions.presence_of_element_located((By.XPATH, start_btn_xpath)))
-            logger.info("Cookie 登录成功")
-            return True
-        except Exception as e:
-            logger.warning(f"Cookie 已失效，将使用账号密码重新登录: {e}")
-            cookies_path.unlink(missing_ok=True)
-            self.driver.refresh()
-            return False
 
     def _password_login(self, account, password, start_btn_xpath) -> bool:
         logger.info("使用账号密码登录...")
@@ -151,18 +177,16 @@ class BrowserOperator(IOperator):
             logger.error(f"账号密码登录失败: {e}")
             return False
 
-    def save_cookies(self, path):
-        cookies = self.driver.get_cookies()
-        with open(path, "w") as f:
-            json.dump(cookies, f)
-
     def confirm(self):
-        wait = WebDriverWait(self.driver, 60, 1)
-        wait.until(expected_conditions.element_to_be_clickable((By.CLASS_NAME, 'van-dialog__confirm')))  # 等待接受按钮可点击
-        self.driver.find_element(By.CLASS_NAME, 'van-dialog__confirm').click()  # 接受协议
-        for _ in range(4):
-            self.click_point(0.5, 0.5, after_sleep=1)
-        return True
+        wait = WebDriverWait(self.driver, 30, 1)
+        try:
+            wait.until(expected_conditions.element_to_be_clickable((By.CLASS_NAME, 'van-dialog__confirm')))  # 等待接受按钮可点击
+            self.driver.find_element(By.CLASS_NAME, 'van-dialog__confirm').click()  # 接受协议
+            for _ in range(4):
+                self.click_point(0.5, 0.5, after_sleep=1)
+            return True
+        except (TimeoutException, NoSuchElementException):
+            return True
 
     def load_initial_local_storage(self):
         data = {
@@ -268,7 +292,7 @@ class BrowserOperator(IOperator):
         int_dicts["OtherSettings_AutoBattleOpen"] = int(status)
         logger.debug(f"设置自动战斗为 {'开启' if status else '关闭'}")
         int_dicts["OtherSettings_IsSaveBattleSpeed"] = int(status)
-        logger.debug(f"设置自动战斗状态为 {'保存' if status else '不保存'}")
+        logger.debug(f"设置沿用自动战斗状态")
 
         # 如果存在 App_LastUserID，添加 User_{UID}_SpeedUpOpen 配置
         uid = int_dicts.get("App_LastUserID")
@@ -289,9 +313,9 @@ class BrowserOperator(IOperator):
         return True
 
     def screenshot(self, *, from_x: float | None = None, from_y: float | None = None, to_x: float | None = None,
-                   to_y: float | None = None, background: bool = True) -> Image:
+                   to_y: float | None = None, background: bool = True) -> Image.Image:
         png = self.driver.get_screenshot_as_png()
-        img = PIL.Image.open(BytesIO(png))
+        img = Image.open(BytesIO(png))
         if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
             left = from_x * self.width
             upper = from_y * self.height
@@ -313,7 +337,7 @@ class BrowserOperator(IOperator):
             action.pointer_action.move_to_location(x + x_offset, y + y_offset)
             action.pointer_action.click()
             action.perform()
-            self.sleep(after_sleep+0.2)
+            self.sleep(after_sleep + 0.2)
             return True
         elif isinstance(x, float) and isinstance(y, float):
             x = int(self.left + self.width * x + x_offset)
@@ -324,7 +348,7 @@ class BrowserOperator(IOperator):
             action.pointer_action.move_to_location(x, y)
             action.pointer_action.click()
             action.perform()
-            self.sleep(after_sleep+0.2)
+            self.sleep(after_sleep + 0.2)
             return True
         else:
             raise ValueError(

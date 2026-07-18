@@ -14,24 +14,18 @@ class OperatorType(enum.StrEnum):
 
 class OperatorFactory:
     __ocr_instance: RapidOCR = None
-    __instance: IOperator = None
 
     @classmethod
-    def get_operator(cls, optype: str | OperatorType | None = None, stop_event: threading.Event | None = None) -> IOperator:
-        if cls.__instance is not None:
-            if cls.__instance.type == optype or optype is None:
-                if stop_event is not None:
-                    cls.__instance.stop_event = stop_event
-                return cls.__instance
+    def get_operator(cls, optype: str | OperatorType , stop_event: threading.Event | None = None) -> IOperator:
         if optype == OperatorType.Local:
             from SRACore.operators.operator import Operator
-            cls.__instance = Operator(stop_event=stop_event, ocr_engine=cls.get_ocr_instance())
+            __instance = Operator(stop_event=stop_event, ocr_engine=cls.get_ocr_instance())
         elif optype == OperatorType.Browser:
             from SRACore.operators.browser_operator import BrowserOperator
-            cls.__instance = BrowserOperator(stop_event=stop_event, ocr_engine=cls.get_ocr_instance())
+            __instance = BrowserOperator(stop_event=stop_event, ocr_engine=cls.get_ocr_instance())
         else:
             raise ValueError(f"Unknown operator type: {optype}")
-        return cls.__instance
+        return __instance
 
     @classmethod
     def get_ocr_instance(cls) -> RapidOCR:

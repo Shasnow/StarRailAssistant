@@ -7,7 +7,7 @@ from rich.text import Text
 
 from SRACore.localization import Resource
 from SRACore.models.app_settings import AppSettings
-from SRACore.operators.factory import OperatorFactory
+from SRACore.operators.factory import OperatorFactory, OperatorType
 from SRACore.runtime.event_listener import KeyboardListener
 from SRACore.runtime.trigger_manager import TriggerManager
 from SRACore.thread.task_process import TaskManager
@@ -295,7 +295,8 @@ class SRACli(cmd2.Cmd):
             self.poutput("--save or --show is required")
             return
         try:
-            img = OperatorFactory.get_operator().screenshot(background=args.background)
+            optype = OperatorType.Browser if self.settings.General.isCloudGameEnabled else OperatorType.Local
+            img = OperatorFactory.get_operator(optype).screenshot(background=args.background)
         except Exception as e:
             self.poutput(f"Failed to take screenshot: {e}")
             return
@@ -318,7 +319,8 @@ class SRACli(cmd2.Cmd):
     def _game_ocr(self, args: argparse.Namespace) -> None:
         import json
         try:
-            operator = OperatorFactory.get_operator()
+            optype = OperatorType.Browser if self.settings.General.isCloudGameEnabled else OperatorType.Local
+            operator = OperatorFactory.get_operator(optype)
             region = args.region
             result = operator.ocr(
                 from_x=region[0] if region else None,

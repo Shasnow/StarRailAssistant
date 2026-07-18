@@ -254,7 +254,7 @@ class IOperator(ABC):
             if rapid_output.txts is None:
                 result = None
             else:
-                result = [(box.tolist(), text, scores) for box, text, scores in zip(rapid_output.boxes, rapid_output.txts, rapid_output.scores)]  # NOQA
+                result = [(box.tolist(), text, scores) for box, text, scores in zip(rapid_output.boxes, rapid_output.txts, rapid_output.scores)]  # NOQA  # pyright: ignore[reportArgumentType]
             if self.is_save_ocr_image:
                 screenshot.save(LogsOCRDir / f"{int(time.time())}.png")
             if trace:
