@@ -1,3 +1,5 @@
+import cv2
+import numpy as np
 import threading
 import time
 from abc import ABC, abstractmethod
@@ -7,7 +9,7 @@ from typing import Any, Callable
 import pyscreeze
 from PIL.Image import Image
 from loguru import logger
-from rapidocr import RapidOCR  # type: ignore
+from rapidocr import RapidOCR
 from rapidocr.utils.output import RapidOCROutput
 
 from SRACore.operators.model import Box
@@ -224,11 +226,11 @@ class IOperator(ABC):
             return None
 
     def ocr(self,
-            *,
             from_x: float | None = None,
             from_y: float | None = None,
             to_x: float | None = None,
             to_y: float | None = None,
+            grayscale: bool = True,
             trace: bool = True) -> list[Any] | None:
         """执行 OCR 文字识别
 
@@ -238,6 +240,7 @@ class IOperator(ABC):
             from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
             to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
             to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
+            grayscale (bool, optional): 是否将截图转换为灰度图像。默认为True。
             trace (bool, optional): 是否打印调试信息。默认为True。
         Returns:
             list[Any] | None: OCR 引擎返回的原始结果。如果发生错误，返回None。
@@ -250,6 +253,7 @@ class IOperator(ABC):
             screenshot = self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
             if screenshot is None:
                 raise RuntimeError("Failed to capture screenshot for OCR")
+            screenshot = screenshot.convert("L") if grayscale else screenshot
             rapid_output:RapidOCROutput = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA # type: ignore
             if rapid_output.txts is None:
                 result = None
@@ -504,6 +508,56 @@ class IOperator(ABC):
             time.sleep(interval)
         logger.debug(f"Timeout: {templates} -> NotFound in {timeout} seconds")
         return -1, None
+
+    def rectangle_detect(self,
+                         min_w: int, max_w: int, min_h: int, max_h: int,
+                         *,
+                         from_x: float | None = None, from_y: float | None = None,
+                         to_x: float | None = None, to_y: float | None = None,
+                         trace: bool = False) -> list[Box]:
+        """在指定区域检测矩形
+        
+        Args:
+            min_w (int): 最小矩形宽度。
+            max_w (int): 最大矩形宽度。
+            min_h (int): 最小矩形高度。
+            max_h (int): 最大矩形高度。
+            from_x (float, optional): 搜索区域起始 X 坐标比例 (0-1)。
+            from_y (float, optional): 搜索区域起始 Y 坐标比例 (0-1)。
+            to_x (float, optional): 搜索区域结束 X 坐标比例 (0-1)。
+            to_y (float, optional): 搜索区域结束 Y 坐标比例 (0-1)。
+            trace (bool, optional): 是否保存调试图片。默认为True。
+        Returns:
+            list[Box]: 检测到的矩形框列表。
+        """
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("矩形检测中断", "线程已停止")
+        try:
+            screenshot = self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
+            img = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            blur = cv2.GaussianBlur(gray, (3, 3), 0)
+            edged = cv2.Canny(blur, 30, 90, apertureSize=3, L2gradient=True)
+            contours, _ = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+            result = []
+            for cnt in contours:
+                x, y, sw, sh = cv2.boundingRect(cnt)
+                if min_w < sw < max_w and min_h < sh < max_h:
+                    cv2.rectangle(img, (x, y), (x + sw, y + sh), (0, 255, 0), 2)
+                    left, top = x, y
+                    if from_x is not None and from_y is not None:
+                        left += int(from_x * self.width)
+                        top += int(from_y * self.height)
+                    result.append(Box(left, top, sw, sh, source="rectangle_detect"))
+
+            if trace:
+                cv2.imwrite(str(LogsOCRDir / f"rectangle_detect_{int(time.time())}.png"), img)
+
+            return result
+        except Exception as e:
+            logger.trace(f"Rectangle detect error: {e}")
+            return []
 
     @staticmethod
     def wait_any(conditions: list[Waitable], timeout: int = 10, interval: float = 0.5) -> tuple[int, Box | None]:
