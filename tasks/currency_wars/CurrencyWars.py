@@ -476,6 +476,16 @@ class CurrencyWars(Executable):
         """ 刷新角色信息，确保手牌中未放置的角色状态正确。 """
         self.get_on_field_area(True)
         self.operator.sleep(0.3)
+        boxes = self.operator.rectangle_detect(120, 150, 130, 150,
+                                               from_x=0.1, from_y=0.52, to_x=0.86, to_y=0.7,
+                                               trace=False)
+        if boxes:
+            sorted_boxes = sorted(boxes, key=lambda b: b.left)
+            self.off_field_area = [
+                (b.center[0] / self.operator.width, b.center[1] / self.operator.height)
+                for b in sorted_boxes
+            ]
+            logger.info(f"当前后台共有 {len(self.off_field_area)} 个位置")
         self.get_off_field_area(True)
         self.operator.sleep(0.3)
         field_characters = self.on_field_character + self.off_field_character
