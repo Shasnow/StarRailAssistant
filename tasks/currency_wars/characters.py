@@ -180,7 +180,7 @@ class Characters:
         '花火': Sparkle,
         '遐蝶': Castorice,
         '银枝': Argenti,
-        '丹恒•饮月': DanHeng_ImbibitorLunae,
+        '丹恒·饮月': DanHeng_ImbibitorLunae,
         '灵砂': Lingsha,
         '大黑塔': TheHerta,
         '托帕&账账': TopazAndNumby,
@@ -196,12 +196,12 @@ class Characters:
         '那刻夏': Anaxa,
         '长夜月': Evernight,
         '飞霄': Feixiao,
-        '阮•梅': RuanMei,
+        '阮·梅': RuanMei,
         '砂金': Aventurine,
         '缇宝': Tribbie,
         '万敌': Mydei,
         '风堇': Hyacine,
-        '丹恒•腾荒': DanHeng_PermansorTerrae,
+        '丹恒·腾荒': DanHeng_PermansorTerrae,
         '黑塔': Herta,
         '赛飞儿': Cipher,
         '青雀': Qingque,
@@ -239,7 +239,7 @@ class Characters:
         '阿格莱雅': Aglaea,
         '开拓者': Trailblazer,
         '大丽花': TheDahlia,
-        '光': YaoGuang,
+        '交光': YaoGuang,
         '爻光': YaoGuang,
         '火花': Sparxie,
         '不死途': Ashveil,
@@ -255,7 +255,7 @@ class Characters:
     @classmethod
     def get_character(cls, name: str) -> Character | None:
         """根据名称获取角色信息"""
-        name = name.replace('·', '•').replace('傑', '杰').replace('姐', '妲').replace("交", "")
+        name = name.replace('•', '·').replace('傑', '杰').replace('姐', '妲')
         if name == cls.username:
             return cls.Trailblazer
         return cls.characters.get(name)
