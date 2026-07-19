@@ -136,7 +136,7 @@ class RerollStart(CurrencyWars):
             logger.info("正在识别投资环境...")
             result = self._detect_invest_env()
             if result != -1:
-                self.operator.click_point(0.25 * (result + 1), 0.27, tag="投资环境")  # 根据投资环境的位置计算点击坐标，每个环境占屏幕宽度的25%
+                self.operator.click_point(0.25 * (result + 1), 0.27, tag="投资环境", trace=True)  # 根据投资环境的位置计算点击坐标，每个环境占屏幕宽度的25%
                 self.operator.click_img(IMG.ENSURE2, after_sleep=1)
                 logger.info("投资环境符合要求，继续游戏...")
                 break
@@ -228,11 +228,11 @@ class RerollStart(CurrencyWars):
             return False
         return self.is_running
 
-    def _detect_invest_strategy(self, wanted_strategy: str = None):
+    def _detect_invest_strategy(self, wanted_strategy: str = ""):
         """
         检测投资策略是否符合要求
         
-        :param wanted_strategy: 当前阶段需要的投资策略，如果为None则使用全部期望策略
+        :param wanted_strategy: 当前阶段需要的投资策略，如果为空则使用全部期望策略
         :return: 匹配的投资策略索引，-1表示未匹配
         """
         detected_invest_strategy = list()
@@ -387,7 +387,7 @@ class RerollStart(CurrencyWars):
         # 优先检测必须的投资环境
         for i, env in enumerate(detected_invest_env):
             # 使用子字符串匹配：将期望值规范化后，与识别到的env做子串比较
-            for want in (self.wanted_invest_env or []):
+            for want in self.wanted_invest_env:  # pyright: ignore[reportOptionalIterable]
                 if self._is_substring(self._normalize_ocr_text(want), env):
                     logger.info(f"检测到必须的投资环境【{env}】(匹配: {want})")
                     return i

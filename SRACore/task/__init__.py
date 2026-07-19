@@ -32,9 +32,9 @@ class BaseTask(Executable, ABC):
         """
         super().__init__(operator)
         self.config = config
-        self._post_init()
+        self.__post_init__()
 
-    def _post_init(self):
+    def __post_init__(self):
         """子类可重写此方法以进行额外初始化"""
         pass
 

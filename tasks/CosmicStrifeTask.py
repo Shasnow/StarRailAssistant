@@ -6,10 +6,13 @@ from tasks.img import DUIMG, IMG
 
 @task(order=3)
 class CosmicStrifeTask(BaseTask):
+    def __post_init__(self):
+        self.notify = True
+
     def run(self):
         """主任务执行函数"""
         if self.config.CosmicStrife.isDivergentUniverseEnabled:
-            logger.info("执行任务：旷宇纷争-模拟宇宙")
+            logger.info("执行任务：旷宇纷争-差分宇宙")
             from tasks.divergent_universe import DivergentUniverse
             du_task = DivergentUniverse(
                 self.operator,
@@ -17,7 +20,7 @@ class CosmicStrifeTask(BaseTask):
                 self.config.CosmicStrife.isDivergentUniverseUseTechnique,
                 self.config.CosmicStrife.isPointRewardsEnabled)
             if not du_task.run():
-                logger.error("旷宇纷争-模拟宇宙任务失败")
+                logger.error("旷宇纷争-差分宇宙任务失败")
                 return False
         # 互斥：货币战争常规 vs 刷开局
         cw_enable = self.config.CosmicStrife.isCurrencyWarsEnabled
@@ -36,6 +39,8 @@ class CosmicStrifeTask(BaseTask):
         Characters.set_username(username)
 
         if cw_mode==2:
+            # noinspection PyAttributeOutsideInit
+            self.notify = False  # 刷开局时关闭任务通知
             logger.info("执行任务：旷宇纷争-货币战争 刷开局")
             from tasks.currency_wars import RerollStart
             rs_task = RerollStart(operator=self.operator, runtimes=runtimes)
@@ -66,6 +71,8 @@ class CosmicStrifeTask(BaseTask):
         return True
 
     def on_completed(self) -> None:
+        if not self.notify:
+            return
         on_complete = self.settings.Notification.onCompleted
         if self.__class__.__name__ in on_complete:
             guide_hotkey = self.settings.General.hotkeyF4

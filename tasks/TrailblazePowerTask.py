@@ -27,7 +27,7 @@ class SubtaskInfo(TypedDict):
 
 @task(order=1)
 class TrailblazePowerTask(BaseTask):
-    def _post_init(self):
+    def __post_init__(self):
         with open(r"tasks/config/trailblaze_power.toml", "rb") as tf:
             task_config = tomllib.load(tf)
         self.sub_tasks: dict[str, SubtaskInfo] = task_config.get("subtasks", {})
