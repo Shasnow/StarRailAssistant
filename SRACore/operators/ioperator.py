@@ -1,11 +1,11 @@
-import cv2
-import numpy as np
 import threading
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Callable
 
+import cv2
+import numpy as np
 import pyscreeze
 from PIL.Image import Image
 from loguru import logger
@@ -18,6 +18,7 @@ from SRACore.util.data_persister import load_app_settings
 from SRACore.util.errors import ThreadStoppedError
 
 type Waitable = Callable[[], Box | None]
+
 
 class IOperator(ABC):
 
@@ -113,7 +114,8 @@ class IOperator(ABC):
             if not Path(template).exists():
                 raise FileNotFoundError("无法找到或读取文件 " + template)
             # noinspection PyTypeChecker
-            boxes = pyscreeze.locateAll(template, self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y), confidence=match_confidence)
+            boxes = pyscreeze.locateAll(template, self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y),
+                                        confidence=match_confidence)
             self.sleep(0.5)
             result = []
             for box in boxes:
@@ -121,8 +123,8 @@ class IOperator(ABC):
                 if from_x is not None and from_y is not None:
                     left += int(from_x * self.width)
                     top += int(from_y * self.height)
-                result.append(Box(left, top, width, height, source=template)) # type: ignore
-            return result # type: ignore
+                result.append(Box(left, top, width, height, source=template))  # type: ignore
+            return result  # type: ignore
         except Exception as e:
             if trace:
                 logger.trace(f"ImageNotFound: {template} -> {e}")
@@ -156,7 +158,7 @@ class IOperator(ABC):
             raise ThreadStoppedError("图像识别中断", "线程已停止")
         match_confidence = self.tm_confidence if confidence is None else confidence
         try:
-            screenshot = self.screenshot(from_x=from_x, from_y=from_y,to_x=to_x, to_y=to_y)
+            screenshot = self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
             self.sleep(0.5)
         except Exception as e:
             logger.trace(f"Error taking screenshot: {e}")
@@ -231,6 +233,7 @@ class IOperator(ABC):
             to_x: float | None = None,
             to_y: float | None = None,
             grayscale: bool = True,
+            confidence: float | None = None,
             trace: bool = True) -> list[Any] | None:
         """执行 OCR 文字识别
 
@@ -241,6 +244,7 @@ class IOperator(ABC):
             to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
             to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
             grayscale (bool, optional): 是否将截图转换为灰度图像。默认为True。
+            confidence (float, optional): 识别置信度。默认为0.7。
             trace (bool, optional): 是否打印调试信息。默认为True。
         Returns:
             list[Any] | None: OCR 引擎返回的原始结果。如果发生错误，返回None。
@@ -249,16 +253,22 @@ class IOperator(ABC):
         """
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("Operation stopped")
+        ocr_confidence = self.ocr_confidence if confidence is None else confidence
         try:
             screenshot = self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
             if screenshot is None:
                 raise RuntimeError("Failed to capture screenshot for OCR")
             screenshot = screenshot.convert("L") if grayscale else screenshot
-            rapid_output:RapidOCROutput = self.ocr_engine(screenshot, use_det=True, use_cls=False, use_rec=True)  # NOQA # type: ignore
+            # noinspection PyTypeChecker
+            rapid_output: RapidOCROutput = self.ocr_engine(screenshot, use_det=True, use_cls=False,  # pyright: ignore[reportAssignmentType, reportArgumentType]
+                                                           use_rec=True)
             if rapid_output.txts is None:
                 result = None
             else:
-                result = [(box.tolist(), text, scores) for box, text, scores in zip(rapid_output.boxes, rapid_output.txts, rapid_output.scores)]  # NOQA  # pyright: ignore[reportArgumentType]
+                # noinspection PyTypeChecker
+                result = [(box.tolist(), text, score) for box, text, score in
+                          zip(rapid_output.boxes, rapid_output.txts, rapid_output.scores) if  # pyright: ignore[reportArgumentType]
+                          score > ocr_confidence]
             if self.is_save_ocr_image:
                 screenshot.save(LogsOCRDir / f"{int(time.time())}.png")
             if trace:
@@ -292,12 +302,11 @@ class IOperator(ABC):
         Returns:
             Box | None: 找到的文本位置，如果未找到则返回None。
         """
-        ocr_confidence = self.ocr_confidence if confidence is None else confidence
-        results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
+        results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace, confidence=confidence)
         if results is None:
             return None
         for result in results:
-            if result[2] >= ocr_confidence and text in result[1]:
+            if text in result[1]:
                 left, top = result[0][0]
                 width = result[0][2][0] - left
                 height = result[0][2][1] - top
@@ -332,13 +341,12 @@ class IOperator(ABC):
         Returns:
             tuple[int, Box | None]: 找到的文本索引和位置，如果未找到则返回-1和None
         """
-        ocr_confidence = self.ocr_confidence if confidence is None else confidence
-        results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace)
+        results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace, confidence=confidence)
         if results is None:
             return -1, None
         for index, text in enumerate(texts):
             for result in results:
-                if result[2] >= ocr_confidence and text in result[1]:
+                if text in result[1]:
                     left, top = result[0][0]
                     width = result[0][2][0] - left
                     height = result[0][2][1] - top
@@ -427,7 +435,8 @@ class IOperator(ABC):
         """
         ...
 
-    def click_box(self, box: Box | None, x_offset: int | float = 0, y_offset: int | float = 0, after_sleep: float = 0) -> bool:
+    def click_box(self, box: Box | None, x_offset: int | float = 0, y_offset: int | float = 0,
+                  after_sleep: float = 0) -> bool:
         """
         点击Box区域中心
         
@@ -488,7 +497,8 @@ class IOperator(ABC):
         logger.debug(f"Timeout: {template} -> NotFound in {timeout} seconds")
         return None
 
-    def wait_any_img(self, templates: list[str], timeout: int = 10, interval: float = 0.5, trace: bool = True) -> tuple[int, Box | None]:
+    def wait_any_img(self, templates: list[str], timeout: int = 10, interval: float = 0.5, trace: bool = True) -> tuple[
+        int, Box | None]:
         """
         等待任意一张图片出现
         
@@ -502,7 +512,7 @@ class IOperator(ABC):
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
-            index, box = self.locate_any(templates, trace = trace)
+            index, box = self.locate_any(templates, trace=trace)
             if index != -1:
                 return index, box
             time.sleep(interval)
@@ -752,4 +762,3 @@ class IOperator(ABC):
             time.sleep(interval)
             iterations += 1
         return iterations != max_iterations
-
