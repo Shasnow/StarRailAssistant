@@ -241,7 +241,12 @@ class WarpForecastTask(BaseTask):
 
             message = self._format_report(current, event, future, total, schedule)
             logger.info("\n" + message)
-            try_send_notification("抽卡资源预测", message, result="success", operator=self.operator)
+            image = None
+            try:
+                image = self.operator.screenshot()
+            except Exception:
+                pass
+            try_send_notification("抽卡资源预测", message, result="success", image=image)
             logger.info("抽卡资源预测完成")
             return True
         finally:

@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import threading
 
@@ -29,7 +29,7 @@ def test_load_all_tasks_and_trigger_start_complete_notifications(monkeypatch) ->
 
     sent_notifications: list[tuple[str, str, str]] = []
 
-    def fake_try_send_notification(title, message, result="success", operator=None):
+    def fake_try_send_notification(title, message, result="success", image=None):
         sent_notifications.append((title, message, result))
         return True
 

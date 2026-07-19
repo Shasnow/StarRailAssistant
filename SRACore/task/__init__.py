@@ -5,6 +5,7 @@ from typing import final
 from pathlib import Path
 
 from loguru import logger
+from PIL.Image import Image
 
 from SRACore.localization import Resource
 from SRACore.models.tasks_config import TasksConfig
@@ -53,12 +54,12 @@ class BaseTask(Executable, ABC):
     def fail(self) -> None:
         self.on_failed()
 
-    def send_notification(self, message: str, result: str) -> None:
+    def send_notification(self, message: str, result: str, image: Image | None = None) -> None:
         try_send_notification(
             Resource.task_notificationTitle,
             message,
             result=result,
-            operator=self.operator
+            image=image
         )
 
     def on_start(self) -> None:
@@ -75,11 +76,13 @@ class BaseTask(Executable, ABC):
         if self.operator.width != 1920 and self.operator.height != 1080:
             logger.warning(
                 f"可能的失败原因：游戏分辨率不符合要求：1920x1080，当前：{self.operator.width}x{self.operator.height}。")
-        self.send_notification(f"任务 {self.__class__.__name__} 执行失败。", "error")
+        image = None
         try:
-            self.operator.screenshot().save(LogsScreenshotDir / f"{self.__class__.__name__}_failed_{time.time()}.png")
+            image = self.operator.screenshot()
+            image.save(LogsScreenshotDir / f"{self.__class__.__name__}_lastfailed.png")
         except Exception:
             pass
+        self.send_notification(f"任务 {self.__class__.__name__} 执行失败。", "error", image=image)
 
     def __str__(self):
         return f"{self.__class__.__name__}"
@@ -98,7 +101,6 @@ def _ensure_task_modules_loaded(package="tasks") -> None:
         for file in Path(package).glob("*.py"):
             importlib.import_module(f"{package}.{file.stem}")
     except ModuleNotFoundError:
-        # 运行环境可能没有顶层 tasks 包；此时仅依赖显式导入的注册结果。
         pass
 
 

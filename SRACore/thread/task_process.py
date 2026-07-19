@@ -161,7 +161,7 @@ class TaskManager:
             try_send_notification(
                 Resource.task_notificationTitle,
                 Resource.task_notificationMessage,
-                operator=last_operator
+                image=last_operator.screenshot() if last_operator else None
             )
         except Exception as e:
             # 捕获线程主循环中的异常（如配置加载失败）
@@ -271,12 +271,12 @@ class TaskManager:
             self.info.status = final_state
             logger.debug("[Done]")
 
-    def get_task(self, config: str, task: str) -> BaseTask | None:
+    def get_task(self, config_name: str, task: str) -> BaseTask | None:
         """
         根据配置名称和任务索引或名称获取单个任务实例。
 
         Args:
-            config (str): 配置名称
+            config_name (str): 配置名称
             task ( str): 任务索引或任务类名称（str）
 
         Returns:
@@ -302,7 +302,7 @@ class TaskManager:
             return None
         try:
             # 加载指定配置
-            config = load_config(config)
+            config = load_config(config_name)
             if config is None:
                 return None
             print_config = config.to_dict()

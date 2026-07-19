@@ -28,7 +28,6 @@ from SRACore.util.logger import logger
 
 
 _cached_game_screenshot_bytes: bytes | None = None
-_cached_game_screenshot_owner_id: int | None = None
 _notification_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="notify_batch")
 _notification_dispatcher = NotificationDispatcher(timeout=10, retries=1)
 _http_client = HttpClient(timeout=10, retries=1)
@@ -76,33 +75,23 @@ def should_capture_notification_screenshot(config: NotificationSettings | None =
     ])
 
 
-def capture_game_screenshot(operator: Any | None = None) -> bytes | None:
-    global _cached_game_screenshot_bytes, _cached_game_screenshot_owner_id
-
-    image_bytes = _capture_game_window_bytes(operator)
-    if image_bytes:
-        _cached_game_screenshot_bytes = image_bytes
-        _cached_game_screenshot_owner_id = id(operator) if operator is not None else None
-    return image_bytes
-
 
 def clear_cached_game_screenshot() -> None:
-    global _cached_game_screenshot_bytes, _cached_game_screenshot_owner_id
+    global _cached_game_screenshot_bytes
 
     _cached_game_screenshot_bytes = None
-    _cached_game_screenshot_owner_id = None
 
 
-def try_send_notification(title: str, message: str, result: str = "success", operator: Any | None = None) -> None:
+def try_send_notification(title: str, message: str, result: str = "success", image: Any | None = None) -> None:
     settings = load_notification_settings()
     if not settings.isEnabled:
         return
 
     screenshot_bytes = None
     if should_capture_notification_screenshot(settings):
-        screenshot_bytes = _capture_game_window_bytes(operator)
+        screenshot_bytes = _image_to_bytes(image)
         if not screenshot_bytes:
-            screenshot_bytes = _get_cached_game_screenshot_bytes(operator)
+            screenshot_bytes = _get_cached_game_screenshot_bytes()
 
     context = NotificationContext(
         title=title,
@@ -188,36 +177,22 @@ def _channel_needs_test_image(channel_key: str, config: NotificationSettings) ->
     return False
 
 
-def _get_cached_game_screenshot_bytes(operator: Any | None = None) -> bytes | None:
-    if _cached_game_screenshot_bytes is None:
-        return None
-    if operator is None:
-        return _cached_game_screenshot_bytes
-    if _cached_game_screenshot_owner_id == id(operator):
-        return _cached_game_screenshot_bytes
-    return None
+def _get_cached_game_screenshot_bytes() -> bytes | None:
+    return _cached_game_screenshot_bytes
 
 
-def _capture_game_window_bytes(operator: Any | None = None) -> bytes | None:
+def _image_to_bytes(image: Any | None = None) -> bytes | None:
     try:
         import io
 
-        if operator is None:
+        if image is None:
             return None
 
-        screenshot = operator.screenshot()
         buf = io.BytesIO()
-        screenshot.save(buf, format="PNG")
+        image.save(buf, format="PNG")
         return buf.getvalue()
     except Exception:
         return None
-
-
-def _take_screenshot_bytes() -> bytes | None:
-    cached = _get_cached_game_screenshot_bytes()
-    if cached:
-        return cached
-    return capture_game_screenshot()
 
 
 def _get_test_image_bytes() -> bytes | None:
@@ -230,7 +205,6 @@ def _get_test_image_bytes() -> bytes | None:
 
 __all__ = [
     "build_notification_payload",
-    "capture_game_screenshot",
     "clear_cached_game_screenshot",
     "format_notification_message",
     "load_notification_settings",
