@@ -58,7 +58,7 @@ def update_file_version(file_path, version):
             pattern = r'^version\s*=\s*"[^"]+"'
             replacement = f'version = "{version}"'
             if re.search(pattern, content, re.MULTILINE):
-                new_content = re.sub(pattern, replacement, content, count=1)
+                new_content = re.sub(pattern, replacement, content, count=1, flags=re.MULTILINE)
                 updated = True
             else:
                 updated = False

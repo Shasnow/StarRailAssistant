@@ -1,6 +1,6 @@
 {
   "name": "sra",
-  "version": "2.18.2",
+  "version": "2.18.3",
   "scripts": {
     "dev": "python main.py",
     "build": "dotnet publish -c Release -r win-x64 SRAFrontend/SRAFrontend.sln && python scripts/package.py",
