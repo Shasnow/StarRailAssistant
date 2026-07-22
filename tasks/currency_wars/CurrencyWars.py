@@ -704,8 +704,11 @@ class CurrencyWars(Executable):
     def battle(self) -> bool:
         battle_box = self.operator.wait_img(CWIMG.BATTLE, timeout=3, interval=0.5)
         if battle_box is None or not self.operator.click_box(battle_box, after_sleep=1.5):
-            logger.error("未识别到战斗按钮")
-            return False
+            logger.info("未识别到战斗按钮，尝试识别跳过按钮...")
+            skip_index, skip_box = self.operator.locate_any([CWIMG.SKIP_1, CWIMG.SKIP_2])
+            if skip_index == -1 or skip_box is None or not self.operator.click_box(skip_box, after_sleep=1.5):
+                logger.error("未识别到战斗按钮或跳过按钮")
+                return False
         if self.operator.locate(IMG.ENSURE):  # 编队未满提醒
             self.operator.click_img(IMG.ENSURE)
         logger.info("战斗开始，等待挑战结束")
