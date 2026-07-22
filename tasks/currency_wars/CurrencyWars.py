@@ -702,9 +702,9 @@ class CurrencyWars(Executable):
         logger.info("出售操作完成")
 
     def battle(self) -> bool:
-        battle_box = self.operator.wait_img(CWIMG.BATTLE, timeout=3, interval=0.5)
+        _ ,battle_box = self.operator.wait_any_img([CWIMG.BATTLE, CWIMG.SKIP], timeout=3, interval=0.5)
         if battle_box is None or not self.operator.click_box(battle_box, after_sleep=1.5):
-            logger.error("未识别到战斗按钮")
+            logger.error("未识别到战斗按钮或跳过按钮")
             return False
         if self.operator.locate(IMG.ENSURE):  # 编队未满提醒
             self.operator.click_img(IMG.ENSURE)
