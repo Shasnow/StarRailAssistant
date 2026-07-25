@@ -234,7 +234,7 @@ class IOperator(ABC):
             to_y: float | None = None,
             grayscale: bool = True,
             confidence: float | None = None,
-            trace: bool = True) -> list[Any] | None:
+            trace: bool = True) -> list[tuple[list[tuple[int, int]], str, float]] | None:
         """执行 OCR 文字识别
 
         考虑使用 ocr_match 或 ocr_match_any 方法来处理文本匹配和位置获取，而不是直接使用此方法。
@@ -247,7 +247,7 @@ class IOperator(ABC):
             confidence (float, optional): 识别置信度。默认为0.7。
             trace (bool, optional): 是否打印调试信息。默认为True。
         Returns:
-            list[Any] | None: OCR 引擎返回的原始结果。如果发生错误，返回None。
+            list[tuple[list[tuple[int, int]], str, float]] | None: OCR 引擎返回的原始结果。如果发生错误，返回None。
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
@@ -302,18 +302,13 @@ class IOperator(ABC):
         Returns:
             Box | None: 找到的文本位置，如果未找到则返回None。
         """
-        results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace, confidence=confidence)
-        if results is None:
+        boxes = self.ocr_boxes(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y,
+                               confidence=confidence, trace=trace)
+        if not boxes:
             return None
-        for result in results:
-            if text in result[1]:
-                left, top = result[0][0]
-                width = result[0][2][0] - left
-                height = result[0][2][1] - top
-                if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
-                    left += int(self.width * from_x)
-                    top += int(self.height * from_y)
-                return Box(left, top, width, height, source=text)
+        for box in boxes:
+            if text in box.source:
+                return box
         if trace:
             logger.debug(f"OCR Result not match text: {text}")
         return None
@@ -341,21 +336,56 @@ class IOperator(ABC):
         Returns:
             tuple[int, Box | None]: 找到的文本索引和位置，如果未找到则返回-1和None
         """
-        results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y, trace=trace, confidence=confidence)
-        if results is None:
+        boxes = self.ocr_boxes(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y,
+                               confidence=confidence, trace=trace)
+        if not boxes:
             return -1, None
         for index, text in enumerate(texts):
-            for result in results:
-                if text in result[1]:
-                    left, top = result[0][0]
-                    width = result[0][2][0] - left
-                    height = result[0][2][1] - top
-                    if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
-                        left += int(self.width * from_x)
-                        top += int(self.height * from_y)
-                    return index, Box(left, top, width, height, source=text)
-        logger.debug(f"OCR Result not match any text: {texts}")
+            for box in boxes:
+                if text in box.source:
+                    return index, box
+        if trace:
+            logger.debug(f"OCR Result not match any text: {texts}")
         return -1, None
+
+    def ocr_boxes(self,
+                  from_x: float | None = None,
+                  from_y: float | None = None,
+                  to_x: float | None = None,
+                  to_y: float | None = None,
+                  grayscale: bool = True,
+                  confidence: float | None = None,
+                  trace: bool = True) -> list[Box] | None:
+        """执行 OCR 文字识别，返回窗口坐标系下的 Box 列表
+
+        与 ocr() 行为相同，但返回的 Box 坐标已转换为窗口坐标系，
+        可直接用于 click_box 等操作，无需再调用 ocr_match。
+
+        Args:
+            from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
+            from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
+            to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
+            to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
+            grayscale (bool, optional): 是否将截图转换为灰度图像。默认为True。
+            confidence (float, optional): 识别置信度。默认为None。
+            trace (bool, optional): 是否打印调试信息。默认为True。
+        Returns:
+            list[Box] | None: Box列表，每个Box包含识别到的文本(source字段)和窗口坐标。
+                              如果未识别到任何文本或发生错误，返回None。
+        """
+        results = self.ocr(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y,
+                           grayscale=grayscale, confidence=confidence, trace=trace)
+        if not results:
+            return None
+        offset_x = int(self.width * from_x) if from_x is not None else 0
+        offset_y = int(self.height * from_y) if from_y is not None else 0
+        boxes = []
+        for result in results:
+            left, top = result[0][0]
+            width = result[0][2][0] - left
+            height = result[0][2][1] - top
+            boxes.append(Box(left + offset_x, top + offset_y, width, height, source=result[1]))
+        return boxes
 
     def wait_ocr(self, text: str,
                  confidence: float | None = None,
@@ -416,7 +446,7 @@ class IOperator(ABC):
 
     @abstractmethod
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
-                    after_sleep: float = 0, tag: str = "", trace: bool = False) -> bool:
+                    after_sleep: float = 0, tag: str = "", trace: bool = True) -> bool:
         """
         点击指定位置
 
@@ -455,7 +485,7 @@ class IOperator(ABC):
         x, y = box.center
         logger.debug(
             f"Click box center:({x}, {y}), source: {box.source}, offset:({x_offset}, {y_offset}), wait {after_sleep}s")
-        return self.click_point(x, y, x_offset, y_offset, after_sleep)
+        return self.click_point(x, y, x_offset, y_offset, after_sleep, trace=False)
 
     def click_img(self, template: str, x_offset: int | float = 0, y_offset: int | float = 0,
                   after_sleep: float = 0) -> bool:
@@ -546,7 +576,7 @@ class IOperator(ABC):
             screenshot = self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
             img = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            blur = cv2.GaussianBlur(gray, (3, 3), 0)
+            blur = cv2.GaussianBlur(gray, (5, 5), 0)
             edged = cv2.Canny(blur, 30, 90, apertureSize=3, L2gradient=True)
             contours, _ = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -562,6 +592,7 @@ class IOperator(ABC):
                     result.append(Box(left, top, sw, sh, source="rectangle_detect"))
 
             if trace:
+                cv2.imwrite(str(LogsOCRDir / f"rectangle_detect_edged_{int(time.time())}.png"), edged)
                 cv2.imwrite(str(LogsOCRDir / f"rectangle_detect_{int(time.time())}.png"), img)
 
             return result

@@ -41,7 +41,7 @@ class Box:
     top: int
     width: int
     height: int
-    source: str | None = None
+    source: str = ''
 
     @property
     def center(self):

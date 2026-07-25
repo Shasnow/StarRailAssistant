@@ -116,7 +116,6 @@ class BrowserOperator(IOperator):
         # noinspection PyTypeChecker
         self._driver: WebDriver = None  # pyright: ignore[reportAttributeAccessIssue]
 
-
     @property
     def driver(self):
         if self._driver is None:

@@ -246,7 +246,7 @@ class Operator(IOperator):
             return pyscreeze.screenshot(region=region.tuple)
 
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
-                    after_sleep: float = 0, tag: str = "", trace: bool = False) -> bool:
+                    after_sleep: float = 0, tag: str = "", trace: bool = True) -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("点击中断", "线程已停止")
         if isinstance(x_offset, float) and isinstance(y_offset, float):
@@ -254,15 +254,19 @@ class Operator(IOperator):
             y_offset = int(self.height * y_offset)
 
         if isinstance(x, int) and isinstance(y, int):
-            pyautogui.click(x + self.left + x_offset, y + self.top + y_offset)
+            screen_x = x + self.left + x_offset
+            screen_y = y + self.top + y_offset
+            if trace:
+                logger.debug(f"Click point: ({screen_x - self.left}, {screen_y - self.top}), tag: {tag}")
+            pyautogui.click(screen_x, screen_y)
             self.sleep(after_sleep)
             return True
         elif isinstance(x, float) and isinstance(y, float):
-            x = int(self.left + self.width * x + x_offset)
-            y = int(self.top + self.height * y + y_offset)
+            screen_x = int(self.left + self.width * x + x_offset)
+            screen_y = int(self.top + self.height * y + y_offset)
             if trace:
-                logger.debug(f"Click point: ({x}, {y}), tag: {tag}")
-            pyautogui.click(x, y)
+                logger.debug(f"Click point: ({screen_x - self.left}, {screen_y - self.top}), tag: {tag}")
+            pyautogui.click(screen_x, screen_y)
             self.sleep(after_sleep)
             return True
         else:
