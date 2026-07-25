@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
@@ -112,6 +113,11 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
     public Task<string> GetTaskStatusAsync()
     {
         return _currentBackend.GetTaskStatusAsync();
+    }
+
+    public Task<List<Strategy>> GetStrategiesAsync()
+    {
+        return _currentBackend.GetStrategiesAsync();
     }
 
     public Task<byte[]> GetGameScreenshotBytesAsync()

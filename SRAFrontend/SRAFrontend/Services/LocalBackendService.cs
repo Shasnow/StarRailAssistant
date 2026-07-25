@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SRAFrontend.Models;
 
 namespace SRAFrontend.Services;
 
@@ -186,6 +189,28 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         _outputTcs = tcs;
         await SendInputAsync("task status --json");
         return await tcs.Task;
+    }
+
+    public async Task<List<Strategy>> GetStrategiesAsync()
+    {
+        if (_backendProcess == null || _backendProcess.HasExited)
+        {
+            logger.LogWarning("Attempted to get strategies, but backend process is not running.");
+            return [];
+        }
+        var tcs = new TaskCompletionSource<string>();
+        _outputTcs = tcs;
+        await SendInputAsync("strategy list --json");
+        var json = await tcs.Task;
+        try
+        {
+            return JsonSerializer.Deserialize<List<Strategy>>(json) ?? [];
+        }
+        catch (JsonException ex)
+        {
+            logger.LogError(ex, "Failed to parse strategies JSON");
+            return [];
+        }
     }
 
     public async Task<byte[]> GetGameScreenshotBytesAsync()

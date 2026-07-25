@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net.Http;
@@ -143,6 +144,12 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
     {
         logger.LogWarning("GetTaskStatus is not implemented for remote backend");
         return Task.FromResult(string.Empty);
+    }
+
+    public Task<List<Strategy>> GetStrategiesAsync()
+    {
+        logger.LogWarning("GetStrategies is not implemented for remote backend");
+        return Task.FromResult(new List<Strategy>());
     }
 
     public Task<byte[]> GetGameScreenshotBytesAsync()

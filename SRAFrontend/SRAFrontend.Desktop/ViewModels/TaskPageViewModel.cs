@@ -1,8 +1,6 @@
-using System.Collections.Generic;
+using System;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
@@ -22,6 +20,7 @@ public partial class TaskPageViewModel : PageViewModel
     private readonly CacheService _cacheService;
     private readonly CommonModel _commonModel;
     private readonly ConfigService _configService;
+    private readonly IBackendService _backendService;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CosmicStrifeConfig), nameof(MissionAccomplishedConfig),
@@ -46,18 +45,20 @@ public partial class TaskPageViewModel : PageViewModel
         CommonModel commonModel,
         ControlPanelViewModel controlPanelViewModel,
         ConfigService configService,
-        CacheService cacheService) : base(
+        CacheService cacheService,
+        IBackendService backendService) : base(
         PageName.Task, "\uE1BC")
     {
         ControlPanelViewModel = controlPanelViewModel;
         _commonModel = commonModel;
         _configService = configService;
         _cacheService = cacheService;
+        _backendService = backendService;
         CurrentConfig = _configService.TasksConfig!;
 
         _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
 
-        if (Cache.Strategies.Count == 0) RefreshStrategies();
+        if (Cache.Strategies.Count == 0) _ = RefreshStrategies();
         return;
 
         void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)
@@ -124,37 +125,20 @@ public partial class TaskPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void RefreshStrategies()
+    private async Task RefreshStrategies()
     {
-        if (!Directory.Exists(DataPath.StrategiesDir))
+        try
         {
-            _commonModel.ShowErrorToast("Error", "未找到攻略文件夹，无法刷新");
-            return;
+            var strategies = await _backendService.GetStrategiesAsync();
+            Cache.Strategies.Clear();
+            foreach (var strategy in strategies)
+                Cache.Strategies.Add(strategy);
+            CurrencyWarsStrategyIndex = 0;
         }
-
-        // 遍历攻略文件夹中的json文件，反序列化成Strategy对象，并更新Cache中的Strategies列表
-        var strategies = new List<Strategy>();
-        foreach (var file in Directory.GetFiles(DataPath.StrategiesDir))
+        catch (Exception ex)
         {
-            if (!file.EndsWith(".json")) continue;
-            var json = File.ReadAllText(file);
-            try
-            {
-                var strategy = JsonSerializer.Deserialize<Strategy>(json);
-                if (strategy is null) continue;
-                strategy.FileName = Path.GetFileNameWithoutExtension(file);
-                strategies.Add(strategy);
-            }
-            catch (JsonException ex)
-            {
-                _commonModel.ShowErrorToast("攻略加载失败", $"文件 {Path.GetFileName(file)} 格式错误：{ex.Message}");
-            }
+            _commonModel.ShowErrorToast("攻略加载失败", ex.Message);
         }
-
-        Cache.Strategies.Clear();
-        foreach (var strategy in strategies)
-            Cache.Strategies.Add(strategy);
-        CurrencyWarsStrategyIndex = 0;
     }
 
     [RelayCommand]

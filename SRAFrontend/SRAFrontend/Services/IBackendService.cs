@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using SRAFrontend.Models;
 
 namespace SRAFrontend.Services;
 
@@ -19,5 +21,6 @@ public interface IBackendService : INotifyPropertyChanged
     Task<bool> TaskSingleAsync(string taskName);
     Task<bool> TaskStopAsync();
     Task<string> GetTaskStatusAsync();
+    Task<List<Strategy>> GetStrategiesAsync();
     Task<byte[]> GetGameScreenshotBytesAsync();
 }
