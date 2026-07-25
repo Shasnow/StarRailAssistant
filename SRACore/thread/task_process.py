@@ -42,7 +42,7 @@ class TaskManager:
         self.info = TaskInfo()
         self.task_list: list[type[BaseTask]] = get_task_classes()
         self.settings: AppSettings = settings
-        self._recovery = TaskRecovery(settings)
+        self._recovery = TaskRecovery()
         logger.debug(f"Successfully load task: {self.task_list}")
 
     def request_stop(self) -> None:
