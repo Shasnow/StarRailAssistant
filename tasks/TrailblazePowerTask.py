@@ -4,7 +4,6 @@ from typing import Callable, TypedDict
 from SRACore.models.tasks_config import TrailblazePowerTaskItem
 from SRACore.operators.model import Box
 from SRACore.task import BaseTask, task
-from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
 from tasks.img import IMG, TPIMG
 
@@ -77,7 +76,7 @@ class TrailblazePowerTask(BaseTask):
         logger.info("识别培养目标任务信息")
         boxes = self.operator.locate_all(TPIMG.TRAILBLAZE_POWER)  # 定位所有体力图标
         if not boxes:
-            logger.error(SRAError(ErrorCode.NO_BUILD_TARGET, "未找到任何培养目标任务"))
+            logger.error("未找到任何培养目标任务")
             self.operator.press_key("esc")
             return
         target_objects = []  # 存储识别到的培养目标任务对象
@@ -97,32 +96,32 @@ class TrailblazePowerTask(BaseTask):
 
         for obj in target_objects:
             # 从配置文件中匹配产物对应的副本任务
-            for id, subtask in self.sub_tasks.items():
+            for tid, subtask in self.sub_tasks.items():
                 subtask_levels = subtask["levels"]
                 found = False  # 标记是否找到对应结果
                 for level in subtask_levels:
                     if obj in level["result"]:
                         logger.info(f"{obj} 需要刷取 {subtask.get('name')} 的关卡 {level["id"]}")
                         found = True
-                        if id == "echo_of_war":
+                        if tid == "echo_of_war":
                             # 历战余响特殊处理
-                            self.manual_tasks.append((self.get_task_by_id(id), {
+                            self.manual_tasks.append((self.get_task_by_id(tid), {
                                 "level": level["id"],
                                 "single_time": 3,
                                 "run_time": 1
                             }))
                         else:
-                            task_name = subtask.get("name", id)
+                            task_name = subtask.get("name", tid)
                             self.auto_detect_tasks.append(
                                 TrailblazePowerTaskItem(
                                     Name=task_name,
-                                    Id=id,
+                                    Id=tid,
                                     Level=level["id"]
                                 )
                             )
                         break
                 else:
-                    logger.debug(f"Could not find {obj} in subtask results of {id}")
+                    logger.debug(f"Could not find {obj} in subtask results of {tid}")
                 if found:
                     break
 
@@ -140,7 +139,7 @@ class TrailblazePowerTask(BaseTask):
             任务列表，每项为 (任务函数, 参数字典)，失败返回 None。
         """
         if not self.goto_survival_index():
-            logger.error(SRAError(ErrorCode.GO_TO_SURVIVAL_INDEX_FAILED, "跳转到生存索引页面失败"))
+            logger.error("跳转到生存索引页面失败")
             return None
         self.operator.sleep(0.5)
 
@@ -154,12 +153,12 @@ class TrailblazePowerTask(BaseTask):
         ava_current_tbp = (current_tbp // 10) * 10
 
         if not self.auto_detect_tasks:
-            logger.warning(SRAError(ErrorCode.NO_BUILD_TARGET, "未识别到可执行任务"))
+            logger.warning("未识别到可执行任务")
             return None
 
         # 如果体力和沉浸器都为0，返回None
         if ava_current_tbp <= 0 and immersion_dev <= 0:
-            logger.warning(SRAError(ErrorCode.NO_POWER, "当前体力和沉浸器都为0，无任务可执行"))
+            logger.warning("当前体力和沉浸器都为0，无任务可执行")
             return None
 
         # 根据体力分配各任务执行次数
@@ -192,7 +191,7 @@ class TrailblazePowerTask(BaseTask):
                 r, _ = tuple(map(int, ocr_result[0][1].split('/')))
                 return r
             except Exception as e:
-                logger.warning(SRAError(ErrorCode.OCR_RECOGNITION_FAILED, "OCR识别结果格式错误", str(e)))
+                logger.warning(f"OCR识别结果格式错误: {str(e)}")
                 return 0
 
         logger.info("获取活动信息")
@@ -240,7 +239,7 @@ class TrailblazePowerTask(BaseTask):
         try:
             res = self.operator.ocr(from_x=0.65625, from_y=0.0417, to_x=0.908, to_y=0.076)
             if not res:
-                logger.error(SRAError(ErrorCode.OCR_RECOGNITION_FAILED, "OCR识别结果为空"))
+                logger.error("OCR识别结果为空")
                 return None
             # 过滤 OCR 噪音字符（+、十、满），保留有效数字
             exclude_chars = {'+', '十', '满'}
@@ -252,7 +251,7 @@ class TrailblazePowerTask(BaseTask):
             immersion_dev_str = valid_res[2].split('/')[0] if '/' in valid_res[2] else valid_res[2]
             immersion_dev = int(immersion_dev_str)
         except (ValueError, IndexError) as e:
-            logger.error(SRAError(ErrorCode.POWER_DETECTION_FAILED, "识别到的体力值格式错误", str(e)))
+            logger.error(f"识别到的体力值格式错误: {str(e)}")
             return None
 
         logger.info(f"当前后备开拓力: {reserve_tbp}, 当前开拓力: {current_tbp}, 沉浸器: {immersion_dev}")
@@ -363,13 +362,13 @@ class TrailblazePowerTask(BaseTask):
         if not self.find_level(level):
             return False
         if not self.operator.click_img(level, x_offset=700):
-            logger.error(SRAError(ErrorCode.CLICK_LEVEL_FAILED, "点击关卡失败"))
+            logger.error("点击关卡失败")
             return False
         if not self.operator.wait_img(TPIMG.ORNAMENT_EXTRACTION_PAGE, timeout=20):  # 等待传送
-            logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待页面加载超时", f"当前关卡：{level}"))
+            logger.error("等待页面加载超时，当前关卡：%s", level)
             return False
         if self.operator.locate(TPIMG.NO_SAVE):
-            logger.warning(SRAError(ErrorCode.NO_SAVE, "当前暂无可用存档，请前往[差分宇宙]获取存档"))
+            logger.warning("当前暂无可用存档，请前往[差分宇宙]获取存档")
             self.operator.press_key("esc", presses=2, interval=1)
             return False
         if single_time is not None:
@@ -382,7 +381,7 @@ class TrailblazePowerTask(BaseTask):
         # 支援逻辑又不通用了
         if self.operator.click_img(TPIMG.BATTLE_STAR, after_sleep=1):
             if self.operator.locate(TPIMG.LIMIT):
-                logger.warning(SRAError(ErrorCode.RELICS_LIMIT, "背包内遗器数量超过限制，请先清理"))
+                logger.warning("背包内遗器数量超过限制，请先清理")
                 self.operator.sleep(2)
                 self.operator.press_key("esc", interval=1, presses=2)
                 return False
@@ -504,14 +503,14 @@ class TrailblazePowerTask(BaseTask):
             run_time: 执行轮数
         """
         if not self.operator.wait_img(TPIMG.BATTLE, timeout=20):  # 等待传送
-            logger.error(SRAError(ErrorCode.WAIT_BATTLE_BOTTON_TIMEOUT, "等待挑战按钮超时失败"))
+            logger.error("等待挑战按钮超时失败")
             return False
         if multi is not None and multi > 1:
             for _ in range(multi - 1):
                 self.operator.click_img(TPIMG.PLUS)
             self.operator.sleep(1)
         if not self.operator.click_img(TPIMG.BATTLE, after_sleep=1):
-            logger.error(SRAError(ErrorCode.CLICK_BATTLE_BUTTON_FAILED, "点击挑战按钮失败"))
+            logger.error("点击挑战按钮失败")
             return False
         if self.operator.locate(TPIMG.REPLENISH):
             if self.replenish_flag and self.replenish_time != 0:
@@ -524,11 +523,11 @@ class TrailblazePowerTask(BaseTask):
         if self.config.TrailblazePower.isUseAssistant:
             self.support()
         if not self.operator.click_img(TPIMG.BATTLE_STAR, after_sleep=1):
-            logger.warning(SRAError(ErrorCode.CLICK_BATTLE_STAR_FAILED, "点击开始挑战按钮失败"))
+            logger.warning("点击开始挑战按钮失败")
             self.operator.press_key("esc", interval=1, presses=3)
             return False
         if self.operator.locate(TPIMG.LIMIT):
-            logger.warning(SRAError(ErrorCode.RELICS_LIMIT, "背包内遗器数量超过限制，请先清理"))
+            logger.warning("背包内遗器数量超过限制，请先清理")
             self.operator.sleep(3)
             self.operator.press_key("esc", interval=1, presses=3)
             return False
@@ -553,7 +552,7 @@ class TrailblazePowerTask(BaseTask):
                 break
 
             if not self.operator.click_img(TPIMG.AGAIN):
-                logger.error(SRAError(ErrorCode.CLICK_AGAIN_BUTTON_FAILED, "点击再次挑战按钮失败"))
+                logger.error("点击再次挑战按钮失败")
                 continue
             if self.operator.wait_img(TPIMG.REPLENISH, timeout=2):
                 if self.replenish_flag and self.replenish_time:
@@ -563,7 +562,7 @@ class TrailblazePowerTask(BaseTask):
                     logger.info("体力不足")
                     self.operator.press_key("esc")
                     if not self.operator.click_img(TPIMG.QUIT_BATTLE):
-                        logger.error(SRAError(ErrorCode.QUIT_BATTLE_FAILED, "退出战斗失败"))
+                        logger.error("退出战斗失败")
                     logger.info("退出战斗")
                     result, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER], timeout=10)
                     if result == 0:
@@ -583,7 +582,7 @@ class TrailblazePowerTask(BaseTask):
                 self.operator.click_point(0.5, 0.5)  # 点击屏幕中心
             else:
                 if not self.operator.click_img(TPIMG.QUIT_BATTLE):
-                    logger.error(SRAError(ErrorCode.QUIT_BATTLE_FAILED, "退出战斗失败"))
+                    logger.error("退出战斗失败")
             logger.info("退出战斗")
             resources, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER])
             if resources == 0:
@@ -700,7 +699,7 @@ class TrailblazePowerTask(BaseTask):
         if result:
             self.operator.click_box(result)
         else:
-            logger.error(SRAError(ErrorCode.SESSION_NOT_FOUND, f"未找到副本类别：{name}"))
+            logger.error(f"未找到副本类别：{name}")
             self.operator.press_key("esc")
             return False
         return True
@@ -738,7 +737,7 @@ class TrailblazePowerTask(BaseTask):
                     self.operator.click_point(0.5, 0.7)  # 点击屏幕中心
                     logger.info("已使用后备开拓力进行补充")
                 else:
-                    logger.error(SRAError(ErrorCode.REPLENISH_POWER_FAILED, "补充体力失败", "补充方式：使用后备开拓力"))
+                    logger.error("补充体力失败")
                     return False
             elif way == 1:
                 if self.operator.click_img(TPIMG.FUEL) or self.operator.locate(
@@ -748,7 +747,7 @@ class TrailblazePowerTask(BaseTask):
                     self.operator.click_point(0.5, 0.7)  # 点击屏幕中心
                     logger.info("已使用燃料进行补充")
                 else:
-                    logger.error(SRAError(ErrorCode.REPLENISH_POWER_FAILED, "补充体力失败", "补充方式：使用燃料"))
+                    logger.error("补充体力失败，补充方式：使用燃料")
                     return False
             elif way == 2:
                 if self.operator.click_img(TPIMG.STELLAR_JADE) or self.operator.locate(
@@ -758,7 +757,7 @@ class TrailblazePowerTask(BaseTask):
                     self.operator.click_point(0.5, 0.7)
                     logger.info("已使用星琼进行补充")
                 else:
-                    logger.error(SRAError(ErrorCode.REPLENISH_POWER_FAILED, "补充体力失败", "补充方式：使用星琼"))
+                    logger.error("补充体力失败，补充方式：使用星琼")
                     return False
             self.replenish_time -= 1
             return True
