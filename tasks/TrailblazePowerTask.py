@@ -603,7 +603,7 @@ class TrailblazePowerTask(BaseTask):
         logger.info("等待战斗结束")
         import time
         start_time = time.monotonic()
-        timeout = 1800  # 30分钟超时
+        timeout = 3600  # 60分钟超时（这很开拓）
         while True:
             if time.monotonic() - start_time > timeout:
                 logger.error(f"等待战斗结束超时（{timeout}秒）")
