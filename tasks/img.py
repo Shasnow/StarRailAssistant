@@ -153,6 +153,7 @@ class CWIMG:
     COLLECTION = f"{BASE}/collection.png"
     CONTINUE = f"{BASE}/continue.png"
     CONTINUE_PROGRESS = f"{BASE}/continue_progress.png"
+    CONFIRM_SELECTION = f"{BASE}/confirm_selection.png"
     START_CURRENCY_WARS = f"{BASE}/start_currency_wars.png"
     DOWN_ARROW = f"{BASE}/down_arrow.png"
     ENCOUNTER_NODE = f"{BASE}/encounter_node.png"

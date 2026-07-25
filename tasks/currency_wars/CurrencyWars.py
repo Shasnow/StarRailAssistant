@@ -1,5 +1,6 @@
-import enum
+﻿import enum
 import json
+from collections.abc import Callable
 from typing import Any
 
 from loguru import logger
@@ -26,20 +27,21 @@ class CurrencyWarsPage(enum.IntEnum):
 
 
 class CurrencyWars(Executable):
-    def __init__(self, operator, runtimes):
+    def __init__(self, operator, runtimes, config: dict[str, Any]):
         super().__init__(operator)
         self.runtimes = runtimes
+        self.special_events: list[dict[str, Any]] = config.get("special_events", [])
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
         self.difficulty: int = Difficulty.LOWEST
-        self.on_field_character: list[Character | None] = [None, None, None, None]  # 场上角色列表
+        self.on_field_character: list[Character | None] = [None, None, None, None]  # 前台角色列表
         self.on_field_area: list[tuple[float, float]] = [
             (0.386, 0.365),
             (0.464, 0.365),
             (0.536, 0.365),
             (0.611, 0.365)
         ]
-        self.off_field_character: list[Character | None] = [None, None, None, None, None, None]  # 场下角色列表
+        self.off_field_character: list[Character | None] = [None, None, None, None, None, None]  # 后台角色列表
         self.off_field_area: list[tuple[float, float]] = [
             (0.3056, 0.620),
             (0.3806, 0.620),
@@ -49,7 +51,7 @@ class CurrencyWars(Executable):
             (0.6738, 0.620)
         ]
         self.in_hand_character: list[Character | None] = [None, None, None, None, None, None, None, None,
-                                                          None]  # 手牌角色列表
+                                                          None]  # 备战席角色列表
         self.in_hand_area: list[tuple[float, float]] = [
             (0.229, 0.844),
             (0.297, 0.844),
@@ -60,7 +62,7 @@ class CurrencyWars(Executable):
             (0.618, 0.844),
             (0.684, 0.844),
             (0.749, 0.844)
-        ]  # 手牌区域
+        ]  # 备战席区域
         self.store_area: list[tuple[float, float]] = [
             (0.25, 0.18),
             (0.40, 0.18),
@@ -74,7 +76,8 @@ class CurrencyWars(Executable):
         self.min_level = 7  # 商店等级
         self.mid_level = 7  # 商店等级
         self.strategy_characters: dict[str, int] = dict()  # 在攻略中的角色及其预期星级
-        self.strategy_code = ""  # 当前使用的攻略代码·
+        self.strategy_code = ""  # 当前使用的攻略代码
+        self.strategy_special_events: dict[str, str] = dict()  # 攻略中的特殊事件处理
         self.is_overclock = False  # 超频博弈
 
     def run(self):
@@ -162,7 +165,7 @@ class CurrencyWars(Executable):
     def start_game(self):
         """开始一局货币战争。
         拆分原复杂流程为多个独立步骤，提升可读性与可维护性。
-        返回 True 表示进入对局并完成初始策略与手牌识别
+        返回 True 表示进入对局并完成初始策略与备战席识别
             False 表示流程中断或失败。
         """
         page = self.page_locate()
@@ -242,7 +245,7 @@ class CurrencyWars(Executable):
             [CWIMG.ENTER_GAME, CWIMG.CONTINUE_PROGRESS],
             timeout=10
         )
-        if enter_type is None:
+        if enter_box is None:
             logger.error("[进入流程] 未识别到任何进入方式（标准/继续）")
             return False
 
@@ -369,7 +372,7 @@ class CurrencyWars(Executable):
         """
         self.operator.sleep(1)
         if self.is_continue:
-            # 继续进度：获取场上角色信息
+            # 继续进度：获取前台角色信息
             logger.info("[初始化] 继续进度")
             self.refresh_character()
         # 新游戏：没有初始化逻辑
@@ -387,7 +390,7 @@ class CurrencyWars(Executable):
         标准模式下，简单地选择中间的投资环境或选择尚未收集的投资环境，点击确定即可。
         """
         if not self.operator.click_img(CWIMG.COLLECTION):
-            self.operator.click_point(0.5, 0.5)
+            self.operator.click_point(0.5, 0.5, tag="选择中间的投资环境")
         self.operator.click_img(IMG.ENSURE2, after_sleep=1)
         if self.operator.locate(CWIMG.INVEST_ENVIRONMENT):
             self.operator.click_point(0.5, 0.5, after_sleep=1)
@@ -418,7 +421,7 @@ class CurrencyWars(Executable):
     def handle_game_initialized(self) -> bool:  # NOQA
         """对局初始化完成后的处理逻辑（如有）。默认实现为无操作，子类可重写此方法以添加额外逻辑。
 
-        调用时机：在完成角色放置和手牌识别后、正式进入游戏循环前调用
+        调用时机：在完成角色放置和备战席识别后、正式进入游戏循环前调用
         Returns:
             True-继续执行游戏循环；False-中止进入流程
         """
@@ -438,20 +441,11 @@ class CurrencyWars(Executable):
         self.handle_game_over()
         return True
 
-    # ==================== 进入后的初始策略 ====================
-    def initialize(self) -> bool:
-        """进入对局后的攻略应用与手牌识别。"""
-        self.operator.sleep(1)
-
-        self.get_in_hand_area()  # 更新手牌信息（若无接管情况，则仅有此行有用）
-        self.place_character()  # 放置角色
-        return True
-
     def game_loop(self):
         run_times = 0
         while self.is_running:
             self.harvest_crystals()
-            self.get_in_hand_area(True)  # 更新手牌信息
+            self.get_in_hand_area(True)  # 更新备战席信息
             self.handle_characters_updated()
             self.update_max_team_size()
             self.place_character()
@@ -465,7 +459,7 @@ class CurrencyWars(Executable):
             self.shopping()
 
             run_times += 1
-            if run_times % 2 == 0:  # 每2轮更新一次场上角色，顺便穿戴装备
+            if run_times % 2 == 0:  # 每2轮更新一次前台角色，顺便穿戴装备
                 self.refresh_character()
                 self.sort_all_areas_by_priority()  # 优先级排序
         # 游戏循环结束，重置角色状态
@@ -473,7 +467,7 @@ class CurrencyWars(Executable):
         return True
 
     def refresh_character(self):
-        """ 刷新角色信息，确保手牌中未放置的角色状态正确。 """
+        """ 刷新角色信息，确保备战席中未放置的角色状态正确。 """
         self.get_on_field_area(True)
         self.operator.sleep(0.3)
         boxes = self.operator.rectangle_detect(120, 150, 130, 150,
@@ -485,6 +479,11 @@ class CurrencyWars(Executable):
                 (b.center[0] / self.operator.width, b.center[1] / self.operator.height)
                 for b in sorted_boxes
             ]
+            # 同步调整角色列表长度
+            if len(self.off_field_area) > len(self.off_field_character):
+                self.off_field_character.extend(
+                    [None] * (len(self.off_field_area) - len(self.off_field_character))
+                )
             logger.info(f"当前后台共有 {len(self.off_field_area)} 个位置")
         self.get_off_field_area(True)
         self.operator.sleep(0.3)
@@ -505,7 +504,13 @@ class CurrencyWars(Executable):
         else:
             return 0
 
-    def _get_character_in_area(self, areas, target_character_list, force=False, equip=False, count_stars=False):
+    def _get_character_in_area(self,
+                               areas,
+                               target_character_list,
+                               force=False,
+                               equip=False,
+                               count_stars=False,
+                               use_backup_ocr=False):
         """
         通用方法：获取指定区域的角色信息
         :param areas: 区域坐标列表（如 off_field_area）
@@ -537,7 +542,7 @@ class CurrencyWars(Executable):
                 # 点击区域（带延迟，确保界面响应）
                 if target_character_list[index] is not None and not force:
                     continue  # 已有角色则跳过
-                self.operator.click_point(*area, after_sleep=0.2)
+                self.operator.click_point(*area, after_sleep=0.2, trace=False)
 
                 # OCR识别角色名称
                 character_names = self.operator.ocr(
@@ -547,6 +552,17 @@ class CurrencyWars(Executable):
                     to_y=ocr_to_y
                 )
 
+                if not character_names and use_backup_ocr:
+                    # 狸猫/佩佩等可能需要在另一个位置识别
+                    ocr_from_x2, ocr_from_y2, ocr_to_x2, ocr_to_y2 = (0.775, 0.445, 0.880, 0.486)
+                    # 尝试在备用区域识别角色名称
+                    character_names = self.operator.ocr(
+                        from_x=ocr_from_x2,
+                        from_y=ocr_from_y2,
+                        to_x=ocr_to_x2,
+                        to_y=ocr_to_y2
+                    )
+
                 # 更新角色列表
                 if character_names and len(character_names) > 0:
                     name = ''
@@ -555,42 +571,43 @@ class CurrencyWars(Executable):
                         name += char_name[1]
                     char = Characters.get_character(name)
                     if char is None:
-                        logger.warning("OCR识别到角色名称：{}，但未在角色列表中找到匹配项".format(name))
+                        logger.warning(f"OCR识别到角色名称：{name}，但未在角色列表中找到匹配项")
+                        target_character_list[index] = Characters.new_character(name)  # 新增临时角色
                         continue
-                    if count_stars:
-                        char.stars = get_stars(3)
+                    if count_stars and not char.is_npc:
+                        char.stars = get_stars(merge=3)
                     target_character_list[index] = char
-                    if equip:
+                    if equip and not char.is_npc:
                         if char.name not in self.strategy_characters.keys():
                             continue  # 不给不在攻略中的角色穿戴装备
                         self.operator.click_img(CWIMG.EQUIPMENT_RECOMMEND, after_sleep=1)
                         _, box = self.operator.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS], confidence=0.8)
                         if box:
                             self.operator.click_box(box, after_sleep=0.5)
-                    self.operator.click_point(0.5, 0.5)  # 点击空白处关闭信息框
+                    self.operator.click_point(0.5, 0.5, trace=False)  # 点击空白处关闭信息框
                 else:
                     target_character_list[index] = None  # 未识别到角色
 
             except Exception as e:
                 # 捕获点击或OCR异常（如坐标错误、识别失败）
                 logger.error(f"获取区域[{index}]角色失败：{str(e)}")
-                target_character_list[index] = None  # 异常时标记为空
 
         return target_character_list
 
     def get_off_field_area(self, force=False):
-        """获取场下角色信息"""
+        """获取后台角色信息"""
         self._get_character_in_area(areas=self.off_field_area, target_character_list=self.off_field_character,
                                     equip=True,
                                     force=force,
-                                    count_stars=True)
+                                    count_stars=True,
+                                    use_backup_ocr=True)
         for char in self.off_field_character:
             if char is not None:
                 char.is_placed = True
-        logger.info(f"当前场下角色：{self.off_field_character}")
+        logger.info(f"当前后台角色：{self.off_field_character}")
 
     def get_on_field_area(self, force=False):
-        """获取场上角色信息"""
+        """获取前台角色信息"""
         self._get_character_in_area(areas=self.on_field_area, target_character_list=self.on_field_character,
                                     equip=True,
                                     force=force,
@@ -598,10 +615,10 @@ class CurrencyWars(Executable):
         for char in self.on_field_character:
             if char is not None:
                 char.is_placed = True
-        logger.info(f"当前场上角色：{self.on_field_character}")
+        logger.info(f"当前前台角色：{self.on_field_character}")
 
     def get_in_hand_area(self, force=False):
-        """获取手牌角色信息"""
+        """获取备战席角色信息"""
         # 打开武器箱或专家邀请函
         target = self.operator.locate(CWIMG.OPEN)
         while target:
@@ -611,7 +628,7 @@ class CurrencyWars(Executable):
             self.operator.click_point(0.8, 0.25, after_sleep=1)
             target = self.operator.locate(CWIMG.OPEN)
         self._get_character_in_area(areas=self.in_hand_area, target_character_list=self.in_hand_character, force=force)
-        logger.info(f"当前手牌角色：{self.in_hand_character}")
+        logger.info(f"当前备战席角色：{self.in_hand_character}")
 
     def harvest_crystals(self):
         # 实现水晶收集逻辑
@@ -637,7 +654,7 @@ class CurrencyWars(Executable):
 
     def sell_character(self):
         """
-        实现角色出售逻辑，确保手牌不超过8个角色
+        实现角色出售逻辑，确保备战席不超过8个角色
         :return: bool - 出售操作是否成功
         """
         max_attempts = 5
@@ -645,23 +662,23 @@ class CurrencyWars(Executable):
 
         while attempt < max_attempts:
             if self.in_hand_character_count < 8:
-                logger.info("手牌未满，跳过出售角色")
+                logger.info("备战席未满，跳过出售角色")
                 return True
-            logger.info("手牌已满，尝试出售角色")
+            logger.info("备战席已满，尝试出售角色")
             self._handle_sell_character()
             self.get_in_hand_area()  # 检测空位，确保没有新插入的角色
             attempt += 1
 
         # 超过最大尝试次数仍未成功出售时的逻辑
-        logger.warning(f"已尝试{max_attempts}次出售角色，手牌仍为满状态，将强制执行出售")
+        logger.warning(f"已尝试{max_attempts}次出售角色，备战席仍为满状态，将强制执行出售")
         self._handle_sell_character(force=True)
-        self.get_in_hand_area()  # 最后更新手牌状态
+        self.get_in_hand_area()  # 最后更新备战席状态
 
         if self.in_hand_character_count < 8:
             logger.info("强制出售角色成功")
             return True
         else:
-            logger.error("强制出售角色失败，手牌仍为满状态")
+            logger.error("强制出售角色失败，备战席仍为满状态")
             return False
 
     def _handle_sell_character(self, force=False):
@@ -693,7 +710,7 @@ class CurrencyWars(Executable):
             sell_area = (0.05, 0.86)  # 出售区域
             source = self.in_hand_area[i]
             self.operator.drag_to(source[0], source[1], sell_area[0], sell_area[1])
-            # 更新手牌状态
+            # 更新备战席状态
             self.in_hand_character[i] = None
             if character:
                 character.is_placed = False
@@ -702,21 +719,23 @@ class CurrencyWars(Executable):
         logger.info("出售操作完成")
 
     def battle(self) -> bool:
-        _ ,battle_box = self.operator.wait_any_img([CWIMG.BATTLE, CWIMG.SKIP], timeout=3, interval=0.5)
+        index, battle_box = self.operator.wait_any_img([CWIMG.BATTLE, CWIMG.SKIP], timeout=3, interval=0.5)
         if battle_box is None or not self.operator.click_box(battle_box, after_sleep=1.5):
             logger.error("未识别到战斗按钮或跳过按钮")
             return False
-        if self.operator.locate(IMG.ENSURE):  # 编队未满提醒
-            self.operator.click_img(IMG.ENSURE)
-        logger.info("战斗开始，等待挑战结束")
-        result, _ = self.operator.wait_any_img([CWIMG.SETTLE, CWIMG.CONTINUE], timeout=600, interval=1, trace=False)
-        if result != -1:
-            logger.info("挑战结束")
-            self.operator.sleep(0.5)
-            return self.operator.click_point(0.5, 0.824, after_sleep=1, tag="点击继续按钮")
+        if index == 1:  # 点击的是跳过按钮，战斗直接结束
+            logger.info("跳过战斗")
         else:
-            logger.warning("等待挑战结束超时")
-            return False
+            if self.operator.locate(IMG.ENSURE):  # 编队未满提醒
+                self.operator.click_img(IMG.ENSURE)
+            logger.info("战斗开始，等待挑战结束")
+            result, _ = self.operator.wait_any_img([CWIMG.SETTLE, CWIMG.CONTINUE], timeout=600, interval=1, trace=False)
+            if result == -1:
+                logger.warning("等待挑战结束超时")
+                return False
+        logger.info("挑战结束")
+        self.operator.sleep(0.5)
+        return self.operator.click_point(0.5, 0.824, after_sleep=1, tag="点击继续按钮")
 
     def stage_transition(self):
         """实现关卡切换逻辑，通过识别图片状态执行对应操作"""
@@ -823,7 +842,7 @@ class CurrencyWars(Executable):
             # 如果所有角色信息均为None，打开商店界面购买角色
             self.operator.click_point(0.8438, 0.8481, after_sleep=1, tag="打开商店界面")
             self.shopping()
-            # 重新获取手牌信息
+            # 重新获取备战席信息
             self.get_in_hand_area()
 
     def handle_game_over(self):
@@ -862,13 +881,55 @@ class CurrencyWars(Executable):
 
     def handle_fortune_teller(self):
         """处理命运卜者事件的逻辑"""
-        self.operator.click_point(0.8, 0.3, after_sleep=1)  # 选择第三个选项
-        self.operator.click_point(0.77, 0.521, after_sleep=1)  # 点击确认按钮
+        return self._handle_selection_event((0.22, 0.34, 0.85, 0.4),
+                                     self.strategy_special_events.get("命运卜者", ""))
+
+    def _handle_selection_event(self, ocr_region: tuple[float, float, float, float],
+                                keyword: str):
+        """
+        通用事件选择处理
+        :param ocr_region: OCR识别区域 (from_x, from_y, to_x, to_y)
+        :param keyword: 目标关键词
+        """
+        boxes = self.operator.ocr_boxes(from_x=ocr_region[0], from_y=ocr_region[1],
+                                        to_x=ocr_region[2], to_y=ocr_region[3])
+        if not boxes:
+            return False
+        target_box = None
+        for box in boxes:
+            if keyword in box.source:
+                target_box = box
+                break
+        if target_box is None:
+            target_box = boxes[0]
+        self.operator.click_box(target_box, after_sleep=1)
+        self.operator.click_img(CWIMG.CONFIRM_SELECTION, after_sleep=1)
+        return True
 
     def handle_the_planet_of_festivities(self):
         """处理盛会之星事件的逻辑"""
-        self.operator.click_point(0.5, 0.25, after_sleep=1)  # 选择第一个选项
-        self.operator.click_point(0.77, 0.521, after_sleep=1)  # 点击确认按钮
+        return self._handle_selection_event((0.22, 0.29, 0.85, 0.35),
+                                     self.strategy_special_events.get("盛会之星",""))
+
+    def handle_choose_partner(self):
+        """处理领航员选择事件的逻辑"""
+        return self._handle_selection_event((0.25, 0.32, 0.85, 0.39),
+                                     self.strategy_special_events.get("领航员",""))
+
+    def handle_wish_trial(self):
+        """处理命运圣杯事件的逻辑"""
+        return self._handle_selection_event((0.22, 0.42, 0.85, 0.465), self.strategy_special_events.get("命运圣杯",""))
+
+    def detect_special_event(self) -> str:
+        """检测当前是否有特殊事件发生，并返回事件名称"""
+        result = self.operator.ocr(from_x=0.49, from_y=0.038, to_x=0.60, to_y=0.11)
+        if not result:
+            return ""
+        text = result[0][1]
+        for event in self.special_events:
+            if text == event["title"]:
+                return event["name"]
+        return ""
 
     def detect_silver_wolf_lv999(self):
         """处理银狼LV.999 2星事件的逻辑"""
@@ -876,27 +937,25 @@ class CurrencyWars(Executable):
             self.handle_silver_wolf_lv999()
 
     def handle_silver_wolf_lv999(self):
-        self.operator.click_point(0.60, 0.34, after_sleep=1)  # 选择第二个选项
-        self.operator.click_point(0.77, 0.55, after_sleep=1)  # 点击确认按钮
+        return self._handle_selection_event((0.22, 0.34, 0.85, 0.4),
+                                     self.strategy_special_events.get("头号玩家",""))
 
-    def _handle_special_event(self):
-        event, _ = self.operator.locate_any([
-            CWIMG.THE_PLANET_OF_FESTIVITIES,
-            CWIMG.FORTUNE_TELLER,
-            CWIMG.SILVER_WOLF_LV999
-        ])
-        if event == 0:  # 盛会之星事件
-            self.handle_the_planet_of_festivities()
-            return self._handle_special_event()  # 可能连续触发事件，递归处理
-        elif event == 1:  # 命运卜者事件
-            self.handle_fortune_teller()
-            return self._handle_special_event()  # 可能连续触发事件，递归处理
-        elif event == 2:
-            self.handle_silver_wolf_lv999()
-            return True
-        else:
-            # 未检测到特殊事件，正常返回
-            return True
+    def handle_special_event(self):
+        event_handler: dict[str, Callable[[], bool]] = {
+            "盛会之星": self.handle_the_planet_of_festivities,
+            "命运卜者": self.handle_fortune_teller,
+            "头号玩家": self.handle_silver_wolf_lv999,
+            "领航员": self.handle_choose_partner
+        }
+        event = self.detect_special_event()
+
+        if event:
+            logger.info(f"检测到特殊事件：{event}")
+            handler = event_handler[event]
+            if not handler():
+                raise RuntimeError("特殊事件处理失败")
+            self.handle_special_event()  # 递归处理
+        # 未检测到事件，退出
 
     def shopping(self):
         def scan_characters_in_store() -> list[Character] | None:
@@ -946,17 +1005,12 @@ class CurrencyWars(Executable):
             logger.info("当前商店无目标角色可购买")
             return False
 
-        # ==================== 优先完成首次购买（利用免费刷新） ====================
-        # 1. 首次购买阶段：强制利用商店打开时的免费刷新，完成一次购买尝试
-        # 扫描商店角色
-        initial_chars = scan_characters_in_store()
-        if initial_chars:
-            # 尝试购买目标角色（优先完成首次购买）
-            purchase_target_character(initial_chars)
-
-        # ==================== 原有循环逻辑：首次购买后，执行后续刷新/购买 ====================
         while True:
             purchased = False
+            # 扫描商店角色并尝试购买
+            cs = scan_characters_in_store()
+            if cs:
+                purchased = purchase_target_character(cs)
             level = self.get_level()
             coins = self.get_coins()
 
@@ -970,11 +1024,6 @@ class CurrencyWars(Executable):
                 self.operator.press_key('f')
                 self.operator.sleep(0.5)
                 continue
-
-            # 扫描商店角色并尝试购买
-            cs = scan_characters_in_store()
-            if cs:
-                purchased = purchase_target_character(cs)
 
             # 非超频模式：检查金币是否满足保留要求（预判刷新后结果）
             if not self.is_overclock:
@@ -1008,7 +1057,7 @@ class CurrencyWars(Executable):
 
     @property
     def in_hand_character_count(self) -> int:
-        """获取当前手牌角色数量"""
+        """获取当前备战席角色数量"""
         count = 0
         for character in self.in_hand_character:
             if character is not None:
@@ -1043,12 +1092,13 @@ class CurrencyWars(Executable):
             path = f"tasks/currency_wars/strategies/{name}.json"
         with open(path, "r", encoding="utf-8") as f:
             strategy_data: dict[str, Any] = json.load(f)
-        strategy_title = strategy_data.get("title")
-        description = strategy_data.get("description")
+        strategy_title = strategy_data.get("title", "")
+        description = strategy_data.get("description", "")
         self.min_coins = strategy_data.get("min_coins", 40)
         self.min_level = strategy_data.get("min_level", 7)
         self.mid_level = strategy_data.get("mid_level", 7)
         self.strategy_code = strategy_data.get("share_code", "")
+        self.strategy_special_events = strategy_data.get("special_events", [])
         # 在攻略中的角色设置成最高优先级
         strategy_on_field: dict[str, int] = strategy_data.get("on_field", {})
         strategy_off_field: dict[str, int] = strategy_data.get("off_field", {})
@@ -1092,7 +1142,7 @@ class CurrencyWars(Executable):
 
     def place_character(self) -> bool:
         """
-        将手中的角色放置到场上或场下（严格先放前台角色，再放后台角色，确保前台优先占位）
+        将手中的角色放置到前台或后台（严格先放前台角色，再放后台角色，确保前台优先占位）
         队伍不满时优先放空位，队伍满时仅替换低priority角色
         :return: 至少有一个角色放置成功返回 True，否则返回 False
         """
@@ -1105,7 +1155,7 @@ class CurrencyWars(Executable):
                 continue
             if self.place_on_field_character(i):
                 self.operator.sleep(1)
-                self._handle_special_event()
+                self.handle_special_event()
 
         # 第二次遍历：仅处理后台角色（Positioning.OffField），填充剩余空位或替换
         logger.info("=== 放置后台角色 ===")
@@ -1116,7 +1166,7 @@ class CurrencyWars(Executable):
                 continue
             if self.place_off_field_character(i):
                 self.operator.sleep(1)
-                self._handle_special_event()
+                self.handle_special_event()
 
         # 若前台为空，则从后台提升一个角色到前台第一个位置，避免出现前台全空的情况
         self.ensure_on_field_not_empty()
@@ -1125,7 +1175,7 @@ class CurrencyWars(Executable):
         return True
 
     def place_on_field_character(self, character_in_hand: int) -> bool:
-        """将手中的角色放置到场上（前台角色专用，优先占位）"""
+        """将手中的角色放置到前台（前台角色专用，优先占位）"""
         return self._place_to_target(
             character_in_hand,
             target_characters=self.on_field_character,
@@ -1133,7 +1183,7 @@ class CurrencyWars(Executable):
         )
 
     def place_off_field_character(self, character_in_hand: int) -> bool:
-        """将手中的角色放置到场下（后台角色专用）"""
+        """将手中的角色放置到后台（后台角色专用）"""
         return self._place_to_target(
             character_in_hand,
             target_characters=self.off_field_character,
@@ -1176,12 +1226,12 @@ class CurrencyWars(Executable):
 
         # 1. 基础有效性检查
         if not (0 <= character_in_hand < len(self.in_hand_character)):
-            logger.error(f"无效的手牌索引：{character_in_hand}（范围：0~{len(self.in_hand_character) - 1}）")
+            logger.error(f"无效的备战席索引：{character_in_hand}（范围：0~{len(self.in_hand_character) - 1}）")
             return False
 
         character = self.in_hand_character[character_in_hand]
         if not character or character.is_placed:
-            logger.warning(f"手牌索引 {character_in_hand} 无有效角色或角色已放置")
+            logger.warning(f"备战席索引 {character_in_hand} 无有效角色或角色已放置")
             return False
 
         # 确定目标区域类型
@@ -1258,9 +1308,9 @@ class CurrencyWars(Executable):
         """
         # 区域映射：区域类型 -> (角色列表, 坐标列表, 区域名称)
         area_mapping = {
-            'on_field': (self.on_field_character, self.on_field_area, "场上"),
-            'off_field': (self.off_field_character, self.off_field_area, "场下"),
-            'in_hand': (self.in_hand_character, self.in_hand_area, "手牌")
+            'on_field': (self.on_field_character, self.on_field_area, "前台"),
+            'off_field': (self.off_field_character, self.off_field_area, "后台"),
+            'in_hand': (self.in_hand_character, self.in_hand_area, "备战席")
         }
 
         # 验证区域类型
@@ -1330,10 +1380,10 @@ class CurrencyWars(Executable):
         # 获取区域信息
         if area_type == 'on_field':
             characters = self.on_field_character
-            area_name = "场上"
+            area_name = "前台"
         else:  # off_field
             characters = self.off_field_character
-            area_name = "场下"
+            area_name = "后台"
 
         logger.info(f"开始对{area_name}区域角色按优先级排序")
 

@@ -76,6 +76,8 @@ class Character:
     position: Positioning | None = None  # 实际站位（适配攻略的特殊情况）
     priority: int | None = None  # 优先级
     is_placed: bool = False  # 是否已放置
+    is_locked: bool = False  # 是否已锁定, 锁定的角色无法参与交换
+    is_npc: bool = False  # 是否是非玩家控制角色, 这类角色没有星级，无法装备
     stars: int = 0  # 角色星级
 
     def __post_init__(self):
@@ -259,6 +261,13 @@ class Characters:
         if name == cls.username:
             return cls.Trailblazer
         return cls.characters.get(name)
+
+    @classmethod
+    def new_character(cls, name: str) -> Character:
+        """创建一个新的角色对象"""
+        character = Character(name, cost=0, positioning=Positioning.OnOffField, is_locked=True)
+        cls.characters[name] = character
+        return character
 
     @classmethod
     def set_username(cls, username: str):
