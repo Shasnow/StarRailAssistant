@@ -328,6 +328,41 @@ class Localization:
         template = self.get_translation("task.managerCrashed")
         return template.format(error=error)
 
+    def task_retryPreparing(self, current, max_retries) -> str:
+        """任务失败，准备重试 ({current}/{max_retries})...
+
+        From task.retryPreparing"""
+        template = self.get_translation("task.retryPreparing")
+        return template.format(current=current, max_retries=max_retries)
+
+    @property
+    def task_killingGameProcess(self) -> str:
+        """正在终止游戏进程...
+
+        From task.killingGameProcess"""
+        return self.get_translation("task.killingGameProcess")
+
+    @property
+    def task_gameProcessKilled(self) -> str:
+        """游戏进程已终止
+
+        From task.gameProcessKilled"""
+        return self.get_translation("task.gameProcessKilled")
+
+    def task_waitingForRetry(self, seconds) -> str:
+        """等待 {seconds} 秒后重试...
+
+        From task.waitingForRetry"""
+        template = self.get_translation("task.waitingForRetry")
+        return template.format(seconds=seconds)
+
+    def task_retryFromConfig(self, config_name) -> str:
+        """将从当前配置 [{config_name}] 重新开始执行
+
+        From task.retryFromConfig"""
+        template = self.get_translation("task.retryFromConfig")
+        return template.format(config_name=config_name)
+
     @property
     def run_description(self) -> str:
         """运行指定配置文件中的所有选中的任务。

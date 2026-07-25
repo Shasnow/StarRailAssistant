@@ -67,6 +67,8 @@ class GeneralSettings:
     isOverlayEnabled: bool = False
     ocrMatchConfidence: float = 0.7
     templateMatchConfidence: float = 0.9
+    isRetryOnTaskFailure: bool = True
+    maxRetryCount: int = 3
 
     def to_dict(self) -> dict:
         """转换为字典"""
@@ -92,7 +94,9 @@ class GeneralSettings:
             "keybindings.stop": self.hotkeyStop,
             "overlay.enabled": self.isOverlayEnabled,
             "ocrMatchConfidence": self.ocrMatchConfidence,
-            "templateMatchConfidence": self.templateMatchConfidence
+            "templateMatchConfidence": self.templateMatchConfidence,
+            "isRetryOnTaskFailure": self.isRetryOnTaskFailure,
+            "maxRetryCount": self.maxRetryCount
         }
 
     @classmethod
@@ -120,7 +124,9 @@ class GeneralSettings:
             "hotkeyStop": data.get("keybindings.stop", "F9"),
             "isOverlayEnabled": data.get("overlay.enabled", False),
             "ocrMatchConfidence": data.get("ocrMatchConfidence", 0.7),
-            "templateMatchConfidence": data.get("templateMatchConfidence", 0.9)
+            "templateMatchConfidence": data.get("templateMatchConfidence", 0.9),
+            "isRetryOnTaskFailure": data.get("isRetryOnTaskFailure", True),
+            "maxRetryCount": data.get("maxRetryCount", 3)
         })
 
 @dataclass

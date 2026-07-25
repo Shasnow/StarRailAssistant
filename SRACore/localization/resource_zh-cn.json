@@ -55,5 +55,10 @@
     "trigger.set.valueHelp": "属性值。",
     "config.fileNotFound": "找不到文件：'{path}'",
     "config.parseError": "解析文件 '{path}' 失败：{error}",
-    "config.exception": "加载文件 '{path}' 时发生错误：{error}"
+    "config.exception": "加载文件 '{path}' 时发生错误：{error}",
+    "task.retryPreparing": "任务失败，准备重试 ({current}/{max_retries})...",
+    "task.killingGameProcess": "正在终止游戏进程...",
+    "task.gameProcessKilled": "游戏进程已终止",
+    "task.waitingForRetry": "等待 {seconds} 秒后重试...",
+    "task.retryFromConfig": "将从当前配置 [{config_name}] 重新开始执行"
 }
