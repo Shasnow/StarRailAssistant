@@ -16,7 +16,8 @@ from SRACore.util.const import VERSION, CORE
 
 class SRACli(cmd2.Cmd):
     def __init__(self, settings: AppSettings):
-        super().__init__(startup_script=".srarc")
+        super().__init__(startup_script=".srarc",
+                         auto_load_commands=True)
         self.intro = f"Welcome to SRA-cli (version {VERSION}, core {CORE}). \nType 'help' to list commands."
         self.prompt = 'sra> '
         self.default_error = Resource.cli_defaultError
@@ -51,7 +52,7 @@ class SRACli(cmd2.Cmd):
         task_parser.add_subparsers(metavar="SUBCOMMAND", required=True)
         return task_parser
 
-    @cmd2.with_argparser(_build_task_parser(), preserve_quotes=True)
+    @cmd2.with_argparser(_build_task_parser, preserve_quotes=True)
     def do_task(self, args: argparse.Namespace) -> None:
         args.cmd2_subcommand_func(args)
 
@@ -62,7 +63,7 @@ class SRACli(cmd2.Cmd):
         task_run_parser.add_argument('config', nargs='*', help=Resource.run_configHelp)
         return task_run_parser
 
-    @cmd2.as_subcommand_to("task", "run", _build_task_run_parser(), help=Resource.run_configHelp)
+    @cmd2.as_subcommand_to("task", "run", _build_task_run_parser, help=Resource.run_configHelp)
     def _task_run(self, args: argparse.Namespace) -> None:
         if self.task_manager.is_thread_running():
             self.poutput(Resource.cli_task_taskAlreadyRunning)
@@ -77,7 +78,7 @@ class SRACli(cmd2.Cmd):
         task_single_parser.add_argument('--config', help=Resource.single_configHelp)
         return task_single_parser
 
-    @cmd2.as_subcommand_to("task", "single", _build_task_single_parser(), help=Resource.single_description)
+    @cmd2.as_subcommand_to("task", "single", _build_task_single_parser, help=Resource.single_description)
     def _task_single(self, args: argparse.Namespace) -> None:
         if self.task_manager.is_thread_running():
             self.poutput(Resource.cli_task_taskAlreadyRunning)
@@ -90,7 +91,7 @@ class SRACli(cmd2.Cmd):
         task_stop_description = Text.assemble(Resource.stop_description)
         return cmd2.Cmd2ArgumentParser(description=task_stop_description)
 
-    @cmd2.as_subcommand_to("task", "stop", _build_task_stop_parser(), help=Resource.stop_description)
+    @cmd2.as_subcommand_to("task", "stop", _build_task_stop_parser, help=Resource.stop_description)
     def _task_stop(self, _) -> None:
         if self.task_manager.is_thread_running():
             self.task_manager.stop_thread()
@@ -105,7 +106,7 @@ class SRACli(cmd2.Cmd):
         task_status_parser.add_argument('--json', action='store_true', help='Output in JSON format')
         return task_status_parser
 
-    @cmd2.as_subcommand_to("task", "status", _build_task_status_parser(), help="Show current task status")
+    @cmd2.as_subcommand_to("task", "status", _build_task_status_parser, help="Show current task status")
     def _task_status(self, args: argparse.Namespace) -> None:
         import json
         info = self.task_manager.info
@@ -143,7 +144,7 @@ class SRACli(cmd2.Cmd):
         single_parser.add_argument('--config', help=Resource.single_configHelp)
         return single_parser
 
-    @cmd2.with_argparser(_build_single_parser())
+    @cmd2.with_argparser(_build_single_parser)
     def do_single(self, args: argparse.Namespace) -> None:
         """Run a single specified task, will block current command line until task complete"""
         self.poutput(Resource.cli_run_started)
@@ -163,7 +164,7 @@ class SRACli(cmd2.Cmd):
         trigger_parser.add_subparsers(metavar="SUBCOMMAND", required=True)
         return trigger_parser
 
-    @cmd2.with_argparser(_build_trigger_parser(), preserve_quotes=True)
+    @cmd2.with_argparser(_build_trigger_parser, preserve_quotes=True)
     def do_trigger(self, args: argparse.Namespace) -> None:
         args.cmd2_subcommand_func(args)
 
@@ -172,7 +173,7 @@ class SRACli(cmd2.Cmd):
         trigger_run_description = Text.assemble(Resource.trigger_run_description)
         return cmd2.Cmd2ArgumentParser(description=trigger_run_description)
 
-    @cmd2.as_subcommand_to("trigger", "run", _build_trigger_run_parser(), help=Resource.trigger_run_description)
+    @cmd2.as_subcommand_to("trigger", "run", _build_trigger_run_parser, help=Resource.trigger_run_description)
     def _trigger_run(self, _) -> None:
         if self.trigger_manager.is_thread_running():
             self.poutput(Resource.cli_trigger_alreadyRunning)
@@ -188,7 +189,7 @@ class SRACli(cmd2.Cmd):
         trigger_stop_description = Text.assemble(Resource.trigger_stop_description)
         return cmd2.Cmd2ArgumentParser(description=trigger_stop_description)
 
-    @cmd2.as_subcommand_to("trigger", "stop", _build_trigger_stop_parser(), help=Resource.trigger_stop_description)
+    @cmd2.as_subcommand_to("trigger", "stop", _build_trigger_stop_parser, help=Resource.trigger_stop_description)
     def _trigger_stop(self, _) -> None:
         if self.trigger_manager.is_thread_running():
             self.trigger_manager.stop_thread()
@@ -203,7 +204,7 @@ class SRACli(cmd2.Cmd):
         trigger_enable_parser.add_argument('name', help=Resource.trigger_enable_nameHelp)
         return trigger_enable_parser
 
-    @cmd2.as_subcommand_to("trigger", "enable", _build_trigger_enable_parser(),
+    @cmd2.as_subcommand_to("trigger", "enable", _build_trigger_enable_parser,
                            help=Resource.trigger_enable_description)
     def _trigger_enable(self, args: argparse.Namespace) -> None:
         for trigger in self.trigger_manager.triggers:
@@ -221,7 +222,7 @@ class SRACli(cmd2.Cmd):
         trigger_disable_parser.add_argument('name', help=Resource.trigger_disable_nameHelp)
         return trigger_disable_parser
 
-    @cmd2.as_subcommand_to("trigger", "disable", _build_trigger_disable_parser(),
+    @cmd2.as_subcommand_to("trigger", "disable", _build_trigger_disable_parser,
                            help=Resource.trigger_disable_description)
     def _trigger_disable(self, args: argparse.Namespace) -> None:
         for trigger in self.trigger_manager.triggers:
@@ -243,7 +244,7 @@ class SRACli(cmd2.Cmd):
                                         default='str', help=Resource.trigger_set_typeHelp)
         return trigger_set_parser
 
-    @cmd2.as_subcommand_to("trigger", "set", _build_trigger_set_parser(), help=Resource.trigger_set_description)
+    @cmd2.as_subcommand_to("trigger", "set", _build_trigger_set_parser, help=Resource.trigger_set_description)
     def _trigger_set(self, args: argparse.Namespace) -> None:
         for trigger in self.trigger_manager.triggers:
             if trigger.__class__.__name__.lower() == args.name.lower():

@@ -1,7 +1,10 @@
 import argparse
+import importlib
 import os
 import subprocess
 import sys
+from pathlib import Path
+
 sys.path.append(os.getcwd())  # 将当前工作目录添加到 sys.path，以便导入 tasks
 
 from SRACore.localization import Resource
@@ -45,6 +48,7 @@ def main():
     if inline:
         sys.argv.remove('--inline')
     # 延迟导入 SRACli
+    dynamic_import("tasks")  # 动态导入 tasks 包下的所有模块
     from SRACore.cli2 import SRACli
     cli_instance = SRACli(settings=settings)
     # 配置交互式模式（隐藏提示符）
@@ -61,7 +65,7 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
         help=Resource.argparse_inline_help
     )
     parser.add_argument(
-         '--command', '-c', '--execute', '-e',
+        '--command', '-c', '--execute', '-e',
         nargs='*',
         type=str,
         help='The command to execute AFTER launch',
@@ -86,6 +90,7 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
     )
 
 
+# noinspection unresolved-references
 def restart_as_admin():
     """以管理员权限重启当前进程"""
     if sys.platform == 'win32' and not is_admin():
@@ -108,6 +113,15 @@ def is_admin() -> bool:
         return ctypes.windll.shell32.IsUserAnAdmin() != 0  # NOQA
     return True
 
+
+def dynamic_import(package: str):
+    """动态导入模块"""
+    try:
+        # 扫描 package 包下的所有 .py 文件，导入每个模块
+        for file in Path(package).glob("*.py"):
+            importlib.import_module(f"{package}.{file.stem}")
+    except ModuleNotFoundError:
+        pass
 
 if __name__ == '__main__':
     main()
