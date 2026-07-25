@@ -69,6 +69,19 @@
                                         <ToggleSwitch Grid.Column="2"
                                                       IsChecked="{Binding IsOverlayEnabled}"/>
                                     </Grid>
+
+                                    <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto">
+                                        <Label Classes="Icon">&#xE038;</Label>
+                                        <Label Grid.Column="1" Content="任务失败后尝试重启" />
+                                        <ToggleSwitch Grid.Column="2"
+                                                      IsChecked="{Binding GeneralSettings.IsRetryOnTaskFailure}"/>
+                                        <Label Grid.Column="3" Content="最大次数" Margin="0,0,4,0"
+                                               IsEnabled="{Binding GeneralSettings.IsRetryOnTaskFailure}" />
+                                        <NumericUpDown Grid.Column="4"
+                                                       Value="{Binding GeneralSettings.MaxRetryCount}"
+                                                       Minimum="0" Maximum="10" Width="70"
+                                                       IsEnabled="{Binding GeneralSettings.IsRetryOnTaskFailure}" />
+                                    </Grid>
                                     <!-- 启动/停止 快捷键（任务通用设置） -->
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Classes="Icon">&#xE3E4;</Label>
@@ -906,20 +919,18 @@
                                         <TextBlock>版本 / Version : <Run Text="{Binding VersionText}" /></TextBlock>
                                     </Button>
                                     <TextBlock HorizontalAlignment="Center">© 2024-2026 StarRailAssistant, All rights reserved.</TextBlock>
-                                    <TextBlock TextWrapping="Wrap" xml:space="preserve">
-链接 / Links :
-<Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="*,*" ColumnSpacing="20" RowSpacing="10">
-    <HyperlinkButton NavigateUri="https://starrailassistant.top" Content="SRA官网" />
-    <HyperlinkButton Grid.Row="0" Grid.Column="1" NavigateUri="https://github.com/Shasnow/StarRailAssistant"
-                     Content="开放源代码仓库(GitHub)" />
-    <HyperlinkButton Grid.Row="0" Grid.Column="2" NavigateUri="https://mirrorchyan.com/zh/get-start?source=sra-about"
-                     Content="Mirror 酱" />
-    <HyperlinkButton Grid.Row="0" Grid.Column="3" NavigateUri="https://qm.qq.com/q/u6iJ4lUlLW" Content="用户群(QQ)" />
-    <HyperlinkButton Grid.Row="0" Grid.Column="4" NavigateUri="https://avaloniaui.net/" Content="Avalonia UI" />
-    <HyperlinkButton Grid.Row="0" Grid.Column="5" NavigateUri="https://dotnet.microsoft.com" Content=".NET" />
-    <HyperlinkButton Grid.Row="1" Grid.Column="0" NavigateUri="https://www.python.org/" Content="Python" />
-</Grid>
-                                    </TextBlock>
+                                    <TextBlock Text="链接 / Links :" FontWeight="Bold" Margin="0,10,0,5" />
+                                    <WrapPanel>
+                                        <HyperlinkButton NavigateUri="https://starrailassistant.top" Content="SRA官网" Margin="0,0,20,5" />
+                                        <HyperlinkButton NavigateUri="https://github.com/Shasnow/StarRailAssistant"
+                                                        Content="开放源代码仓库(GitHub)" Margin="0,0,20,5" />
+                                        <HyperlinkButton NavigateUri="https://mirrorchyan.com/zh/get-start?source=sra-about"
+                                                        Content="Mirror 酱" Margin="0,0,20,5" />
+                                        <HyperlinkButton NavigateUri="https://qm.qq.com/q/u6iJ4lUlLW" Content="用户群(QQ)" Margin="0,0,20,5" />
+                                        <HyperlinkButton NavigateUri="https://avaloniaui.net/" Content="Avalonia UI" Margin="0,0,20,5" />
+                                        <HyperlinkButton NavigateUri="https://dotnet.microsoft.com" Content=".NET" Margin="0,0,20,5" />
+                                        <HyperlinkButton NavigateUri="https://www.python.org/" Content="Python" Margin="0,0,20,5" />
+                                    </WrapPanel> 
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
                         </suki:SettingsLayoutItem>
