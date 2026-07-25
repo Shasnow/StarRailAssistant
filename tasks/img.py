@@ -148,8 +148,7 @@ class CWIMG:
     BACK_PREPARE_PAGE = f"{BASE}/back_prepare_page.png"
     BATTLE = f"{BASE}/battle.png" #依赖于目前的默认 灰度 CCOEFF 算法
     CANNOT_BE_FIELDED = f"{BASE}/cannot_be_fielded.png"
-    SKIP_1 = f"{BASE}/skip_1.png"
-    SKIP_2 = f"{BASE}/skip_2.png"
+    SKIP = f"{BASE}/skip.png"
     CLICK_BLANK = f"{BASE}/click_blank.png"
     COLLECTION = f"{BASE}/collection.png"
     CONTINUE = f"{BASE}/continue.png"
