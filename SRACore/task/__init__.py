@@ -1,11 +1,10 @@
 import importlib
 from abc import ABC, abstractmethod
-import time
-from typing import final
 from pathlib import Path
+from typing import final
 
-from loguru import logger
 from PIL.Image import Image
+from loguru import logger
 
 from SRACore.localization import Resource
 from SRACore.models.tasks_config import TasksConfig
@@ -94,16 +93,6 @@ class BaseTask(Executable, ABC):
 registry: list[tuple[int, type[BaseTask]]] = list()
 
 
-def _ensure_task_modules_loaded(package="tasks") -> None:
-    """确保任务模块已被导入，从而触发装饰器注册。"""
-    try:
-        # 扫描 tasks 包下的所有 .py 文件，导入每个模块
-        for file in Path(package).glob("*.py"):
-            importlib.import_module(f"{package}.{file.stem}")
-    except ModuleNotFoundError:
-        pass
-
-
 def task(_cls: type[BaseTask] | None = None, *, order: int | None = None):
     """
     任务注册装饰器，用于将任务类注册到全局任务列表中，并指定执行顺序。
@@ -122,5 +111,4 @@ def task(_cls: type[BaseTask] | None = None, *, order: int | None = None):
 
 
 def get_task_classes() -> list[type[BaseTask]]:
-    _ensure_task_modules_loaded()
     return [cls for order, cls in sorted(registry, key=lambda x: x[0])]

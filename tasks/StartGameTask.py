@@ -53,7 +53,7 @@ class StartGameTask(BaseTask):
             self.operator.click_img(IMG.ENSURE2)
             return self.login_and_enter_game()  # 递归调用重新登录进入游戏
         else:
-            logger.error(SRAError(ErrorCode.INVALID_STATE, "未知游戏状态", f"当前状态码: {res}，预期状态码: 0~3"))
+            logger.error(f"未知游戏状态，当前状态码: {res}，预期状态码: 0~3")
             return False
 
     def launch_game(self):
@@ -69,7 +69,7 @@ class StartGameTask(BaseTask):
             raw_path = self.config.StartGame.gamePath
         if not raw_path:
             logger.error("未设置游戏启动路径")
-            raise SRAError(ErrorCode.INVALID_INPUT, "未设置游戏启动路径")
+            raise ValueError("未设置游戏启动路径")
         self.operator.launch(channel=self.config.StartGame.gameChannel, path=raw_path)
 
     def login(self):
@@ -86,7 +86,7 @@ class StartGameTask(BaseTask):
             case 2:
                 channel = 'gb'
             case _:
-                raise SRAError(ErrorCode.INVALID_INPUT, "未知的游戏渠道配置", f"当前配置值 {self.config.StartGame.gameChannel}")
+                raise ValueError(f"未知的游戏渠道配置，当前配置值 {self.config.StartGame.gameChannel}")
 
         result, _ = self.operator.wait_any_img([
             SGIMG.LOGIN_PAGE % channel,
@@ -98,7 +98,7 @@ class StartGameTask(BaseTask):
         ], timeout=60, interval=1)
 
         if result == -1:
-            logger.error(SRAError(ErrorCode.LOGIN_TIMEOUT, "等待登录界面超时", "请检查游戏状态"))
+            logger.error("等待登录界面超时，请检查游戏状态")
             return -1
         if result == 5:
             self.operator.click_box(_, after_sleep=1)
@@ -108,7 +108,7 @@ class StartGameTask(BaseTask):
             enable = self.config.StartGame.isReLogin
             if result == 4:
                 # 游戏需要更新
-                logger.error(SRAError(ErrorCode.UPDATE_REQUIRED, "游戏需要更新", "请手动更新游戏后重试"))
+                logger.error("游戏需要更新，请手动更新游戏后重试")
                 return -1
             if enable and result != 3:  # 是否启用退出账号
                 self.logout()  # 执行退出账号后执行下面的登录操作
@@ -121,7 +121,7 @@ class StartGameTask(BaseTask):
             user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
             passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
             if user == "" or passwd == "":
-                logger.error(SRAError(ErrorCode.INVALID_INPUT, "自动登录账号或密码未设置", "请检查配置中的自动登录账号和密码"))
+                logger.error("自动登录账号或密码未设置，请检查配置中的自动登录账号和密码")
                 return -1
             logger.info(f"登录账号：{user}")
             self.operator.click_img(SGIMG.USERNAME_INPUT % channel, after_sleep=1)
@@ -140,7 +140,7 @@ class StartGameTask(BaseTask):
         if self.operator.wait_img(SGIMG.WELCOME % channel, timeout=120):
             return 1
         else:
-            logger.warning(SRAError(ErrorCode.LOGIN_FAILED, "登录后等待欢迎界面超时", "请检查游戏状态"))
+            logger.warning("登录后等待欢迎界面超时，请检查游戏状态")
             return -1
 
     def logout(self):
