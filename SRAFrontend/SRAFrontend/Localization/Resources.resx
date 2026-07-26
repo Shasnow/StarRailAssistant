@@ -106,8 +106,8 @@
     <data name="GithubToolTipText" xml:space="preserve">
         <value>Open On GitHub</value>
     </data>
-    <data name="WebsideToolTipText" xml:space="preserve">
-        <value>Open Official Webside</value>
+    <data name="WebsiteToolTipText" xml:space="preserve">
+        <value>Open Official Website</value>
     </data>
     <data name="SponsorText" xml:space="preserve">
         <value>Sponsor</value>
@@ -125,7 +125,7 @@
         <value>System Notification</value>
     </data>
     <data name="EmailNotificationText" xml:space="preserve">
-        <value>Email Nofication</value>
+        <value>Email Notification</value>
     </data>
     <data name="ControlPanelOpacityText" xml:space="preserve">
         <value>Control Panel Opacity</value>
@@ -269,7 +269,7 @@
         <value>Current configuration</value>
     </data>
     <data name="AutoResolutionText" xml:space="preserve">
-        <value>Auto Set Game Resolotion</value>
+        <value>Auto Set Game Resolution</value>
     </data>
     <data name="DeveloperOptionsText" xml:space="preserve">
         <value>Developer Options</value>

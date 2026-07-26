@@ -102,7 +102,7 @@
     <data name="GithubToolTipText" xml:space="preserve">
         <value>浏览 GitHub 仓库</value>
     </data>
-    <data name="WebsideToolTipText" xml:space="preserve">
+    <data name="WebsiteToolTipText" xml:space="preserve">
         <value>浏览官网</value>
     </data>
     <data name="SponsorText" xml:space="preserve">

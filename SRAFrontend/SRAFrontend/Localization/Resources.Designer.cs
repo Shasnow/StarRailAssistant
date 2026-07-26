@@ -150,7 +150,7 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Auto Set Game Resolotion.
+        ///   Looks up a localized string similar to Auto Set Game Resolution.
         /// </summary>
         public static string AutoResolutionText {
             get {
@@ -366,7 +366,7 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Email Nofication.
+        ///   Looks up a localized string similar to Email Notification.
         /// </summary>
         public static string EmailNotificationText {
             get {
@@ -870,11 +870,11 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open Official Webside.
+        ///   Looks up a localized string similar to Open Official Website.
         /// </summary>
-        public static string WebsideToolTipText {
+        public static string WebsiteToolTipText {
             get {
-                return ResourceManager.GetString("WebsideToolTipText", resourceCulture);
+                return ResourceManager.GetString("WebsiteToolTipText", resourceCulture);
             }
         }
         
