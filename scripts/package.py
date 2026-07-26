@@ -33,7 +33,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 ROOT_PATH = Path(__file__).resolve().parent.parent
 DOTNET_EXE = os.environ.get("DOTNET_EXE", "dotnet")
 DESKTOP_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Desktop" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
-SERVER_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "bin" / "Release" / "net10.0-windows" / "win-x64" / "publish"
+SERVER_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
 WEBUI_FRONTEND_PATH = ROOT_PATH / "SRAFrontend" / "srafrontend-webui"
 WEBUI_WWWROOT_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "wwwroot"
 DIST_DIR = ROOT_PATH / "main.dist"
@@ -113,7 +113,7 @@ def nuitka_build(version: str):
     cmd = [
         sys.executable, "-m", "nuitka",
         "--standalone", "--mingw64",
-        "--windows-console-mode=force", "--windows-uac-admin",
+        "--windows-console-mode=force",
         "--windows-icon-from-ico=resources/SRAicon.ico",
         "--company-name=StarRailAssistant Team",
         "--product-name=StarRailAssistant",
@@ -253,8 +253,8 @@ if __name__ == "__main__":
 
     print("Packaging Resources ...")
     resources_zip = ZipBuilder()
-    resources_zip.add(ROOT_PATH / "tasks", ROOT_PATH / "tasks")
-    resources_zip.add(ROOT_PATH / "resources", ROOT_PATH / "resources")
+    resources_zip.add(ROOT_PATH / "tasks")
+    resources_zip.add(ROOT_PATH / "resources")
     resources_zip.add_file(ROOT_PATH / "package.json", "package.json")
     resources_zip.snapshot(ROOT_PATH / f"StarRailAssistant_Resources_v{version}.zip")
 
