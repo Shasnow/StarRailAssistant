@@ -550,4 +550,7 @@
     <data name="UserGroupText" xml:space="preserve">
         <value>User Group (QQ)</value>
     </data>
+    <data name="GameChineseLanguageTip" xml:space="preserve">
+        <value>Note: The in-game language needs to be set to Simplified Chinese (简体中文)</value>
+    </data>
 </root>

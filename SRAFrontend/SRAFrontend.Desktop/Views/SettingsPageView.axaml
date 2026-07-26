@@ -232,14 +232,22 @@
                                                    VerticalAlignment="Center"
                                                    FontWeight="DemiBold" />
                                     </Grid>
-                                    <Grid ColumnDefinitions="Auto,*,Auto">
-                                        <Label Grid.Column="0" Classes="Icon">&#xe4a2;</Label>
-                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.LanguageText}" />
-                                        <ComboBox Grid.Column="2" SelectedIndex="{Binding DisplaySettings.Language}">
-                                            <ComboBoxItem>简体中文</ComboBoxItem>
-                                            <ComboBoxItem>English</ComboBoxItem>
-                                        </ComboBox>
-                                    </Grid>
+                                    <StackPanel>
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <Label Grid.Column="0" Classes="Icon">&#xe4a2;</Label>
+                                            <Label Grid.Column="1" Content="{x:Static lang:Resources.LanguageText}" />
+                                            <ComboBox Grid.Column="2" SelectedIndex="{Binding DisplaySettings.Language}">
+                                                <ComboBoxItem>简体中文</ComboBoxItem>
+                                                <ComboBoxItem>English</ComboBoxItem>
+                                            </ComboBox>
+                                        </Grid>
+                                        <TextBlock Text="{Binding GameChineseLanguageTip}"
+                                                   IsVisible="{Binding IsLanguageNotChinese}"
+                                                   Margin="28,2,0,0"
+                                                   FontSize="12"
+                                                   Opacity="0.6"
+                                                   FontStyle="Italic" />
+                                    </StackPanel>
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <Label Grid.Column="0" Classes="Icon">&#xE5DA;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.RememberWindowSizeText}" />

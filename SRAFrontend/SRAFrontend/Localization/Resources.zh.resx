@@ -546,4 +546,7 @@
     <data name="UserGroupText" xml:space="preserve">
         <value>用户群(QQ)</value>
     </data>
+    <data name="GameChineseLanguageTip" xml:space="preserve">
+        <value>注意：游戏内需要调整为简体中文</value>
+    </data>
 </root>
