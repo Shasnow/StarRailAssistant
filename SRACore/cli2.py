@@ -63,7 +63,7 @@ class SRACli(cmd2.Cmd):
         task_run_parser.add_argument('config', nargs='*', help=Resource.run_configHelp)
         return task_run_parser
 
-    @cmd2.as_subcommand_to("task", "run", _build_task_run_parser, help=Resource.run_configHelp)
+    @cmd2.as_subcommand_to("task", "run", _build_task_run_parser, help=Resource.run_description)
     def _task_run(self, args: argparse.Namespace) -> None:
         if self.task_manager.is_thread_running():
             self.poutput(Resource.cli_task_taskAlreadyRunning)

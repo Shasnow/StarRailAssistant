@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "starrailassistant"
-version = "2.19.0-beta.1"
+version = "2.19.0-beta.2"
 description = "崩坏：星穹铁道自动化助手"
 readme = "README.md"
 license = "GPL-3.0-or-later"
