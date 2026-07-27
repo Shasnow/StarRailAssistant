@@ -14,6 +14,7 @@ from SRACore.util import sys_util  # NOQA
 from SRACore.util.data_persister import load_cache, load_config
 from SRACore.util.errors import ThreadStoppedError
 from SRACore.util.logger import logger
+from SRACore.util.task_recovery import TaskRecovery
 
 
 @dataclasses.dataclass
@@ -41,6 +42,7 @@ class TaskManager:
         self.info = TaskInfo()
         self.task_list: list[type[BaseTask]] = get_task_classes()
         self.settings: AppSettings = settings
+        self._recovery = TaskRecovery()
         logger.debug(f"Successfully load task: {self.task_list}")
 
     def request_stop(self) -> None:
@@ -105,8 +107,10 @@ class TaskManager:
         1. 读取配置列表（单配置或多配置）
         2. 对每个配置加载任务列表并执行
         3. 处理任务中断或失败的情况
+        4. 任务失败时支持自动重试（重启游戏后从当前配置重新开始）
         """
         self._stop_event.clear()
+        self._recovery.reset()
         logger.debug('[Start]')
         self.info.mode = "run"
         self.info.status = "running"
@@ -119,44 +123,77 @@ class TaskManager:
                 config_list = args
             self.info.configs = config_list
             last_operator = None
-            for config_name in config_list:
+            # 支持重试的配置索引，从这里继续执行
+            config_start_index = 0
+            while config_start_index < len(config_list):
                 if self._stop_event.is_set():
                     return
-                logger.info(Resource.task_currentConfig(config_name))
+                retry_triggered = False
+                for ci in range(config_start_index, len(config_list)):
+                    config_name = config_list[ci]
+                    if self._stop_event.is_set():
+                        return
+                    logger.info(Resource.task_currentConfig(config_name))
 
-                # 获取当前配置需要执行的任务列表
-                tasks_to_run = self.get_tasks(config_name)
-                if tasks_to_run:
-                    last_operator = tasks_to_run[0].operator
-                logger.debug(f'tasks_to_run: {tasks_to_run}')
-                if not tasks_to_run:
-                    logger.warning(Resource.task_noSelectedTasks(config_name))
-                    continue
+                    # 获取当前配置需要执行的任务列表
+                    tasks_to_run = self.get_tasks(config_name)
+                    if tasks_to_run:
+                        last_operator = tasks_to_run[0].operator
+                    logger.debug(f'tasks_to_run: {tasks_to_run}')
+                    if not tasks_to_run:
+                        logger.warning(Resource.task_noSelectedTasks(config_name))
+                        continue
 
-                # 依次执行任务
-                for task in tasks_to_run:
-                    try:
-                        # 运行任务，如果返回 False 表示任务失败
-                        logger.debug('running task: ' + str(task))
-                        self.info.task = str(task)
-                        # 任务开始
-                        task.start()
-                        if not task.run():
-                            logger.error(Resource.task_taskFailed(str(task)))
+                    # 依次执行任务
+                    task_failed = False
+                    for task in tasks_to_run:
+                        try:
+                            # 运行任务，如果返回 False 表示任务失败
+                            logger.debug('running task: ' + str(task))
+                            self.info.task = str(task)
+                            # 任务开始
+                            task.start()
+                            if not task.run():
+                                logger.error(Resource.task_taskFailed(str(task)))
+                                task.fail()
+                                # 尝试重试
+                                if self._recovery.should_retry():
+                                    task_failed = True
+                                    break
+                                else:
+                                    return
+                            # 任务完成
+                            task.complete()
+                        except ThreadStoppedError as e:
+                            logger.error(e)
+                            return
+                        except Exception as e:
+                            # 捕获任务执行中的异常（如未处理的错误）
+                            logger.exception(Resource.task_taskCrashed(str(task), str(e)))
                             task.fail()
-                            return  # 终止所有配置的执行
-                        # 任务完成
-                        task.complete()
-                    except ThreadStoppedError as e:
-                        logger.error(e)
-                        return  # 终止所有配置的执行
-                    except Exception as e:
-                        # 捕获任务执行中的异常（如未处理的错误）
-                        logger.exception(Resource.task_taskCrashed(str(task), str(e)))
-                        task.fail()
-                        return  # 终止所有配置的执行
-                logger.info(Resource.task_configCompleted(config_name))
-                logger.info("=" * 50)
+                            # 尝试重试
+                            if self._recovery.should_retry():
+                                task_failed = True
+                                break
+                            else:
+                                return
+
+                    if task_failed:
+                        # 准备重试：杀死游戏进程并等待
+                        if self._recovery.prepare_retry():
+                            logger.info(Resource.task_retryFromConfig(config_name))
+                            config_start_index = ci
+                            retry_triggered = True
+                            break  # 跳出 tasks 循环，重新开始当前配置
+                        else:
+                            return
+
+                    logger.info(Resource.task_configCompleted(config_name))
+                    logger.info("=" * 50)
+
+                if not retry_triggered:
+                    break  # 所有配置执行完毕，退出重试循环
+
             logger.info("All tasks completed.")
             try_send_notification(
                 Resource.task_notificationTitle,

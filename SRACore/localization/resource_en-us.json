@@ -55,5 +55,10 @@
     "trigger.set.valueHelp": "Value of the attribute to set.",
     "config.fileNotFound": "Could not find config file: '{path}'",
     "config.parseError": "Failed to parse config file '{path}': {error}",
-    "config.exception": "An error occurred while loading config file '{path}': {error}"
+    "config.exception": "An error occurred while loading config file '{path}': {error}",
+    "task.retryPreparing": "Task failed, preparing to retry ({current}/{max_retries})...",
+    "task.killingGameProcess": "Terminating game process...",
+    "task.gameProcessKilled": "Game process terminated",
+    "task.waitingForRetry": "Waiting {seconds} seconds before retry...",
+    "task.retryFromConfig": "Will restart from config [{config_name}]"
 }

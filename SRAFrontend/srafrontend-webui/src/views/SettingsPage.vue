@@ -50,6 +50,14 @@
               <span>停止热键</span>
               <el-input v-model="app.settingsModel.general['keybindings.stop']" />
             </label>
+            <label class="field wide">
+              <span>任务失败后尝试重启游戏</span>
+              <div style="display:flex;align-items:center;gap:12px">
+                <el-switch v-model="app.settingsModel.general.isRetryOnTaskFailure" />
+                <span style="white-space:nowrap">次数</span>
+                <el-input-number v-model="app.settingsModel.general.maxRetryCount" :min="0" :max="10" :disabled="!app.settingsModel.general.isRetryOnTaskFailure" controls-position="right" style="width:120px" />
+              </div>
+            </label>
           </div>
         </el-tab-pane>
 

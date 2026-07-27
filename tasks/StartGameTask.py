@@ -11,7 +11,8 @@ class StartGameTask(BaseTask):
         self.launch_game()
         return self.login_and_enter_game()
 
-    def login_and_enter_game(self):
+    def login_and_enter_game(self, _retry_count: int = 0):
+        max_retries = 3
         self.operator.screenshot_background = False  # 暂时关闭后台截图
         login_result = self.login()
         self.operator.screenshot_background = True
@@ -49,9 +50,12 @@ class StartGameTask(BaseTask):
             logger.error("未能进入游戏，需要下载过往任务资源。")
             return False
         elif res == 3:
+            if _retry_count >= max_retries:
+                logger.error(f"重启游戏更新后仍无法进入，已尝试 {max_retries} 次")
+                return False
             logger.info("需要重启游戏以完成更新，正在重启游戏...")
             self.operator.click_img(IMG.ENSURE2)
-            return self.login_and_enter_game()  # 递归调用重新登录进入游戏
+            return self.login_and_enter_game(_retry_count=_retry_count + 1)  # 递归调用重新登录进入游戏
         else:
             logger.error(f"未知游戏状态，当前状态码: {res}，预期状态码: 0~3")
             return False

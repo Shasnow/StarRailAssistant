@@ -1,4 +1,5 @@
-﻿<root>
+<?xml version="1.0" encoding="utf-8"?>
+<root>
     <resheader name="resmimetype">
         <value>text/microsoft-resx</value>
     </resheader>
@@ -101,7 +102,7 @@
     <data name="GithubToolTipText" xml:space="preserve">
         <value>浏览 GitHub 仓库</value>
     </data>
-    <data name="WebsideToolTipText" xml:space="preserve">
+    <data name="WebsiteToolTipText" xml:space="preserve">
         <value>浏览官网</value>
     </data>
     <data name="SponsorText" xml:space="preserve">
@@ -286,5 +287,266 @@
     </data>
     <data name="CloudGameText" xml:space="preserve">
         <value>使用云·星穹铁道</value>
+    </data>
+    <data name="EnableOverlayText" xml:space="preserve">
+        <value>启用叠加层</value>
+    </data>
+    <data name="RetryAfterTaskFailureText" xml:space="preserve">
+        <value>任务失败后尝试重启</value>
+    </data>
+    <data name="MaxRetryCountText" xml:space="preserve">
+        <value>最大次数</value>
+    </data>
+    <data name="GameLaunchArgumentsText" xml:space="preserve">
+        <value>游戏启动参数</value>
+    </data>
+    <data name="EnableGameArgsText" xml:space="preserve">
+        <value>启用启动参数</value>
+    </data>
+    <data name="WindowSizeText" xml:space="preserve">
+        <value>窗口尺寸</value>
+    </data>
+    <data name="DisplayModeText" xml:space="preserve">
+        <value>显示模式</value>
+    </data>
+    <data name="WindowedText" xml:space="preserve">
+        <value>窗口化</value>
+    </data>
+    <data name="FullScreenText" xml:space="preserve">
+        <value>全屏</value>
+    </data>
+    <data name="BorderlessWindowText" xml:space="preserve">
+        <value>无边框窗口</value>
+    </data>
+    <data name="AdvancedParametersText" xml:space="preserve">
+        <value>高级参数</value>
+    </data>
+    <data name="GameArgsHintText" xml:space="preserve">
+        <value>如果你不知道这是做什么的 请不要填写</value>
+    </data>
+    <data name="UseCmdLaunchText" xml:space="preserve">
+        <value>使用 CMD 启动游戏</value>
+    </data>
+    <data name="RememberWindowSizeText" xml:space="preserve">
+        <value>记忆窗口大小和位置</value>
+    </data>
+    <data name="RememberWindowSizeTipText" xml:space="preserve">
+        <value>启用后，SRA会记住窗口的位置和大小，下次启动时恢复</value>
+    </data>
+    <data name="CheckText" xml:space="preserve">
+        <value>Check</value>
+    </data>
+    <data name="WebhookNotificationText" xml:space="preserve">
+        <value>Webhook 通知</value>
+    </data>
+    <data name="WebhookSettingsText" xml:space="preserve">
+        <value>Webhook 设置</value>
+    </data>
+    <data name="PushAddressText" xml:space="preserve">
+        <value>推送地址</value>
+    </data>
+    <data name="TelegramNotificationText" xml:space="preserve">
+        <value>Telegram 通知</value>
+    </data>
+    <data name="TelegramSettingsText" xml:space="preserve">
+        <value>Telegram 设置</value>
+    </data>
+    <data name="BotTokenText" xml:space="preserve">
+        <value>Bot Token</value>
+    </data>
+    <data name="ChatIdText" xml:space="preserve">
+        <value>Chat ID</value>
+    </data>
+    <data name="CustomApiAddressText" xml:space="preserve">
+        <value>自定义 API 地址</value>
+    </data>
+    <data name="EnableProxyText" xml:space="preserve">
+        <value>启用代理</value>
+    </data>
+    <data name="ProxyAddressText" xml:space="preserve">
+        <value>代理地址</value>
+    </data>
+    <data name="SendScreenshotText" xml:space="preserve">
+        <value>发送截图</value>
+    </data>
+    <data name="OpenText" xml:space="preserve">
+        <value>开</value>
+    </data>
+    <data name="CloseText" xml:space="preserve">
+        <value>关</value>
+    </data>
+    <data name="ServerChanNotificationText" xml:space="preserve">
+        <value>ServerChan 微信通知</value>
+    </data>
+    <data name="ServerChanSettingsText" xml:space="preserve">
+        <value>ServerChan 设置</value>
+    </data>
+    <data name="SendKeyText" xml:space="preserve">
+        <value>SendKey</value>
+    </data>
+    <data name="OneBotNotificationText" xml:space="preserve">
+        <value>OneBot QQ 通知</value>
+    </data>
+    <data name="OneBotSettingsText" xml:space="preserve">
+        <value>OneBot 设置</value>
+    </data>
+    <data name="ApiAddressText" xml:space="preserve">
+        <value>API 地址</value>
+    </data>
+    <data name="QQPrivateText" xml:space="preserve">
+        <value>QQ 号（私聊）</value>
+    </data>
+    <data name="QQGroupText" xml:space="preserve">
+        <value>群号（群聊）</value>
+    </data>
+    <data name="AccessTokenText" xml:space="preserve">
+        <value>AccessToken</value>
+    </data>
+    <data name="BarkNotificationText" xml:space="preserve">
+        <value>Bark 通知（iOS）</value>
+    </data>
+    <data name="BarkSettingsText" xml:space="preserve">
+        <value>Bark 设置</value>
+    </data>
+    <data name="DeviceKeyText" xml:space="preserve">
+        <value>设备 Key</value>
+    </data>
+    <data name="BarkApiEndpointText" xml:space="preserve">
+        <value>Bark API 端点</value>
+    </data>
+    <data name="PushLevelText" xml:space="preserve">
+        <value>推送级别</value>
+    </data>
+    <data name="NotificationSoundText" xml:space="preserve">
+        <value>通知声音</value>
+    </data>
+    <data name="NotificationIconText" xml:space="preserve">
+        <value>通知图标</value>
+    </data>
+    <data name="NotificationGroupText" xml:space="preserve">
+        <value>通知分组</value>
+    </data>
+    <data name="EncryptionKeyText" xml:space="preserve">
+        <value>加密密钥</value>
+    </data>
+    <data name="FeishuNotificationText" xml:space="preserve">
+        <value>飞书通知</value>
+    </data>
+    <data name="FeishuSettingsText" xml:space="preserve">
+        <value>飞书设置</value>
+    </data>
+    <data name="MethodOneText" xml:space="preserve">
+        <value>方式一：群机器人 Webhook</value>
+    </data>
+    <data name="MethodTwoText" xml:space="preserve">
+        <value>方式二：应用 API（可发给指定用户）</value>
+    </data>
+    <data name="FeishuNotificationAddressText" xml:space="preserve">
+        <value>飞书通知地址</value>
+    </data>
+    <data name="FeishuAppIdText" xml:space="preserve">
+        <value>飞书 AppId</value>
+    </data>
+    <data name="FeishuAppSecretText" xml:space="preserve">
+        <value>飞书 AppSecret</value>
+    </data>
+    <data name="ReceiverIdText" xml:space="preserve">
+        <value>接收者 ID</value>
+    </data>
+    <data name="IdTypeText" xml:space="preserve">
+        <value>ID 类型</value>
+    </data>
+    <data name="WeComNotificationText" xml:space="preserve">
+        <value>企业微信通知</value>
+    </data>
+    <data name="WeComSettingsText" xml:space="preserve">
+        <value>企业微信设置</value>
+    </data>
+    <data name="DingTalkNotificationText" xml:space="preserve">
+        <value>钉钉通知</value>
+    </data>
+    <data name="DingTalkSettingsText" xml:space="preserve">
+        <value>钉钉设置</value>
+    </data>
+    <data name="SignSecretText" xml:space="preserve">
+        <value>加签密钥</value>
+    </data>
+    <data name="DiscordWebhookNotificationText" xml:space="preserve">
+        <value>Discord Webhook 通知</value>
+    </data>
+    <data name="DiscordSettingsText" xml:space="preserve">
+        <value>Discord 设置</value>
+    </data>
+    <data name="XxtuiNotificationText" xml:space="preserve">
+        <value>xxtui 通知</value>
+    </data>
+    <data name="XxtuiSettingsText" xml:space="preserve">
+        <value>xxtui 设置</value>
+    </data>
+    <data name="ApiKeyText" xml:space="preserve">
+        <value>API 密钥</value>
+    </data>
+    <data name="NotificationSourceText" xml:space="preserve">
+        <value>通知来源</value>
+    </data>
+    <data name="NotificationChannelText" xml:space="preserve">
+        <value>通知渠道</value>
+    </data>
+    <data name="TaskNotificationConfigText" xml:space="preserve">
+        <value>任务通知配置</value>
+    </data>
+    <data name="TaskNameText" xml:space="preserve">
+        <value>任务名称</value>
+    </data>
+    <data name="TaskStartNotificationText" xml:space="preserve">
+        <value>任务开始时通知</value>
+    </data>
+    <data name="TaskCompleteNotificationText" xml:space="preserve">
+        <value>任务结束后通知</value>
+    </data>
+    <data name="ClearPowerText" xml:space="preserve">
+        <value>清体力</value>
+    </data>
+    <data name="TaskCompleteText" xml:space="preserve">
+        <value>任务完成</value>
+    </data>
+    <data name="BackendLaunchArgsText" xml:space="preserve">
+        <value>后端启动参数</value>
+    </data>
+    <data name="UseExternalBackendText" xml:space="preserve">
+        <value>使用外部 SRA 后端</value>
+    </data>
+    <data name="ExternalBackendDescriptionText" xml:space="preserve">
+        <value>让 SRA.exe 连接另一台机器或另一个进程提供的 SRA 后端服务。</value>
+    </data>
+    <data name="RemoteServerAddressText" xml:space="preserve">
+        <value>远程服务器地址</value>
+    </data>
+    <data name="OverlayDebugInfoText" xml:space="preserve">
+        <value>叠加层显示调试信息</value>
+    </data>
+    <data name="EnterCdkText" xml:space="preserve">
+        <value>Enter You CDK</value>
+    </data>
+    <data name="LinksText" xml:space="preserve">
+        <value>链接</value>
+    </data>
+    <data name="VersionText" xml:space="preserve">
+        <value>版本</value>
+    </data>
+    <data name="SraWebsiteText" xml:space="preserve">
+        <value>SRA官网</value>
+    </data>
+    <data name="SourceRepositoryText" xml:space="preserve">
+        <value>开放源代码仓库(GitHub)</value>
+    </data>
+    <data name="MirrorText" xml:space="preserve">
+        <value>Mirror 酱</value>
+    </data>
+    <data name="UserGroupText" xml:space="preserve">
+        <value>用户群(QQ)</value>
+    </data>
+    <data name="GameChineseLanguageTip" xml:space="preserve">
+        <value>注意：游戏内需要调整为简体中文</value>
     </data>
 </root>

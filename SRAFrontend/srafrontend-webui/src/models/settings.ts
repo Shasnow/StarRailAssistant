@@ -16,6 +16,8 @@ export function createSettingsModel(source: unknown): SettingsModel {
       'keybindings.stop': 'F9',
       ocrMatchConfidence: 0.7,
       templateMatchConfidence: 0.9,
+      isRetryOnTaskFailure: true,
+      maxRetryCount: 3,
       ...(raw.general ?? {})
     },
     advanced: {

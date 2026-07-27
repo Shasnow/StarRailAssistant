@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
@@ -11,6 +13,8 @@ using SRAFrontend.Desktop.Services;
 using SRAFrontend.Localization;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
+using SukiUI.Controls;
+using SukiUI.MessageBox;
 using CustomizableKey = SRAFrontend.Desktop.Models.CustomizableKey;
 
 namespace SRAFrontend.Desktop.ViewModels;
@@ -111,6 +115,11 @@ public partial class SettingsPageViewModel : PageViewModel
     public AdvancedSettings AdvancedSettings => Settings.Advanced;
     public Cache Cache => _cacheService.Cache;
     public static string VersionText => AppSettings.Version;
+
+    public bool IsLanguageNotChinese => DisplaySettings.Language != 0;
+
+    public string GameChineseLanguageTip =>
+        Resources.ResourceManager.GetString(nameof(GameChineseLanguageTip), Resources.Culture) ?? "";
 
     #region 任务通知配置
     // 启动游戏
@@ -348,6 +357,61 @@ public partial class SettingsPageViewModel : PageViewModel
         if (e.PropertyName is nameof(Settings.General.GameArgsWindowSize)
             or nameof(Settings.General.GameArgsFullScreenMode))
             SetGameResolution();
+
+        if (e.PropertyName == nameof(DisplaySettings.Language))
+            OnLanguageChanged();
+    }
+
+    private void OnLanguageChanged()
+    {
+        Resources.Culture = new CultureInfo(DisplaySettings.Language == 0 ? "zh-CN" : "en-US");
+        OnPropertyChanged(nameof(IsLanguageNotChinese));
+        OnPropertyChanged(nameof(GameChineseLanguageTip));
+        _settingsService.Save();
+        _ = AskRestartAsync();
+    }
+
+    private async Task AskRestartAsync()
+    {
+        var isChinese = DisplaySettings.Language == 0;
+        var restartButton = SukiMessageBoxButtonsFactory.CreateButton(
+            isChinese ? "立即重启" : "Restart Now", SukiMessageBoxResult.Yes, "Flat");
+        var laterButton = SukiMessageBoxButtonsFactory.CreateButton(
+            isChinese ? "稍后" : "Later", SukiMessageBoxResult.Cancel);
+
+        var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+        {
+            Header = isChinese ? "语言已更改" : "Language Changed",
+            Content = isChinese
+                ? "需要重启应用以应用新语言，是否立即重启？"
+                : "The application needs to restart to apply the new language. Restart now?",
+            ActionButtonsSource = [restartButton, laterButton]
+        });
+
+        if (result is SukiMessageBoxResult.Yes)
+            RestartApplication();
+    }
+
+    private void RestartApplication()
+    {
+        var exePath = DataPath.SraExecutablePath;
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = exePath,
+                WorkingDirectory = Environment.CurrentDirectory,
+                UseShellExecute = true
+            });
+            Environment.Exit(0);
+        }
+        catch (Exception e)
+        {
+            var isChinese = DisplaySettings.Language == 0;
+            _commonModel.ShowErrorToast(
+                isChinese ? "重启失败" : "Restart Failed",
+                $"{(isChinese ? "发生错误" : "An error occurred")}：{e.Message}");
+        }
     }
 
     [RelayCommand]

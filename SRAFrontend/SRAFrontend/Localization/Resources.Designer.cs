@@ -150,7 +150,7 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Auto Set Game Resolotion.
+        ///   Looks up a localized string similar to Auto Set Game Resolution.
         /// </summary>
         public static string AutoResolutionText {
             get {
@@ -366,7 +366,7 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Email Nofication.
+        ///   Looks up a localized string similar to Email Notification.
         /// </summary>
         public static string EmailNotificationText {
             get {
@@ -870,11 +870,11 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open Official Webside.
+        ///   Looks up a localized string similar to Open Official Website.
         /// </summary>
-        public static string WebsideToolTipText {
+        public static string WebsiteToolTipText {
             get {
-                return ResourceManager.GetString("WebsideToolTipText", resourceCulture);
+                return ResourceManager.GetString("WebsiteToolTipText", resourceCulture);
             }
         }
         
@@ -884,6 +884,781 @@ namespace SRAFrontend.Localization {
         public static string ZoomText {
             get {
                 return ResourceManager.GetString("ZoomText", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to 启用叠加层.
+        /// </summary>
+        public static string EnableOverlayText {
+            get {
+                return ResourceManager.GetString("EnableOverlayText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 任务失败后尝试重启.
+        /// </summary>
+        public static string RetryAfterTaskFailureText {
+            get {
+                return ResourceManager.GetString("RetryAfterTaskFailureText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 最大次数.
+        /// </summary>
+        public static string MaxRetryCountText {
+            get {
+                return ResourceManager.GetString("MaxRetryCountText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 游戏启动参数.
+        /// </summary>
+        public static string GameLaunchArgumentsText {
+            get {
+                return ResourceManager.GetString("GameLaunchArgumentsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 启用启动参数.
+        /// </summary>
+        public static string EnableGameArgsText {
+            get {
+                return ResourceManager.GetString("EnableGameArgsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 窗口尺寸.
+        /// </summary>
+        public static string WindowSizeText {
+            get {
+                return ResourceManager.GetString("WindowSizeText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 显示模式.
+        /// </summary>
+        public static string DisplayModeText {
+            get {
+                return ResourceManager.GetString("DisplayModeText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 窗口化.
+        /// </summary>
+        public static string WindowedText {
+            get {
+                return ResourceManager.GetString("WindowedText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 全屏.
+        /// </summary>
+        public static string FullScreenText {
+            get {
+                return ResourceManager.GetString("FullScreenText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 无边框窗口.
+        /// </summary>
+        public static string BorderlessWindowText {
+            get {
+                return ResourceManager.GetString("BorderlessWindowText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 高级参数.
+        /// </summary>
+        public static string AdvancedParametersText {
+            get {
+                return ResourceManager.GetString("AdvancedParametersText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 如果你不知道这是做什么的 请不要填写.
+        /// </summary>
+        public static string GameArgsHintText {
+            get {
+                return ResourceManager.GetString("GameArgsHintText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 使用 CMD 启动游戏.
+        /// </summary>
+        public static string UseCmdLaunchText {
+            get {
+                return ResourceManager.GetString("UseCmdLaunchText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 记忆窗口大小和位置.
+        /// </summary>
+        public static string RememberWindowSizeText {
+            get {
+                return ResourceManager.GetString("RememberWindowSizeText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 启用后，SRA会记住窗口的位置和大小，下次启动时恢复.
+        /// </summary>
+        public static string RememberWindowSizeTipText {
+            get {
+                return ResourceManager.GetString("RememberWindowSizeTipText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Check.
+        /// </summary>
+        public static string CheckText {
+            get {
+                return ResourceManager.GetString("CheckText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Webhook 通知.
+        /// </summary>
+        public static string WebhookNotificationText {
+            get {
+                return ResourceManager.GetString("WebhookNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Webhook 设置.
+        /// </summary>
+        public static string WebhookSettingsText {
+            get {
+                return ResourceManager.GetString("WebhookSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 推送地址.
+        /// </summary>
+        public static string PushAddressText {
+            get {
+                return ResourceManager.GetString("PushAddressText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Telegram 通知.
+        /// </summary>
+        public static string TelegramNotificationText {
+            get {
+                return ResourceManager.GetString("TelegramNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Telegram 设置.
+        /// </summary>
+        public static string TelegramSettingsText {
+            get {
+                return ResourceManager.GetString("TelegramSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bot Token.
+        /// </summary>
+        public static string BotTokenText {
+            get {
+                return ResourceManager.GetString("BotTokenText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Chat ID.
+        /// </summary>
+        public static string ChatIdText {
+            get {
+                return ResourceManager.GetString("ChatIdText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 自定义 API 地址.
+        /// </summary>
+        public static string CustomApiAddressText {
+            get {
+                return ResourceManager.GetString("CustomApiAddressText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 启用代理.
+        /// </summary>
+        public static string EnableProxyText {
+            get {
+                return ResourceManager.GetString("EnableProxyText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 代理地址.
+        /// </summary>
+        public static string ProxyAddressText {
+            get {
+                return ResourceManager.GetString("ProxyAddressText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 发送截图.
+        /// </summary>
+        public static string SendScreenshotText {
+            get {
+                return ResourceManager.GetString("SendScreenshotText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 开.
+        /// </summary>
+        public static string OpenText {
+            get {
+                return ResourceManager.GetString("OpenText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 关.
+        /// </summary>
+        public static string CloseText {
+            get {
+                return ResourceManager.GetString("CloseText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to ServerChan 微信通知.
+        /// </summary>
+        public static string ServerChanNotificationText {
+            get {
+                return ResourceManager.GetString("ServerChanNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to ServerChan 设置.
+        /// </summary>
+        public static string ServerChanSettingsText {
+            get {
+                return ResourceManager.GetString("ServerChanSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to SendKey.
+        /// </summary>
+        public static string SendKeyText {
+            get {
+                return ResourceManager.GetString("SendKeyText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to OneBot QQ 通知.
+        /// </summary>
+        public static string OneBotNotificationText {
+            get {
+                return ResourceManager.GetString("OneBotNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to OneBot 设置.
+        /// </summary>
+        public static string OneBotSettingsText {
+            get {
+                return ResourceManager.GetString("OneBotSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to API 地址.
+        /// </summary>
+        public static string ApiAddressText {
+            get {
+                return ResourceManager.GetString("ApiAddressText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to QQ 号（私聊）.
+        /// </summary>
+        public static string QQPrivateText {
+            get {
+                return ResourceManager.GetString("QQPrivateText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 群号（群聊）.
+        /// </summary>
+        public static string QQGroupText {
+            get {
+                return ResourceManager.GetString("QQGroupText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to AccessToken.
+        /// </summary>
+        public static string AccessTokenText {
+            get {
+                return ResourceManager.GetString("AccessTokenText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bark 通知（iOS）.
+        /// </summary>
+        public static string BarkNotificationText {
+            get {
+                return ResourceManager.GetString("BarkNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bark 设置.
+        /// </summary>
+        public static string BarkSettingsText {
+            get {
+                return ResourceManager.GetString("BarkSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 设备 Key.
+        /// </summary>
+        public static string DeviceKeyText {
+            get {
+                return ResourceManager.GetString("DeviceKeyText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bark API 端点.
+        /// </summary>
+        public static string BarkApiEndpointText {
+            get {
+                return ResourceManager.GetString("BarkApiEndpointText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 推送级别.
+        /// </summary>
+        public static string PushLevelText {
+            get {
+                return ResourceManager.GetString("PushLevelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 通知声音.
+        /// </summary>
+        public static string NotificationSoundText {
+            get {
+                return ResourceManager.GetString("NotificationSoundText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 通知图标.
+        /// </summary>
+        public static string NotificationIconText {
+            get {
+                return ResourceManager.GetString("NotificationIconText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 通知分组.
+        /// </summary>
+        public static string NotificationGroupText {
+            get {
+                return ResourceManager.GetString("NotificationGroupText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 加密密钥.
+        /// </summary>
+        public static string EncryptionKeyText {
+            get {
+                return ResourceManager.GetString("EncryptionKeyText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 飞书通知.
+        /// </summary>
+        public static string FeishuNotificationText {
+            get {
+                return ResourceManager.GetString("FeishuNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 飞书设置.
+        /// </summary>
+        public static string FeishuSettingsText {
+            get {
+                return ResourceManager.GetString("FeishuSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 方式一：群机器人 Webhook.
+        /// </summary>
+        public static string MethodOneText {
+            get {
+                return ResourceManager.GetString("MethodOneText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 方式二：应用 API（可发给指定用户）.
+        /// </summary>
+        public static string MethodTwoText {
+            get {
+                return ResourceManager.GetString("MethodTwoText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 飞书通知地址.
+        /// </summary>
+        public static string FeishuNotificationAddressText {
+            get {
+                return ResourceManager.GetString("FeishuNotificationAddressText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 飞书 AppId.
+        /// </summary>
+        public static string FeishuAppIdText {
+            get {
+                return ResourceManager.GetString("FeishuAppIdText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 飞书 AppSecret.
+        /// </summary>
+        public static string FeishuAppSecretText {
+            get {
+                return ResourceManager.GetString("FeishuAppSecretText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 接收者 ID.
+        /// </summary>
+        public static string ReceiverIdText {
+            get {
+                return ResourceManager.GetString("ReceiverIdText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to ID 类型.
+        /// </summary>
+        public static string IdTypeText {
+            get {
+                return ResourceManager.GetString("IdTypeText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 企业微信通知.
+        /// </summary>
+        public static string WeComNotificationText {
+            get {
+                return ResourceManager.GetString("WeComNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 企业微信设置.
+        /// </summary>
+        public static string WeComSettingsText {
+            get {
+                return ResourceManager.GetString("WeComSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 钉钉通知.
+        /// </summary>
+        public static string DingTalkNotificationText {
+            get {
+                return ResourceManager.GetString("DingTalkNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 钉钉设置.
+        /// </summary>
+        public static string DingTalkSettingsText {
+            get {
+                return ResourceManager.GetString("DingTalkSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 加签密钥.
+        /// </summary>
+        public static string SignSecretText {
+            get {
+                return ResourceManager.GetString("SignSecretText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Discord Webhook 通知.
+        /// </summary>
+        public static string DiscordWebhookNotificationText {
+            get {
+                return ResourceManager.GetString("DiscordWebhookNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Discord 设置.
+        /// </summary>
+        public static string DiscordSettingsText {
+            get {
+                return ResourceManager.GetString("DiscordSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to xxtui 通知.
+        /// </summary>
+        public static string XxtuiNotificationText {
+            get {
+                return ResourceManager.GetString("XxtuiNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to xxtui 设置.
+        /// </summary>
+        public static string XxtuiSettingsText {
+            get {
+                return ResourceManager.GetString("XxtuiSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to API 密钥.
+        /// </summary>
+        public static string ApiKeyText {
+            get {
+                return ResourceManager.GetString("ApiKeyText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 通知来源.
+        /// </summary>
+        public static string NotificationSourceText {
+            get {
+                return ResourceManager.GetString("NotificationSourceText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 通知渠道.
+        /// </summary>
+        public static string NotificationChannelText {
+            get {
+                return ResourceManager.GetString("NotificationChannelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 任务通知配置.
+        /// </summary>
+        public static string TaskNotificationConfigText {
+            get {
+                return ResourceManager.GetString("TaskNotificationConfigText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 任务名称.
+        /// </summary>
+        public static string TaskNameText {
+            get {
+                return ResourceManager.GetString("TaskNameText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 任务开始时通知.
+        /// </summary>
+        public static string TaskStartNotificationText {
+            get {
+                return ResourceManager.GetString("TaskStartNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 任务结束后通知.
+        /// </summary>
+        public static string TaskCompleteNotificationText {
+            get {
+                return ResourceManager.GetString("TaskCompleteNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 清体力.
+        /// </summary>
+        public static string ClearPowerText {
+            get {
+                return ResourceManager.GetString("ClearPowerText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 任务完成.
+        /// </summary>
+        public static string TaskCompleteText {
+            get {
+                return ResourceManager.GetString("TaskCompleteText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 后端启动参数.
+        /// </summary>
+        public static string BackendLaunchArgsText {
+            get {
+                return ResourceManager.GetString("BackendLaunchArgsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 使用外部 SRA 后端.
+        /// </summary>
+        public static string UseExternalBackendText {
+            get {
+                return ResourceManager.GetString("UseExternalBackendText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 让 SRA.exe 连接另一台机器或另一个进程提供的 SRA 后端服务。.
+        /// </summary>
+        public static string ExternalBackendDescriptionText {
+            get {
+                return ResourceManager.GetString("ExternalBackendDescriptionText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 远程服务器地址.
+        /// </summary>
+        public static string RemoteServerAddressText {
+            get {
+                return ResourceManager.GetString("RemoteServerAddressText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 叠加层显示调试信息.
+        /// </summary>
+        public static string OverlayDebugInfoText {
+            get {
+                return ResourceManager.GetString("OverlayDebugInfoText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter You CDK.
+        /// </summary>
+        public static string EnterCdkText {
+            get {
+                return ResourceManager.GetString("EnterCdkText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 链接.
+        /// </summary>
+        public static string LinksText {
+            get {
+                return ResourceManager.GetString("LinksText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 版本.
+        /// </summary>
+        public static string VersionText {
+            get {
+                return ResourceManager.GetString("VersionText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to SRA官网.
+        /// </summary>
+        public static string SraWebsiteText {
+            get {
+                return ResourceManager.GetString("SraWebsiteText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 开放源代码仓库(GitHub).
+        /// </summary>
+        public static string SourceRepositoryText {
+            get {
+                return ResourceManager.GetString("SourceRepositoryText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mirror 酱.
+        /// </summary>
+        public static string MirrorText {
+            get {
+                return ResourceManager.GetString("MirrorText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 用户群(QQ).
+        /// </summary>
+        public static string UserGroupText {
+            get {
+                return ResourceManager.GetString("UserGroupText", resourceCulture);
             }
         }
     }

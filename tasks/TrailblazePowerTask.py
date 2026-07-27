@@ -600,7 +600,13 @@ class TrailblazePowerTask(BaseTask):
              - ``-1``->unknown error.
         """
         logger.info("等待战斗结束")
+        import time
+        start_time = time.monotonic()
+        timeout = 3600  # 60分钟超时（这很开拓）
         while True:
+            if time.monotonic() - start_time > timeout:
+                logger.error(f"等待战斗结束超时（{timeout}秒）")
+                return -1
             self.operator.sleep(1)
             # 检查战斗结束状态
             index, _ = self.operator.locate_any([
@@ -767,43 +773,51 @@ class TrailblazePowerTask(BaseTask):
     def goto_survival_index(self) -> bool:
         """前往生存索引页面"""
         logger.info("前往生存索引页面")
-        index, box = self.operator.wait_any_img([
-            IMG.ENTER,
-            IMG.SURVIVAL_INDEX,
-            IMG.SURVIVAL_INDEX_ONCLICK
-        ], timeout=30, interval=0.5)
-        if index == 2:
-            # 已经在生存索引页面
-            return True
-        elif index == 1:
-            # 生存索引页面，点击进入
-            self.operator.click_box(box)  # type: ignore
-            return self.operator.wait_img(IMG.SURVIVAL_INDEX_ONCLICK, timeout=10) is not None
-        elif index == 0:
-            # 主页面，按快捷键进入生存索引页面
-            self.operator.press_key(self.settings.General.hotkeyF4.lower())
-            self.operator.sleep(1.5)
-            return self.goto_survival_index()  # 递归调用，直到进入生存索引页面
-        else:
-            return False
+        max_attempts = 3
+        for attempt in range(max_attempts):
+            index, box = self.operator.wait_any_img([
+                IMG.ENTER,
+                IMG.SURVIVAL_INDEX,
+                IMG.SURVIVAL_INDEX_ONCLICK
+            ], timeout=30, interval=0.5)
+            if index == 2:
+                # 已经在生存索引页面
+                return True
+            elif index == 1:
+                # 生存索引页面，点击进入
+                self.operator.click_box(box)  # type: ignore
+                return self.operator.wait_img(IMG.SURVIVAL_INDEX_ONCLICK, timeout=10) is not None
+            elif index == 0:
+                # 主页面，按快捷键进入生存索引页面
+                self.operator.press_key(self.settings.General.hotkeyF4.lower())
+                self.operator.sleep(1.5)
+                continue  # 重试
+            else:
+                return False
+        logger.error(f"前往生存索引页面失败，已尝试 {max_attempts} 次")
+        return False
 
     def goto_activity_page(self) -> bool:
         """前往活动页面"""
         logger.info("前往活动页面")
-        index, box = self.operator.wait_any([
-            lambda: self.operator.locate(IMG.ENTER),
-            lambda: self.operator.ocr_match("旅情事记", from_x=0.05, from_y=0.02, to_x=0.11, to_y=0.09),
-        ], timeout=30, interval=0.5)
-        if index == 1:
-            # 已经在活动页面
-            return True
-        elif index == 0:
-            # 主页面，按快捷键进入活动页面
-            self.operator.press_key(self.settings.General.hotkeyF1.lower())
-            self.operator.sleep(1.5)
-            return self.goto_activity_page()  # 递归调用，直到进入活动页面
-        else:
-            return False
+        max_attempts = 3
+        for attempt in range(max_attempts):
+            index, box = self.operator.wait_any([
+                lambda: self.operator.locate(IMG.ENTER),
+                lambda: self.operator.ocr_match("旅情事记", from_x=0.05, from_y=0.02, to_x=0.11, to_y=0.09),
+            ], timeout=30, interval=0.5)
+            if index == 1:
+                # 已经在活动页面
+                return True
+            elif index == 0:
+                # 主页面，按快捷键进入活动页面
+                self.operator.press_key(self.settings.General.hotkeyF1.lower())
+                self.operator.sleep(1.5)
+                continue  # 重试
+            else:
+                return False
+        logger.error(f"前往活动页面失败，已尝试 {max_attempts} 次")
+        return False
 
     def on_completed(self) -> None:
         on_complete = self.settings.Notification.onCompleted

@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -121,6 +121,18 @@ public partial class GeneralSettings : ObservableObject
     [property: Description("模板匹配置信度（识图置信度），范围 0-1，数值越高越严格")]
     [property: DefaultValue(0.9)]
     private double _templateMatchConfidence = 0.9;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("isRetryOnTaskFailure")]
+    [property: Description("任务失败后是否尝试重启游戏并重试")]
+    [property: DefaultValue(true)]
+    private bool _isRetryOnTaskFailure = true;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("maxRetryCount")]
+    [property: Description("任务失败后最大重试次数")]
+    [property: DefaultValue(3)]
+    private int _maxRetryCount = 3;
 }
 
 public partial class DisplaySettings : ObservableObject

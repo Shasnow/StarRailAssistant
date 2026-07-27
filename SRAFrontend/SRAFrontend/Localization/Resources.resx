@@ -1,11 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-
-<root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-        <xsd:element name="root" msdata:IsDataSet="true">
-            
-        </xsd:element>
-    </xsd:schema>
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:schema id="root">
+        <xs:element name="root" ns1:IsDataSet="true">
+        </xs:element>
+    </xs:schema>
     <resheader name="resmimetype">
         <value>text/microsoft-resx</value>
     </resheader>
@@ -108,8 +106,8 @@
     <data name="GithubToolTipText" xml:space="preserve">
         <value>Open On GitHub</value>
     </data>
-    <data name="WebsideToolTipText" xml:space="preserve">
-        <value>Open Official Webside</value>
+    <data name="WebsiteToolTipText" xml:space="preserve">
+        <value>Open Official Website</value>
     </data>
     <data name="SponsorText" xml:space="preserve">
         <value>Sponsor</value>
@@ -127,7 +125,7 @@
         <value>System Notification</value>
     </data>
     <data name="EmailNotificationText" xml:space="preserve">
-        <value>Email Nofication</value>
+        <value>Email Notification</value>
     </data>
     <data name="ControlPanelOpacityText" xml:space="preserve">
         <value>Control Panel Opacity</value>
@@ -271,7 +269,7 @@
         <value>Current configuration</value>
     </data>
     <data name="AutoResolutionText" xml:space="preserve">
-        <value>Auto Set Game Resolotion</value>
+        <value>Auto Set Game Resolution</value>
     </data>
     <data name="DeveloperOptionsText" xml:space="preserve">
         <value>Developer Options</value>
@@ -293,5 +291,266 @@
     </data>
     <data name="CloudGameText" xml:space="preserve">
         <value>Use StarRail Cloud Game</value>
+    </data>
+    <data name="EnableOverlayText" xml:space="preserve">
+        <value>Enable Overlay</value>
+    </data>
+    <data name="RetryAfterTaskFailureText" xml:space="preserve">
+        <value>Retry After Task Failure</value>
+    </data>
+    <data name="MaxRetryCountText" xml:space="preserve">
+        <value>Max Retry Count</value>
+    </data>
+    <data name="GameLaunchArgumentsText" xml:space="preserve">
+        <value>Game Launch Arguments</value>
+    </data>
+    <data name="EnableGameArgsText" xml:space="preserve">
+        <value>Enable Launch Arguments</value>
+    </data>
+    <data name="WindowSizeText" xml:space="preserve">
+        <value>Window Size</value>
+    </data>
+    <data name="DisplayModeText" xml:space="preserve">
+        <value>Display Mode</value>
+    </data>
+    <data name="WindowedText" xml:space="preserve">
+        <value>Windowed</value>
+    </data>
+    <data name="FullScreenText" xml:space="preserve">
+        <value>Full Screen</value>
+    </data>
+    <data name="BorderlessWindowText" xml:space="preserve">
+        <value>Borderless Window</value>
+    </data>
+    <data name="AdvancedParametersText" xml:space="preserve">
+        <value>Advanced Parameters</value>
+    </data>
+    <data name="GameArgsHintText" xml:space="preserve">
+        <value>If you don't know what this does, please leave it blank</value>
+    </data>
+    <data name="UseCmdLaunchText" xml:space="preserve">
+        <value>Launch Game Using CMD</value>
+    </data>
+    <data name="RememberWindowSizeText" xml:space="preserve">
+        <value>Remember Window Size and Position</value>
+    </data>
+    <data name="RememberWindowSizeTipText" xml:space="preserve">
+        <value>When enabled, SRA will remember the window's position and size, and restore them on next startup</value>
+    </data>
+    <data name="CheckText" xml:space="preserve">
+        <value>Check</value>
+    </data>
+    <data name="WebhookNotificationText" xml:space="preserve">
+        <value>Webhook Notification</value>
+    </data>
+    <data name="WebhookSettingsText" xml:space="preserve">
+        <value>Webhook Settings</value>
+    </data>
+    <data name="PushAddressText" xml:space="preserve">
+        <value>Push Address</value>
+    </data>
+    <data name="TelegramNotificationText" xml:space="preserve">
+        <value>Telegram Notification</value>
+    </data>
+    <data name="TelegramSettingsText" xml:space="preserve">
+        <value>Telegram Settings</value>
+    </data>
+    <data name="BotTokenText" xml:space="preserve">
+        <value>Bot Token</value>
+    </data>
+    <data name="ChatIdText" xml:space="preserve">
+        <value>Chat ID</value>
+    </data>
+    <data name="CustomApiAddressText" xml:space="preserve">
+        <value>Custom API Address</value>
+    </data>
+    <data name="EnableProxyText" xml:space="preserve">
+        <value>Enable Proxy</value>
+    </data>
+    <data name="ProxyAddressText" xml:space="preserve">
+        <value>Proxy Address</value>
+    </data>
+    <data name="SendScreenshotText" xml:space="preserve">
+        <value>Send Screenshot</value>
+    </data>
+    <data name="OpenText" xml:space="preserve">
+        <value>On</value>
+    </data>
+    <data name="CloseText" xml:space="preserve">
+        <value>Off</value>
+    </data>
+    <data name="ServerChanNotificationText" xml:space="preserve">
+        <value>ServerChan WeChat Notification</value>
+    </data>
+    <data name="ServerChanSettingsText" xml:space="preserve">
+        <value>ServerChan Settings</value>
+    </data>
+    <data name="SendKeyText" xml:space="preserve">
+        <value>SendKey</value>
+    </data>
+    <data name="OneBotNotificationText" xml:space="preserve">
+        <value>OneBot QQ Notification</value>
+    </data>
+    <data name="OneBotSettingsText" xml:space="preserve">
+        <value>OneBot Settings</value>
+    </data>
+    <data name="ApiAddressText" xml:space="preserve">
+        <value>API Address</value>
+    </data>
+    <data name="QQPrivateText" xml:space="preserve">
+        <value>QQ Number (Private Chat)</value>
+    </data>
+    <data name="QQGroupText" xml:space="preserve">
+        <value>Group Number (Group Chat)</value>
+    </data>
+    <data name="AccessTokenText" xml:space="preserve">
+        <value>AccessToken</value>
+    </data>
+    <data name="BarkNotificationText" xml:space="preserve">
+        <value>Bark Notification (iOS)</value>
+    </data>
+    <data name="BarkSettingsText" xml:space="preserve">
+        <value>Bark Settings</value>
+    </data>
+    <data name="DeviceKeyText" xml:space="preserve">
+        <value>Device Key</value>
+    </data>
+    <data name="BarkApiEndpointText" xml:space="preserve">
+        <value>Bark API Endpoint</value>
+    </data>
+    <data name="PushLevelText" xml:space="preserve">
+        <value>Push Level</value>
+    </data>
+    <data name="NotificationSoundText" xml:space="preserve">
+        <value>Notification Sound</value>
+    </data>
+    <data name="NotificationIconText" xml:space="preserve">
+        <value>Notification Icon</value>
+    </data>
+    <data name="NotificationGroupText" xml:space="preserve">
+        <value>Notification Group</value>
+    </data>
+    <data name="EncryptionKeyText" xml:space="preserve">
+        <value>Encryption Key</value>
+    </data>
+    <data name="FeishuNotificationText" xml:space="preserve">
+        <value>Feishu Notification</value>
+    </data>
+    <data name="FeishuSettingsText" xml:space="preserve">
+        <value>Feishu Settings</value>
+    </data>
+    <data name="MethodOneText" xml:space="preserve">
+        <value>Method 1: Group Bot Webhook</value>
+    </data>
+    <data name="MethodTwoText" xml:space="preserve">
+        <value>Method 2: App API (Can send to specified users)</value>
+    </data>
+    <data name="FeishuNotificationAddressText" xml:space="preserve">
+        <value>Feishu Notification Address</value>
+    </data>
+    <data name="FeishuAppIdText" xml:space="preserve">
+        <value>Feishu AppId</value>
+    </data>
+    <data name="FeishuAppSecretText" xml:space="preserve">
+        <value>Feishu AppSecret</value>
+    </data>
+    <data name="ReceiverIdText" xml:space="preserve">
+        <value>Receiver ID</value>
+    </data>
+    <data name="IdTypeText" xml:space="preserve">
+        <value>ID Type</value>
+    </data>
+    <data name="WeComNotificationText" xml:space="preserve">
+        <value>WeCom Notification</value>
+    </data>
+    <data name="WeComSettingsText" xml:space="preserve">
+        <value>WeCom Settings</value>
+    </data>
+    <data name="DingTalkNotificationText" xml:space="preserve">
+        <value>DingTalk Notification</value>
+    </data>
+    <data name="DingTalkSettingsText" xml:space="preserve">
+        <value>DingTalk Settings</value>
+    </data>
+    <data name="SignSecretText" xml:space="preserve">
+        <value>Sign Secret</value>
+    </data>
+    <data name="DiscordWebhookNotificationText" xml:space="preserve">
+        <value>Discord Webhook Notification</value>
+    </data>
+    <data name="DiscordSettingsText" xml:space="preserve">
+        <value>Discord Settings</value>
+    </data>
+    <data name="XxtuiNotificationText" xml:space="preserve">
+        <value>Xxtui Notification</value>
+    </data>
+    <data name="XxtuiSettingsText" xml:space="preserve">
+        <value>Xxtui Settings</value>
+    </data>
+    <data name="ApiKeyText" xml:space="preserve">
+        <value>API Key</value>
+    </data>
+    <data name="NotificationSourceText" xml:space="preserve">
+        <value>Notification Source</value>
+    </data>
+    <data name="NotificationChannelText" xml:space="preserve">
+        <value>Notification Channel</value>
+    </data>
+    <data name="TaskNotificationConfigText" xml:space="preserve">
+        <value>Task Notification Configuration</value>
+    </data>
+    <data name="TaskNameText" xml:space="preserve">
+        <value>Task Name</value>
+    </data>
+    <data name="TaskStartNotificationText" xml:space="preserve">
+        <value>Notify on Task Start</value>
+    </data>
+    <data name="TaskCompleteNotificationText" xml:space="preserve">
+        <value>Notify on Task Complete</value>
+    </data>
+    <data name="ClearPowerText" xml:space="preserve">
+        <value>Clear Stamina</value>
+    </data>
+    <data name="TaskCompleteText" xml:space="preserve">
+        <value>Task Complete</value>
+    </data>
+    <data name="BackendLaunchArgsText" xml:space="preserve">
+        <value>Backend Launch Arguments</value>
+    </data>
+    <data name="UseExternalBackendText" xml:space="preserve">
+        <value>Use External SRA Backend</value>
+    </data>
+    <data name="ExternalBackendDescriptionText" xml:space="preserve">
+        <value>Let SRA.exe connect to an SRA backend service provided by another machine or another process.</value>
+    </data>
+    <data name="RemoteServerAddressText" xml:space="preserve">
+        <value>Remote Server Address</value>
+    </data>
+    <data name="OverlayDebugInfoText" xml:space="preserve">
+        <value>Overlay Show Debug Info</value>
+    </data>
+    <data name="EnterCdkText" xml:space="preserve">
+        <value>Enter Your CDK</value>
+    </data>
+    <data name="LinksText" xml:space="preserve">
+        <value>Links</value>
+    </data>
+    <data name="VersionText" xml:space="preserve">
+        <value>Version</value>
+    </data>
+    <data name="SraWebsiteText" xml:space="preserve">
+        <value>SRA Official Website</value>
+    </data>
+    <data name="SourceRepositoryText" xml:space="preserve">
+        <value>Open Source Repository (GitHub)</value>
+    </data>
+    <data name="MirrorText" xml:space="preserve">
+        <value>MirrorChyan</value>
+    </data>
+    <data name="UserGroupText" xml:space="preserve">
+        <value>User Group (QQ)</value>
+    </data>
+    <data name="GameChineseLanguageTip" xml:space="preserve">
+        <value>Note: The in-game language needs to be set to Simplified Chinese (简体中文)</value>
     </data>
 </root>

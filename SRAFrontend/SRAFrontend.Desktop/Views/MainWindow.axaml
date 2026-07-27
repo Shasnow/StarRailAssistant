@@ -79,7 +79,7 @@
                 </Button>
                 <Button Classes="Basic"
                         CommandParameter="https://starrailassistant.top"
-                        ToolTip.Tip="{x:Static lang:Resources.WebsideToolTipText}">
+                        ToolTip.Tip="{x:Static lang:Resources.WebsiteToolTipText}">
                     <Label Classes="Icon">&#xE976;</Label>
                 </Button>
                 <Button Classes="Basic"
