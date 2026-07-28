@@ -5,6 +5,10 @@ import base64
 from SRACore.notification.channels.base import NotificationChannel
 from SRACore.notification.http_client import HttpClient
 from SRACore.notification.models import NotificationContext, format_notification_message
+from SRACore.util.image_util import compress_image_bytes
+
+# OneBot 图片大小限制（2MB，与企业微信一致）
+_MAX_IMAGE_SIZE = 2 * 1024 * 1024
 
 
 class OneBotChannel(NotificationChannel):
@@ -36,7 +40,12 @@ class OneBotChannel(NotificationChannel):
         if cfg.isOneBotSendImage:
             image = context.screenshot_bytes
             if image:
-                image_seg = [{"type": "image", "data": {"file": "base64://" + base64.b64encode(image).decode()}}]
+                image_data = image
+                if len(image_data) > _MAX_IMAGE_SIZE:
+                    compressed, _, _ = compress_image_bytes(image_data, _MAX_IMAGE_SIZE)
+                    if compressed:
+                        image_data = compressed
+                image_seg = [{"type": "image", "data": {"file": "base64://" + base64.b64encode(image_data).decode()}}]
                 if user_id:
                     self.client.post_json(url, {"message_type": "private", "user_id": user_id, "message": image_seg}, headers=headers)
                 if group_id:
