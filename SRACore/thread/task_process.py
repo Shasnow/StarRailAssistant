@@ -154,6 +154,9 @@ class TaskManager:
                             # 任务开始
                             task.start()
                             if not task.run():
+                                # 如果是用户主动停止，直接返回，不触发重试
+                                if self._stop_event.is_set():
+                                    return
                                 logger.error(Resource.task_taskFailed(str(task)))
                                 task.fail()
                                 # 尝试重试
@@ -168,6 +171,9 @@ class TaskManager:
                             logger.error(e)
                             return
                         except Exception as e:
+                            # 如果是用户主动停止，直接返回，不触发重试
+                            if self._stop_event.is_set():
+                                return
                             # 捕获任务执行中的异常（如未处理的错误）
                             logger.exception(Resource.task_taskCrashed(str(task), str(e)))
                             task.fail()
@@ -181,6 +187,24 @@ class TaskManager:
                     if task_failed:
                         # 准备重试：杀死游戏进程并等待
                         if self._recovery.prepare_retry():
+                            # 如果在等待期间用户停止了任务，直接返回
+                            if self._stop_event.is_set():
+                                return
+                            # 重试时需要确保游戏已启动
+                            # 如果任务列表中没有 StartGameTask，则先执行它
+                            if not any(t.__class__.__name__ == 'StartGameTask' for t in tasks_to_run):
+                                logger.info("重试时需要启动游戏，自动执行启动游戏任务")
+                                start_game_task = self._create_start_game_task(config_name)
+                                if start_game_task:
+                                    try:
+                                        start_game_task.start()
+                                        if not start_game_task.run():
+                                            logger.error("重试时启动游戏失败")
+                                            return
+                                        start_game_task.complete()
+                                    except Exception as e:
+                                        logger.error(f"重试时启动游戏异常: {e}")
+                                        return
                             logger.info(Resource.task_retryFromConfig(config_name))
                             config_start_index = ci
                             retry_triggered = True
@@ -207,6 +231,21 @@ class TaskManager:
             final_state = "stopped" if self._stop_event.is_set() else "completed"
             self.info.status = final_state
             logger.debug("[Done]")
+
+    def _create_start_game_task(self, config_name: str) -> BaseTask | None:
+        """创建 StartGameTask 实例（用于重试时启动游戏）"""
+        config = load_config(config_name)
+        if config is None:
+            return None
+        try:
+            optype = OperatorType.Browser if self.settings.General.isCloudGameEnabled else OperatorType.Local
+            operator = OperatorFactory.get_operator(optype, self._stop_event)
+            # StartGameTask 是第一个任务（index=0）
+            if len(self.task_list) > 0:
+                return self.task_list[0](operator, config)
+        except Exception as e:
+            logger.error(f"创建 StartGameTask 失败: {e}")
+        return None
 
     def get_tasks(self, config_name: str) -> list[BaseTask]:
         """
