@@ -154,6 +154,9 @@ class TaskManager:
                             # 任务开始
                             task.start()
                             if not task.run():
+                                # 如果是用户主动停止，直接返回，不触发重试
+                                if self._stop_event.is_set():
+                                    return
                                 logger.error(Resource.task_taskFailed(str(task)))
                                 task.fail()
                                 # 尝试重试
@@ -168,6 +171,9 @@ class TaskManager:
                             logger.error(e)
                             return
                         except Exception as e:
+                            # 如果是用户主动停止，直接返回，不触发重试
+                            if self._stop_event.is_set():
+                                return
                             # 捕获任务执行中的异常（如未处理的错误）
                             logger.exception(Resource.task_taskCrashed(str(task), str(e)))
                             task.fail()
@@ -181,6 +187,9 @@ class TaskManager:
                     if task_failed:
                         # 准备重试：杀死游戏进程并等待
                         if self._recovery.prepare_retry():
+                            # 如果在等待期间用户停止了任务，直接返回
+                            if self._stop_event.is_set():
+                                return
                             logger.info(Resource.task_retryFromConfig(config_name))
                             config_start_index = ci
                             retry_triggered = True
