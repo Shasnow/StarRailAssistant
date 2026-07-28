@@ -152,6 +152,11 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         return Task.FromResult(new List<Strategy>());
     }
 
+    public Task<TpTask[]> GetTpConfigAsync()
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<byte[]> GetGameScreenshotBytesAsync()
     {
         logger.LogWarning("GetGameScreenshotBytes is not implemented for remote backend");

@@ -72,26 +72,26 @@
                                     <TextBlock Grid.Row="0" Grid.Column="1" Width="180" VerticalAlignment="Center" TextAlignment="Center"
                                         Text="拟造花萼（金）"/>
                                     <ComboBox Grid.Row="0" Grid.Column="2"
-                                              SelectedIndex="{Binding TrailblazePowerConfig.GardenOfPlentyLevel1}"
+                                              SelectedIndex="{Binding SelectedGardenOfPlentyLevels1Index}"
                                               ItemsSource="{Binding GardenOfPlentyLevels1}"/>
                                     <TextBlock Grid.Row="1" Grid.Column="1" Width="180" VerticalAlignment="Center" TextAlignment="Center"
                                                Text="拟造花萼（赤）"/>
                                     <ComboBox Grid.Row="1" Grid.Column="2"
-                                              SelectedIndex="{Binding TrailblazePowerConfig.GardenOfPlentyLevel2}"
+                                              SelectedIndex="{Binding SelectedGardenOfPlentyLevels2Index}"
                                               ItemsSource="{Binding GardenOfPlentyLevels2}"/>
                                 </Grid>
                                 <Grid ColumnDefinitions="Auto, Auto,*">
                                     <Label Grid.Column="0" Content="异器盈界"/>
                                     <TextBlock Grid.Column="1" Width="180" Text="侵蚀隧洞" VerticalAlignment="Center" TextAlignment="Center"/>
                                     <ComboBox Grid.Column="2"
-                                              SelectedIndex="{Binding TrailblazePowerConfig.RealmOfTheStrangeLevel}"
+                                              SelectedIndex="{Binding SelectedRealmOfTheStrangeLevelsIndex}"
                                               ItemsSource="{Binding RealmOfTheStrangeLevels}"/>
                                 </Grid>
                                 <Grid ColumnDefinitions="Auto, Auto,*">
                                     <Label Grid.Column="0" Content="位面分裂"/>
                                     <TextBlock Grid.Column="1" Width="180" Text="饰品提取" VerticalAlignment="Center" TextAlignment="Center"/>
                                     <ComboBox Grid.Column="2"
-                                              SelectedIndex="{Binding TrailblazePowerConfig.PlanarFissureLevel}"
+                                              SelectedIndex="{Binding SelectedPlanarFissureLevelsIndex}"
                                               ItemsSource="{Binding PlanarFissureLevels}"/>
                                 </Grid>
                             </StackPanel>

@@ -389,7 +389,7 @@ class IOperator(ABC):
 
     def wait_ocr(self, text: str,
                  confidence: float | None = None,
-                 interval: float = 0.2,
+                 interval: float = 0.5,
                  timeout: float = 10,
                  *args: Any,
                  **kwargs: Any) -> Box | None:

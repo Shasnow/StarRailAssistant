@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Models;
@@ -13,13 +14,15 @@ namespace SRAFrontend.Services;
 public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
     : IBackendService
 {
+    private readonly SemaphoreSlim _commandLock = new(1, 1);
     private Process? _backendProcess;
+    private TaskCompletionSource<string>? _outputTcs;
     public abstract string FileName { get; set; }
     public abstract string WorkingDirectory { get; set; }
     public abstract string MainArgument { get; set; }
     public event PropertyChangedEventHandler? PropertyChanged;
     public event Action<string>? Outputted;
-    private TaskCompletionSource<string>? _outputTcs;
+
     public bool IsTaskRunning
     {
         get;
@@ -180,28 +183,13 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
 
     public async Task<string> GetTaskStatusAsync()
     {
-        if (_backendProcess == null || _backendProcess.HasExited)
-        {
-            logger.LogWarning("Attempted to get task status, but backend process is not running.");
-            return string.Empty;
-        }
-        var tcs = new TaskCompletionSource<string>();
-        _outputTcs = tcs;
-        await SendInputAsync("task status --json");
-        return await tcs.Task;
+        return await SendCommandAndWaitOutputAsync("task status --json") ?? string.Empty;
     }
 
     public async Task<List<Strategy>> GetStrategiesAsync()
     {
-        if (_backendProcess == null || _backendProcess.HasExited)
-        {
-            logger.LogWarning("Attempted to get strategies, but backend process is not running.");
-            return [];
-        }
-        var tcs = new TaskCompletionSource<string>();
-        _outputTcs = tcs;
-        await SendInputAsync("strategy list --json");
-        var json = await tcs.Task;
+        var json = await SendCommandAndWaitOutputAsync("strategy list --json");
+        if (json == null) return [];
         try
         {
             return JsonSerializer.Deserialize<List<Strategy>>(json) ?? [];
@@ -213,25 +201,69 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         }
     }
 
-    public async Task<byte[]> GetGameScreenshotBytesAsync()
+    public async Task<TpTask[]> GetTpConfigAsync()
     {
-        if (_backendProcess == null || _backendProcess.HasExited)
+        var json = await SendCommandAndWaitOutputAsync("tpconfig --json");
+        if (json == null) return [];
+        try
         {
-            logger.LogWarning("Attempted to screenshot, but backend process is not running.");
+            var tpConfigDict = JsonSerializer.Deserialize<Dictionary<string, TpTask>>(json) ?? [];
+            return [.. tpConfigDict.Values];
+        }
+        catch (JsonException ex)
+        {
+            logger.LogError(ex, "Failed to parse TP config JSON");
             return [];
         }
+    }
+
+    public async Task<byte[]> GetGameScreenshotBytesAsync()
+    {
         var screenshotPath = Path.Combine(WorkingDirectory, "screenshot.png");
-        var tcs = new TaskCompletionSource<string>();
-        _outputTcs = tcs;
-        await SendInputAsync($"game screenshot --background --save {screenshotPath}");
-        var result = await tcs.Task; // 等待输出完成
-        if (result.StartsWith("Failed"))
+        var result = await SendCommandAndWaitOutputAsync($"game screenshot --background --save {screenshotPath}");
+        if (result == null || result.StartsWith("Failed"))
         {
             logger.LogError("Failed to create screenshot.");
             return [];
         }
+
         var screenshotBytes = await File.ReadAllBytesAsync(screenshotPath);
         return screenshotBytes;
+    }
+
+    private async Task<string?> SendCommandAndWaitOutputAsync(string command)
+    {
+        await _commandLock.WaitAsync();
+        try
+        {
+            if (_backendProcess == null || _backendProcess.HasExited)
+            {
+                logger.LogWarning(
+                    "Attempted to send command to backend process, but it is not running. Command: {Command}", command);
+                return null;
+            }
+
+            var tcs = new TaskCompletionSource<string>();
+            _outputTcs = tcs;
+            if (await SendInputAsync(command)) return await tcs.Task.WaitAsync(TimeSpan.FromSeconds(10));
+            _outputTcs = null;
+            return null;
+        }
+        catch (TimeoutException)
+        {
+            logger.LogError("Command timed out: {Command}", command);
+            _outputTcs = null;
+            return null;
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning("Command canceled: {Command}", command);
+            return null;
+        }
+        finally
+        {
+            _commandLock.Release();
+        }
     }
 
     private void OnBackendProcessExited(object? sender, EventArgs e)
@@ -261,13 +293,13 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
     private void OnBackendProcessErrorDataReceived(object _, DataReceivedEventArgs args)
     {
         if (string.IsNullOrEmpty(args.Data)) return;
-        
+
         // 更新运行状态
         if (args.Data.Contains(IBackendService.StartMarker))
             IsTaskRunning = true;
         else if (args.Data.Contains(IBackendService.DoneMarker))
             IsTaskRunning = false;
-        
+
         Outputted?.Invoke(args.Data);
     }
 
@@ -281,5 +313,8 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         _backendProcess.Dispose();
         _backendProcess = null;
         IsTaskRunning = false;
+
+        _outputTcs?.TrySetCanceled();
+        _outputTcs = null;
     }
 }

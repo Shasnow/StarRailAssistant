@@ -15,6 +15,7 @@ from SRACore.util.const import VERSION, CORE
 
 
 class SRACli(cmd2.Cmd):
+    DEFAULT_CATEGORY = "Build-in Commands"
     def __init__(self, settings: AppSettings):
         super().__init__(startup_script=".srarc",
                          auto_load_commands=True)

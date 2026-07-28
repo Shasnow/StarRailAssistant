@@ -21,6 +21,7 @@ public partial class TaskPageViewModel : PageViewModel
     private readonly CommonModel _commonModel;
     private readonly ConfigService _configService;
     private readonly IBackendService _backendService;
+    private TpTask[] _tpTasks = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CosmicStrifeConfig), nameof(MissionAccomplishedConfig),
@@ -35,7 +36,46 @@ public partial class TaskPageViewModel : PageViewModel
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(CurrentTpTaskLevels), nameof(CurrentTpTaskMaxSingleTimes))]
     private int _selectedTpTaskIndex;
 
-    [ObservableProperty] private int _selectedTpTaskLevelIndex;
+    public int SelectedGardenOfPlentyLevels1Index
+    {
+        get => TrailblazePowerConfig.GardenOfPlentyLevel1-1;
+        set
+        {
+            TrailblazePowerConfig.GardenOfPlentyLevel1 = value+1;
+            OnPropertyChanged();
+        }
+    }
+    public int SelectedGardenOfPlentyLevels2Index
+    {
+        get => TrailblazePowerConfig.GardenOfPlentyLevel2-1;
+        set
+        {
+            TrailblazePowerConfig.GardenOfPlentyLevel2 = value+1;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SelectedPlanarFissureLevelsIndex
+    {
+        get => TrailblazePowerConfig.PlanarFissureLevel-1;
+        set
+        {
+            TrailblazePowerConfig.PlanarFissureLevel = value+1;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SelectedRealmOfTheStrangeLevelsIndex
+    {
+        get =>  TrailblazePowerConfig.RealmOfTheStrangeLevel-1;
+        set
+        {
+            TrailblazePowerConfig.RealmOfTheStrangeLevel = value+1;
+            OnPropertyChanged();
+        }
+    }
+
+    [ObservableProperty] private TpTaskLevel? _selectedTpTaskLevel;
 
     [ObservableProperty] private int _tpTaskRunTimes = 1;
 
@@ -69,13 +109,13 @@ public partial class TaskPageViewModel : PageViewModel
         }
     }
 
-    public string[] TpTaskNames => TpTaskItems.TpTaskNames;
-    public string[] CurrentTpTaskLevels => TpTaskItems.GetLevelsByIndex(SelectedTpTaskIndex);
-    public string[] GardenOfPlentyLevels1 => TpTaskItems.GetLevelsByIndex(1);
-    public string[] GardenOfPlentyLevels2 => TpTaskItems.GetLevelsByIndex(2);
-    public string[] PlanarFissureLevels => TpTaskItems.GetLevelsByIndex(0);
-    public string[] RealmOfTheStrangeLevels => TpTaskItems.GetLevelsByIndex(4);
-    public int CurrentTpTaskMaxSingleTimes => TpTaskItems.GetMaxSingleTimesByIndex(SelectedTpTaskIndex);
+    public string[] TpTaskNames => [.. _tpTasks.Select(t => t.Name)];
+    public TpTaskLevel[] CurrentTpTaskLevels => _tpTasks.ElementAt(SelectedTpTaskIndex).Levels;
+    public string[] GardenOfPlentyLevels1 => [.. _tpTasks.ElementAt(1).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+    public string[] GardenOfPlentyLevels2 => [.. _tpTasks.ElementAt(2).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+    public string[] PlanarFissureLevels => [.. _tpTasks.ElementAt(0).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+    public string[] RealmOfTheStrangeLevels => [.. _tpTasks.ElementAt(4).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+    public int CurrentTpTaskMaxSingleTimes => _tpTasks[SelectedTpTaskIndex].MaxSingleTimes;
     
     public string TaskListText =>
         TrailblazePowerConfig.TaskList.Count == 0
@@ -118,6 +158,19 @@ public partial class TaskPageViewModel : PageViewModel
 
     public Cache Cache => _cacheService.Cache;
 
+    public async Task GetTpConfigAsync()
+    {
+        if (_tpTasks.Length > 0) return;
+        _tpTasks = await _backendService.GetTpConfigAsync();
+        OnPropertyChanged(nameof(TpTaskNames));
+        OnPropertyChanged(nameof(CurrentTpTaskLevels));
+        OnPropertyChanged(nameof(GardenOfPlentyLevels1));
+        OnPropertyChanged(nameof(GardenOfPlentyLevels2));
+        OnPropertyChanged(nameof(PlanarFissureLevels));
+        OnPropertyChanged(nameof(RealmOfTheStrangeLevels));
+        OnPropertyChanged(nameof(CurrentTpTaskMaxSingleTimes));
+    }
+
     [RelayCommand]
     private async Task SingleTask(string taskName)
     {
@@ -159,7 +212,7 @@ public partial class TaskPageViewModel : PageViewModel
     [RelayCommand]
     private void AddTaskItem()
     {
-        if (SelectedTpTaskLevelIndex == 0)
+        if (SelectedTpTaskLevel is null)
         {
             _commonModel.ShowInfoToast("Info", "请选择副本关卡后再添加任务");
             return;
@@ -167,10 +220,10 @@ public partial class TaskPageViewModel : PageViewModel
 
         TrailblazePowerConfig.TaskList.Add(new TrailblazePowerTaskItem
         {
-            Name = TpTaskItems.TpTaskNames[SelectedTpTaskIndex],
-            Id = TpTaskItems.TaskItems[SelectedTpTaskIndex].Id,
-            Level = SelectedTpTaskLevelIndex,
-            LevelName = CurrentTpTaskLevels.ElementAtOrDefault(SelectedTpTaskLevelIndex) ?? "",
+            Name = _tpTasks[SelectedTpTaskIndex].Name,
+            Id = _tpTasks[SelectedTpTaskIndex].Id,
+            Level = SelectedTpTaskLevel.Id,
+            LevelName = SelectedTpTaskLevel.Name,
             Count = TpTaskSingleTimes,
             RunTimes = TpTaskRunTimes,
             AutoDetect = IsTpTaskAutoDetect

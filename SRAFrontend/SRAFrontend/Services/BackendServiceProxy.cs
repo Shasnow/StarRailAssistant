@@ -120,6 +120,11 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         return _currentBackend.GetStrategiesAsync();
     }
 
+    public Task<TpTask[]> GetTpConfigAsync()
+    {
+        return _currentBackend.GetTpConfigAsync();
+    }
+
     public Task<byte[]> GetGameScreenshotBytesAsync()
     {
         return _currentBackend.GetGameScreenshotBytesAsync();

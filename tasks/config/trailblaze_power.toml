@@ -49,7 +49,7 @@ func = "calyx_crimson"
 cost = 10
 max_count = 24
 levels = [
-    { id = 1, name = "万色，愚者自将（毁灭）", result = "万色，愚者自将" },
+    { id = 1, name = "万色，愚者自将（毁灭）", result = "万色愚者自将" },
     { id = 2, name = "月狂獠牙（毁灭）", result = "月狂獠牙" },
     { id = 3, name = "净世残刃（毁灭）", result = "净世残刃" },
     { id = 4, name = "神体琥珀（存护）", result = "神体琥珀" },
@@ -136,13 +136,13 @@ func = "echo_of_war"
 cost = 30
 max_count = 3
 levels = [
-    { id = 9, name = "伪觉者的期许", result = "伪觉者的期许" },
-    { id = 1, name = "灭流绝溢的缄默", result = "灭流绝溢的缄默" },
-    { id = 2, name = "阳雷的遥想", result = "阳雷的遥想" },
-    { id = 3, name = "吉光片羽", result = "吉光片羽" },
-    { id = 4, name = "同愿的遗音", result = "同愿的遗音" },
-    { id = 5, name = "蛀星孕灾的旧恶", result = "蛀星孕灾的旧恶" },
-    { id = 6, name = "无穷假身的遗恨", result = "无穷假身的遗恨" },
-    { id = 7, name = "守护者的悲愿", result = "守护者的悲愿" },
-    { id = 8, name = "毁灭者的末路", result = "毁灭者的末路" }
+    { id = 9, name = "坏灭的喜剧", result = "伪觉者的期许" },
+    { id = 1, name = "铁骸的锈冢", result = "灭流绝溢的缄默" },
+    { id = 2, name = "晨昏的回眸", result = "阳雷的遥想" },
+    { id = 3, name = "心兽的战场", result = "吉光片羽" },
+    { id = 4, name = "尘梦的赞礼", result = "同愿的遗音" },
+    { id = 5, name = "蛀星的旧魇", result = "蛀星孕灾的旧恶" },
+    { id = 6, name = "不死的神实", result = "无穷假身的遗恨" },
+    { id = 7, name = "寒潮的落幕", result = "守护者的悲愿" },
+    { id = 8, name = "毁灭的开端", result = "毁灭者的末路" }
 ]

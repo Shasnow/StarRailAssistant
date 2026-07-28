@@ -1,9 +1,58 @@
 import argparse
 import json
+import tomllib
 
 import cmd2
 
 from SRACore.cli2 import SRACli
+from SRACore.util.const import AppRootDir
+
+
+class TrailblazePowerCommands(cmd2.CommandSet[SRACli]):
+    DEFAULT_CATEGORY = 'Trailblaze Power'
+
+    @staticmethod
+    def _build_tpconfig_parser() -> cmd2.Cmd2ArgumentParser:
+        parser = cmd2.Cmd2ArgumentParser(description='查看开拓力副本配置')
+        parser.add_argument('--json', action='store_true', help='以JSON格式输出')
+        parser.add_argument('subtask', nargs='?', help='指定子任务名称（如 calyx_golden）')
+        return parser
+
+    @cmd2.with_argparser(_build_tpconfig_parser)
+    def do_tpconfig(self, args: argparse.Namespace) -> None:
+        config_path = AppRootDir / "tasks" / "config" / "trailblaze_power.toml"
+        if not config_path.exists():
+            if args.json:
+                self._cmd.poutput("{}")
+            else:
+                self._cmd.perror(f"配置文件不存在: {config_path}")
+            return
+
+        with open(config_path, "rb") as f:
+            config = tomllib.load(f)
+
+        subtasks: dict = config.get("subtasks", {})
+
+        if args.subtask:
+            if args.subtask not in subtasks:
+                if args.json:
+                    self._cmd.poutput("{}")
+                else:
+                    self._cmd.perror(f"未找到子任务: {args.subtask}")
+                return
+            subtasks = {args.subtask: subtasks[args.subtask]}
+
+        if args.json:
+            self._cmd.poutput(json.dumps(subtasks))
+            return
+
+        for key, st in subtasks.items():
+            self._cmd.poutput(f"[{key}] {st['name']}")
+            self._cmd.poutput(f"    函数: {st['func']}  体力消耗: {st['cost']}  最大次数: {st['max_count']}")
+            self._cmd.poutput(f"    关卡:")
+            for lv in st.get("levels", []):
+                self._cmd.poutput(f"      {lv['id']:>2}. {lv['name']} → {lv['result']}")
+            self._cmd.poutput("")
 
 
 class CurrencyWarsCommands(cmd2.CommandSet[SRACli]):
@@ -29,7 +78,7 @@ class CurrencyWarsCommands(cmd2.CommandSet[SRACli]):
     @cmd2.as_subcommand_to("strategy", "list", _build_strategy_list_parser(), help='列出所有攻略')
     def _strategy_list(self, args: argparse.Namespace) -> None:
         from pathlib import Path
-        strategies_dir = Path(__file__).parent / "currency_wars" / "strategies"
+        strategies_dir = AppRootDir / "tasks" / "currency_wars" / "strategies"
         if not strategies_dir.exists():
             if args.json:
                 self._cmd.poutput("[]")
@@ -47,7 +96,7 @@ class CurrencyWarsCommands(cmd2.CommandSet[SRACli]):
                 self._cmd.perror(f"加载 {file.name} 失败: {e}")
 
         if args.json:
-            self._cmd.poutput(json.dumps(strategies, ensure_ascii=False))
+            self._cmd.poutput(json.dumps(strategies))
             return
 
         if not strategies:

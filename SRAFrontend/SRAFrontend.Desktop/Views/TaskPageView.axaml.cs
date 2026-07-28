@@ -17,5 +17,6 @@ public partial class TaskPageView : UserControl
         if (DataContext is not TaskPageViewModel viewModel) return;
         var topLevel = TopLevel.GetTopLevel(this);
         viewModel.TopLevelObject = topLevel;
+        _ = viewModel.GetTpConfigAsync();
     }
 }

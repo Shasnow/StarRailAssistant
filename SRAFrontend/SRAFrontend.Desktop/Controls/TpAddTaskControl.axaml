@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:SRAFrontend.Desktop.ViewModels"
+             xmlns:models="clr-namespace:SRAFrontend.Models;assembly=SRAFrontend"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
              x:Class="SRAFrontend.Desktop.Controls.TpAddTaskControl"
              x:DataType="viewModels:TaskPageViewModel"
@@ -18,7 +19,17 @@
                 <ComboBox Grid.Row="1" Grid.Column="1"
                           Width="300"
                           ItemsSource="{Binding CurrentTpTaskLevels}"
-                          SelectedIndex="{Binding SelectedTpTaskLevelIndex}"/>
+                          SelectedItem="{Binding SelectedTpTaskLevel}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:TpTaskLevel">
+                            <TextBlock>
+                                <Run Text="{Binding Name}"/>
+                                <Run Text="-"/>
+                                <Run Text="{Binding Result}"/>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
                 <Label Grid.Row="2" Grid.Column="0" Content="单次次数"/>
                 <NumericUpDown Grid.Row="2" Grid.Column="1" Minimum="1" Maximum="{Binding CurrentTpTaskMaxSingleTimes}" FormatString="0"
                                Width="290"

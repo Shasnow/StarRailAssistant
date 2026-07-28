@@ -144,8 +144,8 @@ class CurrencyWars(Executable):
             if not self.operator.wait_img(IMG.F4, timeout=20):
                 logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
                 self.operator.press_key("esc")
-            self.operator.sleep(2)
-            self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
+            box = self.operator.wait_img(IMG.COSMIC_STRIFE, timeout=10)
+            self.operator.click_box(box, after_sleep=1)  # 旷宇纷争
             self.operator.click_point(0.242, 0.30, after_sleep=0.8)  # 货币战争
             self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
             return self.page_locate()
@@ -1098,7 +1098,7 @@ class CurrencyWars(Executable):
         self.min_level = strategy_data.get("min_level", 7)
         self.mid_level = strategy_data.get("mid_level", 7)
         self.strategy_code = strategy_data.get("share_code", "")
-        self.strategy_special_events = strategy_data.get("special_events", [])
+        self.strategy_special_events = strategy_data.get("special_events", {})
         # 在攻略中的角色设置成最高优先级
         strategy_on_field: dict[str, int] = strategy_data.get("on_field", {})
         strategy_off_field: dict[str, int] = strategy_data.get("off_field", {})
