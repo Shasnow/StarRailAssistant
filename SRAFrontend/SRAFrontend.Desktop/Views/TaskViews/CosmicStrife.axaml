@@ -105,14 +105,14 @@
                                     <Label Content="Boss词条" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollBossAffixes}"
-                                             Watermark="例如：决战在即 ！时间刺客" />
+                                             Watermark="例如：决战在即 !时间刺客" />
                                 </StackPanel>
                                 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="投资环境" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollInvestEnvironments}"
-                                             Watermark="例如：长线利好 ？轮岗" />
+                                             Watermark="例如：长线利好 ?轮岗" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">

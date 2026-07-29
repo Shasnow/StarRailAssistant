@@ -73,7 +73,7 @@ nothing to do with it.
 ## ⚠️ 注意事项
 
 * 📺 **分辨率要求**：
-  * 如果你的屏幕分辨率**大于1080p**，请将游戏调整至**1920x1080窗口模式**下运行，否则可能出现识别错误！
+  * 如果你的屏幕分辨率**大于1080p**，请将游戏调整至**1920x1080窗口**模式下运行，否则可能出现识别错误！
   * 如果你的屏幕分辨率**等于1080p**，请将游戏调整至**1920x1080全屏**模式下运行，否则可能出现识别错误！
 * 🖱️ **操作提示**：**执行任务时不要进行其他键鼠操作！**
 
@@ -90,14 +90,6 @@ nothing to do with it.
 * 在Release页面下载`StarRailAssistant_vX.X.X.zip`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`SRA.exe`即可！
 * 如需使用 WebUI，请额外下载 `StarRailAssistant_WebUI_vX.X.X.zip` 并解压到同一个 SRA 根目录；同时需要安装 `ServerDLC` 或使用包含服务端的完整包。
 * 从源码运行SRA，请阅读 [贡献指南](CONTRIBUTING.md)。
-
-### 😡 我不想安装 .NET 10.0 
-
-没关系!🤗 SRA 甚至有**社区版**🤓，您可以在 [这里](https://github.com/EveGlowLuna/StarRailAssistant-CommunityEdition) 查看。
-
-社区版使用 Tauri + Vue 3 重构了前端界面，使您可以在不安装 .NET 10.0 的情况下运行 SRA 🥵
-
-除此之外并无其他区别。
 
 ## 🐛 你这代码保熟吗？
 
