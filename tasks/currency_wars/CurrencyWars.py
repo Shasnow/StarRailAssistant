@@ -896,8 +896,11 @@ class CurrencyWars(Executable):
         if not boxes:
             return False
         target_box = None
+        candidates = keyword.split()
         for box in boxes:
-            if keyword in box.source:
+            text = box.source.strip()
+            # 当前box包含任意一个候选关键词即命中
+            if any(k in text for k in candidates):
                 target_box = box
                 break
         if target_box is None:
