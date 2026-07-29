@@ -1,6 +1,5 @@
 from SRACore.task import BaseTask, task
 from SRACore.util import encryption
-from SRACore.util.errors import SRAError, ErrorCode
 from SRACore.util.logger import logger
 from tasks.img import IMG, SGIMG
 

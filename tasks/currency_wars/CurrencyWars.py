@@ -26,6 +26,18 @@ class CurrencyWarsPage(enum.IntEnum):
     UNKNOWN = -1
 
 
+class StageName(enum.StrEnum):
+    """关卡阶段名称枚举"""
+    FORTUNE_TELLER = '命运卜者'
+    REPLENISH_STAGE = '补给阶段'
+    ENCOUNTER_NODE = '遭遇节点'
+    FOLD = '无'
+    SELECT_INVEST_STRATEGY = '选择投资策略'
+    CLICK_BLANK = '点击空白处关闭'
+    GAME_OVER = '游戏结束'
+    MAIN_MENU = '主界面'
+
+
 class CurrencyWars(Executable):
     def __init__(self, operator, runtimes, config: dict[str, Any]):
         super().__init__(operator)
@@ -743,50 +755,50 @@ class CurrencyWars(Executable):
         stage_config = [
             (
                 CWIMG.FORTUNE_TELLER,
-                '命运卜者',
+                StageName.FORTUNE_TELLER,
                 self._handle_fortune_teller_after_battle,
                 False  # 非终止状态
             ),
             (
                 CWIMG.REPLENISH_STAGE,
-                '补给阶段',
+                StageName.REPLENISH_STAGE,
                 self.handle_replenish_stage,
                 False  # 非终止状态
             ),
             (
                 CWIMG.ENCOUNTER_NODE,
-                '遭遇节点',
+                StageName.ENCOUNTER_NODE,
                 self.handle_encounter_node,
                 False
             ),
             (
                 CWIMG.FOLD,
-                '无',
+                StageName.FOLD,
                 None,  # 目标状态，无需处理
                 True  # 正常终止状态
             ),
             (
                 CWIMG.SELECT_INVEST_STRATEGY,
-                '选择投资策略',
+                StageName.SELECT_INVEST_STRATEGY,
                 self.handle_invest_strategy,
                 False
             ),
             (
                 CWIMG.CLICK_BLANK,
-                '点击空白处关闭',
+                StageName.CLICK_BLANK,
                 self.handle_click_blank,
                 False
             ),
             (
                 CWIMG.NEXT_STEP,
-                '游戏结束',
+                StageName.GAME_OVER,
                 self.handle_game_over,
                 True  # 挑战结束，终止状态
             ),
             (
                 CWIMG.START_CURRENCY_WARS,
-                '主界面',
-                lambda : setattr(self, 'is_game_over', True),
+                StageName.MAIN_MENU,
+                lambda prev_stage: setattr(self, 'is_game_over', True),
                 True
             )
         ]
@@ -796,6 +808,7 @@ class CurrencyWars(Executable):
         # 等待初始状态
         stage_index, _ = self.operator.wait_any_img(img_list, timeout=30, interval=1)
         self.operator.sleep(1.5)
+        prev_stage_name: StageName | None = None
 
         while True:  # 用无限循环 + 内部break控制退出
             # 检查是否超时（未识别到任何状态）
@@ -809,10 +822,13 @@ class CurrencyWars(Executable):
             # 执行状态处理函数
             if handle_func is not None:
                 try:
-                    handle_func()
+                    handle_func(prev_stage_name)
                     logger.info(f"状态 {stage_name} 处理完成")
                 except Exception as e:
                     raise RuntimeError(f"处理状态 {stage_name} 时发生异常: {str(e)}") from e
+
+            # 更新上一阶段名称
+            prev_stage_name = stage_name
 
             # 若当前是终止状态，直接退出循环
             if is_terminal:
@@ -823,7 +839,7 @@ class CurrencyWars(Executable):
             stage_index, _ = self.operator.wait_any_img(img_list, timeout=30, interval=1)
             self.operator.sleep(1.5)
 
-    def _handle_fortune_teller_after_battle(self):
+    def _handle_fortune_teller_after_battle(self, prev_stage: StageName | None = None):
         """战斗结束后触发命运卜者事件"""
         self.handle_fortune_teller()
         self.operator.click_point(0.8438, 0.8481, after_sleep=1, tag="打开商店界面")
@@ -845,7 +861,7 @@ class CurrencyWars(Executable):
             # 重新获取备战席信息
             self.get_in_hand_area()
 
-    def handle_game_over(self):
+    def handle_game_over(self, prev_stage: StageName | None = None):
         """处理游戏结束后的逻辑，如点击继续、返回主界面等"""
         self.operator.click_img(CWIMG.NEXT_STEP)
         self.operator.move_to(0.5, 0.5)  # 移动鼠标避免遮挡
@@ -858,23 +874,23 @@ class CurrencyWars(Executable):
         self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击返回货币战争")
         self.is_game_over = True  # 标记游戏结束
 
-    def handle_click_blank(self) -> None:
+    def handle_click_blank(self, prev_stage: StageName | None = None) -> None:
         """处理Boss预览界面的逻辑"""
         self.operator.click_point(0.5, 0.70, after_sleep=1)
 
-    def handle_invest_strategy(self) -> None:
+    def handle_invest_strategy(self, prev_stage: StageName | None = None) -> None:
         """处理投资策略选择界面的逻辑"""
         if not self.operator.click_img(CWIMG.COLLECTION):
             self.operator.click_point(0.5, 0.3)
         self.operator.click_img(IMG.ENSURE2, after_sleep=1)
 
-    def handle_replenish_stage(self):
+    def handle_replenish_stage(self, prev_stage: StageName | None = None):
         """处理补给阶段的逻辑"""
         self.operator.click_point(0.53, 0.52, after_sleep=1)  # 选择固定位置
         self.operator.click_point(0.88, 0.91, after_sleep=1)  # 点击确认按钮
         self.detect_silver_wolf_lv999()  # 也许选到银狼了
 
-    def handle_encounter_node(self):
+    def handle_encounter_node(self, prev_stage: StageName | None = None):
         """处理遭遇节点的逻辑"""
         self.operator.click_point(0.35, 0.50, after_sleep=1)  # 简单难度
         self.operator.click_point(0.50, 0.84, after_sleep=1)  # 点击确认钮

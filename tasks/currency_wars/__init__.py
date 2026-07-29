@@ -1,4 +1,4 @@
 from .RerollStart import RerollStart
-from .CurrencyWars import CurrencyWars
+from .CurrencyWars import CurrencyWars, StageName
 
-__all__ = ["CurrencyWars", "RerollStart"]
+__all__ = ["CurrencyWars", "RerollStart", "StageName"]
