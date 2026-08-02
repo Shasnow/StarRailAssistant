@@ -77,11 +77,35 @@ class StartGameTask(BaseTask):
 
     def login(self):
         if hasattr(self.operator, 'driver'):
+            # 云游戏模式 - 使用配置的账号密码
             user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
             passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
             return self.operator.login(user, passwd)
+        
+        # 确定使用哪个渠道和账号
+        if self.config.StartGame.useMultiAccountMode and self.config.StartGame.accountManager:
+            # 多账号模式 - 使用选中的账号
+            account = self.config.StartGame.accountManager.get_selected_account()
+            if account:
+                user = account.get_username()
+                passwd = account.get_password()
+                channel_code = account.game_channel
+                logger.info(f"多账号模式 - 使用账号: {account.name}")
+            else:
+                # 没有选中的账号，使用默认配置
+                user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
+                passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
+                channel_code = self.config.StartGame.gameChannel
+                logger.info("多账号模式 - 未选中账号，使用默认配置")
+        else:
+            # 单账号模式 - 使用配置的账号密码
+            user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
+            passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
+            channel_code = self.config.StartGame.gameChannel
+
+        # 转换渠道代码
         channel = None
-        match self.config.StartGame.gameChannel:
+        match channel_code:
             case 0:
                 channel = 'cn'
             case 1:
@@ -89,7 +113,7 @@ class StartGameTask(BaseTask):
             case 2:
                 channel = 'gb'
             case _:
-                raise ValueError(f"未知的游戏渠道配置，当前配置值 {self.config.StartGame.gameChannel}")
+                raise ValueError(f"未知的游戏渠道配置，当前配置值 {channel_code}")
 
         result, _ = self.operator.wait_any_img([
             SGIMG.LOGIN_PAGE % channel,
@@ -121,8 +145,6 @@ class StartGameTask(BaseTask):
         self.operator.click_img(SGIMG.LOGIN_OTHER % channel, after_sleep=1)
         self.operator.click_img(SGIMG.LOGIN_WITH_ACCOUNT % channel, after_sleep=1)
         if self.config.StartGame.isAutoLogin:
-            user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
-            passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
             if user == "" or passwd == "":
                 logger.error("自动登录账号或密码未设置，请检查配置中的自动登录账号和密码")
                 return -1
@@ -159,6 +181,46 @@ class StartGameTask(BaseTask):
                 self.operator.click_img(IMG.ENSURE3, after_sleep=1)
             return True
         return False
+
+    def switch_account(self, account_index: int) -> bool:
+        """切换到指定索引的账号"""
+        if not self.config.StartGame.useMultiAccountMode:
+            logger.warning("未启用多账号模式，无法切换账号")
+            return False
+        
+        if self.config.StartGame.accountManager.select_account(account_index):
+            account = self.config.StartGame.accountManager.get_selected_account()
+            if account:
+                logger.info(f"已切换到账号: {account.name}")
+                return True
+        logger.error(f"切换账号失败，索引: {account_index}")
+        return False
+
+    def switch_account_by_name(self, account_name: str) -> bool:
+        """根据账号名称切换账号"""
+        if not self.config.StartGame.useMultiAccountMode:
+            logger.warning("未启用多账号模式，无法切换账号")
+            return False
+        
+        index = self.config.StartGame.accountManager.find_account_index_by_name(account_name)
+        if index >= 0:
+            return self.switch_account(index)
+        logger.error(f"未找到名为 '{account_name}' 的账号")
+        return False
+
+    def get_available_accounts(self) -> list[dict]:
+        """获取所有可用账号的信息"""
+        if not self.config.StartGame.accountManager:
+            return []
+        
+        accounts = []
+        for i, acc in enumerate(self.config.StartGame.accountManager.accounts):
+            accounts.append({
+                "index": i,
+                "name": acc.name,
+                "gameChannel": acc.game_channel
+            })
+        return accounts
 
     def start_game_click(self):
         result, _ = self.operator.wait_ocr_any(["开始游戏", "点击进入"], interval=1, timeout=60, from_x=0.44,

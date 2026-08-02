@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass, field
+from SRACore.models.account_manager import AccountManager
 
 @dataclass
 class TasksConfig:
@@ -56,6 +57,13 @@ class StartGameConfig:
     isReLogin: bool = True
     EncryptedPassword: str = ""
     EncryptedUsername: str = ""
+    # 新增多账号管理功能
+    accountManager: AccountManager = None
+    useMultiAccountMode: bool = False  # 是否使用多账号模式
+
+    def __post_init__(self):
+        if self.accountManager is None:
+            self.accountManager = AccountManager()
 
     def to_dict(self) -> dict:
         """转换为字典"""
@@ -67,12 +75,21 @@ class StartGameConfig:
             "autologin": self.isAutoLogin,
             "relogin": self.isReLogin,
             "password": self.EncryptedPassword,
-            "username": self.EncryptedUsername
+            "username": self.EncryptedUsername,
+            "accountManager": self.accountManager.to_dict(),
+            "useMultiAccountMode": self.useMultiAccountMode
         }
 
     @classmethod
     def from_dict(cls, data: dict):
         """从字典创建对象"""
+        # 处理 accountManager 的反序列化
+        account_manager_data = data.get("accountManager", {})
+        if isinstance(account_manager_data, dict):
+            account_manager = AccountManager.from_dict(account_manager_data)
+        else:
+            account_manager = AccountManager()
+        
         return cls(**{
             "isEnabled": data.get("enabled", True),
             "gameChannel": data.get("game.channel", 0),
@@ -81,8 +98,36 @@ class StartGameConfig:
             "isAutoLogin": data.get("autologin", True),
             "isReLogin": data.get("relogin", True),
             "EncryptedPassword": data.get("password", ""),
-            "EncryptedUsername": data.get("username", "")
+            "EncryptedUsername": data.get("username", ""),
+            "accountManager": account_manager,
+            "useMultiAccountMode": data.get("useMultiAccountMode", False)
         })
+
+    def get_active_username(self) -> str:
+        """获取当前活跃的用户名（支持多账号模式）"""
+        from SRACore.util import encryption
+        if self.useMultiAccountMode and self.accountManager:
+            account = self.accountManager.get_selected_account()
+            if account:
+                return account.get_username()
+        return encryption.decryptor(self.EncryptedUsername)
+
+    def get_active_password(self) -> str:
+        """获取当前活跃的密码（支持多账号模式）"""
+        from SRACore.util import encryption
+        if self.useMultiAccountMode and self.accountManager:
+            account = self.accountManager.get_selected_account()
+            if account:
+                return account.get_password()
+        return encryption.decryptor(self.EncryptedPassword)
+
+    def get_active_game_channel(self) -> int:
+        """获取当前活跃的游戏渠道（支持多账号模式）"""
+        if self.useMultiAccountMode and self.accountManager:
+            account = self.accountManager.get_selected_account()
+            if account:
+                return account.game_channel
+        return self.gameChannel
 
 @dataclass
 class TrailblazePowerConfig:
