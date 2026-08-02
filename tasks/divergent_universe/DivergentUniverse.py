@@ -1,3 +1,4 @@
+import re
 from collections.abc import Callable
 
 from loguru import logger
@@ -217,11 +218,11 @@ class DivergentUniverse(Executable):
 
     def check_point_rewards(self):
         result = self.operator.ocr(from_x=0.1, from_y=0.89, to_x=0.21, to_y=0.96)
-        # 格式 x/18000
+        # 格式 x/18000，OCR可能将结果切断成多个部分或产生噪声，用正则匹配开头和结尾都是18000
         if result:
-            current = result[0][1]
+            current = "".join(item[1] for item in result)
             logger.info(f"当前积分奖励: {current}")
-            if current == '18000/18000':
+            if re.match(r'^18000.*18000$', current):
                 return True
         return False
 
