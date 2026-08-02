@@ -35,15 +35,15 @@ class StartGameTask(BaseTask):
             SGIMG.RESTART_FOR_UPDATE
         ], timeout=120, interval=2)
         if res == 0:
+            # 月卡界面可能因网络波动或设备性能延迟弹出，等待确认
+            if self.operator.wait_img(SGIMG.TRAIN_SUPPLY, timeout=3, interval=1):
+                self._collect_monthly_card()
+                return True
             if self.operator.type == "Browser":
                 self.operator.change_auto_battle(True)  # 云游戏需要在进入游戏后切换自动战斗模式
             return True
         elif res == 1:
-            # 领取月卡
-            self.operator.sleep(1)
-            self.operator.click_point(0.5, 0.6, after_sleep=4)
-            self.operator.click_point(0.5, 0.8, after_sleep=0.2)
-            self.operator.click_point(0.5, 0.5, y_offset=+400)
+            self._collect_monthly_card()
             return True
         elif res == 2:
             logger.error("未能进入游戏，需要下载过往任务资源。")
@@ -58,6 +58,13 @@ class StartGameTask(BaseTask):
         else:
             logger.error(f"未知游戏状态，当前状态码: {res}，预期状态码: 0~3")
             return False
+
+    def _collect_monthly_card(self):
+        """领取月卡奖励"""
+        self.operator.sleep(1)
+        self.operator.click_point(0.5, 0.6, after_sleep=4)
+        self.operator.click_point(0.5, 0.8, after_sleep=0.2)
+        self.operator.click_point(0.5, 0.5, y_offset=+400)
 
     def launch_game(self):
         """启动游戏"""
