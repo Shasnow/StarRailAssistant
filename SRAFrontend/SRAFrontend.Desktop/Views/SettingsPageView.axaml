@@ -70,7 +70,7 @@
                                                       IsChecked="{Binding IsOverlayEnabled}"/>
                                     </Grid>
 
-                                    <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
                                         <Label Classes="Icon">&#xE038;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.RetryAfterTaskFailureText}" />
                                         <ToggleSwitch Grid.Column="2"

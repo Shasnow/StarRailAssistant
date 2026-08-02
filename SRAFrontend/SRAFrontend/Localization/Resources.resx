@@ -290,7 +290,7 @@
         <value>The Path to main.py</value>
     </data>
     <data name="CloudGameText" xml:space="preserve">
-        <value>Use StarRail Cloud Game</value>
+        <value>Use StarRail Cloud Game (Experimental)</value>
     </data>
     <data name="EnableOverlayText" xml:space="preserve">
         <value>Enable Overlay</value>
@@ -542,7 +542,7 @@
         <value>SRA Official Website</value>
     </data>
     <data name="SourceRepositoryText" xml:space="preserve">
-        <value>Open Source Repository (GitHub)</value>
+        <value>GitHub</value>
     </data>
     <data name="MirrorText" xml:space="preserve">
         <value>MirrorChyan</value>

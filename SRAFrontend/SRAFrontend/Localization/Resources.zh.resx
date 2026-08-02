@@ -286,7 +286,7 @@
         <value>主程序路径</value>
     </data>
     <data name="CloudGameText" xml:space="preserve">
-        <value>使用云·星穹铁道</value>
+        <value>使用云·星穹铁道（实验性）</value>
     </data>
     <data name="EnableOverlayText" xml:space="preserve">
         <value>启用叠加层</value>
@@ -538,7 +538,7 @@
         <value>SRA官网</value>
     </data>
     <data name="SourceRepositoryText" xml:space="preserve">
-        <value>开放源代码仓库(GitHub)</value>
+        <value>GitHub</value>
     </data>
     <data name="MirrorText" xml:space="preserve">
         <value>Mirror 酱</value>
