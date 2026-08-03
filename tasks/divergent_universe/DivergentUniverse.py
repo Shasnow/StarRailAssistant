@@ -96,6 +96,7 @@ class DivergentUniverse(Executable):
             ("方程展开", DUIMG.EQUATION_EXPANSION, self.handle_equation_expand, False),
             ("选择站点卡", DUIMG.STATION_SELECT, self.handle_station_select, False),
             ("选择惊世奇迹", DUIMG.SELECT_GRAND_MIRACLE, self.handle_miracle_select, False),
+            ("选择奇迹", DUIMG.SELECT_YOUR_MIRACLE, self.handle_miracle_select, False),
             ("点击空白处关闭", DUIMG.CLOSE, self.handle_close, False),
             ('', DUIMG.DIVERGENT_UNIVERSE_QUIT, None, True),
         ]
