@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -17,10 +17,10 @@ public static class DataPath
 
     public static readonly string ConfigsDir = Path.Combine(AppDataDir, "configs");
     public static readonly string FrontendLogsDir = Path.Combine(AppDataDir, "logs");
+    public static readonly string BackgroundCacheDir = Path.Combine(AppDataDir, "cache", "backgrounds");
     public static readonly string BackendLogsDir = Path.Combine(AppRoot, "log");
     public static readonly string ReportsDir = Path.Combine(AppRoot, "reports");
     public static readonly string SourceCodeDir = Path.Combine(AppRoot, "SRA");
-    public static readonly string StrategiesDir = Path.Combine(AppRoot, "tasks", "currency_wars", "strategies");
     private static readonly string PythonDir = Path.Combine(AppRoot, "python");
 
     public static readonly string SraExecutablePath = GetSraExecutablePath();
@@ -34,6 +34,7 @@ public static class DataPath
         EnsureDirectoryExists(TempDir);
         EnsureDirectoryExists(ConfigsDir);
         EnsureDirectoryExists(FrontendLogsDir);
+        EnsureDirectoryExists(BackgroundCacheDir);
         // EnsureDirectoryExists(PythonDir);
         // EnsureDirectoryExists(BackendLogsDir);
         // EnsureDirectoryExists(ReportsDir);
