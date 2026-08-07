@@ -964,7 +964,8 @@ class CurrencyWars(Executable):
             "盛会之星": self.handle_the_planet_of_festivities,
             "命运卜者": self.handle_fortune_teller,
             "头号玩家": self.handle_silver_wolf_lv999,
-            "领航员": self.handle_choose_partner
+            "领航员": self.handle_choose_partner,
+            "命运圣杯": self.handle_wish_trial,
         }
         event = self.detect_special_event()
 
