@@ -23,9 +23,7 @@ from SRACore.notification.channels import (
 from SRACore.notification.dispatcher import NotificationDispatcher
 from SRACore.notification.http_client import HttpClient
 from SRACore.notification.models import NotificationContext, format_notification_message
-from SRACore.util.data_persister import load_app_settings
 from SRACore.util.logger import logger
-
 
 _cached_game_screenshot_bytes: bytes | None = None
 _notification_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="notify_batch")
@@ -49,11 +47,6 @@ _CHANNEL_LABELS: dict[str, str] = {
 }
 
 
-def load_notification_settings() -> NotificationSettings:
-    settings = load_app_settings()
-    return settings.Notification
-
-
 def build_notification_payload(title: str, message: str, result: str = "success") -> dict[str, str]:
     return {
         "title": title,
@@ -64,14 +57,13 @@ def build_notification_payload(title: str, message: str, result: str = "success"
     }
 
 
-def should_capture_notification_screenshot(config: NotificationSettings | None = None) -> bool:
-    cfg = config or load_notification_settings()
+def should_capture_notification_screenshot(config: NotificationSettings) -> bool:
     return any([
-        cfg.isTelegramEnabled and cfg.isTelegramSendImage,
-        cfg.isOneBotEnabled and cfg.isOneBotSendImage,
-        cfg.isWeComEnabled and cfg.isWeComSendImage,
-        cfg.isDiscordEnabled and cfg.isDiscordSendImage,
-        cfg.isSystemEnabled
+        config.isTelegramEnabled and config.isTelegramSendImage,
+        config.isOneBotEnabled and config.isOneBotSendImage,
+        config.isWeComEnabled and config.isWeComSendImage,
+        config.isDiscordEnabled and config.isDiscordSendImage,
+        config.isSystemEnabled
     ])
 
 
@@ -82,8 +74,8 @@ def clear_cached_game_screenshot() -> None:
     _cached_game_screenshot_bytes = None
 
 
-def try_send_notification(title: str, message: str, result: str = "success", image: Any | None = None) -> None:
-    settings = load_notification_settings()
+def try_send_notification(settings: NotificationSettings,
+                          title: str, message: str, result: str = "success", image: Any | None = None) -> None:
     if not settings.isEnabled:
         return
 
@@ -105,8 +97,8 @@ def try_send_notification(title: str, message: str, result: str = "success", ima
     _notification_executor.submit(_notification_dispatcher.dispatch, context)
 
 
-def send_channel_test_notification(channel: str, settings: NotificationSettings | None = None) -> tuple[str, bool]:
-    cfg = settings or load_notification_settings()
+def send_channel_test_notification(channel: str, settings: NotificationSettings) -> tuple[str, bool]:
+    cfg = settings
     key = channel.strip().lower()
     label = _CHANNEL_LABELS.get(key, "")
     if not label:
@@ -207,7 +199,6 @@ __all__ = [
     "build_notification_payload",
     "clear_cached_game_screenshot",
     "format_notification_message",
-    "load_notification_settings",
     "send_channel_test_notification",
     "should_capture_notification_screenshot",
     "try_send_notification",

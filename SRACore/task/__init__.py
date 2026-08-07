@@ -55,6 +55,7 @@ class BaseTask(Executable, ABC):
 
     def send_notification(self, message: str, result: str, image: Image | None = None) -> None:
         try_send_notification(
+            self.settings.Notification,
             Resource.task_notificationTitle,
             message,
             result=result,

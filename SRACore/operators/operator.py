@@ -14,14 +14,16 @@ from rapidocr import RapidOCR
 
 from SRACore.operators.ioperator import IOperator
 from SRACore.operators.model import Region
+from SRACore.models.app_settings import AppSettings
 from SRACore.util import sys_util
 from SRACore.util.errors import ErrorCode, SRAError, ThreadStoppedError
 from SRACore.util.logger import logger
 
 
 class Operator(IOperator):
-    def __init__(self, ocr_engine: RapidOCR, stop_event: threading.Event | None = None):
-        super().__init__(ocr_engine, stop_event)
+    def __init__(self, ocr_engine: RapidOCR, settings: AppSettings,
+                 stop_event: threading.Event | None = None):
+        super().__init__(ocr_engine, settings, stop_event)
         self.window_title = "崩坏：星穹铁道"
         self.executable = "StarRail.exe"
         self.top = 0

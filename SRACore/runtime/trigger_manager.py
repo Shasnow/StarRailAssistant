@@ -4,6 +4,7 @@ import time
 
 from SRACore.operators.factory import OperatorFactory
 from SRACore.operators.operator import Operator
+from SRACore.models.app_settings import AppSettings
 from SRACore.triggers import AutoPlotTrigger
 from SRACore.triggers.BaseTrigger import BaseTrigger
 from SRACore.util.logger import logger
@@ -12,13 +13,13 @@ from SRACore.util.logger import logger
 class TriggerManager:
     __instance = None
 
-    def __init__(self):
+    def __init__(self, settings: AppSettings):
         self.isRunning = False
         super().__init__()
         self.triggers: list[BaseTrigger] = []
         self._thread: threading.Thread | None = None
         if sys.platform == 'win32':
-            self.register(AutoPlotTrigger(OperatorFactory.get_operator("Local")))
+            self.register(AutoPlotTrigger(OperatorFactory.get_operator("Local", settings)))
 
     def run(self):
         """触发器主循环"""

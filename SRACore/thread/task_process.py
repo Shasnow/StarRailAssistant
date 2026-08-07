@@ -6,9 +6,9 @@ import uuid
 from typing import Any
 
 from SRACore.localization import Resource
-from SRACore.models.app_settings import AppSettings
 from SRACore.notification import try_send_notification
 from SRACore.operators.factory import OperatorFactory, OperatorType
+from SRACore.service.setting_service import SettingsService
 from SRACore.task import BaseTask, get_task_classes
 from SRACore.util import sys_util  # NOQA
 from SRACore.util.data_persister import load_cache, load_config
@@ -32,7 +32,7 @@ class TaskManager:
     支持通过配置动态加载任务列表，并处理任务的中断和错误。
     """
 
-    def __init__(self, settings: AppSettings):
+    def __init__(self, settings_service: SettingsService):
         """
         初始化任务管理器。
         """
@@ -41,8 +41,8 @@ class TaskManager:
         self._thread: threading.Thread | None = None
         self.info = TaskInfo()
         self.task_list: list[type[BaseTask]] = get_task_classes()
-        self.settings: AppSettings = settings
-        self._recovery = TaskRecovery()
+        self.settings_service: SettingsService = settings_service
+        self._recovery = TaskRecovery(settings_service.settings)
         logger.debug(f"Successfully load task: {self.task_list}")
 
     def request_stop(self) -> None:
@@ -80,8 +80,8 @@ class TaskManager:
             return
         logger.warning(Resource.cli_task_requestStop)
         self.request_stop()
-        self._thread.join(timeout=timeout)
-        if self._thread.is_alive():
+        self._thread.join(timeout=timeout)  # pyright: ignore[reportOptionalMemberAccess]
+        if self._thread.is_alive():  # pyright: ignore[reportOptionalMemberAccess]
             logger.warning(Resource.cli_task_timeout)
         else:
             logger.info(Resource.cli_task_stopped)
@@ -110,6 +110,7 @@ class TaskManager:
         4. 任务失败时支持自动重试（重启游戏后从当前配置重新开始）
         """
         self._stop_event.clear()
+        self._recovery.settings = self.settings_service.settings
         self._recovery.reset()
         logger.debug('[Start]')
         self.info.mode = "run"
@@ -220,6 +221,7 @@ class TaskManager:
 
             logger.info("All tasks completed.")
             try_send_notification(
+                self.settings_service.settings.Notification,
                 Resource.task_notificationTitle,
                 Resource.task_notificationMessage,
                 image=last_operator.screenshot() if last_operator else None
@@ -238,8 +240,8 @@ class TaskManager:
         if config is None:
             return None
         try:
-            optype = OperatorType.Browser if self.settings.General.isCloudGameEnabled else OperatorType.Local
-            operator = OperatorFactory.get_operator(optype, self._stop_event)
+            optype = OperatorType.Browser if self.settings_service.settings.General.isCloudGameEnabled else OperatorType.Local
+            operator = OperatorFactory.get_operator(optype, self.settings_service.settings, self._stop_event)
             # StartGameTask 是第一个任务（index=0）
             if len(self.task_list) > 0:
                 return self.task_list[0](operator, config)
@@ -278,8 +280,8 @@ class TaskManager:
         if not task_select:
             return []
         tasks = []
-        optype = OperatorType.Browser if self.settings.General.isCloudGameEnabled else OperatorType.Local
-        operator = OperatorFactory.get_operator(optype, self._stop_event)
+        optype = OperatorType.Browser if self.settings_service.settings.General.isCloudGameEnabled else OperatorType.Local
+        operator = OperatorFactory.get_operator(optype, self.settings_service.settings, self._stop_event)
 
         # 遍历 task_select，根据选择状态实例化对应任务
         for index, is_select in enumerate(task_select):
@@ -386,8 +388,8 @@ class TaskManager:
             print_config["startGame"]["username"] = "******"
             logger.debug('config: ' + str(print_config))
             # 实例化任务类
-            optype = OperatorType.Browser if self.settings.General.isCloudGameEnabled else OperatorType.Local
-            operator = OperatorFactory.get_operator(optype, self._stop_event)
+            optype = OperatorType.Browser if self.settings_service.settings.General.isCloudGameEnabled else OperatorType.Local
+            operator = OperatorFactory.get_operator(optype, self.settings_service.settings, self._stop_event)
             return task_class(operator, config)
         except Exception as e:
             logger.error(Resource.task_instantiateFailed(task, f'{e.__class__.__name__}: {e}'))

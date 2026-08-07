@@ -7,9 +7,7 @@ from typing import Any
 
 from loguru import logger
 
-from SRACore.notification import try_send_notification
 from SRACore.task import BaseTask, task
-
 
 PULL_COST = 160
 
@@ -246,7 +244,7 @@ class WarpForecastTask(BaseTask):
                 image = self.operator.screenshot()
             except Exception:
                 pass
-            try_send_notification("抽卡资源预测", message, result="success", image=image)
+            self.send_notification("抽卡资源预测" + message, "success", image=image)
             logger.info("抽卡资源预测完成")
             return True
         finally:

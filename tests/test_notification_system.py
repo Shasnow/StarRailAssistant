@@ -50,11 +50,9 @@ def test_dispatcher_only_sends_enabled_channels() -> None:
 def test_try_send_notification_uses_context_and_executor(monkeypatch) -> None:
     submitted: list[tuple] = []
     settings = NotificationSettings(isEnabled=True)
-
-    monkeypatch.setattr(service, "load_notification_settings", lambda: settings)
     monkeypatch.setattr(service._notification_executor, "submit", lambda fn, ctx: submitted.append((fn, ctx)))
 
-    service.try_send_notification("title", "message", "success")
+    service.try_send_notification(settings,"title", "message", "success")
 
     assert len(submitted) == 1
     _, context = submitted[0]
@@ -66,17 +64,16 @@ def test_try_send_notification_uses_context_and_executor(monkeypatch) -> None:
 def test_try_send_notification_uses_new_dispatcher(monkeypatch) -> None:
     recorder = _RecorderDispatcher()
     monkeypatch.setattr(service, "_notification_dispatcher", recorder)
-    monkeypatch.setattr(service, "load_notification_settings", lambda: NotificationSettings(isEnabled=True))
     monkeypatch.setattr(service._notification_executor, "submit", lambda fn, ctx: fn(ctx))
 
-    service.try_send_notification("title", "message", "success")
+    service.try_send_notification(NotificationSettings(isEnabled=True), "title", "message", "success")
 
     assert len(recorder.received) == 1
     assert recorder.received[0].title == "title"
 
 
 def test_channel_test_notification_invalid_channel() -> None:
-    label, ok = service.send_channel_test_notification("unknown")
+    label, ok = service.send_channel_test_notification("unknown", NotificationSettings(isEnabled=True))
 
     assert label == ""
     assert ok is False
@@ -133,7 +130,7 @@ def test_channel_test_notification_catches_channel_exception(monkeypatch) -> Non
     monkeypatch.setattr(service, "load_notification_settings", lambda: NotificationSettings(isEnabled=True))
     monkeypatch.setattr(service.logger, "warning", lambda message: warnings.append(str(message)))
 
-    label, ok = service.send_channel_test_notification("email")
+    label, ok = service.send_channel_test_notification("email", NotificationSettings(isEnabled=True))
 
     assert label == "邮件"
     assert ok is False

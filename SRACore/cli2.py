@@ -10,19 +10,20 @@ from SRACore.models.app_settings import AppSettings
 from SRACore.operators.factory import OperatorFactory, OperatorType
 from SRACore.runtime.event_listener import KeyboardListener
 from SRACore.runtime.trigger_manager import TriggerManager
+from SRACore.service.setting_service import SettingsService
 from SRACore.thread.task_process import TaskManager
 from SRACore.util.const import VERSION, CORE
 
 
 class SRACli(cmd2.Cmd):
     DEFAULT_CATEGORY = "Build-in Commands"
-    def __init__(self, settings: AppSettings):
+    def __init__(self, settings_service: SettingsService):
         super().__init__(startup_script=".srarc",
                          auto_load_commands=True)
         self.intro = f"Welcome to SRA-cli (version {VERSION}, core {CORE}). \nType 'help' to list commands."
         self.prompt = 'sra> '
         self.default_error = Resource.cli_defaultError
-        self.settings = settings
+        self.settings_service = settings_service
 
         # 移除不需要的 settable 选项
         # for attr in ["debug", "timing", "quiet", "feedback_to_output",
@@ -35,12 +36,12 @@ class SRACli(cmd2.Cmd):
             if hasattr(cmd2.Cmd, f"do_{cmd_name}"):
                 delattr(cmd2.Cmd, f"do_{cmd_name}")
         # 初始化任务管理器
-        self.task_manager = TaskManager(settings)
+        self.task_manager = TaskManager(settings_service)
         # 初始化触发器管理器
-        self.trigger_manager = TriggerManager()
+        self.trigger_manager = TriggerManager(settings_service.settings)
 
         # 初始化键盘监听器
-        stop_hotkey = settings.General.hotkeyStop.lower() or 'f9'
+        stop_hotkey = settings_service.settings.General.hotkeyStop.lower() or 'f9'
         self.event_listener = KeyboardListener()
         self.event_listener.register_key_event(stop_hotkey, self._task_stop)
         self.event_listener.start()
@@ -297,8 +298,8 @@ class SRACli(cmd2.Cmd):
             self.poutput("--save or --show is required")
             return
         try:
-            optype = OperatorType.Browser if self.settings.General.isCloudGameEnabled else OperatorType.Local
-            img = OperatorFactory.get_operator(optype).screenshot(background=args.background)
+            optype = OperatorType.Browser if self.settings_service.settings.General.isCloudGameEnabled else OperatorType.Local
+            img = OperatorFactory.get_operator(optype, self.settings_service.settings).screenshot(background=args.background)
         except Exception as e:
             self.poutput(f"Failed to take screenshot: {e}")
             return
@@ -321,8 +322,8 @@ class SRACli(cmd2.Cmd):
     def _game_ocr(self, args: argparse.Namespace) -> None:
         import json
         try:
-            optype = OperatorType.Browser if self.settings.General.isCloudGameEnabled else OperatorType.Local
-            operator = OperatorFactory.get_operator(optype)
+            optype = OperatorType.Browser if self.settings_service.settings.General.isCloudGameEnabled else OperatorType.Local
+            operator = OperatorFactory.get_operator(optype, self.settings_service.settings)
             region = args.region
             result = operator.ocr(
                 from_x=region[0] if region else None,
@@ -346,8 +347,8 @@ class SRACli(cmd2.Cmd):
     @cmd2.as_subcommand_to("game", "kill", _build_game_kill_parser, help="终止游戏进程")
     def _game_kill(self, _: argparse.Namespace) -> None:
         try:
-            optype = OperatorType.Browser if self.settings.General.isCloudGameEnabled else OperatorType.Local
-            OperatorFactory.get_operator(optype).kill()
+            optype = OperatorType.Browser if self.settings_service.settings.General.isCloudGameEnabled else OperatorType.Local
+            OperatorFactory.get_operator(optype, self.settings_service.settings).kill()
         except Exception as e:
             self.poutput(f"Failed to kill game process: {e}")
 
@@ -433,7 +434,7 @@ class SRACli(cmd2.Cmd):
             channel = args[1]
             from SRACore.notification import send_channel_test_notification
 
-            label, result = send_channel_test_notification(channel)
+            label, result = send_channel_test_notification(channel, self.settings_service.settings.Notification)
             if label:
                 self.poutput(label + "测试通知发送" + ("成功" if result else "失败"))
             else:

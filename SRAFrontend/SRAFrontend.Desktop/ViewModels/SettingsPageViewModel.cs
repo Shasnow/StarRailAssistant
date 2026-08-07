@@ -367,7 +367,6 @@ public partial class SettingsPageViewModel : PageViewModel
         Resources.Culture = new CultureInfo(DisplaySettings.Language == 0 ? "zh-CN" : "en-US");
         OnPropertyChanged(nameof(IsLanguageNotChinese));
         OnPropertyChanged(nameof(GameChineseLanguageTip));
-        _settingsService.Save();
         _ = AskRestartAsync();
     }
 

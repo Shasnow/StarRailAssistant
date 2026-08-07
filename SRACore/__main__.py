@@ -8,13 +8,13 @@ from pathlib import Path
 sys.path.append(os.getcwd())  # 将当前工作目录添加到 sys.path，以便导入 tasks
 
 from SRACore.localization import Resource
+from SRACore.service.setting_service import SettingsService
 from SRACore.util.const import VERSION
-from SRACore.util.data_persister import load_app_settings
 
 
 def main():
-    settings = load_app_settings()
-    language: int = settings.Display.language
+    settings_service = SettingsService()
+    language: int = settings_service.settings.Display.language
     Resource.set_language(language)
     parser = argparse.ArgumentParser(
         description=Resource.argparse_description,
@@ -50,7 +50,7 @@ def main():
     # 延迟导入 SRACli
     dynamic_import("tasks")  # 动态导入 tasks 包下的所有模块
     from SRACore.cli2 import SRACli
-    cli_instance = SRACli(settings=settings)
+    cli_instance = SRACli(settings_service)
     # 配置交互式模式（隐藏提示符）
     if inline:
         cli_instance.intro = ''

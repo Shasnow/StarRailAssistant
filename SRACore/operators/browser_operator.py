@@ -17,6 +17,7 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
 from SRACore.operators.ioperator import IOperator
+from SRACore.models.app_settings import AppSettings
 from SRACore.util.const import CacheDir
 from SRACore.util.errors import ThreadStoppedError
 
@@ -107,8 +108,9 @@ class WebDriverManager:
 
 
 class BrowserOperator(IOperator):
-    def __init__(self, ocr_engine: RapidOCR, stop_event: threading.Event | None = None):
-        super().__init__(ocr_engine, stop_event)
+    def __init__(self, ocr_engine: RapidOCR, settings: AppSettings,
+                 stop_event: threading.Event | None = None):
+        super().__init__(ocr_engine, settings, stop_event)
         self.type = "Browser"
         self.height = 1080
         self.width = 1920

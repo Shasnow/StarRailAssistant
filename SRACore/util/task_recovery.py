@@ -8,8 +8,8 @@
 import time
 
 from SRACore.localization import Resource
+from SRACore.models.app_settings import AppSettings
 from SRACore.util import sys_util
-from SRACore.util.data_persister import load_app_settings
 from SRACore.util.logger import logger
 
 # 游戏进程名
@@ -23,33 +23,31 @@ class TaskRecovery:
     1. 判断是否应该重试
     2. 杀死游戏进程、等待、重新启动游戏
     3. 跟踪重试次数
-
-    每次判断时从文件重新读取设置，确保前端修改能及时生效。
     """
 
-    def __init__(self):
+    def __init__(self, settings: AppSettings):
+        self._settings = settings
         self._retry_count: int = 0
 
     @property
     def retry_count(self) -> int:
         return self._retry_count
 
-    def _load_retry_settings(self) -> tuple[bool, int]:
-        """从文件读取最新的重试设置"""
-        try:
-            settings = load_app_settings()
-            return settings.General.isRetryOnTaskFailure, settings.General.maxRetryCount
-        except Exception:
-            return False, 0
+    @property
+    def settings(self) -> AppSettings:
+        return self._settings
+
+    @settings.setter
+    def settings(self, value: AppSettings) -> None:
+        self._settings = value
 
     def reset(self) -> None:
         """重置重试计数器（在新一轮任务执行开始时调用）"""
         self._retry_count = 0
 
     def should_retry(self) -> bool:
-        """判断是否还可以重试（每次从文件读取最新设置）"""
-        enabled, max_retries = self._load_retry_settings()
-        return enabled and self._retry_count < max_retries
+        """判断是否还可以重试"""
+        return self._settings.General.isRetryOnTaskFailure and self._retry_count < self._settings.General.maxRetryCount
 
     def prepare_retry(self) -> bool:
         """准备重试：杀死游戏进程并等待
@@ -61,7 +59,7 @@ class TaskRecovery:
             return False
 
         self._retry_count += 1
-        _, max_retries = self._load_retry_settings()
+        max_retries = self._settings.General.maxRetryCount
         logger.warning(
             Resource.task_retryPreparing(self._retry_count, max_retries)
         )

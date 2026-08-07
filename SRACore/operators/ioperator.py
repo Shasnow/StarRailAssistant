@@ -13,8 +13,8 @@ from rapidocr import RapidOCR
 from rapidocr.utils.output import RapidOCROutput
 
 from SRACore.operators.model import Box
+from SRACore.models.app_settings import AppSettings
 from SRACore.util.const import LogsOCRDir
-from SRACore.util.data_persister import load_app_settings
 from SRACore.util.errors import ThreadStoppedError
 
 type Waitable = Callable[[], Box | None]
@@ -22,9 +22,10 @@ type Waitable = Callable[[], Box | None]
 
 class IOperator(ABC):
 
-    def __init__(self, ocr_engine: RapidOCR, stop_event: threading.Event | None = None):
+    def __init__(self, ocr_engine: RapidOCR, settings: AppSettings,
+                 stop_event: threading.Event | None = None):
         self.type = "Local"
-        self.settings = load_app_settings()
+        self.settings = settings
         self.tm_confidence: float = self.settings.General.templateMatchConfidence
         self.ocr_confidence: float = self.settings.General.ocrMatchConfidence
         self.top = 0

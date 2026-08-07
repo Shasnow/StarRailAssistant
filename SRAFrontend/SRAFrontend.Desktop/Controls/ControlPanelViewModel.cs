@@ -106,7 +106,7 @@ public partial class ControlPanelViewModel : ViewModelBase
     {
         _cacheService.SaveCache();
         _configService.Save();
-        _settingsService.Save();
+        // _settingsService.Save();
     }
 
     [RelayCommand]
