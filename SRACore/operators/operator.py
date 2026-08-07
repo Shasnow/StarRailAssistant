@@ -39,7 +39,7 @@ class Operator(IOperator):
         self._win = None
         self._hwnd = 0
         try:
-            windows: list[pygetwindow.Win32Window] = pygetwindow.getWindowsWithTitle(self.window_title) # type: ignore
+            windows: list[pygetwindow.Win32Window] = pygetwindow.getWindowsWithTitle(self.window_title)  # type: ignore
             for w in windows:
                 if w.title == self.window_title:
                     self._win = w
@@ -53,7 +53,7 @@ class Operator(IOperator):
         hwnd = self._get_hwnd()
         if not hwnd:
             return False
-        return self._win.isActive # type: ignore
+        return self._win.isActive  # type: ignore
 
     def launch(self, channel, path):
         if sys_util.is_process_running(self.executable):
@@ -97,6 +97,14 @@ class Operator(IOperator):
         logger.info("游戏启动命令已执行")
         return True
 
+    def kill(self):
+        if sys_util.task_kill(self.executable):
+            logger.info(f"已终止游戏进程 {self.executable}")
+        else:
+            logger.info(f"未找到运行中的游戏进程 {self.executable}")
+        self._hwnd = 0
+        self._win = None
+
     @staticmethod
     def change_config_ini(path: Path, channel, sub_channel):
         """修改配置文件"""
@@ -119,14 +127,15 @@ class Operator(IOperator):
 
     def get_win_region(self, active_window: bool = True) -> Region:
         hwnd = self._get_hwnd()
-        if active_window and self._win is not None and not self._win.isActive: # type: ignore
+        if active_window and self._win is not None and not self._win.isActive:  # type: ignore
             self.press_key("ctrl")  # 通过模拟键使系统认为是“用户操作”，从而允许 SetForegroundWindow
             self._win.activate()
         region = self._get_client_region(hwnd)
         if region is None:
-            raise SRAError(
-                ErrorCode.WINDOW_REGION_INVALID,
-                f"无法获取窗口客户区域 '{self.window_title}' 句柄 '{hwnd}'", "窗口可能被最小化")
+            if hwnd == 0:
+                raise RuntimeError(f"无法获取窗口客户区域 '{self.window_title}' 句柄 '{hwnd}', 请检查游戏是否已启动")
+            else:
+                raise RuntimeError(f"无法获取窗口客户区域 '{self.window_title}' 句柄 '{hwnd}', 窗口可能被最小化")
         return region
 
     def _get_client_region(self, hwnd: int) -> Region | None:
@@ -174,7 +183,7 @@ class Operator(IOperator):
         """
         if background and sys.platform == "win32":
             # noinspection PyPackageRequirements
-            import win32gui # (in pywin32)
+            import win32gui  # (in pywin32)
             import win32ui
             import ctypes
             from PIL import Image

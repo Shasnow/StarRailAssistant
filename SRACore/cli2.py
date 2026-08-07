@@ -337,6 +337,19 @@ class SRACli(cmd2.Cmd):
         except Exception as e:
             self.poutput(f"OCR Error: {e}")
 
+    @staticmethod
+    def _build_game_kill_parser() -> cmd2.Cmd2ArgumentParser:
+        game_kill_description = Text.assemble("终止游戏进程")
+        game_kill_parser = cmd2.Cmd2ArgumentParser(description=game_kill_description)
+        return game_kill_parser
+
+    @cmd2.as_subcommand_to("game", "kill", _build_game_kill_parser, help="终止游戏进程")
+    def _game_kill(self, _: argparse.Namespace) -> None:
+        try:
+            optype = OperatorType.Browser if self.settings.General.isCloudGameEnabled else OperatorType.Local
+            OperatorFactory.get_operator(optype).kill()
+        except Exception as e:
+            self.poutput(f"Failed to kill game process: {e}")
 
     # endregion
 

@@ -480,3 +480,8 @@ class BrowserOperator(IOperator):
     def scroll(self, distance: int) -> bool:
         ActionChains(self.driver).scroll_by_amount(0, -distance).perform()
         return True
+
+    def kill(self):
+        browser_type = BrowserType(self.settings.General.cloudGameBrowser)
+        WebDriverManager.close_browser(browser_type)
+        self._driver = None  # pyright: ignore[reportAttributeAccessIssue]

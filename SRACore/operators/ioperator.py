@@ -55,6 +55,10 @@ class IOperator(ABC):
         """
         ...
 
+    def kill(self):
+        """终止目标应用程序"""
+        ...
+
     def login(self, account, password):
         ...
 
