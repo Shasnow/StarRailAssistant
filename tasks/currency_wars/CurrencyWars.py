@@ -1106,6 +1106,9 @@ class CurrencyWars(Executable):
 
     def load_strategy(self, name: str):
         """加载攻略文件"""
+        if not name.strip():
+            logger.warning("未指定攻略文件名，将使用默认策略")
+            name = "template"
         if ".json" in name:
             path = name
         else:
