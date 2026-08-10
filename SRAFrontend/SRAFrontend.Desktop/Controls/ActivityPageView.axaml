@@ -1,0 +1,93 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:controls="clr-namespace:SRAFrontend.Desktop.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="520"
+             Width="800" Height="520"
+             x:Class="SRAFrontend.Desktop.Controls.ActivityPageView"
+             x:DataType="controls:ActivityPageViewModel"
+             x:CompileBindings="True">
+    <suki:BusyArea IsBusy="{Binding IsLoading}">
+        <Grid ColumnDefinitions="Auto,*" Margin="16">
+            <!-- 左侧：版本信息 + 日历 -->
+            <StackPanel Grid.Column="0" Spacing="12" Margin="0,0,16,0">
+                <!-- 版本信息卡片 -->
+                <suki:GlassCard Padding="16">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock FontSize="24" FontWeight="Bold" VerticalAlignment="Center"
+                                       Text="{Binding VersionNumber}" />
+                            <TextBlock FontSize="18" Opacity="0.7" VerticalAlignment="Center"
+                                       Text="版本" />
+                        </StackPanel>
+                        <TextBlock FontSize="18" Text="{Binding VersionName}" />
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <TextBlock Opacity="0.6" Text="{Binding VersionTimeRange}" />
+                            <TextBlock FontWeight="Bold" Text="{Binding VersionRemaining}" />
+                        </StackPanel>
+                    </StackPanel>
+                </suki:GlassCard>
+
+                <!-- 日历控件 -->
+                <suki:GlassCard Padding="8">
+                    <Calendar SelectedDate="{Binding SelectedDate}"
+                              DisplayDate="{Binding DisplayDate}"
+                              HorizontalAlignment="Center" />
+                </suki:GlassCard>
+            </StackPanel>
+
+            <!-- 右侧：选中日期活动详情 -->
+            <suki:GlassCard Grid.Column="1" Padding="16">
+                <DockPanel>
+                    <!-- 固定日期标题 -->
+                    <TextBlock DockPanel.Dock="Top" FontSize="18" FontWeight="Bold" Margin="0,0,0,8"
+                               Text="{Binding SelectedDate, Converter={x:Static controls:DateToStringConverter.Instance}}" />
+
+                    <!-- 活动列表（可滚动） -->
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="8">
+                            <ItemsControl ItemsSource="{Binding SelectedDateActivities}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="10" Margin="0,2"
+                                                Background="{Binding StatusBrush}"
+                                                CornerRadius="6">
+                                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="4">
+                                                <TextBlock Grid.Row="0" Grid.Column="0"
+                                                           FontSize="15" FontWeight="Bold"
+                                                           Text="{Binding Name}" />
+                                                <TextBlock Grid.Row="1" Grid.Column="0"
+                                                           FontSize="12" Opacity="0.8"
+                                                           Text="{Binding TimeRange}" />
+                                                <TextBlock Grid.Row="2" Grid.Column="0"
+                                                           IsVisible="{Binding HasDescription}"
+                                                           FontSize="12" Opacity="0.9"
+                                                           Text="{Binding DescriptionPreview}" />
+                                                <StackPanel Grid.Row="0" Grid.RowSpan="3" Grid.Column="1"
+                                                            VerticalAlignment="Center" HorizontalAlignment="Right">
+                                                    <TextBlock FontSize="13" FontWeight="Bold"
+                                                               Text="{Binding Status}" />
+                                                    <TextBlock FontSize="11" Opacity="0.8"
+                                                               Text="{Binding Countdown}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- 空状态提示 -->
+                            <TextBlock IsVisible="{Binding SelectedDateActivities.Count, Converter={x:Static controls:ZeroToBooleanConverter.Instance}}"
+                                       Text="当天暂无活动"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Opacity="0.5" FontSize="14"
+                                       Margin="0,40" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
+            </suki:GlassCard>
+        </Grid>
+    </suki:BusyArea>
+</UserControl>

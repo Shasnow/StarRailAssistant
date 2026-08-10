@@ -25,6 +25,9 @@
         <Button Classes="WindowControlsButton" Command="{Binding ShowAnnouncementBoardCommand}" ToolTip.Tip="公告">
             <Label Classes="Icon" Content="&#xE324;" />
         </Button>
+        <Button Classes="WindowControlsButton" Command="{Binding ShowActivityCommand}" ToolTip.Tip="活动">
+            <Label Classes="Icon" Content="&#xE7B4;" />
+        </Button>
     </suki:SukiWindow.RightWindowTitleBarControls>
 
     <suki:SukiSideMenu ItemsSource="{Binding Pages}">

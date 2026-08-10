@@ -1,12 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SRAFrontend.Desktop.Controls;
 using SRAFrontend.Localization;
+using SRAFrontend.Services;
 using SRAFrontend.Utils;
 using SukiUI;
+using SukiUI.Controls;
+using SukiUI.MessageBox;
 using SukiUI.Toasts;
 
 namespace SRAFrontend.Desktop.ViewModels;
@@ -14,6 +18,7 @@ namespace SRAFrontend.Desktop.ViewModels;
 public partial class MainWindowViewModel(
     IEnumerable<PageViewModel> pages,
     CommonModel commonModel,
+    ActivityService activityService,
     ISukiToastManager toastManager)
     : ViewModelBase
 {
@@ -93,5 +98,17 @@ public partial class MainWindowViewModel(
     private void ShowAnnouncementBoard()
     {
         commonModel.ShowAnnouncementBoard();
+    }
+
+    [RelayCommand]
+    private void ShowActivity()
+    {
+        var viewModel = new ActivityPageViewModel(activityService);
+        var view = new ActivityPageView { DataContext = viewModel };
+        SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+        {
+            Header = "活动日历",
+            Content = view
+        });
     }
 }
