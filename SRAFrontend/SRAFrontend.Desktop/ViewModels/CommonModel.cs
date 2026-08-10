@@ -253,8 +253,30 @@ public class CommonModel(
             toastManager.Dismiss(downloadToast);
         }
 
-        ShowSuccessToast("下载完成", "更新包将在3秒后解压");
-        await Task.Delay(3000);
+        ShowSuccessToast("下载完成", "更新包已就绪");
+        if (!settingsService.Settings.Update.IsAutoUpdate)
+        {
+            var extractNowButton =
+                SukiMessageBoxButtonsFactory.CreateButton("立即解压", SukiMessageBoxResult.Yes, "Flat Accent");
+            var extractLaterButton =
+                SukiMessageBoxButtonsFactory.CreateButton("稍后", SukiMessageBoxResult.Cancel);
+            var extractResult = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+            {
+                Header = "更新包已下载完成",
+                Content = "解压过程将短暂停止后端服务，是否现在开始解压？",
+                ActionButtonsSource = [extractNowButton, extractLaterButton]
+            });
+            if (extractResult is not SukiMessageBoxResult.Yes)
+            {
+                ShowInfoToast("已推迟解压", "可稍后重新检查更新以继续");
+                return;
+            }
+        }
+        else
+        {
+            ShowInfoToast("即将开始解压", "更新包将在3秒后解压");
+            await Task.Delay(3000);
+        }
         backendService.StopBackend();
         if (isHotfix)
         {
