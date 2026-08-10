@@ -119,8 +119,8 @@
                                                     <Label Grid.Column="1" Content="{x:Static lang:Resources.DisplayModeText}" />
                                                     <ComboBox Grid.Column="2"
                                                               SelectedItem="{Binding GeneralSettings.GameArgsFullScreenMode}">
-                                                        <system:String>{x:Static lang:Resources.WindowedText}</system:String>
-                                                        <system:String>{x:Static lang:Resources.FullScreenText}</system:String>
+                                                        <system:String>窗口化</system:String>
+                                                        <system:String>全屏幕</system:String>
                                                     </ComboBox>
                                                 </Grid>
 

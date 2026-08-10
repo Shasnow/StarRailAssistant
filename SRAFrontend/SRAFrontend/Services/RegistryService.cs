@@ -158,7 +158,7 @@ public class RegistryService(
             var w = int.TryParse(size[0], out var width) ? width : 1920;
             var h = int.TryParse(size[1], out var height) ? height : 1080;
 
-            var fullscreenMode = settingsService.Settings.General.GameArgsFullScreenMode == "全屏" ? 1 : 3;
+            var fullscreenMode = settingsService.Settings.General.GameArgsFullScreenMode == "全屏幕" ? 1 : 3;
             var isFull = fullscreenMode != 3;
 
             logger.LogInformation("Write resolution {W}x{H} Fullscreen:{Full}", w, h, isFull);
