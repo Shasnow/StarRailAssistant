@@ -22,6 +22,7 @@
 打包
 """
 
+import hashlib
 import json
 import os
 import shutil
@@ -48,25 +49,19 @@ if SITE_PACKAGES_DIR is None:
     print(f"[ERROR] Could not find site-packages directory in sys.path: {sys.path}")
     sys.exit(1)
 
-def add_to_zip(zipf: ZipFile, path: Path, base_path: Path | None = None):
-    if base_path is None:
-        base_path = path.parent
-    if not path.exists():
-        print(f"  [WARN] Skipping non-existent path: {path}")
-        return
-    if path.is_file():
-        zipf.write(path, path.relative_to(base_path))
-        return
-    for file in sorted(path.rglob("*")):
-        if file.is_file():
-            zipf.write(file, file.relative_to(base_path))
-
-
 class ZipBuilder:
     """增量构建 zip：收集文件条目，不同阶段快照写入不同 zip。"""
 
     def __init__(self):
         self._entries: dict[str, Path] = {}  # arcname -> source path
+
+    @staticmethod
+    def _md5(path: Path) -> str:
+        h = hashlib.md5()
+        with open(path, "rb") as f:
+            for chunk in iter(lambda: f.read(65536), b""):
+                h.update(chunk)
+        return h.hexdigest()
 
     def add(self, path: Path, base_path: Path | None = None):
         if base_path is None:
@@ -85,10 +80,15 @@ class ZipBuilder:
         self._entries[arcname] = file
 
     def snapshot(self, zip_path: Path):
-        """将当前所有条目写入 zip 文件。"""
+        """将当前所有条目写入 zip 文件，并输出 MD5 校验文件。"""
+        md5_dict: dict[str, str] = {}
         with ZipFile(zip_path, "w", compression=ZIP_DEFLATED) as zipf:
             for arcname, src in self._entries.items():
                 zipf.write(src, arcname)
+                md5_dict[arcname] = self._md5(src)
+        md5_path = zip_path.with_suffix(".md5.json")
+        with open(md5_path, "w", encoding="utf-8") as f:
+            json.dump(md5_dict, f, indent=2, ensure_ascii=False)
         print(f"[OK] {zip_path.name} ({len(self._entries)} files)")
 
 
@@ -168,14 +168,14 @@ def copy_core_resources(dist: Path):
 def package_lite(version: str):
     print("Packaging Lite ...")
     lite_zip_path = ROOT_PATH / f"StarRailAssistant_Lite_v{version}.zip"
-    with ZipFile(lite_zip_path, "w", compression=ZIP_DEFLATED) as zipf:
-        for file in DESKTOP_WIN_X64_PUBLISH_PATH.iterdir():
-            add_to_zip(zipf, file)
-        for item in ["SRACore", "tasks", "resources"]:
-            add_to_zip(zipf, ROOT_PATH / item)
-        for file in ["main.py", "README.md", "LICENSE", "requirements.txt", "requirements-linux.txt"]:
-            add_to_zip(zipf, ROOT_PATH / file)
-    print(f"[OK] Lite package: {lite_zip_path.name}")
+    builder = ZipBuilder()
+    for file in DESKTOP_WIN_X64_PUBLISH_PATH.iterdir():
+        builder.add(file)
+    for item in ["SRACore", "tasks", "resources"]:
+        builder.add(ROOT_PATH / item)
+    for file in ["main.py", "README.md", "LICENSE", "requirements.txt", "requirements-linux.txt"]:
+        builder.add(ROOT_PATH / file)
+    builder.snapshot(lite_zip_path)
 
 
 def build_webui():
