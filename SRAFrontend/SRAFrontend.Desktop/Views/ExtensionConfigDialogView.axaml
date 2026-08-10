@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:viewModels="clr-namespace:SRAFrontend.Desktop.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="500"
+             Width="450" Height="500"
+             x:Class="SRAFrontend.Desktop.Views.ExtensionConfigDialogView"
+             x:DataType="viewModels:ExtensionConfigDialogViewModel">
+    <UserControl.DataTemplates>
+        <DataTemplate DataType="viewModels:StringFieldViewModel">
+            <StackPanel Spacing="4" Margin="0,6" ToolTip.Tip="{Binding Description}">
+                <Label Content="{Binding Label}" FontSize="14"/>
+                <TextBlock Text="{Binding Description}" FontSize="12"
+                           Opacity="0.6" TextWrapping="Wrap"
+                           IsVisible="{Binding HasDescription}"/>
+                <TextBox Text="{Binding Value}" Watermark="请输入文本"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="viewModels:IntegerFieldViewModel">
+            <StackPanel Spacing="4" Margin="0,6" ToolTip.Tip="{Binding Description}">
+                <Label Content="{Binding Label}" FontSize="14"/>
+                <TextBlock Text="{Binding Description}" FontSize="12"
+                           Opacity="0.6" TextWrapping="Wrap"
+                           IsVisible="{Binding HasDescription}"/>
+                <NumericUpDown Value="{Binding Value}"
+                               Minimum="{Binding Minimum}"
+                               Maximum="{Binding Maximum}"
+                               FormatString="0"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="viewModels:BooleanFieldViewModel">
+            <StackPanel Spacing="4" Margin="0,6" ToolTip.Tip="{Binding Description}">
+                <Label Content="{Binding Label}" FontSize="14"/>
+                <TextBlock Text="{Binding Description}" FontSize="12"
+                           Opacity="0.6" TextWrapping="Wrap"
+                           IsVisible="{Binding HasDescription}"/>
+                <ToggleSwitch IsChecked="{Binding Value}"/>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.DataTemplates>
+    <suki:BusyArea IsBusy="{Binding IsLoading}" BusyText="加载配置中...">
+        <DockPanel Margin="16">
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                        HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+                <Button Content="保存" Classes="Accent" Command="{Binding SaveCommand}"/>
+                <Button Content="取消" Classes="Flat"/>
+            </StackPanel>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Fields}"/>
+            </ScrollViewer>
+        </DockPanel>
+    </suki:BusyArea>
+</UserControl>

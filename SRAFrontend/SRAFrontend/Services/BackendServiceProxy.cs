@@ -130,6 +130,21 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         return _currentBackend.GetGameScreenshotBytesAsync();
     }
 
+    public Task<List<ExtensionInfo>> GetExtensionsAsync()
+    {
+        return _currentBackend.GetExtensionsAsync();
+    }
+
+    public Task<ExtensionSchema?> GetExtensionSchemaAsync(string extensionId)
+    {
+        return _currentBackend.GetExtensionSchemaAsync(extensionId);
+    }
+
+    public Task<string?> GetExtensionConfigAsync(string extensionId)
+    {
+        return _currentBackend.GetExtensionConfigAsync(extensionId);
+    }
+
     private void ApplyPythonSettings()
     {
         var pythonPath = settingsService.Settings.Advanced.PythonPath;

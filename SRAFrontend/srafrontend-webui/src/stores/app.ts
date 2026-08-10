@@ -233,17 +233,6 @@ export const useAppStore = defineStore('app', () => {
     }, '自动对话设置已应用')
   }
 
-  async function runWarpForecast() {
-    await runAction(async () => {
-      if (!settingsModel.value) throw new Error('设置尚未加载')
-      const body = prepareSettingsForSave(settingsModel.value, emailAuthCodeDraft.value)
-      await settingsApi.saveSettings(body)
-      settingsText.value = JSON.stringify(body, null, 2)
-      await extensionsApi.runWarpForecast()
-      await loadStatus()
-    }, '抽卡资源预测已启动')
-  }
-
   function syncJsonFromForm() {
     if (!configModel.value) return
     configText.value = JSON.stringify(prepareConfigForSave(configModel.value, {
@@ -301,7 +290,7 @@ export const useAppStore = defineStore('app', () => {
     // Actions
     loadStatus, loadConfigs, loadConfigDetail, loadMetadata, loadSettings, loadLogs,
     refreshAll, saveConfig, saveSettings, saveSettingsGui, createConfig,
-    startTask, stopTask, saveAutoPlot, runWarpForecast,
+    startTask, stopTask, saveAutoPlot,
     syncJsonFromForm, applyJsonToForm, syncSettingsJsonFromForm, applySettingsJsonToForm,
     updateGamePaths
   }

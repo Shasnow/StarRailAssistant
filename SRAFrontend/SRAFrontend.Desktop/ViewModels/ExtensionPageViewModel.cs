@@ -1,44 +1,72 @@
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Data;
-using SRAFrontend.Models;
 using SRAFrontend.Services;
 
 namespace SRAFrontend.Desktop.ViewModels;
 
-public partial class ExtensionPageViewModel(IBackendService backendService, SettingsService settingsService) : PageViewModel(PageName.Extension, "\uE596")
+public partial class ExtensionPageViewModel(IBackendService backendService)
+    : PageViewModel(PageName.Extension, "\uE596")
 {
-    private bool _enableAutoPlot;
-
-    private bool _skipPlot;
-
-    public WarpForecastSettings WarpForecastSettings => settingsService.Settings.WarpForecast;
-
     public bool EnableAutoPlot
     {
-        get => _enableAutoPlot;
+        get;
         set
         {
-            _enableAutoPlot = value;
+            field = value;
             OnPropertyChanged();
-            _ = backendService.SendInputAsync(value ? "trigger enable AutoPlotTrigger" : "trigger disable AutoPlotTrigger");
+            _ = backendService.SendInputAsync(value
+                ? "trigger enable AutoPlotTrigger"
+                : "trigger disable AutoPlotTrigger");
         }
     }
 
     public bool SkipPlot
     {
-        get => _skipPlot;
+        get;
         set
         {
-            _skipPlot = value;
+            field = value;
             OnPropertyChanged();
             _ = backendService.SendInputAsync($"trigger set AutoPlotTrigger skip_plot --type bool {value}");
         }
     }
 
+    [ObservableProperty] private bool _isLoadingExtensions;
+
+    public ObservableCollection<ExtensionCardViewModel> Extensions { get; } = [];
+
+    /// <summary>
+    /// 自动加载（页面导航时调用），30秒内跳过
+    /// </summary>
     [RelayCommand]
-    private async Task RunWarpForecastAsync()
+    private async Task LoadExtensionsAsync()
     {
-        await backendService.TaskSingleAsync("WarpForecastTask");
+        if (Extensions.Count > 0)
+            return;
+        await RefreshExtensionsAsync();
+    }
+
+    /// <summary>
+    /// 手动刷新（用户点击刷新按钮），无视缓存
+    /// </summary>
+    [RelayCommand]
+    private async Task RefreshExtensionsAsync()
+    {
+        if (IsLoadingExtensions) return;
+        IsLoadingExtensions = true;
+        try
+        {
+            var extensions = await backendService.GetExtensionsAsync();
+            Extensions.Clear();
+            foreach (var info in extensions)
+                Extensions.Add(new ExtensionCardViewModel(info, backendService));
+        }
+        finally
+        {
+            IsLoadingExtensions = false;
+        }
     }
 }

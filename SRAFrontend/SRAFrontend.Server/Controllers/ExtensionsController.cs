@@ -31,18 +31,6 @@ public class ExtensionsController(IBackendService backendService) : Controller
         return Ok(new R(triggerSent && skipSent, triggerSent && skipSent ? "Auto plot updated" : "Failed to update auto plot"));
     }
 
-    [HttpPost("warp-forecast/run")]
-    [ProducesResponseType(200, Type = typeof(R))]
-    [ProducesResponseType(500)]
-    public async Task<IActionResult> RunWarpForecast()
-    {
-        if (OperatingSystem.IsWindows() && !IsAdministrator())
-            return StatusCode(500, new R(false, "WebUI must be running as administrator before it can start SRA-cli tasks."));
-
-        var sent = await backendService.TaskSingleAsync("WarpForecastTask");
-        return Ok(sent ? new R(true, "Warp forecast task started") : new R(false, "Failed to start warp forecast task"));
-    }
-
     private async Task<bool> WaitForBackendReadyAsync()
     {
         var deadline = DateTimeOffset.UtcNow + BackendStartTimeout;

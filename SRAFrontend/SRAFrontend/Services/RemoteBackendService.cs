@@ -163,6 +163,24 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         return Task.FromResult(Array.Empty<byte>());
     }
 
+    public Task<List<ExtensionInfo>> GetExtensionsAsync()
+    {
+        logger.LogWarning("GetExtensions is not implemented for remote backend");
+        return Task.FromResult(new List<ExtensionInfo>());
+    }
+
+    public Task<ExtensionSchema?> GetExtensionSchemaAsync(string extensionId)
+    {
+        logger.LogWarning("GetExtensionSchema is not implemented for remote backend");
+        return Task.FromResult<ExtensionSchema?>(null);
+    }
+
+    public Task<string?> GetExtensionConfigAsync(string extensionId)
+    {
+        logger.LogWarning("GetExtensionConfig is not implemented for remote backend");
+        return Task.FromResult<string?>(null);
+    }
+
     public Task<bool> SendInputAsync(string input)
     {
         logger.LogWarning("SendInput is not implemented for remote backend");

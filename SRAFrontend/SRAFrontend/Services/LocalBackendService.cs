@@ -231,6 +231,41 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         return screenshotBytes;
     }
 
+    public async Task<List<ExtensionInfo>> GetExtensionsAsync()
+    {
+        var json = await SendCommandAndWaitOutputAsync("extension list --json");
+        if (json == null) return [];
+        try
+        {
+            return JsonSerializer.Deserialize<List<ExtensionInfo>>(json) ?? [];
+        }
+        catch (JsonException ex)
+        {
+            logger.LogError(ex, "Failed to parse extensions JSON");
+            return [];
+        }
+    }
+
+    public async Task<ExtensionSchema?> GetExtensionSchemaAsync(string extensionId)
+    {
+        var json = await SendCommandAndWaitOutputAsync($"extension info {extensionId} --json");
+        if (json == null) return null;
+        try
+        {
+            return JsonSerializer.Deserialize<ExtensionSchema>(json);
+        }
+        catch (JsonException ex)
+        {
+            logger.LogError(ex, "Failed to parse extension schema JSON");
+            return null;
+        }
+    }
+
+    public async Task<string?> GetExtensionConfigAsync(string extensionId)
+    {
+        return await SendCommandAndWaitOutputAsync($"extension config get {extensionId} --json");
+    }
+
     private async Task<string?> SendCommandAndWaitOutputAsync(string command)
     {
         await _commandLock.WaitAsync();

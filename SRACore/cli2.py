@@ -5,12 +5,15 @@ import cmd2
 from loguru import logger
 from rich.text import Text
 
+from SRACore.extension import (ExtensionConfigManager, ExtensionRunner,
+                               load_extensions)
 from SRACore.localization import Resource
 from SRACore.models.app_settings import AppSettings
 from SRACore.operators.factory import OperatorFactory, OperatorType
 from SRACore.runtime.event_listener import KeyboardListener
 from SRACore.runtime.trigger_manager import TriggerManager
 from SRACore.service.setting_service import SettingsService
+from SRACore.task import BaseTask
 from SRACore.thread.task_process import TaskManager
 from SRACore.util.const import VERSION, CORE
 
@@ -39,6 +42,11 @@ class SRACli(cmd2.Cmd):
         self.task_manager = TaskManager(settings_service)
         # 初始化触发器管理器
         self.trigger_manager = TriggerManager(settings_service.settings)
+
+        # 初始化扩展系统：动态导入扩展模块并创建运行器
+        load_extensions()
+        self.extension_config_manager = ExtensionConfigManager()
+        self.extension_runner = ExtensionRunner(self.extension_config_manager, settings_service)
 
         # 初始化键盘监听器
         stop_hotkey = settings_service.settings.General.hotkeyStop.lower() or 'f9'
@@ -267,6 +275,210 @@ class SRACli(cmd2.Cmd):
                 logger.info(Resource.cli_trigger_attrSet(args.name, args.attr, args.value))
                 return
         self.poutput(Resource.cli_trigger_notFound(args.name))
+
+    # endregion
+
+    # region 扩展管理
+
+    @staticmethod
+    def _build_extension_parser() -> cmd2.Cmd2ArgumentParser:
+        extension_parser = cmd2.Cmd2ArgumentParser(description="扩展管理：查看、运行已注册的扩展")
+        extension_parser.add_subparsers(metavar="SUBCOMMAND", required=True)
+        return extension_parser
+
+    @cmd2.with_argparser(_build_extension_parser)
+    def do_extension(self, args: argparse.Namespace) -> None:
+        args.cmd2_subcommand_func(args)
+
+    @staticmethod
+    def _build_extension_list_parser() -> cmd2.Cmd2ArgumentParser:
+        parser = cmd2.Cmd2ArgumentParser(description="列出所有已注册的扩展")
+        parser.add_argument('--json', action='store_true', help="以单行 JSON 格式输出")
+        return parser
+
+    @cmd2.as_subcommand_to("extension", "list", _build_extension_list_parser, help="列出所有已注册的扩展")
+    def _extension_list(self, args: argparse.Namespace) -> None:
+        import json
+
+        from SRACore.extension import extension_registry
+
+        ids = extension_registry.get_ids()
+        if not ids:
+            self.poutput("没有已注册的扩展")
+            return
+        if args.json:
+            data = []
+            for ext_id in ids:
+                entry = extension_registry.get(ext_id)
+                data.append({
+                    "id": ext_id, "name": entry.name, "description": entry.description,
+                    "extension_class": entry.extension_cls.__name__,
+                    "config_class": entry.config_cls.__name__,
+                })
+            self.poutput(json.dumps(data, ensure_ascii=False))
+        else:
+            self.poutput(f"已注册 {len(ids)} 个扩展：")
+            for ext_id in ids:
+                entry = extension_registry.get(ext_id)
+                desc = f"  - {entry.description}" if entry.description else ""
+                self.poutput(f"  {ext_id} ({entry.name})  ->  {entry.extension_cls.__name__}"
+                             f" (config: {entry.config_cls.__name__}){desc}")
+
+    @staticmethod
+    def _build_extension_run_parser() -> cmd2.Cmd2ArgumentParser:
+        parser = cmd2.Cmd2ArgumentParser(description="运行指定的扩展")
+        parser.add_argument('name', help="扩展标识（可通过 extension list 查看）")
+        parser.add_argument('--config', help="扩展配置文件名（不带 .json 后缀），不指定则不加载文件配置")
+        return parser
+
+    @cmd2.as_subcommand_to("extension", "run", _build_extension_run_parser, help="运行指定的扩展")
+    def _extension_run(self, args: argparse.Namespace) -> None:
+        from SRACore.extension import extension_registry
+
+        if not extension_registry.has_id(args.name):
+            self.poutput(f"扩展 '{args.name}' 不存在，使用 'extension list' 查看可用扩展")
+            return
+        if args.config:
+            self.extension_config_manager.load(args.config)
+        result = self.extension_runner.run(args.name)
+        self.poutput(f"扩展 '{args.name}' 执行{'成功' if result else '失败'}")
+
+    @staticmethod
+    def _build_extension_run_all_parser() -> cmd2.Cmd2ArgumentParser:
+        parser = cmd2.Cmd2ArgumentParser(description="运行所有已注册的扩展")
+        parser.add_argument('--config', help="扩展配置文件名（不带 .json 后缀），不指定则不加载文件配置")
+        return parser
+
+    @cmd2.as_subcommand_to("extension", "run-all", _build_extension_run_all_parser, help="运行所有已注册的扩展")
+    def _extension_run_all(self, args: argparse.Namespace) -> None:
+        from SRACore.extension import extension_registry
+
+        if not extension_registry.get_ids():
+            self.poutput("没有已注册的扩展")
+            return
+        if args.config:
+            self.extension_config_manager.load(args.config)
+        results = self.extension_runner.run_all()
+        for key, ok in results.items():
+            self.poutput(f"  {key}: {'成功' if ok else '失败'}")
+        succeeded = sum(1 for v in results.values() if v)
+        self.poutput(f"共 {len(results)} 个扩展，{succeeded} 个成功")
+
+    @staticmethod
+    def _build_extension_info_parser() -> cmd2.Cmd2ArgumentParser:
+        parser = cmd2.Cmd2ArgumentParser(description="显示扩展的配置 Schema 详情")
+        parser.add_argument('name', help="扩展键名")
+        parser.add_argument('--json', action='store_true', help="以 JSON 格式输出")
+        return parser
+
+    @cmd2.as_subcommand_to("extension", "info", _build_extension_info_parser, help="显示扩展的配置 Schema 详情")
+    def _extension_info(self, args: argparse.Namespace) -> None:
+        import json
+
+        from SRACore.extension import extension_registry
+
+        schema = extension_registry.get_schema(args.name)
+        if schema is None:
+            self.poutput(f"扩展 '{args.name}' 不存在")
+            return
+        if args.json:
+            self.poutput(json.dumps(schema, ensure_ascii=False))
+        else:
+            entry = extension_registry.get(args.name)
+            self.poutput(f"扩展: {args.name} ({entry.name})")
+            if entry.description:
+                self.poutput(f"描述: {entry.description}")
+            self.poutput(f"扩展类: {entry.extension_cls.__name__}")
+            self.poutput(f"配置类: {entry.config_cls.__name__}")
+            self.poutput("配置 Schema:")
+            self.poutput(json.dumps(schema, ensure_ascii=False, indent=2))
+
+    @staticmethod
+    def _build_extension_reload_parser() -> cmd2.Cmd2ArgumentParser:
+        return cmd2.Cmd2ArgumentParser(description="重新扫描并导入扩展模块")
+
+    @cmd2.as_subcommand_to("extension", "reload", _build_extension_reload_parser, help="重新扫描并导入扩展模块")
+    def _extension_reload(self, _: argparse.Namespace) -> None:
+        from SRACore.extension import extension_registry
+
+        before = set(extension_registry.get_ids())
+        load_extensions()
+        after = set(extension_registry.get_ids())
+        added = after - before
+        if added:
+            self.poutput(f"新增扩展: {', '.join(added)}")
+        else:
+            self.poutput("未发现新扩展")
+        self.poutput(f"当前已注册 {len(after)} 个扩展")
+
+    @staticmethod
+    def _build_extension_config_parser() -> cmd2.Cmd2ArgumentParser:
+        parser = cmd2.Cmd2ArgumentParser(description="扩展配置管理")
+        parser.add_subparsers(metavar="SUBCOMMAND", required=True)
+        return parser
+
+    @staticmethod
+    def _build_extension_config_get_parser() -> cmd2.Cmd2ArgumentParser:
+        parser = cmd2.Cmd2ArgumentParser(description="获取扩展配置")
+        parser.add_argument('name', help="扩展标识")
+        parser.add_argument('--json', action='store_true', help="以 JSON 格式输出")
+        return parser
+
+    @cmd2.as_subcommand_to("extension", "config", _build_extension_config_parser, help="扩展配置管理")
+    def _extension_config(self, args: argparse.Namespace) -> None:
+        args.cmd2_subcommand_func(args)
+
+    @cmd2.as_subcommand_to("extension config", "get", _build_extension_config_get_parser, help="获取扩展配置")
+    def _extension_config_get(self, args: argparse.Namespace) -> None:
+        import json
+
+        from SRACore.extension import extension_registry
+
+        if not extension_registry.has_id(args.name):
+            self.poutput(f"扩展 '{args.name}' 不存在")
+            return
+        config = self.extension_config_manager.get(args.name)
+        if config is None:
+            self.poutput("配置为空")
+            return
+        data = config.model_dump(by_alias=True)
+        if args.json:
+            self.poutput(json.dumps(data, ensure_ascii=False))
+        else:
+            self.poutput(f"扩展 {args.name} 配置:")
+            for key, value in data.items():
+                self.poutput(f"  {key}: {value}")
+
+    @staticmethod
+    def _build_extension_config_set_parser() -> cmd2.Cmd2ArgumentParser:
+        parser = cmd2.Cmd2ArgumentParser(description="设置扩展配置")
+        parser.add_argument('name', help="扩展标识")
+        parser.add_argument('json', help="配置 JSON 字符串")
+        return parser
+
+    @cmd2.as_subcommand_to("extension config", "set", _build_extension_config_set_parser, help="设置扩展配置")
+    def _extension_config_set(self, args: argparse.Namespace) -> None:
+        import json
+
+        from SRACore.extension import extension_registry
+
+        if not extension_registry.has_id(args.name):
+            self.poutput(f"扩展 '{args.name}' 不存在")
+            return
+        try:
+            data = json.loads(args.json)
+        except json.JSONDecodeError as e:
+            self.poutput(f"JSON 格式错误: {e}")
+            return
+        config_cls = extension_registry.get_config_class(args.name)
+        try:
+            config = config_cls.model_validate(data, by_alias=True)
+        except Exception as e:
+            self.poutput(f"配置验证失败: {e}")
+            return
+        self.extension_config_manager.set(args.name, config)
+        self.extension_config_manager.save()
+        self.poutput(f"扩展 {args.name} 配置已保存")
 
     # endregion
 

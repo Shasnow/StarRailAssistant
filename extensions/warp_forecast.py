@@ -1,3 +1,14 @@
+"""抽卡资源预测扩展。
+
+预测当前版本结束前可获得的抽卡资源总量，包括：
+1. 背包现有资源扫描（星琼、星轨专票、星轨通票）
+2. 奖励指南剩余奖励扫描
+3. 版本剩余日常/周常/深渊估算
+
+运行方式::
+
+    sra> extension run WarpForecast
+"""
 from __future__ import annotations
 
 import re
@@ -6,8 +17,9 @@ from datetime import date, datetime, timedelta
 from typing import Any
 
 from loguru import logger
+from pydantic import BaseModel, Field
 
-from SRACore.task import BaseTask, task
+from SRACore.extension import BaseExtension, extension
 
 PULL_COST = 160
 
@@ -26,6 +38,37 @@ GRID_CELLS = [
 DETAIL_TITLE = dict(from_x=0.55, from_y=0.08, to_x=0.98, to_y=0.18)
 DETAIL_COUNT = dict(from_x=0.70, from_y=0.24, to_x=0.85, to_y=0.36)
 TOP_BAR = dict(from_x=0.55, from_y=0.0, to_x=1.0, to_y=0.08)
+
+
+class WarpForecastConfig(BaseModel):
+    """抽卡资源预测配置。"""
+    version_start_date: str = Field(default="", description="版本起始日（YYYY-MM-DD），用于推算当前版本区间")
+    version_days: int = Field(default=42, ge=1, le=999, description="每个版本持续天数")
+    preview_before_end_days: int = Field(default=12, ge=0, description="前瞻直播距版本结束的天数")
+    preview_status: str = Field(default="auto", description="前瞻状态：auto/done/not_done")
+    endgame_refresh_interval_days: int = Field(default=14, ge=1, description="深渊刷新间隔天数")
+    endgame_first_refresh_offset_days: int = Field(default=0, ge=0, description="首次深渊刷新偏移天数")
+    endgame_refresh_count_override: int = Field(default=-1, ge=-1, le=99, description="深渊刷新次数覆写，-1为自动")
+    include_today_endgame: bool = Field(default=True, description="深渊是否计入今天刷新")
+    weekly_reset_weekday: int = Field(default=0, ge=0, le=6, description="周常刷新星期几（0=周一）")
+    weekly_count_override: int = Field(default=-1, ge=-1, le=99, description="周常次数覆写，-1为自动")
+    include_today_weekly: bool = Field(default=True, description="周常是否计入今天刷新")
+    version_compensation_jade: int = Field(default=600, ge=0, description="版本更新补偿星琼")
+    has_monthly_card: bool = Field(default=False, description="是否有小月卡")
+    daily_jade_without_card: int = Field(default=60, ge=0, description="无月卡每日星琼")
+    daily_jade_with_card: int = Field(default=150, ge=0, description="有月卡每日星琼")
+    endgame_jade_per_refresh: int = Field(default=800, ge=0, description="每次深渊刷新星琼")
+    weekly_universe_jade: int = Field(default=225, ge=0, description="每周模拟宇宙星琼")
+    preview_jade: int = Field(default=300, ge=0, description="前瞻兑换码星琼")
+    scan_bag: bool = Field(default=True, description="自动扫描背包第一排资源")
+    manual_current_jade: int = Field(default=0, ge=0, description="手动填写当前星琼")
+    manual_special_pass: int = Field(default=0, ge=0, description="手动填写当前星轨专票")
+    manual_normal_pass: int = Field(default=0, ge=0, description="手动填写当前星轨通票")
+    scan_event_guide: bool = Field(default=True, description="自动扫描奖励指南")
+    event_reward_type: str = Field(default="auto", description="奖励指南类型：auto/jade/special_pass/normal_pass")
+    manual_event_jade: int = Field(default=0, ge=0, description="手动填写奖励指南星琼")
+    manual_event_special_pass: int = Field(default=0, ge=0, description="手动填写奖励指南专票")
+    manual_event_normal_pass: int = Field(default=0, ge=0, description="手动填写奖励指南通票")
 
 
 @dataclass
@@ -61,65 +104,6 @@ class Schedule:
     weekly_count: int
     preview_pending: bool
     version_compensation_jade: int
-
-
-def _int_param(task: BaseTask, key: str, default: int) -> int:
-    try:
-        return int(_get_warp_forecast_setting(task, key, default))
-    except (TypeError, ValueError):
-        return default
-
-
-def _bool_param(task: BaseTask, key: str, default: bool = False) -> bool:
-    raw = _get_warp_forecast_setting(task, key, default)
-    if raw is None:
-        return default
-    return str(raw).strip().lower() in ("true", "1", "yes", "y", "on")
-
-
-def _text_param(task: BaseTask, key: str, default: str = "") -> str:
-    raw = _get_warp_forecast_setting(task, key, default)
-    return default if raw is None else str(raw).strip()
-
-
-def _get_warp_forecast_setting(task: BaseTask, key: str, default: Any) -> Any:
-    settings = getattr(task.settings, "WarpForecast", None)
-    if settings is None:
-        return default
-
-    aliases = {
-        "version_start_date": "versionStartDate",
-        "version_days": "versionDays",
-        "preview_before_end_days": "previewBeforeEndDays",
-        "preview_status": "previewStatus",
-        "endgame_refresh_interval_days": "endgameRefreshIntervalDays",
-        "endgame_first_refresh_offset_days": "endgameFirstRefreshOffsetDays",
-        "endgame_refresh_count_override": "endgameRefreshCountOverride",
-        "include_today_endgame": "includeTodayEndgame",
-        "weekly_reset_weekday": "weeklyResetWeekday",
-        "weekly_count_override": "weeklyCountOverride",
-        "include_today_weekly": "includeTodayWeekly",
-        "version_compensation_jade": "versionCompensationJade",
-        "has_monthly_card": "hasMonthlyCard",
-        "daily_jade_without_card": "dailyJadeWithoutCard",
-        "daily_jade_with_card": "dailyJadeWithCard",
-        "endgame_jade_per_refresh": "endgameJadePerRefresh",
-        "weekly_universe_jade": "weeklyUniverseJade",
-        "preview_jade": "previewJade",
-        "scan_bag": "scanBag",
-        "manual_current_jade": "manualCurrentJade",
-        "manual_special_pass": "manualSpecialPass",
-        "manual_normal_pass": "manualNormalPass",
-        "scan_event_guide": "scanEventGuide",
-        "event_reward_type": "eventRewardType",
-        "manual_event_jade": "manualEventJade",
-        "manual_event_special_pass": "manualEventSpecialPass",
-        "manual_event_normal_pass": "manualEventNormalPass",
-    }
-    attr = aliases.get(key)
-    if attr is None:
-        return default
-    return getattr(settings, attr, default)
 
 
 def _parse_date(value: str) -> date | None:
@@ -210,8 +194,8 @@ def _find_top_bar_jade(results: list[Any] | None) -> int:
     return 0
 
 
-@task(order=10)
-class WarpForecastTask(BaseTask):
+@extension(name="抽卡资源预测", description="预测当前版本结束前的抽卡资源")
+class WarpForecastExtension(BaseExtension[WarpForecastConfig]):
     """预测当前版本结束前的抽卡资源。"""
 
     def run(self) -> bool:
@@ -220,7 +204,7 @@ class WarpForecastTask(BaseTask):
             self._ensure_game_world_ready()
 
             current = self._manual_current_resources()
-            if _bool_param(self, "scan_bag", True):
+            if self.config.scan_bag:
                 scanned = self._read_bag_resources()
                 current = Resources(
                     jade=scanned.jade if scanned.jade > 0 else current.jade,
@@ -229,7 +213,7 @@ class WarpForecastTask(BaseTask):
                 )
 
             event = self._manual_event_resources()
-            if _bool_param(self, "scan_event_guide", True):
+            if self.config.scan_event_guide:
                 scanned_event = self._read_event_guide_rewards()
                 event = event.add(scanned_event)
 
@@ -252,24 +236,24 @@ class WarpForecastTask(BaseTask):
 
     def _manual_current_resources(self) -> Resources:
         return Resources(
-            jade=max(0, _int_param(self, "manual_current_jade", 0)),
-            special_pass=max(0, _int_param(self, "manual_special_pass", 0)),
-            normal_pass=max(0, _int_param(self, "manual_normal_pass", 0)),
+            jade=max(0, self.config.manual_current_jade),
+            special_pass=max(0, self.config.manual_special_pass),
+            normal_pass=max(0, self.config.manual_normal_pass),
         )
 
     def _manual_event_resources(self) -> Resources:
         return Resources(
-            jade=max(0, _int_param(self, "manual_event_jade", 0)),
-            special_pass=max(0, _int_param(self, "manual_event_special_pass", 0)),
-            normal_pass=max(0, _int_param(self, "manual_event_normal_pass", 0)),
+            jade=max(0, self.config.manual_event_jade),
+            special_pass=max(0, self.config.manual_event_special_pass),
+            normal_pass=max(0, self.config.manual_event_normal_pass),
         )
 
     def _build_schedule(self) -> Schedule:
         today = date.today()
-        configured_start = _parse_date(_text_param(self, "version_start_date", ""))
-        version_days = max(1, _int_param(self, "version_days", 42))
-        preview_before_end = max(0, _int_param(self, "preview_before_end_days", 12))
-        compensation_jade = max(0, _int_param(self, "version_compensation_jade", 600))
+        configured_start = _parse_date(self.config.version_start_date)
+        version_days = max(1, self.config.version_days)
+        preview_before_end = max(0, self.config.preview_before_end_days)
+        compensation_jade = max(0, self.config.version_compensation_jade)
 
         start = self._current_version_start(configured_start, version_days, today)
         end = start + timedelta(days=version_days) if start else None
@@ -279,7 +263,7 @@ class WarpForecastTask(BaseTask):
         endgame_count = self._remaining_endgame_count(start, end, today)
         weekly_count = self._remaining_weekly_count(end, today)
 
-        preview_status = _text_param(self, "preview_status", "auto").lower()
+        preview_status = self.config.preview_status.lower()
         if preview_status == "done":
             preview_pending = False
         elif preview_status == "not_done":
@@ -309,15 +293,15 @@ class WarpForecastTask(BaseTask):
         return configured_start + timedelta(days=cycles * version_days)
 
     def _remaining_endgame_count(self, start: date | None, end: date | None, today: date) -> int:
-        override = _int_param(self, "endgame_refresh_count_override", -1)
+        override = self.config.endgame_refresh_count_override
         if override >= 0:
             return override
         if start is None or end is None:
             return 0
 
-        interval = max(1, _int_param(self, "endgame_refresh_interval_days", 14))
-        offset = _int_param(self, "endgame_first_refresh_offset_days", 0)
-        include_today = _bool_param(self, "include_today_endgame", True)
+        interval = max(1, self.config.endgame_refresh_interval_days)
+        offset = self.config.endgame_first_refresh_offset_days
+        include_today = self.config.include_today_endgame
         lower_bound = today if include_today else today + timedelta(days=1)
 
         count = 0
@@ -330,14 +314,14 @@ class WarpForecastTask(BaseTask):
         return count
 
     def _remaining_weekly_count(self, end: date | None, today: date) -> int:
-        override = _int_param(self, "weekly_count_override", -1)
+        override = self.config.weekly_count_override
         if override >= 0:
             return override
         if end is None:
             return 0
 
-        weekday = min(6, max(0, _int_param(self, "weekly_reset_weekday", 0)))
-        include_today = _bool_param(self, "include_today_weekly", True)
+        weekday = min(6, max(0, self.config.weekly_reset_weekday))
+        include_today = self.config.include_today_weekly
         lower_bound = today if include_today else today + timedelta(days=1)
 
         days_until_reset = (weekday - lower_bound.weekday()) % 7
@@ -349,14 +333,12 @@ class WarpForecastTask(BaseTask):
         return count
 
     def _future_resources(self, schedule: Schedule) -> Resources:
-        daily = _int_param(
-            self,
-            "daily_jade_with_card" if _bool_param(self, "has_monthly_card", False) else "daily_jade_without_card",
-            150 if _bool_param(self, "has_monthly_card", False) else 60,
-        )
-        endgame_jade = max(0, _int_param(self, "endgame_jade_per_refresh", 800))
-        weekly_jade = max(0, _int_param(self, "weekly_universe_jade", 225))
-        preview_jade = max(0, _int_param(self, "preview_jade", 300)) if schedule.preview_pending else 0
+        daily = (self.config.daily_jade_with_card
+                 if self.config.has_monthly_card
+                 else self.config.daily_jade_without_card)
+        endgame_jade = max(0, self.config.endgame_jade_per_refresh)
+        weekly_jade = max(0, self.config.weekly_universe_jade)
+        preview_jade = max(0, self.config.preview_jade) if schedule.preview_pending else 0
 
         return Resources(
             jade=(
@@ -513,8 +495,6 @@ class WarpForecastTask(BaseTask):
             logger.warning("未识别到 ESC 菜单中的旅情事记入口")
             return False
 
-        # OCR 返回裁剪区域内坐标，直接点击 OCR 框容易偏移。这里改为按 1920x1080
-        # 基准坐标点击 ESC 菜单里的“旅情事记”入口。
         for x, y in ((1342, 538), (1410, 556)):
             self._click_1920(x, y, after_sleep=1.5, tag="旅情事记")
             if op.wait_ocr("奖励指南", timeout=4, confidence=0.6, from_x=0.0, from_y=0.0, to_x=0.55, to_y=0.22) is not None:
@@ -523,13 +503,12 @@ class WarpForecastTask(BaseTask):
             logger.warning("点击旅情事记后未进入包含奖励指南的页面")
             return False
 
-        # 旅情事记页左上方页签“奖励指南”，按 1920x1080 固定位置点击。
         for x, y in ((455, 86), (500, 86)):
             self._click_1920(x, y, after_sleep=1.0, tag="奖励指南")
             if op.wait_ocr("剩余", timeout=3, confidence=0.55, from_x=0.0, from_y=0.10, to_x=1.0, to_y=0.95) is not None:
                 return True
 
-        logger.warning("已尝试点击奖励指南，但未识别到“剩余”文本，将继续扫描当前页面")
+        logger.warning('已尝试点击奖励指南，但未识别到"剩余"文本，将继续扫描当前页面')
         return True
 
     def _click_1920(self, x: int, y: int, *, after_sleep: float = 0.0, tag: str = "") -> bool:
@@ -630,12 +609,8 @@ class WarpForecastTask(BaseTask):
         ]
         return "|".join(texts[:30])
 
-    def _parse_event_rewards(self, results: list[Any] | None) -> Resources:
-        resources, _ = self._parse_event_reward_records(results)
-        return resources
-
     def _parse_event_reward_records(self, results: list[Any] | None) -> tuple[Resources, list[tuple[str, int, str]]]:
-        reward_type = _text_param(self, "event_reward_type", "auto").lower()
+        reward_type = self.config.event_reward_type.lower()
         items = _ocr_items(results, 0.5)
         resources = Resources()
         records: list[tuple[str, int, str]] = []
