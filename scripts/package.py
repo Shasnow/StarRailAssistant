@@ -162,6 +162,11 @@ def copy_core_resources(dist: Path):
     else:
         print(f"  [WARN] rapidocr not found in {SITE_PACKAGES_DIR}, skipping OCR model copy")
     shutil.copytree(ROOT_PATH / "tasks", dist / "tasks")
+    extensions_dir = ROOT_PATH / "extensions"
+    if extensions_dir.exists():
+        shutil.copytree(extensions_dir, dist / "extensions")
+    else:
+        print(f"  [WARN] extensions directory not found, skipping")
     print("[OK] Resources copied")
 
 
@@ -171,7 +176,7 @@ def package_lite(version: str):
     builder = ZipBuilder()
     for file in DESKTOP_WIN_X64_PUBLISH_PATH.iterdir():
         builder.add(file)
-    for item in ["SRACore", "tasks", "resources"]:
+    for item in ["SRACore", "tasks", "extensions", "resources"]:
         builder.add(ROOT_PATH / item)
     for file in ["main.py", "README.md", "LICENSE", "requirements.txt", "requirements-linux.txt"]:
         builder.add(ROOT_PATH / file)
@@ -221,7 +226,7 @@ if __name__ == "__main__":
     nuitka_build(version)
     copy_core_resources(DIST_DIR)
 
-    # Lite（独立流程，不使用 ZipBuilder）
+    # Lite
     package_lite(version)
 
     # Core → Basic → Full 增量构建
@@ -254,6 +259,7 @@ if __name__ == "__main__":
     print("Packaging Resources ...")
     resources_zip = ZipBuilder()
     resources_zip.add(ROOT_PATH / "tasks")
+    resources_zip.add(ROOT_PATH / "extensions")
     resources_zip.add(ROOT_PATH / "resources")
     resources_zip.add_file(ROOT_PATH / "package.json", "package.json")
     resources_zip.snapshot(ROOT_PATH / f"StarRailAssistant_Resources_v{version}.zip")
