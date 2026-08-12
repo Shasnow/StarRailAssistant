@@ -59,8 +59,8 @@ def test_load_all_tasks_and_trigger_start_complete_notifications(monkeypatch) ->
 
         sent_notifications.clear()
 
-        task.start()
-        task.complete()
+        task.on_start()
+        task.on_completed()
 
         assert len(sent_notifications) == 2
         assert all(title == Resource.task_notificationTitle for title, _, _ in sent_notifications)

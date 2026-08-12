@@ -23,7 +23,7 @@
       </div>
       <div>
         <span>任务</span>
-        <strong>{{ status.task }}</strong>
+        <strong>{{ status.unit }}</strong>
       </div>
       <div>
         <span>状态</span>

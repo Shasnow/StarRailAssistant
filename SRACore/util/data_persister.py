@@ -9,7 +9,7 @@ from SRACore.util.const import AppDataDir, ConfigsDir
 from SRACore.util.logger import logger
 
 
-def load_config(name: str) -> TasksConfig:
+def load_config(name: str) -> TasksConfig | None:
     path = ''
     try:
         if ".json" in name:

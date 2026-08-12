@@ -6,9 +6,11 @@ export type SraStatus = {
   detail?: string
   mode?: string
   configs?: string[]
-  sessionId?: string
-  task?: string
+  session_id?: string
+  unit?: string
   status?: string
+  error?: string
+  progress?: [number, number]
 }
 
 export type HealthInfo = {

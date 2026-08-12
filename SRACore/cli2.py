@@ -1,5 +1,4 @@
 import argparse
-import dataclasses
 
 import cmd2
 from loguru import logger
@@ -13,7 +12,6 @@ from SRACore.operators.factory import OperatorFactory, OperatorType
 from SRACore.runtime.event_listener import KeyboardListener
 from SRACore.runtime.trigger_manager import TriggerManager
 from SRACore.service.setting_service import SettingsService
-from SRACore.task import BaseTask
 from SRACore.thread.task_process import TaskManager
 from SRACore.util.const import VERSION, CORE
 
@@ -46,7 +44,8 @@ class SRACli(cmd2.Cmd):
         # 初始化扩展系统：动态导入扩展模块并创建运行器
         load_extensions()
         self.extension_config_manager = ExtensionConfigManager()
-        self.extension_runner = ExtensionRunner(self.extension_config_manager, settings_service)
+        self.extension_runner = ExtensionRunner(
+            self.extension_config_manager, settings_service)
 
         # 初始化键盘监听器
         stop_hotkey = settings_service.settings.General.hotkeyStop.lower() or 'f9'
@@ -118,17 +117,20 @@ class SRACli(cmd2.Cmd):
 
     @cmd2.as_subcommand_to("task", "status", _build_task_status_parser, help="Show current task status")
     def _task_status(self, args: argparse.Namespace) -> None:
-        import json
+        import dataclasses, json
         info = self.task_manager.info
         if args.json:
-            self.poutput(json.dumps(dataclasses.asdict(info)))
+            self.poutput(json.dumps(dataclasses.asdict(info), ensure_ascii=False))
         else:
-            self.poutput(f"Session ID: {info.sessionId}")
+            self.poutput(f"Session ID: {info.session_id}")
             self.poutput(f"PID: {info.pid}")
             self.poutput(f"Mode: {info.mode}")
-            self.poutput(f"Configs: {', '.join(info.configs) if info.configs else 'N/A'}")
-            self.poutput(f"Task: {info.task}")
             self.poutput(f"Status: {info.status}")
+            self.poutput(f"Unit: {info.unit}")
+            self.poutput(f"Configs: {', '.join(info.configs) if info.configs else 'N/A'}")
+            self.poutput(f"Progress: {info.progress[0]}/{info.progress[1]}")
+            if info.error:
+                self.poutput(f"Error: {info.error}")
 
     @staticmethod
     def _build_run_parser() -> cmd2.Cmd2ArgumentParser:
@@ -142,7 +144,7 @@ class SRACli(cmd2.Cmd):
         """Run specified tasks, will block current command line until tasks complete"""
         self.poutput(Resource.cli_run_started)
         try:
-            self.task_manager.run(*args.config)
+            self.task_manager.run_and_wait(*args.config)
         except KeyboardInterrupt:
             self.task_manager.request_stop()
 
@@ -159,7 +161,7 @@ class SRACli(cmd2.Cmd):
         """Run a single specified task, will block current command line until task complete"""
         self.poutput(Resource.cli_run_started)
         try:
-            self.task_manager.run_task(args.task, args.config)
+            self.task_manager.run_task_and_wait(args.task, args.config)
         except KeyboardInterrupt:
             self.task_manager.request_stop()
 
@@ -315,7 +317,7 @@ class SRACli(cmd2.Cmd):
                     "extension_class": entry.extension_cls.__name__,
                     "config_class": entry.config_cls.__name__,
                 })
-            self.poutput(json.dumps(data, ensure_ascii=False))
+            self.poutput(json.dumps(data))
         else:
             self.poutput(f"已注册 {len(ids)} 个扩展：")
             for ext_id in ids:
@@ -340,29 +342,9 @@ class SRACli(cmd2.Cmd):
             return
         if args.config:
             self.extension_config_manager.load(args.config)
-        result = self.extension_runner.run(args.name)
-        self.poutput(f"扩展 '{args.name}' 执行{'成功' if result else '失败'}")
-
-    @staticmethod
-    def _build_extension_run_all_parser() -> cmd2.Cmd2ArgumentParser:
-        parser = cmd2.Cmd2ArgumentParser(description="运行所有已注册的扩展")
-        parser.add_argument('--config', help="扩展配置文件名（不带 .json 后缀），不指定则不加载文件配置")
-        return parser
-
-    @cmd2.as_subcommand_to("extension", "run-all", _build_extension_run_all_parser, help="运行所有已注册的扩展")
-    def _extension_run_all(self, args: argparse.Namespace) -> None:
-        from SRACore.extension import extension_registry
-
-        if not extension_registry.get_ids():
-            self.poutput("没有已注册的扩展")
-            return
-        if args.config:
-            self.extension_config_manager.load(args.config)
-        results = self.extension_runner.run_all()
-        for key, ok in results.items():
-            self.poutput(f"  {key}: {'成功' if ok else '失败'}")
-        succeeded = sum(1 for v in results.values() if v)
-        self.poutput(f"共 {len(results)} 个扩展，{succeeded} 个成功")
+        result = self.extension_runner.run_in_thread(args.name)
+        if not result:
+            self.poutput(f"无法启动扩展 '{args.name}'")
 
     @staticmethod
     def _build_extension_info_parser() -> cmd2.Cmd2ArgumentParser:
@@ -382,7 +364,7 @@ class SRACli(cmd2.Cmd):
             self.poutput(f"扩展 '{args.name}' 不存在")
             return
         if args.json:
-            self.poutput(json.dumps(schema, ensure_ascii=False))
+            self.poutput(json.dumps(schema))
         else:
             entry = extension_registry.get(args.name)
             self.poutput(f"扩展: {args.name} ({entry.name})")
@@ -410,6 +392,30 @@ class SRACli(cmd2.Cmd):
         else:
             self.poutput("未发现新扩展")
         self.poutput(f"当前已注册 {len(after)} 个扩展")
+
+    @staticmethod
+    def _build_extension_stop_parser() -> cmd2.Cmd2ArgumentParser:
+        return cmd2.Cmd2ArgumentParser(description="停止当前正在运行的扩展")
+
+    @cmd2.as_subcommand_to("extension", "stop", _build_extension_stop_parser, help="停止当前正在运行的扩展")
+    def _extension_stop(self, _: argparse.Namespace) -> None:
+        if not self.extension_runner.is_thread_running():
+            self.poutput("当前没有正在运行的扩展")
+            return
+        self.extension_runner.stop_thread()
+        self.poutput("扩展已停止")
+
+    @staticmethod
+    def _build_extension_status_parser() -> cmd2.Cmd2ArgumentParser:
+        return cmd2.Cmd2ArgumentParser(description="显示扩展运行状态")
+
+    @cmd2.as_subcommand_to("extension", "status", _build_extension_status_parser, help="显示扩展运行状态")
+    def _extension_status(self, _: argparse.Namespace) -> None:
+        info = self.extension_runner.info
+        self.poutput(f"Status: {info.status}")
+        self.poutput(f"Unit: {info.unit}")
+        if info.error:
+            self.poutput(f"Error: {info.error}")
 
     @staticmethod
     def _build_extension_config_parser() -> cmd2.Cmd2ArgumentParser:

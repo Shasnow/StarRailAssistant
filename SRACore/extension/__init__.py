@@ -1,7 +1,6 @@
 import importlib
 import json
-import threading
-from abc import ABC, abstractmethod
+from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Generic, TYPE_CHECKING, TypeVar, get_args
@@ -9,12 +8,15 @@ from typing import Any, Generic, TYPE_CHECKING, TypeVar, get_args
 from loguru import logger
 from pydantic import BaseModel
 
+from SRACore.localization.resource import Resource
 from SRACore.models.app_settings import AppSettings
+from SRACore.notification import try_send_notification
 from SRACore.operators.factory import OperatorFactory, OperatorType
 from SRACore.operators.ioperator import IOperator
-from SRACore.notification import try_send_notification
-from SRACore.localization.resource import Resource
+from SRACore.task import Executable
+from SRACore.thread.runner import Runner
 from SRACore.util.const import AppDataDir, ConfigsDir
+from SRACore.util.errors import ThreadStoppedError
 
 if TYPE_CHECKING:
     from SRACore.service.setting_service import SettingsService
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
 T = TypeVar('T', bound=BaseModel)
 
 
-class BaseExtension(ABC, Generic[T]):
+class BaseExtension(Executable, Generic[T], ABC):
     """扩展基类，所有扩展都应继承自此类。
 
     扩展是可插拔的功能模块，通过 ``extension`` 装饰器注册到注册表，
@@ -39,12 +41,9 @@ class BaseExtension(ABC, Generic[T]):
     config: T
     operator: IOperator
     settings: AppSettings
-    stop_event: threading.Event | None
 
     def __init__(self, operator: IOperator, config: T):
-        self.operator = operator
-        self.settings = operator.settings
-        self.stop_event = operator.stop_event
+        super().__init__(operator)
         self.config = config
         self.__post_init__()
 
@@ -299,28 +298,26 @@ class ExtensionConfigManager:
         return list(self._configs.keys())
 
 
-class ExtensionRunner:
+class ExtensionRunner(Runner):
     """扩展运行器，负责实例化扩展并执行其 ``run`` 逻辑。
 
-    与 ``TaskManager`` 类似，每次运行时通过 ``OperatorFactory`` 创建
-    ``IOperator`` 实例并注入扩展，使扩展可执行截图、点击、OCR 等实际操作。
+    继承 ``Runner``，与 ``TaskManager`` 共享单线程互斥模型——同一时刻
+    最多只有一个扩展或任务在运行。
 
     典型用法::
 
         load_extensions()                          # 动态导入扩展模块
         config_manager = ExtensionConfigManager()
         runner = ExtensionRunner(config_manager, settings_service)
-        runner.run("MyExtension")                   # 运行单个扩展
-        runner.run_all()                            # 运行所有已注册扩展
+        runner.run_in_thread("MyExtension")        # 运行单个扩展（后台线程）
     """
 
     def __init__(self, config_manager: ExtensionConfigManager,
                  settings_service: 'SettingsService',
-                 stop_event: threading.Event | None = None,
                  registry: ExtensionRegistry | None = None):
+        super().__init__()
         self._config_manager = config_manager
         self._settings_service = settings_service
-        self._stop_event = stop_event
         self._registry = registry or extension_registry
 
     def _create_operator(self) -> IOperator:
@@ -329,7 +326,7 @@ class ExtensionRunner:
         optype = (OperatorType.Browser
                   if settings.General.isCloudGameEnabled
                   else OperatorType.Local)
-        return OperatorFactory.get_operator(optype, settings, self._stop_event)
+        return OperatorFactory.get_operator(optype, settings, self.stop_event)
 
     def create(self, extension_id: str) -> BaseExtension:
         """根据标识实例化扩展（不含运行）。
@@ -352,53 +349,49 @@ class ExtensionRunner:
         operator = self._create_operator()
         return ext_cls(operator, config)
 
-    def run(self, extension_id: str) -> bool:
-        """运行单个扩展，返回是否成功。
-
-        会依次触发 ``on_start`` → ``run`` → ``on_completed`` / ``on_failed`` 回调。
-        """
-        logger.info(f"[Extension] Running '{extension_id}'...")
+    def _run_extension(self, ext_id: str):
+        """扩展执行逻辑（在线程中运行）"""
+        self._set_unit(ext_id)
+        self._set_configs([ext_id])
+        self._set_progress(0, 1)
         try:
-            instance = self.create(extension_id)
+            instance = self.create(ext_id)
         except Exception as e:
-            logger.exception(f"Failed to instantiate extension '{extension_id}': {e}")
-            return False
-
+            logger.exception(f"Failed to instantiate extension '{ext_id}': {e}")
+            self._set_status("failed")
+            self._set_error(str(e))
+            return
         instance.on_start()
         try:
             result = instance.run()
+            if result:
+                instance.on_completed()
+                logger.info(f"[Extension] '{ext_id}' completed")
+            else:
+                instance.on_failed()
+                self._set_status("failed")
+                logger.warning(f"[Extension] '{ext_id}' returned False")
+        except ThreadStoppedError as e:
+            logger.error(e)
+            return
         except Exception as e:
-            logger.exception(f"Extension '{extension_id}' crashed: {e}")
+            logger.exception(f"[Extension] '{ext_id}' crashed: {e}")
             instance.on_failed()
+            self._set_status("failed")
+            self._set_error(str(e))
+            return
+
+    def run_in_thread(self, extension_id: str) -> bool:
+        """在独立线程中运行单个扩展。
+
+        Returns:
+            True 表示成功启动，False 表示已有线程在运行。
+        """
+        if self.is_thread_running():
             return False
 
-        if result:
-            instance.on_completed()
-            logger.info(f"[Extension] '{extension_id}' completed")
-        else:
-            instance.on_failed()
-            logger.warning(f"[Extension] '{extension_id}' returned False")
-        return result
-
-    def run_all(self) -> dict[str, bool]:
-        """运行所有已注册扩展，返回各扩展的执行结果。
-
-        单个扩展失败不会中断其他扩展的执行。
-        """
-        results: dict[str, bool] = {}
-        for ext_id in self._registry.get_ids():
-            results[ext_id] = self.run(ext_id)
-        succeeded = sum(1 for v in results.values() if v)
-        logger.info(f"[Extension] run_all finished: {succeeded}/{len(results)} succeeded")
-        return results
-
-    def run_many(self, ids: list[str]) -> dict[str, bool]:
-        """运行指定的多个扩展，返回各扩展的执行结果。"""
-        results: dict[str, bool] = {}
-        for ext_id in ids:
-            if not self._registry.has_id(ext_id):
-                logger.warning(f"[Extension] '{ext_id}' is not registered, skipping")
-                results[ext_id] = False
-                continue
-            results[ext_id] = self.run(ext_id)
-        return results
+        self._reset_info("extension")
+        self._set_unit(extension_id)
+        logger.info(f"[Extension] Starting '{extension_id}' in background thread...")
+        self.start_thread(self._run_extension, extension_id)
+        return True

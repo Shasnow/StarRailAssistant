@@ -1,7 +1,7 @@
-import importlib
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import final
+from dataclasses import dataclass
 
 from PIL.Image import Image
 from loguru import logger
@@ -17,11 +17,6 @@ class Executable:
     def __init__(self, operator: IOperator):
         self.operator = operator
         self.settings = operator.settings
-        self.stop_event = self.operator.stop_event
-
-    def stop(self):
-        if self.stop_event is not None:
-            self.stop_event.set()
 
 
 class BaseTask(Executable, ABC):
@@ -37,21 +32,9 @@ class BaseTask(Executable, ABC):
         """子类可重写此方法以进行额外初始化"""
         pass
 
-    @final
-    def start(self) -> None:
-        self.on_start()
-
     @abstractmethod
     def run(self) -> bool:
         pass
-
-    @final
-    def complete(self) -> None:
-        self.on_completed()
-
-    @final
-    def fail(self) -> None:
-        self.on_failed()
 
     def send_notification(self, message: str, result: str, image: Image | None = None) -> None:
         try_send_notification(
@@ -91,19 +74,59 @@ class BaseTask(Executable, ABC):
         return f"<{self.__class__.__name__}>"
 
 
-registry: list[tuple[int, type[BaseTask]]] = list()
+@dataclass(frozen=True)
+class TaskEntry:
+    task_cls: type[BaseTask]
+    name: str
+    order: int
 
 
-def task(_cls: type[BaseTask] | None = None, *, order: int | None = None):
+class TaskRegistry:
+    def __init__(self):
+        self._entries: list[TaskEntry] = []
+        self._by_id: dict[str, TaskEntry] = {}
+
+    def register(self, task_cls: type[BaseTask], *, order: int | None = None, task_id: str | None = None) -> None:
+        if not issubclass(task_cls, BaseTask):
+            raise TypeError("只能注册 BaseTask 的子类")
+        _id = task_id or task_cls.__name__
+        if _id in self._by_id:
+            raise KeyError(f"Task '{_id}' already exists")
+        entry = TaskEntry(task_cls=task_cls, name=_id, order=len(self._entries) if order is None else order)
+        self._entries.append(entry)
+        self._by_id[_id] = entry
+
+    def get(self, task_id: str) -> TaskEntry:
+        if task_id in self._by_id:
+            return self._by_id[task_id]
+        for entry in self._entries:
+            if entry.task_cls.__name__.lower() == task_id.lower():
+                return entry
+        raise KeyError(f"Task '{task_id}' does not exist")
+
+    def get_task_class(self, task_id: str) -> type[BaseTask]:
+        return self.get(task_id).task_cls
+
+    def get_task_classes(self) -> list[type[BaseTask]]:
+        return [entry.task_cls for entry in sorted(self._entries, key=lambda item: (item.order, item.name))]
+
+    def get_ids(self) -> list[str]:
+        return [entry.name for entry in sorted(self._entries, key=lambda item: (item.order, item.name))]
+
+    def has_id(self, task_id: str) -> bool:
+        return task_id in self._by_id
+
+
+task_registry = TaskRegistry()
+
+
+def task(_cls: type[BaseTask] | None = None, *, order: int | None = None, task_id: str | None = None):
     """
     任务注册装饰器，用于将任务类注册到全局任务列表中，并指定执行顺序。
     """
 
     def decorator(cls: type[BaseTask]) -> type[BaseTask]:
-        if not issubclass(cls, BaseTask):
-            raise TypeError("只能注册 BaseTask 的子类")
-        _order = len(registry) if order is None else order
-        registry.append((_order, cls))
+        task_registry.register(cls, order=order, task_id=task_id)
         return cls
 
     if _cls is None:
@@ -112,4 +135,4 @@ def task(_cls: type[BaseTask] | None = None, *, order: int | None = None):
 
 
 def get_task_classes() -> list[type[BaseTask]]:
-    return [cls for order, cls in sorted(registry, key=lambda x: x[0])]
+    return task_registry.get_task_classes()
