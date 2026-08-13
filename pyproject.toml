@@ -33,6 +33,7 @@ dependencies = [
     "cmd2==4.1.2",
     "rapidocr==3.9.1",
     "onnxruntime==1.27.0",
+    "pydantic==2.13.4",
     "pyautogui==0.9.54; os_name == 'nt'",
     "pyperclip==1.11.0; os_name == 'nt'",
     "pywin32==311; os_name == 'nt'",

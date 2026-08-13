@@ -10,3 +10,4 @@ rich==15.0.0
 loguru==0.7.3
 selenium==4.44.0
 cmd2==4.1.2
+pydantic==2.13.4
