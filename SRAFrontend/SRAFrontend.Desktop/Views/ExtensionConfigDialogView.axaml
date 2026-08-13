@@ -41,16 +41,10 @@
         </DataTemplate>
     </UserControl.DataTemplates>
     <suki:BusyArea IsBusy="{Binding IsLoading}" BusyText="加载配置中...">
-        <DockPanel Margin="16">
-            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
-                        HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
-                <Button Content="保存" Classes="Accent" Command="{Binding SaveCommand}"/>
-                <Button Content="取消" Classes="Flat"/>
-            </StackPanel>
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled"
-                          VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Fields}"/>
-            </ScrollViewer>
-        </DockPanel>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto"
+                      Margin="16">
+            <ItemsControl ItemsSource="{Binding Fields}"/>
+        </ScrollViewer>
     </suki:BusyArea>
 </UserControl>
