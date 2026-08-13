@@ -56,7 +56,11 @@
                                                 <ProgressBar IsVisible="{Binding IsRunning}"
                                                              IsIndeterminate="True" Width="40"/>
                                                 <Button Content="运行" Classes="Accent"
-                                                        Command="{Binding RunCommand}"/>
+                                                        Command="{Binding RunCommand}"
+                                                        IsVisible="{Binding !IsRunning}"/>
+                                                <Button Content="停止"
+                                                        Command="{Binding StopCommand}"
+                                                        IsVisible="{Binding IsRunning}"/>
                                                 <Button Content="配置" Classes="Flat"
                                                         Command="{Binding ConfigureCommand}"
                                                         IsVisible="{Binding HasConfig}"/>

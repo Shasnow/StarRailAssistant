@@ -125,8 +125,7 @@ public partial class GeneralSettings : ObservableObject
     [ObservableProperty]
     [property: JsonPropertyName("isRetryOnTaskFailure")]
     [property: Description("任务失败后是否尝试重启游戏并重试")]
-    [property: DefaultValue(true)]
-    private bool _isRetryOnTaskFailure = true;
+    private bool _isRetryOnTaskFailure;
 
     [ObservableProperty]
     [property: JsonPropertyName("maxRetryCount")]

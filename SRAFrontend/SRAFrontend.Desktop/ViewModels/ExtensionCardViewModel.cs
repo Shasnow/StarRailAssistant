@@ -41,6 +41,13 @@ public partial class ExtensionCardViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task StopAsync()
+    {
+        await _backendService.SendInputAsync($"extension stop {Id}");
+        IsRunning = false;
+    }
+
+    [RelayCommand]
     private async Task ConfigureAsync()
     {
         var viewModel = new ExtensionConfigDialogViewModel(Id, _backendService);
