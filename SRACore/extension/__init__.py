@@ -1,6 +1,8 @@
 import importlib
 import json
+import threading
 from abc import abstractmethod, ABC
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Generic, TYPE_CHECKING, TypeVar, get_args
@@ -92,6 +94,7 @@ class ExtensionEntry:
     config_cls: type[BaseModel]
     name: str = ""
     description: str = ""
+    is_background: bool = False
 
 
 class ExtensionRegistry:
@@ -101,12 +104,13 @@ class ExtensionRegistry:
         self._storage: dict[str, ExtensionEntry] = {}
 
     def register(self, extension_id: str, extension_cls: type[BaseExtension],
-                 config_cls: type[BaseModel], *, name: str = "", description: str = "") -> None:
+                 config_cls: type[BaseModel], *, name: str = "", description: str = "",
+                 is_background: bool = False) -> None:
         if extension_id in self._storage:
             raise KeyError(f"Extension '{extension_id}' already exists")
         self._storage[extension_id] = ExtensionEntry(
             extension_cls=extension_cls, config_cls=config_cls,
-            name=name, description=description,
+            name=name, description=description, is_background=is_background,
         )
 
     def get(self, extension_id: str) -> ExtensionEntry:
@@ -125,6 +129,12 @@ class ExtensionRegistry:
 
     def get_description(self, extension_id: str) -> str:
         return self.get(extension_id).description
+
+    def is_background(self, extension_id: str) -> bool:
+        return self.get(extension_id).is_background
+
+    def get_background_ids(self) -> list[str]:
+        return [ext_id for ext_id, entry in self._storage.items() if entry.is_background]
 
     def get_all_config_classes(self) -> dict[str, type[BaseModel]]:
         return {ext_id: entry.config_cls for ext_id, entry in self._storage.items()}
@@ -182,7 +192,7 @@ def load_extensions(package: str = "extensions") -> None:
 
 def extension(_cls: type[BaseExtension] | None = None, *, extension_id: str | None = None,
               name: str | None = None, description: str | None = None,
-              registry: ExtensionRegistry | None = None):
+              background: bool = False, registry: ExtensionRegistry | None = None):
     """扩展注册装饰器，将扩展类及其配置模型注册到注册表中。
 
     配置模型通过泛型参数声明::
@@ -197,13 +207,14 @@ def extension(_cls: type[BaseExtension] | None = None, *, extension_id: str | No
         name: 展示名称，默认使用类名。
         description: 扩展描述，默认使用类 docstring 首行。
         registry: 目标注册表，默认使用全局 ``extension_registry``。
+        background: 是否为后台扩展。
     """
     reg = registry or extension_registry
 
     def _resolve_config(cls: type[BaseExtension]) -> type[BaseModel]:
         """从泛型基类 ``BaseExtension[Config]`` 中提取配置类。"""
         for base in getattr(cls, '__orig_bases__', []):
-            origin = getattr(base, '__origin__', None)
+            origin: type | None = getattr(base, '__origin__', None)
             if origin is None or not issubclass(origin, BaseExtension):
                 continue
             args = get_args(base)
@@ -221,8 +232,10 @@ def extension(_cls: type[BaseExtension] | None = None, *, extension_id: str | No
         _id = extension_id if extension_id is not None else cls.__name__.removesuffix("Extension")
         _name = name or cls.__name__
         _desc = description or (cls.__doc__.strip().splitlines()[0] if cls.__doc__ else "")
-        reg.register(_id, cls, resolved_config, name=_name, description=_desc)
-        logger.debug(f"Registered extension: {_id} -> {cls.__name__} (config={resolved_config.__name__})")
+        reg.register(_id, cls, resolved_config, name=_name, description=_desc,
+                    is_background=background)
+        logger.debug(f"Registered extension: {_id} -> {cls.__name__} "
+                     f"(config={resolved_config.__name__}, background={background})")
         return cls
 
     if _cls is None:
@@ -241,7 +254,16 @@ class ExtensionConfigManager:
         self._configs: dict[str, BaseModel] = {}
         self.path: str | Path = self.DEFAULT_PATH
         self._registry = registry or extension_registry
+        self._extension_config_changed_callback: Callable[[str], None] | None = None
         self.load()
+
+    def set_extension_config_changed_callback(self, callback: Callable[[str], None]) -> None:
+        """设置扩展配置变更回调函数，当某个扩展的配置被修改时调用。
+
+        Args:
+            callback: 回调函数，接收一个参数：扩展标识。
+        """
+        self._extension_config_changed_callback = callback
 
     def load(self, name: str | None = None) -> None:
         try:
@@ -293,6 +315,8 @@ class ExtensionConfigManager:
         if not self._registry.has_id(extension_id):
             raise KeyError(f"Extension '{extension_id}' is not registered")
         self._configs[extension_id] = config
+        if self._extension_config_changed_callback is not None:
+            self._extension_config_changed_callback(extension_id)
 
     def ids(self) -> list[str]:
         return list(self._configs.keys())
@@ -319,6 +343,10 @@ class ExtensionRunner(Runner):
         self._config_manager = config_manager
         self._settings_service = settings_service
         self._registry = registry or extension_registry
+        self.extensions: dict[str, BaseExtension] = {}
+        self._background_thread: threading.Thread | None = None
+        self._background_stop_event = threading.Event()
+        self._config_manager.set_extension_config_changed_callback(self.reload_extension)
 
     def _create_operator(self) -> IOperator:
         """根据设置创建 IOperator 实例"""
@@ -354,32 +382,25 @@ class ExtensionRunner(Runner):
         self._set_unit(ext_id)
         self._set_configs([ext_id])
         self._set_progress(0, 1)
-        try:
-            instance = self.create(ext_id)
-        except Exception as e:
-            logger.exception(f"Failed to instantiate extension '{ext_id}': {e}")
-            self._set_status("failed")
-            self._set_error(str(e))
-            return
+
+        instance = self.create(ext_id)
+
         instance.on_start()
         try:
             result = instance.run()
             if result:
                 instance.on_completed()
                 logger.info(f"[Extension] '{ext_id}' completed")
+                return True
             else:
                 instance.on_failed()
-                self._set_status("failed")
                 logger.warning(f"[Extension] '{ext_id}' returned False")
-        except ThreadStoppedError as e:
-            logger.error(e)
-            return
-        except Exception as e:
-            logger.exception(f"[Extension] '{ext_id}' crashed: {e}")
+                return False
+        except ThreadStoppedError:
+            raise
+        except Exception:
             instance.on_failed()
-            self._set_status("failed")
-            self._set_error(str(e))
-            return
+            raise
 
     def run_in_thread(self, extension_id: str) -> bool:
         """在独立线程中运行单个扩展。
@@ -391,7 +412,105 @@ class ExtensionRunner(Runner):
             return False
 
         self._reset_info("extension")
-        self._set_unit(extension_id)
         logger.info(f"[Extension] Starting '{extension_id}' in background thread...")
         self.start_thread(self._run_extension, extension_id)
         return True
+
+    def _start_background_loop(self) -> None:
+        if self._background_thread is not None and self._background_thread.is_alive():
+            return
+        self._background_stop_event.clear()
+        self._background_thread = threading.Thread(target=self._background_loop, daemon=True)
+        # noinspection unresolved-references
+        self._background_thread.start()
+
+    def _stop_background_loop(self, timeout: float = 5.0) -> None:
+        self._background_stop_event.set()
+        thread = self._background_thread
+        if thread is None or not thread.is_alive():
+            self._background_thread = None
+            return
+        thread.join(timeout=timeout)
+        self._background_thread = None
+
+    def _background_loop(self) -> None:
+        """共享后台线程：每 200ms 检查并执行当前启用的后台扩展。"""
+        logger.debug("Background extension thread started")
+        while not self._background_stop_event.is_set():
+            self._background_stop_event.wait(0.5)
+            if not self.extensions:
+                continue
+
+            for ext_id in list(self.extensions.keys()):
+                if self._background_stop_event.is_set():
+                    break
+                instance = self.extensions.get(ext_id)
+                if instance is None:
+                    self.extensions.pop(ext_id, None)
+                    continue
+                try:
+                    instance.run()
+                except ThreadStoppedError:
+                    logger.warning(f"Background extension '{ext_id}' stopped by request")
+                    self.stop_extension(ext_id)
+                except Exception as e:
+                    logger.exception(f"Background extension '{ext_id}' crashed: {e}")
+                    self.stop_extension(ext_id)
+
+        logger.debug("Background extension thread stopped")
+
+    def start_extension(self, extension_id: str) -> bool:
+        """启动指定后台扩展并加入共享轮询列表。"""
+        if not extension_registry.has_id(extension_id):
+            logger.error(f"Background extension '{extension_id}' is not registered")
+            return False
+        if not extension_registry.is_background(extension_id):
+            logger.error(f"Extension '{extension_id}' is not a background extension")
+            return False
+        if extension_id in self.extensions:
+            return True
+
+        instance = self.create(extension_id)
+
+        self.extensions[extension_id] = instance
+        self._start_background_loop()
+        logger.info(f"Background extension '{extension_id}' enabled")
+        return True
+
+    def stop_extension(self, extension_id: str, timeout: float = 5.0) -> bool:
+        """停止指定后台扩展，并从共享轮询列表中移出/销毁实例。"""
+        if extension_id in self.extensions:
+            self.extensions.pop(extension_id, None)
+
+        if not self.extensions:
+            self._stop_background_loop(timeout=timeout)
+            return True
+
+        logger.info(f"Background extension '{extension_id}' stopped")
+        return True
+
+    def reload_extension(self, extension_id: str) -> None:
+        """重新加载指定后台扩展实例（用于配置更新后）。
+
+        注意：后台扩展使用共享轮询线程，因此配置变更时不应在单个扩展
+        重新实例化时停止并重启整个线程；应仅替换当前实例，保留线程
+        持续运行，避免无意义的线程重建。
+        """
+        if extension_id not in extension_registry.get_background_ids():
+            return
+
+        if extension_id not in self.extensions:
+            return
+
+        try:
+            new_instance = self.create(extension_id)
+        except Exception:
+            logger.exception(f"Failed to reload background extension '{extension_id}'")
+            return
+
+        self.extensions[extension_id] = new_instance
+        if self._background_thread is None or not self._background_thread.is_alive():
+            self._start_background_loop()
+
+        logger.debug(f"Reloaded background extension '{extension_id}'")
+

@@ -49,7 +49,7 @@ class TaskManager(Runner):
         self._set_unit(str(task))
         return self.start_and_wait(self.run_task, task, config_name)
 
-    def run(self, *args: str) -> None:
+    def run(self, *args: str) -> bool:
         """
         进程主循环：
         1. 读取配置列表（单配置或多配置）
@@ -61,121 +61,119 @@ class TaskManager(Runner):
         self._recovery.settings = self.settings_service.settings
         self._recovery.reset()
         self._reset_info("run")
-        try:
-            if len(args)==0:
-                # 不指定配置时，加载缓存中的全部配置名称
-                config_list = load_cache().get("ConfigNames", [])
-            else:
-                # 指定配置名称
-                config_list = args
-            self._set_configs(config_list)
-            last_operator = None
-            # 支持重试的配置索引，从这里继续执行
-            config_start_index = 0
-            while config_start_index < len(config_list):
+
+        if len(args)==0:
+            # 不指定配置时，加载缓存中的全部配置名称
+            config_list = load_cache().get("ConfigNames", [])
+        else:
+            # 指定配置名称
+            config_list = args
+        self._set_configs(config_list)
+        last_operator = None
+        # 支持重试的配置索引，从这里继续执行
+        config_start_index = 0
+        while config_start_index < len(config_list):
+            if self.stop_event.is_set():
+                return False
+            retry_triggered = False
+            for ci in range(config_start_index, len(config_list)):
+                config_name = config_list[ci]
                 if self.stop_event.is_set():
-                    return
-                retry_triggered = False
-                for ci in range(config_start_index, len(config_list)):
-                    config_name = config_list[ci]
-                    if self.stop_event.is_set():
-                        return
-                    logger.info(Resource.task_currentConfig(config_name))
+                    return False
+                logger.info(Resource.task_currentConfig(config_name))
 
-                    # 获取当前配置需要执行的任务列表
-                    tasks_to_run = self.get_tasks(config_name)
-                    if tasks_to_run:
-                        last_operator = tasks_to_run[0].operator
-                    logger.debug(f'tasks_to_run: {tasks_to_run}')
-                    if not tasks_to_run:
-                        logger.warning(Resource.task_noSelectedTasks(config_name))
-                        continue
+                # 获取当前配置需要执行的任务列表
+                tasks_to_run = self.get_tasks(config_name)
+                if tasks_to_run:
+                    last_operator = tasks_to_run[0].operator
+                logger.debug(f'tasks_to_run: {tasks_to_run}')
+                if not tasks_to_run:
+                    logger.warning(Resource.task_noSelectedTasks(config_name))
+                    continue
 
-                    # 依次执行任务
-                    task_failed = False
-                    for ti, task in enumerate(tasks_to_run):
-                        try:
-                            # 运行任务，如果返回 False 表示任务失败
-                            logger.debug('running task: ' + str(task))
-                            self._set_unit(str(task))
-                            self._set_progress(ti, len(tasks_to_run))
-                            # 任务开始
-                            task.on_start()
-                            if not task.run():
-                                # 如果是用户主动停止，直接返回，不触发重试
-                                if self.stop_event.is_set():
-                                    return
-                                logger.error(Resource.task_taskFailed(str(task)))
-                                task.on_failed()
-                                # 尝试重试
-                                if self._recovery.should_retry():
-                                    task_failed = True
-                                    break
-                                else:
-                                    return
-                            # 任务完成
-                            task.on_completed()
-                        except ThreadStoppedError as e:
-                            logger.error(e)
-                            return
-                        except Exception as e:
+                # 依次执行任务
+                task_failed = False
+                for ti, task in enumerate(tasks_to_run):
+                    try:
+                        # 运行任务，如果返回 False 表示任务失败
+                        logger.debug('running task: ' + str(task))
+                        self._set_unit(str(task))
+                        self._set_progress(ti, len(tasks_to_run))
+                        # 任务开始
+                        task.on_start()
+                        if not task.run():
                             # 如果是用户主动停止，直接返回，不触发重试
                             if self.stop_event.is_set():
-                                return
-                            # 捕获任务执行中的异常（如未处理的错误）
-                            logger.exception(Resource.task_taskCrashed(str(task), str(e)))
+                                return False
+                            logger.error(Resource.task_taskFailed(str(task)))
                             task.on_failed()
                             # 尝试重试
                             if self._recovery.should_retry():
                                 task_failed = True
                                 break
                             else:
-                                return
-
-                    if task_failed:
-                        # 准备重试：杀死游戏进程并等待
-                        if self._recovery.prepare_retry():
-                            # 如果在等待期间用户停止了任务，直接返回
-                            if self.stop_event.is_set():
-                                return
-                            # 重试时需要确保游戏已启动
-                            # 如果任务列表中没有 StartGameTask，则先执行它
-                            if not any(t.__class__.__name__ == 'StartGameTask' for t in tasks_to_run):
-                                logger.info("重试时需要启动游戏，自动执行启动游戏任务")
-                                start_game_task = self._create_start_game_task(config_name)
-                                if start_game_task:
-                                    try:
-                                        start_game_task.on_start()
-                                        if not start_game_task.run():
-                                            logger.error("重试时启动游戏失败")
-                                            return
-                                        start_game_task.on_completed()
-                                    except Exception as e:
-                                        logger.error(f"重试时启动游戏异常: {e}")
-                                        return
-                            logger.info(Resource.task_retryFromConfig(config_name))
-                            config_start_index = ci
-                            retry_triggered = True
-                            break  # 跳出 tasks 循环，重新开始当前配置
+                                return False
+                        # 任务完成
+                        task.on_completed()
+                    except ThreadStoppedError as e:
+                        logger.warning(e)
+                        return False
+                    except Exception as e:
+                        # 如果是用户主动停止，直接返回，不触发重试
+                        if self.stop_event.is_set():
+                            return False
+                        # 捕获任务执行中的异常（如未处理的错误）
+                        logger.exception(Resource.task_taskCrashed(str(task), str(e)))
+                        task.on_failed()
+                        # 尝试重试
+                        if self._recovery.should_retry():
+                            task_failed = True
+                            break
                         else:
-                            return
+                            return False
 
-                    logger.info(Resource.task_configCompleted(config_name))
-                    logger.info("=" * 50)
+                if task_failed:
+                    # 准备重试：杀死游戏进程并等待
+                    if self._recovery.prepare_retry():
+                        # 如果在等待期间用户停止了任务，直接返回
+                        if self.stop_event.is_set():
+                            return False
+                        # 重试时需要确保游戏已启动
+                        # 如果任务列表中没有 StartGameTask，则先执行它
+                        if not any(t.__class__.__name__ == 'StartGameTask' for t in tasks_to_run):
+                            logger.info("重试时需要启动游戏，自动执行启动游戏任务")
+                            start_game_task = self._create_start_game_task(config_name)
+                            if start_game_task:
+                                try:
+                                    start_game_task.on_start()
+                                    if not start_game_task.run():
+                                        logger.error("重试时启动游戏失败")
+                                        return False
+                                    start_game_task.on_completed()
+                                except Exception as e:
+                                    logger.error(f"重试时启动游戏异常: {e}")
+                                    return False
+                        logger.info(Resource.task_retryFromConfig(config_name))
+                        config_start_index = ci
+                        retry_triggered = True
+                        break  # 跳出 tasks 循环，重新开始当前配置
+                    else:
+                        return False
 
-                if not retry_triggered:
-                    break  # 所有配置执行完毕，退出重试循环
+                logger.info(Resource.task_configCompleted(config_name))
+                logger.info("=" * 50)
 
-            logger.info("All tasks completed.")
-            try_send_notification(
-                self.settings_service.settings.Notification,
-                Resource.task_notificationTitle,
-                Resource.task_notificationMessage,
-                image=last_operator.screenshot() if last_operator else None
-            )
-        except Exception as e:
-            # 捕获线程主循环中的异常（如配置加载失败）
-            logger.exception(Resource.task_managerCrashed(str(e)))
+            if not retry_triggered:
+                break  # 所有配置执行完毕，退出重试循环
+
+        logger.info("All tasks completed.")
+        try_send_notification(
+            self.settings_service.settings.Notification,
+            Resource.task_notificationTitle,
+            Resource.task_notificationMessage,
+            image=last_operator.screenshot() if last_operator else None
+        )
+        return True
 
     def _create_start_game_task(self, config_name: str) -> BaseTask | None:
         """创建 StartGameTask 实例（用于重试时启动游戏）"""
@@ -281,15 +279,11 @@ class TaskManager(Runner):
                 task_instance.on_completed()
             self._set_progress(1, 1)
             return result
-        except ThreadStoppedError as e:
-            logger.error(e)
-            return False
-        except Exception as e:
-            logger.exception(Resource.task_taskCrashed(task, str(e)))
+        except ThreadStoppedError:
+            raise
+        except Exception:
             task_instance.on_failed()
-            self._set_status("failed")
-            self._set_error(str(e))
-            return False
+            raise
 
     def get_task(self, config_name: str, task: str) -> BaseTask | None:
         """

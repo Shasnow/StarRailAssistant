@@ -4,13 +4,11 @@ import cmd2
 from loguru import logger
 from rich.text import Text
 
-from SRACore.extension import (ExtensionConfigManager, ExtensionRunner,
-                               load_extensions)
+from SRACore.extension import ExtensionConfigManager, ExtensionRunner, load_extensions
 from SRACore.localization import Resource
 from SRACore.models.app_settings import AppSettings
 from SRACore.operators.factory import OperatorFactory, OperatorType
 from SRACore.runtime.event_listener import KeyboardListener
-from SRACore.runtime.trigger_manager import TriggerManager
 from SRACore.service.setting_service import SettingsService
 from SRACore.thread.task_process import TaskManager
 from SRACore.util.const import VERSION, CORE
@@ -38,8 +36,6 @@ class SRACli(cmd2.Cmd):
                 delattr(cmd2.Cmd, f"do_{cmd_name}")
         # 初始化任务管理器
         self.task_manager = TaskManager(settings_service)
-        # 初始化触发器管理器
-        self.trigger_manager = TriggerManager(settings_service.settings)
 
         # 初始化扩展系统：动态导入扩展模块并创建运行器
         load_extensions()
@@ -104,9 +100,8 @@ class SRACli(cmd2.Cmd):
     def _task_stop(self, _) -> None:
         if self.task_manager.is_thread_running():
             self.task_manager.stop_thread()
-            self.poutput(Resource.cli_task_stopped)
         else:
-            self.poutput(Resource.cli_task_notRunning)
+            logger.info(Resource.cli_task_notRunning)
 
     @staticmethod
     def _build_task_status_parser() -> cmd2.Cmd2ArgumentParser:
@@ -167,119 +162,6 @@ class SRACli(cmd2.Cmd):
 
     # endregion
 
-    # region 触发器管理
-
-    @staticmethod
-    def _build_trigger_parser() -> cmd2.Cmd2ArgumentParser:
-        trigger_description = Text.assemble(Resource.trigger_description)
-        trigger_parser = cmd2.Cmd2ArgumentParser(description=trigger_description)
-        trigger_parser.add_subparsers(metavar="SUBCOMMAND", required=True)
-        return trigger_parser
-
-    @cmd2.with_argparser(_build_trigger_parser, preserve_quotes=True)
-    def do_trigger(self, args: argparse.Namespace) -> None:
-        args.cmd2_subcommand_func(args)
-
-    @staticmethod
-    def _build_trigger_run_parser() -> cmd2.Cmd2ArgumentParser:
-        trigger_run_description = Text.assemble(Resource.trigger_run_description)
-        return cmd2.Cmd2ArgumentParser(description=trigger_run_description)
-
-    @cmd2.as_subcommand_to("trigger", "run", _build_trigger_run_parser, help=Resource.trigger_run_description)
-    def _trigger_run(self, _) -> None:
-        if self.trigger_manager.is_thread_running():
-            self.poutput(Resource.cli_trigger_alreadyRunning)
-            return
-        if not self.trigger_manager.has_enabled_triggers():
-            self.poutput(Resource.cli_trigger_noEnabledTriggers)
-            return
-        self.trigger_manager.start_thread()
-        self.poutput(Resource.cli_trigger_started)
-
-    @staticmethod
-    def _build_trigger_stop_parser() -> cmd2.Cmd2ArgumentParser:
-        trigger_stop_description = Text.assemble(Resource.trigger_stop_description)
-        return cmd2.Cmd2ArgumentParser(description=trigger_stop_description)
-
-    @cmd2.as_subcommand_to("trigger", "stop", _build_trigger_stop_parser, help=Resource.trigger_stop_description)
-    def _trigger_stop(self, _) -> None:
-        if self.trigger_manager.is_thread_running():
-            self.trigger_manager.stop_thread()
-            self.poutput(Resource.cli_trigger_stopped)
-        else:
-            self.poutput(Resource.cli_trigger_notRunning)
-
-    @staticmethod
-    def _build_trigger_enable_parser() -> cmd2.Cmd2ArgumentParser:
-        trigger_enable_description = Text.assemble(Resource.trigger_enable_description)
-        trigger_enable_parser = cmd2.Cmd2ArgumentParser(description=trigger_enable_description)
-        trigger_enable_parser.add_argument('name', help=Resource.trigger_enable_nameHelp)
-        return trigger_enable_parser
-
-    @cmd2.as_subcommand_to("trigger", "enable", _build_trigger_enable_parser,
-                           help=Resource.trigger_enable_description)
-    def _trigger_enable(self, args: argparse.Namespace) -> None:
-        for trigger in self.trigger_manager.triggers:
-            if trigger.__class__.__name__.lower() == args.name.lower():
-                trigger.set_enable(True)
-                logger.info(Resource.cli_trigger_enabled(args.name))
-                self.trigger_manager.ensure_running()
-                return
-        self.poutput(Resource.cli_trigger_notFound(args.name))
-
-    @staticmethod
-    def _build_trigger_disable_parser() -> cmd2.Cmd2ArgumentParser:
-        trigger_disable_description = Text.assemble(Resource.trigger_disable_description)
-        trigger_disable_parser = cmd2.Cmd2ArgumentParser(description=trigger_disable_description)
-        trigger_disable_parser.add_argument('name', help=Resource.trigger_disable_nameHelp)
-        return trigger_disable_parser
-
-    @cmd2.as_subcommand_to("trigger", "disable", _build_trigger_disable_parser,
-                           help=Resource.trigger_disable_description)
-    def _trigger_disable(self, args: argparse.Namespace) -> None:
-        for trigger in self.trigger_manager.triggers:
-            if trigger.__class__.__name__.lower() == args.name.lower():
-                trigger.set_enable(False)
-                logger.info(Resource.cli_trigger_disabled(args.name))
-                self.trigger_manager.stop_if_idle()
-                return
-        self.poutput(Resource.cli_trigger_notFound(args.name))
-
-    @staticmethod
-    def _build_trigger_set_parser() -> cmd2.Cmd2ArgumentParser:
-        trigger_set_description = Text.assemble(Resource.trigger_set_description)
-        trigger_set_parser = cmd2.Cmd2ArgumentParser(description=trigger_set_description)
-        trigger_set_parser.add_argument('name', help=Resource.trigger_set_nameHelp)
-        trigger_set_parser.add_argument('attr', help=Resource.trigger_set_attrHelp)
-        trigger_set_parser.add_argument('value', help=Resource.trigger_set_valueHelp)
-        trigger_set_parser.add_argument('--type', choices=['int', 'float', 'str', 'bool'],
-                                        default='str', help=Resource.trigger_set_typeHelp)
-        return trigger_set_parser
-
-    @cmd2.as_subcommand_to("trigger", "set", _build_trigger_set_parser, help=Resource.trigger_set_description)
-    def _trigger_set(self, args: argparse.Namespace) -> None:
-        for trigger in self.trigger_manager.triggers:
-            if trigger.__class__.__name__.lower() == args.name.lower():
-                if not hasattr(trigger, args.attr):
-                    self.poutput(Resource.cli_trigger_attrNotFound(args.attr, args.name))
-                    return
-                if args.type == 'int':
-                    setattr(trigger, args.attr, int(args.value))
-                elif args.type == 'float':
-                    setattr(trigger, args.attr, float(args.value))
-                elif args.type == 'str':
-                    setattr(trigger, args.attr, args.value)
-                elif args.type == 'bool':
-                    setattr(trigger, args.attr, args.value.lower() in ['true', '1', 'yes'])
-                else:
-                    self.poutput(Resource.cli_trigger_unknownType(args.type))
-                    return
-                logger.info(Resource.cli_trigger_attrSet(args.name, args.attr, args.value))
-                return
-        self.poutput(Resource.cli_trigger_notFound(args.name))
-
-    # endregion
-
     # region 扩展管理
 
     @staticmethod
@@ -328,7 +210,7 @@ class SRACli(cmd2.Cmd):
 
     @staticmethod
     def _build_extension_run_parser() -> cmd2.Cmd2ArgumentParser:
-        parser = cmd2.Cmd2ArgumentParser(description="运行指定的扩展")
+        parser = cmd2.Cmd2ArgumentParser(description="按扩展类型自动分发：非后台扩展走共享线程，后台扩展走专用线程")
         parser.add_argument('name', help="扩展标识（可通过 extension list 查看）")
         parser.add_argument('--config', help="扩展配置文件名（不带 .json 后缀），不指定则不加载文件配置")
         return parser
@@ -342,8 +224,19 @@ class SRACli(cmd2.Cmd):
             return
         if args.config:
             self.extension_config_manager.load(args.config)
+
+        if extension_registry.is_background(args.name):
+            ok = self.extension_runner.start_extension(args.name)
+            if ok:
+                self.poutput(f"已启动后台扩展 '{args.name}'")
+            else:
+                self.poutput(f"无法启动后台扩展 '{args.name}'")
+            return
+
         result = self.extension_runner.run_in_thread(args.name)
-        if not result:
+        if result:
+            self.poutput(f"已启动扩展 '{args.name}'")
+        else:
             self.poutput(f"无法启动扩展 '{args.name}'")
 
     @staticmethod
@@ -395,10 +288,25 @@ class SRACli(cmd2.Cmd):
 
     @staticmethod
     def _build_extension_stop_parser() -> cmd2.Cmd2ArgumentParser:
-        return cmd2.Cmd2ArgumentParser(description="停止当前正在运行的扩展")
+        parser = cmd2.Cmd2ArgumentParser(description="停止指定的后台扩展或当前正在运行的单次扩展")
+        parser.add_argument('name', nargs='?', help="扩展标识；若不传则停止当前单次扩展")
+        return parser
 
-    @cmd2.as_subcommand_to("extension", "stop", _build_extension_stop_parser, help="停止当前正在运行的扩展")
-    def _extension_stop(self, _: argparse.Namespace) -> None:
+    @cmd2.as_subcommand_to("extension", "stop", _build_extension_stop_parser, help="停止指定后台扩展或当前正在运行的单次扩展")
+    def _extension_stop(self, args: argparse.Namespace) -> None:
+        if args.name:
+            from SRACore.extension import extension_registry
+
+            if not extension_registry.has_id(args.name):
+                self.poutput(f"扩展 '{args.name}' 不存在")
+                return
+            if not extension_registry.is_background(args.name):
+                self.poutput(f"扩展 '{args.name}' 不是后台扩展，不能通过 stop 指定停止")
+                return
+            stopped = self.extension_runner.stop_extension(args.name)
+            self.poutput(f"已停止后台扩展 '{args.name}'" if stopped else f"后台扩展 '{args.name}' 未运行")
+            return
+
         if not self.extension_runner.is_thread_running():
             self.poutput("当前没有正在运行的扩展")
             return
@@ -667,7 +575,6 @@ class SRACli(cmd2.Cmd):
     def _cleanup(self):
         """清理资源"""
         self.task_manager.stop_thread(timeout=5.0)
-        self.trigger_manager.stop_thread(timeout=5.0)
         self.event_listener.stop()
 
     # endregion

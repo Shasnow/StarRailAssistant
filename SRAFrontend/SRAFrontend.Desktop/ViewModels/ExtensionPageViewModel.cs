@@ -10,36 +10,12 @@ namespace SRAFrontend.Desktop.ViewModels;
 public partial class ExtensionPageViewModel(IBackendService backendService)
     : PageViewModel(PageName.Extension, "\uE596")
 {
-    public bool EnableAutoPlot
-    {
-        get;
-        set
-        {
-            field = value;
-            OnPropertyChanged();
-            _ = backendService.SendInputAsync(value
-                ? "trigger enable AutoPlotTrigger"
-                : "trigger disable AutoPlotTrigger");
-        }
-    }
-
-    public bool SkipPlot
-    {
-        get;
-        set
-        {
-            field = value;
-            OnPropertyChanged();
-            _ = backendService.SendInputAsync($"trigger set AutoPlotTrigger skip_plot --type bool {value}");
-        }
-    }
-
     [ObservableProperty] private bool _isLoadingExtensions;
 
     public ObservableCollection<ExtensionCardViewModel> Extensions { get; } = [];
 
     /// <summary>
-    /// 自动加载（页面导航时调用），30秒内跳过
+    /// 自动加载（页面导航时调用）
     /// </summary>
     [RelayCommand]
     private async Task LoadExtensionsAsync()

@@ -13,6 +13,8 @@ from typing import Any
 
 from loguru import logger
 
+from SRACore.util.errors import ThreadStoppedError
+
 
 # ── 运行时状态 ──
 
@@ -141,10 +143,21 @@ class Runner(ABC):
     def _worker(self, target: Callable[..., Any], *args):
         """线程执行目标函数的包装器，捕获异常，完成后清理共享状态。"""
         logger.debug("[Start]")
+        self._set_status("running")
         try:
-            target(*args)
+            result = target(*args)
+            if result is False:
+                self._set_status("stopped" if self.stop_event.is_set() else "failed")
+            elif self.stop_event.is_set():
+                self._set_status("stopped")
+            elif self._info.status == "running":
+                self._set_status("completed")
         except KeyboardInterrupt:
             self.request_stop()
+            self._set_status("stopped")
+        except ThreadStoppedError:
+            logger.warning(f"{self.__class__.__name__} stopped by request")
+            self._set_status("stopped")
         except Exception as e:
             logger.exception(f"{self.__class__.__name__} crashed: {e}")
             self._set_error(str(e))
