@@ -9,7 +9,7 @@ namespace SRAFrontend.Services;
 
 public class ActivityService(IHttpClientFactory httpClientFactory, ILogger<ActivityService> logger)
 {
-    private const string RequestUrl = "https://gitee.com/yukikage/sraresource/raw/main/SRA/activities.json";
+    private const string RequestUrl = "https://starrailassistant.top/api/v1/activities.json";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {

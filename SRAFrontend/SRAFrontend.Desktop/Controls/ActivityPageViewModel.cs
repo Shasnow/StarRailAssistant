@@ -45,8 +45,18 @@ public partial class ActivityPageViewModel(ActivityService activityService) : Vi
         var end = DateTime.Parse(info.EndTime);
         VersionTimeRange = $"{start:MM/dd HH:mm} - {end:MM/dd HH:mm}";
 
-        var remaining = (int)(end - DateTime.Now).TotalDays;
-        VersionRemaining = remaining > 0 ? $"剩余 {remaining} 天" : "已结束";
+        var remaining = end - DateTime.Now;
+        if (remaining.TotalSeconds <= 0)
+        {
+            VersionRemaining = "已结束";
+        }
+        else
+        {
+            var totalHours = (int)remaining.TotalHours;
+            var days = totalHours / 24;
+            var hours = totalHours % 24;
+            VersionRemaining = days > 0 ? $"剩余 {days} 天 {hours} 小时" : $"剩余 {totalHours} 小时";
+        }
 
         _allActivities = info.Activities?.ToList() ?? [];
 
@@ -91,29 +101,40 @@ public class ActivityItemViewModel : ViewModelBase
         DescriptionPreview = Description.Length > 25 ? Description[..25] + "..." : Description;
         var start = DateTime.Parse(info.StartTime);
         var end = DateTime.Parse(info.EndTime);
+        var referenceTime = selectedDate.Date == DateTime.Today ? DateTime.Now : selectedDate;
         TimeRange = $"{start:MM/dd HH:mm} - {end:MM/dd HH:mm}";
 
-        if (selectedDate < start)
+        if (referenceTime < start)
         {
-            var days = (int)(start - selectedDate).TotalDays;
+            var remaining = start - referenceTime;
+            var totalHours = (int)remaining.TotalHours;
+            var days = totalHours / 24;
+            var hours = totalHours % 24;
             Status = "未开始";
-            Countdown = days > 0 ? $"{days}天后开始" : "即将开始";
+            Countdown = days > 0 ? $"{days} 天 {hours} 小时后开始" : $"{totalHours} 小时后开始";
             StatusBrush = InactiveBrush;
         }
-        else if (selectedDate > end)
+        else if (referenceTime > end)
         {
+            var elapsed = referenceTime - end;
+            var totalHours = (int)elapsed.TotalHours;
+            var days = totalHours / 24;
+            var hours = totalHours % 24;
             Status = "已结束";
-            Countdown = $"已结束 {(int)(selectedDate - end).TotalDays} 天";
+            Countdown = days > 0 ? $"已结束 {days} 天 {hours} 小时" : $"已结束 {totalHours} 小时";
             StatusBrush = InactiveBrush;
         }
         else
         {
-            var days = (int)(end - selectedDate).TotalDays;
+            var remaining = end - referenceTime;
+            var totalHours = (int)remaining.TotalHours;
+            var days = totalHours / 24;
+            var hours = totalHours % 24;
             Status = "进行中";
-            Countdown = days > 0 ? $"剩余 {days} 天" : "即将结束";
-            StatusBrush = days > 7
+            Countdown = days > 0 ? $"剩余 {days} 天 {hours} 小时" : $"剩余 {totalHours} 小时";
+            StatusBrush = totalHours > 7 * 24
                 ? AbundantBrush
-                : days > 3
+                : totalHours > 3 * 24
                     ? ModerateBrush
                     : UrgentBrush;
         }

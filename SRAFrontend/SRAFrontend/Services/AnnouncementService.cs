@@ -9,7 +9,7 @@ namespace SRAFrontend.Services;
 
 public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<AnnouncementService> logger)
 {
-    private const string RequestUrl = "https://gitee.com/yukikage/sraresource/raw/main/SRA/anno.json";
+    private const string RequestUrl = "https://starrailassistant.top/api/v1/anno.json";
     private AnnouncementList? _cachedAnnouncements; // 缓存数据，避免重复请求
 
     /// <summary>
