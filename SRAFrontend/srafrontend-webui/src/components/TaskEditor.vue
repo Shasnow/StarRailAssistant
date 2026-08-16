@@ -24,6 +24,15 @@
                 <el-option label="国际服" :value="2" />
               </el-select>
             </label>
+            <label class="field">
+              <span>国际服区服</span>
+              <el-select v-model="configModel.startGame['game.server']" :disabled="configModel.startGame['game.channel'] !== 2">
+                <el-option label="Asia" :value="0" />
+                <el-option label="Europe" :value="1" />
+                <el-option label="America" :value="2" />
+                <el-option label="TW,HK,MO" :value="3" />
+              </el-select>
+            </label>
             <label class="field wide">
               <span>游戏路径</span>
               <el-input v-model="configModel.startGame['game.path']" :disabled="configModel.startGame['game.useGlobalPath']" placeholder="使用全局路径时会忽略此项" />
@@ -38,15 +47,6 @@
             <label class="field">
               <span>密码</span>
               <el-input v-model="localStartPassword" type="password" show-password placeholder="留空则保留已保存密码" />
-            </label>
-            <label class="field">
-              <span>国际服区服</span>
-              <el-select v-model="configModel.startGame['game.server']" :disabled="configModel.startGame['game.channel'] !== 2">
-                <el-option label="Asia" :value="0" />
-                <el-option label="Europe" :value="1" />
-                <el-option label="America" :value="2" />
-                <el-option label="TW,HK,MO" :value="3" />
-              </el-select>
             </label>
           </div>
         </section>
