@@ -21,6 +21,21 @@ public class ZeroToBooleanConverter : IValueConverter
     }
 }
 
+public class GlobalChannelConverter : IValueConverter
+{
+    public static readonly GlobalChannelConverter Instance = new();
+
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is int channel && channel == 2;
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
 public class DateToStringConverter : IValueConverter
 {
     public static readonly DateToStringConverter Instance = new();

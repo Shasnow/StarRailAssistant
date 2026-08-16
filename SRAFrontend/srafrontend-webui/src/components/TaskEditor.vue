@@ -24,9 +24,9 @@
                 <el-option label="国际服" :value="2" />
               </el-select>
             </label>
-            <label class="field">
+            <label v-if="configModel.startGame['game.channel'] === 2" class="field">
               <span>国际服区服</span>
-              <el-select v-model="configModel.startGame['game.server']" :disabled="configModel.startGame['game.channel'] !== 2">
+              <el-select v-model="configModel.startGame['game.server']">
                 <el-option label="Asia" :value="0" />
                 <el-option label="Europe" :value="1" />
                 <el-option label="America" :value="2" />
