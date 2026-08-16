@@ -165,17 +165,24 @@ class StartGameTask(BaseTask):
         labels = ["Asia", "Europe", "America", "TW,HK,MO"]
         server_index = max(0, min(int(getattr(self.config.StartGame, "gameServer", 0)), len(labels) - 1))
         target = labels[server_index]
-        index, box = self.operator.wait_ocr_any(labels, timeout=15, from_y=0.65, to_y=0.98)
+        # OCR boxes from a cropped screenshot are crop-relative. Keep these
+        # lookups full-screen because their boxes are clicked directly below.
+        index, box = self.operator.wait_ocr_any(labels, timeout=15)
         if index < 0 or box is None:
             logger.warning("未检测到国际服区服选择器，跳过区服切换")
             return False
+        logger.info(f"打开国际服区服选择器，当前区服: {labels[index]}，目标区服: {target}")
         self.operator.click_box(box, after_sleep=1)
-        index, box = self.operator.wait_ocr_any([target], timeout=10, from_y=0.25, to_y=0.75)
+        index, _ = self.operator.wait_ocr_any(["服务器列表", "Server List"], timeout=10)
+        if index < 0:
+            logger.warning("未检测到国际服区服选择弹窗")
+            return False
+        index, box = self.operator.wait_ocr_any([target], timeout=10)
         if index < 0 or box is None:
             logger.warning(f"未检测到国际服目标区服: {target}")
             return False
         self.operator.click_box(box, after_sleep=0.5)
-        index, box = self.operator.wait_ocr_any(["确认", "Confirm"], timeout=5, from_y=0.55, to_y=0.95)
+        index, box = self.operator.wait_ocr_any(["确认", "Confirm"], timeout=5)
         if index >= 0 and box is not None:
             self.operator.click_box(box, after_sleep=1)
             logger.info(f"已选择国际服区服: {target}")
