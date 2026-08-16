@@ -176,7 +176,8 @@ class DivergentUniverse(Executable):
         if self.operator.wait_img(DUIMG.RETURN):
             self.operator.click_img(DUIMG.RETURN, after_sleep=0.5)
 
-        return True
+        return self.operator.wait_any_img(
+            [DUIMG.DIVERGENT_UNIVERSE_START, IMG.ENTER], timeout=30)
 
     def _return_to_main_menu(self):
         """返回主菜单"""
@@ -228,6 +229,8 @@ class DivergentUniverse(Executable):
         return False
 
     def receive_point_rewards(self):
+        if self.operator.locate(IMG.ENTER):
+            self.operator.press_key("f")
         self.operator.click_point(0.15, 0.93, tag="领取积分奖励", after_sleep=1)
         if self.operator.click_img(DUIMG.RECEIVE, after_sleep=1):
             self.operator.press_key("esc")

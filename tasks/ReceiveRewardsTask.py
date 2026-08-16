@@ -84,7 +84,7 @@ class ReceiveRewardsTask(BaseTask):
         """Mission trailblaze profile"""
         logger.info("执行任务：签证奖励")
         if self.operator.click_point(0.92, 0.10, after_sleep=1):
-            if self.operator.click_point(0.82, 0.13, after_sleep=1):
+            if self.operator.click_point(0.82, 0.13, after_sleep=2):
                 if self.operator.click_img(RRIMG.ASSISTANCE_REWARD):
                     self.operator.sleep(1)
                     self.operator.press_key("esc", presses=2, interval=1.2)
