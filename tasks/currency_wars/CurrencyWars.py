@@ -1025,6 +1025,7 @@ class CurrencyWars(Executable):
             logger.info("当前商店无目标角色可购买")
             return False
 
+        prev_coins = -1
         while True:
             purchased = False
             # 扫描商店角色并尝试购买
@@ -1033,6 +1034,12 @@ class CurrencyWars(Executable):
                 purchased = purchase_target_character(cs)
             level = self.get_level()
             coins = self.get_coins()
+
+            # 前后两次循环识别到的金币数量相同则结束循环
+            if coins == prev_coins:
+                logger.info(f"当前金币{coins}与上一轮相同，退出购物循环")
+                break
+            prev_coins = coins
 
             # 基础退出条件：金币不足4
             if coins < 4:
