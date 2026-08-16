@@ -137,6 +137,7 @@ class RRIMG:
     REVERSE_ORDER = f"{BASE}/reverse_order.png"
     SYNTHESIS = f"{BASE}/synthesis.png"
     SYNTHESIS2 = f"{BASE}/synthesis2.png"
+    TRAILBLAZER_PROFILE_PAGE = f"{BASE}/trailblazer_profile_page.png"
     UPGRADE_MATERIALS = f"{BASE}/upgrade_materials.png"
 # endregion
 
