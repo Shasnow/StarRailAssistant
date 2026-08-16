@@ -126,7 +126,7 @@ nothing to do with it.
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Shasnow/StarRailAssistant&type=Date)](https://star-history.com/#Shasnow/StarRailAssistant&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=Shasnow/StarRailAssistant&type=Date)](https://star-history.dera.page/#Shasnow/StarRailAssistant&Date)
 
 ----------------------------------------------------------------------------------------------
 
