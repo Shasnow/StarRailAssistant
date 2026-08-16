@@ -823,5 +823,8 @@ class TrailblazePowerTask(BaseTask):
         on_complete = self.settings.Notification.onCompleted
         if self.__class__.__name__ in on_complete:
             self.goto_survival_index()  # 在生存索引页面发送通知
-            self.send_notification(f"任务 {self.__class__.__name__} 执行完成。", "success")
+            self.send_notification(
+                f"任务 {self.__class__.__name__} 执行完成。",
+                "success",
+                self.operator.screenshot())
             self.operator.press_key('esc')

@@ -365,7 +365,16 @@ class ReceiveRewardsTask(BaseTask):
     def on_completed(self) -> None:
         on_complete = self.settings.Notification.onCompleted
         if self.__class__.__name__ in on_complete:
-            self.operator.press_key("b")  # 打开背包
-            self.operator.wait_ocr("背包", from_x=0.05, from_y=0.03, to_x=0.1, to_y=0.08, interval=0.5)
-            self.send_notification(f"任务 {self.__class__.__name__} 执行完成。", "success")
+            self.operator.do_while(
+                lambda :self.operator.press_key("b"),  # 打开背包
+                lambda :self.operator.wait_ocr("背包",
+                                               from_x=0.05, from_y=0.03, to_x=0.1, to_y=0.08, interval=0.5,
+                                               timeout=5) is None,
+                interval=1,
+                max_iterations=5
+            )
+
+            self.send_notification(f"任务 {self.__class__.__name__} 执行完成。",
+                                   "success",
+                                   self.operator.screenshot())
             self.operator.press_key('esc')

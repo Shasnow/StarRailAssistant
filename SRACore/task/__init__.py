@@ -56,7 +56,7 @@ class BaseTask(Executable, ABC):
             self.send_notification(f"任务 {self.__class__.__name__} 执行完成。", "success")
 
     def on_failed(self) -> None:
-        if self.operator.width != 1920 and self.operator.height != 1080:
+        if self.operator.width != 1920 or self.operator.height != 1080:
             logger.warning(
                 f"可能的失败原因：游戏分辨率不符合要求：1920x1080，当前：{self.operator.width}x{self.operator.height}。")
         image = None
