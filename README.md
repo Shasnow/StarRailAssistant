@@ -126,8 +126,6 @@ nothing to do with it.
 
 ## ⭐ Star History
 
-## Star History
-
 <a href="https://www.star-history.com/?repos=Shasnow%2FStarRailAssistant&type=date&legend=top-left">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=Shasnow/StarRailAssistant&type=date&theme=dark&legend=top-left&sealed_token=-d1hfRmVNv67qW-5NaLnQpmr58Vatft_y975chPsQxz3vrLBmXMjqH_G2XuU9t1rwl-NqjNBgKKmYL_3inwquYr1j0QEtL-uiclG-hR18uUPLcpm2mb92g" />
@@ -137,5 +135,3 @@ nothing to do with it.
 </a>
 
 ----------------------------------------------------------------------------------------------
-
-
