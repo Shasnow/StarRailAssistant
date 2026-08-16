@@ -29,7 +29,6 @@
                             <ComboBoxItem>国际服</ComboBoxItem>
                         </ComboBox>
                     </Grid>
-                    
                     <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto" ColumnSpacing="12">
                         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="12">
                             <Label Content="{x:Static lang:Resources.GamePathText}"/>
@@ -62,6 +61,15 @@
                         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
                         <TextBox Grid.Row="1" Grid.Column="1" Classes="revealPasswordButton" PasswordChar="*"
                                  Text="{Binding StartGameConfig.Password}"/> 
+                    </Grid>
+                    <Grid Margin="0,15,0,0" ColumnDefinitions="Auto, Auto">
+                        <TextBlock Text="国际服区服" VerticalAlignment="Center" />
+                        <ComboBox Grid.Column="1" SelectedIndex="{Binding StartGameConfig.GameServer}">
+                            <ComboBoxItem>Asia</ComboBoxItem>
+                            <ComboBoxItem>Europe</ComboBoxItem>
+                            <ComboBoxItem>America</ComboBoxItem>
+                            <ComboBoxItem>TW,HK,MO</ComboBoxItem>
+                        </ComboBox>
                     </Grid>
                 </StackPanel>
             </ScrollViewer>

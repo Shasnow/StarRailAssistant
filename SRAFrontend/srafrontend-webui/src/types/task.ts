@@ -35,6 +35,7 @@ export type TaskConfig = {
   startGame: {
     enabled: boolean
     'game.channel': number
+    'game.server': number
     'game.path': string
     'game.useGlobalPath': boolean
     autologin: boolean
