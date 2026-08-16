@@ -125,8 +125,6 @@ class StartGameTask(BaseTask):
             else:
                 return result  # 直接返回登录状态
 
-        if channel == 'gb':
-            self.select_global_server()
         self.operator.click_img(SGIMG.LOGIN_OTHER % channel, after_sleep=1)
         # The global client exposes the account fields directly on this page.
         if channel != 'gb':
@@ -200,6 +198,8 @@ class StartGameTask(BaseTask):
         return False
 
     def start_game_click(self):
+        if self.config.StartGame.gameChannel == 2:
+            self.select_global_server()
         result, _ = self.operator.wait_ocr_any(["开始游戏", "点击进入"], interval=1, timeout=60, from_x=0.44,
                                                from_y=0.74, to_x=0.57, to_y=0.97)
         if result == 0:
