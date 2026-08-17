@@ -165,9 +165,16 @@ class StartGameTask(BaseTask):
         labels = ["Asia", "Europe", "America", "TW,HK,MO"]
         server_index = max(0, min(int(getattr(self.config.StartGame, "gameServer", 0)), len(labels) - 1))
         target = labels[server_index]
-        # OCR boxes from a cropped screenshot are crop-relative. Keep these
-        # lookups full-screen because their boxes are clicked directly below.
-        index, box = self.operator.wait_ocr_any(labels, timeout=15)
+        # All four bounds are required for cropped OCR so the returned box is
+        # offset back into window coordinates correctly before click_box().
+        index, box = self.operator.wait_ocr_any(
+            labels,
+            timeout=15,
+            from_x=0,
+            from_y=0.55,
+            to_x=1,
+            to_y=0.95,
+        )
         if index < 0 or box is None:
             logger.warning("未检测到国际服区服选择器，跳过区服切换")
             return False

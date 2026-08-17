@@ -4,10 +4,11 @@ import tomllib
 
 import cmd2
 
+from SRACore.cli2 import SRACli
 from SRACore.util.const import AppRootDir
 
 
-class TrailblazePowerCommands(cmd2.CommandSet):
+class TrailblazePowerCommands(cmd2.CommandSet[SRACli]):
     DEFAULT_CATEGORY = 'Trailblaze Power'
 
     @staticmethod
@@ -54,7 +55,7 @@ class TrailblazePowerCommands(cmd2.CommandSet):
             self._cmd.poutput("")
 
 
-class CurrencyWarsCommands(cmd2.CommandSet):
+class CurrencyWarsCommands(cmd2.CommandSet[SRACli]):
     DEFAULT_CATEGORY = 'Currency Wars'
 
     @staticmethod
