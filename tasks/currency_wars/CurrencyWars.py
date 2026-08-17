@@ -1025,13 +1025,13 @@ class CurrencyWars(Executable):
             logger.info("当前商店无目标角色可购买")
             return False
 
+        cs = scan_characters_in_store()
+        if cs:
+            purchase_target_character(cs)
         prev_coins = -1
         while True:
             purchased = False
-            # 扫描商店角色并尝试购买
-            cs = scan_characters_in_store()
-            if cs:
-                purchased = purchase_target_character(cs)
+
             level = self.get_level()
             coins = self.get_coins()
 
@@ -1051,6 +1051,11 @@ class CurrencyWars(Executable):
                 self.operator.press_key('f')
                 self.operator.sleep(0.5)
                 continue
+
+            # 扫描商店角色并尝试购买
+            cs = scan_characters_in_store()
+            if cs:
+                purchased = purchase_target_character(cs)
 
             # 非超频模式：检查金币是否满足保留要求（预判刷新后结果）
             if not self.is_overclock:
