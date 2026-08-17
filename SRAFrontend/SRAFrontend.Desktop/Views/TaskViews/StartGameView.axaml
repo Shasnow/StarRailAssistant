@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:controls="clr-namespace:SRAFrontend.Desktop.Controls"
              xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend"
              xmlns:viewModels="clr-namespace:SRAFrontend.Desktop.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -21,15 +22,24 @@
             </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Margin="10">
-                    <Grid Margin="0,0,0,15" ColumnDefinitions="Auto, Auto">
+                    <Grid Margin="0,0,0,15" ColumnDefinitions="Auto, Auto, Auto, Auto" ColumnSpacing="12">
                         <TextBlock Text="渠道" VerticalAlignment="Center" />
                         <ComboBox Grid.Column="1" SelectedIndex="{Binding StartGameConfig.GameChannel}">
                             <ComboBoxItem>官服</ComboBoxItem>
                             <ComboBoxItem>b服</ComboBoxItem>
                             <ComboBoxItem>国际服</ComboBoxItem>
                         </ComboBox>
+                        <StackPanel Grid.Column="2" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="12"
+                                    IsVisible="{Binding StartGameConfig.GameChannel, Converter={x:Static controls:GlobalChannelConverter.Instance}}">
+                            <TextBlock Text="国际服区服" VerticalAlignment="Center" />
+                            <ComboBox SelectedIndex="{Binding StartGameConfig.GameServer}">
+                                <ComboBoxItem>Asia</ComboBoxItem>
+                                <ComboBoxItem>Europe</ComboBoxItem>
+                                <ComboBoxItem>America</ComboBoxItem>
+                                <ComboBoxItem>TW,HK,MO</ComboBoxItem>
+                            </ComboBox>
+                        </StackPanel>
                     </Grid>
-                    
                     <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto" ColumnSpacing="12">
                         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="12">
                             <Label Content="{x:Static lang:Resources.GamePathText}"/>

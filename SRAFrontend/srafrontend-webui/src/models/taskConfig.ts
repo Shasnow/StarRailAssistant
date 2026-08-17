@@ -13,6 +13,7 @@ export function createConfigModel(source: unknown, fallbackName: string): TaskCo
     startGame: {
       enabled: true,
       'game.channel': 0,
+      'game.server': 0,
       'game.path': '',
       'game.useGlobalPath': true,
       autologin: true,

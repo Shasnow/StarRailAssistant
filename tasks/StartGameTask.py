@@ -126,7 +126,9 @@ class StartGameTask(BaseTask):
                 return result  # 直接返回登录状态
 
         self.operator.click_img(SGIMG.LOGIN_OTHER % channel, after_sleep=1)
-        self.operator.click_img(SGIMG.LOGIN_WITH_ACCOUNT % channel, after_sleep=1)
+        # The global client exposes the account fields directly on this page.
+        if channel != 'gb':
+            self.operator.click_img(SGIMG.LOGIN_WITH_ACCOUNT % channel, after_sleep=1)
         if self.config.StartGame.isAutoLogin:
             user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
             passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
@@ -142,7 +144,12 @@ class StartGameTask(BaseTask):
             self.operator.sleep(0.2)
             self.operator.copy(passwd)
             self.operator.paste()
-            self.operator.click_img(SGIMG.AGREE % channel, x_offset=-35, after_sleep=1)
+            if channel == 'gb':
+                index, box = self.operator.wait_ocr_any(["同意", "Agree"], timeout=10, from_y=0.55, to_y=0.95)
+                if index >= 0 and box is not None:
+                    self.operator.click_box(box, x_offset=-35, after_sleep=1)
+            else:
+                self.operator.click_img(SGIMG.AGREE % channel, x_offset=-35, after_sleep=1)
             self.operator.click_img(SGIMG.ENTER_GAME % channel)
         else:
             logger.info("未启用自动登录，请手动完成登录")
@@ -152,6 +159,43 @@ class StartGameTask(BaseTask):
         else:
             logger.warning("登录后等待欢迎界面超时，请检查游戏状态")
             return -1
+
+    def select_global_server(self):
+        """Select and confirm the configured global server before login."""
+        labels = ["Asia", "Europe", "America", "TW,HK,MO"]
+        server_index = max(0, min(int(getattr(self.config.StartGame, "gameServer", 0)), len(labels) - 1))
+        target = labels[server_index]
+        # All four bounds are required for cropped OCR so the returned box is
+        # offset back into window coordinates correctly before click_box().
+        index, box = self.operator.wait_ocr_any(
+            labels,
+            timeout=15,
+            from_x=0,
+            from_y=0.55,
+            to_x=1,
+            to_y=0.95,
+        )
+        if index < 0 or box is None:
+            logger.warning("未检测到国际服区服选择器，跳过区服切换")
+            return False
+        logger.info(f"打开国际服区服选择器，当前区服: {labels[index]}，目标区服: {target}")
+        self.operator.click_box(box, after_sleep=1)
+        index, _ = self.operator.wait_ocr_any(["服务器列表", "Server List"], timeout=10)
+        if index < 0:
+            logger.warning("未检测到国际服区服选择弹窗")
+            return False
+        index, box = self.operator.wait_ocr_any([target], timeout=10)
+        if index < 0 or box is None:
+            logger.warning(f"未检测到国际服目标区服: {target}")
+            return False
+        self.operator.click_box(box, after_sleep=0.5)
+        index, box = self.operator.wait_ocr_any(["确认", "Confirm"], timeout=5)
+        if index >= 0 and box is not None:
+            self.operator.click_box(box, after_sleep=1)
+            logger.info(f"已选择国际服区服: {target}")
+            return True
+        logger.warning(f"国际服区服选择未找到确认按钮: {target}")
+        return False
 
     def logout(self):
         logger.info("登出账号")
@@ -168,6 +212,8 @@ class StartGameTask(BaseTask):
         return False
 
     def start_game_click(self):
+        if self.config.StartGame.gameChannel == 2:
+            self.select_global_server()
         result, _ = self.operator.wait_ocr_any(["开始游戏", "点击进入"], interval=1, timeout=60, from_x=0.44,
                                                from_y=0.74, to_x=0.57, to_y=0.97)
         if result == 0:

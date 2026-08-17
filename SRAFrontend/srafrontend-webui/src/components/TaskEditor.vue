@@ -24,6 +24,15 @@
                 <el-option label="国际服" :value="2" />
               </el-select>
             </label>
+            <label v-if="configModel.startGame['game.channel'] === 2" class="field">
+              <span>国际服区服</span>
+              <el-select v-model="configModel.startGame['game.server']">
+                <el-option label="Asia" :value="0" />
+                <el-option label="Europe" :value="1" />
+                <el-option label="America" :value="2" />
+                <el-option label="TW,HK,MO" :value="3" />
+              </el-select>
+            </label>
             <label class="field wide">
               <span>游戏路径</span>
               <el-input v-model="configModel.startGame['game.path']" :disabled="configModel.startGame['game.useGlobalPath']" placeholder="使用全局路径时会忽略此项" />

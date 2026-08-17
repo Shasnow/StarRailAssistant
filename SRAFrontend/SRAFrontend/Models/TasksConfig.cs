@@ -28,6 +28,9 @@ public partial class StartGameConfig : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("game.channel")]
     private int _gameChannel;
 
+    [ObservableProperty] [property: JsonPropertyName("game.server")]
+    private int _gameServer;
+
     [ObservableProperty] [property: JsonPropertyName("game.path")]
     private string _gamePath = "";
 
