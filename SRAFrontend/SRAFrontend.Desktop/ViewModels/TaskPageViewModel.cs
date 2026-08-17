@@ -24,8 +24,16 @@ public partial class TaskPageViewModel : PageViewModel
     private TpTask[] _tpTasks = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CosmicStrifeConfig), nameof(MissionAccomplishedConfig),
-        nameof(ReceiveRewardsConfig), nameof(StartGameConfig), nameof(TrailblazePowerConfig))]
+    [NotifyPropertyChangedFor(
+        nameof(CosmicStrifeConfig), 
+        nameof(MissionAccomplishedConfig),
+        nameof(ReceiveRewardsConfig),
+        nameof(StartGameConfig),
+        nameof(TrailblazePowerConfig),
+        nameof(SelectedGardenOfPlentyLevels1Index),
+        nameof(SelectedGardenOfPlentyLevels2Index),
+        nameof(SelectedPlanarFissureLevelsIndex),
+        nameof(SelectedRealmOfTheStrangeLevelsIndex))]
     private TasksConfig _currentConfig;
 
     [ObservableProperty] private bool _isTpTaskAutoDetect;
