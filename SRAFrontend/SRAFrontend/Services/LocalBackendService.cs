@@ -248,7 +248,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
 
     public async Task<ExtensionSchema?> GetExtensionSchemaAsync(string extensionId)
     {
-        var json = await SendCommandAndWaitOutputAsync($"extension info {extensionId} --json");
+        var json = await SendCommandAndWaitOutputAsync($"extension schema {extensionId} --json");
         if (json == null) return null;
         try
         {

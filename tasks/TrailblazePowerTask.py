@@ -44,8 +44,7 @@ class TrailblazePowerTask(BaseTask):
         use_build_target = self.config.TrailblazePower.isUseBuildTarget
         if use_build_target:
             self.detect_build_target_tasklist()
-        else:
-            self.init_custom_tasklist()
+        self.init_custom_tasklist()
         for func, kwargs in self.manual_tasks:
             func(**kwargs)
         if len(self.auto_detect_tasks) > 0:

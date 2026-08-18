@@ -37,14 +37,19 @@ class BaseExtension(Executable, Generic[T], ABC):
         class HelloExtension(BaseExtension[HelloConfig]):
             def run(self) -> bool: ...
 
+    也可不声明配置类型，此时 ``self.config`` 为 ``None``::
+
+        class SimpleExtension(BaseExtension):
+            def run(self) -> bool: ...
+
     扩展可通过 ``self.operator`` 执行截图、点击、OCR 等实际操作。
     """
 
-    config: T
+    config: T | None = None
     operator: IOperator
     settings: AppSettings
 
-    def __init__(self, operator: IOperator, config: T):
+    def __init__(self, operator: IOperator, config: T | None = None):
         super().__init__(operator)
         self.config = config
         self.__post_init__()
@@ -91,7 +96,7 @@ class BaseExtension(Executable, Generic[T], ABC):
 class ExtensionEntry:
     """注册表中单个扩展的完整元数据。"""
     extension_cls: type[BaseExtension]
-    config_cls: type[BaseModel]
+    config_cls: type[BaseModel] | None = None
     name: str = ""
     description: str = ""
     is_background: bool = False
@@ -104,7 +109,7 @@ class ExtensionRegistry:
         self._storage: dict[str, ExtensionEntry] = {}
 
     def register(self, extension_id: str, extension_cls: type[BaseExtension],
-                 config_cls: type[BaseModel], *, name: str = "", description: str = "",
+                 config_cls: type[BaseModel] | None = None, *, name: str = "", description: str = "",
                  is_background: bool = False) -> None:
         if extension_id in self._storage:
             raise KeyError(f"Extension '{extension_id}' already exists")
@@ -121,7 +126,7 @@ class ExtensionRegistry:
     def get_extension_class(self, extension_id: str) -> type[BaseExtension]:
         return self.get(extension_id).extension_cls
 
-    def get_config_class(self, extension_id: str) -> type[BaseModel]:
+    def get_config_class(self, extension_id: str) -> type[BaseModel] | None:
         return self.get(extension_id).config_cls
 
     def get_name(self, extension_id: str) -> str:
@@ -137,7 +142,8 @@ class ExtensionRegistry:
         return [ext_id for ext_id, entry in self._storage.items() if entry.is_background]
 
     def get_all_config_classes(self) -> dict[str, type[BaseModel]]:
-        return {ext_id: entry.config_cls for ext_id, entry in self._storage.items()}
+        return {ext_id: entry.config_cls for ext_id, entry in self._storage.items()
+                if entry.config_cls is not None}
 
     def get_all_extension_classes(self) -> dict[str, type[BaseExtension]]:
         return {ext_id: entry.extension_cls for ext_id, entry in self._storage.items()}
@@ -147,13 +153,14 @@ class ExtensionRegistry:
 
     def get_schema(self, extension_id: str) -> dict[str, Any] | None:
         entry = self._storage.get(extension_id)
-        if entry is None:
+        if entry is None or entry.config_cls is None:
             return None
         return entry.config_cls.model_json_schema()
 
     def get_all_schemas(self) -> dict[str, Any]:
         return {ext_id: entry.config_cls.model_json_schema()
-                for ext_id, entry in self._storage.items()}
+                for ext_id, entry in self._storage.items()
+                if entry.config_cls is not None}
 
     def get_ids(self) -> list[str]:
         return list(self._storage.keys())
@@ -211,8 +218,8 @@ def extension(_cls: type[BaseExtension] | None = None, *, extension_id: str | No
     """
     reg = registry or extension_registry
 
-    def _resolve_config(cls: type[BaseExtension]) -> type[BaseModel]:
-        """从泛型基类 ``BaseExtension[Config]`` 中提取配置类。"""
+    def _resolve_config(cls: type[BaseExtension]) -> type[BaseModel] | None:
+        """从泛型基类 ``BaseExtension[Config]`` 中提取配置类，无泛型参数则返回 None。"""
         for base in getattr(cls, '__orig_bases__', []):
             origin: type | None = getattr(base, '__origin__', None)
             if origin is None or not issubclass(origin, BaseExtension):
@@ -220,10 +227,7 @@ def extension(_cls: type[BaseExtension] | None = None, *, extension_id: str | No
             args = get_args(base)
             if args and isinstance(args[0], type) and issubclass(args[0], BaseModel):
                 return args[0]
-        raise ValueError(
-            f"Extension '{cls.__name__}' must declare its config via generic parameter, "
-            f"e.g. `class {cls.__name__}(BaseExtension[YourConfig])`."
-        )
+        return None
 
     def decorator(cls: type[BaseExtension]) -> type[BaseExtension]:
         if not issubclass(cls, BaseExtension):
@@ -234,8 +238,9 @@ def extension(_cls: type[BaseExtension] | None = None, *, extension_id: str | No
         _desc = description or (cls.__doc__.strip().splitlines()[0] if cls.__doc__ else "")
         reg.register(_id, cls, resolved_config, name=_name, description=_desc,
                     is_background=background)
+        _config_name = resolved_config.__name__ if resolved_config else "None"
         logger.debug(f"Registered extension: {_id} -> {cls.__name__} "
-                     f"(config={resolved_config.__name__}, background={background})")
+                     f"(config={_config_name}, background={background})")
         return cls
 
     if _cls is None:
@@ -279,10 +284,13 @@ class ExtensionConfigManager:
             for ext_id, value in data.items():
                 if ext_id in ("name", "version"):
                     continue
+                if not self._registry.has_id(ext_id):
+                    continue
+                config_cls = self._registry.get_config_class(ext_id)
+                if config_cls is None:
+                    continue
                 logger.info(f"加载扩展配置 {ext_id}...")
-                if self._registry.has_id(ext_id):
-                    config_cls = self._registry.get_config_class(ext_id)
-                    self._configs[ext_id] = config_cls.model_validate(value, by_alias=True)
+                self._configs[ext_id] = config_cls.model_validate(value, by_alias=True)
         except FileNotFoundError:
             logger.debug(f"扩展配置文件 {self.path} 不存在，将使用默认配置")
         except json.JSONDecodeError as e:
@@ -292,8 +300,10 @@ class ExtensionConfigManager:
 
         for ext_id in self._registry.get_ids():
             if ext_id not in self._configs:
-                logger.debug(f"扩展配置 {ext_id} 未在文件中找到，使用默认值")
                 config_cls = self._registry.get_config_class(ext_id)
+                if config_cls is None:
+                    continue
+                logger.debug(f"扩展配置 {ext_id} 未在文件中找到，使用默认值")
                 self._configs[ext_id] = config_cls()
 
     def save(self) -> None:
@@ -372,8 +382,9 @@ class ExtensionRunner(Runner):
         config = self._config_manager.get(extension_id)
         if config is None:
             config_cls = self._registry.get_config_class(extension_id)
-            config = config_cls()
-            logger.debug(f"Config for '{extension_id}' not loaded, using default")
+            if config_cls is not None:
+                config = config_cls()
+                logger.debug(f"Config for '{extension_id}' not loaded, using default")
         operator = self._create_operator()
         return ext_cls(operator, config)
 

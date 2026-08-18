@@ -197,7 +197,7 @@ class SRACli(cmd2.Cmd):
                 data.append({
                     "id": ext_id, "name": entry.name, "description": entry.description,
                     "extension_class": entry.extension_cls.__name__,
-                    "config_class": entry.config_cls.__name__,
+                    "config_class": entry.config_cls.__name__ if entry.config_cls else "",
                 })
             self.poutput(json.dumps(data))
         else:
@@ -205,8 +205,9 @@ class SRACli(cmd2.Cmd):
             for ext_id in ids:
                 entry = extension_registry.get(ext_id)
                 desc = f"  - {entry.description}" if entry.description else ""
+                config_str = f" (config: {entry.config_cls.__name__})" if entry.config_cls else ""
                 self.poutput(f"  {ext_id} ({entry.name})  ->  {entry.extension_cls.__name__}"
-                             f" (config: {entry.config_cls.__name__}){desc}")
+                             f"{config_str}{desc}")
 
     @staticmethod
     def _build_extension_run_parser() -> cmd2.Cmd2ArgumentParser:
@@ -240,31 +241,31 @@ class SRACli(cmd2.Cmd):
             self.poutput(f"无法启动扩展 '{args.name}'")
 
     @staticmethod
-    def _build_extension_info_parser() -> cmd2.Cmd2ArgumentParser:
+    def _build_extension_schema_parser() -> cmd2.Cmd2ArgumentParser:
         parser = cmd2.Cmd2ArgumentParser(description="显示扩展的配置 Schema 详情")
         parser.add_argument('name', help="扩展键名")
         parser.add_argument('--json', action='store_true', help="以 JSON 格式输出")
         return parser
 
-    @cmd2.as_subcommand_to("extension", "info", _build_extension_info_parser, help="显示扩展的配置 Schema 详情")
+    @cmd2.as_subcommand_to("extension", "schema", _build_extension_schema_parser, help="显示扩展的配置 Schema 详情")
     def _extension_info(self, args: argparse.Namespace) -> None:
         import json
 
         from SRACore.extension import extension_registry
 
-        schema = extension_registry.get_schema(args.name)
-        if schema is None:
+        if not extension_registry.has_id(args.name):
             self.poutput(f"扩展 '{args.name}' 不存在")
             return
+
+        entry = extension_registry.get(args.name)
+        schema = extension_registry.get_schema(args.name)
         if args.json:
             self.poutput(json.dumps(schema))
         else:
-            entry = extension_registry.get(args.name)
             self.poutput(f"扩展: {args.name} ({entry.name})")
-            if entry.description:
-                self.poutput(f"描述: {entry.description}")
+            self.poutput(f"配置类: {entry.config_cls.__name__ if entry.config_cls else 'None'}")
+            self.poutput(f"描述: {entry.description}")
             self.poutput(f"扩展类: {entry.extension_cls.__name__}")
-            self.poutput(f"配置类: {entry.config_cls.__name__}")
             self.poutput("配置 Schema:")
             self.poutput(json.dumps(schema, ensure_ascii=False, indent=2))
 
@@ -385,6 +386,9 @@ class SRACli(cmd2.Cmd):
             self.poutput(f"JSON 格式错误: {e}")
             return
         config_cls = extension_registry.get_config_class(args.name)
+        if config_cls is None:
+            self.poutput(f"扩展 '{args.name}' 没有配置")
+            return
         try:
             config = config_cls.model_validate(data, by_alias=True)
         except Exception as e:
