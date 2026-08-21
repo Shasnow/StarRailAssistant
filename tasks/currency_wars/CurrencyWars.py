@@ -39,10 +39,16 @@ class StageName(enum.StrEnum):
 
 
 class CurrencyWars(Executable):
-    def __init__(self, operator, runtimes, config: dict[str, Any]):
+    def __init__(self, operator, runtimes):
         super().__init__(operator)
         self.runtimes = runtimes
-        self.special_events: list[dict[str, Any]] = config.get("special_events", [])
+        self.special_events: dict[str, tuple[str, Callable[[], bool]]] = {
+            "领航员": ("选择伙伴", self.handle_choose_partner),
+            "盛会之星": ("盛会之星", self.handle_the_planet_of_festivities),
+            "命运圣杯": ("祈愿试炼", self.handle_wish_trial),
+            "头号玩家": ("我来当策划", self.handle_silver_wolf_lv999),
+            "命运卜者": ("命运卜者", self.handle_fortune_teller)
+        }
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
         self.difficulty: int = Difficulty.LOWEST
@@ -442,11 +448,14 @@ class CurrencyWars(Executable):
     def abort_and_return(self) -> bool:
         """中止当前对局并返回开始页面"""
         logger.info("中止当前对局并返回开始页面")
-        box = self.operator.wait_img(CWIMG.QUIT)
-        if box is None:
+        index, box = self.operator.wait_any_img([CWIMG.QUIT, CWIMG.WITHDRAW_AND_SETTLE])
+        if index<0:
             return False
-        self.operator.click_box(box, after_sleep=1)
-        self.operator.click_img(CWIMG.WITHDRAW_AND_SETTLE)
+        if index == 0:
+            self.operator.click_box(box, after_sleep=1)
+            self.operator.click_img(CWIMG.WITHDRAW_AND_SETTLE)
+        elif index == 1:
+            self.operator.click_box(box)
         b = self.operator.wait_img(CWIMG.NEXT_STEP)
         if b is None:
             return False
@@ -532,6 +541,7 @@ class CurrencyWars(Executable):
         :param count_stars: 是否获取角色星级
         :return: 更新后的角色列表
         """
+
         def get_stars(merge: int) -> int:
             # 获取角色星级 merge: 当 box 之间的距离小于此值时，将它们视为同一个box
             boxes = self.operator.locate_all(CWIMG.STAR, from_x=0.83, from_y=0.15, to_x=0.87, to_y=0.17)
@@ -660,7 +670,7 @@ class CurrencyWars(Executable):
             # 浏览器不支持滑动，拖动可能无法正确触发收集
             for x in range(66, 85, 2):
                 for y in range(20, 41, 5):
-                    self.operator.click_point(x / 100, y / 100, trace = False)
+                    self.operator.click_point(x / 100, y / 100, trace=False)
 
         self.detect_silver_wolf_lv999()  # 也许开出银狼了
 
@@ -744,6 +754,14 @@ class CurrencyWars(Executable):
             result, _ = self.operator.wait_any_img([CWIMG.SETTLE, CWIMG.CONTINUE], timeout=600, interval=1, trace=False)
             if result == -1:
                 logger.warning("等待挑战结束超时")
+                for _ in range(5):
+                    self.operator.press_key('esc')
+                    self.operator.sleep(1)
+                    if self.operator.click_img(CWIMG.RETREAT):
+                        break
+                else:
+                    raise RuntimeError("挑战结束超时，未能成功中止对局")
+                self.abort_and_return() # 挑战结束超时，尝试中止并返回开始页面
                 return False
         logger.info("挑战结束")
         self.operator.sleep(0.5)
@@ -898,7 +916,7 @@ class CurrencyWars(Executable):
     def handle_fortune_teller(self):
         """处理命运卜者事件的逻辑"""
         return self._handle_selection_event((0.22, 0.34, 0.85, 0.4),
-                                     self.strategy_special_events.get("命运卜者", ""))
+                                            self.strategy_special_events.get("命运卜者", ""))
 
     def _handle_selection_event(self, ocr_region: tuple[float, float, float, float],
                                 keyword: str):
@@ -928,16 +946,16 @@ class CurrencyWars(Executable):
     def handle_the_planet_of_festivities(self):
         """处理盛会之星事件的逻辑"""
         return self._handle_selection_event((0.22, 0.29, 0.85, 0.35),
-                                     self.strategy_special_events.get("盛会之星",""))
+                                            self.strategy_special_events.get("盛会之星", ""))
 
     def handle_choose_partner(self):
         """处理领航员选择事件的逻辑"""
         return self._handle_selection_event((0.25, 0.32, 0.85, 0.39),
-                                     self.strategy_special_events.get("领航员",""))
+                                            self.strategy_special_events.get("领航员", ""))
 
     def handle_wish_trial(self):
         """处理命运圣杯事件的逻辑"""
-        return self._handle_selection_event((0.22, 0.42, 0.85, 0.465), self.strategy_special_events.get("命运圣杯",""))
+        return self._handle_selection_event((0.22, 0.42, 0.85, 0.465), self.strategy_special_events.get("命运圣杯", ""))
 
     def detect_special_event(self) -> str:
         """检测当前是否有特殊事件发生，并返回事件名称"""
@@ -945,9 +963,10 @@ class CurrencyWars(Executable):
         if not result:
             return ""
         text = result[0][1]
-        for event in self.special_events:
-            if text == event["title"]:
-                return event["name"]
+        # 遍历特殊事件列表，匹配标题
+        for event, (title, handler) in self.special_events.items():
+            if text == title:
+                return event
         return ""
 
     def detect_silver_wolf_lv999(self):
@@ -957,21 +976,15 @@ class CurrencyWars(Executable):
 
     def handle_silver_wolf_lv999(self):
         return self._handle_selection_event((0.22, 0.34, 0.85, 0.4),
-                                     self.strategy_special_events.get("头号玩家",""))
+                                            self.strategy_special_events.get("头号玩家", ""))
 
     def handle_special_event(self):
-        event_handler: dict[str, Callable[[], bool]] = {
-            "盛会之星": self.handle_the_planet_of_festivities,
-            "命运卜者": self.handle_fortune_teller,
-            "头号玩家": self.handle_silver_wolf_lv999,
-            "领航员": self.handle_choose_partner,
-            "命运圣杯": self.handle_wish_trial,
-        }
+        """处理特殊事件的逻辑"""
         event = self.detect_special_event()
 
         if event:
             logger.info(f"检测到特殊事件：{event}")
-            handler = event_handler[event]
+            handler = self.special_events[event][1]
             if not handler():
                 raise RuntimeError("特殊事件处理失败")
             self.handle_special_event()  # 递归处理
@@ -1380,7 +1393,7 @@ class CurrencyWars(Executable):
         target_coord = target_coords[target_index]
 
         # 执行拖拽
-        self.operator.drag_to(source_coord[0], source_coord[1], target_coord[0], target_coord[1])
+        self.operator.drag_to(source_coord[0], source_coord[1], target_coord[0], target_coord[1], trace=False)
         self.operator.sleep(0.5)  # 等待操作完成
         if self.operator.locate(CWIMG.CANNOT_BE_FIELDED, from_x=0.25, from_y=0.25, to_x=0.75, to_y=0.75):
             logger.warning("对换操作失败：目标位置无法放置该角色")
@@ -1451,7 +1464,7 @@ class CurrencyWars(Executable):
                 continue
 
             # 找到目标位置当前的角色信息
-            target_current_info:dict[str, Any] | None = None
+            target_current_info: dict[str, Any] | None = None
             for info in char_info_list:
                 if info['index'] == target_pos:
                     target_current_info = info

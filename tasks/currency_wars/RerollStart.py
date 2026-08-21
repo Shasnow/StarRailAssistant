@@ -30,7 +30,7 @@ class RerollStart(CurrencyWars):
     INVEST_ENV_OCR_TO_Y = 0.380
 
     def __init__(self, operator, runtimes, config):
-        super().__init__(operator, runtimes, config)
+        super().__init__(operator, runtimes)
         self.reroll = False  # 重开标志
         self.wanted_invest_env = None  # 需要的投资环境
         self.optional_invest_env = None  # 可选的投资环境

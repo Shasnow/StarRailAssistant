@@ -174,6 +174,7 @@ class CWIMG:
     OPEN = f"{BASE}/open.png"
     PREPARATION_STAGE = f"{BASE}/preparation_stage.png"
     QUIT = f"{BASE}/quit.png"
+    RETREAT = f"{BASE}/retreat.png"
     REPLENISH_STAGE = f"{BASE}/replenish_stage.png"
     RETURN_HIGHEST_RANK = f"{BASE}/return_highest_rank.png"
     RIGHT = f"{BASE}/right.png"

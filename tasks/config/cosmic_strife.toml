@@ -1,7 +1,0 @@
-[currency_wars]
-special_events = [
-    { name = "领航员", title = "选择伙伴" },
-    { name = "盛会之星", title = "盛会之星" },
-    { name = "命运圣杯", title = "祈愿试炼" },
-    { name = "头号玩家", title = "我来当策划" }
-]
