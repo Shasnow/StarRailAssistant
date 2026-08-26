@@ -201,13 +201,16 @@ class DivergentUniverse(Executable):
             DUIMG.BONUS_POINTS
         ], interval=1)
         if page == 0:
-            self.operator.press_key(self.settings.General.hotkeyF4)
-            if not self.operator.wait_img(IMG.F4, timeout=20):
-                logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
-                self.operator.press_key("esc")
-            self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
-            self.operator.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙
-            self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
+            if self.operator.locate(DUIMG.DIVERGENT_UNIVERSE): # 差分宇宙门口
+                self.operator.press_key("f")
+            else:
+                self.operator.press_key(self.settings.General.hotkeyF4)
+                if not self.operator.wait_img(IMG.F4, timeout=20):
+                    logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
+                    self.operator.press_key("esc")
+                self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
+                self.operator.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙
+                self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
             return self.page_locate(depth + 1)
         elif page == 1:
             return True

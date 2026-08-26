@@ -145,28 +145,33 @@ class CurrencyWars(Executable):
     def set_overclock(self, overclock: bool):
         self.is_overclock = overclock
 
-    def page_locate(self) -> CurrencyWarsPage:
+    def page_locate(self, depth = 0) -> CurrencyWarsPage:
         """
         定位到货币战争页面
 
         :return: CurrencyWarsPage 枚举值，表示当前所在页面；如果未识别到任何目标页面，则返回 CurrencyWarsPage.UNKNOWN
         """
+        if depth>5:
+            raise RuntimeError("页面定位递归过深，可能存在无限循环")
         page, _ = self.operator.wait_any_img([IMG.ENTER,
                                               CWIMG.START_CURRENCY_WARS,
                                               CWIMG.PREPARATION_STAGE,
                                               DUIMG.BONUS_POINTS], interval=0.5)
         if page == 0:
-            logger.info("[页面定位] 正在定位到货币战争开始页面")
-            guide_hotkey = self.settings.General.hotkeyF4
-            self.operator.press_key(str(guide_hotkey).lower())
-            if not self.operator.wait_img(IMG.F4, timeout=20):
-                logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
-                self.operator.press_key("esc")
-            box = self.operator.wait_img(IMG.COSMIC_STRIFE, timeout=10)
-            self.operator.click_box(box, after_sleep=1)  # 旷宇纷争
-            self.operator.click_point(0.242, 0.30, after_sleep=0.8)  # 货币战争
-            self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
-            return self.page_locate()
+            if self.operator.locate(CWIMG.CURRENCY_WARS): # 货币战争门口
+                self.operator.press_key("f")
+            else:
+                logger.info("[页面定位] 正在定位到货币战争开始页面")
+                guide_hotkey = self.settings.General.hotkeyF4
+                self.operator.press_key(str(guide_hotkey).lower())
+                if not self.operator.wait_img(IMG.F4, timeout=20):
+                    logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
+                    self.operator.press_key("esc")
+                box = self.operator.wait_img(IMG.COSMIC_STRIFE, timeout=10)
+                self.operator.click_box(box, after_sleep=1)  # 旷宇纷争
+                self.operator.click_point(0.242, 0.30, after_sleep=0.8)  # 货币战争
+                self.operator.click_point(0.7786, 0.8194, after_sleep=1)  # 前往参与
+            return self.page_locate(depth + 1)
         elif page == 1:
             logger.info("[页面定位] 已定位到货币战争开始页面")
             return CurrencyWarsPage.START
