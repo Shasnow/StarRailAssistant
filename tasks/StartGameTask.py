@@ -5,6 +5,7 @@ from tasks.img import IMG, SGIMG
 
 @task(order=0)
 class StartGameTask(BaseTask):
+    """启动游戏任务"""
     def run(self):
         logger.info("启动游戏任务开始")
         self.launch_game()

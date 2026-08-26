@@ -238,23 +238,8 @@ if __name__ == "__main__":
 
     print("Packaging Basic ...")
     builder.add(DESKTOP_WIN_X64_PUBLISH_PATH, DESKTOP_WIN_X64_PUBLISH_PATH)
-    builder.snapshot(ROOT_PATH / f"StarRailAssistant_v{version}.zip")
-
-    print("Packaging Full ...")
     builder.add(SERVER_WIN_X64_PUBLISH_PATH, SERVER_WIN_X64_PUBLISH_PATH)
-    builder.snapshot(ROOT_PATH / f"StarRailAssistant_Full_v{version}.zip")
-
-    # package_webui(version)
-
-    print("Packaging ServerDLC ...")
-    server_dlc = ZipBuilder()
-    server_dlc.add(SERVER_WIN_X64_PUBLISH_PATH, SERVER_WIN_X64_PUBLISH_PATH)
-    server_dlc.snapshot(ROOT_PATH / f"StarRailAssistant_ServerDLC_v{version}.zip")
-
-    print("Packaging DesktopDLC ...")
-    desktop_dlc = ZipBuilder()
-    desktop_dlc.add(DESKTOP_WIN_X64_PUBLISH_PATH, DESKTOP_WIN_X64_PUBLISH_PATH)
-    desktop_dlc.snapshot(ROOT_PATH / f"StarRailAssistant_DesktopDLC_v{version}.zip")
+    builder.snapshot(ROOT_PATH / f"StarRailAssistant_v{version}.zip")
 
     print("Packaging Resources ...")
     resources_zip = ZipBuilder()

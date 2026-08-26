@@ -7,6 +7,7 @@ from tasks.img import DUIMG, IMG, RRIMG
 
 @task(order=2)
 class ReceiveRewardsTask(BaseTask):
+    """领取奖励任务"""
     def __post_init__(self):
         self.config_name = self.config.Name
 

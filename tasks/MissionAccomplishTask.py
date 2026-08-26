@@ -9,6 +9,7 @@ from tasks.img import IMG, MAIMG
 
 @task(order=4)
 class MissionAccomplishTask(BaseTask):
+    """任务完成任务"""
     def run(self):
         if self.config.MissionAccomplished.isLogout:
             self.logout()

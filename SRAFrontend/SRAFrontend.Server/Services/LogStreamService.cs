@@ -11,8 +11,7 @@ namespace SRAFrontend.Server.Services;
 public sealed class LogStreamService : IDisposable
 {
     private readonly ConcurrentBag<WeakReference<Channel<string>>> _subscribers = [];
-    private readonly List<string> _recentLogs = [];
-    private readonly Lock _lock = new();
+    private readonly ConcurrentQueue<string> _recentLogs = [];
     private const int MaxRecentLogs = 500;
 
     public LogStreamService(IBackendService backendService)
@@ -22,12 +21,10 @@ public sealed class LogStreamService : IDisposable
 
     private void OnOutput(string line)
     {
-        lock (_lock)
-        {
-            _recentLogs.Add(line);
-            if (_recentLogs.Count > MaxRecentLogs)
-                _recentLogs.RemoveAt(0);
-        }
+
+        _recentLogs.Enqueue(line);
+        if (_recentLogs.Count > MaxRecentLogs)
+            _recentLogs.TryDequeue(out _);
 
         // 广播给所有活跃的订阅者
         var dead = new List<WeakReference<Channel<string>>>();
@@ -51,10 +48,7 @@ public sealed class LogStreamService : IDisposable
     /// <summary>获取最近的日志条目</summary>
     public List<string> GetRecentLogs(int count = 100)
     {
-        lock (_lock)
-        {
-            return _recentLogs.TakeLast(Math.Min(count, _recentLogs.Count)).ToList();
-        }
+        return _recentLogs.TakeLast(Math.Min(count, _recentLogs.Count)).ToList();
     }
 
     /// <summary>订阅实时日志流</summary>

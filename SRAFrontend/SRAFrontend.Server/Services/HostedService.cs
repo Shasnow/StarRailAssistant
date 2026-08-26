@@ -13,6 +13,7 @@ public class HostedService(
         settingsService.Load();
         cacheService.Load();
         configService.Load();
+        // backendService.StartBackend("--inline --no-admin");
         return Task.CompletedTask;
     }
 

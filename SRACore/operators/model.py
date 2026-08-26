@@ -3,6 +3,15 @@ from math import sqrt
 
 
 @dataclasses.dataclass
+class WindowContext:
+    """游戏窗口的位置与尺寸，在 Operator 实例间共享。"""
+    top: int = 0
+    left: int = 0
+    width: int = 0
+    height: int = 0
+
+
+@dataclasses.dataclass
 class Region:
     """表示屏幕上的一个矩形区域
 
@@ -54,3 +63,6 @@ class Box:
         x1, y1 = self.center
         x2, y2 = other.center
         return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
+    def __repr__(self):
+        return f'Box(left={self.left}, top={self.top}, width={self.width}, height={self.height}, center={self.center}, source={self.source})'

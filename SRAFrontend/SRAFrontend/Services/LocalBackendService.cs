@@ -171,9 +171,11 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         return SendInputAsync(string.IsNullOrEmpty(configName) ? "task run" : $"task run {configName}");
     }
 
-    public Task<bool> TaskSingleAsync(string taskName)
+    public Task<bool> TaskSingleAsync(string taskName, string? configName)
     {
-        return SendInputAsync($"task single {taskName}");
+        return SendInputAsync(string.IsNullOrEmpty(configName) 
+            ? $"task single {taskName}"
+            : $"task single {taskName} --config {configName}");
     }
 
     public Task<bool> TaskStopAsync()
@@ -181,92 +183,68 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         return SendInputAsync("task stop");
     }
 
-    public async Task<string> GetTaskStatusAsync()
+    public Task<string?> TaskListAsync()
     {
-        return await SendCommandAndWaitOutputAsync("task status --json") ?? string.Empty;
+        return SendInputAndWaitOutputAsync("task list --json");
     }
 
-    public async Task<List<Strategy>> GetStrategiesAsync()
+    public async Task<string> GetTaskStatusAsync()
     {
-        var json = await SendCommandAndWaitOutputAsync("strategy list --json");
-        if (json == null) return [];
-        try
-        {
-            return JsonSerializer.Deserialize<List<Strategy>>(json) ?? [];
-        }
-        catch (JsonException ex)
-        {
-            logger.LogError(ex, "Failed to parse strategies JSON");
-            return [];
-        }
+        return await SendInputAndWaitOutputAsync("task status --json") ?? string.Empty;
+    }
+
+    public async Task<Strategy[]> GetStrategiesAsync()
+    {
+        return await SendInputAndWaitObjectAsync<Strategy[]>("strategy list") ?? [];
     }
 
     public async Task<TpTask[]> GetTpConfigAsync()
     {
-        var json = await SendCommandAndWaitOutputAsync("tpconfig --json");
-        if (json == null) return [];
-        try
-        {
-            var tpConfigDict = JsonSerializer.Deserialize<Dictionary<string, TpTask>>(json) ?? [];
-            return [.. tpConfigDict.Values];
-        }
-        catch (JsonException ex)
-        {
-            logger.LogError(ex, "Failed to parse TP config JSON");
-            return [];
-        }
+        var res = await SendInputAndWaitObjectAsync<Dictionary<string, TpTask>>("tpconfig --json");
+        return res is null ? [] : [.. res.Values];
     }
 
-    public async Task<byte[]> GetGameScreenshotBytesAsync()
+    public async Task<(string Message, byte[])> GetGameScreenshotBytesAsync()
     {
         var screenshotPath = Path.Combine(WorkingDirectory, "screenshot.png");
-        var result = await SendCommandAndWaitOutputAsync($"game screenshot --background --save {screenshotPath}");
-        if (result == null || result.StartsWith("Failed"))
+        var param = new
         {
-            logger.LogError("Failed to create screenshot.");
-            return [];
+            save_path = screenshotPath,
+            background = true,
+            resize = new[] { 1280, 720 }
+        };
+        var result = await SendInputAndWaitObjectAsync($"operator call screenshot '{JsonSerializer.Serialize(param)}' --json");
+        switch (result)
+        {
+            case null:
+                logger.LogError("Failed to create screenshot: No response from backend.");
+                return ("No response from backend.", []);
+            case { Success: true }:
+                var screenshotBytes = await File.ReadAllBytesAsync(screenshotPath);
+                return (result.Message, screenshotBytes);
+            default:
+                logger.LogError("Failed to create screenshot.");
+                return (result.Message, []);
         }
-
-        var screenshotBytes = await File.ReadAllBytesAsync(screenshotPath);
-        return screenshotBytes;
     }
 
-    public async Task<List<ExtensionInfo>> GetExtensionsAsync()
+    public async Task<ExtensionInfo[]> GetExtensionsAsync()
     {
-        var json = await SendCommandAndWaitOutputAsync("extension list --json");
-        if (json == null) return [];
-        try
-        {
-            return JsonSerializer.Deserialize<List<ExtensionInfo>>(json) ?? [];
-        }
-        catch (JsonException ex)
-        {
-            logger.LogError(ex, "Failed to parse extensions JSON");
-            return [];
-        }
+        return await SendInputAndWaitObjectAsync<ExtensionInfo[]>("extension list --json") ?? [];
     }
 
     public async Task<ExtensionSchema?> GetExtensionSchemaAsync(string extensionId)
     {
-        var json = await SendCommandAndWaitOutputAsync($"extension schema {extensionId} --json");
-        if (json == null) return null;
-        try
-        {
-            return JsonSerializer.Deserialize<ExtensionSchema>(json);
-        }
-        catch (JsonException ex)
-        {
-            logger.LogError(ex, "Failed to parse extension schema JSON");
-            return null;
-        }
+        return await SendInputAndWaitObjectAsync<ExtensionSchema>($"extension schema {extensionId} --json");
     }
 
     public async Task<string?> GetExtensionConfigAsync(string extensionId)
     {
-        return await SendCommandAndWaitOutputAsync($"extension config get {extensionId} --json");
+        var obj = await SendInputAndWaitObjectAsync<object>($"extension config get {extensionId} --json");
+        return obj == null ? null : JsonSerializer.Serialize(obj);
     }
 
-    private async Task<string?> SendCommandAndWaitOutputAsync(string command)
+    public async Task<string?> SendInputAndWaitOutputAsync(string command)
     {
         await _commandLock.WaitAsync();
         try
@@ -301,6 +279,44 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         }
     }
 
+    public async Task<T?> SendInputAndWaitObjectAsync<T>(string command)
+    {
+        var output = await SendInputAndWaitOutputAsync(command);
+        if (output == null) return default;
+        try
+        {
+            var response = JsonSerializer.Deserialize<BackendResponse<T>>(output, options: JsonSerializerOptions.Web);
+            if (response is { Success: true })
+                return response.Data;
+        }
+        catch (JsonException ex)
+        {
+            logger.LogError(ex, "Failed to deserialize JSON response for command: {Command}", command);
+        }
+        return default;
+    }
+
+    public async Task<BackendResponse?> SendInputAndWaitObjectAsync(string command)
+    {
+        var output = await SendInputAndWaitOutputAsync(command);
+        if (output == null) return null;
+        try
+        {
+            return JsonSerializer.Deserialize<BackendResponse>(output, options: JsonSerializerOptions.Web);
+        }
+        catch (JsonException ex)
+        {
+            logger.LogError(ex, "Failed to deserialize JSON response for command: {Command}", command);
+        }
+        return null;
+    }
+
+    public Task<BackendResponse?> OperatorCallAsync(string method, object? parameters)
+    {
+        var command = $"operator call {method} '{JsonSerializer.Serialize(parameters)}' --json";
+        return SendInputAndWaitObjectAsync(command);
+    }
+    
     private void OnBackendProcessExited(object? sender, EventArgs e)
     {
         var processId = _backendProcess?.Id ?? -1;

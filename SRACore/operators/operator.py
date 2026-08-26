@@ -9,12 +9,12 @@ import pyautogui
 import pygetwindow  # type: ignore
 import pyperclip
 import pyscreeze
-from PIL.Image import Image
+from PIL import Image
 from rapidocr import RapidOCR
 
-from SRACore.operators.ioperator import IOperator
-from SRACore.operators.model import Region
 from SRACore.models.app_settings import AppSettings
+from SRACore.operators.ioperator import IOperator
+from SRACore.operators.model import Region, WindowContext
 from SRACore.util import sys_util
 from SRACore.util.errors import ErrorCode, SRAError, ThreadStoppedError
 from SRACore.util.logger import logger
@@ -22,16 +22,16 @@ from SRACore.util.logger import logger
 
 class Operator(IOperator):
     def __init__(self, ocr_engine: RapidOCR, settings: AppSettings,
-                 stop_event: threading.Event | None = None):
-        super().__init__(ocr_engine, settings, stop_event)
+                 stop_event: threading.Event | None = None, window_context: WindowContext | None = None):
+        super().__init__(ocr_engine, settings, stop_event, window_context)
         self.window_title = "崩坏：星穹铁道"
         self.executable = "StarRail.exe"
-        self.top = 0
-        self.left = 0
-        self.width = pyautogui.size()[0]
-        self.height = pyautogui.size()[1]
         self._win: pygetwindow.Win32Window | None = None
         self._hwnd: int = 0
+        if self.window_context.width <= 0:
+            self.window_context.width = pyautogui.size()[0]
+        if self.window_context.height <= 0:
+            self.window_context.height = pyautogui.size()[1]
 
     def _get_hwnd(self) -> int:
         """获取有效的窗口句柄，无效时自动刷新"""
@@ -150,33 +150,40 @@ class Operator(IOperator):
         height = client_rect.bottom - client_rect.top
         if width <= 0 or height <= 0:
             return None
-        self.left = left_top.x
-        self.top = left_top.y
-        self.width = width
-        self.height = height
-        return Region(self.left, self.top, self.width, self.height)
+        self.window_context.left = left_top.x
+        self.window_context.top = left_top.y
+        self.window_context.width = width
+        self.window_context.height = height
+        return Region(self.window_context.left, self.window_context.top, self.window_context.width,
+                      self.window_context.height)
 
     def screenshot(self, *,
                    from_x: float | None = None,
                    from_y: float | None = None,
                    to_x: float | None = None,
                    to_y: float | None = None,
-                   background: bool = False) -> Image:
+                   background: bool = False,
+                   resize: tuple[int, int] | None = None,
+                   save_path: str | None = None) -> Image.Image:
         region = self.get_win_region(active_window=not background)
         self.sleep(0.5)
         img = self._screenshot(self._hwnd, region, self.screenshot_background)
         if img is None:
             raise SRAError(ErrorCode.SCREENSHOT_FAILED, "无法截取窗口内容")
         if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
-            left = from_x * self.width
-            upper = from_y * self.height
-            right = to_x * self.width
-            bottom = to_y * self.height
-            return img.crop((left, upper, right, bottom))
+            left = from_x * self.window_context.width
+            upper = from_y * self.window_context.height
+            right = to_x * self.window_context.width
+            bottom = to_y * self.window_context.height
+            img = img.crop((left, upper, right, bottom))
+        if resize:
+            img = img.resize(resize, Image.Resampling.LANCZOS)
+        if save_path:
+            img.save(save_path)
         return img
 
     @staticmethod
-    def _screenshot(hwnd: int, region: Region, background: bool = True) -> Image | None:
+    def _screenshot(hwnd: int, region: Region, background: bool = True) -> Image.Image | None:
         """
         后台截取指定窗口，不会被其他窗口遮挡
         :param hwnd: 窗口句柄
@@ -261,22 +268,24 @@ class Operator(IOperator):
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("点击中断", "线程已停止")
         if isinstance(x_offset, float) and isinstance(y_offset, float):
-            x_offset = int(self.width * x_offset)
-            y_offset = int(self.height * y_offset)
+            x_offset = int(self.window_context.width * x_offset)
+            y_offset = int(self.window_context.height * y_offset)
 
         if isinstance(x, int) and isinstance(y, int):
-            screen_x = x + self.left + x_offset
-            screen_y = y + self.top + y_offset
+            screen_x = x + self.window_context.left + x_offset
+            screen_y = y + self.window_context.top + y_offset
             if trace:
-                logger.debug(f"Click point: ({screen_x - self.left}, {screen_y - self.top}), tag: {tag}")
+                logger.debug(
+                    f"Click point: ({screen_x - self.window_context.left}, {screen_y - self.window_context.top}), tag: {tag}")
             pyautogui.click(screen_x, screen_y)
             self.sleep(after_sleep)
             return True
         elif isinstance(x, float) and isinstance(y, float):
-            screen_x = int(self.left + self.width * x + x_offset)
-            screen_y = int(self.top + self.height * y + y_offset)
+            screen_x = int(self.window_context.left + self.window_context.width * x + x_offset)
+            screen_y = int(self.window_context.top + self.window_context.height * y + y_offset)
             if trace:
-                logger.debug(f"Click point: ({screen_x - self.left}, {screen_y - self.top}), tag: {tag}")
+                logger.debug(
+                    f"Click point: ({screen_x - self.window_context.left}, {screen_y - self.window_context.top}), tag: {tag}")
             pyautogui.click(screen_x, screen_y)
             self.sleep(after_sleep)
             return True
@@ -289,9 +298,15 @@ class Operator(IOperator):
             raise ThreadStoppedError("按键中断", "线程已停止")
         try:
             time.sleep(wait)
+            keys = key.split("+")
             if trace:
                 logger.debug(f"Press key: {key}")
-            pyautogui.press(key, presses=presses, interval=interval)
+            for _ in range(presses):
+                if len(keys) > 1:
+                    pyautogui.hotkey(*keys)
+                else:
+                    pyautogui.press(keys[0])
+                time.sleep(interval)
             return True
         except Exception as e:
             if trace:
@@ -302,10 +317,13 @@ class Operator(IOperator):
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("按键中断", "线程已停止")
         try:
+            keys = key.split("+")
             logger.debug(f"Hold key {key}")
-            pyautogui.keyDown(key)
+            for k in keys:
+                pyautogui.keyDown(k)
             time.sleep(duration)
-            pyautogui.keyUp(key)
+            for k in reversed(keys):
+                pyautogui.keyUp(k)
             return True
         except Exception as e:
             logger.debug(f"Failed to hold key: {e}")
@@ -326,7 +344,7 @@ class Operator(IOperator):
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("鼠标移动中断", "线程已停止")
         try:
-            pyautogui.moveRel(x_offset, y_offset)
+            pyautogui.moveRel(x_offset, y_offset, 0.5)
             return True
         except Exception as e:
             logger.debug(f"Error moving cursor: {e}")
@@ -339,10 +357,10 @@ class Operator(IOperator):
             if trace:
                 logger.debug(f"Move cursor to ({x}, {y}), duration: {duration}s")
             if isinstance(x, int) and isinstance(y, int):
-                pyautogui.moveTo(x + self.left, y + self.top, duration=duration)
+                pyautogui.moveTo(x + self.window_context.left, y + self.window_context.top, duration=duration)
             elif isinstance(x, float) and isinstance(y, float):
-                x = int(self.left + self.width * x)
-                y = int(self.top + self.height * y)
+                x = int(self.window_context.left + self.window_context.width * x)
+                y = int(self.window_context.top + self.window_context.height * y)
                 pyautogui.moveTo(x, y, duration=duration)
             else:
                 raise ValueError(
@@ -359,10 +377,10 @@ class Operator(IOperator):
             if trace:
                 logger.debug(f"Mouse down: ({x}, {y})")
             if isinstance(x, int) and isinstance(y, int):
-                pyautogui.mouseDown(x + self.left, y + self.top)
+                pyautogui.mouseDown(x + self.window_context.left, y + self.window_context.top)
             elif isinstance(x, float) and isinstance(y, float):
-                x = int(self.left + self.width * x)
-                y = int(self.top + self.height * y)
+                x = int(self.window_context.left + self.window_context.width * x)
+                y = int(self.window_context.top + self.window_context.height * y)
                 pyautogui.mouseDown(x, y)
             else:
                 raise ValueError(

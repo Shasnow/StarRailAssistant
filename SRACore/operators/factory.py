@@ -1,10 +1,10 @@
 import enum
 import threading
-
 from rapidocr import RapidOCR
 
 from SRACore.models.app_settings import AppSettings
 from SRACore.operators.ioperator import IOperator
+from SRACore.operators.model import WindowContext
 from SRACore.util.const import AppRootDir
 
 
@@ -14,7 +14,9 @@ class OperatorType(enum.StrEnum):
 
 
 class OperatorFactory:
+    # noinspection bad-assignment
     __ocr_instance: RapidOCR = None  # pyright: ignore[reportAssignmentType]
+    __window_context = WindowContext()
 
     @classmethod
     def get_operator(cls, optype: str | OperatorType, settings: AppSettings,
@@ -22,11 +24,11 @@ class OperatorFactory:
         if optype == OperatorType.Local:
             from SRACore.operators.operator import Operator
             __instance = Operator(ocr_engine=cls.get_ocr_instance(), settings=settings,
-                                  stop_event=stop_event)
+                                  stop_event=stop_event, window_context=cls.__window_context)
         elif optype == OperatorType.Browser:
             from SRACore.operators.browser_operator import BrowserOperator
             __instance = BrowserOperator(ocr_engine=cls.get_ocr_instance(), settings=settings,
-                                         stop_event=stop_event)
+                                         stop_event=stop_event, window_context=cls.__window_context)
         else:
             raise ValueError(f"Unknown operator type: {optype}")
         return __instance

@@ -104,6 +104,9 @@ class TaskRegistry:
                 return entry
         raise KeyError(f"Task '{task_id}' does not exist")
 
+    def get_entries(self) -> list[TaskEntry]:
+        return self._entries
+
     def get_task_class(self, task_id: str) -> type[BaseTask]:
         return self.get(task_id).task_cls
 

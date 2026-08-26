@@ -72,6 +72,16 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         return _currentBackend.SendInput(input);
     }
 
+    public Task<T?> SendInputAndWaitObjectAsync<T>(string command)
+    {
+        return _currentBackend.SendInputAndWaitObjectAsync<T>(command);
+    }
+
+    public Task<BackendResponse?> SendInputAndWaitObjectAsync(string command)
+    {
+        return _currentBackend.SendInputAndWaitObjectAsync(command);
+    }
+
     public void StartBackend(string arguments)
     {
         if (!_initialized) Initialize();
@@ -81,7 +91,6 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
 
     public void StopBackend()
     {
-        if (!_initialized) return;
         _currentBackend.StopBackend();
     }
 
@@ -94,19 +103,23 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
 
     public Task<bool> TaskRunAsync(string? configName)
     {
-        if (!_initialized) Initialize();
         return _currentBackend.TaskRunAsync(configName);
     }
 
-    public Task<bool> TaskSingleAsync(string taskName)
+    public Task<bool> TaskSingleAsync(string taskName, string? configName)
     {
-        if (!_initialized) Initialize();
-        return _currentBackend.TaskSingleAsync(taskName);
+        return _currentBackend.TaskSingleAsync(taskName, configName);
+    }
+    
+    
+
+    public Task<string?> TaskListAsync()
+    {
+        return _currentBackend.TaskListAsync();
     }
 
     public Task<bool> TaskStopAsync()
     {
-        if (!_initialized) Initialize();
         return _currentBackend.TaskStopAsync();
     }
 
@@ -115,7 +128,7 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         return _currentBackend.GetTaskStatusAsync();
     }
 
-    public Task<List<Strategy>> GetStrategiesAsync()
+    public Task<Strategy[]> GetStrategiesAsync()
     {
         return _currentBackend.GetStrategiesAsync();
     }
@@ -125,12 +138,12 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         return _currentBackend.GetTpConfigAsync();
     }
 
-    public Task<byte[]> GetGameScreenshotBytesAsync()
+    public Task<(string Message, byte[])> GetGameScreenshotBytesAsync()
     {
         return _currentBackend.GetGameScreenshotBytesAsync();
     }
 
-    public Task<List<ExtensionInfo>> GetExtensionsAsync()
+    public Task<ExtensionInfo[]> GetExtensionsAsync()
     {
         return _currentBackend.GetExtensionsAsync();
     }
@@ -143,6 +156,16 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
     public Task<string?> GetExtensionConfigAsync(string extensionId)
     {
         return _currentBackend.GetExtensionConfigAsync(extensionId);
+    }
+
+    public Task<string?> SendInputAndWaitOutputAsync(string command)
+    {
+        return _currentBackend.SendInputAndWaitOutputAsync(command);
+    }
+
+    public Task<BackendResponse?> OperatorCallAsync(string method, object? parameters)
+    {
+        return _currentBackend.OperatorCallAsync(method, parameters);
     }
 
     private void ApplyPythonSettings()

@@ -16,8 +16,9 @@ from selenium.webdriver.common.webdriver import LocalWebDriver as WebDriver
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-from SRACore.operators.ioperator import IOperator
 from SRACore.models.app_settings import AppSettings
+from SRACore.operators.ioperator import IOperator
+from SRACore.operators.model import WindowContext
 from SRACore.util.const import CacheDir
 from SRACore.util.errors import ThreadStoppedError
 
@@ -82,7 +83,8 @@ class WebDriverManager:
         return driver
 
     @staticmethod
-    def _build_options(opt: webdriver.EdgeOptions | webdriver.ChromeOptions | webdriver.FirefoxOptions, binary_path: str, headless: bool):
+    def _build_options(opt: webdriver.EdgeOptions | webdriver.ChromeOptions | webdriver.FirefoxOptions,
+                       binary_path: str, headless: bool):
         if binary_path:
             opt.binary_location = binary_path
         if headless:
@@ -109,11 +111,12 @@ class WebDriverManager:
 
 class BrowserOperator(IOperator):
     def __init__(self, ocr_engine: RapidOCR, settings: AppSettings,
-                 stop_event: threading.Event | None = None):
-        super().__init__(ocr_engine, settings, stop_event)
+                 stop_event: threading.Event | None = None,
+                 window_context: WindowContext | None = None):
+        super().__init__(ocr_engine, settings, stop_event, window_context)
         self.type = "Browser"
-        self.height = 1080
-        self.width = 1920
+        self.window_context.width = 1920
+        self.window_context.height = 1080
         self.clipboard: str = ""
         # noinspection PyTypeChecker
         self._driver: WebDriver = None  # pyright: ignore[reportAttributeAccessIssue]
@@ -314,15 +317,19 @@ class BrowserOperator(IOperator):
         return True
 
     def screenshot(self, *, from_x: float | None = None, from_y: float | None = None, to_x: float | None = None,
-                   to_y: float | None = None, background: bool = True) -> Image.Image:
+                   to_y: float | None = None, background: bool = True, resize: tuple[int, int] | None = None, save_path: str | None = None) -> Image.Image:
         png = self.driver.get_screenshot_as_png()
         img = Image.open(BytesIO(png))
         if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
-            left = from_x * self.width
-            upper = from_y * self.height
-            right = to_x * self.width
-            bottom = to_y * self.height
-            return img.crop((left, upper, right, bottom))
+            left = from_x * self.window_context.width
+            upper = from_y * self.window_context.height
+            right = to_x * self.window_context.width
+            bottom = to_y * self.window_context.height
+            img = img.crop((left, upper, right, bottom))
+        if resize:
+            img = img.resize(resize, Image.Resampling.LANCZOS)
+        if save_path:
+            img.save(save_path)
         return img
 
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
@@ -330,8 +337,8 @@ class BrowserOperator(IOperator):
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("点击中断", "线程已停止")
         if isinstance(x_offset, float) and isinstance(y_offset, float):
-            x_offset = int(self.width * x_offset)
-            y_offset = int(self.height * y_offset)
+            x_offset = int(self.window_context.width * x_offset)
+            y_offset = int(self.window_context.height * y_offset)
 
         if isinstance(x, int) and isinstance(y, int):
             action = ActionBuilder(self.driver)
@@ -341,8 +348,8 @@ class BrowserOperator(IOperator):
             self.sleep(after_sleep + 0.2)
             return True
         elif isinstance(x, float) and isinstance(y, float):
-            x = int(self.left + self.width * x + x_offset)
-            y = int(self.top + self.height * y + y_offset)
+            x = int(self.window_context.left + self.window_context.width * x + x_offset)
+            y = int(self.window_context.top + self.window_context.height * y + y_offset)
             if trace:
                 logger.debug(f"Click point: ({x}, {y}), tag: {tag}")
             action = ActionBuilder(self.driver)
@@ -370,11 +377,16 @@ class BrowserOperator(IOperator):
             raise ThreadStoppedError("按键中断", "线程已停止")
         try:
             self.sleep(wait)
+            keys = [self.convert_key(k.strip()) for k in key.split("+") if k.strip()]
             if trace:
                 logger.debug(f"Press key: {key}")
-            key = self.convert_key(key)
             for _ in range(presses):
-                ActionChains(self.driver).send_keys(key).perform()
+                chain = ActionChains(self.driver)
+                for k in keys:
+                    chain.key_down(k)
+                for k in reversed(keys):
+                    chain.key_up(k)
+                chain.perform()
                 self.sleep(interval)
             return True
         except Exception as e:
@@ -386,11 +398,13 @@ class BrowserOperator(IOperator):
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("按键中断", "线程已停止")
         try:
-            key = self.convert_key(key)
+            keys = [self.convert_key(k.strip()) for k in key.split("+") if k.strip()]
             logger.debug(f"Hold key {key}")
-            ActionChains(self.driver).key_down(key).perform()
+            for k in keys:
+                ActionChains(self.driver).key_down(k).perform()
             self.sleep(duration)
-            ActionChains(self.driver).key_up(key).perform()
+            for k in reversed(keys):
+                ActionChains(self.driver).key_up(k).perform()
             return True
         except Exception as e:
             logger.debug(f"Failed to hold key: {e}")
@@ -424,8 +438,8 @@ class BrowserOperator(IOperator):
                 action.pointer_action.move_to_location(x, y)
                 action.perform()
             elif isinstance(x, float) and isinstance(y, float):
-                x = int(self.left + self.width * x)
-                y = int(self.top + self.height * y)
+                x = int(self.window_context.left + self.window_context.width * x)
+                y = int(self.window_context.top + self.window_context.height * y)
                 action = ActionBuilder(self.driver)
                 action.pointer_action.move_to_location(x, y)
                 action.perform()
@@ -449,8 +463,8 @@ class BrowserOperator(IOperator):
                 action.pointer_action.pointer_down()
                 action.perform()
             elif isinstance(x, float) and isinstance(y, float):
-                x = int(self.left + self.width * x)
-                y = int(self.top + self.height * y)
+                x = int(self.window_context.left + self.window_context.width * x)
+                y = int(self.window_context.top + self.window_context.height * y)
                 action = ActionBuilder(self.driver)
                 action.pointer_action.move_to_location(x, y)
                 action.pointer_action.pointer_down()

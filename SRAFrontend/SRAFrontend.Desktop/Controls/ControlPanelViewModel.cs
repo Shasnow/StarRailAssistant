@@ -90,7 +90,7 @@ public partial class ControlPanelViewModel : ViewModelBase
     public async Task StartSingleTask(string configName)
     {
         Save();
-        if (await _backendService.TaskSingleAsync(configName))
+        if (await _backendService.TaskSingleAsync(configName, null))
             _commonModel.ShowSuccessToast("任务启动成功", "已启动任务");
         else
             _commonModel.ShowErrorToast("任务启动失败", "无法启动任务，请检查后端状态。");

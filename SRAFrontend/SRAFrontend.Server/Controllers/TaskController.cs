@@ -2,7 +2,6 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
-using SRAFrontend.Server.Services;
 using SRAFrontend.Services;
 
 namespace SRAFrontend.Server.Controllers;
@@ -11,12 +10,9 @@ namespace SRAFrontend.Server.Controllers;
 [Route("[controller]")]
 public class TaskController(
     IBackendService backendService,
-    LogStreamService logStream,
-    IHostApplicationLifetime lifetime,
     ILogger<TaskController> logger) : Controller
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
-    private static readonly TimeSpan BackendStartTimeout = TimeSpan.FromSeconds(3);
 
     [HttpPost("run")]
     [EndpointSummary("运行任务")]
@@ -28,11 +24,7 @@ public class TaskController(
     {
         if (backendService.IsTaskRunning)
             return Conflict(new R(false, "A task is already running"));
-
-        backendService.StartBackend("--inline --no-admin");
-        if (!await WaitForBackendReadyAsync())
-            return StatusCode(500, new R(false, "Backend failed to start. Check WebUI logs for details."));
-        
+     
         string? configName = null;
 
         if (request.Config is not null)
@@ -67,6 +59,20 @@ public class TaskController(
         return Ok(new R(true, "Task started"));
     }
 
+    [HttpPost("single")]
+    [EndpointSummary("运行单个指定任务")]
+    [ProducesResponseType(200, Type = typeof(R))]
+    [ProducesResponseType(409)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> RunSingleTask([FromBody] SingleTaskRequest request)
+    {
+        if (backendService.IsTaskRunning)
+            return Conflict(new R(false, "A task is already running"));
+
+        var sent = await backendService.TaskSingleAsync(request.TaskName, request.ConfigName);
+        return Ok(sent ? new R(true, "Single task started") : new R(false, "Failed to send single task command"));
+    }
+
     [HttpPost("stop")]
     [EndpointSummary("停止任务")]
     [ProducesResponseType(200, Type = typeof(R))]
@@ -95,55 +101,6 @@ public class TaskController(
         }
     }
 
-    [HttpGet("logs")]
-    [EndpointSummary("获取最近日志")]
-    [ProducesResponseType(200, Type = typeof(List<string>))]
-    public IActionResult GetRecentLogs([FromQuery] int count = 100)
-    {
-        return Ok(logStream.GetRecentLogs(count));
-    }
-
-    [HttpGet("logs/stream")]
-    [EndpointSummary("SSE 日志流")]
-    [Produces("text/event-stream")]
-    public async Task StreamLogs(CancellationToken cancellationToken)
-    {
-        Response.Headers.ContentType = "text/event-stream";
-        Response.Headers.CacheControl = "no-cache";
-        Response.Headers.Connection = "keep-alive";
-
-        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
-            cancellationToken, lifetime.ApplicationStopping);
-
-        try
-        {
-            await foreach (var line in logStream.Subscribe(linkedCts.Token))
-            {
-                await Response.WriteAsync($"data: {line}\n\n", linkedCts.Token);
-                await Response.Body.FlushAsync(linkedCts.Token);
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            // Client disconnected or the host is shutting down.
-        }
-    }
-
-    private async Task<bool> WaitForBackendReadyAsync()
-    {
-        var deadline = DateTimeOffset.UtcNow + BackendStartTimeout;
-        while (DateTimeOffset.UtcNow < deadline)
-        {
-            // There is no dedicated readiness endpoint for the CLI process, so a
-            // harmless built-in command is used as the readiness probe.
-            if (await backendService.SendInputAsync("help"))
-                return true;
-
-            await Task.Delay(150);
-        }
-
-        return false;
-    }
 }
 
 public class RunRequest
@@ -151,6 +108,12 @@ public class RunRequest
     public string? ConfigName { get; set; }
     public TasksConfig? Config { get; set; }
     public bool Persist { get; set; }
+}
+
+public class SingleTaskRequest
+{
+    public string TaskName { get; set; } = "";
+    public string? ConfigName { get; set; }
 }
 
 public record R(bool Success, string Message, object? Data = null);

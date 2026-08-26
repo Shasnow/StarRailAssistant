@@ -8,6 +8,7 @@ from tasks.img import DUIMG, IMG
 
 @task(order=3)
 class CosmicStrifeTask(BaseTask):
+    """旷宇纷争任务"""
     def run(self):
         """主任务执行函数"""
         if self.config.CosmicStrife.isDivergentUniverseEnabled:

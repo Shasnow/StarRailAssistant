@@ -42,6 +42,11 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         }
     }
 
+    public Task<BackendResponse?> SendInputAndWaitObjectAsync(string command)
+    {
+        throw new NotImplementedException();
+    }
+
     public void StartBackend(string arguments)
     {
         if (_sseCts is not null) return;
@@ -118,6 +123,11 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         }
     }
 
+    public Task<string?> TaskListAsync()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<bool> TaskStopAsync()
     {
         try
@@ -146,10 +156,10 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         return Task.FromResult(string.Empty);
     }
 
-    public Task<List<Strategy>> GetStrategiesAsync()
+    public Task<Strategy[]> GetStrategiesAsync()
     {
         logger.LogWarning("GetStrategies is not implemented for remote backend");
-        return Task.FromResult(new List<Strategy>());
+        return Task.FromResult<Strategy[]>([]);
     }
 
     public Task<TpTask[]> GetTpConfigAsync()
@@ -157,16 +167,15 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         throw new NotImplementedException();
     }
 
-    public Task<byte[]> GetGameScreenshotBytesAsync()
+    public Task<(string Message, byte[])> GetGameScreenshotBytesAsync()
     {
-        logger.LogWarning("GetGameScreenshotBytes is not implemented for remote backend");
-        return Task.FromResult(Array.Empty<byte>());
+        throw new NotImplementedException();
     }
 
-    public Task<List<ExtensionInfo>> GetExtensionsAsync()
+    public Task<ExtensionInfo[]> GetExtensionsAsync()
     {
         logger.LogWarning("GetExtensions is not implemented for remote backend");
-        return Task.FromResult(new List<ExtensionInfo>());
+        return Task.FromResult(Array.Empty<ExtensionInfo>());
     }
 
     public Task<ExtensionSchema?> GetExtensionSchemaAsync(string extensionId)
@@ -181,6 +190,22 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         return Task.FromResult<string?>(null);
     }
 
+    public Task<string?> SendInputAndWaitOutputAsync(string command)
+    {
+        logger.LogWarning("SendCommandAndWaitOutput is not implemented for remote backend");
+        return Task.FromResult<string?>(null);
+    }
+
+    public Task<BackendResponse?> OperatorCallAsync(string method, object? parameters)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<T?> SendInputAndWaitObjectAsync<T>(string command)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<bool> SendInputAsync(string input)
     {
         logger.LogWarning("SendInput is not implemented for remote backend");
@@ -193,7 +218,7 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         return false;
     }
 
-    public Task<bool> TaskSingleAsync(string taskName)
+    public Task<bool> TaskSingleAsync(string taskName, string? configName)
     {
         logger.LogWarning("TaskSingle is not implemented for remote backend");
         return Task.FromResult(false);

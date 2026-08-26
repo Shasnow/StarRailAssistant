@@ -12,8 +12,8 @@ from loguru import logger
 from rapidocr import RapidOCR
 from rapidocr.utils.output import RapidOCROutput
 
-from SRACore.operators.model import Box
 from SRACore.models.app_settings import AppSettings
+from SRACore.operators.model import Box, WindowContext
 from SRACore.util.const import LogsOCRDir
 from SRACore.util.errors import ThreadStoppedError
 
@@ -23,15 +23,13 @@ type Waitable = Callable[[], Box | None]
 class IOperator(ABC):
 
     def __init__(self, ocr_engine: RapidOCR, settings: AppSettings,
-                 stop_event: threading.Event | None = None):
+                 stop_event: threading.Event | None = None,
+                 window_context: WindowContext | None = None):
         self.type = "Local"
         self.settings = settings
+        self.window_context: WindowContext = window_context or WindowContext()
         self.tm_confidence: float = self.settings.General.templateMatchConfidence
         self.ocr_confidence: float = self.settings.General.ocrMatchConfidence
-        self.top = 0
-        self.left = 0
-        self.width = 0
-        self.height = 0
         self.is_developer_mode: bool = self.settings.Advanced.isDeveloperModeEnabled
         self.is_save_ocr_image: bool = self.settings.Advanced.isSaveOcrImage if self.is_developer_mode else False
         self.stop_event: threading.Event | None = stop_event
@@ -44,8 +42,7 @@ class IOperator(ABC):
         ...
 
     def launch(self, channel: int, path: str):
-        """
-        启动目标应用程序
+        """启动目标应用程序
 
         Args:
             channel: 启动渠道，可能是应用程序路径或其他标识符
@@ -69,7 +66,9 @@ class IOperator(ABC):
                    from_y: float | None = None,
                    to_x: float | None = None,
                    to_y: float | None = None,
-                   background: bool = False) -> Image:
+                   background: bool = False,
+                   resize: tuple[int, int] | None = None,
+                   save_path: str | None = None) -> Image:
         """截取屏幕截图
         Args:
             from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
@@ -77,6 +76,8 @@ class IOperator(ABC):
             to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
             to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
             background (bool): 是否在后台截取屏幕截图，默认为False
+            resize (tuple[int, int] | None): 如果提供尺寸，则将截图调整为指定大小
+            save_path (str | None): 如果提供路径，则将截图保存到指定位置
         Returns:
             PIL.Image.Image: 返回截取的屏幕区域图像对象
         Note:
@@ -126,8 +127,8 @@ class IOperator(ABC):
             for box in boxes:
                 left, top, width, height = box
                 if from_x is not None and from_y is not None:
-                    left += int(from_x * self.width)
-                    top += int(from_y * self.height)
+                    left += int(from_x * self.window_context.width)
+                    top += int(from_y * self.window_context.height)
                 result.append(Box(left, top, width, height, source=template))  # type: ignore
             return result  # type: ignore
         except Exception as e:
@@ -181,8 +182,8 @@ class IOperator(ABC):
             if box is not None:
                 left, top, width, height = box
                 if from_x is not None and from_y is not None:
-                    left += int(from_x * self.width)
-                    top += int(from_y * self.height)
+                    left += int(from_x * self.window_context.width)
+                    top += int(from_y * self.window_context.height)
                 return templates.index(img_path), Box(left, top, width, height, source=img_path)
         return -1, None
 
@@ -223,8 +224,8 @@ class IOperator(ABC):
                 return None
             left, top, width, height = box
             if from_x is not None and from_y is not None:
-                left += int(from_x * self.width)
-                top += int(from_y * self.height)
+                left += int(from_x * self.window_context.width)
+                top += int(from_y * self.window_context.height)
             self.sleep(0.5)
             return Box(left, top, width, height, source=template)
         except Exception as e:
@@ -272,7 +273,7 @@ class IOperator(ABC):
             else:
                 # noinspection PyTypeChecker
                 result = [(box.tolist(), text, score) for box, text, score in
-                          zip(rapid_output.boxes, rapid_output.txts, rapid_output.scores) if  # pyright: ignore[reportArgumentType]
+                          zip(rapid_output.boxes, rapid_output.txts, rapid_output.scores) if # pyright: ignore[reportArgumentType]
                           score > ocr_confidence]
             if self.is_save_ocr_image:
                 screenshot.save(LogsOCRDir / f"{int(time.time())}.png")
@@ -293,8 +294,7 @@ class IOperator(ABC):
                   to_x: float | None = None,
                   to_y: float | None = None,
                   trace: bool = True) -> Box | None:
-        """
-        OCR识别并匹配指定文本，返回文本位置
+        """OCR识别并匹配指定文本，返回文本位置
 
         Args:
             text (str): 要识别的文本
@@ -327,8 +327,7 @@ class IOperator(ABC):
                       to_x: float | None = None,
                       to_y: float | None = None,
                       trace: bool = True) -> tuple[int, Box | None]:
-        """
-        OCR识别并匹配任意指定文本，返回文本索引和位置
+        """OCR识别并匹配任意指定文本，返回文本索引和位置
 
         Args:
             texts (list[str]): 要识别的文本列表
@@ -382,8 +381,8 @@ class IOperator(ABC):
                            grayscale=grayscale, confidence=confidence, trace=trace)
         if not results:
             return None
-        offset_x = int(self.width * from_x) if from_x is not None else 0
-        offset_y = int(self.height * from_y) if from_y is not None else 0
+        offset_x = int(self.window_context.width * from_x) if from_x is not None else 0
+        offset_y = int(self.window_context.height * from_y) if from_y is not None else 0
         boxes = []
         for result in results:
             left, top = result[0][0]
@@ -398,8 +397,7 @@ class IOperator(ABC):
                  timeout: float = 10,
                  *args: Any,
                  **kwargs: Any) -> Box | None:
-        """
-        等待OCR识别到指定文本
+        """等待OCR识别到指定文本
 
         Args:
             text (str): 要识别的文本
@@ -427,8 +425,7 @@ class IOperator(ABC):
                      timeout: float = 10,
                      *args: Any,
                      **kwargs: Any) -> tuple[int, Box | None]:
-        """
-        等待OCR识别到任意指定文本
+        """等待OCR识别到任意指定文本
 
         Args:
             texts (list[str]): 要识别的文本列表
@@ -452,8 +449,7 @@ class IOperator(ABC):
     @abstractmethod
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
                     after_sleep: float = 0, tag: str = "", trace: bool = True) -> bool:
-        """
-        点击指定位置
+        """点击指定位置
 
         如果x和y是整数，则直接点击坐标(x, y)
         如果x和y是浮点数，则将其转换为相对于窗口区域的坐标
@@ -472,8 +468,7 @@ class IOperator(ABC):
 
     def click_box(self, box: Box | None, x_offset: int | float = 0, y_offset: int | float = 0,
                   after_sleep: float = 0) -> bool:
-        """
-        点击Box区域中心
+        """点击Box区域中心
         
         计算box中心点坐标并调用click_point方法进行点击
         Args:
@@ -494,8 +489,7 @@ class IOperator(ABC):
 
     def click_img(self, template: str, x_offset: int | float = 0, y_offset: int | float = 0,
                   after_sleep: float = 0) -> bool:
-        """
-        查找图片并点击其中心位置
+        """查找图片并点击其中心位置
         
         先调用locate方法查找图片位置，如果找到则调用click_box方法点击
         Args:
@@ -512,8 +506,7 @@ class IOperator(ABC):
         return self.click_box(box, x_offset, y_offset, after_sleep)
 
     def wait_img(self, template: str, timeout: int = 10, interval: float = 0.5) -> Box | None:
-        """
-        等待模板图片出现
+        """等待模板图片出现
         
         Args:
             template (str): 模板图片路径
@@ -534,8 +527,7 @@ class IOperator(ABC):
 
     def wait_any_img(self, templates: list[str], timeout: int = 10, interval: float = 0.5, trace: bool = True) -> tuple[
         int, Box | None]:
-        """
-        等待任意一张图片出现
+        """等待任意一张图片出现
         
         Args:
             templates (list[str]): 模板图片路径列表
@@ -592,8 +584,8 @@ class IOperator(ABC):
                     cv2.rectangle(img, (x, y), (x + sw, y + sh), (0, 255, 0), 2)
                     left, top = x, y
                     if from_x is not None and from_y is not None:
-                        left += int(from_x * self.width)
-                        top += int(from_y * self.height)
+                        left += int(from_x * self.window_context.width)
+                        top += int(from_y * self.window_context.height)
                     result.append(Box(left, top, sw, sh, source="rectangle_detect"))
 
             if trace:
@@ -607,6 +599,15 @@ class IOperator(ABC):
 
     @staticmethod
     def wait_any(conditions: list[Waitable], timeout: int = 10, interval: float = 0.5) -> tuple[int, Box | None]:
+        """等待任意条件满足
+
+        Args:
+            conditions (list[Waitable]): 条件列表，每个条件是一个可调用对象
+            timeout (int, optional): 超时时间，单位秒。默认值为10秒
+            interval (float, optional): 检查间隔时间，单位秒。默认值为0.5秒
+        Returns:
+            tuple[int, Box | None]: 满足条件的索引和Box，如果超时未满足任何条件则返回-1和None
+        """
         start_time = time.time()
         while time.time() - start_time < timeout:
             for index, condition in enumerate(conditions):
@@ -622,7 +623,7 @@ class IOperator(ABC):
         """按下按键
 
         Args:
-            key: 按键
+            key: 按键名称，支持组合键，如 "a"、"ctrl+c"、"ctrl+shift+s"
             presses: 按下次数
             interval: 按键间隔时间(如果填入,程序会间隔interval秒再按下按键)
             wait: 首次按下按键前的等待时间
@@ -638,7 +639,7 @@ class IOperator(ABC):
         按下按键一段时间
 
         Args:
-            key: 按键
+            key: 按键名称，支持组合键，如 "a"、"ctrl+shift"
             duration: 按下时间
 
         Returns:
@@ -660,8 +661,7 @@ class IOperator(ABC):
 
     @abstractmethod
     def copy(self, text: str) -> None:
-        """
-        Copy the text to clipboard.
+        """Copy the text to clipboard.
         
         Args:
             text (str): The text to copy.
@@ -672,8 +672,7 @@ class IOperator(ABC):
 
     @abstractmethod
     def paste(self) -> None:
-        """
-        Paste the text from clipboard.
+        """Paste the text from clipboard.
         
         Returns:
             None
@@ -682,8 +681,7 @@ class IOperator(ABC):
 
     @abstractmethod
     def move_rel(self, x_offset: int, y_offset: int) -> bool:
-        """
-        相对当前位置移动光标。
+        """相对当前位置移动光标。
 
         Args:
             x_offset (int): X 轴偏移量。
@@ -696,8 +694,7 @@ class IOperator(ABC):
 
     @abstractmethod
     def move_to(self, x: int | float, y: int | float, duration: float = 0.0, trace: bool = True) -> bool:
-        """
-        将鼠标移动到指定位置。
+        """将鼠标移动到指定位置。
 
         Args:
             x (int | float): X 坐标。
@@ -711,8 +708,7 @@ class IOperator(ABC):
 
     @abstractmethod
     def mouse_down(self, x: int | float, y: int | float, trace: bool = True) -> bool:
-        """
-        按下鼠标按钮。
+        """按下鼠标按钮。
 
         Args:
             x (int | float): X 坐标。
@@ -725,8 +721,7 @@ class IOperator(ABC):
 
     @abstractmethod
     def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace: bool = True) -> bool:
-        """
-        释放鼠标按钮。
+        """释放鼠标按钮。
         
         Args:
             x (int | float): X 坐标。
@@ -739,8 +734,7 @@ class IOperator(ABC):
 
     @abstractmethod
     def scroll(self, distance: int) -> bool:
-        """
-        滚动鼠标滚轮。
+        """滚动鼠标滚轮。
 
         Args:
             distance (int): 滚动距离。
@@ -757,8 +751,7 @@ class IOperator(ABC):
                 to_y: int | float,
                 duration: float = 0.5,
                 trace: bool = True) -> bool:
-        """
-        拖动鼠标到指定位置。
+        """拖动鼠标到指定位置。
 
         Args:
             from_x (int | float): 目标 X 坐标。
@@ -778,8 +771,7 @@ class IOperator(ABC):
     @staticmethod
     def do_while(action: Callable[[], Any], condition: Callable[[], bool], interval: float = 0.1,
                  max_iterations: int = 50) -> bool:
-        """
-        在满足条件时重复执行操作。
+        """在满足条件时重复执行操作。
 
         操作函数会先被执行一次，然后在每次检查条件前等待指定的时间。如果条件不再满足或达到最大迭代次数，循环将停止。
         Args:
