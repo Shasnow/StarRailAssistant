@@ -396,17 +396,17 @@ class Operator(IOperator):
         try:
             if trace:
                 logger.debug("Mouse up")
-            pyautogui.mouseUp()
+            pyautogui.mouseUp(x, y)
             return True
         except Exception as e:
             logger.debug(f"Error releasing mouse button: {e}")
             return False
 
-    def scroll(self, distance: int) -> bool:
+    def scroll(self, clicks: int, x: int | float | None = None, y: int | float | None = None) -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("Error scrolling", "线程已停止")
         try:
-            pyautogui.scroll(distance)
+            pyautogui.scroll(clicks, x, y)
             return True
         except Exception as e:
             logger.debug(f"Error scrolling: {e}")

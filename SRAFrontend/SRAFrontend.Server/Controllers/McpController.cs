@@ -11,12 +11,17 @@ public class McpController(IBackendService backendService)
 {
     [McpServerTool(Name = "sra_screenshot")]
     [Description("Take a screenshot(720p) of the game window(1080p)")]
-    public async Task<ContentBlock> TakeScreenshotAsync()
+    public async Task<IEnumerable<ContentBlock>> TakeScreenshotAsync()
     {
         var (msg, screenshotBytes) = await backendService.GetGameScreenshotBytesAsync();
         if (screenshotBytes.Length == 0)
-            return new TextContentBlock { Text = msg };
-        return ImageContentBlock.FromBytes(screenshotBytes, "image/png");
+            return [new TextContentBlock { Text = msg }];
+        return
+        [
+            ImageContentBlock.FromBytes(screenshotBytes, "image/png"),
+            new TextContentBlock
+                { Text = "You must convert coordinates from 720p to 1080p if you want to use them in other tools." }
+        ];
     }
 
     [McpServerTool(Name = "sra_startup")]
@@ -133,14 +138,50 @@ public class McpController(IBackendService backendService)
         return (await backendService.OperatorCallAsync("click_point", parameters))?.Message ??
                "(no response from backend)";
     }
-    
+
+    [McpServerTool(Name = "sra_scroll")]
+    [Description("Scroll the mouse wheel")]
+    public async Task<string> ScrollAsync(
+        [Description("The number of clicks to scroll, positive for up, negative for down")] int clicks,
+        [Description("X coordinate of the scroll position, null for current position")] int? x=null,
+        [Description("Y coordinate of the scroll position, null for current position")] int? y=null)
+    {
+        var parameters = new { clicks, x, y };
+        return (await backendService.OperatorCallAsync("scroll", parameters))?.Message ??
+               "(no response from backend)";
+    }
+
     [McpServerTool(Name = "sra_press_key")]
     [Description("Press a key on the keyboard")]
     public async Task<string> PressKeyAsync(
-        [Description("The key to press, combinations like 'w+d' are supported")] string key)
+        [Description("The key to press, combinations like 'w+d' are supported")]
+        string key)
     {
         var parameters = new { key };
         return (await backendService.OperatorCallAsync("press_key", parameters))?.Message ??
                "(no response from backend)";
+    }
+    
+    [McpServerTool(Name = "sra_hold_key")]
+    [Description("Hold a key on the keyboard")]
+    public async Task<string> HoldKeyAsync(
+        [Description("The key to hold, combinations like 'w+d' are supported")]
+        string key,
+        [Description("The duration to hold the key in seconds, default is 1.0s")]
+        float duration = 1.0f)
+    {
+        var parameters = new { key, duration };
+        return (await backendService.OperatorCallAsync("hold_key", parameters))?.Message ??
+               "(no response from backend)";
+    }
+
+    [McpServerTool(Name = "sra_sleep")]
+    [Description("Pause the execution for a specified number of seconds")]
+    public async Task<string> SleepAsync(
+        [Description("The number of seconds to sleep")]
+        int seconds)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(seconds));
+        return $"Slept for {seconds} seconds";
     }
 }

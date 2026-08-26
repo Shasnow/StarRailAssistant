@@ -733,11 +733,13 @@ class IOperator(ABC):
         ...
 
     @abstractmethod
-    def scroll(self, distance: int) -> bool:
-        """滚动鼠标滚轮。
+    def scroll(self, clicks: int, x: int | float | None = None, y: int | float | None = None) -> bool:
+        """滚动鼠标滚轮指定次数。
 
         Args:
-            distance (int): 滚动距离。
+            clicks (int): 滚动点击次数。正数表示向上滚动，负数表示向下滚动。
+            x (int | float | None): X 坐标。如果为 None，则使用当前鼠标位置。
+            y (int | float | None): Y 坐标。如果为 None，则使用当前鼠标位置。
 
         Returns:
             bool: 如果滚动成功则返回 True，否则返回 False。

@@ -493,8 +493,10 @@ class BrowserOperator(IOperator):
             logger.debug(f"Error releasing mouse button: {e}")
             return False
 
-    def scroll(self, distance: int) -> bool:
-        ActionChains(self.driver).scroll_by_amount(0, -distance).perform()
+    def scroll(self, clicks: int, x: int | float | None = None, y: int | float | None = None) -> bool:
+        if x and y:
+            self.move_to(x, y)
+        ActionChains(self.driver).scroll_by_amount(0, -clicks).perform()
         return True
 
     def kill(self):
