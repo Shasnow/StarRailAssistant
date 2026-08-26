@@ -520,7 +520,7 @@ class WarpForecastExtension(BaseExtension[WarpForecastConfig]):
         for item in _ocr_items(results, 0.55):
             if text in str(item[1]):
                 x, y = _box_center(item)
-                if self.operator.width and self.operator.height:
+                if self.operator.window_context.width and self.operator.window_context.height:
                     self.operator.click_point(int(x), int(y), after_sleep=0.5)
                 else:
                     self.operator.click_point(fallback[0], fallback[1], after_sleep=0.5)

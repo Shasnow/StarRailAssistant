@@ -666,7 +666,7 @@ class TrailblazePowerTask(BaseTask):
         x1, y1, x2, y2 = 45, 190, 155, 320
 
         # 检查第一个支援角色是否有替换图标（与队伍中角色重复）
-        w, h = self.operator.width, self.operator.height
+        w, h = self.operator.window_context.width, self.operator.window_context.height
         has_replace = self.operator.locate(
             TPIMG.DUPLICATE_REPLACED,
             from_x=x1 / w, from_y=y1 / h,

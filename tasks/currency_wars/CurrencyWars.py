@@ -502,7 +502,7 @@ class CurrencyWars(Executable):
         if boxes:
             sorted_boxes = sorted(boxes, key=lambda b: b.left)
             self.off_field_area = [
-                (b.center[0] / self.operator.width, b.center[1] / self.operator.height)
+                (b.center[0] / self.operator.window_context.width, b.center[1] / self.operator.window_context.height)
                 for b in sorted_boxes
             ]
             # 同步调整角色列表长度
