@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SRAFrontend.Services;
 
 namespace SRAFrontend.Server.Controllers;
 
@@ -15,11 +16,11 @@ public class AuthController(IConfiguration configuration) : Controller
     {
         var token = request.Token?.Trim() ?? "";
         var configuredToken = configuration["AccessToken"];
-        if (string.IsNullOrWhiteSpace(configuredToken)) return Ok(new { ok = true });
+        if (string.IsNullOrWhiteSpace(configuredToken)) return Ok(new R(true, "No access token configured"));
         if (!string.Equals(token, configuredToken, StringComparison.Ordinal))
-            return Unauthorized(new { message = "访问令牌不正确" });
+            return Unauthorized(new R(false, "unauthorized" ));
 
-        return Ok(new { ok = true });
+        return Ok(new R(true, "authorized"));
     }
 }
 

@@ -10,7 +10,6 @@ public class TokenAuthenticationOptions : AuthenticationSchemeOptions
     public const string DefaultScheme = "AccessToken";
     public const string HeaderName = "X-Access-Token";
     public const string QueryName = "access_token";
-    public const string DefaultToken = "starrailassistant";
 }
 
 public class TokenAuthenticationHandler(

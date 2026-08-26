@@ -41,7 +41,7 @@ public sealed class LogStreamService : IDisposable
         }
 
         // 清理已失效的订阅者
-        foreach (var d in dead)
+        foreach (var unused in dead)
             _subscribers.TryTake(out _);
     }
 

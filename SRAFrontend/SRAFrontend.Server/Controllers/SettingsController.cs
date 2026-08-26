@@ -13,16 +13,16 @@ public class SettingsController(SettingsService settingsService, ILogger<Setting
     [HttpGet]
     [EndpointSummary("获取设置")]
     [EndpointDescription("获取当前应用程序的设置")]
-    [ProducesResponseType(200, Type = typeof(AppSettings))]
+    [ProducesResponseType(200, Type = typeof(R<AppSettings>))]
     public IActionResult GetSettings()
     {
-        return Ok(settingsService.Settings);
+        return Ok(new R(true, "Settings retrieved", settingsService.Settings));
     }
 
     [HttpPut]
     [EndpointSummary("修改设置")]
     [EndpointDescription("按字段修改设置，支持只传需要修改的部分。请求体为 AppSettings 的部分 JSON，例如 { \"advanced\": { \"backend.remote.enabled\": true } }")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(200, Type = typeof(R<IEnumerable<string>>))]
     [ProducesResponseType(400)]
     public IActionResult UpdateSettings([FromBody] JsonElement body)
     {
@@ -53,11 +53,11 @@ public class SettingsController(SettingsService settingsService, ILogger<Setting
         }
 
         if (updated.Count == 0)
-            return BadRequest(new { message = "No valid settings were updated" });
+            return BadRequest(new R(false, "No valid settings were updated"));
 
         settingsService.Save();
         logger.LogInformation("Updated settings: {Fields}", string.Join(", ", updated));
-        return Ok(new { updated });
+        return Ok(new R(true, "Settings updated", updated));
     }
 
     private static object? GetSection(AppSettings settings, string name)

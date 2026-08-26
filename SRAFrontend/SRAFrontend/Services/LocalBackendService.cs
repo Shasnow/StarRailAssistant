@@ -188,9 +188,9 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         return SendInputAndWaitOutputAsync("task list --json");
     }
 
-    public async Task<string> GetTaskStatusAsync()
+    public async Task<R> GetTaskStatusAsync()
     {
-        return await SendInputAndWaitOutputAsync("task status --json") ?? string.Empty;
+        return await SendInputAndWaitObjectAsync("task status --json") ?? new R(false, "No response from backend");
     }
 
     public async Task<Strategy[]> GetStrategiesAsync()
@@ -285,7 +285,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         if (output == null) return default;
         try
         {
-            var response = JsonSerializer.Deserialize<BackendResponse<T>>(output, options: JsonSerializerOptions.Web);
+            var response = JsonSerializer.Deserialize<R<T>>(output, options: JsonSerializerOptions.Web);
             if (response is { Success: true })
                 return response.Data;
         }
@@ -296,13 +296,13 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         return default;
     }
 
-    public async Task<BackendResponse?> SendInputAndWaitObjectAsync(string command)
+    public async Task<R?> SendInputAndWaitObjectAsync(string command)
     {
         var output = await SendInputAndWaitOutputAsync(command);
         if (output == null) return null;
         try
         {
-            return JsonSerializer.Deserialize<BackendResponse>(output, options: JsonSerializerOptions.Web);
+            return JsonSerializer.Deserialize<R>(output, options: JsonSerializerOptions.Web);
         }
         catch (JsonException ex)
         {
@@ -311,7 +311,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         return null;
     }
 
-    public Task<BackendResponse?> OperatorCallAsync(string method, object? parameters)
+    public Task<R?> OperatorCallAsync(string method, object? parameters)
     {
         var command = $"operator call {method} '{JsonSerializer.Serialize(parameters)}' --json";
         return SendInputAndWaitObjectAsync(command);

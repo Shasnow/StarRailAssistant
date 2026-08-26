@@ -16,7 +16,7 @@ public interface IBackendService : INotifyPropertyChanged
     Task<bool> SendInputAsync(string input);
     Task<string?> SendInputAndWaitOutputAsync(string command);
     Task<T?> SendInputAndWaitObjectAsync<T>(string command);
-    Task<BackendResponse?> SendInputAndWaitObjectAsync(string command);
+    Task<R?> SendInputAndWaitObjectAsync(string command);
     void StartBackend(string arguments);
     void StopBackend();
     Task RestartBackendAsync(string arguments);
@@ -24,15 +24,15 @@ public interface IBackendService : INotifyPropertyChanged
     Task<bool> TaskSingleAsync(string taskName, string? configName);
     Task<string?> TaskListAsync();
     Task<bool> TaskStopAsync();
-    Task<string> GetTaskStatusAsync();
+    Task<R> GetTaskStatusAsync();
     Task<Strategy[]> GetStrategiesAsync();
     Task<TpTask[]> GetTpConfigAsync();
     Task<(string Message, byte[])> GetGameScreenshotBytesAsync();
     Task<ExtensionInfo[]> GetExtensionsAsync();
     Task<ExtensionSchema?> GetExtensionSchemaAsync(string extensionId);
     Task<string?> GetExtensionConfigAsync(string extensionId);
-    Task<BackendResponse?> OperatorCallAsync(string method, object? parameters);
+    Task<R?> OperatorCallAsync(string method, object? parameters);
 }
 
-public record BackendResponse<T>(bool Success, string Message, T Data);
-public record BackendResponse(bool Success, string Message, object? Data);
+public record R<T>(bool Success, string Message, T Data);
+public record R(bool Success, string Message, object? Data=null);

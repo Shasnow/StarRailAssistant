@@ -33,7 +33,7 @@ public class BackendController(
     [ProducesResponseType(200, Type = typeof(List<string>))]
     public IActionResult GetRecentLogs([FromQuery] int count = 100)
     {
-        return Ok(logStream.GetRecentLogs(count));
+        return Ok(new R(true, "success", logStream.GetRecentLogs(count)));
     }
 
     [HttpGet("logs/stream")]

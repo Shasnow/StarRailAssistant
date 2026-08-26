@@ -88,11 +88,11 @@ public class McpController(IBackendService backendService)
     public async Task<string> GetTaskStatusAsync()
     {
         var status = await backendService.GetTaskStatusAsync();
-        return string.IsNullOrWhiteSpace(status) ? "No task is currently running." : status;
+        return JsonSerializer.Serialize(status, JsonSerializerOptions.Web);
     }
 
     [McpServerTool(Name = "sra_ocr")]
-    [Description("Perform OCR on the game window, returns the recognized texts")]
+    [Description("Perform OCR on the game window, returns all recognized texts")]
     public async Task<string> PerformOcrAsync(
         int? fromX = null,
         int? fromY = null,

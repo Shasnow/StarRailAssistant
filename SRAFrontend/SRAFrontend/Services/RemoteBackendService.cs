@@ -42,7 +42,7 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         }
     }
 
-    public Task<BackendResponse?> SendInputAndWaitObjectAsync(string command)
+    public Task<R?> SendInputAndWaitObjectAsync(string command)
     {
         throw new NotImplementedException();
     }
@@ -150,10 +150,9 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         }
     }
 
-    public Task<string> GetTaskStatusAsync()
+    public Task<R> GetTaskStatusAsync()
     {
-        logger.LogWarning("GetTaskStatus is not implemented for remote backend");
-        return Task.FromResult(string.Empty);
+        throw new NotImplementedException();
     }
 
     public Task<Strategy[]> GetStrategiesAsync()
@@ -196,7 +195,7 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         return Task.FromResult<string?>(null);
     }
 
-    public Task<BackendResponse?> OperatorCallAsync(string method, object? parameters)
+    public Task<R?> OperatorCallAsync(string method, object? parameters)
     {
         throw new NotImplementedException();
     }

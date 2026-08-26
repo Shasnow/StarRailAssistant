@@ -53,10 +53,9 @@ public class TaskController(
         }
 
         var sent = await backendService.TaskRunAsync(configName);
-        if (!sent)
-            return StatusCode(500, new R(false, "Failed to send task command to backend."));
-
-        return Ok(new R(true, "Task started"));
+        return Ok(sent
+            ? new R(true, "Task started")
+            : new R(false, "Failed to send task command to backend."));
     }
 
     [HttpPost("single")]
@@ -70,7 +69,9 @@ public class TaskController(
             return Conflict(new R(false, "A task is already running"));
 
         var sent = await backendService.TaskSingleAsync(request.TaskName, request.ConfigName);
-        return Ok(sent ? new R(true, "Single task started") : new R(false, "Failed to send single task command"));
+        return Ok(sent 
+            ? new R(true, "Single task started")
+            : new R(false, "Failed to send single task command"));
     }
 
     [HttpPost("stop")]
@@ -82,23 +83,18 @@ public class TaskController(
             return Ok(new R(false, "No task is running"));
 
         var sent = await backendService.TaskStopAsync();
-        return Ok(sent ? new R(true, "Stop signal sent") : new R(false, "Failed to send stop signal"));
+        return Ok(sent
+            ? new R(true, "Stop signal sent")
+            : new R(false, "Failed to send stop signal"));
     }
 
     [HttpGet("status")]
     [EndpointSummary("获取任务状态")]
-    [ProducesResponseType(200, Type = typeof(JsonDocument))]
+    [ProducesResponseType(200, Type = typeof(R))]
     public async Task<IActionResult> GetTaskStatus()
     {
-        var json = await backendService.GetTaskStatusAsync();
-        try
-        {
-            return Ok(JsonDocument.Parse(json));
-        }
-        catch (JsonException)
-        {
-            return StatusCode(500, new R(false, "Failed to parse task status JSON"));
-        }
+        var response = await backendService.GetTaskStatusAsync();
+        return Ok(response);
     }
 
 }
@@ -115,5 +111,3 @@ public class SingleTaskRequest
     public string TaskName { get; set; } = "";
     public string? ConfigName { get; set; }
 }
-
-public record R(bool Success, string Message, object? Data = null);

@@ -77,7 +77,7 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         return _currentBackend.SendInputAndWaitObjectAsync<T>(command);
     }
 
-    public Task<BackendResponse?> SendInputAndWaitObjectAsync(string command)
+    public Task<R?> SendInputAndWaitObjectAsync(string command)
     {
         return _currentBackend.SendInputAndWaitObjectAsync(command);
     }
@@ -123,7 +123,7 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         return _currentBackend.TaskStopAsync();
     }
 
-    public Task<string> GetTaskStatusAsync()
+    public Task<R> GetTaskStatusAsync()
     {
         return _currentBackend.GetTaskStatusAsync();
     }
@@ -163,7 +163,7 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         return _currentBackend.SendInputAndWaitOutputAsync(command);
     }
 
-    public Task<BackendResponse?> OperatorCallAsync(string method, object? parameters)
+    public Task<R?> OperatorCallAsync(string method, object? parameters)
     {
         return _currentBackend.OperatorCallAsync(method, parameters);
     }

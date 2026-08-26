@@ -11,15 +11,15 @@ public class ConfigsController(ConfigService configService, CacheService cacheSe
 {
     [HttpGet]
     [EndpointSummary("获取所有配置名称")]
-    [ProducesResponseType(200, Type = typeof(List<string>))]
+    [ProducesResponseType(200, Type = typeof(R<List<string>>))]
     public IActionResult GetConfigNames()
     {
-        return Ok(cacheService.Cache.ConfigNames);
+        return Ok(new R(true, "success", cacheService.Cache.ConfigNames));
     }
 
     [HttpGet("{configName}")]
     [EndpointSummary("获取指定配置")]
-    [ProducesResponseType(200, Type = typeof(TasksConfig))]
+    [ProducesResponseType(200, Type = typeof(R<TasksConfig>))]
     [ProducesResponseType(404)]
     public IActionResult GetConfig(string configName)
     {
@@ -27,12 +27,12 @@ public class ConfigsController(ConfigService configService, CacheService cacheSe
             return NotFound();
 
         configService.Load(configName);
-        return Ok(CreateSafeConfigPayload(configService.TasksConfig));
+        return Ok(new R(true, "success", CreateSafeConfigPayload(configService.TasksConfig)));
     }
 
     [HttpPost("{configName}")]
     [EndpointSummary("新建配置")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(200, Type = typeof(R<string>))]
     [ProducesResponseType(400, Description = "名称包含非法字符")]
     [ProducesResponseType(409, Description = "配置已存在")]
     public IActionResult CreateConfig(string configName)
@@ -45,12 +45,12 @@ public class ConfigsController(ConfigService configService, CacheService cacheSe
 
         cacheService.Cache.ConfigNames.Add(configName);
         cacheService.SaveCache();
-        return Ok(configName);
+        return Ok(new R(true, "success", configName));
     }
 
     [HttpPut("{configName}")]
     [EndpointSummary("更新配置")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(200, Type = typeof(R<string>))]
     [ProducesResponseType(404)]
     public IActionResult UpdateConfig(string configName, [FromBody] JsonElement body)
     {
@@ -61,7 +61,7 @@ public class ConfigsController(ConfigService configService, CacheService cacheSe
         var currentStartGame = configService.TasksConfig?.StartGame;
         var config = body.Deserialize<TasksConfig>();
         if (config is null)
-            return BadRequest("Invalid config payload");
+            return BadRequest(new R(false, "Invalid config payload"));
 
         config.Name = configName;
         if (body.TryGetProperty("startGame", out var startGame))
@@ -84,20 +84,19 @@ public class ConfigsController(ConfigService configService, CacheService cacheSe
 
         configService.TasksConfig = config;
         configService.Save();
-        return Ok();
+        return Ok(new R(true, "updated"));
     }
 
     [HttpDelete("{configName}")]
     [EndpointSummary("删除配置")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(200, Type = typeof(R<string>))]
     [ProducesResponseType(404)]
     public IActionResult DeleteConfig(string configName)
     {
         if (!cacheService.Cache.ConfigNames.Remove(configName))
             return NotFound();
 
-        cacheService.SaveCache();
-        return Ok(configName);
+        return Ok(new R(true, "deleted", configName));
     }
 
     private static object? CreateSafeConfigPayload(TasksConfig? config)
