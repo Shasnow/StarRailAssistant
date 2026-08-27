@@ -3,7 +3,7 @@ using Avalonia;
 
 namespace SRAFrontend.Desktop;
 
-sealed class Program
+internal static class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -16,6 +16,8 @@ sealed class Program
     private static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .WithInterFont()
+#if DEBUG
+            .WithDeveloperTools()
+#endif
             .LogToTrace();
 }

@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -15,7 +15,7 @@
                 <TextBlock Text="{Binding Description}" FontSize="12"
                            Opacity="0.6" TextWrapping="Wrap"
                            IsVisible="{Binding HasDescription}"/>
-                <TextBox Text="{Binding Value}" Watermark="请输入文本"/>
+                <TextBox Text="{Binding Value}" PlaceholderText="请输入文本"/>
             </StackPanel>
         </DataTemplate>
         <DataTemplate DataType="viewModels:IntegerFieldViewModel">

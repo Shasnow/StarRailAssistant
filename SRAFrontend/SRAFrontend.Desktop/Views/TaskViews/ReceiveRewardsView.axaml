@@ -28,7 +28,7 @@
                     <CheckBox IsChecked="{Binding ReceiveRewardsConfig.Rewards[4]}" Content="无名勋礼" />
                     <CheckBox IsChecked="{Binding ReceiveRewardsConfig.Rewards[5]}" Content="巡星之礼" />
                     <CheckBox IsChecked="{Binding ReceiveRewardsConfig.Rewards[6]}" Content="兑换码" />
-                    <TextBox Text="{Binding ReceiveRewardsConfig.RedeemCodes}" Watermark="兑换码填写处"></TextBox>
+                    <TextBox Text="{Binding ReceiveRewardsConfig.RedeemCodes}" PlaceholderText="兑换码填写处"></TextBox>
                 </StackPanel>
             </ScrollViewer>
         </suki:GroupBox>

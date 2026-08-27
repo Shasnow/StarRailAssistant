@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -138,7 +138,7 @@
                                                     <Label Grid.Column="1" Content="{x:Static lang:Resources.AdvancedParametersText}" />
                                                     <TextBox Grid.Column="2"
                                                              MinWidth="300"
-                                                             Watermark="{x:Static lang:Resources.GameArgsHintText}"
+                                                             PlaceholderText="{x:Static lang:Resources.GameArgsHintText}"
                                                              Text="{Binding GeneralSettings.GameArgsAdvanced}" />
                                                 </Grid>
                                             </StackPanel>
@@ -199,7 +199,7 @@
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.BackgroundImageText}" />
                                         <TextBox Grid.Column="2"
                                                  Width="400"
-                                                 Watermark="{x:Static lang:Resources.BgImagePathWatermarkText}"
+                                                 PlaceholderText="{x:Static lang:Resources.BgImagePathWatermarkText}"
                                                  Text="{Binding DisplaySettings.BackgroundImageUri}" />
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto, *, Auto, 28">
@@ -291,27 +291,27 @@
                                                            Content="{x:Static lang:Resources.SmtpServerText}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.SmtpServer}"
-                                                             Watermark="smtp.qq.com" />
+                                                             PlaceholderText="smtp.qq.com" />
                                                     <Label Grid.Row="1" Grid.Column="0"
                                                            Content="{x:Static lang:Resources.SmtpPortText}" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.SmtpPort}"
-                                                             Watermark="465" />
+                                                             PlaceholderText="465" />
                                                     <Label Grid.Row="2" Grid.Column="0"
                                                            Content="{x:Static lang:Resources.SenderEmailAddrText}" />
                                                     <TextBox Grid.Row="2" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.SmtpSender}"
-                                                             Watermark="123456@qq.com" />
+                                                             PlaceholderText="123456@qq.com" />
                                                     <Label Grid.Row="3" Grid.Column="0"
                                                            Content="{x:Static lang:Resources.AuthorCodeText}" />
                                                     <TextBox Grid.Row="3" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.SmtpAuthCode}"
-                                                             Watermark="123456" />
+                                                             PlaceholderText="123456" />
                                                     <Label Grid.Row="4" Grid.Column="0"
                                                            Content="{x:Static lang:Resources.ReceiverEmailAddrText}" />
                                                     <TextBox Grid.Row="4" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.SmtpReceiver}"
-                                                             Watermark="123456@qq.com" />
+                                                             PlaceholderText="123456@qq.com" />
                                                 </Grid>
                                             </Expander>
                                             <!-- Webhook 通知 -->
@@ -333,7 +333,7 @@
                                                            Content="{x:Static lang:Resources.PushAddressText}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.WebhookUrl}"
-                                                             Watermark="https://your-webhook-endpoint" />
+                                                             PlaceholderText="https://your-webhook-endpoint" />
                                                 </Grid>
                                             </Expander>
                                             <!-- Telegram 通知 -->
@@ -357,19 +357,19 @@
                                                            Content="{x:Static lang:Resources.BotTokenText}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.TelegramBotToken}"
-                                                             Watermark="1234567890:ABCdef..." />
+                                                             PlaceholderText="1234567890:ABCdef..." />
                                                     <Label Grid.Row="1" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.ChatIdText}" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.TelegramChatId}"
-                                                             Watermark="-1001234567890" />
+                                                             PlaceholderText="-1001234567890" />
                                                     <Label Grid.Row="2" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.CustomApiAddressText}" />
                                                     <TextBox Grid.Row="2" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.TelegramApiBaseUrl}"
-                                                             Watermark="留空使用官方 API" />
+                                                             PlaceholderText="留空使用官方 API" />
                                                     <Label Grid.Row="3" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.EnableProxyText}" />
@@ -382,7 +382,7 @@
                                                     <TextBox Grid.Row="4" Grid.Column="1"
                                                              IsVisible="{Binding NotificationSettings.IsTelegramProxyEnabled}"
                                                              Text="{Binding NotificationSettings.TelegramProxyUrl}"
-                                                             Watermark="http://127.0.0.1:7890" />
+                                                             PlaceholderText="http://127.0.0.1:7890" />
                                                     <Label Grid.Row="5" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.SendScreenshotText}" />
@@ -411,7 +411,7 @@
                                                            Content="{x:Static lang:Resources.SendKeyText}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.ServerChanSendKey}"
-                                                             Watermark="SCT... 或 sctp..." />
+                                                             PlaceholderText="SCT... 或 sctp..." />
                                                 </Grid>
                                             </Expander>
 
@@ -436,25 +436,25 @@
                                                            Content="{x:Static lang:Resources.ApiAddressText}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.OneBotUrl}"
-                                                             Watermark="http://127.0.0.1:3000" />
+                                                             PlaceholderText="http://127.0.0.1:3000" />
                                                     <Label Grid.Row="1" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.QQPrivateText}" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.OneBotUserId}"
-                                                             Watermark="留空则不发送私聊" />
+                                                             PlaceholderText="留空则不发送私聊" />
                                                     <Label Grid.Row="2" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.QQGroupText}" />
                                                     <TextBox Grid.Row="2" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.OneBotGroupId}"
-                                                             Watermark="留空则不发送群聊" />
+                                                             PlaceholderText="留空则不发送群聊" />
                                                     <Label Grid.Row="3" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.AccessTokenText}" />
                                                     <TextBox Grid.Row="3" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.OneBotToken}"
-                                                             Watermark="留空则不使用认证" />
+                                                             PlaceholderText="留空则不使用认证" />
                                                     <Label Grid.Row="4" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.SendScreenshotText}" />
@@ -483,40 +483,40 @@
                                                            Content="{x:Static lang:Resources.DeviceKeyText}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.BarkDeviceKey}"
-                                                             Watermark="从 Bark App 复制，多个用逗号分隔" />
+                                                             PlaceholderText="从 Bark App 复制，多个用逗号分隔" />
                                                     <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.BarkApiEndpointText}" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.BarkServerUrl}"
-                                                             Watermark="https://api.day.app" />
+                                                             PlaceholderText="https://api.day.app" />
                                                     <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.PushLevelText}" />
                                                     <TextBox Grid.Row="2" Grid.Column="1"
                                                              Text=""
                                                              IsReadOnly="True"
-                                                             Watermark="active / timeSensitive / passive" />
+                                                             PlaceholderText="active / timeSensitive / passive" />
                                                     <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.NotificationSoundText}" />
                                                     <TextBox Grid.Row="3" Grid.Column="1"
                                                              Text=""
                                                              IsReadOnly="True"
-                                                             Watermark="minuet（可选）" />
+                                                             PlaceholderText="minuet（可选）" />
                                                     <Label Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.NotificationIconText}" />
                                                     <TextBox Grid.Row="4" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.BarkIcon}"
-                                                             Watermark="图标 URL（可选）" />
+                                                             PlaceholderText="图标 URL（可选）" />
                                                     <Label Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.NotificationGroupText}" />
                                                     <TextBox Grid.Row="5" Grid.Column="1"
                                                              Text=""
                                                              IsReadOnly="True"
-                                                             Watermark="StarRailAssistant" />
+                                                             PlaceholderText="StarRailAssistant" />
                                                     <Label Grid.Row="6" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.EncryptionKeyText}" />
                                                     <TextBox Grid.Row="6" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.BarkCiphertext}"
-                                                             Watermark="加密内容（可选）" />
+                                                             PlaceholderText="加密内容（可选）" />
                                                 </Grid>
                                             </Expander>
 
@@ -540,7 +540,7 @@
                                                                Content="{x:Static lang:Resources.FeishuNotificationAddressText}" />
                                                         <TextBox Grid.Row="0" Grid.Column="1"
                                                                  Text="{Binding NotificationSettings.FeishuWebhookUrl}"
-                                                                 Watermark="https://open.feishu.cn/open-apis/bot/v2/hook/..." />
+                                                                 PlaceholderText="https://open.feishu.cn/open-apis/bot/v2/hook/..." />
                                                     </Grid>
                                                     <TextBlock Text="{x:Static lang:Resources.MethodTwoText}" FontWeight="Bold"
                                                                Margin="0,6,0,0" />
@@ -550,22 +550,22 @@
                                                                Content="{x:Static lang:Resources.FeishuAppIdText}" />
                                                         <TextBox Grid.Row="0" Grid.Column="1"
                                                                  Text="{Binding NotificationSettings.FeishuAppId}"
-                                                                 Watermark="cli_..." />
+                                                                 PlaceholderText="cli_..." />
                                                         <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
                                                                Content="{x:Static lang:Resources.FeishuAppSecretText}" />
                                                         <TextBox Grid.Row="1" Grid.Column="1"
                                                                  Text="{Binding NotificationSettings.FeishuAppSecret}"
-                                                                 Watermark="应用 AppSecret" />
+                                                                 PlaceholderText="应用 AppSecret" />
                                                         <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
                                                                Content="{x:Static lang:Resources.ReceiverIdText}" />
                                                         <TextBox Grid.Row="2" Grid.Column="1"
                                                                  Text="{Binding NotificationSettings.FeishuReceiveId}"
-                                                                 Watermark="open_id / user_id / chat_id" />
+                                                                 PlaceholderText="open_id / user_id / chat_id" />
                                                         <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"
                                                                Content="{x:Static lang:Resources.IdTypeText}" />
                                                         <TextBox Grid.Row="3" Grid.Column="1"
                                                                  Text="{Binding NotificationSettings.FeishuReceiveIdType}"
-                                                                 Watermark="open_id（默认）" />
+                                                                 PlaceholderText="open_id（默认）" />
                                                     </Grid>
                                                 </StackPanel>
                                             </Expander>
@@ -588,7 +588,7 @@
                                                            Content="Webhook 地址" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.WeComWebhookUrl}"
-                                                             Watermark="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..." />
+                                                             PlaceholderText="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..." />
                                                     <Label Grid.Row="1" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.SendScreenshotText}" />
@@ -617,12 +617,12 @@
                                                            Content="Webhook 地址" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.DingTalkWebhookUrl}"
-                                                             Watermark="https://oapi.dingtalk.com/robot/send?access_token=..." />
+                                                             PlaceholderText="https://oapi.dingtalk.com/robot/send?access_token=..." />
                                                     <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.SignSecretText}" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.DingTalkSecret}"
-                                                             Watermark="SEC... （可选）" />
+                                                             PlaceholderText="SEC... （可选）" />
                                                 </Grid>
                                             </Expander>
 
@@ -644,7 +644,7 @@
                                                            Content="Webhook 地址" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.DiscordWebhookUrl}"
-                                                             Watermark="https://discord.com/api/webhooks/..." />
+                                                             PlaceholderText="https://discord.com/api/webhooks/..." />
                                                     <Label Grid.Row="1" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.SendScreenshotText}" />
@@ -673,17 +673,17 @@
                                                            Content="{x:Static lang:Resources.ApiKeyText}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.XxtuiApiKey}"
-                                                             Watermark="从 xxtui.com 获取" />
+                                                             PlaceholderText="从 xxtui.com 获取" />
                                                     <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.NotificationSourceText}" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.XxtuiSource}"
-                                                             Watermark="如 StarRailAssistant（可选）" />
+                                                             PlaceholderText="如 StarRailAssistant（可选）" />
                                                     <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.NotificationChannelText}" />
                                                     <TextBox Grid.Row="2" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.XxtuiChannel}"
-                                                             Watermark="如 WX_MP（可选）" />
+                                                             PlaceholderText="如 WX_MP（可选）" />
                                                 </Grid>
                                             </Expander>
 
@@ -781,7 +781,7 @@
                                                 Command="{Binding VerifyCdkCommand}" />
                                         <StackPanel Grid.Column="3">
                                             <TextBox
-                                                Watermark="{x:Static lang:Resources.EnterCdkText}"
+                                                PlaceholderText="{x:Static lang:Resources.EnterCdkText}"
                                                 PasswordChar="*"
                                                 Text="{Binding MirrorChyanCdk}" />
                                             <TextBlock Text="{Binding Cache.CdkStatus}"
@@ -839,7 +839,7 @@
                                         <Label Classes="Icon">&#xe184;</Label>
                                         <Label Grid.Column="1"
                                                Content="{x:Static lang:Resources.BackendLaunchArgsText}" />
-                                        <TextBox Grid.Column="2" Text="{Binding AdvancedSettings.BackendLaunchArgs}" Watermark="--inline"/>
+                                        <TextBox Grid.Column="2" Text="{Binding AdvancedSettings.BackendLaunchArgs}" PlaceholderText="--inline"/>
                                     </Grid>
 
                                     <Grid ColumnDefinitions="Auto, *, Auto">
@@ -859,7 +859,7 @@
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.RemoteServerAddressText}" />
                                         <TextBox Grid.Column="2"
                                                  MinWidth="300"
-                                                 Watermark="http://localhost:5000"
+                                                 PlaceholderText="http://localhost:5000"
                                                  Text="{Binding AdvancedSettings.RemoteBaseUrl}" />
                                     </Grid>
                                     
@@ -901,7 +901,7 @@
                                                        Content="{x:Static lang:Resources.PythonInterpreterText}" />
                                                 <TextBox Grid.Column="2"
                                                          MinWidth="300"
-                                                         Watermark="/path/to/your/python.exe"
+                                                         PlaceholderText="/path/to/your/python.exe"
                                                          Text="{Binding AdvancedSettings.PythonPath}" />
                                             </Grid>
                                             <Grid ColumnDefinitions="Auto, *, Auto">
@@ -909,7 +909,7 @@
                                                 <Label Grid.Column="1" Content="{x:Static lang:Resources.MainPyText}" />
                                                 <TextBox Grid.Column="2"
                                                          MinWidth="300"
-                                                         Watermark="/path/to/your/main.py"
+                                                         PlaceholderText="/path/to/your/main.py"
                                                          Text="{Binding AdvancedSettings.PythonMain}" />
                                             </Grid>
                                         </StackPanel>

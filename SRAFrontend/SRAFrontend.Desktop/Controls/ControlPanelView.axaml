@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -12,7 +12,7 @@
         HorizontalAlignment="Right"
         Spacing="10">
         <TextBox Width="250"
-                 Watermark="{x:Static lang:Resources.ConfigInputMarkText}"
+                 PlaceholderText="{x:Static lang:Resources.ConfigInputMarkText}"
                  Text="{Binding NewConfigName}"
                  IsVisible="{Binding IsAddConfigOpen}"/>
         <Button Classes="Icon" Content="&#xE3D4;"

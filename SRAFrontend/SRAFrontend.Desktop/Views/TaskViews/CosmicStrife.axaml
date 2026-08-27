@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -49,7 +49,7 @@
                                 <TextBox Grid.Column="1"
                                          Width="200"
                                          Text="{Binding CosmicStrifeConfig.CurrencyWarsUsername}"
-                                         Watermark="请输入开拓者角色名"/>
+                                         PlaceholderText="请输入开拓者角色名"/>
                             </Grid>
                             
                             <StackPanel Orientation="Horizontal" Spacing="6">
@@ -98,28 +98,28 @@
                                     <Label Content="Boss名称" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollBossNames}"
-                                             Watermark="例如：巨鹿生物制药;增熵能源集团;金血记忆体联盟" />
+                                             PlaceholderText="例如：巨鹿生物制药;增熵能源集团;金血记忆体联盟" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="Boss词条" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollBossAffixes}"
-                                             Watermark="例如：决战在即 !时间刺客" />
+                                             PlaceholderText="例如：决战在即 !时间刺客" />
                                 </StackPanel>
                                 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="投资环境" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollInvestEnvironments}"
-                                             Watermark="例如：长线利好 ?轮岗" />
+                                             PlaceholderText="例如：长线利好 ?轮岗" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="投资策略" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollInvestStrategies}"
-                                             Watermark="第一位面策略1 第一位面策略2；第二位面策略1 第二位面策略2" />
+                                             PlaceholderText="第一位面策略1 第一位面策略2；第二位面策略1 第二位面策略2" />
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>

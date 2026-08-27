@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -42,5 +43,19 @@ public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<A
     {
         _cachedAnnouncements = null; // 清空缓存
         return await GetAnnouncementsAsync(); // 重新获取
+    }
+
+    public ReadOnlySpan<char> BuildAnnouncementHtml(AnnouncementList announcementList)
+    {
+        
+        var htmlBuilder = new System.Text.StringBuilder();
+        htmlBuilder.AppendLine("<html><head><meta charset=\"UTF-8\"></head><body>");
+        foreach (var announcement in announcementList.Announcements)
+        {
+            htmlBuilder.AppendLine($"<h2>{announcement.Title}</h2>");
+            htmlBuilder.AppendLine($"<p>{announcement.Content}</p>");
+        }
+        htmlBuilder.AppendLine("</body></html>");
+        return htmlBuilder.ToString().AsSpan();
     }
 }

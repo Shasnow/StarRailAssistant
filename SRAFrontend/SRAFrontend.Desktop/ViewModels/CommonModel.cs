@@ -4,11 +4,11 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
-using SRAFrontend.Desktop.Controls;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 using SRAFrontend.Utils;
@@ -34,22 +34,15 @@ public class CommonModel(
 
     public void ShowAnnouncementBoard()
     {
-        if (_announcementList is null)
+        var dialog = new NativeWebDialog
         {
-            ShowWarningToast("公告获取失败", "当前没有可显示的公告");
-            return;
-        }
-        SukiMessageBox.ShowDialog(new SukiMessageBoxHost
-        {
-            Header = "公告栏",
-            Content = new AnnouncementBoardViewModel
-            {
-                Announcements = _announcementList.Announcements
-            }
-        });
-        cacheService.Cache.LastViewAnnouncementId = _announcementList.Id;
+            Title = "公告",
+            Source = new Uri("https://starrailassistant.top/ann/updates/")
+        };
+        dialog.Resize(1024, 600);
+        dialog.Show();
     }
-    
+
     public async Task CheckAnnouncementAsync()
     {
         _announcementList = await announcementService.GetAnnouncementsAsync();
@@ -115,18 +108,22 @@ public class CommonModel(
             var manualUpgradeButton =
                 SukiMessageBoxButtonsFactory.CreateButton("手动更新", SukiMessageBoxResult.OK, "Flat Accent");
             var cancelButton = SukiMessageBoxButtonsFactory.CreateButton("忽略", SukiMessageBoxResult.Cancel);
-            var markdownViewer = new ThemedMarkdownScrollViewer
+            var releaseNoteViewer = new SelectableTextBlock
             {
-                Markdown = response.Data.ReleaseNote,
-                Width = 600,
-                Height = 400
+                Text = response.Data.ReleaseNote,
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                Margin = new Thickness(0, 10, 0, 10),
+                Width = 600
             };
             
             var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
             {
                 Header = "Update Available - " + response.Data.VersionName,
-                Content = markdownViewer,
+                Content = releaseNoteViewer,
                 ActionButtonsSource = [autoUpgradeButton, manualUpgradeButton, cancelButton]
+            }, new SukiMessageBoxOptions
+            {
+                CanResize = true
             });
             switch (result)
             {
