@@ -195,7 +195,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
 
     public async Task<Strategy[]> GetStrategiesAsync()
     {
-        return await SendInputAndWaitObjectAsync<Strategy[]>("strategy list") ?? [];
+        return await SendInputAndWaitObjectAsync<Strategy[]>("strategy list --json") ?? [];
     }
 
     public async Task<TpTask[]> GetTpConfigAsync()

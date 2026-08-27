@@ -64,13 +64,9 @@ if (isAuthEnabled)
 }
 
 if (app.Environment.IsDevelopment())
-{
     app.MapControllers();
-}
 else
-{
     app.MapGroup("/api").MapControllers();
-}
 
 app.MapOpenApi();
 app.MapMcp("/mcp");
