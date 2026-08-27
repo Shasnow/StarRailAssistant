@@ -137,7 +137,7 @@ def increment_version(version, level='patch'):
     parts = [int(part) for part in parts]
 
     # 处理 prerelease 单独逻辑
-    if level == 'prerelease':
+    if level == 'pre':
         # 如果没有后缀，默认添加 beta.1
         if not suffix:
             return f"{core_version}-beta.1"
@@ -203,10 +203,10 @@ def main():
         '--increment', '-i',
         nargs='?',
         const='patch',
-        choices=['patch', 'minor', 'major', 'prerelease'],
-        help='递增版本号，可选级别: patch (默认), minor, major, prerelease\n'
+        choices=['patch', 'minor', 'major', 'pre'],
+        help='递增版本号，可选级别: patch (默认), minor, major, pre\n'
              "例如: --increment minor 将 2.10.0 递增为 2.11.0；"
-             "--increment prerelease 将 2.12.0-beta.1 递增为 2.12.0-beta.2"
+             "--increment pre 将 2.12.0-beta.1 递增为 2.12.0-beta.2"
     )
     
     # 添加 --release 选项：转换为正式版
