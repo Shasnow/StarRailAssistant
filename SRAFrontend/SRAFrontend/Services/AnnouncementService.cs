@@ -35,7 +35,21 @@ public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<A
             return null;
         }
     }
+    
+    public async Task<bool> HasNewAnnouncementsAsync(int lastKnownId)
+    {
+        var announcements = await GetAnnouncementsAsync();
+        if (announcements == null)
+        {
+            logger.LogWarning("Failed to fetch announcements for new check.");
+            return false; // 请求失败，无法判断
+        }
 
+        return announcements.Id > lastKnownId;
+    }
+
+    public int LatestAnnouncementId => _cachedAnnouncements?.Id ?? 0;
+    
     /// <summary>
     ///     强制刷新缓存（重新请求数据）
     /// </summary>

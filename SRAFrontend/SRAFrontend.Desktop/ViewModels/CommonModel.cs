@@ -29,8 +29,6 @@ public class CommonModel(
 {
     // 常量定义（避免魔法值）
     private const int ToastDisplayDuration = 5; // Toast 显示时长（秒）
-    
-    private AnnouncementList? _announcementList;
 
     public void ShowAnnouncementBoard()
     {
@@ -39,22 +37,17 @@ public class CommonModel(
             Title = "公告",
             Source = new Uri("https://starrailassistant.top/ann/updates/")
         };
-        dialog.Resize(1024, 600);
+        dialog.Resize(1200, 800);
         dialog.Show();
     }
 
     public async Task CheckAnnouncementAsync()
     {
-        _announcementList = await announcementService.GetAnnouncementsAsync();
-        if (_announcementList == null || _announcementList.Announcements.Count == 0)
+        if (await announcementService.HasNewAnnouncementsAsync(cacheService.Cache.LastViewAnnouncementId))
         {
-            logger.LogInformation("No announcements available");
-            return;
-        }
-
-        // 检查是否有新公告, 自动弹出公告栏
-        if (cacheService.Cache.LastViewAnnouncementId != _announcementList.Id)
             ShowAnnouncementBoard();
+            cacheService.Cache.LastViewAnnouncementId = announcementService.LatestAnnouncementId;
+        }
     }
 
     public async Task CheckForUpdatesAsync()
