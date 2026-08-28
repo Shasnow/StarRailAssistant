@@ -1,3 +1,4 @@
+from SRACore.operators.factory import OperatorType
 from SRACore.task import BaseTask, task
 from SRACore.util import encryption
 from SRACore.util.logger import logger
@@ -84,10 +85,10 @@ class StartGameTask(BaseTask):
         self.operator.launch(channel=self.config.StartGame.gameChannel, path=raw_path)
 
     def login(self):
-        if hasattr(self.operator, 'driver'):
+        if self.operator.type == OperatorType.Browser:
             user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
             passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
-            return self.operator.login(user, passwd)
+            return self.operator.login(user, passwd, relogin=self.config.StartGame.isReLogin)
         channel = None
         match self.config.StartGame.gameChannel:
             case 0:

@@ -130,7 +130,19 @@ class BrowserOperator(IOperator):
             self._driver = WebDriverManager.get_driver(BrowserType(browser_type), binary_path, headless)
         return self._driver
 
-    def login(self, account, password):
+    def login(self, account, password, relogin: bool = False):
+        if relogin:
+            # 精确删除登录态 cookies，保留 DEVICEFP_SEED_TIME、DEVICEFP、_MHYUUID 等非登录信息
+            login_cookies = [
+                "uni_web_token", 
+                "Ituid_v2", "Ituid", "Itoken_v2", "Itoken", "Itmid_v2",
+                "cookie_token_v2", "cookie_token",
+                "account_mid_v2", "account_id_v2", "account_id",
+            ]
+            for name in login_cookies:
+                self.driver.delete_cookie(name)
+            self.driver.refresh()
+            logger.info("已清除登录态 Cookie，准备重新登录")
         start_btn_xpath = '//*[@id="app"]/div[1]/div[3]/div[1]/div/div[2]/div[2]'
         try:
             WebDriverWait(self.driver, 10).until(

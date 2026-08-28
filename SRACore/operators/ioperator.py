@@ -57,7 +57,7 @@ class IOperator(ABC):
         """终止目标应用程序"""
         ...
 
-    def login(self, account, password):
+    def login(self, account, password, relogin: bool = False):
         ...
 
     @abstractmethod
