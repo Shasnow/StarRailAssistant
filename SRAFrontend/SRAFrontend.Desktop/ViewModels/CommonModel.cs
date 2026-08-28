@@ -4,11 +4,11 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
+using SRAFrontend.Desktop.Controls;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 using SRAFrontend.Utils;
@@ -23,7 +23,7 @@ public class CommonModel(
     CacheService cacheService,
     UpdateService updateService,
     IBackendService backendService,
-    AnnouncementService announcementService,
+    AnnService annService,
     ILogger<CommonModel> logger,
     ISukiToastManager toastManager)
 {
@@ -32,21 +32,22 @@ public class CommonModel(
 
     public void ShowAnnouncementBoard()
     {
-        var dialog = new NativeWebDialog
+        SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
-            Title = "公告",
-            Source = new Uri("https://starrailassistant.top/ann/updates/")
-        };
-        dialog.Resize(1200, 800);
-        dialog.Show();
+            Header = "公告",
+            Content = new AnnBoardViewModel
+            {
+                Announcements = annService.CachedAnnouncements?.Announcements
+            }
+        });
     }
 
     public async Task CheckAnnouncementAsync()
     {
-        if (await announcementService.HasNewAnnouncementsAsync(cacheService.Cache.LastViewAnnouncementId))
+        if (await annService.HasNewAnnouncementsAsync(cacheService.Cache.LastViewAnnouncementId))
         {
             ShowAnnouncementBoard();
-            cacheService.Cache.LastViewAnnouncementId = announcementService.LatestAnnouncementId;
+            cacheService.Cache.LastViewAnnouncementId = annService.LatestAnnouncementId;
         }
     }
 
@@ -101,12 +102,9 @@ public class CommonModel(
             var manualUpgradeButton =
                 SukiMessageBoxButtonsFactory.CreateButton("手动更新", SukiMessageBoxResult.OK, "Flat Accent");
             var cancelButton = SukiMessageBoxButtonsFactory.CreateButton("忽略", SukiMessageBoxResult.Cancel);
-            var releaseNoteViewer = new SelectableTextBlock
+            var releaseNoteViewer = new ThemedMarkdownScrollViewer
             {
-                Text = response.Data.ReleaseNote,
-                TextWrapping = Avalonia.Media.TextWrapping.Wrap,
-                Margin = new Thickness(0, 10, 0, 10),
-                Width = 600
+                Markdown = response.Data.ReleaseNote
             };
             
             var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost

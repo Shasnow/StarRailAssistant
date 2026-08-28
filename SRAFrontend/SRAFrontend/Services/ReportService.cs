@@ -17,7 +17,7 @@ public class ReportService(
     private const string ReportUrl = "https://shasnow.top/s/api/report";
     private string? _deviceIdCache;
 
-    private string GetDeviceId()
+    public string GetDeviceId()
     {
         if (!string.IsNullOrEmpty(_deviceIdCache)) return _deviceIdCache;
         var deviceIdFilePath = Path.Combine(DataPath.AppDataDir, "profile.txt");

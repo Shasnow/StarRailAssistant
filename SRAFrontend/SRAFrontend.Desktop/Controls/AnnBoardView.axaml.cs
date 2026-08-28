@@ -2,9 +2,9 @@
 
 namespace SRAFrontend.Desktop.Controls;
 
-public partial class AnnouncementBoardView : UserControl
+public partial class AnnBoardView : UserControl
 {
-    public AnnouncementBoardView()
+    public AnnBoardView()
     {
         InitializeComponent();
     }

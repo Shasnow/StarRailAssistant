@@ -8,10 +8,10 @@ using SRAFrontend.Models;
 
 namespace SRAFrontend.Services;
 
-public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<AnnouncementService> logger)
+public class AnnService(IHttpClientFactory httpClientFactory, ILogger<AnnService> logger)
 {
     private const string RequestUrl = "https://starrailassistant.top/api/v1/anno.json";
-    private AnnouncementList? _cachedAnnouncements; // 缓存数据，避免重复请求
+    public AnnouncementList? CachedAnnouncements { get; private set; } // 缓存数据，避免重复请求
 
     /// <summary>
     ///     获取公告列表（带缓存）
@@ -21,8 +21,8 @@ public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<A
         try
         {
             var httpClient = httpClientFactory.CreateClient("GlobalClient");
-            _cachedAnnouncements = await httpClient.GetFromJsonAsync<AnnouncementList>(RequestUrl);
-            return _cachedAnnouncements;
+            CachedAnnouncements = await httpClient.GetFromJsonAsync<AnnouncementList>(RequestUrl);
+            return CachedAnnouncements;
         }
         catch (HttpRequestException ex)
         {
@@ -48,14 +48,14 @@ public class AnnouncementService(IHttpClientFactory httpClientFactory, ILogger<A
         return announcements.Id > lastKnownId;
     }
 
-    public int LatestAnnouncementId => _cachedAnnouncements?.Id ?? 0;
+    public int LatestAnnouncementId => CachedAnnouncements?.Id ?? 0;
     
     /// <summary>
     ///     强制刷新缓存（重新请求数据）
     /// </summary>
     public async Task<AnnouncementList?> RefreshAnnouncementsAsync()
     {
-        _cachedAnnouncements = null; // 清空缓存
+        CachedAnnouncements = null; // 清空缓存
         return await GetAnnouncementsAsync(); // 重新获取
     }
 

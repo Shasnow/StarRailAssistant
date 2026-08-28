@@ -4,7 +4,7 @@ using SRAFrontend.Models;
 
 namespace SRAFrontend.Desktop.Controls;
 
-public class AnnouncementBoardViewModel : ViewModelBase
+public class AnnBoardViewModel : ViewModelBase
 {
     public List<Announcement>? Announcements { get; set; }
     public bool IsLoading { get; set; }

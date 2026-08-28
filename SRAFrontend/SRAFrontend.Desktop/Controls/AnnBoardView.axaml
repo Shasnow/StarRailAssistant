@@ -3,12 +3,12 @@
              xmlns:suki="https://github.com/kikipoulet/SukiUI"
              xmlns:models="clr-namespace:SRAFrontend.Models;assembly=SRAFrontend"
              xmlns:controls="clr-namespace:SRAFrontend.Desktop.Controls"
-             x:Class="SRAFrontend.Desktop.Controls.AnnouncementBoardView"
-             x:DataType="controls:AnnouncementBoardViewModel"
+             x:Class="SRAFrontend.Desktop.Controls.AnnBoardView"
+             x:DataType="controls:AnnBoardViewModel"
              Width="600"
              Height="400">
     <Design.DataContext>
-        <controls:AnnouncementBoardViewModel />
+        <controls:AnnBoardViewModel />
     </Design.DataContext>
     <suki:BusyArea BusyText="Loading Announcements..." IsBusy="{Binding IsLoading}">
         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
