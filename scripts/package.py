@@ -79,11 +79,17 @@ class ZipBuilder:
     def add_file(self, file: Path, arcname: str):
         self._entries[arcname] = file
 
+    _EXCLUDESuffixes = (".pdb",)
+    _EXCLUDENames = {"web.config"}
+
     def snapshot(self, zip_path: Path):
         """将当前所有条目写入 zip 文件，并输出 MD5 校验文件。"""
         md5_dict: dict[str, str] = {}
         with ZipFile(zip_path, "w", compression=ZIP_DEFLATED) as zipf:
             for arcname, src in self._entries.items():
+                name = Path(arcname).name
+                if name.lower().endswith(self._EXCLUDESuffixes) or name.lower() in self._EXCLUDENames:
+                    continue
                 zipf.write(src, arcname)
                 md5_dict[arcname] = self._md5(src)
         md5_path = zip_path.with_suffix(".md5.json")
