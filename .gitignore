@@ -4,6 +4,7 @@
 
 # IDE / 编辑器
 /.vscode/
+/.trae/
 **/.vs/
 **/.idea/
 
