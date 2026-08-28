@@ -3,6 +3,7 @@
 - 新增SRA MCP (Model Control Protocol) 服务器，为Agent接入准备好。
 - 新增operator命令，用于直接调用SRA的Operator API以实现游戏操控。
 - 不再单独分发SRA ServerDLC，而是包含在主程序包中。
+- 升级到Avalonia 12、使用WebView显示公告。
 
 ### 问题修复：
 - 修复了货币战争中无法处理命运卜者事件的问题。 #234
