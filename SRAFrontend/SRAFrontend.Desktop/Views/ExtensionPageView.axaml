@@ -54,7 +54,7 @@
                                             <StackPanel Orientation="Horizontal" Spacing="8"
                                                         HorizontalAlignment="Right" Margin="0,4,0,0">
                                                 <ProgressBar IsVisible="{Binding IsRunning}"
-                                                             IsIndeterminate="True" Width="40"/>
+                                                             IsIndeterminate="True" Width="40" Height="12"/>
                                                 <Button Content="运行" Classes="Accent"
                                                         Command="{Binding RunCommand}"
                                                         IsVisible="{Binding !IsRunning}"/>

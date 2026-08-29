@@ -62,7 +62,7 @@ class AutoPlotExtension(BaseExtension[AutoPlotConfig]):
 
     def skip_check(self):
         """检测是否可以跳过对话。"""
-        self.operator.click_point(0.8225, 0.055)
+        self.operator.click_point(0.758, 0.055, after_sleep=0.5)
         if self.operator.click_img("resources/img/ensure.png"):
             self._can_skip = True
         else:
