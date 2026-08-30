@@ -8,15 +8,16 @@
     <a href="https://mirrorchyan.com/zh/projects?rid=StarRailAssistant">
         <img alt="mirrorc" src="https://img.shields.io/badge/Mirror%E9%85%B1-%239af3f6?logo=countingworkspro&logoColor=4f46e5">
     </a>
+    <img alt="PyPI Version" src="https://img.shields.io/pypi/v/starrailassistant">
 </p>
 <p align="center"><a href="https://starrailassistant.top"><b>主页</b></a></p>
 
-#### [问题排查](https://starrailassistant.top/trouble/having_trouble.html) | [FAQ](https://starrailassistant.top/faq.html) | [下载和安装](https://starrailassistant.top/download.html) | [使用方法](https://starrailassistant.top/getstarted/getstarted.html)
+#### [问题排查](https://starrailassistant.top/getting-started/trouble-shooting/) | [FAQ](https://starrailassistant.top/getting-started/faq/) | [下载和安装](https://starrailassistant.top/getting-started/download/) | [使用方法](https://starrailassistant.top/getting-started/getting-started/)
 
 # 🌟 StarRailAssistant(SRA)
 
 🎮 崩坏星穹铁道自动化助手  
-如果您在使用的过程中遇到问题，请先阅读[问题排查](https://starrailassistant.top/trouble/having_trouble.html)。
+如果您在使用的过程中遇到问题，请先阅读[问题排查](https://starrailassistant.top/getting-started/trouble-shooting/)。
 
 如果项目对您有帮助，欢迎点个Star⭐支持一下！
 
@@ -24,7 +25,7 @@
 
 🤖 一个基于图像识别的崩铁自动化程序，帮您完成从启动到退出的崩铁日常。
 
-![预览](https://starrailassistant.top/img/use/softwaremain2.png)
+![预览](https://starrailassistant.top/_astro/softwaremain2.C3xP9Cen_6MuUy.webp)
 
 ## ⚠️ 免责声明
 
@@ -106,6 +107,7 @@ nothing to do with it.
     * ✨ 与 **`暮光闪闪`** 交流友谊的魔法
     * 🎮 和 **`青雀`** 一起摸鱼
     * 😺 体验 **`柔情猫娘`** 的温柔
+    * 🧠 向 **`梦见月瑞希`** 获取心理咨询
 * 欢迎通过上述渠道反馈问题和提交意见！
 
 ## 🤝 想要为项目做出贡献
