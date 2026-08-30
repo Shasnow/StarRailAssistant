@@ -428,6 +428,7 @@ class CurrencyWars(Executable):
         """
         if self.strategy_code and not self.is_continue:
             self.operator.click_img(CWIMG.STRATEGY, after_sleep=1)
+            self.operator.click_img(CWIMG.HOT_STRATEGIES, after_sleep=1)
             self.operator.move_to(0.5, 0.5)
             self.operator.sleep(0.5)
             self.operator.click_img(CWIMG.ENTER_STRATEGY_CODE, after_sleep=1)

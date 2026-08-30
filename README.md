@@ -8,7 +8,9 @@
     <a href="https://mirrorchyan.com/zh/projects?rid=StarRailAssistant">
         <img alt="mirrorc" src="https://img.shields.io/badge/Mirror%E9%85%B1-%239af3f6?logo=countingworkspro&logoColor=4f46e5">
     </a>
-    <img alt="PyPI Version" src="https://img.shields.io/pypi/v/starrailassistant">
+    <a href="https://pypi.org/project/starrailassistant/">
+      <img alt="PyPI Version" src="https://img.shields.io/pypi/v/starrailassistant">
+    </a>
 </p>
 <p align="center"><a href="https://starrailassistant.top"><b>主页</b></a></p>
 

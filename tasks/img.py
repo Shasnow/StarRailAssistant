@@ -165,6 +165,7 @@ class CWIMG:
     EQUIPMENT_RECOMMEND = f"{BASE}/equipment_recommend.png"
     FOLD = f"{BASE}/fold.png"
     FORTUNE_TELLER = f"{BASE}/FortuneTeller.png"
+    HOT_STRATEGIES = f"{BASE}/hot_strategies.png"
     INVEST_ENVIRONMENT = f"{BASE}/invest_environment.png"
     INVEST_ENV_REFRESH = f"{BASE}/invest_env_refresh.png"
     INVEST_STRATEGY_REFRESH = f"{BASE}/invest_strategy_refresh.png"
