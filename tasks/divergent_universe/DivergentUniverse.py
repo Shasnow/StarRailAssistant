@@ -123,10 +123,12 @@ class DivergentUniverse(Executable):
         return True
 
     def handle_mask_select(self):
-        self.operator.click_point(0.1713, 0.82, tag="选择下面的面具")
+        self.operator.click_point(0.1713, 0.80, tag="选择下面的面具")
         confirm_btn = self.operator.wait_img(DUIMG.ENSURE)
         if confirm_btn is not None:
             self.operator.click_box(confirm_btn)
+        else:
+            raise RuntimeError("选择面具后未找到确认按钮")
 
     def handle_blessing_select(self):
         if not self.operator.click_img(DUIMG.COLLECTION):
