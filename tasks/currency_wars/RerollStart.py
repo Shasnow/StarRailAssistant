@@ -1,3 +1,8 @@
+# noinspection package-requirements
+from typing_extensions import deprecated
+
+from SRACore.operators.model import Box
+from SRACore.util import strutil
 from SRACore.util.logger import logger
 from tasks.img import CWIMG, IMG
 
@@ -46,10 +51,12 @@ class RerollStart(CurrencyWars):
         pass
 
     @staticmethod
+    @deprecated("此方法已过时，请使用 strutil.normalize_ocr_text 方法")
     def _normalize_ocr_text(text: str) -> str:
         return text.strip().replace("·", "").replace("•", "").replace("?", "").replace(" ", "")
 
     @staticmethod
+    @deprecated("此方法已过时，请使用 strutil.is_substring 方法")
     def _is_substring(a: str, b: str) -> bool:
         """Return True if `a` is a substring of `b` or `b` is a substring of `a`."""
         if not a or not b:
@@ -84,7 +91,7 @@ class RerollStart(CurrencyWars):
         # 去除末尾空字符串（如"策略1;"会分割为["策略1", ""]）
         if stages[-1] == "":
             stages.pop()
-        self.wanted_invest_strategies = [self._normalize_ocr_text(s) for s in stages]
+        self.wanted_invest_strategies = [strutil.normalize_ocr_text(s) for s in stages]
 
     def set_boss_name(self, boss_names: str):
         """
@@ -94,7 +101,7 @@ class RerollStart(CurrencyWars):
         if not boss_names:
             return
         boss_name_tokens = boss_names.replace("；", ";").split(";") if boss_names else []
-        normalized_boss_names = [self._normalize_ocr_text(item) for item in boss_name_tokens[:3]]
+        normalized_boss_names = [strutil.normalize_ocr_text(item) for item in boss_name_tokens[:3]]
         while len(normalized_boss_names) < 3:
             normalized_boss_names.append("")
         self.wanted_boss_names = normalized_boss_names if any(normalized_boss_names) else None
@@ -108,9 +115,9 @@ class RerollStart(CurrencyWars):
         self.hate_boss_affixes = list()
         for item in boss_affix_tokens:
             if item.startswith(("!", "！")):
-                self.hate_boss_affixes.append(self._normalize_ocr_text(item[1:]))
+                self.hate_boss_affixes.append(strutil.normalize_ocr_text(item[1:]))
             else:
-                self.wanted_boss_affixes.append(self._normalize_ocr_text(item))
+                self.wanted_boss_affixes.append(strutil.normalize_ocr_text(item))
 
     def handle_boss_info(self) -> None:
         if self.wanted_boss_names:
@@ -172,7 +179,7 @@ class RerollStart(CurrencyWars):
         def default_invest_strategy_handler():
             # 当前阶段的必需策略未匹配到，直接重开
             logger.info(f"阶段{self.invest_strategy_stage}投资策略未满足要求，准备重开...")
-            self.operator.click_img(CWIMG.BACK_PREPARE_PAGE, after_sleep=0.5,)
+            self.operator.click_img(CWIMG.BACK_PREPARE_PAGE, after_sleep=0.5)
             self.abort_and_return()
             self.invest_strategy_stage = 0
 
@@ -201,8 +208,7 @@ class RerollStart(CurrencyWars):
         if not wanted_strategy:
             # 当前阶段无要求，直接继续下一阶段
             logger.info(f"阶段{self.invest_strategy_stage}无投资策略要求，继续游戏...")
-            self.operator.click_point(0.5, 0.27, tag="选择中间的投资策略")  # 点击中心点选择任意策略
-            self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+            super().handle_invest_strategy(prev_stage=prev_stage)
             # 检查下一阶段是否还有要求，若无则结束
             if current_stage_index + 1 >= len(self.wanted_invest_strategies):
                 logger.info("所有阶段投资策略已满足，停止刷开局")
@@ -212,7 +218,7 @@ class RerollStart(CurrencyWars):
         for _ in range(3):
             logger.info(f"阶段{self.invest_strategy_stage}正在识别投资策略...")
             result = self._detect_invest_strategy(wanted_strategy)
-            if result == -1:
+            if result is None:
                 logger.info("投资策略不符合要求，正在刷新...")
                 boxs = self.operator.locate_all(CWIMG.INVEST_STRATEGY_REFRESH)
                 if boxs is None:
@@ -222,7 +228,7 @@ class RerollStart(CurrencyWars):
                     self.operator.click_box(box, after_sleep=1)
             else:
                 logger.info("投资策略符合要求，继续游戏...")
-                self.operator.click_point(0.25 * (result + 1), 0.27, tag="投资策略")  # 根据投资策略的位置计算点击坐标，每个策略占屏幕宽度的25%
+                self.operator.click_box(result)
                 self.operator.click_img(IMG.ENSURE2, after_sleep=1)
                 # 检查下一阶段是否还有要求，若无则结束
                 if current_stage_index + 1 >= len(self.wanted_invest_strategies):
@@ -244,10 +250,10 @@ class RerollStart(CurrencyWars):
         检测投资策略是否符合要求
         
         :param wanted_strategy: 当前阶段需要的投资策略，如果为空则使用全部期望策略
-        :return: 匹配的投资策略索引，-1表示未匹配
+        :return: Box-匹配到的投资策略框，None-未匹配到任何投资策略
         """
         detected_invest_strategy = list()
-        raw_results = self.operator.ocr(
+        raw_results = self.operator.ocr_boxes(
             from_x=self.INVEST_STRATEGY_OCR_FROM_X,
             from_y=self.INVEST_STRATEGY_OCR_FROM_Y,
             to_x=self.INVEST_STRATEGY_OCR_TO_X,
@@ -256,25 +262,25 @@ class RerollStart(CurrencyWars):
         # 边界处理：OCR识别失败/无结果
         if not raw_results:  # 覆盖None和空列表两种情况
             logger.warning("投资策略OCR识别失败：无识别结果")
-            return -1
+            return None
 
         # 解析OCR结果：过滤空字符串，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
-            affix_text = self._normalize_ocr_text(str(item[1]))  # 去除常见的干扰字符
-            detected_invest_strategy.append(affix_text)
+            item.source = strutil.normalize_ocr_text(item.source)  # 去除常见的干扰字符
+            detected_invest_strategy.append(item.source)
 
         # 日志输出识别到的词缀，便于调试
         logger.info(f"识别到投资策略：{detected_invest_strategy}")
 
         # 使用指定的当前阶段策略进行匹配
         if wanted_strategy:
-            for i, invest_strategy in enumerate(detected_invest_strategy):
-                if self._is_substring(wanted_strategy, invest_strategy):
-                    logger.info(f"检测到需要的投资策略 {invest_strategy} (匹配: {wanted_strategy})")
-                    return i
-            return -1
-        return -1
+            for i, invest_strategy in enumerate(raw_results):
+                if strutil.is_substring(wanted_strategy, invest_strategy.source):
+                    logger.info(f"检测到需要的投资策略 {invest_strategy.source} (匹配: {wanted_strategy})")
+                    return invest_strategy
+            return None
+        return None
 
     def _detect_boss_affix(self) -> bool:
         """
@@ -298,7 +304,7 @@ class RerollStart(CurrencyWars):
         # 解析OCR结果：过滤空字符串+去重，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
-            affix_text = self._normalize_ocr_text(str(item[1]))
+            affix_text = strutil.normalize_ocr_text(str(item[1]))
             if not affix_text:  # 过滤空字符串
                 continue
             detected_affixes.append(affix_text)
@@ -312,7 +318,7 @@ class RerollStart(CurrencyWars):
             for hate_affix in self.hate_boss_affixes:
                 # 仇恨词缀采用子字符串匹配，只要识别到的任一词缀与仇恨词缀存在子串关系即判定为不符合
                 for aff in detected_affixes:
-                    if self._is_substring(hate_affix, aff):
+                    if strutil.is_substring(hate_affix, aff):
                         logger.warning(f"检测到词缀【{hate_affix}】(识别:{aff})，不符合要求")
                         return False
 
@@ -322,7 +328,7 @@ class RerollStart(CurrencyWars):
             for wanted_affix in self.wanted_boss_affixes:
                 found = False
                 for aff in detected_affixes:
-                    if self._is_substring(wanted_affix, aff):
+                    if strutil.is_substring(wanted_affix, aff):
                         found = True
                         break
                 if not found:
@@ -345,7 +351,7 @@ class RerollStart(CurrencyWars):
         sorted_results = sorted(raw_results, key=lambda _item: _item[0][0][0])
         detected_boss_names = []
         for item in sorted_results:
-            boss_name = self._normalize_ocr_text(str(item[1]))
+            boss_name = strutil.normalize_ocr_text(str(item[1]))
             if not boss_name:
                 continue
             detected_boss_names.append(boss_name)
@@ -364,7 +370,7 @@ class RerollStart(CurrencyWars):
                 return False
             # 使用子字符串匹配判断名称是否符合要求
             detected_name = detected_boss_names[i]
-            if not self._is_substring(wanted_boss_name, detected_name):
+            if not strutil.is_substring(wanted_boss_name, detected_name):
                 logger.warning(
                     f"第{i + 1}位面Boss名称不符合要求，识别到【{detected_name}】，期望包含【{wanted_boss_name}】"
                 )
@@ -389,7 +395,7 @@ class RerollStart(CurrencyWars):
         # 解析OCR结果：过滤空字符串+去重，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
-            affix_text = self._normalize_ocr_text(str(item[1]))
+            affix_text = strutil.normalize_ocr_text(str(item[1]))
             detected_invest_env.append(affix_text)
 
         # 日志输出识别到的词缀，便于调试
@@ -398,8 +404,8 @@ class RerollStart(CurrencyWars):
         # 优先检测必须的投资环境
         for i, env in enumerate(detected_invest_env):
             # 使用子字符串匹配：将期望值规范化后，与识别到的env做子串比较
-            for want in self.wanted_invest_env:  # pyright: ignore[reportOptionalIterable]
-                if self._is_substring(self._normalize_ocr_text(want), env):
+            for want in self.wanted_invest_env:
+                if strutil.is_substring(strutil.normalize_ocr_text(want), env):
                     logger.info(f"检测到必须的投资环境【{env}】(匹配: {want})")
                     return i
 
@@ -407,7 +413,7 @@ class RerollStart(CurrencyWars):
         if self.optional_invest_env:
             for i, env in enumerate(detected_invest_env):
                 for opt in self.optional_invest_env:
-                    if self._is_substring(self._normalize_ocr_text(opt), env):
+                    if strutil.is_substring(strutil.normalize_ocr_text(opt), env):
                         logger.info(f"检测到可选的投资环境【{env}】(匹配: {opt})")
                         return i
 

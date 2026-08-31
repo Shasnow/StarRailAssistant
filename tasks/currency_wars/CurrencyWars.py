@@ -97,6 +97,7 @@ class CurrencyWars(Executable):
         self.strategy_code = ""  # 当前使用的攻略代码
         self.strategy_special_events: dict[str, str] = dict()  # 攻略中的特殊事件处理
         self.is_overclock = False  # 超频博弈
+        self.is_complex_invest_strategy_selection_enabled = False  # 是否启用复杂投资策略选择逻辑
 
     def run(self):
         self.is_running = True
@@ -905,8 +906,14 @@ class CurrencyWars(Executable):
     def handle_invest_strategy(self, prev_stage: StageName | None = None) -> None:
         """处理投资策略选择界面的逻辑"""
         if not self.operator.click_img(CWIMG.COLLECTION):
-            self.operator.click_point(0.5, 0.3)
+            self.operator.click_point(0.5, 0.3, after_sleep=0.5, tag="选择中间的投资策略")
         self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+        self.post_invest_strategy()
+
+    def post_invest_strategy(self, strategy_name: str | None = None):
+        """投资策略选择后的后续处理逻辑"""
+        if strategy_name == "阿哈大悦" or self.operator.locate(CWIMG.SELECT_SIMPLE_EQUIPMENT):
+            self.operator.click_point(0.8, 0.25, after_sleep=1, tag="阿哈大悦选择装备4")
 
     def handle_replenish_stage(self, prev_stage: StageName | None = None):
         """处理补给阶段的逻辑"""
