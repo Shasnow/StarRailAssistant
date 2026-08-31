@@ -19,7 +19,6 @@ public static class ZipUtil
         {
             FileName = "cmd.exe",
             Arguments = $"/C tar -xf \"{path}\" -C \"{target}\"",
-            CreateNoWindow = true,
             UseShellExecute = false
         });
     }

@@ -173,29 +173,60 @@ public class CommonModel(
         }
     }
 
-    public void OpenFolderInExplorer(string folderPath)
+    public void OpenFolderInExplorer(string path)
     {
         try
         {
-            if (!Directory.Exists(folderPath))
+            if (File.Exists(path))
             {
-                logger.LogWarning("Folder does not exist: {FolderPath}", folderPath);
-                ShowErrorToast("打开文件夹失败", "指定的文件夹不存在");
-                return;
+                logger.LogInformation("Selecting file in explorer: {FilePath}", path);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "explorer.exe",
+                        Arguments = $"/select,\"{path}\"",
+                        UseShellExecute = true
+                    });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", $"-R \"{path}\"");
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    // nautilus 支持 --select 参数，其他文件管理器回退到打开所在文件夹
+                    var dir = Path.GetDirectoryName(path);
+                    Process.Start("xdg-open", dir ?? path);
+                }
             }
-
-            logger.LogInformation("Opening folder: {FolderPath}", folderPath);
-            Process.Start(new ProcessStartInfo
+            else if (Directory.Exists(path))
             {
-                FileName = folderPath,
-                UseShellExecute = true,
-                Verb = "open"
-            });
+                logger.LogInformation("Opening folder: {FolderPath}", path);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = path,
+                        UseShellExecute = true,
+                        Verb = "open"
+                    });
+                }
+                else
+                {
+                    Process.Start("xdg-open", path);
+                }
+            }
+            else
+            {
+                logger.LogWarning("Path does not exist: {Path}", path);
+                ShowErrorToast("打开失败", "指定的路径不存在");
+            }
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error opening folder: {FolderPath}", folderPath);
-            ShowErrorToast("打开文件夹失败", $"发生错误：{e.Message}");
+            logger.LogError(e, "Error opening path: {Path}", path);
+            ShowErrorToast("打开失败", $"发生错误：{e.Message}");
         }
     }
 
@@ -284,6 +315,7 @@ public class CommonModel(
             unzipToast.CanDismissByTime = false;
             try
             {
+                throw new Exception("测试异常");
                 // 重命名当前可执行文件（以防更新过程中被占用）
                 File.Move(DataPath.SraExecutablePath, DataPath.SraOldExecutablePath);
                 // 解压更新包
@@ -294,10 +326,27 @@ public class CommonModel(
             {
                 toastManager.Dismiss(unzipToast);
                 logger.LogError(e, "Error extracting update");
-                ShowErrorToast("更新解压失败", $"发生错误，应用程序将退出以重新解压：{e.Message}");
-                await Task.Delay(5000);
-                ZipUtil.UnzipExternal(downloadFilePath, Environment.CurrentDirectory);
-                Environment.Exit(0);
+                var manualExtractButton =
+                    SukiMessageBoxButtonsFactory.CreateButton("手动解压", SukiMessageBoxResult.Yes, "Flat");
+                var retryButton =
+                    SukiMessageBoxButtonsFactory.CreateButton("我知道了", SukiMessageBoxResult.OK, "Flat Accent");
+                var extractResult = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+                {
+                    Header = "更新解压失败",
+                    Content = $"自动解压失败：{e.Message}\n\n需要退出程序完成解压（退出后请等待5~10秒），或手动完成解压",
+                    ActionButtonsSource = [manualExtractButton, retryButton]
+                });
+                if (extractResult is SukiMessageBoxResult.Yes)
+                {
+                    // 打开压缩包所在文件夹并选中压缩包
+                    OpenFolderInExplorer(downloadFilePath);
+                }
+                else
+                {
+                    // 使用外部解压工具重试
+                    ZipUtil.UnzipExternal(downloadFilePath, Environment.CurrentDirectory);
+                    Environment.Exit(0);
+                }
                 return;
             }
 
