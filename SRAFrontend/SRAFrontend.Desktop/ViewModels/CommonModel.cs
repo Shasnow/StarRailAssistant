@@ -315,7 +315,6 @@ public class CommonModel(
             unzipToast.CanDismissByTime = false;
             try
             {
-                throw new Exception("测试异常");
                 // 重命名当前可执行文件（以防更新过程中被占用）
                 File.Move(DataPath.SraExecutablePath, DataPath.SraOldExecutablePath);
                 // 解压更新包
