@@ -1,6 +1,6 @@
 {
   "name": "sra",
-  "version": "2.21.0-beta.7",
+  "version": "2.21.0-beta.8",
   "scripts": {
     "dev": "python main.py",
     "build": "dotnet publish -c Release -r win-x64 SRAFrontend/SRAFrontend.sln && python scripts/package.py",
@@ -10,6 +10,7 @@
     "ver": "python scripts/update_version.py",
     "ver:release": "python scripts/update_version.py -r",
     "ver:patch": "python scripts/update_version.py -i",
+    "ver:pre": "python scripts/update_version.py -i pre",
     "modelgen": "python scripts/model_gen.py SRAFrontend/SRAFrontend/Models/AppSettings.cs -o SRACore/models/app_settings.py && python scripts/model_gen.py SRAFrontend/SRAFrontend/Models/TasksConfig.cs -o SRACore/models/tasks_config.py",
     "clean": "python scripts/clean.py"
   }

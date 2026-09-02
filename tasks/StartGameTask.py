@@ -146,17 +146,12 @@ class StartGameTask(BaseTask):
             self.operator.sleep(0.2)
             self.operator.copy(passwd)
             self.operator.paste()
-            if channel == 'gb':
-                index, box = self.operator.wait_ocr_any(["同意", "Agree"], timeout=10, from_y=0.55, to_y=0.95)
-                if index >= 0 and box is not None:
-                    self.operator.click_box(box, x_offset=-35, after_sleep=1)
-            else:
-                self.operator.click_img(SGIMG.AGREE % channel, x_offset=-35, after_sleep=1)
+            self.operator.click_img(SGIMG.AGREE % channel, x_offset=-35, after_sleep=1)
             self.operator.click_img(SGIMG.ENTER_GAME % channel)
         else:
             logger.info("未启用自动登录，请手动完成登录")
 
-        if self.operator.wait_img(SGIMG.WELCOME % channel, timeout=120):
+        if self.operator.wait_img(SGIMG.WELCOME % channel, timeout=180):
             return 1
         else:
             logger.warning("登录后等待欢迎界面超时，请检查游戏状态")
