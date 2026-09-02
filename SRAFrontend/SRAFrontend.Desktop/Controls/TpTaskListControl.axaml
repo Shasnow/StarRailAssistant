@@ -18,7 +18,7 @@
                             <Label Grid.Row="1" Grid.Column="0">关卡名称</Label>
                             <Label Grid.Row="1" Grid.Column="1" Content="{Binding LevelName}" />
                             <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                                   Content="自动检测"
+                                   Content="次数：自动检测"
                                    IsVisible="{Binding AutoDetect}" />
                             <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                                   RowDefinitions="*, *" ColumnDefinitions="Auto, *"

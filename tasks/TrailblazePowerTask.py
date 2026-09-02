@@ -61,7 +61,16 @@ class TrailblazePowerTask(BaseTask):
         tasklist = self.config.TrailblazePower.TaskList
         for t in tasklist:
             if t.AutoDetect:
-                self.auto_detect_tasks.append(t)
+                if t.Id == "echo_of_war":
+                    # 历战余响特殊处理，单次执行次数固定为3，执行轮数固定为1
+                    self.manual_tasks.append((
+                        self.get_task_by_id(t.Id),
+                        {"level": t.Level,
+                         "single_time": 3,
+                         "run_time": 1}
+                    ))
+                else:
+                    self.auto_detect_tasks.append(t)
             else:
                 self.manual_tasks.append((
                     self.get_task_by_id(t.Id),
@@ -367,10 +376,11 @@ class TrailblazePowerTask(BaseTask):
         if not self.operator.wait_img(TPIMG.ORNAMENT_EXTRACTION_PAGE, timeout=20):  # 等待传送
             logger.error("等待页面加载超时，当前关卡：%s", level)
             return False
-        if self.operator.locate(TPIMG.NO_SAVE):
-            logger.warning("当前暂无可用存档，请前往[差分宇宙]获取存档")
-            self.operator.press_key("esc", presses=2, interval=1)
-            return False
+        # if self.operator.locate(TPIMG.NO_SAVE):
+        #     logger.warning("当前暂无可用存档，请前往[差分宇宙]获取存档")
+        #     self.operator.press_key("esc", presses=2, interval=1)
+        #     return False
+        # 现在不需要存档了，直接点挑战就行
         if single_time is not None:
             for _ in range(single_time - 1):
                 self.operator.sleep(0.2)
@@ -393,9 +403,9 @@ class TrailblazePowerTask(BaseTask):
                     logger.info("体力不足")
                     self.operator.press_key("esc", interval=1, presses=3)
                     return False
-            box = self.operator.locate(IMG.ENSURE2)
-            if box:
-                self.operator.click_box(box)
+
+            self.operator.click_img(IMG.ENSURE2) # 编队未满/无存档确认
+
             if not self.operator.wait_img(IMG.F3, timeout=240):
                 pass
             self.operator.hold_key("w", 2.5)
@@ -410,53 +420,23 @@ class TrailblazePowerTask(BaseTask):
         return True
 
     def calyx_golden(self, level, single_time=1, run_time=1, **_):
-        return self.battle("拟造花萼（金）",
-                           "calyx(golden)",
-                           level,
-                           run_time,
-                           False,
-                           single_time)
+        return self.battle("拟造花萼（金）", "calyx(golden)", level, run_time, False, single_time)
 
     def calyx_crimson(self, level, single_time=1, run_time=1, **_):
-        return self.battle("拟造花萼（赤）",
-                           "calyx(crimson)",
-                           level,
-                           run_time,
-                           False,
-                           single_time,
-                           x_add=700)
+        return self.battle("拟造花萼（赤）", "calyx(crimson)", level, run_time, False, single_time, x_add=700)
 
     def stagnant_shadow(self, level, single_time=1, run_time=1, **_):
-        return self.battle("凝滞虚影",
-                           "stagnant_shadow",
-                           level,
-                           run_time,
-                           True,
-                           single_time,
-                           x_add=700)
+        return self.battle("凝滞虚影", "stagnant_shadow", level, run_time, True, single_time, x_add=700)
 
     def caver_of_corrosion(self, level, single_time=1, run_time=1, **_):
-        return self.battle("侵蚀隧洞",
-                           "caver_of_corrosion",
-                           level,
-                           run_time,
-                           True,
-                           single_time,
-                           x_add=700)
+        return self.battle("侵蚀隧洞", "caver_of_corrosion", level, run_time, True, single_time, x_add=700)
 
     def echo_of_war(self, level, single_time=1, run_time=1, **_):
-        return self.battle("历战余响",
-                           "echo_of_war",
-                           level,
-                           run_time,
-                           True,
-                           single_time,
-                           x_add=770,
-                           y_add=25)
+        return self.battle("历战余响", "echo_of_war", level, run_time, True, single_time, x_add=770, y_add=25)
 
     def battle(self,
                mission_name: str,
-               level_belonging: str,
+               level_set: str,
                level: int,
                run_time: int,
                scroll_flag: bool,
@@ -470,7 +450,7 @@ class TrailblazePowerTask(BaseTask):
             Args:
 
                 mission_name (str): The name of this mission.
-                level_belonging (str): The series to which the level belongs.
+                level_set (str): The series to which the level belongs.
                 level (int): The index of level in /resources/img.
                 run_time (int): Number of times the task was executed.
                 scroll_flag (bool): Whether scroll or not when finding session.
@@ -482,8 +462,8 @@ class TrailblazePowerTask(BaseTask):
                 None
         """
         logger.info(f"执行任务：{mission_name}")
-        level_path = TPIMG.level(level_belonging, level)
-        if not self.find_session(level_belonging, scroll_flag):
+        level_path = TPIMG.level(level_set, level)
+        if not self.find_session(level_set, scroll_flag):
             return False
         level_box = self.find_level(level_path)
         if not level_box:
