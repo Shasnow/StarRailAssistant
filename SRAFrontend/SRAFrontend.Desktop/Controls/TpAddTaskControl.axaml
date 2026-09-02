@@ -8,39 +8,37 @@
              x:Class="SRAFrontend.Desktop.Controls.TpAddTaskControl"
              x:DataType="viewModels:TaskPageViewModel"
              Width="400" Height="400">
-    <StackPanel>
-        <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-                <Label Grid.Row="0" Grid.Column="0" Content="类型"/>
-                <ComboBox Grid.Row="0" Grid.Column="1"
-                          Width="300"
-                          ItemsSource="{Binding TpTaskNames}"
-                          SelectedIndex="{Binding SelectedTpTaskIndex}"/>
-                <Label Grid.Row="1" Grid.Column="0" Content="关卡"/>
-                <ComboBox Grid.Row="1" Grid.Column="1"
-                          Width="300"
-                          ItemsSource="{Binding CurrentTpTaskLevels}"
-                          SelectedItem="{Binding SelectedTpTaskLevel}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate x:DataType="models:TpTaskLevel">
-                            <TextBlock>
-                                <Run Text="{Binding Name}"/>
-                                <Run Text="-"/>
-                                <Run Text="{Binding Result}"/>
-                            </TextBlock>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <Label Grid.Row="2" Grid.Column="0" Content="单次次数"/>
-                <NumericUpDown Grid.Row="2" Grid.Column="1" Minimum="1" Maximum="{Binding CurrentTpTaskMaxSingleTimes}" FormatString="0"
-                               Width="290"
-                               Value="{Binding TpTaskSingleTimes}"/>
-                <Label Grid.Row="3" Grid.Column="0" Content="运行次数"/>
-                <NumericUpDown Grid.Row="3" Grid.Column="1" Minimum="1" Maximum="99" FormatString="0"
-                               Width="290"
-                               Value="{Binding TpTaskRunTimes}"/>
-                <Label Grid.Row="4" Grid.Column="0" Content="自动检测"/>
-                <ToggleSwitch Grid.Row="4" Grid.Column="1" IsChecked="{Binding IsTpTaskAutoDetect}"/>
-            </Grid>
-        <Button Content="确认" Command="{Binding AddTaskItemCommand}"/>
-    </StackPanel>
+    <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+        <Label Grid.Row="0" Grid.Column="0" Content="类型" />
+        <ComboBox Grid.Row="0" Grid.Column="1"
+                  Width="300"
+                  ItemsSource="{Binding TpTaskNames}"
+                  SelectedIndex="{Binding SelectedTpTaskIndex}" />
+        <Label Grid.Row="1" Grid.Column="0" Content="关卡" />
+        <ComboBox Grid.Row="1" Grid.Column="1"
+                  Width="300"
+                  ItemsSource="{Binding CurrentTpTaskLevels}"
+                  SelectedItem="{Binding SelectedTpTaskLevel}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="models:TpTaskLevel">
+                    <TextBlock>
+                        <Run Text="{Binding Name}" />
+                        <Run Text="-" />
+                        <Run Text="{Binding Result}" />
+                    </TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Label Grid.Row="2" Grid.Column="0" Content="单次次数" />
+        <NumericUpDown Grid.Row="2" Grid.Column="1" Minimum="1" Maximum="{Binding CurrentTpTaskMaxSingleTimes}"
+                       FormatString="0"
+                       Width="290"
+                       Value="{Binding TpTaskSingleTimes}" />
+        <Label Grid.Row="3" Grid.Column="0" Content="运行次数" />
+        <NumericUpDown Grid.Row="3" Grid.Column="1" Minimum="1" Maximum="99" FormatString="0"
+                       Width="290"
+                       Value="{Binding TpTaskRunTimes}" />
+        <Label Grid.Row="4" Grid.Column="0" Content="自动检测" />
+        <ToggleSwitch Grid.Row="4" Grid.Column="1" IsChecked="{Binding IsTpTaskAutoDetect}" />
+    </Grid>
 </UserControl>

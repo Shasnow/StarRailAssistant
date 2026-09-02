@@ -219,6 +219,33 @@ public partial class TaskPageViewModel : PageViewModel
     }
 
     [RelayCommand]
+    private async Task ShowTaskListControl()
+    {
+        var taskListControl = new TpTaskListControl
+        {
+            DataContext = this
+        };
+        await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+        {
+            Content = taskListControl
+        });
+        OnPropertyChanged(nameof(TaskListText));  // 窗口关闭时更新显示文本
+    }
+
+    [RelayCommand]
+    private async Task ShowAddTaskControl()
+    {
+        var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+        {
+            Content = new TpAddTaskControl{DataContext = this},
+            ActionButtonsPreset = SukiMessageBoxButtons.ApplyCancel
+        });
+        if (result is SukiMessageBoxResult.Apply)
+        {
+            AddTaskItem();
+        }
+    }
+    
     private void AddTaskItem()
     {
         if (SelectedTpTaskLevel is null)
@@ -236,33 +263,6 @@ public partial class TaskPageViewModel : PageViewModel
             Count = TpTaskSingleTimes,
             RunTimes = TpTaskRunTimes,
             AutoDetect = IsTpTaskAutoDetect
-        });
-    }
-
-    [RelayCommand]
-    private async Task ShowTaskListControl()
-    {
-        var taskListControl = new TpTaskListControl
-        {
-            DataContext = this
-        };
-        await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
-        {
-            Content = taskListControl
-        });
-        OnPropertyChanged(nameof(TaskListText));  // 窗口关闭时更新显示文本
-    }
-
-    [RelayCommand]
-    private void ShowAddTaskControl()
-    {
-        var addTaskControl = new TpAddTaskControl
-        {
-            DataContext = this
-        };
-        SukiMessageBox.ShowDialog(new SukiMessageBoxHost
-        {
-            Content = addTaskControl
         });
     }
 }
