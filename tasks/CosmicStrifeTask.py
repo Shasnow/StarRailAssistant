@@ -1,5 +1,3 @@
-import tomllib
-
 from SRACore.task import BaseTask, task
 from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
@@ -8,6 +6,9 @@ from tasks.img import DUIMG, IMG
 
 @task(order=3)
 class CosmicStrifeTask(BaseTask):
+    def __post_init__(self):
+        self.notify = True
+
     """旷宇纷争任务"""
     def run(self):
         """主任务执行函数"""

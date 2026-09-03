@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,7 +25,7 @@ public partial class TaskPageViewModel : PageViewModel
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(
-        nameof(CosmicStrifeConfig), 
+        nameof(CosmicStrifeConfig),
         nameof(MissionAccomplishedConfig),
         nameof(ReceiveRewardsConfig),
         nameof(StartGameConfig),
@@ -35,15 +34,18 @@ public partial class TaskPageViewModel : PageViewModel
         nameof(SelectedGardenOfPlentyLevels2Index),
         nameof(SelectedPlanarFissureLevelsIndex),
         nameof(SelectedRealmOfTheStrangeLevelsIndex))]
-    private TasksConfig _currentConfig;
+    private partial TasksConfig CurrentConfig { get; set; }
 
-    [ObservableProperty] private bool _isTpTaskAutoDetect;
+    [ObservableProperty]
+    public partial bool IsTpTaskAutoDetect { get; set; }
 
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(EnableContextMenu))]
-    private object? _selectedTaskItem;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(EnableContextMenu))]
+    public partial object? SelectedTaskItem { get; set; }
 
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(CurrentTpTaskLevels), nameof(CurrentTpTaskMaxSingleTimes))]
-    private int _selectedTpTaskIndex;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentTpTaskLevels), nameof(CurrentTpTaskMaxSingleTimes))]
+    public partial int SelectedTpTaskIndex { get; set; }
 
     public int SelectedGardenOfPlentyLevels1Index
     {
@@ -84,11 +86,14 @@ public partial class TaskPageViewModel : PageViewModel
         }
     }
 
-    [ObservableProperty] private TpTaskLevel? _selectedTpTaskLevel;
+    [ObservableProperty]
+    public partial TpTaskLevel? SelectedTpTaskLevel { get; set; }
 
-    [ObservableProperty] private int _tpTaskRunTimes = 1;
+    [ObservableProperty]
+    public partial int TpTaskRunTimes { get; set; } = 1;
 
-    [ObservableProperty] private int _tpTaskSingleTimes = 1;
+    [ObservableProperty]
+    public partial int TpTaskSingleTimes { get; set; } = 1;
 
     public TaskPageViewModel(
         CommonModel commonModel,
