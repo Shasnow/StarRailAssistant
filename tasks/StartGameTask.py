@@ -4,9 +4,11 @@ from SRACore.util import encryption
 from SRACore.util.logger import logger
 from tasks.img import IMG, SGIMG
 
+
 @task(order=0)
 class StartGameTask(BaseTask):
     """启动游戏任务"""
+
     def run(self):
         logger.info("启动游戏任务开始")
         self.launch_game()
@@ -71,11 +73,11 @@ class StartGameTask(BaseTask):
     def launch_game(self):
         """启动游戏"""
         if self.operator.type == "Browser":
-            self.operator.launch(0,"")
+            self.operator.launch(0, "")
             return
         if self.config.StartGame.isUseGlobalGamePath:
             game_path_index = self.settings.General.gamePathIndex
-            game_paths:list[str] = self.settings.General.gamePaths
+            game_paths: list[str] = self.settings.General.gamePaths
             raw_path = game_paths[game_path_index] if game_path_index < len(game_paths) else None
         else:
             raw_path = self.config.StartGame.gamePath
@@ -100,37 +102,41 @@ class StartGameTask(BaseTask):
             case _:
                 raise ValueError(f"未知的游戏渠道配置，当前配置值 {self.config.StartGame.gameChannel}")
 
-        result, _ = self.operator.wait_any_img([
-            SGIMG.LOGIN_PAGE % channel,
-            SGIMG.WELCOME % channel,
-            SGIMG.SETTINGS,
-            IMG.ENTER,
-            SGIMG.NEW_VERSION,
-            SGIMG.AGREE1
-        ], timeout=60, interval=1)
+        login_pages = [
+                SGIMG.LOGIN_PAGE % channel,
+                SGIMG.WELCOME % channel,
+                SGIMG.SETTINGS,
+                IMG.ENTER,
+                SGIMG.NEW_VERSION]
+        result, box = self.operator.wait_any([
+            lambda: self.operator.locate_any(login_pages)[1],
+            lambda: self.operator.ocr_match("同意", from_x=0.5, from_y=0.58, to_x=0.6, to_y=0.64)],
+            timeout=60, interval=1)
 
         if result == -1:
             logger.error("等待登录界面超时，请检查游戏状态")
             return -1
-        if result == 5:
-            self.operator.click_box(_, after_sleep=1)
-            result = 0
-        if result != 0:
-            logger.info(f"登录状态 {result}")
+        if result == 1:
+            self.operator.click_box(box, after_sleep=1)
+            box.source = login_pages[0]  # 将box.source设置为登录界面，以便后续处理
+        if box.source != login_pages[0]:  # 如果不是登录界面，说明已经登录过了
+            logger.info(f"登录状态 {box.source}")
             enable = self.config.StartGame.isReLogin
-            if result == 4:
+            if box.source == SGIMG.NEW_VERSION:
                 # 游戏需要更新
                 logger.error("游戏需要更新，请手动更新游戏后重试")
                 return -1
-            if enable and result != 3:  # 是否启用退出账号
+            if enable and box.source != IMG.ENTER:  # 是否启用退出账号
                 self.logout()  # 执行退出账号后执行下面的登录操作
             else:
-                return result  # 直接返回登录状态
+                return login_pages.index(box.source)  # 直接返回登录状态
 
-        self.operator.click_img(SGIMG.LOGIN_OTHER % channel, after_sleep=1)
+        box = self.operator.ocr_match("其他账号")
+        self.operator.click_box(box, after_sleep=1)
         # The global client exposes the account fields directly on this page.
         if channel != 'gb':
-            self.operator.click_img(SGIMG.LOGIN_WITH_ACCOUNT % channel, after_sleep=1)
+            box = self.operator.ocr_match("密码", from_x=0.4, from_y=0.67, to_x=0.6, to_y=0.75)
+            self.operator.click_box(box, after_sleep=1)
         if self.config.StartGame.isAutoLogin:
             user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
             passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
@@ -138,7 +144,22 @@ class StartGameTask(BaseTask):
                 logger.error("自动登录账号或密码未设置，请检查配置中的自动登录账号和密码")
                 return -1
             logger.info(f"登录账号：{user}")
-            self.operator.click_img(SGIMG.USERNAME_INPUT % channel, after_sleep=1)
+            boxes = self.operator.ocr_boxes(from_x=0.34, from_y=0.3, to_x=0.65, to_y=0.66)
+            if boxes is None:
+                raise RuntimeError("未检测到登录界面输入框，请检查游戏状态")
+            email_box = None
+            agree_box = None
+            login_box = None
+            for box in boxes:
+                if "邮箱" in box.source:
+                    email_box = box
+                if "登录" in box.source or "进入游戏" in box.source:
+                    login_box = box
+                if "同意" in box.source:
+                    agree_box = box
+            if email_box is None or login_box is None:
+                raise RuntimeError("未检测到登录界面输入框，请检查游戏状态")
+            self.operator.click_box(email_box, after_sleep=1)
             self.operator.copy(user)
             self.operator.paste()
             self.operator.sleep(1)
@@ -146,8 +167,12 @@ class StartGameTask(BaseTask):
             self.operator.sleep(0.2)
             self.operator.copy(passwd)
             self.operator.paste()
-            self.operator.click_img(SGIMG.AGREE % channel, x_offset=-35, after_sleep=1)
-            self.operator.click_img(SGIMG.ENTER_GAME % channel)
+            if agree_box is not None:
+                self.operator.click_point(
+                    int(agree_box.left), int(agree_box.top),
+                    x_offset=-10, y_offset=15,
+                    after_sleep=1, tag="同意隐私政策")
+            self.operator.click_box(login_box)
         else:
             logger.info("未启用自动登录，请手动完成登录")
 
@@ -198,7 +223,7 @@ class StartGameTask(BaseTask):
         logger.info("登出账号")
         idx, box = self.operator.wait_ocr_any(["登出", "登入"], interval=1, timeout=60, from_x=0.9375, from_y=0.1204,
                                               to_x=0.96875, to_y=0.3935)
-        if idx==1:
+        if idx == 1:
             # 已经在登录界面，无需登出
             return True
         if box:

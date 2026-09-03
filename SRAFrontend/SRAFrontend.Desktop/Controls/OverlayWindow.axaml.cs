@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -13,7 +13,7 @@ namespace SRAFrontend.Desktop.Controls;
 public partial class OverlayWindow : Window
 {
     private readonly Timer _followTimer = new(500);
-    private readonly Queue<string> _logLines = new();
+    private readonly ConcurrentQueue<string> _logLines = new();
 
     // 日志最大保留行数
     private readonly int _maxLogLines = 30;
@@ -128,11 +128,12 @@ public partial class OverlayWindow : Window
 
         // 限制行数
         while (_logLines.Count > _maxLogLines)
-            _logLines.Dequeue();
+            _logLines.TryDequeue(out _);
 
-        // 拼接显示
+        // 快照后遍历，避免迭代时集合被修改
+        var snapshot = _logLines.ToArray();
         var sb = new StringBuilder();
-        foreach (var line in _logLines)
+        foreach (var line in snapshot)
             sb.AppendLine(line);
 
         var text = sb.ToString();
@@ -143,7 +144,7 @@ public partial class OverlayWindow : Window
         }
         else
         {
-            Dispatcher.UIThread.Invoke<string>(() => LogText.Text = text);
+            Dispatcher.UIThread.Invoke(() => LogText.Text = text);
         }
     }
 
