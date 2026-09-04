@@ -49,39 +49,39 @@ public partial class TaskPageViewModel : PageViewModel
 
     public int SelectedGardenOfPlentyLevels1Index
     {
-        get => TrailblazePowerConfig.GardenOfPlentyLevel1-1;
+        get => TrailblazePowerConfig.GardenOfPlentyLevel1;
         set
         {
-            TrailblazePowerConfig.GardenOfPlentyLevel1 = value+1;
+            TrailblazePowerConfig.GardenOfPlentyLevel1 = value;
             OnPropertyChanged();
         }
     }
     public int SelectedGardenOfPlentyLevels2Index
     {
-        get => TrailblazePowerConfig.GardenOfPlentyLevel2-1;
+        get => TrailblazePowerConfig.GardenOfPlentyLevel2;
         set
         {
-            TrailblazePowerConfig.GardenOfPlentyLevel2 = value+1;
+            TrailblazePowerConfig.GardenOfPlentyLevel2 = value;
             OnPropertyChanged();
         }
     }
 
     public int SelectedPlanarFissureLevelsIndex
     {
-        get => TrailblazePowerConfig.PlanarFissureLevel-1;
+        get => TrailblazePowerConfig.PlanarFissureLevel;
         set
         {
-            TrailblazePowerConfig.PlanarFissureLevel = value+1;
+            TrailblazePowerConfig.PlanarFissureLevel = value;
             OnPropertyChanged();
         }
     }
 
     public int SelectedRealmOfTheStrangeLevelsIndex
     {
-        get =>  TrailblazePowerConfig.RealmOfTheStrangeLevel-1;
+        get => TrailblazePowerConfig.RealmOfTheStrangeLevel;
         set
         {
-            TrailblazePowerConfig.RealmOfTheStrangeLevel = value+1;
+            TrailblazePowerConfig.RealmOfTheStrangeLevel = value;
             OnPropertyChanged();
         }
     }
@@ -125,10 +125,10 @@ public partial class TaskPageViewModel : PageViewModel
 
     public string[] TpTaskNames => [.. _tpTasks.Select(t => t.Name)];
     public TpTaskLevel[] CurrentTpTaskLevels => _tpTasks.ElementAt(SelectedTpTaskIndex).Levels;
-    public string[] GardenOfPlentyLevels1 => [.. _tpTasks.ElementAt(1).Levels.Select(x => $"{x.Name}（{x.Result}）")];
-    public string[] GardenOfPlentyLevels2 => [.. _tpTasks.ElementAt(2).Levels.Select(x => $"{x.Name}（{x.Result}）")];
-    public string[] PlanarFissureLevels => [.. _tpTasks.ElementAt(0).Levels.Select(x => $"{x.Name}（{x.Result}）")];
-    public string[] RealmOfTheStrangeLevels => [.. _tpTasks.ElementAt(4).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+    public string[] GardenOfPlentyLevels1 => ["未选择", .. _tpTasks.ElementAt(1).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+    public string[] GardenOfPlentyLevels2 => ["未选择", .. _tpTasks.ElementAt(2).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+    public string[] PlanarFissureLevels => ["未选择", .. _tpTasks.ElementAt(0).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+    public string[] RealmOfTheStrangeLevels => ["未选择", .. _tpTasks.ElementAt(4).Levels.Select(x => $"{x.Name}（{x.Result}）")];
     public int CurrentTpTaskMaxSingleTimes => _tpTasks[SelectedTpTaskIndex].MaxSingleTimes;
     
     public string TaskListText =>
