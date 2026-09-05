@@ -466,7 +466,7 @@ class CurrencyWars(Executable):
         b = self.operator.wait_img(CWIMG.NEXT_STEP)
         if b is None:
             return False
-        self.handle_game_over()
+        self.handle_game_over(None)
         return True
 
     def game_loop(self):
@@ -781,50 +781,42 @@ class CurrencyWars(Executable):
             (
                 CWIMG.FORTUNE_TELLER,
                 StageName.FORTUNE_TELLER,
-                self._handle_fortune_teller_after_battle,
-                False  # 非终止状态
+                self._handle_fortune_teller_after_battle
             ),
             (
                 CWIMG.REPLENISH_STAGE,
                 StageName.REPLENISH_STAGE,
-                self.handle_replenish_stage,
-                False  # 非终止状态
+                self.handle_replenish_stage
             ),
             (
                 CWIMG.ENCOUNTER_NODE,
                 StageName.ENCOUNTER_NODE,
-                self.handle_encounter_node,
-                False
+                self.handle_encounter_node
             ),
             (
                 CWIMG.FOLD,
                 StageName.FOLD,
-                None,  # 目标状态，无需处理
-                True  # 正常终止状态
+                lambda prev_stage: True,  # 目标状态，无需处理
             ),
             (
                 CWIMG.SELECT_INVEST_STRATEGY,
                 StageName.SELECT_INVEST_STRATEGY,
-                self.handle_invest_strategy,
-                False
+                self.handle_invest_strategy
             ),
             (
                 CWIMG.CLICK_BLANK,
                 StageName.CLICK_BLANK,
-                self.handle_click_blank,
-                False
+                self.handle_click_blank
             ),
             (
                 CWIMG.NEXT_STEP,
                 StageName.GAME_OVER,
-                self.handle_game_over,
-                True  # 挑战结束，终止状态
+                self.handle_game_over
             ),
             (
                 CWIMG.START_CURRENCY_WARS,
                 StageName.MAIN_MENU,
-                lambda prev_stage: setattr(self, 'is_game_over', True),
-                True
+                self.handle_main_menu
             )
         ]
 
@@ -841,16 +833,15 @@ class CurrencyWars(Executable):
                 raise RuntimeError("关卡状态检测超时，未识别到任何图片")
 
             # 获取当前状态配置
-            img_path, stage_name, handle_func, is_terminal = stage_config[stage_index]
+            img_path, stage_name, handle_func = stage_config[stage_index]
             logger.info(f"检测到状态：{stage_name}({img_path})")
 
             # 执行状态处理函数
-            if handle_func is not None:
-                try:
-                    handle_func(prev_stage_name)
-                    logger.info(f"状态 {stage_name} 处理完成")
-                except Exception as e:
-                    raise RuntimeError(f"处理状态 {stage_name} 时发生异常: {str(e)}") from e
+            try:
+                is_terminal = handle_func(prev_stage_name)
+                logger.info(f"状态 {stage_name} 处理完成")
+            except Exception as e:
+                raise RuntimeError(f"处理状态 {stage_name} 时发生异常: {str(e)}") from e
 
             # 更新上一阶段名称
             prev_stage_name = stage_name
@@ -864,10 +855,16 @@ class CurrencyWars(Executable):
             stage_index, _ = self.operator.wait_any_img(img_list, timeout=30, interval=1)
             self.operator.sleep(1.5)
 
-    def _handle_fortune_teller_after_battle(self, prev_stage: StageName | None = None):
+    def handle_main_menu(self, _: StageName | None) -> bool:
+        """处理主菜单界面的逻辑"""
+        self.is_game_over = True
+        return True
+
+    def _handle_fortune_teller_after_battle(self, _: StageName | None) -> bool:
         """战斗结束后触发命运卜者事件"""
         self.handle_fortune_teller()
         self.operator.click_point(0.8438, 0.8481, after_sleep=1, tag="打开商店界面")
+        return False
 
     def handle_stage_transitioned(self) -> bool:  # NOQA
         """关卡切换完成后的处理逻辑（如有）。默认实现为无操作，子类可重写此方法以添加额外逻辑。
@@ -886,7 +883,7 @@ class CurrencyWars(Executable):
             # 重新获取备战席信息
             self.get_in_hand_area()
 
-    def handle_game_over(self, prev_stage: StageName | None = None):
+    def handle_game_over(self, _: StageName | None) -> bool:
         """处理游戏结束后的逻辑，如点击继续、返回主界面等"""
         self.operator.click_img(CWIMG.NEXT_STEP)
         self.operator.move_to(0.5, 0.5)  # 移动鼠标避免遮挡
@@ -898,33 +895,38 @@ class CurrencyWars(Executable):
             self.operator.click_box(next_page_box, after_sleep=1)
         self.operator.click_point(0.5, 0.82, after_sleep=1, tag="点击返回货币战争")
         self.is_game_over = True  # 标记游戏结束
+        return True
 
-    def handle_click_blank(self, prev_stage: StageName | None = None) -> None:
+    def handle_click_blank(self, _: StageName | None) -> bool:
         """处理Boss预览界面的逻辑"""
         self.operator.click_point(0.5, 0.70, after_sleep=1)
+        return False
 
-    def handle_invest_strategy(self, prev_stage: StageName | None = None) -> None:
+    def handle_invest_strategy(self, prev_stage: StageName | None) -> bool:
         """处理投资策略选择界面的逻辑"""
         if not self.operator.click_img(CWIMG.COLLECTION):
             self.operator.click_point(0.5, 0.3, after_sleep=0.5, tag="选择中间的投资策略")
         self.operator.click_img(IMG.ENSURE2, after_sleep=1)
         self.post_invest_strategy()
+        return False
 
     def post_invest_strategy(self, strategy_name: str | None = None):
         """投资策略选择后的后续处理逻辑"""
         if strategy_name == "阿哈大悦" or self.operator.locate(CWIMG.SELECT_SIMPLE_EQUIPMENT):
             self.operator.click_point(0.8, 0.25, after_sleep=1, tag="阿哈大悦选择装备4")
 
-    def handle_replenish_stage(self, prev_stage: StageName | None = None):
+    def handle_replenish_stage(self, _: StageName | None):
         """处理补给阶段的逻辑"""
         self.operator.click_point(0.53, 0.52, after_sleep=1)  # 选择固定位置
         self.operator.click_point(0.88, 0.91, after_sleep=1)  # 点击确认按钮
         self.detect_silver_wolf_lv999()  # 也许选到银狼了
+        return False
 
-    def handle_encounter_node(self, prev_stage: StageName | None = None):
+    def handle_encounter_node(self, _: StageName | None) -> bool:
         """处理遭遇节点的逻辑"""
         self.operator.click_point(0.35, 0.50, after_sleep=1)  # 简单难度
         self.operator.click_point(0.50, 0.84, after_sleep=1)  # 点击确认钮
+        return False
 
     def handle_fortune_teller(self):
         """处理命运卜者事件的逻辑"""

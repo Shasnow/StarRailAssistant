@@ -1,11 +1,9 @@
 # noinspection package-requirements
 from typing_extensions import deprecated
 
-from SRACore.operators.model import Box
 from SRACore.util import strutil
 from SRACore.util.logger import logger
 from tasks.img import CWIMG, IMG
-
 from .CurrencyWars import CurrencyWars, StageName
 
 
@@ -175,7 +173,7 @@ class RerollStart(CurrencyWars):
             return False
         return True
 
-    def handle_invest_strategy(self, prev_stage: StageName | None = None):
+    def handle_invest_strategy(self, prev_stage: StageName | None) -> bool:
         def default_invest_strategy_handler():
             # 当前阶段的必需策略未匹配到，直接重开
             logger.info(f"阶段{self.invest_strategy_stage}投资策略未满足要求，准备重开...")
@@ -191,8 +189,10 @@ class RerollStart(CurrencyWars):
                 current_stage_index = retrigger_index
                 logger.info(f"检测到投资策略re-trigger，阶段{current_stage_index + 1}未变更，不推进阶段")
             else:
-                current_stage_index = self.invest_strategy_stage
-                self.invest_strategy_stage += 1
+                # re-trigger 但索引越界，说明已无更多阶段，直接结束
+                logger.info(f"阶段{self.invest_strategy_stage}已无更多投资策略要求，停止刷开局")
+                self.is_running = False
+                return True
         else:
             current_stage_index = self.invest_strategy_stage
             self.invest_strategy_stage += 1
@@ -202,7 +202,7 @@ class RerollStart(CurrencyWars):
             # 没有更多要求，直接结束刷开局
             logger.info(f"阶段{self.invest_strategy_stage}无投资策略要求，所有阶段已满足，停止刷开局")
             self.is_running = False
-            return
+            return True
         
         wanted_strategy = self.wanted_invest_strategies[current_stage_index]
         if not wanted_strategy:
@@ -213,7 +213,8 @@ class RerollStart(CurrencyWars):
             if current_stage_index + 1 >= len(self.wanted_invest_strategies):
                 logger.info("所有阶段投资策略已满足，停止刷开局")
                 self.is_running = False
-            return
+                return True
+            return False
 
         for _ in range(3):
             logger.info(f"阶段{self.invest_strategy_stage}正在识别投资策略...")
@@ -234,9 +235,10 @@ class RerollStart(CurrencyWars):
                 if current_stage_index + 1 >= len(self.wanted_invest_strategies):
                     logger.info("当前阶段满足且无后续要求，停止刷开局")
                     self.is_running = False
-                return
+                return True
 
         default_invest_strategy_handler()
+        return True
 
     def handle_stage_transitioned(self) -> bool:
         if self.reroll:
