@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -315,8 +315,8 @@ public class CommonModel(
             unzipToast.CanDismissByTime = false;
             try
             {
-                // 重命名当前可执行文件（以防更新过程中被占用）
-                File.Move(DataPath.SraExecutablePath, DataPath.SraOldExecutablePath);
+                // 重命名当前可执行文件（以防更新过程中被占用），覆盖上次更新残留的旧文件
+                File.Move(DataPath.SraExecutablePath, DataPath.SraOldExecutablePath, true);
                 // 解压更新包
                 await Task.Run(() => ZipUtil.Unzip(downloadFilePath, Environment.CurrentDirectory));
                 toastManager.Dismiss(unzipToast);
