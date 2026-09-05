@@ -133,6 +133,7 @@ class StartGameTask(BaseTask):
 
         box = self.operator.ocr_match("其他账号")
         self.operator.click_box(box, after_sleep=1)
+        self.operator.move_to(0.5, 0.5)  # 移动到中心位置, 防止按钮提示文本干扰
         # The global client exposes the account fields directly on this page.
         if channel != 'gb':
             box = self.operator.ocr_match("密码", from_x=0.4, from_y=0.67, to_x=0.6, to_y=0.75)
