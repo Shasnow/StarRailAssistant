@@ -60,7 +60,7 @@
                     <StackPanel Margin="0,15,0,15">
                         <CheckBox x:Name="AutoLoginCheckBox" Content="自动登录" IsChecked="{Binding StartGameConfig.IsAutoLogin}" />
                         <TextBlock Margin="25,5,0,0" FontSize="12" Foreground="Gray" TextWrapping="Wrap">
-                            勾选自动登录表明您已阅读并同意《用户协议》和《隐私政策》
+                            勾选自动登录表明您已阅读并知晓《用户协议》和《隐私政策》
                         </TextBlock>
                         <CheckBox Content="总是重新登录" Margin="0,10,0,0" IsChecked="{Binding StartGameConfig.IsReLogin}"/>
                     </StackPanel>
