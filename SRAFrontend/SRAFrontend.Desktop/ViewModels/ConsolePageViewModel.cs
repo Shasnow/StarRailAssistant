@@ -221,17 +221,19 @@ public partial class ConsolePageViewModel : PageViewModel
     }
 
     /// <summary>
-    /// 复制目录下的所有文件到目标目录（顶层，不递归）
+    /// 递归复制目录下的所有文件到目标目录（保留相对目录结构）
     /// </summary>
     /// <returns>复制的文件数量</returns>
     private static int CopyLogFiles(string sourceDir, string destDir)
     {
         if (!Directory.Exists(sourceDir)) return 0;
-        Directory.CreateDirectory(destDir);
         var count = 0;
-        foreach (var file in Directory.GetFiles(sourceDir))
+        foreach (var file in Directory.EnumerateFiles(sourceDir, "*", SearchOption.AllDirectories))
         {
-            File.Copy(file, Path.Combine(destDir, Path.GetFileName(file)), true);
+            var relativePath = Path.GetRelativePath(sourceDir, file);
+            var destPath = Path.Combine(destDir, relativePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
+            File.Copy(file, destPath, true);
             count++;
         }
         return count;

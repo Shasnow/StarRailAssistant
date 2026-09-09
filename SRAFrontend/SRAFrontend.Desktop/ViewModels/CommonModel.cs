@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -328,7 +328,7 @@ public class CommonModel(
                 var manualExtractButton =
                     SukiMessageBoxButtonsFactory.CreateButton("手动解压", SukiMessageBoxResult.Yes, "Flat");
                 var retryButton =
-                    SukiMessageBoxButtonsFactory.CreateButton("我知道了", SukiMessageBoxResult.OK, "Flat Accent");
+                    SukiMessageBoxButtonsFactory.CreateButton("退出程序", SukiMessageBoxResult.OK, "Flat");
                 var extractResult = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
                 {
                     Header = "更新解压失败",
