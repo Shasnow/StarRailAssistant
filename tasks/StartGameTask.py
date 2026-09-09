@@ -163,7 +163,7 @@ class StartGameTask(BaseTask):
         self.operator.move_to(0.5, 0.5)  # 移动到中心位置, 防止按钮提示文本干扰
         self.operator.sleep(1)
         if self._game_channel() != 'gb':  # 国际服客户端此页面直接暴露账号输入框
-            self.operator.click_box(self.operator.ocr_match("密码", from_x=0.4, from_y=0.67, to_x=0.6, to_y=0.75), after_sleep=1)
+            self.operator.click_box(self.operator.ocr_match("密码", from_x=0.4, from_y=0.65, to_x=0.6, to_y=0.75), after_sleep=1)
         if self.config.StartGame.isAutoLogin:
             if not self._fill_credentials():
                 return -1
