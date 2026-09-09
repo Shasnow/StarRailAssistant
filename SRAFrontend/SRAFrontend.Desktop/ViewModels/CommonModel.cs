@@ -166,10 +166,22 @@ public class CommonModel(
 
     public async Task CleanupOldExeAsync()
     {
+        
         if (File.Exists(DataPath.SraOldExecutablePath))
         {
             logger.LogDebug("Cleaning up old executable file: SRA_old.exe");
-            await Task.Run(() => File.Delete(DataPath.SraOldExecutablePath));
+            await Task.Run(() =>
+            {
+                try
+                {
+                    File.Delete(DataPath.SraOldExecutablePath);
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Failed to delete old executable file: SRA_old.exe");
+                    ShowErrorToast("清理旧文件失败", $"无法删除旧可执行文件：{e.Message}");
+                }
+            });
         }
     }
 
