@@ -8,7 +8,7 @@ class AutoPlotConfig(BaseModel):
     skip_plot: bool = Field(default=False, description="是否自动跳过剧情对话")
 
 
-@extension(
+@extension(  # pyright: ignore[reportArgumentType]
     name="自动对话",
     description="自动检测并处理剧情对话，可按配置跳过剧情",
     background=True,
@@ -16,8 +16,8 @@ class AutoPlotConfig(BaseModel):
 class AutoPlotExtension(BaseExtension[AutoPlotConfig]):
     """后台扩展：自动处理对话状态并在需要时跳过剧情。"""
 
-    def __init__(self, operator, config: AutoPlotConfig):
-        super().__init__(operator, config)
+    def __init__(self, operator, config: AutoPlotConfig, event_listener=None):
+        super().__init__(operator, config, event_listener=event_listener)
         self._can_skip = True
 
     def run(self) -> bool:
