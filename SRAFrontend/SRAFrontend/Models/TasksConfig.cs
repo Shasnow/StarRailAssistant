@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -42,6 +42,9 @@ public partial class StartGameConfig : ObservableObject
 
     [ObservableProperty] [property: JsonPropertyName("relogin")]
     private bool _isReLogin = true;
+
+    [ObservableProperty] [property: JsonPropertyName("game.launchDelay")]
+    private int _launchDelay = 5;
 
     [JsonPropertyName("password")]
     public string EncryptedPassword { get; set; } = string.Empty;

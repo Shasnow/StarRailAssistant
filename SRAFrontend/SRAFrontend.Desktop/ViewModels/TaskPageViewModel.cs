@@ -17,11 +17,41 @@ namespace SRAFrontend.Desktop.ViewModels;
 
 public partial class TaskPageViewModel : PageViewModel
 {
+    private readonly IBackendService _backendService;
     private readonly CacheService _cacheService;
     private readonly CommonModel _commonModel;
     private readonly ConfigService _configService;
-    private readonly IBackendService _backendService;
+
+    private bool _isAccountTextBoxFocused;
     private TpTask[] _tpTasks = [];
+
+    public TaskPageViewModel(
+        CommonModel commonModel,
+        ControlPanelViewModel controlPanelViewModel,
+        ConfigService configService,
+        CacheService cacheService,
+        IBackendService backendService) : base(
+        PageName.Task, "\uE1BC")
+    {
+        ControlPanelViewModel = controlPanelViewModel;
+        _commonModel = commonModel;
+        _configService = configService;
+        _cacheService = cacheService;
+        _backendService = backendService;
+        CurrentConfig = _configService.TasksConfig!;
+
+        _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
+
+        if (Cache.Strategies.Count == 0) _ = RefreshStrategies();
+        return;
+
+        void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName != nameof(Cache.CurrentConfigIndex)) return;
+            _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.CurrentConfigIndex]);
+            CurrentConfig = _configService.TasksConfig!;
+        }
+    }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(
@@ -33,11 +63,11 @@ public partial class TaskPageViewModel : PageViewModel
         nameof(SelectedGardenOfPlentyLevels1Index),
         nameof(SelectedGardenOfPlentyLevels2Index),
         nameof(SelectedPlanarFissureLevelsIndex),
-        nameof(SelectedRealmOfTheStrangeLevelsIndex))]
+        nameof(SelectedRealmOfTheStrangeLevelsIndex),
+        nameof(AccountText))]
     private partial TasksConfig CurrentConfig { get; set; }
 
-    [ObservableProperty]
-    public partial bool IsTpTaskAutoDetect { get; set; }
+    [ObservableProperty] public partial bool IsTpTaskAutoDetect { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EnableContextMenu))]
@@ -56,6 +86,7 @@ public partial class TaskPageViewModel : PageViewModel
             OnPropertyChanged();
         }
     }
+
     public int SelectedGardenOfPlentyLevels2Index
     {
         get => TrailblazePowerConfig.GardenOfPlentyLevel2;
@@ -86,60 +117,51 @@ public partial class TaskPageViewModel : PageViewModel
         }
     }
 
-    [ObservableProperty]
-    public partial TpTaskLevel? SelectedTpTaskLevel { get; set; }
+    [ObservableProperty] public partial TpTaskLevel? SelectedTpTaskLevel { get; set; }
 
-    [ObservableProperty]
-    public partial int TpTaskRunTimes { get; set; } = 1;
+    [ObservableProperty] public partial int TpTaskRunTimes { get; set; } = 1;
 
-    [ObservableProperty]
-    public partial int TpTaskSingleTimes { get; set; } = 1;
-
-    public TaskPageViewModel(
-        CommonModel commonModel,
-        ControlPanelViewModel controlPanelViewModel,
-        ConfigService configService,
-        CacheService cacheService,
-        IBackendService backendService) : base(
-        PageName.Task, "\uE1BC")
-    {
-        ControlPanelViewModel = controlPanelViewModel;
-        _commonModel = commonModel;
-        _configService = configService;
-        _cacheService = cacheService;
-        _backendService = backendService;
-        CurrentConfig = _configService.TasksConfig!;
-
-        _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
-
-        if (Cache.Strategies.Count == 0) _ = RefreshStrategies();
-        return;
-
-        void OnCachePropertyChanged(object? _, PropertyChangedEventArgs args)
-        {
-            if (args.PropertyName != nameof(Cache.CurrentConfigIndex)) return;
-            _configService.SwitchConfig(_cacheService.Cache.ConfigNames[_cacheService.Cache.CurrentConfigIndex]);
-            CurrentConfig = _configService.TasksConfig!;
-        }
-    }
+    [ObservableProperty] public partial int TpTaskSingleTimes { get; set; } = 1;
 
     public string[] TpTaskNames => [.. _tpTasks.Select(t => t.Name)];
     public TpTaskLevel[] CurrentTpTaskLevels => _tpTasks.ElementAt(SelectedTpTaskIndex).Levels;
-    public string[] GardenOfPlentyLevels1 => ["未选择", .. _tpTasks.ElementAt(1).Levels.Select(x => $"{x.Name}（{x.Result}）")];
-    public string[] GardenOfPlentyLevels2 => ["未选择", .. _tpTasks.ElementAt(2).Levels.Select(x => $"{x.Name}（{x.Result}）")];
-    public string[] PlanarFissureLevels => ["未选择", .. _tpTasks.ElementAt(0).Levels.Select(x => $"{x.Name}（{x.Result}）")];
-    public string[] RealmOfTheStrangeLevels => ["未选择", .. _tpTasks.ElementAt(4).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+
+    public string[] GardenOfPlentyLevels1 =>
+        ["未选择", .. _tpTasks.ElementAt(1).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+
+    public string[] GardenOfPlentyLevels2 =>
+        ["未选择", .. _tpTasks.ElementAt(2).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+
+    public string[] PlanarFissureLevels =>
+        ["未选择", .. _tpTasks.ElementAt(0).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+
+    public string[] RealmOfTheStrangeLevels =>
+        ["未选择", .. _tpTasks.ElementAt(4).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+
     public int CurrentTpTaskMaxSingleTimes => _tpTasks[SelectedTpTaskIndex].MaxSingleTimes;
-    
+
     public string TaskListText =>
         TrailblazePowerConfig.TaskList.Count == 0
             ? "暂无任务"
             : $"{string.Join("、", TrailblazePowerConfig.TaskList.Select(x => x.Name).Take(3))} 等 {TrailblazePowerConfig.TaskList.Count} 个任务";
+
     public CosmicStrifeConfig CosmicStrifeConfig => CurrentConfig.CosmicStrife;
     public MissionAccomplishedConfig MissionAccomplishedConfig => CurrentConfig.MissionAccomplished;
     public ReceiveRewardsConfig ReceiveRewardsConfig => CurrentConfig.ReceiveRewards;
     public StartGameConfig StartGameConfig => CurrentConfig.StartGame;
     public TrailblazePowerConfig TrailblazePowerConfig => CurrentConfig.TrailblazePower;
+
+    public string AccountText
+    {
+        get => _isAccountTextBoxFocused
+            ? StartGameConfig.Username
+            : $"{StartGameConfig.Username[..Math.Min(3, StartGameConfig.Username.Length)]}****{StartGameConfig.Username[^Math.Min(3, StartGameConfig.Username.Length)..]}";
+        set
+        {
+            StartGameConfig.Username = value;
+            OnPropertyChanged();
+        }
+    }
 
     public int CurrencyWarsStrategyIndex
     {
@@ -171,6 +193,12 @@ public partial class TaskPageViewModel : PageViewModel
     public bool IsCwNormalMode => CosmicStrifeConfig.CurrencyWarsMode != 2;
 
     public Cache Cache => _cacheService.Cache;
+
+    public void ToggleAccountTextFocus(bool isFocused)
+    {
+        _isAccountTextBoxFocused = isFocused;
+        OnPropertyChanged(nameof(AccountText));
+    }
 
     public async Task GetTpConfigAsync()
     {
@@ -234,7 +262,7 @@ public partial class TaskPageViewModel : PageViewModel
         {
             Content = taskListControl
         });
-        OnPropertyChanged(nameof(TaskListText));  // 窗口关闭时更新显示文本
+        OnPropertyChanged(nameof(TaskListText)); // 窗口关闭时更新显示文本
     }
 
     [RelayCommand]
@@ -242,15 +270,12 @@ public partial class TaskPageViewModel : PageViewModel
     {
         var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
-            Content = new TpAddTaskControl{DataContext = this},
+            Content = new TpAddTaskControl { DataContext = this },
             ActionButtonsPreset = SukiMessageBoxButtons.ApplyCancel
         });
-        if (result is SukiMessageBoxResult.Apply)
-        {
-            AddTaskItem();
-        }
+        if (result is SukiMessageBoxResult.Apply) AddTaskItem();
     }
-    
+
     private void AddTaskItem()
     {
         if (SelectedTpTaskLevel is null)

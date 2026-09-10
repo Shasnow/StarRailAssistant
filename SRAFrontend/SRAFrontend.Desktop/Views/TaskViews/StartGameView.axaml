@@ -57,22 +57,38 @@
                                 IsEnabled="{Binding !StartGameConfig.IsUseGlobalGamePath}"/>
                     </Grid>
 
+                    <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,15"
+                                ToolTip.Tip="启动游戏后，等待游戏加载完成再执行后续任务的时间，单位为秒。">
+                        <Label VerticalAlignment="Center" Content="启动等待时间（秒）"/>
+                        <NumericUpDown VerticalAlignment="Center" Width="120" Minimum="0" Maximum="120"
+                                       FormatString="0" Value="{Binding StartGameConfig.LaunchDelay}"/>
+                    </StackPanel>
+
                     <StackPanel Margin="0,15,0,15">
-                        <CheckBox x:Name="AutoLoginCheckBox" Content="自动登录" IsChecked="{Binding StartGameConfig.IsAutoLogin}" />
+                        <CheckBox x:Name="AutoLoginCheckBox" Content="自动登录"
+                                  IsChecked="{Binding StartGameConfig.IsAutoLogin}"
+                                  ToolTip.Tip="勾选后，游戏启动后会使用指定的账号与密码进行自动登录。"/>
                         <TextBlock Margin="25,5,0,0" FontSize="12" Foreground="Gray" TextWrapping="Wrap">
                             勾选自动登录表明您已阅读并知晓《用户协议》和《隐私政策》
                         </TextBlock>
-                        <CheckBox Content="总是重新登录" Margin="0,10,0,0" IsChecked="{Binding StartGameConfig.IsReLogin}"/>
+                        <CheckBox Content="总是重新登录" Margin="0,10,0,0"
+                                  IsChecked="{Binding StartGameConfig.IsReLogin}"
+                                  ToolTip.Tip="勾选后，每次启动游戏时都会退出当前登录账号重新登录。"/>
                     </StackPanel>
-                    
                     <Grid RowDefinitions="*, *" ColumnDefinitions="Auto, *, Auto" Width="400" HorizontalAlignment="Left">
                         <Label Grid.Row="0" Grid.Column="0" Content="账号：" />
-                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding StartGameConfig.Username}"/>
+                        <!-- ReSharper disable Xaml.StyleClassNotFound -->
+                        <TextBox Grid.Row="0" Grid.Column="1" suki:TextBoxExtensions.AddDeleteButton="True"
+                                 Text="{Binding AccountText}"
+                                 GotFocus="OnAccountTextBoxGotFocus"
+                                 LostFocus="OnAccountTextBoxLostFocus">
+                        </TextBox>
                         <Label Grid.Row="1" Grid.Column="0" Content="密码：" />
-                        <!-- ReSharper disable once Xaml.StyleClassNotFound -->
-                        <TextBox Grid.Row="1" Grid.Column="1" Classes="revealPasswordButton" PasswordChar="*"
+                        <TextBox Grid.Row="1" Grid.Column="1" Classes="revealPasswordButton" PasswordChar="*" suki:TextBoxExtensions.AddDeleteButton="True"
                                  Text="{Binding StartGameConfig.Password}"/> 
+                        <!-- ReSharper restore Xaml.StyleClassNotFound -->
                     </Grid>
+
                 </StackPanel>
             </ScrollViewer>
         </suki:GroupBox>

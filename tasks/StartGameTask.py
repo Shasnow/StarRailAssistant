@@ -25,6 +25,9 @@ class StartGameTask(BaseTask):
     def run(self):
         logger.info("启动游戏任务开始")
         self.launch_game()
+        delay = self.config.StartGame.launchDelay
+        logger.info(f"游戏已启动, {delay}秒后开始自动化操作")
+        self.operator.sleep(delay)
         return self.login_and_enter_game()
 
     def login_and_enter_game(self, _retry_count: int = 0):
@@ -185,7 +188,7 @@ class StartGameTask(BaseTask):
         if user == "" or passwd == "":
             logger.error("自动登录账号或密码未设置，请检查配置中的自动登录账号和密码")
             return False
-        logger.info(f"登录账号：{user}")
+        logger.info(f"登录账号：{user[:3]}*****{user[-3:]}")
         boxes = self.operator.ocr_boxes(from_x=0.34, from_y=0.3, to_x=0.65, to_y=0.66)
         if boxes is None:
             raise RuntimeError("未检测到登录界面")

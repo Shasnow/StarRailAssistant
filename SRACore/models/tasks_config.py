@@ -55,6 +55,7 @@ class StartGameConfig:
     isUseGlobalGamePath: bool = True
     isAutoLogin: bool = True
     isReLogin: bool = True
+    launchDelay: int = 5
     EncryptedPassword: str = ""
     EncryptedUsername: str = ""
 
@@ -68,6 +69,7 @@ class StartGameConfig:
             "game.useGlobalPath": self.isUseGlobalGamePath,
             "autologin": self.isAutoLogin,
             "relogin": self.isReLogin,
+            "game.launchDelay": self.launchDelay,
             "password": self.EncryptedPassword,
             "username": self.EncryptedUsername
         }
@@ -83,6 +85,7 @@ class StartGameConfig:
             "isUseGlobalGamePath": data.get("game.useGlobalPath", True),
             "isAutoLogin": data.get("autologin", True),
             "isReLogin": data.get("relogin", True),
+            "launchDelay": data.get("game.launchDelay", 5),
             "EncryptedPassword": data.get("password", ""),
             "EncryptedUsername": data.get("username", "")
         })
