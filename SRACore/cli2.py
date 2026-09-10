@@ -45,17 +45,18 @@ class SRACli(cmd2.Cmd):
         # 初始化任务管理器
         self.task_manager = TaskManager(settings_service)
 
-        # 初始化扩展系统：动态导入扩展模块并创建运行器
-        load_extensions()
-        self.extension_config_manager = ExtensionConfigManager()
-        self.extension_runner = ExtensionRunner(
-            self.extension_config_manager, settings_service)
-
-        # 初始化键盘监听器
+        # 初始化键盘监听器（全局单实例，由 CLI 持有并注入给扩展）
         stop_hotkey = settings_service.settings.General.hotkeyStop.lower() or 'f9'
         self.event_listener = KeyboardListener()
         self.event_listener.register_key_event(stop_hotkey, self._task_stop)
         self.event_listener.start()
+
+        # 初始化扩展系统：动态导入扩展模块并创建运行器
+        load_extensions()
+        self.extension_config_manager = ExtensionConfigManager()
+        self.extension_runner = ExtensionRunner(
+            self.extension_config_manager, settings_service,
+            event_listener=self.event_listener)
 
     def precmd(self, statement: cmd2.Statement | str) -> cmd2.Statement:
         """在执行命令前检查是否需要使用 JSON 输出"""
@@ -108,10 +109,11 @@ class SRACli(cmd2.Cmd):
 
     @cmd2.as_subcommand_to("task", "stop", _build_task_stop_parser, help=Resource.stop_description)
     def _task_stop(self, _) -> None:
-        if self.task_manager.is_thread_running():
-            self.task_manager.stop_thread()
-        else:
-            logger.info(Resource.cli_task_notRunning)
+        # 任务与扩展共用全局工作线程，需同时向两个 Runner 请求停止：
+        # 否则 stop_thread 的 join 会因目标线程不响应本 Runner 的事件而空等超时
+        self.task_manager.request_stop()
+        self.extension_runner.request_stop()
+        self.task_manager.stop_thread()
 
     @staticmethod
     def _build_task_status_parser() -> cmd2.Cmd2ArgumentParser:

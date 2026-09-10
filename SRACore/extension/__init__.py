@@ -21,6 +21,7 @@ from SRACore.util.const import AppDataDir, ConfigsDir
 from SRACore.util.errors import ThreadStoppedError
 
 if TYPE_CHECKING:
+    from SRACore.runtime.event_listener import KeyboardListener
     from SRACore.service.setting_service import SettingsService
 
 T = TypeVar('T', bound=BaseModel)
@@ -42,16 +43,21 @@ class BaseExtension(Executable, Generic[T], ABC):
         class SimpleExtension(BaseExtension):
             def run(self) -> bool: ...
 
-    扩展可通过 ``self.operator`` 执行截图、点击、OCR 等实际操作。
+    扩展可通过 ``self.operator`` 执行截图、点击、OCR 等实际操作；
+    需要监听键盘热键时，通过 ``self.event_listener`` 注册/注销按键回调
+    （全局单实例由宿主创建并注入，扩展不管理其生命周期）。
     """
 
     config: T | None = None
     operator: IOperator
     settings: AppSettings
+    event_listener: 'KeyboardListener | None' = None
 
-    def __init__(self, operator: IOperator, config: T | None = None):
+    def __init__(self, operator: IOperator, config: T | None = None,
+                 event_listener: 'KeyboardListener | None' = None):
         super().__init__(operator)
         self.config = config
+        self.event_listener = event_listener
         self.__post_init__()
 
     def __post_init__(self) -> None:
@@ -348,10 +354,12 @@ class ExtensionRunner(Runner):
 
     def __init__(self, config_manager: ExtensionConfigManager,
                  settings_service: 'SettingsService',
-                 registry: ExtensionRegistry | None = None):
+                 registry: ExtensionRegistry | None = None,
+                 event_listener: 'KeyboardListener | None' = None):
         super().__init__()
         self._config_manager = config_manager
         self._settings_service = settings_service
+        self._event_listener = event_listener
         self._registry = registry or extension_registry
         self.extensions: dict[str, BaseExtension] = {}
         self._background_thread: threading.Thread | None = None
@@ -386,7 +394,7 @@ class ExtensionRunner(Runner):
                 config = config_cls()
                 logger.debug(f"Config for '{extension_id}' not loaded, using default")
         operator = self._create_operator()
-        return ext_cls(operator, config)
+        return ext_cls(operator, config, event_listener=self._event_listener)
 
     def _run_extension(self, ext_id: str):
         """扩展执行逻辑（在线程中运行）"""

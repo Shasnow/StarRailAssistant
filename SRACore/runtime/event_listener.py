@@ -2,7 +2,7 @@ import dataclasses
 import threading
 import time
 from threading import Lock
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from loguru import logger
 import pynput
@@ -17,14 +17,22 @@ class KeyDownEvent:
 
 
 class KeyboardListener:
-    # 退出信号：控制监听器线程退出
-    exit_event = threading.Event()
-    # 按键回调列表：(按键字符串, 回调函数, 是否已触发防抖)
-    _key_down_events: dict[str, KeyDownEvent] = {}
-    # 线程锁：保证多线程操作_key_down_events的安全性
-    _lock = Lock()
-    # 监听器线程实例
-    _listener_thread: Optional[threading.Thread] = None
+    """全局键盘监听器。
+
+    设计为**单实例**：由宿主（CLI）创建、启动并注入给需要监听键盘
+    事件的组件（如扩展基类），不应多处实例化。状态全部为实例属性，
+    各实例互不干扰。
+    """
+
+    def __init__(self) -> None:
+        # 退出信号：控制监听器线程退出
+        self.exit_event = threading.Event()
+        # 按键回调注册表：按键字符串 -> 按键事件
+        self._key_down_events: dict[str, KeyDownEvent] = {}
+        # 线程锁：保证多线程操作 _key_down_events 的安全性
+        self._lock = Lock()
+        # 监听器线程实例
+        self._listener_thread: threading.Thread | None = None
 
     def register_key_event(self, key: str, callback: Callable[..., Any], args: Any | None = None) -> None:
         """
@@ -42,6 +50,13 @@ class KeyboardListener:
         with self._lock:
             if key in self._key_down_events:
                 del self._key_down_events[key]
+
+    def _dispatch_callback(self, event: KeyDownEvent, key: str) -> None:
+        """在独立线程中安全执行按键回调（内部方法）"""
+        try:
+            event.callback(event.args)
+        except Exception as e:
+            logger.error(f"回调执行失败 (按键={key}): {e}")
 
     def _listener_loop(self) -> None:
         """监听器核心循环（内部方法，不直接调用）"""
@@ -66,11 +81,14 @@ class KeyboardListener:
                     return
                 # 标记为已触发，防止重复触发
                 event.is_triggered = True
-                # 调用回调函数
-                try:
-                    event.callback(event.args)
-                except Exception as e:
-                    logger.error(f"回调执行失败 (按键={key_str}): {e}")
+            # 回调放到独立线程执行：本函数运行在低级键盘钩子线程，
+            # 同步执行耗时回调（如停止线程时的 join 等待）会阻塞整个
+            # 键盘输入管道，导致系统按键（包括脚本注入）全部延迟
+            threading.Thread(
+                target=self._dispatch_callback,
+                args=(event, key_str),
+                daemon=True,
+            ).start()
 
         # 监听按键释放事件（重置防抖标记）
         def on_release(key: pynput.keyboard.Key | pynput.keyboard.KeyCode | None) -> None:
@@ -92,7 +110,7 @@ class KeyboardListener:
                 time.sleep(0.1)  # 降低CPU占用
 
     def start(self) -> None:
-        """启动事件监听器（独立子线程，不阻塞主线程）"""
+        """启动事件监听器（独立子线程，不阻塞主线程；幂等，重复调用直接返回）"""
         if self._listener_thread and self._listener_thread.is_alive():
             logger.info("event listener is already running")
             return
