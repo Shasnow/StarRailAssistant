@@ -4,14 +4,14 @@
 #   This file is part of StarRailAssistant.
 
 #   StarRailAssistant is free software: you can redistribute it and/or modify it
-#   under the terms of the GNU General Public License as published by the Free Software Foundation,
+#   under the terms of the GNU Affero General Public License as published by the Free Software Foundation,
 #   either version 3 of the License, or (at your option) any later version.
 
 #   StarRailAssistant is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 #   without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-#   See the GNU General Public License for more details.
+#   See the GNU Affero General Public License for more details.
 
-#   You should have received a copy of the GNU General Public License along with StarRailAssistant.
+#   You should have received a copy of the GNU Affero General Public License along with StarRailAssistant.
 #   If not, see <https://www.gnu.org/licenses/>.
 
 #   yukikage@qq.com
@@ -22,6 +22,7 @@
 打包
 """
 
+import argparse
 import hashlib
 import json
 import os
@@ -221,10 +222,29 @@ def package_webui(version: str):
     builder.snapshot(webui_zip_path)
 
 
+def package_resources(version: str):
+    print("Packaging Resources ...")
+    resources_zip = ZipBuilder()
+    resources_zip.add(ROOT_PATH / "tasks")
+    resources_zip.add(ROOT_PATH / "extensions")
+    resources_zip.add(ROOT_PATH / "resources")
+    resources_zip.add_file(ROOT_PATH / "package.json", "package.json")
+    resources_zip.snapshot(ROOT_PATH / f"StarRailAssistant_Resources_v{version}.zip")
+
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="StarRailAssistant 打包脚本")
+    parser.add_argument("--resources-only", action="store_true", help="只打包资源，跳过 Nuitka 构建等其他操作")
+    args = parser.parse_args()
+
     with (ROOT_PATH / "package.json").open(encoding="utf-8") as f:
         data = json.load(f)
     version = data["version"]
+
+    if args.resources_only:
+        package_resources(version)
+        print(f"\nPackaging completed! Version: v{version}")
+        sys.exit(0)
 
     with (ROOT_PATH / "ChangeLog2.0.md").open(encoding="utf-8") as f:
         changelog = f.read()
@@ -235,7 +255,7 @@ if __name__ == "__main__":
     # Lite
     package_lite(version)
 
-    # Core → Basic → Full 增量构建
+    # Core → Basic 增量构建
     builder = ZipBuilder()
 
     print("Packaging Core ...")
@@ -247,13 +267,7 @@ if __name__ == "__main__":
     builder.add(SERVER_WIN_X64_PUBLISH_PATH, SERVER_WIN_X64_PUBLISH_PATH)
     builder.snapshot(ROOT_PATH / f"StarRailAssistant_v{version}.zip")
 
-    print("Packaging Resources ...")
-    resources_zip = ZipBuilder()
-    resources_zip.add(ROOT_PATH / "tasks")
-    resources_zip.add(ROOT_PATH / "extensions")
-    resources_zip.add(ROOT_PATH / "resources")
-    resources_zip.add_file(ROOT_PATH / "package.json", "package.json")
-    resources_zip.snapshot(ROOT_PATH / f"StarRailAssistant_Resources_v{version}.zip")
+    package_resources(version)
 
     if DIST_DIR.exists():
         shutil.rmtree(DIST_DIR)
