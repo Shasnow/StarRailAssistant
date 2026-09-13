@@ -57,6 +57,18 @@ class Operator(IOperator):
             return False
         return self._win.isActive  # type: ignore
 
+    def active_window(self):
+        hwnd = self._get_hwnd()
+        if not hwnd:
+            logger.warning(f"未找到窗口 '{self.window_title}'，无法激活")
+            return False
+        if self._win is not None and not self._win.isActive:  # type: ignore
+            self.press_key("ctrl")  # 通过模拟键使系统认为是“用户操作”，从而允许 SetForegroundWindow
+            self._win.activate()
+            logger.info(f"已激活窗口 '{self.window_title}'")
+            return True
+        return True
+
     def launch(self, channel, path):
         if sys_util.is_process_running(self.executable):
             logger.info("游戏已在运行中")

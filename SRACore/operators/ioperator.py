@@ -775,7 +775,7 @@ class IOperator(ABC):
         return True
 
     @staticmethod
-    def do_while(action: Callable[[], Any], condition: Callable[[], bool], interval: float = 0.1,
+    def do_while(action: Callable[[], Any], condition: Callable[[], bool], interval: float = 0.5,
                  max_iterations: int = 50) -> bool:
         """在满足条件时重复执行操作。
 
@@ -796,3 +796,6 @@ class IOperator(ABC):
             time.sleep(interval)
             iterations += 1
         return iterations != max_iterations
+
+    def active_window(self):
+        pass
