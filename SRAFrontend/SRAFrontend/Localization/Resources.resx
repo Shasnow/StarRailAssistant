@@ -70,9 +70,6 @@
     <data name="DefaultPageText" xml:space="preserve">
         <value>Default Start Page</value>
     </data>
-    <data name="ZoomText" xml:space="preserve">
-        <value>Zoom</value>
-    </data>
     <data name="ConfidenceText" xml:space="preserve">
         <value>Image Recognition Confidence</value>
     </data>
@@ -373,7 +370,7 @@
     <data name="SendScreenshotText" xml:space="preserve">
         <value>Send Screenshot</value>
     </data>
-    <data name="OpenText" xml:space="preserve">
+    <data name="OnText" xml:space="preserve">
         <value>On</value>
     </data>
     <data name="CloseText" xml:space="preserve">
@@ -552,5 +549,14 @@
     </data>
     <data name="GameChineseLanguageTip" xml:space="preserve">
         <value>Note: The in-game language needs to be set to Simplified Chinese (简体中文)</value>
+    </data>
+    <data name="ReInstallText" xml:space="preserve">
+        <value>Reinstall the latest app</value>
+    </data>
+    <data name="DownloadDirText" xml:space="preserve">
+        <value>Download Dir</value>
+    </data>
+    <data name="OpenText" xml:space="preserve">
+        <value>Open</value>
     </data>
 </root>

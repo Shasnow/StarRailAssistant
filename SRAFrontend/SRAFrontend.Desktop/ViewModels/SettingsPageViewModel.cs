@@ -1,12 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Data;
 using SRAFrontend.Desktop.Services;
@@ -307,6 +309,83 @@ public partial class SettingsPageViewModel : PageViewModel
         _ = _commonModel.CheckForUpdatesAsync();
     }
 
+    /// <summary>重新安装最新版本流程是否进行中（用于禁用按钮，防止重复触发）</summary>
+    [ObservableProperty]
+    private bool _isReinstalling;
+
+    [RelayCommand]
+    private async Task ReinstallLatest()
+    {
+        if (IsReinstalling) return;
+        IsReinstalling = true;
+        try
+        {
+            await _commonModel.ReinstallLatestAsync();
+        }
+        finally
+        {
+            IsReinstalling = false;
+        }
+    }
+
+    /// <summary>当前生效的下载保存目录（配置为空白时回退到默认临时目录）</summary>
+    public string EffectiveDownloadPath =>
+        string.IsNullOrWhiteSpace(UpdateSettings.DownloadPath)
+            ? DataPath.TempDir
+            : UpdateSettings.DownloadPath;
+
+    /// <summary>下载目录输入框的占位提示（展示默认目录）</summary>
+    public string DownloadPathWatermark => DataPath.TempDir;
+
+    /// <summary>通过系统文件夹选择器更改下载文件的保存目录</summary>
+    [RelayCommand]
+    private async Task ChangeDownloadPath()
+    {
+        if (TopLevelObject is null) return;
+        var folders = await TopLevelObject.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = "选择下载文件的保存目录",
+            AllowMultiple = false
+        });
+        if (folders.Count == 0) return;
+
+        var path = folders[0].Path.LocalPath;
+        try
+        {
+            Directory.CreateDirectory(path);
+        }
+        catch (Exception)
+        {
+            await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+            {
+                Header = "目录不可用",
+                Content = $"无法创建或访问所选目录：\n{path}\n请重新选择其他目录。",
+                ActionButtonsSource = [SukiMessageBoxButtonsFactory.CreateButton("知道了", SukiMessageBoxResult.Cancel)]
+            });
+            return;
+        }
+
+        UpdateSettings.DownloadPath = path;
+        OnPropertyChanged(nameof(EffectiveDownloadPath));
+    }
+
+    /// <summary>在系统文件管理器中打开当前下载目录</summary>
+    [RelayCommand]
+    private void OpenDownloadPath()
+    {
+        var path = EffectiveDownloadPath;
+        try
+        {
+            Directory.CreateDirectory(path);
+        }
+        catch (Exception)
+        {
+            // 创建失败时交由 OpenFolderInExplorer 的不存在目录分支提示用户
+        }
+
+        _commonModel.OpenFolderInExplorer(path);
+    }
+
     [RelayCommand]
     private void CreateDesktopShortcut()
     {
@@ -359,6 +438,9 @@ public partial class SettingsPageViewModel : PageViewModel
         if (e.PropertyName is nameof(Settings.General.GameArgsWindowSize)
             or nameof(Settings.General.GameArgsFullScreenMode))
             SetGameResolution();
+
+        if (e.PropertyName == nameof(UpdateSettings.DownloadPath))
+            OnPropertyChanged(nameof(EffectiveDownloadPath));
 
         if (e.PropertyName == nameof(DisplaySettings.Language))
             OnLanguageChanged();

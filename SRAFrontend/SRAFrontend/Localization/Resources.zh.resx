@@ -66,9 +66,6 @@
     <data name="DefaultPageText" xml:space="preserve">
         <value>默认起始页</value>
     </data>
-    <data name="ZoomText" xml:space="preserve">
-        <value>缩放</value>
-    </data>
     <data name="ConfidenceText" xml:space="preserve">
         <value>识图置信度</value>
     </data>
@@ -369,7 +366,7 @@
     <data name="SendScreenshotText" xml:space="preserve">
         <value>发送截图</value>
     </data>
-    <data name="OpenText" xml:space="preserve">
+    <data name="OnText" xml:space="preserve">
         <value>开</value>
     </data>
     <data name="CloseText" xml:space="preserve">
@@ -548,5 +545,14 @@
     </data>
     <data name="GameChineseLanguageTip" xml:space="preserve">
         <value>注意：游戏内需要调整为简体中文</value>
+    </data>
+    <data name="ReInstallText" xml:space="preserve">
+        <value>重新安装最新版本</value>
+    </data>
+    <data name="DownloadDirText" xml:space="preserve">
+        <value>下载目录</value>
+    </data>
+    <data name="OpenText" xml:space="preserve">
+        <value>打开</value>
     </data>
 </root>

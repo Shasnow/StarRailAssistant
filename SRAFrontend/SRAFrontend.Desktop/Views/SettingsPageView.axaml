@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -388,7 +388,7 @@
                                                            Content="{x:Static lang:Resources.SendScreenshotText}" />
                                                     <ToggleSwitch Grid.Row="5" Grid.Column="1"
                                                                   IsChecked="{Binding NotificationSettings.IsTelegramSendImage}"
-                                                                  OnContent="{x:Static lang:Resources.OpenText}" OffContent="{x:Static lang:Resources.CloseText}" />
+                                                                  OnContent="{x:Static lang:Resources.OnText}" OffContent="{x:Static lang:Resources.CloseText}" />
                                                 </Grid>
                                             </Expander>
 
@@ -460,7 +460,7 @@
                                                            Content="{x:Static lang:Resources.SendScreenshotText}" />
                                                     <ToggleSwitch Grid.Row="4" Grid.Column="1"
                                                                   IsChecked="{Binding NotificationSettings.IsOneBotSendImage}"
-                                                                  OnContent="{x:Static lang:Resources.OpenText}" OffContent="{x:Static lang:Resources.CloseText}" />
+                                                                  OnContent="{x:Static lang:Resources.OnText}" OffContent="{x:Static lang:Resources.CloseText}" />
                                                 </Grid>
                                             </Expander>
 
@@ -594,7 +594,7 @@
                                                            Content="{x:Static lang:Resources.SendScreenshotText}" />
                                                     <ToggleSwitch Grid.Row="1" Grid.Column="1"
                                                                   IsChecked="{Binding NotificationSettings.IsWeComSendImage}"
-                                                                  OnContent="{x:Static lang:Resources.OpenText}" OffContent="{x:Static lang:Resources.CloseText}" />
+                                                                  OnContent="{x:Static lang:Resources.OnText}" OffContent="{x:Static lang:Resources.CloseText}" />
                                                 </Grid>
                                             </Expander>
 
@@ -650,7 +650,7 @@
                                                            Content="{x:Static lang:Resources.SendScreenshotText}" />
                                                     <ToggleSwitch Grid.Row="1" Grid.Column="1"
                                                                   IsChecked="{Binding NotificationSettings.IsDiscordSendImage}"
-                                                                  OnContent="{x:Static lang:Resources.OpenText}" OffContent="{x:Static lang:Resources.CloseText}" />
+                                                                  OnContent="{x:Static lang:Resources.OnText}" OffContent="{x:Static lang:Resources.CloseText}" />
                                                 </Grid>
                                             </Expander>
 
@@ -761,9 +761,14 @@
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.UpdateText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
-                                    <Button Content="{x:Static lang:Resources.CheckForUpdateText}"
-                                            HorizontalAlignment="Left"
-                                            Command="{Binding CheckForUpdatesCommand}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+                                        <Button Content="{x:Static lang:Resources.CheckForUpdateText}"
+                                                Command="{Binding CheckForUpdatesCommand}" />
+                                        <Button Content="{x:Static lang:Resources.ReInstallText}"
+                                                Command="{Binding ReinstallLatestCommand}"
+                                                IsEnabled="{Binding !IsReinstalling}"
+                                                ToolTip.Tip="重新下载并安装最新版本安装包，以修复可能存在的文件损坏等问题" />
+                                    </StackPanel>
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Classes="Icon">&#xe094;</Label>
                                         <Label Grid.Column="1"
@@ -807,6 +812,26 @@
                                             <ComboBoxItem>stable</ComboBoxItem>
                                             <ComboBoxItem>beta</ComboBoxItem>
                                         </ComboBox>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                                        <Label Classes="Icon"
+                                               FontFamily="{StaticResource Phosphor}">&#xE256;</Label>
+                                        <Label Grid.Column="1"
+                                               Content="{x:Static lang:Resources.DownloadDirText}"
+                                               ToolTip.Tip="更新安装包的下载保存目录，留空则使用默认临时目录" />
+                                        <TextBox Grid.Column="2"
+                                                 Text="{Binding UpdateSettings.DownloadPath}"
+                                                 PlaceholderText="{Binding DownloadPathWatermark}"
+                                                 ToolTip.Tip="可直接编辑，或点击右侧按钮选择目录"
+                                                 suki:TextBoxExtensions.AddDeleteButton="True"/>
+                                        <Button Grid.Column="3"
+                                                Content="更改"
+                                                Command="{Binding ChangeDownloadPathCommand}"
+                                                ToolTip.Tip="选择下载文件的保存目录" />
+                                        <Button Grid.Column="4"
+                                                Content="{x:Static lang:Resources.OpenText}"
+                                                Command="{Binding OpenDownloadPathCommand}"
+                                                ToolTip.Tip="打开当前下载目录" />
                                     </Grid>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>

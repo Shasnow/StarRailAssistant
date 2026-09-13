@@ -555,6 +555,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Download Dir.
+        /// </summary>
+        public static string DownloadDirText {
+            get {
+                return ResourceManager.GetString("DownloadDirText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email Notification.
         /// </summary>
         public static string EmailNotificationText {
@@ -1025,6 +1034,15 @@ namespace SRAFrontend.Localization {
         /// <summary>
         ///   Looks up a localized string similar to On.
         /// </summary>
+        public static string OnText {
+            get {
+                return ResourceManager.GetString("OnText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open.
+        /// </summary>
         public static string OpenText {
             get {
                 return ResourceManager.GetString("OpenText", resourceCulture);
@@ -1127,6 +1145,15 @@ namespace SRAFrontend.Localization {
         public static string RegularText {
             get {
                 return ResourceManager.GetString("RegularText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reinstall the latest app.
+        /// </summary>
+        public static string ReInstallText {
+            get {
+                return ResourceManager.GetString("ReInstallText", resourceCulture);
             }
         }
         
@@ -1658,15 +1685,6 @@ namespace SRAFrontend.Localization {
         public static string XxtuiSettingsText {
             get {
                 return ResourceManager.GetString("XxtuiSettingsText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Zoom.
-        /// </summary>
-        public static string ZoomText {
-            get {
-                return ResourceManager.GetString("ZoomText", resourceCulture);
             }
         }
     }

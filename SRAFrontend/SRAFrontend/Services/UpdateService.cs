@@ -90,40 +90,98 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     /// <param name="downloadChannel">下载渠道</param>
     /// <param name="statusProgress">下载状态回调</param>
     /// <param name="cancellationToken">取消下载Token</param>
+    /// <param name="downloadDir">安装包保存目录，为 null/空白时使用默认临时目录</param>
     /// <returns>更新文件的路径</returns>
     /// <exception cref="Exception"></exception>
     public async Task<string> DownloadUpdateAsync(
         VersionResponse versionResponse,
         int downloadChannel,
         IProgress<DownloadStatus> statusProgress,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken = default,
+        string? downloadDir = null
     )
     {
         var version = versionResponse.Data.VersionName;
         var downloadUrl = GetDownloadUrl(versionResponse, downloadChannel);
         var sha256 = await GetSha256Async(versionResponse, cancellationToken);
 
-        var saveFileName = $"update_{version}.zip";
-        var savePath = Path.Combine(DataPath.TempDir, saveFileName);
-        Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+        return await DownloadPackageAsync(version, downloadUrl, sha256, statusProgress,
+            cancellationToken, downloadDir);
+    }
 
-        // 1. 如果已有文件，则先校验
+    /// <summary>
+    ///     重新安装最新版本：获取最新版本信息后下载其完整安装包（不做版本高低比较，
+    ///     当前已是最新版时同样重新下载安装）。缓存命中且 SHA256 校验通过时直接复用。
+    /// </summary>
+    /// <param name="downloadChannel">下载渠道（0=Mirror酱，1=GitHub，2=Auto-MAS）</param>
+    /// <param name="statusProgress">下载状态回调</param>
+    /// <param name="cdk">Mirror酱 CDK（可选）</param>
+    /// <param name="channel">更新通道（stable/beta）</param>
+    /// <param name="cancellationToken">取消下载 Token</param>
+    /// <param name="downloadDir">安装包保存目录，为 null/空白时使用默认临时目录</param>
+    /// <returns>最新版本信息与已校验安装包的本地路径</returns>
+    /// <exception cref="InvalidOperationException">无法获取最新版本信息</exception>
+    public async Task<(VersionResponse VersionResponse, string PackagePath)> ReinstallLatestVersionAsync(
+        int downloadChannel,
+        IProgress<DownloadStatus> statusProgress,
+        string? cdk = null,
+        string? channel = null,
+        CancellationToken cancellationToken = default,
+        string? downloadDir = null
+    )
+    {
+        logger.LogInformation("Reinstalling latest version package");
+        var response = await GetRemoteVersionAsync(null, cdk, channel)
+                       ?? throw new InvalidOperationException(
+                           "Could not get the latest version information. Please check your network connection or try again later.");
+
+        var packagePath = await DownloadUpdateAsync(
+            response, downloadChannel, statusProgress, cancellationToken, downloadDir);
+        return (response, packagePath);
+    }
+
+    /// <summary>
+    ///     解析安装包保存目录：自定义目录为空白时回退到默认临时目录，并确保目录存在。
+    /// </summary>
+    private static string ResolveDownloadDir(string? downloadDir)
+    {
+        var dir = string.IsNullOrWhiteSpace(downloadDir) ? DataPath.TempDir : downloadDir.Trim();
+        Directory.CreateDirectory(dir);
+        return dir;
+    }
+
+    /// <summary>
+    ///     下载（或复用缓存的）指定版本安装包，并严格执行 SHA256 校验。
+    ///     缓存校验失败会删除重下；下载完成后再次校验，失败则删除文件并抛出异常。
+    /// </summary>
+    private async Task<string> DownloadPackageAsync(
+        string version,
+        string downloadUrl,
+        string sha256,
+        IProgress<DownloadStatus> statusProgress,
+        CancellationToken cancellationToken,
+        string? downloadDir = null
+    )
+    {
+        var savePath = Path.Combine(ResolveDownloadDir(downloadDir), $"update_{version}.zip");
+
+        // 1. 如果已有缓存文件，则先校验
         if (File.Exists(savePath))
         {
-            logger.LogInformation("Found existing update file, verifying SHA256: {Path}", savePath);
+            logger.LogInformation("Found cached update file, verifying SHA256: {Path}", savePath);
             if (await VerifyFileSha256Async(savePath, sha256, cancellationToken))
             {
-                logger.LogInformation("Existing update file passed SHA256 verification, reuse it.");
+                logger.LogInformation("Cached update file passed SHA256 verification, reuse it.");
                 return savePath;
             }
 
-            logger.LogWarning("Existing update file failed SHA256 verification, deleting: {Path}", savePath);
+            logger.LogWarning("Cached update file failed SHA256 verification, deleting: {Path}", savePath);
             File.Delete(savePath);
         }
 
         // 2. 下载文件
         var httpClient = httpClientFactory.CreateClient("GlobalClient");
-        logger.LogDebug("Downloading update");
+        logger.LogDebug("Downloading update package from {Url}", downloadUrl);
         await DownloadUtil.DownloadFileWithDetailsAsync(
             httpClient,
             downloadUrl,
@@ -133,13 +191,11 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         );
 
         // 3. 下载后再校验一次
-        if (!await VerifyFileSha256Async(savePath, sha256, cancellationToken))
-        {
-            File.Delete(savePath);
-            throw new InvalidOperationException("Downloaded update file failed SHA256 verification.");
-        }
+        if (await VerifyFileSha256Async(savePath, sha256, cancellationToken)) return savePath;
+        File.Delete(savePath);
+        throw new InvalidOperationException(
+            "Failed to verify the downloaded update package's SHA256. The file has been deleted.");
 
-        return savePath;
     }
 
     /// <summary>
@@ -169,13 +225,10 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
 
         // 使用主程序的 sha256 校验热更包的一致性（如果服务端有单独的校验地址，可再扩展）
         var sha256 = await GetSha256Async(versionResponse, cancellationToken);
-        if (!await VerifyFileSha256Async(savePath, sha256, cancellationToken))
-        {
-            File.Delete(savePath);
-            throw new InvalidOperationException("Downloaded hotfix file failed SHA256 verification.");
-        }
+        if (await VerifyFileSha256Async(savePath, sha256, cancellationToken)) return savePath;
+        File.Delete(savePath);
+        throw new InvalidOperationException("Downloaded hotfix file failed SHA256 verification.");
 
-        return savePath;
     }
 
     // 辅助方法：获取下载URL

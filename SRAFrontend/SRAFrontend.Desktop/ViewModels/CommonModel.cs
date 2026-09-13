@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -260,12 +261,14 @@ public class CommonModel(
             progressLabel.Content = $"{value.FormattedDownloadedSize} / {value.FormattedTotalSize} {value.FormattedSpeed}";
         });
         var downloadChannel = settingsService.Settings.Update.DownloadChannel;
+        var downloadDir = settingsService.Settings.Update.DownloadPath;
         string downloadFilePath;
         try
         {
             downloadFilePath = isHotfix
                 ? await updateService.DownloadHotfixAsync(versionResponse, progressHandler, cts.Token)
-                : await updateService.DownloadUpdateAsync(versionResponse, downloadChannel, progressHandler, cts.Token);
+                : await updateService.DownloadUpdateAsync(versionResponse, downloadChannel, progressHandler,
+                    cts.Token, downloadDir);
         }
         catch (OperationCanceledException)
         {
@@ -322,44 +325,7 @@ public class CommonModel(
         {
             logger.LogDebug("Extracting full update: {Source} -> {Destination}", downloadFilePath,
                 Environment.CurrentDirectory);
-            var unzipToast = ShowInfoToast("正在解压更新", "请稍候...");
-            unzipToast.CanDismissByClicking = false;
-            unzipToast.CanDismissByTime = false;
-            try
-            {
-                // 重命名当前可执行文件（以防更新过程中被占用），覆盖上次更新残留的旧文件
-                File.Move(DataPath.SraExecutablePath, DataPath.SraOldExecutablePath, true);
-                // 解压更新包
-                await Task.Run(() => ZipUtil.Unzip(downloadFilePath, Environment.CurrentDirectory));
-                toastManager.Dismiss(unzipToast);
-            }
-            catch (Exception e)
-            {
-                toastManager.Dismiss(unzipToast);
-                logger.LogError(e, "Error extracting update");
-                var manualExtractButton =
-                    SukiMessageBoxButtonsFactory.CreateButton("手动解压", SukiMessageBoxResult.Yes, "Flat");
-                var retryButton =
-                    SukiMessageBoxButtonsFactory.CreateButton("退出程序", SukiMessageBoxResult.OK, "Flat");
-                var extractResult = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
-                {
-                    Header = "更新解压失败",
-                    Content = $"自动解压失败：{e.Message}\n\n需要退出程序完成解压（退出后请等待5~10秒），或手动完成解压",
-                    ActionButtonsSource = [manualExtractButton, retryButton]
-                });
-                if (extractResult is SukiMessageBoxResult.Yes)
-                {
-                    // 打开压缩包所在文件夹并选中压缩包
-                    OpenFolderInExplorer(downloadFilePath);
-                }
-                else
-                {
-                    // 使用外部解压工具重试
-                    ZipUtil.UnzipExternal(downloadFilePath, Environment.CurrentDirectory);
-                    Environment.Exit(0);
-                }
-                return;
-            }
+            if (!await TryExtractFullPackageAsync(downloadFilePath)) return;
 
             ShowSuccessToast("更新准备完成", "重启应用程序以应用最新版本");
             var restartNowButton =
@@ -373,6 +339,131 @@ public class CommonModel(
                 ActionButtonsSource = [restartNowButton, restartLaterButton]
             });
             if (result is SukiMessageBoxResult.Yes) RestartApplication();
+        }
+    }
+
+    /// <summary>
+    ///     重新安装最新版本：用户确认后下载最新版本完整安装包（复用缓存并严格执行 SHA256 校验，
+    ///     不做版本高低比较），解压后自动重启应用。与正常更新共用下载进度、解压与错误处理流程。
+    /// </summary>
+    public async Task ReinstallLatestAsync()
+    {
+        var confirmButton =
+            SukiMessageBoxButtonsFactory.CreateButton("确认", SukiMessageBoxResult.Yes, "Flat Accent");
+        var cancelButton = SukiMessageBoxButtonsFactory.CreateButton("取消", SukiMessageBoxResult.Cancel);
+        var confirmResult = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+        {
+            Header = "重新安装最新版本",
+            Content = "此操作将重新下载并安装最新版本安装包，以修复可能存在的问题。是否继续？",
+            ActionButtonsSource = [cancelButton, confirmButton]
+        });
+        if (confirmResult is not SukiMessageBoxResult.Yes) return;
+
+        var cdk = settingsService.Settings.Update.MirrorChyanCdk;
+        var updateChannel = settingsService.Settings.Update.UpdateChannel == 0 ? "stable" : "beta";
+        var downloadChannel = settingsService.Settings.Update.DownloadChannel;
+
+        var (progressPanel, progressLabel, progressBar, cts) = BuildDownloadProgressUi();
+        var downloadToast =
+            CreateStandardToastBuilder("正在下载最新版本安装包...", progressPanel, NotificationType.Information).Queue();
+        downloadToast.CanDismissByClicking = false;
+        downloadToast.CanDismissByTime = false;
+        var progressHandler = new Progress<DownloadStatus>(value =>
+        {
+            progressBar.Value = value.ProgressPercent;
+            progressLabel.Content = $"{value.FormattedDownloadedSize} / {value.FormattedTotalSize} {value.FormattedSpeed}";
+        });
+
+        string downloadFilePath;
+        string latestVersion;
+        try
+        {
+            var (versionResponse, packagePath) = await updateService.ReinstallLatestVersionAsync(
+                downloadChannel, progressHandler, cdk, updateChannel, cts.Token,
+                settingsService.Settings.Update.DownloadPath);
+            downloadFilePath = packagePath;
+            latestVersion = versionResponse.Data.VersionName;
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogInformation("Reinstall download canceled by user");
+            ShowWarningToast("操作已取消", "您已取消安装包的下载");
+            return;
+        }
+        catch (HttpRequestException e)
+        {
+            logger.LogError(e, "Network error while downloading latest package");
+            ShowErrorToast("重新安装失败",
+                "网络错误：无法下载最新版本安装包，请检查网络连接，或在更新设置中切换下载渠道后重试。");
+            return;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error reinstalling latest version");
+            ShowErrorToast("重新安装失败", e.Message);
+            return;
+        }
+        finally
+        {
+            toastManager.Dismiss(downloadToast);
+        }
+
+        ShowSuccessToast("下载完成", $"版本 {latestVersion} 安装包 SHA256 校验通过，即将开始安装");
+        await Task.Delay(1500);
+
+        backendService.StopBackend();
+        if (!await TryExtractFullPackageAsync(downloadFilePath)) return;
+
+        ShowInfoToast("安装完成", "应用将在 3 秒后自动重启");
+        await Task.Delay(3000);
+        RestartApplication();
+    }
+
+    /// <summary>
+    ///     解压完整安装包到当前目录：重命名当前 exe 防占用，再做 MD5 增量覆盖。
+    ///     解压失败时弹窗提供"手动解压（打开目录）"或"退出程序后外部解压"两种处理。
+    /// </summary>
+    /// <returns>true 表示解压成功；false 表示失败且用户已选择手动处理或退出程序。</returns>
+    private async Task<bool> TryExtractFullPackageAsync(string downloadFilePath)
+    {
+        var unzipToast = ShowInfoToast("正在解压更新", "请稍候...");
+        unzipToast.CanDismissByClicking = false;
+        unzipToast.CanDismissByTime = false;
+        try
+        {
+            // 重命名当前可执行文件（以防更新过程中被占用），覆盖上次更新残留的旧文件
+            File.Move(DataPath.SraExecutablePath, DataPath.SraOldExecutablePath, true);
+            // 解压更新包（后台线程执行，避免阻塞 UI）
+            await Task.Run(() => ZipUtil.Unzip(downloadFilePath, Environment.CurrentDirectory));
+            toastManager.Dismiss(unzipToast);
+            return true;
+        }
+        catch (Exception e)
+        {
+            toastManager.Dismiss(unzipToast);
+            logger.LogError(e, "Error extracting update package");
+            var manualExtractButton =
+                SukiMessageBoxButtonsFactory.CreateButton("手动解压", SukiMessageBoxResult.Yes, "Flat");
+            var exitButton =
+                SukiMessageBoxButtonsFactory.CreateButton("退出程序", SukiMessageBoxResult.OK, "Flat");
+            var extractResult = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+            {
+                Header = "更新解压失败",
+                Content = $"自动解压失败：{e.Message}\n\n需要退出程序完成解压（退出后请等待5~10秒），或手动完成解压",
+                ActionButtonsSource = [manualExtractButton, exitButton]
+            });
+            if (extractResult is SukiMessageBoxResult.Yes)
+            {
+                // 打开压缩包所在文件夹并选中压缩包
+                OpenFolderInExplorer(downloadFilePath);
+            }
+            else
+            {
+                // 使用外部解压工具重试
+                ZipUtil.UnzipExternal(downloadFilePath, Environment.CurrentDirectory);
+                Environment.Exit(0);
+            }
+            return false;
         }
     }
 
