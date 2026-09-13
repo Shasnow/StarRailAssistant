@@ -317,20 +317,44 @@ class SRACli(cmd2.Cmd):
 
     @staticmethod
     def _build_extension_reload_parser() -> cmd2.Cmd2ArgumentParser:
-        return SRACli.cmd2argumentparser_factory(description="重新扫描并导入扩展模块")
+        return SRACli.cmd2argumentparser_factory(description="重新导入扩展模块（含已导入模块的热重载）")
 
-    @cmd2.as_subcommand_to("extension", "reload", _build_extension_reload_parser, help="重新扫描并导入扩展模块")
+    @cmd2.as_subcommand_to("extension", "reload", _build_extension_reload_parser,
+                           help="重新导入扩展模块（含已导入模块的热重载）")
     def _extension_reload(self, _: argparse.Namespace) -> None:
-        from SRACore.extension import extension_registry
+        from SRACore.extension import extension_registry, reload_extensions
 
-        before = set(extension_registry.get_ids())
-        load_extensions()
-        after = set(extension_registry.get_ids())
-        added = after - before
+        if self.extension_runner.is_thread_running():
+            self.err("扩展线程正在运行中，无法执行重载操作")
+            return
+
+        # 运行中的后台扩展持有旧模块的类实例：先停止，重载后按新类重启
+        active_background = [ext_id for ext_id in self.extension_runner.extensions
+                             if extension_registry.is_background(ext_id)]
+        for ext_id in active_background:
+            self.extension_runner.stop_extension(ext_id)
+
+        before, after = reload_extensions()
+        self.extension_config_manager.refresh()
+
+        restarted = [ext_id for ext_id in active_background
+                     if extension_registry.has_id(ext_id)
+                     and self.extension_runner.start_extension(ext_id)]
+
+        if not after:
+            self.err("重载完成，但没有已注册的扩展")
+            return
+        added = sorted(after - before)
+        removed = sorted(before - after)
+        updated = sorted(before & after)
+        message = f"已重载扩展，当前共 {len(after)} 个（更新 {len(updated)} 个）"
         if added:
-            self.ok(f"新增扩展: {', '.join(added)}", len(after))
-        else:
-            self.ok("未发现新扩展", len(after))
+            message += f"，新增: {', '.join(added)}"
+        if removed:
+            message += f"，移除: {', '.join(removed)}"
+        if restarted:
+            message += f"，已重启后台扩展: {', '.join(restarted)}"
+        self.ok(message, {"extensions": sorted(after)})
 
     @staticmethod
     def _build_extension_stop_parser() -> cmd2.Cmd2ArgumentParser:

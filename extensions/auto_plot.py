@@ -15,9 +15,7 @@ class AutoPlotConfig(BaseModel):
 )
 class AutoPlotExtension(BaseExtension[AutoPlotConfig]):
     """后台扩展：自动处理对话状态并在需要时跳过剧情。"""
-
-    def __init__(self, operator, config: AutoPlotConfig, event_listener=None):
-        super().__init__(operator, config, event_listener=event_listener)
+    def __post_init__(self) -> None:
         self._can_skip = True
 
     def run(self) -> bool:

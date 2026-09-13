@@ -1,11 +1,12 @@
 import importlib
 import json
+import sys
 import threading
 from abc import abstractmethod, ABC
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Generic, TYPE_CHECKING, TypeVar, get_args
+from typing import Any, Generic, TYPE_CHECKING, get_args, overload, TypeVar
 
 from loguru import logger
 from pydantic import BaseModel
@@ -14,7 +15,6 @@ from SRACore.localization.resource import Resource
 from SRACore.models.app_settings import AppSettings
 from SRACore.notification import try_send_notification
 from SRACore.operators.factory import OperatorFactory, OperatorType
-from SRACore.operators.ioperator import IOperator
 from SRACore.task import Executable
 from SRACore.thread.runner import Runner
 from SRACore.util.const import AppDataDir, ConfigsDir
@@ -23,8 +23,9 @@ from SRACore.util.errors import ThreadStoppedError
 if TYPE_CHECKING:
     from SRACore.runtime.event_listener import KeyboardListener
     from SRACore.service.setting_service import SettingsService
+    from SRACore.operators.ioperator import IOperator
 
-T = TypeVar('T', bound=BaseModel)
+T = TypeVar('T', bound=BaseModel | None)
 
 
 class BaseExtension(Executable, Generic[T], ABC):
@@ -36,9 +37,10 @@ class BaseExtension(Executable, Generic[T], ABC):
     通过泛型参数声明配置类型，例如::
 
         class HelloExtension(BaseExtension[HelloConfig]):
-            def run(self) -> bool: ...
+            def run(self) -> bool:
+                self.config.some_field  # 类型为 HelloConfig，无需判空
 
-    也可不声明配置类型，此时 ``self.config`` 为 ``None``::
+    也可不声明配置类型，此时 ``self.config`` 推断为 ``None``::
 
         class SimpleExtension(BaseExtension):
             def run(self) -> bool: ...
@@ -48,13 +50,21 @@ class BaseExtension(Executable, Generic[T], ABC):
     （全局单实例由宿主创建并注入，扩展不管理其生命周期）。
     """
 
-    config: T | None = None
-    operator: IOperator
+    config: T
+    operator: 'IOperator'
     settings: AppSettings
     event_listener: 'KeyboardListener | None' = None
 
-    def __init__(self, operator: IOperator, config: T | None = None,
-                 event_listener: 'KeyboardListener | None' = None):
+    @overload
+    def __init__(self, operator: 'IOperator', config: T,
+                 event_listener: 'KeyboardListener | None' = None) -> None: ...
+
+    @overload
+    def __init__(self: 'BaseExtension[None]', operator: 'IOperator', *,
+                 event_listener: 'KeyboardListener | None' = None) -> None: ...
+
+    def __init__(self, operator: 'IOperator', config: Any = None,
+                 event_listener: 'KeyboardListener | None' = None) -> None:
         super().__init__(operator)
         self.config = config
         self.event_listener = event_listener
@@ -101,7 +111,7 @@ class BaseExtension(Executable, Generic[T], ABC):
 @dataclass
 class ExtensionEntry:
     """注册表中单个扩展的完整元数据。"""
-    extension_cls: type[BaseExtension]
+    extension_cls: type[BaseExtension[Any]]
     config_cls: type[BaseModel] | None = None
     name: str = ""
     description: str = ""
@@ -114,7 +124,7 @@ class ExtensionRegistry:
     def __init__(self):
         self._storage: dict[str, ExtensionEntry] = {}
 
-    def register(self, extension_id: str, extension_cls: type[BaseExtension],
+    def register(self, extension_id: str, extension_cls: type[BaseExtension[Any]],
                  config_cls: type[BaseModel] | None = None, *, name: str = "", description: str = "",
                  is_background: bool = False) -> None:
         if extension_id in self._storage:
@@ -129,7 +139,7 @@ class ExtensionRegistry:
             raise KeyError(f"Extension '{extension_id}' does not exist")
         return self._storage[extension_id]
 
-    def get_extension_class(self, extension_id: str) -> type[BaseExtension]:
+    def get_extension_class(self, extension_id: str) -> type[BaseExtension[Any]]:
         return self.get(extension_id).extension_cls
 
     def get_config_class(self, extension_id: str) -> type[BaseModel] | None:
@@ -151,11 +161,15 @@ class ExtensionRegistry:
         return {ext_id: entry.config_cls for ext_id, entry in self._storage.items()
                 if entry.config_cls is not None}
 
-    def get_all_extension_classes(self) -> dict[str, type[BaseExtension]]:
+    def get_all_extension_classes(self) -> dict[str, type[BaseExtension[Any]]]:
         return {ext_id: entry.extension_cls for ext_id, entry in self._storage.items()}
 
     def has_id(self, extension_id: str) -> bool:
         return extension_id in self._storage
+
+    def clear(self) -> None:
+        """清空注册表（热重载前调用，使扩展类可重新注册）。"""
+        self._storage.clear()
 
     def get_schema(self, extension_id: str) -> dict[str, Any] | None:
         entry = self._storage.get(extension_id)
@@ -175,6 +189,31 @@ class ExtensionRegistry:
 extension_registry = ExtensionRegistry()
 
 
+def _import_extension_modules(package: str, *, reload_existing: bool) -> None:
+    """扫描扩展目录并导入全部模块；``reload_existing`` 为真时热重载已导入模块。
+
+    单个模块导入/重载失败不影响其余模块。
+    """
+    pkg_path = Path(package)
+    if not pkg_path.is_dir():
+        logger.debug(f"Extensions directory '{package}' not found, skipping")
+        return
+    for file in pkg_path.glob("*.py"):
+        if file.stem == "__init__":
+            continue
+        module_name = f"{package}.{file.stem}"
+        existing = None
+        try:
+            existing = sys.modules.get(module_name)
+            if existing is not None and reload_existing:
+                importlib.reload(existing)
+            else:
+                importlib.import_module(module_name)
+        except Exception as e:
+            action = "reload" if existing is not None and reload_existing else "import"
+            logger.exception(f"Failed to {action} extension module '{file.stem}': {e}")
+
+
 def load_extensions(package: str = "extensions") -> None:
     """动态导入指定目录下的所有扩展模块。
 
@@ -185,25 +224,36 @@ def load_extensions(package: str = "extensions") -> None:
     Args:
         package: 扩展模块所在目录名，默认为 ``"extensions"``。
     """
-    try:
-        pkg_path = Path(package)
-        if not pkg_path.is_dir():
-            logger.debug(f"Extensions directory '{package}' not found, skipping")
-            return
-        for file in pkg_path.glob("*.py"):
-            if file.stem == "__init__":
-                continue
-            try:
-                importlib.import_module(f"{package}.{file.stem}")
-            except Exception as e:
-                logger.exception(f"Failed to import extension module '{file.stem}': {e}")
-        logger.info(f"Loaded {len(extension_registry.get_ids())} extension(s): "
-                    f"{extension_registry.get_ids()}")
-    except Exception as e:
-        logger.exception(f"Error loading extensions: {e}")
+    _import_extension_modules(package, reload_existing=False)
+    logger.info(f"Loaded {len(extension_registry.get_ids())} extension(s): "
+                f"{extension_registry.get_ids()}")
 
 
-def extension(_cls: type[BaseExtension] | None = None, *, extension_id: str | None = None,
+def reload_extensions(package: str = "extensions") -> tuple[set[str], set[str]]:
+    """热重载扩展：清空注册表后重新导入全部模块（含已导入模块）。
+
+    与 ``load_extensions`` 不同，已存在于 ``sys.modules`` 的模块会通过
+    ``importlib.reload`` 重新执行，使代码修改与 ``@extension`` 注册即时生效。
+    调用方需保证当前没有正在运行的扩展实例（旧实例持有的类不会被更新）。
+
+    Args:
+        package: 扩展模块所在目录名，默认为 ``"extensions"``。
+
+    Returns:
+        (重载前的扩展 id 集合, 重载后的扩展 id 集合)。
+    """
+    before = set(extension_registry.get_ids())
+    extension_registry.clear()
+    _import_extension_modules(package, reload_existing=True)
+    after = set(extension_registry.get_ids())
+    added, removed = sorted(after - before), sorted(before - after)
+    logger.info(f"Reloaded {len(after)} extension(s): {sorted(after)}"
+                + (f", added: {added}" if added else "")
+                + (f", removed: {removed}" if removed else ""))
+    return before, after
+
+
+def extension(_cls: type[BaseExtension[Any]] | None = None, *, extension_id: str | None = None,
               name: str | None = None, description: str | None = None,
               background: bool = False, registry: ExtensionRegistry | None = None):
     """扩展注册装饰器，将扩展类及其配置模型注册到注册表中。
@@ -235,7 +285,7 @@ def extension(_cls: type[BaseExtension] | None = None, *, extension_id: str | No
                 return args[0]
         return None
 
-    def decorator(cls: type[BaseExtension]) -> type[BaseExtension]:
+    def decorator(cls: type[BaseExtension[Any]]) -> type[BaseExtension[Any]]:
         if not issubclass(cls, BaseExtension):
             raise TypeError(f"Extension {cls.__name__} must inherit from BaseExtension")
         resolved_config = _resolve_config(cls)
@@ -319,6 +369,33 @@ class ExtensionConfigManager:
         with open(self.path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
+    def refresh(self) -> None:
+        """注册表热重载后同步配置实例。
+
+        - 已移除扩展的配置实例被删除；
+        - 保留扩展的旧实例按其**最新配置类**重新校验构造（保留已有值，
+          同时使新增字段获得默认值）；
+        - 新扩展补充默认配置。
+        直接操作底层字典，不触发单个扩展的配置变更回调。
+        """
+        for ext_id in list(self._configs.keys()):
+            config_cls = self._registry.get_config_class(ext_id) if self._registry.has_id(ext_id) else None
+            if config_cls is None:
+                self._configs.pop(ext_id, None)
+                continue
+            old = self._configs[ext_id]
+            if not isinstance(old, config_cls):
+                self._configs[ext_id] = config_cls.model_validate(
+                    old.model_dump(by_alias=True), by_alias=True)
+
+        for ext_id in self._registry.get_ids():
+            if ext_id in self._configs:
+                continue
+            config_cls = self._registry.get_config_class(ext_id)
+            if config_cls is not None:
+                logger.debug(f"扩展配置 {ext_id} 为重载后新增，使用默认值")
+                self._configs[ext_id] = config_cls()
+
     def get_required(self, extension_id: str) -> BaseModel:
         if extension_id not in self._configs:
             raise KeyError(f"Extension config '{extension_id}' does not exist")
@@ -361,12 +438,12 @@ class ExtensionRunner(Runner):
         self._settings_service = settings_service
         self._event_listener = event_listener
         self._registry = registry or extension_registry
-        self.extensions: dict[str, BaseExtension] = {}
+        self.extensions: dict[str, BaseExtension[Any]] = {}
         self._background_thread: threading.Thread | None = None
         self._background_stop_event = threading.Event()
         self._config_manager.set_extension_config_changed_callback(self.reload_extension)
 
-    def _create_operator(self) -> IOperator:
+    def _create_operator(self) -> 'IOperator':
         """根据设置创建 IOperator 实例"""
         settings = self._settings_service.settings
         optype = (OperatorType.Browser
@@ -374,7 +451,7 @@ class ExtensionRunner(Runner):
                   else OperatorType.Local)
         return OperatorFactory.get_operator(optype, settings, self.stop_event)
 
-    def create(self, extension_id: str) -> BaseExtension:
+    def create(self, extension_id: str) -> BaseExtension[Any]:
         """根据标识实例化扩展（不含运行）。
 
         Args:

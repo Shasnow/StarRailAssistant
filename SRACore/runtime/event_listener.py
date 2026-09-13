@@ -42,7 +42,9 @@ class KeyboardListener:
         :param args: 回调函数的参数
         """
         with self._lock:
-            # 先移除同名按键，避免重复注册
+            # 禁止重复注册
+            if key in self._key_down_events:
+                raise ValueError(f"按键 {key} 已被注册")
             self._key_down_events[key] = KeyDownEvent(key=key, callback=callback, args=args)
 
     def unregister_key_event(self, key: str) -> None:

@@ -465,7 +465,7 @@ class AutoPlayerExtension(BaseExtension[AutoPlayerConfig]):
     """游戏自动演奏扩展。"""
 
     def run(self) -> bool:
-        cfg = self.config or AutoPlayerConfig()
+        cfg = self.config
 
         try:
             score = load_score(cfg.score)
