@@ -213,7 +213,7 @@ def build_timeline(score: Score, *, beat_sec: float) -> list[NoteEvent]:
 
 class AutoPlayerConfig(BaseModel):
     """自动演奏扩展配置。"""
-    score: str = Field(default="twinkle_star", description="乐谱名称或 JSON 文件路径")
+    score: str = Field(default="远航星的告别", description="乐谱名称或 JSON 文件路径")
     speed: float = Field(default=1.0, ge=0.25, le=4.0, description="演奏速度倍率（1.0 = 乐谱原速）")
     loop: int = Field(default=1, ge=1, le=99, description="演奏遍数")
     start_delay: float = Field(default=2.0, ge=0.0, le=30.0, description="首次开始前的延迟（秒），用于切换到游戏窗口")
@@ -460,7 +460,7 @@ class _HotkeyController:
 
 # ── 扩展入口 ──
 
-@extension(name="自动演奏(鸣潮)", description="按 JSON 乐谱自动演奏游戏键盘（暂停 F8 / 重置 F10 / 停止 F9）")  # pyright: ignore[reportArgumentType]
+@extension(name="自动演奏", description="按 JSON 乐谱自动演奏游戏键盘（暂停 F8 / 重置 F10 / 停止 F9）")  # pyright: ignore[reportArgumentType]
 class AutoPlayerExtension(BaseExtension[AutoPlayerConfig]):
     """游戏自动演奏扩展。"""
 
