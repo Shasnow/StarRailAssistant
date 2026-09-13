@@ -143,8 +143,8 @@ class StartGameTask(BaseTask):
         for _ in range(3):
             index, result = self.operator.wait_any([
                 lambda: self.operator.locate_any(login_pages),
-                lambda: self.operator.ocr_match("同意", from_x=0.5, from_y=0.58, to_x=0.6, to_y=0.64),
-                lambda: self.operator.ocr_match_any(["登录", "欢迎"], from_x=0.25, from_y=0.07, to_x=0.75, to_y=0.75)],
+                lambda: self.operator.ocr_match("同意"),
+                lambda: self.operator.ocr_match_any(["登录", "欢迎"])],
                 timeout=60, interval=1)
             match index:
                 case -1:
@@ -162,11 +162,13 @@ class StartGameTask(BaseTask):
 
     def _account_login(self) -> int:
         """进入账号密码界面完成登录，并等待欢迎界面出现"""
-        self.operator.click_box(self.operator.ocr_match("其他账号", from_x=0.25, from_y=0.1, to_x=0.75, to_y=0.75))
+        self.operator.click_box(self.operator.ocr_match("其他账号"))
         self.operator.move_to(0.5, 0.5)  # 移动到中心位置, 防止按钮提示文本干扰
         self.operator.sleep(1)
         if self._game_channel() != 'gb':  # 国际服客户端此页面直接暴露账号输入框
-            self.operator.click_box(self.operator.ocr_match("密码", from_x=0.4, from_y=0.65, to_x=0.6, to_y=0.75), after_sleep=1)
+            self.operator.click_box(self.operator.ocr_match("密码"))
+            self.operator.move_to(0.5, 0.5)  # 移动到中心位置, 防止按钮提示文本干扰
+            self.operator.sleep(1)
         if self.config.StartGame.isAutoLogin:
             if not self._fill_credentials():
                 return -1
@@ -189,17 +191,15 @@ class StartGameTask(BaseTask):
             logger.error("自动登录账号或密码未设置，请检查配置中的自动登录账号和密码")
             return False
         logger.info(f"登录账号：{user[:3]}*****{user[-3:]}")
-        boxes = self.operator.ocr_boxes(from_x=0.34, from_y=0.3, to_x=0.65, to_y=0.66)
+        boxes = self.operator.ocr_boxes()
         if boxes is None:
             raise RuntimeError("未检测到登录界面")
-        email_box = agree_box = login_box = None
+        email_box = login_box = None
         for box in boxes:
             if "邮箱" in box.source:
                 email_box = box
             if "登录" in box.source or "进入游戏" in box.source:
                 login_box = box
-            if "同意" in box.source:
-                agree_box = box
         if email_box is None or login_box is None:
             raise RuntimeError("未检测到登录界面输入框，请检查游戏状态")
         self.operator.click_box(email_box, after_sleep=1)
@@ -210,12 +210,14 @@ class StartGameTask(BaseTask):
         self.operator.sleep(0.2)
         self.operator.copy(passwd)
         self.operator.paste()
-        if agree_box is not None:
-            self.operator.click_point(
-                int(agree_box.left), int(agree_box.top),
-                x_offset=-10, y_offset=15,
-                after_sleep=1, tag="同意隐私政策")
-        self.operator.click_box(login_box)
+        self.operator.click_box(login_box, after_sleep=1)
+        boxes = self.operator.ocr_boxes()
+        if boxes is None:
+            raise RuntimeError("未检测到同意隐私政策界面，请检查游戏状态")
+        for box in boxes:
+            if box.source == "同意" or box.source == "同意并继续":
+                self.operator.click_box(box, after_sleep=1)
+                break
         return True
 
     def _game_channel(self) -> str:
