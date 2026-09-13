@@ -1,4 +1,5 @@
-﻿using SRAFrontend.Models;
+using System.Collections.Generic;
+using SRAFrontend.Models;
 using System.Collections.ObjectModel;
 
 namespace SRAFrontend.Migrations;
@@ -37,7 +38,14 @@ public static class ConfigMigrator
             {
                 IsEnabled = config.EnabledTasks[2],
                 RedeemCodes = config.ReceiveRewardRedeemCodes,
-                Rewards = new ObservableCollection<bool>(config.ReceiveRewards)
+                // 旧配置为按索引对应的布尔列表，可能被人为改短，越界时保留新字段的默认值
+                IsTrailblazeProfileEnabled = GetLegacyReward(config.ReceiveRewards, 0, true),
+                IsAssignmentsEnabled = GetLegacyReward(config.ReceiveRewards, 1, true),
+                IsMailEnabled = GetLegacyReward(config.ReceiveRewards, 2, true),
+                IsDailyTrainingEnabled = GetLegacyReward(config.ReceiveRewards, 3, true),
+                IsNamelessHonorEnabled = GetLegacyReward(config.ReceiveRewards, 4, true),
+                IsGiftOfOdysseyEnabled = GetLegacyReward(config.ReceiveRewards, 5, true),
+                IsRedeemCodeEnabled = GetLegacyReward(config.ReceiveRewards, 6, false)
             },
             CosmicStrife = new CosmicStrifeConfig
             {
@@ -68,5 +76,11 @@ public static class ConfigMigrator
                 IsSleep = config.AfterSleep
             }
         };
+    }
+
+    /// <summary>按索引读取旧版奖励开关列表，索引越界（列表被改短）时返回默认值。</summary>
+    private static bool GetLegacyReward(IReadOnlyList<bool> rewards, int index, bool defaultValue)
+    {
+        return index < rewards.Count ? rewards[index] : defaultValue;
     }
 }

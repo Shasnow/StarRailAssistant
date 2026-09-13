@@ -119,7 +119,7 @@ public partial class TrailblazePowerConfig : ObservableObject
     private int _realmOfTheStrangeLevel;
 }
 
-public partial class ReceiveRewardsConfig : ObservableObject
+public partial class ReceiveRewardsConfig : ObservableObject, IJsonOnDeserialized
 {
     [ObservableProperty] [property: JsonPropertyName("enabled")]
     private bool _isEnabled;
@@ -129,9 +129,62 @@ public partial class ReceiveRewardsConfig : ObservableObject
     [property: Description("兑换码列表，格式为：兑换码1 兑换码2 兑换码3")]
     private string _redeemCodes = "";
 
+    [ObservableProperty]
+    [property: JsonPropertyName("rewards.trailblazeProfile")]
+    [property: Description("是否领取漫游签证奖励")]
+    private bool _isTrailblazeProfileEnabled = true;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("rewards.assignments")]
+    [property: Description("是否领取派遣奖励")]
+    private bool _isAssignmentsEnabled = true;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("rewards.mail")]
+    [property: Description("是否领取邮件奖励")]
+    private bool _isMailEnabled = true;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("rewards.dailyTraining")]
+    [property: Description("是否领取每日实训奖励")]
+    private bool _isDailyTrainingEnabled = true;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("rewards.namelessHonor")]
+    [property: Description("是否领取无名勋礼奖励")]
+    private bool _isNamelessHonorEnabled = true;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("rewards.giftOfOdyssey")]
+    [property: Description("是否领取巡星之礼奖励")]
+    private bool _isGiftOfOdysseyEnabled = true;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("rewards.redeemCode")]
+    [property: Description("是否执行兑换码兑换")]
+    private bool _isRedeemCodeEnabled;
+
+    /// <summary>
+    ///     旧版配置的奖励开关列表（索引依次为：签证、派遣、邮件、每日实训、无名勋礼、巡星之礼、兑换码）。
+    ///     仅用于反序列化旧配置文件，序列化时不再写回。
+    /// </summary>
     [JsonPropertyName("rewards")]
-    [Description("奖励列表，依次为：签证、派遣、邮件、每日实训、无名勋礼、巡星之礼、兑换码")]
-    public ObservableCollection<bool> Rewards { get; init; } = [true, true, true, true, true, true, false];
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ObservableCollection<bool>? Rewards { get; set; }
+
+    /// <summary>旧版配置兼容：把旧 rewards 列表按索引映射到独立开关，越界索引保留默认值。</summary>
+    public void OnDeserialized()
+    {
+        if (Rewards is not { Count: > 0 }) return;
+        if (Rewards.Count > 0) IsTrailblazeProfileEnabled = Rewards[0];
+        if (Rewards.Count > 1) IsAssignmentsEnabled = Rewards[1];
+        if (Rewards.Count > 2) IsMailEnabled = Rewards[2];
+        if (Rewards.Count > 3) IsDailyTrainingEnabled = Rewards[3];
+        if (Rewards.Count > 4) IsNamelessHonorEnabled = Rewards[4];
+        if (Rewards.Count > 5) IsGiftOfOdysseyEnabled = Rewards[5];
+        if (Rewards.Count > 6) IsRedeemCodeEnabled = Rewards[6];
+        Rewards = null;
+    }
 }
 
 public partial class CosmicStrifeConfig : ObservableObject

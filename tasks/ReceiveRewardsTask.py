@@ -29,25 +29,25 @@ class ReceiveRewardsTask(BaseTask):
     def _init_tasks(self):
         """根据配置初始化任务列表"""
         tasks = []
-        item_select = self.config.ReceiveRewards.Rewards
+        rewards = self.config.ReceiveRewards
 
         # 主任务列表（需要传参的任务）esc界面完成的
-        if item_select[0]:
+        if rewards.isTrailblazeProfileEnabled:
             tasks.append((self.trailblazer_profile, ()))
-        if item_select[1]:
+        if rewards.isAssignmentsEnabled:
             tasks.append((self.assignments_reward, ()))
-        if item_select[6]:
-            tasks.append((self.redeem_code, (self.config.ReceiveRewards.redeemCodes,)))
-        if item_select[2]:
+        if rewards.isRedeemCodeEnabled:
+            tasks.append((self.redeem_code, (rewards.redeemCodes,)))
+        if rewards.isMailEnabled:
             tasks.append((self.mail, ()))
 
         # 次要任务列表（无参数任务）
         tasks2 = []
-        if item_select[3]:
+        if rewards.isDailyTrainingEnabled:
             tasks2.append(self.daily_training_reward)
-        if item_select[4]:
+        if rewards.isNamelessHonorEnabled:
             tasks2.append(self.nameless_honor)
-        if item_select[5]:
+        if rewards.isGiftOfOdysseyEnabled:
             tasks2.append(self.gift_of_odyssey)
 
         return tasks, tasks2

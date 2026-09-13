@@ -149,22 +149,48 @@ class ReceiveRewardsConfig:
     isEnabled: bool = False
     redeemCodes: str = ""
     Rewards: list[bool] = field(default_factory=list)
+    isTrailblazeProfileEnabled: bool = True
+    isAssignmentsEnabled: bool = True
+    isMailEnabled: bool = True
+    isDailyTrainingEnabled: bool = True
+    isNamelessHonorEnabled: bool = True
+    isGiftOfOdysseyEnabled: bool = True
+    isRedeemCodeEnabled: bool = False
 
     def to_dict(self) -> dict:
         """转换为字典"""
         return {
             "enabled": self.isEnabled,
             "redeemCodes": self.redeemCodes,
-            "rewards": self.Rewards
+            "rewards.trailblazeProfile": self.isTrailblazeProfileEnabled,
+            "rewards.assignments": self.isAssignmentsEnabled,
+            "rewards.mail": self.isMailEnabled,
+            "rewards.dailyTraining": self.isDailyTrainingEnabled,
+            "rewards.namelessHonor": self.isNamelessHonorEnabled,
+            "rewards.giftOfOdyssey": self.isGiftOfOdysseyEnabled,
+            "rewards.redeemCode": self.isRedeemCodeEnabled
         }
 
     @classmethod
     def from_dict(cls, data: dict):
         """从字典创建对象"""
+        rewards = data.get("rewards")
+
+        def legacy_reward(index: int, default: bool) -> bool:
+            """旧版配置兼容：按索引回退读取旧 rewards 列表，列表被改短时越界索引按默认值处理"""
+            return rewards[index] if isinstance(rewards, list) and len(rewards) > index else default
+
         return cls(**{
             "isEnabled": data.get("enabled", False),
             "redeemCodes": data.get("redeemCodes", ""),
-            "Rewards": data.get("rewards", list())
+            "Rewards": rewards if isinstance(rewards, list) else list(),
+            "isTrailblazeProfileEnabled": data.get("rewards.trailblazeProfile", legacy_reward(0, True)),
+            "isAssignmentsEnabled": data.get("rewards.assignments", legacy_reward(1, True)),
+            "isMailEnabled": data.get("rewards.mail", legacy_reward(2, True)),
+            "isDailyTrainingEnabled": data.get("rewards.dailyTraining", legacy_reward(3, True)),
+            "isNamelessHonorEnabled": data.get("rewards.namelessHonor", legacy_reward(4, True)),
+            "isGiftOfOdysseyEnabled": data.get("rewards.giftOfOdyssey", legacy_reward(5, True)),
+            "isRedeemCodeEnabled": data.get("rewards.redeemCode", legacy_reward(6, False))
         })
 
 @dataclass
