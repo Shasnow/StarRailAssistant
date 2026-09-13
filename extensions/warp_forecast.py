@@ -194,33 +194,27 @@ def _find_top_bar_jade(results: list[Any] | None) -> int:
     return 0
 
 
-@extension(name="抽卡资源预测", description="预测当前版本结束前的抽卡资源")
+@extension(name="抽卡资源预测", description="预测当前版本结束前的抽卡资源")  # pyright: ignore[reportArgumentType]
 class WarpForecastExtension(BaseExtension[WarpForecastConfig]):
     """预测当前版本结束前的抽卡资源。"""
 
     def run(self) -> bool:
         logger.info("抽卡资源预测开始")
         try:
-            self._ensure_game_world_ready()
+            if not self._ensure_game_world_ready():
+                raise RuntimeError("未能返回角色操作界面，停止预测")
 
             current = self._manual_current_resources()
             if self.config.scan_bag:
-                scanned = self._read_bag_resources()
-                current = Resources(
-                    jade=scanned.jade if scanned.jade > 0 else current.jade,
-                    special_pass=scanned.special_pass if scanned.special_pass > 0 else current.special_pass,
-                    normal_pass=scanned.normal_pass if scanned.normal_pass > 0 else current.normal_pass,
-                )
+                current = self._read_bag_resources()
 
             event = self._manual_event_resources()
             if self.config.scan_event_guide:
-                scanned_event = self._read_event_guide_rewards()
-                event = event.add(scanned_event)
+                event = event.add(self._read_event_guide_rewards())
 
             schedule = self._build_schedule()
             future = self._future_resources(schedule)
             total = current.add(event).add(future)
-
             message = self._format_report(current, event, future, total, schedule)
             logger.info("\n" + message)
             image = None
@@ -231,8 +225,77 @@ class WarpForecastExtension(BaseExtension[WarpForecastConfig]):
             self.send_notification("抽卡资源预测" + message, "success", image=image)
             logger.info("抽卡资源预测完成")
             return True
+        except Exception as exc:
+            logger.exception("抽卡资源预测失败")
+            self.send_notification(
+                f"抽卡资源预测失败：{exc}，未生成可靠预测结果", "error"
+            )
+            return False
         finally:
             self._return_to_world()
+
+    def _read_bag_resources(self) -> Resources:
+        op = self.operator
+        self.operator.active_window()
+        op.click_point(0.5, 0.5, after_sleep=0.5)
+        op.press_key("b")
+        op.sleep(2.5)
+        if op.wait_ocr(
+            "背包", timeout=8, confidence=0.75,
+            from_x=0.0, from_y=0.0, to_x=0.18, to_y=0.12,
+        ) is None:
+            raise RuntimeError("背包未打开")
+
+        jade = _find_top_bar_jade(op.ocr(**TOP_BAR, trace=False))
+        if jade is None:
+            raise RuntimeError("未识别到星琼数量")
+        self._click_precious_tab()
+        special, normal = self._scan_passes()
+        op.press_key("escape")
+        op.sleep(0.5)
+        return Resources(jade=jade, special_pass=special, normal_pass=normal)
+
+    def _click_precious_tab(self) -> None:
+        if self.operator.ocr_match("贵重", from_x=0.0, from_y=0.0, to_x=0.1, to_y=0.1) is not None:
+            return
+        res = self.operator.do_while(
+            lambda :self.operator.press_key('q'),
+            lambda :self.operator.ocr_match("贵重", from_x=0.0, from_y=0.0, to_x=0.1, to_y=0.1) is None,
+            interval=1,
+            max_iterations=8,
+        )
+        if res:
+            return
+        raise RuntimeError("未确认贵重物品页签")
+
+    def _scan_passes(self) -> tuple[int, int]:
+        op = self.operator
+        special_pass = None
+        normal_pass = None
+        for gx, gy in GRID_CELLS:
+            if self.operator.stop_event and self.operator.stop_event.is_set():
+                raise RuntimeError("背包扫描已取消")
+            if special_pass is not None and normal_pass is not None:
+                break
+            op.click_point(float(gx), float(gy), after_sleep=0.25)
+            title = self._read_detail_title()
+            if "星轨专票" in title and special_pass is None:
+                special_pass = self._read_detail_count()
+            elif "星轨通票" in title and normal_pass is None:
+                normal_pass = self._read_detail_count()
+        if special_pass is None:
+            special_pass = 0
+        if normal_pass is None:
+            normal_pass = 0
+        return special_pass, normal_pass
+
+    def _read_event_guide_rewards(self) -> Resources:
+        if not self._open_reward_guide():
+            raise RuntimeError("未能确认奖励指南页面")
+        resources = self._scan_event_guide_pages()
+        self.operator.press_key("escape")
+        self.operator.sleep(0.4)
+        return resources
 
     def _manual_current_resources(self) -> Resources:
         return Resources(
@@ -350,35 +413,8 @@ class WarpForecastExtension(BaseExtension[WarpForecastConfig]):
             )
         )
 
-    def _read_bag_resources(self) -> Resources:
-        op = self.operator
-        resources = Resources()
-        try:
-            self._activate_window()
-            op.click_point(0.5, 0.5, after_sleep=0.5)
-            op.press_key("b")
-            op.sleep(2.5)
-
-            if op.wait_ocr("背包", timeout=8, confidence=0.75, from_x=0.0, from_y=0.0, to_x=0.18, to_y=0.12) is None:
-                logger.warning("背包未打开，跳过背包自动识别")
-                return resources
-
-            top_bar = op.ocr(**TOP_BAR, trace=False)
-            resources.jade = _find_top_bar_jade(top_bar)
-
-            self._click_precious_tab()
-            special, normal = self._scan_passes()
-            resources.special_pass = special or 0
-            resources.normal_pass = normal or 0
-            op.press_key("escape")
-            op.sleep(0.5)
-        except Exception as exc:
-            logger.warning(f"背包资源自动识别失败：{exc}")
-        logger.info(f"背包识别结果：星琼={resources.jade}, 专票={resources.special_pass}, 通票={resources.normal_pass}")
-        return resources
-
     def _ensure_game_world_ready(self) -> bool:
-        self._activate_window()
+        self.operator.active_window()
         for attempt in range(5):
             if self._has_world_enter_prompt():
                 logger.info("已切换到游戏窗口，并检测到角色操作界面 Enter 提示")
@@ -408,51 +444,8 @@ class WarpForecastExtension(BaseExtension[WarpForecastConfig]):
                 logger.warning(f"任务结束返回角色界面失败：{exc}")
                 return
 
-    def _activate_window(self) -> None:
-        op = self.operator
-        for attempt in range(2):
-            try:
-                op.get_win_region(active_window=(attempt == 0))
-                return
-            except Exception as exc:
-                logger.warning(f"激活窗口失败 attempt={attempt}: {exc}")
-                op.sleep(0.5)
-
-    def _click_precious_tab(self) -> None:
-        op = self.operator
-        tab_y = int(op.height * 0.044)
-        step = max(1, int(op.width * 0.01))
-        for px in range(int(op.width * 0.75), int(op.width * 0.20), -step):
-            op.click_point(px, tab_y, after_sleep=0.25)
-            label = _ocr_text(op.ocr(from_x=0.0, from_y=0.03, to_x=0.22, to_y=0.11, trace=False), 0.7)
-            if "贵重" in label:
-                logger.info(f"已切换到贵重物品页签 px={px}")
-                return
-        logger.warning("未确认贵重物品页签，继续尝试扫描当前页")
-
-    def _scan_passes(self) -> tuple[int | None, int | None]:
-        op = self.operator
-        special_pass = None
-        normal_pass = None
-        for index, (gx, gy) in enumerate(GRID_CELLS):
-            if self.stop_event and self.stop_event.is_set():
-                break
-            if special_pass is not None and normal_pass is not None:
-                break
-
-            op.click_point(int(op.width * gx), int(op.height * gy), after_sleep=0.25)
-            title = self._read_detail_title()
-            if not title:
-                continue
-            logger.debug(f"背包格子 {index + 1}: {title}")
-            if "星轨专票" in title and special_pass is None:
-                special_pass = self._read_detail_count()
-            elif "星轨通票" in title and normal_pass is None:
-                normal_pass = self._read_detail_count()
-        return special_pass, normal_pass
-
     def _read_detail_title(self) -> str:
-        results = self.operator.ocr(**DETAIL_TITLE, trace=False)
+        results = self.operator.ocr(**DETAIL_TITLE)
         candidates = [
             str(item[1])
             for item in _ocr_items(results, 0.7)
@@ -461,30 +454,16 @@ class WarpForecastExtension(BaseExtension[WarpForecastConfig]):
         return max(candidates, key=len) if candidates else ""
 
     def _read_detail_count(self) -> int | None:
-        results = self.operator.ocr(**DETAIL_COUNT, trace=False)
+        results = self.operator.ocr(**DETAIL_COUNT)
         full_text = _ocr_text(results, 0.5)
         match = re.search(r"[xX×]\s*(\d+)", full_text)
         if match:
             return int(match.group(1))
         return _clean_number(full_text)
 
-    def _read_event_guide_rewards(self) -> Resources:
-        resources = Resources()
-        try:
-            if not self._open_reward_guide():
-                logger.warning("未能打开奖励指南，跳过奖励指南识别")
-                return resources
-            resources = self._scan_event_guide_pages()
-            self.operator.press_key("escape")
-            self.operator.sleep(0.4)
-        except Exception as exc:
-            logger.warning(f"奖励指南自动识别失败：{exc}")
-        logger.info(f"奖励指南识别结果：星琼={resources.jade}, 专票={resources.special_pass}, 通票={resources.normal_pass}")
-        return resources
-
     def _open_reward_guide(self) -> bool:
         op = self.operator
-        self._activate_window()
+        self.operator.active_window()
         op.click_point(0.5, 0.5, after_sleep=0.3)
 
         if op.wait_ocr("旅情事记", timeout=2, confidence=0.65, from_x=0.55, from_y=0.20, to_x=0.95, to_y=0.78) is None:
@@ -540,7 +519,7 @@ class WarpForecastExtension(BaseExtension[WarpForecastConfig]):
         stable_pages = 0
         previous_fingerprint = ""
         for page_index in range(14):
-            if self.stop_event and self.stop_event.is_set():
+            if self.operator.stop_event and self.operator.stop_event.is_set():
                 break
 
             results = op.ocr(from_x=0.0, from_y=0.08, to_x=1.0, to_y=0.96, trace=False)
