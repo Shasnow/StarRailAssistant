@@ -953,7 +953,8 @@ class CurrencyWars(Executable):
                 target_box = box
                 break
         if target_box is None:
-            target_box = boxes[0]
+            # 如果没有匹配的关键词，则默认选择最后一个选项
+            target_box = boxes[-1]
         self.operator.click_box(target_box, after_sleep=1)
         self.operator.click_img(CWIMG.CONFIRM_SELECTION, after_sleep=1)
         return True
