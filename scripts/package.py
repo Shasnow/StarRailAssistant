@@ -149,7 +149,6 @@ def copy_core_resources(dist: Path):
     shutil.copy2(ROOT_PATH / "LICENSE", dist / "LICENSE")
     shutil.copy2(ROOT_PATH / "README.md", dist / "README.md")
     # shutil.copy2(ROOT_PATH / "requirements.txt", dist / "requirements.txt")
-    # shutil.copy2(ROOT_PATH / "requirements-linux.txt", dist / "requirements-linux.txt")
     # shutil.copy2(ROOT_PATH / "main.py", dist / "main.py")
     # shutil.copytree(ROOT_PATH / "SRACore", dist / "SRACore")
     (DIST_DIR / "SRACore" / "localization").mkdir(parents=True, exist_ok=True)
@@ -185,7 +184,7 @@ def package_lite(version: str):
         builder.add(file)
     for item in ["SRACore", "tasks", "extensions", "resources"]:
         builder.add(ROOT_PATH / item)
-    for file in ["main.py", "README.md", "LICENSE", "requirements.txt", "requirements-linux.txt"]:
+    for file in ["main.py", "README.md", "LICENSE", "requirements.txt"]:
         builder.add(ROOT_PATH / file)
     builder.snapshot(lite_zip_path)
 
