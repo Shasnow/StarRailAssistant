@@ -207,6 +207,8 @@ class DUIMG:
     DIVERGENT_UNIVERSE_START = f"{BASE}/divergent_universe_start.png"
     DIVERGENT_UNIVERSE_QUIT = f"{BASE}/divergent_universe_quit.png"
     DIVERGENT_UNIVERSE = f"{BASE}/divergent_universe.png"
+    DISCARD_CURIOSITY = f"{BASE}/discard_curiosity.png"
+    DISCARD = f"{BASE}/discard.png"
     END_AND_SETTLE = f"{BASE}/end_and_settle.png"
     EQUATION_EXPANSION = f"{BASE}/equation_expansion.png"
     EQUATION_SELECT = f"{BASE}/equation_select.png"
@@ -214,10 +216,22 @@ class DUIMG:
     PERIODIC_CALCULUS = f"{BASE}/periodic_calculus.png"
     RETURN = f"{BASE}/return.png"
     RECEIVE = f"{BASE}/receive.png"
+    RECOMMENDED_BLESSING = f"{BASE}/recommended_blessing.png"
+    REROLL = f"{BASE}/reroll.png"
     ENSURE = f"{BASE}/ensure.png"
     ENSURE2 = f"{BASE}/ensure2.png"
+    ENSURE3 = f"{BASE}/ensure3.png"
+    ENSURE4 = f"{BASE}/ensure4.png"
+    EVENT = f"{BASE}/event.png"
+    EVENT_SELECTION = f"{BASE}/event_selection.png"
+    EVENT_SELECT = f"{BASE}/event_select.png"
+    EVENT_NEXT = f"{BASE}/event_next.png"
+
     SELECT_GRAND_MIRACLE = f"{BASE}/select_grand_miracle.png"
     SELECT_YOUR_MIRACLE = f"{BASE}/select_your_miracle.png"
+    SELECT_NEXT_STATION = f"{BASE}/select_next_station.png"
+    SELECT_AREA = f"{BASE}/select_area.png"
+    SUCCESS = f"{BASE}/success.png"
 # endregion
 
 # region 任务完成专用
