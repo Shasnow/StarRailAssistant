@@ -19,15 +19,15 @@ class OperatorFactory:
     __window_context = WindowContext()
 
     @classmethod
-    def get_operator(cls, optype: str | OperatorType, settings: AppSettings,
+    def get_operator(cls, optype: str | OperatorType, settings: AppSettings | None = None,
                      stop_event: threading.Event | None = None) -> IOperator:
         if optype == OperatorType.Local:
             from SRACore.operators.operator import Operator
-            __instance = Operator(ocr_engine=cls.get_ocr_instance(), settings=settings,
+            __instance = Operator(ocr_engine=cls.get_ocr_instance(), settings=settings or AppSettings.from_dict({}),
                                   stop_event=stop_event, window_context=cls.__window_context)
         elif optype == OperatorType.Browser:
             from SRACore.operators.browser_operator import BrowserOperator
-            __instance = BrowserOperator(ocr_engine=cls.get_ocr_instance(), settings=settings,
+            __instance = BrowserOperator(ocr_engine=cls.get_ocr_instance(), settings=settings or AppSettings.from_dict({}),
                                          stop_event=stop_event, window_context=cls.__window_context)
         else:
             raise ValueError(f"Unknown operator type: {optype}")
