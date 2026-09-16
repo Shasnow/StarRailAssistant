@@ -143,21 +143,24 @@ class StartGameTask(BaseTask):
         for _ in range(3):
             index, result = self.operator.wait_any([
                 lambda: self.operator.locate_any(login_pages),
-                lambda: self.operator.ocr_match("同意"),
-                lambda: self.operator.ocr_match_any(["登录", "欢迎"])],
+                lambda: self.operator.ocr_match_any(["登录", "欢迎", "同意"])],
                 timeout=60, interval=1)
             match index:
                 case -1:
                     logger.error("等待登录界面超时，请检查游戏状态")
                     return None
                 case 0:  # 特征图片定位
-                    page_index:int = typing.cast(int, result[0])
+                    page_index: int = typing.cast(int, result[0])
                     return (LoginStatus.ENTER_GAME_PAGE, LoginStatus.IN_GAME_PAGE, LoginStatus.NEW_VERSION_PAGE)[page_index]
-                case 1:  # 隐私协议界面，点击同意后重新检测
-                    self.operator.click_box(typing.cast('Box', result), after_sleep=1)
-                case 2:  # OCR 匹配到"登录"/"欢迎"
-                    ocr_index, _ = typing.cast(tuple, result)
-                    return LoginStatus.LOGIN_PAGE if ocr_index == 0 else LoginStatus.WELCOME_PAGE
+                case 1:  # OCR 匹配
+                    ocr_index, box = typing.cast(tuple, result)
+                    match ocr_index:
+                        case 0:  # "登录"
+                            return LoginStatus.LOGIN_PAGE
+                        case 1:  # "欢迎"
+                            return LoginStatus.WELCOME_PAGE
+                        case 2:  # "同意" - 隐私协议界面，点击后重新检测
+                            self.operator.click_box(typing.cast('Box', box), after_sleep=1)
         return LoginStatus.UNKNOWN_PAGE
 
     def _account_login(self) -> int:
