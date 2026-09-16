@@ -1,5 +1,8 @@
 import enum
 import typing
+
+from SRACore.util.strutil import EqualsMatcher
+
 if typing.TYPE_CHECKING:
     from SRACore.operators.model import Box
 
@@ -143,7 +146,8 @@ class StartGameTask(BaseTask):
         for _ in range(3):
             index, result = self.operator.wait_any([
                 lambda: self.operator.locate_any(login_pages),
-                lambda: self.operator.ocr_match_any(["登录", "欢迎", "同意"])],
+                lambda: self.operator.ocr_match_any(
+                    ["登录", "欢迎", EqualsMatcher("同意")])],
                 timeout=60, interval=1)
             match index:
                 case -1:

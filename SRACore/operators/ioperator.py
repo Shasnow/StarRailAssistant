@@ -16,9 +16,9 @@ from SRACore.models.app_settings import AppSettings
 from SRACore.operators.model import Box, WindowContext
 from SRACore.util.const import LogsOCRDir
 from SRACore.util.errors import ThreadStoppedError
+from SRACore.util.strutil import StrMatcher
 
 type Waitable = Callable[[], Box | None | tuple[int, Box | None]]
-
 
 class IOperator(ABC):
 
@@ -286,7 +286,7 @@ class IOperator(ABC):
             return None
 
     def ocr_match(self,
-                  text: str,
+                  text: str | StrMatcher,
                   confidence: float | None = None,
                   *,
                   from_x: float | None = None,
@@ -297,7 +297,7 @@ class IOperator(ABC):
         """OCR识别并匹配指定文本，返回文本位置
 
         Args:
-            text (str): 要识别的文本
+            text (str | StrMatcher): 要识别的文本或匹配器
             confidence (float, optional): 识别置信度。默认为0.9。
             from_x (float, optional): 识别区域起始x坐标比例(0-1)。
             from_y (float, optional): 识别区域起始y坐标比例(0-1)。
@@ -311,15 +311,20 @@ class IOperator(ABC):
                                confidence=confidence, trace=trace)
         if not boxes:
             return None
-        for box in boxes:
-            if text in box.source:
-                return box
+        if isinstance(text, str):
+            for box in boxes:
+                if text in box.source:
+                    return box
+        else:
+            for box in boxes:
+                if text.match(box.source):
+                    return box
         if trace:
             logger.debug(f"OCR Result not match text: {text}")
         return None
 
     def ocr_match_any(self,
-                      texts: list[str],
+                      texts: list[str | StrMatcher],
                       confidence: float | None = None,
                       *,
                       from_x: float | None = None,
@@ -330,7 +335,7 @@ class IOperator(ABC):
         """OCR识别并匹配任意指定文本，返回文本索引和位置
 
         Args:
-            texts (list[str]): 要识别的文本列表
+            texts (list[str | StrMatcher]): 要识别的文字或匹配器对象列表
             confidence (float, optional): 识别置信度。默认为0.9。
             from_x (float, optional): 识别区域起始x坐标比例(0-1)。
             from_y (float, optional): 识别区域起始y坐标比例(0-1)。
@@ -345,9 +350,14 @@ class IOperator(ABC):
         if not boxes:
             return -1, None
         for index, text in enumerate(texts):
-            for box in boxes:
-                if text in box.source:
-                    return index, box
+            if isinstance(text, str):
+                for box in boxes:
+                    if text in box.source:
+                        return index, box
+            else:
+                for box in boxes:
+                    if text.match(box.source):
+                        return index, box
         if trace:
             logger.debug(f"OCR Result not match any text: {texts}")
         return -1, None
@@ -391,7 +401,7 @@ class IOperator(ABC):
             boxes.append(Box(left + offset_x, top + offset_y, width, height, source=result[1]))
         return boxes
 
-    def wait_ocr(self, text: str,
+    def wait_ocr(self, text: str | StrMatcher,
                  confidence: float | None = None,
                  interval: float = 0.5,
                  timeout: float = 10,
@@ -400,10 +410,10 @@ class IOperator(ABC):
         """等待OCR识别到指定文本
 
         Args:
-            text (str): 要识别的文本
+            text (str | StrMatcher): 要识别的文本或匹配器
+            confidence (float, optional): 识别置信度。默认值为None。
+            interval (float, optional): 检查间隔时间，单位秒。默认值为0.5秒。
             timeout (float, optional): 超时时间，单位秒。默认值为10秒。
-            interval (float, optional): 检查间隔时间，单位秒。默认值为0.2秒。
-            confidence (float, optional): 识别置信度。默认值为0.9。
             *args: 传递给ocr_match的其他位置参数。
             **kwargs: 传递给ocr_match的其他关键字参数。
         Returns:
@@ -419,7 +429,7 @@ class IOperator(ABC):
         return None
 
     def wait_ocr_any(self,
-                     texts: list[str],
+                     texts: list[str | StrMatcher],
                      confidence: float | None = None,
                      interval: float = 0.2,
                      timeout: float = 10,
@@ -428,7 +438,7 @@ class IOperator(ABC):
         """等待OCR识别到任意指定文本
 
         Args:
-            texts (list[str]): 要识别的文本列表
+            texts (list[str | StrMatcher]): 要识别的文本列表
             timeout (float, optional): 超时时间，单位秒。默认值为10秒。
             interval (float, optional): 检查间隔时间，单位秒。默认值为0.2秒。
             confidence (float, optional): 识别置信度。默认值为0.9。
