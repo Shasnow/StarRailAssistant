@@ -406,12 +406,13 @@ class BrowserOperator(IOperator):
                 logger.debug(f"Failed to press key: {e}")
             return False
 
-    def hold_key(self, key: str, duration: float = 0) -> bool:
+    def hold_key(self, key: str, duration: float = 0, trace: bool = True) -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("按键中断", "线程已停止")
         try:
             keys = [self.convert_key(k.strip()) for k in key.split("+") if k.strip()]
-            logger.debug(f"Hold key {key}")
+            if trace:
+                logger.debug(f"Hold key {key}")
             for k in keys:
                 ActionChains(self.driver).key_down(k).perform()
             self.sleep(duration)
@@ -429,10 +430,12 @@ class BrowserOperator(IOperator):
         content = self.clipboard
         ActionChains(self.driver).send_keys(content).perform()
 
-    def move_rel(self, x_offset: int, y_offset: int) -> bool:
+    def move_rel(self, x_offset: int, y_offset: int, trace: bool = True) -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("鼠标移动中断", "线程已停止")
         try:
+            if trace:
+                logger.debug(f"Move cursor relative: ({x_offset}, {y_offset})")
             ActionChains(self.driver).move_by_offset(x_offset, y_offset).perform()
             return True
         except Exception as e:
@@ -505,7 +508,9 @@ class BrowserOperator(IOperator):
             logger.debug(f"Error releasing mouse button: {e}")
             return False
 
-    def scroll(self, clicks: int, x: int | float | None = None, y: int | float | None = None) -> bool:
+    def scroll(self, clicks: int, x: int | float | None = None, y: int | float | None = None, trace: bool = True) -> bool:
+        if trace:
+            logger.debug(f"Scroll: {clicks} clicks, ({x}, {y})")
         if x and y:
             self.move_to(x, y)
         ActionChains(self.driver).scroll_by_amount(0, -clicks).perform()

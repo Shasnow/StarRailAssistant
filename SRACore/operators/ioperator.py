@@ -2,9 +2,11 @@ import threading
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Callable
+from collections.abc import Sequence, Callable
+from typing import Any
 
 import cv2
+# noinspection package-requirements
 import numpy as np
 import pyscreeze
 from PIL.Image import Image
@@ -13,10 +15,11 @@ from rapidocr import RapidOCR
 from rapidocr.utils.output import RapidOCROutput
 
 from SRACore.models.app_settings import AppSettings
+from SRACore.operators.color_detector import ColorTargetDetector, ContourSort
 from SRACore.operators.model import Box, WindowContext
 from SRACore.util.const import LogsOCRDir
 from SRACore.util.errors import ThreadStoppedError
-from SRACore.util.strutil import StrMatcher
+from SRACore.util.strutil import StrMatcher, ContainsMatcher
 
 type Waitable = Callable[[], Box | None | tuple[int, Box | None]]
 
@@ -312,19 +315,16 @@ class IOperator(ABC):
         if not boxes:
             return None
         if isinstance(text, str):
-            for box in boxes:
-                if text in box.source:
-                    return box
-        else:
-            for box in boxes:
-                if text.match(box.source):
-                    return box
+            text = ContainsMatcher(text)
+        for box in boxes:
+            if text.match(box.source):
+                return box
         if trace:
             logger.debug(f"OCR Result not match text: {text}")
         return None
 
     def ocr_match_any(self,
-                      texts: list[str | StrMatcher],
+                      texts: Sequence[str | StrMatcher],
                       confidence: float | None = None,
                       *,
                       from_x: float | None = None,
@@ -335,7 +335,7 @@ class IOperator(ABC):
         """OCR识别并匹配任意指定文本，返回文本索引和位置
 
         Args:
-            texts (list[str | StrMatcher]): 要识别的文字或匹配器对象列表
+            texts (Sequence[str | StrMatcher]): 要识别的文字或匹配器对象列表
             confidence (float, optional): 识别置信度。默认为0.9。
             from_x (float, optional): 识别区域起始x坐标比例(0-1)。
             from_y (float, optional): 识别区域起始y坐标比例(0-1)。
@@ -351,13 +351,10 @@ class IOperator(ABC):
             return -1, None
         for index, text in enumerate(texts):
             if isinstance(text, str):
-                for box in boxes:
-                    if text in box.source:
-                        return index, box
-            else:
-                for box in boxes:
-                    if text.match(box.source):
-                        return index, box
+                text = ContainsMatcher(text)
+            for box in boxes:
+                if text.match(box.source):
+                    return index, box
         if trace:
             logger.debug(f"OCR Result not match any text: {texts}")
         return -1, None
@@ -411,9 +408,9 @@ class IOperator(ABC):
 
         Args:
             text (str | StrMatcher): 要识别的文本或匹配器
-            confidence (float, optional): 识别置信度。默认值为None。
-            interval (float, optional): 检查间隔时间，单位秒。默认值为0.5秒。
             timeout (float, optional): 超时时间，单位秒。默认值为10秒。
+            interval (float, optional): 检查间隔时间，单位秒。默认值为0.2秒。
+            confidence (float, optional): 识别置信度。默认值为0.9。
             *args: 传递给ocr_match的其他位置参数。
             **kwargs: 传递给ocr_match的其他关键字参数。
         Returns:
@@ -429,7 +426,7 @@ class IOperator(ABC):
         return None
 
     def wait_ocr_any(self,
-                     texts: list[str | StrMatcher],
+                     texts: Sequence[str | StrMatcher],
                      confidence: float | None = None,
                      interval: float = 0.2,
                      timeout: float = 10,
@@ -438,7 +435,7 @@ class IOperator(ABC):
         """等待OCR识别到任意指定文本
 
         Args:
-            texts (list[str | StrMatcher]): 要识别的文本列表
+            texts (Sequence[str | StrMatcher]): 要识别的文本列表
             timeout (float, optional): 超时时间，单位秒。默认值为10秒。
             interval (float, optional): 检查间隔时间，单位秒。默认值为0.2秒。
             confidence (float, optional): 识别置信度。默认值为0.9。
@@ -455,6 +452,105 @@ class IOperator(ABC):
             time.sleep(interval)
         logger.debug(f"Timeout: '{texts}' -> NotFound in {timeout} seconds")
         return -1, None
+
+    def detect_color(self,
+                     hsv_lower: tuple[int, int, int],
+                     hsv_upper: tuple[int, int, int],
+                     *,
+                     from_x: float | None = None,
+                     from_y: float | None = None,
+                     to_x: float | None = None,
+                     to_y: float | None = None,
+                     min_area: int = 500,
+                     max_targets: int = 1,
+                     sort_by: ContourSort = ContourSort.AREA_DESC,
+                     trace: bool = True,
+                     **kwargs: Any) -> list[Box]:
+        """按 HSV 颜色范围检测目标
+
+        截取窗口画面后，通过 HSV 色彩过滤检测目标位置。
+        坐标系与 locate/ocr_boxes 一致，可直接用于 click_box。
+
+        Args:
+            hsv_lower (tuple[int, int, int]): HSV 下界 (H 0-179, S 0-255, V 0-255)
+            hsv_upper (tuple[int, int, int]): HSV 上界
+            from_x/from_y/to_x/to_y (float, optional): 截图区域比例 (0-1)，默认全图
+            min_area (int): 最小有效轮廓面积（像素）。默认 500
+            max_targets (int): 最多返回目标数，0 = 返回全部。默认 1
+            sort_by (ContourSort): 多目标排序方式。默认按面积降序
+            trace (bool): 是否打印调试信息。默认 True
+            **kwargs: 传递给 ColorTargetDetector 的其他参数
+                      (max_area, open_kernel, close_kernel, blur_size,
+                       min_aspect_ratio, max_aspect_ratio, fallback_hsv_ranges 等)
+        Returns:
+            list[Box]: 检测到的目标列表。未检测到返回空列表
+        """
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("颜色检测中断", "线程已停止")
+        try:
+            screenshot = self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
+            frame = np.array(screenshot)[:, :, ::-1]  # PIL RGB → BGR
+            detector = ColorTargetDetector(
+                hsv_lower=hsv_lower, hsv_upper=hsv_upper,
+                min_area=min_area, max_targets=max_targets, sort_by=sort_by,
+                **kwargs,
+            )
+            results = detector.detect(frame)
+            offset_x = int(self.window_context.width * from_x) if from_x is not None else 0
+            offset_y = int(self.window_context.height * from_y) if from_y is not None else 0
+            boxes = [
+                Box(r.bbox_x + offset_x, r.bbox_y + offset_y, r.bbox_w, r.bbox_h,
+                    source=f"color({r.area:.0f},{r.confidence:.2f})")
+                for r in results if r.found
+            ]
+            if trace:
+                logger.debug(f"DetectColor: HSV {hsv_lower}-{hsv_upper} -> {len(boxes)} targets")
+            return boxes
+        except Exception as e:
+            if trace:
+                logger.trace(f"DetectColor error: {e}")
+            return []
+
+    def wait_color(self,
+                   hsv_lower: tuple[int, int, int],
+                   hsv_upper: tuple[int, int, int],
+                   timeout: float = 10,
+                   interval: float = 0.5,
+                   *,
+                   from_x: float | None = None,
+                   from_y: float | None = None,
+                   to_x: float | None = None,
+                   to_y: float | None = None,
+                   min_area: int = 500,
+                   trace: bool = True,
+                   **kwargs: Any) -> Box | None:
+        """等待 HSV 颜色目标出现
+
+        Args:
+            hsv_lower (tuple[int, int, int]): HSV 下界
+            hsv_upper (tuple[int, int, int]): HSV 上界
+            timeout (float): 超时时间（秒）。默认 10
+            interval (float): 检查间隔（秒）。默认 0.5
+            from_x/from_y/to_x/to_y (float, optional): 截图区域比例 (0-1)
+            min_area (int): 最小轮廓面积。默认 500
+            trace (bool): 是否打印调试信息。默认 True
+            **kwargs: 传递给 detect_color 的其他参数
+        Returns:
+            Box | None: 找到的目标位置，超时返回 None
+        """
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            boxes = self.detect_color(
+                hsv_lower, hsv_upper,
+                from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y,
+                min_area=min_area, trace=trace, **kwargs,
+            )
+            if boxes:
+                return boxes[0]
+            time.sleep(interval)
+        if trace:
+            logger.debug(f"Timeout: wait_color HSV {hsv_lower}-{hsv_upper} -> NotFound in {timeout}s")
+        return None
 
     @abstractmethod
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
@@ -559,6 +655,8 @@ class IOperator(ABC):
     def rectangle_detect(self,
                          min_w: int, max_w: int, min_h: int, max_h: int,
                          *,
+                         canny_threshold: tuple[int, int] = (30, 90),
+                         gaussian_ksize: tuple[int, int] = (5, 5),
                          from_x: float | None = None, from_y: float | None = None,
                          to_x: float | None = None, to_y: float | None = None,
                          trace: bool = False) -> list[Box]:
@@ -569,6 +667,8 @@ class IOperator(ABC):
             max_w (int): 最大矩形宽度。
             min_h (int): 最小矩形高度。
             max_h (int): 最大矩形高度。
+            canny_threshold (tuple[int, int], optional): Canny边缘检测阈值。默认值为(30, 90)。
+            gaussian_ksize (tuple[int, int], optional): 高斯模糊核大小。默认值为(5, 5)。
             from_x (float, optional): 搜索区域起始 X 坐标比例 (0-1)。
             from_y (float, optional): 搜索区域起始 Y 坐标比例 (0-1)。
             to_x (float, optional): 搜索区域结束 X 坐标比例 (0-1)。
@@ -583,8 +683,8 @@ class IOperator(ABC):
             screenshot = self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
             img = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            blur = cv2.GaussianBlur(gray, (5, 5), 0)
-            edged = cv2.Canny(blur, 30, 90, apertureSize=3, L2gradient=True)
+            blur = cv2.GaussianBlur(gray, gaussian_ksize, 0)
+            edged = cv2.Canny(blur, *canny_threshold, apertureSize=3, L2gradient=True)
             contours, _ = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
             result = []
@@ -592,6 +692,8 @@ class IOperator(ABC):
                 x, y, sw, sh = cv2.boundingRect(cnt)
                 if min_w < sw < max_w and min_h < sh < max_h:
                     cv2.rectangle(img, (x, y), (x + sw, y + sh), (0, 255, 0), 2)
+                    cv2.putText(img, f"{sw}x{sh}", (x, max(y - 5, 12)),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 1)
                     left, top = x, y
                     if from_x is not None and from_y is not None:
                         left += int(from_x * self.window_context.width)
@@ -599,8 +701,9 @@ class IOperator(ABC):
                     result.append(Box(left, top, sw, sh, source="rectangle_detect"))
 
             if trace:
-                cv2.imwrite(str(LogsOCRDir / f"rectangle_detect_edged_{int(time.time())}.png"), edged)
-                cv2.imwrite(str(LogsOCRDir / f"rectangle_detect_{int(time.time())}.png"), img)
+                # 左侧为标注框结果，右侧为 Canny 边缘图，拼接成一张调试图保存
+                combined = np.hstack([img, cv2.cvtColor(edged, cv2.COLOR_GRAY2BGR)])
+                cv2.imwrite(str(LogsOCRDir / f"rectangle_detect_{int(time.time())}.png"), combined)
 
             return result
         except Exception as e:
@@ -648,13 +751,14 @@ class IOperator(ABC):
         ...
 
     @abstractmethod
-    def hold_key(self, key: str, duration: float = 0) -> bool:
+    def hold_key(self, key: str, duration: float = 0, trace: bool = True) -> bool:
         """
         按下按键一段时间
 
         Args:
             key: 按键名称，支持组合键，如 "a"、"ctrl+shift"
             duration: 按下时间
+            trace: 是否打印调试信息
 
         Returns:
             按键成功返回True，否则返回False
@@ -694,12 +798,13 @@ class IOperator(ABC):
         ...
 
     @abstractmethod
-    def move_rel(self, x_offset: int, y_offset: int) -> bool:
+    def move_rel(self, x_offset: int, y_offset: int, trace: bool = True) -> bool:
         """相对当前位置移动光标。
 
         Args:
             x_offset (int): X 轴偏移量。
             y_offset (int): Y 轴偏移量。
+            trace (bool): 是否打印调试信息。默认为 True。
 
         Returns:
             bool: 如果移动成功则返回 True，否则返回 False。
@@ -747,13 +852,14 @@ class IOperator(ABC):
         ...
 
     @abstractmethod
-    def scroll(self, clicks: int, x: int | float | None = None, y: int | float | None = None) -> bool:
+    def scroll(self, clicks: int, x: int | float | None = None, y: int | float | None = None, trace: bool = True) -> bool:
         """滚动鼠标滚轮指定次数。
 
         Args:
             clicks (int): 滚动点击次数。正数表示向上滚动，负数表示向下滚动。
             x (int | float | None): X 坐标。如果为 None，则使用当前鼠标位置。
             y (int | float | None): Y 坐标。如果为 None，则使用当前鼠标位置。
+            trace (bool): 是否打印调试信息。默认为 True。
 
         Returns:
             bool: 如果滚动成功则返回 True，否则返回 False。
