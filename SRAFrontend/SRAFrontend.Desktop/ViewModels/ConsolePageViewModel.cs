@@ -22,20 +22,17 @@ public partial class ConsolePageViewModel : PageViewModel
 {
     private const int MaxConsoleLines = 1000;
     private readonly IBackendService _backendService;
+    private readonly CommonModel _commonModel;
     private readonly ConcurrentQueue<string> _consoleLines = new();
 
     private readonly string[] _levelPrefixes = ["TRACE", "DEBUG", "INFO", "WARN", "ERROR"];
     private readonly ILogger<ConsolePageViewModel> _logger;
-    private readonly CommonModel _commonModel;
     private readonly SettingsService _settingsService;
 
     [ObservableProperty]
     private AvaloniaList<bool> _filterOptions = [false, false, true, true, true]; // TRACE, DEBUG, INFO, WARN, ERROR
 
-    [ObservableProperty]
-    private bool _isExporting; // 日志导出进行中标志
-
-    public TopLevel? TopLevelObject { get; set; }
+    [ObservableProperty] private bool _isExporting; // 日志导出进行中标志
 
     public ConsolePageViewModel(IBackendService backendService, SettingsService settingsService,
         CommonModel commonModel, ILogger<ConsolePageViewModel> logger) : base(
@@ -49,6 +46,8 @@ public partial class ConsolePageViewModel : PageViewModel
         _backendService.StartBackend(Arguments);
         FilterOptions.CollectionChanged += (_, _) => OnPropertyChanged(nameof(ConsoleLines));
     }
+
+    public TopLevel? TopLevelObject { get; set; }
 
     private string Arguments => Environment.GetCommandLineArgs().Length > 1
         ? string.Join(' ', Environment.GetCommandLineArgs()[1..].Select(arg => arg.Contains(' ') ? $"\"{arg}\"" : arg))
@@ -153,7 +152,8 @@ public partial class ConsolePageViewModel : PageViewModel
         try
         {
             var (consoleLines, frontendFiles, backendFiles) = await Task.Run(() => ExportLogsCore(targetPath));
-            _logger.LogInformation("Log export completed: {TargetPath} (console {Console} lines, frontend {Frontend} files, backend {Backend} files)",
+            _logger.LogInformation(
+                "Log export completed: {TargetPath} (console {Console} lines, frontend {Frontend} files, backend {Backend} files)",
                 targetPath, consoleLines, frontendFiles, backendFiles);
             _commonModel.ShowSuccessToast("日志导出成功",
                 $"已保存至：{targetPath}");
@@ -170,7 +170,7 @@ public partial class ConsolePageViewModel : PageViewModel
     }
 
     /// <summary>
-    /// 收集前端/后端/控制台日志，生成清单并压缩为ZIP
+    ///     收集前端/后端/控制台日志，生成清单并压缩为ZIP
     /// </summary>
     /// <returns>(控制台行数, 前端文件数, 后端文件数)</returns>
     private (int ConsoleLines, int FrontendFiles, int BackendFiles) ExportLogsCore(string targetZipPath)
@@ -193,12 +193,30 @@ public partial class ConsolePageViewModel : PageViewModel
             // 4. 导出清单（JSON）
             var manifest = new
             {
-                exported_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                app_version = AppSettings.Version,
-                counts = new { console_lines = lines.Length, frontend_files = frontendCount, backend_files = backendCount }
+                exportedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                appVersion = AppSettings.Version,
+                counts = new
+                    { consoleLines = lines.Length, frontendFiles = frontendCount, backendFiles = backendCount },
+                systemInfo = new
+                {
+                    os = Environment.OSVersion.ToString(),
+                    architecture = Environment.Is64BitOperatingSystem ? "x64" : "x86",
+                    dotnetVersion = Environment.Version.ToString(),
+                    displays = TopLevelObject?.Screens?.All.Select(screen => new
+                    {
+                        bounds = new {screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height},
+                        workingArea = new {screen.WorkingArea.X, screen.WorkingArea.Y, screen.WorkingArea.Width, screen.WorkingArea.Height},
+                        screen.Scaling,
+                        screen.IsPrimary
+                    })
+                },
+                settings = new
+                {
+                    _settingsService.Settings.General
+                }
             };
             File.WriteAllText(Path.Combine(stagingDir, "manifest.json"),
-                JsonSerializer.Serialize(manifest, new JsonSerializerOptions { WriteIndented = true }));
+                JsonSerializer.Serialize(manifest, new JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
 
             // 5. 压缩为ZIP
             if (File.Exists(targetZipPath)) File.Delete(targetZipPath);
@@ -221,21 +239,25 @@ public partial class ConsolePageViewModel : PageViewModel
     }
 
     /// <summary>
-    /// 递归复制目录下的所有文件到目标目录（保留相对目录结构）
+    ///     递归复制目录下的所有文件到目标目录（保留相对目录结构）
     /// </summary>
     /// <returns>复制的文件数量</returns>
     private static int CopyLogFiles(string sourceDir, string destDir)
     {
+        var suffixes = new[] { ".log", ".png" }; // 仅复制日志文件和截图文件
         if (!Directory.Exists(sourceDir)) return 0;
         var count = 0;
         foreach (var file in Directory.EnumerateFiles(sourceDir, "*", SearchOption.AllDirectories))
         {
+            if (!suffixes.Any(suffix => file.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)))
+                continue;
             var relativePath = Path.GetRelativePath(sourceDir, file);
             var destPath = Path.Combine(destDir, relativePath);
             Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
             File.Copy(file, destPath, true);
             count++;
         }
+
         return count;
     }
 }

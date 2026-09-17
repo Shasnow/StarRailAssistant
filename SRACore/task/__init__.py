@@ -59,6 +59,8 @@ class BaseTask(Executable, ABC):
         if self.operator.window_context.width != 1920 or self.operator.window_context.height != 1080:
             logger.warning(
                 f"可能的失败原因：游戏分辨率不符合要求：1920x1080，当前：{self.operator.window_context.width}x{self.operator.window_context.height}。")
+        if self.operator.tm_confidence > 0.9:
+            logger.warning(f"可能的失败原因：游戏界面识别置信度过高，当前：{self.operator.tm_confidence}。")
         image = None
         try:
             image = self.operator.screenshot()
