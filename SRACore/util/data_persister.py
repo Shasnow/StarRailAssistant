@@ -9,6 +9,28 @@ from SRACore.util.const import AppDataDir, ConfigsDir
 from SRACore.util.logger import logger
 
 
+def _migrate_legacy_rewards(data: dict) -> dict:
+    """旧版配置兼容：将旧 rewards 列表迁移为新版独立开关字段"""
+    rewards = data.get("receiveRewards", {}).get("rewards")
+    if not isinstance(rewards, list):
+        return data
+    rw = data["receiveRewards"]
+    # 旧版 rewards 列表索引对应的字段名及默认值
+    legacy_map = [
+        ("rewards.trailblazeProfile", True),
+        ("rewards.assignments", True),
+        ("rewards.mail", True),
+        ("rewards.dailyTraining", True),
+        ("rewards.namelessHonor", True),
+        ("rewards.giftOfOdyssey", True),
+        ("rewards.redeemCode", False),
+    ]
+    for index, (key, default) in enumerate(legacy_map):
+        if key not in rw:  # 仅在新版字段缺失时回退读取旧列表
+            rw[key] = rewards[index] if len(rewards) > index else default
+    return data
+
+
 def load_config(name: str) -> TasksConfig | None:
     path = ''
     try:
@@ -17,7 +39,9 @@ def load_config(name: str) -> TasksConfig | None:
         else:
             path = ConfigsDir / f'{name}.json'
         with open(path, 'r') as f:
-            return TasksConfig.from_dict(json.load(f))
+            data = json.load(f)
+        data = _migrate_legacy_rewards(data)
+        return TasksConfig.from_dict(data)
     except FileNotFoundError:
         logger.error(Resource.config_fileNotFound(path))
         return None
