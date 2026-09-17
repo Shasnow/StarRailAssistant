@@ -29,7 +29,12 @@ class DivergentUniverse(Executable):
     # 站点刷新最大次数
     MAX_REROLL_ATTEMPTS = 3
 
-    def __init__(self, operator, run_times: int = 1, use_technique: bool = False, point_rewards: bool = False):
+    def __init__(self,
+                 operator,
+                 run_times: int = 1,
+                 use_technique: bool = False,
+                 point_rewards: bool = False,
+                 mode: int = 0):
         super().__init__(operator)
         self.run_times = run_times
         self.use_technique = use_technique
@@ -69,7 +74,7 @@ class DivergentUniverse(Executable):
         self.selection_template_list = [s[1] for s in self.selections]
         self.in_game = False
         self.is_running = False
-        self.mode = 1
+        self.mode = mode
         self.current_station = "战斗"
         
 
