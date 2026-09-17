@@ -1,4 +1,11 @@
 import abc
+import unicodedata
+
+
+def normalize_unicode(text: str) -> str:
+    """NFKC 归一化：全角字符转半角（如 ？(U+FF1F) → ?(U+003F)、全角字母数字转半角），
+    消除 OCR 对全角/半角字符识别结果不稳定的影响"""
+    return unicodedata.normalize("NFKC", text)
 
 
 def normalize_ocr_text(text: str) -> str:
@@ -34,9 +41,9 @@ class StrMatcher(abc.ABC):
 
 class ContainsMatcher(StrMatcher):
     def match(self, other: str) -> bool:
-        return self.value in other
+        return normalize_unicode(self.value) in normalize_unicode(other)
 
 
 class EqualsMatcher(StrMatcher):
     def match(self, other: str) -> bool:
-        return self.value == other
+        return normalize_unicode(self.value) == normalize_unicode(other)

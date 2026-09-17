@@ -314,10 +314,9 @@ class IOperator(ABC):
                                confidence=confidence, trace=trace)
         if not boxes:
             return None
-        if isinstance(text, str):
-            text = ContainsMatcher(text)
+        matcher = ContainsMatcher(text) if isinstance(text, str) else text
         for box in boxes:
-            if text.match(box.source):
+            if matcher.match(box.source):
                 return box
         if trace:
             logger.debug(f"OCR Result not match text: {text}")
@@ -350,10 +349,9 @@ class IOperator(ABC):
         if not boxes:
             return -1, None
         for index, text in enumerate(texts):
-            if isinstance(text, str):
-                text = ContainsMatcher(text)
+            matcher = ContainsMatcher(text) if isinstance(text, str) else text
             for box in boxes:
-                if text.match(box.source):
+                if matcher.match(box.source):
                     return index, box
         if trace:
             logger.debug(f"OCR Result not match any text: {texts}")
