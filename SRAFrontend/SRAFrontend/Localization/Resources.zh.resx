@@ -30,6 +30,9 @@
     <data name="ResourceIntegrityCheckText" xml:space="preserve">
         <value>资源完整性检查</value>
     </data>
+    <data name="ResourceCleanupText" xml:space="preserve">
+        <value>资源清理</value>
+    </data>
     <data name="ExtensionText" xml:space="preserve">
         <value>拓展</value>
     </data>
@@ -554,5 +557,8 @@
     </data>
     <data name="OpenText" xml:space="preserve">
         <value>打开</value>
+    </data>
+    <data name="CleanupText" xml:space="preserve">
+        <value>清理</value>
     </data>
 </root>

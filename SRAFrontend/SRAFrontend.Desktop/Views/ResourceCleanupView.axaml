@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:viewModels="clr-namespace:SRAFrontend.Desktop.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+             Width="620"
+             x:Class="SRAFrontend.Desktop.Views.ResourceCleanupView"
+             x:DataType="viewModels:ResourceCleanupViewModel">
+    <suki:BusyArea IsBusy="{Binding IsDeleting}" BusyText="正在删除...">
+        <StackPanel Margin="0,4" Spacing="8">
+            <Grid ColumnDefinitions="Auto, *, Auto">
+                <CheckBox Content="全选"
+                          IsChecked="{Binding IsAllSelected}" />
+                <TextBlock Grid.Column="2"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           Opacity="0.72"
+                           Text="{Binding SelectedSummary}" />
+            </Grid>
+            <ScrollViewer MaxHeight="360"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Files}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:ResourceCleanupItem">
+                            <Grid ColumnDefinitions="Auto, *, Auto" Margin="0,2">
+                                <CheckBox IsChecked="{Binding IsSelected}" />
+                                <TextBlock Grid.Column="1"
+                                           Margin="8,0"
+                                           VerticalAlignment="Center"
+                                           FontSize="12"
+                                           Text="{Binding RelativePath}"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip.Tip="{Binding RelativePath}" />
+                                <TextBlock Grid.Column="2"
+                                           VerticalAlignment="Center"
+                                           FontSize="12"
+                                           Opacity="0.72"
+                                           Text="{Binding SizeText}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </StackPanel>
+    </suki:BusyArea>
+</UserControl>

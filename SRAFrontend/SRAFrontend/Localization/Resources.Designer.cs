@@ -339,6 +339,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Clean Up.
+        /// </summary>
+        public static string CleanupText {
+            get {
+                return ResourceManager.GetString("CleanupText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clear Stamina.
         /// </summary>
         public static string ClearPowerText {
@@ -1190,6 +1199,15 @@ namespace SRAFrontend.Localization {
         public static string RemoveConfigText {
             get {
                 return ResourceManager.GetString("RemoveConfigText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resource cleanup.
+        /// </summary>
+        public static string ResourceCleanupText {
+            get {
+                return ResourceManager.GetString("ResourceCleanupText", resourceCulture);
             }
         }
         

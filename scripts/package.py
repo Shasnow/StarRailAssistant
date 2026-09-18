@@ -71,11 +71,16 @@ class ZipBuilder:
             print(f"  [WARN] Skipping non-existent path: {path}")
             return
         if path.is_file():
-            self._entries[str(path.relative_to(base_path))] = path
+            self._entries[self._arcname(path.relative_to(base_path))] = path
             return
         for file in sorted(path.rglob("*")):
             if file.is_file():
-                self._entries[str(file.relative_to(base_path))] = file
+                self._entries[self._arcname(file.relative_to(base_path))] = file
+
+    @staticmethod
+    def _arcname(relative_path: Path) -> str:
+        """归一化为 zip 标准的正斜杠分隔路径，与压缩包内条目名及 MD5 清单键保持一致。"""
+        return str(relative_path).replace("\\", "/")
 
     def add_file(self, file: Path, arcname: str):
         self._entries[arcname] = file
@@ -83,19 +88,23 @@ class ZipBuilder:
     _EXCLUDESuffixes = (".pdb",)
     _EXCLUDENames = {"web.config"}
 
+    # MD5 校验清单在压缩包内的固定路径，便于统一读取
+    MD5_MANIFEST_NAME = "manifest.md5.json"
+
     def snapshot(self, zip_path: Path):
-        """将当前所有条目写入 zip 文件，并输出 MD5 校验文件。"""
+        """将当前所有条目写入 zip 文件，并在压缩包内写入固定命名的 MD5 校验清单。"""
         md5_dict: dict[str, str] = {}
+        entries: list[tuple[str, Path]] = []
+        for arcname, src in self._entries.items():
+            name = Path(arcname).name
+            if name.lower().endswith(self._EXCLUDESuffixes) or name.lower() in self._EXCLUDENames:
+                continue
+            entries.append((arcname, src))
+            md5_dict[arcname] = self._md5(src)
         with ZipFile(zip_path, "w", compression=ZIP_DEFLATED) as zipf:
-            for arcname, src in self._entries.items():
-                name = Path(arcname).name
-                if name.lower().endswith(self._EXCLUDESuffixes) or name.lower() in self._EXCLUDENames:
-                    continue
+            for arcname, src in entries:
                 zipf.write(src, arcname)
-                md5_dict[arcname] = self._md5(src)
-        md5_path = zip_path.with_suffix(".md5.json")
-        with open(md5_path, "w", encoding="utf-8") as f:
-            json.dump(md5_dict, f, indent=2, ensure_ascii=False)
+            zipf.writestr(self.MD5_MANIFEST_NAME, json.dumps(md5_dict, indent=2, ensure_ascii=False))
         print(f"[OK] {zip_path.name} ({len(self._entries)} files)")
 
 

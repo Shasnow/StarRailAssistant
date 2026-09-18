@@ -1,20 +1,25 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Data;
 using SRAFrontend.Desktop.Services;
+using SRAFrontend.Desktop.Views;
 using SRAFrontend.Localization;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
+using SRAFrontend.Utils;
 using SukiUI.Controls;
 using SukiUI.MessageBox;
 using CustomizableKey = SRAFrontend.Desktop.Models.CustomizableKey;
@@ -325,6 +330,128 @@ public partial class SettingsPageViewModel : PageViewModel
         finally
         {
             IsReinstalling = false;
+        }
+    }
+
+    /// <summary>资源完整性检查是否进行中（用于禁用按钮，防止重复触发）</summary>
+    [ObservableProperty]
+    private bool _isResourceChecking;
+
+    /// <summary>根据安装包内置的 MD5 清单（manifest.md5.json）校验应用文件完整性</summary>
+    [RelayCommand]
+    private async Task CheckResourceIntegrityAsync()
+    {
+        if (IsResourceChecking) return;
+        IsResourceChecking = true;
+        try
+        {
+            var result = await Task.Run(() => ZipUtil.CheckIntegrity(DataPath.AppRoot));
+            if (result.IsIntact)
+            {
+                _commonModel.ShowSuccessToast(Resources.ResourceIntegrityCheckText,
+                    $"完整性检查通过，共校验 {result.TotalCount} 个文件");
+                return;
+            }
+
+            var problems = new StackPanel { Spacing = 8 };
+            AddProblemFiles(problems, "以下文件缺失", result.MissingFiles);
+            AddProblemFiles(problems, "以下文件校验失败（已损坏或版本不一致）", result.CorruptedFiles);
+            await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+            {
+                Header = Resources.ResourceIntegrityCheckText,
+                Content = new ScrollViewer { MaxHeight = 400, Content = problems },
+                ActionButtonsSource =
+                    [SukiMessageBoxButtonsFactory.CreateButton("知道了", SukiMessageBoxResult.Cancel)]
+            });
+        }
+        catch (FileNotFoundException)
+        {
+            _commonModel.ShowErrorToast(Resources.ResourceIntegrityCheckText,
+                "未找到完整性清单文件（manifest.md5.json），请通过应用内更新重新安装后再试");
+        }
+        catch (Exception e)
+        {
+            _commonModel.ShowErrorToast(Resources.ResourceIntegrityCheckText, $"检查失败：{e.Message}");
+        }
+        finally
+        {
+            IsResourceChecking = false;
+        }
+    }
+
+    /// <summary>把一组问题文件以标题 + 明细列表的形式追加到对话框面板（最多展示 50 条，超出部分汇总）</summary>
+    private static void AddProblemFiles(StackPanel panel, string header, IReadOnlyList<string> files)
+    {
+        if (files.Count == 0) return;
+        panel.Children.Add(new TextBlock
+        {
+            Text = $"{header}（{files.Count} 个）",
+            FontWeight = FontWeight.Bold
+        });
+        foreach (var file in files.Take(50))
+            panel.Children.Add(new TextBlock { Text = file, FontSize = 12, Opacity = 0.72 });
+        if (files.Count > 50)
+            panel.Children.Add(new TextBlock
+            {
+                Text = $"……其余 {files.Count - 50} 个文件省略",
+                FontSize = 12,
+                Opacity = 0.72
+            });
+    }
+
+    /// <summary>资源清理流程是否进行中（用于禁用按钮，防止重复触发）</summary>
+    [ObservableProperty]
+    private bool _isResourceCleaning;
+
+    /// <summary>扫描应用目录下不在 MD5 清单中的冗余文件，弹窗勾选后删除</summary>
+    [RelayCommand]
+    private async Task CleanupResourcesAsync()
+    {
+        if (IsResourceCleaning) return;
+        IsResourceCleaning = true;
+        try
+        {
+            var redundant = await Task.Run(() => ZipUtil.ScanRedundantFiles(DataPath.AppRoot));
+            if (redundant.Count == 0)
+            {
+                _commonModel.ShowSuccessToast(Resources.ResourceCleanupText, "未发现可清理的文件");
+                return;
+            }
+
+            var viewModel = new ResourceCleanupViewModel(DataPath.AppRoot, redundant);
+            var view = new ResourceCleanupView { DataContext = viewModel };
+            var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+            {
+                Header = Resources.ResourceCleanupText,
+                Content = view,
+                ActionButtonsSource =
+                [
+                    SukiMessageBoxButtonsFactory.CreateButton("删除选中", SukiMessageBoxResult.Yes, "Flat"),
+                    SukiMessageBoxButtonsFactory.CreateButton("取消", SukiMessageBoxResult.Cancel)
+                ]
+            });
+            if (result is not SukiMessageBoxResult.Yes) return;
+
+            var (deletedCount, freedBytes, failed) = await viewModel.DeleteSelectedAsync();
+            if (failed.Count == 0)
+                _commonModel.ShowSuccessToast(Resources.ResourceCleanupText,
+                    $"已删除 {deletedCount} 个文件，释放 {ZipUtil.FormatFileSize(freedBytes)}");
+            else
+                _commonModel.ShowErrorToast(Resources.ResourceCleanupText,
+                    $"已删除 {deletedCount} 个文件，{failed.Count} 个删除失败（可能被占用）：{string.Join("、", failed.Take(3))}{(failed.Count > 3 ? " 等" : "")}");
+        }
+        catch (FileNotFoundException)
+        {
+            _commonModel.ShowErrorToast(Resources.ResourceCleanupText,
+                "未找到完整性清单文件（manifest.md5.json），无法区分冗余文件，请通过应用内更新重新安装后再试");
+        }
+        catch (Exception e)
+        {
+            _commonModel.ShowErrorToast(Resources.ResourceCleanupText, $"扫描失败：{e.Message}");
+        }
+        finally
+        {
+            IsResourceCleaning = false;
         }
     }
 

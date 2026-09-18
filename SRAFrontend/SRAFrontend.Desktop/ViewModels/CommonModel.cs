@@ -105,7 +105,9 @@ public class CommonModel(
             var cancelButton = SukiMessageBoxButtonsFactory.CreateButton("忽略", SukiMessageBoxResult.Cancel);
             var releaseNoteViewer = new ThemedMarkdownScrollViewer
             {
-                Markdown = response.Data.ReleaseNote
+                Markdown = response.Data.ReleaseNote,
+                Width = 800,
+                Height = 600
             };
             
             var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost

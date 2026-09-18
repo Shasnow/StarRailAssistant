@@ -858,7 +858,21 @@
                                         <Label Classes="Icon">&#xe184;</Label>
                                         <Label Grid.Column="1"
                                                Content="{x:Static lang:Resources.ResourceIntegrityCheckText}" />
-                                        <Button Grid.Column="2" IsEnabled="False">Check</Button>
+                                        <Button Grid.Column="2"
+                                                Content="{x:Static lang:Resources.CheckText}"
+                                                IsEnabled="{Binding !IsResourceChecking}"
+                                                Command="{Binding CheckResourceIntegrityCommand}"
+                                                ToolTip.Tip="根据安装包内置的 MD5 清单校验应用文件完整性" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="Icon">&#xEC54;</Label>
+                                        <Label Grid.Column="1"
+                                               Content="{x:Static lang:Resources.ResourceCleanupText}" />
+                                        <Button Grid.Column="2"
+                                                Content="{x:Static lang:Resources.CleanupText}"
+                                                IsEnabled="{Binding !IsResourceCleaning}"
+                                                Command="{Binding CleanupResourcesCommand}"
+                                                ToolTip.Tip="扫描应用目录下的冗余文件（更新残留、日志等），结果包含个人数据，请谨慎操作" />
                                     </Grid>
                                     <Grid ColumnDefinitions="Auto, Auto, *">
                                         <Label Classes="Icon">&#xe184;</Label>
