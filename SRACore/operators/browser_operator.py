@@ -2,13 +2,15 @@ import enum
 import json
 import threading
 import time
+from collections.abc import Callable
 from io import BytesIO
 
+import psutil
 from PIL import Image
 from loguru import logger
 from rapidocr import RapidOCR
 from selenium import webdriver
-from selenium.common import NoSuchElementException, TimeoutException
+from selenium.common import NoSuchElementException, SessionNotCreatedException, TimeoutException
 from selenium.webdriver import Keys, ActionChains
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.by import By
@@ -59,28 +61,85 @@ class WebDriverManager:
                 from selenium.webdriver.edge.options import Options
                 opt = Options()
                 cls._build_options(opt, binary_path, headless)
-                width, height = cls.WINDOW_SIZE[browser]
-                driver = webdriver.Edge(options=opt)
-                driver.set_window_size(width, height)
+                width, height = cls.WINDOW_SIZE[browser] if not headless else (1920, 1080)
+                driver = cls._launch(lambda: webdriver.Edge(options=opt), browser)
             case BrowserType.CHROME:
                 from selenium.webdriver.chrome.options import Options
                 opt = Options()
                 cls._build_options(opt, binary_path, headless)
-                width, height = cls.WINDOW_SIZE[browser]
-                driver = webdriver.Chrome(options=opt)
-                driver.set_window_size(width, height)
+                width, height = cls.WINDOW_SIZE[browser] if not headless else (1920, 1080)
+                driver = cls._launch(lambda: webdriver.Chrome(options=opt), browser)
             case BrowserType.FIREFOX:
                 from selenium.webdriver.firefox.options import Options
                 opt = Options()
                 cls._build_options(opt, binary_path, headless)
-                width, height = cls.WINDOW_SIZE[browser]
-                driver = webdriver.Firefox(options=opt)
-                driver.set_window_size(width, height)
+                width, height = cls.WINDOW_SIZE[browser] if not headless else (1920, 1080)
+                driver = cls._launch(lambda: webdriver.Firefox(options=opt), browser)
             case _:
                 raise ValueError(f"未知浏览器类型 {browser}")
+        if headless and browser is not BrowserType.FIREFOX:
+            # 无头模式下 set_window_size 设置的是含模拟边框的窗口尺寸，
+            # 截图截取的却是视口，直接用 CDP 把渲染视口设为目标分辨率
+            cls._set_viewport_size(driver, width, height)
+        else:
+            driver.set_window_size(width, height)
         # 加入缓存池
         cls._driver_pool[browser] = driver
         return driver
+
+    @staticmethod
+    def _set_viewport_size(driver: WebDriver, width: int, height: int):
+        driver.execute_cdp_cmd("Emulation.setDeviceMetricsOverride",
+                               {"width": width, "height": height, "deviceScaleFactor": 1, "mobile": False})
+
+    @classmethod
+    def _launch(cls, create: Callable[[], WebDriver], browser: BrowserType) -> WebDriver:
+        """创建 WebDriver；因残留进程占用 profile 或锁文件损坏导致启动崩溃时，清理后重试一次"""
+        try:
+            return create()
+        except SessionNotCreatedException as e:
+            logger.warning(f"{browser} 启动失败，清理残留浏览器进程与锁文件后重试: {e.msg.splitlines()[0] if e.msg else e}")
+        cls._kill_stale_browser_processes()
+        cls._clean_profile_locks()
+        return create()
+
+    # 复用 profile 的 Chromium 系浏览器进程名
+    _STALE_PROCESS_NAMES = {"msedge.exe", "chrome.exe"}
+
+    @classmethod
+    def _kill_stale_browser_processes(cls):
+        """结束仍在占用 selenium_profile 的残留浏览器进程（不影响用户正常使用的浏览器窗口）"""
+        profile_arg = str(CacheDir / "selenium_profile")
+        stale_pids = []
+        for proc in psutil.process_iter(["name", "cmdline"]):
+            try:
+                name = (proc.info["name"] or "").lower()
+                if name not in cls._STALE_PROCESS_NAMES:
+                    continue
+                cmdline = " ".join(proc.info["cmdline"] or [])
+                if profile_arg in cmdline:
+                    stale_pids.append(proc.pid)
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
+        for pid in stale_pids:
+            try:
+                psutil.Process(pid).kill()
+                logger.info(f"已结束占用 selenium_profile 的残留浏览器进程 (PID {pid})")
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                pass
+        if stale_pids:
+            psutil.wait_procs([psutil.Process(pid) for pid in stale_pids if psutil.pid_exists(pid)], timeout=5)
+
+    @staticmethod
+    def _clean_profile_locks():
+        """清理 profile 中进程被强杀后残留的锁文件"""
+        profile_dir = CacheDir / "selenium_profile"
+        for lock_name in ("DevToolsActivePort", "lockfile", "SingletonLock", "SingletonCookie", "SingletonSocket"):
+            lock_path = profile_dir / lock_name
+            try:
+                lock_path.unlink(missing_ok=True)
+            except OSError:
+                logger.debug(f"清理锁文件失败: {lock_path}")
 
     @staticmethod
     def _build_options(opt: webdriver.EdgeOptions | webdriver.ChromeOptions | webdriver.FirefoxOptions,
@@ -128,6 +187,9 @@ class BrowserOperator(IOperator):
             binary_path = self.settings.General.cloudGameBrowserPath
             headless = self.settings.General.cloudGameBrowserHeadless
             self._driver = WebDriverManager.get_driver(BrowserType(browser_type), binary_path, headless)
+            # 以实际渲染视口为准，避免窗口边框/工具栏导致比例坐标与截图偏差
+            self.window_context.width, self.window_context.height = \
+                self._driver.execute_script("return [window.innerWidth, window.innerHeight]")
         return self._driver
 
     def login(self, account, password, relogin: bool = False):
@@ -156,7 +218,6 @@ class BrowserOperator(IOperator):
             logger.error("登录失败")
             return -1
 
-        self.load_initial_local_storage()
         try:
             self.driver.find_element(By.XPATH, '/html/body/div[6]/div[3]/button[1]').click()  # 下次再说
         except NoSuchElementException:
@@ -203,18 +264,6 @@ class BrowserOperator(IOperator):
             return True
         except (TimeoutException, NoSuchElementException):
             return True
-
-    def load_initial_local_storage(self):
-        data = {
-            "clgm_web_app_settings_hkrpg_cn": "{\"kickoutMinMigratedFromUseConfig\":true,\"showGameMenuSettingGuideMigratedFromUseConfig\":true,\"showGameMenuSettingGuide\":false,\"gameLang\":\"zh-CN\",\"videoModeSmoothFirstToggleConfirmed\":true,\"videoMode\":0}",
-            "clgm_web_app_client_store_config_hkrpg_cn": "{\"showGameMenuGuide\":false,\"volume\":1,\"showGameStatBar\":false,\"gameStatBarType\":\"verbose\",\"speedLimitGearId\":\"0\",\"fabPosition\":{\"x\":0.0,\"y\":0.35},\"showMouseStatusGuide\":false,\"enableVolume\":true}"
-        }
-        for key, value in data.items():
-            self.driver.execute_script(
-                "window.localStorage.setItem(arguments[0], arguments[1]);",
-                key,
-                value,
-            )
 
     def _wait_in_queue(self, timeout=600) -> bool:
         """排队等待进入"""

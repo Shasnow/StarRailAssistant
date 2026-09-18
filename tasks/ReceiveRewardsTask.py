@@ -215,7 +215,7 @@ class ReceiveRewardsTask(BaseTask):
             logger.info("没有可领取的奖励")
         else:
             while self.operator.click_img(RRIMG.DAILY_REWARD, after_sleep=0.5):
-                self.operator.move_rel(0, 50)
+                self.operator.move_to(0.5, 0.5)
 
             if self.operator.click_img(RRIMG.DAILY_TRAIN_REWARD, after_sleep=1.5):
                 self.operator.press_key("esc")
