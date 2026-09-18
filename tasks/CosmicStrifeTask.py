@@ -19,7 +19,8 @@ class CosmicStrifeTask(BaseTask):
                 self.operator,
                 self.config.CosmicStrife.divergentUniverseRuntimes,
                 self.config.CosmicStrife.isDivergentUniverseUseTechnique,
-                self.config.CosmicStrife.isPointRewardsEnabled)
+                self.config.CosmicStrife.isPointRewardsEnabled,
+                self.config.CosmicStrife.divergentUniverseMode)
             if not du_task.run():
                 logger.error("旷宇纷争-差分宇宙任务失败")
                 return False

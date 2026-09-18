@@ -51,6 +51,7 @@ class Box:
     width: int
     height: int
     source: str = ''
+    _text: str | None = None
 
     @property
     def center(self):
@@ -59,6 +60,15 @@ class Box:
         center_y = int(self.top + self.height // 2)
         return center_x, center_y
 
+    @property
+    def text(self):
+        """获取Box的文本内容，如果没有设置文本，则返回source属性"""
+        return self._text or self.source
+
+    @text.setter
+    def text(self, value: str):
+        self._text = value
+
     def distance(self, other: 'Box'):
         x1, y1 = self.center
         x2, y2 = other.center
@@ -66,3 +76,6 @@ class Box:
 
     def __repr__(self):
         return f'Box(left={self.left}, top={self.top}, width={self.width}, height={self.height}, center={self.center}, source={self.source})'
+
+    def __str__(self):
+        return self.text

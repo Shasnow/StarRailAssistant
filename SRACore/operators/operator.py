@@ -19,6 +19,28 @@ from SRACore.util import sys_util
 from SRACore.util.errors import ErrorCode, SRAError, ThreadStoppedError
 from SRACore.util.logger import logger
 
+# Win32 SendInput 相对鼠标移动结构（移植自 pydirectinput moveRel relative=True）
+_PUL = ctypes.POINTER(ctypes.c_ulong)
+_MOUSEEVENTF_MOVE = 0x0001
+
+
+class _MouseInput(ctypes.Structure):
+    _fields_ = [("dx", ctypes.c_long),
+                ("dy", ctypes.c_long),
+                ("mouseData", ctypes.c_ulong),
+                ("dwFlags", ctypes.c_ulong),
+                ("time", ctypes.c_ulong),
+                ("dwExtraInfo", _PUL)]
+
+
+class _InputUnion(ctypes.Union):
+    _fields_ = [("mi", _MouseInput)]
+
+
+class _INPUT(ctypes.Structure):
+    _fields_ = [("type", ctypes.c_ulong),
+                ("ii", _InputUnion)]
+
 
 class Operator(IOperator):
     def __init__(self, ocr_engine: RapidOCR, settings: AppSettings,
@@ -325,12 +347,13 @@ class Operator(IOperator):
                 logger.debug(f"Failed to press key: {e}")
             return False
 
-    def hold_key(self, key: str, duration: float = 0) -> bool:
+    def hold_key(self, key: str, duration: float = 0, trace: bool = True) -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("按键中断", "线程已停止")
         try:
             keys = key.split("+")
-            logger.debug(f"Hold key {key}")
+            if trace:
+                logger.debug(f"Hold key {key}")
             for k in keys:
                 pyautogui.keyDown(k)
             time.sleep(duration)
@@ -352,11 +375,17 @@ class Operator(IOperator):
         pyautogui.keyUp("v")
         pyautogui.keyUp("ctrl")
 
-    def move_rel(self, x_offset: int, y_offset: int) -> bool:
+    def move_rel(self, x_offset: int, y_offset: int, trace: bool = True) -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("鼠标移动中断", "线程已停止")
         try:
-            pyautogui.moveRel(x_offset, y_offset, 0.5)
+            if trace:
+                logger.debug(f"Move cursor relative: ({x_offset}, {y_offset})")
+            extra = ctypes.c_ulong(0)
+            ii = _InputUnion()
+            ii.mi = _MouseInput(x_offset, y_offset, 0, _MOUSEEVENTF_MOVE, 0, ctypes.pointer(extra))
+            command = _INPUT(ctypes.c_ulong(0), ii)
+            ctypes.windll.user32.SendInput(1, ctypes.pointer(command), ctypes.sizeof(command))
             return True
         except Exception as e:
             logger.debug(f"Error moving cursor: {e}")
@@ -414,10 +443,12 @@ class Operator(IOperator):
             logger.debug(f"Error releasing mouse button: {e}")
             return False
 
-    def scroll(self, clicks: int, x: int | float | None = None, y: int | float | None = None) -> bool:
+    def scroll(self, clicks: int, x: int | float | None = None, y: int | float | None = None, trace: bool = True) -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("Error scrolling", "线程已停止")
         try:
+            if trace:
+                logger.debug(f"Scroll: {clicks} clicks, ({x}, {y})")
             pyautogui.scroll(clicks, x, y)
             return True
         except Exception as e:

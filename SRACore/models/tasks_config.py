@@ -174,23 +174,17 @@ class ReceiveRewardsConfig:
     @classmethod
     def from_dict(cls, data: dict):
         """从字典创建对象"""
-        rewards = data.get("rewards")
-
-        def legacy_reward(index: int, default: bool) -> bool:
-            """旧版配置兼容：按索引回退读取旧 rewards 列表，列表被改短时越界索引按默认值处理"""
-            return rewards[index] if isinstance(rewards, list) and len(rewards) > index else default
-
         return cls(**{
             "isEnabled": data.get("enabled", False),
             "redeemCodes": data.get("redeemCodes", ""),
-            "Rewards": rewards if isinstance(rewards, list) else list(),
-            "isTrailblazeProfileEnabled": data.get("rewards.trailblazeProfile", legacy_reward(0, True)),
-            "isAssignmentsEnabled": data.get("rewards.assignments", legacy_reward(1, True)),
-            "isMailEnabled": data.get("rewards.mail", legacy_reward(2, True)),
-            "isDailyTrainingEnabled": data.get("rewards.dailyTraining", legacy_reward(3, True)),
-            "isNamelessHonorEnabled": data.get("rewards.namelessHonor", legacy_reward(4, True)),
-            "isGiftOfOdysseyEnabled": data.get("rewards.giftOfOdyssey", legacy_reward(5, True)),
-            "isRedeemCodeEnabled": data.get("rewards.redeemCode", legacy_reward(6, False))
+            "Rewards": data.get("rewards", list()) if isinstance(data.get("rewards"), list) else list(),
+            "isTrailblazeProfileEnabled": data.get("rewards.trailblazeProfile", True),
+            "isAssignmentsEnabled": data.get("rewards.assignments", True),
+            "isMailEnabled": data.get("rewards.mail", True),
+            "isDailyTrainingEnabled": data.get("rewards.dailyTraining", True),
+            "isNamelessHonorEnabled": data.get("rewards.namelessHonor", True),
+            "isGiftOfOdysseyEnabled": data.get("rewards.giftOfOdyssey", True),
+            "isRedeemCodeEnabled": data.get("rewards.redeemCode", False)
         })
 
 @dataclass

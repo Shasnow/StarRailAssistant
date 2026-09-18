@@ -29,10 +29,11 @@
                                 <Label>模式</Label>
                                 <ComboBox SelectedIndex="{Binding CosmicStrifeConfig.DivergentUniverseMode}">
                                     <ComboBoxItem>刷第一关</ComboBoxItem>
+                                    <ComboBoxItem>完整对局</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="10">
-                                <Label>次数</Label>
+                                <Label>运行次数</Label>
                                 <NumericUpDown FormatString="0" Value="{Binding CosmicStrifeConfig.DivergentUniverseRuntimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
                             <ToggleSwitch OnContent="秘技速刷" IsChecked="{Binding CosmicStrifeConfig.IsDivergentUniverseUseTechnique}" />
