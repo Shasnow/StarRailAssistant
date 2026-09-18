@@ -7,6 +7,7 @@ from loguru import logger
 from SRACore.operators.model import Box
 from SRACore.task import Executable
 from SRACore.util.errors import SRAError, ErrorCode
+from SRACore.util.strutil import ContainsMatcher
 from tasks.img import DUIMG, IMG
 
 
@@ -28,6 +29,12 @@ class DivergentUniverse(Executable):
     MAX_ALIGN_ATTEMPTS = 10
     # 站点刷新最大次数
     MAX_REROLL_ATTEMPTS = 3
+    # 事件扫描：一周内转动+识别的步数
+    SCAN_STEPS = 10
+    # 事件扫描：轮数上限（每轮 = 旋转一周识别 + 前进识别）
+    MAX_SCAN_ROUNDS = 4
+    # 事件扫描：每轮前进时长（秒）
+    SCAN_FORWARD_DURATION = 1.0
 
     def __init__(self,
                  operator,
@@ -46,13 +53,15 @@ class DivergentUniverse(Executable):
             ("选择方程", DUIMG.EQUATION_SELECT, self.handle_equation_select, False),
             ("选择奇物", DUIMG.CURIOSITY_SELECT, self.handle_curiosity_select, False),
             ("方程展开", DUIMG.EQUATION_EXPANSION, self.handle_equation_expand, False),
+            ("祝福强化", DUIMG.BLESSING_ENHANCEMENT, self.handle_close, False),
             ("选择站点卡", DUIMG.STATION_SELECT, self.handle_station_select, False),
             ("选择下一个站点", DUIMG.SELECT_NEXT_STATION, self.handle_next_station_select, False),
             ("选择惊世奇迹", DUIMG.SELECT_GRAND_MIRACLE, self.handle_miracle_select, False),
             ("选择奇迹", DUIMG.SELECT_YOUR_MIRACLE, self.handle_miracle_select, False),
             ("选择区域", DUIMG.SELECT_AREA, self.handle_area_select, False),
             ("点击空白处关闭", DUIMG.CLOSE, self.handle_close, False),
-            ("丢弃奇物", DUIMG.DISCARD_CURIOSITY, self.handle_disc_curiosity, False),
+            ("丢弃", DUIMG.DISCARD_DISABLE, self.handle_disc_curiosity, False),
+            # ("奇物损毁", DUIMG.DESTROY_CURIOSITY, self.handle_disc_curiosity, False),
             ("事件", DUIMG.EVENT, self.handle_event, False),
             ("探索成功", DUIMG.SUCCESS, self.handle_success, True),
             ('处理完成', DUIMG.DIVERGENT_UNIVERSE_QUIT, None, True),
@@ -113,9 +122,9 @@ class DivergentUniverse(Executable):
             if not self.select():
                 return False
             if self.mode == 0:
-                self._complete_mission()
+                self._quit_game()
                 break
-            if not self._navigate_to_next_station():
+            if not self.navigate_to_next_station():
                 return False
         return True
 
@@ -131,18 +140,18 @@ class DivergentUniverse(Executable):
             box = self.operator.wait_img(DUIMG.DIVERGENT_UNIVERSE_START)
         # index=1, 已经在差分宇宙界面，box为开始按钮
         # 点击开始按钮直到进入
-        self.operator.do_while(lambda: self.operator.click_box(box),  # NOQA
+        self.operator.do_while(lambda: self.operator.click_box(box),
                                lambda: self.operator.locate(DUIMG.PERIODIC_CALCULUS) is None,
                                interval=1, max_iterations=10)
         self.operator.click_img(DUIMG.PERIODIC_CALCULUS)
 
-        launch_button_box = self.operator.wait_img(DUIMG.LAUNCH_DIVERGENT_UNIVERSE)
+        _, launch_button_box = self.operator.wait_any_img([DUIMG.LAUNCH_DIVERGENT_UNIVERSE, DUIMG.CONTINUE_PROGRESS])
         # 启动差分宇宙
         if launch_button_box is None:
-            logger.error(SRAError(ErrorCode.IMAGE_NOT_FOUND, "未找到差分宇宙启动按钮"))
+            logger.error("未找到差分宇宙启动按钮")
             return False
         if not self.operator.click_box(launch_button_box):
-            logger.error(SRAError(ErrorCode.MOUSE_CLICK_FAILED, "点击差分宇宙启动按钮失败"))
+            logger.error("点击差分宇宙启动按钮失败")
             return False
 
         return True
@@ -186,16 +195,51 @@ class DivergentUniverse(Executable):
 
     def handle_event_station(self):
         """事件站点处理"""
-        self.operator.hold_key("w", duration=1)
-        self.operator.hold_key("a", duration=0.5)
-        self._move_forward_until_found()
-        self.operator.press_key("f")
-        self.select()
-        self.operator.hold_key("d", duration=1)
-        self.operator.press_key("f")
-        self.select()
-
+        self.operator.sleep(1)
+        for _ in range(4):
+            event = self._scan_for_event()
+            if event is None:
+                logger.info("扫描未找到事件，结束事件站点处理")
+                break
+            matcher = ContainsMatcher(event.source)
+            self._align_horizontal(event, lambda: self.operator.ocr_match(text=matcher, from_x=0.24, from_y=0.0, to_x=0.77, to_y=0.5))
+            self._move_forward_until_found("事件")
+            self.operator.press_key("f")
+            self.select()
         return True
+
+    def _detect_event(self) -> Box | None:
+        """识别视野内的事件名称，过滤以数字开头的干扰文本"""
+        events = self.operator.ocr_boxes(from_x=0.24, from_y=0.0, to_x=0.77, to_y=0.5, confidence=0.8)
+        for box in events or []:
+            if len(box.source) < 2 or box.source.isascii() or box.source == "造物调试台":  # 事件不可能为纯ASCII文本
+                continue
+            logger.info(f"识别到事件: {box.source}")
+            return box
+        return None
+
+    def _scan_for_event(self) -> Box | None:
+        """扫描寻找事件：重置视角 → 向右旋转一周并穿插识别 → 未找到则前进后重新扫描，循环直到找到或达到轮数上限"""
+        step = int(self.operator.window_context.width * 0.5)
+        for round_ in range(1, self.MAX_SCAN_ROUNDS + 1):
+            self.operator.press_key("capslock")  # 视角重置到角色面向方向
+            self.operator.sleep(0.5)
+            # 向右旋转一周，每步转动后识别
+            for _ in range(self.SCAN_STEPS):
+                self.operator.move_rel(step, 0)
+                self.operator.sleep(0.3)
+                event = self._detect_event()
+                if event is not None:
+                    return event
+            logger.info(f"{round_}/{self.MAX_SCAN_ROUNDS} 未找到事件，前进后重试")
+            # 前进一段距离后识别，再进入下一轮
+            self.operator.hold_key("w", self.SCAN_FORWARD_DURATION)
+            self.operator.sleep(0.3)
+            event = self._detect_event()
+            if event is not None:
+                return event
+        logger.warning("扫描完成仍未找到事件")
+        return None
 
     def handle_event(self):
         """事件处理"""
@@ -221,19 +265,17 @@ class DivergentUniverse(Executable):
 
     def handle_forge_station(self):
         """铸造站点处理"""
-        self._move_forward_until_found()
-        self.operator.hold_key("a", duration=0.5)
-        self._move_forward_until_found()
-        self.operator.press_key("f")
-        self.select()
-        self.operator.hold_key("d", duration=1)
-        self.operator.press_key("f")
-        self.select()
-        return True
+        return self.handle_event_station()
 
-    def _navigate_to_next_station(self):
+    def navigate_to_next_station(self):
         """导航到下一个站点：定位随意门 → 水平对齐 → 前进 → 交互"""
-        self._find_door_and_align()
+        if not self._find_door_and_align():
+            self._quit_game(temporary=True)
+            self._start_divergent_universe(0)
+            self.page_locate()
+            self.operator.hold_key("d", duration=1)
+            if not self._find_door_and_align():
+                return False
         if not self._move_forward_until_found("随意门"):
             logger.warning("前进超时未检测到交互提示，尝试直接交互")
         self.operator.press_key('f')
@@ -354,7 +396,7 @@ class DivergentUniverse(Executable):
     def station(self):
         """站点操作"""
         for station_name, handler in self.stations:
-            if station_name == self.current_station:
+            if self.current_station in station_name:
                 return handler()
         raise RuntimeError(f"无法处理站点 {self.current_station}")
 
@@ -387,6 +429,7 @@ class DivergentUniverse(Executable):
     def handle_disc_curiosity(self):
         self.operator.click_point(0.45, 0.4, tag="选择丢弃奇物")
         self.operator.click_img(DUIMG.DISCARD, after_sleep=0.5)
+        self.operator.click_img(IMG.ENSURE, after_sleep=0.5)
 
     def handle_station_select(self):
         """选择站点"""
@@ -399,7 +442,7 @@ class DivergentUniverse(Executable):
     def handle_next_station_select(self):
         """选择下一个站点：优先选择 station_priority 中的站点，未刷出则点击刷新重试"""
         self.operator.click_point(0.5, 0.5)  # 点击中心，确保选择到下一个站点，防止只有单个站点时未识别到
-        boxes = self.operator.ocr_boxes(from_x=0.1, from_y=0.675, to_x=0.9, to_y=0.75)  # 识别选项
+        boxes = self.operator.ocr_boxes(from_x=0.1, from_y=0.675, to_x=0.9, to_y=0.76)  # 识别选项
         if not boxes:
             raise RuntimeError("未找到下一个站点")
         logger.info(f"识别到 {len(boxes)} 个选项")
@@ -452,9 +495,9 @@ class DivergentUniverse(Executable):
         self.select()
         return True
 
-    def _complete_mission(self):
-        """完成任务结算"""
-        logger.info("退出并结算")
+    def _quit_game(self, temporary=False):
+        """退出游戏"""
+        logger.info("退出差分宇宙")
         for _ in range(30):
             if not self.operator.locate(DUIMG.END_AND_SETTLE):
                 self.operator.press_key("esc")
@@ -462,13 +505,17 @@ class DivergentUniverse(Executable):
             else:
                 break
         else:
-            logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待结算退出入口超时"))
+            logger.error("等待结算退出入口超时")
             return False
-
-        self.operator.click_point(0.8, 0.9, after_sleep=0.5, tag="退出并结算")
+        
+        if temporary:  # 暂离
+            self.operator.click_point(0.8, 0.83, after_sleep=0.5, tag="暂离")
+            return True
+        else:
+            self.operator.click_point(0.8, 0.9, after_sleep=0.5, tag="退出并结算")
         box = self.operator.wait_img(IMG.ENSURE2)
         if box is None:
-            logger.warning(SRAError(ErrorCode.IMAGE_NOT_FOUND, "未找到结算确认按钮"))
+            logger.warning("未找到结算确认按钮")
             return False
 
         self.operator.click_box(box)
