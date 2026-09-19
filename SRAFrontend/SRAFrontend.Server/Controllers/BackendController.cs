@@ -80,6 +80,20 @@ public class BackendController(
             // Client disconnected or the host is shutting down.
         }
     }
+    
+    [HttpGet("screenshot")]
+    [EndpointSummary("获取 Operator 截图")]
+    [ProducesResponseType(200, Type = typeof(FileContentResult))]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> GetScreenshot()
+    {
+        var (msg, bytes) = await backendService.GetGameScreenshotBytesAsync();
+        if (bytes.Length == 0)
+        {
+            return Ok(new R(false, $"Failed to get screenshot from backend: {msg}"));
+        }
+        return File(bytes, "image/jpeg");
+    }
 }
 
 public record RestartRequest(string Arguments);

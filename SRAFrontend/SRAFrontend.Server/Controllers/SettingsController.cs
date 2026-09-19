@@ -24,12 +24,12 @@ public class SettingsController(SettingsService settingsService, ILogger<Setting
     [EndpointDescription("按字段修改设置，支持只传需要修改的部分。请求体为 AppSettings 的部分 JSON，例如 { \"advanced\": { \"backend.remote.enabled\": true } }")]
     [ProducesResponseType(200, Type = typeof(R<IEnumerable<string>>))]
     [ProducesResponseType(400)]
-    public IActionResult UpdateSettings([FromBody] JsonElement body)
+    public IActionResult UpdateSettings([FromBody] object body)
     {
         var settings = settingsService.Settings;
         var updated = new List<string>();
-
-        foreach (var sectionProp in body.EnumerateObject())
+        var jsonElement = JsonSerializer.SerializeToElement(body);
+        foreach (var sectionProp in jsonElement.EnumerateObject())
         {
             // 找到 AppSettings 中匹配的 section（如 "advanced" -> Settings.Advanced）
             var section = GetSection(settings, sectionProp.Name);
