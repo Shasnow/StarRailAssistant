@@ -47,13 +47,13 @@ public partial class ExtensionConfigDialogViewModel : ObservableObject
             Fields.Clear();
             foreach (var (key, prop) in schema.Properties)
             {
-                ConfigFieldViewModel field = CreateFieldByType(key, prop);
-
+                var field = CreateFieldByType(key, prop);
+                var defaultElement = JsonSerializer.SerializeToElement(prop.Default);
                 if (configValues.TryGetValue(key, out var currentVal) &&
                     currentVal.ValueKind != JsonValueKind.Undefined)
                     ApplyValue(field, currentVal);
-                else if (prop.Default.HasValue && prop.Default.Value.ValueKind != JsonValueKind.Undefined)
-                    ApplyValue(field, prop.Default.Value);
+                else if (defaultElement.ValueKind != JsonValueKind.Undefined)
+                    ApplyValue(field, defaultElement);
 
                 Fields.Add(field);
             }
