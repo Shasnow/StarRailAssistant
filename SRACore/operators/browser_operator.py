@@ -290,6 +290,7 @@ class BrowserOperator(IOperator):
             return False
 
     def confirm(self):
+        """确认协议"""
         wait = WebDriverWait(self.driver, 30, 1)
         try:
             wait.until(expected_conditions.element_to_be_clickable((By.CLASS_NAME, 'van-dialog__confirm')))  # 等待接受按钮可点击
@@ -319,6 +320,9 @@ class BrowserOperator(IOperator):
 
             select_retries = 0
             while status == "select_queue":
+                if self.stop_event and self.stop_event.is_set():
+                    logger.error("线程已停止，排队等待中断")  # 线程已停止
+                    return False
                 select_retries += 1
                 if select_retries >= 5:
                     logger.error("选择排队队列超时")
