@@ -83,8 +83,13 @@ public partial class GeneralSettings : ObservableObject
     [ObservableProperty]
     [property: JsonPropertyName("cloudGame.browser.headless")]
     [property: Description("云游戏使用的浏览器是否无头模式")]
-    private bool _cloudGameBrowserHeadless;
-
+    private bool _isCloudGameBrowserHeadless;
+    
+    [ObservableProperty]
+    [property: JsonPropertyName("cloudGame.browser.muteAudio")]
+    [property: Description("云游戏使用的浏览器是否静音")]
+    private bool _isCloudGameBrowserMuteAudio;
+    
     [ObservableProperty] [property: JsonPropertyName("keybindings.e")]
     private string _hotkeyE = "E";
 
