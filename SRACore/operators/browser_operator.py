@@ -190,7 +190,42 @@ class BrowserOperator(IOperator):
             # 以实际渲染视口为准，避免窗口边框/工具栏导致比例坐标与截图偏差
             self.window_context.width, self.window_context.height = \
                 self._driver.execute_script("return [window.innerWidth, window.innerHeight]")
+            if headless and not getattr(self._driver, "_pointer_lock_guarded", False):
+                self._configure_pointer_lock()
+                # 标记在 driver 实例上：driver 被池化复用时避免重复注入
+                setattr(self._driver, "_pointer_lock_guarded", True)
         return self._driver
+
+    # 无窗口运行时禁止网页锁定系统鼠标指针（Pointer Lock 会捕获真实光标）
+    DISABLE_POINTER_LOCK_SCRIPT = """
+        (() => {
+            const blocked = function () {
+                return Promise.reject(new DOMException(
+                    'Pointer Lock is disabled in background mode.',
+                    'NotAllowedError'
+                ));
+            };
+            Object.defineProperty(Element.prototype, 'requestPointerLock', {
+                configurable: true,
+                writable: true,
+                value: blocked,
+            });
+            if (document.pointerLockElement && document.exitPointerLock) {
+                document.exitPointerLock();
+            }
+        })();
+    """
+
+    def _configure_pointer_lock(self) -> None:
+        """禁用无头模式下的 Pointer Lock"""
+        try:
+            self._driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+                "source": self.DISABLE_POINTER_LOCK_SCRIPT,
+                "runImmediately": True,
+            })
+            logger.debug("无头模式已禁用 Pointer Lock")
+        except Exception as e:
+            logger.warning(f"无头模式禁用 Pointer Lock 失败: {e}")
 
     def login(self, account, password, relogin: bool = False):
         if relogin:
