@@ -206,12 +206,14 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
 
     public async Task<(string Message, byte[])> GetGameScreenshotBytesAsync()
     {
-        var screenshotPath = Path.Combine(WorkingDirectory, "screenshot.png");
+        var screenshotPath = Path.Combine(WorkingDirectory, "screenshot.jpg");
         var param = new
         {
             save_path = screenshotPath,
             background = true,
-            resize = new[] { 1280, 720 }
+            resize = new[] { 1280, 720 },
+            // 让浏览器合成器直接输出 720p JPEG，跳过 PNG 编解码与 PIL 重采样
+            jpeg_quality = 80
         };
         var result = await SendInputAndWaitObjectAsync($"operator call screenshot '{JsonSerializer.Serialize(param)}' --json");
         switch (result)

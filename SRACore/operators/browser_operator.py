@@ -1,3 +1,4 @@
+import base64
 import enum
 import json
 import threading
@@ -416,8 +417,58 @@ class BrowserOperator(IOperator):
     def is_window_active(self) -> bool:
         return True
 
+    def _capture_jpeg(self, quality: int, region: tuple[float, float, float, float] | None,
+                      resize: tuple[int, int] | None) -> bytes | None:
+        """用 CDP 让浏览器合成器直接输出目标尺寸的 JPEG（裁剪与缩放一并完成）。
+
+        省去「整幅 PNG 解码 → PIL 重采样 → 重新编码」三步，宽高比匹配时可直接落盘原始字节。
+        Firefox 没有 CDP，返回 None 由调用方回退到 Selenium 截图。
+        """
+        if BrowserType(self.settings.General.cloudGameBrowser) is BrowserType.FIREFOX:
+            return None
+        viewport_w, viewport_h = self.window_context.width, self.window_context.height
+        if region is None:
+            clip_x, clip_y, clip_w, clip_h = 0, 0, viewport_w, viewport_h
+        else:
+            from_x, from_y, to_x, to_y = region
+            clip_x, clip_y = from_x * viewport_w, from_y * viewport_h
+            clip_w, clip_h = (to_x - from_x) * viewport_w, (to_y - from_y) * viewport_h
+        # clip.scale 由合成器在缩放阶段完成重采样，避免把原始分辨率的整幅图像送回 Python
+        scale = resize[0] / clip_w if resize and clip_w else 1
+        try:
+            result = self.driver.execute_cdp_cmd("Page.captureScreenshot", {
+                "format": "jpeg",
+                "quality": quality,
+                "clip": {"x": clip_x, "y": clip_y, "width": clip_w, "height": clip_h, "scale": scale},
+            })
+        except Exception as e:
+            logger.warning(f"CDP 截图失败，回退到 Selenium 截图: {e}")
+            return None
+        return base64.b64decode(result["data"])
+
     def screenshot(self, *, from_x: float | None = None, from_y: float | None = None, to_x: float | None = None,
-                   to_y: float | None = None, background: bool = True, resize: tuple[int, int] | None = None, save_path: str | None = None) -> Image.Image:
+                   to_y: float | None = None, background: bool = True, resize: tuple[int, int] | None = None,
+                   save_path: str | None = None, jpeg_quality: int | None = None) -> Image.Image:
+        # 指定 jpeg_quality 时优先走 CDP：浏览器直接产出目标尺寸的 JPEG。
+        # 内部 OCR/模板匹配不传该参数，继续走下面的无损 PNG 路径
+        if jpeg_quality is not None:
+            region = ((from_x, from_y, to_x, to_y)
+                      if from_x is not None and from_y is not None and to_x is not None and to_y is not None
+                      else None)
+            raw = self._capture_jpeg(jpeg_quality, region, resize)
+            if raw is not None:
+                img = Image.open(BytesIO(raw))
+                img.load()
+                if resize is not None and img.size != tuple(resize):
+                    # 合成器只能等比缩放，宽高比不符时补一次精确重采样（常规 16:9 不会触发）
+                    img = img.resize(resize, Image.Resampling.LANCZOS)
+                    if save_path:
+                        img.save(save_path, format="JPEG", quality=jpeg_quality)
+                elif save_path:
+                    with open(save_path, "wb") as f:
+                        f.write(raw)  # 直接落盘，免去二次编解码
+                return img
+
         png = self.driver.get_screenshot_as_png()
         img = Image.open(BytesIO(png))
         if from_x is not None and from_y is not None and to_x is not None and to_y is not None:
@@ -429,7 +480,11 @@ class BrowserOperator(IOperator):
         if resize:
             img = img.resize(resize, Image.Resampling.LANCZOS)
         if save_path:
-            img.save(save_path)
+            if jpeg_quality is not None:
+                # JPEG 不支持 alpha/调色板模式，先统一转 RGB
+                img.convert("RGB").save(save_path, format="JPEG", quality=jpeg_quality)
+            else:
+                img.save(save_path)
         return img
 
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,

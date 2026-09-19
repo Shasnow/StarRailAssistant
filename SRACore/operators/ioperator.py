@@ -71,7 +71,8 @@ class IOperator(ABC):
                    to_y: float | None = None,
                    background: bool = False,
                    resize: tuple[int, int] | None = None,
-                   save_path: str | None = None) -> Image:
+                   save_path: str | None = None,
+                   jpeg_quality: int | None = None) -> Image:
         """截取屏幕截图
         Args:
             from_x (float, optional): 起始点X坐标比例 (0-1)，相对于窗口左上角
@@ -81,6 +82,8 @@ class IOperator(ABC):
             background (bool): 是否在后台截取屏幕截图，默认为False
             resize (tuple[int, int] | None): 如果提供尺寸，则将截图调整为指定大小
             save_path (str | None): 如果提供路径，则将截图保存到指定位置
+            jpeg_quality (int | None): 提供时以 JPEG 输出（编码质量 0-100），而非默认的无损 PNG。
+                仅用于预览等对体积敏感的场景；OCR/模板匹配等内部调用不要传，以免有损压缩影响识别精度
         Returns:
             PIL.Image.Image: 返回截取的屏幕区域图像对象
         Note:

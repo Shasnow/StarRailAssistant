@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Text.Json;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
@@ -18,7 +18,7 @@ public class McpController(IBackendService backendService)
             return [new TextContentBlock { Text = msg }];
         return
         [
-            ImageContentBlock.FromBytes(screenshotBytes, "image/png"),
+            ImageContentBlock.FromBytes(screenshotBytes, "image/jpeg"),
             new TextContentBlock
                 { Text = "You must convert coordinates from 720p to 1080p if you want to use them in other tools." }
         ];
