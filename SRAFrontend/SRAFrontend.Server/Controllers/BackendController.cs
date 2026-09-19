@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SRAFrontend.Server.Services;
 using SRAFrontend.Services;
 
@@ -28,6 +28,23 @@ public class BackendController(
         }
     }
     
+    [HttpPost("stop")]
+    [EndpointSummary("停止后端")]
+    [ProducesResponseType(200, Type = typeof(R))]
+    [ProducesResponseType(500)]
+    public IActionResult StopBackend()
+    {
+        try
+        {
+            backendService.StopBackend();
+            return Ok(new R(true, "Backend stopped successfully"));
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new R(false, "Failed to stop backend"));
+        }
+    }
+
     [HttpGet("logs")]
     [EndpointSummary("获取最近日志")]
     [ProducesResponseType(200, Type = typeof(List<string>))]
@@ -44,6 +61,8 @@ public class BackendController(
         Response.Headers.ContentType = "text/event-stream";
         Response.Headers.CacheControl = "no-cache";
         Response.Headers.Connection = "keep-alive";
+        await Response.WriteAsync("* Connected *\n\n", cancellationToken);
+        await Response.Body.FlushAsync(cancellationToken); // 没有这行，响应头会一直被缓冲
 
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
             cancellationToken, lifetime.ApplicationStopping);
