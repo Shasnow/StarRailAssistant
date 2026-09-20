@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
+using SRAFrontend.Models;
 
 namespace SRAFrontend.Services;
 
@@ -118,5 +120,18 @@ public class AppService(SettingsService settingsService, ILogger<AppService> log
             logger.LogError("Error downloading background {Name}: {Message}", name, e.Message);
             return null;
         }
+    }
+
+    public object GetSystemInfo()
+    {
+        return new
+        {
+            version = AppSettings.Version,
+            osVersion = Environment.OSVersion.ToString(),
+            architecture = Environment.Is64BitOperatingSystem ? "x64" : "x86",
+            dotnetVersion = Environment.Version.ToString(),
+            processorCount = Environment.ProcessorCount,
+            cultureInfo = CultureInfo.CurrentCulture.Name,
+        };
     }
 }

@@ -15,4 +15,13 @@ public class AppController(AppService appService): Controller
         var imageBytes = await appService.GetBackgroundImageAsync();
         return File(imageBytes, "image/jpeg");
     }
+    
+    [HttpGet("system-info")]
+    [EndpointSummary("获取系统信息")]
+    [ProducesResponseType(200, Type = typeof(R))]
+    public IActionResult GetSystemInfo()
+    {
+        var systemInfo = appService.GetSystemInfo();
+        return Ok(new R(true, "success", systemInfo));
+    }
 }
