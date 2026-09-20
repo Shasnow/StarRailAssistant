@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SRAFrontend.Services;
 
 namespace SRAFrontend.Server.Controllers;
@@ -7,6 +8,7 @@ namespace SRAFrontend.Server.Controllers;
 [Route("[controller]")]
 public class AppController(AppService appService): Controller
 {
+    [AllowAnonymous]
     [HttpGet("background")]
     [EndpointSummary("获取背景图")]
     [ProducesResponseType(200, Type = typeof(byte[]))]
