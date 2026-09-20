@@ -10,6 +10,7 @@ namespace SRAFrontend.Server.Controllers;
 [Route("[controller]")]
 public class TaskController(
     IBackendService backendService,
+    IConfiguration configuration,
     ILogger<TaskController> logger) : Controller
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
@@ -22,6 +23,9 @@ public class TaskController(
     [ProducesResponseType(500)]
     public async Task<IActionResult> RunTask([FromBody] RunRequest request)
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "Task started"));
+        
         if (backendService.IsTaskRunning)
             return Conflict(new R(false, "A task is already running"));
      
@@ -65,6 +69,9 @@ public class TaskController(
     [ProducesResponseType(500)]
     public async Task<IActionResult> RunSingleTask([FromBody] SingleTaskRequest request)
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "Single task started"));
+
         if (backendService.IsTaskRunning)
             return Conflict(new R(false, "A task is already running"));
 
@@ -99,15 +106,6 @@ public class TaskController(
 
 }
 
-public class RunRequest
-{
-    public string? ConfigName { get; set; }
-    public TasksConfig? Config { get; set; }
-    public bool Persist { get; set; }
-}
+public record RunRequest(string? ConfigName, TasksConfig? Config, bool Persist);
+public record SingleTaskRequest(string TaskName, string? ConfigName);
 
-public class SingleTaskRequest
-{
-    public string TaskName { get; set; } = "";
-    public string? ConfigName { get; set; }
-}

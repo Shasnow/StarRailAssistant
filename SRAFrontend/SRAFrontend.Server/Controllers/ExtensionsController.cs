@@ -6,7 +6,7 @@ namespace SRAFrontend.Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class ExtensionsController(IBackendService backendService) : Controller
+public class ExtensionsController(IBackendService backendService, IConfiguration configuration) : Controller
 {
     // --- 列表 ---
 
@@ -52,6 +52,8 @@ public class ExtensionsController(IBackendService backendService) : Controller
     [ProducesResponseType(500)]
     public async Task<IActionResult> SetConfig(string id, [FromBody] string json)
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "Config updated"));
         var sent = await backendService.SendInputAsync($"extension config set {id} {json}");
         return Ok(new R(sent, sent ? "Config updated" : "Failed to update config."));
     }
@@ -64,6 +66,8 @@ public class ExtensionsController(IBackendService backendService) : Controller
     [ProducesResponseType(500)]
     public async Task<IActionResult> RunExtension(string id, [FromQuery] string? config = null)
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, $"Extension '{id}' started"));
         var cmd = string.IsNullOrEmpty(config)
             ? $"extension run {id}"
             : $"extension run {id} --config {config}";
@@ -77,6 +81,8 @@ public class ExtensionsController(IBackendService backendService) : Controller
     [ProducesResponseType(500)]
     public async Task<IActionResult> StopExtension(string id)
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, $"Extension '{id}' stopped"));
         var sent = await backendService.SendInputAsync($"extension stop {id}");
         return Ok(new R(sent, sent ? $"Extension '{id}' stopped" : $"Failed to stop extension '{id}'"));
     }
@@ -89,6 +95,8 @@ public class ExtensionsController(IBackendService backendService) : Controller
     [ProducesResponseType(500)]
     public async Task<IActionResult> ReloadExtensions()
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "Extensions reloaded"));
         var sent = await backendService.SendInputAsync("extension reload");
         return Ok(new R(sent, sent ? "Extensions reloaded" : "Failed to reload extensions"));
     }

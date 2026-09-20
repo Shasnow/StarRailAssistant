@@ -9,7 +9,8 @@ namespace SRAFrontend.Server.Controllers;
 public class BackendController(
     IBackendService backendService,
     LogStreamService logStream,
-    IHostApplicationLifetime lifetime): Controller
+    IHostApplicationLifetime lifetime,
+    IConfiguration configuration): Controller
 {
     [HttpPost("restart")]
     [EndpointSummary("重启后端")]
@@ -17,6 +18,9 @@ public class BackendController(
     [ProducesResponseType(500)]
     public async Task<IActionResult> RestartBackend([FromBody] RestartRequest? request)
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "Backend restarted successfully"));
+        
         try
         {
             await backendService.RestartBackendAsync(request?.Arguments ?? "--inline --no-admin");
@@ -87,6 +91,10 @@ public class BackendController(
     [ProducesResponseType(500)]
     public async Task<IActionResult> GetScreenshot()
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+        {
+            return File([], "image/jpeg");
+        }
         var (msg, bytes) = await backendService.GetGameScreenshotBytesAsync();
         if (bytes.Length == 0)
         {

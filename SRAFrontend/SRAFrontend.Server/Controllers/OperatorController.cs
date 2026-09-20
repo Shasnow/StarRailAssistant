@@ -6,7 +6,7 @@ namespace SRAFrontend.Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class OperatorController(IBackendService backendService) : Controller
+public class OperatorController(IBackendService backendService, IConfiguration configuration) : Controller
 {
     [HttpGet("list")]
     [EndpointSummary("列出所有可用的 Operator 方法")]
@@ -41,7 +41,8 @@ public class OperatorController(IBackendService backendService) : Controller
     {
         if (string.IsNullOrWhiteSpace(request.Method))
             return BadRequest(new R(false, "method is required"));
-
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "Method called"));
         var parameters = request.Params == null ? "" : request.Params.ToString();
         var response = await backendService.SendInputAndWaitObjectAsync($"operator call {request.Method} '{parameters}' --json");
         if (response is null)

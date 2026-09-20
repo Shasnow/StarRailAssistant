@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -40,6 +40,8 @@ public class ConfigsController(ConfigService configService, CacheService cacheSe
     [ProducesResponseType(409, Description = "配置已存在")]
     public IActionResult CreateConfig(string configName)
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "success", configName));
         if (configName.IndexOfAny(['\\', '/', ':', '*', '?', '"', '<', '>', '|']) != -1)
             return BadRequest("Config name contains invalid characters");
 
@@ -57,6 +59,8 @@ public class ConfigsController(ConfigService configService, CacheService cacheSe
     [ProducesResponseType(404)]
     public IActionResult UpdateConfig(string configName, [FromBody] object body)
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "success", configName));
         if (!cacheService.Cache.ConfigNames.Contains(configName))
             return NotFound();
 
@@ -97,6 +101,9 @@ public class ConfigsController(ConfigService configService, CacheService cacheSe
     [ProducesResponseType(404)]
     public IActionResult DeleteConfig(string configName)
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "deleted", configName));
+        
         if (!cacheService.Cache.ConfigNames.Remove(configName))
             return NotFound();
 

@@ -34,6 +34,7 @@ builder.Services.AddMcpServer(options =>
     .WithHttpTransport(option => { option.Stateless = true; })
     .WithTools<McpController>();
 var isAuthEnabled = !string.IsNullOrWhiteSpace(builder.Configuration["AccessToken"]);
+var isVisitorMode = builder.Configuration.GetValue<bool>("VisitorMode");
 
 if (isAuthEnabled)
 {
@@ -77,5 +78,8 @@ if (isAuthEnabled)
 app.MapGroup(apiPrefix).MapControllers();
 
 app.MapOpenApi();
-app.MapMcp("/mcp");
+
+if (!isVisitorMode)
+    app.MapMcp("/mcp");
+
 app.Run();

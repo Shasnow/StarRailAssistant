@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using SRAFrontend.Models;
@@ -8,7 +8,7 @@ namespace SRAFrontend.Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class SettingsController(SettingsService settingsService, ILogger<SettingsController> logger) : Controller
+public class SettingsController(SettingsService settingsService, IConfiguration configuration, ILogger<SettingsController> logger) : Controller
 {
     [HttpGet]
     [EndpointSummary("获取设置")]
@@ -26,6 +26,8 @@ public class SettingsController(SettingsService settingsService, ILogger<Setting
     [ProducesResponseType(400)]
     public IActionResult UpdateSettings([FromBody] object body)
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "Settings updated", body));
         var settings = settingsService.Settings;
         var updated = new List<string>();
         var jsonElement = JsonSerializer.SerializeToElement(body);
