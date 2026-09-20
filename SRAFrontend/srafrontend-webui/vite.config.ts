@@ -21,7 +21,6 @@ const pnpmVersion = /pnpm\/([\w.]+)/.exec(process.env.npm_config_user_agent ?? '
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/',
   define: {
     __BUILD_INFO__: JSON.stringify({
       appVersion: pkg.version,
