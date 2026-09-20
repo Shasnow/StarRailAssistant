@@ -82,4 +82,12 @@ app.MapOpenApi();
 if (!isVisitorMode)
     app.MapMcp("/mcp");
 
+#if DEBUG
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/openapi/v1.json", "SRA Server API");
+    options.RoutePrefix = "swagger";
+});
+#endif
+
 app.Run();

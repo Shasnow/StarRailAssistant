@@ -13,6 +13,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11"/>
         <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.2.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3" Condition="'$(Configuration)' == 'Debug'"/>
     </ItemGroup>
 
     <ItemGroup>
