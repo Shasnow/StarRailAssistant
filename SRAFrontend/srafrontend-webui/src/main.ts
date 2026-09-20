@@ -1,14 +1,18 @@
+import './assets/main.css'
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import 'element-plus/dist/index.css'
-import './styles/app.css'
+
 import App from './App.vue'
 import router from './router'
-import { applyTheme } from './configs/theme'
+import { useThemeHue } from './composables/useThemeHue'
 
-applyTheme()
+// 应用启动前应用持久化的主题色相，避免首帧闪色
+useThemeHue().init()
 
 const app = createApp(App)
+
 app.use(createPinia())
 app.use(router)
+
 app.mount('#app')
