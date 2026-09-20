@@ -17,7 +17,39 @@ public class AppService(SettingsService settingsService, ILogger<AppService> log
         ["shasnow"] = "https://shasnow.top/gallery/starrailassistant/shasnow.png",
         ["yumemizukimizuki"] = "https://shasnow.top/gallery/starrailassistant/yumemizukimizuki.png"
     };
+    
+    private static readonly string[] PhrasesZh =
+    [
+        "欢迎使用 SRA",
+        "坐和放宽",
+        "并非\n'Sequence Read Archive'",
+        "启动器启动启动器",
+        "-1073741819",
+        "飞荧扑火，向死而生",
+        "跨越寰宇终抵黯淡星外",
+        "立志成为崩铁糕手",
+        "Bon voyage",
+        "May your path be clear",
+        "May you get to where\ndreams are all\ncrystalline and sweet",
+        "我们将在过去篆刻未来",
+        "铁花飞，飘逸不残灰",
+        "一切正常就是异常",
+    ];
 
+    private static readonly string[] PhrasesEn =
+    [
+        "Welcome to SRA",
+        "Sit back and relax",
+        "not\n'Sequence Read Archive'",
+        "Launcher launching launcher",
+        "-1073741819",
+        "Bon voyage",
+        "May your path be clear",
+        "May you get to where\ndreams are all\ncrystalline and sweet",
+        "We will mark the past with the future",
+        "Neverness To Everness"
+    ];
+    
     private static byte[] DefaultImage { get; } = LoadDefaultImage();
 
     private static byte[] LoadDefaultImage()
@@ -133,5 +165,24 @@ public class AppService(SettingsService settingsService, ILogger<AppService> log
             processorCount = Environment.ProcessorCount,
             cultureInfo = CultureInfo.CurrentCulture.Name,
         };
+    }
+    
+    public string[] GetPhrases()
+    {
+        return settingsService.Settings.Display.Language switch
+        {
+            0 => PhrasesZh,
+            1 => PhrasesEn,
+            _ => PhrasesZh
+        };
+    }
+    
+    public string GetPhrase()
+    {
+        var phrases = GetPhrases();
+        if (phrases.Length == 0) return string.Empty;
+
+        var random = new Random();
+        return phrases[random.Next(phrases.Length)];
     }
 }

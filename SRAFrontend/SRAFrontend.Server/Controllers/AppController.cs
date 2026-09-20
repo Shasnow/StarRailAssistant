@@ -26,4 +26,13 @@ public class AppController(AppService appService): Controller
         var systemInfo = appService.GetSystemInfo();
         return Ok(new R(true, "success", systemInfo));
     }
+    
+    [HttpGet("phrases")]
+    [EndpointSummary("获取短语")]
+    [ProducesResponseType(200, Type = typeof(R<string[]>))]
+    public IActionResult GetPhrases()
+    {
+        var phrase = appService.GetPhrases();
+        return Ok(new R(true, "success", phrase));
+    }
 }

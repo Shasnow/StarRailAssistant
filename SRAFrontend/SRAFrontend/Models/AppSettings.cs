@@ -169,9 +169,9 @@ public partial class DisplaySettings : ObservableObject
     private double _controlPanelOpacity = 0.9;
 
     [ObservableProperty]
-    [property: JsonPropertyName("language")]
-    [property: Description("界面语言，0=中文, 2=English")]
-    private int _language;
+    [JsonPropertyName("language")]
+    [Description("界面语言，0=中文, 1=English")]
+    public partial int Language { get; set; }
 
     [ObservableProperty]
     [property: JsonPropertyName("window.remember")]
