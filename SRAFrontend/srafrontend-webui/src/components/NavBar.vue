@@ -146,6 +146,7 @@ const routes = router
   --nav-height: 60px;
   --nav-radius: 16px;
   --nav-bg: rgba(255, 255, 255, 0.72);
+  --nav-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 
   position: fixed;
   top: 0;
@@ -158,7 +159,7 @@ const routes = router
   border-bottom: 1px solid var(--color-border);
   border-bottom-left-radius: var(--nav-radius);
   border-bottom-right-radius: var(--nav-radius);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--nav-shadow);
   transition:
     background-color 0.3s,
     border-color 0.3s,
@@ -167,7 +168,7 @@ const routes = router
 
 html.dark .nav-bar {
   --nav-bg: rgba(24, 24, 24, 0.72);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  --nav-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* ---------- 覆盖在 Hero 之上：全透明 + 白色文字 ---------- */
