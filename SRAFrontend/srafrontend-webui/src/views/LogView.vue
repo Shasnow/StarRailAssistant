@@ -332,8 +332,8 @@ onMounted(() => {
   --term-h: clamp(420px, calc(100vh - 300px), 900px);
   max-width: 1400px;
   margin: 0 auto;
-  /* 顶部留白避开 60px 全局导航（桌面端悬浮 +12px） */
-  padding: 84px 24px 48px;
+  /* 顶部留白避开全局导航 */
+  padding: 32px 24px 48px;
 }
 
 /* 左日志 + 右实时画面双栏；窄屏折叠为单列 */

@@ -11,16 +11,19 @@ const bare = computed(() => route.meta.bare === true)
 </script>
 
 <template>
-  <template v-if="!bare">
-    <NavBar />
+  <!-- 全局消息配置：顶部固定导航栏占 60px，ElMessage 默认贴顶弹出会被遮挡，统一下移到导航栏下方 -->
+  <ElConfigProvider :message="{ offset: 76 }">
+    <template v-if="!bare">
+      <NavBar />
 
-    <!-- 全局 Hero：所有页面共用，内容区紧随其后 -->
-    <HeroSection />
-  </template>
+      <!-- 全局 Hero：所有页面共用，内容区紧随其后 -->
+      <HeroSection />
+    </template>
 
-  <main id="page-content" class="page-content">
-    <RouterView />
-  </main>
+    <main id="page-content" class="page-content">
+      <RouterView />
+    </main>
 
-  <FooterSection v-if="!bare" />
+    <FooterSection v-if="!bare" />
+  </ElConfigProvider>
 </template>

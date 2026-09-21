@@ -54,8 +54,13 @@ const wavePathB =
   'M0,80 C240,0 480,160 720,80 C960,0 1200,160 1440,80 C1680,0 1920,160 2160,80 C2400,0 2640,160 2880,80 L2880,160 L0,160 Z'
 
 // Hero 全局渲染在 App.vue，内容区 id 固定
+// 滚动落点预留固定导航栏高度（60px）+ 间距，避免导航栏遮挡内容区顶部（与 SettingsView 的 SCROLL_OFFSET 一致）
+const SCROLL_OFFSET = 84
+
 function scrollToContent() {
-  document.getElementById('page-content')?.scrollIntoView({ behavior: 'smooth' })
+  const el = document.getElementById('page-content')
+  if (!el) return
+  window.scrollTo({ top: window.scrollY + el.getBoundingClientRect().top - SCROLL_OFFSET, behavior: 'smooth' })
 }
 
 /* ---------- 副标题打字机 + 轮换 ---------- */
