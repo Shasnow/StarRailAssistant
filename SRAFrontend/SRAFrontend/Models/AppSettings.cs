@@ -58,6 +58,11 @@ public partial class GeneralSettings : ObservableObject
     private bool _isGameArgsPopupWindow;
 
     [ObservableProperty]
+    [property: JsonPropertyName("gameArgs.autoButtle")]
+    [property: Description("是否启用自动战斗")]
+    private bool _isGameArgsAutoButtle = true;
+
+    [ObservableProperty]
     [property: JsonPropertyName("gameArgs.useCmd")]
     [property: Description("是否使用命令行启动游戏（避免一些直接启动导致的问题）")]
     private bool _isUseCmd;

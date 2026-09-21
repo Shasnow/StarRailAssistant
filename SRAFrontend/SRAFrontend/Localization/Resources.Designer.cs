@@ -177,6 +177,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Auto Battle.
+        /// </summary>
+        public static string AutoBattleText {
+            get {
+                return ResourceManager.GetString("AutoBattleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Auto Detect.
         /// </summary>
         public static string AutoDetectText {

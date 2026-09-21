@@ -312,8 +312,11 @@ public class RegistryService(
         [
             @"Software\miHoYo\HYP\standalone\14_0\hkrpg_cn\6P5gHMNyK3\hkrpg_cn",
             @"Software\miHoYo\HYP\1_1\hkrpg_cn",
+            @"Software\miHoYo\HYP\1_2\hkrpg_cn",
+            @"Software\miHoYo\HYP\1_3\hkrpg_cn",
             @"Software\Cognosphere\HYP\1_1\hkrpg_global",
-            @"Software\Cognosphere\HYP\1_0\hkrpg_global"
+            @"Software\Cognosphere\HYP\1_0\hkrpg_global",
+            @"Software\Cognosphere\HYP\1_2\hkrpg_global"
         ];
     }
 }

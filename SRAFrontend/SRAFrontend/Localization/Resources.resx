@@ -565,4 +565,7 @@
     <data name="CleanupText" xml:space="preserve">
         <value>Clean Up</value>
     </data>
+    <data name="AutoBattleText" xml:space="preserve">
+        <value>Auto Battle</value>
+    </data>
 </root>

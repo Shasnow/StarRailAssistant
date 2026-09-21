@@ -28,15 +28,14 @@
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.TaskSettingsText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
-                                    <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto">
+                                    <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" ToolTip.Tip="开启以自动检测电脑中的游戏">
                                         <Label Classes="Icon">&#xe40c;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.GamePathText}" />
                                         <ToggleSwitch OnContent="{x:Static lang:Resources.AutoDetectText}"
                                                       Grid.Column="2"
                                                       IsChecked="{Binding GeneralSettings.IsAutoDetectGamePath}"
                                                       Command="{Binding DetectGamePathCommand}"
-                                                      Width="120"
-                                                      ToolTip.Tip="开启以自动检测电脑中的游戏" />
+                                                      Width="120"/>
                                         <ComboBox Grid.Column="3"
                                                   ItemsSource="{Binding GeneralSettings.GamePaths}"
                                                   SelectedIndex="{Binding GeneralSettings.GamePathIndex}" />
@@ -44,7 +43,7 @@
                                                 FontFamily="{StaticResource Phosphor}"
                                                 Content="&#xE256;"
                                                 Command="{Binding SelectedPathCommand}"
-                                                IsVisible="{Binding !GeneralSettings.IsAutoDetectGamePath}"
+                                                IsEnabled="{Binding !GeneralSettings.IsAutoDetectGamePath}"
                                                 ToolTip.Tip="浏览并选择文件" />
                                     </Grid>
                                     
@@ -94,65 +93,68 @@
                                     <Expander Header="{x:Static lang:Resources.GameLaunchArgumentsText}" IsExpanded="True">
                                         <StackPanel>
                                             <!-- 启用开关 -->
-                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                            <Grid ColumnDefinitions="Auto, *, Auto" ToolTip.Tip="启用后，下面的参数才会生效">
                                                 <Label Classes="Icon">&#xE47E;</Label>
                                                 <Label Grid.Column="1" Content="{x:Static lang:Resources.EnableGameArgsText}" />
                                                 <ToggleSwitch Grid.Column="2"
                                                               IsChecked="{Binding GeneralSettings.IsGameArgsEnabled}" />
                                             </Grid>
 
-                                            <!-- 以下控件仅在启用时显示 -->
-                                            <StackPanel IsVisible="{Binding GeneralSettings.IsGameArgsEnabled}">
-                                                <!-- 窗口尺寸 -->
-                                                <Grid ColumnDefinitions="Auto, *, Auto">
-                                                    <Label Classes="Icon">&#xED6E;</Label>
-                                                    <Label Grid.Column="1" Content="{x:Static lang:Resources.WindowSizeText}" />
-                                                    <ComboBox Grid.Column="2"
-                                                              SelectedItem="{Binding GeneralSettings.GameArgsWindowSize}">
-                                                        <system:String>1920x1080</system:String>
-                                                    </ComboBox>
-                                                </Grid>
-
-                                                <!-- 显示模式 -->
-                                                <Grid ColumnDefinitions="Auto, *, Auto">
-                                                    <Label Classes="Icon">&#xE626;</Label>
-                                                    <Label Grid.Column="1" Content="{x:Static lang:Resources.DisplayModeText}" />
-                                                    <ComboBox Grid.Column="2"
-                                                              SelectedItem="{Binding GeneralSettings.GameArgsFullScreenMode}">
-                                                        <system:String>窗口化</system:String>
-                                                        <system:String>全屏幕</system:String>
-                                                    </ComboBox>
-                                                </Grid>
-
-                                                <!-- 无边框窗口 -->
-                                                <Grid ColumnDefinitions="Auto, *, Auto">
-                                                    <Label Classes="Icon">&#xE5DA;</Label>
-                                                    <Label Grid.Column="1" Content="{x:Static lang:Resources.BorderlessWindowText}" />
-                                                    <ToggleSwitch Grid.Column="2"
-                                                                  IsChecked="{Binding GeneralSettings.IsGameArgsPopupWindow}" />
-                                                </Grid>
-
-                                                <!-- 高级参数 -->
-                                                <Grid ColumnDefinitions="Auto, *, Auto">
-                                                    <Label Classes="Icon">&#xE12C;</Label>
-                                                    <Label Grid.Column="1" Content="{x:Static lang:Resources.AdvancedParametersText}" />
-                                                    <TextBox Grid.Column="2"
-                                                             MinWidth="300"
-                                                             PlaceholderText="{x:Static lang:Resources.GameArgsHintText}"
-                                                             Text="{Binding GeneralSettings.GameArgsAdvanced}" />
-                                                </Grid>
-                                            </StackPanel>
-
-                                            <!-- 使用 CMD 启动游戏（不受启用开关影响） -->
+                                            <!-- 窗口尺寸 -->
                                             <Grid ColumnDefinitions="Auto, *, Auto">
-                                                <Label Classes="Icon">&#xE272;</Label>
-                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.UseCmdLaunchText}" />
+                                                <Label Classes="Icon">&#xED6E;</Label>
+                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.WindowSizeText}" />
+                                                <ComboBox Grid.Column="2"
+                                                          SelectedItem="{Binding GeneralSettings.GameArgsWindowSize}">
+                                                    <system:String>1920x1080</system:String>
+                                                </ComboBox>
+                                            </Grid>
+
+                                            <!-- 显示模式 -->
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE626;</Label>
+                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.DisplayModeText}" />
+                                                <ComboBox Grid.Column="2"
+                                                          SelectedItem="{Binding GeneralSettings.GameArgsFullScreenMode}">
+                                                    <system:String>窗口化</system:String>
+                                                    <system:String>全屏幕</system:String>
+                                                </ComboBox>
+                                            </Grid>
+
+                                            <!-- 无边框窗口 -->
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE5DA;</Label>
+                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.BorderlessWindowText}" />
                                                 <ToggleSwitch Grid.Column="2"
-                                                              IsChecked="{Binding GeneralSettings.IsUseCmd}" />
+                                                              IsChecked="{Binding GeneralSettings.IsGameArgsPopupWindow}" />
+                                            </Grid>
+                                            
+                                            <!-- 自动战斗 -->
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE12C;</Label>
+                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.AutoBattleText}" />
+                                                <ToggleSwitch Grid.Column="2"
+                                                              IsChecked="{Binding GeneralSettings.IsGameArgsAutoButtle}" />
+                                            </Grid>
+
+                                            <!-- 高级参数 -->
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE12C;</Label>
+                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.AdvancedParametersText}" />
+                                                <TextBox Grid.Column="2"
+                                                         MinWidth="300"
+                                                         PlaceholderText="{x:Static lang:Resources.GameArgsHintText}"
+                                                         Text="{Binding GeneralSettings.GameArgsAdvanced}" />
                                             </Grid>
                                         </StackPanel>
                                     </Expander>
-
+                                    <!-- 使用 CMD 启动游戏 -->
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Label Classes="Icon">&#xE272;</Label>
+                                        <Label Grid.Column="1" Content="{x:Static lang:Resources.UseCmdLaunchText}" />
+                                        <ToggleSwitch Grid.Column="2"
+                                                      IsChecked="{Binding GeneralSettings.IsUseCmd}" />
+                                    </Grid>
                                     <Expander Header="{x:Static lang:Resources.HotkeysText}">
                                         <StackPanel>
                                             <TextBlock Text="{x:Static lang:Resources.ModifyHoldText}"

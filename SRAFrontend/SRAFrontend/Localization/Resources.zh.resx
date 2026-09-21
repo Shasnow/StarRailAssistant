@@ -561,4 +561,7 @@
     <data name="CleanupText" xml:space="preserve">
         <value>清理</value>
     </data>
+    <data name="AutoBattleText" xml:space="preserve">
+        <value>自动战斗</value>
+    </data>
 </root>
