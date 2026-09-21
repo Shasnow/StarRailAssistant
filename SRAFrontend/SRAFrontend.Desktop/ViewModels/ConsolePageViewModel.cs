@@ -21,6 +21,7 @@ namespace SRAFrontend.Desktop.ViewModels;
 public partial class ConsolePageViewModel : PageViewModel
 {
     private const int MaxConsoleLines = 1000;
+    private readonly AppService _appService;
     private readonly IBackendService _backendService;
     private readonly CommonModel _commonModel;
     private readonly ConcurrentQueue<string> _consoleLines = new();
@@ -34,12 +35,13 @@ public partial class ConsolePageViewModel : PageViewModel
 
     [ObservableProperty] private bool _isExporting; // 日志导出进行中标志
 
-    public ConsolePageViewModel(IBackendService backendService, SettingsService settingsService,
+    public ConsolePageViewModel(IBackendService backendService, SettingsService settingsService, AppService appService,
         CommonModel commonModel, ILogger<ConsolePageViewModel> logger) : base(
         PageName.Console, "\uEAE8")
     {
         _backendService = backendService;
         _settingsService = settingsService;
+        _appService = appService;
         _commonModel = commonModel;
         _logger = logger;
         _backendService.Outputted += AddConsoleLine;
@@ -197,26 +199,26 @@ public partial class ConsolePageViewModel : PageViewModel
                 appVersion = AppSettings.Version,
                 counts = new
                     { consoleLines = lines.Length, frontendFiles = frontendCount, backendFiles = backendCount },
-                systemInfo = new
+                systemInfo = _appService.GetSystemInfo(),
+                displays = TopLevelObject?.Screens?.All.Select(screen => new
                 {
-                    os = Environment.OSVersion.ToString(),
-                    architecture = Environment.Is64BitOperatingSystem ? "x64" : "x86",
-                    dotnetVersion = Environment.Version.ToString(),
-                    displays = TopLevelObject?.Screens?.All.Select(screen => new
+                    bounds = new { screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height },
+                    workingArea = new
                     {
-                        bounds = new {screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height},
-                        workingArea = new {screen.WorkingArea.X, screen.WorkingArea.Y, screen.WorkingArea.Width, screen.WorkingArea.Height},
-                        screen.Scaling,
-                        screen.IsPrimary
-                    })
-                },
+                        screen.WorkingArea.X, screen.WorkingArea.Y, screen.WorkingArea.Width, screen.WorkingArea.Height
+                    },
+                    screen.Scaling,
+                    screen.IsPrimary
+                }),
                 settings = new
                 {
                     _settingsService.Settings.General
                 }
             };
             File.WriteAllText(Path.Combine(stagingDir, "manifest.json"),
-                JsonSerializer.Serialize(manifest, new JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+                JsonSerializer.Serialize(manifest,
+                    new JsonSerializerOptions
+                        { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
 
             // 5. 压缩为ZIP
             if (File.Exists(targetZipPath)) File.Delete(targetZipPath);

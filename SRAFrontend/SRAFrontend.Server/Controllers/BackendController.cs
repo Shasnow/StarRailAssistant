@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SRAFrontend.Server.Services;
 using SRAFrontend.Services;
 
@@ -9,7 +9,8 @@ namespace SRAFrontend.Server.Controllers;
 public class BackendController(
     IBackendService backendService,
     LogStreamService logStream,
-    IHostApplicationLifetime lifetime): Controller
+    IHostApplicationLifetime lifetime,
+    IConfiguration configuration): Controller
 {
     [HttpPost("restart")]
     [EndpointSummary("重启后端")]
@@ -17,6 +18,9 @@ public class BackendController(
     [ProducesResponseType(500)]
     public async Task<IActionResult> RestartBackend([FromBody] RestartRequest? request)
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "Backend restarted successfully"));
+        
         try
         {
             await backendService.RestartBackendAsync(request?.Arguments ?? "--inline --no-admin");
@@ -28,6 +32,23 @@ public class BackendController(
         }
     }
     
+    [HttpPost("stop")]
+    [EndpointSummary("停止后端")]
+    [ProducesResponseType(200, Type = typeof(R))]
+    [ProducesResponseType(500)]
+    public IActionResult StopBackend()
+    {
+        try
+        {
+            backendService.StopBackend();
+            return Ok(new R(true, "Backend stopped successfully"));
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new R(false, "Failed to stop backend"));
+        }
+    }
+
     [HttpGet("logs")]
     [EndpointSummary("获取最近日志")]
     [ProducesResponseType(200, Type = typeof(List<string>))]
@@ -44,6 +65,8 @@ public class BackendController(
         Response.Headers.ContentType = "text/event-stream";
         Response.Headers.CacheControl = "no-cache";
         Response.Headers.Connection = "keep-alive";
+        await Response.WriteAsync("* Connected *\n\n", cancellationToken);
+        await Response.Body.FlushAsync(cancellationToken); // 没有这行，响应头会一直被缓冲
 
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
             cancellationToken, lifetime.ApplicationStopping);
@@ -60,6 +83,24 @@ public class BackendController(
         {
             // Client disconnected or the host is shutting down.
         }
+    }
+    
+    [HttpGet("screenshot")]
+    [EndpointSummary("获取 Operator 截图")]
+    [ProducesResponseType(200, Type = typeof(FileContentResult))]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> GetScreenshot()
+    {
+        if (configuration.GetValue<bool>("VisitorMode"))
+        {
+            return File([], "image/jpeg");
+        }
+        var (msg, bytes) = await backendService.GetGameScreenshotBytesAsync();
+        if (bytes.Length == 0)
+        {
+            return Ok(new R(false, $"Failed to get screenshot from backend: {msg}"));
+        }
+        return File(bytes, "image/jpeg");
     }
 }
 

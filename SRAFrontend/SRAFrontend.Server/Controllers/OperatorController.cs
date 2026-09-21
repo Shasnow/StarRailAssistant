@@ -6,23 +6,8 @@ namespace SRAFrontend.Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class OperatorController(IBackendService backendService) : Controller
+public class OperatorController(IBackendService backendService, IConfiguration configuration) : Controller
 {
-    [HttpGet("screenshot")]
-    [EndpointSummary("获取 Operator 截图")]
-    [ProducesResponseType(200, Type = typeof(FileContentResult))]
-    [ProducesResponseType(500)]
-    public async Task<IActionResult> GetScreenshot()
-    {
-        var (msg, bytes) = await backendService.GetGameScreenshotBytesAsync();
-        if (bytes.Length == 0)
-        {
-            return Ok(new R(false, $"Failed to get screenshot from backend: {msg}"));
-        }
-        return File(bytes, "image/png");
-    }
-    
-    
     [HttpGet("list")]
     [EndpointSummary("列出所有可用的 Operator 方法")]
     [ProducesResponseType(200, Type = typeof(R))]
@@ -56,7 +41,8 @@ public class OperatorController(IBackendService backendService) : Controller
     {
         if (string.IsNullOrWhiteSpace(request.Method))
             return BadRequest(new R(false, "method is required"));
-
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "Method called"));
         var parameters = request.Params == null ? "" : request.Params.ToString();
         var response = await backendService.SendInputAndWaitObjectAsync($"operator call {request.Method} '{parameters}' --json");
         if (response is null)
@@ -67,4 +53,4 @@ public class OperatorController(IBackendService backendService) : Controller
     // --- 工具方法 ---
 }
 
-public record OperatorCallRequest(string Method, JsonElement? Params);
+public record OperatorCallRequest(string Method, object? Params);

@@ -198,7 +198,8 @@ class Operator(IOperator):
                    to_y: float | None = None,
                    background: bool = False,
                    resize: tuple[int, int] | None = None,
-                   save_path: str | None = None) -> Image.Image:
+                   save_path: str | None = None,
+                   jpeg_quality: int | None = None) -> Image.Image:
         region = self.get_win_region(active_window=not background)
         self.sleep(0.5)
         img = self._screenshot(self._hwnd, region, self.screenshot_background)
@@ -213,7 +214,12 @@ class Operator(IOperator):
         if resize:
             img = img.resize(resize, Image.Resampling.LANCZOS)
         if save_path:
-            img.save(save_path)
+            # 本地截屏没有 CDP 可用，只能按需把编码格式换成 JPEG
+            if jpeg_quality is not None:
+                # JPEG 不支持 alpha/调色板模式，先统一转 RGB
+                img.convert("RGB").save(save_path, format="JPEG", quality=jpeg_quality)
+            else:
+                img.save(save_path)
         return img
 
     @staticmethod

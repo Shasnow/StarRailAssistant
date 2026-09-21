@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using SRAFrontend.Models;
@@ -8,7 +8,7 @@ namespace SRAFrontend.Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class SettingsController(SettingsService settingsService, ILogger<SettingsController> logger) : Controller
+public class SettingsController(SettingsService settingsService, IConfiguration configuration, ILogger<SettingsController> logger) : Controller
 {
     [HttpGet]
     [EndpointSummary("获取设置")]
@@ -24,12 +24,14 @@ public class SettingsController(SettingsService settingsService, ILogger<Setting
     [EndpointDescription("按字段修改设置，支持只传需要修改的部分。请求体为 AppSettings 的部分 JSON，例如 { \"advanced\": { \"backend.remote.enabled\": true } }")]
     [ProducesResponseType(200, Type = typeof(R<IEnumerable<string>>))]
     [ProducesResponseType(400)]
-    public IActionResult UpdateSettings([FromBody] JsonElement body)
+    public IActionResult UpdateSettings([FromBody] object body)
     {
+        if (configuration.GetValue<bool>("VisitorMode"))
+            return Ok(new R(true, "Settings updated", body));
         var settings = settingsService.Settings;
         var updated = new List<string>();
-
-        foreach (var sectionProp in body.EnumerateObject())
+        var jsonElement = JsonSerializer.SerializeToElement(body);
+        foreach (var sectionProp in jsonElement.EnumerateObject())
         {
             // 找到 AppSettings 中匹配的 section（如 "advanced" -> Settings.Advanced）
             var section = GetSection(settings, sectionProp.Name);

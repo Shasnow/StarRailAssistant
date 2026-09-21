@@ -1,10 +1,8 @@
 using System;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -81,6 +79,7 @@ public class App : Application
         services.AddSingleton<ControlPanelViewModel>();
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
         services.AddSingleton<SettingsService>();
+        services.AddSingleton<AppService>();
         services.AddSingleton<CacheService>();
         // Register backend implementations and proxy
         services.AddSingleton<CliBackendService>();

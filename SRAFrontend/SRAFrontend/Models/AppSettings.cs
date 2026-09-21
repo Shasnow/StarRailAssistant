@@ -9,15 +9,15 @@ public class AppSettings
 {
     public const string Version = "2.23.0-beta.1"; // 应用版本号
 
-    [JsonPropertyName("general")] public GeneralSettings General { get; init; } = new();
+    [JsonPropertyName("general"), Description("通用设置")] public GeneralSettings General { get; init; } = new();
 
-    [JsonPropertyName("display")] public DisplaySettings Display { get; init; } = new();
+    [JsonPropertyName("display"), Description("显示设置")] public DisplaySettings Display { get; init; } = new();
 
-    [JsonPropertyName("update")] public UpdateSettings Update { get; init; } = new();
+    [JsonPropertyName("update"), Description("更新设置")] public UpdateSettings Update { get; init; } = new();
 
-    [JsonPropertyName("advanced")] public AdvancedSettings Advanced { get; init; } = new();
+    [JsonPropertyName("advanced"), Description("高级设置")] public AdvancedSettings Advanced { get; init; } = new();
 
-    [JsonPropertyName("notification")] public NotificationSettings Notification { get; init; } = new();
+    [JsonPropertyName("notification"), Description("通知设置")] public NotificationSettings Notification { get; init; } = new();
 }
 
 public partial class GeneralSettings : ObservableObject
@@ -44,10 +44,12 @@ public partial class GeneralSettings : ObservableObject
 
     [ObservableProperty]
     [property: JsonPropertyName("gameArgs.fullScreenMode")]
+    [property: Description("游戏窗口模式，如 窗口化、全屏")]
     private string _gameArgsFullScreenMode = "窗口化";
 
     [ObservableProperty]
     [property: JsonPropertyName("gameArgs.windowSize")]
+    [property: Description("游戏窗口尺寸，格式为 宽x高，如 1920x1080")]
     private string _gameArgsWindowSize = "1920x1080";
 
     [ObservableProperty]
@@ -74,33 +76,50 @@ public partial class GeneralSettings : ObservableObject
     [property: JsonPropertyName("cloudGame.browser")]
     [property: Description("云游戏使用的浏览器")]
     private string _cloudGameBrowser = "Microsoft Edge";
-    
+
     [ObservableProperty]
     [property: JsonPropertyName("cloudGame.browser.path")]
     [property: Description("云游戏使用的浏览器路径")]
     private string _cloudGameBrowserPath = "";
-    
+
     [ObservableProperty]
     [property: JsonPropertyName("cloudGame.browser.headless")]
     [property: Description("云游戏使用的浏览器是否无头模式")]
-    private bool _cloudGameBrowserHeadless;
+    private bool _isCloudGameBrowserHeadless;
 
-    [ObservableProperty] [property: JsonPropertyName("keybindings.e")]
+    [ObservableProperty]
+    [property: JsonPropertyName("cloudGame.browser.muteAudio")]
+    [property: Description("云游戏使用的浏览器是否静音")]
+    private bool _isCloudGameBrowserMuteAudio;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("keybindings.e")]
+    [property: Description("施放秘技的快捷键")]
     private string _hotkeyE = "E";
 
-    [ObservableProperty] [property: JsonPropertyName("keybindings.f1")]
+    [ObservableProperty]
+    [property: JsonPropertyName("keybindings.f1")]
+    [property: Description("打开活动界面的快捷键")]
     private string _hotkeyF1 = "F1";
 
-    [ObservableProperty] [property: JsonPropertyName("keybindings.f2")]
+    [ObservableProperty]
+    [property: JsonPropertyName("keybindings.f2")]
+    [property: Description("打开纪行界面的快捷键")]
     private string _hotkeyF2 = "F2";
 
-    [ObservableProperty] [property: JsonPropertyName("keybindings.f3")]
+    [ObservableProperty]
+    [property: JsonPropertyName("keybindings.f3")]
+    [property: Description("打开卡池界面的快捷键")]
     private string _hotkeyF3 = "F3";
 
-    [ObservableProperty] [property: JsonPropertyName("keybindings.f4")]
+    [ObservableProperty]
+    [property: JsonPropertyName("keybindings.f4")]
+    [property: Description("打开指南界面的快捷键")]
     private string _hotkeyF4 = "F4";
 
-    [ObservableProperty] [property: JsonPropertyName("keybindings.stop")]
+    [ObservableProperty]
+    [property: JsonPropertyName("keybindings.stop")]
+    [property: Description("停止运行任务的快捷键")]
     private string _hotkeyStop = "F9";
 
     [ObservableProperty]
@@ -150,9 +169,9 @@ public partial class DisplaySettings : ObservableObject
     private double _controlPanelOpacity = 0.9;
 
     [ObservableProperty]
-    [property: JsonPropertyName("language")]
-    [property: Description("界面语言，0=中文, 2=English")]
-    private int _language;
+    [JsonPropertyName("language")]
+    [Description("界面语言，0=中文, 1=English")]
+    public partial int Language { get; set; }
 
     [ObservableProperty]
     [property: JsonPropertyName("window.remember")]
@@ -164,181 +183,294 @@ public partial class DisplaySettings : ObservableObject
     public int WindowState { get; set; }
 
     [JsonPropertyName("window.position.x")]
+    [Description("主窗口位置的 X 坐标")]
     public int WindowPositionX { get; set; }
 
     [JsonPropertyName("window.position.y")]
+    [Description("主窗口位置的 Y 坐标")]
     public int WindowPositionY { get; set; }
 
-    [JsonPropertyName("window.width")] public double WindowWidth { get; set; }
+    [JsonPropertyName("window.width")]
+    [Description("主窗口宽度")]
+    public double WindowWidth { get; set; }
 
-    [JsonPropertyName("window.height")] public double WindowHeight { get; set; }
+    [JsonPropertyName("window.height")]
+    [Description("主窗口高度")]
+    public double WindowHeight { get; set; }
 }
 
 public partial class NotificationSettings : ObservableObject
 {
-    [ObservableProperty] [property: JsonPropertyName("enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("enabled")]
+    [property: Description("是否启用通知功能")]
     private bool _isEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("system.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("system.enabled")]
+    [property: Description("是否启用系统通知")]
     private bool _isSystemEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("bark.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("bark.enabled")]
+    [property: Description("是否启用 Bark 推送")]
     private bool _isBarkEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("bark.ciphertext")]
+    [ObservableProperty]
+    [property: JsonPropertyName("bark.ciphertext")]
+    [property: Description("Bark 推送的密文内容，设置后作为 ciphertext 参数发送")]
     private string _barkCiphertext = "";
 
-    [ObservableProperty] [property: JsonPropertyName("bark.deviceKey")]
+    [ObservableProperty]
+    [property: JsonPropertyName("bark.deviceKey")]
+    [property: Description("Bark 设备 Key，支持逗号分隔多个设备")]
     private string _barkDeviceKey = "";
 
-    [ObservableProperty] [property: JsonPropertyName("bark.group")]
+    [ObservableProperty]
+    [property: JsonPropertyName("bark.group")]
+    [property: Description("Bark 消息分组")]
     private string _barkGroup = "StarRailAssistant";
 
-    [ObservableProperty] [property: JsonPropertyName("bark.icon")]
+    [ObservableProperty]
+    [property: JsonPropertyName("bark.icon")]
+    [property: Description("Bark 推送图标的 URL")]
     private string _barkIcon = "";
 
-    [ObservableProperty] [property: JsonPropertyName("bark.level")]
+    [ObservableProperty]
+    [property: JsonPropertyName("bark.level")]
+    [property: Description("Bark 推送级别，active/timeSensitive/passive")]
     private string _barkLevel = "";
 
-    [ObservableProperty] [property: JsonPropertyName("bark.serverUrl")]
+    [ObservableProperty]
+    [property: JsonPropertyName("bark.serverUrl")]
+    [property: Description("Bark 服务器地址")]
     private string _barkServerUrl = "https://api.day.app";
 
-    [ObservableProperty] [property: JsonPropertyName("bark.sound")]
+    [ObservableProperty]
+    [property: JsonPropertyName("bark.sound")]
+    [property: Description("Bark 推送提示音名称")]
     private string _barkSound = "";
 
-    [ObservableProperty] [property: JsonPropertyName("dingTalk.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("dingTalk.enabled")]
+    [property: Description("是否启用钉钉机器人推送")]
     private bool _isDingTalkEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("dingTalk.secret")]
+    [ObservableProperty]
+    [property: JsonPropertyName("dingTalk.secret")]
+    [property: Description("钉钉机器人的加签密钥（SEC 开头）")]
     private string _dingTalkSecret = "";
 
-    [ObservableProperty] [property: JsonPropertyName("dingTalk.webhookUrl")]
+    [ObservableProperty]
+    [property: JsonPropertyName("dingTalk.webhookUrl")]
+    [property: Description("钉钉机器人的 Webhook 地址")]
     private string _dingTalkWebhookUrl = "";
 
-    [ObservableProperty] [property: JsonPropertyName("discord.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("discord.enabled")]
+    [property: Description("是否启用 Discord 推送")]
     private bool _isDiscordEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("discord.sendImage")]
+    [ObservableProperty]
+    [property: JsonPropertyName("discord.sendImage")]
+    [property: Description("是否在 Discord 推送中附带截图")]
     private bool _isDiscordSendImage;
 
-    [ObservableProperty] [property: JsonPropertyName("discord.webhookUrl")]
+    [ObservableProperty]
+    [property: JsonPropertyName("discord.webhookUrl")]
+    [property: Description("Discord 的 Webhook 地址")]
     private string _discordWebhookUrl = "";
 
-    [ObservableProperty] [property: JsonPropertyName("feishu.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("feishu.enabled")]
+    [property: Description("是否启用飞书推送")]
     private bool _isFeishuEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("feishu.appId")]
+    [ObservableProperty]
+    [property: JsonPropertyName("feishu.appId")]
+    [property: Description("飞书应用的 App ID")]
     private string _feishuAppId = "";
 
-    [ObservableProperty] [property: JsonPropertyName("feishu.appSecret")]
+    [ObservableProperty]
+    [property: JsonPropertyName("feishu.appSecret")]
+    [property: Description("飞书应用的 App Secret")]
     private string _feishuAppSecret = "";
 
-    [ObservableProperty] [property: JsonPropertyName("feishu.receiveId")]
+    [ObservableProperty]
+    [property: JsonPropertyName("feishu.receiveId")]
+    [property: Description("飞书消息接收者 ID")]
     private string _feishuReceiveId = "";
 
-    [ObservableProperty] [property: JsonPropertyName("feishu.receiveIdType")]
+    [ObservableProperty]
+    [property: JsonPropertyName("feishu.receiveIdType")]
+    [property: Description("飞书接收者 ID 类型，如 open_id、user_id、union_id、chat_id")]
     private string _feishuReceiveIdType = "";
 
-    [ObservableProperty] [property: JsonPropertyName("feishu.webhookUrl")]
+    [ObservableProperty]
+    [property: JsonPropertyName("feishu.webhookUrl")]
+    [property: Description("飞书机器人的 Webhook 地址")]
     private string _feishuWebhookUrl = "";
 
-    [ObservableProperty] [property: JsonPropertyName("oneBot.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("oneBot.enabled")]
+    [property: Description("是否启用 OneBot 推送")]
     private bool _isOneBotEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("oneBot.sendImage")]
+    [ObservableProperty]
+    [property: JsonPropertyName("oneBot.sendImage")]
+    [property: Description("是否在 OneBot 推送中附带截图")]
     private bool _isOneBotSendImage;
 
-    [ObservableProperty] [property: JsonPropertyName("oneBot.groupId")]
+    [ObservableProperty]
+    [property: JsonPropertyName("oneBot.groupId")]
+    [property: Description("OneBot 推送的目标群号")]
     private string _oneBotGroupId = "";
 
-    [ObservableProperty] [property: JsonPropertyName("oneBot.token")]
+    [ObservableProperty]
+    [property: JsonPropertyName("oneBot.token")]
+    [property: Description("OneBot 的访问 Token")]
     private string _oneBotToken = "";
 
-    [ObservableProperty] [property: JsonPropertyName("oneBot.url")]
+    [ObservableProperty]
+    [property: JsonPropertyName("oneBot.url")]
+    [property: Description("OneBot 的 HTTP API 地址")]
     private string _oneBotUrl = "";
 
-    [ObservableProperty] [property: JsonPropertyName("oneBot.userId")]
+    [ObservableProperty]
+    [property: JsonPropertyName("oneBot.userId")]
+    [property: Description("OneBot 机器人的账号")]
     private string _oneBotUserId = "";
 
-    [ObservableProperty] [property: JsonPropertyName("serverChan.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("serverChan.enabled")]
+    [property: Description("是否启用 Server酱 推送")]
     private bool _isServerChanEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("serverChan.sendKey")]
+    [ObservableProperty]
+    [property: JsonPropertyName("serverChan.sendKey")]
+    [property: Description("Server酱 的 SendKey")]
     private string _serverChanSendKey = "";
 
-    [ObservableProperty] [property: JsonPropertyName("telegram.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("telegram.enabled")]
+    [property: Description("是否启用 Telegram 推送")]
     private bool _isTelegramEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("telegram.proxyEnabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("telegram.proxyEnabled")]
+    [property: Description("是否为 Telegram 推送启用代理")]
     private bool _isTelegramProxyEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("telegram.sendImage")]
+    [ObservableProperty]
+    [property: JsonPropertyName("telegram.sendImage")]
+    [property: Description("是否在 Telegram 推送中附带截图")]
     private bool _isTelegramSendImage;
 
-    [ObservableProperty] [property: JsonPropertyName("weCom.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("weCom.enabled")]
+    [property: Description("是否启用企业微信推送")]
     private bool _isWeComEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("weCom.sendImage")]
+    [ObservableProperty]
+    [property: JsonPropertyName("weCom.sendImage")]
+    [property: Description("是否在企业微信推送中附带截图")]
     private bool _isWeComSendImage;
 
-    [ObservableProperty] [property: JsonPropertyName("weCom.webhookUrl")]
+    [ObservableProperty]
+    [property: JsonPropertyName("weCom.webhookUrl")]
+    [property: Description("企业微信机器人的 Webhook 地址")]
     private string _weComWebhookUrl = "";
 
-    [ObservableProperty] [property: JsonPropertyName("webhook.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("webhook.enabled")]
+    [property: Description("是否启用自定义 Webhook 推送")]
     private bool _isWebhookEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("webhook.url")]
+    [ObservableProperty]
+    [property: JsonPropertyName("webhook.url")]
+    [property: Description("自定义 Webhook 的 URL")]
     private string _webhookUrl = "";
 
-    [ObservableProperty] [property: JsonPropertyName("xxtui.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("xxtui.enabled")]
+    [property: Description("是否启用 息知(xxtui) 推送")]
     private bool _isXxtuiEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("email.enabled")]
+    [ObservableProperty]
+    [property: JsonPropertyName("email.enabled")]
+    [property: Description("是否启用邮件推送")]
     private bool _isEmailEnabled;
 
-    [ObservableProperty] [property: JsonPropertyName("email.smtpPort")]
+    [ObservableProperty]
+    [property: JsonPropertyName("email.smtpPort")]
+    [property: Description("SMTP 服务器端口，SSL 通常为 465")]
     private int _smtpPort = 465;
 
-    [ObservableProperty] [property: JsonPropertyName("email.smtpReceiver")]
+    [ObservableProperty]
+    [property: JsonPropertyName("email.smtpReceiver")]
+    [property: Description("收件邮箱地址")]
     private string _smtpReceiver = "";
 
-    [ObservableProperty] [property: JsonPropertyName("email.smtpSender")]
+    [ObservableProperty]
+    [property: JsonPropertyName("email.smtpSender")]
+    [property: Description("发件邮箱地址")]
     private string _smtpSender = "";
 
-    [ObservableProperty] [property: JsonPropertyName("email.smtpServer")]
+    [ObservableProperty]
+    [property: JsonPropertyName("email.smtpServer")]
+    [property: Description("SMTP 服务器地址")]
     private string _smtpServer = "";
 
     [JsonPropertyName("email.smtpAuthCode")]
+    [Description("SMTP 授权码（加密存储）")]
     public string EncryptedSmtpAuthCode { get; set; } = "";
 
     [ObservableProperty] [property: JsonIgnore]
     private string _smtpAuthCode = "";
 
-    [ObservableProperty] [property: JsonPropertyName("telegram.apiBaseUrl")]
+    [ObservableProperty]
+    [property: JsonPropertyName("telegram.apiBaseUrl")]
+    [property: Description("Telegram Bot API 地址")]
     private string _telegramApiBaseUrl = "https://api.telegram.org";
 
-    [ObservableProperty] [property: JsonPropertyName("telegram.botToken")]
+    [ObservableProperty]
+    [property: JsonPropertyName("telegram.botToken")]
+    [property: Description("Telegram 机器人的 Bot Token")]
     private string _telegramBotToken = "";
 
-    [ObservableProperty] [property: JsonPropertyName("telegram.chatId")]
+    [ObservableProperty]
+    [property: JsonPropertyName("telegram.chatId")]
+    [property: Description("Telegram 推送目标 Chat ID")]
     private string _telegramChatId = "";
 
-    [ObservableProperty] [property: JsonPropertyName("telegram.proxyUrl")]
+    [ObservableProperty]
+    [property: JsonPropertyName("telegram.proxyUrl")]
+    [property: Description("Telegram 代理服务器地址")]
     private string _telegramProxyUrl = "http://127.0.0.1:7890";
 
-    [ObservableProperty] [property: JsonPropertyName("xxtui.apiKey")]
+    [ObservableProperty]
+    [property: JsonPropertyName("xxtui.apiKey")]
+    [property: Description("息知(xxtui) 的 API Key")]
     private string _xxtuiApiKey = "";
 
-    [ObservableProperty] [property: JsonPropertyName("xxtui.channel")]
+    [ObservableProperty]
+    [property: JsonPropertyName("xxtui.channel")]
+    [property: Description("息知(xxtui) 的推送通道")]
     private string _xxtuiChannel = "";
 
-    [ObservableProperty] [property: JsonPropertyName("xxtui.source")]
+    [ObservableProperty]
+    [property: JsonPropertyName("xxtui.source")]
+    [property: Description("息知(xxtui) 的消息来源")]
     private string _xxtuiSource = "";
-    
-    [ObservableProperty] [property: JsonPropertyName("onCompleted")]
+
+    [ObservableProperty]
+    [property: JsonPropertyName("onCompleted")]
+    [property: Description("任务完成时发送通知的任务名称列表")]
     private ObservableCollection<string> _onCompleted = [];
 
-    [ObservableProperty] [property: JsonPropertyName("onStart")]
+    [ObservableProperty]
+    [property: JsonPropertyName("onStart")]
+    [property: Description("任务开始时发送通知的任务名称列表")]
     private ObservableCollection<string> _onStart = [];
 }
 

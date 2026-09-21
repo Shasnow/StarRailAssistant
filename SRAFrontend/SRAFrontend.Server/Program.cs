@@ -8,6 +8,8 @@ using SRAFrontend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+const string apiPrefix = "/api";
+
 var webUiEnabled = !args.Contains("--no-webui", StringComparer.OrdinalIgnoreCase);
 
 builder.Services.AddSingleton<PyBackendService>();
@@ -17,6 +19,7 @@ builder.Services.AddSingleton<SettingsService>();
 builder.Services.AddSingleton<CacheService>();
 builder.Services.AddSingleton<ConfigService>();
 builder.Services.AddSingleton<LogStreamService>();
+builder.Services.AddSingleton<AppService>();
 builder.Services.AddHostedService<HostedService>();
 builder.Services.AddHttpClient();
 builder.Services.AddMcpServer(options =>
@@ -31,6 +34,7 @@ builder.Services.AddMcpServer(options =>
     .WithHttpTransport(option => { option.Stateless = true; })
     .WithTools<McpController>();
 var isAuthEnabled = !string.IsNullOrWhiteSpace(builder.Configuration["AccessToken"]);
+var isVisitorMode = builder.Configuration.GetValue<bool>("VisitorMode");
 
 if (isAuthEnabled)
 {
@@ -44,15 +48,23 @@ builder.Services.AddControllers(options =>
 {
     if (isAuthEnabled) options.Filters.Add(new AuthorizeFilter());
 });
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    // MapGroup 的前缀不会反映到 MVC ApiExplorer 生成的 OpenAPI 文档中，这里统一补上
+    options.AddDocumentTransformer((document, _, _) =>
+    {
+        var prefixed = document.Paths.ToDictionary(p => $"{apiPrefix}{p.Key}", p => p.Value);
+        document.Paths.Clear();
+        foreach (var (path, item) in prefixed)
+            document.Paths[path] = item;
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 
 if (webUiEnabled)
 {
-    // The Vue build output is copied into wwwroot by packaging.  ASP.NET Core
-    // then serves it as static files while the controllers below provide the
-    // actual SRA operations.
     app.UseDefaultFiles();
     app.UseStaticFiles();
 }
@@ -63,11 +75,19 @@ if (isAuthEnabled)
     app.UseAuthorization();
 }
 
-if (app.Environment.IsDevelopment())
-    app.MapControllers();
-else
-    app.MapGroup("/api").MapControllers();
+app.MapGroup(apiPrefix).MapControllers();
 
 app.MapOpenApi();
-app.MapMcp("/mcp");
+
+if (!isVisitorMode)
+    app.MapMcp("/mcp");
+
+#if DEBUG
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/openapi/v1.json", "SRA Server API");
+    options.RoutePrefix = "swagger";
+});
+#endif
+
 app.Run();

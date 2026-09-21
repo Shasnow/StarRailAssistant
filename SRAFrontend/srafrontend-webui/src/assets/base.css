@@ -1,0 +1,437 @@
+/* OKLCH 主题色彩系统：
+   全站颜色由单一主题色相 --hue（0-360 无单位数字）派生——
+   中性色/主色 = oklch(L C var(--hue)) 低饱和着色；
+   语义四色 = 固定色相（success 150 / warning 80 / danger 27 / info 262）+ 与主色共享的 L/C 坡道；
+   深浅模式通过 :root / :root.dark 两套 token 值适配（useDark 切换 html.dark）。
+   --hue 由 useThemeHue 写入 html 内联样式并持久化，缺失时以下方默认值兜底（防 IACVT）。 */
+:root {
+  --hue: 163;
+
+  color-scheme: light;
+  --page-bg: oklch(.95 .01 var(--hue));
+
+  /* ========== 中性 / 表面 ========== */
+  --color-background: oklch(0.985 0.004 var(--hue));
+  --color-background-soft: oklch(0.962 0.006 var(--hue));
+  --color-background-mute: oklch(0.938 0.008 var(--hue));
+  --color-surface: oklch(0.995 0.003 var(--hue));
+
+  --color-border: oklch(0.91 0.012 var(--hue));
+  --color-border-hover: oklch(0.83 0.02 var(--hue));
+
+  --color-text: oklch(0.3 0.02 var(--hue));
+  --color-text-secondary: oklch(0.44 0.02 var(--hue));
+  --color-heading: oklch(0.25 0.02 var(--hue));
+  --color-muted: oklch(0.46 0.015 var(--hue));
+
+  /* ========== 主色（随主题色相） ========== */
+  --color-primary: oklch(0.53 0.14 var(--hue));
+  --color-primary-hover: oklch(0.46 0.14 var(--hue));
+  --color-primary-active: oklch(0.41 0.13 var(--hue));
+  --color-primary-disabled: oklch(0.75 0.05 var(--hue));
+  --color-primary-tint: color-mix(in oklab, var(--color-primary) 12%, transparent);
+
+  /* ========== 语义色（固定色相，共享 L/C 坡道） ========== */
+  --color-success: oklch(0.5 0.13 150);
+  --color-warning: oklch(0.6 0.13 80);
+  --color-danger: oklch(0.52 0.19 27);
+  --color-info: oklch(0.53 0.1 262);
+
+  /* ========== 固定 token（不随模式翻转） ========== */
+  /* 深底上的提示文字（既定决策：固定亮灰，约 5.5:1，不随主题翻转） */
+  --color-hint-on-dark: #8b949e;
+
+  /* 终端族：两种模式下恒为深色，仅随色相微着色（对应原 #141414/#1f1f1f/#2d2d2d/#3a3a3a 等） */
+  --terminal-bg: oklch(0.17 0.008 var(--hue));
+  --terminal-surface: oklch(0.21 0.008 var(--hue));
+  --terminal-border: oklch(0.27 0.008 var(--hue));
+  --terminal-border-strong: oklch(0.33 0.01 var(--hue));
+  --terminal-deep: oklch(0.13 0.006 var(--hue));
+  --terminal-text: oklch(0.9 0.006 var(--hue));
+  --terminal-text-2: oklch(0.86 0.006 var(--hue));
+  --terminal-time: oklch(0.6 0.015 var(--hue));
+  --terminal-btn-bg: oklch(0.245 0.008 var(--hue));
+  --terminal-btn-border: oklch(0.33 0.01 var(--hue));
+  --terminal-btn-text: oklch(0.84 0.008 var(--hue));
+  --terminal-btn-disabled-bg: oklch(0.2 0.006 var(--hue));
+  --terminal-btn-disabled-border: oklch(0.26 0.006 var(--hue));
+  --terminal-btn-disabled-text: oklch(0.48 0.008 var(--hue));
+  --terminal-scrollbar: oklch(0.33 0.008 var(--hue));
+  --terminal-scrollbar-hover: oklch(0.42 0.01 var(--hue));
+  --terminal-hover: oklch(1 0 0 / 4%);
+  --terminal-hover-strong: oklch(1 0 0 / 8%);
+  --terminal-hl-bg: color-mix(in oklab, var(--color-warning) 28%, transparent);
+  --terminal-hl-text: oklch(0.88 0.12 95);
+
+  /* ========== 阴影 ========== */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 5%);
+  --shadow-lg: 0 8px 24px rgb(0 0 0 / 6%);
+
+  --section-gap: 160px;
+}
+
+/* ========== Element Plus 变量重映射（浅色） ==========
+   双 :root 将特异性提升至 (0,2,0)：unplugin-vue-components 会在运行时
+   按需注入 :root(0,1,0) 的 EP 组件样式表（晚于本文件，同级特异性会反超），
+   双写后无论注入顺序如何均能压过它，也高于 EP dark 的 html.dark(0,1,1)。
+   本块必须位于 :root.dark 之前——深色 ramp 依赖等特异性下按顺序胜出。
+   light-N 向白混（悬停/plain 背景），dark-2 向黑混（按下） */
+:root:root {
+  --el-color-primary: var(--color-primary);
+  --el-color-primary-dark-2: color-mix(in oklab, var(--color-primary) 82%, black);
+  --el-color-primary-light-3: color-mix(in oklab, var(--color-primary) 70%, white);
+  --el-color-primary-light-5: color-mix(in oklab, var(--color-primary) 50%, white);
+  --el-color-primary-light-7: color-mix(in oklab, var(--color-primary) 30%, white);
+  --el-color-primary-light-8: color-mix(in oklab, var(--color-primary) 20%, white);
+  --el-color-primary-light-9: color-mix(in oklab, var(--color-primary) 10%, white);
+
+  --el-color-success: var(--color-success);
+  --el-color-success-dark-2: color-mix(in oklab, var(--color-success) 82%, black);
+  --el-color-success-light-3: color-mix(in oklab, var(--color-success) 70%, white);
+  --el-color-success-light-5: color-mix(in oklab, var(--color-success) 50%, white);
+  --el-color-success-light-7: color-mix(in oklab, var(--color-success) 30%, white);
+  --el-color-success-light-8: color-mix(in oklab, var(--color-success) 20%, white);
+  --el-color-success-light-9: color-mix(in oklab, var(--color-success) 10%, white);
+
+  --el-color-warning: var(--color-warning);
+  --el-color-warning-dark-2: color-mix(in oklab, var(--color-warning) 82%, black);
+  --el-color-warning-light-3: color-mix(in oklab, var(--color-warning) 70%, white);
+  --el-color-warning-light-5: color-mix(in oklab, var(--color-warning) 50%, white);
+  --el-color-warning-light-7: color-mix(in oklab, var(--color-warning) 30%, white);
+  --el-color-warning-light-8: color-mix(in oklab, var(--color-warning) 20%, white);
+  --el-color-warning-light-9: color-mix(in oklab, var(--color-warning) 10%, white);
+
+  --el-color-danger: var(--color-danger);
+  --el-color-error: var(--color-danger);
+  --el-color-danger-dark-2: color-mix(in oklab, var(--color-danger) 82%, black);
+  --el-color-danger-light-3: color-mix(in oklab, var(--color-danger) 70%, white);
+  --el-color-danger-light-5: color-mix(in oklab, var(--color-danger) 50%, white);
+  --el-color-danger-light-7: color-mix(in oklab, var(--color-danger) 30%, white);
+  --el-color-danger-light-8: color-mix(in oklab, var(--color-danger) 20%, white);
+  --el-color-danger-light-9: color-mix(in oklab, var(--color-danger) 10%, white);
+  --el-color-error-dark-2: color-mix(in oklab, var(--color-danger) 82%, black);
+  --el-color-error-light-3: color-mix(in oklab, var(--color-danger) 70%, white);
+  --el-color-error-light-5: color-mix(in oklab, var(--color-danger) 50%, white);
+  --el-color-error-light-7: color-mix(in oklab, var(--color-danger) 30%, white);
+  --el-color-error-light-8: color-mix(in oklab, var(--color-danger) 20%, white);
+  --el-color-error-light-9: color-mix(in oklab, var(--color-danger) 10%, white);
+
+  --el-color-info: var(--color-info);
+  --el-color-info-dark-2: color-mix(in oklab, var(--color-info) 82%, black);
+  --el-color-info-light-3: color-mix(in oklab, var(--color-info) 70%, white);
+  --el-color-info-light-5: color-mix(in oklab, var(--color-info) 50%, white);
+  --el-color-info-light-7: color-mix(in oklab, var(--color-info) 30%, white);
+  --el-color-info-light-8: color-mix(in oklab, var(--color-info) 20%, white);
+  --el-color-info-light-9: color-mix(in oklab, var(--color-info) 10%, white);
+
+  /* 表面 / 文字 / 边框 / 填充 → 项目 token */
+  --el-bg-color: var(--color-surface);
+  --el-bg-color-page: var(--color-background);
+  --el-bg-color-overlay: var(--color-surface);
+
+  --el-text-color-primary: var(--color-heading);
+  --el-text-color-regular: var(--color-text);
+  --el-text-color-secondary: var(--color-text-secondary);
+  --el-text-color-placeholder: oklch(0.68 0.015 var(--hue));
+  --el-text-color-disabled: oklch(0.78 0.008 var(--hue));
+
+  --el-border-color: var(--color-border);
+  --el-border-color-light: color-mix(in oklab, var(--color-border) 75%, white);
+  --el-border-color-lighter: color-mix(in oklab, var(--color-border) 60%, white);
+  --el-border-color-extra-light: color-mix(in oklab, var(--color-border) 40%, white);
+  --el-border-color-dark: color-mix(in oklab, var(--color-border) 88%, black);
+  --el-border-color-darker: color-mix(in oklab, var(--color-border) 78%, black);
+
+  --el-fill-color: var(--color-background-mute);
+  --el-fill-color-light: color-mix(
+    in oklab,
+    var(--color-background-mute) 55%,
+    var(--color-background)
+  );
+  --el-fill-color-lighter: color-mix(
+    in oklab,
+    var(--color-background-mute) 35%,
+    var(--color-background)
+  );
+  --el-fill-color-extra-light: color-mix(
+    in oklab,
+    var(--color-background-mute) 20%,
+    var(--color-background)
+  );
+  --el-fill-color-dark: color-mix(in oklab, var(--color-background-mute) 88%, black);
+  --el-fill-color-darker: color-mix(in oklab, var(--color-background-mute) 75%, black);
+  --el-fill-color-blank: var(--color-surface);
+}
+
+/* 深色模式：由导航栏的主题切换逻辑在 <html> 上添加/移除 .dark 类 */
+:root.dark {
+  color-scheme: dark;
+
+  --page-bg: oklch(.16 .014 var(--hue));
+
+  /* ========== 中性 / 表面 ========== */
+  --color-background: oklch(0.175 0.008 var(--hue));
+  --color-background-soft: oklch(0.215 0.01 var(--hue));
+  --color-background-mute: oklch(0.25 0.012 var(--hue));
+  --color-surface: oklch(0.215 0.01 var(--hue));
+
+  --color-border: oklch(0.32 0.015 var(--hue));
+  --color-border-hover: oklch(0.42 0.02 var(--hue));
+
+  --color-text: oklch(0.9 0.01 var(--hue));
+  --color-text-secondary: oklch(0.72 0.012 var(--hue));
+  --color-heading: oklch(0.95 0.01 var(--hue));
+  --color-muted: oklch(0.62 0.02 var(--hue));
+
+  /* ========== 主色（随主题色相） ========== */
+  --color-primary: oklch(0.64 0.13 var(--hue));
+  --color-primary-hover: oklch(0.71 0.13 var(--hue));
+  --color-primary-active: oklch(0.59 0.13 var(--hue));
+  --color-primary-disabled: oklch(0.4 0.04 var(--hue));
+  --color-primary-tint: color-mix(in oklab, var(--color-primary) 12%, transparent);
+
+  /* ========== 语义色（固定色相，共享 L/C 坡道） ========== */
+  --color-success: oklch(0.78 0.14 150);
+  --color-warning: oklch(0.8 0.14 80);
+  --color-danger: oklch(0.7 0.17 27);
+  --color-info: oklch(0.75 0.1 262);
+
+  /* ========== 阴影 ========== */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 30%);
+  --shadow-lg: 0 8px 24px rgb(0 0 0 / 22%);
+
+  /* ========== Element Plus 变量重映射（深色） ==========
+     基础映射（--el-color-* 等间接引用）由 :root:root 提供：
+     其值为 var(--color-*) 间接引用，token 本身已随 :root.dark 翻转，自动适配深色。
+     此处只需重申「方向反转」的 ramp 与深色专属字面值——
+     特异性同为 (0,2,0) 但声明顺序在后，可覆盖 :root:root 的浅色方向 ramp，
+     同时高于 EP dark 的 html.dark(0,1,1)；
+     ramp 方向反转：light-N 向页面背景混（变暗），dark-2 向白混（变亮） */
+  --el-color-primary-dark-2: color-mix(in oklab, var(--color-primary) 80%, white);
+  --el-color-primary-light-3: color-mix(
+    in oklab,
+    var(--color-primary) 70%,
+    var(--color-background)
+  );
+  --el-color-primary-light-5: color-mix(
+    in oklab,
+    var(--color-primary) 50%,
+    var(--color-background)
+  );
+  --el-color-primary-light-7: color-mix(
+    in oklab,
+    var(--color-primary) 30%,
+    var(--color-background)
+  );
+  --el-color-primary-light-8: color-mix(
+    in oklab,
+    var(--color-primary) 20%,
+    var(--color-background)
+  );
+  --el-color-primary-light-9: color-mix(
+    in oklab,
+    var(--color-primary) 10%,
+    var(--color-background)
+  );
+
+  --el-color-success-dark-2: color-mix(in oklab, var(--color-success) 80%, white);
+  --el-color-success-light-3: color-mix(
+    in oklab,
+    var(--color-success) 70%,
+    var(--color-background)
+  );
+  --el-color-success-light-5: color-mix(
+    in oklab,
+    var(--color-success) 50%,
+    var(--color-background)
+  );
+  --el-color-success-light-7: color-mix(
+    in oklab,
+    var(--color-success) 30%,
+    var(--color-background)
+  );
+  --el-color-success-light-8: color-mix(
+    in oklab,
+    var(--color-success) 20%,
+    var(--color-background)
+  );
+  --el-color-success-light-9: color-mix(
+    in oklab,
+    var(--color-success) 10%,
+    var(--color-background)
+  );
+
+  --el-color-warning-dark-2: color-mix(in oklab, var(--color-warning) 80%, white);
+  --el-color-warning-light-3: color-mix(
+    in oklab,
+    var(--color-warning) 70%,
+    var(--color-background)
+  );
+  --el-color-warning-light-5: color-mix(
+    in oklab,
+    var(--color-warning) 50%,
+    var(--color-background)
+  );
+  --el-color-warning-light-7: color-mix(
+    in oklab,
+    var(--color-warning) 30%,
+    var(--color-background)
+  );
+  --el-color-warning-light-8: color-mix(
+    in oklab,
+    var(--color-warning) 20%,
+    var(--color-background)
+  );
+  --el-color-warning-light-9: color-mix(
+    in oklab,
+    var(--color-warning) 10%,
+    var(--color-background)
+  );
+
+  --el-color-danger-dark-2: color-mix(in oklab, var(--color-danger) 80%, white);
+  --el-color-danger-light-3: color-mix(in oklab, var(--color-danger) 70%, var(--color-background));
+  --el-color-danger-light-5: color-mix(in oklab, var(--color-danger) 50%, var(--color-background));
+  --el-color-danger-light-7: color-mix(in oklab, var(--color-danger) 30%, var(--color-background));
+  --el-color-danger-light-8: color-mix(in oklab, var(--color-danger) 20%, var(--color-background));
+  --el-color-danger-light-9: color-mix(in oklab, var(--color-danger) 10%, var(--color-background));
+  --el-color-error-dark-2: color-mix(in oklab, var(--color-danger) 80%, white);
+  --el-color-error-light-3: color-mix(in oklab, var(--color-danger) 70%, var(--color-background));
+  --el-color-error-light-5: color-mix(in oklab, var(--color-danger) 50%, var(--color-background));
+  --el-color-error-light-7: color-mix(in oklab, var(--color-danger) 30%, var(--color-background));
+  --el-color-error-light-8: color-mix(in oklab, var(--color-danger) 20%, var(--color-background));
+  --el-color-error-light-9: color-mix(in oklab, var(--color-danger) 10%, var(--color-background));
+
+  --el-color-info-dark-2: color-mix(in oklab, var(--color-info) 80%, white);
+  --el-color-info-light-3: color-mix(in oklab, var(--color-info) 70%, var(--color-background));
+  --el-color-info-light-5: color-mix(in oklab, var(--color-info) 50%, var(--color-background));
+  --el-color-info-light-7: color-mix(in oklab, var(--color-info) 30%, var(--color-background));
+  --el-color-info-light-8: color-mix(in oklab, var(--color-info) 20%, var(--color-background));
+  --el-color-info-light-9: color-mix(in oklab, var(--color-info) 10%, var(--color-background));
+
+  --el-text-color-placeholder: oklch(0.55 0.012 var(--hue));
+  --el-text-color-disabled: oklch(0.5 0.008 var(--hue));
+
+  --el-border-color-light: color-mix(in oklab, var(--color-border) 80%, black);
+  --el-border-color-lighter: color-mix(in oklab, var(--color-border) 60%, black);
+  --el-border-color-extra-light: color-mix(in oklab, var(--color-border) 40%, black);
+  --el-border-color-dark: color-mix(in oklab, var(--color-border) 75%, white);
+  --el-border-color-darker: color-mix(in oklab, var(--color-border) 55%, white);
+
+  --el-fill-color-light: color-mix(
+    in oklab,
+    var(--color-background-mute) 70%,
+    var(--color-background)
+  );
+  --el-fill-color-lighter: color-mix(
+    in oklab,
+    var(--color-background-mute) 45%,
+    var(--color-background)
+  );
+  --el-fill-color-extra-light: color-mix(
+    in oklab,
+    var(--color-background-mute) 25%,
+    var(--color-background)
+  );
+  --el-fill-color-dark: color-mix(in oklab, var(--color-background-mute) 88%, white);
+  --el-fill-color-darker: color-mix(in oklab, var(--color-background-mute) 78%, white);
+}
+
+/* 终端作用域：挂载后内部恒为深底（两种模式下终端背景不变），
+   并把语义 token 重注册为固定深色档（:root.dark 只匹配 <html>，
+   不会与组件内元素竞争，后代自然继承这里的覆盖值） */
+.terminal-scope {
+  background: var(--terminal-bg);
+  --color-success: oklch(0.78 0.14 150);
+  --color-warning: oklch(0.8 0.14 80);
+  --color-danger: oklch(0.7 0.17 27);
+  --color-info: oklch(0.75 0.1 262);
+  --color-muted: oklch(0.62 0.02 var(--hue));
+  --color-text: var(--terminal-text);
+  --color-text-secondary: var(--terminal-time);
+}
+
+/* 主题切换圆形揭示过渡（View Transitions API）：
+   禁用默认交叉淡入淡出，由 CSS 动画按 clip-path 圆形收缩/扩张完成切换。
+   方向与圆心/半径由 NavBar 在 <html> 上设置的 data-theme-transition 属性
+   和 --theme-transition-x/y/radius 变量控制 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2147483646;
+}
+
+/* 浅→深：旧（浅色）视图置顶，从全圆收缩到圆心（both 保持终态，避免结束时闪回浅色帧） */
+html[data-theme-transition='to-dark']::view-transition-old(root) {
+  z-index: 2147483646;
+  animation: theme-change 400ms ease-in both;
+}
+
+html[data-theme-transition='to-dark']::view-transition-new(root) {
+  z-index: 1;
+}
+
+/* 深→浅：新（浅色）视图置顶，反向播放收缩动画即从圆心扩张到全圆 */
+html[data-theme-transition='to-light']::view-transition-old(root) {
+  z-index: 1;
+}
+
+html[data-theme-transition='to-light']::view-transition-new(root) {
+  z-index: 2147483646;
+  animation: theme-change 400ms ease-in both;
+  animation-direction: reverse;
+}
+
+@keyframes theme-change {
+  from {
+    clip-path: circle(
+      var(--theme-transition-radius) at var(--theme-transition-x) var(--theme-transition-y)
+    );
+  }
+
+  to {
+    clip-path: circle(0% at var(--theme-transition-x) var(--theme-transition-y));
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--page-bg);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

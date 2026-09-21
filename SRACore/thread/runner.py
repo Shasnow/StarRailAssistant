@@ -9,6 +9,7 @@ import uuid
 from abc import ABC
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from enum import StrEnum
 from typing import Any
 
 from loguru import logger
@@ -17,6 +18,18 @@ from SRACore.util.errors import ThreadStoppedError
 
 
 # ── 运行时状态 ──
+
+class RunStatus(StrEnum):
+    """Runner 运行状态。
+
+    继承 StrEnum：JSON 序列化与 f-string 日志输出直接得到字符串值。
+    """
+    IDLE = "idle"  # 空闲，未在运行
+    RUNNING = "running"  # 正在运行
+    COMPLETED = "completed"  # 正常完成
+    FAILED = "failed"  # 执行出错
+    STOPPED = "stopped"  # 被用户请求停止
+
 
 @dataclass
 class RuntimeInfo:
@@ -27,11 +40,11 @@ class RuntimeInfo:
     session_id: str = field(default_factory=lambda :uuid.uuid4().hex)
     pid: int = field(default_factory=os.getpid)
     mode: str = "unknown"
-    status: str = "idle"
-    configs: tuple[str, ...] = ()
-    unit: str = ""
+    status: RunStatus = RunStatus.IDLE  # 当前状态
+    configs: tuple[str, ...] = ()  # 当前任务配置，一个或多个字符串配置名
+    unit: str = ""  # 当前任务单位，如 "任务1"、"任务2" 等
     error: str = ""
-    progress: tuple[int, int] = (0, 0)
+    progress: tuple[int, int] = (0, 0)  # (current, total) 任务进度
 
 
 class Runner(ABC):
@@ -64,10 +77,10 @@ class Runner(ABC):
         """重置运行时状态，每次启动线程时调用。"""
         self._info = RuntimeInfo(
             mode=mode,
-            status="running",
+            status=RunStatus.RUNNING,
         )
 
-    def _set_status(self, status: str) -> None:
+    def _set_status(self, status: RunStatus) -> None:
         self._info.status = status
 
     def _set_configs(self, configs: tuple[str, ...] | list[str]) -> None:
@@ -143,27 +156,27 @@ class Runner(ABC):
     def _worker(self, target: Callable[..., Any], *args):
         """线程执行目标函数的包装器，捕获异常，完成后清理共享状态。"""
         logger.debug("[Start]")
-        self._set_status("running")
+        self._set_status(RunStatus.RUNNING)
         try:
             result = target(*args)
             if result is False:
-                self._set_status("stopped" if self.stop_event.is_set() else "failed")
+                self._set_status(RunStatus.STOPPED if self.stop_event.is_set() else RunStatus.FAILED)
             elif self.stop_event.is_set():
-                self._set_status("stopped")
-            elif self._info.status == "running":
-                self._set_status("completed")
+                self._set_status(RunStatus.STOPPED)
+            elif self._info.status is RunStatus.RUNNING:
+                self._set_status(RunStatus.COMPLETED)
         except KeyboardInterrupt:
             self.request_stop()
-            self._set_status("stopped")
+            self._set_status(RunStatus.STOPPED)
         except ThreadStoppedError:
             logger.warning(f"{self.__class__.__name__} stopped by request")
-            self._set_status("stopped")
+            self._set_status(RunStatus.STOPPED)
         except Exception as e:
             logger.exception(f"{self.__class__.__name__} crashed: {e}")
             self._set_error(str(e))
-            self._set_status("failed")
+            self._set_status(RunStatus.FAILED)
         finally:
-            if self._info.status == "running":
-                self._set_status("stopped" if self.stop_event.is_set() else "completed")
+            if self._info.status is RunStatus.RUNNING:
+                self._set_status(RunStatus.STOPPED if self.stop_event.is_set() else RunStatus.COMPLETED)
             logger.debug("[Done]")
             Runner._shared_thread = None

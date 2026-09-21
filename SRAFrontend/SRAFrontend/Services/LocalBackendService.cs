@@ -147,8 +147,8 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
             logger.LogInformation("Stopping backend (PID: {Pid})", _backendProcess.Id);
             // 优先发送停止命令，优雅退出）
             SendInput("exit");
-            // 等待1秒，若未退出则强制终止
-            if (_backendProcess.WaitForExit(1000)) return;
+            // 等待5秒，若未退出则强制终止
+            if (_backendProcess.WaitForExit(5000)) return;
             _backendProcess.Kill();
             logger.LogWarning("Terminating backend process (PID: {Pid})", _backendProcess.Id);
         }
@@ -206,12 +206,14 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
 
     public async Task<(string Message, byte[])> GetGameScreenshotBytesAsync()
     {
-        var screenshotPath = Path.Combine(WorkingDirectory, "screenshot.png");
+        var screenshotPath = Path.Combine(WorkingDirectory, "screenshot.jpg");
         var param = new
         {
             save_path = screenshotPath,
             background = true,
-            resize = new[] { 1280, 720 }
+            resize = new[] { 1280, 720 },
+            // 让浏览器合成器直接输出 720p JPEG，跳过 PNG 编解码与 PIL 重采样
+            jpeg_quality = 80
         };
         var result = await SendInputAndWaitObjectAsync($"operator call screenshot '{JsonSerializer.Serialize(param)}' --json");
         switch (result)
@@ -256,16 +258,16 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
                 return null;
             }
 
-            var tcs = new TaskCompletionSource<string>();
+            // RunContinuationsAsynchronously：防止 TrySetResult 在输出读取线程上内联执行
+            // 等待者的延续（含锁释放与下一条命令的 tcs 赋值），避免字段交错覆盖
+            var tcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
             _outputTcs = tcs;
             if (await SendInputAsync(command)) return await tcs.Task.WaitAsync(TimeSpan.FromSeconds(10));
-            _outputTcs = null;
             return null;
         }
         catch (TimeoutException)
         {
             logger.LogError("Command timed out: {Command}", command);
-            _outputTcs = null;
             return null;
         }
         catch (OperationCanceledException)
@@ -275,6 +277,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         }
         finally
         {
+            _outputTcs = null;
             _commandLock.Release();
         }
     }
@@ -336,9 +339,11 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
 
         Outputted?.Invoke(args.Data);
 
-        // 完成等待中的输出请求
-        if (_outputTcs?.TrySetResult(args.Data) == true)
-            _outputTcs = null; // 释放引用
+        // 完成等待中的输出请求。注意：不要在此处清空 _outputTcs——
+        // 等待者的 finally（持有 _commandLock 时）已无条件清空；
+        // 若在此清空，TrySetResult 内联唤醒的下一个等待命令刚赋值的 tcs 会被覆盖，
+        // 导致其响应到达时无人接收而超时
+        _outputTcs?.TrySetResult(args.Data);
     }
 
     private void OnBackendProcessErrorDataReceived(object _, DataReceivedEventArgs args)

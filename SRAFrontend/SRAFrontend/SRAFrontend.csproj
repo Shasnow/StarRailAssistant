@@ -19,6 +19,7 @@
             <Generator>PublicResXFileCodeGenerator</Generator>
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Include="Assets\background\default.jpg" />
     </ItemGroup>
 
     <ItemGroup>

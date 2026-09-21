@@ -19,54 +19,15 @@ public partial class MainWindowViewModel(
     IEnumerable<PageViewModel> pages,
     CommonModel commonModel,
     ActivityService activityService,
+    AppService appService,
     ISukiToastManager toastManager)
     : ViewModelBase
 {
-    private static readonly List<string> GreetingsZh =
-    [
-        "欢迎使用 SRA",
-        "坐和放宽",
-        "并非\n'Sequence Read Archive'",
-        "启动器启动启动器",
-        "-1073741819",
-        "飞荧扑火，向死而生",
-        "跨越寰宇终抵黯淡星外",
-        "立志成为崩铁糕手",
-        "Bon voyage",
-        "May your path be clear",
-        "May you get to where\ndreams are all\ncrystalline and sweet",
-        "我们将在过去篆刻未来",
-        "铁花飞，飘逸不残灰",
-        "一切正常就是异常",
-    ];
-
-    private static readonly List<string> GreetingsEn =
-    [
-        "Welcome to SRA",
-        "Sit back and relax",
-        "not\n'Sequence Read Archive'",
-        "Launcher launching launcher",
-        "-1073741819",
-        "Bon voyage",
-        "May your path be clear",
-        "May you get to where\ndreams are all\ncrystalline and sweet",
-        "We will mark the past with the future",
-        "Neverness To Everness"
-    ];
 
     [ObservableProperty] private string _lightModeText =
         SukiTheme.GetInstance().ActiveBaseTheme.ToString() == "Light" ? "\uE472" : "\uE330";
 
-    public static string GreetingMessage
-    {
-        get
-        {
-            var rand = new Random();
-            return Resources.Culture.Name == "zh-CN"
-                ? GreetingsZh[rand.Next(GreetingsZh.Count)]
-                : GreetingsEn[rand.Next(GreetingsEn.Count)];
-        }
-    }
+    public string GreetingMessage => appService.GetPhrase();
 
     public ISukiToastManager ToastManager { get; init; } = toastManager;
 
