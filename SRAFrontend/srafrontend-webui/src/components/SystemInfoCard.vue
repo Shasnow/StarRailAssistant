@@ -43,7 +43,7 @@ const backendRows = computed(() => {
   return [
     { icon: WindowIcon, label: '前端版本', value: appVersion || '—' },
     { icon: ServerIcon, label: '后端版本', value: d.version || '—' },
-    { icon: WindowsIcon, label: '操作系统', value: `${d.osVersion} / ${d.architecture}` || `—` },
+    { icon: WindowsIcon, label: '操作系统', value: d.osVersion && d.architecture ? `${d.osVersion} / ${d.architecture}` : '—' },
     { icon: DotnetIcon, label: '.NET 运行时', value: d.dotnetVersion || '—' },
   ]
 })
