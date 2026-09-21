@@ -5,25 +5,35 @@
              xmlns:controls="clr-namespace:SRAFrontend.Desktop.Controls"
              x:Class="SRAFrontend.Desktop.Controls.AnnBoardView"
              x:DataType="controls:AnnBoardViewModel"
-             Width="600"
-             Height="400">
+             Height="600"
+             Width="800">
     <Design.DataContext>
         <controls:AnnBoardViewModel />
     </Design.DataContext>
     <suki:BusyArea BusyText="Loading Announcements..." IsBusy="{Binding IsLoading}">
         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
-        <TabControl TabStripPlacement="Left" Classes="HorizontalTabs" ItemsSource="{Binding Announcements}">
-            <TabControl.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Title}" TextWrapping="Wrap" TextAlignment="Center" Width="100" />
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-            <TabControl.ContentTemplate>
-                <DataTemplate DataType="{x:Type models:Announcement}">
-                    <controls:ThemedMarkdownScrollViewer Markdown="{Binding Content}" />
-                </DataTemplate>
-            </TabControl.ContentTemplate>
-        </TabControl>
+        <Grid ColumnDefinitions="200,*">
+            <ListBox Grid.Column="0"
+                     Margin="4"
+                     ItemsSource="{Binding Announcements}"
+                     SelectedItem="{Binding SelectedAnnouncement}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:Announcement">
+                        <TextBlock Text="{Binding Title}"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Grid Grid.Column="1" Margin="8,4" RowDefinitions="Auto,*">
+                <TextBlock Grid.Row="0"
+                           Classes="h3"
+                           Text="{Binding SelectedAnnouncement?.Title}"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,4" />
+                <controls:ThemedMarkdownScrollViewer Grid.Row="1" Markdown="{Binding Content}" />
+            </Grid>
+        </Grid>
     </suki:BusyArea>
 
 </UserControl>
