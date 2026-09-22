@@ -91,7 +91,7 @@ nothing to do with it.
 含有 StarRailAssistant_ServerDLC 的版本需要安装[ASP.NET Core 运行时 10.0](https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0)。
 
 * 在Release页面下载`StarRailAssistant_vX.X.X.zip`文件，*一切都为您准备妥当*，只需解压到您喜欢的位置，然后运行`SRA.exe`即可！
-* 如需使用 WebUI，请额外下载 `StarRailAssistant_WebUI_vX.X.X.zip` 并解压到同一个 SRA 根目录；同时需要安装 `ServerDLC` 或使用包含服务端的完整包。
+* 如需使用 WebUI，无需单独下载：WebUI 已内嵌于包含服务端的完整包 `StarRailAssistant_vX.X.X.zip` 中（或安装 `ServerDLC`），解压后由服务端直接托管，启动服务端即可访问。
 * 从源码运行SRA，请阅读 [贡献指南](CONTRIBUTING.md)。
 
 ## 🐛 你这代码保熟吗？

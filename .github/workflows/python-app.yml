@@ -44,13 +44,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-#      - name: Set up Node.js
-#        uses: actions/setup-node@v4
-#        with:
-#          node-version: "22"
-#
-#      - name: Enable pnpm
-#        run: corepack enable
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: pnpm run build
+        run: |
+          cd SRAFrontend\srafrontend-webui
+          pnpm install
+          pnpm run build
       
       - name: Install .NET 10.0
         uses: actions/setup-dotnet@v3
@@ -72,8 +78,6 @@ jobs:
           pip install flake8 pytest
           pip install nuitka
           pip install -r requirements.txt
-#          cd SRAFrontend\srafrontend-webui
-#          pnpm install
 
       - name: Lint with flake8
         run: |
@@ -133,13 +137,6 @@ jobs:
         with:
           name: StarRailAssistant_Lite_${{ env.version }}
           path: StarRailAssistant_Lite_${{ env.version }}.zip
-
-#
-#      - name: Upload WebUI zip Artifact
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: StarRailAssistant_WebUI_${{ env.version }}
-#          path: StarRailAssistant_WebUI_${{ env.version }}.zip
 
       - name: Upload Resources zip Artifact
         uses: actions/upload-artifact@v4

@@ -36,8 +36,6 @@ ROOT_PATH = Path(__file__).resolve().parent.parent
 DOTNET_EXE = os.environ.get("DOTNET_EXE", "dotnet")
 DESKTOP_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Desktop" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
 SERVER_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
-WEBUI_FRONTEND_PATH = ROOT_PATH / "SRAFrontend" / "srafrontend-webui"
-WEBUI_WWWROOT_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "wwwroot"
 DIST_DIR = ROOT_PATH / "main.dist"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
@@ -114,15 +112,6 @@ def collect_core_files(builder: ZipBuilder):
         builder.add(item)
 
 
-def collect_webui_files(builder: ZipBuilder):
-    """收集 WebUI 独立资源包。"""
-    if not WEBUI_WWWROOT_PATH.exists():
-        print(f"[ERROR] WebUI output not found: {WEBUI_WWWROOT_PATH}")
-        sys.exit(1)
-
-    builder.add(WEBUI_WWWROOT_PATH, WEBUI_WWWROOT_PATH.parent)
-
-
 def nuitka_build(version: str):
     file_version = version.split("-")[0]
     print("Building Python program with Nuitka ...")
@@ -164,7 +153,7 @@ def copy_core_resources(dist: Path):
     shutil.copy2(ROOT_PATH / "SRACore" / "localization" / "resource_en-us.json", DIST_DIR / "SRACore" / "localization" / "resource_en-us.json")
     shutil.copy2(ROOT_PATH / "SRACore" / "localization" / "resource_zh-cn.json", DIST_DIR / "SRACore" / "localization" / "resource_zh-cn.json")
     shutil.copytree(ROOT_PATH / "resources", dist / "resources")
-    rapidocr_pkg = SITE_PACKAGES_DIR / "rapidocr"
+    rapidocr_pkg = SITE_PACKAGES_DIR / "rapidocr"  # pyright: ignore[reportOptionalOperand]
     if rapidocr_pkg.exists():
         (dist / "rapidocr").mkdir(parents=True, exist_ok=True)
         models_dir = rapidocr_pkg / "models"
@@ -198,16 +187,6 @@ def package_lite(version: str):
     builder.snapshot(lite_zip_path)
 
 
-def build_webui():
-    print("Building WebUI ...")
-    cmd = ["pnpm", "build"]
-    result = subprocess.run(cmd, cwd=WEBUI_FRONTEND_PATH)
-    if result.returncode != 0:
-        print(f"[ERROR] WebUI build failed (exit code: {result.returncode})")
-        sys.exit(1)
-    print("[OK] WebUI built successfully")
-
-
 def publish_dotnet_projects():
     print("Publishing .NET projects ...")
     commands = [
@@ -220,14 +199,6 @@ def publish_dotnet_projects():
             print(f"[ERROR] dotnet publish failed (exit code: {result.returncode})")
             sys.exit(1)
     print("[OK] .NET projects published successfully")
-
-
-def package_webui(version: str):
-    print("Packaging WebUI resources ...")
-    webui_zip_path = ROOT_PATH / f"StarRailAssistant_WebUI_v{version}.zip"
-    builder = ZipBuilder()
-    collect_webui_files(builder)
-    builder.snapshot(webui_zip_path)
 
 
 def package_resources(version: str):
