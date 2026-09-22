@@ -333,9 +333,6 @@
     <data name="RememberWindowSizeTipText" xml:space="preserve">
         <value>启用后，SRA会记住窗口的位置和大小，下次启动时恢复</value>
     </data>
-    <data name="CheckText" xml:space="preserve">
-        <value>Check</value>
-    </data>
     <data name="WebhookNotificationText" xml:space="preserve">
         <value>Webhook 通知</value>
     </data>
@@ -563,5 +560,8 @@
     </data>
     <data name="AutoBattleText" xml:space="preserve">
         <value>自动战斗</value>
+    </data>
+    <data name="CheckText" xml:space="preserve">
+        <value>检查</value>
     </data>
 </root>
