@@ -181,7 +181,7 @@ class StartGameTask(BaseTask):
                 return -1
         else:
             logger.info("未启用自动登录，请手动完成登录")
-        if self.operator.wait_ocr("欢迎", from_x=0.5, from_y=0.07, to_x=0.6, to_y=0.2, timeout=180):
+        if self.operator.wait_ocr_any(["欢迎", "开始游戏", "点击进入"], from_x=0.44, from_y=0.07, to_x=0.6, to_y=0.9, timeout=180):
             return 1
         logger.warning("登录后等待欢迎界面超时，请检查游戏状态")
         return -1
