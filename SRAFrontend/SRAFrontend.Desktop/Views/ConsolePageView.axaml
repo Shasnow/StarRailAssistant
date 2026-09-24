@@ -75,7 +75,7 @@
                             TextWrapping="Wrap" />
                     </ScrollViewer>
                 </Border>
-                <TextBox Grid.Row="2" PlaceholderText="请输入文本" KeyDown="InputElement_OnKeyDown"/>
+                <TextBox Grid.Row="2" Margin="0,12,0,0" PlaceholderText="请输入文本" KeyDown="InputElement_OnKeyDown"/>
             </Grid>
         </suki:GroupBox>
     </suki:GlassCard>
