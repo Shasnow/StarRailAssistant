@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Avalonia.Controls.Documents;
@@ -40,6 +41,12 @@ public static class ConsoleLineFormatter
     private const int MaxCacheEntries = 4000;
 
     private static readonly ConcurrentDictionary<string, IReadOnlyList<ConsoleSegment>> Cache = new();
+
+    /// <summary>JSON 显示用序列化选项：不转义非 ASCII 字符，中日韩文本按原文显示</summary>
+    private static readonly JsonSerializerOptions DisplayJsonOptions = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
 
     private static readonly Regex TimeRegex = new(@"\b\d{1,2}:\d{2}:\d{2}(?:\.\d+)?\b", RegexOptions.Compiled);
 
@@ -194,7 +201,8 @@ public static class ConsoleLineFormatter
                 {
                     if (count++ > 0) AddSegment(segments, ",", ConsoleSegmentKind.JsonPunct);
                     AddSegment(segments, "\n" + new string(' ', (depth + 1) * 2), ConsoleSegmentKind.JsonPunct);
-                    AddSegment(segments, JsonSerializer.Serialize(property.Name), ConsoleSegmentKind.JsonKey);
+                    AddSegment(segments, JsonSerializer.Serialize(property.Name, DisplayJsonOptions),
+                        ConsoleSegmentKind.JsonKey);
                     AddSegment(segments, ": ", ConsoleSegmentKind.JsonPunct);
                     WriteElement(property.Value, depth + 1, segments);
                 }
@@ -219,7 +227,9 @@ public static class ConsoleLineFormatter
                 break;
             }
             case JsonValueKind.String:
-                AddSegment(segments, element.GetRawText(), ConsoleSegmentKind.JsonString);
+                // 解码后重新加引号，避免把后端的 \uXXXX 转义原样显示
+                AddSegment(segments, JsonSerializer.Serialize(element.GetString(), DisplayJsonOptions),
+                    ConsoleSegmentKind.JsonString);
                 break;
             case JsonValueKind.Number:
                 AddSegment(segments, element.GetRawText(), ConsoleSegmentKind.JsonNumber);
