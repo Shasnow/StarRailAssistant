@@ -9,7 +9,7 @@
              x:Class="SRAFrontend.Desktop.Views.ConsolePageView"
              x:DataType="viewModels:ConsolePageViewModel">
 
-    <suki:GlassCard>
+    <suki:GlassCard CornerRadius="0">
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="10">
