@@ -4,7 +4,8 @@
  *
  * SSE 消息负载约定（默认 message 事件）：
  * - 优先 JSON：{ level?: 'ERROR'|'WARN'|'INFO'|'DEBUG', message: string, timestamp?: string, source?: string }
- * - 纯文本行：整行作为 INFO 级别日志，时间戳取前端接收时刻
+ * - 后端纯文本行（自带前缀）：`21:51:02 | INFO  | 消息` → 拆出时间与级别，避免前端重复渲染
+ * - 无前缀纯文本行：整行作为 INFO 级别日志，时间戳取前端接收时刻
  */
 
 /** 日志级别（与后端日志级别对应，展示时区分颜色） */
@@ -35,10 +36,14 @@ function normalizeLevel(value: unknown): LogLevel {
   return (LOG_LEVELS as string[]).includes(upper) ? (upper as LogLevel) : 'INFO'
 }
 
+/** 后端纯文本行前缀：`21:51:02 | INFO  | 消息`（级别字段宽度可变，两侧空白不敏感） */
+const PLAIN_PREFIX = /^(\d{1,2}:\d{2}:\d{2})\s*\|\s*([A-Za-z]+)\s*\|\s?(.*)$/
+
 /**
  * 解析 SSE 推送的单条日志负载：
  * - JSON 负载：提取 level / message / timestamp，缺省字段按约定回退
- * - 非 JSON 文本：整行作为 INFO 日志，时间戳取当前接收时刻
+ * - 带 `时间 | 级别 |` 前缀的纯文本行：拆出后端自带的时间与级别，仅保留消息体
+ * - 无前缀非 JSON 文本：整行作为 INFO 日志，时间戳取当前接收时刻
  */
 export function parseLogPayload(raw: string): Omit<LogEntry, 'id'> {
   const fallback = (): Omit<LogEntry, 'id'> => ({
@@ -57,6 +62,15 @@ export function parseLogPayload(raw: string): Omit<LogEntry, 'id'> {
       timestamp: typeof data.timestamp === 'string' ? data.timestamp : formatTime(new Date()),
     }
   } catch {
+    // 非 JSON：识别后端自带的 `HH:mm:ss | LEVEL | msg` 前缀，避免前端重复渲染时间与等级
+    const matched = PLAIN_PREFIX.exec(raw)
+    if (matched) {
+      return {
+        level: normalizeLevel(matched[2]),
+        message: matched[3] ?? '',
+        timestamp: matched[1]!,
+      }
+    }
     return fallback()
   }
 }

@@ -39,6 +39,28 @@ describe('logs api', () => {
       expect(entry.message).toBe('plain text line')
     })
 
+    it('拆出后端自带的「时间 | 级别 | 消息」前缀，不重复渲染', () => {
+      const entry = parseLogPayload('21:51:02 | INFO  | Current version: 2.23.0-beta.2')
+      expect(entry).toEqual({
+        level: 'INFO',
+        message: 'Current version: 2.23.0-beta.2',
+        timestamp: '21:51:02',
+      })
+    })
+
+    it('后端前缀行级别归一化（DEBUG 等不再回退 INFO）', () => {
+      const entry = parseLogPayload('21:51:02 | DEBUG | cwd: D:\\20114\\Python\\SRA2')
+      expect(entry.level).toBe('DEBUG')
+      expect(entry.message).toBe('cwd: D:\\20114\\Python\\SRA2')
+      expect(entry.timestamp).toBe('21:51:02')
+    })
+
+    it('后端前缀行未知级别回退 INFO', () => {
+      const entry = parseLogPayload('08:05:01 | TRACE | span start')
+      expect(entry.level).toBe('INFO')
+      expect(entry.message).toBe('span start')
+    })
+
     it('空负载返回空消息且不抛错', () => {
       const entry = parseLogPayload('')
       expect(entry.message).toBe('')

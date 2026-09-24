@@ -129,7 +129,8 @@ import LiveViewCard from '@/components/LiveViewCard.vue'
 import BackendControlCard from '@/components/BackendControlCard.vue'
 
 /* ---------- 日志流：连接 / 缓存 / 批量刷入 ---------- */
-const { entries, status, reconnectAttempt, lastError, refresh, clear } = useLogStream()
+const { entries, status, reconnectAttempt, lastError, refresh, ensureConnected, clear } =
+  useLogStream()
 
 const STATUS_TEXT: Record<string, string> = {
   connecting: '连接中',
@@ -318,7 +319,8 @@ function changeFont(delta: number) {
 }
 
 onMounted(() => {
-  refresh()
+  // 连接为全局单例：已开着就不动（切回页面不强制重连），仅在真正未连接时建连
+  ensureConnected()
   // 初始定位到最新日志：缓存恢复发生在首次渲染前，visibleEntries 的 watch（非 immediate）
   // 不会触发，切页返回 / 刷新后滚动条会停留在顶部，这里主动定位一次
   void scrollToBottom()
