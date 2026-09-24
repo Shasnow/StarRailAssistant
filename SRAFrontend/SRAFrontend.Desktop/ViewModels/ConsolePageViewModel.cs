@@ -8,11 +8,13 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
+using SRAFrontend.Desktop.Utilities;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 
@@ -55,24 +57,23 @@ public partial class ConsolePageViewModel : PageViewModel
         ? string.Join(' ', Environment.GetCommandLineArgs()[1..].Select(arg => arg.Contains(' ') ? $"\"{arg}\"" : arg))
         : _settingsService.Settings.Advanced.BackendLaunchArgs;
 
-    public string ConsoleLines
+    /// <summary>
+    ///     当前可见日志渲染为着色行内集合：
+    ///     黑底多色（按级别/时间戳着色），JSON 行自动缩进美化并按语法元素高亮。
+    /// </summary>
+    public InlineCollection ConsoleLines =>
+        ConsoleLineFormatter.BuildInlines(_consoleLines.Where(IsLineVisible));
+
+    /// <summary>按已勾选的日志级别过滤单行（无任何级别标识的行默认保留）</summary>
+    private bool IsLineVisible(string line)
     {
-        get
-        {
-            // ConcurrentQueue 枚举线程安全，无需加锁
-            var filteredLines = _consoleLines.Where(line =>
-            {
-                // 1. 检查是否匹配已勾选的级别（标识可能在任意位置，用 Contains）
-                for (var i = 0; i < _levelPrefixes.Length; i++)
-                    // 勾选了该级别，且日志行包含对应标识 → 保留
-                    if (FilterOptions[i] && line.Contains(_levelPrefixes[i]))
-                        return true;
-                // 2. 保留无任何级别标识的日志（无匹配级别时默认保留）
-                var hasAnyLevelPrefix = _levelPrefixes.Any(line.Contains);
-                return !hasAnyLevelPrefix;
-            });
-            return string.Join('\n', filteredLines);
-        }
+        // 检查是否匹配已勾选的级别（标识可能在任意位置，用 Contains）
+        for (var i = 0; i < _levelPrefixes.Length; i++)
+            // 勾选了该级别，且日志行包含对应标识 → 保留
+            if (FilterOptions[i] && line.Contains(_levelPrefixes[i]))
+                return true;
+        // 保留无任何级别标识的日志（无匹配级别时默认保留）
+        return !_levelPrefixes.Any(line.Contains);
     }
 
     private void AddConsoleLine(string line)

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -9,6 +10,9 @@ namespace SRAFrontend.Desktop.Views;
 
 public partial class ConsolePageView : UserControl
 {
+    private const int RefreshDebounceMs = 80;
+    private bool _refreshScheduled;
+
     public ConsolePageView()
     {
         InitializeComponent();
@@ -16,19 +20,32 @@ public partial class ConsolePageView : UserControl
 
     private void OnModelOnPropertyChanged(object? _, PropertyChangedEventArgs args)
     {
-        if (args.PropertyName == nameof(ConsolePageViewModel.ConsoleLines))
+        if (args.PropertyName == nameof(ConsolePageViewModel.ConsoleLines)) ScheduleConsoleRefresh();
+    }
+
+    /// <summary>防抖合并连续日志事件，避免高频输出时整页行内样式反复重建</summary>
+    private void ScheduleConsoleRefresh()
+    {
+        if (_refreshScheduled) return;
+        _refreshScheduled = true;
+        Dispatcher.UIThread.Post(async () =>
         {
-            Dispatcher.UIThread.Post(() =>
-            {
-                ConsoleScrollViewer.ScrollToEnd();
-            });
-        }
+            await Task.Delay(RefreshDebounceMs);
+            _refreshScheduled = false;
+            RefreshConsole();
+        });
+    }
+
+    private void RefreshConsole()
+    {
+        if (DataContext is ConsolePageViewModel model) ConsoleText.Inlines = model.ConsoleLines;
+        ConsoleScrollViewer.ScrollToEnd();
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
-        ConsoleScrollViewer.ScrollToEnd();
+        RefreshConsole();
         if (DataContext is ConsolePageViewModel model)
         {
             model.TopLevelObject = TopLevel.GetTopLevel(this);
