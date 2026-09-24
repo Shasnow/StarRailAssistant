@@ -49,14 +49,14 @@
                 </StackPanel>
             </suki:GroupBox.Header>
             <Grid RowDefinitions="Auto,*,Auto">
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="20">
-                    <Label Content="过滤器：" />
+                <StackPanel Grid.Row="0" Margin="0,4,0,12" Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
+                    <Label Content="过滤器：" VerticalAlignment="Center" Padding="0" />
                     <!-- ReSharper disable Xaml.StyleClassNotFound -->
-                    <ToggleButton Classes="Discrete" Content="Trace" IsChecked="{Binding FilterOptions[0]}" />
-                    <ToggleButton Classes="Information" Content="Debug" IsChecked="{Binding FilterOptions[1]}" />
-                    <ToggleButton Classes="Success" Content="Info" IsChecked="{Binding FilterOptions[2]}"/>
-                    <ToggleButton Classes="Warning" Content="Warn" IsChecked="{Binding FilterOptions[3]}"/>
-                    <ToggleButton Classes="Danger" Content="Error" IsChecked="{Binding FilterOptions[4]}"/>
+                    <ToggleButton Height="20" Padding="14,0" VerticalAlignment="Center" Classes="Discrete" Content="Trace" IsChecked="{Binding FilterOptions[0]}" />
+                    <ToggleButton Height="20" Padding="14,0" VerticalAlignment="Center" Classes="Information" Content="Debug" IsChecked="{Binding FilterOptions[1]}" />
+                    <ToggleButton Height="20" Padding="14,0" VerticalAlignment="Center" Classes="Success" Content="Info" IsChecked="{Binding FilterOptions[2]}"/>
+                    <ToggleButton Height="20" Padding="14,0" VerticalAlignment="Center" Classes="Warning" Content="Warn" IsChecked="{Binding FilterOptions[3]}"/>
+                    <ToggleButton Height="20" Padding="14,0" VerticalAlignment="Center" Classes="Danger" Content="Error" IsChecked="{Binding FilterOptions[4]}"/>
                     <!-- ReSharper restore Xaml.StyleClassNotFound -->
                 </StackPanel>
                 <Border
