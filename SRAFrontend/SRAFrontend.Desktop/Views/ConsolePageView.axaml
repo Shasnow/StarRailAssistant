@@ -71,7 +71,7 @@
                             x:Name="ConsoleText"
                             Margin="10,6"
                             FontFamily="Cascadia Mono,Consolas"
-                            FontSize="13"
+                            FontSize="14"
                             TextWrapping="Wrap" />
                     </ScrollViewer>
                 </Border>

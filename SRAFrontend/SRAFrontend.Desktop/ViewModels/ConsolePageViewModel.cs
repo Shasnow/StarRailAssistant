@@ -23,6 +23,9 @@ namespace SRAFrontend.Desktop.ViewModels;
 public partial class ConsolePageViewModel : PageViewModel
 {
     private const int MaxConsoleLines = 1000;
+
+    /// <summary>单次仅渲染最近 N 行：解析虽有缓存，但 Run/LineBreak 分配与 TextBlock 布局开销随行数线性增长</summary>
+    private const int MaxRenderedLines = 300;
     private readonly AppService _appService;
     private readonly IBackendService _backendService;
     private readonly CommonModel _commonModel;
@@ -58,11 +61,11 @@ public partial class ConsolePageViewModel : PageViewModel
         : _settingsService.Settings.Advanced.BackendLaunchArgs;
 
     /// <summary>
-    ///     当前可见日志渲染为着色行内集合：
+    ///     当前可见日志渲染为着色行内集合（仅取最近 <see cref="MaxRenderedLines" /> 行，控制每帧分配与布局规模）：
     ///     黑底多色（按级别/时间戳着色），JSON 行自动缩进美化并按语法元素高亮。
     /// </summary>
     public InlineCollection ConsoleLines =>
-        ConsoleLineFormatter.BuildInlines(_consoleLines.Where(IsLineVisible));
+        ConsoleLineFormatter.BuildInlines(_consoleLines.Where(IsLineVisible).TakeLast(MaxRenderedLines));
 
     /// <summary>按已勾选的日志级别过滤单行（无任何级别标识的行默认保留）</summary>
     private bool IsLineVisible(string line)
