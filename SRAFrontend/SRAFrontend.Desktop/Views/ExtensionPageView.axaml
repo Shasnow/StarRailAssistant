@@ -8,71 +8,195 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SRAFrontend.Desktop.Views.ExtensionPageView"
              x:DataType="viewModels:ExtensionPageViewModel">
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <StackPanel Spacing="16">
-            <!-- 固定卡片区域 -->
-            <suki:GlassCard>
-                <suki:GroupBox Header="{x:Static lang:Resources.ExtensionText}">
-                    <Grid ColumnDefinitions="Auto, Auto, Auto" RowDefinitions="Auto" ColumnSpacing="12">
-                        <suki:GlassCard Grid.Column="0" Grid.Row="0" Width="200">
-                            <suki:GroupBox Header="猫猫糕友人帐">
-                                <StackPanel Spacing="4">
-                                    <Label Content="查询对应猫猫糕UID"/>
-                                    <Button Content="寻找猫猫糕"
-                                            Click="Button_OnClick"/>
-                                </StackPanel>
-                            </suki:GroupBox>
-                        </suki:GlassCard>
-                    </Grid>
-                </suki:GroupBox>
-            </suki:GlassCard>
+    <!-- 页面外框去除圆角，与「控制台」页保持一致 -->
+    <suki:GlassCard CornerRadius="0">
+        <suki:GroupBox Header="{x:Static lang:Resources.ExtensionText}">
+            <Grid RowDefinitions="Auto,Auto,*" Margin="0,2,0,0">
 
-            <!-- 动态扩展区域 -->
-            <suki:GlassCard>
-                <suki:GroupBox Header="动态扩展">
-                    <StackPanel Spacing="8">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Text="从后端加载的扩展列表" FontSize="12" Opacity="0.6"
-                                       VerticalAlignment="Center"/>
-                            <Button Grid.Column="1" Content="刷新" Classes="Flat"
-                                    Command="{Binding RefreshExtensionsCommand}"/>
-                        </Grid>
-                        <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsLoadingExtensions}"/>
-                        <ItemsControl ItemsSource="{Binding Extensions}">
+                <!-- 固定工具：猫猫糕友人帐。压成单行紧凑条，不再层层嵌套卡片 -->
+                <Border Grid.Row="0"
+                        CornerRadius="10"
+                        Padding="14,10"
+                        Background="#1A808080"
+                        BorderThickness="1"
+                        BorderBrush="#33808080">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Label Grid.Column="0"
+                               Classes="Icon"
+                               Content="&#xE976;"
+                               FontSize="20"
+                               Opacity="0.75"
+                               VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                            <TextBlock Text="猫猫糕友人帐" FontWeight="SemiBold" FontSize="14" />
+                            <TextBlock Text="查询对应猫猫糕 UID" FontSize="12" Opacity="0.6" />
+                        </StackPanel>
+                        <Button Grid.Column="2"
+                                Classes="Flat Rounded"
+                                Content="寻找猫猫糕"
+                                Height="34"
+                                Padding="18,0"
+                                VerticalAlignment="Center"
+                                ToolTip.Tip="在浏览器中打开猫猫糕友人帐"
+                                Click="Button_OnClick" />
+                    </Grid>
+                </Border>
+
+                <!-- 扩展列表标题栏：标题 + 数量 + 刷新 -->
+                <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="2,18,2,10">
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Text="可用扩展" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" />
+                        <Border CornerRadius="9"
+                                Padding="8,1"
+                                Background="#22808080"
+                                VerticalAlignment="Center"
+                                IsVisible="{Binding !IsLoadingExtensions}">
+                            <TextBlock Text="{Binding ExtensionCount}" FontSize="11" Opacity="0.75" />
+                        </Border>
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Classes="Basic"
+                            Height="30"
+                            Padding="12,0"
+                            VerticalAlignment="Center"
+                            ToolTip.Tip="重新从后端读取扩展列表"
+                            Command="{Binding RefreshExtensionsCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Classes="Icon" Text="&#xE036;" FontSize="13" VerticalAlignment="Center" />
+                            <TextBlock Text="刷新" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <!-- 扩展卡片区：两列等宽的卡片网格 -->
+                <Grid Grid.Row="2">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Extensions}" Margin="0,0,0,4">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <!-- 两列等宽：卡片自动撑满可用宽度，避免右侧留白 -->
+                                    <UniformGrid Columns="2" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="viewModels:ExtensionCardViewModel">
-                                    <suki:GlassCard Margin="0,4" Padding="12">
-                                        <StackPanel Spacing="6">
-                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="15"/>
-                                            <TextBlock Text="{Binding Description}" FontSize="12"
-                                                       Opacity="0.6" TextWrapping="Wrap"/>
-                                            <TextBlock FontSize="11" Opacity="0.5">
-                                                <Run Text="{Binding ExtensionClass}"/>
-                                                <Run Text=" / "/>
-                                                <Run Text="{Binding ConfigClass}"/>
-                                            </TextBlock>
-                                            <StackPanel Orientation="Horizontal" Spacing="8"
-                                                        HorizontalAlignment="Right" Margin="0,4,0,0">
-                                                <ProgressBar IsVisible="{Binding IsRunning}"
-                                                             IsIndeterminate="True" Width="40" Height="12"/>
-                                                <Button Content="运行" Classes="Accent"
-                                                        Command="{Binding RunCommand}"
-                                                        IsVisible="{Binding !IsRunning}"/>
-                                                <Button Content="停止"
-                                                        Command="{Binding StopCommand}"
-                                                        IsVisible="{Binding IsRunning}"/>
-                                                <Button Content="配置" Classes="Flat"
+                                    <!-- VerticalAlignment=Top：条目数为奇数时卡片不会被拉伸变形 -->
+                                    <suki:GlassCard Margin="0,0,12,12" Padding="14" VerticalAlignment="Top">
+                                        <Grid RowDefinitions="Auto,Auto,Auto,Auto">
+
+                                            <!-- 名称 + 运行状态标签 -->
+                                            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                <StackPanel Grid.Column="0" Spacing="1">
+                                                    <TextBlock Text="{Binding Name}"
+                                                               FontWeight="SemiBold"
+                                                               FontSize="15"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               ToolTip.Tip="{Binding Name}" />
+                                                    <TextBlock Text="{Binding Id}"
+                                                               FontSize="11"
+                                                               Opacity="0.5"
+                                                               TextTrimming="CharacterEllipsis" />
+                                                </StackPanel>
+                                                <Border Grid.Column="1"
+                                                        CornerRadius="10"
+                                                        Padding="9,3"
+                                                        VerticalAlignment="Center"
+                                                        Background="{Binding StatusBackground}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <Ellipse Width="7"
+                                                                 Height="7"
+                                                                 VerticalAlignment="Center"
+                                                                 Fill="{Binding StatusBrush}" />
+                                                        <TextBlock Text="{Binding StatusText}"
+                                                                   FontSize="11"
+                                                                   VerticalAlignment="Center"
+                                                                   Foreground="{Binding StatusBrush}" />
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+
+                                            <TextBlock Grid.Row="1"
+                                                       Margin="0,10,0,0"
+                                                       FontSize="12"
+                                                       Opacity="0.65"
+                                                       TextWrapping="Wrap"
+                                                       Text="{Binding Description}" />
+
+                                            <TextBlock Grid.Row="2"
+                                                       Margin="0,10,0,0"
+                                                       FontSize="11"
+                                                       Opacity="0.45"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Text="{Binding ClassSummary}"
+                                                       ToolTip.Tip="{Binding ClassSummary}" />
+
+                                            <!-- 操作区：运行/停止为大号主按钮，配置为次要按钮 -->
+                                            <Grid Grid.Row="3"
+                                                  ColumnDefinitions="*,Auto"
+                                                  ColumnSpacing="8"
+                                                  Margin="0,12,0,0">
+                                                <Panel Grid.Column="0">
+                                                    <Button Classes="Flat Rounded"
+                                                            Content="运行"
+                                                            Height="36"
+                                                            HorizontalAlignment="Stretch"
+                                                            HorizontalContentAlignment="Center"
+                                                            ToolTip.Tip="启动该扩展"
+                                                            Command="{Binding RunCommand}"
+                                                            IsVisible="{Binding !IsRunning}" />
+                                                    <Button Classes="Flat Rounded"
+                                                            Content="停止"
+                                                            Height="36"
+                                                            HorizontalAlignment="Stretch"
+                                                            HorizontalContentAlignment="Center"
+                                                            ToolTip.Tip="停止该扩展"
+                                                            Command="{Binding StopCommand}"
+                                                            IsVisible="{Binding IsRunning}" />
+                                                </Panel>
+                                                <Button Grid.Column="1"
+                                                        Classes="Basic"
+                                                        Content="配置"
+                                                        Height="36"
+                                                        Padding="16,0"
+                                                        ToolTip.Tip="打开扩展配置"
                                                         Command="{Binding ConfigureCommand}"
-                                                        IsVisible="{Binding HasConfig}"/>
-                                            </StackPanel>
-                                        </StackPanel>
+                                                        IsVisible="{Binding HasConfig}" />
+                                            </Grid>
+                                        </Grid>
                                     </suki:GlassCard>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- 空状态 -->
+                    <StackPanel IsVisible="{Binding IsEmpty}"
+                                Spacing="8"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Margin="0,30,0,0">
+                        <Label Classes="Icon"
+                               Content="&#xE596;"
+                               FontSize="36"
+                               Opacity="0.35"
+                               HorizontalAlignment="Center" />
+                        <TextBlock Text="暂无可用扩展"
+                                   FontSize="14"
+                                   Opacity="0.6"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="请确认后端已启动，然后点击「刷新」重新加载"
+                                   FontSize="12"
+                                   Opacity="0.45"
+                                   HorizontalAlignment="Center" />
                     </StackPanel>
-                </suki:GroupBox>
-            </suki:GlassCard>
-        </StackPanel>
-    </ScrollViewer>
+
+                    <ProgressBar IsIndeterminate="True"
+                                 IsVisible="{Binding IsLoadingExtensions}"
+                                 VerticalAlignment="Top"
+                                 Height="3" />
+                </Grid>
+            </Grid>
+        </suki:GroupBox>
+    </suki:GlassCard>
 </UserControl>
