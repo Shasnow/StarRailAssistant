@@ -98,11 +98,20 @@ def parse_csharp_file(file_path: str) -> list[dict]:
 
 def parse_properties(class_content: str) -> list[dict]:
     """从类内容中解析属性，包括默认值"""
-    # 匹配属性定义，支持两种格式：
+    # 匹配属性定义，支持以下格式：
     # 格式1：[property: JsonPropertyName("xxx")]\nprivate Type _name = value;
     # 格式2：[JsonPropertyName("xxx")]\npublic Type Name { get; set; } = value;
+    # 格式3：[JsonPropertyName("xxx"), Description("...")] public Type Name { get; init; } = new();
+    # 格式4：[JsonPropertyName("xxx")]\npublic partial Type Name { get; set; }
+    # 格式5：[ObservableProperty] [property: JsonPropertyName("xxx")] [property: Description("...")]（特性同行或换行均可）
     # 支持有默认值和没有默认值的情况
-    property_pattern = r'\[(?:property:\s*)?JsonPropertyName\("([^"]+)"\)\](?:\s*\n\s*\[[^\]]*\])*\s*\n?\s*(?:private|public)\s+([^\s<>]+(?:<[^>]+>)?)\s+[_]?(\w+)\s*(?:\{[^}]+\})?(?:\s*=\s*([^;]+))?;?'
+    property_pattern = (
+        r'\[(?:property:\s*)?JsonPropertyName\("([^"]+)"\)(?:\s*,\s*[^\]]*)?\]'  # 特性内逗号分隔的其他特性
+        r'(?:\s*\[[^\]]*\])*'                                                   # 后续其他特性（\s* 含换行，同行/换行均可）
+        r'\s*\n?\s*(?:private|public)\s+(?:partial\s+)?'
+        r'([^\s<>]+(?:<[^>]+>)?)\s+[_]?(\w+)'
+        r'\s*(?:\{[^}]+\})?(?:\s*=\s*([^;]+))?;?'
+    )
     prop_matches = re.findall(property_pattern, class_content, re.DOTALL)
 
     properties = []
@@ -123,8 +132,18 @@ def parse_properties(class_content: str) -> list[dict]:
     return properties
 
 
-def convert_csharp_default(csharp_default: str | None, python_type: str) -> str:
+def convert_csharp_default(csharp_default: str | None, python_type: str, class_names: list[str] | None = None) -> str:
     """将C#默认值转换为Python默认值"""
+    class_names = class_names or []
+
+    # 嵌套自定义类对象（= new()）使用工厂默认值，保证 to_dict 可递归转换
+    if python_type in class_names and (
+        csharp_default is None
+        or csharp_default == 'new()'
+        or csharp_default.startswith('new ')
+    ):
+        return f'field(default_factory={python_type})'
+
     # 如果没有默认值，使用类型默认值
     if csharp_default is None:
         defaults = {
@@ -159,7 +178,8 @@ def convert_csharp_default(csharp_default: str | None, python_type: str) -> str:
     elif '.' in csharp_default and csharp_default.replace('.', '', 1).lstrip('-').isdigit():
         return csharp_default
     elif csharp_default.lstrip('-').isdigit():
-        return csharp_default
+        # float 类型的整数字面量（如 double x = 1;）补成浮点形式
+        return f'{csharp_default}.0' if python_type == 'float' else csharp_default
     elif csharp_default.startswith('[') and csharp_default.endswith(']'):
         return 'field(default_factory=list)'
     else:
@@ -184,7 +204,7 @@ def generate_python_class(class_info: dict, class_names: list[str]) -> str:
 
     for prop in class_info['properties']:
         # 使用从C#代码中提取的实际默认值
-        default_value = convert_csharp_default(prop['csharp_default'], prop['python_type'])
+        default_value = convert_csharp_default(prop['csharp_default'], prop['python_type'], class_names)
         lines.append(f'    {prop["name"]}: {prop["python_type"]} = {default_value}')
 
     lines.append('')
@@ -231,7 +251,7 @@ def generate_python_class(class_info: dict, class_names: list[str]) -> str:
             else:
                 from_dict_lines.append(f'"{prop_name}": data.get("{json_name}", list())')
         else:
-            default_value = convert_csharp_default(prop['csharp_default'], prop['python_type'])
+            default_value = convert_csharp_default(prop['csharp_default'], prop['python_type'], class_names)
             if default_value == "field(default_factory=list)":
                 default_value = 'list()'
             from_dict_lines.append(f'"{prop_name}": data.get("{json_name}", {default_value})')
@@ -258,6 +278,35 @@ def generate_header(file_path: str) -> list[str]:
     ]
 
 
+def sort_classes_by_dependency(classes: list[dict], class_names: list[str]) -> list[dict]:
+    """按依赖关系排序类：被嵌套引用的类先输出，避免前向引用导致 NameError"""
+    ordered = []
+    emitted: set[str] = set()
+    pending = list(classes)
+
+    while pending:
+        progress = False
+        remaining = []
+        for class_info in pending:
+            deps = {
+                prop['python_type']
+                for prop in class_info['properties']
+                if prop['python_type'] in class_names and prop['python_type'] != class_info['name']
+            }
+            if deps <= emitted:
+                ordered.append(class_info)
+                emitted.add(class_info['name'])
+                progress = True
+            else:
+                remaining.append(class_info)
+        if not progress:  # 存在循环依赖时保持原顺序
+            ordered.extend(remaining)
+            break
+        pending = remaining
+
+    return ordered
+
+
 def main():
     """主函数"""
     parser = argparse.ArgumentParser(description='根据C#类自动生成对应的Python类')
@@ -276,7 +325,7 @@ def main():
     # 获取所有类名，用于在from_dict中判断是否需要递归实例化
     class_names = [c['name'] for c in classes]
 
-    for class_info in classes:
+    for class_info in sort_classes_by_dependency(classes, class_names):
         output_lines.append(generate_python_class(class_info, class_names))
         output_lines.append('')
 

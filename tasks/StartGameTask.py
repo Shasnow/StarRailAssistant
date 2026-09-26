@@ -21,7 +21,7 @@ class LoginStatus(enum.IntEnum):
     IN_GAME_PAGE = 3
     NEW_VERSION_PAGE = 4
 
-@task(order=0)
+@task(order=0)  # pyright: ignore[reportCallIssue]
 class StartGameTask(BaseTask):
     """启动游戏任务"""
 
@@ -63,7 +63,7 @@ class StartGameTask(BaseTask):
                 self._collect_monthly_card()
                 return True
             if self.operator.type == "Browser":
-                self.operator.change_auto_battle(True)  # 云游戏需要在进入游戏后切换自动战斗模式
+                self.operator.change_auto_battle(True)  # 云游戏需要在进入游戏后切换自动战斗模式  # pyright: ignore[reportAttributeAccessIssue]
             return True
         elif res == 1:
             self._collect_monthly_card()
@@ -154,7 +154,7 @@ class StartGameTask(BaseTask):
                     logger.error("等待登录界面超时，请检查游戏状态")
                     return None
                 case 0:  # 特征图片定位
-                    page_index: int = typing.cast(int, result[0])
+                    page_index: int = typing.cast(int, result[0])  # pyright: ignore[reportOptionalSubscript, reportIndexIssue]
                     return (LoginStatus.ENTER_GAME_PAGE, LoginStatus.IN_GAME_PAGE, LoginStatus.NEW_VERSION_PAGE)[page_index]
                 case 1:  # OCR 匹配
                     ocr_index, box = typing.cast(tuple, result)

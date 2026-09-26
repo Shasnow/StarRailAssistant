@@ -670,7 +670,7 @@ class SRACli(cmd2.Cmd):
         """Show version information"""
         self.ok("Version", VERSION)
 
-    def do_quit(self, _: argparse.Namespace) -> bool | None:
+    def do_quit(self, _) -> bool | None:
         """Exit this application."""
         self._cleanup()
         # Return True to stop the command loop

@@ -12,7 +12,7 @@ from SRACore.util.const import VERSION
 
 def main():
     settings_service = SettingsService()
-    language: int = settings_service.settings.Display.language
+    language: int = settings_service.settings.Display.Language
     Resource.set_language(language)
     parser = argparse.ArgumentParser(
         description=Resource.argparse_description,

@@ -8,40 +8,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 @dataclass
-class AppSettings:
-    """自动生成的 AppSettings 类"""
-
-    General: GeneralSettings = None
-    Display: DisplaySettings = None
-    Update: UpdateSettings = None
-    Advanced: AdvancedSettings = None
-    Notification: NotificationSettings = None
-    WarpForecast: WarpForecastSettings = None
-
-    def to_dict(self) -> dict:
-        """转换为字典"""
-        return {
-            "general": self.General.to_dict(),
-            "display": self.Display.to_dict(),
-            "update": self.Update.to_dict(),
-            "advanced": self.Advanced.to_dict(),
-            "notification": self.Notification.to_dict(),
-            "warpForecast": self.WarpForecast.to_dict()
-        }
-
-    @classmethod
-    def from_dict(cls, data: dict):
-        """从字典创建对象"""
-        return cls(**{
-            "General": GeneralSettings.from_dict(data.get("general", {})),
-            "Display": DisplaySettings.from_dict(data.get("display", {})),
-            "Update": UpdateSettings.from_dict(data.get("update", {})),
-            "Advanced": AdvancedSettings.from_dict(data.get("advanced", {})),
-            "Notification": NotificationSettings.from_dict(data.get("notification", {})),
-            "WarpForecast": WarpForecastSettings.from_dict(data.get("warpForecast", {}))
-        })
-
-@dataclass
 class GeneralSettings:
     """自动生成的 GeneralSettings 类"""
 
@@ -52,12 +18,14 @@ class GeneralSettings:
     gameArgsFullScreenMode: str = "窗口化"
     gameArgsWindowSize: str = "1920x1080"
     isGameArgsPopupWindow: bool = False
+    isGameArgsAutoButtle: bool = True
     isUseCmd: bool = False
     gameArgsAdvanced: str = ""
     isCloudGameEnabled: bool = False
     cloudGameBrowser: str = "Microsoft Edge"
     cloudGameBrowserPath: str = ""
-    cloudGameBrowserHeadless: bool = False
+    isCloudGameBrowserHeadless: bool = False
+    isCloudGameBrowserMuteAudio: bool = False
     hotkeyE: str = "E"
     hotkeyF1: str = "F1"
     hotkeyF2: str = "F2"
@@ -67,7 +35,7 @@ class GeneralSettings:
     isOverlayEnabled: bool = False
     ocrMatchConfidence: float = 0.7
     templateMatchConfidence: float = 0.9
-    isRetryOnTaskFailure: bool = True
+    isRetryOnTaskFailure: bool = False
     maxRetryCount: int = 3
 
     def to_dict(self) -> dict:
@@ -80,12 +48,14 @@ class GeneralSettings:
             "gameArgs.fullScreenMode": self.gameArgsFullScreenMode,
             "gameArgs.windowSize": self.gameArgsWindowSize,
             "gameArgs.popupWindow": self.isGameArgsPopupWindow,
+            "gameArgs.autoButtle": self.isGameArgsAutoButtle,
             "gameArgs.useCmd": self.isUseCmd,
             "gameArgs.advanced": self.gameArgsAdvanced,
             "cloudGame.enabled": self.isCloudGameEnabled,
             "cloudGame.browser": self.cloudGameBrowser,
             "cloudGame.browser.path": self.cloudGameBrowserPath,
-            "cloudGame.browser.headless": self.cloudGameBrowserHeadless,
+            "cloudGame.browser.headless": self.isCloudGameBrowserHeadless,
+            "cloudGame.browser.muteAudio": self.isCloudGameBrowserMuteAudio,
             "keybindings.e": self.hotkeyE,
             "keybindings.f1": self.hotkeyF1,
             "keybindings.f2": self.hotkeyF2,
@@ -110,12 +80,14 @@ class GeneralSettings:
             "gameArgsFullScreenMode": data.get("gameArgs.fullScreenMode", "窗口化"),
             "gameArgsWindowSize": data.get("gameArgs.windowSize", "1920x1080"),
             "isGameArgsPopupWindow": data.get("gameArgs.popupWindow", False),
+            "isGameArgsAutoButtle": data.get("gameArgs.autoButtle", True),
             "isUseCmd": data.get("gameArgs.useCmd", False),
             "gameArgsAdvanced": data.get("gameArgs.advanced", ""),
             "isCloudGameEnabled": data.get("cloudGame.enabled", False),
             "cloudGameBrowser": data.get("cloudGame.browser", "Microsoft Edge"),
             "cloudGameBrowserPath": data.get("cloudGame.browser.path", ""),
-            "cloudGameBrowserHeadless": data.get("cloudGame.browser.headless", False),
+            "isCloudGameBrowserHeadless": data.get("cloudGame.browser.headless", False),
+            "isCloudGameBrowserMuteAudio": data.get("cloudGame.browser.muteAudio", False),
             "hotkeyE": data.get("keybindings.e", "E"),
             "hotkeyF1": data.get("keybindings.f1", "F1"),
             "hotkeyF2": data.get("keybindings.f2", "F2"),
@@ -125,7 +97,7 @@ class GeneralSettings:
             "isOverlayEnabled": data.get("overlay.enabled", False),
             "ocrMatchConfidence": data.get("ocrMatchConfidence", 0.7),
             "templateMatchConfidence": data.get("templateMatchConfidence", 0.9),
-            "isRetryOnTaskFailure": data.get("isRetryOnTaskFailure", True),
+            "isRetryOnTaskFailure": data.get("isRetryOnTaskFailure", False),
             "maxRetryCount": data.get("maxRetryCount", 3)
         })
 
@@ -134,9 +106,9 @@ class DisplaySettings:
     """自动生成的 DisplaySettings 类"""
 
     backgroundImageUri: str = ""
-    backgroundOpacity: float = 1
+    backgroundOpacity: float = 1.0
     controlPanelOpacity: float = 0.9
-    language: int = 0
+    Language: int = 0
     isRememberWindow: bool = False
     WindowState: int = 0
     WindowPositionX: int = 0
@@ -150,7 +122,7 @@ class DisplaySettings:
             "backgroundImage.uri": self.backgroundImageUri,
             "backgroundImage.opacity": self.backgroundOpacity,
             "controlPanel.opacity": self.controlPanelOpacity,
-            "language": self.language,
+            "language": self.Language,
             "window.remember": self.isRememberWindow,
             "window.state": self.WindowState,
             "window.position.x": self.WindowPositionX,
@@ -164,9 +136,9 @@ class DisplaySettings:
         """从字典创建对象"""
         return cls(**{
             "backgroundImageUri": data.get("backgroundImage.uri", ""),
-            "backgroundOpacity": data.get("backgroundImage.opacity", 1),
+            "backgroundOpacity": data.get("backgroundImage.opacity", 1.0),
             "controlPanelOpacity": data.get("controlPanel.opacity", 0.9),
-            "language": data.get("language", 0),
+            "Language": data.get("language", 0),
             "isRememberWindow": data.get("window.remember", False),
             "WindowState": data.get("window.state", 0),
             "WindowPositionX": data.get("window.position.x", 0),
@@ -361,6 +333,7 @@ class UpdateSettings:
     isAutoUpdate: bool = False
     isCheckForUpdates: bool = True
     updateChannel: int = 0
+    downloadPath: str = ""
     EncryptedMirrorChyanCdk: str = ""
 
     def to_dict(self) -> dict:
@@ -370,6 +343,7 @@ class UpdateSettings:
             "autoUpdate": self.isAutoUpdate,
             "checkForUpdates": self.isCheckForUpdates,
             "updateChannel": self.updateChannel,
+            "downloadPath": self.downloadPath,
             "mirrorChyanCdk": self.EncryptedMirrorChyanCdk
         }
 
@@ -381,6 +355,7 @@ class UpdateSettings:
             "isAutoUpdate": data.get("autoUpdate", False),
             "isCheckForUpdates": data.get("checkForUpdates", True),
             "updateChannel": data.get("updateChannel", 0),
+            "downloadPath": data.get("downloadPath", ""),
             "EncryptedMirrorChyanCdk": data.get("mirrorChyanCdk", "")
         })
 
@@ -428,98 +403,32 @@ class AdvancedSettings:
         })
 
 @dataclass
-class WarpForecastSettings:
-    """自动生成的 WarpForecastSettings 类"""
+class AppSettings:
+    """自动生成的 AppSettings 类"""
 
-    versionStartDate: str = ""
-    versionDays: int = 42
-    previewBeforeEndDays: int = 12
-    previewStatus: str = "auto"
-    endgameRefreshIntervalDays: int = 14
-    endgameFirstRefreshOffsetDays: int = 0
-    endgameRefreshCountOverride: int = -1
-    includeTodayEndgame: bool = True
-    weeklyResetWeekday: int = 0
-    weeklyCountOverride: int = -1
-    includeTodayWeekly: bool = True
-    versionCompensationJade: int = 600
-    hasMonthlyCard: bool = False
-    dailyJadeWithoutCard: int = 60
-    dailyJadeWithCard: int = 150
-    endgameJadePerRefresh: int = 800
-    weeklyUniverseJade: int = 225
-    previewJade: int = 300
-    scanBag: bool = True
-    manualCurrentJade: int = 0
-    manualSpecialPass: int = 0
-    manualNormalPass: int = 0
-    scanEventGuide: bool = True
-    eventRewardType: str = "auto"
-    manualEventJade: int = 0
-    manualEventSpecialPass: int = 0
-    manualEventNormalPass: int = 0
+    General: GeneralSettings = field(default_factory=GeneralSettings)
+    Display: DisplaySettings = field(default_factory=DisplaySettings)
+    Update: UpdateSettings = field(default_factory=UpdateSettings)
+    Advanced: AdvancedSettings = field(default_factory=AdvancedSettings)
+    Notification: NotificationSettings = field(default_factory=NotificationSettings)
 
     def to_dict(self) -> dict:
         """转换为字典"""
         return {
-            "version.startDate": self.versionStartDate,
-            "version.days": self.versionDays,
-            "preview.beforeEndDays": self.previewBeforeEndDays,
-            "preview.status": self.previewStatus,
-            "endgame.refreshIntervalDays": self.endgameRefreshIntervalDays,
-            "endgame.firstRefreshOffsetDays": self.endgameFirstRefreshOffsetDays,
-            "endgame.refreshCountOverride": self.endgameRefreshCountOverride,
-            "endgame.includeToday": self.includeTodayEndgame,
-            "weekly.resetWeekday": self.weeklyResetWeekday,
-            "weekly.countOverride": self.weeklyCountOverride,
-            "weekly.includeToday": self.includeTodayWeekly,
-            "version.compensationJade": self.versionCompensationJade,
-            "monthlyCard.enabled": self.hasMonthlyCard,
-            "daily.jadeWithoutCard": self.dailyJadeWithoutCard,
-            "daily.jadeWithCard": self.dailyJadeWithCard,
-            "endgame.jadePerRefresh": self.endgameJadePerRefresh,
-            "weekly.universeJade": self.weeklyUniverseJade,
-            "preview.jade": self.previewJade,
-            "scan.bag": self.scanBag,
-            "manual.currentJade": self.manualCurrentJade,
-            "manual.specialPass": self.manualSpecialPass,
-            "manual.normalPass": self.manualNormalPass,
-            "scan.eventGuide": self.scanEventGuide,
-            "event.rewardType": self.eventRewardType,
-            "manual.eventJade": self.manualEventJade,
-            "manual.eventSpecialPass": self.manualEventSpecialPass,
-            "manual.eventNormalPass": self.manualEventNormalPass
+            "general": self.General.to_dict(),
+            "display": self.Display.to_dict(),
+            "update": self.Update.to_dict(),
+            "advanced": self.Advanced.to_dict(),
+            "notification": self.Notification.to_dict()
         }
 
     @classmethod
     def from_dict(cls, data: dict):
         """从字典创建对象"""
         return cls(**{
-            "versionStartDate": data.get("version.startDate", ""),
-            "versionDays": data.get("version.days", 42),
-            "previewBeforeEndDays": data.get("preview.beforeEndDays", 12),
-            "previewStatus": data.get("preview.status", "auto"),
-            "endgameRefreshIntervalDays": data.get("endgame.refreshIntervalDays", 14),
-            "endgameFirstRefreshOffsetDays": data.get("endgame.firstRefreshOffsetDays", 0),
-            "endgameRefreshCountOverride": data.get("endgame.refreshCountOverride", -1),
-            "includeTodayEndgame": data.get("endgame.includeToday", True),
-            "weeklyResetWeekday": data.get("weekly.resetWeekday", 0),
-            "weeklyCountOverride": data.get("weekly.countOverride", -1),
-            "includeTodayWeekly": data.get("weekly.includeToday", True),
-            "versionCompensationJade": data.get("version.compensationJade", 600),
-            "hasMonthlyCard": data.get("monthlyCard.enabled", False),
-            "dailyJadeWithoutCard": data.get("daily.jadeWithoutCard", 60),
-            "dailyJadeWithCard": data.get("daily.jadeWithCard", 150),
-            "endgameJadePerRefresh": data.get("endgame.jadePerRefresh", 800),
-            "weeklyUniverseJade": data.get("weekly.universeJade", 225),
-            "previewJade": data.get("preview.jade", 300),
-            "scanBag": data.get("scan.bag", True),
-            "manualCurrentJade": data.get("manual.currentJade", 0),
-            "manualSpecialPass": data.get("manual.specialPass", 0),
-            "manualNormalPass": data.get("manual.normalPass", 0),
-            "scanEventGuide": data.get("scan.eventGuide", True),
-            "eventRewardType": data.get("event.rewardType", "auto"),
-            "manualEventJade": data.get("manual.eventJade", 0),
-            "manualEventSpecialPass": data.get("manual.eventSpecialPass", 0),
-            "manualEventNormalPass": data.get("manual.eventNormalPass", 0)
+            "General": GeneralSettings.from_dict(data.get("general", {})),
+            "Display": DisplaySettings.from_dict(data.get("display", {})),
+            "Update": UpdateSettings.from_dict(data.get("update", {})),
+            "Advanced": AdvancedSettings.from_dict(data.get("advanced", {})),
+            "Notification": NotificationSettings.from_dict(data.get("notification", {}))
         })

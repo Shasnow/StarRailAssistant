@@ -52,7 +52,7 @@ class WebDriverManager:
     ]
 
     @classmethod
-    def get_driver(cls, browser: BrowserType, binary_path: str = "", headless: bool = False) -> WebDriver:
+    def get_driver(cls, browser: BrowserType, binary_path: str = "", headless: bool = False, mute_audio: bool = False) -> WebDriver:
         # 复用已存在的驱动实例
         if browser in cls._driver_pool:
             return cls._driver_pool[browser]
@@ -61,19 +61,19 @@ class WebDriverManager:
             case BrowserType.EDGE:
                 from selenium.webdriver.edge.options import Options
                 opt = Options()
-                cls._build_options(opt, binary_path, headless)
+                cls._build_options(opt, binary_path, headless, mute_audio)
                 width, height = cls.WINDOW_SIZE[browser] if not headless else (1920, 1080)
                 driver = cls._launch(lambda: webdriver.Edge(options=opt), browser)
             case BrowserType.CHROME:
                 from selenium.webdriver.chrome.options import Options
                 opt = Options()
-                cls._build_options(opt, binary_path, headless)
+                cls._build_options(opt, binary_path, headless, mute_audio)
                 width, height = cls.WINDOW_SIZE[browser] if not headless else (1920, 1080)
                 driver = cls._launch(lambda: webdriver.Chrome(options=opt), browser)
             case BrowserType.FIREFOX:
                 from selenium.webdriver.firefox.options import Options
                 opt = Options()
-                cls._build_options(opt, binary_path, headless)
+                cls._build_options(opt, binary_path, headless, mute_audio)
                 width, height = cls.WINDOW_SIZE[browser] if not headless else (1920, 1080)
                 driver = cls._launch(lambda: webdriver.Firefox(options=opt), browser)
             case _:
@@ -144,11 +144,13 @@ class WebDriverManager:
 
     @staticmethod
     def _build_options(opt: webdriver.EdgeOptions | webdriver.ChromeOptions | webdriver.FirefoxOptions,
-                       binary_path: str, headless: bool):
+                       binary_path: str, headless: bool, mute_audio: bool = False):
         if binary_path:
             opt.binary_location = binary_path
         if headless:
             opt.add_argument("--headless")
+        if mute_audio:
+            opt.add_argument("--mute-audio")
         # 公共参数批量添加
         for arg in WebDriverManager.COMMON_CLI_ARGS:
             opt.add_argument(arg)
@@ -186,8 +188,10 @@ class BrowserOperator(IOperator):
         if self._driver is None:
             browser_type = self.settings.General.cloudGameBrowser
             binary_path = self.settings.General.cloudGameBrowserPath
-            headless = self.settings.General.cloudGameBrowserHeadless
-            self._driver = WebDriverManager.get_driver(BrowserType(browser_type), binary_path, headless)
+            headless = self.settings.General.isCloudGameBrowserHeadless
+            mute_audio = self.settings.General.isCloudGameBrowserMuteAudio
+
+            self._driver = WebDriverManager.get_driver(BrowserType(browser_type), binary_path, headless, mute_audio)
             # 以实际渲染视口为准，避免窗口边框/工具栏导致比例坐标与截图偏差
             self.window_context.width, self.window_context.height = \
                 self._driver.execute_script("return [window.innerWidth, window.innerHeight]")
