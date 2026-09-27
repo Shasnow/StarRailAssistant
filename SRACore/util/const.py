@@ -25,8 +25,10 @@ if sys.platform == "win32":
     AppDataDir = Path(os.getenv("APPDATA", "")) / "SRA"
 else:
     AppDataDir = Path.home() / ".config" / "SRA"
+
+SettingsJson = AppDataDir / "settings.json"
 ConfigsDir = AppDataDir / "configs"
 CacheDir = AppDataDir / "cache"
-LogsDir = Path("log")
+LogsDir = Path("log").absolute()
 LogsOCRDir = LogsDir / "ocr"
 LogsScreenshotDir = LogsDir / "screenshot"

@@ -17,7 +17,7 @@ from SRACore.runtime.event_listener import KeyboardListener
 from SRACore.service.setting_service import SettingsService
 from SRACore.thread.task_process import TaskManager
 from SRACore.util import reload_package
-from SRACore.util.const import VERSION, CORE
+from SRACore.util.const import VERSION, CORE, SettingsJson
 
 
 class SRACli(cmd2.Cmd):
@@ -643,7 +643,7 @@ class SRACli(cmd2.Cmd):
 
         # 创建设置文件
         AppDataDir.mkdir(parents=True, exist_ok=True)
-        settings_path = AppDataDir / "settings.json"
+        settings_path = SettingsJson
         if not settings_path.exists():
             settings = AppSettings.from_dict({})
             with open(settings_path, "w", encoding="utf-8") as f:

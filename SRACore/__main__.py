@@ -7,7 +7,7 @@ sys.path.append(os.getcwd())  # 将当前工作目录添加到 sys.path，以便
 
 from SRACore.localization import Resource
 from SRACore.service.setting_service import SettingsService
-from SRACore.util.const import VERSION
+from SRACore.util.const import VERSION, AppDataDir, CacheDir, ConfigsDir, LogsDir, SettingsJson
 
 
 def main():
@@ -22,9 +22,13 @@ def main():
     setup_argumentparser(parser)
     # 解析参数
     args = parser.parse_known_args()[0]
+    if args.subcommand == 'where':
+        print(where(args.path))
+        return
+    if args.no_admin:
+        sys.argv.remove('--no-admin')  # 移除参数，不向下传递（无论是否已是管理员）
     if not is_admin():
         if args.no_admin:
-            sys.argv.remove('--no-admin')  # 移除参数，不向下传递
             print(Resource.cli_noAdminWarning)
         else:
             restart_as_admin()
@@ -42,8 +46,7 @@ def main():
         for cmd in commands:
             sys.argv.append(cmd)
         print(sys.argv)
-    inline = args.inline
-    if inline:
+    if args.inline:
         sys.argv.remove('--inline')
     # 延迟导入 SRACli
     from SRACore.util import dynamic_import
@@ -51,7 +54,7 @@ def main():
     from SRACore.cli2 import SRACli
     cli_instance = SRACli(settings_service)
     # 配置交互式模式（隐藏提示符）
-    if inline:
+    if args.inline:
         cli_instance.intro = ''
         cli_instance.prompt = ''
     cli_instance.cmdloop()
@@ -88,6 +91,36 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
         help="Do not require admin privileges"
     )
 
+    subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands')
+    where_parser = subparsers.add_parser('where', help='Show paths to important files')
+    where_parser.add_argument(
+        'path',
+        type=str,
+        nargs='?',          # 可选位置参数：省略时取 default=''（即 `where` 无参数）
+        default='',
+        choices=['', 'configs', 'logs', 'cache', 'data', 'settings'],  # '' 需在 choices 内，否则 default 会被校验拒绝
+        metavar='[{configs,logs,cache,data,settings}]',
+        help='The path to show the absolute path of, e.g. configs, logs, cache, data, settings')
+
+
+def where(args: str) -> str:
+    """查找路径"""
+    match args:
+        case '':
+            return sys.executable
+        case 'configs':
+            return str(ConfigsDir)
+        case 'logs':
+            return str(LogsDir)
+        case 'cache':
+            return str(CacheDir)
+        case 'data':
+            return str(AppDataDir)
+        case 'settings':
+            return str(SettingsJson)
+        case _:
+            return ''
+    
 
 # noinspection unresolved-references
 def restart_as_admin():

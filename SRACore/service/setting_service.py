@@ -3,12 +3,12 @@ import json
 from loguru import logger
 
 from SRACore.models.app_settings import AppSettings
-from SRACore.util.const import AppDataDir
+from SRACore.util.const import SettingsJson
 
 
 class SettingsService:
     def __init__(self):
-        self.path = AppDataDir / 'settings.json'
+        self.path = SettingsJson
         self.st_mtime = self.path.stat().st_mtime if self.path.exists() else 0
         self._settings: AppSettings = self.load_settings() if self.path.exists() else AppSettings()
 
