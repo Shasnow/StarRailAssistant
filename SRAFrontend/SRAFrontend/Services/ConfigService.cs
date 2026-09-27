@@ -3,7 +3,6 @@ using System.IO;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
-using SRAFrontend.Migrations;
 using SRAFrontend.Models;
 using SRAFrontend.Utils;
 
@@ -39,19 +38,7 @@ public class ConfigService(CacheService cacheService, ILogger<ConfigService> log
         try
         {
             var configJson = File.ReadAllText(configPath);
-            TasksConfig? newConfig = null;
-
-            // 旧格式迁移
-            if (configJson.Contains("AfterExitApp"))
-            {
-                logger.LogInformation("Migrating OLD config format...");
-                var oldConfig = JsonSerializer.Deserialize<Config>(configJson);
-                if (oldConfig != null) newConfig = ConfigMigrator.MigrateOldToNew(oldConfig);
-            }
-            else
-            {
-                newConfig = JsonSerializer.Deserialize<TasksConfig>(configJson);
-            }
+            var newConfig = JsonSerializer.Deserialize<TasksConfig>(configJson);
 
             // 加载失败 / 版本过低 → 使用默认
             if (newConfig == null || newConfig.Version < TasksConfig.StaticVersion)

@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
-using SRAFrontend.Migrations;
 using SRAFrontend.Models;
 using SRAFrontend.Utils;
 
@@ -43,15 +42,7 @@ public class SettingsService(ILogger<SettingsService> logger)
         var settingsJson = File.ReadAllText(DataPath.SettingsJson);
         try
         {
-            if (settingsJson.Contains("EmailAuthCode"))  // 旧格式标志字段
-            {
-                _logger.LogInformation("Migrating from old settings format...");
-                Settings = SettingsMigrator.MigrateOldToNew(JsonSerializer.Deserialize<Settings>(settingsJson, _jsonSerializerOptions)!);
-            }
-            else
-            {
-                Settings = JsonSerializer.Deserialize<AppSettings>(settingsJson)!;
-            }
+            Settings = JsonSerializer.Deserialize<AppSettings>(settingsJson)!;
             DecryptSensitiveFields();
         }
         catch (Exception)
