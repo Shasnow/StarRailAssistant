@@ -526,7 +526,7 @@ class BrowserOperator(IOperator):
         # 这里可以添加更多的按键转换规则
         if key == 'esc':
             return Keys.ESCAPE
-        elif key.startswith('f'):
+        elif key[0] in 'fF':
             return getattr(Keys, key.upper(), key)
         else:
             return key

@@ -238,6 +238,7 @@ class ReceiveRewardsTask(BaseTask):
             index, box = self.operator.wait_any_img([IMG.ENTER, IMG.F2, RRIMG.NAMELESS_HONOR_START], timeout=20)
             if index == 0:
                 self.operator.press_key(self.settings.General.hotkeyF2.lower())
+                self.operator.sleep(0.5)
             elif index == 1:
                 return True  # 到达F2页面
             elif index == 2:

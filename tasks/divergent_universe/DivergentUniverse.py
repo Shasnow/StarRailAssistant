@@ -220,7 +220,7 @@ class DivergentUniverse(Executable):
 
     def _scan_for_event(self) -> Box | None:
         """扫描寻找事件：重置视角 → 向右旋转一周并穿插识别 → 未找到则前进后重新扫描，循环直到找到或达到轮数上限"""
-        step = int(self.operator.window_context.width * 0.5)
+        step = int(self.operator.window_context.width * 0.5) - 1
         for round_ in range(1, self.MAX_SCAN_ROUNDS + 1):
             self.operator.press_key("capslock")  # 视角重置到角色面向方向
             self.operator.sleep(0.5)
@@ -395,8 +395,11 @@ class DivergentUniverse(Executable):
 
     def station(self):
         """站点操作"""
+        if self.current_station == '':
+            return True
         for station_name, handler in self.stations:
             if self.current_station in station_name:
+                self.current_station = ''  # 处理完后，将当前站点重置为空字符串
                 return handler()
         raise RuntimeError(f"无法处理站点 {self.current_station}")
 
@@ -553,7 +556,7 @@ class DivergentUniverse(Executable):
             if self.operator.locate(DUIMG.DIVERGENT_UNIVERSE): # 差分宇宙门口
                 self.operator.press_key("f")
             else:
-                self.operator.press_key(self.settings.General.hotkeyF4)
+                self.operator.press_key(self.settings.General.hotkeyF4.lower())
                 if not self.operator.wait_img(IMG.F4, timeout=20):
                     logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
                     self.operator.press_key("esc")

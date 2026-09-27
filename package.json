@@ -3,6 +3,7 @@
   "version": "2.23.0-beta.2",
   "scripts": {
     "dev": "python main.py",
+    "dev:frontend": "cd SRAFrontend/SRAFrontend.Desktop && dotnet run",
     "build": "dotnet publish -c Release -r win-x64 SRAFrontend/SRAFrontend.sln && python scripts/package.py",
     "install": "pip install -r requirements.txt",
     "frontend": "dotnet run --project SRAFrontend/SRAFrontend.Desktop/SRAFrontend.Desktop.csproj",
