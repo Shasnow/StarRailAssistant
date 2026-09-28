@@ -264,7 +264,7 @@ class TaskManager(Runner):
         task_instance = self.get_task(config, task_name)
         self._set_progress(0, 1)
         if task_instance is None:
-            logger.error(Resource.task_noSuchTask(config))
+            logger.error(Resource.task_noSuchTask(task_name))
             return False
         self.stop_event.clear()
         try:

@@ -21,8 +21,13 @@ def main():
     )
     setup_argumentparser(parser)
     # 解析参数
-    args = parser.parse_known_args()[0]
-    if args.subcommand == 'where':
+    args, unknown = parser.parse_known_args()
+    # where 子命令按需注册：若提前注册 subparsers，其 choices 校验会拦截所有首个位置参数，
+    # 导致本应交给 cmd2 的命令（如 help、start_game）启动即报 invalid choice
+    if unknown and unknown[0] == 'where':
+        setup_where_subparser(parser)
+        args = parser.parse_known_args()[0]
+    if getattr(args, 'subcommand', None) == 'where':
         print(where(args.path))
         return
     if args.no_admin:
@@ -91,6 +96,9 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
         help="Do not require admin privileges"
     )
 
+
+def setup_where_subparser(parser: argparse.ArgumentParser) -> None:
+    """注册 where 子命令（仅在首个位置参数确为 where 时调用，避免 choices 拦截交给 cmd2 的命令）"""
     subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands')
     where_parser = subparsers.add_parser('where', help='Show paths to important files')
     where_parser.add_argument(
