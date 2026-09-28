@@ -758,6 +758,8 @@ class CurrencyWars(Executable):
             if self.operator.locate(IMG.ENSURE):  # 编队未满提醒
                 self.operator.click_img(IMG.ENSURE)
             logger.info("战斗开始，等待挑战结束")
+            if self.operator.wait_img(IMG.Q):
+                self.operator.press_key("v")
             result, _ = self.operator.wait_any_img([CWIMG.SETTLE, CWIMG.CONTINUE], timeout=600, interval=1, trace=False)
             if result == -1:
                 logger.warning("等待挑战结束超时")

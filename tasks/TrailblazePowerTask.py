@@ -24,7 +24,7 @@ class SubtaskInfo(TypedDict):
     levels: list[LevelInfo]
 
 
-@task(order=1)
+@task(order=1)  # pyright: ignore[reportCallIssue]
 class TrailblazePowerTask(BaseTask):
     """清体力任务"""
     def __post_init__(self):
@@ -621,7 +621,7 @@ class TrailblazePowerTask(BaseTask):
                 return box
             else:
                 for _ in range(12):
-                    self.operator.scroll(-1)
+                    self.operator.scroll(-1, trace=False)
 
     def support(self):
         """选择支援角色（固定选第一个可用角色）
@@ -679,7 +679,7 @@ class TrailblazePowerTask(BaseTask):
             self.operator.move_to(0.25, 0.5)
             self.operator.sleep(1)
             for _ in range(10):
-                self.operator.scroll(-5)
+                self.operator.scroll(-5, trace=False)
         self.operator.sleep(0.5)
         _, result = self.operator.locate_any([name1, name2])
         if result:

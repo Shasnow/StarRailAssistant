@@ -114,6 +114,7 @@ func = "caver_of_corrosion"
 cost = 40
 max_count = 6
 levels = [
+    { id = 17, name = "密伶之径", result = "戏梦点星的伶人/贪噬禁果的异端" },
     { id = 1, name = "观火之径", result = "星如我见的领航员/叩问天工的名冶" },
     { id = 2, name = "魔占之径", result = "闪耀功勋的魔法少女/应天涉远的卜者" },
     { id = 3, name = "隐救之径", result = "再创天地的救世主/自匿星芒的隐士" },
