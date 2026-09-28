@@ -21,15 +21,10 @@ def main():
     )
     setup_argumentparser(parser)
     # 解析参数
-    args, unknown = parser.parse_known_args()
-    # where 子命令按需注册：若提前注册 subparsers，其 choices 校验会拦截所有首个位置参数，
-    # 导致本应交给 cmd2 的命令（如 help、start_game）启动即报 invalid choice
-    if unknown and unknown[0] == 'where':
-        setup_where_subparser(parser)
-        args = parser.parse_known_args()[0]
-    if getattr(args, 'subcommand', None) == 'where':
-        print(where(args.path))
-        return
+    args = parser.parse_known_args()[0]
+    if args.subcommand:
+        if subcommand_handler(args.subcommand, args.rest):
+            return
     if args.no_admin:
         sys.argv.remove('--no-admin')  # 移除参数，不向下传递（无论是否已是管理员）
     if not is_admin():
@@ -96,39 +91,69 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
         help="Do not require admin privileges"
     )
 
+    parser.add_argument(
+        'subcommand',
+        type=str,
+        nargs='?',
+        default='',
+        metavar=f'{{{",".join(subcommands.keys())}}}',
+        help="Subcommands, type '{subcommand} --help' for more information"
+    )
 
-def setup_where_subparser(parser: argparse.ArgumentParser) -> None:
-    """注册 where 子命令（仅在首个位置参数确为 where 时调用，避免 choices 拦截交给 cmd2 的命令）"""
-    subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands')
-    where_parser = subparsers.add_parser('where', help='Show paths to important files')
-    where_parser.add_argument(
+    parser.add_argument(
+        'rest',
+        nargs=argparse.REMAINDER,
+        help=argparse.SUPPRESS
+    )
+
+
+def subcommand_handler(subcommand: str, rest: list) -> bool:
+    """处理子命令"""
+    if subcommand in subcommands:
+        parser, func = subcommands[subcommand]  # 值为 (解析器, 处理函数) 的单个元组
+        args = parser().parse_args(rest)
+        return func(args)
+    return False
+
+
+def where_parser() -> argparse.ArgumentParser:
+    """返回路径查找解析器"""
+    parser = argparse.ArgumentParser(
+        prog=f'{os.path.basename(sys.argv[0])} where',
+        description='Find the path of the executable file or a directory',
+    )
+    parser.add_argument(
         'path',
         type=str,
-        nargs='?',          # 可选位置参数：省略时取 default=''（即 `where` 无参数）
+        nargs='?',
+        choices=['configs', 'logs', 'cache', 'data', 'settings', ''],
         default='',
-        choices=['', 'configs', 'logs', 'cache', 'data', 'settings'],  # '' 需在 choices 内，否则 default 会被校验拒绝
-        metavar='[{configs,logs,cache,data,settings}]',
-        help='The path to show the absolute path of, e.g. configs, logs, cache, data, settings')
+        help='The path to find',
+    )
+    return parser
 
 
-def where(args: str) -> str:
+def where(args: argparse.Namespace) -> bool:
     """查找路径"""
-    match args:
-        case '':
-            return sys.executable
-        case 'configs':
-            return str(ConfigsDir)
-        case 'logs':
-            return str(LogsDir)
-        case 'cache':
-            return str(CacheDir)
-        case 'data':
-            return str(AppDataDir)
-        case 'settings':
-            return str(SettingsJson)
-        case _:
-            return ''
-    
+    paths = {
+        '': sys.executable,
+        'configs': str(ConfigsDir),
+        'logs': str(LogsDir),
+        'cache': str(CacheDir),
+        'data': str(AppDataDir),
+        'settings': str(SettingsJson),
+    }
+    if args.path in paths:
+        print(paths[args.path])
+    else:
+        print(f'Unknown path: {args.path}, available paths: {",".join(paths.keys())}')
+    return True
+
+
+subcommands = {
+    'where': (where_parser, where),
+}
+
 
 # noinspection unresolved-references
 def restart_as_admin():
