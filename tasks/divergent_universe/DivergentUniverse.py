@@ -92,6 +92,7 @@ class DivergentUniverse(Executable):
         logger.info("执行任务：差分宇宙-周期演算")
 
         for exe_time in range(self.run_times):
+            self.current_station = "战斗"  # 每次新对局重置默认站点（第一站固定为战斗）
             if not self.page_locate():
                 return False
             if not self.in_game:
@@ -122,7 +123,8 @@ class DivergentUniverse(Executable):
             if not self.select():
                 return False
             if self.mode == 0:
-                self._quit_game()
+                if self._quit_game():
+                    self.in_game = False  # 已退出差分宇宙，下次循环需重新进入
                 break
             if not self.navigate_to_next_station():
                 return False
@@ -527,8 +529,9 @@ class DivergentUniverse(Executable):
         if self.operator.wait_img(DUIMG.RETURN):
             self.operator.click_img(DUIMG.RETURN, after_sleep=0.5)
 
-        return self.operator.wait_any_img(
+        index, _ = self.operator.wait_any_img(
             [DUIMG.DIVERGENT_UNIVERSE_START, IMG.ENTER], timeout=30)
+        return index != -1
 
     def _return_to_main_menu(self):
         """返回主菜单"""
