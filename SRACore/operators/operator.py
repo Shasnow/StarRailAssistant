@@ -86,6 +86,7 @@ class Operator(IOperator):
             return False
         if self._win is not None and not self._win.isActive:  # type: ignore
             self.press_key("ctrl")  # 通过模拟键使系统认为是“用户操作”，从而允许 SetForegroundWindow
+            self.click_point(0.5, 0.5)  # 点击窗口中心，确保窗口被激活
             self._win.activate()
             logger.info(f"已激活窗口 '{self.window_title}'")
             return True
@@ -162,16 +163,14 @@ class Operator(IOperator):
             logger.error(SRAError(ErrorCode.UNKNOWN_ERROR, "修改配置文件时发生未知错误", str(e)))
 
     def get_win_region(self, active_window: bool = True) -> Region:
-        hwnd = self._get_hwnd()
-        if active_window and self._win is not None and not self._win.isActive:  # type: ignore
-            self.press_key("ctrl")  # 通过模拟键使系统认为是“用户操作”，从而允许 SetForegroundWindow
-            self._win.activate()
-        region = self._get_client_region(hwnd)
+        if active_window:
+            self.active_window()
+        region = self._get_client_region(self._hwnd)
         if region is None:
-            if hwnd == 0:
-                raise RuntimeError(f"无法获取窗口客户区域 '{self.window_title}' 句柄 '{hwnd}', 请检查游戏是否已启动")
+            if self._hwnd == 0:
+                raise RuntimeError(f"无法获取窗口客户区域 '{self.window_title}' 句柄 '{self._hwnd}', 请检查游戏是否已启动")
             else:
-                raise RuntimeError(f"无法获取窗口客户区域 '{self.window_title}' 句柄 '{hwnd}', 窗口可能被最小化")
+                raise RuntimeError(f"无法获取窗口客户区域 '{self.window_title}' 句柄 '{self._hwnd}', 窗口可能被最小化")
         return region
 
     def _get_client_region(self, hwnd: int) -> Region | None:
