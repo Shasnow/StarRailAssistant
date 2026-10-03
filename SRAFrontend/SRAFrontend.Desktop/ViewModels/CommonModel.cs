@@ -94,7 +94,7 @@ public class CommonModel(
         if (settingsService.Settings.Update.IsAutoUpdate)
         {
             ShowInfoToast("发现新版本", $"正在自动下载更新包：{response.Data.VersionName}");
-            _ = HandleUpdateAsync(response, remoteVersion);
+            _ = HandleUpdateAsync(response, remoteVersion, channel);
         }
         else
         {
@@ -122,7 +122,7 @@ public class CommonModel(
             switch (result)
             {
                 case SukiMessageBoxResult.Yes:
-                    _ = HandleUpdateAsync(response, remoteVersion);
+                    _ = HandleUpdateAsync(response, remoteVersion, channel);
                     break;
                 case SukiMessageBoxResult.OK:
                     UrlUtil.OpenUrl("https://github.com/Shasnow/StarRailAssistant/releases/latest");
@@ -245,7 +245,8 @@ public class CommonModel(
         }
     }
 
-    private async Task HandleUpdateAsync(VersionResponse versionResponse, SemVerInfo remoteVersion)
+    private async Task HandleUpdateAsync(VersionResponse versionResponse, SemVerInfo remoteVersion,
+        string updateChannel)
     {
         // var currentVersion = SemVerParser.Parse(Settings.Version)!;
         // var isHotfix = VersionHelper.IsHotfix(currentVersion, remoteVersion);
@@ -269,8 +270,8 @@ public class CommonModel(
         {
             downloadFilePath = isHotfix
                 ? await updateService.DownloadHotfixAsync(versionResponse, progressHandler, cts.Token)
-                : await updateService.DownloadUpdateAsync(versionResponse, downloadChannel, progressHandler,
-                    cts.Token, downloadDir);
+                : await updateService.DownloadUpdateAsync(versionResponse, downloadChannel, updateChannel,
+                    progressHandler, cts.Token, downloadDir);
         }
         catch (OperationCanceledException)
         {
