@@ -57,12 +57,12 @@ jobs:
           cd SRAFrontend\srafrontend-webui
           pnpm install
           pnpm run build
-      
+
       - name: Install .NET 10.0
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '10.0.x'
-        
+          dotnet-version: "10.0.x"
+
       - name: Publish win-x64
         run: |
           dotnet publish -c Release -r win-x64 .\SRAFrontend\SRAFrontend.sln
@@ -71,7 +71,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -85,11 +85,11 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-          
+
       - name: Built with package.py
         run: |
           python scripts/package.py
-          
+
       - name: Read version
         id: read_version
         run: |
@@ -97,16 +97,16 @@ jobs:
           $CHANNEL=$VERSION.Contains("-beta") ? "beta" : "stable"
           "version=$VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
           "channel=$CHANNEL" | Out-File -FilePath $env:GITHUB_ENV -Append
-          
+
       - name: Install Inno Setup
         run: |
           choco install innosetup --no-progress --yes
-         
+
       - name: Prepare for Inno Setup
         run: |
           Expand-Archive -Path StarRailAssistant_${{ env.version }}.zip -DestinationPath StarRailAssistant
           Copy-Item version_info.txt -Destination setup\install_info.txt -Force
-          
+
       - name: Build Installer
         run: |
           New-Item -ItemType Directory -Path setup\SRA -Force
@@ -115,7 +115,7 @@ jobs:
           python setup/version_modifier.py --version "${{ env.version }}"
           iscc setup\srasetup.iss
           Copy-Item -Path setup\output\* -Destination . -Force
-          
+
       - name: Upload Setup Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -143,13 +143,12 @@ jobs:
         with:
           name: StarRailAssistant_Resources_${{ env.version }}
           path: StarRailAssistant_Resources_${{ env.version }}.zip
-          
+
       - name: Upload Version_Info Artifact
         uses: actions/upload-artifact@v4
         with:
           name: version_info
           path: version_info.txt
-
 
   publish_release:
     name: Publish release
@@ -210,7 +209,7 @@ jobs:
           gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" --prerelease artifacts/*
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-          
+
   mirrorchyan:
     needs: publish_release
     runs-on: macos-latest
@@ -242,10 +241,41 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Update Auto-MAS
+      - name: Read version
+        id: meta
         run: |
           VERSION=$(node -p '"v" + require("./package.json").version')
           CHANNEL=$([[ "$VERSION" == *"-beta"* ]] && echo "beta" || echo "stable")
-          curl -X POST -H "Content-Type: application/json" \
-            -d "{\"version\":\"$VERSION\",\"res_id\":\"StarRailAssistant\",\"channel\":\"$CHANNEL\"}" \
-            "${{ secrets.UPDATE_URL }}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "channel=$CHANNEL" >> "$GITHUB_OUTPUT"
+      - name: Download full zip artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: StarRailAssistant_${{ steps.meta.outputs.version }}
+          path: package
+      - name: Push to data center
+        env:
+          DATACENTER_ACCESS_KEY: ${{ secrets.DATACENTER_ACCESS_KEY }}
+          STABLE_FILE_ID: ${{ vars.DATACENTER_RELEASE_STABLE_FILE_ID }}
+          BETA_FILE_ID: ${{ vars.DATACENTER_RELEASE_BETA_FILE_ID }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.meta.outputs.version }}"
+          CHANNEL="${{ steps.meta.outputs.channel }}"
+          PKG="package/StarRailAssistant_${VERSION}.zip"
+          test -f "$PKG" || { echo "Package not found: $PKG"; exit 1; }
+          push_version() {
+            echo "Uploading ${PKG} to file ${1}"
+            curl -sS --fail --show-error -X POST \
+              "https://data.auto-mas.top/api/v1/user/files/${1}/versions" \
+              -H "Authorization: Bearer ${DATACENTER_ACCESS_KEY}" \
+              -F "file=@${PKG};type=application/zip"
+            echo
+          }
+          # 预发布只推 beta；正式版 stable 与 beta 都推
+          if [[ "$CHANNEL" == "beta" ]]; then
+            push_version "$BETA_FILE_ID"
+          else
+            push_version "$STABLE_FILE_ID"
+            push_version "$BETA_FILE_ID"
+          fi
