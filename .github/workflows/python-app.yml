@@ -255,27 +255,22 @@ jobs:
           path: package
       - name: Push to data center
         env:
-          DATACENTER_ACCESS_KEY: ${{ secrets.DATACENTER_ACCESS_KEY }}
           STABLE_FILE_ID: ${{ vars.DATACENTER_RELEASE_STABLE_FILE_ID }}
           BETA_FILE_ID: ${{ vars.DATACENTER_RELEASE_BETA_FILE_ID }}
+          FILE_UPDATE_SHA256: ${{ vars.DATACENTER_FILE_UPDATE_SHA256 }}
         run: |
           set -euo pipefail
           VERSION="${{ steps.meta.outputs.version }}"
           CHANNEL="${{ steps.meta.outputs.channel }}"
           PKG="package/StarRailAssistant_${VERSION}.zip"
           test -f "$PKG" || { echo "Package not found: $PKG"; exit 1; }
-          push_version() {
-            echo "Uploading ${PKG} to file ${1}"
-            curl -sS --fail --show-error -X POST \
-              "https://data.auto-mas.top/api/v1/user/files/${1}/versions" \
-              -H "Authorization: Bearer ${DATACENTER_ACCESS_KEY}" \
-              -F "file=@${PKG};type=application/zip"
-            echo
-          }
-          # 预发布只推 beta；正式版 stable 与 beta 都推
+
           if [[ "$CHANNEL" == "beta" ]]; then
-            push_version "$BETA_FILE_ID"
+            TARGETS=(--file-id "$BETA_FILE_ID")
           else
-            push_version "$STABLE_FILE_ID"
-            push_version "$BETA_FILE_ID"
+            TARGETS=(--file-id "$STABLE_FILE_ID" --file-id "$BETA_FILE_ID")
           fi
+
+          curl -fsSL --proto '=https' --tlsv1.2 -o file_update.sh https://data.auto-mas.top/api/v1/tools/file_update.sh
+          echo "${FILE_UPDATE_SHA256:?vars.DATACENTER_FILE_UPDATE_SHA256 is not set}  file_update.sh" | sha256sum -c -
+          AUTOMAS_TOKEN="${{ secrets.DATACENTER_ACCESS_KEY }}" bash file_update.sh "$PKG" "${TARGETS[@]}" --change-note "$VERSION"
