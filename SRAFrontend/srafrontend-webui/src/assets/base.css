@@ -8,7 +8,7 @@
   --hue: 163;
 
   color-scheme: light;
-  --page-bg: oklch(.95 .01 var(--hue));
+  --page-bg: oklch(0.95 0.01 var(--hue));
 
   /* ========== 中性 / 表面 ========== */
   --color-background: oklch(0.985 0.004 var(--hue));
@@ -36,6 +36,8 @@
   --color-warning: oklch(0.6 0.13 80);
   --color-danger: oklch(0.52 0.19 27);
   --color-info: oklch(0.53 0.1 262);
+  /* 演示模式徽标（紫色系，与语义色区分） */
+  --color-demo: oklch(0.53 0.15 300);
 
   /* ========== 固定 token（不随模式翻转） ========== */
   /* 深底上的提示文字（既定决策：固定亮灰，约 5.5:1，不随主题翻转） */
@@ -167,7 +169,7 @@
 :root.dark {
   color-scheme: dark;
 
-  --page-bg: oklch(.16 .014 var(--hue));
+  --page-bg: oklch(0.16 0.014 var(--hue));
 
   /* ========== 中性 / 表面 ========== */
   --color-background: oklch(0.175 0.008 var(--hue));
@@ -195,6 +197,7 @@
   --color-warning: oklch(0.8 0.14 80);
   --color-danger: oklch(0.7 0.17 27);
   --color-info: oklch(0.75 0.1 262);
+  --color-demo: oklch(0.75 0.14 300);
 
   /* ========== 阴影 ========== */
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 30%);

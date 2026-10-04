@@ -9,7 +9,7 @@
       <header class="login-head">
         <img class="login-logo" :src="siteConfig.logo" alt="" />
         <h1 id="login-title" class="login-title">{{ siteConfig.title }}</h1>
-        <p class="login-desc">该实例已启用访问认证，请输入 Access Token 继续</p>
+        <p class="login-desc">{{ descText }}</p>
       </header>
 
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" hide-required-asterisk
@@ -19,7 +19,7 @@
             placeholder="请输入 Access Token" autocomplete="current-password" :disabled="submitting" />
         </el-form-item>
 
-        <p class="login-hint">请查看您的后端服务配置，获取 Access Token 后输入</p>
+        <p class="login-hint">{{ hintText }}</p>
 
         <el-alert v-if="error" class="login-error" :title="error" type="error" show-icon :closable="false" />
 
@@ -43,6 +43,15 @@ import { setStoredToken } from '@/api/http'
 
 const router = useRouter()
 const route = useRoute()
+
+// 演示模式提示文案：__IS_DEMO__ 为 define 注入的编译期常量，
+// 正式构建下三元折叠为正式文案，演示提示不进正式产物
+const descText = __IS_DEMO__
+  ? '演示模式：输入任意 Access Token 即可进入'
+  : '该实例已启用访问认证，请输入 Access Token 继续'
+const hintText = __IS_DEMO__
+  ? '演示环境不校验 Token 内容，任意非空文本均可通过'
+  : '请查看您的后端服务配置，获取 Access Token 后输入'
 
 const formRef = ref<FormInstance>()
 const form = ref({ token: '' })

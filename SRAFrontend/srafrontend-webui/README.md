@@ -46,7 +46,9 @@
 ```bash
 pnpm install          # 安装依赖
 pnpm dev              # 开发服务器（端口 5173，代理 /api → localhost:5073）
+pnpm dev:demo         # 演示模式开发（无后端，内置 API 模拟层）
 pnpm build            # 类型检查 + 生产构建（并行）
+pnpm build:demo       # 演示模式静态构建（可直接部署，无后端依赖）
 pnpm build-only       # 仅 Vite 构建（跳过类型检查）
 pnpm type-check       # vue-tsc 类型检查
 pnpm test             # Vitest 单次运行
@@ -54,6 +56,10 @@ pnpm test:watch       # Vitest 监听模式
 pnpm lint             # oxlint + eslint（顺序运行，均带 --fix）
 pnpm format           # Prettier 格式化
 ```
+
+### 演示模式
+
+`pnpm build:demo` 产出**无需后端**的静态站点，可直接部署到 GitHub Pages / Netlify 等静态托管；导航栏显示"演示模式"徽标。模式在构建期唯一确定，无运行时切换开关。详见 [docs/demo-mode.md](docs/demo-mode.md)。
 
 ### 验证流程
 

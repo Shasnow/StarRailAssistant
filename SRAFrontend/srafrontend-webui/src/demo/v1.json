@@ -1,0 +1,2940 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "SRA-server | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5073/"
+    }
+  ],
+  "paths": {
+    "/api/App/background": {
+      "get": {
+        "tags": [
+          "App"
+        ],
+        "summary": "获取背景图",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/App/system-info": {
+      "get": {
+        "tags": [
+          "App"
+        ],
+        "summary": "获取系统信息",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/App/phrases": {
+      "get": {
+        "tags": [
+          "App"
+        ],
+        "summary": "获取短语",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfString[]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfString[]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfString[]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Auth": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Backend/restart": {
+      "post": {
+        "tags": [
+          "Backend"
+        ],
+        "summary": "重启后端",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/RestartRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/RestartRequest"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/RestartRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Backend/stop": {
+      "post": {
+        "tags": [
+          "Backend"
+        ],
+        "summary": "停止后端",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Backend/logs": {
+      "get": {
+        "tags": [
+          "Backend"
+        ],
+        "summary": "获取最近日志",
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Backend/logs/stream": {
+      "get": {
+        "tags": [
+          "Backend"
+        ],
+        "summary": "SSE 日志流",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/event-stream": { }
+            }
+          }
+        }
+      }
+    },
+    "/api/Backend/screenshot": {
+      "get": {
+        "tags": [
+          "Backend"
+        ],
+        "summary": "获取 Operator 截图",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileContentResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileContentResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileContentResult"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Configs": {
+      "get": {
+        "tags": [
+          "Configs"
+        ],
+        "summary": "获取所有配置名称",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfListOfstring"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfListOfstring"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfListOfstring"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Configs/{configName}": {
+      "get": {
+        "tags": [
+          "Configs"
+        ],
+        "summary": "获取指定配置",
+        "parameters": [
+          {
+            "name": "configName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfTasksConfig"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfTasksConfig"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfTasksConfig"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Configs"
+        ],
+        "summary": "新建配置",
+        "parameters": [
+          {
+            "name": "configName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfstring"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfstring"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfstring"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "名称包含非法字符",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "配置已存在",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Configs"
+        ],
+        "summary": "更新配置",
+        "parameters": [
+          {
+            "name": "configName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { }
+            },
+            "text/json": {
+              "schema": { }
+            },
+            "application/*+json": {
+              "schema": { }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfstring"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfstring"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfstring"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Configs"
+        ],
+        "summary": "删除配置",
+        "parameters": [
+          {
+            "name": "configName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfstring"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfstring"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfstring"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Extensions": {
+      "get": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "列出所有已注册的扩展",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfExtensionInfo[]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfExtensionInfo[]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfExtensionInfo[]"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Extensions/{id}/schema": {
+      "get": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "获取扩展配置 Schema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfExtensionSchema"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfExtensionSchema"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfExtensionSchema"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Extensions/{id}/config": {
+      "get": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "获取扩展配置值",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfstring"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfstring"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfstring"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "设置扩展配置值",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Extensions/{id}/run": {
+      "post": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "运行指定扩展",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "config",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Extensions/{id}/stop": {
+      "post": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "停止指定扩展",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Extensions/reload": {
+      "post": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "重新扫描并导入扩展模块",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Operator/list": {
+      "get": {
+        "tags": [
+          "Operator"
+        ],
+        "summary": "列出所有可用的 Operator 方法",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Operator/help/{method}": {
+      "get": {
+        "tags": [
+          "Operator"
+        ],
+        "summary": "获取 Operator 方法的详细帮助",
+        "parameters": [
+          {
+            "name": "method",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Operator/call": {
+      "post": {
+        "tags": [
+          "Operator"
+        ],
+        "summary": "调用 Operator 方法",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorCallRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorCallRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorCallRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Settings": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "获取设置",
+        "description": "获取当前应用程序的设置",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfAppSettings"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfAppSettings"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfAppSettings"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "修改设置",
+        "description": "按字段修改设置，支持只传需要修改的部分。请求体为 AppSettings 的部分 JSON，例如 { \"advanced\": { \"backend.remote.enabled\": true } }",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { }
+            },
+            "text/json": {
+              "schema": { }
+            },
+            "application/*+json": {
+              "schema": { }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfIEnumerableOfstring"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfIEnumerableOfstring"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ROfIEnumerableOfstring"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Task/run": {
+      "post": {
+        "tags": [
+          "Task"
+        ],
+        "summary": "运行任务",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Task/single": {
+      "post": {
+        "tags": [
+          "Task"
+        ],
+        "summary": "运行单个指定任务",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SingleTaskRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SingleTaskRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SingleTaskRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Task/stop": {
+      "post": {
+        "tags": [
+          "Task"
+        ],
+        "summary": "停止任务",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Task/status": {
+      "get": {
+        "tags": [
+          "Task"
+        ],
+        "summary": "获取任务状态",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/R"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdvancedSettings": {
+        "type": "object",
+        "properties": {
+          "backend.launchArgs": {
+            "type": "string",
+            "description": "后端启动参数",
+            "default": "--inline"
+          },
+          "backend.remote.enabled": {
+            "type": "boolean",
+            "description": "是否使用远程后端"
+          },
+          "backend.remote.baseUrl": {
+            "type": "string",
+            "description": "远程后端地址"
+          },
+          "developerMode.overlay": {
+            "type": "boolean",
+            "description": "是否在叠加层显示调试信息"
+          },
+          "developerMode.enabled": {
+            "type": "boolean",
+            "description": "是否启用开发者模式"
+          },
+          "developerMode.python.enabled": {
+            "type": "boolean",
+            "description": "是否启用 Python 后端"
+          },
+          "developerMode.saveOcrImage": {
+            "type": "boolean",
+            "description": "是否保存 OCR 截图以便调试"
+          },
+          "developerMode.python.main": {
+            "type": "string",
+            "description": "Python 后端主脚本路径，通常为 main.py"
+          },
+          "developerMode.python.path": {
+            "type": "string",
+            "description": "Python 解释器路径，通常为 python.exe 的路径"
+          }
+        }
+      },
+      "AppSettings": {
+        "type": "object",
+        "properties": {
+          "general": {
+            "description": "通用设置",
+            "$ref": "#/components/schemas/GeneralSettings"
+          },
+          "display": {
+            "description": "显示设置",
+            "$ref": "#/components/schemas/DisplaySettings"
+          },
+          "update": {
+            "description": "更新设置",
+            "$ref": "#/components/schemas/UpdateSettings"
+          },
+          "advanced": {
+            "description": "高级设置",
+            "$ref": "#/components/schemas/AdvancedSettings"
+          },
+          "notification": {
+            "description": "通知设置",
+            "$ref": "#/components/schemas/NotificationSettings"
+          }
+        }
+      },
+      "CosmicStrifeConfig": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "是否启用旷宇纷争任务"
+          },
+          "currencyWars.enabled": {
+            "type": "boolean",
+            "description": "货币战争总开关"
+          },
+          "currencyWars.difficulty": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "货币战争难度，0-最低难度，1-最高难度，2-当前难度",
+            "format": "int32"
+          },
+          "currencyWars.mode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "货币战争模式，0-标准博弈，1-超频博弈，2-刷开局",
+            "format": "int32"
+          },
+          "currencyWars.reroll.bossAffixes": {
+            "type": "string",
+            "description": "货币战争刷开局时的Boss词缀"
+          },
+          "currencyWars.reroll.bossNames": {
+            "type": "string",
+            "description": "货币战争刷开局时的Boss名称"
+          },
+          "currencyWars.reroll.investEnvironments": {
+            "type": "string",
+            "description": "货币战争刷开局时的投资环境"
+          },
+          "currencyWars.reroll.investStrategies": {
+            "type": "string",
+            "description": "货币战争刷开局时的投资策略"
+          },
+          "currencyWars.runtimes": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "货币战争刷开局时的运行次数",
+            "format": "int32"
+          },
+          "currencyWars.strategy": {
+            "type": "string",
+            "description": "货币战争使用的攻略名称"
+          },
+          "currencyWars.strategyIndex": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "货币战争使用的攻略索引",
+            "format": "int32"
+          },
+          "currencyWars.username": {
+            "type": "string",
+            "description": "货币战争中开拓者的名字"
+          },
+          "divergentUniverse.enabled": {
+            "type": "boolean",
+            "description": "差分宇宙总开关"
+          },
+          "divergentUniverse.mode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "差分宇宙模式：0-刷单层，1-完整对局",
+            "format": "int32"
+          },
+          "divergentUniverse.runtimes": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "差分宇宙运行次数",
+            "format": "int32"
+          },
+          "divergentUniverse.useTechnique": {
+            "type": "boolean",
+            "description": "差分宇宙是否使用秘技速刷"
+          },
+          "pointRewards.enabled": {
+            "type": "boolean",
+            "description": "是否启用积分奖励，启用后当达到周积分上限时跳过此任务"
+          }
+        }
+      },
+      "DisplaySettings": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "界面语言，0=中文, 1=English",
+            "format": "int32"
+          },
+          "window.state": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "窗口状态，0=正常, 1=最小化, 2=最大化",
+            "format": "int32"
+          },
+          "window.position.x": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "主窗口位置的 X 坐标",
+            "format": "int32"
+          },
+          "window.position.y": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "主窗口位置的 Y 坐标",
+            "format": "int32"
+          },
+          "window.width": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "description": "主窗口宽度",
+            "format": "double"
+          },
+          "window.height": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "description": "主窗口高度",
+            "format": "double"
+          },
+          "backgroundImage.uri": {
+            "type": "string",
+            "description": "背景图片 URI，可以是本地路径或网络 URL"
+          },
+          "backgroundImage.opacity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "description": "背景图片不透明度，范围 0-1",
+            "format": "double"
+          },
+          "controlPanel.opacity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "description": "控制面板不透明度，范围 0-1",
+            "format": "double"
+          },
+          "window.remember": {
+            "type": "boolean",
+            "description": "是否记住窗口位置和大小"
+          }
+        }
+      },
+      "EntityTagHeaderValue": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "$ref": "#/components/schemas/StringSegment"
+          },
+          "isWeak": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ExtensionInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "extension_class": {
+            "type": "string"
+          },
+          "config_class": {
+            "type": "string"
+          }
+        }
+      },
+      "ExtensionSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ExtensionSchemaProperty"
+            }
+          }
+        }
+      },
+      "ExtensionSchemaProperty": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "default": { },
+          "minimum": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "maximum": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "FileContentResult": {
+        "type": "object",
+        "properties": {
+          "fileContents": {
+            "type": "string",
+            "format": "byte"
+          },
+          "contentType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "fileDownloadName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lastModified": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "entityTag": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/EntityTagHeaderValue"
+              }
+            ]
+          },
+          "enableRangeProcessing": {
+            "type": "boolean"
+          }
+        }
+      },
+      "GeneralSettings": {
+        "type": "object",
+        "properties": {
+          "gamePath.index": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "游戏路径索引，指向 gamePath.uris 中的一个 URI",
+            "format": "int32"
+          },
+          "gamePath.uris": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "游戏路径列表，支持多个路径以便快速切换"
+          },
+          "gamePath.autoDetect": {
+            "type": "boolean",
+            "description": "是否自动检测游戏路径，启用后将扫描常见安装位置以找到游戏路径"
+          },
+          "gameArgs.enabled": {
+            "type": "boolean",
+            "description": "是否启用游戏启动参数，启用后将使用下面的参数启动游戏"
+          },
+          "gameArgs.fullScreenMode": {
+            "type": "string",
+            "description": "游戏窗口模式，如 窗口化、全屏"
+          },
+          "gameArgs.windowSize": {
+            "type": "string",
+            "description": "游戏窗口尺寸，格式为 宽x高，如 1920x1080"
+          },
+          "gameArgs.popupWindow": {
+            "type": "boolean",
+            "description": "是否使用无边框游戏窗口"
+          },
+          "gameArgs.autoButtle": {
+            "type": "boolean",
+            "description": "是否启用自动战斗"
+          },
+          "gameArgs.useCmd": {
+            "type": "boolean",
+            "description": "是否使用命令行启动游戏（避免一些直接启动导致的问题）"
+          },
+          "gameArgs.advanced": {
+            "type": "string",
+            "description": "高级启动参数，直接传递给游戏进程，覆盖其他参数设置"
+          },
+          "cloudGame.enabled": {
+            "type": "boolean",
+            "description": "是否使用云游戏"
+          },
+          "cloudGame.browser": {
+            "type": "string",
+            "description": "云游戏使用的浏览器"
+          },
+          "cloudGame.browser.path": {
+            "type": "string",
+            "description": "云游戏使用的浏览器路径"
+          },
+          "cloudGame.browser.headless": {
+            "type": "boolean",
+            "description": "云游戏使用的浏览器是否无头模式"
+          },
+          "cloudGame.browser.muteAudio": {
+            "type": "boolean",
+            "description": "云游戏使用的浏览器是否静音"
+          },
+          "keybindings.e": {
+            "type": "string",
+            "description": "施放秘技的快捷键"
+          },
+          "keybindings.f1": {
+            "type": "string",
+            "description": "打开活动界面的快捷键"
+          },
+          "keybindings.f2": {
+            "type": "string",
+            "description": "打开纪行界面的快捷键"
+          },
+          "keybindings.f3": {
+            "type": "string",
+            "description": "打开卡池界面的快捷键"
+          },
+          "keybindings.f4": {
+            "type": "string",
+            "description": "打开指南界面的快捷键"
+          },
+          "keybindings.stop": {
+            "type": "string",
+            "description": "停止运行任务的快捷键"
+          },
+          "overlay.enabled": {
+            "type": "boolean",
+            "description": "是否启用叠加层"
+          },
+          "ocrMatchConfidence": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "description": "OCR 识图置信度，范围 0-1，数值越高越严格",
+            "format": "double",
+            "default": 0.7
+          },
+          "templateMatchConfidence": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "description": "模板匹配置信度（识图置信度），范围 0-1，数值越高越严格",
+            "format": "double",
+            "default": 0.9
+          },
+          "isRetryOnTaskFailure": {
+            "type": "boolean",
+            "description": "任务失败后是否尝试重启游戏并重试"
+          },
+          "maxRetryCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "任务失败后最大重试次数",
+            "format": "int32",
+            "default": 3
+          }
+        }
+      },
+      "MissionAccomplishedConfig": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "是否启用任务完成后操作"
+          },
+          "exitApp": {
+            "type": "boolean",
+            "description": "完成任务后是否退出应用"
+          },
+          "exitGame": {
+            "type": "boolean",
+            "description": "完成任务后是否退出游戏"
+          },
+          "logout": {
+            "type": "boolean",
+            "description": "完成任务后是否登出账号"
+          },
+          "shutdown": {
+            "type": "boolean",
+            "description": "完成任务后是否关机"
+          },
+          "sleep": {
+            "type": "boolean",
+            "description": "完成任务后是否睡眠"
+          }
+        }
+      },
+      "NotificationSettings": {
+        "type": "object",
+        "properties": {
+          "email.smtpAuthCode": {
+            "type": "string",
+            "description": "SMTP 授权码（加密存储）"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "是否启用通知功能"
+          },
+          "system.enabled": {
+            "type": "boolean",
+            "description": "是否启用系统通知"
+          },
+          "bark.enabled": {
+            "type": "boolean",
+            "description": "是否启用 Bark 推送"
+          },
+          "bark.ciphertext": {
+            "type": "string",
+            "description": "Bark 推送的密文内容，设置后作为 ciphertext 参数发送"
+          },
+          "bark.deviceKey": {
+            "type": "string",
+            "description": "Bark 设备 Key，支持逗号分隔多个设备"
+          },
+          "bark.group": {
+            "type": "string",
+            "description": "Bark 消息分组"
+          },
+          "bark.icon": {
+            "type": "string",
+            "description": "Bark 推送图标的 URL"
+          },
+          "bark.level": {
+            "type": "string",
+            "description": "Bark 推送级别，active/timeSensitive/passive"
+          },
+          "bark.serverUrl": {
+            "type": "string",
+            "description": "Bark 服务器地址"
+          },
+          "bark.sound": {
+            "type": "string",
+            "description": "Bark 推送提示音名称"
+          },
+          "dingTalk.enabled": {
+            "type": "boolean",
+            "description": "是否启用钉钉机器人推送"
+          },
+          "dingTalk.secret": {
+            "type": "string",
+            "description": "钉钉机器人的加签密钥（SEC 开头）"
+          },
+          "dingTalk.webhookUrl": {
+            "type": "string",
+            "description": "钉钉机器人的 Webhook 地址"
+          },
+          "discord.enabled": {
+            "type": "boolean",
+            "description": "是否启用 Discord 推送"
+          },
+          "discord.sendImage": {
+            "type": "boolean",
+            "description": "是否在 Discord 推送中附带截图"
+          },
+          "discord.webhookUrl": {
+            "type": "string",
+            "description": "Discord 的 Webhook 地址"
+          },
+          "feishu.enabled": {
+            "type": "boolean",
+            "description": "是否启用飞书推送"
+          },
+          "feishu.appId": {
+            "type": "string",
+            "description": "飞书应用的 App ID"
+          },
+          "feishu.appSecret": {
+            "type": "string",
+            "description": "飞书应用的 App Secret"
+          },
+          "feishu.receiveId": {
+            "type": "string",
+            "description": "飞书消息接收者 ID"
+          },
+          "feishu.receiveIdType": {
+            "type": "string",
+            "description": "飞书接收者 ID 类型，如 open_id、user_id、union_id、chat_id"
+          },
+          "feishu.webhookUrl": {
+            "type": "string",
+            "description": "飞书机器人的 Webhook 地址"
+          },
+          "oneBot.enabled": {
+            "type": "boolean",
+            "description": "是否启用 OneBot 推送"
+          },
+          "oneBot.sendImage": {
+            "type": "boolean",
+            "description": "是否在 OneBot 推送中附带截图"
+          },
+          "oneBot.groupId": {
+            "type": "string",
+            "description": "OneBot 推送的目标群号"
+          },
+          "oneBot.token": {
+            "type": "string",
+            "description": "OneBot 的访问 Token"
+          },
+          "oneBot.url": {
+            "type": "string",
+            "description": "OneBot 的 HTTP API 地址"
+          },
+          "oneBot.userId": {
+            "type": "string",
+            "description": "OneBot 机器人的账号"
+          },
+          "serverChan.enabled": {
+            "type": "boolean",
+            "description": "是否启用 Server酱 推送"
+          },
+          "serverChan.sendKey": {
+            "type": "string",
+            "description": "Server酱 的 SendKey"
+          },
+          "telegram.enabled": {
+            "type": "boolean",
+            "description": "是否启用 Telegram 推送"
+          },
+          "telegram.proxyEnabled": {
+            "type": "boolean",
+            "description": "是否为 Telegram 推送启用代理"
+          },
+          "telegram.sendImage": {
+            "type": "boolean",
+            "description": "是否在 Telegram 推送中附带截图"
+          },
+          "weCom.enabled": {
+            "type": "boolean",
+            "description": "是否启用企业微信推送"
+          },
+          "weCom.sendImage": {
+            "type": "boolean",
+            "description": "是否在企业微信推送中附带截图"
+          },
+          "weCom.webhookUrl": {
+            "type": "string",
+            "description": "企业微信机器人的 Webhook 地址"
+          },
+          "webhook.enabled": {
+            "type": "boolean",
+            "description": "是否启用自定义 Webhook 推送"
+          },
+          "webhook.url": {
+            "type": "string",
+            "description": "自定义 Webhook 的 URL"
+          },
+          "xxtui.enabled": {
+            "type": "boolean",
+            "description": "是否启用 息知(xxtui) 推送"
+          },
+          "email.enabled": {
+            "type": "boolean",
+            "description": "是否启用邮件推送"
+          },
+          "email.smtpPort": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "SMTP 服务器端口，SSL 通常为 465",
+            "format": "int32"
+          },
+          "email.smtpReceiver": {
+            "type": "string",
+            "description": "收件邮箱地址"
+          },
+          "email.smtpSender": {
+            "type": "string",
+            "description": "发件邮箱地址"
+          },
+          "email.smtpServer": {
+            "type": "string",
+            "description": "SMTP 服务器地址"
+          },
+          "telegram.apiBaseUrl": {
+            "type": "string",
+            "description": "Telegram Bot API 地址"
+          },
+          "telegram.botToken": {
+            "type": "string",
+            "description": "Telegram 机器人的 Bot Token"
+          },
+          "telegram.chatId": {
+            "type": "string",
+            "description": "Telegram 推送目标 Chat ID"
+          },
+          "telegram.proxyUrl": {
+            "type": "string",
+            "description": "Telegram 代理服务器地址"
+          },
+          "xxtui.apiKey": {
+            "type": "string",
+            "description": "息知(xxtui) 的 API Key"
+          },
+          "xxtui.channel": {
+            "type": "string",
+            "description": "息知(xxtui) 的推送通道"
+          },
+          "xxtui.source": {
+            "type": "string",
+            "description": "息知(xxtui) 的消息来源"
+          },
+          "onCompleted": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "任务完成时发送通知的任务名称列表"
+          },
+          "onStart": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "任务开始时发送通知的任务名称列表"
+          }
+        }
+      },
+      "OperatorCallRequest": {
+        "required": [
+          "method",
+          "params"
+        ],
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string"
+          },
+          "params": { }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "R": {
+        "required": [
+          "success",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": { }
+        }
+      },
+      "ReceiveRewardsConfig": {
+        "type": "object",
+        "properties": {
+          "rewards": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "boolean"
+            }
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "是否启用领取奖励任务"
+          },
+          "rewards.assignments": {
+            "type": "boolean",
+            "description": "是否领取派遣奖励"
+          },
+          "rewards.dailyTraining": {
+            "type": "boolean",
+            "description": "是否领取每日实训奖励"
+          },
+          "rewards.giftOfOdyssey": {
+            "type": "boolean",
+            "description": "是否领取巡星之礼奖励"
+          },
+          "rewards.mail": {
+            "type": "boolean",
+            "description": "是否领取邮件奖励"
+          },
+          "rewards.namelessHonor": {
+            "type": "boolean",
+            "description": "是否领取无名勋礼奖励"
+          },
+          "rewards.redeemCode": {
+            "type": "boolean",
+            "description": "是否执行兑换码兑换"
+          },
+          "rewards.trailblazeProfile": {
+            "type": "boolean",
+            "description": "是否领取漫游签证奖励"
+          },
+          "redeemCodes": {
+            "type": "string",
+            "description": "兑换码列表，格式为：兑换码1 兑换码2 兑换码3"
+          }
+        }
+      },
+      "RestartRequest": {
+        "required": [
+          "arguments"
+        ],
+        "type": "object",
+        "properties": {
+          "arguments": {
+            "type": "string"
+          }
+        }
+      },
+      "ROfAppSettings": {
+        "required": [
+          "success",
+          "message",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AppSettings"
+              }
+            ]
+          }
+        }
+      },
+      "ROfExtensionInfo[]": {
+        "required": [
+          "success",
+          "message",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ExtensionInfo"
+            }
+          }
+        }
+      },
+      "ROfExtensionSchema": {
+        "required": [
+          "success",
+          "message",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ExtensionSchema"
+              }
+            ]
+          }
+        }
+      },
+      "ROfIEnumerableOfstring": {
+        "required": [
+          "success",
+          "message",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ROfListOfstring": {
+        "required": [
+          "success",
+          "message",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ROfstring": {
+        "required": [
+          "success",
+          "message",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ROfString[]": {
+        "required": [
+          "success",
+          "message",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ROfTasksConfig": {
+        "required": [
+          "success",
+          "message",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/TasksConfig"
+              }
+            ]
+          }
+        }
+      },
+      "RunRequest": {
+        "required": [
+          "configName",
+          "config",
+          "persist"
+        ],
+        "type": "object",
+        "properties": {
+          "configName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "config": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/TasksConfig"
+              }
+            ]
+          },
+          "persist": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SingleTaskRequest": {
+        "required": [
+          "taskName",
+          "configName"
+        ],
+        "type": "object",
+        "properties": {
+          "taskName": {
+            "type": "string"
+          },
+          "configName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "StartGameConfig": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "加密存储的账号密码"
+          },
+          "username": {
+            "type": "string",
+            "description": "加密存储的账号用户名"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "是否启用启动游戏任务"
+          },
+          "game.channel": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "游戏渠道，0-国服，1-B服，2-国际服",
+            "format": "int32"
+          },
+          "game.path": {
+            "type": "string",
+            "description": "游戏启动程序路径"
+          },
+          "game.server": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "国际服服务器，0-亚洲，1-欧洲，2-美洲，3-台港澳，仅国际服有效",
+            "format": "int32"
+          },
+          "game.useGlobalPath": {
+            "type": "boolean",
+            "description": "是否使用全局设置中的游戏路径"
+          },
+          "game.launchDelay": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "启动游戏后的等待延迟（秒）",
+            "format": "int32"
+          },
+          "autologin": {
+            "type": "boolean",
+            "description": "是否自动登录账号"
+          },
+          "relogin": {
+            "type": "boolean",
+            "description": "是否在登录失败后自动重新登录"
+          }
+        }
+      },
+      "StringSegment": {
+        "type": "object",
+        "properties": {
+          "buffer": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "offset": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "length": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "value": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "hasValue": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TasksConfig": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "任务配置名称"
+          },
+          "startGame": {
+            "description": "启动游戏配置",
+            "$ref": "#/components/schemas/StartGameConfig"
+          },
+          "trailblazePower": {
+            "description": "体力配置",
+            "$ref": "#/components/schemas/TrailblazePowerConfig"
+          },
+          "receiveRewards": {
+            "description": "领取奖励配置",
+            "$ref": "#/components/schemas/ReceiveRewardsConfig"
+          },
+          "cosmicStrife": {
+            "description": "旷宇纷争配置",
+            "$ref": "#/components/schemas/CosmicStrifeConfig"
+          },
+          "missionAccomplished": {
+            "description": "任务完成后操作",
+            "$ref": "#/components/schemas/MissionAccomplishedConfig"
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "配置文件版本号",
+            "format": "int32"
+          }
+        }
+      },
+      "TokenRequest": {
+        "required": [
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "TrailblazePowerConfig": {
+        "type": "object",
+        "properties": {
+          "tasklist": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrailblazePowerTaskItem"
+            },
+            "description": "任务列表"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "是否启用开拓力任务"
+          },
+          "activity.gardenOfPlenty.level1": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "花藏繁生中拟造花萼（金）的目标关卡",
+            "format": "int32"
+          },
+          "activity.gardenOfPlenty.level2": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "花藏繁生中拟造花萼（赤）的目标关卡",
+            "format": "int32"
+          },
+          "useAssistant": {
+            "type": "boolean",
+            "description": "是否使用支援角色"
+          },
+          "useBuildTarget": {
+            "type": "boolean",
+            "description": "是否启用培养目标，开启后将优先完成培养目标"
+          },
+          "activity.enabled": {
+            "type": "boolean",
+            "description": "是否启用多倍活动检测，启用后将优先刷取花藏繁生/异器盈界/位面分裂副本"
+          },
+          "activity.planarFissure.level": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "位面分裂的目标关卡",
+            "format": "int32"
+          },
+          "activity.realmOfTheStrange.level": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "异器盈界的目标关卡",
+            "format": "int32"
+          },
+          "replenish.times": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "补充体力的次数",
+            "format": "int32"
+          },
+          "replenish.enabled": {
+            "type": "boolean",
+            "description": "是否补充体力"
+          },
+          "replenish.way": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "补充体力的方式，0-后备开拓力，1-燃料，2-星琼",
+            "format": "int32"
+          }
+        }
+      },
+      "TrailblazePowerTaskItem": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "任务名称"
+          },
+          "id": {
+            "type": "string",
+            "description": "任务标识ID，如 calyx_golden、echo_of_war"
+          },
+          "level": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "关卡等级",
+            "format": "int32"
+          },
+          "levelName": {
+            "type": "string",
+            "description": "关卡名称"
+          },
+          "count": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "手动模式下单个任务的执行次数",
+            "format": "int32"
+          },
+          "runtimes": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "手动模式下的执行轮数",
+            "format": "int32"
+          },
+          "autoDetect": {
+            "type": "boolean",
+            "description": "是否根据剩余体力自动分配执行次数"
+          }
+        }
+      },
+      "UpdateSettings": {
+        "type": "object",
+        "properties": {
+          "mirrorChyanCdk": {
+            "type": "string",
+            "description": "Mirror Chyan 下载渠道的授权码，敏感信息将被加密存储"
+          },
+          "downloadChannel": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "下载渠道，0=Mirror Chyan, 1=Github Release, 2=AUTO-MAS",
+            "format": "int32"
+          },
+          "autoUpdate": {
+            "type": "boolean",
+            "description": "是否启用自动更新: 将在有更新时直接开始下载"
+          },
+          "checkForUpdates": {
+            "type": "boolean",
+            "description": "是否启用检查更新功能: 将在启动时检查更新并提示用户"
+          },
+          "updateChannel": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "更新频道，0=Stable, 1=Beta",
+            "format": "int32"
+          },
+          "downloadPath": {
+            "type": "string",
+            "description": "更新安装包的下载保存目录，留空则使用系统临时目录下的 SRA 文件夹"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "App"
+    },
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Backend"
+    },
+    {
+      "name": "Configs"
+    },
+    {
+      "name": "Extensions"
+    },
+    {
+      "name": "Operator"
+    },
+    {
+      "name": "Settings"
+    },
+    {
+      "name": "Task"
+    }
+  ]
+}

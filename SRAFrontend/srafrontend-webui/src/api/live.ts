@@ -14,6 +14,12 @@ export const SCREENSHOT_URL = '/api/backend/screenshot'
  * - 非 2xx 或返回非图片内容（如 JSON 错误体）时抛出错误
  */
 export async function fetchScreenshot(signal?: AbortSignal, cacheBust?: number): Promise<Blob> {
+  // 演示模式：本地 canvas 绘制演示画面（动态导入，__IS_DEMO__ 为编译期常量，
+  // 正式构建下该分支与 demo/screenshot chunk 一并被消除）
+  if (__IS_DEMO__) {
+    const { renderDemoScreenshot } = await import('@/demo/screenshot')
+    return renderDemoScreenshot()
+  }
   const url = cacheBust ? `${SCREENSHOT_URL}?t=${cacheBust}` : SCREENSHOT_URL
   const res = await fetch(url, { signal })
   if (!res.ok) throw new Error(`截图请求失败（HTTP ${res.status}）`)

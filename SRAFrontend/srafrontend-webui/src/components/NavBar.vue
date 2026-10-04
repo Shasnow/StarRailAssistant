@@ -19,6 +19,9 @@
 
       <!-- 右侧：用户状态 -->
       <div class="nav-right">
+        <!-- 演示模式只读徽标（构建期确定，无切换交互） -->
+        <span v-if="demoBadge" class="demo-badge">{{ demoBadge }}</span>
+
         <div class="user-info">
           <span class="avatar" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
@@ -77,6 +80,9 @@ import siteConfig from '@/configs/siteConfig'
 import ThemeHuePicker from './ThemeHuePicker.vue'
 
 const router = useRouter()
+// 演示模式徽标文案：__IS_DEMO__ 为 define 注入的编译期常量，
+// 正式构建下三元被折叠为空串，分支与文案一并被消除
+const demoBadge = __IS_DEMO__ ? '演示模式' : ''
 const status = ref('online')
 const menuOpen = ref(false)
 
@@ -204,6 +210,13 @@ html.dark .nav-bar {
 
 .nav-bar.over-hero .theme-toggle,
 .nav-bar.over-hero :deep(.hue-toggle) {
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.nav-bar.over-hero .demo-badge {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.55);
   color: #fff;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
 }
@@ -340,6 +353,19 @@ html.dark .nav-bar {
 .status-dot.online {
   background: var(--color-success);
   box-shadow: 0 0 4px color-mix(in srgb, var(--color-success) 60%, transparent);
+}
+
+/* ---------- 演示模式徽标（只读状态指示） ---------- */
+.demo-badge {
+  padding: 3px 10px;
+  border: 1px solid color-mix(in srgb, var(--color-demo) 55%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-demo) 14%, transparent);
+  color: var(--color-demo);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
 }
 
 /* ---------- 主题切换按钮 ---------- */

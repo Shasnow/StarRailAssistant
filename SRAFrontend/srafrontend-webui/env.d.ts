@@ -1,5 +1,16 @@
 /// <reference types="vite/client" />
 
+interface ImportMetaEnv {
+  /** 演示模式开关（仅 --mode demo 时从 .env.demo 加载，'1' 表示演示模式） */
+  readonly VITE_DEMO_DEFAULT?: string
+  /** 部署子路径（如 '/repo/'，默认 '/'） */
+  readonly VITE_BASE?: string
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}
+
 /** 构建环境信息（vite.config.ts 经 define 注入，关于页展示用） */
 interface BuildInfo {
   /** 应用版本（package.json version） */
@@ -17,3 +28,6 @@ interface BuildInfo {
 }
 
 declare const __BUILD_INFO__: BuildInfo
+
+/** 演示模式编译期常量（vite.config.ts 经 define 注入，仅 --mode demo 构建为 true） */
+declare const __IS_DEMO__: boolean

@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import { getStoredToken } from '@/api/http'
 import { LOG_STREAM_URL, parseLogPayload } from '@/api/logs'
 import type { LogEntry } from '@/api/logs'
+import { getLogSourceFactory } from '@/demo/mode'
+import type { LogSource } from '@/demo/mode'
 
 /** 连接状态：连接中 / 已连接 / 重连中 / 已断开 */
 export type StreamStatus = 'connecting' | 'connected' | 'reconnecting' | 'disconnected'
@@ -38,7 +40,8 @@ const reconnectAttempt = ref(0)
 /** 最近一次致命错误（重连次数耗尽等），供界面提示 */
 const lastError = ref('')
 
-let source: EventSource | null = null
+/** 当前日志源（EventSource 或演示模式注册的兼容实现） */
+let source: LogSource | null = null
 let flushTimer: ReturnType<typeof setInterval> | undefined
 let retryTimer: ReturnType<typeof setTimeout> | undefined
 let openTimer: ReturnType<typeof setTimeout> | undefined
@@ -119,7 +122,9 @@ function connect() {
   // EventSource 无法自定义请求头，认证 token 以查询参数携带（后端未启用认证时忽略）
   const token = getStoredToken()
   const url = token ? `${LOG_STREAM_URL}?access_token=${encodeURIComponent(token)}` : LOG_STREAM_URL
-  const es = new EventSource(url)
+  // 演示模式由注册的日志源工厂替代原生 EventSource（正式模式工厂为 null，走原生连接）
+  const factory = getLogSourceFactory()
+  const es: LogSource = factory ? factory(url) : new EventSource(url)
   source = es
 
   // 建立超时兜底：响应头迟迟未到时主动放弃并重连（close 后不会再触发 error 事件）
