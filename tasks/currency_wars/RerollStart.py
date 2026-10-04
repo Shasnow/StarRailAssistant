@@ -35,12 +35,12 @@ class RerollStart(CurrencyWars):
     def __init__(self, operator, runtimes):
         super().__init__(operator, runtimes)
         self.reroll = False  # 重开标志
-        self.wanted_invest_env = None  # 需要的投资环境
-        self.optional_invest_env = None  # 可选的投资环境
-        self.wanted_invest_strategies = None  # 各阶段需要的投资策略（列表，按阶段顺序）
-        self.wanted_boss_names = None  # 需要的Boss名称
-        self.wanted_boss_affixes = None  # 必须出现的boss词缀
-        self.hate_boss_affixes = None  # 讨厌的boss词缀，出现就重开
+        self.wanted_invest_env: list[strutil.StrMatcher] | None = None  # 需要的投资环境
+        self.optional_invest_env: list[strutil.StrMatcher] | None = None  # 可选的投资环境
+        self.wanted_invest_strategies: list[strutil.StrMatcher] | None = None  # 各阶段需要的投资策略（列表，按阶段顺序）
+        self.wanted_boss_names: list[strutil.StrMatcher] | None = None  # 需要的Boss名称
+        self.wanted_boss_affixes: list[strutil.StrMatcher] | None = None  # 必须出现的boss词缀
+        self.hate_boss_affixes: list[strutil.StrMatcher] | None = None  # 讨厌的boss词缀，出现就重开
         self.invest_strategy_stage = 0  # 投资策略阶段
         self.invest_strategy_satisfied = False  # 满意标志
 
@@ -68,9 +68,9 @@ class RerollStart(CurrencyWars):
         self.optional_invest_env = list()
         for item in invest_env_tokens:
             if item.startswith(("?", "？")):
-                self.optional_invest_env.append(item[1:])
+                self.optional_invest_env.append(strutil.RegexMatcher(item[1:]))
             else:
-                self.wanted_invest_env.append(item)
+                self.wanted_invest_env.append(strutil.RegexMatcher(item))
 
     def set_invest_strategy(self, invest_strategy: str):
         """设置投资策略
@@ -85,11 +85,11 @@ class RerollStart(CurrencyWars):
         if not invest_strategy:
             return
         # 使用分号分隔各阶段的投资策略要求
-        stages = invest_strategy.replace("；", ";").split(";")
+        stages = strutil.normalize_unicode(invest_strategy).split(";")
         # 去除末尾空字符串（如"策略1;"会分割为["策略1", ""]）
         if stages[-1] == "":
             stages.pop()
-        self.wanted_invest_strategies = [strutil.normalize_ocr_text(s) for s in stages]
+        self.wanted_invest_strategies = [strutil.RegexMatcher(strutil.clean_text(s)) for s in stages]
 
     def set_boss_name(self, boss_names: str):
         """
@@ -98,10 +98,10 @@ class RerollStart(CurrencyWars):
         """
         if not boss_names:
             return
-        boss_name_tokens = boss_names.replace("；", ";").split(";") if boss_names else []
-        normalized_boss_names = [strutil.normalize_ocr_text(item) for item in boss_name_tokens[:3]]
+        boss_name_tokens = strutil.normalize_unicode(boss_names).split(";") if boss_names else []
+        normalized_boss_names: list[strutil.StrMatcher] = [strutil.RegexMatcher(strutil.clean_text(item)) for item in boss_name_tokens[:3]]
         while len(normalized_boss_names) < 3:
-            normalized_boss_names.append("")
+            normalized_boss_names.append(strutil.ContainsMatcher(""))
         self.wanted_boss_names = normalized_boss_names if any(normalized_boss_names) else None
 
     def set_boss_affix(self, boss_affix: str):
@@ -113,9 +113,9 @@ class RerollStart(CurrencyWars):
         self.hate_boss_affixes = list()
         for item in boss_affix_tokens:
             if item.startswith(("!", "！")):
-                self.hate_boss_affixes.append(strutil.normalize_ocr_text(item[1:]))
+                self.hate_boss_affixes.append(strutil.RegexMatcher(strutil.clean_text(item[1:])))
             else:
-                self.wanted_boss_affixes.append(strutil.normalize_ocr_text(item))
+                self.wanted_boss_affixes.append(strutil.RegexMatcher(strutil.clean_text(item)))
 
     def handle_boss_info(self) -> None:
         if self.wanted_boss_names:
@@ -247,7 +247,7 @@ class RerollStart(CurrencyWars):
             return False
         return self.is_running
 
-    def _detect_invest_strategy(self, wanted_strategy: str = ""):
+    def _detect_invest_strategy(self, wanted_strategy: strutil.StrMatcher):
         """
         检测投资策略是否符合要求
         
@@ -269,19 +269,17 @@ class RerollStart(CurrencyWars):
         # 解析OCR结果：过滤空字符串，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
-            item.source = strutil.normalize_ocr_text(item.source)  # 去除常见的干扰字符
+            item.source = strutil.clean_text(item.source)  # 去除常见的干扰字符
             detected_invest_strategy.append(item.source)
 
         # 日志输出识别到的词缀，便于调试
         logger.info(f"识别到投资策略：{detected_invest_strategy}")
 
         # 使用指定的当前阶段策略进行匹配
-        if wanted_strategy:
-            for i, invest_strategy in enumerate(raw_results):
-                if strutil.is_substring(wanted_strategy, invest_strategy.source):
-                    logger.info(f"检测到需要的投资策略 {invest_strategy.source} (匹配: {wanted_strategy})")
-                    return invest_strategy
-            return None
+        for i, invest_strategy in enumerate(raw_results):
+            if wanted_strategy.match(invest_strategy.source):
+                logger.info(f"检测到需要的投资策略 {invest_strategy.source} (匹配: {wanted_strategy.value})")
+                return invest_strategy
         return None
 
     def _detect_boss_affix(self) -> bool:
@@ -306,7 +304,7 @@ class RerollStart(CurrencyWars):
         # 解析OCR结果：过滤空字符串+去重，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
-            affix_text = strutil.normalize_ocr_text(str(item[1]))
+            affix_text = strutil.clean_text(str(item[1]))
             if not affix_text:  # 过滤空字符串
                 continue
             detected_affixes.append(affix_text)
@@ -318,23 +316,22 @@ class RerollStart(CurrencyWars):
         # 规则1：检测仇恨词缀（只要包含任意一个，直接返回False）
         if self.hate_boss_affixes:
             for hate_affix in self.hate_boss_affixes:
-                # 仇恨词缀采用子字符串匹配，只要识别到的任一词缀与仇恨词缀存在子串关系即判定为不符合
+                # 仇恨词缀采用匹配器匹配（RegexMatcher 正则搜索），只要识别到的任一词缀命中仇恨词缀即判定为不符合
                 for aff in detected_affixes:
-                    if strutil.is_substring(hate_affix, aff):
-                        logger.warning(f"检测到词缀【{hate_affix}】(识别:{aff})，不符合要求")
+                    if hate_affix.match(aff):
+                        logger.warning(f"检测到词缀【{hate_affix.value}】(识别:{aff})，不符合要求")
                         return False
 
         # 规则2：检测需要词缀（必须包含所有需要词缀，否则返回False）
         if self.wanted_boss_affixes:
-            # 必需词缀也采用子字符串匹配：每个需要词缀必须在识别结果中找到至少一个存在子串关系的项
             for wanted_affix in self.wanted_boss_affixes:
                 found = False
                 for aff in detected_affixes:
-                    if strutil.is_substring(wanted_affix, aff):
+                    if wanted_affix.match(aff):
                         found = True
                         break
                 if not found:
-                    logger.warning(f"缺少需要词缀【{wanted_affix}】，不符合要求")
+                    logger.warning(f"缺少需要词缀【{wanted_affix.value}】，不符合要求")
                     return False
         return True
 
@@ -353,7 +350,7 @@ class RerollStart(CurrencyWars):
         sorted_results = sorted(raw_results, key=lambda _item: _item[0][0][0])
         detected_boss_names = []
         for item in sorted_results:
-            boss_name = strutil.normalize_ocr_text(str(item[1]))
+            boss_name = strutil.clean_text(str(item[1]))
             if not boss_name:
                 continue
             detected_boss_names.append(boss_name)
@@ -370,11 +367,11 @@ class RerollStart(CurrencyWars):
             if i >= len(detected_boss_names):
                 logger.warning(f"第{i + 1}位面Boss名称缺失，期望【{wanted_boss_name}】")
                 return False
-            # 使用子字符串匹配判断名称是否符合要求
+            # 使用匹配器匹配判断名称是否符合要求
             detected_name = detected_boss_names[i]
-            if not strutil.is_substring(wanted_boss_name, detected_name):
+            if not wanted_boss_name.match(detected_name):
                 logger.warning(
-                    f"第{i + 1}位面Boss名称不符合要求，识别到【{detected_name}】，期望包含【{wanted_boss_name}】"
+                    f"第{i + 1}位面Boss名称不符合要求，识别到【{detected_name}】，期望包含【{wanted_boss_name.value}】"
                 )
                 return False
 
@@ -397,26 +394,27 @@ class RerollStart(CurrencyWars):
         # 解析OCR结果：过滤空字符串+去重，仅保留有效词缀
         for item in raw_results:
             # 提取并清洗词缀文本
-            affix_text = strutil.normalize_ocr_text(str(item[1]))
+            affix_text = strutil.clean_text(str(item[1]))
             detected_invest_env.append(affix_text)
 
         # 日志输出识别到的词缀，便于调试
         logger.info(f"识别到投资环境：{detected_invest_env}")
         
         # 优先检测必须的投资环境
+        assert self.wanted_invest_env, "必须的投资环境不能为空"
         for i, env in enumerate(detected_invest_env):
-            # 使用子字符串匹配：将期望值规范化后，与识别到的env做子串比较
+            # 使用匹配器匹配：通过 want.match 与识别到的env比较
             for want in self.wanted_invest_env:
-                if strutil.is_substring(strutil.normalize_ocr_text(want), env):
-                    logger.info(f"检测到必须的投资环境【{env}】(匹配: {want})")
+                if want.match(env):
+                    logger.info(f"检测到必须的投资环境【{env}】(匹配: {want.value})")
                     return i
 
         # 如果没有必须的投资环境，检测可选的投资环境
         if self.optional_invest_env:
             for i, env in enumerate(detected_invest_env):
                 for opt in self.optional_invest_env:
-                    if strutil.is_substring(strutil.normalize_ocr_text(opt), env):
-                        logger.info(f"检测到可选的投资环境【{env}】(匹配: {opt})")
+                    if opt.match(env):
+                        logger.info(f"检测到可选的投资环境【{env}】(匹配: {opt.value})")
                         return i
 
         # 既没有必须的投资环境，也没有可选的投资环境

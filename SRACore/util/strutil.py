@@ -8,9 +8,9 @@ def normalize_unicode(text: str) -> str:
     return unicodedata.normalize("NFKC", text)
 
 
-def normalize_ocr_text(text: str) -> str:
+def clean_text(text: str) -> str:
     """
-    Normalize a string by converting it to lowercase and stripping whitespace.
+    清理文本：移除空格、全角字符、换行符等。
 
     Args:
         text (str): The input string to normalize.
@@ -47,3 +47,13 @@ class ContainsMatcher(StrMatcher):
 class EqualsMatcher(StrMatcher):
     def match(self, other: str) -> bool:
         return normalize_unicode(self.value) == normalize_unicode(other)
+
+class RegexMatcher(StrMatcher):
+    def __init__(self, value: str):
+        import re
+        self.value = value
+        self.regex = re.compile(self.value)
+
+    def match(self, other: str) -> bool:
+        return bool(self.regex.search(other))
+        
