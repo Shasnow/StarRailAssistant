@@ -16,7 +16,6 @@ FILES = {
     'cs': os.path.join(PROJECT_ROOT, 'SRAFrontend', 'SRAFrontend', 'Models', 'AppSettings.cs'),
     'const.py': os.path.join(PROJECT_ROOT, 'SRACore', 'util', 'const.py'),
     'package.json': os.path.join(PROJECT_ROOT, 'package.json'),
-    'pyproject.toml': os.path.join(PROJECT_ROOT, 'pyproject.toml')
 }
 
 def update_file_version(file_path, version):

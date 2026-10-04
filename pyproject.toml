@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "starrailassistant"
-version = "2.23.2"
+dynamic = ["version"]
 description = "崩坏：星穹铁道助手"
 readme = "README.md"
 license = "AGPL-3.0-or-later"
@@ -56,3 +56,6 @@ SRACore = [
     "localization/*.toml",
     "localization/*.json"
 ]
+
+[tool.setuptools.dynamic]
+version = {attr = "SRACore.util.const:VERSION"}
