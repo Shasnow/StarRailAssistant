@@ -348,11 +348,11 @@ class ExtensionConfigManager:
                 logger.info(f"加载扩展配置 {ext_id}...")
                 self._configs[ext_id] = config_cls.model_validate(value, by_alias=True)
         except FileNotFoundError:
-            logger.debug(f"扩展配置文件 {self.path} 不存在，将使用默认配置")
+            logger.debug(f"扩展配置文件不存在，将使用默认配置")
         except json.JSONDecodeError as e:
-            logger.error(f"扩展配置文件 {self.path} 格式错误: {e}")
+            logger.error(f"扩展配置文件格式错误: {e}")
         except Exception as e:
-            logger.error(f"加载扩展配置文件 {self.path} 时发生未知错误: {e}")
+            logger.error(f"加载扩展配置文件时发生未知错误: {e}")
 
         for ext_id in self._registry.get_ids():
             if ext_id not in self._configs:

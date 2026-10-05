@@ -23,6 +23,7 @@ from SRACore.util.logger import logger
 _PUL = ctypes.POINTER(ctypes.c_ulong)
 _MOUSEEVENTF_MOVE = 0x0001
 
+pyautogui.FAILSAFE = False
 
 class _MouseInput(ctypes.Structure):
     _fields_ = [("dx", ctypes.c_long),

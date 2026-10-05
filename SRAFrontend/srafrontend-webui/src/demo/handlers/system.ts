@@ -23,9 +23,9 @@ const PHRASES = [
 function buildSystemInfo(): Record<string, unknown> {
   return {
     version: __BUILD_INFO__.appVersion,
-    osVersion: `${navigator.platform || 'Web'}（演示）`,
-    architecture: 'X64（演示）',
-    dotnetVersion: '9.0（演示环境无后端）',
+    osVersion: `${navigator.platform || 'Web'}`,
+    architecture: 'X64',
+    dotnetVersion: '10.0',
     processorCount: navigator.hardwareConcurrency || 4,
     cultureInfo: 'zh-CN',
   }
@@ -49,11 +49,11 @@ export function handlePhrases(_ctx: RouteContext): RouteResult {
 }
 
 export function handleBackendRestart(_ctx: RouteContext): RouteResult {
-  return { envelope: { success: true, message: '后端重启指令已下发（演示环境，无真实操作）' } }
+  return { envelope: { success: true, message: '后端重启指令已下发' } }
 }
 
 export function handleBackendStop(_ctx: RouteContext): RouteResult {
-  return { envelope: { success: true, message: '后端停止指令已下发（演示环境，无真实操作）' } }
+  return { envelope: { success: true, message: '后端停止指令已下发' } }
 }
 
 export function handleGetSettings(_ctx: RouteContext): RouteResult {

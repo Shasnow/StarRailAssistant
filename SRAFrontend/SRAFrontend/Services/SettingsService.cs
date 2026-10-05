@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -89,6 +89,7 @@ public class SettingsService(ILogger<SettingsService> logger)
         Subscribe(Settings.Advanced);
 
         // 订阅所有 ObservableCollection 的 CollectionChanged 事件
+        SubscribeObservableCollection(Settings.General.GamePaths);
         SubscribeObservableCollection(Settings.Notification.OnStart);
         SubscribeObservableCollection(Settings.Notification.OnCompleted);
     }
