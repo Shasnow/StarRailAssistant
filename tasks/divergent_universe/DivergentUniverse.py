@@ -6,7 +6,6 @@ from loguru import logger
 
 from SRACore.operators.model import Box
 from SRACore.task import Executable
-from SRACore.util.errors import SRAError, ErrorCode
 from SRACore.util.strutil import ContainsMatcher
 from tasks.img import DUIMG, IMG
 
@@ -135,7 +134,7 @@ class DivergentUniverse(Executable):
         logger.info(f"第{exe_time + 1}次进入差分宇宙，少女祈祷中…")
         index, box = self.operator.wait_any_img([DUIMG.DIVERGENT_UNIVERSE, DUIMG.DIVERGENT_UNIVERSE_START])
         if index == -1:
-            logger.error(SRAError(ErrorCode.IMAGE_NOT_FOUND, "未找到差分宇宙入口"))
+            logger.error("未找到差分宇宙入口")
             return False
         if index == 0:  # 差分宇宙门口
             self.operator.press_key("f")
@@ -386,7 +385,7 @@ class DivergentUniverse(Executable):
                 try:
                     handler()
                 except Exception as e:
-                    logger.error(SRAError(ErrorCode.UNKNOWN_ERROR, f"处理{selection_name}时发生错误: {e}"))
+                    logger.error(f"处理{selection_name}时发生错误: {e}")
                     return False
             if is_terminal:
                 break
@@ -459,6 +458,7 @@ class DivergentUniverse(Executable):
             if not self.operator.click_img(DUIMG.REROLL, after_sleep=1):
                 logger.warning("未找到刷新按钮，停止刷新")
                 break
+            self.operator.click_img(IMG.ENSURE, after_sleep=1)  # 可能需要点击确认刷新
             boxes = self.operator.ocr_boxes(from_x=0.1, from_y=0.675, to_x=0.9, to_y=0.75)  # 刷新后重新识别
             if not boxes:
                 raise RuntimeError("刷新后未找到站点选项")
@@ -561,7 +561,7 @@ class DivergentUniverse(Executable):
             else:
                 self.operator.press_key(self.settings.General.hotkeyF4.lower())
                 if not self.operator.wait_img(IMG.F4, timeout=20):
-                    logger.error(SRAError(ErrorCode.WAIT_TIMEOUT, "等待指南界面超时"))
+                    logger.error("等待指南界面超时")
                     self.operator.press_key("esc")
                 self.operator.click_img(IMG.COSMIC_STRIFE, after_sleep=1)  # 旷宇纷争
                 self.operator.click_point(0.242, 0.441, after_sleep=0.5)  # 差分宇宙
