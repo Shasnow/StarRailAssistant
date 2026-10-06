@@ -1,7 +1,8 @@
 import enum
+import time
 import typing
 
-from SRACore.util.strutil import EqualsMatcher
+from SRACore.util.strutil import EqualsMatcher, RegexMatcher, StrMatcher
 
 if typing.TYPE_CHECKING:
     from SRACore.operators.model import Box
@@ -24,6 +25,13 @@ class LoginStatus(enum.IntEnum):
 @task(order=0)  # pyright: ignore[reportCallIssue]
 class StartGameTask(BaseTask):
     """启动游戏任务"""
+
+    # 登出确认弹窗的标题/说明文案，用于判断弹窗是否已关闭
+    LOGOUT_CONFIRM_TITLE = RegexMatcher(r"退出登录|退出并保留登录记录|确定要退出")
+    # 弹窗确认按钮
+    LOGOUT_CONFIRM_BUTTON = EqualsMatcher("退出")
+    # 滑块验证码文案，出现时只能人工处理
+    SLIDER_CAPTCHA_TEXT = "请拖动滑块完成拼图"
 
     def run(self):
         logger.info("启动游戏任务开始")
@@ -122,7 +130,10 @@ class StartGameTask(BaseTask):
                 logger.error("游戏需要更新，请手动更新游戏后重试")
                 return -1
             if self.config.StartGame.isReLogin and status != LoginStatus.IN_GAME_PAGE:
-                self.logout()  # 登出后走账号密码登录
+                # 登出失败时沿用当前登录状态，避免在残留弹窗遮挡的界面上继续走账号登录
+                if not self.logout():  # 登出后走账号密码登录
+                    logger.warning("登出失败，沿用当前登录状态继续")
+                    return status
             else:
                 return status
         return self._account_login()
@@ -143,11 +154,17 @@ class StartGameTask(BaseTask):
                 SGIMG.SETTINGS,
                 IMG.ENTER,
                 SGIMG.NEW_VERSION]
+        # 顺序即优先级：滑块验证码需最先识别，避免被同屏的「登录」按钮抢先命中
+        login_texts: list[str | StrMatcher] = [
+            self.SLIDER_CAPTCHA_TEXT,
+            "登录",
+            "欢迎",
+            EqualsMatcher("同意"),
+            "开始游戏"]
         for _ in range(3):
             index, result = self.operator.wait_any([
                 lambda: self.operator.locate_any(login_pages),
-                lambda: self.operator.ocr_match_any(
-                    ["登录", "欢迎", EqualsMatcher("同意")])],
+                lambda: self.operator.ocr_match_any(login_texts)],
                 timeout=60, interval=1)
             match index:
                 case -1:
@@ -159,13 +176,37 @@ class StartGameTask(BaseTask):
                 case 1:  # OCR 匹配
                     ocr_index, box = typing.cast(tuple, result)
                     match ocr_index:
-                        case 0:  # "登录"
+                        case 0:  # 滑块验证码 - 只能人工完成，完成后重新检测
+                            if not self._wait_slider_captcha():
+                                return None
+                        case 1:  # "登录"
                             return LoginStatus.LOGIN_PAGE
-                        case 1:  # "欢迎"
+                        case 2:  # "欢迎"
                             return LoginStatus.WELCOME_PAGE
-                        case 2:  # "同意" - 隐私协议界面，点击后重新检测
+                        case 3:  # "同意" - 隐私协议界面，点击后重新检测
                             self.operator.click_box(typing.cast('Box', box), after_sleep=1)
+                        case 4:  # "开始游戏" - 已保存登录记录，可直接进入
+                            return LoginStatus.ENTER_GAME_PAGE
         return LoginStatus.UNKNOWN_PAGE
+
+    def _wait_slider_captcha(self, timeout: float = 180) -> bool:
+        """等待人工完成滑块验证码
+
+        Args:
+            timeout: 最长等待秒数
+
+        Returns:
+            bool: 验证码是否已完成
+        """
+        logger.warning("检测到滑块验证码，请在游戏窗口中手动拖动滑块完成验证")
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            self.operator.sleep(2)
+            if self.operator.ocr_match(self.SLIDER_CAPTCHA_TEXT) is None:
+                logger.info("滑块验证码已完成")
+                return True
+        logger.error("等待滑块验证码超时，请检查游戏状态")
+        return False
 
     def _account_login(self) -> int:
         """进入账号密码界面完成登录，并等待欢迎界面出现"""
@@ -276,18 +317,40 @@ class StartGameTask(BaseTask):
         logger.warning(f"国际服区服选择未找到确认按钮: {target}")
         return False
 
-    def logout(self):
+    def logout(self) -> bool:
+        """登出当前账号
+
+        Returns:
+            bool: 是否已处于登录界面（登出成功或本身无需登出）
+        """
         logger.info("登出账号")
         idx, box = self.operator.wait_ocr_any(["登出", "登入"], interval=1, timeout=60, from_x=0.9375, from_y=0.1204,
                                               to_x=0.96875, to_y=0.3935)
         if idx == 1:
             # 已经在登录界面，无需登出
             return True
-        if box:
-            self.operator.click_box(box, after_sleep=1)
-            if not self.operator.click_img(IMG.QUIT2, after_sleep=1):
-                self.operator.click_img(IMG.ENSURE3, after_sleep=1)
+        if box is None:
+            logger.warning("未找到登出按钮")
+            return False
+        self.operator.click_box(box, after_sleep=1)
+        # 先尝试模板点击确认按钮；失败则由 _confirm_logout_dialog 用 OCR 兜底
+        self.operator.click_img(IMG.QUIT2, after_sleep=1)
+        if self._confirm_logout_dialog():
             return True
+        logger.warning("登出确认弹窗未能关闭，登录界面可能被遮挡")
+        return False
+
+    def _confirm_logout_dialog(self) -> bool:
+        """点击登出确认弹窗的确认按钮，并校验弹窗已关闭
+
+        Returns:
+            bool: 弹窗是否已关闭
+        """
+        for _ in range(3):
+            box = self.operator.ocr_match(self.LOGOUT_CONFIRM_BUTTON, from_x=0.325,from_y=0.3, to_x=0.675, to_y=0.7)
+            if box is None:
+                return True
+            self.operator.click_box(box, after_sleep=1)
         return False
 
     def start_game_click(self):
