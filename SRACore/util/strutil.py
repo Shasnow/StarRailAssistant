@@ -38,6 +38,9 @@ class StrMatcher(abc.ABC):
         """Check if the other string matches the criteria defined by this matcher."""
         pass
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.value})"
+
 
 class ContainsMatcher(StrMatcher):
     def match(self, other: str) -> bool:

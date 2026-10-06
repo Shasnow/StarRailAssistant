@@ -166,6 +166,9 @@ class Operator(IOperator):
     def get_win_region(self, active_window: bool = True) -> Region:
         if active_window:
             self.active_window()
+        else:
+            # 后台截图不激活窗口，但仍需刷新窗口句柄，避免首次调用时句柄为 0
+            self._get_hwnd()
         region = self._get_client_region(self._hwnd)
         if region is None:
             if self._hwnd == 0:
