@@ -184,6 +184,8 @@ def package_lite(version: str):
     builder = ZipBuilder()
     for file in DESKTOP_WIN_X64_PUBLISH_PATH.iterdir():
         builder.add(file)
+    for file in SERVER_WIN_X64_PUBLISH_PATH.iterdir():
+        builder.add(file)
     for item in ["SRACore", "tasks", "extensions", "resources"]:
         builder.add(ROOT_PATH / item)
     for file in ["main.py", "README.md", "LICENSE", "requirements.txt"]:

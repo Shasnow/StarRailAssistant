@@ -4,7 +4,7 @@
 
 # IDE / 编辑器
 /.vscode/
-/.trae/
+**/.trae/
 **/.vs/
 **/.idea/
 
@@ -23,7 +23,6 @@
 /setup/install_info.txt
 /main.dist/
 SRAFrontend/SRAFrontend.Server/wwwroot/*
-!SRAFrontend/SRAFrontend.Server/wwwroot/.gitkeep
 *.zip
 
 # 构建产物
