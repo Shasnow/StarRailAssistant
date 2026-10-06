@@ -257,7 +257,6 @@ def main():
     update_file_version(FILES['cs'], version)
     update_file_version(FILES['const.py'], version)
     update_file_version(FILES['package.json'], version)
-    update_file_version(FILES['pyproject.toml'], version)
     
     print("=" * 50)
     print("版本号更新完成！")

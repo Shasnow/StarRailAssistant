@@ -85,6 +85,8 @@ class ZipBuilder:
 
     _EXCLUDESuffixes = (".pdb",)
     _EXCLUDENames = {"web.config"}
+    # OpenCV 视频 IO 后端，本项目只用于截图与模板匹配，不使用 VideoCapture/VideoWriter
+    _EXCLUDEPrefixes = ("opencv_videoio_ffmpeg",)
 
     # MD5 校验清单在压缩包内的固定路径，便于统一读取
     MD5_MANIFEST_NAME = "manifest.md5.json"
@@ -95,7 +97,9 @@ class ZipBuilder:
         entries: list[tuple[str, Path]] = []
         for arcname, src in self._entries.items():
             name = Path(arcname).name
-            if name.lower().endswith(self._EXCLUDESuffixes) or name.lower() in self._EXCLUDENames:
+            if (name.lower().endswith(self._EXCLUDESuffixes)
+                    or name.lower() in self._EXCLUDENames
+                    or name.lower().startswith(self._EXCLUDEPrefixes)):
                 continue
             entries.append((arcname, src))
             md5_dict[arcname] = self._md5(src)
