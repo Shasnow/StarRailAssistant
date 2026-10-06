@@ -2,13 +2,16 @@ using System.ComponentModel;
 using System.Text.Json;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
+using SRAFrontend.Server.Services;
 using SRAFrontend.Services;
 
 namespace SRAFrontend.Server.Controllers;
 
 [McpServerToolType]
-public class McpController(IBackendService backendService)
+public class McpController(IBackendService backendService, LogStreamService logStreamService)
 {
+    private const string NoResponseMsg = "(No response from backend, is the backend running?)";
+    
     [McpServerTool(Name = "sra_screenshot")]
     [Description("Take a screenshot(720p) of the game window(1080p)")]
     public async Task<IEnumerable<ContentBlock>> TakeScreenshotAsync()
@@ -39,12 +42,20 @@ public class McpController(IBackendService backendService)
         backendService.StopBackend();
         return "StarRailAssistant Backend shutdown successfully.";
     }
+    
+    [McpServerTool(Name = "sra_restart")]
+    [Description("Restart StarRailAssistant Backend")]
+    public async Task<string> RestartBackend()
+    {
+        await backendService.RestartBackendAsync("--inline");
+        return "StarRailAssistant Backend restarted successfully.";
+    }
 
     [McpServerTool(Name = "sra_task_list")]
     [Description("List all available tasks")]
     public async Task<string> ListTasksAsync()
     {
-        return await backendService.TaskListAsync() ?? "(no response from backend)";
+        return await backendService.TaskListAsync() ?? NoResponseMsg;
     }
 
     [McpServerTool(Name = "sra_task_run")]
@@ -123,7 +134,7 @@ public class McpController(IBackendService backendService)
     {
         var parameters = new { x, y };
         return (await backendService.OperatorCallAsync("click_point", parameters))?.Message ??
-               "(no response from backend)";
+               NoResponseMsg;
     }
 
     [McpServerTool(Name = "sra_click_point_rel")]
@@ -136,7 +147,7 @@ public class McpController(IBackendService backendService)
     {
         var parameters = new { x, y };
         return (await backendService.OperatorCallAsync("click_point", parameters))?.Message ??
-               "(no response from backend)";
+               NoResponseMsg;
     }
 
     [McpServerTool(Name = "sra_scroll")]
@@ -148,7 +159,7 @@ public class McpController(IBackendService backendService)
     {
         var parameters = new { clicks, x, y };
         return (await backendService.OperatorCallAsync("scroll", parameters))?.Message ??
-               "(no response from backend)";
+               NoResponseMsg;
     }
 
     [McpServerTool(Name = "sra_press_key")]
@@ -159,7 +170,7 @@ public class McpController(IBackendService backendService)
     {
         var parameters = new { key };
         return (await backendService.OperatorCallAsync("press_key", parameters))?.Message ??
-               "(no response from backend)";
+               NoResponseMsg;
     }
     
     [McpServerTool(Name = "sra_hold_key")]
@@ -172,7 +183,7 @@ public class McpController(IBackendService backendService)
     {
         var parameters = new { key, duration };
         return (await backendService.OperatorCallAsync("hold_key", parameters))?.Message ??
-               "(no response from backend)";
+               NoResponseMsg;
     }
 
     [McpServerTool(Name = "sra_sleep")]
@@ -183,5 +194,14 @@ public class McpController(IBackendService backendService)
     {
         await Task.Delay(TimeSpan.FromSeconds(seconds));
         return $"Slept for {seconds} seconds";
+    }
+    
+    [McpServerTool(Name = "sra_get_logs")]
+    [Description("Get the backend logs")]
+    public string GetLogsAsync(
+        [Description("The number of log lines to retrieve, default is 100")]
+        int count = 100)
+    {
+        return string.Join("\n", logStreamService.GetRecentLogs(count));
     }
 }
