@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -81,6 +81,7 @@
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
                                 <Button Command="{Binding RefreshStrategiesCommand}">刷新</Button>
+                                <Button Command="{Binding InstallStrategyCommand}">导入</Button>
                                 <HyperlinkButton Content="攻略站" NavigateUri="https://starrailassistant.top/sra-strategy-site/"/>
                             </StackPanel>
 

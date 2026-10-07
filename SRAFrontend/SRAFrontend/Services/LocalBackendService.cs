@@ -198,6 +198,11 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         return await SendInputAndWaitObjectAsync<Strategy[]>("strategy list --json") ?? [];
     }
 
+    public Task<R?> InstallStrategyAsync(string filePath)
+    {
+        return SendInputAndWaitObjectAsync($"strategy install \"{filePath}\" --json");
+    }
+
     public async Task<TpTask[]> GetTpConfigAsync()
     {
         var res = await SendInputAndWaitObjectAsync<Dictionary<string, TpTask>>("tpconfig --json");
@@ -337,7 +342,8 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
     {
         if (string.IsNullOrEmpty(args.Data)) return;
 
-        Outputted?.Invoke(args.Data);
+        // Outputted?.Invoke(args.Data);
+        logger.LogDebug("Backend output: {Output}", args.Data);
 
         // 完成等待中的输出请求。注意：不要在此处清空 _outputTcs——
         // 等待者的 finally（持有 _commandLock 时）已无条件清空；

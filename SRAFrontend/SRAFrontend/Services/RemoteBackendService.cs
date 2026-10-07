@@ -161,6 +161,12 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         return Task.FromResult<Strategy[]>([]);
     }
 
+    public Task<R?> InstallStrategyAsync(string filePath)
+    {
+        logger.LogWarning("InstallStrategy is not implemented for remote backend");
+        return Task.FromResult<R?>(null);
+    }
+
     public Task<TpTask[]> GetTpConfigAsync()
     {
         throw new NotImplementedException();

@@ -133,6 +133,11 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         return _currentBackend.GetStrategiesAsync();
     }
 
+    public Task<R?> InstallStrategyAsync(string filePath)
+    {
+        return _currentBackend.InstallStrategyAsync(filePath);
+    }
+
     public Task<TpTask[]> GetTpConfigAsync()
     {
         return _currentBackend.GetTpConfigAsync();

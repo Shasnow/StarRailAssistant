@@ -26,6 +26,7 @@ public interface IBackendService : INotifyPropertyChanged
     Task<bool> TaskStopAsync();
     Task<R> GetTaskStatusAsync();
     Task<Strategy[]> GetStrategiesAsync();
+    Task<R?> InstallStrategyAsync(string filePath);
     Task<TpTask[]> GetTpConfigAsync();
     Task<(string Message, byte[])> GetGameScreenshotBytesAsync();
     Task<ExtensionInfo[]> GetExtensionsAsync();

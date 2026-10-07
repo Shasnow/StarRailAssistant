@@ -1,6 +1,8 @@
 import argparse
 import json
+import shutil
 import tomllib
+from pathlib import Path
 
 import cmd2
 
@@ -13,8 +15,7 @@ class TrailblazePowerCommands(cmd2.CommandSet[SRACli]):
 
     @staticmethod
     def _build_tpconfig_parser() -> cmd2.Cmd2ArgumentParser:
-        parser = cmd2.Cmd2ArgumentParser(description='查看开拓力副本配置')
-        parser.add_argument('--json', action='store_true', help='以JSON格式输出')
+        parser = SRACli.cmd2argumentparser_factory(description='查看开拓力副本配置')
         parser.add_argument('subtask', nargs='?', help='指定子任务名称（如 calyx_golden）')
         return parser
 
@@ -66,11 +67,9 @@ class CurrencyWarsCommands(cmd2.CommandSet[SRACli]):
 
     @staticmethod
     def _build_strategy_list_parser() -> cmd2.Cmd2ArgumentParser:
-        parser = cmd2.Cmd2ArgumentParser(description='列出所有攻略')
-        parser.add_argument('--json', action='store_true', help='以JSON格式输出')
-        return parser
+        return SRACli.cmd2argumentparser_factory(description='列出所有攻略')
 
-    @cmd2.as_subcommand_to("strategy", "list", _build_strategy_list_parser(), help='列出所有攻略')
+    @cmd2.as_subcommand_to("strategy", "list", _build_strategy_list_parser, help='列出所有攻略')
     def _strategy_list(self, _: argparse.Namespace) -> None:
         strategies_dir = AppRootDir / "tasks" / "currency_wars" / "strategies"
         if not strategies_dir.exists():
@@ -104,5 +103,33 @@ class CurrencyWarsCommands(cmd2.CommandSet[SRACli]):
             return "\n".join(lines)
 
         self._cmd.ok(f"已找到 {len(strategies)} 个攻略", strategies, formatter=format_strategies)
+
+    @staticmethod
+    def _build_strategy_install_parser() -> cmd2.Cmd2ArgumentParser:
+        parser = SRACli.cmd2argumentparser_factory(description='导入攻略文件到攻略目录')
+        parser.add_argument('path', help='攻略文件的绝对路径（JSON 格式）')
+        return parser
+
+    @cmd2.as_subcommand_to("strategy", "install", _build_strategy_install_parser,
+                           help='导入攻略文件到攻略目录')
+    def _strategy_install(self, args: argparse.Namespace) -> None:
+        src = Path(args.path)
+        if not src.is_absolute():
+            self._cmd.err(f"请使用绝对路径: {args.path}")
+            return
+        if not src.is_file():
+            self._cmd.err(f"文件不存在: {src}")
+            return
+
+        strategies_dir = AppRootDir / "tasks" / "currency_wars" / "strategies"
+        strategies_dir.mkdir(parents=True, exist_ok=True)
+        dest = strategies_dir / src.name
+        try:
+            shutil.copyfile(src, dest)
+        except OSError as e:
+            self._cmd.err(f"导入攻略失败: {e}")
+            return
+
+        self._cmd.ok(f"已导入攻略: {dest.name}")
 
 

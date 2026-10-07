@@ -237,6 +237,35 @@ public partial class TaskPageViewModel : PageViewModel
     }
 
     [RelayCommand]
+    private async Task InstallStrategy()
+    {
+        if (TopLevelObject is null) return;
+        var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "选择攻略文件",
+            AllowMultiple = false,
+            FileTypeFilter = [new FilePickerFileType("JSON 攻略文件") { Patterns = ["*.json"] }]
+        });
+        if (files.Count == 0) return;
+
+        try
+        {
+            var result = await _backendService.InstallStrategyAsync(files[0].Path.LocalPath);
+            if (result is not { Success: true })
+            {
+                _commonModel.ShowErrorToast("攻略导入失败", result?.Message ?? "后端无响应");
+                return;
+            }
+            _commonModel.ShowSuccessToast("攻略导入成功", result.Message);
+            await RefreshStrategies();
+        }
+        catch (Exception ex)
+        {
+            _commonModel.ShowErrorToast("攻略导入失败", ex.Message);
+        }
+    }
+
+    [RelayCommand]
     private async Task SelectedPath()
     {
         if (TopLevelObject is null) return;
