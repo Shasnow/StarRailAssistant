@@ -6,7 +6,6 @@ from collections.abc import Callable
 from typing import Any
 
 import cmd2
-from loguru import logger
 from rich.text import Text
 
 from SRACore.extension import ExtensionConfigManager, ExtensionRunner, load_extensions
@@ -624,8 +623,9 @@ class SRACli(cmd2.Cmd):
         from SRACore.models.tasks_config import TasksConfig
         from SRACore.util.const import AppDataDir, ConfigsDir
 
-        url = f"https://github.com/Shasnow/StarRailAssistant/releases/download/v{VERSION}/StarRailAssistant_Lite_v{VERSION}.zip"
-        # url = f"https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant_Resource_v{VERSION}.zip"
+        # R2 资源站：固定文件名区分正式版/beta（版本含 "-" 视为 beta），避免 beta 覆盖正式版包
+        package_name = "SRAFrontend_Server_beta.zip" if "-" in VERSION else "SRAFrontend_Server.zip"
+        url = f"https://resource.starrailassistant.top/{package_name}"
         self.ok(f"Downloading resources from {url} ...")
         try:
             req = Request(url, headers={"User-Agent": "SRA-cli"})

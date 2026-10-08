@@ -29,6 +29,9 @@ import os
 import shutil
 import subprocess
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 
@@ -39,6 +42,8 @@ SERVER_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" /
 DIST_DIR = ROOT_PATH / "main.dist"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
+# R2 自定义域名（绑定到上传桶的公开访问基址），CLI init 从此处下载 Server 包
+R2_PUBLIC_BASE_URL = "https://resource.starrailassistant.top"
 SITE_PACKAGES_DIR = None
 for p in sys.path[1:]:
     if p.endswith("site-packages"):
@@ -217,9 +222,69 @@ def package_resources(version: str):
     resources_zip.snapshot(ROOT_PATH / f"StarRailAssistant_Resources_v{version}.zip")
 
 
+def server_package_object_key(version: str) -> str:
+    """R2 对象键：区分正式版/beta 的固定文件名，避免发布 beta 时覆盖正式版压缩包。"""
+    return "SRAFrontend_Server_beta.zip" if "-" in version else "SRAFrontend_Server.zip"
+
+
+def package_server(version: str) -> Path:
+    """打包 SRAFrontend.Server 的发布产物，供 CLI init 命令下载。"""
+    print("Packaging Server ...")
+    if not SERVER_WIN_X64_PUBLISH_PATH.exists():
+        print(f"[ERROR] Server publish path not found: {SERVER_WIN_X64_PUBLISH_PATH}")
+        print("        Run `dotnet publish -c Release -r win-x64 .\\SRAFrontend\\SRAFrontend.sln` first.")
+        sys.exit(1)
+    zip_path = ROOT_PATH / f"SRAFrontend_Server_v{version}.zip"
+    builder = ZipBuilder()
+    builder.add(SERVER_WIN_X64_PUBLISH_PATH, SERVER_WIN_X64_PUBLISH_PATH)
+    builder.snapshot(zip_path)
+    return zip_path
+
+
+def upload_to_r2(zip_path: Path, version: str):
+    """通过 Cloudflare R2 REST API（Bearer Token + PUT 对象）上传 Server 包。
+
+    文档：https://developers.cloudflare.com/api/resources/r2/
+    凭据从环境变量读取：R2_ACCOUNT_ID、R2_API_TOKEN、R2_BUCKET。
+    凭据缺失时跳过上传（仅警告），不影响本地打包。
+    """
+    env_vars = ["R2_ACCOUNT_ID", "R2_API_TOKEN", "R2_BUCKET"]
+    values = {name: os.environ.get(name, "") for name in env_vars}
+    missing = [name for name, value in values.items() if not value]
+    if missing:
+        print(f"[WARN] Missing environment variables: {', '.join(missing)}, skipping R2 upload")
+        return
+
+    account_id = values["R2_ACCOUNT_ID"]
+    api_token = values["R2_API_TOKEN"]
+    bucket = values["R2_BUCKET"]
+    object_key = server_package_object_key(version)
+
+    print(f"Uploading {zip_path.name} to r2://{bucket}/{object_key} ...")
+    url = (
+        f"https://api.cloudflare.com/client/v4/accounts/{account_id}"
+        f"/r2/buckets/{bucket}/objects/{urllib.parse.quote(object_key, safe='/.-')}"
+    )
+    req = urllib.request.Request(url, data=zip_path.read_bytes(), method="PUT", headers={
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/zip",
+    })
+    try:
+        with urllib.request.urlopen(req) as resp:
+            resp.read()
+    except urllib.error.HTTPError as e:
+        print(f"[ERROR] R2 upload failed: HTTP {e.code} {e.read().decode('utf-8', errors='replace')}")
+        sys.exit(1)
+    except urllib.error.URLError as e:
+        print(f"[ERROR] R2 upload failed: {e.reason}")
+        sys.exit(1)
+    print(f"[OK] Uploaded to {R2_PUBLIC_BASE_URL}/{object_key}")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="StarRailAssistant 打包脚本")
     parser.add_argument("--resources-only", action="store_true", help="只打包资源，跳过 Nuitka 构建等其他操作")
+    parser.add_argument("--server-only", action="store_true", help="只打包并上传 Server 包，跳过 Nuitka 构建等其他操作")
     args = parser.parse_args()
 
     with (ROOT_PATH / "package.json").open(encoding="utf-8") as f:
@@ -231,8 +296,14 @@ if __name__ == "__main__":
         print(f"\nPackaging completed! Version: v{version}")
         sys.exit(0)
 
+    if args.server_only:
+        server_zip = package_server(version)
+        upload_to_r2(server_zip, version)
+        print(f"\nPackaging completed! Version: v{version}")
+        sys.exit(0)
+
     with (ROOT_PATH / "ChangeLog2.0.md").open(encoding="utf-8") as f:
-        changelog = f.read()
+        changelog = f.read().replace("${VERSION}", version)
 
     nuitka_build(version)
     copy_core_resources(DIST_DIR)
@@ -253,6 +324,10 @@ if __name__ == "__main__":
     builder.snapshot(ROOT_PATH / f"StarRailAssistant_v{version}.zip")
 
     package_resources(version)
+
+    # Server 包 → R2（供 CLI init 下载）
+    server_zip = package_server(version)
+    upload_to_r2(server_zip, version)
 
     if DIST_DIR.exists():
         shutil.rmtree(DIST_DIR)

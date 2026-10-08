@@ -73,10 +73,10 @@
 [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
 
 下载说明: 
-- StarRailAssistant_vX.X.X.zip - 主程序包（推荐）
-- StarRailAssistant_vX.X.X_Setup.exe - 主程序安装包（推荐）
-- StarRailAssistant_Core*.zip - 核心包（需要手动配置）
-- StarRailAssistant_Lite*.zip - 轻量版（需要手动安装和配置 Python 环境）
+- [StarRailAssistant_v${VERSION}.zip](https://github.com/StarRailAssistant/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_v${VERSION}.zip) - 主程序包（推荐）
+- [StarRailAssistant_v${VERSION}_Setup.exe](https://github.com/StarRailAssistant/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_v${VERSION}_Setup.exe) - 主程序安装包（推荐）
+- [StarRailAssistant_Core_${VERSION}.zip](https://github.com/StarRailAssistant/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_Core_${VERSION}.zip) - 核心包（需要手动配置）
+- [StarRailAssistant_Lite_${VERSION}.zip](https://github.com/StarRailAssistant/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_Lite_${VERSION}.zip) - 轻量版（需要手动安装和配置 Python 环境）
 
 需要安装 [.NET 桌面运行时 10.0](https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0) 才能运行
 如果你需要使用SRA-server（提供HTTP接口、MCP服务器和WebUI），你必须安装`ASP.NET Core 运行时 10.0`。或`.NET SDK 10.0`。
