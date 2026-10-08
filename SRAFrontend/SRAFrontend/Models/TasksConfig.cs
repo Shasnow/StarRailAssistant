@@ -272,6 +272,9 @@ public partial class MissionAccomplishedConfig : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("exitGame")] [property: Description("完成任务后是否退出游戏")]
     private bool _isExitGame;
 
+    [ObservableProperty] [property: JsonPropertyName("logoff")] [property: Description("完成任务后是否注销当前用户")]
+    private bool _isLogoff;
+
     [ObservableProperty] [property: JsonPropertyName("logout")] [property: Description("完成任务后是否登出账号")]
     private bool _isLogout;
 

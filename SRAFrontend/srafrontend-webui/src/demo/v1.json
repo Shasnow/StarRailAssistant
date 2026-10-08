@@ -1971,6 +1971,10 @@
             "type": "boolean",
             "description": "完成任务后是否退出游戏"
           },
+          "logoff": {
+            "type": "boolean",
+            "description": "完成任务后是否注销当前用户"
+          },
           "logout": {
             "type": "boolean",
             "description": "完成任务后是否登出账号"

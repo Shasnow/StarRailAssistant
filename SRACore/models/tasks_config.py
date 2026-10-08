@@ -222,6 +222,7 @@ class MissionAccomplishedConfig:
     isEnabled: bool = False
     isExitApp: bool = False
     isExitGame: bool = False
+    isLogoff: bool = False
     isLogout: bool = False
     isShutdown: bool = False
     isSleep: bool = False
@@ -232,6 +233,7 @@ class MissionAccomplishedConfig:
             "enabled": self.isEnabled,
             "exitApp": self.isExitApp,
             "exitGame": self.isExitGame,
+            "logoff": self.isLogoff,
             "logout": self.isLogout,
             "shutdown": self.isShutdown,
             "sleep": self.isSleep
@@ -244,6 +246,7 @@ class MissionAccomplishedConfig:
             "isEnabled": data.get("enabled", False),
             "isExitApp": data.get("exitApp", False),
             "isExitGame": data.get("exitGame", False),
+            "isLogoff": data.get("logoff", False),
             "isLogout": data.get("logout", False),
             "isShutdown": data.get("shutdown", False),
             "isSleep": data.get("sleep", False)

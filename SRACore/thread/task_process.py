@@ -170,11 +170,15 @@ class TaskManager(Runner):
                 break  # 所有配置执行完毕，退出重试循环
 
         logger.info("All tasks completed.")
+        try:
+            screenshot = last_operator.screenshot() if last_operator else None
+        except Exception:
+            screenshot = None
         try_send_notification(
             self.settings_service.settings.Notification,
             Resource.task_notificationTitle,
             Resource.task_notificationMessage,
-            image=last_operator.screenshot() if last_operator else None
+            image=screenshot
         )
         return True
 

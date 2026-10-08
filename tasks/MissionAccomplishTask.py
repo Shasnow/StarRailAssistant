@@ -7,7 +7,7 @@ from SRACore.util.logger import logger
 from tasks.img import IMG, MAIMG
 
 
-@task(order=4)
+@task(order=4)  # pyright: ignore[reportCallIssue]
 class MissionAccomplishTask(BaseTask):
     """任务完成任务"""
     def run(self):
@@ -19,6 +19,8 @@ class MissionAccomplishTask(BaseTask):
             self.shutdown()
         elif self.config.MissionAccomplished.isSleep:
             self.sleep()
+        elif self.config.MissionAccomplished.isLogoff:
+            self.logoff()
         elif self.config.MissionAccomplished.isExitApp:
             self.exit_app()
         return True
@@ -77,4 +79,14 @@ class MissionAccomplishTask(BaseTask):
         except Exception as e:
             logger.debug(e)
             logger.error(SRAError(ErrorCode.SYSTEM_SHUTDOWN_FAILED, "休眠失败", str(e)))
+            return False
+
+    def logoff(self):
+        logger.info("正在注销当前用户...")
+        try:
+            sys_util.logoff(time=10)
+            return True
+        except Exception as e:
+            logger.debug(e)
+            logger.error(SRAError(ErrorCode.SYSTEM_SHUTDOWN_FAILED, "注销失败", str(e)))
             return False

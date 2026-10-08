@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -26,6 +26,7 @@
                     <CheckBox IsChecked="{Binding MissionAccomplishedConfig.IsExitApp}" Content="关闭程序" />
                     <RadioButton IsChecked="{Binding MissionAccomplishedConfig.IsShutdown}" Content="关机" />
                     <RadioButton IsChecked="{Binding MissionAccomplishedConfig.IsSleep}" Content="休眠" />
+                    <RadioButton IsChecked="{Binding MissionAccomplishedConfig.IsLogoff}" Content="注销当前用户" />
                     <RadioButton Content="无动作" />
                 </StackPanel>
             </ScrollViewer>

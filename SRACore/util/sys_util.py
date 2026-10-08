@@ -90,6 +90,23 @@ def shutdown_cancel():
         Popen("shutdown -c", shell=True)
 
 
+def logoff(time: int = 10):
+    """注销当前用户
+
+    Args:
+        time (int): 延迟注销时间，单位秒
+    """
+    if time < 0:
+        time = 0
+    if sys.platform == "win32":
+        # shutdown /l 不支持 /t 延时，用 ping 模拟延迟再注销，为完成通知留出发送时间
+        Popen(f"ping -n {time + 1} 127.0.0.1 > nul & shutdown /l /f", shell=True)
+    elif sys.platform == "linux":
+        Popen(f"sleep {time}; loginctl terminate-user $(id -un)", shell=True)
+    else:
+        Popen(f"osascript -e 'delay {time}' -e 'tell application \"System Events\" to log out'", shell=True)
+
+
 def sleep_system():
     """将系统置于睡眠状态"""
     if sys.platform == "win32":
