@@ -65,4 +65,4 @@ SRACore = [
 ]
 
 [tool.setuptools.dynamic]
-version = {attr = "SRACore.util.const:VERSION"}
+version = {attr = "SRACore.util.const.VERSION"}

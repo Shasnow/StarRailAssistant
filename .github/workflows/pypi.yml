@@ -44,11 +44,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Update version in pyproject.toml
+      - name: Update version in SRACore/util/const.py
         run: |
-          sed -i 's/^version = .*/version = "${{ steps.version.outputs.version }}"/' pyproject.toml
-          echo "Updated pyproject.toml:"
-          grep '^version' pyproject.toml
+          sed -i 's/^VERSION = "[^"]*"/VERSION = "${{ steps.version.outputs.version }}"/' SRACore/util/const.py
+          echo "Updated SRACore/util/const.py:"
+          grep '^VERSION' SRACore/util/const.py
 
       - name: Build release distributions
         run: |
