@@ -11,7 +11,6 @@ from rich.text import Text
 
 from SRACore.extension import ExtensionConfigManager, ExtensionRunner, load_extensions
 from SRACore.localization import Resource
-from SRACore.models.app_settings import AppSettings
 from SRACore.operators.factory import OperatorFactory, OperatorType
 from SRACore.runtime.event_listener import KeyboardListener
 from SRACore.service.setting_service import SettingsService
@@ -675,21 +674,13 @@ class SRACli(cmd2.Cmd):
 
         # 创建设置文件
         AppDataDir.mkdir(parents=True, exist_ok=True)
-        settings_path = SettingsJson
-        if not settings_path.exists():
-            settings = AppSettings.from_dict({
-                "Advanced": {
-                    "isDeveloperModeEnabled": True,
-                    "isCustomBackendEnabled": True,
-                    "customBackendCommand": "sra-cli",
-                    "customBackendParams": "",
-                    "customBackendWorkDir": cwd,
-                }})
-            with open(settings_path, "w", encoding="utf-8") as f:
-                json.dump(settings.to_dict(), f, indent=2, ensure_ascii=False)
-            self.ok(f"Created settings file: {settings_path}")
-        else:
-            self.ok(f"Settings file already exists: {settings_path}")
+        self.settings_service.settings.Advanced.isDeveloperModeEnabled = True
+        self.settings_service.settings.Advanced.isCustomBackendEnabled = True
+        self.settings_service.settings.Advanced.customBackendCommand = "sra-cli"
+        self.settings_service.settings.Advanced.customBackendArguments = ""
+        self.settings_service.settings.Advanced.customBackendWorkingDirectory = cwd
+        self.settings_service.save_settings()
+        self.ok(f"Created/Updated settings file: {SettingsJson}")
 
         # 创建默认配置文件
         ConfigsDir.mkdir(parents=True, exist_ok=True)
@@ -702,7 +693,7 @@ class SRACli(cmd2.Cmd):
         else:
             self.ok(f"Default config already exists: {config_path}")
 
-        self.ok("Initialization completed. Please restart the application or run `sra-server` to start the server.")
+        self.ok("Initialization completed. Please restart the application or run `./SRA-server` to start the server.")
         return True
 
     def do_version(self, _: str):

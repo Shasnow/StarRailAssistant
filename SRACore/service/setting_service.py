@@ -26,3 +26,8 @@ class SettingsService:
     def load_settings(self) -> AppSettings:
         with open(self.path, 'r') as f:
             return AppSettings.from_dict(json.load(f))
+
+    def save_settings(self):
+        with open(self.path, 'w') as f:
+            json.dump(self.settings.to_dict(), f, indent=2)
+            self.st_mtime = self.path.stat().st_mtime

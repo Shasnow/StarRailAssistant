@@ -156,17 +156,26 @@ def serve_parser() -> argparse.ArgumentParser:
         description='Start the SRA server',
     )
     parser.add_argument(
+        '--host',
+        action='store_true',
+        help='Expose the server to the public network',
+    )
+    parser.add_argument(
         '--port',
         type=int,
-        default=8080,
+        default=5000,
         help='The port to use',
     )
     return parser
 
 def serve(args: argparse.Namespace) -> bool:
     """启动服务器"""
-    executable = "SRA-server.exe" if sys.platform == 'win32' else "SRA-server"
-    subprocess.run([executable, f"--port={args.port}"])
+    executable = "./SRA-server.exe" if sys.platform == 'win32' else "./SRA-server"
+    if args.host:
+        urls = f'http://0.0.0.0:{args.port}'
+    else:
+        urls = f'http://localhost:{args.port}'
+    subprocess.run([executable, f"--urls '{urls}'"], cwd=os.getcwd())
     return True
 
 
