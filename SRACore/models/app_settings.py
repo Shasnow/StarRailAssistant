@@ -368,10 +368,11 @@ class AdvancedSettings:
     remoteBaseUrl: str = "http://localhost:5000"
     isDebugOverlayEnabled: bool = False
     isDeveloperModeEnabled: bool = False
-    isPythonEnabled: bool = False
+    isCustomBackendEnabled: bool = False
+    customBackendCommand: str = ""
+    customBackendArguments: str = ""
+    customBackendWorkingDirectory: str = ""
     isSaveOcrImage: bool = False
-    pythonMain: str = ""
-    pythonPath: str = ""
 
     def to_dict(self) -> dict:
         """转换为字典"""
@@ -381,10 +382,11 @@ class AdvancedSettings:
             "backend.remote.baseUrl": self.remoteBaseUrl,
             "developerMode.overlay": self.isDebugOverlayEnabled,
             "developerMode.enabled": self.isDeveloperModeEnabled,
-            "developerMode.python.enabled": self.isPythonEnabled,
-            "developerMode.saveOcrImage": self.isSaveOcrImage,
-            "developerMode.python.main": self.pythonMain,
-            "developerMode.python.path": self.pythonPath
+            "developerMode.customBackend.enabled": self.isCustomBackendEnabled,
+            "developerMode.customBackend.command": self.customBackendCommand,
+            "developerMode.customBackend.arguments": self.customBackendArguments,
+            "developerMode.customBackend.workingDirectory": self.customBackendWorkingDirectory,
+            "developerMode.saveOcrImage": self.isSaveOcrImage
         }
 
     @classmethod
@@ -396,10 +398,11 @@ class AdvancedSettings:
             "remoteBaseUrl": data.get("backend.remote.baseUrl", "http://localhost:5000"),
             "isDebugOverlayEnabled": data.get("developerMode.overlay", False),
             "isDeveloperModeEnabled": data.get("developerMode.enabled", False),
-            "isPythonEnabled": data.get("developerMode.python.enabled", False),
-            "isSaveOcrImage": data.get("developerMode.saveOcrImage", False),
-            "pythonMain": data.get("developerMode.python.main", ""),
-            "pythonPath": data.get("developerMode.python.path", "")
+            "isCustomBackendEnabled": data.get("developerMode.customBackend.enabled", False),
+            "customBackendCommand": data.get("developerMode.customBackend.command", ""),
+            "customBackendArguments": data.get("developerMode.customBackend.arguments", ""),
+            "customBackendWorkingDirectory": data.get("developerMode.customBackend.workingDirectory", ""),
+            "isSaveOcrImage": data.get("developerMode.saveOcrImage", False)
         })
 
 @dataclass

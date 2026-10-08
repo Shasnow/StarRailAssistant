@@ -544,22 +544,27 @@ public partial class AdvancedSettings : ObservableObject
     private bool _isDeveloperModeEnabled;
 
     [ObservableProperty]
-    [property: JsonPropertyName("developerMode.python.enabled")]
-    [property: Description("是否启用 Python 后端")]
-    private bool _isPythonEnabled;
+    [property: JsonPropertyName("developerMode.customBackend.enabled")]
+    [property: Description("是否启用自定义后端")]
+    private bool _isCustomBackendEnabled;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("developerMode.customBackend.command")]
+    [property: Description("自定义后端命令/可执行文件，如 python、sra-cli、uv 或可执行文件路径")]
+    private string _customBackendCommand = "";
+
+    [ObservableProperty]
+    [property: JsonPropertyName("developerMode.customBackend.arguments")]
+    [property: Description("自定义后端启动参数，如 main.py、-m SRACore")]
+    private string _customBackendArguments = "";
+
+    [ObservableProperty]
+    [property: JsonPropertyName("developerMode.customBackend.workingDirectory")]
+    [property: Description("自定义后端工作目录，留空时使用程序当前目录")]
+    private string _customBackendWorkingDirectory = "";
 
     [ObservableProperty]
     [property: JsonPropertyName("developerMode.saveOcrImage")]
     [property: Description("是否保存 OCR 截图以便调试")]
     private bool _isSaveOcrImage;
-
-    [ObservableProperty]
-    [property: JsonPropertyName("developerMode.python.main")]
-    [property: Description("Python 后端主脚本路径，通常为 main.py")]
-    private string _pythonMain = "";
-
-    [ObservableProperty]
-    [property: JsonPropertyName("developerMode.python.path")]
-    [property: Description("Python 解释器路径，通常为 python.exe 的路径")]
-    private string _pythonPath = "";
 }

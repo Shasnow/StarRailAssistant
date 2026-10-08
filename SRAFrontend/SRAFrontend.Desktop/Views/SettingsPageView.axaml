@@ -931,26 +931,39 @@
                                             <Grid ColumnDefinitions="Auto, *, Auto">
                                                 <Label Classes="Icon">&#xE47E;</Label>
                                                 <Label Grid.Column="1"
-                                                       Content="{x:Static lang:Resources.UsingPythonText}" />
+                                                       Content="{x:Static lang:Resources.CustomBackendText}" />
                                                 <ToggleSwitch Grid.Column="2"
-                                                              IsChecked="{Binding AdvancedSettings.IsPythonEnabled}" />
+                                                              IsChecked="{Binding AdvancedSettings.IsCustomBackendEnabled}" />
                                             </Grid>
-                                            <Grid ColumnDefinitions="Auto, *, Auto">
-                                                <Label Classes="Icon">&#xE1C2;</Label>
-                                                <Label Grid.Column="1"
-                                                       Content="{x:Static lang:Resources.PythonInterpreterText}" />
+                                            <Grid ColumnDefinitions="Auto, *, Auto"
+                                                  IsVisible="{Binding AdvancedSettings.IsCustomBackendEnabled}"
+                                                  ToolTip.Tip="python、sra-cli 或可执行文件路径">
+                                                <Label Classes="Icon">&#xE768;</Label>
+                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.BackendCommandText}" />
                                                 <TextBox Grid.Column="2"
                                                          MinWidth="300"
-                                                         PlaceholderText="/path/to/your/python.exe"
-                                                         Text="{Binding AdvancedSettings.PythonPath}" />
+                                                         PlaceholderText="python"
+                                                         Text="{Binding AdvancedSettings.CustomBackendCommand}" />
                                             </Grid>
-                                            <Grid ColumnDefinitions="Auto, *, Auto">
-                                                <Label Classes="Icon">&#xEB2C;</Label>
-                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.MainPyText}" />
+                                            <Grid ColumnDefinitions="Auto, *, Auto"
+                                                  IsVisible="{Binding AdvancedSettings.IsCustomBackendEnabled}"
+                                                  ToolTip.Tip="如 main.py、-m SRACore，留空表示无参数">
+                                                <Label Classes="Icon">&#xE756;</Label>
+                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.BackendArgumentsText}" />
                                                 <TextBox Grid.Column="2"
                                                          MinWidth="300"
-                                                         PlaceholderText="/path/to/your/main.py"
-                                                         Text="{Binding AdvancedSettings.PythonMain}" />
+                                                         PlaceholderText="main.py"
+                                                         Text="{Binding AdvancedSettings.CustomBackendArguments}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto, *, Auto"
+                                                  IsVisible="{Binding AdvancedSettings.IsCustomBackendEnabled}"
+                                                  ToolTip.Tip="如 /path/to/working/dir，留空表示使用当前目录">
+                                                <Label Classes="Icon">&#xE24A;</Label>
+                                                <Label Grid.Column="1" Content="{x:Static lang:Resources.BackendWorkingDirectoryText}" />
+                                                <TextBox Grid.Column="2"
+                                                         MinWidth="300"
+                                                         PlaceholderText="/path/to/working/dir"
+                                                         Text="{Binding AdvancedSettings.CustomBackendWorkingDirectory}" />
                                             </Grid>
                                         </StackPanel>
                                     </Expander>

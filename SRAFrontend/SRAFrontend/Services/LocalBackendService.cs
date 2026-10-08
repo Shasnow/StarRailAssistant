@@ -97,7 +97,10 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
     public void StartBackend(string arguments)
     {
         if (_backendProcess is not null) return;
-        if (!File.Exists(FileName))
+        // 含目录分隔符时视为显式路径，直接校验存在性；
+        // 否则视为 PATH 命令（如 sra-cli、uv），交由系统在启动时解析
+        var isExplicitPath = FileName.IndexOfAny(['/', '\\']) >= 0;
+        if (isExplicitPath && !File.Exists(FileName))
         {
             logger.LogError("Backend executable not found: {FileName}", FileName);
             Outputted?.Invoke($"启动失败: 未找到后端可执行文件（路径: {FileName}）");

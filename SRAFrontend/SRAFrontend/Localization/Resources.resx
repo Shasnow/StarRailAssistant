@@ -280,14 +280,20 @@
     <data name="SaveOcrImageText" xml:space="preserve">
         <value>Save OCR Image</value>
     </data>
-    <data name="UsingPythonText" xml:space="preserve">
-        <value>Use Python to run the backend</value>
+    <data name="CustomBackendText" xml:space="preserve">
+        <value>Use a custom backend</value>
     </data>
-    <data name="PythonInterpreterText" xml:space="preserve">
-        <value>Python Interpreter</value>
+    <data name="BackendCommandText" xml:space="preserve">
+        <value>Command / Executable</value>
     </data>
-    <data name="MainPyText" xml:space="preserve">
-        <value>The Path to main.py</value>
+    <data name="BackendArgumentsText" xml:space="preserve">
+        <value>Launch Arguments</value>
+    </data>
+    <data name="BackendWorkingDirectoryText" xml:space="preserve">
+        <value>Working Directory</value>
+    </data>
+    <data name="BackendWorkingDirectoryHintText" xml:space="preserve">
+        <value>Leave empty to use the application directory</value>
     </data>
     <data name="CloudGameText" xml:space="preserve">
         <value>Use StarRail Cloud Game (Experimental)</value>

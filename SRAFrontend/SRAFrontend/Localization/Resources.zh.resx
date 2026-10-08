@@ -276,14 +276,20 @@
     <data name="SaveOcrImageText" xml:space="preserve">
         <value>保存OCR截图</value>
     </data>
-    <data name="UsingPythonText" xml:space="preserve">
-        <value>使用Python从源代码运行后端</value>
+    <data name="CustomBackendText" xml:space="preserve">
+        <value>启用自定义后端</value>
     </data>
-    <data name="PythonInterpreterText" xml:space="preserve">
-        <value>Python 解释器</value>
+    <data name="BackendCommandText" xml:space="preserve">
+        <value>命令 / 可执行文件</value>
     </data>
-    <data name="MainPyText" xml:space="preserve">
-        <value>主程序路径</value>
+    <data name="BackendArgumentsText" xml:space="preserve">
+        <value>启动参数</value>
+    </data>
+    <data name="BackendWorkingDirectoryText" xml:space="preserve">
+        <value>工作目录</value>
+    </data>
+    <data name="BackendWorkingDirectoryHintText" xml:space="preserve">
+        <value>留空则使用程序当前目录</value>
     </data>
     <data name="CloudGameText" xml:space="preserve">
         <value>使用云·星穹铁道（实验性）</value>

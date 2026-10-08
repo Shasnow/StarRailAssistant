@@ -624,7 +624,7 @@ class SRACli(cmd2.Cmd):
         from SRACore.models.tasks_config import TasksConfig
         from SRACore.util.const import AppDataDir, ConfigsDir
 
-        url = f"https://github.com/Shasnow/StarRailAssistant/releases/download/v{VERSION}/StarRailAssistant_Resources_v{VERSION}.zip"
+        url = f"https://github.com/Shasnow/StarRailAssistant/releases/download/v{VERSION}/StarRailAssistant_Lite_v{VERSION}.zip"
         # url = f"https://download.auto-mas.top/d/StarRailAssistant/StarRailAssistant_Resource_v{VERSION}.zip"
         self.ok(f"Downloading resources from {url} ...")
         try:
@@ -645,7 +645,14 @@ class SRACli(cmd2.Cmd):
         AppDataDir.mkdir(parents=True, exist_ok=True)
         settings_path = SettingsJson
         if not settings_path.exists():
-            settings = AppSettings.from_dict({})
+            settings = AppSettings.from_dict({
+                "Advanced": {
+                    "isDeveloperModeEnabled": True,
+                    "isCustomBackendEnabled": True,
+                    "customBackendCommand": "sra-cli",
+                    "customBackendParams": "",
+                    "customBackendWorkDir": cwd,
+                }})
             with open(settings_path, "w", encoding="utf-8") as f:
                 json.dump(settings.to_dict(), f, indent=2, ensure_ascii=False)
             self.ok(f"Created settings file: {settings_path}")

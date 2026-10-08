@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using SRAFrontend.Data;
 using SRAFrontend.Models;
 
 namespace SRAFrontend.Services;
@@ -21,14 +20,14 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         // 按需解析 RemoteBackendService（Server 端未注册时返回 null）
         _remoteBackendService = serviceProvider.GetService<RemoteBackendService>();
 
-        // 初始化 Python 后端配置
-        ApplyPythonSettings();
+        // 初始化自定义后端配置
+        ApplyBackendSettings();
         // 初始化远程后端配置
         ApplyRemoteSettings();
 
         var adv = settingsService.Settings.Advanced;
         var isUsingPython = Environment.GetCommandLineArgs().Contains("--use-python") ||
-                            adv is { IsDeveloperModeEnabled: true, IsPythonEnabled: true };
+                            adv is { IsDeveloperModeEnabled: true, IsCustomBackendEnabled: true };
         var isUsingRemote = adv.IsRemoteEnabled && _remoteBackendService is not null;
 
         if (isUsingRemote)
@@ -173,19 +172,21 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         return _currentBackend.OperatorCallAsync(method, parameters);
     }
 
-    private void ApplyPythonSettings()
+    private void ApplyBackendSettings()
     {
-        var pythonPath = settingsService.Settings.Advanced.PythonPath;
-        var mainPy = settingsService.Settings.Advanced.PythonMain;
+        var adv = settingsService.Settings.Advanced;
 
-        if (!string.IsNullOrWhiteSpace(pythonPath))
-            pyBackendService.FileName = pythonPath;
+        // 命令/可执行文件：支持引号包裹的路径
+        var command = adv.CustomBackendCommand.Trim().Trim('"');
+        var arguments = adv.CustomBackendArguments.Trim();
 
-        if (!string.IsNullOrWhiteSpace(mainPy))
-        {
-            pyBackendService.MainArgument = mainPy;
-            pyBackendService.WorkingDirectory = Path.GetDirectoryName(mainPy) ?? Environment.CurrentDirectory;
-        }
+        // 留空时回退到内置 python 运行 main.py（保持原默认行为）
+        pyBackendService.FileName = command.Length == 0 ? DataPath.PythonExe : command;
+        pyBackendService.MainArgument = command.Length == 0 && arguments.Length == 0 ? "main.py" : arguments;
+
+        pyBackendService.WorkingDirectory = string.IsNullOrWhiteSpace(adv.CustomBackendWorkingDirectory)
+            ? Environment.CurrentDirectory
+            : adv.CustomBackendWorkingDirectory;
     }
 
     private void ApplyRemoteSettings()
@@ -203,22 +204,23 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
             var useRemote = settingsService.Settings.Advanced.IsRemoteEnabled;
             IBackendService target = useRemote
                 ? _remoteBackendService
-                : settingsService.Settings.Advanced.IsPythonEnabled ? pyBackendService : cliBackendService;
+                : settingsService.Settings.Advanced.IsCustomBackendEnabled ? pyBackendService : cliBackendService;
             SetCurrentBackend(target);
         }
 
-        if (e.PropertyName == nameof(AdvancedSettings.IsPythonEnabled))
+        if (e.PropertyName == nameof(AdvancedSettings.IsCustomBackendEnabled))
         {
-            var usePython = settingsService.Settings.Advanced.IsPythonEnabled;
+            var useCustomBackend = settingsService.Settings.Advanced.IsCustomBackendEnabled;
             if (!settingsService.Settings.Advanced.IsRemoteEnabled)
             {
-                IBackendService target = usePython ? pyBackendService : cliBackendService;
+                IBackendService target = useCustomBackend ? pyBackendService : cliBackendService;
                 SetCurrentBackend(target);
             }
         }
 
-        if (e.PropertyName is nameof(AdvancedSettings.PythonPath) or nameof(AdvancedSettings.PythonMain))
-            ApplyPythonSettings();
+        if (e.PropertyName is nameof(AdvancedSettings.CustomBackendCommand) or nameof(AdvancedSettings.CustomBackendArguments)
+            or nameof(AdvancedSettings.CustomBackendWorkingDirectory))
+            ApplyBackendSettings();
 
         if (e.PropertyName == nameof(AdvancedSettings.RemoteBaseUrl))
             ApplyRemoteSettings();
