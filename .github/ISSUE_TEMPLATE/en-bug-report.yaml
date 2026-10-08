@@ -85,7 +85,7 @@ body:
       label: SRA Version Where the Bug Occurs
       placeholder: "Example: 1.1.1"
     validations:
-      required: true
+      required: false
 
   - type: input
     id: last_good_version
@@ -103,7 +103,7 @@ body:
       placeholder: |
         Example: Windows 11 Pro 23H2; CPU: i7-12700K; Memory: 32GB; GPU: RTX 3060
     validations:
-      required: true
+      required: false
 
   - type: input
     id: resolution
@@ -111,7 +111,7 @@ body:
       label: Resolution and Display Mode
       placeholder: "Example: 1920x1080, windowed / exclusive fullscreen / borderless fullscreen"
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: others

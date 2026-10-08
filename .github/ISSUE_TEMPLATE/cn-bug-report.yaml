@@ -66,7 +66,7 @@ body:
     id: logs
     attributes:
       label: 日志和截图
-      description: 点击导出日志并上传，同时附上关键截图
+      description: 请在SRA**控制台**页面点击**导出日志**并上传，同时附上关键截图
       placeholder: 请在提交前确认日志已导出并上传
     validations:
       required: true
@@ -85,7 +85,7 @@ body:
       label: SRA 出现 bug 的版本
       placeholder: 例如 1.1.1
     validations:
-      required: true
+      required: false
 
   - type: input
     id: last_good_version
@@ -103,7 +103,7 @@ body:
       placeholder: >
         例如 Windows 11 Pro 23H2；CPU: i7-12700K；内存: 32GB；显卡: RTX 3060
     validations:
-      required: true
+      required: false
 
   - type: input
     id: resolution
@@ -111,7 +111,7 @@ body:
       label: 分辨率选择
       placeholder: 例如 1920x1080，窗口化 / 全屏独占 / 全屏无边框
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: others
