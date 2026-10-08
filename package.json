@@ -5,7 +5,7 @@
     "dev": "python main.py",
     "dev:frontend": "cd SRAFrontend/SRAFrontend.Desktop && dotnet run",
     "build": "dotnet publish -c Release -r win-x64 SRAFrontend/SRAFrontend.sln && python scripts/package.py",
-    "install": "pip install -r requirements.txt",
+    "install": "pip install \".[full]\"",
     "frontend": "dotnet run --project SRAFrontend/SRAFrontend.Desktop/SRAFrontend.Desktop.csproj",
     "pyl10nc": "python scripts/pyl10nc/__main__.py SRACore/localization/resource.toml",
     "ver": "python scripts/update_version.py",

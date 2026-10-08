@@ -3,9 +3,16 @@ import threading
 import time
 from threading import Lock
 from typing import Any, Callable
+import typing
 
 from loguru import logger
-import pynput
+if typing.TYPE_CHECKING:
+    import pynput
+try:
+    raise ImportError("pynput 库未安装")
+    import pynput
+except ImportError:
+    logger.warning("pynput 库未安装，无法启动事件监听器")
 
 
 @dataclasses.dataclass
@@ -64,14 +71,14 @@ class KeyboardListener:
         """监听器核心循环（内部方法，不直接调用）"""
 
         # 映射pynput的按键名称到字符串（适配原keyboard库的命名习惯）
-        def _key_to_str(key: pynput.keyboard.Key | pynput.keyboard.KeyCode | None) -> str | None:
+        def _key_to_str(key: 'pynput.keyboard.Key | pynput.keyboard.KeyCode | None') -> str | None:
             try:
                 return key.char  # type: ignore # 普通按键（a、1、空格等）
             except AttributeError:
                 return str(key).split('.')[-1]  # 特殊按键（enter、ctrl等）
 
         # 监听按键按下事件
-        def on_press(key: pynput.keyboard.Key | pynput.keyboard.KeyCode | None) -> None:
+        def on_press(key: 'pynput.keyboard.Key | pynput.keyboard.KeyCode | None') -> None:
             if self.exit_event.is_set():
                 return  # 退出监听
             key_str = _key_to_str(key)
@@ -93,7 +100,7 @@ class KeyboardListener:
             ).start()
 
         # 监听按键释放事件（重置防抖标记）
-        def on_release(key: pynput.keyboard.Key | pynput.keyboard.KeyCode | None) -> None:
+        def on_release(key: 'pynput.keyboard.Key | pynput.keyboard.KeyCode | None') -> None:
             if self.exit_event.is_set():
                 return
             key_str = _key_to_str(key)
@@ -105,6 +112,11 @@ class KeyboardListener:
                     event.is_triggered = False
 
         # 启动pynput监听（阻塞式，直到exit_event被设置）
+        try:
+            import pynput
+        except ImportError:
+            return
+                
         with pynput.keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
             while not self.exit_event.is_set():
                 if not listener.is_alive():

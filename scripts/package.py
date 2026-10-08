@@ -39,6 +39,8 @@ ROOT_PATH = Path(__file__).resolve().parent.parent
 DOTNET_EXE = os.environ.get("DOTNET_EXE", "dotnet")
 DESKTOP_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Desktop" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
 SERVER_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
+SERVER_LINUX_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "bin" / "Release" / "net10.0" / "linux-x64" / "publish"
+
 DIST_DIR = ROOT_PATH / "main.dist"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
@@ -155,7 +157,6 @@ def copy_core_resources(dist: Path):
     dist.mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT_PATH / "LICENSE", dist / "LICENSE")
     shutil.copy2(ROOT_PATH / "README.md", dist / "README.md")
-    # shutil.copy2(ROOT_PATH / "requirements.txt", dist / "requirements.txt")
     # shutil.copy2(ROOT_PATH / "main.py", dist / "main.py")
     # shutil.copytree(ROOT_PATH / "SRACore", dist / "SRACore")
     (DIST_DIR / "SRACore" / "localization").mkdir(parents=True, exist_ok=True)
@@ -193,7 +194,8 @@ def package_lite(version: str):
         builder.add(file)
     for item in ["SRACore", "tasks", "extensions", "resources"]:
         builder.add(ROOT_PATH / item)
-    for file in ["main.py", "README.md", "LICENSE", "requirements.txt"]:
+    # pyproject.toml 随包分发：用户在解压目录执行 pip install ".[full]" 安装依赖
+    for file in ["main.py", "README.md", "LICENSE", "pyproject.toml"]:
         builder.add(ROOT_PATH / file)
     builder.snapshot(lite_zip_path)
 
@@ -203,6 +205,7 @@ def publish_dotnet_projects():
     commands = [
         [DOTNET_EXE, "publish", "-c", "Release", "-r", "win-x64", "SRAFrontend\\SRAFrontend.Desktop\\SRAFrontend.Desktop.csproj"],
         [DOTNET_EXE, "publish", "-c", "Release", "-r", "win-x64", "SRAFrontend\\SRAFrontend.Server\\SRAFrontend.Server.csproj"],
+        [DOTNET_EXE, "publish", "-c", "Release", "-r", "linux-x64", "SRAFrontend\\SRAFrontend.Server\\SRAFrontend.Server.csproj"],
     ]
     for cmd in commands:
         result = subprocess.run(cmd, cwd=ROOT_PATH)
@@ -235,8 +238,13 @@ def package_server(version: str) -> Path:
         print("        Run `dotnet publish -c Release -r win-x64 .\\SRAFrontend\\SRAFrontend.sln` first.")
         sys.exit(1)
     zip_path = ROOT_PATH / f"SRAFrontend_Server_v{version}.zip"
+    if not SERVER_LINUX_X64_PUBLISH_PATH.exists():
+        print(f"[ERROR] Server publish path not found: {SERVER_LINUX_X64_PUBLISH_PATH}")
+        print("        Run `dotnet publish -c Release -r linux-x64 .\\SRAFrontend\\SRAFrontend.sln` first.")
+        sys.exit(1)
     builder = ZipBuilder()
     builder.add(SERVER_WIN_X64_PUBLISH_PATH, SERVER_WIN_X64_PUBLISH_PATH)
+    builder.add(SERVER_LINUX_X64_PUBLISH_PATH, SERVER_LINUX_X64_PUBLISH_PATH)
     builder.snapshot(zip_path)
     return zip_path
 

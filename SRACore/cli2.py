@@ -1,6 +1,7 @@
 import argparse
 import dataclasses
 import json
+import sys
 import typing
 from collections.abc import Callable
 from typing import Any
@@ -640,6 +641,9 @@ class SRACli(cmd2.Cmd):
         with zipfile.ZipFile(io.BytesIO(data)) as zf:
             zf.extractall(cwd)
         self.ok(f"Resources extracted to {cwd}")
+        if sys.platform == "linux":
+            self.ok("Detected Linux platform, setting permissions for sra-server.")
+            os.chmod("./sra-server", 0o755)
 
         # 创建设置文件
         AppDataDir.mkdir(parents=True, exist_ok=True)
@@ -670,7 +674,7 @@ class SRACli(cmd2.Cmd):
         else:
             self.ok(f"Default config already exists: {config_path}")
 
-        self.ok("Initialization completed.")
+        self.ok("Initialization completed. Please restart the application or run `sra-server` to start the server.")
         return True
 
     def do_version(self, _: str):

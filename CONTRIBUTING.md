@@ -29,7 +29,7 @@
 │   └── backend/           # 🐍 后端单元测试
 ├── main.py                # 🚪 程序入口文件
 ├── rapidocr_onnxruntime/  # 👁️ OCR识别相关模型
-├── requirements.txt       # 📋 Python依赖列表
+├── pyproject.toml         # 📋 Python依赖与打包配置
 ├── resources/             # 📁 资源文件目录
 │   ├── img/               # 🖼️ 图像资源
 │   ├── test/              # 🧪 测试资源
@@ -58,14 +58,14 @@ cd StarRailAssistant
 ## 📦 安装依赖
 
 ```bash
-# 安装运行依赖
-pip install -r requirements.txt
+# 安装运行依赖（含桌面端 full 组，依赖声明单源于 pyproject.toml）
+pip install -e ".[full]"
 
 # 安装开发/测试依赖
 pip install -r requirements-dev.txt
 
 # 如果遇到安装失败，尝试使用国内镜像源
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -e ".[full]" -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 也可使用 npm 或 yarn:

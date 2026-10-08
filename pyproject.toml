@@ -21,11 +21,9 @@ classifiers = [
     "Topic :: Games/Entertainment",
 ]
 dependencies = [
-    "plyer==2.1.0",
     "opencv-python==4.13.0.92",
     "pillow==12.2.0",
     "pyscreeze==1.0.1",
-    "pynput==1.8.2",
     "psutil==7.2.2",
     "rich==15.0.0",
     "loguru==0.7.3",
@@ -34,10 +32,19 @@ dependencies = [
     "rapidocr==3.9.1",
     "onnxruntime==1.27.0",
     "pydantic==2.13.4",
+]
+
+[project.optional-dependencies]
+full = [
+    "plyer==2.1.0",
+    "pynput==1.8.2",
     "pyautogui==0.9.54; os_name == 'nt'",
     "pyperclip==1.11.0; os_name == 'nt'",
     "pywin32==311; os_name == 'nt'",
     "pygetwindow==0.0.9; os_name == 'nt'",
+]
+dev = [
+    "pytest",
 ]
 
 [project.scripts]
