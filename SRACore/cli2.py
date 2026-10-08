@@ -621,29 +621,57 @@ class SRACli(cmd2.Cmd):
         from urllib.error import URLError, HTTPError
         from urllib.request import Request, urlopen
 
+        from rich.progress import BarColumn, DownloadColumn, Progress, TextColumn, TransferSpeedColumn
+
         from SRACore.models.tasks_config import TasksConfig
         from SRACore.util.const import AppDataDir, ConfigsDir
 
-        # R2 资源站：固定文件名区分正式版/beta（版本含 "-" 视为 beta），避免 beta 覆盖正式版包
-        package_name = "SRAFrontend_Server_beta.zip" if "-" in VERSION else "SRAFrontend_Server.zip"
-        url = f"https://resource.starrailassistant.top/{package_name}"
-        self.ok(f"Downloading resources from {url} ...")
-        try:
+        def download(url: str) -> bytes:
+            """流式下载文件并显示进度条，返回完整内容。"""
             req = Request(url, headers={"User-Agent": "SRA-cli"})
             with urlopen(req) as resp:
-                data = resp.read()
-        except (URLError, HTTPError) as e:
-            self.err(f"Failed to download resources: {e}")
-            return True
+                total = int(resp.headers.get("Content-Length") or 0)
+                progress = Progress(
+                    TextColumn("{task.description}"),
+                    BarColumn(),
+                    DownloadColumn(),
+                    TransferSpeedColumn(),
+                )
+                with progress:
+                    task = progress.add_task(url.rsplit("/", 1)[-1], total=total or None)
+                    chunks: list[bytes] = []
+                    while True:
+                        chunk = resp.read(65536)
+                        if not chunk:
+                            break
+                        chunks.append(chunk)
+                        progress.advance(task, len(chunk))
+                return b"".join(chunks)
 
-        self.ok("Extracting resources ...")
+        # R2 资源站：固定文件名区分正式版/beta（版本含 "-" 视为 beta），避免 beta 覆盖正式版包
+        beta = "_beta" if "-" in VERSION else ""
+        packages = [
+            f"SRAFrontend_Server{beta}.zip",
+            f"StarRailAssistant_Resources{beta}.zip",
+        ]
+        base_url = "https://resource.starrailassistant.top"
         cwd = os.getcwd()
-        with zipfile.ZipFile(io.BytesIO(data)) as zf:
-            zf.extractall(cwd)
-        self.ok(f"Resources extracted to {cwd}")
+        for package_name in packages:
+            url = f"{base_url}/{package_name}"
+            self.ok(f"Downloading {url} ...")
+            try:
+                data = download(url)
+            except (URLError, HTTPError) as e:
+                self.err(f"Failed to download {package_name}: {e}")
+                return True
+
+            self.ok(f"Extracting {package_name} ...")
+            with zipfile.ZipFile(io.BytesIO(data)) as zf:
+                zf.extractall(cwd)
+            self.ok(f"{package_name} extracted to {cwd}")
         if sys.platform == "linux":
-            self.ok("Detected Linux platform, setting permissions for sra-server.")
-            os.chmod("./sra-server", 0o755)
+            self.ok("Detected Linux platform, setting permissions for SRA-server.")
+            os.chmod("./SRA-server", 0o755)
 
         # 创建设置文件
         AppDataDir.mkdir(parents=True, exist_ok=True)

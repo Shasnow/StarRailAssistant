@@ -149,9 +149,30 @@ def where(args: argparse.Namespace) -> bool:
         print(f'Unknown path: {args.path}, available paths: {",".join(paths.keys())}')
     return True
 
+def serve_parser() -> argparse.ArgumentParser:
+    """返回服务器解析器"""
+    parser = argparse.ArgumentParser(
+        prog=f'{os.path.basename(sys.argv[0])} serve',
+        description='Start the SRA server',
+    )
+    parser.add_argument(
+        '--port',
+        type=int,
+        default=8080,
+        help='The port to use',
+    )
+    return parser
+
+def serve(args: argparse.Namespace) -> bool:
+    """启动服务器"""
+    executable = "SRA-server.exe" if sys.platform == 'win32' else "SRA-server"
+    subprocess.run([executable, f"--port={args.port}"])
+    return True
+
 
 subcommands = {
     'where': (where_parser, where),
+    'serve': (serve_parser, serve),
 }
 
 

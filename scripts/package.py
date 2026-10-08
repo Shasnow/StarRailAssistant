@@ -44,7 +44,7 @@ SERVER_LINUX_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server"
 DIST_DIR = ROOT_PATH / "main.dist"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
-# R2 自定义域名（绑定到上传桶的公开访问基址），CLI init 从此处下载 Server 包
+# R2 自定义域名（绑定到上传桶的公开访问基址），CLI init 从此处下载 Server 包与资源包
 R2_PUBLIC_BASE_URL = "https://resource.starrailassistant.top"
 SITE_PACKAGES_DIR = None
 for p in sys.path[1:]:
@@ -215,19 +215,26 @@ def publish_dotnet_projects():
     print("[OK] .NET projects published successfully")
 
 
-def package_resources(version: str):
+def package_resources(version: str) -> Path:
     print("Packaging Resources ...")
     resources_zip = ZipBuilder()
     resources_zip.add(ROOT_PATH / "tasks")
     resources_zip.add(ROOT_PATH / "extensions")
     resources_zip.add(ROOT_PATH / "resources")
     resources_zip.add_file(ROOT_PATH / "package.json", "package.json")
-    resources_zip.snapshot(ROOT_PATH / f"StarRailAssistant_Resources_v{version}.zip")
+    zip_path = ROOT_PATH / f"StarRailAssistant_Resources_v{version}.zip"
+    resources_zip.snapshot(zip_path)
+    return zip_path
 
 
 def server_package_object_key(version: str) -> str:
     """R2 对象键：区分正式版/beta 的固定文件名，避免发布 beta 时覆盖正式版压缩包。"""
     return "SRAFrontend_Server_beta.zip" if "-" in version else "SRAFrontend_Server.zip"
+
+
+def resources_package_object_key(version: str) -> str:
+    """R2 对象键：资源包同样区分正式版/beta，规则与 Server 包一致。"""
+    return "StarRailAssistant_Resources_beta.zip" if "-" in version else "StarRailAssistant_Resources.zip"
 
 
 def package_server(version: str) -> Path:
@@ -249,8 +256,8 @@ def package_server(version: str) -> Path:
     return zip_path
 
 
-def upload_to_r2(zip_path: Path, version: str):
-    """通过 Cloudflare R2 REST API（Bearer Token + PUT 对象）上传 Server 包。
+def upload_to_r2(zip_path: Path, object_key: str):
+    """通过 Cloudflare R2 REST API（Bearer Token + PUT 对象）上传压缩包到指定对象键。
 
     文档：https://developers.cloudflare.com/api/resources/r2/
     凭据从环境变量读取：R2_ACCOUNT_ID、R2_API_TOKEN、R2_BUCKET。
@@ -266,7 +273,6 @@ def upload_to_r2(zip_path: Path, version: str):
     account_id = values["R2_ACCOUNT_ID"]
     api_token = values["R2_API_TOKEN"]
     bucket = values["R2_BUCKET"]
-    object_key = server_package_object_key(version)
 
     print(f"Uploading {zip_path.name} to r2://{bucket}/{object_key} ...")
     url = (
@@ -300,13 +306,14 @@ if __name__ == "__main__":
     version = data["version"]
 
     if args.resources_only:
-        package_resources(version)
+        resources_zip = package_resources(version)
+        upload_to_r2(resources_zip, resources_package_object_key(version))
         print(f"\nPackaging completed! Version: v{version}")
         sys.exit(0)
 
     if args.server_only:
         server_zip = package_server(version)
-        upload_to_r2(server_zip, version)
+        upload_to_r2(server_zip, server_package_object_key(version))
         print(f"\nPackaging completed! Version: v{version}")
         sys.exit(0)
 
@@ -331,11 +338,13 @@ if __name__ == "__main__":
     builder.add(SERVER_WIN_X64_PUBLISH_PATH, SERVER_WIN_X64_PUBLISH_PATH)
     builder.snapshot(ROOT_PATH / f"StarRailAssistant_v{version}.zip")
 
-    package_resources(version)
+    # 资源包 → R2（供 CLI init 下载）
+    resources_zip = package_resources(version)
+    upload_to_r2(resources_zip, resources_package_object_key(version))
 
     # Server 包 → R2（供 CLI init 下载）
     server_zip = package_server(version)
-    upload_to_r2(server_zip, version)
+    upload_to_r2(server_zip, server_package_object_key(version))
 
     if DIST_DIR.exists():
         shutil.rmtree(DIST_DIR)
