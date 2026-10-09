@@ -94,9 +94,9 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         }
     }
 
-    public void StartBackend(string arguments)
+    public bool StartBackend(string arguments)
     {
-        if (_backendProcess is not null) return;
+        if (_backendProcess is not null) return true; // 已在运行
         // 含目录分隔符时视为显式路径，直接校验存在性；
         // 否则视为 PATH 命令（如 sra-cli、uv），交由系统在启动时解析
         var isExplicitPath = FileName.IndexOfAny(['/', '\\']) >= 0;
@@ -104,7 +104,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         {
             logger.LogError("Backend executable not found: {FileName}", FileName);
             Outputted?.Invoke($"启动失败: 未找到后端可执行文件（路径: {FileName}）");
-            return;
+            return false;
         }
 
         var fullArguments = $"{MainArgument} {arguments}".Trim();
@@ -132,41 +132,45 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
             _backendProcess.BeginOutputReadLine();
             _backendProcess.BeginErrorReadLine();
             logger.LogInformation("Backend process started successfully (PID: {Pid})", _backendProcess.Id);
+            return true;
         }
         catch (Exception e)
         {
             logger.LogError(e, "Fail to start SRA: {Message}", e.Message);
             Outputted?.Invoke($"启动失败: {e.Message}");
             CleanupProcessResources();
+            return false;
         }
     }
 
-    public void StopBackend()
+    public bool StopBackend()
     {
-        if (_backendProcess == null) return;
+        if (_backendProcess == null) return false;
         try
         {
-            if (_backendProcess.HasExited) return;
+            if (_backendProcess.HasExited) return false;
             logger.LogInformation("Stopping backend (PID: {Pid})", _backendProcess.Id);
             // 优先发送停止命令，优雅退出）
             SendInput("exit");
             // 等待5秒，若未退出则强制终止
-            if (_backendProcess.WaitForExit(5000)) return;
+            if (_backendProcess.WaitForExit(5000)) return true;
             _backendProcess.Kill();
             logger.LogWarning("Terminating backend process (PID: {Pid})", _backendProcess.Id);
+            return true;
         }
         catch (Exception e)
         {
             logger.LogError(e, "Fail to stop backend process: {Message}", e.Message);
+            return false;
         }
     }
 
-    public async Task RestartBackendAsync(string arguments)
+    public async Task<bool> RestartBackendAsync(string arguments)
     {
         logger.LogInformation("Restarting backend process.");
         StopBackend();
         await Task.Delay(200);
-        StartBackend(arguments);
+        return StartBackend(arguments);
     }
 
     public Task<bool> TaskRunAsync(string? configName)

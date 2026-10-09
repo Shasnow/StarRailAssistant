@@ -81,19 +81,19 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         return _currentBackend.SendInputAndWaitObjectAsync(command);
     }
 
-    public void StartBackend(string arguments)
+    public bool StartBackend(string arguments)
     {
         if (!_initialized) Initialize();
         _lastStartArguments = arguments;
-        _currentBackend.StartBackend(arguments);
+        return _currentBackend.StartBackend(arguments);
     }
 
-    public void StopBackend()
+    public bool StopBackend()
     {
-        _currentBackend.StopBackend();
+        return _currentBackend.StopBackend();
     }
 
-    public Task RestartBackendAsync(string arguments)
+    public Task<bool> RestartBackendAsync(string arguments)
     {
         if (!_initialized) Initialize();
         _lastStartArguments = arguments;

@@ -555,7 +555,7 @@ class IOperator(ABC):
 
     @abstractmethod
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
-                    after_sleep: float = 0, tag: str = "", trace: bool = True) -> bool:
+                    after_sleep: float = 0, tag: str = "", trace: bool = True, mode: str = "auto") -> bool:
         """点击指定位置
 
         如果x和y是整数，则直接点击坐标(x, y)
@@ -568,6 +568,8 @@ class IOperator(ABC):
             after_sleep (float, optional): 点击后等待时间，单位秒。默认值为0。
             tag (str, optional): 日志标记。默认值为空字符串。
             trace (bool): 是否打印日志
+            mode (str, optional): 坐标模式。"auto"按类型推断（默认）；"abs"强制按绝对像素；
+                "rel"强制按窗口相对比例。默认值为"auto"。
         Returns:
             bool: 点击成功返回True，否则返回False
         """

@@ -307,9 +307,16 @@ class Operator(IOperator):
             return pyscreeze.screenshot(region=region.tuple)
 
     def click_point(self, x: int | float, y: int | float, x_offset: int | float = 0, y_offset: int | float = 0,
-                    after_sleep: float = 0, tag: str = "", trace: bool = True) -> bool:
+                    after_sleep: float = 0, tag: str = "", trace: bool = True, mode: str = "auto") -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("点击中断", "线程已停止")
+        # 显式模式：abs 强制按绝对像素，rel 强制按窗口相对比例（避免 JSON 整数被误判为绝对坐标）
+        if mode == "abs":
+            x, y = int(x), int(y)
+        elif mode == "rel":
+            x, y = float(x), float(y)
+        elif mode != "auto":
+            raise ValueError(f"Invalid mode: {mode!r}, expected 'abs', 'rel' or 'auto'")
         if isinstance(x_offset, float) and isinstance(y_offset, float):
             x_offset = int(self.window_context.width * x_offset)
             y_offset = int(self.window_context.height * y_offset)

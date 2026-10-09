@@ -47,30 +47,32 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         throw new NotImplementedException();
     }
 
-    public void StartBackend(string arguments)
+    public bool StartBackend(string arguments)
     {
-        if (_sseCts is not null) return;
+        if (_sseCts is not null) return true;
 
         _sseCts = new CancellationTokenSource();
         _ = ConnectAndRunAsync(_sseCts.Token);
         logger.LogInformation("Connecting to remote server at {BaseUrl}", BaseUrl);
+        return true;
     }
 
-    public void StopBackend()
+    public bool StopBackend()
     {
-        if (_sseCts is null) return;
+        if (_sseCts is null) return false;
         _sseCts.Cancel();
         _sseCts.Dispose();
         _sseCts = null;
         IsTaskRunning = false;
         logger.LogInformation("Disconnected from remote server");
+        return true;
     }
 
-    public async Task RestartBackendAsync(string arguments)
+    public async Task<bool> RestartBackendAsync(string arguments)
     {
         StopBackend();
         await Task.Delay(200);
-        StartBackend(arguments);
+        return StartBackend(arguments);
     }
 
     public async Task<bool> TaskRunAsync(string? configName)

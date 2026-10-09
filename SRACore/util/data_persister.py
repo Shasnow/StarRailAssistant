@@ -38,7 +38,7 @@ def load_config(name: str) -> TasksConfig | None:
             path = name.replace('\"', '')
         else:
             path = ConfigsDir / f'{name}.json'
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf-8-sig') as f:
             data = json.load(f)
         data = _migrate_legacy_rewards(data)
         return TasksConfig.from_dict(data)
@@ -63,7 +63,7 @@ def load_data(typ: str) -> dict[Any, Any]:
             return {}
 
     try:
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf-8-sig') as f:
             return json.load(f)
     except FileNotFoundError:
         logger.error(Resource.config_fileNotFound(path))

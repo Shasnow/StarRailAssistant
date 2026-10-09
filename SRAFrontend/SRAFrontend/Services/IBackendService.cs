@@ -17,9 +17,9 @@ public interface IBackendService : INotifyPropertyChanged
     Task<string?> SendInputAndWaitOutputAsync(string command);
     Task<T?> SendInputAndWaitObjectAsync<T>(string command);
     Task<R?> SendInputAndWaitObjectAsync(string command);
-    void StartBackend(string arguments);
-    void StopBackend();
-    Task RestartBackendAsync(string arguments);
+    bool StartBackend(string arguments);
+    bool StopBackend();
+    Task<bool> RestartBackendAsync(string arguments);
     Task<bool> TaskRunAsync(string? configName);
     Task<bool> TaskSingleAsync(string taskName, string? configName);
     Task<string?> TaskListAsync();
