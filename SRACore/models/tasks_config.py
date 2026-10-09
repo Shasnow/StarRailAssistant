@@ -160,7 +160,7 @@ class CosmicStrifeConfig:
     currencyWarsRerollBossNames: str = ""
     currencyWarsRerollInvestEnvironments: str = ""
     currencyWarsRerollInvestStrategies: str = ""
-    currencyWarsRuntimes: int = 0
+    currencyWarsRuntimes: int = 1
     currencyWarsStrategy: str = "template"
     currencyWarsStrategyIndex: int = 0
     currencyWarsUsername: str = ""
@@ -204,7 +204,7 @@ class CosmicStrifeConfig:
             "currencyWarsRerollBossNames": data.get("currencyWars.reroll.bossNames", ""),
             "currencyWarsRerollInvestEnvironments": data.get("currencyWars.reroll.investEnvironments", ""),
             "currencyWarsRerollInvestStrategies": data.get("currencyWars.reroll.investStrategies", ""),
-            "currencyWarsRuntimes": data.get("currencyWars.runtimes", 0),
+            "currencyWarsRuntimes": data.get("currencyWars.runtimes", 1),
             "currencyWarsStrategy": data.get("currencyWars.strategy", "template"),
             "currencyWarsStrategyIndex": data.get("currencyWars.strategyIndex", 0),
             "currencyWarsUsername": data.get("currencyWars.username", ""),

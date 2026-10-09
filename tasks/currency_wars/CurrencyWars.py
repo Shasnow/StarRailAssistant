@@ -1,4 +1,4 @@
-﻿import enum
+import enum
 import json
 from collections.abc import Callable
 from typing import Any
@@ -102,6 +102,7 @@ class CurrencyWars(Executable):
     def run(self):
         self.is_running = True
         if self.runtimes == 0:
+            logger.warning("货币战争运行次数为 0 ，本次将跳过运行。")
             return True
         for i in range(self.runtimes):
             if not self.is_running:

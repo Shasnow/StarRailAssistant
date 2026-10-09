@@ -226,7 +226,7 @@ public partial class CosmicStrifeConfig : ObservableObject
     private string _currencyWarsRerollInvestStrategies = "";
 
     [ObservableProperty] [property: JsonPropertyName("currencyWars.runtimes")] [property: Description("货币战争刷开局时的运行次数")]
-    private int _currencyWarsRuntimes;
+    private int _currencyWarsRuntimes = 1;
 
     [ObservableProperty] [property: JsonPropertyName("currencyWars.strategy")] [property: Description("货币战争使用的攻略名称")]
     private string _currencyWarsStrategy = "template";
