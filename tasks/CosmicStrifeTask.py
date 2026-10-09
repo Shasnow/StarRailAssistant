@@ -4,7 +4,7 @@ from SRACore.util.logger import logger
 from tasks.currency_wars.characters import Characters
 from tasks.img import DUIMG, IMG
 
-@task(order=3)
+@task(order=3)  # pyright: ignore[reportCallIssue]
 class CosmicStrifeTask(BaseTask):
     def __post_init__(self):
         self.notify = True
@@ -60,7 +60,8 @@ class CosmicStrifeTask(BaseTask):
         elif cw_mode==1 or cw_mode==0:
             logger.info("执行任务：旷宇纷争-货币战争 常规")
             from tasks.currency_wars import CurrencyWars
-            cw_task = CurrencyWars(operator=self.operator, runtimes=runtimes)
+            cw_task = CurrencyWars(operator=self.operator, runtimes=runtimes,
+                                   isPointRewardsEnabled=self.config.CosmicStrife.isCurrencyWarsPointRewardsEnabled)
             cw_task.load_strategy(strategy)
             # 前端难度选择：0=最低难度，1=最高难度
             cw_task.set_difficulty(difficulty)

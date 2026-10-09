@@ -89,7 +89,9 @@
                                 <Label>运行次数</Label>
                                 <NumericUpDown FormatString="0" Value="{Binding CosmicStrifeConfig.CurrencyWarsRuntimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
-                            
+
+                            <ToggleSwitch OnContent="积分已满时跳过" IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsPointRewardsEnabled}" />
+
                             <Separator/>
 
                             <StackPanel IsVisible="{Binding !IsCwNormalMode}" Margin="0,4,0,0" Spacing="4">

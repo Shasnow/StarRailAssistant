@@ -206,6 +206,11 @@ public partial class CosmicStrifeConfig : ObservableObject
     private int _currencyWarsMode;
 
     [ObservableProperty]
+    [property: JsonPropertyName("currencyWars.pointRewards")]
+    [property: Description("启用后，若旷宇纷争积分奖励已满则跳过货币战争任务")]
+    private bool _isCurrencyWarsPointRewardsEnabled;
+
+    [ObservableProperty]
     [property: JsonPropertyName("currencyWars.reroll.bossAffixes")]
     [property: Description("货币战争刷开局时的Boss词缀")]
     private string _currencyWarsRerollBossAffixes = "";

@@ -1,5 +1,6 @@
 import enum
 import json
+import re
 from collections.abc import Callable
 from typing import Any
 
@@ -39,9 +40,10 @@ class StageName(enum.StrEnum):
 
 
 class CurrencyWars(Executable):
-    def __init__(self, operator, runtimes):
+    def __init__(self, operator, runtimes, isPointRewardsEnabled: bool = False):
         super().__init__(operator)
         self.runtimes = runtimes
+        self.isPointRewardsEnabled = isPointRewardsEnabled
         self.special_events: dict[str, tuple[str, Callable[[], bool]]] = {
             "领航员": ("选择伙伴", self.handle_choose_partner),
             "盛会之星": ("盛会之星", self.handle_the_planet_of_festivities),
@@ -104,6 +106,11 @@ class CurrencyWars(Executable):
         if self.runtimes == 0:
             logger.warning("货币战争运行次数为 0 ，本次将跳过运行。")
             return True
+        if self.isPointRewardsEnabled:
+            page = self.page_locate()
+            if page == CurrencyWarsPage.START and self.check_point_rewards():
+                logger.info("旷宇纷争积分奖励已满，跳过货币战争任务")
+                return True
         for i in range(self.runtimes):
             if not self.is_running:
                 break
@@ -121,6 +128,17 @@ class CurrencyWars(Executable):
         """ 处理游戏结束逻辑，默认退出货币战争页面 """
         self.operator.wait_img(CWIMG.START_CURRENCY_WARS, timeout=30)
         self.operator.press_key("esc")
+
+    def check_point_rewards(self) -> bool:
+        """检查旷宇纷争积分奖励是否已满（需处于货币战争开始页面）"""
+        result = self.operator.ocr(from_x=0.1, from_y=0.89, to_x=0.21, to_y=0.96)
+        # 格式 x/18000，OCR可能将结果切断成多个部分或产生噪声，用正则匹配开头和结尾都是18000
+        if result:
+            current = "".join(item[1] for item in result)
+            logger.info(f"当前积分奖励: {current}")
+            if re.match(r'^18000.*18000$', current):
+                return True
+        return False
 
     def reset_character(self):
         """ 重置所有角色信息 """
