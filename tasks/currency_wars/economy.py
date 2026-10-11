@@ -345,7 +345,9 @@ def next_economy_action(
         return EconomyDecision("recover", "invalid_economy_limits")
     if needs_prepare:
         return EconomyDecision("prepare", "candidate_needs_preparation")
-    floor = reserve_gold + purchase_reserve_gold
+    # First-main search uses only main_c_search_min_coins supplied as reserve.
+    # The daily purchase reserve resumes after first fielding is confirmed.
+    floor = reserve_gold + (0 if first_main_search else purchase_reserve_gold)
     below_target = level < target_level
     if below_target and not first_main_search:
         if type(upgrade_allowed) is not bool:

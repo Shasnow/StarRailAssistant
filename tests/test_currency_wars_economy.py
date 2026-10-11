@@ -183,8 +183,44 @@ class EconomyActionTests(unittest.TestCase):
     def test_main_character_search_blocks_upgrade_even_with_high_gold(self):
         result = self.decide(coins=150, target_level=9, reserve_gold=0, first_main_search=True)
         self.assertEqual(result, economy.EconomyDecision("roll", "first_main_search"))
-        self.assertEqual(self.decide(coins=6, reserve_gold=0, first_main_search=True).action, "save")
-        self.assertEqual(self.decide(coins=7, reserve_gold=0, first_main_search=True).action, "roll")
+        self.assertEqual(self.decide(coins=1, reserve_gold=0, first_main_search=True).action, "save")
+        self.assertEqual(self.decide(coins=2, reserve_gold=0, first_main_search=True).action, "roll")
+
+    def test_first_main_search_uses_all_affordable_gold_despite_daily_purchase_reserve(self):
+        for coins in (2, 29, 30, 31):
+            with self.subTest(coins=coins):
+                result = self.decide(coins=coins, target_level=9, reserve_gold=0,
+                                     purchase_reserve_gold=30, first_main_search=True)
+                self.assertEqual(result, economy.EconomyDecision("roll", "first_main_search"))
+        result = self.decide(coins=1, target_level=9, reserve_gold=0,
+                             purchase_reserve_gold=30, first_main_search=True)
+        self.assertEqual(result, economy.EconomyDecision("save", "roll_reserve_floor"))
+
+    def test_first_main_search_still_preserves_its_configured_gold(self):
+        for coins, expected in ((6, "save"), (7, "roll")):
+            with self.subTest(coins=coins):
+                result = self.decide(coins=coins, target_level=9, reserve_gold=5,
+                                     purchase_reserve_gold=30, first_main_search=True)
+                self.assertEqual(result.action, expected)
+
+    def test_daily_purchase_reserve_returns_after_main_search_finishes(self):
+        for coins, expected in ((31, "save"), (32, "roll")):
+            with self.subTest(coins=coins):
+                result = self.decide(level=9, coins=coins, target_level=9, reserve_gold=0,
+                                     purchase_reserve_gold=30, first_main_search=False)
+                self.assertEqual(result.action, expected)
+
+    def test_first_main_search_keeps_evidence_and_space_requirements(self):
+        base = dict(coins=30, target_level=9, reserve_gold=0,
+                    purchase_reserve_gold=30, first_main_search=True)
+        for values, expected in (({"coins": None}, "recover"),
+                                 ({"has_purchase_targets": None}, "recover"),
+                                 ({"space_safe": None}, "recover"),
+                                 ({"roll_cost": None}, "recover"),
+                                 ({"space_safe": False}, "prepare"),
+                                 ({"needs_prepare": True}, "prepare")):
+            with self.subTest(values=values):
+                self.assertEqual(self.decide(**dict(base, **values)).action, expected)
 
     def test_existing_candidate_is_prepared_before_spending(self):
         self.assertEqual(self.decide(needs_prepare=True).action, "prepare")

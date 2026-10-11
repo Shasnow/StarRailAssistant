@@ -88,7 +88,7 @@ class StageName(enum.StrEnum):
 
 class CurrencyWars(Executable):
     # These limits apply to page transitions, not shop or formation actions.
-    FLOW_REVISION = "mandatory-final-round-spending-cap-ocr-release-20261011-v29-bench-sale-fix-preparation-stop-fix"
+    FLOW_REVISION = "mandatory-final-round-spending-cap-ocr-release-20261011-v29-bench-sale-fix-preparation-stop-fix-first-main-reserve-fix"
     PAGE_LOCATE_TIMEOUT = 45
     ENTRY_TRANSITION_TIMEOUT = 30
     STAGE_TRANSITION_TIMEOUT = 60
