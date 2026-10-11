@@ -162,10 +162,61 @@ class CurrencyWarsFieldRecoveryTests(unittest.TestCase):
         self.assertEqual((prepared.state, prepared.reason),
                          (self.module.Readiness.BLOCKED, "preparation_time_budget"))
         self.assertEqual(prepared.blocked_reason, initial.reason)
-        self.assertTrue(set(initial.gaps).issubset(prepared.gaps))
+        # The deadline assessment uses the latest observations. Rereading may
+        # change evidence text; the role cause and unresolved slots must remain.
+        self.assertTrue(set(gap for gap in initial.gaps if not gap.startswith("field_unknown:"))
+                        .issubset(prepared.gaps))
+        self.assertEqual({gap.rsplit(":", 1)[0] for gap in initial.gaps
+                          if gap.startswith("field_unknown:")},
+                         {gap.rsplit(":", 1)[0] for gap in prepared.gaps
+                          if gap.startswith("field_unknown:")})
         self.assertTrue(any(gap.startswith("role:survival:") for gap in prepared.gaps))
         self.assertTrue(any(gap.startswith("field_unknown:") for gap in prepared.gaps))
         self.assertEqual(self.operator.drags(), [])
+
+    def test_timeout_reassesses_roster_confirmed_during_last_recovery(self):
+        initial = self.install_failure_board(empty_evidence=True)
+        self.assertEqual(initial.state, self.module.Readiness.BLOCKED)
+        recover = self.task._recover_preparation_observations
+
+        def finish_recovery(reason):
+            recover(reason)
+            self.task.place_character()
+            self.case.clock.advance(self.task.preparation_budget["seconds"] + 1)
+
+        self.task._recover_preparation_observations = Mock(side_effect=finish_recovery)
+        prepared = self.task.prepare_for_battle()
+        self.assertEqual((prepared.state, prepared.reason),
+                         (self.module.Readiness.DEGRADED, "confirmed_gaps"))
+        self.assertEqual(prepared.blocked_reason, "")
+        self.assertEqual((prepared.moves, prepared.attempts, prepared.recoveries), (2, 2, 1))
+        self.assertEqual(self.task._role_evaluations()["survival"].state, "satisfied")
+        self.assertFalse(any(gap.startswith(("role:survival:", "field_unknown:"))
+                             for gap in prepared.gaps))
+        self.assertEqual(len(self.operator.drags()), 2)
+        battle_box = self.case.battle_button_available()
+        self.assertTrue(self.task.battle())
+        self.assertTrue(any(name == "click_box" and args and args[0] is battle_box
+                            for name, args, _ in self.operator.calls))
+
+    def test_total_timeout_blocks_roster_confirmed_during_last_recovery(self):
+        self.install_failure_board(empty_evidence=True)
+        recover = self.task._recover_preparation_observations
+
+        def finish_recovery(reason):
+            recover(reason)
+            self.task.place_character()
+            self.case.clock.advance(self.task.preparation_budget["total_seconds"] + 1)
+
+        self.task._recover_preparation_observations = Mock(side_effect=finish_recovery)
+        prepared = self.task.prepare_for_battle()
+        self.assertEqual((prepared.state, prepared.reason, prepared.blocked_reason),
+                         (self.module.Readiness.BLOCKED, "preparation_time_budget",
+                          "preparation_total_time_budget"))
+        self.assertEqual((prepared.moves, prepared.attempts, prepared.recoveries), (2, 2, 1))
+        self.assertEqual(self.task._role_evaluations()["survival"].state, "satisfied")
+        self.assertEqual(len(self.operator.drags()), 2)
+        self.assert_no_battle_click()
 
     def test_soft_role_without_candidate_does_not_hide_a_held_strategy_card_and_free_population(self):
         initial = self.install_failure_board(healer=False, empty_evidence=None)

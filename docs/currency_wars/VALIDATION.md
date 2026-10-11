@@ -2,7 +2,7 @@
 
 检查日期：2026-10-11。基于上游主分支 `f3a4790ae404d5e64b350b3f60265a3f72f63678`，使用当前已脱敏的货币战争代码与配置。
 
-完整源码回归与公开校准补测均通过。当前 1213 个用例的合并覆盖结果为 **1160 通过、53 因私人回放素材或可选 OCR 输入未配置而跳过、0 失败、0 错误**。
+初次源码整理时，完整源码回归与公开校准补测均通过。当时 1213 个用例的合并覆盖结果为 **1160 通过、53 因私人回放素材或可选 OCR 输入未配置而跳过、0 失败、0 错误**。
 
 | 检查 | 实际结果 |
 | --- | --- |
@@ -35,7 +35,15 @@ python -B -m unittest discover -s tests -p "test_currency_wars*.py" -v
 python -B -m unittest discover -s tests -p "test_currency_wars_calibration_all_slots.py" -v
 ```
 
-本次环境为 Python 3.12.14、OpenCV 4.13.0、NumPy 2.3.5、Pillow 12.3.0。GitHub Actions 使用项目 `pyproject.toml` 中的 Pillow、OpenCV 依赖与 NumPy，执行相同的完整回归命令；云端工作流尚未运行。
+本次环境为 Python 3.12.14、OpenCV 4.13.0、NumPy 2.3.5、Pillow 12.3.0。GitHub Actions 使用项目 `pyproject.toml` 中的 Pillow、OpenCV 依赖与 NumPy，执行相同的完整回归命令。
+
+## 布阵超时与出战检查补测
+
+2026-10-11 补修后重新执行完整套件：发现 1217 个用例，实际调度 1196 个，0 失败、0 错误，unittest 输出 35 条条件跳过记录；耗时 283.704 秒。跳过记录包括整组私人素材回放与子测试，不能直接作为跳过用例的去重数量。回归前后源码文件哈希一致。
+
+相关整备、布阵和恢复检查先单独运行，74 个用例全部通过。新增四项公开回归覆盖：最后补读完成后仅布阵时限到期仍可出战；总准备时限到期阻止出战；未知场地格或待复核场地格阻止出战；等待出战按钮跨越总准备时限时不点击。
+
+超时诊断检查仍要求角色阻塞原因和未知物理格位保留；补读后的证据文本允许按最新观察更新。
 
 私人回放可通过 `SRA_CURRENCY_WARS_REPLAY_DIR` 指向自行审查的本地素材目录。真实 OCR 回放还需要 `SRA_POPULATION_OCR_DEPS` 及 `SRA_CURRENCY_WARS_OCR_DIR`，见测试辅助模块；这些输入不随源码发布。
 

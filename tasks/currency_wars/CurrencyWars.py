@@ -3140,6 +3140,14 @@ class CurrencyWars(Executable):
                 and obs.evidence not in UNRELIABLE_EVIDENCE]
 
     def _ensure_battle_roster(self):
+        if (self._preparation_deadline is not None
+                and time.monotonic() >= self._preparation_deadline):
+            return False
+        if (self._formation_deadline is not None
+                and time.monotonic() >= self._formation_deadline
+                and (self._unknown_field_gaps() or any(area in ("on_field", "off_field")
+                                                     for area, _ in self._dirty_slots))):
+            return False
         if self._confirmed_frontline():
             return self._assess_preparation().state != Readiness.BLOCKED
         logger.warning("[出战检查] 前台没有已确认角色，重新识别并尝试布阵")
@@ -3330,6 +3338,9 @@ class CurrencyWars(Executable):
         self._check_stop()
         if self._placement_pending or self._pending_move is not None:
             self._fail_battle("preparation_pending_move_unresolved")
+        if (index == 0 and self._preparation_deadline is not None
+                and time.monotonic() >= self._preparation_deadline):
+            self._fail_battle("preparation_total_time_budget")
         self._report_preflight("battle" if index == 0 else "skip_reward")
         self._last_battle_outcome = "unknown"
         self._last_health_read = None
@@ -5081,7 +5092,7 @@ class CurrencyWars(Executable):
                             first_main_search=searching_main, gate_has_purchase_targets=gate_actionable)
                     logger.info(f"[经济决策] mode=stages stage={stage_selection.index} stage_reason={stage_selection.reason} "
                         f"battles={self._confirmed_battle_count} L={level} target={effective_target} gold={coins} R={reserve} "
-                        f"P={0 if all_in else self.economy_config.purchase_reserve_gold} xp_cost={self.SHOP_EXPERIENCE_COST} "
+                        f"P={0 if all_in or searching_main else self.economy_config.purchase_reserve_gold} xp_cost={self.SHOP_EXPERIENCE_COST} "
                         f"roll_cost={self.SHOP_REFRESH_COST} action={economy_decision.action} "
                         f"reason={economy_decision.reason} gate={gate_reason}")
                     if economy_decision.action in ("save", "prepare", "recover"):

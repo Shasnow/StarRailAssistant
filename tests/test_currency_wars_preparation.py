@@ -414,6 +414,51 @@ class CurrencyWarsPreparationTests(unittest.TestCase):
         self.task.prepare_for_battle()
         self.assertEqual(self.task._preparation_recoveries, recoveries)
 
+    def test_formation_timeout_blocks_unknown_field_or_dirty_slot(self):
+        self.empty_board()
+        self.task.max_team_size = self.task._population_current = 1
+        self.stage(("灵砂",))
+        self.observe("on_field", 0, self.character("灵砂"))
+        self.install_board()
+        self.task._begin_preparation()
+        self.task._formation_deadline = self.clock.monotonic() - 1
+        for unknown in (True, False):
+            with self.subTest(unknown=unknown):
+                self.observe("on_field", 1,
+                             state=self.logic.SlotState.UNKNOWN if unknown else self.logic.SlotState.EMPTY)
+                self.task._dirty_slots = set() if unknown else {("on_field", 1)}
+                self.assertEqual(self.task._assess_preparation().state, self.module.Readiness.READY)
+                prepared = self.task.prepare_for_battle()
+                self.assertEqual((prepared.state, prepared.reason, prepared.blocked_reason),
+                                 (self.module.Readiness.BLOCKED, "preparation_time_budget",
+                                  "field_observation_not_confirmed"))
+                self.assertEqual(self.operator.drags(), [])
+                battle_box = self.battle_button_available()
+                with self.assertRaises(RuntimeError):
+                    self.task.battle()
+                self.assertFalse(any(name == "click_box" and args and args[0] is battle_box
+                                     for name, args, _ in self.operator.calls))
+        self.task._observe_slot.assert_not_called()
+
+    def test_battle_button_wait_cannot_cross_total_preparation_deadline(self):
+        self.empty_board()
+        self.task.max_team_size = self.task._population_current = 1
+        self.stage(("灵砂",))
+        self.observe("on_field", 0, self.character("灵砂"))
+        self.install_board()
+        self.task._begin_preparation()
+        battle_box = self.battle_button_available()
+
+        def slow_button_read(*args, **kwargs):
+            self.clock.advance(self.task.preparation_budget["total_seconds"] + 1)
+            return battle_box
+
+        self.operator.wait_img = Mock(side_effect=slow_button_read)
+        with self.assertRaisesRegex(RuntimeError, "preparation_total_time_budget"):
+            self.task.battle()
+        self.assertFalse(any(name == "click_box" and args and args[0] is battle_box
+                             for name, args, _ in self.operator.calls))
+
     def test_layout_change_does_not_compare_or_reuse_old_pending_endpoints(self):
         self.empty_board()
         self.observe("on_field", 0, self.character("灵砂"))
