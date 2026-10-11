@@ -88,7 +88,7 @@ class StageName(enum.StrEnum):
 
 class CurrencyWars(Executable):
     # These limits apply to page transitions, not shop or formation actions.
-    FLOW_REVISION = "mandatory-final-round-spending-cap-ocr-release-20261011-v29-bench-sale-fix"
+    FLOW_REVISION = "mandatory-final-round-spending-cap-ocr-release-20261011-v29-bench-sale-fix-preparation-stop-fix"
     PAGE_LOCATE_TIMEOUT = 45
     ENTRY_TRANSITION_TIMEOUT = 30
     STAGE_TRANSITION_TIMEOUT = 60
@@ -237,6 +237,7 @@ class CurrencyWars(Executable):
         self._pending_move = None
         self._last_move_result = MoveResult(MoveStatus.REJECTED, "no_move_attempted")
         self._move_failures = {}
+        self._fielding_rejections = set()
         self._last_preparation_result = None
         self._preparation_deadline = None
         self._preparation_rewards_collected = False
@@ -329,6 +330,7 @@ class CurrencyWars(Executable):
         self._preparation_attempts = self._preparation_recoveries = 0
         self._preparation_moves = 0
         self._last_preparation_result = None
+        self._fielding_rejections.clear()
         self._preparation_assessment_cache = None
         self._equipment_batch_attempts = 0
         self._economy_recovery_attempts = 0
@@ -444,14 +446,17 @@ class CurrencyWars(Executable):
             observation_identity(pending["target_before"]) and
             pending["source_before"].stars != pending["target_before"].stars)
         ends = []
-        for area, index in (pending["source"], pending["target"]):
+        for (area, index), (other_area, _) in (
+                (pending["source"], pending["target"]), (pending["target"], pending["source"])):
             if index >= len(self._observations[area]):
                 return False
-            observation = self._observe_slot(area, index, count_stars=verify_same_name_stars or area != "in_hand",
-                                             use_backup_ocr=area == "off_field")
+            observation = self._observe_slot(area, index,
+                count_stars=verify_same_name_stars or area != "in_hand" or other_area != "in_hand",
+                use_backup_ocr=area == "off_field")
             self._set_observation(area, observation)
             ends.append(observation)
         result = classify_move(pending["source_before"], pending["target_before"], *ends)
+        result = self._confirm_fielding_rejection(pending, result)
         self._last_move_result = replace(result, source=pending["source"], target=pending["target"])
         if result.status == MoveStatus.INDETERMINATE:
             return False
@@ -484,6 +489,40 @@ class CurrencyWars(Executable):
                 (effective.stage.on_field, effective.stage.off_field,
                  tuple(sorted(effective.assignments.items()))) if effective.stage is not None else None)
 
+    def _fielding_rejection_key(self, source_area, source_index, target_area):
+        source = self._observations[source_area][source_index]
+        return (source_area, source_index, target_area, self._layout_revision,
+                observation_identity(source), source.stars, self.max_team_size)
+
+    def _fielding_rejection_matches(self, key):
+        source_area, source_index, target_area = key[:3]
+        if source_index >= len(self._observations[source_area]):
+            return False
+        current = self._fielding_rejection_key(source_area, source_index, target_area)
+        # A missing star read is not evidence that this is a different unit.
+        return (key[:5] == current[:5] and key[6:] == current[6:]
+                and (key[5] is None or current[5] is None or key[5] == current[5]))
+
+    def _confirm_fielding_rejection(self, pending, result):
+        source_area, source_index = pending["source"]
+        target_area, _ = pending["target"]
+        if (pending.get("fielding_rejected") and source_area == "in_hand"
+                and target_area in ("on_field", "off_field")
+                and result.status == MoveStatus.CONFIRMED_UNCHANGED):
+            before_stars = pending["source_before"].stars
+            after_stars = self._observations[source_area][source_index].stars
+            if before_stars is not None and after_stars is not None and before_stars != after_stars:
+                return result
+            key = self._fielding_rejection_key(source_area, source_index, target_area)
+            if key[5] is None and before_stars is not None:
+                key = key[:5] + (before_stars,) + key[6:]
+            self._fielding_rejections.add(key)
+            name = pending["source_before"].character.name
+            logger.warning(f"[布阵跳过] 游戏提示{name}当前无法上场且两端未变化，"
+                           f"本整备期跳过备战[{source_index}]进入{target_area}的全部槽位")
+            return replace(result, reason="game_cannot_be_fielded")
+        return result
+
     def _excluded_moves(self):
         threshold = self.preparation_budget["move_retries"] + 1
         result = set()
@@ -493,6 +532,11 @@ class CurrencyWars(Executable):
                     and target_index < len(self._observations[target_area])
                     and key == self._move_key(source_area, source_index, target_area, target_index)):
                 result.add(key[:4])
+        for key in self._fielding_rejections:
+            source_area, source_index, target_area = key[:3]
+            if self._fielding_rejection_matches(key):
+                result.update((source_area, source_index, target_area, target_index)
+                              for target_index in range(len(self._observations[target_area])))
         return result
 
     def _unknown_field_gaps(self):
@@ -641,16 +685,26 @@ class CurrencyWars(Executable):
         if self._formation_deadline is None:
             self._formation_deadline = min(self._preparation_deadline,
                 time.monotonic() + self.preparation_budget["seconds"])
-        last_blocked = self._last_preparation_result
         recovery_baseline = recovery_reason = None
         for _ in range(self.preparation_budget["recoveries"] + 2):
             self._check_stop()
             if time.monotonic() >= self._formation_deadline:
-                result = (replace(last_blocked, reason="preparation_time_budget",
-                                  blocked_reason=last_blocked.blocked_reason or last_blocked.reason)
-                          if last_blocked is not None and last_blocked.state == Readiness.BLOCKED
-                          else PreparationResult(Readiness.BLOCKED, "preparation_time_budget",
-                                                 gaps=self._unknown_field_gaps()))
+                # Expiry stops further actions; it does not invalidate a confirmed roster.
+                result = self._assess_preparation()
+                field_gaps = self._unknown_field_gaps()
+                if time.monotonic() >= self._preparation_deadline:
+                    result = replace(result, state=Readiness.BLOCKED, reason="preparation_time_budget",
+                                     blocked_reason="preparation_total_time_budget")
+                elif result.state == Readiness.BLOCKED:
+                    result = replace(result, reason="preparation_time_budget",
+                                     blocked_reason=result.blocked_reason or result.reason)
+                elif field_gaps or any(area in ("on_field", "off_field")
+                                       for area, _ in self._dirty_slots):
+                    result = replace(result, state=Readiness.BLOCKED, reason="preparation_time_budget",
+                                     blocked_reason="field_observation_not_confirmed",
+                                     gaps=result.gaps + field_gaps)
+                else:
+                    logger.info("[整备检查] 布阵时间已用尽，现有场上证据确认就绪，停止移动并继续战斗流程")
                 break
             if not self._layout_valid:
                 result = PreparationResult(Readiness.BLOCKED, "backend_layout_not_confirmed",
@@ -680,7 +734,6 @@ class CurrencyWars(Executable):
                 result = replace(result, reason="preparation_no_progress", blocked_reason=result.reason)
                 logger.warning(f"[整备恢复] 补读后无新增有效证据，原因={result.blocked_reason} 缺口={result.gaps}")
                 break
-            last_blocked = result
             if (self._preparation_recoveries >= self.preparation_budget["recoveries"]
                     or time.monotonic() >= self._formation_deadline):
                 if time.monotonic() >= self._formation_deadline:
@@ -774,6 +827,16 @@ class CurrencyWars(Executable):
         observations[observation.slot_index] = observation
         if observation.state != SlotState.UNKNOWN:
             self._dirty_slots.discard((area_type, observation.slot_index))
+        identity = observation_identity(observation)
+        if identity is not None:
+            # Retire the old card's refusal after a confirmed replacement or upgrade.
+            for key in tuple(self._fielding_rejections):
+                if key[:2] != (area_type, observation.slot_index):
+                    continue
+                stars_changed = (key[5] is not None and observation.stars is not None
+                                 and key[5] != observation.stars)
+                if key[4] != identity or stars_changed:
+                    self._fielding_rejections.discard(key)
         characters = getattr(self, area_type + "_character")
         if observation.state == SlotState.KNOWN:
             characters[observation.slot_index] = observation.character
@@ -1080,6 +1143,7 @@ class CurrencyWars(Executable):
 
         self._pending_move = None
         self._move_failures.clear()
+        self._fielding_rejections.clear()
         self._preparation_deadline = self._formation_deadline = None
         self._preparation_rewards_collected = False
         self._preparation_departure_confirmed = False
@@ -5550,6 +5614,10 @@ class CurrencyWars(Executable):
             return False
         if self._pending_move is not None or observation_identity(source_obs) is None or observation_identity(target_obs) is None:
             return False
+        if any(key[:3] == (source_area_type, source_index, target_area_type)
+               and self._fielding_rejection_matches(key) for key in self._fielding_rejections):
+            self._last_move_result = replace(self._last_move_result, reason="game_cannot_be_fielded")
+            return False
         if source_area_type == "in_hand" and target_area_type != "in_hand" and target_obs.state == SlotState.EMPTY:
             possible_occupied = sum(o.state not in (SlotState.EMPTY, SlotState.LOCKED)
                                    or observation_identity(o) is None
@@ -5591,24 +5659,30 @@ class CurrencyWars(Executable):
         self._dirty_slots.update({(source_area_type, source_index), (target_area_type, target_index)})
         dragged = self._safe_drag_to(*source, *target, trace=False)
         self.operator.sleep(0.5)
-        if self.operator.locate(CWIMG.CANNOT_BE_FIELDED, from_x=0.25, from_y=0.25,
-                                to_x=0.75, to_y=0.75):
+        fielding_rejected = bool(self.operator.locate(
+            CWIMG.CANNOT_BE_FIELDED, from_x=0.25, from_y=0.25, to_x=0.75, to_y=0.75))
+        self._pending_move["fielding_rejected"] = bool(dragged and fielding_rejected)
+        if fielding_rejected:
             self.operator.click_point(0.5, 0.5, after_sleep=1)
         if source_area_type == "in_hand" and target_area_type != "in_hand":
-            if dragged:
+            if dragged and not fielding_rejected:
                 self.handle_special_event()
-        # Do not certify a placement from the drag return value alone.
+        # Confirm both endpoints, including the stars of a unit returned to the bench.
+        # Reuse these open panels instead of forcing a later full bench scan.
         verify_same_name_stars = (observation_identity(source_obs) == observation_identity(target_obs)
                                   and source_obs.stars != target_obs.stars)
         target_after = self._observe_slot(target_area_type, target_index,
-                                          count_stars=verify_same_name_stars or target_area_type != "in_hand",
+                                          count_stars=(verify_same_name_stars or target_area_type != "in_hand"
+                                                       or source_area_type != "in_hand"),
                                           use_backup_ocr=target_area_type == "off_field")
         self._set_observation(target_area_type, target_after)
         source_after = self._observe_slot(source_area_type, source_index,
-                                          count_stars=verify_same_name_stars or source_area_type != "in_hand",
+                                          count_stars=(verify_same_name_stars or source_area_type != "in_hand"
+                                                       or target_area_type != "in_hand"),
                                           use_backup_ocr=source_area_type == "off_field")
         self._set_observation(source_area_type, source_after)
         result = classify_move(source_obs, target_obs, source_after, target_after)
+        result = self._confirm_fielding_rejection(self._pending_move, result)
         self._last_move_result = replace(result, source=(source_area_type, source_index),
                                         target=(target_area_type, target_index))
         if (target_after.state == SlotState.KNOWN and target_after.character.name == source_char.name
