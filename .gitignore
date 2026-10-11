@@ -33,3 +33,22 @@ SRAFrontend/SRAFrontend.Server/wwwroot/*
 
 # 其他
 version_info.txt
+
+# 本地运行数据与发布准备材料
+/runtime/
+/AI_HANDOFF/
+/SRAExtraCurrency_wars/
+/StarRailAssistant_PR*/
+/tasks/currency_wars/diagnostics/
+/tasks/currency_wars/state/
+/tasks/currency_wars/calibration/*provenance*.json
+/.sra-patch-backups/
+/.env
+/.env.*
+!.env.example
+*.pem
+*.key
+**/.pytest_cache/
+**/.ruff_cache/
+*.log
+/tests/fixtures/currency_wars_private/

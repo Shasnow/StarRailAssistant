@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "kind": "reviewed_locked_backend_support",
+  "window_size": [
+    1920,
+    1080
+  ],
+  "reviewed_evidence": [
+    "six visibly empty ordinary backend slots",
+    "one additional cat-shaped support card",
+    "white lock icon on additional card"
+  ],
+  "synthetic_training_images": false,
+  "templates": [
+    {
+      "kind": "portrait",
+      "path": "backend-locked-support-portrait.png",
+      "sha256": "b76edb2bdea6bff9fb7f390f387152f9531a7ceeace70c1e73f67cbbb54b9b2f",
+      "relative_box": [
+        -0.024739583333333332,
+        -0.04212962962962963,
+        0.021614583333333333,
+        0.04861111111111111
+      ],
+      "max_mae": 0.035
+    },
+    {
+      "kind": "lock",
+      "path": "backend-locked-support-lock.png",
+      "sha256": "2a90ece1e44d348067b53a09d93d82ea255c26b62d59fe8578440cb6070c34bb",
+      "relative_box": [
+        0.014322916666666666,
+        -0.05324074074074074,
+        0.02265625,
+        -0.029166666666666667
+      ],
+      "max_mae": 0.025
+    }
+  ],
+  "position": [
+    0.7216145833333333,
+    0.6180555555555556
+  ]
+}

@@ -1,0 +1,54 @@
+name: Currency Wars Offline Tests
+
+on:
+  pull_request:
+    paths:
+      - 'tasks/currency_wars/**'
+      - 'tasks/img.py'
+      - 'resources/img/currency_wars/**'
+      - 'tests/*currency_wars*'
+      - 'tests/fixtures/currency_wars*'
+      - 'docs/currency_wars/**'
+      - 'pyproject.toml'
+      - '.github/workflows/currency-wars-tests.yml'
+  push:
+    branches:
+      - 'feat/currency-wars-*'
+    paths:
+      - 'tasks/currency_wars/**'
+      - 'tasks/img.py'
+      - 'resources/img/currency_wars/**'
+      - 'tests/*currency_wars*'
+      - 'tests/fixtures/currency_wars*'
+      - 'docs/currency_wars/**'
+      - 'pyproject.toml'
+      - '.github/workflows/currency-wars-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install image test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python - <<'PY'
+          import subprocess
+          import sys
+          import tomllib
+          from pathlib import Path
+
+          config = tomllib.loads(Path('pyproject.toml').read_text(encoding='utf-8'))
+          packages = [item for item in config['project']['dependencies']
+                      if item.startswith(('pillow==', 'opencv-python=='))]
+          subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'numpy', *packages])
+          PY
+      - name: Run currency wars regressions without game inputs
+        run: python -B -m unittest discover -s tests -p 'test_currency_wars*.py'

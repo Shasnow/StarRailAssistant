@@ -65,6 +65,7 @@ nothing to do with it.
 * 🎲 **货币战争**
   * 标准博弈、超频博弈自动化（最高难度不一定能赢）
   * 刷开局：支持任意投资环境、投资策略、Boss名称、Boss词条，如叽米、砂金
+  * 货币战争运营、阵容配置与恢复规则见[配置说明](docs/currency_wars/README.md)。
 * 🚪 **退出游戏**
   * 可选退出SRA以及关闭计算机。
 * 📖 **自动剧情**
@@ -132,9 +133,9 @@ nothing to do with it.
 
 <a href="https://www.star-history.com/?repos=Shasnow%2FStarRailAssistant&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=Shasnow/StarRailAssistant&type=date&theme=dark&legend=top-left&sealed_token=-d1hfRmVNv67qW-5NaLnQpmr58Vatft_y975chPsQxz3vrLBmXMjqH_G2XuU9t1rwl-NqjNBgKKmYL_3inwquYr1j0QEtL-uiclG-hR18uUPLcpm2mb92g" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=Shasnow/StarRailAssistant&type=date&legend=top-left&sealed_token=-d1hfRmVNv67qW-5NaLnQpmr58Vatft_y975chPsQxz3vrLBmXMjqH_G2XuU9t1rwl-NqjNBgKKmYL_3inwquYr1j0QEtL-uiclG-hR18uUPLcpm2mb92g" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=Shasnow/StarRailAssistant&type=date&legend=top-left&sealed_token=-d1hfRmVNv67qW-5NaLnQpmr58Vatft_y975chPsQxz3vrLBmXMjqH_G2XuU9t1rwl-NqjNBgKKmYL_3inwquYr1j0QEtL-uiclG-hR18uUPLcpm2mb92g" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=Shasnow/StarRailAssistant&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=Shasnow/StarRailAssistant&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=Shasnow/StarRailAssistant&type=date&legend=top-left" />
  </picture>
 </a>
 

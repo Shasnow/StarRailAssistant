@@ -174,6 +174,7 @@ class CWIMG:
     LOGO = f"{BASE}/logo.png"
     NEXT_PAGE = f"{BASE}/next_page.png"
     NEXT_STEP = f"{BASE}/next_step.png"
+    BOSS_PREVIEW = f"{BASE}/boss_preview.png"
     OPEN = f"{BASE}/open.png"
     PREPARATION_STAGE = f"{BASE}/preparation_stage.png"
     QUIT = f"{BASE}/quit.png"

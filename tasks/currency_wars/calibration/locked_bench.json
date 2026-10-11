@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "kind": "reviewed_locked_bench_slots",
+  "window_size": [
+    1920,
+    1080
+  ],
+  "slots": [
+    {
+      "index": 3,
+      "position": [
+        0.426,
+        0.844
+      ],
+      "relative_box": [
+        -0.012,
+        -0.029,
+        0.012,
+        0.031
+      ],
+      "max_mae": 0.025,
+      "template": {
+        "label": "locked",
+        "path": "bench-04-locked.png",
+        "sha256": "6f1f64444943f48d14c4faccb3bf08cbb853b92a65d50bb90846bcd5720f1535"
+      }
+    },
+    {
+      "index": 4,
+      "position": [
+        0.488,
+        0.844
+      ],
+      "relative_box": [
+        -0.012,
+        -0.029,
+        0.012,
+        0.031
+      ],
+      "max_mae": 0.025,
+      "template": {
+        "label": "locked",
+        "path": "bench-05-locked.png",
+        "sha256": "83e74271e7b4b473dda26157638d019bc562080e6dc55ee62c561ce11c0c455a"
+      }
+    },
+    {
+      "index": 5,
+      "position": [
+        0.556,
+        0.844
+      ],
+      "relative_box": [
+        -0.012,
+        -0.029,
+        0.012,
+        0.031
+      ],
+      "max_mae": 0.025,
+      "template": {
+        "label": "locked",
+        "path": "bench-06-locked.png",
+        "sha256": "a1d269f2545427663ce47324f03143378bb39482a6f922588afd3dc23aff5d48"
+      }
+    },
+    {
+      "index": 6,
+      "position": [
+        0.618,
+        0.844
+      ],
+      "relative_box": [
+        -0.012,
+        -0.029,
+        0.012,
+        0.031
+      ],
+      "max_mae": 0.025,
+      "template": {
+        "label": "locked",
+        "path": "bench-07-locked.png",
+        "sha256": "d9601f3a977610f5cdcc2d7af931f80fc8547c6a79cef172765ce84f9de38456"
+      }
+    },
+    {
+      "index": 7,
+      "position": [
+        0.684,
+        0.844
+      ],
+      "relative_box": [
+        -0.012,
+        -0.029,
+        0.012,
+        0.031
+      ],
+      "max_mae": 0.025,
+      "template": {
+        "label": "locked",
+        "path": "bench-08-locked.png",
+        "sha256": "0177714d39647db38bb956d1ef1b2f5fa22309df94fc29f2ca9f4d740273f118"
+      }
+    },
+    {
+      "index": 8,
+      "position": [
+        0.749,
+        0.844
+      ],
+      "relative_box": [
+        -0.012,
+        -0.029,
+        0.012,
+        0.031
+      ],
+      "max_mae": 0.025,
+      "template": {
+        "label": "locked",
+        "path": "bench-09-locked.png",
+        "sha256": "5e67f270eaa131f9d9021f13fb6ff683cbab62d4cb5ba8e758ef1212134e1cdb"
+      }
+    }
+  ]
+}
