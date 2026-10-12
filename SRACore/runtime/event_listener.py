@@ -8,12 +8,6 @@ import typing
 from loguru import logger
 if typing.TYPE_CHECKING:
     import pynput
-try:
-    raise ImportError("pynput 库未安装")
-    import pynput
-except ImportError:
-    logger.warning("pynput 库未安装，无法启动事件监听器")
-
 
 @dataclasses.dataclass
 class KeyDownEvent:
@@ -115,6 +109,7 @@ class KeyboardListener:
         try:
             import pynput
         except ImportError:
+            logger.warning("pynput库未安装，键盘监听功能不可用。")
             return
                 
         with pynput.keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
