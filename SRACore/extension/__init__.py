@@ -188,6 +188,35 @@ class ExtensionRegistry:
 
 extension_registry = ExtensionRegistry()
 
+# Modules imported while loading each extension.  The mapping must survive
+# registry reloads because already-imported dependencies do not appear as new
+# entries in ``sys.modules`` on the next import.
+_extension_dependencies: dict[str, set[str]] = {}
+
+
+def _get_extension_dependencies(
+    package: str,
+    package_path: Path,
+    module_names: set[str],
+    current_module: str,
+) -> set[str]:
+    """Return newly loaded modules that belong to the extension package."""
+    package_root = package_path.resolve()
+    dependencies: set[str] = set()
+    for module_name in module_names:
+        if module_name == current_module or module_name == package:
+            continue
+        module = sys.modules.get(module_name)
+        module_file = getattr(module, "__file__", None)
+        if module_file is None:
+            continue
+        try:
+            Path(module_file).resolve().relative_to(package_root)
+        except (OSError, ValueError):
+            continue
+        dependencies.add(module_name)
+    return dependencies
+
 
 def _import_extension_modules(package: str, *, reload_existing: bool) -> None:
     """扫描扩展目录并导入全部模块；``reload_existing`` 为真时热重载已导入模块。
@@ -203,12 +232,40 @@ def _import_extension_modules(package: str, *, reload_existing: bool) -> None:
             continue
         module_name = f"{package}.{file.stem}"
         existing = None
+        modules_before = set(sys.modules)
+        known_dependencies = _get_extension_dependencies(
+            package,
+            pkg_path,
+            _extension_dependencies.get(module_name, set()),
+            module_name,
+        )
         try:
             existing = sys.modules.get(module_name)
             if existing is not None and reload_existing:
+                for dependency_name in _extension_dependencies.get(module_name, set()):
+                    dependency = sys.modules.get(dependency_name)
+                    if dependency is None:
+                        continue
+                    try:
+                        importlib.reload(dependency)
+                    except Exception as e:
+                        logger.exception(
+                            f"Failed to reload dependency '{dependency_name}' "
+                            f"of extension module '{file.stem}': {e}"
+                        )
                 importlib.reload(existing)
             else:
                 importlib.import_module(module_name)
+            _extension_dependencies[module_name] = (
+                known_dependencies
+                | _get_extension_dependencies(
+                    package,
+                    pkg_path,
+                    set(sys.modules) - modules_before,
+                    module_name,
+                )
+            )
+            logger.debug(f"Extension module '{file.stem}' imported, dependencies: {_extension_dependencies[module_name]}")
         except Exception as e:
             action = "reload" if existing is not None and reload_existing else "import"
             logger.exception(f"Failed to {action} extension module '{file.stem}': {e}")
@@ -609,4 +666,3 @@ class ExtensionRunner(Runner):
             self._start_background_loop()
 
         logger.debug(f"Reloaded background extension '{extension_id}'")
-
