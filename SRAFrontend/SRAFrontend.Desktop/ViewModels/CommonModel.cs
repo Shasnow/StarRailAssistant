@@ -382,8 +382,8 @@ public class CommonModel(
         try
         {
             var (versionResponse, packagePath) = await updateService.ReinstallLatestVersionAsync(
-                downloadChannel, progressHandler, cdk, updateChannel, cts.Token,
-                settingsService.Settings.Update.DownloadPath);
+                downloadChannel, progressHandler, updateChannel, cdk,
+                cts.Token, settingsService.Settings.Update.DownloadPath);
             downloadFilePath = packagePath;
             latestVersion = versionResponse.Data.VersionName;
         }

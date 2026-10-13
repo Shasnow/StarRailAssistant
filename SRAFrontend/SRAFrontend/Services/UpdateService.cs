@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -24,10 +24,11 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     private const string BaseDownloadUrl =
         "https://github.com/Shasnow/StarRailAssistant/releases/download/{version}/StarRailAssistant_{version}.zip";
 
-    private const string DataCenterBaseUrl = "https://data.auto-mas.top";
+    private const string DataCenterReleaseMetadataUrl =
+        "https://data.auto-mas.top/api/v1/files/starrailassistant/Release/{channel}";
 
-    private const string DataCenterDownloadUrl =
-        "https://data.auto-mas.top/api/v1/files/starrailassistant/Release/{channel}/download";
+    private const string GitHubReleaseMetadataUrl =
+        "https://api.github.com/repos/Shasnow/StarRailAssistant/releases/tags/{version}";
 
     // 数据中心目前没有热更包（Core）产物：旧站 download.auto-mas.top 上该资源已长期未上传
     // （实测返回 500 object not found），客户端侧 DownloadHotfixAsync 也因 isHotfix 恒为 false
@@ -36,11 +37,12 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     private const string BaseCoreDownloadUrl =
         "https://data.auto-mas.top/api/v1/files/starrailassistant/Release/core/download";
 
-    // 数据中心产出的完整包名为 StarRailAssistant_v2.23.1.zip（beta 形如 ..._v2.23.2-beta.1.zip）。
-    // 前缀写死 StarRailAssistant_v，避免把 Resources/Core/Lite 等同目录产物误判为完整包。
-    private static readonly Regex DataCenterFileNameRegex = new(
-        @"StarRailAssistant_v(\d+\.\d+\.\d+(?:-[0-9A-Za-z.\-]+)?)\.zip$",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString
+    };
 
     private readonly Dictionary<int, string> _errorCodes = new()
     {
@@ -60,7 +62,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     {
         var httpClient = httpClientFactory.CreateClient("GlobalClient");
         var response = await httpClient.GetAsync($"{BaseVersionUrl}?cdk={cdk}");
-        return await response.Content.ReadFromJsonAsync<VersionResponse>();
+        return await response.Content.ReadFromJsonAsync<VersionResponse>(_jsonSerializerOptions);
     }
 
     public string GetErrorMessage(int code)
@@ -86,7 +88,7 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
         try
         {
             var response = await httpClient.GetAsync(url);
-            return await response.Content.ReadFromJsonAsync<VersionResponse>();
+            return await response.Content.ReadFromJsonAsync<VersionResponse>(_jsonSerializerOptions);
         }
         catch (Exception)
         {
@@ -108,15 +110,17 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     public async Task<string> DownloadUpdateAsync(
         VersionResponse versionResponse,
         int downloadChannel,
-        string? updateChannel,
+        string updateChannel,
         IProgress<DownloadStatus> statusProgress,
         CancellationToken cancellationToken = default,
         string? downloadDir = null
     )
     {
         var version = versionResponse.Data.VersionName;
-        var downloadUrl = GetDownloadUrl(versionResponse, downloadChannel, updateChannel);
-        var sha256 = await GetExpectedSha256Async(downloadUrl, versionResponse, cancellationToken);
+        var downloadUrl = await GetDownloadUrlAsync(versionResponse, downloadChannel, updateChannel,
+            cancellationToken);
+        var sha256 = await GetSha256Async(versionResponse,
+            cancellationToken);
 
         return await DownloadPackageAsync(version, downloadUrl, sha256, statusProgress,
             cancellationToken, downloadDir);
@@ -128,8 +132,8 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     /// </summary>
     /// <param name="downloadChannel">下载渠道（0=Mirror酱，1=GitHub，2=Auto-MAS）</param>
     /// <param name="statusProgress">下载状态回调</param>
-    /// <param name="cdk">Mirror酱 CDK（可选）</param>
     /// <param name="channel">更新通道（stable/beta）</param>
+    /// <param name="cdk">Mirror酱 CDK（可选）</param>
     /// <param name="cancellationToken">取消下载 Token</param>
     /// <param name="downloadDir">安装包保存目录，为 null/空白时使用默认临时目录</param>
     /// <returns>最新版本信息与已校验安装包的本地路径</returns>
@@ -137,8 +141,8 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     public async Task<(VersionResponse VersionResponse, string PackagePath)> ReinstallLatestVersionAsync(
         int downloadChannel,
         IProgress<DownloadStatus> statusProgress,
+        string channel,
         string? cdk = null,
-        string? channel = null,
         CancellationToken cancellationToken = default,
         string? downloadDir = null
     )
@@ -246,11 +250,24 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     }
 
     // 辅助方法：获取下载URL
-    private static string GetDownloadUrl(VersionResponse versionResponse, int downloadChannel,
-        string? updateChannel)
+    private async Task<string> GetDownloadUrlAsync(VersionResponse versionResponse, int downloadChannel,
+        string updateChannel, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(versionResponse.Data.Url) || downloadChannel == 2)
+        {
+            var publishedVersion = await FetchDataCenterMetadataAsync(updateChannel, cancellationToken);
+            var expectedFileName = $"StarRailAssistant_{versionResponse.Data.VersionName}.zip";
+            if (!string.Equals(publishedVersion.SourceFilename, expectedFileName,
+                    StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException(
+                    $"""
+                     The Auto-MAS data center is serving {publishedVersion.SourceFilename},
+                     which does not match the latest version {versionResponse.Data.VersionName}. It may not have been synced yet.
+                     Please try again later or switch the download channel in settings.
+                     """);
+            versionResponse.Data.PublishedVersion = publishedVersion;
             return BuildDataCenterUrl(updateChannel);
+        }
         if (downloadChannel == 1)
             return BaseDownloadUrl.Replace("{version}", versionResponse.Data.VersionName);
         return versionResponse.Data.Url;
@@ -259,168 +276,84 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
     /// <summary>
     ///     拼接数据中心下载地址，并把通道收敛到 stable/beta，避免异常取值拼出无效 URL。
     /// </summary>
-    private static string BuildDataCenterUrl(string? updateChannel) =>
-        DataCenterDownloadUrl.Replace("{channel}",
+    private static string BuildDataCenterMetadataUrl(string? updateChannel) =>
+        DataCenterReleaseMetadataUrl.Replace("{channel}",
             string.Equals(updateChannel, "beta", StringComparison.OrdinalIgnoreCase) ? "beta" : "stable");
 
-    private static bool IsDataCenterUrl(string url) =>
-        url.StartsWith(DataCenterBaseUrl, StringComparison.OrdinalIgnoreCase);
+    private static string BuildDataCenterUrl(string? updateChannel) =>
+        $"{BuildDataCenterMetadataUrl(updateChannel)}/download";
 
     /// <summary>
-    ///     解析本次下载应使用的 SHA256。
-    ///
-    ///     数据中心渠道：哈希取自服务端 Repr-Digest，并额外用文件名里的版本号做一次漂移校验
-    ///     （mirrorchyan 无 CDK 时不返回 sha256，因此不能依赖哈希做跨源比对）。
-    ///     其余渠道：沿用 mirrorchyan 返回的 sha256，未填 CDK 时为空、跳过校验。
+    ///     获取数据中心元数据，取出包内哈希与服务端保存的原始文件名。
     /// </summary>
-    private async Task<string> GetExpectedSha256Async(string downloadUrl, VersionResponse versionResponse,
-        CancellationToken cancellationToken)
+    private async Task<PublishedVersion> FetchDataCenterMetadataAsync(string updateChannel,
+        CancellationToken cancellationToken=default)
     {
-        if (!IsDataCenterUrl(downloadUrl))
-            return await GetSha256Async(versionResponse, cancellationToken);
-
-        var (sha256, fileName) = await FetchDataCenterMetadataAsync(downloadUrl, cancellationToken);
-        EnsureDataCenterVersionMatches(fileName, versionResponse.Data.VersionName);
-        return sha256;
-    }
-
-    /// <summary>
-    ///     HEAD 一次数据中心下载地址，取出包内哈希（Repr-Digest）与服务端保存的原始文件名。
-    /// </summary>
-    private async Task<(string Sha256, string FileName)> FetchDataCenterMetadataAsync(string url,
-        CancellationToken cancellationToken)
-    {
+        var metadataUrl = BuildDataCenterMetadataUrl(updateChannel);
         var httpClient = httpClientFactory.CreateClient("GlobalClient");
-        using var request = new HttpRequestMessage(HttpMethod.Head, url);
-        using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead,
+        using var response = await httpClient.GetAsync(metadataUrl, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        var metadata = await response.Content.ReadFromJsonAsync<VersionResponse>(_jsonSerializerOptions,
             cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
-            throw new InvalidOperationException(
-                $"The Auto-MAS data center returned {(int)response.StatusCode} for the update package. " +
-                "Please check your network connection or switch the download channel in settings.");
-
-        var sha256 = TryParseReprDigestSha256(response)
-                     ?? throw new InvalidOperationException(
-                         "The Auto-MAS data center did not return a usable Repr-Digest, so the update " +
-                         "package cannot be verified. Please switch the download channel in settings.");
-
-        var fileName = GetContentDispositionFileName(response) ?? "";
-        logger.LogDebug("Data center package: {FileName} (sha-256 {Sha256})", fileName, sha256);
-        return (sha256, fileName);
+        var publishedVersion = metadata?.Data.PublishedVersion
+                               ?? throw new InvalidOperationException(
+                                   "The Auto-MAS data center did not return package metadata.");
+        return publishedVersion;
     }
 
     /// <summary>
-    ///     校验数据中心实际提供的版本与 mirrorchyan 报告的最新版本一致。
-    ///
-    ///     数据中心的 published_version_no 是每个 file 自增的整数，不是应用版本号，
-    ///     因此只能从 Content-Disposition 的文件名（如 StarRailAssistant_v2.23.1.zip）里取版本。
-    ///     不一致说明数据中心尚未同步到该版本，此时必须明确失败——否则会静默装回旧版本，
-    ///     下次启动又提示更新，陷入「检查更新 → 装旧版 → 再提示」的循环。
+    ///     按优先级获取安装包 SHA256：
+    ///     1. versionResponse 中已有值；
+    ///     2. Auto-MAS 对应 channel 的元数据；
+    ///     3. GitHub 对应 Release 的完整安装包 asset digest。
+    ///     所有来源均不可用时返回空值，此时沿用未提供 SHA256 时跳过校验的既有行为。
     /// </summary>
-    private static void EnsureDataCenterVersionMatches(string fileName, string remoteVersionName)
+    private async Task<string> GetSha256Async(VersionResponse versionResponse,
+        CancellationToken cancellationToken)
     {
-        var servedVersion = ExtractVersionFromFileName(fileName);
-        var served = SemVerParser.Parse(servedVersion);
-        var remote = SemVerParser.Parse(remoteVersionName);
+        var responseSha256 = versionResponse.Data.Sha256?.Trim();
+        if (string.IsNullOrEmpty(responseSha256))
+            responseSha256 = versionResponse.Data.PublishedVersion?.Sha256.Trim();
 
-        // SemVerInfo 未重写 ==/Equals，只能靠 CompareTo 判断相等
-        if (served is not null && remote is not null && served.CompareTo(remote) == 0)
-            return;
+        if (!string.IsNullOrEmpty(responseSha256))
+            return responseSha256.ToLowerInvariant();
 
-        var servedDescription = servedVersion
-                                ?? (string.IsNullOrEmpty(fileName) ? "an unknown version" : fileName);
-        throw new InvalidOperationException(
-            $"The Auto-MAS data center is serving {servedDescription}, " +
-            $"which does not match the latest version {remoteVersionName}. It may not have been synced yet. " +
-            "Please try again later or switch the download channel in settings.");
-    }
+        var httpClient = httpClientFactory.CreateClient("GlobalClient");
 
-    /// <summary>
-    ///     从 Content-Disposition 取服务端保存的原始文件名。
-    /// </summary>
-    private static string? GetContentDispositionFileName(HttpResponseMessage response)
-    {
-        var disposition = response.Content.Headers.ContentDisposition;
-        var fileName = disposition?.FileNameStar ?? disposition?.FileName;
-        if (string.IsNullOrWhiteSpace(fileName)) return null;
-
-        // 个别实现会把 RFC 5987 的 charset'' 前缀一起带出来，这里兜底清掉
-        var value = Regex.Replace(fileName.Trim().Trim('"'), @"^[A-Za-z0-9\-]+''", "");
-        return value.Trim().Trim('"');
-    }
-
-    /// <summary>
-    ///     从 StarRailAssistant_v2.23.1.zip / StarRailAssistant_v2.23.2-beta.1.zip 中取出版本号。
-    /// </summary>
-    private static string? ExtractVersionFromFileName(string fileName)
-    {
-        if (string.IsNullOrWhiteSpace(fileName)) return null;
-        var match = DataCenterFileNameRegex.Match(fileName.Trim());
-        return match.Success ? match.Groups[1].Value : null;
-    }
-
-    /// <summary>
-    ///     解析 RFC 9530 的 Repr-Digest，取出 sha-256 的小写十六进制。
-    /// </summary>
-    private static string? TryParseReprDigestSha256(HttpResponseMessage response)
-    {
-        if (TryParseReprDigest(response.Headers, out var digest)) return digest;
-        if (TryParseReprDigest(response.Content.Headers, out digest)) return digest;
-        return null;
-    }
-
-    private static bool TryParseReprDigest(HttpHeaders headers, out string? digest)
-    {
-        digest = null;
-        if (!headers.TryGetValues("Repr-Digest", out var values)) return false;
-
-        foreach (var raw in values)
-        foreach (var member in raw.Split(','))
+        try
         {
-            var part = member.Trim();
-            // 用第一个 '=' 分隔算法与取值，base64 的 '=' 填充不受影响
-            var separator = part.IndexOf('=');
-            if (separator <= 0) continue;
-
-            var algorithm = part[..separator].Trim();
-            var parameter = algorithm.IndexOf(';');
-            if (parameter >= 0) algorithm = algorithm[..parameter].Trim();
-            if (!string.Equals(algorithm.Replace("-", ""), "sha256", StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            // RFC 9530 的字节序列用冒号包裹：sha-256=:<base64>:
-            var value = part[(separator + 1)..].Trim();
-            if (value.Length < 2 || value[0] != ':' || value[^1] != ':') continue;
-
-            try
-            {
-                var base64 = value[1..^1].Trim();
-                var remainder = base64.Length % 4;
-                if (remainder != 0) base64 = base64.PadRight(base64.Length + (4 - remainder), '=');
-
-                var bytes = Convert.FromBase64String(base64);
-                if (bytes.Length != 32) continue; // 必须是 32 字节的 SHA-256
-                digest = Convert.ToHexString(bytes).ToLowerInvariant();
-                return true;
-            }
-            catch (FormatException)
-            {
-                // 该成员格式非法，继续尝试下一个
-            }
+            var url = GitHubReleaseMetadataUrl.Replace("{version}", versionResponse.Data.VersionName);
+            using var response = await httpClient.GetAsync(url, cancellationToken);
+            response.EnsureSuccessStatusCode();
+            var release = await response.Content.ReadFromJsonAsync<GitHubReleaseMetadata>(
+                _jsonSerializerOptions, cancellationToken);
+            var assetName = $"StarRailAssistant_{versionResponse.Data.VersionName}.zip";
+            var digest = release?.Assets.Find(asset =>
+                    string.Equals(asset.Name, assetName, StringComparison.OrdinalIgnoreCase))
+                ?.Digest;
+            const string sha256Prefix = "sha256:";
+            if (!string.IsNullOrWhiteSpace(digest) &&
+                digest.StartsWith(sha256Prefix, StringComparison.OrdinalIgnoreCase))
+                return digest[sha256Prefix.Length..].Trim().ToLowerInvariant();
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            logger.LogDebug(exception, "Failed to get SHA256 from GitHub release metadata.");
         }
 
-        return false;
+        return "";
     }
 
-    /// <summary>
-    ///     获取 mirrorchyan 提供的 SHA256。
-    ///
-    ///     旧站的 .sha256 旁路文件随旧站一起退役，这里不再有回退来源；未填 CDK 时该值为空，
-    ///     此时 VerifyFileSha256Async 会跳过校验（既有行为）。
-    /// </summary>
-    private Task<string> GetSha256Async(VersionResponse versionResponse, CancellationToken cancellationToken) =>
-        Task.FromResult(versionResponse.Data.Sha256?.Trim().ToLowerInvariant() ?? "");
+    private sealed class GitHubReleaseMetadata
+    {
+        public List<GitHubReleaseAsset> Assets { get; init; } = [];
+    }
+
+    private record GitHubReleaseAsset(string Name, string? Digest);
 
     /// <summary>
     ///     校验本地文件的 SHA256 是否与远端一致。
