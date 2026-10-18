@@ -370,11 +370,21 @@ class SRACli(cmd2.Cmd):
             if not extension_registry.has_id(args.name):
                 self.err(f"扩展 '{args.name}' 不存在")
                 return
-            if not extension_registry.is_background(args.name):
-                self.err(f"扩展 '{args.name}' 不是后台扩展，不能通过 stop 指定停止")
+            if extension_registry.is_background(args.name):
+                stopped = self.extension_runner.stop_extension(args.name)
+                self.ok(f"已停止后台扩展 '{args.name}'" if stopped else f"后台扩展 '{args.name}' 未运行")
                 return
-            stopped = self.extension_runner.stop_extension(args.name)
-            self.ok(f"已停止后台扩展 '{args.name}'" if stopped else f"后台扩展 '{args.name}' 未运行")
+
+            # 非后台扩展在共享工作线程中运行，只能通过停止线程来停止
+            info = self.extension_runner.info
+            if not self.extension_runner.is_thread_running():
+                self.err(f"扩展 '{args.name}' 未在运行")
+                return
+            if info.unit and info.unit != args.name:
+                self.err(f"当前正在运行的扩展是 '{info.unit}'，不是 '{args.name}'")
+                return
+            self.extension_runner.stop_thread()
+            self.ok(f"已停止扩展 '{args.name}'")
             return
 
         if not self.extension_runner.is_thread_running():
