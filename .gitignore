@@ -7,6 +7,7 @@
 **/.trae/
 **/.vs/
 **/.idea/
+**/.workbuddy/
 
 # .NET 构建输出
 **/bin/
