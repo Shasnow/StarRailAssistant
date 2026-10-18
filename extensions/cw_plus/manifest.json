@@ -1,0 +1,973 @@
+{
+  "id": "CurrencyWarsPlus",
+  "name": "货币战争优化版",
+  "version": "plusv1",
+  "host_release": "v2.24.1",
+  "upstream_commit": "d1fb48ac9e807110f955a5cbb02beeab48cbad1a",
+  "author": "YukkiSSYB",
+  "license": "AGPL-3.0-or-later",
+  "upstream": "https://github.com/Shasnow/StarRailAssistant",
+  "documentation": "cw_plus/README.md",
+  "files": [
+    {
+      "path": "currency_wars_plus.py",
+      "bytes": 5148,
+      "sha256": "61e608ac123c7cfaf1767f6bdfafd4f2df80db8cd7b4694b48f0ae4ebec17fcd"
+    },
+    {
+      "path": "cw_plus/CHANGELOG.md",
+      "bytes": 10739,
+      "sha256": "1acdfceb52de2e4de86cfca07189167ac77297ce958105da1da28daae1c193e5"
+    },
+    {
+      "path": "cw_plus/CONFIGURATION.md",
+      "bytes": 11970,
+      "sha256": "c884dc252a88c626a232439ffef859972349a98b17c3b569caa295a8d1f0caba"
+    },
+    {
+      "path": "cw_plus/CurrencyWars.py",
+      "bytes": 555301,
+      "sha256": "d6d0095f4cab0778274bca9524ec50d8ac0b06573e59184e27bd3f64440fe675"
+    },
+    {
+      "path": "cw_plus/LICENSE",
+      "bytes": 34523,
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+    },
+    {
+      "path": "cw_plus/README.md",
+      "bytes": 13536,
+      "sha256": "ce3a3e350e5b005bc65c06d3bddac300db5156710074ea64e27fc6eb2add616a"
+    },
+    {
+      "path": "cw_plus/__init__.py",
+      "bytes": 119,
+      "sha256": "6e16bb8779302d7d3849177faf946b326da6db10d97430b28b4626739a751ca7"
+    },
+    {
+      "path": "cw_plus/bench_full.py",
+      "bytes": 2258,
+      "sha256": "b246ad0ad600b67eaa5c7d448cd5c341ea9494c020ab2e96a9d17b85970635fa"
+    },
+    {
+      "path": "cw_plus/calibration/backend-locked-support-lock.png",
+      "bytes": 400,
+      "sha256": "2a90ece1e44d348067b53a09d93d82ea255c26b62d59fe8578440cb6070c34bb"
+    },
+    {
+      "path": "cw_plus/calibration/backend-locked-support-portrait.png",
+      "bytes": 12423,
+      "sha256": "b76edb2bdea6bff9fb7f390f387152f9531a7ceeace70c1e73f67cbbb54b9b2f"
+    },
+    {
+      "path": "cw_plus/calibration/backend-locked-support-robot-portrait.png",
+      "bytes": 15604,
+      "sha256": "030dd0bb64e2566eb17ebe79754f45199c8de65f8da7de71665d28ee6f7c1182"
+    },
+    {
+      "path": "cw_plus/calibration/backend-locked-support-visored-robot-portrait.png",
+      "bytes": 15857,
+      "sha256": "3e633d34928b1076469f77e4ed038d2aa2d3e905abc1d9febec43e6523f6fcd7"
+    },
+    {
+      "path": "cw_plus/calibration/backend_locked_support.json",
+      "bytes": 1822,
+      "sha256": "6eab341e0ead6a140c5b91170f3f15e6c64cbd2f0ffd027605650906d5b8c812"
+    },
+    {
+      "path": "cw_plus/calibration/bench-01-empty.png",
+      "bytes": 1686,
+      "sha256": "1361c7bb3f4ee8238e83faeb44d15ca4fed76ea8a4d75e8cb4e60a241d57bbc9"
+    },
+    {
+      "path": "cw_plus/calibration/bench-01-occupied.png",
+      "bytes": 18085,
+      "sha256": "220577effd6e5043efdc90c4f3d5799207c0ff379691d8799413b811ef163e07"
+    },
+    {
+      "path": "cw_plus/calibration/bench-02-empty.png",
+      "bytes": 1460,
+      "sha256": "1f808e05ad92efb1bd170da513c4fa791f5982530c5d54879431dfaabc647d96"
+    },
+    {
+      "path": "cw_plus/calibration/bench-02-occupied.png",
+      "bytes": 17339,
+      "sha256": "c01b2add9f47b09cd4e774dd819d2995c4fc31929a7f1d3a16916aa111069afa"
+    },
+    {
+      "path": "cw_plus/calibration/bench-03-empty.png",
+      "bytes": 1406,
+      "sha256": "6cdeffc61d6308cba792ccb78a9cb3e20706f5ac260304726c4d226649e1220a"
+    },
+    {
+      "path": "cw_plus/calibration/bench-03-occupied.png",
+      "bytes": 18153,
+      "sha256": "c50a0bfc8278a43d47c49f06774212793e6a64139091edca34fac4d97703cc91"
+    },
+    {
+      "path": "cw_plus/calibration/bench-04-empty.png",
+      "bytes": 1434,
+      "sha256": "082fcd852daeabe19020c81de43d70f9a238e95365a04c74e307169237734978"
+    },
+    {
+      "path": "cw_plus/calibration/bench-04-locked.png",
+      "bytes": 1791,
+      "sha256": "6f1f64444943f48d14c4faccb3bf08cbb853b92a65d50bb90846bcd5720f1535"
+    },
+    {
+      "path": "cw_plus/calibration/bench-04-occupied.png",
+      "bytes": 18201,
+      "sha256": "253e9f7e988f918d436d754eb699f695bcc3ce6410bc04afc5ac494d663851d6"
+    },
+    {
+      "path": "cw_plus/calibration/bench-05-empty.png",
+      "bytes": 1322,
+      "sha256": "e86505e1a579af966529caac040deff661e11a747b206126eee8a073d885ba4e"
+    },
+    {
+      "path": "cw_plus/calibration/bench-05-locked.png",
+      "bytes": 1883,
+      "sha256": "83e74271e7b4b473dda26157638d019bc562080e6dc55ee62c561ce11c0c455a"
+    },
+    {
+      "path": "cw_plus/calibration/bench-05-occupied.png",
+      "bytes": 16951,
+      "sha256": "ceb2320d6c9b8991a8089534bca87b94b7317a901e43b9487e4fc65355700c4d"
+    },
+    {
+      "path": "cw_plus/calibration/bench-06-empty.png",
+      "bytes": 1237,
+      "sha256": "10b9f61a14ae34387a32c741cd33ea4c64be57345da6ab789a5429afd7c544e2"
+    },
+    {
+      "path": "cw_plus/calibration/bench-06-locked.png",
+      "bytes": 1814,
+      "sha256": "a1d269f2545427663ce47324f03143378bb39482a6f922588afd3dc23aff5d48"
+    },
+    {
+      "path": "cw_plus/calibration/bench-06-occupied.png",
+      "bytes": 17689,
+      "sha256": "7712a91651222c0b571cf1a86147ce7294c64eb0f890533fcfbaa4138fc1d9f8"
+    },
+    {
+      "path": "cw_plus/calibration/bench-07-empty.png",
+      "bytes": 1456,
+      "sha256": "81cbd6556ee454f421903a8e7762facf3fb66544a3d7e36b56f0303358b60985"
+    },
+    {
+      "path": "cw_plus/calibration/bench-07-locked.png",
+      "bytes": 1769,
+      "sha256": "d9601f3a977610f5cdcc2d7af931f80fc8547c6a79cef172765ce84f9de38456"
+    },
+    {
+      "path": "cw_plus/calibration/bench-07-occupied.png",
+      "bytes": 17140,
+      "sha256": "2c122cd8e1fa3a2c8c83efd6441702fcf5ff1c984deaeb2bca31d52183c6fba7"
+    },
+    {
+      "path": "cw_plus/calibration/bench-08-empty.png",
+      "bytes": 1464,
+      "sha256": "34ea92fe53e1faa7df5131e1589fee89d94fb98efc220d9adba51b01735c09c0"
+    },
+    {
+      "path": "cw_plus/calibration/bench-08-locked.png",
+      "bytes": 1778,
+      "sha256": "0177714d39647db38bb956d1ef1b2f5fa22309df94fc29f2ca9f4d740273f118"
+    },
+    {
+      "path": "cw_plus/calibration/bench-08-occupied.png",
+      "bytes": 16542,
+      "sha256": "0704cf4a071c181a6967da9b6378a9fc3b8ca4b2862c7f71d93500fbd6694690"
+    },
+    {
+      "path": "cw_plus/calibration/bench-09-empty.png",
+      "bytes": 1463,
+      "sha256": "fe6dfabe7f12d09de8ef0dbdbbf3c473dad7e26e6784b4379186455f3048a300"
+    },
+    {
+      "path": "cw_plus/calibration/bench-09-locked.png",
+      "bytes": 1811,
+      "sha256": "5e67f270eaa131f9d9021f13fb6ff683cbab62d4cb5ba8e758ef1212134e1cdb"
+    },
+    {
+      "path": "cw_plus/calibration/bench-09-occupied.png",
+      "bytes": 18001,
+      "sha256": "5d57c03d677f4d81ad6c67bf5dcb42f83da1cc6f73bb171637aaa7bf5360a2e1"
+    },
+    {
+      "path": "cw_plus/calibration/field-dynamic-backend-right-empty-0.png",
+      "bytes": 4156,
+      "sha256": "cf097959d840d626867c3c696166c7cc754d9dba61b1e495d5be353f8d0e996d"
+    },
+    {
+      "path": "cw_plus/calibration/field-dynamic-backend-right-empty-1.png",
+      "bytes": 4283,
+      "sha256": "638e976e923a1b9e925039ccd6b137d57c2bc3222194c6f761298e0a4fafbd21"
+    },
+    {
+      "path": "cw_plus/calibration/field-dynamic-backend-right-occupied-2.png",
+      "bytes": 9668,
+      "sha256": "62d88926975ba4069d272f827c3e252bac9e4e94ee75bda0e9e83f43a5a7f7a0"
+    },
+    {
+      "path": "cw_plus/calibration/field-locked-support-off_field-0-empty.png",
+      "bytes": 3953,
+      "sha256": "499737597c9567a0689780df27bbb8ea2b6becb65ca4255ec92db38bc16352e5"
+    },
+    {
+      "path": "cw_plus/calibration/field-locked-support-off_field-1-empty.png",
+      "bytes": 3769,
+      "sha256": "4b99148d0400b7d21d6f94a999b73043b032cca1be24a2468be500e095e4fee6"
+    },
+    {
+      "path": "cw_plus/calibration/field-locked-support-off_field-2-empty.png",
+      "bytes": 4290,
+      "sha256": "73c9d14d276e23ec35347632a46469a59465cd8859c3b68bcd35812fc8c3fed9"
+    },
+    {
+      "path": "cw_plus/calibration/field-locked-support-off_field-3-empty.png",
+      "bytes": 4193,
+      "sha256": "f887dd54cb09808935dacb86da134954b5057b07c5451259334191759f274ae0"
+    },
+    {
+      "path": "cw_plus/calibration/field-locked-support-off_field-4-empty.png",
+      "bytes": 4356,
+      "sha256": "a8480f6769c8103effed6ef7a40fc9d35bf71db6868fbbfbf2c0d371899a49b4"
+    },
+    {
+      "path": "cw_plus/calibration/field-locked-support-off_field-5-empty.png",
+      "bytes": 4367,
+      "sha256": "a4d799073f7c4b1e22b7011f2d8545a6e3d3f09fba00a3b217d7704e6f395302"
+    },
+    {
+      "path": "cw_plus/calibration/field-occupied-0-off_field-0.png",
+      "bytes": 12334,
+      "sha256": "906fec11b6b5442d5ee8d095487628b880873f605db0e4395e987bafbbce8f69"
+    },
+    {
+      "path": "cw_plus/calibration/field-occupied-0-on_field-0.png",
+      "bytes": 12827,
+      "sha256": "f9293100e5f11a553545a360d906d8a7a461020d189546938df487171d2b021f"
+    },
+    {
+      "path": "cw_plus/calibration/field-occupied-0-on_field-1.png",
+      "bytes": 12486,
+      "sha256": "fe78f11fd4d45f441d16108f26f10df98340879beeb08e96973339dca78c07fd"
+    },
+    {
+      "path": "cw_plus/calibration/field-occupied-1-off_field-0.png",
+      "bytes": 12333,
+      "sha256": "14a99466c34e6a4faaf774634fa26ffc2f52d8ce82b34957171525619d809bc1"
+    },
+    {
+      "path": "cw_plus/calibration/field-occupied-1-on_field-0.png",
+      "bytes": 12219,
+      "sha256": "45bdea027257a084af159b3cde6708fc66364a3877e728f7b44eded4a5eb230c"
+    },
+    {
+      "path": "cw_plus/calibration/field-occupied-1-on_field-1.png",
+      "bytes": 13072,
+      "sha256": "1713241f3e93f356ac030977726fe7462904c69cc755b8636786df85d256309e"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-0-empty-0.png",
+      "bytes": 3573,
+      "sha256": "4460801cd98b6fd5d3eb36f0a36235d79660630ca0d9c83e2340cc8f2f91166d"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-0-empty-1.png",
+      "bytes": 3750,
+      "sha256": "aeb93c0999b5339882aad9979e7248a003b9b46841e52aae687fb43d5f37deb5"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-0-empty-2.png",
+      "bytes": 3260,
+      "sha256": "a56fa395420a4a4a4cb56b23189acc57de3b030e51570a4cbd70cf90c655c41f"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-1-empty-0.png",
+      "bytes": 4225,
+      "sha256": "c700b419ef903d6088b506c0901a2f572b1e290c0d6987a4b436c3262e894f7e"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-1-empty-1.png",
+      "bytes": 4239,
+      "sha256": "41c16fc045cdcd4aa34b7f81a2d5649a0ba4376e28302c9d9a2252ed011bc989"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-1-empty-2.png",
+      "bytes": 4158,
+      "sha256": "f4c980265878a8e1c8cde4a07134ee3c63051cd42dbab15b71097fb8751faa53"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-2-empty-0.png",
+      "bytes": 4033,
+      "sha256": "4e579db0f93b0440687ba4e9f6466d8ccab5ee3d12e7c0c799d7b43682b77fa3"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-2-empty-1.png",
+      "bytes": 4040,
+      "sha256": "2dafd8ad277f816da1e1dc4c003306244289cead669ac97cec03d2ef8435ebf1"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-2-empty-2.png",
+      "bytes": 4285,
+      "sha256": "bfc6ac0f382b75ebdb0b209bbc985a2518d6a87a5ebf227fa54fb260c3e12c38"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-2-empty-red-full-bench-20261017-phase1.png",
+      "bytes": 8741,
+      "sha256": "655e0414c19851bbc6e88203cff6a8b150a7d94c37d50fd8cafa6d37d434ffee"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-2-empty-red-full-bench-20261017-phase2.png",
+      "bytes": 8695,
+      "sha256": "63abc0482d1ebd75c1d2094d45d2aeab9a2cd2644871f6de80b13a4a20dedb27"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-2-empty-red-full-bench-20261017.png",
+      "bytes": 8634,
+      "sha256": "23b2d11e4f534b9c68432392f9a5c0794c59ac4f0603eec145ef01c9c431add7"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-3-empty-0.png",
+      "bytes": 4170,
+      "sha256": "83b218df2fc018901ffe20131b782ace9b27c112ee33f4258cf8a32d63342f2d"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-3-empty-1.png",
+      "bytes": 4117,
+      "sha256": "942ac1486608e3af2566a6f974509fb9ea629ec8f18f1ba43368c96b03d1f93a"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-3-empty-2.png",
+      "bytes": 4267,
+      "sha256": "2eff8a4b28e0648ac21ba2abe49cc97f465e02fb2f02dc03292da734e281f731"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-4-empty-0.png",
+      "bytes": 4280,
+      "sha256": "fe4bfc6309b3a246c19de7d858a481eb861743a5518ae6ff92ec7d3297e6eff9"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-4-empty-1.png",
+      "bytes": 4210,
+      "sha256": "ff2bd1f19cb2f08ebff1c9bfd0389b4c997b57eb3dbecd0fc4e150177953ee3a"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-4-empty-2.png",
+      "bytes": 4255,
+      "sha256": "d13bae6918152d2fa5307abe742af69f36e92f2705a4baa66cdabdae76a0da39"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-4-empty-red-entry-20261017-phase2.png",
+      "bytes": 8849,
+      "sha256": "3f7ccdb42071f828334f5c6912c5d6911c82158d1e8ba7a36838753470e30c35"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-4-empty-red-entry-20261017.png",
+      "bytes": 8779,
+      "sha256": "83717446dbe9ee4f11460be62efe42671710cd755b0923329fc547f08a946539"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-4-empty-red-full-bench-20261017-phase1.png",
+      "bytes": 8737,
+      "sha256": "b39689e89acc5f101061f563ba2b33803ba8a581252b6a0c14f3c17990882645"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-4-empty-red-full-bench-20261017-phase2.png",
+      "bytes": 8577,
+      "sha256": "6eeb3ab25c35228d281505899ca15dcbf627093c576bd78be4e05c76692d2055"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-4-empty-red-full-bench-20261017.png",
+      "bytes": 8699,
+      "sha256": "12c5484f0b6916e54c768559666012d849c0e1d1a3f21136aa33f7643d7c60ec"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-5-empty-0.png",
+      "bytes": 5156,
+      "sha256": "bdd93719bc0dc613fa19265c87b95c771b1662872313180f08a7cec8d0c4c5df"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-5-empty-1.png",
+      "bytes": 4441,
+      "sha256": "07a233860c9cfc6068f6109eaf91fb1019e23b9beaa0ef4104eb3bf971afea74"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-5-empty-2.png",
+      "bytes": 4841,
+      "sha256": "8717885beb799f0fdb36cd3c2b4bfe2040f9b9bee3e7600cbd9de8274afc703f"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-5-empty-red-full-bench-20261017-phase1.png",
+      "bytes": 9036,
+      "sha256": "501253571c8181bd952011f72b77c23b68fa2868ec25f1d248cd3d25b541c6ab"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-5-empty-red-full-bench-20261017-phase2.png",
+      "bytes": 8568,
+      "sha256": "24263b3f4ee6df0a1581cd3344ddba6532621e9a24863a6b30a912f4be416ba9"
+    },
+    {
+      "path": "cw_plus/calibration/field-off_field-5-empty-red-full-bench-20261017.png",
+      "bytes": 8681,
+      "sha256": "c5e489dbcfc85f57aab5cd47a0a27e2ae7239c9301ce447fd0d7516d1a7f8b66"
+    },
+    {
+      "path": "cw_plus/calibration/field-on_field-0-empty-0.png",
+      "bytes": 4383,
+      "sha256": "0e11e39753bb91f651a35ebd5611b27602c5f7182f90617e1da443431dd1c6f7"
+    },
+    {
+      "path": "cw_plus/calibration/field-on_field-0-empty-1.png",
+      "bytes": 4449,
+      "sha256": "ef348794ffb3f5c3a0f595cc86ca42d0dcd6a5f116232f96b02477882865e6f0"
+    },
+    {
+      "path": "cw_plus/calibration/field-on_field-0-empty-2.png",
+      "bytes": 3640,
+      "sha256": "0332b75f54a65b88ee71e3b0d726278767958f8ce1bd4f5e9ec21d6981c1c0a8"
+    },
+    {
+      "path": "cw_plus/calibration/field-on_field-1-empty-0.png",
+      "bytes": 3944,
+      "sha256": "c06f83b767c69c7133ed866b99748d640006d393b3d9e1047a4f00975c88eba4"
+    },
+    {
+      "path": "cw_plus/calibration/field-on_field-1-empty-1.png",
+      "bytes": 4057,
+      "sha256": "bf7874127baa1ef8287f91bbf5a57589225fe85247de883d4caa794c6698386e"
+    },
+    {
+      "path": "cw_plus/calibration/field-on_field-1-empty-2.png",
+      "bytes": 3902,
+      "sha256": "17c68fcf9dbe6b9c7112861a48b9cd2ed5baa5b2a5524d4d1f2a8114dd1edee9"
+    },
+    {
+      "path": "cw_plus/calibration/field-on_field-2-empty-0.png",
+      "bytes": 3597,
+      "sha256": "9ce7380143ad38e206d8ad4571e85345b45b71a51b6437d79c3cca98518f5309"
+    },
+    {
+      "path": "cw_plus/calibration/field-on_field-2-empty-1.png",
+      "bytes": 3701,
+      "sha256": "6c8f274c2d4810507ac4f93e0fe9b820c3bff33db093c3ae179aebb4eccb326f"
+    },
+    {
+      "path": "cw_plus/calibration/field-on_field-2-empty-2.png",
+      "bytes": 3451,
+      "sha256": "484eaa39233d64f8e35081ad006b2fc65d5fb917ef3a3c5681514e99241cc563"
+    },
+    {
+      "path": "cw_plus/calibration/field-on_field-3-empty-0.png",
+      "bytes": 3326,
+      "sha256": "da28e72f0252a813df1b4ee3f5cc68d0ed39eb70feaaf522fd459fafa24ce9f4"
+    },
+    {
+      "path": "cw_plus/calibration/field-on_field-3-empty-1.png",
+      "bytes": 3574,
+      "sha256": "27d420f4233bfad1b97b5ab9ca494fcdc4d618697ea40f93bb4a506a029b07db"
+    },
+    {
+      "path": "cw_plus/calibration/field-on_field-3-empty-2.png",
+      "bytes": 3105,
+      "sha256": "641ef3360d2c4592088e95b3668b13313a1c8af89827eecb9d9e4f55442e743e"
+    },
+    {
+      "path": "cw_plus/calibration/field_profile.json",
+      "bytes": 28913,
+      "sha256": "105ddef8609d4bf2c9bdeb989f243fc9b026018afcc347ea7104e1716ba8b6ab"
+    },
+    {
+      "path": "cw_plus/calibration/field_profile_backend_dynamic.json",
+      "bytes": 1320,
+      "sha256": "3cfe58bdbd5e645255ea96c1145da04602f152f86f9855f32d42661dc53e672f"
+    },
+    {
+      "path": "cw_plus/calibration/field_profile_locked_support.json",
+      "bytes": 22332,
+      "sha256": "065d6878591241cd9cca22a8f6f6500ed039556b6cb664554c67db825946355b"
+    },
+    {
+      "path": "cw_plus/calibration/locked_bench.json",
+      "bytes": 2436,
+      "sha256": "929546a331501fcd7c1eac42cc2095b012b2e05a64c73a9cb425e0f12e825f59"
+    },
+    {
+      "path": "cw_plus/calibration/profile.json",
+      "bytes": 10007,
+      "sha256": "11250caa39de952a69807179123c6ecb1f358d5f757841967052ef7a10e56705"
+    },
+    {
+      "path": "cw_plus/calibration/store-01-empty.png",
+      "bytes": 2430,
+      "sha256": "5093e6d98a253fe27d53e4ab6f4535a0d13b6532dd7154b6fcff675a0b0b931b"
+    },
+    {
+      "path": "cw_plus/calibration/store-01-occupied.png",
+      "bytes": 52341,
+      "sha256": "4c1fe4027339e8dfb8a5730d5c74323bafe60ea184a6b35f4704d8c4a95b3fa1"
+    },
+    {
+      "path": "cw_plus/calibration/store-02-empty.png",
+      "bytes": 1942,
+      "sha256": "96a67151bb653352da2d691954263edd6c76759e8a136b61159538b2f1a59386"
+    },
+    {
+      "path": "cw_plus/calibration/store-02-occupied.png",
+      "bytes": 50973,
+      "sha256": "fcc759027eb9d626d3756c47f4af3b2ec94df9fafb5f0fc70f5cc51e2a4db2a4"
+    },
+    {
+      "path": "cw_plus/calibration/store-03-empty.png",
+      "bytes": 2273,
+      "sha256": "bb4727a7716630cd5771f54b52f75215d9e5a6001beba7453d4a6e35322ebfe2"
+    },
+    {
+      "path": "cw_plus/calibration/store-03-occupied.png",
+      "bytes": 40689,
+      "sha256": "7d488a66c9447b35210cead4622f20b040b693fc883209bbc27463820d6cb8d4"
+    },
+    {
+      "path": "cw_plus/calibration/store-04-empty.png",
+      "bytes": 1816,
+      "sha256": "abf23683823cbc60d285924f82197328204f3a71849e48cf0c2ad31f3953d15f"
+    },
+    {
+      "path": "cw_plus/calibration/store-04-occupied.png",
+      "bytes": 46001,
+      "sha256": "72bd87167d438191a1bdef59f7cbd634ca780d7d954edd50dc59259c7da89c68"
+    },
+    {
+      "path": "cw_plus/calibration/store-05-empty.png",
+      "bytes": 3147,
+      "sha256": "817aa362e320c09042c6c1e43d15ce71f66d480dd40ecd189418dbce70aba542"
+    },
+    {
+      "path": "cw_plus/calibration/store-05-occupied.png",
+      "bytes": 48440,
+      "sha256": "a4291cc5fc9d2231842bc95c3a5aed17667974c20efbdf88da4d3c6d52b835d2"
+    },
+    {
+      "path": "cw_plus/characters.py",
+      "bytes": 10285,
+      "sha256": "cf928f76e8773e0287a15b2164d87c52761f14884c70b9ef58036dae0590f111"
+    },
+    {
+      "path": "cw_plus/coins.py",
+      "bytes": 16750,
+      "sha256": "f9edab72a5827784a067cb88eed9de4dd8fa0deb7ed56c145dfdad11a7fa1f9b"
+    },
+    {
+      "path": "cw_plus/economy.py",
+      "bytes": 19103,
+      "sha256": "4e947277f7b0aca355f2ee10ac71b8f84ddf65bd192201bee35a15bfa8919302"
+    },
+    {
+      "path": "cw_plus/equipment_choice.py",
+      "bytes": 9270,
+      "sha256": "88f6176fbd56a18332d7ca9c5606368cc00a28346947da7d8bc85205479b1d10"
+    },
+    {
+      "path": "cw_plus/equipment_policy.py",
+      "bytes": 3541,
+      "sha256": "6103548dc74110da519b8c41f7adc4ff62fc974032962c8dbcd81e15c6c8cdc1"
+    },
+    {
+      "path": "cw_plus/formation.py",
+      "bytes": 90181,
+      "sha256": "8980fbc7a480e9178f7eac7eaab4f509a6cdc83d5cbb2c4487be9918020aaa82"
+    },
+    {
+      "path": "cw_plus/images.py",
+      "bytes": 2710,
+      "sha256": "56689175eb43e108358ffcc95943ab772befd8270a62f19a205bafd4f0f85325"
+    },
+    {
+      "path": "cw_plus/layout.py",
+      "bytes": 34387,
+      "sha256": "2288a26a6b023460dca2677afa923b2ac4d6bc9e858db0c613792fefa015b6ba"
+    },
+    {
+      "path": "cw_plus/logic.py",
+      "bytes": 25888,
+      "sha256": "5aaefd086361a434912e2fd7a4a5ef6594c8cf1bbdb73f7eb290d65c3bc6a41f"
+    },
+    {
+      "path": "cw_plus/module_runtime.py",
+      "bytes": 3216,
+      "sha256": "d45fa012d78ab64a372d229e800647639c2261872dbdf59b0f26a5da3967aaea"
+    },
+    {
+      "path": "cw_plus/ocr_geometry.py",
+      "bytes": 6669,
+      "sha256": "7ee51d4178f85b6cb83e9459b00c1fdd5f7b930c5bea18828e9430f6f11bc28f"
+    },
+    {
+      "path": "cw_plus/paths.py",
+      "bytes": 1048,
+      "sha256": "8ef0a3638f2ee23b2c000cdbbe10dc0b542739828b0dfbab789b304d2464aa98"
+    },
+    {
+      "path": "cw_plus/policy.py",
+      "bytes": 4627,
+      "sha256": "4532f6057f26b52ec3daff87d19af616d9b6a0a3e7316beb686aa9f301737558"
+    },
+    {
+      "path": "cw_plus/population_vision.py",
+      "bytes": 16378,
+      "sha256": "7c6de214547e1877eeb29db0edd191a7c73a4b3b6b53afd990900c9f5388a9db"
+    },
+    {
+      "path": "cw_plus/preparation.py",
+      "bytes": 7285,
+      "sha256": "7bdccba7c21e617e550094426dad1c52ee04d003ed28da2abb6c652814e4d250"
+    },
+    {
+      "path": "cw_plus/resources/FortuneTeller.png",
+      "bytes": 4661,
+      "sha256": "2c6548ba6249f6142b933e4c3e5b1740bd2774472dd0c1b077f5c164b3afbe21"
+    },
+    {
+      "path": "cw_plus/resources/ThePlanetOfFestivities.png",
+      "bytes": 4448,
+      "sha256": "86f68f66a927dd4b9c89ef52ad41e5f106e26d49348255883c4aece3f7b6db0a"
+    },
+    {
+      "path": "cw_plus/resources/apply_strategy.png",
+      "bytes": 2007,
+      "sha256": "1a8a413ba9a5777a08f7a46f31acf1d62e126371e1eff90a361ad78a70c161e2"
+    },
+    {
+      "path": "cw_plus/resources/back_currency_wars.png",
+      "bytes": 5131,
+      "sha256": "6cd97638e9caad9b0c5c0631fd1dc994e0a33326bf625c2424fdf7099277a7a3"
+    },
+    {
+      "path": "cw_plus/resources/back_prepare_page.png",
+      "bytes": 5857,
+      "sha256": "62cbcc273fa8573173e92599014ed8582f52ed5bc8d5b5f6a9d2c2f9b7452b5d"
+    },
+    {
+      "path": "cw_plus/resources/battle.png",
+      "bytes": 8819,
+      "sha256": "a6894881a324bfeb407393f933b571c05c3ceaa71500b76686e268b8d19bd5b9"
+    },
+    {
+      "path": "cw_plus/resources/bench_full_warning.png",
+      "bytes": 10892,
+      "sha256": "64c0a32f1786db64dcaf65b8a04b80ee87f9d2e3e9a1dad11222239033f24588"
+    },
+    {
+      "path": "cw_plus/resources/boss_preview.png",
+      "bytes": 9390,
+      "sha256": "907df43a4fe2d4cf247783835fd7253f9c4b1c47e5ae6daff9b61ba697151f8e"
+    },
+    {
+      "path": "cw_plus/resources/cancel_apply.png",
+      "bytes": 3222,
+      "sha256": "ff816208e91c9f46a96230b86805ef2e7a9c048ce5e970ab8fe399d9d719ae7c"
+    },
+    {
+      "path": "cw_plus/resources/cannot_be_fielded.png",
+      "bytes": 7727,
+      "sha256": "8cdccf446d1bce24d9c39b431fe7522e34d3e810e182938a69eebf1a2ce04373"
+    },
+    {
+      "path": "cw_plus/resources/click_blank.png",
+      "bytes": 10312,
+      "sha256": "2040402fe9929e612d47cdb0a3126a02de50fb8b65f15df842285efe6cf55663"
+    },
+    {
+      "path": "cw_plus/resources/collection.png",
+      "bytes": 643,
+      "sha256": "889572053150daed8cb50c6ae56a1e6b3f6563ef3a3340729d194bedf77f765f"
+    },
+    {
+      "path": "cw_plus/resources/combat_party_marker.png",
+      "bytes": 971,
+      "sha256": "7322479b60e9bc1e28f10992c0db4950b39373a86b45938b23da7280e91ce3f8"
+    },
+    {
+      "path": "cw_plus/resources/combat_pause.png",
+      "bytes": 516,
+      "sha256": "8ccde0d7c3c6ef7c5139b91e2beca6ee9d4191ab88e6e359130838129efddaec"
+    },
+    {
+      "path": "cw_plus/resources/confirm_selection.png",
+      "bytes": 2640,
+      "sha256": "c3681d039037f86f399e4602f8ade110fdf82e561119e25c9dcfdb9f8a5f0388"
+    },
+    {
+      "path": "cw_plus/resources/continue.png",
+      "bytes": 6446,
+      "sha256": "5012d8981d1fc7df7b3cac76e1444492be373af5f7325492ec5b1b0af938e5c8"
+    },
+    {
+      "path": "cw_plus/resources/continue_progress.png",
+      "bytes": 4931,
+      "sha256": "3b6a223eb6aed308d4289db4d861c92f5bae79622a714b0a8bee218b6960a8ae"
+    },
+    {
+      "path": "cw_plus/resources/currency_wars.png",
+      "bytes": 10253,
+      "sha256": "5257164c32a9627349320d62da89312121cf148ee6bc7a9a1d81f74675b5a02e"
+    },
+    {
+      "path": "cw_plus/resources/down_arrow.png",
+      "bytes": 3427,
+      "sha256": "3c511455f2dbed63145f98507783726b7f6a470c41af584a34545c00e15868ea"
+    },
+    {
+      "path": "cw_plus/resources/encounter_node.png",
+      "bytes": 8391,
+      "sha256": "e1bfaa4bc47fb3425001cd2656069173781fb2d4c8c323b194d5bd4aedf11626"
+    },
+    {
+      "path": "cw_plus/resources/enter_game.png",
+      "bytes": 1765,
+      "sha256": "06f0a5c617a41b2a04ab8b4d3bc359603f7a5aa14eec76b047157c3ede6c2a11"
+    },
+    {
+      "path": "cw_plus/resources/enter_strategy_code.png",
+      "bytes": 5212,
+      "sha256": "c7caa7bddddf15a5dd59965ffaa4b8dee410575bbc1c5115e11e3d48ec106952"
+    },
+    {
+      "path": "cw_plus/resources/equip.png",
+      "bytes": 1417,
+      "sha256": "4fe2547b9aaf970ef076bab452b327b244e94d0f4f34be064efa74f810ec83c4"
+    },
+    {
+      "path": "cw_plus/resources/equipment_recommend.png",
+      "bytes": 3666,
+      "sha256": "0e5250fab7abcaaec55a770d83f9b1b385aca97fd46357c1c08861d9ea2b7de3"
+    },
+    {
+      "path": "cw_plus/resources/equipment_tracking_close.png",
+      "bytes": 2020,
+      "sha256": "840d6fcbfa21653e3a3c4d4ae6e366576998c74161c20827f259a670a6e37f69"
+    },
+    {
+      "path": "cw_plus/resources/equipment_tracking_title.png",
+      "bytes": 5157,
+      "sha256": "f1a1d7dd1bb76051184cd30cf82cbffcee8ba36ed5c812bb577f0e20a4f4fca3"
+    },
+    {
+      "path": "cw_plus/resources/fold.png",
+      "bytes": 1850,
+      "sha256": "eb01eb61089806dff529215d5d804dd2393cb6c56933a4eb41f10d05a5576755"
+    },
+    {
+      "path": "cw_plus/resources/hot_strategies.png",
+      "bytes": 4591,
+      "sha256": "dfabb53c831259600e155d0727b21f242266f88d8871e7f13e9f782ac459e7f4"
+    },
+    {
+      "path": "cw_plus/resources/instructions.png",
+      "bytes": 5565,
+      "sha256": "586455d6e2719f652fd670b8c90d2e82970084f746016b53ec2d296e80d0adcc"
+    },
+    {
+      "path": "cw_plus/resources/invest_env_refresh.png",
+      "bytes": 1698,
+      "sha256": "42a3bb6cf384846aae157620322b6b87bfea116bc9df761720520bae353312fe"
+    },
+    {
+      "path": "cw_plus/resources/invest_environment.png",
+      "bytes": 10614,
+      "sha256": "12f7b67906cba165ea499075725dd437dd131d200fe63dd0991c1fc1f0765695"
+    },
+    {
+      "path": "cw_plus/resources/invest_strategy_refresh.png",
+      "bytes": 1661,
+      "sha256": "8f97eaf3b79c2a44a8cd15f26f913eb03170a577ed7f2fde9561d67da1cf7f4f"
+    },
+    {
+      "path": "cw_plus/resources/logo.png",
+      "bytes": 3617,
+      "sha256": "094b44a70d91058889f9fc3b5ba94dea320356b750e98350f861eda0a2f26443"
+    },
+    {
+      "path": "cw_plus/resources/next_page.png",
+      "bytes": 1434,
+      "sha256": "557b197f7bfe488ce5f05e3a45e7a1f0846f88584d28fed95bc3a47a499575d9"
+    },
+    {
+      "path": "cw_plus/resources/next_step.png",
+      "bytes": 2547,
+      "sha256": "afb7af6e828f14295e188f3edcc37e6c068e75981ad0c1c4c9222bb6040cc261"
+    },
+    {
+      "path": "cw_plus/resources/open.png",
+      "bytes": 1355,
+      "sha256": "36e865050b6a20e7bc764299b7ff023a0eee9ec707b6535bb1e422adb8342949"
+    },
+    {
+      "path": "cw_plus/resources/preparation_stage.png",
+      "bytes": 4380,
+      "sha256": "76d35350d971607e457be968b42112206e1e6f87809c7b1577024d1c5efab194"
+    },
+    {
+      "path": "cw_plus/resources/quit.png",
+      "bytes": 920,
+      "sha256": "bd362a2e55742e2496cd1d9a2910774d10b815f989d75317d551afc6524688f2"
+    },
+    {
+      "path": "cw_plus/resources/replenish_stage.png",
+      "bytes": 7695,
+      "sha256": "63fd9a88602c26e5df6c1fb7e5eaa0673644d148efa8eda41f97a26a69704a64"
+    },
+    {
+      "path": "cw_plus/resources/retreat.png",
+      "bytes": 2362,
+      "sha256": "d5e47a38189d77d62346c29271a9a7e2800e444ced2daff38436e2c3242245da"
+    },
+    {
+      "path": "cw_plus/resources/return_highest_rank.png",
+      "bytes": 7778,
+      "sha256": "b1832e0a4b7b29685b79cd965b77edb61e36c97dd98d42b3831ca30013e75889"
+    },
+    {
+      "path": "cw_plus/resources/right.png",
+      "bytes": 1271,
+      "sha256": "ebd0580f2d43cd6c1fc6c507fae957e86cf6dd2422d2b01cdfe76333f5c3bb0e"
+    },
+    {
+      "path": "cw_plus/resources/select_invest_strategy.png",
+      "bytes": 12070,
+      "sha256": "616537c69724f51433c4448efdd8b8b6b8550bc4d5e16b8d2efc1124178d9c63"
+    },
+    {
+      "path": "cw_plus/resources/select_simple_equipment.png",
+      "bytes": 8558,
+      "sha256": "4d076ac229613c701a2eb780b25e04033bc620604a11e7809c619bd2c83a9cbd"
+    },
+    {
+      "path": "cw_plus/resources/settle.png",
+      "bytes": 3851,
+      "sha256": "d0f461506fa495d0002706e040308132d068aacf200e2549237401c9a4238394"
+    },
+    {
+      "path": "cw_plus/resources/silver_wolf_lv999.png",
+      "bytes": 5534,
+      "sha256": "153ce2d254c4b333abe89f1696a48aeac124d7f01013c4d0e79a4714481d65b0"
+    },
+    {
+      "path": "cw_plus/resources/skip.png",
+      "bytes": 16198,
+      "sha256": "642b80774efa0394ea0c76b14ffd7e7af8d8c351902348bdcd2150864e18471f"
+    },
+    {
+      "path": "cw_plus/resources/star.png",
+      "bytes": 913,
+      "sha256": "2312901c744a00cdb3437ae3f634901a8a32affe626a5123b5b1c5b06fa71870"
+    },
+    {
+      "path": "cw_plus/resources/start_currency_wars.png",
+      "bytes": 6737,
+      "sha256": "3ae3debc5eebc88e26ca3bd15193914ee2b68a79cbbb80c42fef1ac125c44bce"
+    },
+    {
+      "path": "cw_plus/resources/start_game.png",
+      "bytes": 4025,
+      "sha256": "a90c3a2f78d7fc5c8a1c5469e8d104fe6fe061752aa24956cb2f28e0c8a219ec"
+    },
+    {
+      "path": "cw_plus/resources/strategy.png",
+      "bytes": 866,
+      "sha256": "cb0797b3c1b22d98200a61764e5c3cc16bd798352a0fec4a774b68a115036b68"
+    },
+    {
+      "path": "cw_plus/resources/synthesis.png",
+      "bytes": 1255,
+      "sha256": "d257ea9a299828cb3578e5b63e55d6e64bd0aadec8407dfc3f37506825ed2d2c"
+    },
+    {
+      "path": "cw_plus/resources/win.png",
+      "bytes": 28193,
+      "sha256": "e647338fa9d3342402f06b58cf56c8c405b6d39e2095c0a4add19f3f15cefccf"
+    },
+    {
+      "path": "cw_plus/resources/withdraw_and_settle.png",
+      "bytes": 4677,
+      "sha256": "18a9c513e588c4ff1828196b337ee38c8ccf5c3ce9fea68b4fb9828e565c4589"
+    },
+    {
+      "path": "cw_plus/reward_fast.py",
+      "bytes": 2797,
+      "sha256": "4f5f2b562e9d7842a174ba7ed22e99c95cb1cac13710de1a50d56454f0f79580"
+    },
+    {
+      "path": "cw_plus/runtime_rebuild.py",
+      "bytes": 6005,
+      "sha256": "8e9d21d81369e9e8db98b46a971f56d627c79374d2326c42fd02c5f7eff2d62e"
+    },
+    {
+      "path": "cw_plus/scoped_logging.py",
+      "bytes": 2367,
+      "sha256": "9fdfca8ef472a020c95dfad7abeac61c50e1930d07e1ffa54a0d533869ff03a2"
+    },
+    {
+      "path": "cw_plus/session.py",
+      "bytes": 30370,
+      "sha256": "3f40e30417bd9199149215df5805275d73c76f924c4a18910c9c4b8828045348"
+    },
+    {
+      "path": "cw_plus/shop_overlay.py",
+      "bytes": 8427,
+      "sha256": "34ccf4d091eabbb64b7bcc7e9dc1cab8f8eb3619269386d9e5c1ef57abd11a96"
+    },
+    {
+      "path": "cw_plus/shop_stall_recovery.py",
+      "bytes": 10653,
+      "sha256": "fef3634762d655afa73ea846893149c5bba43732730556bbd885869324bf6168"
+    },
+    {
+      "path": "cw_plus/shopping_batch.py",
+      "bytes": 5073,
+      "sha256": "d7635fea9bcf29506378a3e482515c778b58289602abd3c7c3d24338ae57017a"
+    },
+    {
+      "path": "cw_plus/silver_wolf_fee_recovery.py",
+      "bytes": 11773,
+      "sha256": "e3a52ab71a556edda18ffdc795705a62add3dcf1893eaa5463d0c351e84be0bc"
+    },
+    {
+      "path": "cw_plus/stop_compat.py",
+      "bytes": 2752,
+      "sha256": "e04288cf147f464b70f0545cf543c8f9a86bcf1e2f04344cc7575702c9944ed0"
+    },
+    {
+      "path": "cw_plus/strategies/himeko_level5_quality_level7_two_star_20261018.json",
+      "bytes": 10034,
+      "sha256": "339040a6d6c0b65f78a71769dce24bc9ec5c05ae83bbddedd020c39269446c3f"
+    },
+    {
+      "path": "cw_plus/strategies/silver_wolf_lv999_budget_economy_20261017.json",
+      "bytes": 8855,
+      "sha256": "a378b09991ede6b6ee3054f53dcf225e843714c76cf5cec93ef477f27870438e"
+    },
+    {
+      "path": "cw_plus/strategies/货币战争增强版_标准配置填写规范.annotated.jsonc",
+      "bytes": 27396,
+      "sha256": "18df00ffc48a843698678f538c8112368072b758092005869b9fb05662f9b73b"
+    },
+    {
+      "path": "cw_plus/strategy_catalog.py",
+      "bytes": 1620,
+      "sha256": "887a52c00c1b423eaa5a960084d8591c60c6dc6c4cd3cc1299c37973a5d17bc4"
+    },
+    {
+      "path": "cw_plus/unicode_templates.py",
+      "bytes": 12272,
+      "sha256": "4a90ad69d3b6b81acc79d92c2bc87786b3f6131c12a655951a3ea0735149a254"
+    },
+    {
+      "path": "cw_plus/vision.py",
+      "bytes": 129300,
+      "sha256": "ce364385527a644c7057d78afa364ff5722b2220f5a8a97fc03b35961042caaf"
+    }
+  ]
+}

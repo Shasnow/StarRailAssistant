@@ -1,0 +1,445 @@
+{
+  "version": 2,
+  "window_size": [
+    1920,
+    1080
+  ],
+  "aspect_tolerance": 0.0,
+  "scale_tolerance": 0.0,
+  "slots": [
+    {
+      "area": "in_hand",
+      "index": 0,
+      "position": [
+        0.229,
+        0.844
+      ],
+      "relative_box": [
+        -0.022,
+        -0.043,
+        0.022,
+        0.043
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "bench-01-empty.png",
+          "label": "empty",
+          "sha256": "1361c7bb3f4ee8238e83faeb44d15ca4fed76ea8a4d75e8cb4e60a241d57bbc9"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "bench-01-occupied.png",
+          "label": "occupied",
+          "sha256": "220577effd6e5043efdc90c4f3d5799207c0ff379691d8799413b811ef163e07"
+        }
+      ]
+    },
+    {
+      "area": "in_hand",
+      "index": 1,
+      "position": [
+        0.297,
+        0.844
+      ],
+      "relative_box": [
+        -0.022,
+        -0.043,
+        0.022,
+        0.043
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "bench-02-empty.png",
+          "label": "empty",
+          "sha256": "1f808e05ad92efb1bd170da513c4fa791f5982530c5d54879431dfaabc647d96"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "bench-02-occupied.png",
+          "label": "occupied",
+          "sha256": "c01b2add9f47b09cd4e774dd819d2995c4fc31929a7f1d3a16916aa111069afa"
+        }
+      ]
+    },
+    {
+      "area": "in_hand",
+      "index": 2,
+      "position": [
+        0.358,
+        0.844
+      ],
+      "relative_box": [
+        -0.022,
+        -0.043,
+        0.022,
+        0.043
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "bench-03-empty.png",
+          "label": "empty",
+          "sha256": "6cdeffc61d6308cba792ccb78a9cb3e20706f5ac260304726c4d226649e1220a"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "bench-03-occupied.png",
+          "label": "occupied",
+          "sha256": "c50a0bfc8278a43d47c49f06774212793e6a64139091edca34fac4d97703cc91"
+        }
+      ]
+    },
+    {
+      "area": "in_hand",
+      "index": 3,
+      "position": [
+        0.426,
+        0.844
+      ],
+      "relative_box": [
+        -0.022,
+        -0.043,
+        0.022,
+        0.043
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "bench-04-empty.png",
+          "label": "empty",
+          "sha256": "082fcd852daeabe19020c81de43d70f9a238e95365a04c74e307169237734978"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "bench-04-occupied.png",
+          "label": "occupied",
+          "sha256": "253e9f7e988f918d436d754eb699f695bcc3ce6410bc04afc5ac494d663851d6"
+        }
+      ]
+    },
+    {
+      "area": "in_hand",
+      "index": 4,
+      "position": [
+        0.488,
+        0.844
+      ],
+      "relative_box": [
+        -0.022,
+        -0.043,
+        0.022,
+        0.043
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "bench-05-empty.png",
+          "label": "empty",
+          "sha256": "e86505e1a579af966529caac040deff661e11a747b206126eee8a073d885ba4e"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "bench-05-occupied.png",
+          "label": "occupied",
+          "sha256": "ceb2320d6c9b8991a8089534bca87b94b7317a901e43b9487e4fc65355700c4d"
+        }
+      ]
+    },
+    {
+      "area": "in_hand",
+      "index": 5,
+      "position": [
+        0.556,
+        0.844
+      ],
+      "relative_box": [
+        -0.022,
+        -0.043,
+        0.022,
+        0.043
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "bench-06-empty.png",
+          "label": "empty",
+          "sha256": "10b9f61a14ae34387a32c741cd33ea4c64be57345da6ab789a5429afd7c544e2"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "bench-06-occupied.png",
+          "label": "occupied",
+          "sha256": "7712a91651222c0b571cf1a86147ce7294c64eb0f890533fcfbaa4138fc1d9f8"
+        }
+      ]
+    },
+    {
+      "area": "in_hand",
+      "index": 6,
+      "position": [
+        0.618,
+        0.844
+      ],
+      "relative_box": [
+        -0.022,
+        -0.043,
+        0.022,
+        0.043
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "bench-07-empty.png",
+          "label": "empty",
+          "sha256": "81cbd6556ee454f421903a8e7762facf3fb66544a3d7e36b56f0303358b60985"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "bench-07-occupied.png",
+          "label": "occupied",
+          "sha256": "2c122cd8e1fa3a2c8c83efd6441702fcf5ff1c984deaeb2bca31d52183c6fba7"
+        }
+      ]
+    },
+    {
+      "area": "in_hand",
+      "index": 7,
+      "position": [
+        0.684,
+        0.844
+      ],
+      "relative_box": [
+        -0.022,
+        -0.043,
+        0.022,
+        0.043
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "bench-08-empty.png",
+          "label": "empty",
+          "sha256": "34ea92fe53e1faa7df5131e1589fee89d94fb98efc220d9adba51b01735c09c0"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "bench-08-occupied.png",
+          "label": "occupied",
+          "sha256": "0704cf4a071c181a6967da9b6378a9fc3b8ca4b2862c7f71d93500fbd6694690"
+        }
+      ]
+    },
+    {
+      "area": "in_hand",
+      "index": 8,
+      "position": [
+        0.749,
+        0.844
+      ],
+      "relative_box": [
+        -0.022,
+        -0.043,
+        0.022,
+        0.043
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "bench-09-empty.png",
+          "label": "empty",
+          "sha256": "fe6dfabe7f12d09de8ef0dbdbbf3c473dad7e26e6784b4379186455f3048a300"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "bench-09-occupied.png",
+          "label": "occupied",
+          "sha256": "5d57c03d677f4d81ad6c67bf5dcb42f83da1cc6f73bb171637aaa7bf5360a2e1"
+        }
+      ]
+    },
+    {
+      "area": "store",
+      "index": 0,
+      "position": [
+        0.25,
+        0.18
+      ],
+      "relative_box": [
+        -0.045,
+        -0.07,
+        0.06,
+        0.07
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "store-01-empty.png",
+          "label": "empty",
+          "sha256": "5093e6d98a253fe27d53e4ab6f4535a0d13b6532dd7154b6fcff675a0b0b931b"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "store-01-occupied.png",
+          "label": "occupied",
+          "sha256": "4c1fe4027339e8dfb8a5730d5c74323bafe60ea184a6b35f4704d8c4a95b3fa1"
+        }
+      ]
+    },
+    {
+      "area": "store",
+      "index": 1,
+      "position": [
+        0.4,
+        0.18
+      ],
+      "relative_box": [
+        -0.045,
+        -0.07,
+        0.06,
+        0.07
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "store-02-empty.png",
+          "label": "empty",
+          "sha256": "96a67151bb653352da2d691954263edd6c76759e8a136b61159538b2f1a59386"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "store-02-occupied.png",
+          "label": "occupied",
+          "sha256": "fcc759027eb9d626d3756c47f4af3b2ec94df9fafb5f0fc70f5cc51e2a4db2a4"
+        }
+      ]
+    },
+    {
+      "area": "store",
+      "index": 2,
+      "position": [
+        0.55,
+        0.18
+      ],
+      "relative_box": [
+        -0.045,
+        -0.07,
+        0.06,
+        0.07
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "store-03-empty.png",
+          "label": "empty",
+          "sha256": "bb4727a7716630cd5771f54b52f75215d9e5a6001beba7453d4a6e35322ebfe2"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "store-03-occupied.png",
+          "label": "occupied",
+          "sha256": "7d488a66c9447b35210cead4622f20b040b693fc883209bbc27463820d6cb8d4"
+        }
+      ]
+    },
+    {
+      "area": "store",
+      "index": 3,
+      "position": [
+        0.68,
+        0.18
+      ],
+      "relative_box": [
+        -0.045,
+        -0.07,
+        0.06,
+        0.07
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "store-04-empty.png",
+          "label": "empty",
+          "sha256": "abf23683823cbc60d285924f82197328204f3a71849e48cf0c2ad31f3953d15f"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "store-04-occupied.png",
+          "label": "occupied",
+          "sha256": "72bd87167d438191a1bdef59f7cbd634ca780d7d954edd50dc59259c7da89c68"
+        }
+      ]
+    },
+    {
+      "area": "store",
+      "index": 4,
+      "position": [
+        0.8,
+        0.18
+      ],
+      "relative_box": [
+        -0.045,
+        -0.07,
+        0.06,
+        0.07
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": true,
+      "empty": [
+        {
+          "path": "store-05-empty.png",
+          "label": "empty",
+          "sha256": "817aa362e320c09042c6c1e43d15ce71f66d480dd40ecd189418dbce70aba542"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "store-05-occupied.png",
+          "label": "occupied",
+          "sha256": "a4291cc5fc9d2231842bc95c3a5aed17667974c20efbdf88da4d3c6d52b835d2"
+        }
+      ]
+    }
+  ]
+}
