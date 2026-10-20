@@ -1,1 +1,6 @@
 * text=auto eol=crlf
+
+# ssyb：发行清单按统一换行校验，跨平台检出保持相同字节。
+/extensions/currency_wars_plus.py text eol=lf
+/extensions/cw_plus/** text=auto eol=lf
+/extensions/cw_plus/**/*.png -text

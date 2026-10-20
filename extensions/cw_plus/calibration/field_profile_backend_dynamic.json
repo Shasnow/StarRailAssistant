@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "kind": "backend_field_glyph_templates",
+  "window_size": [
+    1920,
+    1080
+  ],
+  "aspect_tolerance": 0,
+  "scale_tolerance": 0,
+  "slots": [
+    {
+      "area": "off_field",
+      "index": 8,
+      "position": [
+        0.7958333333333333,
+        0.6199074074074075
+      ],
+      "relative_box": [
+        -0.013541666666666563,
+        -0.049537037037037046,
+        0.013541666666666674,
+        0.04861111111111105
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": false,
+      "empty": [
+        {
+          "path": "field-dynamic-backend-right-empty-0.png",
+          "label": "empty",
+          "sha256": "cf097959d840d626867c3c696166c7cc754d9dba61b1e495d5be353f8d0e996d",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-dynamic-backend-right-empty-1.png",
+          "label": "empty",
+          "sha256": "638e976e923a1b9e925039ccd6b137d57c2bc3222194c6f761298e0a4fafbd21",
+          "source_area": "off_field"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "field-dynamic-backend-right-occupied-2.png",
+          "label": "occupied",
+          "sha256": "62d88926975ba4069d272f827c3e252bac9e4e94ee75bda0e9e83f43a5a7f7a0",
+          "source_area": "off_field"
+        }
+      ]
+    }
+  ]
+}

@@ -23,11 +23,27 @@ public class ExtensionInfo
 /// </summary>
 public class ExtensionSchemaProperty
 {
+    [JsonPropertyName("type")]
     public string Type { get; set; } = "";
+    [JsonPropertyName("description")]
     public string Description { get; set; } = "";
+    [JsonPropertyName("default")]
     public object? Default { get; set; }
+    [JsonPropertyName("minimum")]
     public decimal? Minimum { get; set; }
+    [JsonPropertyName("maximum")]
     public decimal? Maximum { get; set; }
+    // Yukki：枚举标签与真实配置值分别传递。
+    [JsonPropertyName("enum")]
+    public List<JsonElement>? Enum { get; set; }
+    [JsonPropertyName("x-enum-labels")]
+    public List<string>? EnumLabels { get; set; }
+    [JsonPropertyName("x-refreshable")]
+    public bool Refreshable { get; set; }
+    [JsonPropertyName("x-refresh-label")]
+    public string RefreshLabel { get; set; } = "扫描";
+    [JsonPropertyName("x-allow-custom")]
+    public bool AllowCustom { get; set; }
 }
 
 /// <summary>

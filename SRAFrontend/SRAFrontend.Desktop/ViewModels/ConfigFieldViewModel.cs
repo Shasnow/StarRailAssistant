@@ -1,5 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace SRAFrontend.Desktop.ViewModels;
 
@@ -50,4 +56,139 @@ public partial class BooleanFieldViewModel : ConfigFieldViewModel
         var json = JsonSerializer.Serialize(Value);
         return JsonDocument.Parse(json).RootElement.Clone();
     }
+}
+
+/// <summary>下拉选项保留原始 JSON 值，显示名称与配置值分别保存。</summary>
+public sealed class EnumOptionViewModel(string label, JsonElement value)
+{
+    public string Label { get; } = label;
+    public JsonElement Value { get; } = value.Clone();
+}
+
+// ssyb：选项刷新保留当前真实值，避免覆盖尚未保存的配置。
+public partial class EnumFieldViewModel : ConfigFieldViewModel
+{
+    private readonly List<EnumOptionViewModel> _availableOptions = [];
+    private JsonElement _currentValue = JsonSerializer.SerializeToElement("");
+    private bool _isSynchronizing;
+
+    [ObservableProperty] private EnumOptionViewModel? _selectedOption;
+    [ObservableProperty] private string _rawText = "";
+    [ObservableProperty] private bool _allowCustom;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RefreshOptionsCommand))]
+    private bool _refreshable;
+    [ObservableProperty] private string _refreshLabel = "扫描";
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RefreshOptionsCommand))]
+    private bool _isRefreshing;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasRefreshError))]
+    private string _refreshError = "";
+    [ObservableProperty] private string _optionsStatus = "";
+
+    public ObservableCollection<EnumOptionViewModel> Options { get; } = [];
+    public bool HasRefreshError => !string.IsNullOrWhiteSpace(RefreshError);
+    public Func<EnumFieldViewModel, Task>? RefreshOptionsRequested { get; set; }
+
+    public void SetValue(JsonElement value)
+    {
+        _currentValue = value.Clone();
+        SynchronizeOptions();
+    }
+
+    public void UpdateOptions(IReadOnlyList<JsonElement> values, IReadOnlyList<string>? labels)
+    {
+        // 先构造新选项，再替换旧列表；扫描失败时旧列表仍可继续使用。
+        var options = new List<EnumOptionViewModel>();
+        for (var index = 0; index < values.Count; index++)
+        {
+            var value = values[index];
+            var label = labels?.Count == values.Count ? labels[index] : ValueText(value);
+            options.Add(new EnumOptionViewModel(label, value));
+        }
+
+        _availableOptions.Clear();
+        _availableOptions.AddRange(options);
+        SynchronizeOptions();
+        OptionsStatus = $"可选项：{options.Count} 个";
+    }
+
+    private void SynchronizeOptions()
+    {
+        _isSynchronizing = true;
+        try
+        {
+            Options.Clear();
+            foreach (var option in _availableOptions)
+                Options.Add(option);
+            var selected = Options.FirstOrDefault(option => JsonElement.DeepEquals(option.Value, _currentValue));
+            if (selected == null)
+            {
+                // 新扫描未包含已选文件或自定义路径时，保留当前配置供用户检查。
+                var text = ValueText(_currentValue);
+                selected = new EnumOptionViewModel($"{(text.Length == 0 ? "（空）" : text)}（当前值）", _currentValue);
+                Options.Add(selected);
+            }
+            SelectedOption = selected;
+            RawText = ValueText(_currentValue);
+        }
+        finally
+        {
+            _isSynchronizing = false;
+        }
+    }
+
+    partial void OnSelectedOptionChanged(EnumOptionViewModel? value)
+    {
+        if (_isSynchronizing || value == null)
+            return;
+        _currentValue = value.Value.Clone();
+        // 控件正在提交选择时不修改选项集合，避免选中索引因列表重建失效。
+        _isSynchronizing = true;
+        try
+        {
+            RawText = ValueText(_currentValue);
+        }
+        finally
+        {
+            _isSynchronizing = false;
+        }
+    }
+
+    partial void OnRawTextChanged(string value)
+    {
+        if (_isSynchronizing || !AllowCustom)
+            return;
+        _currentValue = JsonSerializer.SerializeToElement(value);
+        SynchronizeOptions();
+    }
+
+    private static string ValueText(JsonElement value) =>
+        value.ValueKind == JsonValueKind.String ? value.GetString() ?? "" : value.ToString();
+
+    private bool CanRefreshOptions() => Refreshable && !IsRefreshing;
+
+    [RelayCommand(CanExecute = nameof(CanRefreshOptions))]
+    private async Task RefreshOptionsAsync()
+    {
+        if (!CanRefreshOptions() || RefreshOptionsRequested == null)
+            return;
+        IsRefreshing = true;
+        RefreshError = "";
+        try
+        {
+            await RefreshOptionsRequested(this);
+        }
+        catch (Exception error)
+        {
+            RefreshError = $"扫描失败：{error.Message}";
+        }
+        finally
+        {
+            IsRefreshing = false;
+        }
+    }
+
+    public override JsonElement GetValueAsJson() => _currentValue.Clone();
 }

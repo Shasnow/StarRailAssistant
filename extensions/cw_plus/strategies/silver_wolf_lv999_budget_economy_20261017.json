@@ -1,0 +1,366 @@
+{
+  "title": "【5欢愉3量子】银狼低配·五级找核九级成型",
+  "description": "五级开始搜索第一张银狼LV.999，可靠确认上场后继续发展人口；七级起还须确认其实际费用至少4费，才放行常规升级。根正式角色采购目标两星，银狼升费变回一星后仍可按需求补至两星。输出职责由一星银狼覆盖，或由两星绯英、青雀、黑塔过渡；青雀和黑塔仅作为职责候选，不列为永久根采购目标。绯英和缇宝按根名单采购，缇宝不绑定输出职责，可为主C部署暂缓上场。普通经济各阶段目标均为九级，但仍受首次主C与七级费用门槛约束。购牌保留金R为0、10、20，从开局、完成6战或稳定60金币、完成12战或稳定100金币起生效，刷新和经验后保留R+10。首次搜索购牌底线0，刷新另留5金币购牌余量。1-3起允许出售，1-4起允许刷新；每个普通准备期最多12次刷新。保留阶段换人、三欢愉与双猎手保护和生存职责；可靠持有火花与开拓者后转最终四前五后，不要求专家银狼。装备优先名单包含绯英、缇宝、青雀和黑塔等已上场过渡角色，每两场真实战斗检查，3-4起开放其他角色。不配置提前全额运营。装备使用游戏推荐，不保证逐件配方、精确格位或开拓者形态。奖励快速关卡为1-8、2-6、3-6。3-7使用程序强制终局运营，覆盖常规金币保留、升级门槛和日常刷新额度，免费与付费刷新累计最多80次，末页仍处理需求牌。配置不按血量、连败或实际伤害动态调整经济，不提供实战胜率保证。",
+  "author": "dokikiiila",
+  "uploader": "YukkiSSYB",
+  "share_code": "##/4dV8ESNe9OW02k5ObasqJe9SZFgK5jHThj6tbuIhtA=##",
+  "reward_fast_rounds": [
+    "1-8",
+    "2-6",
+    "3-6"
+  ],
+  "main_c": "银狼LV.999",
+  "main_c_search_level": 5,
+  "main_c_search_min_coins": 0,
+  "main_c_search_purchase_reserve_gold": 5,
+  "min_coins": 20,
+  "min_level": 5,
+  "mid_level": 9,
+  "preparation_budget": {
+    "seconds": 120,
+    "actions": 20,
+    "recoveries": 2,
+    "move_retries": 1,
+    "total_seconds": 300,
+    "field_refresh_seconds": 60
+  },
+  "on_field": {
+    "银狼LV.999": 2,
+    "火花": 2,
+    "绯英": 2,
+    "缇宝": 2
+  },
+  "off_field": {
+    "千冶·刃": 2,
+    "爻光": 2,
+    "花火": 2,
+    "符玄": 2,
+    "开拓者": 2
+  },
+  "special_events": {
+    "头号玩家": "银狼 > 星核猎手卡带",
+    "盛会之星": "花火"
+  },
+  "formation": {
+    "roles": {
+      "survival": [
+        {
+          "name": "符玄",
+          "area": "off_field",
+          "min_stars": 1
+        },
+        {
+          "name": "藿藿",
+          "area": [
+            "on_field",
+            "off_field"
+          ],
+          "min_stars": 1
+        },
+        {
+          "name": "风堇",
+          "area": "on_field",
+          "min_stars": 1
+        }
+      ],
+      "main_damage": [
+        {
+          "name": "银狼LV.999",
+          "area": "on_field",
+          "min_stars": 1
+        },
+        {
+          "name": "绯英",
+          "area": "on_field",
+          "min_stars": 2
+        },
+        {
+          "name": "青雀",
+          "area": "on_field",
+          "min_stars": 2
+        },
+        {
+          "name": "黑塔",
+          "area": "on_field",
+          "min_stars": 2
+        }
+      ]
+    },
+    "role_requirements": {
+      "survival": {
+        "minimum": 1,
+        "candidates": [
+          "符玄"
+        ],
+        "interim_candidates": [
+          "藿藿",
+          "风堇"
+        ],
+        "on_missing": "warn_continue"
+      },
+      "main_damage": {
+        "minimum": 1,
+        "candidates": [
+          "银狼LV.999"
+        ],
+        "interim_candidates": [
+          "绯英",
+          "青雀",
+          "黑塔"
+        ],
+        "on_missing": "warn_continue"
+      }
+    },
+    "traits": {
+      "银狼LV.999": [
+        "欢愉",
+        "星核猎手"
+      ],
+      "火花": [
+        "欢愉"
+      ],
+      "绯英": [
+        "欢愉"
+      ],
+      "爻光": [
+        "欢愉"
+      ],
+      "开拓者": [
+        "欢愉"
+      ],
+      "千冶·刃": [
+        "星核猎手"
+      ],
+      "缇宝": [
+        "量子同频"
+      ],
+      "花火": [
+        "量子同频"
+      ],
+      "符玄": [
+        "量子同频"
+      ]
+    },
+    "preserve_traits": {
+      "欢愉": 3,
+      "星核猎手": 2
+    },
+    "upgrade_gate": {
+      "from_level": 7,
+      "fielded": {
+        "银狼LV.999": 1
+      },
+      "prices": {
+        "银狼LV.999": 4
+      }
+    },
+    "stages": [
+      {
+        "name": "前期三欢愉双猎手过渡",
+        "min_capacity": 0,
+        "on_field": [
+          "银狼LV.999",
+          "爻光",
+          "绯英",
+          "缇宝"
+        ],
+        "off_field": [
+          "千冶·刃"
+        ],
+        "priority": [
+          "银狼LV.999",
+          "爻光",
+          "千冶·刃",
+          "绯英",
+          "缇宝"
+        ]
+      },
+      {
+        "name": "六人口补符玄保生存",
+        "min_capacity": 6,
+        "on_field": [
+          "银狼LV.999",
+          "爻光",
+          "绯英",
+          "缇宝"
+        ],
+        "off_field": [
+          "千冶·刃",
+          "符玄"
+        ],
+        "priority": [
+          "银狼LV.999",
+          "符玄",
+          "爻光",
+          "千冶·刃",
+          "绯英",
+          "缇宝"
+        ]
+      },
+      {
+        "name": "七人口四欢愉攻略中期",
+        "min_capacity": 7,
+        "on_field": [
+          "银狼LV.999",
+          "火花",
+          "绯英",
+          "爻光"
+        ],
+        "off_field": [
+          "千冶·刃",
+          "缇宝",
+          "符玄"
+        ],
+        "priority": [
+          "银狼LV.999",
+          "符玄",
+          "爻光",
+          "千冶·刃",
+          "绯英",
+          "火花",
+          "缇宝"
+        ]
+      },
+      {
+        "name": "八人口补花火三量子",
+        "min_capacity": 8,
+        "on_field": [
+          "银狼LV.999",
+          "火花",
+          "绯英",
+          "爻光"
+        ],
+        "off_field": [
+          "千冶·刃",
+          "缇宝",
+          "花火",
+          "符玄"
+        ],
+        "priority": [
+          "银狼LV.999",
+          "符玄",
+          "爻光",
+          "千冶·刃",
+          "绯英",
+          "火花",
+          "缇宝",
+          "花火"
+        ]
+      },
+      {
+        "name": "九人口补开拓者等待成型",
+        "min_capacity": 9,
+        "on_field": [
+          "银狼LV.999",
+          "火花",
+          "绯英",
+          "爻光"
+        ],
+        "off_field": [
+          "千冶·刃",
+          "缇宝",
+          "花火",
+          "符玄",
+          "开拓者"
+        ],
+        "priority": [
+          "银狼LV.999",
+          "符玄",
+          "爻光",
+          "千冶·刃",
+          "绯英",
+          "火花",
+          "缇宝",
+          "花火",
+          "开拓者"
+        ]
+      },
+      {
+        "name": "最终低配四前台五后台",
+        "min_capacity": 9,
+        "requires_available": [
+          "火花",
+          "开拓者"
+        ],
+        "role_requirements": {
+          "survival": {
+            "on_missing": "block"
+          }
+        },
+        "on_field": [
+          "银狼LV.999",
+          "火花",
+          "绯英",
+          "缇宝"
+        ],
+        "off_field": [
+          "千冶·刃",
+          "爻光",
+          "花火",
+          "符玄",
+          "开拓者"
+        ],
+        "priority": [
+          "银狼LV.999",
+          "爻光",
+          "符玄",
+          "千冶·刃",
+          "绯英",
+          "火花",
+          "缇宝",
+          "花火",
+          "开拓者"
+        ]
+      }
+    ]
+  },
+  "opening_policy": {
+    "refresh_from_round": "1-4",
+    "sell_from_round": "1-3"
+  },
+  "economy": {
+    "enabled": true,
+    "purchase_reserve_gold": 10,
+    "stages": [
+      {
+        "from_battles": 0,
+        "target_level": 9,
+        "reserve_gold": 0,
+        "upgrade_gold": null
+      },
+      {
+        "from_battles": 6,
+        "target_level": 9,
+        "reserve_gold": 10,
+        "upgrade_gold": 60
+      },
+      {
+        "from_battles": 12,
+        "target_level": 9,
+        "reserve_gold": 20,
+        "upgrade_gold": 100
+      }
+    ]
+  },
+  "equipment": {
+    "priority_characters": [
+      "银狼LV.999",
+      "火花",
+      "绯英",
+      "缇宝",
+      "青雀",
+      "黑塔",
+      "爻光",
+      "符玄"
+    ],
+    "others_from_round": "3-4",
+    "interval_battles": 2
+  },
+  "shopping_budget": {
+    "actions": 60,
+    "seconds": 90,
+    "purchases": 60,
+    "refreshes": 12,
+    "experiences": 60
+  }
+}

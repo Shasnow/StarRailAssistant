@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.Json;
@@ -64,8 +65,24 @@ public partial class ExtensionConfigDialogViewModel : ObservableObject
         }
     }
 
-    private static ConfigFieldViewModel CreateFieldByType(string key, ExtensionSchemaProperty prop)
+    private ConfigFieldViewModel CreateFieldByType(string key, ExtensionSchemaProperty prop)
     {
+        // Yukki：枚举优先于基础类型，难度数字仍按数字保存。
+        // 空枚举也保留下拉和扫描入口，方便用户添加攻略后重新扫描。
+        if (prop.Enum != null)
+        {
+            var field = new EnumFieldViewModel
+            {
+                Key = key, Label = key, Description = prop.Description,
+                AllowCustom = prop.AllowCustom && prop.Type == "string",
+                Refreshable = prop.Refreshable,
+                RefreshLabel = string.IsNullOrWhiteSpace(prop.RefreshLabel) ? "扫描" : prop.RefreshLabel,
+                RefreshOptionsRequested = RefreshFieldOptionsAsync
+            };
+            field.UpdateOptions(prop.Enum, prop.EnumLabels);
+            return field;
+        }
+
         // 根据字段类型创建对应的子类，确保只实例化一个控件模板，
         // 而不是把三种控件都创建出来再用 IsVisible 隐藏。
         return prop.Type switch
@@ -87,10 +104,23 @@ public partial class ExtensionConfigDialogViewModel : ObservableObject
         };
     }
 
+    private async Task RefreshFieldOptionsAsync(EnumFieldViewModel field)
+    {
+        var schema = await _backendService.GetExtensionSchemaAsync(_extensionId);
+        if (schema == null || !schema.Properties.TryGetValue(field.Key, out var prop) || prop.Enum == null)
+            throw new InvalidOperationException("未能获取可选项，请确认后端已启动后重试。");
+
+        // 只更新此字段的选项，当前选择及其他未保存的配置均保持原值。
+        field.UpdateOptions(prop.Enum, prop.EnumLabels);
+    }
+
     private static void ApplyValue(ConfigFieldViewModel field, JsonElement value)
     {
         switch (field)
         {
+            case EnumFieldViewModel ef:
+                ef.SetValue(value);
+                break;
             case StringFieldViewModel sf:
                 sf.Value = value.ValueKind == JsonValueKind.String
                     ? value.GetString() ?? ""

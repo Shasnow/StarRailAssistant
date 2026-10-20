@@ -1,0 +1,843 @@
+{
+  "version": 1,
+  "kind": "field_glyph_templates",
+  "window_size": [
+    1920,
+    1080
+  ],
+  "aspect_tolerance": 0.0,
+  "scale_tolerance": 0.0,
+  "layout": {
+    "on_field": 4,
+    "off_field": 6
+  },
+  "slots": [
+    {
+      "area": "on_field",
+      "index": 0,
+      "position": [
+        0.386,
+        0.365
+      ],
+      "relative_box": [
+        -0.011520833333333369,
+        -0.04462962962962963,
+        0.015562499999999979,
+        0.05351851851851852
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": false,
+      "empty": [
+        {
+          "path": "field-on_field-0-empty-0.png",
+          "label": "empty",
+          "sha256": "0e11e39753bb91f651a35ebd5611b27602c5f7182f90617e1da443431dd1c6f7",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-on_field-0-empty-1.png",
+          "label": "empty",
+          "sha256": "ef348794ffb3f5c3a0f595cc86ca42d0dcd6a5f116232f96b02477882865e6f0",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-on_field-0-empty-2.png",
+          "label": "empty",
+          "sha256": "0332b75f54a65b88ee71e3b0d726278767958f8ce1bd4f5e9ec21d6981c1c0a8",
+          "source_area": "on_field"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "field-occupied-0-on_field-0.png",
+          "label": "occupied",
+          "sha256": "f9293100e5f11a553545a360d906d8a7a461020d189546938df487171d2b021f",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-on_field-1.png",
+          "label": "occupied",
+          "sha256": "fe78f11fd4d45f441d16108f26f10df98340879beeb08e96973339dca78c07fd",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-off_field-0.png",
+          "label": "occupied",
+          "sha256": "906fec11b6b5442d5ee8d095487628b880873f605db0e4395e987bafbbce8f69",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-0.png",
+          "label": "occupied",
+          "sha256": "45bdea027257a084af159b3cde6708fc66364a3877e728f7b44eded4a5eb230c",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-1.png",
+          "label": "occupied",
+          "sha256": "1713241f3e93f356ac030977726fe7462904c69cc755b8636786df85d256309e",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-off_field-0.png",
+          "label": "occupied",
+          "sha256": "14a99466c34e6a4faaf774634fa26ffc2f52d8ce82b34957171525619d809bc1",
+          "source_area": "off_field"
+        }
+      ]
+    },
+    {
+      "area": "on_field",
+      "index": 1,
+      "position": [
+        0.464,
+        0.365
+      ],
+      "relative_box": [
+        -0.015041666666666675,
+        -0.04462962962962963,
+        0.012041666666666617,
+        0.05351851851851852
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": false,
+      "empty": [
+        {
+          "path": "field-on_field-1-empty-0.png",
+          "label": "empty",
+          "sha256": "c06f83b767c69c7133ed866b99748d640006d393b3d9e1047a4f00975c88eba4",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-on_field-1-empty-1.png",
+          "label": "empty",
+          "sha256": "bf7874127baa1ef8287f91bbf5a57589225fe85247de883d4caa794c6698386e",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-on_field-1-empty-2.png",
+          "label": "empty",
+          "sha256": "17c68fcf9dbe6b9c7112861a48b9cd2ed5baa5b2a5524d4d1f2a8114dd1edee9",
+          "source_area": "on_field"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "field-occupied-0-on_field-0.png",
+          "label": "occupied",
+          "sha256": "f9293100e5f11a553545a360d906d8a7a461020d189546938df487171d2b021f",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-on_field-1.png",
+          "label": "occupied",
+          "sha256": "fe78f11fd4d45f441d16108f26f10df98340879beeb08e96973339dca78c07fd",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-off_field-0.png",
+          "label": "occupied",
+          "sha256": "906fec11b6b5442d5ee8d095487628b880873f605db0e4395e987bafbbce8f69",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-0.png",
+          "label": "occupied",
+          "sha256": "45bdea027257a084af159b3cde6708fc66364a3877e728f7b44eded4a5eb230c",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-1.png",
+          "label": "occupied",
+          "sha256": "1713241f3e93f356ac030977726fe7462904c69cc755b8636786df85d256309e",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-off_field-0.png",
+          "label": "occupied",
+          "sha256": "14a99466c34e6a4faaf774634fa26ffc2f52d8ce82b34957171525619d809bc1",
+          "source_area": "off_field"
+        }
+      ]
+    },
+    {
+      "area": "on_field",
+      "index": 2,
+      "position": [
+        0.536,
+        0.365
+      ],
+      "relative_box": [
+        -0.012041666666666728,
+        -0.04462962962962963,
+        0.01504166666666662,
+        0.05351851851851852
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": false,
+      "empty": [
+        {
+          "path": "field-on_field-2-empty-0.png",
+          "label": "empty",
+          "sha256": "9ce7380143ad38e206d8ad4571e85345b45b71a51b6437d79c3cca98518f5309",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-on_field-2-empty-1.png",
+          "label": "empty",
+          "sha256": "6c8f274c2d4810507ac4f93e0fe9b820c3bff33db093c3ae179aebb4eccb326f",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-on_field-2-empty-2.png",
+          "label": "empty",
+          "sha256": "484eaa39233d64f8e35081ad006b2fc65d5fb917ef3a3c5681514e99241cc563",
+          "source_area": "on_field"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "field-occupied-0-on_field-0.png",
+          "label": "occupied",
+          "sha256": "f9293100e5f11a553545a360d906d8a7a461020d189546938df487171d2b021f",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-on_field-1.png",
+          "label": "occupied",
+          "sha256": "fe78f11fd4d45f441d16108f26f10df98340879beeb08e96973339dca78c07fd",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-off_field-0.png",
+          "label": "occupied",
+          "sha256": "906fec11b6b5442d5ee8d095487628b880873f605db0e4395e987bafbbce8f69",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-0.png",
+          "label": "occupied",
+          "sha256": "45bdea027257a084af159b3cde6708fc66364a3877e728f7b44eded4a5eb230c",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-1.png",
+          "label": "occupied",
+          "sha256": "1713241f3e93f356ac030977726fe7462904c69cc755b8636786df85d256309e",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-off_field-0.png",
+          "label": "occupied",
+          "sha256": "14a99466c34e6a4faaf774634fa26ffc2f52d8ce82b34957171525619d809bc1",
+          "source_area": "off_field"
+        }
+      ]
+    },
+    {
+      "area": "on_field",
+      "index": 3,
+      "position": [
+        0.611,
+        0.365
+      ],
+      "relative_box": [
+        -0.012562500000000032,
+        -0.04462962962962963,
+        0.014520833333333316,
+        0.05351851851851852
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": false,
+      "empty": [
+        {
+          "path": "field-on_field-3-empty-0.png",
+          "label": "empty",
+          "sha256": "da28e72f0252a813df1b4ee3f5cc68d0ed39eb70feaaf522fd459fafa24ce9f4",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-on_field-3-empty-1.png",
+          "label": "empty",
+          "sha256": "27d420f4233bfad1b97b5ab9ca494fcdc4d618697ea40f93bb4a506a029b07db",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-on_field-3-empty-2.png",
+          "label": "empty",
+          "sha256": "641ef3360d2c4592088e95b3668b13313a1c8af89827eecb9d9e4f55442e743e",
+          "source_area": "on_field"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "field-occupied-0-on_field-0.png",
+          "label": "occupied",
+          "sha256": "f9293100e5f11a553545a360d906d8a7a461020d189546938df487171d2b021f",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-on_field-1.png",
+          "label": "occupied",
+          "sha256": "fe78f11fd4d45f441d16108f26f10df98340879beeb08e96973339dca78c07fd",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-off_field-0.png",
+          "label": "occupied",
+          "sha256": "906fec11b6b5442d5ee8d095487628b880873f605db0e4395e987bafbbce8f69",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-0.png",
+          "label": "occupied",
+          "sha256": "45bdea027257a084af159b3cde6708fc66364a3877e728f7b44eded4a5eb230c",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-1.png",
+          "label": "occupied",
+          "sha256": "1713241f3e93f356ac030977726fe7462904c69cc755b8636786df85d256309e",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-off_field-0.png",
+          "label": "occupied",
+          "sha256": "14a99466c34e6a4faaf774634fa26ffc2f52d8ce82b34957171525619d809bc1",
+          "source_area": "off_field"
+        }
+      ]
+    },
+    {
+      "area": "off_field",
+      "index": 0,
+      "position": [
+        0.31484375,
+        0.6199074074074075
+      ],
+      "relative_box": [
+        -0.012760416666666663,
+        -0.049537037037037046,
+        0.014322916666666685,
+        0.04861111111111105
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": false,
+      "empty": [
+        {
+          "path": "field-off_field-0-empty-0.png",
+          "label": "empty",
+          "sha256": "4460801cd98b6fd5d3eb36f0a36235d79660630ca0d9c83e2340cc8f2f91166d",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-0-empty-1.png",
+          "label": "empty",
+          "sha256": "aeb93c0999b5339882aad9979e7248a003b9b46841e52aae687fb43d5f37deb5",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-0-empty-2.png",
+          "label": "empty",
+          "sha256": "a56fa395420a4a4a4cb56b23189acc57de3b030e51570a4cbd70cf90c655c41f",
+          "source_area": "off_field"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "field-occupied-0-on_field-0.png",
+          "label": "occupied",
+          "sha256": "f9293100e5f11a553545a360d906d8a7a461020d189546938df487171d2b021f",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-on_field-1.png",
+          "label": "occupied",
+          "sha256": "fe78f11fd4d45f441d16108f26f10df98340879beeb08e96973339dca78c07fd",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-off_field-0.png",
+          "label": "occupied",
+          "sha256": "906fec11b6b5442d5ee8d095487628b880873f605db0e4395e987bafbbce8f69",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-0.png",
+          "label": "occupied",
+          "sha256": "45bdea027257a084af159b3cde6708fc66364a3877e728f7b44eded4a5eb230c",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-1.png",
+          "label": "occupied",
+          "sha256": "1713241f3e93f356ac030977726fe7462904c69cc755b8636786df85d256309e",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-off_field-0.png",
+          "label": "occupied",
+          "sha256": "14a99466c34e6a4faaf774634fa26ffc2f52d8ce82b34957171525619d809bc1",
+          "source_area": "off_field"
+        }
+      ]
+    },
+    {
+      "area": "off_field",
+      "index": 1,
+      "position": [
+        0.3888020833333333,
+        0.6199074074074075
+      ],
+      "relative_box": [
+        -0.012760416666666663,
+        -0.049537037037037046,
+        0.014322916666666685,
+        0.04861111111111105
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": false,
+      "empty": [
+        {
+          "path": "field-off_field-1-empty-0.png",
+          "label": "empty",
+          "sha256": "c700b419ef903d6088b506c0901a2f572b1e290c0d6987a4b436c3262e894f7e",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-1-empty-1.png",
+          "label": "empty",
+          "sha256": "41c16fc045cdcd4aa34b7f81a2d5649a0ba4376e28302c9d9a2252ed011bc989",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-1-empty-2.png",
+          "label": "empty",
+          "sha256": "f4c980265878a8e1c8cde4a07134ee3c63051cd42dbab15b71097fb8751faa53",
+          "source_area": "off_field"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "field-occupied-0-on_field-0.png",
+          "label": "occupied",
+          "sha256": "f9293100e5f11a553545a360d906d8a7a461020d189546938df487171d2b021f",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-on_field-1.png",
+          "label": "occupied",
+          "sha256": "fe78f11fd4d45f441d16108f26f10df98340879beeb08e96973339dca78c07fd",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-off_field-0.png",
+          "label": "occupied",
+          "sha256": "906fec11b6b5442d5ee8d095487628b880873f605db0e4395e987bafbbce8f69",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-0.png",
+          "label": "occupied",
+          "sha256": "45bdea027257a084af159b3cde6708fc66364a3877e728f7b44eded4a5eb230c",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-1.png",
+          "label": "occupied",
+          "sha256": "1713241f3e93f356ac030977726fe7462904c69cc755b8636786df85d256309e",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-off_field-0.png",
+          "label": "occupied",
+          "sha256": "14a99466c34e6a4faaf774634fa26ffc2f52d8ce82b34957171525619d809bc1",
+          "source_area": "off_field"
+        }
+      ]
+    },
+    {
+      "area": "off_field",
+      "index": 2,
+      "position": [
+        0.4625,
+        0.6199074074074075
+      ],
+      "relative_box": [
+        -0.012500000000000011,
+        -0.049537037037037046,
+        0.014583333333333337,
+        0.04861111111111105
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": false,
+      "empty": [
+        {
+          "path": "field-off_field-2-empty-0.png",
+          "label": "empty",
+          "sha256": "4e579db0f93b0440687ba4e9f6466d8ccab5ee3d12e7c0c799d7b43682b77fa3",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-2-empty-1.png",
+          "label": "empty",
+          "sha256": "2dafd8ad277f816da1e1dc4c003306244289cead669ac97cec03d2ef8435ebf1",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-2-empty-2.png",
+          "label": "empty",
+          "sha256": "bfc6ac0f382b75ebdb0b209bbc985a2518d6a87a5ebf227fa54fb260c3e12c38",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-2-empty-red-full-bench-20261017.png",
+          "label": "empty",
+          "sha256": "23b2d11e4f534b9c68432392f9a5c0794c59ac4f0603eec145ef01c9c431add7",
+          "source_area": "off_field",
+          "review": "Complete empty glyph visible; lower mini-card overlay is not occupancy evidence."
+        },
+        {
+          "path": "field-off_field-2-empty-red-full-bench-20261017-phase1.png",
+          "label": "empty",
+          "sha256": "655e0414c19851bbc6e88203cff6a8b150a7d94c37d50fd8cafa6d37d434ffee",
+          "source_area": "off_field",
+          "review": "Complete empty glyph visible; lower mini-card overlay is not occupancy evidence."
+        },
+        {
+          "path": "field-off_field-2-empty-red-full-bench-20261017-phase2.png",
+          "label": "empty",
+          "sha256": "63abc0482d1ebd75c1d2094d45d2aeab9a2cd2644871f6de80b13a4a20dedb27",
+          "source_area": "off_field",
+          "review": "Complete empty glyph visible; lower mini-card overlay is not occupancy evidence."
+        }
+      ],
+      "occupied": [
+        {
+          "path": "field-occupied-0-on_field-0.png",
+          "label": "occupied",
+          "sha256": "f9293100e5f11a553545a360d906d8a7a461020d189546938df487171d2b021f",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-on_field-1.png",
+          "label": "occupied",
+          "sha256": "fe78f11fd4d45f441d16108f26f10df98340879beeb08e96973339dca78c07fd",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-off_field-0.png",
+          "label": "occupied",
+          "sha256": "906fec11b6b5442d5ee8d095487628b880873f605db0e4395e987bafbbce8f69",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-0.png",
+          "label": "occupied",
+          "sha256": "45bdea027257a084af159b3cde6708fc66364a3877e728f7b44eded4a5eb230c",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-1.png",
+          "label": "occupied",
+          "sha256": "1713241f3e93f356ac030977726fe7462904c69cc755b8636786df85d256309e",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-off_field-0.png",
+          "label": "occupied",
+          "sha256": "14a99466c34e6a4faaf774634fa26ffc2f52d8ce82b34957171525619d809bc1",
+          "source_area": "off_field"
+        }
+      ]
+    },
+    {
+      "area": "off_field",
+      "index": 3,
+      "position": [
+        0.5375,
+        0.6199074074074075
+      ],
+      "relative_box": [
+        -0.013541666666666674,
+        -0.049537037037037046,
+        0.013541666666666674,
+        0.04861111111111105
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": false,
+      "empty": [
+        {
+          "path": "field-off_field-3-empty-0.png",
+          "label": "empty",
+          "sha256": "83b218df2fc018901ffe20131b782ace9b27c112ee33f4258cf8a32d63342f2d",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-3-empty-1.png",
+          "label": "empty",
+          "sha256": "942ac1486608e3af2566a6f974509fb9ea629ec8f18f1ba43368c96b03d1f93a",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-3-empty-2.png",
+          "label": "empty",
+          "sha256": "2eff8a4b28e0648ac21ba2abe49cc97f465e02fb2f02dc03292da734e281f731",
+          "source_area": "off_field"
+        }
+      ],
+      "occupied": [
+        {
+          "path": "field-occupied-0-on_field-0.png",
+          "label": "occupied",
+          "sha256": "f9293100e5f11a553545a360d906d8a7a461020d189546938df487171d2b021f",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-on_field-1.png",
+          "label": "occupied",
+          "sha256": "fe78f11fd4d45f441d16108f26f10df98340879beeb08e96973339dca78c07fd",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-off_field-0.png",
+          "label": "occupied",
+          "sha256": "906fec11b6b5442d5ee8d095487628b880873f605db0e4395e987bafbbce8f69",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-0.png",
+          "label": "occupied",
+          "sha256": "45bdea027257a084af159b3cde6708fc66364a3877e728f7b44eded4a5eb230c",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-1.png",
+          "label": "occupied",
+          "sha256": "1713241f3e93f356ac030977726fe7462904c69cc755b8636786df85d256309e",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-off_field-0.png",
+          "label": "occupied",
+          "sha256": "14a99466c34e6a4faaf774634fa26ffc2f52d8ce82b34957171525619d809bc1",
+          "source_area": "off_field"
+        }
+      ]
+    },
+    {
+      "area": "off_field",
+      "index": 4,
+      "position": [
+        0.6114583333333333,
+        0.6199074074074075
+      ],
+      "relative_box": [
+        -0.013541666666666674,
+        -0.049537037037037046,
+        0.013541666666666674,
+        0.04861111111111105
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": false,
+      "empty": [
+        {
+          "path": "field-off_field-4-empty-0.png",
+          "label": "empty",
+          "sha256": "fe4bfc6309b3a246c19de7d858a481eb861743a5518ae6ff92ec7d3297e6eff9",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-4-empty-1.png",
+          "label": "empty",
+          "sha256": "ff2bd1f19cb2f08ebff1c9bfd0389b4c997b57eb3dbecd0fc4e150177953ee3a",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-4-empty-2.png",
+          "label": "empty",
+          "sha256": "d13bae6918152d2fa5307abe742af69f36e92f2705a4baa66cdabdae76a0da39",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-4-empty-red-full-bench-20261017.png",
+          "label": "empty",
+          "sha256": "12c5484f0b6916e54c768559666012d849c0e1d1a3f21136aa33f7643d7c60ec",
+          "source_area": "off_field",
+          "review": "Complete empty glyph visible; lower mini-card overlay is not occupancy evidence."
+        },
+        {
+          "path": "field-off_field-4-empty-red-full-bench-20261017-phase1.png",
+          "label": "empty",
+          "sha256": "b39689e89acc5f101061f563ba2b33803ba8a581252b6a0c14f3c17990882645",
+          "source_area": "off_field",
+          "review": "Complete empty glyph visible; lower mini-card overlay is not occupancy evidence."
+        },
+        {
+          "path": "field-off_field-4-empty-red-full-bench-20261017-phase2.png",
+          "label": "empty",
+          "sha256": "6eeb3ab25c35228d281505899ca15dcbf627093c576bd78be4e05c76692d2055",
+          "source_area": "off_field",
+          "review": "Complete empty glyph visible; lower mini-card overlay is not occupancy evidence."
+        },
+        {
+          "path": "field-off_field-4-empty-red-entry-20261017.png",
+          "label": "empty",
+          "sha256": "83717446dbe9ee4f11460be62efe42671710cd755b0923329fc547f08a946539",
+          "source_area": "off_field",
+          "review": "Visually reviewed complete red empty glyph; the small lower-right overflow border is not occupancy evidence."
+        },
+        {
+          "path": "field-off_field-4-empty-red-entry-20261017-phase2.png",
+          "label": "empty",
+          "sha256": "3f7ccdb42071f828334f5c6912c5d6911c82158d1e8ba7a36838753470e30c35",
+          "source_area": "off_field",
+          "review": "Visually reviewed complete red empty glyph; the small lower-right overflow border is not occupancy evidence."
+        }
+      ],
+      "occupied": [
+        {
+          "path": "field-occupied-0-on_field-0.png",
+          "label": "occupied",
+          "sha256": "f9293100e5f11a553545a360d906d8a7a461020d189546938df487171d2b021f",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-on_field-1.png",
+          "label": "occupied",
+          "sha256": "fe78f11fd4d45f441d16108f26f10df98340879beeb08e96973339dca78c07fd",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-off_field-0.png",
+          "label": "occupied",
+          "sha256": "906fec11b6b5442d5ee8d095487628b880873f605db0e4395e987bafbbce8f69",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-0.png",
+          "label": "occupied",
+          "sha256": "45bdea027257a084af159b3cde6708fc66364a3877e728f7b44eded4a5eb230c",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-1.png",
+          "label": "occupied",
+          "sha256": "1713241f3e93f356ac030977726fe7462904c69cc755b8636786df85d256309e",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-off_field-0.png",
+          "label": "occupied",
+          "sha256": "14a99466c34e6a4faaf774634fa26ffc2f52d8ce82b34957171525619d809bc1",
+          "source_area": "off_field"
+        }
+      ]
+    },
+    {
+      "area": "off_field",
+      "index": 5,
+      "position": [
+        0.68515625,
+        0.6199074074074075
+      ],
+      "relative_box": [
+        -0.013281250000000022,
+        -0.049537037037037046,
+        0.013802083333333326,
+        0.04861111111111105
+      ],
+      "max_mae": 0.035,
+      "min_margin": 0.025,
+      "require_empty_structure": false,
+      "empty": [
+        {
+          "path": "field-off_field-5-empty-0.png",
+          "label": "empty",
+          "sha256": "bdd93719bc0dc613fa19265c87b95c771b1662872313180f08a7cec8d0c4c5df",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-5-empty-1.png",
+          "label": "empty",
+          "sha256": "07a233860c9cfc6068f6109eaf91fb1019e23b9beaa0ef4104eb3bf971afea74",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-5-empty-2.png",
+          "label": "empty",
+          "sha256": "8717885beb799f0fdb36cd3c2b4bfe2040f9b9bee3e7600cbd9de8274afc703f",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-off_field-5-empty-red-full-bench-20261017.png",
+          "label": "empty",
+          "sha256": "c5e489dbcfc85f57aab5cd47a0a27e2ae7239c9301ce447fd0d7516d1a7f8b66",
+          "source_area": "off_field",
+          "review": "Complete empty glyph visible; lower mini-card overlay is not occupancy evidence."
+        },
+        {
+          "path": "field-off_field-5-empty-red-full-bench-20261017-phase1.png",
+          "label": "empty",
+          "sha256": "501253571c8181bd952011f72b77c23b68fa2868ec25f1d248cd3d25b541c6ab",
+          "source_area": "off_field",
+          "review": "Complete empty glyph visible; lower mini-card overlay is not occupancy evidence."
+        },
+        {
+          "path": "field-off_field-5-empty-red-full-bench-20261017-phase2.png",
+          "label": "empty",
+          "sha256": "24263b3f4ee6df0a1581cd3344ddba6532621e9a24863a6b30a912f4be416ba9",
+          "source_area": "off_field",
+          "review": "Complete empty glyph visible; lower mini-card overlay is not occupancy evidence."
+        }
+      ],
+      "occupied": [
+        {
+          "path": "field-occupied-0-on_field-0.png",
+          "label": "occupied",
+          "sha256": "f9293100e5f11a553545a360d906d8a7a461020d189546938df487171d2b021f",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-on_field-1.png",
+          "label": "occupied",
+          "sha256": "fe78f11fd4d45f441d16108f26f10df98340879beeb08e96973339dca78c07fd",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-0-off_field-0.png",
+          "label": "occupied",
+          "sha256": "906fec11b6b5442d5ee8d095487628b880873f605db0e4395e987bafbbce8f69",
+          "source_area": "off_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-0.png",
+          "label": "occupied",
+          "sha256": "45bdea027257a084af159b3cde6708fc66364a3877e728f7b44eded4a5eb230c",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-on_field-1.png",
+          "label": "occupied",
+          "sha256": "1713241f3e93f356ac030977726fe7462904c69cc755b8636786df85d256309e",
+          "source_area": "on_field"
+        },
+        {
+          "path": "field-occupied-1-off_field-0.png",
+          "label": "occupied",
+          "sha256": "14a99466c34e6a4faaf774634fa26ffc2f52d8ce82b34957171525619d809bc1",
+          "source_area": "off_field"
+        }
+      ]
+    }
+  ]
+}

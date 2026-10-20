@@ -1,0 +1,415 @@
+{
+  "title": "【4列车3量子】姬子五级补质量·七级二星放行",
+  "description": "按已确认战斗数推进经济：0至4场目标五级，5至7场目标七级，8至11场目标八级，12场起目标九级，不以金币提前触发阶段。五级起在现有需求和预算内补质量，目标等级不限制自然升级。七级开始首次主C搜索，确认姬子·启行上场后结束首次搜索；七级起继续买经验还须确认前台姬子至少二星，采购目标仍为三星。普通购牌保留金R依阶段为0、0、10、20，刷新和经验后保留R+10；首次搜索购牌底线10，刷新另留5金币购牌余量。1-4起允许出售和刷新，每个普通准备期免费与付费刷新合计最多12次。前期使用饮月、青雀、黑塔等输出候选与三月七、符玄、藿藿等生存候选，职责不足记录缺口继续。保留已建立四列车保护，九人口可靠持有开拓者与瓦尔特后用瓦尔特替换星期日。装备优先正式角色，每两场真实战斗检查，3-1起开放其他角色。装备使用游戏推荐，不保证逐件配方、精确格位或开拓者形态。奖励快速关卡为1-8、2-6、3-6。3-7使用程序强制终局运营，覆盖常规金币保留、升级门槛和日常刷新额度，免费与付费刷新累计最多80次，末页仍处理需求牌。配置不按血量、连败或实际伤害动态调整经济，不提供实战胜率保证。",
+  "author": "甘泽成谣雨成诗",
+  "uploader": "YukkiSSYB",
+  "share_code": "##2ziYV78bU6RmA0AcUkioD0K7DowAWueVLyA7eunvZuc=##",
+  "reward_fast_rounds": [
+    "1-8",
+    "2-6",
+    "3-6"
+  ],
+  "main_c": "姬子·启行",
+  "main_c_search_level": 7,
+  "main_c_search_min_coins": 10,
+  "main_c_search_purchase_reserve_gold": 5,
+  "min_coins": 30,
+  "min_level": 8,
+  "mid_level": 9,
+  "on_field": {
+    "姬子·启行": 3,
+    "瓦尔特": 1,
+    "开拓者": 2,
+    "花火": 2,
+    "星期日": 1,
+    "丹恒·饮月": 1
+  },
+  "off_field": {
+    "三月七": 2,
+    "刻律德菈": 2,
+    "符玄": 2,
+    "千冶·刃": 2,
+    "缇宝": 2
+  },
+  "special_events": {
+    "领航员": "护盾 三月七 > 能量 星期日 > 战技点 丹恒·饮月"
+  },
+  "formation": {
+    "roles": {
+      "march_shield": [
+        {
+          "name": "三月七",
+          "area": "off_field",
+          "min_stars": 1
+        }
+      ],
+      "frontline_presence": [
+        {
+          "name": "姬子·启行",
+          "area": "on_field",
+          "min_stars": 1
+        },
+        {
+          "name": "丹恒·饮月",
+          "area": "on_field",
+          "min_stars": 1
+        },
+        {
+          "name": "青雀",
+          "area": "on_field",
+          "min_stars": 1
+        },
+        {
+          "name": "黑塔",
+          "area": "on_field",
+          "min_stars": 1
+        }
+      ],
+      "main_damage": [
+        {
+          "name": "姬子·启行",
+          "area": "on_field",
+          "min_stars": 1
+        },
+        {
+          "name": "丹恒·饮月",
+          "area": "on_field",
+          "min_stars": 2
+        },
+        {
+          "name": "青雀",
+          "area": "on_field",
+          "min_stars": 2
+        },
+        {
+          "name": "黑塔",
+          "area": "on_field",
+          "min_stars": 2
+        }
+      ],
+      "survival": [
+        {
+          "name": "三月七",
+          "area": "off_field",
+          "min_stars": 1
+        },
+        {
+          "name": "符玄",
+          "area": "off_field",
+          "min_stars": 1
+        },
+        {
+          "name": "藿藿",
+          "area": [
+            "on_field",
+            "off_field"
+          ],
+          "min_stars": 1
+        }
+      ]
+    },
+    "role_requirements": {
+      "march_shield": {
+        "minimum": 1,
+        "candidates": [
+          "三月七"
+        ],
+        "interim_candidates": [],
+        "on_missing": "warn_continue"
+      },
+      "frontline_presence": {
+        "minimum": 1,
+        "candidates": [
+          "姬子·启行"
+        ],
+        "interim_candidates": [
+          "丹恒·饮月",
+          "青雀",
+          "黑塔"
+        ],
+        "on_missing": "warn_continue"
+      },
+      "main_damage": {
+        "minimum": 1,
+        "candidates": [
+          "姬子·启行"
+        ],
+        "interim_candidates": [
+          "丹恒·饮月",
+          "青雀",
+          "黑塔"
+        ],
+        "on_missing": "warn_continue"
+      },
+      "survival": {
+        "minimum": 1,
+        "candidates": [
+          "三月七",
+          "符玄"
+        ],
+        "interim_candidates": [
+          "藿藿"
+        ],
+        "on_missing": "warn_continue"
+      }
+    },
+    "traits": {
+      "姬子·启行": [
+        "列车同行"
+      ],
+      "丹恒·饮月": [
+        "列车同行"
+      ],
+      "星期日": [
+        "列车同行"
+      ],
+      "三月七": [
+        "列车同行"
+      ],
+      "开拓者": [
+        "列车同行"
+      ],
+      "瓦尔特": [
+        "列车同行"
+      ],
+      "花火": [
+        "量子同频"
+      ],
+      "符玄": [
+        "量子同频"
+      ],
+      "缇宝": [
+        "量子同频"
+      ]
+    },
+    "preserve_traits": {
+      "列车同行": 4
+    },
+    "upgrade_gate": {
+      "from_level": 7,
+      "fielded": {
+        "姬子·启行": 2
+      }
+    },
+    "stages": [
+      {
+        "name": "四列车起步",
+        "min_capacity": 0,
+        "on_field": [
+          "姬子·启行",
+          "丹恒·饮月",
+          "星期日"
+        ],
+        "off_field": [
+          "三月七"
+        ],
+        "priority": [
+          "姬子·启行",
+          "三月七",
+          "丹恒·饮月",
+          "星期日"
+        ]
+      },
+      {
+        "name": "五人口补千冶刃",
+        "min_capacity": 5,
+        "on_field": [
+          "姬子·启行",
+          "丹恒·饮月",
+          "星期日"
+        ],
+        "off_field": [
+          "三月七",
+          "千冶·刃"
+        ],
+        "priority": [
+          "姬子·启行",
+          "三月七",
+          "丹恒·饮月",
+          "星期日",
+          "千冶·刃"
+        ]
+      },
+      {
+        "name": "六人口补刻律",
+        "min_capacity": 6,
+        "on_field": [
+          "姬子·启行",
+          "丹恒·饮月",
+          "星期日"
+        ],
+        "off_field": [
+          "三月七",
+          "千冶·刃",
+          "刻律德菈"
+        ],
+        "priority": [
+          "姬子·启行",
+          "三月七",
+          "丹恒·饮月",
+          "星期日",
+          "千冶·刃",
+          "刻律德菈"
+        ]
+      },
+      {
+        "name": "七人口攻略中期阵容",
+        "min_capacity": 7,
+        "on_field": [
+          "姬子·启行",
+          "开拓者",
+          "花火",
+          "星期日"
+        ],
+        "off_field": [
+          "千冶·刃",
+          "三月七",
+          "刻律德菈"
+        ],
+        "priority": [
+          "姬子·启行",
+          "三月七",
+          "开拓者",
+          "星期日",
+          "花火",
+          "千冶·刃",
+          "刻律德菈"
+        ]
+      },
+      {
+        "name": "八人口补符玄",
+        "min_capacity": 8,
+        "on_field": [
+          "姬子·启行",
+          "开拓者",
+          "花火",
+          "星期日"
+        ],
+        "off_field": [
+          "三月七",
+          "刻律德菈",
+          "符玄",
+          "千冶·刃"
+        ],
+        "priority": [
+          "姬子·启行",
+          "三月七",
+          "开拓者",
+          "星期日",
+          "花火",
+          "千冶·刃",
+          "刻律德菈",
+          "符玄"
+        ]
+      },
+      {
+        "name": "九人口补缇宝等瓦尔特",
+        "min_capacity": 9,
+        "on_field": [
+          "姬子·启行",
+          "开拓者",
+          "花火",
+          "星期日"
+        ],
+        "off_field": [
+          "三月七",
+          "刻律德菈",
+          "符玄",
+          "千冶·刃",
+          "缇宝"
+        ],
+        "priority": [
+          "姬子·启行",
+          "三月七",
+          "开拓者",
+          "星期日",
+          "花火",
+          "千冶·刃",
+          "刻律德菈",
+          "符玄",
+          "缇宝"
+        ]
+      },
+      {
+        "name": "九人口瓦尔特换星期日",
+        "min_capacity": 9,
+        "requires_available": [
+          "开拓者",
+          "瓦尔特"
+        ],
+        "on_field": [
+          "姬子·启行",
+          "瓦尔特",
+          "开拓者",
+          "花火"
+        ],
+        "off_field": [
+          "三月七",
+          "刻律德菈",
+          "符玄",
+          "千冶·刃",
+          "缇宝"
+        ],
+        "priority": [
+          "姬子·启行",
+          "三月七",
+          "开拓者",
+          "瓦尔特",
+          "花火",
+          "千冶·刃",
+          "刻律德菈",
+          "符玄",
+          "缇宝"
+        ]
+      }
+    ]
+  },
+  "opening_policy": {
+    "sell_from_round": "1-4",
+    "refresh_from_round": "1-4"
+  },
+  "economy": {
+    "enabled": true,
+    "purchase_reserve_gold": 10,
+    "stages": [
+      {
+        "from_battles": 0,
+        "target_level": 5,
+        "reserve_gold": 0,
+        "upgrade_gold": null
+      },
+      {
+        "from_battles": 5,
+        "target_level": 7,
+        "reserve_gold": 0,
+        "upgrade_gold": null
+      },
+      {
+        "from_battles": 8,
+        "target_level": 8,
+        "reserve_gold": 10,
+        "upgrade_gold": null
+      },
+      {
+        "from_battles": 12,
+        "target_level": 9,
+        "reserve_gold": 20,
+        "upgrade_gold": null
+      }
+    ]
+  },
+  "equipment": {
+    "priority_characters": [
+      "姬子·启行",
+      "三月七",
+      "花火",
+      "刻律德菈",
+      "千冶·刃"
+    ],
+    "others_from_round": "3-1",
+    "interval_battles": 2
+  },
+  "shopping_budget": {
+    "refreshes": 12
+  }
+}

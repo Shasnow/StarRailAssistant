@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -9,6 +9,38 @@
              x:Class="SRAFrontend.Desktop.Views.ExtensionConfigDialogView"
              x:DataType="viewModels:ExtensionConfigDialogViewModel">
     <UserControl.DataTemplates>
+        <!-- ssyb：枚举字段共用选项和扫描入口。 -->
+        <DataTemplate DataType="viewModels:EnumFieldViewModel">
+            <StackPanel Spacing="4" Margin="0,6" ToolTip.Tip="{Binding Description}">
+                <Label Content="{Binding Label}" FontSize="14"/>
+                <TextBlock Text="{Binding Description}" FontSize="12"
+                           Opacity="0.6" TextWrapping="Wrap"
+                           IsVisible="{Binding HasDescription}"/>
+                <ComboBox ItemsSource="{Binding Options}"
+                          SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
+                          HorizontalAlignment="Stretch">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:EnumOptionViewModel">
+                            <TextBlock Text="{Binding Label}" TextWrapping="Wrap"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <StackPanel Spacing="4" IsVisible="{Binding AllowCustom}">
+                    <TextBlock Text="或填写攻略 JSON 的完整路径" FontSize="12" Opacity="0.6"/>
+                    <TextBox Text="{Binding RawText, Mode=TwoWay}"
+                             PlaceholderText="攻略 JSON 的完整路径"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding Refreshable}">
+                    <Button Content="{Binding RefreshLabel}" Command="{Binding RefreshOptionsCommand}"/>
+                    <TextBlock Text="扫描中..." IsVisible="{Binding IsRefreshing}"
+                               VerticalAlignment="Center" FontSize="12"/>
+                </StackPanel>
+                <TextBlock Text="{Binding OptionsStatus}" FontSize="12" Opacity="0.6"
+                           IsVisible="{Binding Refreshable}"/>
+                <TextBlock Text="{Binding RefreshError}" FontSize="12" Foreground="#D94343"
+                           TextWrapping="Wrap" IsVisible="{Binding HasRefreshError}"/>
+            </StackPanel>
+        </DataTemplate>
         <DataTemplate DataType="viewModels:StringFieldViewModel">
             <StackPanel Spacing="4" Margin="0,6" ToolTip.Tip="{Binding Description}">
                 <Label Content="{Binding Label}" FontSize="14"/>
