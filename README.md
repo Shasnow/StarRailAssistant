@@ -25,8 +25,6 @@
 
 ## ❓ 什么是SRA？
 
-货币战争独立优化扩展 `CurrencyWarsPlus` 提供阶段阵容、经济运营和流程恢复，开发者为 **YukkiSSYB**。使用方法、按重大／一般／bug修复分类的更新及测试结果见[扩展 README](extensions/cw_plus/README.md)。
-
 🤖 一个基于图像识别的崩铁自动化程序，帮您完成从启动到退出的崩铁日常。
 
 ![预览](https://starrailassistant.top/_astro/softwaremain2.C3xP9Cen_6MuUy.webp)
