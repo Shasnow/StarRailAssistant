@@ -20,7 +20,7 @@
                           SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
                           HorizontalAlignment="Stretch">
                     <ComboBox.ItemTemplate>
-                        <DataTemplate x:DataType="viewModels:EnumOptionViewModel">
+                        <DataTemplate x:DataType="viewModels:EnumOption">
                             <TextBlock Text="{Binding Label}" TextWrapping="Wrap"/>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>

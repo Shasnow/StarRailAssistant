@@ -59,7 +59,7 @@ public partial class BooleanFieldViewModel : ConfigFieldViewModel
 }
 
 /// <summary>下拉选项保留原始 JSON 值，显示名称与配置值分别保存。</summary>
-public sealed class EnumOptionViewModel(string label, JsonElement value)
+public sealed class EnumOption(string label, JsonElement value)
 {
     public string Label { get; } = label;
     public JsonElement Value { get; } = value.Clone();
@@ -68,11 +68,11 @@ public sealed class EnumOptionViewModel(string label, JsonElement value)
 // ssyb：选项刷新保留当前真实值，避免覆盖尚未保存的配置。
 public partial class EnumFieldViewModel : ConfigFieldViewModel
 {
-    private readonly List<EnumOptionViewModel> _availableOptions = [];
+    private readonly List<EnumOption> _availableOptions = [];
     private JsonElement _currentValue = JsonSerializer.SerializeToElement("");
     private bool _isSynchronizing;
 
-    [ObservableProperty] private EnumOptionViewModel? _selectedOption;
+    [ObservableProperty] private EnumOption? _selectedOption;
     [ObservableProperty] private string _rawText = "";
     [ObservableProperty] private bool _allowCustom;
     [ObservableProperty]
@@ -87,7 +87,7 @@ public partial class EnumFieldViewModel : ConfigFieldViewModel
     private string _refreshError = "";
     [ObservableProperty] private string _optionsStatus = "";
 
-    public ObservableCollection<EnumOptionViewModel> Options { get; } = [];
+    public ObservableCollection<EnumOption> Options { get; } = [];
     public bool HasRefreshError => !string.IsNullOrWhiteSpace(RefreshError);
     public Func<EnumFieldViewModel, Task>? RefreshOptionsRequested { get; set; }
 
@@ -100,12 +100,12 @@ public partial class EnumFieldViewModel : ConfigFieldViewModel
     public void UpdateOptions(IReadOnlyList<JsonElement> values, IReadOnlyList<string>? labels)
     {
         // 先构造新选项，再替换旧列表；扫描失败时旧列表仍可继续使用。
-        var options = new List<EnumOptionViewModel>();
+        var options = new List<EnumOption>();
         for (var index = 0; index < values.Count; index++)
         {
             var value = values[index];
             var label = labels?.Count == values.Count ? labels[index] : ValueText(value);
-            options.Add(new EnumOptionViewModel(label, value));
+            options.Add(new EnumOption(label, value));
         }
 
         _availableOptions.Clear();
@@ -127,7 +127,7 @@ public partial class EnumFieldViewModel : ConfigFieldViewModel
             {
                 // 新扫描未包含已选文件或自定义路径时，保留当前配置供用户检查。
                 var text = ValueText(_currentValue);
-                selected = new EnumOptionViewModel($"{(text.Length == 0 ? "（空）" : text)}（当前值）", _currentValue);
+                selected = new EnumOption($"{(text.Length == 0 ? "（空）" : text)}（当前值）", _currentValue);
                 Options.Add(selected);
             }
             SelectedOption = selected;
@@ -139,7 +139,7 @@ public partial class EnumFieldViewModel : ConfigFieldViewModel
         }
     }
 
-    partial void OnSelectedOptionChanged(EnumOptionViewModel? value)
+    partial void OnSelectedOptionChanged(EnumOption? value)
     {
         if (_isSynchronizing || value == null)
             return;
