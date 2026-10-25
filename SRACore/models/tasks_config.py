@@ -62,6 +62,7 @@ class TrailblazePowerConfig:
     gardenOfPlentyLevel2: int = 0
     isUseAssistant: bool = False
     isUseBuildTarget: bool = False
+    isMaterialPriority: bool = False
     isActivityEnabled: bool = False
     planarFissureLevel: int = 0
     realmOfTheStrangeLevel: int = 0
@@ -78,6 +79,7 @@ class TrailblazePowerConfig:
             "activity.gardenOfPlenty.level2": self.gardenOfPlentyLevel2,
             "useAssistant": self.isUseAssistant,
             "useBuildTarget": self.isUseBuildTarget,
+            "materialPriority": self.isMaterialPriority,
             "activity.enabled": self.isActivityEnabled,
             "activity.planarFissure.level": self.planarFissureLevel,
             "activity.realmOfTheStrange.level": self.realmOfTheStrangeLevel,
@@ -96,6 +98,7 @@ class TrailblazePowerConfig:
             "gardenOfPlentyLevel2": data.get("activity.gardenOfPlenty.level2", 0),
             "isUseAssistant": data.get("useAssistant", False),
             "isUseBuildTarget": data.get("useBuildTarget", False),
+            "isMaterialPriority": data.get("materialPriority", False),
             "isActivityEnabled": data.get("activity.enabled", False),
             "planarFissureLevel": data.get("activity.planarFissure.level", 0),
             "realmOfTheStrangeLevel": data.get("activity.realmOfTheStrange.level", 0),

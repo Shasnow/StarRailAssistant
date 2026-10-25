@@ -9,6 +9,9 @@ from tasks.img import IMG, TPIMG
 
 type TrailblazePowerFunc = Callable[..., bool]
 
+# 非材料类型副本（不产出角色/光锥培养材料），材料优先模式下不参与匹配
+NON_MATERIAL_SUBTASK_IDS = {"ornament_extraction", "caver_of_corrosion"}
+
 
 class LevelInfo(TypedDict):
     id: int  # 关卡id
@@ -80,9 +83,16 @@ class TrailblazePowerTask(BaseTask):
                 ))
 
     def detect_build_target_tasklist(self):
-        """识别培养目标任务信息"""
+        """识别培养目标任务信息
+
+        材料优先模式下，仅将识别到的材料类型副本（除饰品提取、侵蚀隧洞以外的副本）
+        添加进任务列表。
+        """
         self.find_session("build_target")
         logger.info("识别培养目标任务信息")
+        material_only = self.config.TrailblazePower.isMaterialPriority
+        if material_only:
+            logger.info("已启用材料优先：仅识别材料类型副本")
         boxes = self.operator.locate_all(TPIMG.TRAILBLAZE_POWER)  # 定位所有体力图标
         if not boxes:
             logger.error("未找到任何培养目标任务")
@@ -106,6 +116,9 @@ class TrailblazePowerTask(BaseTask):
         for obj in target_objects:
             # 从配置文件中匹配产物对应的副本任务
             for tid, subtask in self.sub_tasks.items():
+                if material_only and tid in NON_MATERIAL_SUBTASK_IDS:
+                    logger.debug(f"材料优先模式下跳过非材料类型副本 {tid}")
+                    continue
                 subtask_levels = subtask["levels"]
                 found = False  # 标记是否找到对应结果
                 for level in subtask_levels:

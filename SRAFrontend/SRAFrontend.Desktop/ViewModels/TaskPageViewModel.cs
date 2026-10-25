@@ -124,21 +124,24 @@ public partial class TaskPageViewModel : PageViewModel
     [ObservableProperty] public partial int TpTaskSingleTimes { get; set; } = 1;
 
     public string[] TpTaskNames => [.. _tpTasks.Select(t => t.Name)];
-    public TpTaskLevel[] CurrentTpTaskLevels => _tpTasks.ElementAt(SelectedTpTaskIndex).Levels;
 
+    // _tpTasks 在后端就绪前为空，以下取值一律用 ElementAtOrDefault 兜底，避免绑定求值时抛越界异常
+    public TpTaskLevel[] CurrentTpTaskLevels => _tpTasks.ElementAtOrDefault(SelectedTpTaskIndex)?.Levels ?? [];
+
+    // 下标对应 tasks/config/trailblaze_power.toml 中 subtasks 的定义顺序
     public string[] GardenOfPlentyLevels1 =>
-        ["未选择", .. _tpTasks.ElementAt(1).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+        ["未选择", .. (_tpTasks.ElementAtOrDefault(1)?.Levels ?? []).Select(x => $"{x.Name}（{x.Result}）")];
 
     public string[] GardenOfPlentyLevels2 =>
-        ["未选择", .. _tpTasks.ElementAt(2).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+        ["未选择", .. (_tpTasks.ElementAtOrDefault(2)?.Levels ?? []).Select(x => $"{x.Name}（{x.Result}）")];
 
     public string[] PlanarFissureLevels =>
-        ["未选择", .. _tpTasks.ElementAt(0).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+        ["未选择", .. (_tpTasks.ElementAtOrDefault(0)?.Levels ?? []).Select(x => $"{x.Name}（{x.Result}）")];
 
     public string[] RealmOfTheStrangeLevels =>
-        ["未选择", .. _tpTasks.ElementAt(4).Levels.Select(x => $"{x.Name}（{x.Result}）")];
+        ["未选择", .. (_tpTasks.ElementAtOrDefault(4)?.Levels ?? []).Select(x => $"{x.Name}（{x.Result}）")];
 
-    public int CurrentTpTaskMaxSingleTimes => _tpTasks[SelectedTpTaskIndex].MaxSingleTimes;
+    public int CurrentTpTaskMaxSingleTimes => _tpTasks.ElementAtOrDefault(SelectedTpTaskIndex)?.MaxSingleTimes ?? 1;
 
     public string TaskListText =>
         TrailblazePowerConfig.TaskList.Count == 0
@@ -203,7 +206,27 @@ public partial class TaskPageViewModel : PageViewModel
     public async Task GetTpConfigAsync()
     {
         if (_tpTasks.Length > 0) return;
-        _tpTasks = await _backendService.GetTpConfigAsync();
+
+        try
+        {
+            // 页面加载时后端可能尚未就绪，命令无响应会返回空数组，
+            // 此处重试约 3 秒覆盖 Python 后端冷启动，避免副本列表一直为空
+            for (var attempt = 1; attempt <= 5; attempt++)
+            {
+                _tpTasks = await _backendService.GetTpConfigAsync();
+                if (_tpTasks.Length > 0) break;
+                if (attempt < 5) await Task.Delay(TimeSpan.FromMilliseconds(800));
+            }
+        }
+        catch (Exception ex)
+        {
+            _commonModel.ShowErrorToast("副本配置加载失败", ex.Message);
+            return;
+        }
+
+        if (_tpTasks.Length == 0)
+            _commonModel.ShowErrorToast("副本配置加载失败", "未能从后端获取副本配置，请尝试重启后端。");
+
         OnPropertyChanged(nameof(TpTaskNames));
         OnPropertyChanged(nameof(CurrentTpTaskLevels));
         OnPropertyChanged(nameof(GardenOfPlentyLevels1));
