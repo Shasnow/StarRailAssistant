@@ -1,29 +1,25 @@
-### 新增货币战争 plusv1 独立优化扩展
+### 主要更新内容:
+
+- 新增 `CurrencyWarsPlus`，支持常规与超频博弈、阶段阵容与职责、阶段经济及 3-7 终局运营。
+- 清体力培养目标新增“材料优先”选项，开启后若识别到材料型副本则忽略仪器副本，未识别到材料型副本时仍保留仪器副本。
+
+### 问题修复：
+- 修复了启动时错误地提示pynput库未安装的问题。
+- 修复了extension stop命令无法停止非后台扩展的问题。
+- 修复了货币战争中当应用攻略码失败时，程序卡死的问题。
+
+### 更新说明：
+
+#### 新增货币战争 plus 独立优化扩展
+
+此拓展是一个独立的任务，你需要拓展页面对它进行配置和运行
 
 - 新增 `CurrencyWarsPlus`，支持常规与超频博弈、阶段阵容与职责、阶段经济及 3-7 终局运营。
 - 提供动作结果核实、动态后台与锁定支援识别、会话恢复、两份正式攻略和中文配置说明。
 - 配置表单支持枚举标签、真实数值、选项扫描与自定义路径。
 - plusv1 补齐后台身份、事件观测、采购确认、出战门槛、事件交接、费用补读、结算血量与同线程任务重建。
 - 完整的重大／一般／bug修复清单、测试结果和已知限制见[扩展 README](extensions/cw_plus/README.md)。
-- 开发者：**YukkiSSYB**；感谢 **Shasnow / StarRailAssistant 贡献者**提供原始实现。
-
-### 主要更新内容:
-
-**由于AUTO-MAS正在进行服务器数据迁移，如果您的版本低于2.24.0，将无法使用AUTO-MAS和Github下载渠道。请手动更新到2.24.0或更高版本。**
-
-[点击下载最新版本](https://data.auto-mas.top/api/v1/files/starrailassistant/Release/stable/download)
-
-更新后AUTO-MAS渠道才能正常使用。
-
-见2.24.0的主要更新内容。
-
-### 问题修复：
-- 修复了启动时错误地提示pynput库未安装的问题。
-- 修复了extension stop命令无法停止非后台扩展的问题。
-
-### 更新说明：
-
-见2.24.0的更新说明。
+- 开发者：**YukkiSSYB**。
 
 [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
 
