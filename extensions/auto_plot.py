@@ -8,7 +8,7 @@ class AutoPlotConfig(BaseModel):
     skip_plot: bool = Field(default=False, description="是否自动跳过剧情对话")
 
 
-@extension(  # pyright: ignore[reportArgumentType]
+@extension(
     name="自动对话",
     description="自动检测并处理剧情对话，可按配置跳过剧情",
     background=True,

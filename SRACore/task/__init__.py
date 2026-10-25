@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass
+from typing import TypeVar, overload
 
 from PIL.Image import Image
 from loguru import logger
@@ -132,12 +134,25 @@ class TaskRegistry:
 task_registry = TaskRegistry()
 
 
-def task(_cls: type[BaseTask] | None = None, *, order: int | None = None, task_id: str | None = None):
+_TaskCls = TypeVar("_TaskCls", bound="type[BaseTask]")
+
+
+@overload
+def task(_cls: _TaskCls, /, *, order: int | None = None, task_id: str | None = None) -> _TaskCls: ...
+
+
+@overload
+def task(_cls: None = None, /, *, order: int | None = None,
+         task_id: str | None = None) -> Callable[[_TaskCls], _TaskCls]: ...
+
+
+def task(_cls: _TaskCls | None = None, /, *,
+         order: int | None = None, task_id: str | None = None) -> _TaskCls | Callable[[_TaskCls], _TaskCls]:
     """
     任务注册装饰器，用于将任务类注册到全局任务列表中，并指定执行顺序。
     """
 
-    def decorator(cls: type[BaseTask]) -> type[BaseTask]:
+    def decorator(cls: _TaskCls) -> _TaskCls:
         task_registry.register(cls, order=order, task_id=task_id)
         return cls
 

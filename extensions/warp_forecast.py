@@ -194,7 +194,7 @@ def _find_top_bar_jade(results: list[Any] | None) -> int:
     return 0
 
 
-@extension(name="抽卡资源预测", description="预测当前版本结束前的抽卡资源")  # pyright: ignore[reportArgumentType]
+@extension(name="抽卡资源预测", description="预测当前版本结束前的抽卡资源")
 class WarpForecastExtension(BaseExtension[WarpForecastConfig]):
     """预测当前版本结束前的抽卡资源。"""
 

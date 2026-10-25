@@ -460,7 +460,7 @@ class _HotkeyController:
 
 # ── 扩展入口 ──
 
-@extension(name="自动演奏", description="按 JSON 乐谱自动演奏游戏键盘（暂停 F8 / 重置 F10 / 停止 F9）")  # pyright: ignore[reportArgumentType]
+@extension(name="自动演奏", description="按 JSON 乐谱自动演奏游戏键盘（暂停 F8 / 重置 F10 / 停止 F9）")
 class AutoPlayerExtension(BaseExtension[AutoPlayerConfig]):
     """游戏自动演奏扩展。"""
 

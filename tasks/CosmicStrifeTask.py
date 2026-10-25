@@ -4,7 +4,7 @@ from SRACore.util.logger import logger
 from tasks.currency_wars.characters import Characters
 from tasks.img import DUIMG, IMG
 
-@task(order=3)  # pyright: ignore[reportCallIssue]
+@task(order=3)
 class CosmicStrifeTask(BaseTask):
     def __post_init__(self):
         self.notify = True

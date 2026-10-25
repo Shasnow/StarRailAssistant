@@ -22,7 +22,7 @@ class LoginStatus(enum.IntEnum):
     IN_GAME_PAGE = 3
     NEW_VERSION_PAGE = 4
 
-@task(order=0)  # pyright: ignore[reportCallIssue]
+@task(order=0)
 class StartGameTask(BaseTask):
     """启动游戏任务"""
 

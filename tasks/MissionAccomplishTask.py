@@ -7,7 +7,7 @@ from SRACore.util.logger import logger
 from tasks.img import IMG, MAIMG
 
 
-@task(order=4)  # pyright: ignore[reportCallIssue]
+@task(order=4)
 class MissionAccomplishTask(BaseTask):
     """任务完成任务"""
     def run(self):

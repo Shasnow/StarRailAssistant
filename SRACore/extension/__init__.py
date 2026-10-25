@@ -310,9 +310,24 @@ def reload_extensions(package: str = "extensions") -> tuple[set[str], set[str]]:
     return before, after
 
 
-def extension(_cls: type[BaseExtension[Any]] | None = None, *, extension_id: str | None = None,
+_ExtCls = TypeVar("_ExtCls", bound="type[BaseExtension[Any]]")
+
+
+@overload
+def extension(_cls: _ExtCls, /, *, extension_id: str | None = None,
               name: str | None = None, description: str | None = None,
-              background: bool = False, registry: ExtensionRegistry | None = None):
+              background: bool = False, registry: ExtensionRegistry | None = None) -> _ExtCls: ...
+
+
+@overload
+def extension(_cls: None = None, /, *, extension_id: str | None = None,
+              name: str | None = None, description: str | None = None,
+              background: bool = False, registry: ExtensionRegistry | None = None) -> Callable[[_ExtCls], _ExtCls]: ...
+
+
+def extension(_cls: _ExtCls | None = None, /, *, extension_id: str | None = None,
+              name: str | None = None, description: str | None = None,
+              background: bool = False, registry: ExtensionRegistry | None = None) -> _ExtCls | Callable[[_ExtCls], _ExtCls]:
     """扩展注册装饰器，将扩展类及其配置模型注册到注册表中。
 
     配置模型通过泛型参数声明::
@@ -342,7 +357,7 @@ def extension(_cls: type[BaseExtension[Any]] | None = None, *, extension_id: str
                 return args[0]
         return None
 
-    def decorator(cls: type[BaseExtension[Any]]) -> type[BaseExtension[Any]]:
+    def decorator(cls: _ExtCls) -> _ExtCls:
         if not issubclass(cls, BaseExtension):
             raise TypeError(f"Extension {cls.__name__} must inherit from BaseExtension")
         resolved_config = _resolve_config(cls)
