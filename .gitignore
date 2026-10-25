@@ -1,6 +1,7 @@
 # 数据和日志
 /data/
 /log/
+/tmp/
 
 # IDE / 编辑器
 /.vscode/

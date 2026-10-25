@@ -60,6 +60,23 @@ class IOperator(ABC):
         """终止目标应用程序"""
         ...
 
+    def set_window_context(self, window_title: str | None = None, executable: str | None = None, full_screen: bool | None = None) -> WindowContext:
+        """设置窗口上下文
+
+        设置窗口上下文，包括窗口标题、进程名和整屏操作模式。
+
+        Args:
+            window_title (str): 目标窗口标题
+            executable (str): 目标应用程序进程名
+            full_screen (bool): 是否开启整屏操作模式。
+        Returns:
+            WindowContext: 设置后的窗口上下文
+        """
+        self.window_context.window_title = window_title or self.window_context.window_title
+        self.window_context.executable = executable or self.window_context.executable
+        self.window_context.full_screen = full_screen or self.window_context.full_screen
+        return self.window_context
+
     def login(self, account, password, relogin: bool = False) -> int:
         ...
 
@@ -918,3 +935,8 @@ class IOperator(ABC):
 
     def active_window(self):
         pass
+
+    @property
+    def hwnd(self) -> int:
+        """目标窗口句柄，无窗口句柄的实现（如云游戏）返回 0"""
+        return 0

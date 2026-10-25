@@ -563,6 +563,13 @@ class SRACli(cmd2.Cmd):
                             help="JSON 格式的方法参数，例如 '{\"x\": 0.5, \"y\": 0.7}'")
         return parser
 
+    def _create_operator(self):
+        """按当前设置创建 Operator 实例（云游戏时使用 Browser 实现）"""
+        optype = (OperatorType.Browser
+                  if self.settings_service.settings.General.isCloudGameEnabled
+                  else OperatorType.Local)
+        return OperatorFactory.get_operator(optype, self.settings_service.settings)
+
     @cmd2.as_subcommand_to("operator", "call", _build_operator_call_parser,
                            help="调用 Operator 方法")
     def _operator_call(self, args: argparse.Namespace) -> None:
@@ -572,10 +579,7 @@ class SRACli(cmd2.Cmd):
 
         # 创建 Operator 实例，从实例获取实际方法（而非抽象类上的空方法）
         try:
-            optype = (OperatorType.Browser
-                      if self.settings_service.settings.General.isCloudGameEnabled
-                      else OperatorType.Local)
-            op = OperatorFactory.get_operator(optype, self.settings_service.settings)
+            op = self._create_operator()
         except Exception as e:
             self.err(f"Operator 初始化失败: {e}")
             return

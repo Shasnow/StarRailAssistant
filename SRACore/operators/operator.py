@@ -47,8 +47,6 @@ class Operator(IOperator):
     def __init__(self, ocr_engine: RapidOCR, settings: AppSettings,
                  stop_event: threading.Event | None = None, window_context: WindowContext | None = None):
         super().__init__(ocr_engine, settings, stop_event, window_context)
-        self.window_title = "崩坏：星穹铁道"
-        self.executable = "StarRail.exe"
         self._win: pygetwindow.Win32Window | None = None
         self._hwnd: int = 0
         if self.window_context.width <= 0:
@@ -64,15 +62,20 @@ class Operator(IOperator):
         self._win = None
         self._hwnd = 0
         try:
-            windows: list[pygetwindow.Win32Window] = pygetwindow.getWindowsWithTitle(self.window_title)  # type: ignore
+            windows: list[pygetwindow.Win32Window] = pygetwindow.getWindowsWithTitle(self.window_context.window_title)  # type: ignore
             for w in windows:
-                if w.title == self.window_title:
+                if w.title.strip() == self.window_context.window_title.strip():
                     self._win = w
                     self._hwnd = w._hWnd  # type: ignore # NOQA
                     break
         except Exception as e:
-            logger.trace(f"WindowNotFound: {self.window_title} -> {e}")
+            logger.trace(f"WindowNotFound: {self.window_context.window_title} -> {e}")
         return self._hwnd
+
+    @property
+    def hwnd(self) -> int:
+        """游戏窗口句柄，窗口不存在时返回 0"""
+        return int(self._get_hwnd() or 0)
 
     def is_window_active(self) -> bool:
         hwnd = self._get_hwnd()
@@ -83,18 +86,19 @@ class Operator(IOperator):
     def active_window(self):
         hwnd = self._get_hwnd()
         if not hwnd:
-            logger.warning(f"未找到窗口 '{self.window_title}'，无法激活")
+            logger.warning(f"未找到窗口 '{self.window_context.window_title}'，无法激活")
             return False
         if self._win is not None and not self._win.isActive:  # type: ignore
             self.press_key("ctrl")  # 通过模拟键使系统认为是“用户操作”，从而允许 SetForegroundWindow
-            self.click_point(0.5, 0.5)  # 点击窗口中心，确保窗口被激活
+            if not self.window_context.full_screen:
+                self.click_point(0.5, 0.5)  # 点击窗口中心，确保窗口被激活（全屏模式下中心点是屏幕中心，跳过）
             self._win.activate()
-            logger.info(f"已激活窗口 '{self.window_title}'")
+            logger.info(f"已激活窗口 '{self.window_context.window_title}'")
             return True
         return True
 
     def launch(self, channel, path):
-        if sys_util.is_process_running(self.executable):
+        if sys_util.is_process_running(self.window_context.executable):
             logger.info("游戏已在运行中")
             return True
 
@@ -136,10 +140,10 @@ class Operator(IOperator):
         return True
 
     def kill(self):
-        if sys_util.task_kill(self.executable):
-            logger.info(f"已终止游戏进程 {self.executable}")
+        if sys_util.task_kill(self.window_context.executable):
+            logger.info(f"已终止游戏进程 {self.window_context.executable}")
         else:
-            logger.info(f"未找到运行中的游戏进程 {self.executable}")
+            logger.info(f"未找到运行中的游戏进程 {self.window_context.executable}")
         self._hwnd = 0
         self._win = None
 
@@ -164,6 +168,14 @@ class Operator(IOperator):
             logger.error(SRAError(ErrorCode.UNKNOWN_ERROR, "修改配置文件时发生未知错误", str(e)))
 
     def get_win_region(self, active_window: bool = True) -> Region:
+        if self.window_context.full_screen:
+            # 全屏模式：整个屏幕即为操作区域，窗口上下文退化为屏幕尺寸 (left/top 为 0)
+            width, height = pyautogui.size()
+            self.window_context.left = 0
+            self.window_context.top = 0
+            self.window_context.width = width
+            self.window_context.height = height
+            return Region(0, 0, width, height)
         if active_window:
             self.active_window()
         else:
@@ -172,9 +184,9 @@ class Operator(IOperator):
         region = self._get_client_region(self._hwnd)
         if region is None:
             if self._hwnd == 0:
-                raise RuntimeError(f"无法获取窗口客户区域 '{self.window_title}' 句柄 '{self._hwnd}', 请检查游戏是否已启动")
+                raise RuntimeError(f"无法获取窗口客户区域 '{self.window_context.window_title}' 句柄 '{self._hwnd}', 请检查游戏是否已启动")
             else:
-                raise RuntimeError(f"无法获取窗口客户区域 '{self.window_title}' 句柄 '{self._hwnd}', 窗口可能被最小化")
+                raise RuntimeError(f"无法获取窗口客户区域 '{self.window_context.window_title}' 句柄 '{self._hwnd}', 窗口可能被最小化")
         return region
 
     def _get_client_region(self, hwnd: int) -> Region | None:
@@ -205,7 +217,8 @@ class Operator(IOperator):
                    jpeg_quality: int | None = None) -> Image.Image:
         region = self.get_win_region(active_window=not background)
         self.sleep(0.5)
-        img = self._screenshot(self._hwnd, region, self.screenshot_background)
+        # 全屏模式必须走屏幕抓取，窗口后台截图只能拿到游戏窗口内容
+        img = self._screenshot(self._hwnd, region, self.screenshot_background and not self.window_context.full_screen)
         if img is None:
             raise SRAError(ErrorCode.SCREENSHOT_FAILED, "无法截取窗口内容")
         if from_x is not None and from_y is not None and to_x is not None and to_y is not None:

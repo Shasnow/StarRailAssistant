@@ -4,11 +4,16 @@ from math import sqrt
 
 @dataclasses.dataclass
 class WindowContext:
-    """游戏窗口的位置与尺寸，在 Operator 实例间共享。"""
+    """游戏窗口的位置、尺寸与标识，在 Operator 实例间共享。"""
     top: int = 0
     left: int = 0
     width: int = 0
     height: int = 0
+    # 目标窗口标题与进程名
+    window_title: str = "崩坏：星穹铁道"
+    executable: str = "StarRail.exe"
+    # 整屏操作模式：为 True 时忽略窗口，坐标原点为屏幕左上角，截图覆盖整个屏幕
+    full_screen: bool = False
 
 
 @dataclasses.dataclass
