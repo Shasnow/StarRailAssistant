@@ -106,7 +106,7 @@ public partial class TrailblazePowerConfig : ObservableObject
 
     [ObservableProperty]
     [property: JsonPropertyName("materialPriority")]
-    [property: Description("培养目标是否仅识别材料类型副本，启用后跳过饰品提取与侵蚀隧洞")]
+    [property: Description("培养目标材料优先：识别到材料型副本时跳过饰品提取与侵蚀隧洞，未识别到时仍保留")]
     private bool _isMaterialPriority;
 
     [ObservableProperty]

@@ -9,7 +9,7 @@ from tasks.img import IMG, TPIMG
 
 type TrailblazePowerFunc = Callable[..., bool]
 
-# 非材料类型副本（不产出角色/光锥培养材料），材料优先模式下不参与匹配
+# 非材料类型副本（不产出角色/光锥培养材料）
 NON_MATERIAL_SUBTASK_IDS = {"ornament_extraction", "caver_of_corrosion"}
 
 
@@ -27,7 +27,7 @@ class SubtaskInfo(TypedDict):
     levels: list[LevelInfo]
 
 
-@task(order=1)  # pyright: ignore[reportCallIssue]
+@task(order=1)
 class TrailblazePowerTask(BaseTask):
     """清体力任务"""
     def __post_init__(self):
@@ -82,17 +82,34 @@ class TrailblazePowerTask(BaseTask):
                      "run_time": t.RunTimes}
                 ))
 
+    def _match_subtasks(self, obj: str) -> list[tuple[str, LevelInfo]]:
+        """按副本定义顺序找出物品 obj 命中的全部副本关卡。
+
+        Returns:
+            命中的 (副本 id, 关卡) 列表，未命中时为空列表。
+        """
+        hits: list[tuple[str, LevelInfo]] = []
+        for tid, subtask in self.sub_tasks.items():
+            for level in subtask["levels"]:
+                if obj in level["result"]:
+                    hits.append((tid, level))
+                    break
+            else:
+                logger.debug(f"Could not find {obj} in subtask results of {tid}")
+        return hits
+
     def detect_build_target_tasklist(self):
         """识别培养目标任务信息
 
-        材料优先模式下，仅将识别到的材料类型副本（除饰品提取、侵蚀隧洞以外的副本）
-        添加进任务列表。
+        材料优先模式下，若检测结果中存在材料类型副本（除饰品提取、侵蚀隧洞以外的副本），
+        则移除非材料类型副本；若不存在材料类型副本，则保留非材料类型副本。
+        单个物品命中多个副本时，材料优先模式下优先取材料类型副本。
         """
         self.find_session("build_target")
         logger.info("识别培养目标任务信息")
         material_only = self.config.TrailblazePower.isMaterialPriority
         if material_only:
-            logger.info("已启用材料优先：仅识别材料类型副本")
+            logger.info("已启用材料优先：优先识别材料类型副本")
         boxes = self.operator.locate_all(TPIMG.TRAILBLAZE_POWER)  # 定位所有体力图标
         if not boxes:
             logger.error("未找到任何培养目标任务")
@@ -113,39 +130,41 @@ class TrailblazePowerTask(BaseTask):
             self.operator.press_key('esc')
             self.operator.sleep(1)
 
+        matches: list[tuple[str, LevelInfo]] = []  # 产物与副本的匹配结果 (副本 id, 关卡)
         for obj in target_objects:
-            # 从配置文件中匹配产物对应的副本任务
-            for tid, subtask in self.sub_tasks.items():
-                if material_only and tid in NON_MATERIAL_SUBTASK_IDS:
-                    logger.debug(f"材料优先模式下跳过非材料类型副本 {tid}")
-                    continue
-                subtask_levels = subtask["levels"]
-                found = False  # 标记是否找到对应结果
-                for level in subtask_levels:
-                    if obj in level["result"]:
-                        logger.info(f"{obj} 需要刷取 {subtask.get('name')} 的关卡 {level["id"]}")
-                        found = True
-                        if tid == "echo_of_war":
-                            # 历战余响特殊处理
-                            self.manual_tasks.append((self.get_task_by_id(tid), {
-                                "level": level["id"],
-                                "single_time": 3,
-                                "run_time": 1
-                            }))
-                        else:
-                            task_name = subtask.get("name", tid)
-                            self.auto_detect_tasks.append(
-                                TrailblazePowerTaskItem(
-                                    Name=task_name,
-                                    Id=tid,
-                                    Level=level["id"]
-                                )
-                            )
-                        break
-                else:
-                    logger.debug(f"Could not find {obj} in subtask results of {tid}")
-                if found:
-                    break
+            hits = self._match_subtasks(obj)  # 从配置文件中匹配产物对应的副本任务
+            if not hits:
+                continue
+            # 材料优先模式下优先取命中的材料类型副本
+            material_hit = next((h for h in hits if h[0] not in NON_MATERIAL_SUBTASK_IDS), None)
+            tid, level = (material_hit or hits[0]) if material_only else hits[0]
+            logger.info(f"{obj} 需要刷取 {self.sub_tasks[tid].get('name')} 的关卡 {level["id"]}")
+            matches.append((tid, level))
+
+        if material_only:
+            material_matches = [m for m in matches if m[0] not in NON_MATERIAL_SUBTASK_IDS]
+            if material_matches:  # 存在材料类型副本时移除非材料类型副本
+                matches = material_matches
+                logger.info("材料优先：检测到材料类型副本，已移除非材料类型副本")
+            else:
+                logger.info("材料优先：未检测到材料类型副本，保留非材料类型副本")
+
+        for tid, level in matches:
+            if tid == "echo_of_war":
+                # 历战余响特殊处理
+                self.manual_tasks.append((self.get_task_by_id(tid), {
+                    "level": level["id"],
+                    "single_time": 3,
+                    "run_time": 1
+                }))
+            else:
+                self.auto_detect_tasks.append(
+                    TrailblazePowerTaskItem(
+                        Name=self.sub_tasks[tid].get("name", tid),
+                        Id=tid,
+                        Level=level["id"]
+                    )
+                )
 
     def detect_tasks(self) -> list[tuple[TrailblazePowerFunc, dict[str, int]]] | None:
         """识别体力值，计算并返回可执行的任务列表。
