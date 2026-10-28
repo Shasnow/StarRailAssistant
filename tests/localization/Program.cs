@@ -63,6 +63,25 @@ internal static class Program
 
     private static void CheckResources(string output)
     {
+        var originalCulture = CultureInfo.CurrentCulture;
+        var originalDefaultCulture = CultureInfo.DefaultThreadCurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("ja-JP");
+            foreach (var language in new[] { 0, 1, 2 })
+            {
+                UiText.ApplyCulture(language);
+                Check(CultureInfo.CurrentCulture.Name == "en-US", "UI language preserves parsing culture");
+                Check(CultureInfo.DefaultThreadCurrentCulture.Name == "ja-JP", "UI language preserves default parsing culture");
+            }
+            Check(UiText.F($"剩余 {1.5} 小时") == "Осталось: 1,5 ч.", "Russian display formatting uses UI culture");
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+            CultureInfo.DefaultThreadCurrentCulture = originalDefaultCulture;
+        }
         foreach (var language in new[] { 0, 1, 2 })
         {
             UiText.ApplyCulture(language);
@@ -169,11 +188,18 @@ internal static class Program
                         Check(text.Length > 0, $"Text controls {page}");
                         if (language == 2)
                             Check(text.Any(node => node.Text!.Any(ch => ch is >= 'А' and <= 'я')), $"Cyrillic text {page}");
+                        if (language == 2 && page == "settings")
+                        {
+                            var label = text.First(node => node.Text == Resources.RetryAfterTaskFailureText);
+                            Check(label.TextWrapping == TextWrapping.Wrap, "Long settings label wraps");
+                        }
                         if (language == 2 && page == "console")
                         {
                             var hint = text.Single(node => node.Text == ExtraResources.U0418);
                             Check(hint.TextWrapping == TextWrapping.Wrap, "Long console instruction wraps");
                             Check(hint.Bounds.Width > 0 && hint.Bounds.Right <= content.Bounds.Width, "Console instruction fits");
+                            foreach (var filter in text.Where(node => node.Text is "Trace" or "Debug" or "Info" or "Warn" or "Error"))
+                                Check(filter.TextLayout.Height <= filter.Bounds.Height + 1, "Console filter text height");
                         }
                         using var bitmap = new RenderTargetBitmap(new PixelSize(width, 700), new Vector(96, 96));
                         bitmap.Render(window);

@@ -30,6 +30,8 @@ formatted messages, numeric extension enums and the actual `LocalBackendService`
 three-pipe UTF-8 contract against an echo-only Python fixture. It then renders
 real Avalonia settings, console, Currency Wars and extension views in a headless
 SukiUI host at 800/1024 pixels in light/dark mode and all three languages.
+It also verifies that UI language selection preserves the runtime parsing culture,
+long Russian settings labels wrap, and console filter labels fit their line height.
 
 It deliberately does **not** run `App.OnFrameworkInitializationCompleted`,
 `SettingsService.Load`, registry access, updater, network services or backend CLI

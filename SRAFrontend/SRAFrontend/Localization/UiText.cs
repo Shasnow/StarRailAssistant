@@ -32,9 +32,8 @@ public static class UiText
     {
         var culture = CultureFor(language);
         Resources.Culture = culture;
-        CultureInfo.CurrentCulture = culture;
+        // 仅切换界面语言，保留数字和日期解析所用的运行时区域设置。
         CultureInfo.CurrentUICulture = culture;
-        CultureInfo.DefaultThreadCurrentCulture = culture;
         CultureInfo.DefaultThreadCurrentUICulture = culture;
     }
 
@@ -54,6 +53,6 @@ public static class UiText
         if (Resources.Culture?.Name != "ru-RU") return source.ToString(CultureInfo.CurrentCulture);
         var format = T(source.Format);
         var args = source.GetArguments().Select(value => value is string text ? T(text) : value).ToArray();
-        return string.Format(CultureInfo.CurrentCulture, format, args);
+        return string.Format(Resources.Culture, format, args);
     }
 }
