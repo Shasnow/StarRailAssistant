@@ -4,6 +4,11 @@ import { useRoute } from 'vue-router'
 import NavBar from './components/NavBar.vue'
 import HeroSection from './components/HeroSection.vue'
 import FooterSection from './components/FooterSection.vue'
+import { locale } from './i18n'
+import ruLocale from 'element-plus/es/locale/lang/ru'
+import enLocale from 'element-plus/es/locale/lang/en'
+import zhLocale from 'element-plus/es/locale/lang/zh-cn'
+const componentLocale = computed(() => locale.value === 'ru-RU' ? ruLocale : locale.value === 'en-US' ? enLocale : zhLocale)
 
 // 全屏独立页（登录页）：不渲染导航栏 / Hero / 页脚
 const route = useRoute()
@@ -12,7 +17,7 @@ const bare = computed(() => route.meta.bare === true)
 
 <template>
   <!-- 全局消息配置：顶部固定导航栏占 60px，ElMessage 默认贴顶弹出会被遮挡，统一下移到导航栏下方 -->
-  <ElConfigProvider :message="{ offset: 76 }">
+  <ElConfigProvider :message="{ offset: 76 }" :locale="componentLocale">
     <template v-if="!bare">
       <NavBar />
 

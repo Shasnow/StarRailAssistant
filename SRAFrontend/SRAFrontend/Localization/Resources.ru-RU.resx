@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:element name="root" ns1:IsDataSet="true">
+        </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="GreetingText" xml:space="preserve">
+    <value>Добро пожаловать в SRA</value>
+  </data>
+  <data name="HomeText" xml:space="preserve">
+    <value>Главная</value>
+  </data>
+  <data name="ConsoleText" xml:space="preserve">
+    <value>Консоль</value>
+  </data>
+  <data name="AdvanceText" xml:space="preserve">
+    <value>Дополнительно</value>
+  </data>
+  <data name="RegularText" xml:space="preserve">
+    <value>Общие</value>
+  </data>
+  <data name="ResourceIntegrityCheckText" xml:space="preserve">
+    <value>Проверка файлов</value>
+  </data>
+  <data name="ResourceCleanupText" xml:space="preserve">
+    <value>Очистка файлов</value>
+  </data>
+  <data name="ExtensionText" xml:space="preserve">
+    <value>Расширения</value>
+  </data>
+  <data name="SettingText" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="AutoUpdateText" xml:space="preserve">
+    <value>Автообновление</value>
+  </data>
+  <data name="EnableTrayIconText" xml:space="preserve">
+    <value>Значок в области уведомлений</value>
+  </data>
+  <data name="StartUpText" xml:space="preserve">
+    <value>Запуск</value>
+  </data>
+  <data name="ThreadSafetyText" xml:space="preserve">
+    <value>Безопасность потоков</value>
+  </data>
+  <data name="AllowNotificationText" xml:space="preserve">
+    <value>Разрешить уведомления</value>
+  </data>
+  <data name="DisplayText" xml:space="preserve">
+    <value>Интерфейс</value>
+  </data>
+  <data name="ThemeText" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="LanguageText" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="NotificationText" xml:space="preserve">
+    <value>Уведомления</value>
+  </data>
+  <data name="DefaultPageText" xml:space="preserve">
+    <value>Стартовая страница</value>
+  </data>
+  <data name="ConfidenceText" xml:space="preserve">
+    <value>Порог распознавания изображений</value>
+  </data>
+  <data name="UpdateText" xml:space="preserve">
+    <value>Обновления</value>
+  </data>
+  <data name="MirrorChyanText" xml:space="preserve">
+    <value>MirrorChyan</value>
+  </data>
+  <data name="TaskText" xml:space="preserve">
+    <value>Задачи</value>
+  </data>
+  <data name="DarkText" xml:space="preserve">
+    <value>Тёмная</value>
+  </data>
+  <data name="LightText" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
+  <data name="FollowSystemText" xml:space="preserve">
+    <value>Как в системе</value>
+  </data>
+  <data name="AboutText" xml:space="preserve">
+    <value>О программе</value>
+  </data>
+  <data name="BackgroundImageText" xml:space="preserve">
+    <value>Фоновое изображение</value>
+  </data>
+  <data name="BackgroundImageOpacityText" xml:space="preserve">
+    <value>Непрозрачность фона</value>
+  </data>
+  <data name="GithubToolTipText" xml:space="preserve">
+    <value>Открыть GitHub</value>
+  </data>
+  <data name="WebsiteToolTipText" xml:space="preserve">
+    <value>Открыть официальный сайт</value>
+  </data>
+  <data name="SponsorText" xml:space="preserve">
+    <value>Поддержать проект</value>
+  </data>
+  <data name="UpdateChannelText" xml:space="preserve">
+    <value>Канал обновлений</value>
+  </data>
+  <data name="AppChannelText" xml:space="preserve">
+    <value>Источник загрузки</value>
+  </data>
+  <data name="TaskSettingsText" xml:space="preserve">
+    <value>Настройки задач</value>
+  </data>
+  <data name="SystemNotificationText" xml:space="preserve">
+    <value>Системные уведомления</value>
+  </data>
+  <data name="EmailNotificationText" xml:space="preserve">
+    <value>Уведомления по почте</value>
+  </data>
+  <data name="ControlPanelOpacityText" xml:space="preserve">
+    <value>Непрозрачность панели управления</value>
+  </data>
+  <data name="NotSetText" xml:space="preserve">
+    <value>Не задано</value>
+  </data>
+  <data name="HotkeysText" xml:space="preserve">
+    <value>Клавиши в игре</value>
+  </data>
+  <data name="ActivityText" xml:space="preserve">
+    <value>События</value>
+  </data>
+  <data name="ChronicleText" xml:space="preserve">
+    <value>Честь Безымянных</value>
+  </data>
+  <data name="WarpText" xml:space="preserve">
+    <value>Прыжок</value>
+  </data>
+  <data name="GuideText" xml:space="preserve">
+    <value>Путеводитель межзвёздного мира</value>
+  </data>
+  <data name="MapText" xml:space="preserve">
+    <value>Карта</value>
+  </data>
+  <data name="TechniqueText" xml:space="preserve">
+    <value>Техника</value>
+  </data>
+  <data name="StopHotkeyText" xml:space="preserve">
+    <value>Клавиша остановки</value>
+  </data>
+  <data name="ModifyHoldText" xml:space="preserve">
+    <value>Удерживайте для изменения</value>
+  </data>
+  <data name="StartGameText" xml:space="preserve">
+    <value>Запуск игры</value>
+  </data>
+  <data name="TrailblazePowerText" xml:space="preserve">
+    <value>Энергия Освоения</value>
+  </data>
+  <data name="ReceiveRewardsText" xml:space="preserve">
+    <value>Получение наград</value>
+  </data>
+  <data name="CosmicStrifeText" xml:space="preserve">
+    <value>Космическое противостояние</value>
+  </data>
+  <data name="InTheEndText" xml:space="preserve">
+    <value>После выполнения</value>
+  </data>
+  <data name="StopText" xml:space="preserve">
+    <value>Остановить</value>
+  </data>
+  <data name="CurrentText" xml:space="preserve">
+    <value>Текущая</value>
+  </data>
+  <data name="AllText" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="SaveOnlyText" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="UnknownText" xml:space="preserve">
+    <value>Неизвестно</value>
+  </data>
+  <data name="ConfigInputMarkText" xml:space="preserve">
+    <value>Введите имя конфигурации</value>
+  </data>
+  <data name="NewConfigText" xml:space="preserve">
+    <value>Новая конфигурация</value>
+  </data>
+  <data name="EnsureText" xml:space="preserve">
+    <value>Подтвердить</value>
+  </data>
+  <data name="RemoveConfigText" xml:space="preserve">
+    <value>Удалить текущую конфигурацию</value>
+  </data>
+  <data name="StartButtonTipText" xml:space="preserve">
+    <value>Выполнить задачи в выбранном режиме</value>
+  </data>
+  <data name="CurrentButtonTipText" xml:space="preserve">
+    <value>Запустить выбранную конфигурацию</value>
+  </data>
+  <data name="AllButtonTipText" xml:space="preserve">
+    <value>Запустить все конфигурации</value>
+  </data>
+  <data name="SaveOnlyButtonTipText" xml:space="preserve">
+    <value>Сохранить настройки без запуска задач</value>
+  </data>
+  <data name="BgImagePathWatermarkText" xml:space="preserve">
+    <value>Введите путь к изображению</value>
+  </data>
+  <data name="SmtpSettingsText" xml:space="preserve">
+    <value>Настройки SMTP</value>
+  </data>
+  <data name="SmtpServerText" xml:space="preserve">
+    <value>Сервер SMTP</value>
+  </data>
+  <data name="SmtpPortText" xml:space="preserve">
+    <value>Порт SMTP</value>
+  </data>
+  <data name="SenderEmailAddrText" xml:space="preserve">
+    <value>Отправитель</value>
+  </data>
+  <data name="AuthorCodeText" xml:space="preserve">
+    <value>Пароль приложения</value>
+  </data>
+  <data name="ReceiverEmailAddrText" xml:space="preserve">
+    <value>Получатель</value>
+  </data>
+  <data name="CreateShortcutText" xml:space="preserve">
+    <value>Создать ярлык на рабочем столе</value>
+  </data>
+  <data name="CheckForUpdateText" xml:space="preserve">
+    <value>Проверить обновления</value>
+  </data>
+  <data name="AutoUpdateTipText" xml:space="preserve">
+    <value>Автоматически загружать и распаковывать доступные обновления</value>
+  </data>
+  <data name="MirrorChyanTipText" xml:space="preserve">
+    <value>Сервис быстрой загрузки MirrorChyan</value>
+  </data>
+  <data name="BeLogsFolderText" xml:space="preserve">
+    <value>Журналы ядра</value>
+  </data>
+  <data name="FeLogsFolder" xml:space="preserve">
+    <value>Журналы интерфейса</value>
+  </data>
+  <data name="ConfigsFolder" xml:space="preserve">
+    <value>Папка конфигураций</value>
+  </data>
+  <data name="AppDataFolder" xml:space="preserve">
+    <value>Данные приложения</value>
+  </data>
+  <data name="GamePathText" xml:space="preserve">
+    <value>Путь к игре</value>
+  </data>
+  <data name="AutoDetectText" xml:space="preserve">
+    <value>Автопоиск</value>
+  </data>
+  <data name="CurrentConfigText" xml:space="preserve">
+    <value>Текущая конфигурация</value>
+  </data>
+  <data name="AutoResolutionText" xml:space="preserve">
+    <value>Автонастройка разрешения игры</value>
+  </data>
+  <data name="DeveloperOptionsText" xml:space="preserve">
+    <value>Для разработчиков</value>
+  </data>
+  <data name="EnableDeveloperOptionsText" xml:space="preserve">
+    <value>Режим разработчика</value>
+  </data>
+  <data name="SaveOcrImageText" xml:space="preserve">
+    <value>Сохранять снимки OCR</value>
+  </data>
+  <data name="CustomBackendText" xml:space="preserve">
+    <value>Другое ядро</value>
+  </data>
+  <data name="BackendCommandText" xml:space="preserve">
+    <value>Команда или исполняемый файл</value>
+  </data>
+  <data name="BackendArgumentsText" xml:space="preserve">
+    <value>Аргументы запуска</value>
+  </data>
+  <data name="BackendWorkingDirectoryText" xml:space="preserve">
+    <value>Рабочая папка</value>
+  </data>
+  <data name="BackendWorkingDirectoryHintText" xml:space="preserve">
+    <value>Пустое поле — папка приложения</value>
+  </data>
+  <data name="CloudGameText" xml:space="preserve">
+    <value>Облачная версия игры (экспериментально)</value>
+  </data>
+  <data name="EnableOverlayText" xml:space="preserve">
+    <value>Оверлей</value>
+  </data>
+  <data name="RetryAfterTaskFailureText" xml:space="preserve">
+    <value>Повторять при ошибке задачи</value>
+  </data>
+  <data name="MaxRetryCountText" xml:space="preserve">
+    <value>Число повторов</value>
+  </data>
+  <data name="GameLaunchArgumentsText" xml:space="preserve">
+    <value>Параметры запуска игры</value>
+  </data>
+  <data name="EnableGameArgsText" xml:space="preserve">
+    <value>Использовать параметры запуска</value>
+  </data>
+  <data name="WindowSizeText" xml:space="preserve">
+    <value>Размер окна</value>
+  </data>
+  <data name="DisplayModeText" xml:space="preserve">
+    <value>Режим экрана</value>
+  </data>
+  <data name="WindowedText" xml:space="preserve">
+    <value>Оконный</value>
+  </data>
+  <data name="FullScreenText" xml:space="preserve">
+    <value>Полноэкранный</value>
+  </data>
+  <data name="BorderlessWindowText" xml:space="preserve">
+    <value>Окно без рамки</value>
+  </data>
+  <data name="AdvancedParametersText" xml:space="preserve">
+    <value>Дополнительные параметры</value>
+  </data>
+  <data name="GameArgsHintText" xml:space="preserve">
+    <value>Оставьте пустым, если не уверены</value>
+  </data>
+  <data name="UseCmdLaunchText" xml:space="preserve">
+    <value>Запускать игру через CMD</value>
+  </data>
+  <data name="RememberWindowSizeText" xml:space="preserve">
+    <value>Запоминать размер и положение окна</value>
+  </data>
+  <data name="RememberWindowSizeTipText" xml:space="preserve">
+    <value>Восстанавливать размер и положение окна SRA при следующем запуске</value>
+  </data>
+  <data name="CheckText" xml:space="preserve">
+    <value>Проверить</value>
+  </data>
+  <data name="WebhookNotificationText" xml:space="preserve">
+    <value>Уведомления Webhook</value>
+  </data>
+  <data name="WebhookSettingsText" xml:space="preserve">
+    <value>Настройки Webhook</value>
+  </data>
+  <data name="PushAddressText" xml:space="preserve">
+    <value>Адрес отправки</value>
+  </data>
+  <data name="TelegramNotificationText" xml:space="preserve">
+    <value>Уведомления Telegram</value>
+  </data>
+  <data name="TelegramSettingsText" xml:space="preserve">
+    <value>Настройки Telegram</value>
+  </data>
+  <data name="BotTokenText" xml:space="preserve">
+    <value>Токен бота</value>
+  </data>
+  <data name="ChatIdText" xml:space="preserve">
+    <value>ID чата</value>
+  </data>
+  <data name="CustomApiAddressText" xml:space="preserve">
+    <value>Другой адрес API</value>
+  </data>
+  <data name="EnableProxyText" xml:space="preserve">
+    <value>Использовать прокси</value>
+  </data>
+  <data name="ProxyAddressText" xml:space="preserve">
+    <value>Адрес прокси</value>
+  </data>
+  <data name="SendScreenshotText" xml:space="preserve">
+    <value>Прикладывать снимок экрана</value>
+  </data>
+  <data name="OnText" xml:space="preserve">
+    <value>Вкл.</value>
+  </data>
+  <data name="CloseText" xml:space="preserve">
+    <value>Выкл.</value>
+  </data>
+  <data name="ServerChanNotificationText" xml:space="preserve">
+    <value>WeChat через ServerChan</value>
+  </data>
+  <data name="ServerChanSettingsText" xml:space="preserve">
+    <value>Настройки ServerChan</value>
+  </data>
+  <data name="SendKeyText" xml:space="preserve">
+    <value>SendKey</value>
+  </data>
+  <data name="OneBotNotificationText" xml:space="preserve">
+    <value>QQ через OneBot</value>
+  </data>
+  <data name="OneBotSettingsText" xml:space="preserve">
+    <value>Настройки OneBot</value>
+  </data>
+  <data name="ApiAddressText" xml:space="preserve">
+    <value>Адрес API</value>
+  </data>
+  <data name="QQPrivateText" xml:space="preserve">
+    <value>Номер QQ (личные сообщения)</value>
+  </data>
+  <data name="QQGroupText" xml:space="preserve">
+    <value>Номер группы QQ</value>
+  </data>
+  <data name="AccessTokenText" xml:space="preserve">
+    <value>Токен доступа</value>
+  </data>
+  <data name="BarkNotificationText" xml:space="preserve">
+    <value>Уведомления Bark (iOS)</value>
+  </data>
+  <data name="BarkSettingsText" xml:space="preserve">
+    <value>Настройки Bark</value>
+  </data>
+  <data name="DeviceKeyText" xml:space="preserve">
+    <value>Ключ устройства</value>
+  </data>
+  <data name="BarkApiEndpointText" xml:space="preserve">
+    <value>Адрес API Bark</value>
+  </data>
+  <data name="PushLevelText" xml:space="preserve">
+    <value>Важность уведомлений</value>
+  </data>
+  <data name="NotificationSoundText" xml:space="preserve">
+    <value>Звук уведомления</value>
+  </data>
+  <data name="NotificationIconText" xml:space="preserve">
+    <value>Значок уведомления</value>
+  </data>
+  <data name="NotificationGroupText" xml:space="preserve">
+    <value>Группа уведомлений</value>
+  </data>
+  <data name="EncryptionKeyText" xml:space="preserve">
+    <value>Ключ шифрования</value>
+  </data>
+  <data name="FeishuNotificationText" xml:space="preserve">
+    <value>Уведомления Feishu</value>
+  </data>
+  <data name="FeishuSettingsText" xml:space="preserve">
+    <value>Настройки Feishu</value>
+  </data>
+  <data name="MethodOneText" xml:space="preserve">
+    <value>Способ 1: Webhook группового бота</value>
+  </data>
+  <data name="MethodTwoText" xml:space="preserve">
+    <value>Способ 2: API приложения (выбор получателей)</value>
+  </data>
+  <data name="FeishuNotificationAddressText" xml:space="preserve">
+    <value>Адрес отправки Feishu</value>
+  </data>
+  <data name="FeishuAppIdText" xml:space="preserve">
+    <value>AppId Feishu</value>
+  </data>
+  <data name="FeishuAppSecretText" xml:space="preserve">
+    <value>AppSecret Feishu</value>
+  </data>
+  <data name="ReceiverIdText" xml:space="preserve">
+    <value>ID получателя</value>
+  </data>
+  <data name="IdTypeText" xml:space="preserve">
+    <value>Тип ID</value>
+  </data>
+  <data name="WeComNotificationText" xml:space="preserve">
+    <value>Уведомления WeCom</value>
+  </data>
+  <data name="WeComSettingsText" xml:space="preserve">
+    <value>Настройки WeCom</value>
+  </data>
+  <data name="DingTalkNotificationText" xml:space="preserve">
+    <value>Уведомления DingTalk</value>
+  </data>
+  <data name="DingTalkSettingsText" xml:space="preserve">
+    <value>Настройки DingTalk</value>
+  </data>
+  <data name="SignSecretText" xml:space="preserve">
+    <value>Ключ подписи</value>
+  </data>
+  <data name="DiscordWebhookNotificationText" xml:space="preserve">
+    <value>Discord через Webhook</value>
+  </data>
+  <data name="DiscordSettingsText" xml:space="preserve">
+    <value>Настройки Discord</value>
+  </data>
+  <data name="XxtuiNotificationText" xml:space="preserve">
+    <value>Уведомления xxtui</value>
+  </data>
+  <data name="XxtuiSettingsText" xml:space="preserve">
+    <value>Настройки xxtui</value>
+  </data>
+  <data name="ApiKeyText" xml:space="preserve">
+    <value>Ключ API</value>
+  </data>
+  <data name="NotificationSourceText" xml:space="preserve">
+    <value>Источник уведомления</value>
+  </data>
+  <data name="NotificationChannelText" xml:space="preserve">
+    <value>Канал уведомлений</value>
+  </data>
+  <data name="TaskNotificationConfigText" xml:space="preserve">
+    <value>Уведомления о задачах</value>
+  </data>
+  <data name="TaskNameText" xml:space="preserve">
+    <value>Название задачи</value>
+  </data>
+  <data name="TaskStartNotificationText" xml:space="preserve">
+    <value>При запуске</value>
+  </data>
+  <data name="TaskCompleteNotificationText" xml:space="preserve">
+    <value>При завершении</value>
+  </data>
+  <data name="ClearPowerText" xml:space="preserve">
+    <value>Расход энергии</value>
+  </data>
+  <data name="TaskCompleteText" xml:space="preserve">
+    <value>Завершение задач</value>
+  </data>
+  <data name="BackendLaunchArgsText" xml:space="preserve">
+    <value>Параметры запуска ядра</value>
+  </data>
+  <data name="UseExternalBackendText" xml:space="preserve">
+    <value>Внешнее ядро SRA</value>
+  </data>
+  <data name="ExternalBackendDescriptionText" xml:space="preserve">
+    <value>Подключить SRA.exe к ядру SRA на другом компьютере или в другом процессе.</value>
+  </data>
+  <data name="RemoteServerAddressText" xml:space="preserve">
+    <value>Адрес удалённого сервера</value>
+  </data>
+  <data name="OverlayDebugInfoText" xml:space="preserve">
+    <value>Отладочные данные в оверлее</value>
+  </data>
+  <data name="EnterCdkText" xml:space="preserve">
+    <value>Введите CDK</value>
+  </data>
+  <data name="LinksText" xml:space="preserve">
+    <value>Ссылки</value>
+  </data>
+  <data name="VersionText" xml:space="preserve">
+    <value>Версия</value>
+  </data>
+  <data name="SraWebsiteText" xml:space="preserve">
+    <value>Официальный сайт SRA</value>
+  </data>
+  <data name="SourceRepositoryText" xml:space="preserve">
+    <value>GitHub</value>
+  </data>
+  <data name="MirrorText" xml:space="preserve">
+    <value>MirrorChyan</value>
+  </data>
+  <data name="UserGroupText" xml:space="preserve">
+    <value>Сообщество (QQ)</value>
+  </data>
+  <data name="GameChineseLanguageTip" xml:space="preserve">
+    <value>Важно: для распознавания язык игры должен быть «简体中文» (упрощённый китайский). Язык интерфейса SRA не меняет язык игры.</value>
+  </data>
+  <data name="ReInstallText" xml:space="preserve">
+    <value>Переустановить последнюю версию</value>
+  </data>
+  <data name="DownloadDirText" xml:space="preserve">
+    <value>Папка загрузки</value>
+  </data>
+  <data name="OpenText" xml:space="preserve">
+    <value>Открыть</value>
+  </data>
+  <data name="CleanupText" xml:space="preserve">
+    <value>Очистить</value>
+  </data>
+  <data name="AutoBattleText" xml:space="preserve">
+    <value>Автобой</value>
+  </data>
+</root>

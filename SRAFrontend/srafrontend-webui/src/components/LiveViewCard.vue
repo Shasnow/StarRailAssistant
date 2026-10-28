@@ -1,15 +1,15 @@
 <template>
-  <PanelCard title="实时画面">
+  <PanelCard :title="t('W0059')">
     <div class="live-card">
       <!-- 画面区：恒深终端底（terminal-scope 固定深色寄存器），PNG 帧按比例缩放居中展示 -->
       <div class="live-screen terminal-scope">
-        <img v-if="frameUrl" :src="frameUrl" alt="实时画面" class="live-img" />
+        <img v-if="frameUrl" :src="frameUrl" :alt="t('W0059')" class="live-img" />
         <div v-else class="live-placeholder">
           <template v-if="viewing">
             <span class="live-spinner" aria-hidden="true" />
-            <span>正在获取画面…</span>
+            <span>{{ t('W0060') }}</span>
           </template>
-          <template v-else>实时查看未启动</template>
+          <template v-else>{{ t('W0061') }}</template>
         </div>
 
         <!-- LIVE 角标：轮询进行中时显示 -->
@@ -25,30 +25,32 @@
       <!-- 启动/停止实时查看 -->
       <div class="live-controls">
         <el-button type="success" :icon="VideoPlay" :disabled="viewing" @click="start">
-          启动实时查看
+          {{ t('W0062') }}
         </el-button>
         <el-button type="danger" :icon="VideoPause" :disabled="!viewing" @click="stop">
-          停止
+          {{ t('W0029') }}
         </el-button>
       </div>
 
       <!-- 轮询间隔调整：运行中修改立即按新间隔生效 -->
       <div class="live-settings">
-        <span class="live-label">轮询间隔</span>
+        <span class="live-label">{{ t('W0063') }}</span>
         <el-select v-model="intervalMs" size="small" class="interval-select">
           <el-option v-for="opt in INTERVAL_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
         </el-select>
       </div>
 
       <div class="live-meta">
-        <template v-if="frameUrl">上次更新 {{ lastUpdated }} · 已接收 {{ frameCount }} 帧</template>
-        <template v-else>等待画面数据</template>
+        <template v-if="frameUrl">{{ t('W0064') }} {{ lastUpdated }} {{ t('W0065') }} {{ frameCount }} {{ t('W0066') }}</template>
+        <template v-else>{{ t('W0067') }}</template>
       </div>
     </div>
   </PanelCard>
 </template>
 
 <script setup lang="ts">
+import { t } from '@/i18n'
+
 import { VideoPause, VideoPlay } from '@element-plus/icons-vue'
 import { useIntervalFn, useLocalStorage } from '@vueuse/core'
 import { onScopeDispose, ref, watch } from 'vue'
@@ -58,11 +60,11 @@ import PanelCard from './PanelCard.vue'
 
 /** 可选轮询间隔 */
 const INTERVAL_OPTIONS = [
-  { label: '0.5 秒', value: 500 },
-  { label: '1 秒', value: 1000 },
-  { label: '2 秒', value: 2000 },
-  { label: '5 秒', value: 5000 },
-  { label: '10 秒', value: 10000 },
+  { label: t('W0054'), value: 500 },
+  { label: t('W0055'), value: 1000 },
+  { label: t('W0056'), value: 2000 },
+  { label: t('W0057'), value: 5000 },
+  { label: t('W0058'), value: 10000 },
 ]
 
 const viewing = ref(false)

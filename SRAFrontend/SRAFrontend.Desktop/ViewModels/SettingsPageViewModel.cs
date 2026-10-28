@@ -227,7 +227,7 @@ public partial class SettingsPageViewModel : PageViewModel
             // 基础长度校验
             if (value.Length != 24)
             {
-                Cache.CdkStatus = "CDK长度错误，应为24位字符";
+                Cache.CdkStatus = global::SRAFrontend.Localization.UiText.T("CDK长度错误，应为24位字符");
                 Cache.CdkStatusForeground = "#F5222D";
                 return;
             }
@@ -282,7 +282,7 @@ public partial class SettingsPageViewModel : PageViewModel
     {
         var cdk = MirrorChyanCdk;
         // 显示"验证中"状态
-        Cache.CdkStatus = "验证中...";
+        Cache.CdkStatus = global::SRAFrontend.Localization.UiText.T("验证中...");
         Cache.CdkStatusForeground = "#FAAD14"; // 黄色表示处理中
 
         // 执行异步验证
@@ -290,7 +290,7 @@ public partial class SettingsPageViewModel : PageViewModel
 
         if (response is null)
         {
-            Cache.CdkStatus = "验证失败，无法连接到验证服务";
+            Cache.CdkStatus = global::SRAFrontend.Localization.UiText.T("验证失败，无法连接到验证服务");
             Cache.CdkStatusForeground = "#F5222D"; // 红色表示错误
             return;
         }
@@ -298,7 +298,7 @@ public partial class SettingsPageViewModel : PageViewModel
         if (response.Code == 0)
         {
             var leastTime = DateTimeOffset.FromUnixTimeSeconds(response.Data.CdkExpiredTime);
-            Cache.CdkStatus = $"CDK有效 至: {leastTime:yyyy-MM-dd HH:mm:ss}";
+            Cache.CdkStatus = global::SRAFrontend.Localization.UiText.F($"CDK有效 至: {leastTime:yyyy-MM-dd HH:mm:ss}");
             Cache.CdkStatusForeground = "#279F27"; // 绿色表示成功
         }
         else
@@ -349,29 +349,29 @@ public partial class SettingsPageViewModel : PageViewModel
             if (result.IsIntact)
             {
                 _commonModel.ShowSuccessToast(Resources.ResourceIntegrityCheckText,
-                    $"完整性检查通过，共校验 {result.TotalCount} 个文件");
+                    global::SRAFrontend.Localization.UiText.F($"完整性检查通过，共校验 {result.TotalCount} 个文件"));
                 return;
             }
 
             var problems = new StackPanel { Spacing = 8 };
-            AddProblemFiles(problems, "以下文件缺失", result.MissingFiles);
-            AddProblemFiles(problems, "以下文件校验失败（已损坏或版本不一致）", result.CorruptedFiles);
+            AddProblemFiles(problems, global::SRAFrontend.Localization.UiText.T("以下文件缺失"), result.MissingFiles);
+            AddProblemFiles(problems, global::SRAFrontend.Localization.UiText.T("以下文件校验失败（已损坏或版本不一致）"), result.CorruptedFiles);
             await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
             {
                 Header = Resources.ResourceIntegrityCheckText,
                 Content = new ScrollViewer { MaxHeight = 400, Content = problems },
                 ActionButtonsSource =
-                    [SukiMessageBoxButtonsFactory.CreateButton("知道了", SukiMessageBoxResult.Cancel)]
+                    [SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("知道了"), SukiMessageBoxResult.Cancel)]
             });
         }
         catch (FileNotFoundException)
         {
             _commonModel.ShowErrorToast(Resources.ResourceIntegrityCheckText,
-                "未找到完整性清单文件（manifest.md5.json），请通过应用内更新重新安装后再试");
+                global::SRAFrontend.Localization.UiText.T("未找到完整性清单文件（manifest.md5.json），请通过应用内更新重新安装后再试"));
         }
         catch (Exception e)
         {
-            _commonModel.ShowErrorToast(Resources.ResourceIntegrityCheckText, $"检查失败：{e.Message}");
+            _commonModel.ShowErrorToast(Resources.ResourceIntegrityCheckText, global::SRAFrontend.Localization.UiText.F($"检查失败：{e.Message}"));
         }
         finally
         {
@@ -385,7 +385,7 @@ public partial class SettingsPageViewModel : PageViewModel
         if (files.Count == 0) return;
         panel.Children.Add(new TextBlock
         {
-            Text = $"{header}（{files.Count} 个）",
+            Text = global::SRAFrontend.Localization.UiText.F($"{header}（{files.Count} 个）"),
             FontWeight = FontWeight.Bold
         });
         foreach (var file in files.Take(50))
@@ -393,7 +393,7 @@ public partial class SettingsPageViewModel : PageViewModel
         if (files.Count > 50)
             panel.Children.Add(new TextBlock
             {
-                Text = $"……其余 {files.Count - 50} 个文件省略",
+                Text = global::SRAFrontend.Localization.UiText.F($"……其余 {files.Count - 50} 个文件省略"),
                 FontSize = 12,
                 Opacity = 0.72
             });
@@ -414,7 +414,7 @@ public partial class SettingsPageViewModel : PageViewModel
             var redundant = await Task.Run(() => ZipUtil.ScanRedundantFiles(DataPath.AppRoot));
             if (redundant.Count == 0)
             {
-                _commonModel.ShowSuccessToast(Resources.ResourceCleanupText, "未发现可清理的文件");
+                _commonModel.ShowSuccessToast(Resources.ResourceCleanupText, global::SRAFrontend.Localization.UiText.T("未发现可清理的文件"));
                 return;
             }
 
@@ -426,8 +426,8 @@ public partial class SettingsPageViewModel : PageViewModel
                 Content = view,
                 ActionButtonsSource =
                 [
-                    SukiMessageBoxButtonsFactory.CreateButton("删除选中", SukiMessageBoxResult.Yes, "Flat"),
-                    SukiMessageBoxButtonsFactory.CreateButton("取消", SukiMessageBoxResult.Cancel)
+                    SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("删除选中"), SukiMessageBoxResult.Yes, "Flat"),
+                    SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("取消"), SukiMessageBoxResult.Cancel)
                 ]
             });
             if (result is not SukiMessageBoxResult.Yes) return;
@@ -435,19 +435,19 @@ public partial class SettingsPageViewModel : PageViewModel
             var (deletedCount, freedBytes, failed) = await viewModel.DeleteSelectedAsync();
             if (failed.Count == 0)
                 _commonModel.ShowSuccessToast(Resources.ResourceCleanupText,
-                    $"已删除 {deletedCount} 个文件，释放 {ZipUtil.FormatFileSize(freedBytes)}");
+                    global::SRAFrontend.Localization.UiText.F($"已删除 {deletedCount} 个文件，释放 {ZipUtil.FormatFileSize(freedBytes)}"));
             else
                 _commonModel.ShowErrorToast(Resources.ResourceCleanupText,
-                    $"已删除 {deletedCount} 个文件，{failed.Count} 个删除失败（可能被占用）：{string.Join("、", failed.Take(3))}{(failed.Count > 3 ? " 等" : "")}");
+                    global::SRAFrontend.Localization.UiText.F($"已删除 {deletedCount} 个文件，{failed.Count} 个删除失败（可能被占用）：{string.Join("、", failed.Take(3))}{(failed.Count > 3 ? " 等" : "")}"));
         }
         catch (FileNotFoundException)
         {
             _commonModel.ShowErrorToast(Resources.ResourceCleanupText,
-                "未找到完整性清单文件（manifest.md5.json），无法区分冗余文件，请通过应用内更新重新安装后再试");
+                global::SRAFrontend.Localization.UiText.T("未找到完整性清单文件（manifest.md5.json），无法区分冗余文件，请通过应用内更新重新安装后再试"));
         }
         catch (Exception e)
         {
-            _commonModel.ShowErrorToast(Resources.ResourceCleanupText, $"扫描失败：{e.Message}");
+            _commonModel.ShowErrorToast(Resources.ResourceCleanupText, global::SRAFrontend.Localization.UiText.F($"扫描失败：{e.Message}"));
         }
         finally
         {
@@ -471,7 +471,7 @@ public partial class SettingsPageViewModel : PageViewModel
         if (TopLevelObject is null) return;
         var folders = await TopLevelObject.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
-            Title = "选择下载文件的保存目录",
+            Title = global::SRAFrontend.Localization.UiText.T("选择下载文件的保存目录"),
             AllowMultiple = false
         });
         if (folders.Count == 0) return;
@@ -485,9 +485,9 @@ public partial class SettingsPageViewModel : PageViewModel
         {
             await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
             {
-                Header = "目录不可用",
-                Content = $"无法创建或访问所选目录：\n{path}\n请重新选择其他目录。",
-                ActionButtonsSource = [SukiMessageBoxButtonsFactory.CreateButton("知道了", SukiMessageBoxResult.Cancel)]
+                Header = global::SRAFrontend.Localization.UiText.T("目录不可用"),
+                Content = global::SRAFrontend.Localization.UiText.F($"无法创建或访问所选目录：\n{path}\n请重新选择其他目录。"),
+                ActionButtonsSource = [SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("知道了"), SukiMessageBoxResult.Cancel)]
             });
             return;
         }
@@ -575,7 +575,9 @@ public partial class SettingsPageViewModel : PageViewModel
 
     private void OnLanguageChanged()
     {
-        Resources.Culture = new CultureInfo(DisplaySettings.Language == 0 ? "zh-CN" : "en-US");
+        SRAFrontend.Localization.UiText.ApplyCulture(DisplaySettings.Language);
+        SukiUI.SukiTheme.GetInstance().Locale = SRAFrontend.Localization.UiText.CultureFor(DisplaySettings.Language).Name;
+        _settingsService.Save();
         OnPropertyChanged(nameof(IsLanguageNotChinese));
         OnPropertyChanged(nameof(GameChineseLanguageTip));
         _ = AskRestartAsync();
@@ -583,17 +585,17 @@ public partial class SettingsPageViewModel : PageViewModel
 
     private async Task AskRestartAsync()
     {
-        var isChinese = DisplaySettings.Language == 0;
+        var isChinese = DisplaySettings.Language != 1;
         var restartButton = SukiMessageBoxButtonsFactory.CreateButton(
-            isChinese ? "立即重启" : "Restart Now", SukiMessageBoxResult.Yes, "Flat");
+            isChinese ? global::SRAFrontend.Localization.UiText.T("立即重启") : "Restart Now", SukiMessageBoxResult.Yes, "Flat");
         var laterButton = SukiMessageBoxButtonsFactory.CreateButton(
-            isChinese ? "稍后" : "Later", SukiMessageBoxResult.Cancel);
+            isChinese ? global::SRAFrontend.Localization.UiText.T("稍后") : "Later", SukiMessageBoxResult.Cancel);
 
         var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
-            Header = isChinese ? "语言已更改" : "Language Changed",
+            Header = isChinese ? global::SRAFrontend.Localization.UiText.T("语言已更改") : "Language Changed",
             Content = isChinese
-                ? "需要重启应用以应用新语言，是否立即重启？"
+                ? global::SRAFrontend.Localization.UiText.T("需要重启应用以应用新语言，是否立即重启？")
                 : "The application needs to restart to apply the new language. Restart now?",
             ActionButtonsSource = [restartButton, laterButton]
         });
@@ -607,6 +609,7 @@ public partial class SettingsPageViewModel : PageViewModel
         var exePath = DataPath.SraExecutablePath;
         try
         {
+            _settingsService.Save();
             Process.Start(new ProcessStartInfo
             {
                 FileName = exePath,
@@ -617,10 +620,10 @@ public partial class SettingsPageViewModel : PageViewModel
         }
         catch (Exception e)
         {
-            var isChinese = DisplaySettings.Language == 0;
+            var isChinese = DisplaySettings.Language != 1;
             _commonModel.ShowErrorToast(
-                isChinese ? "重启失败" : "Restart Failed",
-                $"{(isChinese ? "发生错误" : "An error occurred")}：{e.Message}");
+                isChinese ? global::SRAFrontend.Localization.UiText.T("重启失败") : "Restart Failed",
+                global::SRAFrontend.Localization.UiText.F($"{(isChinese ? "发生错误" : "An error occurred")}：{e.Message}"));
         }
     }
 
@@ -628,128 +631,128 @@ public partial class SettingsPageViewModel : PageViewModel
     private async Task TestEmailAsync()
     {
         await SendTestNotificationAsync(
-            "邮件测试",
+            global::SRAFrontend.Localization.UiText.T("邮件测试"),
             () => !string.IsNullOrEmpty(Settings.Notification.SmtpServer.Trim()) &&
                   Settings.Notification.SmtpPort > 0 &&
                   !string.IsNullOrEmpty(Settings.Notification.SmtpSender.Trim()) &&
                   !string.IsNullOrEmpty(Settings.Notification.SmtpAuthCode.Trim()) &&
                   !string.IsNullOrEmpty(Settings.Notification.SmtpReceiver.Trim()),
-            "请先完成 SMTP 相关设置",
+            global::SRAFrontend.Localization.UiText.T("请先完成 SMTP 相关设置"),
             "notify test email",
-            "测试邮件已发送，请检查收件箱");
+            global::SRAFrontend.Localization.UiText.T("测试邮件已发送，请检查收件箱"));
     }
 
     [RelayCommand]
     private async Task TestWebhookAsync()
     {
         await SendTestNotificationAsync(
-            "Webhook 测试",
+            global::SRAFrontend.Localization.UiText.T("Webhook 测试"),
             () => !string.IsNullOrEmpty(Settings.Notification.WebhookUrl.Trim()),
-            "请先填写 Webhook 地址",
+            global::SRAFrontend.Localization.UiText.T("请先填写 Webhook 地址"),
             "notify test webhook",
-            $"测试请求已发送至：{Settings.Notification.WebhookUrl.Trim()}");
+            global::SRAFrontend.Localization.UiText.F($"测试请求已发送至：{Settings.Notification.WebhookUrl.Trim()}"));
     }
 
     [RelayCommand]
     private async Task TestTelegramAsync()
     {
         await SendTestNotificationAsync(
-            "Telegram 测试",
+            global::SRAFrontend.Localization.UiText.T("Telegram 测试"),
             () => !string.IsNullOrEmpty(Settings.Notification.TelegramBotToken.Trim()) &&
                   !string.IsNullOrEmpty(Settings.Notification.TelegramChatId.Trim()),
-            "请先填写 Bot Token 和 Chat ID",
+            global::SRAFrontend.Localization.UiText.T("请先填写 Bot Token 和 Chat ID"),
             "notify test telegram",
-            "测试消息已发送，请检查 Telegram");
+            global::SRAFrontend.Localization.UiText.T("测试消息已发送，请检查 Telegram"));
     }
 
     [RelayCommand]
     private async Task TestServerChanAsync()
     {
         await SendTestNotificationAsync(
-            "ServerChan 测试",
+            global::SRAFrontend.Localization.UiText.T("ServerChan 测试"),
             () => !string.IsNullOrEmpty(Settings.Notification.ServerChanSendKey.Trim()),
-            "请先填写 SendKey",
+            global::SRAFrontend.Localization.UiText.T("请先填写 SendKey"),
             "notify test serverchan",
-            "测试消息已发送，请检查微信");
+            global::SRAFrontend.Localization.UiText.T("测试消息已发送，请检查微信"));
     }
 
     [RelayCommand]
     private async Task TestBarkAsync()
     {
         await SendTestNotificationAsync(
-            "Bark 测试",
+            global::SRAFrontend.Localization.UiText.T("Bark 测试"),
             () => !string.IsNullOrEmpty(Settings.Notification.BarkDeviceKey.Trim()),
-            "请先填写设备 Key",
+            global::SRAFrontend.Localization.UiText.T("请先填写设备 Key"),
             "notify test bark",
-            "测试消息已发送，请检查 iPhone");
+            global::SRAFrontend.Localization.UiText.T("测试消息已发送，请检查 iPhone"));
     }
 
     [RelayCommand]
     private async Task TestFeishuAsync()
     {
         await SendTestNotificationAsync(
-            "飞书测试",
+            global::SRAFrontend.Localization.UiText.T("飞书测试"),
             () => !string.IsNullOrEmpty(Settings.Notification.FeishuWebhookUrl.Trim()),
-            "请先填写 Webhook 地址",
+            global::SRAFrontend.Localization.UiText.T("请先填写 Webhook 地址"),
             "notify test feishu",
-            "测试消息已发送，请检查飞书");
+            global::SRAFrontend.Localization.UiText.T("测试消息已发送，请检查飞书"));
     }
 
     [RelayCommand]
     private async Task TestWeComAsync()
     {
         await SendTestNotificationAsync(
-            "企业微信测试",
+            global::SRAFrontend.Localization.UiText.T("企业微信测试"),
             () => !string.IsNullOrEmpty(Settings.Notification.WeComWebhookUrl.Trim()),
-            "请先填写 Webhook 地址",
+            global::SRAFrontend.Localization.UiText.T("请先填写 Webhook 地址"),
             "notify test wecom",
-            "测试消息已发送，请检查企业微信");
+            global::SRAFrontend.Localization.UiText.T("测试消息已发送，请检查企业微信"));
     }
 
     [RelayCommand]
     private async Task TestDingTalkAsync()
     {
         await SendTestNotificationAsync(
-            "钉钉测试",
+            global::SRAFrontend.Localization.UiText.T("钉钉测试"),
             () => !string.IsNullOrEmpty(Settings.Notification.DingTalkWebhookUrl.Trim()),
-            "请先填写 Webhook 地址",
+            global::SRAFrontend.Localization.UiText.T("请先填写 Webhook 地址"),
             "notify test dingtalk",
-            "测试消息已发送，请检查钉钉");
+            global::SRAFrontend.Localization.UiText.T("测试消息已发送，请检查钉钉"));
     }
 
     [RelayCommand]
     private async Task TestDiscordAsync()
     {
         await SendTestNotificationAsync(
-            "Discord 测试",
+            global::SRAFrontend.Localization.UiText.T("Discord 测试"),
             () => !string.IsNullOrEmpty(Settings.Notification.DiscordWebhookUrl.Trim()),
-            "请先填写 Webhook 地址",
+            global::SRAFrontend.Localization.UiText.T("请先填写 Webhook 地址"),
             "notify test discord",
-            "测试消息已发送，请检查 Discord");
+            global::SRAFrontend.Localization.UiText.T("测试消息已发送，请检查 Discord"));
     }
 
     [RelayCommand]
     private async Task TestXxtuiAsync()
     {
         await SendTestNotificationAsync(
-            "xxtui 测试",
+            global::SRAFrontend.Localization.UiText.T("xxtui 测试"),
             () => !string.IsNullOrEmpty(Settings.Notification.XxtuiApiKey.Trim()),
-            "请先填写 API Key",
+            global::SRAFrontend.Localization.UiText.T("请先填写 API Key"),
             "notify test xxtui",
-            "测试消息已发送");
+            global::SRAFrontend.Localization.UiText.T("测试消息已发送"));
     }
 
     [RelayCommand]
     private async Task TestOneBotAsync()
     {
         await SendTestNotificationAsync(
-            "OneBot 测试",
+            global::SRAFrontend.Localization.UiText.T("OneBot 测试"),
             () => !string.IsNullOrEmpty(Settings.Notification.OneBotUrl.Trim()) &&
                   (!string.IsNullOrEmpty(Settings.Notification.OneBotUserId.Trim()) ||
                    !string.IsNullOrEmpty(Settings.Notification.OneBotGroupId.Trim())),
-            "请填写 API 地址以及 QQ 号或群号（至少一个）",
+            global::SRAFrontend.Localization.UiText.T("请填写 API 地址以及 QQ 号或群号（至少一个）"),
             "notify test onebot",
-            "测试消息已发送，请检查 QQ");
+            global::SRAFrontend.Localization.UiText.T("测试消息已发送，请检查 QQ"));
     }
 
     /// <summary>
@@ -802,7 +805,7 @@ public partial class SettingsPageViewModel : PageViewModel
         if (_versionClickCount < VersionClickRequiredCount)
         {
             if (_versionClickCount > 3)
-                _commonModel.ShowInfoToast("开发者模式", Settings.Advanced.IsDeveloperModeEnabled ? "您正处于开发者模式！" : $"只需再执行 {VersionClickRequiredCount - _versionClickCount} 次操作，即可进入开发者模式。");
+                _commonModel.ShowInfoToast(global::SRAFrontend.Localization.UiText.T("开发者模式"), Settings.Advanced.IsDeveloperModeEnabled ? global::SRAFrontend.Localization.UiText.T("您正处于开发者模式！") : global::SRAFrontend.Localization.UiText.F($"只需再执行 {VersionClickRequiredCount - _versionClickCount} 次操作，即可进入开发者模式。"));
             return;
         }
 
@@ -810,7 +813,7 @@ public partial class SettingsPageViewModel : PageViewModel
 
         // 只负责开启开发者模式，关闭仍然通过显式开关
         if (!Settings.Advanced.IsDeveloperModeEnabled) Settings.Advanced.IsDeveloperModeEnabled = true;
-        _commonModel.ShowInfoToast("开发者模式", "您正处于开发者模式！");
+        _commonModel.ShowInfoToast(global::SRAFrontend.Localization.UiText.T("开发者模式"), global::SRAFrontend.Localization.UiText.T("您正处于开发者模式！"));
     }
 
     #endregion

@@ -1,6 +1,6 @@
 <template>
   <div ref="rootEl" class="anno-card">
-    <PanelCard title="公告">
+    <PanelCard :title="t('W0017')">
       <!-- 加载中 -->
       <div v-if="loading" class="anno-state">
         <el-skeleton :rows="5" animated />
@@ -8,12 +8,12 @@
 
       <!-- 加载失败：可重试 -->
       <div v-else-if="errorMsg" class="anno-state">
-        <el-empty description="公告加载失败" :image-size="64">
-          <el-button type="primary" size="small" @click="load">重试</el-button>
+        <el-empty :description="t('W0018')" :image-size="64">
+          <el-button type="primary" size="small" @click="load">{{ t('W0019') }}</el-button>
         </el-empty>
       </div>
 
-      <el-empty v-else-if="!annos.length" description="暂无公告" :image-size="64" />
+      <el-empty v-else-if="!annos.length" :description="t('W0020')" :image-size="64" />
 
       <!-- 公告列表：点击查看详情 -->
       <ul v-else class="anno-list">
@@ -38,6 +38,8 @@
 </template>
 
 <script setup lang="ts">
+import { t } from '@/i18n'
+
 import { computed, onMounted, ref } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
 import { ArrowRight } from '@element-plus/icons-vue'

@@ -78,7 +78,7 @@ public partial class EnumFieldViewModel : ConfigFieldViewModel
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RefreshOptionsCommand))]
     private bool _refreshable;
-    [ObservableProperty] private string _refreshLabel = "扫描";
+    [ObservableProperty] private string _refreshLabel = global::SRAFrontend.Localization.UiText.T("扫描");
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RefreshOptionsCommand))]
     private bool _isRefreshing;
@@ -105,13 +105,13 @@ public partial class EnumFieldViewModel : ConfigFieldViewModel
         {
             var value = values[index];
             var label = labels?.Count == values.Count ? labels[index] : ValueText(value);
-            options.Add(new EnumOption(label, value));
+            options.Add(new EnumOption(SRAFrontend.Localization.UiText.T(label), value));
         }
 
         _availableOptions.Clear();
         _availableOptions.AddRange(options);
         SynchronizeOptions();
-        OptionsStatus = $"可选项：{options.Count} 个";
+        OptionsStatus = global::SRAFrontend.Localization.UiText.F($"可选项：{options.Count} 个");
     }
 
     private void SynchronizeOptions()
@@ -127,7 +127,7 @@ public partial class EnumFieldViewModel : ConfigFieldViewModel
             {
                 // 新扫描未包含已选文件或自定义路径时，保留当前配置供用户检查。
                 var text = ValueText(_currentValue);
-                selected = new EnumOption($"{(text.Length == 0 ? "（空）" : text)}（当前值）", _currentValue);
+                selected = new EnumOption(global::SRAFrontend.Localization.UiText.F($"{(text.Length == 0 ? "（空）" : text)}（当前值）"), _currentValue);
                 Options.Add(selected);
             }
             SelectedOption = selected;
@@ -182,7 +182,7 @@ public partial class EnumFieldViewModel : ConfigFieldViewModel
         }
         catch (Exception error)
         {
-            RefreshError = $"扫描失败：{error.Message}";
+            RefreshError = global::SRAFrontend.Localization.UiText.F($"扫描失败：{error.Message}");
         }
         finally
         {

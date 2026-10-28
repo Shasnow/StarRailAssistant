@@ -28,16 +28,16 @@
                                Opacity="0.75"
                                VerticalAlignment="Center" />
                         <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
-                            <TextBlock Text="猫猫糕友人帐" FontWeight="SemiBold" FontSize="14" />
-                            <TextBlock Text="查询对应猫猫糕 UID" FontSize="12" Opacity="0.6" />
+                            <TextBlock Text="{x:Static lang:ExtraResources.U0425}" FontWeight="SemiBold" FontSize="14" />
+                            <TextBlock Text="{x:Static lang:ExtraResources.U0426}" FontSize="12" Opacity="0.6" />
                         </StackPanel>
                         <Button Grid.Column="2"
                                 Classes="Flat Rounded"
-                                Content="寻找猫猫糕"
+                                Content="{x:Static lang:ExtraResources.U0427}"
                                 Height="34"
                                 Padding="18,0"
                                 VerticalAlignment="Center"
-                                ToolTip.Tip="在浏览器中打开猫猫糕友人帐"
+                                ToolTip.Tip="{x:Static lang:ExtraResources.U0428}"
                                 Click="Button_OnClick" />
                     </Grid>
                 </Border>
@@ -45,7 +45,7 @@
                 <!-- 扩展列表标题栏：标题 + 数量 + 刷新 -->
                 <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="2,18,2,10">
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <TextBlock Text="可用扩展" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" />
+                        <TextBlock Text="{x:Static lang:ExtraResources.U0429}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" />
                         <Border CornerRadius="9"
                                 Padding="8,1"
                                 Background="#22808080"
@@ -59,11 +59,11 @@
                             Height="30"
                             Padding="12,0"
                             VerticalAlignment="Center"
-                            ToolTip.Tip="重新从后端读取扩展列表"
+                            ToolTip.Tip="{x:Static lang:ExtraResources.U0430}"
                             Command="{Binding RefreshExtensionsCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <TextBlock Classes="Icon" Text="&#xE036;" FontSize="13" VerticalAlignment="Center" />
-                            <TextBlock Text="刷新" VerticalAlignment="Center" />
+                            <TextBlock Text="{x:Static lang:ExtraResources.U0431}" VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
                 </Grid>
@@ -140,28 +140,28 @@
                                                   Margin="0,12,0,0">
                                                 <Panel Grid.Column="0">
                                                     <Button Classes="Flat Rounded"
-                                                            Content="运行"
+                                                            Content="{x:Static lang:ExtraResources.U0432}"
                                                             Height="36"
                                                             HorizontalAlignment="Stretch"
                                                             HorizontalContentAlignment="Center"
-                                                            ToolTip.Tip="启动该扩展"
+                                                            ToolTip.Tip="{x:Static lang:ExtraResources.U0433}"
                                                             Command="{Binding RunCommand}"
                                                             IsVisible="{Binding !IsRunning}" />
                                                     <Button Classes="Flat Rounded"
-                                                            Content="停止"
+                                                            Content="{x:Static lang:ExtraResources.U0434}"
                                                             Height="36"
                                                             HorizontalAlignment="Stretch"
                                                             HorizontalContentAlignment="Center"
-                                                            ToolTip.Tip="停止该扩展"
+                                                            ToolTip.Tip="{x:Static lang:ExtraResources.U0435}"
                                                             Command="{Binding StopCommand}"
                                                             IsVisible="{Binding IsRunning}" />
                                                 </Panel>
                                                 <Button Grid.Column="1"
                                                         Classes="Basic"
-                                                        Content="配置"
+                                                        Content="{x:Static lang:ExtraResources.U0436}"
                                                         Height="36"
                                                         Padding="16,0"
-                                                        ToolTip.Tip="打开扩展配置"
+                                                        ToolTip.Tip="{x:Static lang:ExtraResources.U0437}"
                                                         Command="{Binding ConfigureCommand}"
                                                         IsVisible="{Binding HasConfig}" />
                                             </Grid>
@@ -183,11 +183,11 @@
                                FontSize="36"
                                Opacity="0.35"
                                HorizontalAlignment="Center" />
-                        <TextBlock Text="暂无可用扩展"
+                        <TextBlock Text="{x:Static lang:ExtraResources.U0438}"
                                    FontSize="14"
                                    Opacity="0.6"
                                    HorizontalAlignment="Center" />
-                        <TextBlock Text="请确认后端已启动，然后点击「刷新」重新加载"
+                        <TextBlock Text="{x:Static lang:ExtraResources.U0439}"
                                    FontSize="12"
                                    Opacity="0.45"
                                    HorizontalAlignment="Center" />

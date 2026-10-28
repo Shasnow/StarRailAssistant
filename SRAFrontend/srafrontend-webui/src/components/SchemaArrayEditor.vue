@@ -5,17 +5,17 @@
             <div class="array-titles">
                 <template v-if="label">
                     <div class="array-label">{{ label }}</div>
-                    <div v-if="description" class="array-desc" :title="description">{{ description }}</div>
+                    <div v-if="description" class="array-desc" :title="tr(description)">{{ tr(description) }}</div>
                 </template>
             </div>
-            <el-button size="small" plain :icon="Plus" @click="addItem">添加</el-button>
+            <el-button size="small" plain :icon="Plus" @click="addItem">{{ t('W0072') }}</el-button>
         </div>
 
         <!-- 对象条目：每个条目一个嵌套分组，内部由 SchemaForm 递归渲染 -->
         <template v-if="itemKind === 'object'">
             <div v-for="(item, i) in items" :key="i" class="array-group">
                 <div class="array-group-head">
-                    <span class="array-group-title">条目 {{ i + 1 }}</span>
+                    <span class="array-group-title">{{ t('W0073') }} {{ i + 1 }}</span>
                     <el-button size="small" type="danger" plain :icon="Delete" @click="removeItem(i)" />
                 </div>
                 <SchemaForm :schema="itemSchema" :doc="doc" :model-value="items[i]" :baseline="baselineItems[i]"
@@ -32,11 +32,13 @@
             </div>
         </template>
 
-        <div v-if="!items.length" class="array-empty">暂无条目，点击「添加」新增</div>
+        <div v-if="!items.length" class="array-empty">{{ t('W0074') }}</div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { t, tr } from '@/i18n'
+
 import { computed } from 'vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
 import type { OpenApiDocument, SchemaNode } from '@/utils/schemaForm'

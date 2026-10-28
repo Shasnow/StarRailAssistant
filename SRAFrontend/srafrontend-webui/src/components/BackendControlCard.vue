@@ -1,15 +1,15 @@
 <template>
-  <PanelCard title="后端控制">
+  <PanelCard :title="t('W0032')">
     <div class="backend-control">
-      <p class="hint">重启会中断运行中的任务；停止后日志与实时画面将断开，需手动重启后端才能恢复。</p>
+      <p class="hint">{{ t('W0033') }}</p>
       <div class="actions">
         <el-button type="warning" plain :icon="RefreshRight" class="control-btn" :loading="busy === 'restart'"
           :disabled="busy === 'stop'" @click="onRestart">
-          重启后端
+          {{ t('W0022') }}
         </el-button>
         <el-button type="danger" plain :icon="SwitchButton" class="control-btn" :loading="busy === 'stop'"
           :disabled="busy === 'restart'" @click="onStop">
-          停止后端
+          {{ t('W0028') }}
         </el-button>
       </div>
     </div>
@@ -17,6 +17,8 @@
 </template>
 
 <script setup lang="ts">
+import { t } from '@/i18n'
+
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { RefreshRight, SwitchButton } from '@element-plus/icons-vue'
 import { ref } from 'vue'
@@ -29,9 +31,9 @@ const busy = ref<'' | 'restart' | 'stop'>('')
 /** 重启后端：危险操作，二次确认后调用 /api/Backend/restart */
 async function onRestart() {
   try {
-    await ElMessageBox.confirm('确定重启后端服务？运行中的任务将被中断。', '重启后端', {
-      confirmButtonText: '重启',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('W0021'), t('W0022'), {
+      confirmButtonText: t('W0023'),
+      cancelButtonText: t('W0024'),
       type: 'warning',
     })
   } catch {
@@ -40,9 +42,9 @@ async function onRestart() {
   busy.value = 'restart'
   try {
     const message = await restartBackend()
-    ElMessage.success(message || '重启指令已发送')
+    ElMessage.success(message || t('W0025'))
   } catch (err) {
-    ElMessage.error(err instanceof Error ? err.message : '重启后端失败')
+    ElMessage.error(err instanceof Error ? err.message : t('W0026'))
   } finally {
     busy.value = ''
   }
@@ -51,9 +53,9 @@ async function onRestart() {
 /** 停止后端：危险操作，二次确认后调用 /api/Backend/stop */
 async function onStop() {
   try {
-    await ElMessageBox.confirm('确定停止后端服务？停止后需手动重启才能恢复。', '停止后端', {
-      confirmButtonText: '停止',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('W0027'), t('W0028'), {
+      confirmButtonText: t('W0029'),
+      cancelButtonText: t('W0024'),
       type: 'warning',
     })
   } catch {
@@ -62,9 +64,9 @@ async function onStop() {
   busy.value = 'stop'
   try {
     const message = await stopBackend()
-    ElMessage.success(message || '停止指令已发送')
+    ElMessage.success(message || t('W0030'))
   } catch (err) {
-    ElMessage.error(err instanceof Error ? err.message : '停止后端失败')
+    ElMessage.error(err instanceof Error ? err.message : t('W0031'))
   } finally {
     busy.value = ''
   }

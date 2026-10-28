@@ -1,3 +1,4 @@
+import { t, tf } from '@/i18n'
 // OpenAPI Schema 驱动表单的工具集：$ref 解析、类型推断、默认模型构建、字段校验
 
 export interface SchemaNode {
@@ -102,8 +103,8 @@ export function validateValue(node: SchemaNode, value: unknown): string | null {
   if ((kind === 'integer' || kind === 'string') && node.pattern) {
     if (!new RegExp(node.pattern).test(String(value))) {
       return kind === 'integer'
-        ? '请输入有效整数（如 0、3、-5）'
-        : `格式不正确，需匹配 ${node.pattern}`
+        ? t('W0116')
+        : tf('W0117', node.pattern)
     }
   }
   return null

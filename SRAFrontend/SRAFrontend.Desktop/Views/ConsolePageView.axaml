@@ -12,7 +12,8 @@
     <suki:GlassCard CornerRadius="0">
         <suki:GroupBox>
             <suki:GroupBox.Header>
-                <StackPanel Orientation="Horizontal" Spacing="10">
+                <Grid ColumnDefinitions="Auto,*">
+                  <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
                     <TextBlock Text="{x:Static lang:Resources.ConsoleText}" VerticalAlignment="Center" />
                     <!-- ReSharper disable once Xaml.StyleClassNotFound -->
                     <Button
@@ -20,7 +21,7 @@
                         Width="20"
                         Classes="Basic Icon"
                         Content="&#xE036;"
-                        ToolTip.Tip="重新启动后端"
+                        ToolTip.Tip="{x:Static lang:ExtraResources.U0414}"
                         Command="{Binding RestartConsoleCommand}"/>
                     <!-- ReSharper disable once Xaml.StyleClassNotFound -->
                     <Button
@@ -28,29 +29,30 @@
                         Width="20"
                         Classes="Basic Icon"
                         Content="&#xE3DE;"
-                        ToolTip.Tip="停止后端"
+                        ToolTip.Tip="{x:Static lang:ExtraResources.U0415}"
                         Command="{Binding StopConsoleCommand}"/>
                     <Button
                         Height="26"
                         Classes="Flat Accent"
                         Padding="8,0"
-                        ToolTip.Tip="将控制台、前端、后端日志打包导出为 ZIP 文件"
+                        ToolTip.Tip="{x:Static lang:ExtraResources.U0416}"
                         Command="{Binding ExportLogsCommand}"
                         IsEnabled="{Binding !IsExporting}">
                         <Panel>
                             <StackPanel Orientation="Horizontal" Spacing="4" IsVisible="{Binding !IsExporting}">
                                 <TextBlock Classes="Icon" Text="&#xEAF0;" VerticalAlignment="Center" FontSize="14"/>
-                                <TextBlock Text="导出日志" VerticalAlignment="Center"/>
+                                <TextBlock Text="{x:Static lang:ExtraResources.U0332}" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <TextBlock Text="导出中..." IsVisible="{Binding IsExporting}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Static lang:ExtraResources.U0417}" IsVisible="{Binding IsExporting}" VerticalAlignment="Center"/>
                         </Panel>
                     </Button>
-                    <TextBlock Text="如果要反馈问题，请发送日志文件，而不是这个页面的照片或截图" VerticalAlignment="Center"/>
-                </StackPanel>
+                  </StackPanel>
+                    <TextBlock Grid.Column="1" Margin="10,0,0,0" Text="{x:Static lang:ExtraResources.U0418}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                </Grid>
             </suki:GroupBox.Header>
             <Grid RowDefinitions="Auto,*,Auto">
                 <StackPanel Grid.Row="0" Margin="0,4,0,12" Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
-                    <Label Content="过滤器：" VerticalAlignment="Center" Padding="0" />
+                    <Label Content="{x:Static lang:ExtraResources.U0419}" VerticalAlignment="Center" Padding="0" />
                     <!-- ReSharper disable Xaml.StyleClassNotFound -->
                     <ToggleButton Height="20" Padding="14,0" VerticalAlignment="Center" Classes="Discrete" Content="Trace" IsChecked="{Binding FilterOptions[0]}" />
                     <ToggleButton Height="20" Padding="14,0" VerticalAlignment="Center" Classes="Information" Content="Debug" IsChecked="{Binding FilterOptions[1]}" />
@@ -70,12 +72,12 @@
                         <SelectableTextBlock
                             x:Name="ConsoleText"
                             Margin="10,6"
-                            FontFamily="Cascadia Mono,Consolas"
+                            FontFamily="Cascadia Mono,Consolas,Microsoft YaHei UI,Microsoft YaHei,SimSun,MS Gothic"
                             FontSize="14"
                             TextWrapping="Wrap" />
                     </ScrollViewer>
                 </Border>
-                <TextBox Grid.Row="2" Margin="0,12,0,0" PlaceholderText="请输入文本" KeyDown="InputElement_OnKeyDown"/>
+                <TextBox Grid.Row="2" Margin="0,12,0,0" PlaceholderText="{x:Static lang:ExtraResources.U0420}" KeyDown="InputElement_OnKeyDown"/>
             </Grid>
         </suki:GroupBox>
     </suki:GlassCard>

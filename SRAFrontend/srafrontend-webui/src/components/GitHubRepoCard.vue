@@ -32,7 +32,7 @@
           :href="repoUrl"
           target="_blank"
           rel="noopener noreferrer"
-          :aria-label="`在 GitHub 上查看 ${repoName}`"
+          :aria-label="tf('W0048', repoName)"
         >
           <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true">
             <path :d="OCTICON_MARK_GITHUB" />
@@ -42,7 +42,7 @@
 
       <!-- 描述 -->
       <p class="repo-desc">{{ info.description }}</p>
-      <p v-if="fetchError" class="repo-fallback-hint">实时信息获取失败，展示本地配置</p>
+      <p v-if="fetchError" class="repo-fallback-hint">{{ t('W0049') }}</p>
 
       <!-- 统计行：Star / Fork / License -->
       <ul class="repo-stats">
@@ -70,6 +70,8 @@
 </template>
 
 <script setup lang="ts">
+import { t, tf } from '@/i18n'
+
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { fetchRepoInfo, GITHUB_REPO_SLUG } from '@/api/github'
 import type { GitHubRepoInfo } from '@/api/github'

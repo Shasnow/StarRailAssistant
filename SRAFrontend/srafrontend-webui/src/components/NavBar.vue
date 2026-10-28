@@ -19,6 +19,11 @@
 
       <!-- 右侧：用户状态 -->
       <div class="nav-right">
+        <select class="locale-select" :value="locale" aria-label="Language / Язык" @change="setLocale(($event.target as HTMLSelectElement).value)">
+          <option value="zh-CN">简体中文</option>
+          <option value="en-US">English</option>
+          <option value="ru-RU">Русский</option>
+        </select>
         <!-- 演示模式只读徽标（构建期确定，无切换交互） -->
         <span v-if="demoBadge" class="demo-badge">{{ demoBadge }}</span>
 
@@ -31,7 +36,7 @@
           </span>
           <span class="status">
             <span class="status-dot" :class="status"></span>
-            {{ status }}
+            {{ tr(status) }}
           </span>
         </div>
 
@@ -39,7 +44,7 @@
         <ThemeHuePicker />
 
         <!-- 深色模式切换 -->
-        <button class="theme-toggle" :aria-label="isDark ? '切换到浅色模式' : '切换到深色模式'" @click="toggleTheme($event)">
+        <button class="theme-toggle" :aria-label="isDark ? t('W0069') : t('W0070')" @click="toggleTheme($event)">
           <svg v-if="isDark" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
             stroke-width="2" stroke-linecap="round">
             <circle cx="12" cy="12" r="4" />
@@ -53,7 +58,7 @@
         </button>
 
         <!-- 移动端汉堡按钮 -->
-        <button class="hamburger" :class="{ open: menuOpen }" aria-label="切换菜单" @click="menuOpen = !menuOpen">
+        <button class="hamburger" :class="{ open: menuOpen }" :aria-label="t('W0071')" @click="menuOpen = !menuOpen">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -73,6 +78,8 @@
 </template>
 
 <script lang="ts" setup>
+import { t, tr, locale, setLocale } from '@/i18n'
+
 import { computed, nextTick, ref } from 'vue'
 import { useDark, useToggle, useWindowScroll } from '@vueuse/core'
 import { useRouter } from 'vue-router'
@@ -82,7 +89,7 @@ import ThemeHuePicker from './ThemeHuePicker.vue'
 const router = useRouter()
 // 演示模式徽标文案：__IS_DEMO__ 为 define 注入的编译期常量，
 // 正式构建下三元被折叠为空串，分支与文案一并被消除
-const demoBadge = __IS_DEMO__ ? '演示模式' : ''
+const demoBadge = __IS_DEMO__ ? t('W0068') : ''
 const status = ref('online')
 const menuOpen = ref(false)
 
@@ -142,7 +149,7 @@ const routes = router
   .filter((item) => !item.meta.hideInNav)
   .map((item) => ({
     path: item.path,
-    name: item.name,
+    name: item.meta.title ?? item.name,
     icon: item.meta.icon,
   }))
 </script>
@@ -470,7 +477,38 @@ html.dark .nav-bar {
 
 /* ---------- 响应式 ---------- */
 @media (max-width: 768px) {
+  .nav-inner {
+    gap: 8px;
+    padding: 0 12px;
+  }
+
+  .nav-brand {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .nav-title {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .nav-center {
+    display: none;
+  }
+
+  .nav-right {
+    flex-shrink: 0;
+    gap: 6px;
+  }
+
+  .locale-select {
+    max-width: 104px;
+    min-width: 0;
+  }
+
+  .user-info {
     display: none;
   }
 
@@ -478,8 +516,19 @@ html.dark .nav-bar {
     display: none;
   }
 
+  .theme-toggle,
+  :deep(.hue-toggle) {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+  }
+
   .hamburger {
     display: flex;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    padding: 7px;
   }
 }
 </style>

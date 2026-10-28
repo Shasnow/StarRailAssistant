@@ -3,15 +3,20 @@
     <div v-if="fieldKey || description" class="field-titles">
       <!-- 字段 key 总是作为主标签显示，方便对应后端配置字段；有未保存更改时在 key 旁标记圆点 -->
       <div v-if="fieldKey" class="field-label">
-        {{ fieldKey }}<span v-if="dirty" class="dirty-dot" title="有未保存的更改" />
+        {{ tr(fieldKey) }}<span v-if="dirty" class="dirty-dot" :title="t('W0075')" />
       </div>
       <!-- description 作为辅助说明，以小字显示在 key 下方；截断时悬停 title 显示全文 -->
-      <div v-if="description" class="field-desc" :title="description">{{ description }}</div>
+      <div v-if="description" class="field-desc" :title="tr(description)">{{ tr(description) }}</div>
     </div>
 
-    <el-switch v-if="kind === 'boolean'" :model-value="boolVal" @update:model-value="onUpdate" />
+    <el-select v-if="fieldKey === 'language'" class="control-full" :model-value="modelValue" @update:model-value="onUpdate">
+      <el-option label="简体中文" :value="0" />
+      <el-option label="English" :value="1" />
+      <el-option label="Русский" :value="2" />
+    </el-select>
+    <el-switch v-else-if="kind === 'boolean'" :model-value="boolVal" @update:model-value="onUpdate" />
     <el-select v-else-if="kind === 'enum'" class="control-full" :model-value="textVal" @update:model-value="onUpdate">
-      <el-option v-for="opt in enumOptions" :key="String(opt)" :label="String(opt)" :value="String(opt)" />
+      <el-option v-for="opt in enumOptions" :key="String(opt)" :label="tr(String(opt))" :value="String(opt)" />
     </el-select>
     <el-input-number v-else-if="kind === 'integer' && !intTextInput" class="control-full" :model-value="numVal"
       :precision="0" :step="1" @update:model-value="onUpdate" />
@@ -24,6 +29,8 @@
 </template>
 
 <script setup lang="ts">
+import { t, tr } from '@/i18n'
+
 import { computed, ref } from 'vue'
 import type { OpenApiDocument, SchemaNode } from '@/utils/schemaForm'
 import { fieldKind, isIntTextInput, resolveNode, validateValue } from '@/utils/schemaForm'
@@ -79,7 +86,7 @@ function onUpdate(value: unknown) {
   color: var(--color-heading);
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 /* 未保存圆点：继承 key 的前景色，避免与必填红色星号混淆 */
@@ -99,7 +106,7 @@ function onUpdate(value: unknown) {
   opacity: 0.55;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .control-full {

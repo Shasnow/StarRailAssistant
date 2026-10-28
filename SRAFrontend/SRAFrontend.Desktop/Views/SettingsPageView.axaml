@@ -1,4 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:controls="clr-namespace:SRAFrontend.Desktop.Controls"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -28,7 +29,7 @@
                         <suki:SettingsLayoutItem Header="{x:Static lang:Resources.TaskSettingsText}">
                             <suki:SettingsLayoutItem.Content>
                                 <StackPanel>
-                                    <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" ToolTip.Tip="开启以自动检测电脑中的游戏">
+                                    <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" ToolTip.Tip="{x:Static lang:ExtraResources.U0445}">
                                         <Label Classes="Icon">&#xe40c;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.GamePathText}" />
                                         <ToggleSwitch OnContent="{x:Static lang:Resources.AutoDetectText}"
@@ -38,13 +39,19 @@
                                                       Width="120"/>
                                         <ComboBox Grid.Column="3"
                                                   ItemsSource="{Binding GeneralSettings.GamePaths}"
-                                                  SelectedIndex="{Binding GeneralSettings.GamePathIndex}" />
+                                                  SelectedIndex="{Binding GeneralSettings.GamePathIndex}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock x:CompileBindings="False" Text="{Binding Converter={x:Static controls:LocalizedStringConverter.Instance}}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
                                         <Button Grid.Column="4" Classes="Icon"
                                                 FontFamily="{StaticResource Phosphor}"
                                                 Content="&#xE256;"
                                                 Command="{Binding SelectedPathCommand}"
                                                 IsEnabled="{Binding !GeneralSettings.IsAutoDetectGamePath}"
-                                                ToolTip.Tip="浏览并选择文件" />
+                                                ToolTip.Tip="{x:Static lang:ExtraResources.U0446}" />
                                     </Grid>
                                     
                                     <Grid ColumnDefinitions="Auto, *, Auto">
@@ -93,7 +100,7 @@
                                     <Expander Header="{x:Static lang:Resources.GameLaunchArgumentsText}" IsExpanded="True">
                                         <StackPanel>
                                             <!-- 启用开关 -->
-                                            <Grid ColumnDefinitions="Auto, *, Auto" ToolTip.Tip="启用后，下面的参数才会生效">
+                                            <Grid ColumnDefinitions="Auto, *, Auto" ToolTip.Tip="{x:Static lang:ExtraResources.U0447}">
                                                 <Label Classes="Icon">&#xE47E;</Label>
                                                 <Label Grid.Column="1" Content="{x:Static lang:Resources.EnableGameArgsText}" />
                                                 <ToggleSwitch Grid.Column="2"
@@ -116,6 +123,7 @@
                                                 <Label Grid.Column="1" Content="{x:Static lang:Resources.DisplayModeText}" />
                                                 <ComboBox Grid.Column="2"
                                                           SelectedItem="{Binding GeneralSettings.GameArgsFullScreenMode}">
+<ComboBox.ItemTemplate><DataTemplate><TextBlock x:CompileBindings="False" Text="{Binding Converter={x:Static controls:LocalizedStringConverter.Instance}}" /></DataTemplate></ComboBox.ItemTemplate>
                                                     <system:String>窗口化</system:String>
                                                     <system:String>全屏幕</system:String>
                                                 </ComboBox>
@@ -239,11 +247,13 @@
                                             <Label Grid.Column="0" Classes="Icon">&#xe4a2;</Label>
                                             <Label Grid.Column="1" Content="{x:Static lang:Resources.LanguageText}" />
                                             <ComboBox Grid.Column="2" SelectedIndex="{Binding DisplaySettings.Language}">
-                                                <ComboBoxItem>简体中文</ComboBoxItem>
+                                                <ComboBoxItem><x:Static Member="lang:ExtraResources.U0475" /></ComboBoxItem>
                                                 <ComboBoxItem>English</ComboBoxItem>
+                                                <ComboBoxItem Content="{x:Static lang:ExtraResources.RussianLanguageName}" />
                                             </ComboBox>
                                         </Grid>
                                         <TextBlock Text="{Binding GameChineseLanguageTip}"
+                                                   TextWrapping="Wrap"
                                                    IsVisible="{Binding IsLanguageNotChinese}"
                                                    Margin="28,2,0,0"
                                                    FontSize="12"
@@ -371,7 +381,7 @@
                                                            Content="{x:Static lang:Resources.CustomApiAddressText}" />
                                                     <TextBox Grid.Row="2" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.TelegramApiBaseUrl}"
-                                                             PlaceholderText="留空使用官方 API" />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0448}" />
                                                     <Label Grid.Row="3" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.EnableProxyText}" />
@@ -413,7 +423,7 @@
                                                            Content="{x:Static lang:Resources.SendKeyText}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.ServerChanSendKey}"
-                                                             PlaceholderText="SCT... 或 sctp..." />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0449}" />
                                                 </Grid>
                                             </Expander>
 
@@ -444,19 +454,19 @@
                                                            Content="{x:Static lang:Resources.QQPrivateText}" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.OneBotUserId}"
-                                                             PlaceholderText="留空则不发送私聊" />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0450}" />
                                                     <Label Grid.Row="2" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.QQGroupText}" />
                                                     <TextBox Grid.Row="2" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.OneBotGroupId}"
-                                                             PlaceholderText="留空则不发送群聊" />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0451}" />
                                                     <Label Grid.Row="3" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.AccessTokenText}" />
                                                     <TextBox Grid.Row="3" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.OneBotToken}"
-                                                             PlaceholderText="留空则不使用认证" />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0452}" />
                                                     <Label Grid.Row="4" Grid.Column="0"
                                                            VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.SendScreenshotText}" />
@@ -485,7 +495,7 @@
                                                            Content="{x:Static lang:Resources.DeviceKeyText}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.BarkDeviceKey}"
-                                                             PlaceholderText="从 Bark App 复制，多个用逗号分隔" />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0453}" />
                                                     <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.BarkApiEndpointText}" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
@@ -502,12 +512,12 @@
                                                     <TextBox Grid.Row="3" Grid.Column="1"
                                                              Text=""
                                                              IsReadOnly="True"
-                                                             PlaceholderText="minuet（可选）" />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0454}" />
                                                     <Label Grid.Row="4" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.NotificationIconText}" />
                                                     <TextBox Grid.Row="4" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.BarkIcon}"
-                                                             PlaceholderText="图标 URL（可选）" />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0455}" />
                                                     <Label Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.NotificationGroupText}" />
                                                     <TextBox Grid.Row="5" Grid.Column="1"
@@ -518,7 +528,7 @@
                                                            Content="{x:Static lang:Resources.EncryptionKeyText}" />
                                                     <TextBox Grid.Row="6" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.BarkCiphertext}"
-                                                             PlaceholderText="加密内容（可选）" />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0456}" />
                                                 </Grid>
                                             </Expander>
 
@@ -557,7 +567,7 @@
                                                                Content="{x:Static lang:Resources.FeishuAppSecretText}" />
                                                         <TextBox Grid.Row="1" Grid.Column="1"
                                                                  Text="{Binding NotificationSettings.FeishuAppSecret}"
-                                                                 PlaceholderText="应用 AppSecret" />
+                                                                 PlaceholderText="{x:Static lang:ExtraResources.U0457}" />
                                                         <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
                                                                Content="{x:Static lang:Resources.ReceiverIdText}" />
                                                         <TextBox Grid.Row="2" Grid.Column="1"
@@ -567,7 +577,7 @@
                                                                Content="{x:Static lang:Resources.IdTypeText}" />
                                                         <TextBox Grid.Row="3" Grid.Column="1"
                                                                  Text="{Binding NotificationSettings.FeishuReceiveIdType}"
-                                                                 PlaceholderText="open_id（默认）" />
+                                                                 PlaceholderText="{x:Static lang:ExtraResources.U0458}" />
                                                     </Grid>
                                                 </StackPanel>
                                             </Expander>
@@ -587,7 +597,7 @@
                                                       IsVisible="{Binding NotificationSettings.IsWeComEnabled}">
                                                 <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
                                                     <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
-                                                           Content="Webhook 地址" />
+                                                           Content="{x:Static lang:ExtraResources.U0459}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.WeComWebhookUrl}"
                                                              PlaceholderText="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..." />
@@ -616,7 +626,7 @@
                                                 <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*"
                                                       RowSpacing="6">
                                                     <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
-                                                           Content="Webhook 地址" />
+                                                           Content="{x:Static lang:ExtraResources.U0459}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.DingTalkWebhookUrl}"
                                                              PlaceholderText="https://oapi.dingtalk.com/robot/send?access_token=..." />
@@ -624,7 +634,7 @@
                                                            Content="{x:Static lang:Resources.SignSecretText}" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.DingTalkSecret}"
-                                                             PlaceholderText="SEC... （可选）" />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0460}" />
                                                 </Grid>
                                             </Expander>
 
@@ -643,7 +653,7 @@
                                                       IsVisible="{Binding NotificationSettings.IsDiscordEnabled}">
                                                 <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
                                                     <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
-                                                           Content="Webhook 地址" />
+                                                           Content="{x:Static lang:ExtraResources.U0459}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.DiscordWebhookUrl}"
                                                              PlaceholderText="https://discord.com/api/webhooks/..." />
@@ -675,17 +685,17 @@
                                                            Content="{x:Static lang:Resources.ApiKeyText}" />
                                                     <TextBox Grid.Row="0" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.XxtuiApiKey}"
-                                                             PlaceholderText="从 xxtui.com 获取" />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0461}" />
                                                     <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.NotificationSourceText}" />
                                                     <TextBox Grid.Row="1" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.XxtuiSource}"
-                                                             PlaceholderText="如 StarRailAssistant（可选）" />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0462}" />
                                                     <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
                                                            Content="{x:Static lang:Resources.NotificationChannelText}" />
                                                     <TextBox Grid.Row="2" Grid.Column="1"
                                                              Text="{Binding NotificationSettings.XxtuiChannel}"
-                                                             PlaceholderText="如 WX_MP（可选）" />
+                                                             PlaceholderText="{x:Static lang:ExtraResources.U0463}" />
                                                 </Grid>
                                             </Expander>
 
@@ -769,7 +779,7 @@
                                         <Button Content="{x:Static lang:Resources.ReInstallText}"
                                                 Command="{Binding ReinstallLatestCommand}"
                                                 IsEnabled="{Binding !IsReinstalling}"
-                                                ToolTip.Tip="重新下载并安装最新版本安装包，以修复可能存在的文件损坏等问题" />
+                                                ToolTip.Tip="{x:Static lang:ExtraResources.U0464}" />
                                     </StackPanel>
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Label Classes="Icon">&#xe094;</Label>
@@ -800,7 +810,7 @@
                                         <Label Classes="Icon">&#xebaa;</Label>
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.UpdateChannelText}" />
                                         <ComboBox Grid.Column="2" SelectedIndex="{Binding UpdateSettings.DownloadChannel}">
-                                            <ComboBoxItem>Mirror 酱</ComboBoxItem>
+                                            <ComboBoxItem><x:Static Member="lang:ExtraResources.U0476" /></ComboBoxItem>
                                             <ComboBoxItem>GitHub</ComboBoxItem>
                                             <ComboBoxItem>Auto-MAS</ComboBoxItem>
                                         </ComboBox>
@@ -820,20 +830,20 @@
                                                FontFamily="{StaticResource Phosphor}">&#xE256;</Label>
                                         <Label Grid.Column="1"
                                                Content="{x:Static lang:Resources.DownloadDirText}"
-                                               ToolTip.Tip="更新安装包的下载保存目录，留空则使用默认临时目录" />
+                                               ToolTip.Tip="{x:Static lang:ExtraResources.U0465}" />
                                         <TextBox Grid.Column="2"
                                                  Text="{Binding UpdateSettings.DownloadPath}"
                                                  PlaceholderText="{Binding DownloadPathWatermark}"
-                                                 ToolTip.Tip="可直接编辑，或点击右侧按钮选择目录"
+                                                 ToolTip.Tip="{x:Static lang:ExtraResources.U0466}"
                                                  suki:TextBoxExtensions.AddDeleteButton="True"/>
                                         <Button Grid.Column="3"
-                                                Content="更改"
+                                                Content="{x:Static lang:ExtraResources.U0467}"
                                                 Command="{Binding ChangeDownloadPathCommand}"
-                                                ToolTip.Tip="选择下载文件的保存目录" />
+                                                ToolTip.Tip="{x:Static lang:ExtraResources.U0365}" />
                                         <Button Grid.Column="4"
                                                 Content="{x:Static lang:Resources.OpenText}"
                                                 Command="{Binding OpenDownloadPathCommand}"
-                                                ToolTip.Tip="打开当前下载目录" />
+                                                ToolTip.Tip="{x:Static lang:ExtraResources.U0468}" />
                                     </Grid>
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>
@@ -856,7 +866,7 @@
                                                 Command="{Binding OpenFolderCommand}"
                                                 CommandParameter="appdata" />
                                     </StackPanel>
-                                    <Grid ColumnDefinitions="Auto, *, Auto" ToolTip.Tip="根据安装包内置的 MD5 清单校验应用文件完整性">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" ToolTip.Tip="{x:Static lang:ExtraResources.U0469}">
                                         <Label Classes="Icon">&#xe184;</Label>
                                         <Label Grid.Column="1"
                                                Content="{x:Static lang:Resources.ResourceIntegrityCheckText}" />
@@ -865,7 +875,7 @@
                                                 IsEnabled="{Binding !IsResourceChecking}"
                                                 Command="{Binding CheckResourceIntegrityCommand}"/>
                                     </Grid>
-                                    <Grid ColumnDefinitions="Auto, *, Auto" ToolTip.Tip="扫描应用目录下的冗余文件（更新残留、日志等），结果包含个人数据，请谨慎操作" >
+                                    <Grid ColumnDefinitions="Auto, *, Auto" ToolTip.Tip="{x:Static lang:ExtraResources.U0470}" >
                                         <Label Classes="Icon">&#xEC54;</Label>
                                         <Label Grid.Column="1"
                                                Content="{x:Static lang:Resources.ResourceCleanupText}" />
@@ -937,7 +947,7 @@
                                             </Grid>
                                             <Grid ColumnDefinitions="Auto, *, Auto"
                                                   IsVisible="{Binding AdvancedSettings.IsCustomBackendEnabled}"
-                                                  ToolTip.Tip="python、sra-cli 或可执行文件路径">
+                                                  ToolTip.Tip="{x:Static lang:ExtraResources.U0471}">
                                                 <Label Classes="Icon">&#xE768;</Label>
                                                 <Label Grid.Column="1" Content="{x:Static lang:Resources.BackendCommandText}" />
                                                 <TextBox Grid.Column="2"
@@ -947,7 +957,7 @@
                                             </Grid>
                                             <Grid ColumnDefinitions="Auto, *, Auto"
                                                   IsVisible="{Binding AdvancedSettings.IsCustomBackendEnabled}"
-                                                  ToolTip.Tip="如 main.py、-m SRACore，留空表示无参数">
+                                                  ToolTip.Tip="{x:Static lang:ExtraResources.U0472}">
                                                 <Label Classes="Icon">&#xE756;</Label>
                                                 <Label Grid.Column="1" Content="{x:Static lang:Resources.BackendArgumentsText}" />
                                                 <TextBox Grid.Column="2"
@@ -957,7 +967,7 @@
                                             </Grid>
                                             <Grid ColumnDefinitions="Auto, *, Auto"
                                                   IsVisible="{Binding AdvancedSettings.IsCustomBackendEnabled}"
-                                                  ToolTip.Tip="如 /path/to/working/dir，留空表示使用当前目录">
+                                                  ToolTip.Tip="{x:Static lang:ExtraResources.U0473}">
                                                 <Label Classes="Icon">&#xE24A;</Label>
                                                 <Label Grid.Column="1" Content="{x:Static lang:Resources.BackendWorkingDirectoryText}" />
                                                 <TextBox Grid.Column="2"
@@ -985,7 +995,7 @@
                                     </Button>
                                     <TextBlock HorizontalAlignment="Center">© 2024-2026 StarRailAssistant, All rights reserved.</TextBlock>
                                     <SelectableTextBlock>
-                                        <Run Text="设备ID: "></Run>
+                                        <Run Text="{x:Static lang:ExtraResources.U0474}"></Run>
                                         <Run Text="{Binding DeviceId}" />
                                     </SelectableTextBlock>
                                     <TextBlock Text="{x:Static lang:Resources.LinksText}" FontWeight="Bold" Margin="0,10,0,5" />

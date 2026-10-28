@@ -1,4 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend"
+             xmlns:controls="clr-namespace:SRAFrontend.Desktop.Controls"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,11 +13,11 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="旷宇纷争" IsChecked="{Binding CosmicStrifeConfig.IsEnabled}"/>
+                    <CheckBox Content="{x:Static lang:ExtraResources.U0477}" IsChecked="{Binding CosmicStrifeConfig.IsEnabled}"/>
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="CosmicStrifeTask"
-                            ToolTip.Tip="单次运行"/>
+                            ToolTip.Tip="{x:Static lang:ExtraResources.U0478}"/>
                 </StackPanel>
                 
             </suki:GroupBox.Header>
@@ -24,111 +26,111 @@
                     <suki:GlassCard>
                         <StackPanel>
                             <CheckBox IsChecked="{Binding CosmicStrifeConfig.IsDivergentUniverseEnabled}"
-                                      Content="差分宇宙 - 乐园漫记"/>
+                                      Content="{x:Static lang:ExtraResources.U0479}"/>
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Label>模式</Label>
+                                <Label><x:Static Member="lang:ExtraResources.U0496" /></Label>
                                 <ComboBox SelectedIndex="{Binding CosmicStrifeConfig.DivergentUniverseMode}">
-                                    <ComboBoxItem>刷第一关</ComboBoxItem>
-                                    <ComboBoxItem>完整对局</ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0497" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0498" /></ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="10">
-                                <Label>运行次数</Label>
+                                <Label><x:Static Member="lang:ExtraResources.U0251" /></Label>
                                 <NumericUpDown FormatString="0" Value="{Binding CosmicStrifeConfig.DivergentUniverseRuntimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
-                            <ToggleSwitch OnContent="秘技速刷" IsChecked="{Binding CosmicStrifeConfig.IsDivergentUniverseUseTechnique}" />
-                            <ToggleSwitch OnContent="启用积分奖励" IsChecked="{Binding CosmicStrifeConfig.IsPointRewardsEnabled}" />
+                            <ToggleSwitch OnContent="{x:Static lang:ExtraResources.U0480}" IsChecked="{Binding CosmicStrifeConfig.IsDivergentUniverseUseTechnique}" />
+                            <ToggleSwitch OnContent="{x:Static lang:ExtraResources.U0481}" IsChecked="{Binding CosmicStrifeConfig.IsPointRewardsEnabled}" />
                         </StackPanel>
                     </suki:GlassCard>
-                    <TextBlock>请完成引导关卡I、引导关卡II，并清除所有新手提示</TextBlock>
+                    <TextBlock><x:Static Member="lang:ExtraResources.U0499" /></TextBlock>
                     <suki:GlassCard>
                         <StackPanel>
                             <CheckBox IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsEnabled}"
-                                      Content="货币战争 - 零和博弈" />
+                                      Content="{x:Static lang:ExtraResources.U0482}" />
                             <Grid ColumnDefinitions="Auto, Auto">
-                                <Label Content="开拓者名称 " />
+                                <Label Content="{x:Static lang:ExtraResources.U0483}" />
                                 <TextBox Grid.Column="1"
-                                         Width="200"
+                                         Width="320"
                                          Text="{Binding CosmicStrifeConfig.CurrencyWarsUsername}"
-                                         PlaceholderText="请输入开拓者角色名"/>
+                                         PlaceholderText="{x:Static lang:ExtraResources.U0484}"/>
                             </Grid>
                             
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Label>类型</Label>
+                                <Label><x:Static Member="lang:ExtraResources.U0248" /></Label>
                                 <ComboBox SelectedIndex="{Binding CurrencyWarsModeIndex}" Width="200" HorizontalAlignment="Left">
-                                    <ComboBoxItem>标准博弈</ComboBoxItem>
-                                    <ComboBoxItem>超频博弈</ComboBoxItem>
-                                    <ComboBoxItem>刷开局</ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0500" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0501" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0502" /></ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Label>难度</Label>
+                                <Label><x:Static Member="lang:ExtraResources.U0503" /></Label>
                                 <ComboBox SelectedIndex="{Binding CosmicStrifeConfig.CurrencyWarsDifficulty}" Width="200">
-                                    <ComboBoxItem>最低难度</ComboBoxItem>
-                                    <ComboBoxItem>最高难度</ComboBoxItem>
-                                    <ComboBoxItem>当前难度</ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0504" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0505" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0506" /></ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Label>攻略</Label>
+                                <Label><x:Static Member="lang:ExtraResources.U0507" /></Label>
                                 <ComboBox ItemsSource="{Binding Cache.Strategies}"
                                           SelectedIndex="{Binding CurrencyWarsStrategyIndex}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Title}"/>
+                                            <TextBlock Text="{Binding Title, Converter={x:Static controls:LocalizedStringConverter.Instance}}"/>
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
-                                <Button Command="{Binding RefreshStrategiesCommand}">刷新</Button>
-                                <Button Command="{Binding InstallStrategyCommand}">导入</Button>
-                                <HyperlinkButton Content="攻略站" NavigateUri="https://starrailassistant.top/sra-strategy-site/"/>
+                                <Button Command="{Binding RefreshStrategiesCommand}"><x:Static Member="lang:ExtraResources.U0431" /></Button>
+                                <Button Command="{Binding InstallStrategyCommand}"><x:Static Member="lang:ExtraResources.U0508" /></Button>
+                                <HyperlinkButton Content="{x:Static lang:ExtraResources.U0485}" NavigateUri="https://starrailassistant.top/sra-strategy-site/"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Spacing="10">
-                                <Label>运行次数</Label>
+                                <Label><x:Static Member="lang:ExtraResources.U0251" /></Label>
                                 <NumericUpDown FormatString="0" Value="{Binding CosmicStrifeConfig.CurrencyWarsRuntimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
 
-                            <ToggleSwitch OnContent="积分已满时跳过" IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsPointRewardsEnabled}" />
+                            <ToggleSwitch OnContent="{x:Static lang:ExtraResources.U0486}" IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsPointRewardsEnabled}" />
 
                             <Separator/>
 
                             <StackPanel IsVisible="{Binding !IsCwNormalMode}" Margin="0,4,0,0" Spacing="4">
                                 <TextBlock Foreground="Gray"
-                                           Text="下方可配置Boss名称、Boss词条、投资环境与投资策略。格式参见文档。" />
+                                           Text="{x:Static lang:ExtraResources.U0487}" />
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Label Content="Boss名称" />
+                                    <Label Content="{x:Static lang:ExtraResources.U0488}" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollBossNames}"
-                                             PlaceholderText="例如：巨鹿生物制药;增熵能源集团;金血记忆体联盟" />
+                                             PlaceholderText="{x:Static lang:ExtraResources.U0489}" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Label Content="Boss词条" />
+                                    <Label Content="{x:Static lang:ExtraResources.U0490}" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollBossAffixes}"
-                                             PlaceholderText="例如：决战在即 !时间刺客" />
+                                             PlaceholderText="{x:Static lang:ExtraResources.U0491}" />
                                 </StackPanel>
                                 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Label Content="投资环境" />
+                                    <Label Content="{x:Static lang:ExtraResources.U0492}" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollInvestEnvironments}"
-                                             PlaceholderText="例如：长线利好 ?轮岗" />
+                                             PlaceholderText="{x:Static lang:ExtraResources.U0493}" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Label Content="投资策略" />
+                                    <Label Content="{x:Static lang:ExtraResources.U0494}" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollInvestStrategies}"
-                                             PlaceholderText="第一位面策略1 第一位面策略2；第二位面策略1 第二位面策略2" />
+                                             PlaceholderText="{x:Static lang:ExtraResources.U0495}" />
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </suki:GlassCard>
-                    <TextBlock>请先手动完成一次以清除所有新手提示</TextBlock>
+                    <TextBlock><x:Static Member="lang:ExtraResources.U0509" /></TextBlock>
                 </StackPanel>
             </ScrollViewer>
         </suki:GroupBox>

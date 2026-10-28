@@ -11,6 +11,7 @@ public class HostedService(
     public Task StartAsync(CancellationToken cancellationToken)
     {
         settingsService.Load();
+        SRAFrontend.Localization.UiText.ApplyCulture(settingsService.Settings.Display.Language);
         cacheService.Load();
         configService.Load();
         // backendService.StartBackend("--inline --no-admin");

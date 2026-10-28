@@ -70,7 +70,7 @@ public partial class MainWindowViewModel(
         var view = new ActivityPageView { DataContext = viewModel };
         SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
-            Header = "活动日历",
+            Header = global::SRAFrontend.Localization.UiText.T("活动日历"),
             Content = view
         });
     }

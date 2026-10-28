@@ -90,7 +90,7 @@ public partial class ResourceCleanupViewModel : ObservableObject
         var selectedSize = Files.Where(f => f.IsSelected).Sum(f => f.Size);
         var totalSize = Files.Sum(f => f.Size);
         SelectedSummary =
-            $"已选 {selectedCount}/{Files.Count} 个，共 {ZipUtil.FormatFileSize(selectedSize)}（冗余合计 {ZipUtil.FormatFileSize(totalSize)}）";
+            global::SRAFrontend.Localization.UiText.F($"已选 {selectedCount}/{Files.Count} 个，共 {ZipUtil.FormatFileSize(selectedSize)}（冗余合计 {ZipUtil.FormatFileSize(totalSize)}）");
         OnPropertyChanged(nameof(IsAllSelected));
     }
 

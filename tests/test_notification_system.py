@@ -127,7 +127,6 @@ def test_channel_test_notification_catches_channel_exception(monkeypatch) -> Non
             raise RuntimeError("boom")
 
     monkeypatch.setattr(service, "_build_channel", lambda _channel: _BrokenChannel())
-    monkeypatch.setattr(service, "load_notification_settings", lambda: NotificationSettings(isEnabled=True))
     monkeypatch.setattr(service.logger, "warning", lambda message: warnings.append(str(message)))
 
     label, ok = service.send_channel_test_notification("email", NotificationSettings(isEnabled=True))

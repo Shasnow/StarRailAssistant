@@ -48,14 +48,14 @@ public partial class ActivityPageViewModel(ActivityService activityService) : Vi
         var remaining = end - DateTime.Now;
         if (remaining.TotalSeconds <= 0)
         {
-            VersionRemaining = "已结束";
+            VersionRemaining = global::SRAFrontend.Localization.UiText.T("已结束");
         }
         else
         {
             var totalHours = (int)remaining.TotalHours;
             var days = totalHours / 24;
             var hours = totalHours % 24;
-            VersionRemaining = days > 0 ? $"剩余 {days} 天 {hours} 小时" : $"剩余 {totalHours} 小时";
+            VersionRemaining = days > 0 ? global::SRAFrontend.Localization.UiText.F($"剩余 {days} 天 {hours} 小时") : global::SRAFrontend.Localization.UiText.F($"剩余 {totalHours} 小时");
         }
 
         _allActivities = info.Activities?.ToList() ?? [];
@@ -110,8 +110,8 @@ public class ActivityItemViewModel : ViewModelBase
             var totalHours = (int)remaining.TotalHours;
             var days = totalHours / 24;
             var hours = totalHours % 24;
-            Status = "未开始";
-            Countdown = days > 0 ? $"{days} 天 {hours} 小时后开始" : $"{totalHours} 小时后开始";
+            Status = global::SRAFrontend.Localization.UiText.T("未开始");
+            Countdown = days > 0 ? global::SRAFrontend.Localization.UiText.F($"{days} 天 {hours} 小时后开始") : global::SRAFrontend.Localization.UiText.F($"{totalHours} 小时后开始");
             StatusBrush = InactiveBrush;
         }
         else if (referenceTime > end)
@@ -120,8 +120,8 @@ public class ActivityItemViewModel : ViewModelBase
             var totalHours = (int)elapsed.TotalHours;
             var days = totalHours / 24;
             var hours = totalHours % 24;
-            Status = "已结束";
-            Countdown = days > 0 ? $"已结束 {days} 天 {hours} 小时" : $"已结束 {totalHours} 小时";
+            Status = global::SRAFrontend.Localization.UiText.T("已结束");
+            Countdown = days > 0 ? global::SRAFrontend.Localization.UiText.F($"已结束 {days} 天 {hours} 小时") : global::SRAFrontend.Localization.UiText.F($"已结束 {totalHours} 小时");
             StatusBrush = InactiveBrush;
         }
         else
@@ -130,8 +130,8 @@ public class ActivityItemViewModel : ViewModelBase
             var totalHours = (int)remaining.TotalHours;
             var days = totalHours / 24;
             var hours = totalHours % 24;
-            Status = "进行中";
-            Countdown = days > 0 ? $"剩余 {days} 天 {hours} 小时" : $"剩余 {totalHours} 小时";
+            Status = global::SRAFrontend.Localization.UiText.T("进行中");
+            Countdown = days > 0 ? global::SRAFrontend.Localization.UiText.F($"剩余 {days} 天 {hours} 小时") : global::SRAFrontend.Localization.UiText.F($"剩余 {totalHours} 小时");
             StatusBrush = totalHours > 7 * 24
                 ? AbundantBrush
                 : totalHours > 3 * 24

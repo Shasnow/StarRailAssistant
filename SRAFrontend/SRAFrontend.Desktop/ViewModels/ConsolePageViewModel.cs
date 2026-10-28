@@ -103,13 +103,13 @@ public partial class ConsolePageViewModel : PageViewModel
         switch (command)
         {
             case "connect":
-                AddConsoleLine("未来版本支持WebSocket连接命令");
+                AddConsoleLine(global::SRAFrontend.Localization.UiText.T("未来版本支持WebSocket连接命令"));
                 break;
             case "disconnect":
-                AddConsoleLine("未连接到任何WebSocket服务器");
+                AddConsoleLine(global::SRAFrontend.Localization.UiText.T("未连接到任何WebSocket服务器"));
                 break;
             default:
-                AddConsoleLine($"未知命令: {command}");
+                AddConsoleLine(global::SRAFrontend.Localization.UiText.F($"未知命令: {command}"));
                 break;
         }
     }
@@ -143,10 +143,10 @@ public partial class ConsolePageViewModel : PageViewModel
         // 1. 弹出保存路径选择器（含确认/取消），默认文件名 logs_YYYYMMDD_HHMMSS.zip
         var saveFile = await TopLevelObject.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "导出日志",
+            Title = global::SRAFrontend.Localization.UiText.T("导出日志"),
             SuggestedFileName = $"logs_{DateTime.Now:yyyyMMdd_HHmmss}",
             DefaultExtension = "zip",
-            FileTypeChoices = [new FilePickerFileType("ZIP 压缩包") { Patterns = ["*.zip"] }],
+            FileTypeChoices = [new FilePickerFileType(global::SRAFrontend.Localization.UiText.T("ZIP 压缩包")) { Patterns = ["*.zip"] }],
             ShowOverwritePrompt = true
         });
         if (saveFile is null) return; // 用户取消
@@ -154,20 +154,20 @@ public partial class ConsolePageViewModel : PageViewModel
 
         // 2. 收集日志并打包（后台线程执行，避免阻塞UI）
         IsExporting = true;
-        _commonModel.ShowInfoToast("正在导出日志", "正在收集日志文件并打包，请稍候...");
+        _commonModel.ShowInfoToast(global::SRAFrontend.Localization.UiText.T("正在导出日志"), global::SRAFrontend.Localization.UiText.T("正在收集日志文件并打包，请稍候..."));
         try
         {
             var (consoleLines, frontendFiles, backendFiles) = await Task.Run(() => ExportLogsCore(targetPath));
             _logger.LogInformation(
                 "Log export completed: {TargetPath} (console {Console} lines, frontend {Frontend} files, backend {Backend} files)",
                 targetPath, consoleLines, frontendFiles, backendFiles);
-            _commonModel.ShowSuccessToast("日志导出成功",
-                $"已保存至：{targetPath}");
+            _commonModel.ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("日志导出成功"),
+                global::SRAFrontend.Localization.UiText.F($"已保存至：{targetPath}"));
         }
         catch (Exception e)
         {
             _logger.LogError(e, "日志导出失败: {TargetPath}", targetPath);
-            _commonModel.ShowErrorToast("日志导出失败", $"发生错误：{e.Message}\n请检查目标路径是否可写后重试");
+            _commonModel.ShowErrorToast(global::SRAFrontend.Localization.UiText.T("日志导出失败"), global::SRAFrontend.Localization.UiText.F($"发生错误：{e.Message}\n请检查目标路径是否可写后重试"));
         }
         finally
         {

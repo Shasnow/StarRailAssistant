@@ -1,4 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -20,7 +21,7 @@
                             <TextBlock FontSize="24" FontWeight="Bold" VerticalAlignment="Center"
                                        Text="{Binding VersionNumber}" />
                             <TextBlock FontSize="18" Opacity="0.7" VerticalAlignment="Center"
-                                       Text="版本" />
+                                       Text="{x:Static lang:ExtraResources.U0222}" />
                         </StackPanel>
                         <TextBlock FontSize="18" Text="{Binding VersionName}" />
                         <StackPanel Orientation="Horizontal" Spacing="16">
@@ -80,7 +81,7 @@
 
                             <!-- 空状态提示 -->
                             <TextBlock IsVisible="{Binding SelectedDateActivities.Count, Converter={x:Static controls:ZeroToBooleanConverter.Instance}}"
-                                       Text="当天暂无活动"
+                                       Text="{x:Static lang:ExtraResources.U0223}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Opacity="0.5" FontSize="14"
                                        Margin="0,40" />

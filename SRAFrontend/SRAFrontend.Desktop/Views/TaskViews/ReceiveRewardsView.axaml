@@ -1,4 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,24 +12,24 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="领取奖励" IsChecked="{Binding ReceiveRewardsConfig.IsEnabled}"/>
+                    <CheckBox Content="{x:Static lang:ExtraResources.U0518}" IsChecked="{Binding ReceiveRewardsConfig.IsEnabled}"/>
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="ReceiveRewardsTask"
-                            ToolTip.Tip="单次运行"/>
+                            ToolTip.Tip="{x:Static lang:ExtraResources.U0478}"/>
                 </StackPanel>
                 
             </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Margin="10" Spacing="20">
-                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsTrailblazeProfileEnabled}" Content="漫游签证" />
-                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsAssignmentsEnabled}" Content="派遣" />
-                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsMailEnabled}" Content="邮件" />
-                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsDailyTrainingEnabled}" Content="每日实训" />
-                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsNamelessHonorEnabled}" Content="无名勋礼" />
-                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsGiftOfOdysseyEnabled}" Content="巡星之礼" />
-                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsRedeemCodeEnabled}" Content="兑换码" />
-                    <TextBox Text="{Binding ReceiveRewardsConfig.RedeemCodes}" PlaceholderText="兑换码填写处"></TextBox>
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsTrailblazeProfileEnabled}" Content="{x:Static lang:ExtraResources.U0519}" />
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsAssignmentsEnabled}" Content="{x:Static lang:ExtraResources.U0520}" />
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsMailEnabled}" Content="{x:Static lang:ExtraResources.U0521}" />
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsDailyTrainingEnabled}" Content="{x:Static lang:ExtraResources.U0522}" />
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsNamelessHonorEnabled}" Content="{x:Static lang:ExtraResources.U0523}" />
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsGiftOfOdysseyEnabled}" Content="{x:Static lang:ExtraResources.U0524}" />
+                    <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsRedeemCodeEnabled}" Content="{x:Static lang:ExtraResources.U0525}" />
+                    <TextBox Text="{Binding ReceiveRewardsConfig.RedeemCodes}" PlaceholderText="{x:Static lang:ExtraResources.U0526}"></TextBox>
                 </StackPanel>
             </ScrollViewer>
         </suki:GroupBox>

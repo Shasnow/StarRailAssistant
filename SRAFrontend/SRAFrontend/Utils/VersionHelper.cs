@@ -49,9 +49,9 @@ public static class VersionHelper
     /// </summary>
     public static string GetVersionDisplayText(SemVerInfo currentVersion, SemVerInfo? installedHotfixVersion)
     {
-        if (installedHotfixVersion == null) return $"当前版本：{currentVersion}";
+        if (installedHotfixVersion == null) return global::SRAFrontend.Localization.UiText.F($"当前版本：{currentVersion}");
         return currentVersion > installedHotfixVersion
-            ? $"当前版本：{currentVersion}"
-            : $"热修复：{installedHotfixVersion}";
+            ? global::SRAFrontend.Localization.UiText.F($"当前版本：{currentVersion}")
+            : global::SRAFrontend.Localization.UiText.F($"热修复：{installedHotfixVersion}");
     }
 }

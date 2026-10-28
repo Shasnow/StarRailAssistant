@@ -73,10 +73,10 @@ public partial class ExtensionConfigDialogViewModel : ObservableObject
         {
             var field = new EnumFieldViewModel
             {
-                Key = key, Label = key, Description = prop.Description,
+                Key = key, Label = SRAFrontend.Localization.UiText.T(key), Description = SRAFrontend.Localization.UiText.T(prop.Description),
                 AllowCustom = prop.AllowCustom && prop.Type == "string",
                 Refreshable = prop.Refreshable,
-                RefreshLabel = string.IsNullOrWhiteSpace(prop.RefreshLabel) ? "扫描" : prop.RefreshLabel,
+                RefreshLabel = string.IsNullOrWhiteSpace(prop.RefreshLabel) ? global::SRAFrontend.Localization.UiText.T("扫描") : SRAFrontend.Localization.UiText.T(prop.RefreshLabel),
                 RefreshOptionsRequested = RefreshFieldOptionsAsync
             };
             field.UpdateOptions(prop.Enum, prop.EnumLabels);
@@ -89,17 +89,17 @@ public partial class ExtensionConfigDialogViewModel : ObservableObject
         {
             "integer" => new IntegerFieldViewModel
             {
-                Key = key, Label = key, Description = prop.Description,
+                Key = key, Label = SRAFrontend.Localization.UiText.T(key), Description = SRAFrontend.Localization.UiText.T(prop.Description),
                 Minimum = prop.Minimum ?? decimal.MinValue,
                 Maximum = prop.Maximum ?? decimal.MaxValue
             },
             "boolean" => new BooleanFieldViewModel
             {
-                Key = key, Label = key, Description = prop.Description
+                Key = key, Label = SRAFrontend.Localization.UiText.T(key), Description = SRAFrontend.Localization.UiText.T(prop.Description)
             },
             _ => new StringFieldViewModel
             {
-                Key = key, Label = key, Description = prop.Description
+                Key = key, Label = SRAFrontend.Localization.UiText.T(key), Description = SRAFrontend.Localization.UiText.T(prop.Description)
             }
         };
     }
@@ -108,7 +108,7 @@ public partial class ExtensionConfigDialogViewModel : ObservableObject
     {
         var schema = await _backendService.GetExtensionSchemaAsync(_extensionId);
         if (schema == null || !schema.Properties.TryGetValue(field.Key, out var prop) || prop.Enum == null)
-            throw new InvalidOperationException("未能获取可选项，请确认后端已启动后重试。");
+            throw new InvalidOperationException(global::SRAFrontend.Localization.UiText.T("未能获取可选项，请确认后端已启动后重试。"));
 
         // 只更新此字段的选项，当前选择及其他未保存的配置均保持原值。
         field.UpdateOptions(prop.Enum, prop.EnumLabels);

@@ -1,4 +1,5 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,21 +12,21 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="清体力" IsChecked="{Binding TrailblazePowerConfig.IsEnabled}" />
+                    <CheckBox Content="{x:Static lang:ExtraResources.U0543}" IsChecked="{Binding TrailblazePowerConfig.IsEnabled}" />
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="TrailblazePowerTask"
-                            ToolTip.Tip="单次运行" />
+                            ToolTip.Tip="{x:Static lang:ExtraResources.U0478}" />
                 </StackPanel>
 
             </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Spacing="10">
                     <suki:GlassCard>
-                        <suki:GroupBox Header="任务清单">
+                        <suki:GroupBox Header="{x:Static lang:ExtraResources.U0544}">
                             <Grid ColumnDefinitions="Auto,*, Auto">
                                 <Label Grid.Column="1" Content="{Binding TaskListText}"/>
-                                <Button Grid.Column="2" Content="配置" Command="{Binding ShowTaskListControlCommand}"/>
+                                <Button Grid.Column="2" Content="{x:Static lang:ExtraResources.U0436}" Command="{Binding ShowTaskListControlCommand}"/>
                             </Grid>
                         </suki:GroupBox>
                     </suki:GlassCard>
@@ -33,35 +34,35 @@
                         <StackPanel >
                             <CheckBox
                                 IsChecked="{Binding TrailblazePowerConfig.IsReplenishEnabled}"
-                                Content="补充体力" />
+                                Content="{x:Static lang:ExtraResources.U0545}" />
                             <Grid
                                 ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="10">
-                                <Label Grid.Column="0" Content="使用" />
+                                <Label Grid.Column="0" Content="{x:Static lang:ExtraResources.U0546}" />
                                 <ComboBox Grid.Column="1"
                                           SelectedIndex="{Binding TrailblazePowerConfig.ReplenishWay}">
-                                    <ComboBoxItem Content="后备开拓力" />
-                                    <ComboBoxItem Content="燃料" />
-                                    <ComboBoxItem Content="星琼" />
+                                    <ComboBoxItem Content="{x:Static lang:ExtraResources.U0547}" />
+                                    <ComboBoxItem Content="{x:Static lang:ExtraResources.U0548}" />
+                                    <ComboBoxItem Content="{x:Static lang:ExtraResources.U0549}" />
                                 </ComboBox>
-                                <Label Grid.Column="2" Content="补充" />
+                                <Label Grid.Column="2" Content="{x:Static lang:ExtraResources.U0550}" />
                                 <NumericUpDown Grid.Column="3" Minimum="1" Maximum="99" FormatString="0"
                                                Height="20"
                                                Value="{Binding TrailblazePowerConfig.ReplenishTimes}" />
-                                <Label Grid.Column="4" Content="次" />
+                                <Label Grid.Column="4" Content="{x:Static lang:ExtraResources.U0551}" />
                             </Grid>
 
                             <ToggleSwitch
                                 IsChecked="{Binding TrailblazePowerConfig.IsUseAssistant}"
-                                OnContent="使用支援角色" />
+                                OnContent="{x:Static lang:ExtraResources.U0552}" />
                             <StackPanel Orientation="Horizontal" Spacing="16">
                                 <ToggleSwitch
                                     IsChecked="{Binding TrailblazePowerConfig.IsUseBuildTarget}"
-                                    OnContent="启用培养目标"
-                                    ToolTip.Tip="是否启用培养目标，开启后将优先完成培养目标" />
+                                    OnContent="{x:Static lang:ExtraResources.U0553}"
+                                    ToolTip.Tip="{x:Static lang:ExtraResources.U0135}" />
                                 <ToggleSwitch
                                     IsChecked="{Binding TrailblazePowerConfig.IsMaterialPriority}"
-                                    OnContent="材料优先"
-                                    ToolTip.Tip="培养目标是否仅识别材料类型副本，启用后跳过饰品提取与侵蚀隧洞" />
+                                    OnContent="{x:Static lang:ExtraResources.U0554}"
+                                    ToolTip.Tip="{x:Static lang:ExtraResources.U0555}" />
                             </StackPanel>
                         </StackPanel>
                     </suki:GlassCard>
@@ -69,34 +70,34 @@
                         <suki:GroupBox>
                             <suki:GroupBox.Header>
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="启用多倍活动检测" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{x:Static lang:ExtraResources.U0556}" VerticalAlignment="Center"/>
                                     <ToggleSwitch IsChecked="{Binding TrailblazePowerConfig.IsActivityEnabled}"/>
                                 </StackPanel>
                             </suki:GroupBox.Header>
                             <StackPanel>
                                 <Grid ColumnDefinitions="Auto, Auto,*" RowDefinitions="Auto, Auto">
-                                    <Label Grid.Row="0" Grid.Column="0" Content="花藏繁生"/>
+                                    <Label Grid.Row="0" Grid.Column="0" Content="{x:Static lang:ExtraResources.U0557}"/>
                                     <TextBlock Grid.Row="0" Grid.Column="1" Width="180" VerticalAlignment="Center" TextAlignment="Center"
-                                        Text="拟造花萼（金）"/>
+                                        Text="{x:Static lang:ExtraResources.U0558}"/>
                                     <ComboBox Grid.Row="0" Grid.Column="2"
                                               SelectedIndex="{Binding SelectedGardenOfPlentyLevels1Index}"
                                               ItemsSource="{Binding GardenOfPlentyLevels1}"/>
                                     <TextBlock Grid.Row="1" Grid.Column="1" Width="180" VerticalAlignment="Center" TextAlignment="Center"
-                                               Text="拟造花萼（赤）"/>
+                                               Text="{x:Static lang:ExtraResources.U0559}"/>
                                     <ComboBox Grid.Row="1" Grid.Column="2"
                                               SelectedIndex="{Binding SelectedGardenOfPlentyLevels2Index}"
                                               ItemsSource="{Binding GardenOfPlentyLevels2}"/>
                                 </Grid>
                                 <Grid ColumnDefinitions="Auto, Auto,*">
-                                    <Label Grid.Column="0" Content="异器盈界"/>
-                                    <TextBlock Grid.Column="1" Width="180" Text="侵蚀隧洞" VerticalAlignment="Center" TextAlignment="Center"/>
+                                    <Label Grid.Column="0" Content="{x:Static lang:ExtraResources.U0560}"/>
+                                    <TextBlock Grid.Column="1" Width="180" Text="{x:Static lang:ExtraResources.U0561}" VerticalAlignment="Center" TextAlignment="Center"/>
                                     <ComboBox Grid.Column="2"
                                               SelectedIndex="{Binding SelectedRealmOfTheStrangeLevelsIndex}"
                                               ItemsSource="{Binding RealmOfTheStrangeLevels}"/>
                                 </Grid>
                                 <Grid ColumnDefinitions="Auto, Auto,*">
-                                    <Label Grid.Column="0" Content="位面分裂"/>
-                                    <TextBlock Grid.Column="1" Width="180" Text="饰品提取" VerticalAlignment="Center" TextAlignment="Center"/>
+                                    <Label Grid.Column="0" Content="{x:Static lang:ExtraResources.U0562}"/>
+                                    <TextBlock Grid.Column="1" Width="180" Text="{x:Static lang:ExtraResources.U0563}" VerticalAlignment="Center" TextAlignment="Center"/>
                                     <ComboBox Grid.Column="2"
                                               SelectedIndex="{Binding SelectedPlanarFissureLevelsIndex}"
                                               ItemsSource="{Binding PlanarFissureLevels}"/>

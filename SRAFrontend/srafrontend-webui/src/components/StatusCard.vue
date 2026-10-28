@@ -1,5 +1,5 @@
 <template>
-  <PanelCard title="运行状态">
+  <PanelCard :title="t('W0091')">
     <div class="status-grid">
       <div v-for="item in infoRows" :key="item.label" class="row">
         <span class="row-label">{{ item.label }}</span>
@@ -15,7 +15,7 @@
       <!-- 进度：百分比数值 + 进度条（progress 为后端 [current, total] 元组） -->
       <div class="progress">
         <div class="row">
-          <span class="row-label">进度</span>
+          <span class="row-label">{{ t('W0092') }}</span>
           <span class="progress-num">{{ Math.round(progressPercent) }}%</span>
         </div>
         <div class="progress-track" role="progressbar" :aria-valuenow="Math.round(progressPercent)" aria-valuemin="0"
@@ -29,6 +29,8 @@
 </template>
 
 <script setup lang="ts">
+import { t } from '@/i18n'
+
 import { computed } from 'vue'
 import type { TaskStatus } from '@/api/task'
 import PanelCard from './PanelCard.vue'
@@ -41,20 +43,20 @@ const props = defineProps<{
 // 状态展示：label 精确到后端 5 种 RunStatus；
 // pill/进度条沿用三色编码（running-绿、failed-红、其余-灰）
 const stateMeta: Record<TaskStatus['status'], { label: string; pill: 'running' | 'stopped' | 'error' }> = {
-  idle: { label: '空闲', pill: 'stopped' },
-  running: { label: '运行中', pill: 'running' },
-  completed: { label: '已完成', pill: 'stopped' },
-  failed: { label: '失败', pill: 'error' },
-  stopped: { label: '已停止', pill: 'stopped' },
+  idle: { label: t('W0080'), pill: 'stopped' },
+  running: { label: t('W0081'), pill: 'running' },
+  completed: { label: t('W0082'), pill: 'stopped' },
+  failed: { label: t('W0083'), pill: 'error' },
+  stopped: { label: t('W0084'), pill: 'stopped' },
 }
 
 const infoRows = computed(() => [
-  { label: '会话 ID', value: props.status.session_id || '—', mono: true },
-  { label: '进程 PID', value: props.status.pid > 0 ? String(props.status.pid) : '—', mono: true },
-  { label: '运行模式', value: props.status.mode || '—' },
-  { label: '当前状态', pill: true },
-  { label: '运行单元', value: props.status.unit || '—' },
-  { label: '运行配置', value: props.status.configs.join('、') || '—' },
+  { label: t('W0085'), value: props.status.session_id || '—', mono: true },
+  { label: t('W0086'), value: props.status.pid > 0 ? String(props.status.pid) : '—', mono: true },
+  { label: t('W0087'), value: props.status.mode || '—' },
+  { label: t('W0088'), pill: true },
+  { label: t('W0089'), value: props.status.unit || '—' },
+  { label: t('W0090'), value: props.status.configs.join('、') || '—' },
 ])
 
 /** [current, total] 换算为 0-100 百分比；total 为 0 视为无进度 */

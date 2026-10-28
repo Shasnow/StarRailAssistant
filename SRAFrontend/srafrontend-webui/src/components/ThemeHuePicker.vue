@@ -1,7 +1,7 @@
 <template>
   <el-popover placement="bottom-end" :width="264" trigger="click">
     <template #reference>
-      <button class="hue-toggle" type="button" aria-label="调整主题色相">
+      <button class="hue-toggle" type="button" :aria-label="t('W0105')">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256">
           <path
             d="M200.77,53.89A103.27,103.27,0,0,0,128,24h-1.07A104,104,0,0,0,24,128c0,43,26.58,79.06,69.36,94.17A32,32,0,0,0,136,192a16,16,0,0,1,16-16h46.21a31.81,31.81,0,0,0,31.2-24.88,104.43,104.43,0,0,0,2.59-24A103.28,103.28,0,0,0,200.77,53.89Zm13,93.71A15.89,15.89,0,0,1,198.21,160H152a32,32,0,0,0-32,32,16,16,0,0,1-21.31,15.07C62.49,194.3,40,164,40,128a88,88,0,0,1,87.09-88h.9a88.35,88.35,0,0,1,88,87.25A88.86,88.86,0,0,1,213.81,147.6ZM140,76a12,12,0,1,1-12-12A12,12,0,0,1,140,76ZM96,100A12,12,0,1,1,84,88,12,12,0,0,1,96,100Zm0,56a12,12,0,1,1-12-12A12,12,0,0,1,96,156Zm88-56a12,12,0,1,1-12-12A12,12,0,0,1,184,100Z" />
@@ -13,8 +13,8 @@
     <div class="hue-panel">
       <div class="hue-head">
         <span class="hue-preview" :style="{ background: 'var(--color-primary)' }"></span>
-        <span class="hue-label">主题色相 {{ Math.round(hue) }}°</span>
-        <button class="hue-reset" type="button" @click="resetHue">重置</button>
+        <span class="hue-label">{{ t('W0106') }} {{ Math.round(hue) }}°</span>
+        <button class="hue-reset" type="button" @click="resetHue">{{ t('W0107') }}</button>
       </div>
 
       <el-slider class="hue-slider" :model-value="hue" :min="0" :max="360" :step="1" :show-tooltip="false"
@@ -23,13 +23,15 @@
       <div class="hue-presets">
         <button v-for="p in PRESETS" :key="p" type="button" class="preset-dot"
           :class="{ active: Math.round(hue) === p }" :style="{ background: `oklch(0.6 0.14 ${p})` }"
-          :aria-label="`预设色相 ${p}°`" @click="setHue(p)" />
+          :aria-label="tf('W0108', p)" @click="setHue(p)" />
       </div>
     </div>
   </el-popover>
 </template>
 
 <script setup lang="ts">
+import { t, tf } from '@/i18n'
+
 import { useThemeHue } from '@/composables/useThemeHue'
 
 const { hue, setHue, resetHue } = useThemeHue()

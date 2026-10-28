@@ -1,3 +1,4 @@
+import { t, tf, tr } from '@/i18n'
 import axios, { type AxiosRequestConfig, type AxiosInstance } from 'axios'
 
 // axios 扩展：
@@ -26,7 +27,7 @@ export class ApiError extends Error {
   readonly canceled: boolean
 
   constructor(message: string, status?: number, canceled = false) {
-    super(message)
+    super(tr(message))
     this.name = 'ApiError'
     this.status = status
     this.canceled = canceled
@@ -76,25 +77,25 @@ export function setUnauthorizedHandler(handler: (() => void) | null): void {
 export function statusMessage(status: number): string {
   switch (status) {
     case 400:
-      return '请求参数无效'
+      return t('W0002')
     case 401:
-      return '未授权，请先完成认证'
+      return t('W0003')
     case 403:
-      return '没有访问权限'
+      return t('W0004')
     case 404:
-      return '资源不存在'
+      return t('W0005')
     case 409:
-      return '资源已存在或状态冲突'
+      return t('W0006')
     case 422:
-      return '请求校验失败'
+      return t('W0007')
     case 500:
-      return '服务器内部错误'
+      return t('W0008')
     case 502:
     case 503:
     case 504:
-      return '服务暂不可用，请稍后重试'
+      return t('W0009')
     default:
-      return `请求失败（HTTP ${status}）`
+      return tf('W0010', status)
   }
 }
 
@@ -108,10 +109,10 @@ function toApiError(err: unknown): ApiError {
   if (err instanceof ApiError) return err
 
   if (axios.isAxiosError(err)) {
-    if (err.code === 'ERR_CANCELED') return new ApiError('请求已取消', undefined, true)
+    if (err.code === 'ERR_CANCELED') return new ApiError(t('W0011'), undefined, true)
     if (err.code === 'ECONNABORTED')
-      return new ApiError('请求超时，请检查后端服务是否可用', err.response?.status)
-    if (!err.response) return new ApiError('网络异常，无法连接到后端服务')
+      return new ApiError(t('W0012'), err.response?.status)
+    if (!err.response) return new ApiError(t('W0013'))
 
     const status = err.response.status
     const body: unknown = err.response.data
@@ -156,7 +157,7 @@ export function createHttpClient(): AxiosInstance {
         typeof body.success === 'boolean' &&
         !body.success
       ) {
-        throw new ApiError(body.message || '请求失败', response.status)
+        throw new ApiError(body.message || t('W0014'), response.status)
       }
       return response
     },

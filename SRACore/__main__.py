@@ -6,11 +6,15 @@ import sys
 sys.path.append(os.getcwd())  # 将当前工作目录添加到 sys.path，以便导入 tasks
 
 from SRACore.localization import Resource
+from SRACore.localization.presentation import translate
 from SRACore.service.setting_service import SettingsService
 from SRACore.util.const import VERSION, AppDataDir, CacheDir, ConfigsDir, LogsDir, SettingsJson
+from SRACore.util.standard_io import configure_standard_streams
 
 
 def main():
+    # Must precede argparse output and cmd2/Rich/logging stream capture.
+    configure_standard_streams()
     settings_service = SettingsService()
     language: int = settings_service.settings.Display.Language
     Resource.set_language(language)
@@ -70,7 +74,7 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
         '--command', '-c', '--execute', '-e',
         nargs='*',
         type=str,
-        help='The command to execute AFTER launch',
+        help=translate('The command to execute AFTER launch'),
     )
     parser.add_argument(
         '-v', '--version',
@@ -88,7 +92,7 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         '--no-admin',
         action='store_true',
-        help="Do not require admin privileges"
+        help=translate("Do not require admin privileges")
     )
 
     parser.add_argument(
@@ -97,7 +101,7 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
         nargs='?',
         default='',
         metavar=f'{{{",".join(subcommands.keys())}}}',
-        help="Subcommands, type '{subcommand} --help' for more information"
+        help=translate("Subcommands, type '{subcommand} --help' for more information")
     )
 
     parser.add_argument(
@@ -120,7 +124,7 @@ def where_parser() -> argparse.ArgumentParser:
     """返回路径查找解析器"""
     parser = argparse.ArgumentParser(
         prog=f'{os.path.basename(sys.argv[0])} where',
-        description='Find the path of the executable file or a directory',
+        description=translate('Find the path of the executable file or a directory'),
     )
     parser.add_argument(
         'path',
@@ -128,7 +132,7 @@ def where_parser() -> argparse.ArgumentParser:
         nargs='?',
         choices=['configs', 'logs', 'cache', 'data', 'settings', ''],
         default='',
-        help='The path to find',
+        help=translate('The path to find'),
     )
     return parser
 
@@ -153,18 +157,18 @@ def serve_parser() -> argparse.ArgumentParser:
     """返回服务器解析器"""
     parser = argparse.ArgumentParser(
         prog=f'{os.path.basename(sys.argv[0])} serve',
-        description='Start the SRA server',
+        description=translate('Start the SRA server'),
     )
     parser.add_argument(
         '--host',
         action='store_true',
-        help='Expose the server to the public network',
+        help=translate('Expose the server to the public network'),
     )
     parser.add_argument(
         '--port',
         type=int,
         default=5000,
-        help='The port to use',
+        help=translate('The port to use'),
     )
     return parser
 

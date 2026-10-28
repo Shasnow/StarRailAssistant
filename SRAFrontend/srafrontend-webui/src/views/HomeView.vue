@@ -22,6 +22,8 @@
 </template>
 
 <script setup lang="ts">
+import { t, tf } from '@/i18n'
+
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { computed, onMounted, ref } from 'vue'
 import AnnouncementCard from '@/components/AnnouncementCard.vue'
@@ -59,11 +61,11 @@ async function handleConfigChange(next: string) {
   if (panel?.isDirty) {
     try {
       await ElMessageBox.confirm(
-        `配置「${selectedConfig.value}」有未保存的更改，切换前是否保存？`,
-        '未保存的更改',
+        tf('W0119', selectedConfig.value),
+        t('W0120'),
         {
-          confirmButtonText: '保存并切换',
-          cancelButtonText: '放弃更改',
+          confirmButtonText: t('W0121'),
+          cancelButtonText: t('W0122'),
           distinguishCancelAndClose: true,
           type: 'warning',
         },
@@ -81,20 +83,20 @@ async function handleConfigChange(next: string) {
 /** 新建配置：成功后切换到新配置（复用切换流程，保留未保存更改检查） */
 async function handleConfigCreate(name: string) {
   if (!(await configsStore.createConfig(name))) {
-    ElMessage.error(configsStore.saveError || '新建配置失败')
+    ElMessage.error(configsStore.saveError || t('W0123'))
     return
   }
-  ElMessage.success(`配置「${name}」已创建`)
+  ElMessage.success(tf('W0124', name))
   await handleConfigChange(name)
 }
 
 /** 删除配置：删除的是当前配置时回退选中第一个剩余配置 */
 async function handleConfigRemove(name: string) {
   if (!(await configsStore.removeConfig(name))) {
-    ElMessage.error(configsStore.saveError || '删除配置失败')
+    ElMessage.error(configsStore.saveError || t('W0125'))
     return
   }
-  ElMessage.success(`配置「${name}」已删除`)
+  ElMessage.success(tf('W0126', name))
   configsStore.normalizeSelection()
 }
 
@@ -108,14 +110,14 @@ onMounted(async () => {
 /** 启动任务：以当前选中配置运行，结果通过消息提示 */
 async function handleStart() {
   if (!selectedConfig.value) {
-    ElMessage.warning('请先选择运行配置')
+    ElMessage.warning(t('W0127'))
     return
   }
   try {
     await task.start(selectedConfig.value)
-    ElMessage.success('任务已启动')
+    ElMessage.success(t('W0128'))
   } catch (err) {
-    ElMessage.error(err instanceof Error ? err.message : '启动任务失败')
+    ElMessage.error(err instanceof Error ? err.message : t('W0129'))
   }
 }
 
@@ -123,9 +125,9 @@ async function handleStart() {
 async function handleStop() {
   try {
     await task.stop()
-    ElMessage.success('已发送停止指令')
+    ElMessage.success(t('W0130'))
   } catch (err) {
-    ElMessage.error(err instanceof Error ? err.message : '停止任务失败')
+    ElMessage.error(err instanceof Error ? err.message : t('W0131'))
   }
 }
 </script>

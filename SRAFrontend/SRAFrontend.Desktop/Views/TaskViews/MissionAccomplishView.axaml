@@ -1,4 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,23 +12,23 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="任务完成后" IsChecked="{Binding MissionAccomplishedConfig.IsEnabled}"/>
+                    <CheckBox Content="{x:Static lang:ExtraResources.U0510}" IsChecked="{Binding MissionAccomplishedConfig.IsEnabled}"/>
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="MissionAccomplishTask"
-                            ToolTip.Tip="单次运行"/>
+                            ToolTip.Tip="{x:Static lang:ExtraResources.U0478}"/>
                 </StackPanel>
                 
             </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Margin="10" Spacing="20">
-                    <CheckBox IsChecked="{Binding MissionAccomplishedConfig.IsLogout}" Content="登出当前账号" />
-                    <CheckBox IsChecked="{Binding MissionAccomplishedConfig.IsExitGame}" Content="退出游戏" />
-                    <CheckBox IsChecked="{Binding MissionAccomplishedConfig.IsExitApp}" Content="关闭程序" />
-                    <RadioButton IsChecked="{Binding MissionAccomplishedConfig.IsShutdown}" Content="关机" />
-                    <RadioButton IsChecked="{Binding MissionAccomplishedConfig.IsSleep}" Content="休眠" />
-                    <RadioButton IsChecked="{Binding MissionAccomplishedConfig.IsLogoff}" Content="注销当前用户" />
-                    <RadioButton Content="无动作" />
+                    <CheckBox IsChecked="{Binding MissionAccomplishedConfig.IsLogout}" Content="{x:Static lang:ExtraResources.U0511}" />
+                    <CheckBox IsChecked="{Binding MissionAccomplishedConfig.IsExitGame}" Content="{x:Static lang:ExtraResources.U0512}" />
+                    <CheckBox IsChecked="{Binding MissionAccomplishedConfig.IsExitApp}" Content="{x:Static lang:ExtraResources.U0513}" />
+                    <RadioButton IsChecked="{Binding MissionAccomplishedConfig.IsShutdown}" Content="{x:Static lang:ExtraResources.U0514}" />
+                    <RadioButton IsChecked="{Binding MissionAccomplishedConfig.IsSleep}" Content="{x:Static lang:ExtraResources.U0515}" />
+                    <RadioButton IsChecked="{Binding MissionAccomplishedConfig.IsLogoff}" Content="{x:Static lang:ExtraResources.U0516}" />
+                    <RadioButton Content="{x:Static lang:ExtraResources.U0517}" />
                 </StackPanel>
             </ScrollViewer>
         </suki:GroupBox>
