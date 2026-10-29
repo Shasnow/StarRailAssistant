@@ -1484,9 +1484,30 @@ class CurrencyWarsVision:
                 failure_summary = (headers == {"挑战失败"}
                     and "小队生命值" in {text for text, _ in regions[0][0]}
                     and "对局评价" in identity_labels)
-                if {"对局评价", "当前职级"} <= identity_labels or failure_summary:
+                # 超频胜利汇总也可能没有当前职级；必须在同帧认证完整身份与精确动作。
+                success_identity = (headers == {"挑战成功"}
+                    and "对局评价" in identity_labels and any(text == "小队生命值" or
+                        re.fullmatch(r"小队生命值[:：]?[❤♥♡]?(?:100|[1-9]?[0-9])", text)
+                         for text, _ in regions[0][0]))
+                conflicting_actions = action_labels & {"下一页", "返回货币战争", "前往结算", "继续挑战", "点击空白加速"}
+                if success_identity and not conflicting_actions and "下一步" not in action_labels:
+                    # 原尺寸可能只读到“下一”；仅放大同一帧的原动作ROI，仍须完整高置信度文字。
+                    from PIL import Image
+                    action_crop = frame.crop(regions[1][1])
+                    action_crop = action_crop.resize((action_crop.width * 2, action_crop.height * 2),
+                                                     Image.Resampling.LANCZOS)
+                    action_lines, action_raw = _battle_result_lines(
+                        self._engine_ocr(action_crop, minimum_confidence=0.9), action_crop.size)
+                    self._check_stop()
+                    attempts.append({"method": "final_action_2x", "roi": list(BATTLE_RESULT_ACTION_ROI),
+                                     "text": action_raw, "reason": "exact_action_same_frame"})
+                    if "下一步" in {text for text, _ in action_lines}:
+                        action_labels.add("下一步")
+                success_summary = success_identity and not conflicting_actions and "下一步" in action_labels
+                if {"对局评价", "当前职级"} <= identity_labels or failure_summary or success_summary:
                     return BattleScreenObservation("final_summary", None, None,
-                        ("same_frame_failure_header_health_evaluation_and_next_step" if failure_summary
+                        ("same_frame_success_header_health_evaluation_and_next_step" if success_summary
+                         else "same_frame_failure_header_health_evaluation_and_next_step" if failure_summary
                          else "same_frame_final_header_labels_and_next_step"), (raw_text + " | " + raw)[:480],
                         outcome, point)
             if not headers:
@@ -1577,6 +1598,15 @@ class CurrencyWarsVision:
                                 round(roi[3] * height) - round(roi[1] * height))
                 self._check_stop()
                 answer = parse_squad_health(rows, image_size=size, evidence=method)
+                if (has_engine and tuple(roi) == FINAL_HEALTH_ROI
+                        and answer.reason in {"health_label_missing", "health_value_missing"}):
+                    # 仅补同帧同ROI缺失的标签/数值；冲突、低置信度和越界RGB结果不能被覆盖。
+                    gray_rows = self._engine_ocr(image.convert("L"), minimum_confidence=0.0)
+                    self._check_stop()
+                    gray_answer = parse_squad_health(gray_rows, image_size=size,
+                                                     evidence="health_same_frame_gray")
+                    if gray_answer.current is not None:
+                        answer, method = gray_answer, "health_same_frame_gray"
             except Exception as error:
                 self._failure(error)
                 answer = HealthObservation(None, None, method, type(error).__name__, "")
