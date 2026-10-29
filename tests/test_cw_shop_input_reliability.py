@@ -21,6 +21,9 @@ class ShopOperator(ReplayOperator):
         self.shop_open = False
         self.level, self.progress, self.gold = 6, 34, 20
         self.native_events = []
+        self.store_name = None
+        self.store_price = None
+        self.card_clicks = 0
         self.game_accepts = self.active = True
         self.minimum_hold = 0
         paint_slots(self)
@@ -35,6 +38,8 @@ class ShopOperator(ReplayOperator):
         return frame
 
     def click_point(self, x, y, **kwargs):
+        if (x, y) == (.25, .18):
+            self.card_clicks += 1
         if (x, y) in ((.8438, .8481), (1620, 915)):
             self.shop_open = True
         return super().click_point(x, y, **kwargs)
@@ -53,6 +58,11 @@ class ShopOperator(ReplayOperator):
         return True  # 复现逻辑键映射失效而不报错。
 
     def ocr(self, *, from_x=None, **kwargs):
+        if from_x == .19 and self.store_name:
+            rows = [([[70, 5], [150, 5], [150, 30], [70, 30]], self.store_name, .999)]
+            if self.store_price is not None:
+                rows.append(([[220, 5], [238, 5], [238, 30], [220, 30]], str(self.store_price), .999))
+            return rows
         if from_x in (.115, .05, .015):
             return [([[5, 5 + 25 * i], [110, 5 + 25 * i], [110, 25 + 25 * i], [5, 25 + 25 * i]], text, .999)
                     for i, text in enumerate(("购买经验", f"Lv.{self.level}", f"{self.progress}/36"))]
@@ -230,4 +240,51 @@ def test_browser_operator_retains_logical_keyboard_path(shop):
 
     assert operator.gold == 16 and operator.level == 7
     assert operator.inputs == [("logical_key", "f")]
+    assert operator.native_events == []
+
+
+def seed_store_target(shop):
+    task, operator = shop
+    task.strategy_characters = {"花火": 1}
+    task.shopping_budget.update(actions=1, purchases=1, refreshes=0, experiences=0)
+    operator.level = 7
+    operator.store_name = "花火"
+
+
+def test_unchanged_purchase_is_not_confirmed_or_clicked_twice(shop):
+    seed_store_target(shop)
+    task, operator = shop
+
+    result = task.shopping()
+
+    assert result.attempted_purchases == 1
+    assert result.confirmed_purchases == 0
+    assert operator.card_clicks == 1
+    assert operator.gold == 20
+    assert operator.native_events == []
+
+
+def test_known_card_price_above_balance_never_authorizes_purchase(shop):
+    seed_store_target(shop)
+    task, operator = shop
+    operator.store_price, operator.gold = 4, 3
+
+    result = task.shopping()
+
+    assert result.attempted_purchases == result.confirmed_purchases == 0
+    assert operator.card_clicks == 0 and operator.gold == 3
+    assert operator.native_events == []
+
+
+def test_occupied_store_slot_with_unknown_name_never_authorizes_purchase(shop):
+    seed_store_target(shop)
+    task, operator = shop
+    operator.store_name = "TEST_UNKNOWN_CHARACTER"
+    operator.scene["store", 0] = "花火", 1
+    paint_slots(operator)
+
+    result = task.shopping()
+
+    assert result.attempted_purchases == result.confirmed_purchases == 0
+    assert operator.card_clicks == 0
     assert operator.native_events == []
