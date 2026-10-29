@@ -103,3 +103,32 @@ def test_stop_before_empty_read_propagates_without_input(replay):
     with pytest.raises(ThreadStoppedError):
         replay.task.prepare_for_battle()
     assert replay.operator.inputs == []
+
+
+@pytest.mark.parametrize("control", ["empty", "blank", "occupied"])
+def test_backend_slot_keeps_original_exact_structure_contract(replay, control):
+    task, operator = replay.task, replay.operator
+    profile = json.loads((CALIBRATION_ROOT / "field_profile.json").read_text(encoding="utf-8"))
+    slot = next(item for item in profile["slots"] if (item["area"], item["index"]) == ("off_field", 2))
+    # 静态审核配置来自另一行位置；不能把默认坐标误当成该模板的已校准坐标。
+    task.off_field_area[2] = tuple(slot["position"])
+    operator.points[task.off_field_area[2]] = "off_field", 2
+    group = "occupied" if control == "occupied" else "empty"
+    with Image.open(CALIBRATION_ROOT / slot[group][0]["path"]) as image:
+        crop = image.convert("RGB")
+    if control == "blank":
+        crop = Image.new("RGB", crop.size, crop.getpixel((0, 0)))
+    bounds = tuple(round((slot["position"][i % 2] + value) * (1920, 1080)[i % 2])
+                   for i, value in enumerate(slot["relative_box"]))
+    operator.frame.paste(crop, bounds[:2])
+    operator.ambiguous_empty.add(("off_field", 2))
+    task._purchase_pending_names.clear()
+    task._purchase_scan_baseline = None
+    task._dirty_slots = {("off_field", 2)}
+    task._observations["off_field"][2] = replace(task._observations["off_field"][2],
+        state=SlotState.UNKNOWN, evidence="reward_unknown")
+
+    result = task.prepare_for_battle()
+
+    assert result.state == (Readiness.READY if control == "empty" else Readiness.BLOCKED), result
+    assert operator.inputs == []

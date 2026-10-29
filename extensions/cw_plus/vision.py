@@ -372,11 +372,13 @@ def _field_structure(image):
     return bands
 
 
-def _matches_field_structure(crop, structure):
+def _matches_field_structure(crop, structure, *, allow_antialiasing=False):
     detail = _field_highpass(crop)
     if all(sum(max(1, expected * 0.4) <= detail[index] <= expected + 6
                for index, expected in band) >= 0.65 * len(band) for band in structure):
         return True
+    if not allow_antialiasing:
+        return False
     # 仅为完整轮廓高度相关的细线开放一个网格像素的抗锯齿容差。
     # 单靠邻域覆盖会误收密集噪点，先认证全局正轮廓相关性。
     positive = tuple(value if value >= 3 else 0 for value in detail)
@@ -1866,7 +1868,7 @@ class CurrencyWarsVision:
         if positive <= slot.max_mae and negative - positive >= slot.min_margin:
             if slot.field_structures:
                 return True if any(distance <= slot.max_mae and negative - distance >= slot.min_margin
-                    and _matches_field_structure(crop, structure)
+                    and _matches_field_structure(crop, structure, allow_antialiasing=slot.area == "on_field")
                     for distance, structure in zip(positive_distances, slot.field_structures)) else None
             if not slot.require_empty_structure or any(
                     distance <= slot.max_mae and negative - distance >= slot.min_margin
