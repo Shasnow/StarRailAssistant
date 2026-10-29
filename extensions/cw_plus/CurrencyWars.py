@@ -2539,6 +2539,42 @@ class CurrencyWars(Executable):
             self.operator.click_point(0.5, 0.5, after_sleep=1)
             self.operator.click_img(IMG.ENSURE2, after_sleep=1)
 
+    def _strategy_code_controls(self, frame):
+        """同帧认证1080p攻略码弹窗，不能在其他页面盲点剪贴板坐标。"""
+        self._check_stop()
+        if frame is None or tuple(frame.size) != (1920, 1080) or tuple(frame.size) != (
+                self.operator.window_context.width, self.operator.window_context.height):
+            return None
+        title = self._locate_page_template(CWIMG.STRATEGY_CODE_TITLE, frame)
+        paste = self._locate_page_template(CWIMG.STRATEGY_CODE_PASTE, frame)
+        if title is None or paste is None:
+            return None
+        tx, ty = title.center
+        px, py = paste.center
+        if not (870 <= tx <= 1050 and 320 <= ty <= 365 and 1410 <= px <= 1480 and 500 <= py <= 570):
+            return None
+        return paste
+
+    def _strategy_code_text_state(self, frame):
+        """占位文字消失不等于成功，须在输入区域读到配置码的连续片段。"""
+        if self._strategy_code_controls(frame) is None:
+            return "unknown"
+        field = frame.crop((445, 430, 1395, 635))
+        if self._locate_page_template(CWIMG.STRATEGY_CODE_PLACEHOLDER, field) is not None:
+            return "empty"
+        rows = self._vision._engine_ocr(field, minimum_confidence=0.7)
+        for row in rows or ():
+            if not isinstance(row, (list, tuple)) or len(row) != 3:
+                continue
+            if (not isinstance(row[1], str) or not isinstance(row[2], (int, float))
+                    or isinstance(row[2], bool) or not 0.7 <= row[2] <= 1):
+                continue
+            text = re.sub(r"\s", "", row[1])
+            # 只证明配置码已经可见；游戏是否接受仍由后续应用结果认证。
+            if any(text[i:i + 12] in self.strategy_code for i in range(len(text) - 11)):
+                return "visible"
+        return "unknown"
+
     def handle_game_entered(self) -> bool:  # NOQA  # 保留原有静态检查指令。
         """初始化前应用新局攻略；开局重刷钩子保持独立。"""
         if not self.strategy_code or self.is_continue:
@@ -2567,18 +2603,30 @@ class CurrencyWars(Executable):
                 return self._fail_startup("strategy_code_entry_failed", "未能打开攻略码输入框")
             if self.operator.wait_img(IMG.ENSURE2, timeout=self.ENTRY_TRANSITION_TIMEOUT) is None:
                 return self._fail_startup("strategy_code_dialog_missing", "攻略码输入页面未确认")
-            self._check_stop()
-            if not self.operator.click_point(0.5, 0.5, after_sleep=1, tag="攻略码输入框"):
-                return self._fail_startup("strategy_code_focus_failed", "攻略码输入框点击失败")
+            frame = self._capture_page_frame()
+            paste = self._strategy_code_controls(frame)
+            if paste is None:
+                return self._fail_startup("strategy_code_dialog_unconfirmed", "攻略码标题与游戏粘贴按钮未确认")
             step = "paste_code"
             self._check_stop()
             self.operator.copy(self.strategy_code)
             self._check_stop()
-            self.operator.paste()
-            self.operator.sleep(1)
+            if not self.operator.click_box(paste, after_sleep=0.5):
+                return self._fail_startup("strategy_code_paste_failed", "游戏粘贴按钮点击失败")
+            # 只粘贴一次，有限读取新的字段截图；未知或空白不能授权提交。
+            for _ in range(3):
+                frame = self._capture_page_frame()
+                state = self._strategy_code_text_state(frame)
+                self._check_stop()
+                if state == "visible":
+                    break
+                self.operator.sleep(0.3)
+            else:
+                return self._fail_startup("strategy_code_empty" if state == "empty" else
+                    "strategy_code_text_unconfirmed", "攻略码字段文字未确认，禁止提交")
 
             step = "confirm_code"
-            confirm = self.operator.wait_img(IMG.ENSURE2, timeout=self.ENTRY_TRANSITION_TIMEOUT)
+            confirm = self._locate_page_template(IMG.ENSURE2, frame)
             self._check_stop()
             if confirm is None or not self.operator.click_box(confirm, after_sleep=1):
                 return self._fail_startup("strategy_code_confirm_failed", "攻略码提交失败")
