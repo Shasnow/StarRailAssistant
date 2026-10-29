@@ -1192,6 +1192,15 @@ class CurrencyWars(Executable):
     def _slot_needs_scan(self, area, index, now=None):
         observation = self._observations[area][index]
         key = (area, index)
+        # 逻辑空场基线没有逐槽OCR时间；只有未受动作或未知事件影响的槽仍可使用。
+        if (area != "in_hand" and observation.state == SlotState.EMPTY
+                and observation.evidence in {"new_game_empty", "zero_population"}
+                and key not in self._dirty_slots
+                and (area != "off_field" or self._layout_valid
+                     and index in self._backend_ordinary_slots
+                     and index not in self._backend_unknown_slots
+                     and index not in self._backend_support_slots)):
+            return False
         receipt = self._slot_evidence.get(key)
         return (key in self._dirty_slots or not self._complete_slot_observation(observation)
                 or receipt is None or receipt[0] is not observation
@@ -1235,7 +1244,10 @@ class CurrencyWars(Executable):
             for index, observation in enumerate(slots):
                 if self._slot_needs_scan(area, index, now):
                     return False
-                receipt = self._slot_evidence[(area, index)]
+                receipt = self._slot_evidence.get((area, index))
+                if receipt is None:
+                    # 通过上方检查的逻辑空场不是一次截图，不为它伪造时间。
+                    continue
                 if receipt[1] > now:
                     return False
                 observed_times.append(receipt[1])
@@ -1449,6 +1461,7 @@ class CurrencyWars(Executable):
             # 续局也可通过实时 0/N 读数建立同样的基线。
             # 文本冲突会使该基线也失效。
             if (area_type != "in_hand" and previous.state == SlotState.EMPTY
+                    and (area_type, index) not in self._dirty_slots
                     and empty is not False
                     and previous.evidence in ("new_game_empty", "zero_population")
                     and not any(str(item[1]).strip() and not str(item[1]).strip().isdecimal()
@@ -6771,6 +6784,9 @@ class CurrencyWars(Executable):
                 logger.info("[购后增量核实] 缺全场完成标记，按真实逐槽收据补缺；不作废未受影响观测")
             for attempt in range(2):
                 self._check_stop()
+                # 以本次扫描开始时判断旧证据是否过期；串行读取自身可能超过60秒。
+                # 保留逐槽真实时间、脏标记与交易检查，不续签旧观测。
+                scan_started = time.monotonic()
                 incremental = reusable and not full_scan and attempt == 0
                 vacancies = self._read_bench_empty_observations()
                 if incremental and any(before["in_hand"][index].state == SlotState.KNOWN
@@ -6785,8 +6801,8 @@ class CurrencyWars(Executable):
                     vacancies = self._read_bench_empty_observations()
                 # 完整身份扫描仍必须遵守当前锁定槽位；
                 # 点击它们不会出现角色面板。
-                overrides = {index: obs for index, obs in vacancies.items()
-                             if not full_scan or obs.state == SlotState.LOCKED}
+                # 完整恢复不能丢弃布局重建后刚读取的双帧空位证据。
+                overrides = dict(vacancies)
                 if incremental:
                     for index, old in enumerate(before["in_hand"]):
                         if (index not in overrides and old is self._observations["in_hand"][index]
@@ -6804,7 +6820,7 @@ class CurrencyWars(Executable):
                         character = obs.character or historical
                         if (not full_scan and ((area, index) in self._dirty_slots
                                 or character is not None and character.name in names
-                                or self._slot_needs_scan(area, index, time.monotonic()))):
+                                or self._slot_needs_scan(area, index, scan_started))):
                             observed = self._observe_slot(area, index, count_stars=True,
                                 use_backup_ocr=area == "off_field")
                             self._set_observation(area, observed)
@@ -6833,7 +6849,7 @@ class CurrencyWars(Executable):
                          and all(self._complete_slot_observation(obs) and (area, index) not in self._dirty_slots
                              for area, slots in self._observations.items()
                              for index, obs in enumerate(slots))) for name in names)
-                        and all(not self._slot_needs_scan(area, index, time.monotonic())
+                        and all(not self._slot_needs_scan(area, index, scan_started)
                             for area in ("on_field", "off_field")
                             for index, obs in enumerate(self._observations[area]))):
                     return True
