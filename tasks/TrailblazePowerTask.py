@@ -576,11 +576,16 @@ class TrailblazePowerTask(BaseTask):
                     if not self.operator.click_img(TPIMG.QUIT_BATTLE):
                         logger.error("退出战斗失败")
                     logger.info("退出战斗")
-                    result, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER], timeout=10)
+                    result, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER, TPIMG.LIGHT_CONE])
                     if result == 0:
                         self.operator.press_key("esc", wait=1)
                     elif result == 1:
                         pass
+                    elif result == 2:
+                        logger.info("获得光锥")
+                        self.operator.click_point(0.5, 0.8)  # 点击屏幕中心偏下位置关闭弹窗
+                        self.operator.sleep(1)
+                        self.operator.press_key("esc", wait=1)
                     break
             if self.config.TrailblazePower.isUseAssistant:
                 self.support()
@@ -596,11 +601,16 @@ class TrailblazePowerTask(BaseTask):
                 if not self.operator.click_img(TPIMG.QUIT_BATTLE):
                     logger.error("退出战斗失败")
             logger.info("退出战斗")
-            resources, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER])
+            resources, _ = self.operator.wait_any_img([TPIMG.BATTLE, IMG.ENTER, TPIMG.LIGHT_CONE])
             if resources == 0:
                 self.operator.press_key("esc", wait=1)
             elif resources == 1:
                 pass
+            elif resources == 2:
+                logger.info("获得光锥")
+                self.operator.click_point(0.5, 0.8)  # 点击屏幕中心偏下位置关闭弹窗
+                self.operator.sleep(1)
+                self.operator.press_key("esc", wait=1)
 
     def wait_battle_end(self):
         """Wait battle end
@@ -624,14 +634,10 @@ class TrailblazePowerTask(BaseTask):
             index, _ = self.operator.locate_any([
                 TPIMG.QUIT_BATTLE,
                 TPIMG.BATTLE_FAILURE,
-                TPIMG.LIGHT_CONE
             ], trace=False)
             if index == -1:
                 continue  # 继续等待战斗结束
-            if index == 2:
-                logger.info("获得光锥")
-                self.operator.click_point(0.5, 0.8)  # 点击屏幕中心偏下位置关闭弹窗
-                continue  # 继续检测战斗结束状态
+
             logger.info("战斗结束")
             return index
 
