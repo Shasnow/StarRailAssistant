@@ -19,6 +19,7 @@ from SRACore.util.errors import ErrorCode, SRAError, ThreadStoppedError
 from .characters import Character, Characters, Positioning
 from tasks.img import IMG, DUIMG
 from .images import CWIMG
+from .game_input import adapt_game_input
 from .unicode_templates import load_template, load_match_template, template_cache_key
 from .paths import CALIBRATION_ROOT, RESOURCE_ROOT, default_data_dir, resolve_strategy_path
 from .logic import (
@@ -135,7 +136,7 @@ class CurrencyWars(Executable):
     SHOP_EXPERIENCE_COST = 4  # 这是本玩法单次 F 输入的价格，并非整级升级价格。
 
     def __init__(self, operator, runtimes, *, data_dir=None):
-        super().__init__(operator)
+        super().__init__(adapt_game_input(operator))
         # 扩展存档和诊断使用独立目录，避免与原版任务互相覆盖。
         self._data_dir = Path(data_dir) if data_dir is not None else default_data_dir()
         self.runtimes = runtimes
@@ -9623,7 +9624,7 @@ class CurrencyWars(Executable):
                     f"稳定={self.STAGE_SETTLE_SECONDS} 战斗复核={self.BATTLE_TIMEOUT} "
                     f"战斗总上限={self.BATTLE_MAX_WAIT_SECONDS}")
         paths = [Path(__file__).resolve()]
-        for name in ("logic", "formation", "vision", "characters", "preparation", "layout", "session", "economy", "shop_overlay", "equipment_choice", "policy", "equipment_policy", "shopping_batch", "coins", "images", "paths", "stop_compat"):
+        for name in ("logic", "formation", "vision", "characters", "preparation", "layout", "session", "economy", "shop_overlay", "equipment_choice", "policy", "equipment_policy", "shopping_batch", "coins", "images", "paths", "stop_compat", "game_input"):
             module = sys.modules.get(f"{__package__}.{name}")
             location = getattr(module, "__file__", None)
             if location:
