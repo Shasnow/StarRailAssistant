@@ -1,5 +1,5 @@
 <template>
-  <PanelCard title="系统信息" class="stack-card">
+  <PanelCard :title="t('W0097')" class="stack-card">
     <div v-if="loading" class="backend-loading">
       <el-skeleton animated :rows="3" />
     </div>
@@ -10,6 +10,8 @@
 </template>
 
 <script setup lang="ts">
+import { t } from '@/i18n'
+
 import { computed, onMounted, ref } from 'vue'
 import { fetchSystemInfo, type AppSystemInfo } from '@/api/app'
 import PanelCard from './PanelCard.vue'
@@ -41,10 +43,10 @@ const backendRows = computed(() => {
   const d = info.value
   if (!d) return []
   return [
-    { icon: WindowIcon, label: '前端版本', value: appVersion || '—' },
-    { icon: ServerIcon, label: '后端版本', value: d.version || '—' },
-    { icon: WindowsIcon, label: '操作系统', value: `${d.osVersion} / ${d.architecture}` },
-    { icon: DotnetIcon, label: '.NET 运行时', value: d.dotnetVersion || '—' },
+    { icon: WindowIcon, label: t('W0093'), value: appVersion || '—' },
+    { icon: ServerIcon, label: t('W0094'), value: d.version || '—' },
+    { icon: WindowsIcon, label: t('W0095'), value: `${d.osVersion} / ${d.architecture}` },
+    { icon: DotnetIcon, label: t('W0096'), value: d.dotnetVersion || '—' },
   ]
 })
 </script>

@@ -19,13 +19,13 @@
     </suki:SukiWindow.Hosts>
     <suki:SukiWindow.RightWindowTitleBarControls>
         <!-- ReSharper disable Xaml.StyleClassNotFound -->
-        <Button Classes="WindowControlsButton" Command="{Binding SwitchLightModeCommand}" ToolTip.Tip="切换深/浅色模式">
+        <Button Classes="WindowControlsButton" Command="{Binding SwitchLightModeCommand}" ToolTip.Tip="{x:Static lang:ExtraResources.U0440}">
             <Label Classes="Icon" Content="{Binding LightModeText}" />
         </Button>
-        <Button Classes="WindowControlsButton" Command="{Binding ShowAnnouncementBoardCommand}" ToolTip.Tip="公告">
+        <Button Classes="WindowControlsButton" Command="{Binding ShowAnnouncementBoardCommand}" ToolTip.Tip="{x:Static lang:ExtraResources.U0257}">
             <Label Classes="Icon" Content="&#xE324;" />
         </Button>
-        <Button Classes="WindowControlsButton" Command="{Binding ShowActivityCommand}" ToolTip.Tip="活动">
+        <Button Classes="WindowControlsButton" Command="{Binding ShowActivityCommand}" ToolTip.Tip="{x:Static lang:ExtraResources.U0441}">
             <Label Classes="Icon" Content="&#xE7B4;" />
         </Button>
     </suki:SukiWindow.RightWindowTitleBarControls>
@@ -61,7 +61,7 @@
                        Margin="30,10,30,30"
                        Classes="AppIcon"
                        Source="/Assets/SRAico.png"
-                       ToolTip.Tip="Just Icon." />
+                       ToolTip.Tip="{x:Static lang:ExtraResources.JustIconText}" />
                 <TextBlock TextWrapping="Wrap" FontSize="16"
                            Text="{Binding GreetingMessage}"
                            HorizontalAlignment="Center" TextAlignment="Center"/>
@@ -92,7 +92,7 @@
                 </Button>
                 <Button Classes="Basic"
                         CommandParameter="https://starrailassistant.top/getting-started/faq/"
-                        ToolTip.Tip="常见问题">
+                        ToolTip.Tip="{x:Static lang:ExtraResources.U0442}">
                     <Label Classes="Icon" Content="&#xE3E8;" />
                 </Button>
             </StackPanel>

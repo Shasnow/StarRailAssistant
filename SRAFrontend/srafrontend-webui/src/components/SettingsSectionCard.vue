@@ -1,12 +1,13 @@
 <template>
   <!-- data-anchor 落在卡片根元素上（PanelCard 单根，属性透传），供导航滚动定位 -->
-  <PanelCard :title="label" class="section-card" :data-anchor="sectionKey">
+  <PanelCard :title="tr(label)" class="section-card" :data-anchor="sectionKey">
     <!-- 字段渲染整体委托 SchemaForm：点号前缀自动分组，数组/嵌套对象/叶子字段与未保存圆点统一处理 -->
     <SchemaForm :schema="node" :doc="doc" :model-value="section" :baseline="baseline" />
   </PanelCard>
 </template>
 
 <script setup lang="ts">
+import { tr } from '@/i18n'
 import { computed } from 'vue'
 import PanelCard from './PanelCard.vue'
 import SchemaForm from './SchemaForm.vue'

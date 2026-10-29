@@ -143,9 +143,9 @@ public static class ZipUtil
     private static Dictionary<string, string> LoadManifest(string baseDir)
     {
         var manifestPath = Path.Combine(baseDir, ManifestFileName);
-        if (!File.Exists(manifestPath)) throw new FileNotFoundException("未找到 MD5 完整性清单", manifestPath);
+        if (!File.Exists(manifestPath)) throw new FileNotFoundException(global::SRAFrontend.Localization.UiText.T("未找到 MD5 完整性清单"), manifestPath);
         var manifest = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(manifestPath));
-        if (manifest is null || manifest.Count == 0) throw new InvalidDataException("MD5 清单内容为空或格式错误");
+        if (manifest is null || manifest.Count == 0) throw new InvalidDataException(global::SRAFrontend.Localization.UiText.T("MD5 清单内容为空或格式错误"));
         return manifest;
     }
 
@@ -174,7 +174,7 @@ public static class ZipUtil
     public static void Unzip(string zipFilePath, string targetDir)
     {
         // 基础校验：确保ZIP文件存在
-        if (!File.Exists(zipFilePath)) throw new FileNotFoundException("ZIP文件不存在", zipFilePath);
+        if (!File.Exists(zipFilePath)) throw new FileNotFoundException(global::SRAFrontend.Localization.UiText.T("ZIP文件不存在"), zipFilePath);
         // 确保目标目录存在
         Directory.CreateDirectory(targetDir);
         // 生成临时解压目录（避免与现有文件冲突）

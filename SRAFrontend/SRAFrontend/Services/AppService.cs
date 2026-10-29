@@ -173,6 +173,7 @@ public class AppService(SettingsService settingsService, ILogger<AppService> log
         {
             0 => PhrasesZh,
             1 => PhrasesEn,
+            2 => Array.ConvertAll(PhrasesZh, Localization.UiText.T),
             _ => PhrasesZh
         };
     }

@@ -253,7 +253,7 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
                 catch (Exception ex)
                 {
                     logger.LogWarning(ex, "SSE connection lost, reconnecting in 3s...");
-                    Outputted?.Invoke("[RemoteBackend] 连接断开，3 秒后重连...");
+                    Outputted?.Invoke(global::SRAFrontend.Localization.UiText.T("[RemoteBackend] 连接断开，3 秒后重连..."));
                     await Task.Delay(3000, ct);
                 }
             }

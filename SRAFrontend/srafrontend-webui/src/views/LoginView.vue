@@ -16,7 +16,7 @@
         @submit.prevent="handleSubmit">
         <el-form-item label="Access Token" prop="token">
           <el-input v-model="form.token" type="password" size="large" show-password :prefix-icon="Key"
-            placeholder="请输入 Access Token" autocomplete="current-password" :disabled="submitting" />
+            :placeholder="t('W0141')" autocomplete="current-password" :disabled="submitting" />
         </el-form-item>
 
         <p class="login-hint">{{ hintText }}</p>
@@ -24,7 +24,7 @@
         <el-alert v-if="error" class="login-error" :title="error" type="error" show-icon :closable="false" />
 
         <el-button class="login-submit" type="primary" size="large" native-type="submit" :loading="submitting">
-          {{ submitting ? '正在验证…' : '进入' }}
+          {{ submitting ? t('W0142') : t('W0143') }}
         </el-button>
       </el-form>
     </section>
@@ -32,6 +32,8 @@
 </template>
 
 <script setup lang="ts">
+import { t } from '@/i18n'
+
 import { Key } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -47,11 +49,11 @@ const route = useRoute()
 // 演示模式提示文案：__IS_DEMO__ 为 define 注入的编译期常量，
 // 正式构建下三元折叠为正式文案，演示提示不进正式产物
 const descText = __IS_DEMO__
-  ? '演示模式：输入任意 Access Token 即可进入'
-  : '该实例已启用访问认证，请输入 Access Token 继续'
+  ? t('W0132')
+  : t('W0133')
 const hintText = __IS_DEMO__
-  ? '演示环境不校验 Token 内容，任意非空文本均可通过'
-  : '请查看您的后端服务配置，获取 Access Token 后输入'
+  ? t('W0134')
+  : t('W0135')
 
 const formRef = ref<FormInstance>()
 const form = ref({ token: '' })
@@ -64,13 +66,13 @@ const bgFailed = ref(false)
 // 基本格式校验：必填、不含空白字符、长度上限
 const rules: FormRules<typeof form> = {
   token: [
-    { required: true, message: '请输入 access token', trigger: 'blur' },
+    { required: true, message: t('W0136'), trigger: 'blur' },
     {
       validator: (_rule, value: string, callback) => {
         const token = (value ?? '').trim()
-        if (!token) return callback(new Error('请输入 access token'))
-        if (/\s/.test(token)) return callback(new Error('access token 不能包含空格'))
-        if (token.length > 512) return callback(new Error('access token 长度不能超过 512 位'))
+        if (!token) return callback(new Error(t('W0136')))
+        if (/\s/.test(token)) return callback(new Error(t('W0137')))
+        if (token.length > 512) return callback(new Error(t('W0138')))
         callback()
       },
       trigger: 'blur',
@@ -98,10 +100,10 @@ async function handleSubmit() {
     const token = form.value.token.trim()
     await verifyToken(token)
     setStoredToken(token)
-    ElMessage.success('验证通过')
+    ElMessage.success(t('W0139'))
     await router.replace(redirectTarget())
   } catch (err) {
-    error.value = err instanceof Error ? err.message : '验证失败，请稍后重试'
+    error.value = err instanceof Error ? err.message : t('W0140')
   } finally {
     submitting.value = false
   }

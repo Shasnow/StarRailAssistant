@@ -10,18 +10,26 @@ from types import SimpleNamespace
 import pytest
 
 import main
+import SRACore.__main__ as core_main
+from SRACore.localization import Resource
 from SRACore.util.const import VERSION
 
 
-def test_main_version_option_exits_cleanly(monkeypatch, capsys):
+@pytest.mark.parametrize('language', [0, 1, 2])
+def test_main_version_option_exits_cleanly(monkeypatch, capsys, language):
     """main.py should print the version and exit when --version is used."""
 
-    monkeypatch.setattr(main, "load_app_settings", lambda: SimpleNamespace(Display=SimpleNamespace(language=0)))
-    monkeypatch.setattr(main.Resource, "set_language", lambda *_args, **_kwargs: None)
-    monkeypatch.setattr(main.sys, "argv", ["main.py", "--version"])
+    monkeypatch.setattr(core_main, "SettingsService", lambda: SimpleNamespace(
+        settings=SimpleNamespace(Display=SimpleNamespace(Language=language))))
+    monkeypatch.setattr(core_main.sys, "argv", ["main.py", "--version"])
+    original = Resource.lang
 
-    with pytest.raises(SystemExit) as exc_info:
-        main.main()
+    try:
+        with pytest.raises(SystemExit) as exc_info:
+            main.main()
+        assert Resource.lang == ['zh-cn', 'en-us', 'ru-ru'][language]
+    finally:
+        Resource.set_language(original)
 
     captured = capsys.readouterr()
 

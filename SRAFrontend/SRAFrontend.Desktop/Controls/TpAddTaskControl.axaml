@@ -1,4 +1,6 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend"
+             xmlns:controls="clr-namespace:SRAFrontend.Desktop.Controls"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -7,38 +9,38 @@
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
              x:Class="SRAFrontend.Desktop.Controls.TpAddTaskControl"
              x:DataType="viewModels:TaskPageViewModel"
-             Width="400" Height="400">
+             Width="640" Height="440">
     <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-        <Label Grid.Row="0" Grid.Column="0" Content="类型" />
+        <Label Grid.Row="0" Grid.Column="0" Content="{x:Static lang:ExtraResources.U0248}" />
         <ComboBox Grid.Row="0" Grid.Column="1"
-                  Width="300"
+                  Width="450"
                   ItemsSource="{Binding TpTaskNames}"
                   SelectedIndex="{Binding SelectedTpTaskIndex}" />
-        <Label Grid.Row="1" Grid.Column="0" Content="关卡" />
+        <Label Grid.Row="1" Grid.Column="0" Content="{x:Static lang:ExtraResources.U0249}" />
         <ComboBox Grid.Row="1" Grid.Column="1"
-                  Width="300"
+                  Width="450"
                   ItemsSource="{Binding CurrentTpTaskLevels}"
                   SelectedItem="{Binding SelectedTpTaskLevel}">
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="models:TpTaskLevel">
                     <TextBlock>
-                        <Run Text="{Binding Name}" />
+                        <Run Text="{Binding Name, Converter={x:Static controls:LocalizedStringConverter.Instance}}" />
                         <Run Text="-" />
-                        <Run Text="{Binding Result}" />
+                        <Run Text="{Binding Result, Converter={x:Static controls:LocalizedStringConverter.Instance}}" />
                     </TextBlock>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Label Grid.Row="2" Grid.Column="0" Content="单次次数" />
+        <Label Grid.Row="2" Grid.Column="0" Content="{x:Static lang:ExtraResources.U0250}" />
         <NumericUpDown Grid.Row="2" Grid.Column="1" Minimum="1" Maximum="{Binding CurrentTpTaskMaxSingleTimes}"
                        FormatString="0"
-                       Width="290"
+                       Width="440"
                        Value="{Binding TpTaskSingleTimes}" />
-        <Label Grid.Row="3" Grid.Column="0" Content="运行次数" />
+        <Label Grid.Row="3" Grid.Column="0" Content="{x:Static lang:ExtraResources.U0251}" />
         <NumericUpDown Grid.Row="3" Grid.Column="1" Minimum="1" Maximum="99" FormatString="0"
-                       Width="290"
+                       Width="440"
                        Value="{Binding TpTaskRunTimes}" />
-        <Label Grid.Row="4" Grid.Column="0" Content="自动检测" />
+        <Label Grid.Row="4" Grid.Column="0" Content="{x:Static lang:ExtraResources.U0252}" />
         <ToggleSwitch Grid.Row="4" Grid.Column="1" IsChecked="{Binding IsTpTaskAutoDetect}" />
     </Grid>
 </UserControl>

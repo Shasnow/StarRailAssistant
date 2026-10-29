@@ -7,6 +7,8 @@ from SRACore.util.const import LogsOCRDir, LogsScreenshotDir
 
 # 设置日志记录器
 def setup_logger(path: str = "log/SRA{time:YYYYMMDD}.log", level: str = "TRACE", queue: Any = None) -> None:
+    from SRACore.localization.presentation import localize_record
+    logger.configure(patcher=localize_record)
     logger.remove()
     log_format = "<green>{time:HH:mm:ss}</green> | <level>{level:5}</level> | <level>{message}</level>"
     logger.add(sys.stderr, level=level,

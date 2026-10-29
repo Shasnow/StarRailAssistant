@@ -1,0 +1,2625 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:element name="root" ns1:IsDataSet="true">
+        </xs:element>
+  </xs:schema>
+  <data name="CurrencyWarsPlusDescription" xml:space="preserve">
+    <value>Обычный режим и разгон с исправлениями распознавания монет, персонажей поддержки и сводки ошибок.</value>
+  </data>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="U0224" xml:space="preserve">
+    <value>Завершено</value>
+  </data>
+  <data name="U0225" xml:space="preserve">
+    <value>Осталось: {0} дн. {1} ч.</value>
+  </data>
+  <data name="U0226" xml:space="preserve">
+    <value>Осталось: {0} ч.</value>
+  </data>
+  <data name="U0227" xml:space="preserve">
+    <value>Ещё не началось</value>
+  </data>
+  <data name="U0228" xml:space="preserve">
+    <value>Начало через {0} дн. {1} ч.</value>
+  </data>
+  <data name="U0229" xml:space="preserve">
+    <value>Начало через {0} ч.</value>
+  </data>
+  <data name="U0230" xml:space="preserve">
+    <value>Завершилось {0} дн. {1} ч. назад</value>
+  </data>
+  <data name="U0231" xml:space="preserve">
+    <value>Завершилось {0} ч. назад</value>
+  </data>
+  <data name="U0232" xml:space="preserve">
+    <value>Идёт</value>
+  </data>
+  <data name="U0233" xml:space="preserve">
+    <value>Задачи запущены</value>
+  </data>
+  <data name="U0234" xml:space="preserve">
+    <value>Запущена конфигурация: {0}</value>
+  </data>
+  <data name="U0235" xml:space="preserve">
+    <value>Не удалось запустить задачи</value>
+  </data>
+  <data name="U0236" xml:space="preserve">
+    <value>Не удалось запустить конфигурацию {0}. Проверьте состояние ядра.</value>
+  </data>
+  <data name="U0237" xml:space="preserve">
+    <value>Запущены задачи всех конфигураций.</value>
+  </data>
+  <data name="U0238" xml:space="preserve">
+    <value>Не удалось запустить все конфигурации. Проверьте состояние ядра.</value>
+  </data>
+  <data name="U0239" xml:space="preserve">
+    <value>Сохранено</value>
+  </data>
+  <data name="U0240" xml:space="preserve">
+    <value>Текущая конфигурация сохранена.</value>
+  </data>
+  <data name="U0241" xml:space="preserve">
+    <value>Задача запущена</value>
+  </data>
+  <data name="U0242" xml:space="preserve">
+    <value>Не удалось запустить задачу. Проверьте состояние ядра.</value>
+  </data>
+  <data name="U0247" xml:space="preserve">
+    <value>Указатель мыши вне окна игры</value>
+  </data>
+  <data name="U0257" xml:space="preserve">
+    <value>Объявления</value>
+  </data>
+  <data name="U0258" xml:space="preserve">
+    <value>Не удалось проверить обновления</value>
+  </data>
+  <data name="U0259" xml:space="preserve">
+    <value>Неверный формат текущей версии</value>
+  </data>
+  <data name="U0260" xml:space="preserve">
+    <value>Не удалось получить данные обновления. Проверьте подключение к сети</value>
+  </data>
+  <data name="U0261" xml:space="preserve">
+    <value>Неверный формат версии на сервере</value>
+  </data>
+  <data name="U0262" xml:space="preserve">
+    <value>Установлена последняя версия</value>
+  </data>
+  <data name="U0263" xml:space="preserve">
+    <value>Доступна новая версия</value>
+  </data>
+  <data name="U0264" xml:space="preserve">
+    <value>Автоматическая загрузка обновления: {0}</value>
+  </data>
+  <data name="U0265" xml:space="preserve">
+    <value>Обновить автоматически</value>
+  </data>
+  <data name="U0266" xml:space="preserve">
+    <value>Обновить вручную</value>
+  </data>
+  <data name="U0267" xml:space="preserve">
+    <value>Пропустить</value>
+  </data>
+  <data name="U0268" xml:space="preserve">
+    <value>Ярлык уже существует</value>
+  </data>
+  <data name="U0269" xml:space="preserve">
+    <value>Ярлык уже есть на рабочем столе</value>
+  </data>
+  <data name="U0270" xml:space="preserve">
+    <value>Создать ярлык</value>
+  </data>
+  <data name="U0271" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="U0272" xml:space="preserve">
+    <value>Больше не спрашивать</value>
+  </data>
+  <data name="U0273" xml:space="preserve">
+    <value>Создать ярлык на рабочем столе</value>
+  </data>
+  <data name="U0274" xml:space="preserve">
+    <value>На рабочем столе нет ярлыка. Создать его сейчас?</value>
+  </data>
+  <data name="U0275" xml:space="preserve">
+    <value>Ярлык создан</value>
+  </data>
+  <data name="U0276" xml:space="preserve">
+    <value>Ярлык SRA создан на рабочем столе</value>
+  </data>
+  <data name="U0277" xml:space="preserve">
+    <value>Не удалось создать ярлык</value>
+  </data>
+  <data name="U0278" xml:space="preserve">
+    <value>Подробности в журнале</value>
+  </data>
+  <data name="U0279" xml:space="preserve">
+    <value>Не удалось удалить старые файлы</value>
+  </data>
+  <data name="U0280" xml:space="preserve">
+    <value>Не удалось удалить старый исполняемый файл: {0}</value>
+  </data>
+  <data name="U0281" xml:space="preserve">
+    <value>Не удалось открыть</value>
+  </data>
+  <data name="U0282" xml:space="preserve">
+    <value>Указанный путь не существует</value>
+  </data>
+  <data name="U0283" xml:space="preserve">
+    <value>Произошла ошибка: {0}</value>
+  </data>
+  <data name="U0284" xml:space="preserve">
+    <value>Загрузка…</value>
+  </data>
+  <data name="U0285" xml:space="preserve">
+    <value>Загрузка отменена</value>
+  </data>
+  <data name="U0286" xml:space="preserve">
+    <value>Загрузка обновления отменена пользователем</value>
+  </data>
+  <data name="U0287" xml:space="preserve">
+    <value>Не удалось загрузить обновление</value>
+  </data>
+  <data name="U0288" xml:space="preserve">
+    <value>Загрузка завершена</value>
+  </data>
+  <data name="U0289" xml:space="preserve">
+    <value>Обновление готово к установке</value>
+  </data>
+  <data name="U0290" xml:space="preserve">
+    <value>Распаковать сейчас</value>
+  </data>
+  <data name="U0291" xml:space="preserve">
+    <value>Позже</value>
+  </data>
+  <data name="U0292" xml:space="preserve">
+    <value>Обновление загружено</value>
+  </data>
+  <data name="U0293" xml:space="preserve">
+    <value>На время распаковки ядро будет остановлено. Распаковать сейчас?</value>
+  </data>
+  <data name="U0294" xml:space="preserve">
+    <value>Распаковка отложена</value>
+  </data>
+  <data name="U0295" xml:space="preserve">
+    <value>Проверьте обновления позже, чтобы продолжить</value>
+  </data>
+  <data name="U0296" xml:space="preserve">
+    <value>Подготовка к распаковке</value>
+  </data>
+  <data name="U0297" xml:space="preserve">
+    <value>Распаковка начнётся через 3 секунды</value>
+  </data>
+  <data name="U0298" xml:space="preserve">
+    <value>Горячее обновление установлено</value>
+  </data>
+  <data name="U0299" xml:space="preserve">
+    <value>Перезапустите консоль для использования новой версии</value>
+  </data>
+  <data name="U0300" xml:space="preserve">
+    <value>Подготовка обновления завершена</value>
+  </data>
+  <data name="U0301" xml:space="preserve">
+    <value>Перезапустите приложение для применения обновления</value>
+  </data>
+  <data name="U0302" xml:space="preserve">
+    <value>Перезапустить</value>
+  </data>
+  <data name="U0303" xml:space="preserve">
+    <value>Обновление готово</value>
+  </data>
+  <data name="U0304" xml:space="preserve">
+    <value>Перезапустить приложение для применения обновления?</value>
+  </data>
+  <data name="U0305" xml:space="preserve">
+    <value>Подтвердить</value>
+  </data>
+  <data name="U0306" xml:space="preserve">
+    <value>Переустановить последнюю версию</value>
+  </data>
+  <data name="U0307" xml:space="preserve">
+    <value>Будет загружена и установлена последняя версия для исправления возможных ошибок. Продолжить?</value>
+  </data>
+  <data name="U0308" xml:space="preserve">
+    <value>Загрузка установочного пакета последней версии…</value>
+  </data>
+  <data name="U0309" xml:space="preserve">
+    <value>Действие отменено</value>
+  </data>
+  <data name="U0310" xml:space="preserve">
+    <value>Загрузка установочного пакета отменена пользователем</value>
+  </data>
+  <data name="U0311" xml:space="preserve">
+    <value>Не удалось переустановить</value>
+  </data>
+  <data name="U0312" xml:space="preserve">
+    <value>Не удалось загрузить установочный пакет. Проверьте сеть или выберите другой источник загрузки в настройках обновлений.</value>
+  </data>
+  <data name="U0313" xml:space="preserve">
+    <value>SHA256 установочного пакета версии {0} проверен. Начинается установка</value>
+  </data>
+  <data name="U0314" xml:space="preserve">
+    <value>Установка завершена</value>
+  </data>
+  <data name="U0315" xml:space="preserve">
+    <value>Приложение перезапустится через 3 секунды</value>
+  </data>
+  <data name="U0316" xml:space="preserve">
+    <value>Распаковка обновления</value>
+  </data>
+  <data name="U0317" xml:space="preserve">
+    <value>Подождите…</value>
+  </data>
+  <data name="U0318" xml:space="preserve">
+    <value>Распаковать вручную</value>
+  </data>
+  <data name="U0319" xml:space="preserve">
+    <value>Выйти</value>
+  </data>
+  <data name="U0320" xml:space="preserve">
+    <value>Не удалось распаковать обновление</value>
+  </data>
+  <data name="U0321" xml:space="preserve">
+    <value>Ошибка распаковки: {0}
+
+Закройте приложение и подождите 5–10 секунд либо распакуйте обновление вручную</value>
+  </data>
+  <data name="U0322" xml:space="preserve">
+    <value>Не удалось перезапустить</value>
+  </data>
+  <data name="U0323" xml:space="preserve">
+    <value>Подключение…</value>
+  </data>
+  <data name="U0324" xml:space="preserve">
+    <value>Отменить загрузку</value>
+  </data>
+  <data name="U0325" xml:space="preserve">
+    <value>Отмена…</value>
+  </data>
+  <data name="U0113" xml:space="preserve">
+    <value>Сканировать</value>
+  </data>
+  <data name="U0326" xml:space="preserve">
+    <value>Вариантов: {0}</value>
+  </data>
+  <data name="U0327" xml:space="preserve">
+    <value>{0} (текущее значение)</value>
+  </data>
+  <data name="U0328" xml:space="preserve">
+    <value>Не удалось сканировать: {0}</value>
+  </data>
+  <data name="U0329" xml:space="preserve">
+    <value>Подключение команд по WebSocket появится в будущих версиях</value>
+  </data>
+  <data name="U0330" xml:space="preserve">
+    <value>Нет подключения к серверу WebSocket</value>
+  </data>
+  <data name="U0331" xml:space="preserve">
+    <value>Неизвестная команда: {0}</value>
+  </data>
+  <data name="U0332" xml:space="preserve">
+    <value>Экспорт журналов</value>
+  </data>
+  <data name="U0333" xml:space="preserve">
+    <value>ZIP-архив</value>
+  </data>
+  <data name="U0334" xml:space="preserve">
+    <value>Экспорт журналов</value>
+  </data>
+  <data name="U0335" xml:space="preserve">
+    <value>Сбор и упаковка журналов. Подождите…</value>
+  </data>
+  <data name="U0336" xml:space="preserve">
+    <value>Журналы экспортированы</value>
+  </data>
+  <data name="U0337" xml:space="preserve">
+    <value>Сохранено: {0}</value>
+  </data>
+  <data name="U0338" xml:space="preserve">
+    <value>Не удалось экспортировать журналы: {TargetPath}</value>
+  </data>
+  <data name="U0339" xml:space="preserve">
+    <value>Не удалось экспортировать журналы</value>
+  </data>
+  <data name="U0340" xml:space="preserve">
+    <value>Ошибка: {0}
+Проверьте права записи в указанную папку и повторите попытку</value>
+  </data>
+  <data name="U0341" xml:space="preserve">
+    <value>Выполняется</value>
+  </data>
+  <data name="U0342" xml:space="preserve">
+    <value>Остановлено</value>
+  </data>
+  <data name="U0343" xml:space="preserve">
+    <value>Настройки — {0}</value>
+  </data>
+  <data name="U0344" xml:space="preserve">
+    <value>Не удалось получить варианты. Убедитесь, что ядро запущено, и повторите попытку.</value>
+  </data>
+  <data name="U0345" xml:space="preserve">
+    <value>Календарь событий</value>
+  </data>
+  <data name="U0346" xml:space="preserve">
+    <value>Выбрано {0}/{1}, объём {2} (всего лишних файлов: {3})</value>
+  </data>
+  <data name="U0347" xml:space="preserve">
+    <value>CDK должен содержать 24 символа</value>
+  </data>
+  <data name="U0348" xml:space="preserve">
+    <value>Проверка…</value>
+  </data>
+  <data name="U0349" xml:space="preserve">
+    <value>Не удалось подключиться к сервису проверки</value>
+  </data>
+  <data name="U0351" xml:space="preserve">
+    <value>Проверка пройдена. Проверено файлов: {0}</value>
+  </data>
+  <data name="U0352" xml:space="preserve">
+    <value>Отсутствующие файлы</value>
+  </data>
+  <data name="U0353" xml:space="preserve">
+    <value>Повреждённые файлы или несовпадение версий</value>
+  </data>
+  <data name="U0354" xml:space="preserve">
+    <value>Понятно</value>
+  </data>
+  <data name="U0355" xml:space="preserve">
+    <value>Файл manifest.md5.json не найден. Переустановите программу через встроенное обновление и повторите проверку</value>
+  </data>
+  <data name="U0356" xml:space="preserve">
+    <value>Ошибка проверки: {0}</value>
+  </data>
+  <data name="U0357" xml:space="preserve">
+    <value>{0} (файлов: {1})</value>
+  </data>
+  <data name="U0358" xml:space="preserve">
+    <value>…ещё {0} файлов не показано</value>
+  </data>
+  <data name="U0359" xml:space="preserve">
+    <value>Нет файлов для очистки</value>
+  </data>
+  <data name="U0360" xml:space="preserve">
+    <value>Удалить выбранные</value>
+  </data>
+  <data name="U0361" xml:space="preserve">
+    <value>Удалено файлов: {0}. Освобождено: {1}</value>
+  </data>
+  <data name="U0363" xml:space="preserve">
+    <value>Файл manifest.md5.json не найден. Невозможно определить лишние файлы. Переустановите программу через встроенное обновление</value>
+  </data>
+  <data name="U0365" xml:space="preserve">
+    <value>Выберите папку для загружаемых файлов</value>
+  </data>
+  <data name="U0366" xml:space="preserve">
+    <value>Папка недоступна</value>
+  </data>
+  <data name="U0367" xml:space="preserve">
+    <value>Невозможно создать или открыть папку:
+{0}
+Выберите другую папку.</value>
+  </data>
+  <data name="U0368" xml:space="preserve">
+    <value>Язык изменён</value>
+  </data>
+  <data name="U0369" xml:space="preserve">
+    <value>Для применения языка нужно перезапустить приложение. Перезапустить сейчас?</value>
+  </data>
+  <data name="X0135" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="U0370" xml:space="preserve">
+    <value>Проверка почты</value>
+  </data>
+  <data name="U0371" xml:space="preserve">
+    <value>Сначала заполните настройки SMTP</value>
+  </data>
+  <data name="U0372" xml:space="preserve">
+    <value>Тестовое письмо отправлено. Проверьте входящие</value>
+  </data>
+  <data name="U0373" xml:space="preserve">
+    <value>Проверка Webhook</value>
+  </data>
+  <data name="U0374" xml:space="preserve">
+    <value>Сначала укажите адрес Webhook</value>
+  </data>
+  <data name="U0375" xml:space="preserve">
+    <value>Тестовый запрос отправлен: {0}</value>
+  </data>
+  <data name="U0376" xml:space="preserve">
+    <value>Проверка Telegram</value>
+  </data>
+  <data name="U0377" xml:space="preserve">
+    <value>Сначала укажите токен бота и ID чата</value>
+  </data>
+  <data name="U0378" xml:space="preserve">
+    <value>Тестовое сообщение отправлено. Проверьте Telegram</value>
+  </data>
+  <data name="U0379" xml:space="preserve">
+    <value>Проверка ServerChan</value>
+  </data>
+  <data name="U0380" xml:space="preserve">
+    <value>Сначала укажите SendKey</value>
+  </data>
+  <data name="U0381" xml:space="preserve">
+    <value>Тестовое сообщение отправлено. Проверьте WeChat</value>
+  </data>
+  <data name="U0382" xml:space="preserve">
+    <value>Проверка Bark</value>
+  </data>
+  <data name="U0383" xml:space="preserve">
+    <value>Сначала укажите ключ устройства</value>
+  </data>
+  <data name="U0384" xml:space="preserve">
+    <value>Тестовое сообщение отправлено. Проверьте iPhone</value>
+  </data>
+  <data name="U0385" xml:space="preserve">
+    <value>Проверка Feishu</value>
+  </data>
+  <data name="U0386" xml:space="preserve">
+    <value>Тестовое сообщение отправлено. Проверьте Feishu</value>
+  </data>
+  <data name="U0387" xml:space="preserve">
+    <value>Проверка WeCom</value>
+  </data>
+  <data name="U0388" xml:space="preserve">
+    <value>Тестовое сообщение отправлено. Проверьте WeCom</value>
+  </data>
+  <data name="U0389" xml:space="preserve">
+    <value>Проверка DingTalk</value>
+  </data>
+  <data name="U0390" xml:space="preserve">
+    <value>Тестовое сообщение отправлено. Проверьте DingTalk</value>
+  </data>
+  <data name="U0391" xml:space="preserve">
+    <value>Проверка Discord</value>
+  </data>
+  <data name="U0392" xml:space="preserve">
+    <value>Тестовое сообщение отправлено. Проверьте Discord</value>
+  </data>
+  <data name="U0393" xml:space="preserve">
+    <value>Проверка xxtui</value>
+  </data>
+  <data name="U0394" xml:space="preserve">
+    <value>Сначала укажите ключ API</value>
+  </data>
+  <data name="U0395" xml:space="preserve">
+    <value>Тестовое сообщение отправлено</value>
+  </data>
+  <data name="U0396" xml:space="preserve">
+    <value>Проверка OneBot</value>
+  </data>
+  <data name="U0397" xml:space="preserve">
+    <value>Укажите адрес API и хотя бы один номер QQ или группы</value>
+  </data>
+  <data name="U0398" xml:space="preserve">
+    <value>Тестовое сообщение отправлено. Проверьте QQ</value>
+  </data>
+  <data name="U0399" xml:space="preserve">
+    <value>Режим разработчика</value>
+  </data>
+  <data name="U0400" xml:space="preserve">
+    <value>Вы находитесь в режиме разработчика!</value>
+  </data>
+  <data name="U0401" xml:space="preserve">
+    <value>До включения режима разработчика осталось нажатий: {0}.</value>
+  </data>
+  <data name="U0402" xml:space="preserve">
+    <value>Не выбрано</value>
+  </data>
+  <data name="U0403" xml:space="preserve">
+    <value>Нет задач</value>
+  </data>
+  <data name="U0404" xml:space="preserve">
+    <value>{0} и другие; всего задач: {1}</value>
+  </data>
+  <data name="U0405" xml:space="preserve">
+    <value>Не удалось загрузить настройки подземелий</value>
+  </data>
+  <data name="U0406" xml:space="preserve">
+    <value>Не удалось получить настройки подземелий от ядра. Попробуйте перезапустить ядро.</value>
+  </data>
+  <data name="U0407" xml:space="preserve">
+    <value>Не удалось загрузить стратегию</value>
+  </data>
+  <data name="U0408" xml:space="preserve">
+    <value>Выберите файл стратегии</value>
+  </data>
+  <data name="U0409" xml:space="preserve">
+    <value>Стратегия JSON</value>
+  </data>
+  <data name="U0410" xml:space="preserve">
+    <value>Не удалось импортировать стратегию</value>
+  </data>
+  <data name="U0411" xml:space="preserve">
+    <value>Ядро не отвечает</value>
+  </data>
+  <data name="U0412" xml:space="preserve">
+    <value>Стратегия импортирована</value>
+  </data>
+  <data name="U0413" xml:space="preserve">
+    <value>Перед добавлением задачи выберите подземелье</value>
+  </data>
+  <data name="U0564" xml:space="preserve">
+    <value>Получить фон</value>
+  </data>
+  <data name="U0565" xml:space="preserve">
+    <value>Получить сведения о системе</value>
+  </data>
+  <data name="U0566" xml:space="preserve">
+    <value>Получить фразы</value>
+  </data>
+  <data name="U0567" xml:space="preserve">
+    <value>Перезапустить ядро</value>
+  </data>
+  <data name="U0415" xml:space="preserve">
+    <value>Остановить ядро</value>
+  </data>
+  <data name="U0568" xml:space="preserve">
+    <value>Получить последние записи журнала</value>
+  </data>
+  <data name="U0569" xml:space="preserve">
+    <value>Поток журналов SSE</value>
+  </data>
+  <data name="U0570" xml:space="preserve">
+    <value>Получить снимок Operator</value>
+  </data>
+  <data name="U0571" xml:space="preserve">
+    <value>Получить имена всех конфигураций</value>
+  </data>
+  <data name="U0572" xml:space="preserve">
+    <value>Получить выбранную конфигурацию</value>
+  </data>
+  <data name="U0573" xml:space="preserve">
+    <value>Создать конфигурацию</value>
+  </data>
+  <data name="U0574" xml:space="preserve">
+    <value>Имя содержит недопустимые символы</value>
+  </data>
+  <data name="U0575" xml:space="preserve">
+    <value>Конфигурация уже существует</value>
+  </data>
+  <data name="U0578" xml:space="preserve">
+    <value>Перечислить зарегистрированные расширения</value>
+  </data>
+  <data name="U0579" xml:space="preserve">
+    <value>Получить схему настроек расширения</value>
+  </data>
+  <data name="U0580" xml:space="preserve">
+    <value>Получить настройки расширения</value>
+  </data>
+  <data name="U0581" xml:space="preserve">
+    <value>Сохранить настройки расширения</value>
+  </data>
+  <data name="U0582" xml:space="preserve">
+    <value>Запустить расширение</value>
+  </data>
+  <data name="U0583" xml:space="preserve">
+    <value>Остановить расширение</value>
+  </data>
+  <data name="U0584" xml:space="preserve">
+    <value>Повторно найти и импортировать расширения</value>
+  </data>
+  <data name="U0585" xml:space="preserve">
+    <value>Перечислить доступные методы Operator</value>
+  </data>
+  <data name="U0586" xml:space="preserve">
+    <value>Получить справку по методу Operator</value>
+  </data>
+  <data name="U0587" xml:space="preserve">
+    <value>Вызвать метод Operator</value>
+  </data>
+  <data name="U0588" xml:space="preserve">
+    <value>Получить настройки</value>
+  </data>
+  <data name="U0589" xml:space="preserve">
+    <value>Получить текущие настройки приложения</value>
+  </data>
+  <data name="U0590" xml:space="preserve">
+    <value>Изменить настройки</value>
+  </data>
+  <data name="U0591" xml:space="preserve">
+    <value>Изменить только указанные поля. Тело запроса — часть JSON AppSettings, например { "advanced": { "backend.remote.enabled": true } }</value>
+  </data>
+  <data name="U0592" xml:space="preserve">
+    <value>Запустить задачи</value>
+  </data>
+  <data name="U0593" xml:space="preserve">
+    <value>Запустить одну задачу</value>
+  </data>
+  <data name="U0594" xml:space="preserve">
+    <value>Остановить задачи</value>
+  </data>
+  <data name="U0595" xml:space="preserve">
+    <value>Получить состояние задач</value>
+  </data>
+  <data name="U0001" xml:space="preserve">
+    <value>Общие настройки</value>
+  </data>
+  <data name="U0002" xml:space="preserve">
+    <value>Настройки интерфейса</value>
+  </data>
+  <data name="U0003" xml:space="preserve">
+    <value>Настройки обновлений</value>
+  </data>
+  <data name="U0004" xml:space="preserve">
+    <value>Дополнительные настройки</value>
+  </data>
+  <data name="U0005" xml:space="preserve">
+    <value>Настройки уведомлений</value>
+  </data>
+  <data name="U0006" xml:space="preserve">
+    <value>Индекс пути к игре в списке gamePath.uris</value>
+  </data>
+  <data name="U0007" xml:space="preserve">
+    <value>Список путей к игре для быстрого переключения</value>
+  </data>
+  <data name="U0008" xml:space="preserve">
+    <value>Автоматически искать игру в стандартных папках установки</value>
+  </data>
+  <data name="U0009" xml:space="preserve">
+    <value>Запускать игру с указанными ниже параметрами</value>
+  </data>
+  <data name="U0010" xml:space="preserve">
+    <value>Режим окна игры: оконный или полноэкранный</value>
+  </data>
+  <data name="U0012" xml:space="preserve">
+    <value>Размер окна в формате ширинаxвысота, например 1920x1080</value>
+  </data>
+  <data name="U0013" xml:space="preserve">
+    <value>Использовать окно игры без рамки</value>
+  </data>
+  <data name="U0014" xml:space="preserve">
+    <value>Включить автобой</value>
+  </data>
+  <data name="U0015" xml:space="preserve">
+    <value>Запускать игру через командную строку для устранения проблем прямого запуска</value>
+  </data>
+  <data name="U0016" xml:space="preserve">
+    <value>Дополнительные параметры передаются игре напрямую и имеют приоритет над остальными</value>
+  </data>
+  <data name="U0017" xml:space="preserve">
+    <value>Использовать облачную версию игры</value>
+  </data>
+  <data name="U0018" xml:space="preserve">
+    <value>Браузер для облачной игры</value>
+  </data>
+  <data name="U0019" xml:space="preserve">
+    <value>Путь к браузеру для облачной игры</value>
+  </data>
+  <data name="U0020" xml:space="preserve">
+    <value>Запускать браузер облачной игры без окна</value>
+  </data>
+  <data name="U0021" xml:space="preserve">
+    <value>Отключить звук в браузере облачной игры</value>
+  </data>
+  <data name="U0022" xml:space="preserve">
+    <value>Клавиша применения техники</value>
+  </data>
+  <data name="U0023" xml:space="preserve">
+    <value>Клавиша открытия событий</value>
+  </data>
+  <data name="U0024" xml:space="preserve">
+    <value>Клавиша открытия Чести Безымянных</value>
+  </data>
+  <data name="U0025" xml:space="preserve">
+    <value>Клавиша открытия Прыжка</value>
+  </data>
+  <data name="U0026" xml:space="preserve">
+    <value>Клавиша открытия Путеводителя межзвёздного мира</value>
+  </data>
+  <data name="U0027" xml:space="preserve">
+    <value>Клавиша остановки задач</value>
+  </data>
+  <data name="U0028" xml:space="preserve">
+    <value>Включить оверлей</value>
+  </data>
+  <data name="U0029" xml:space="preserve">
+    <value>Порог уверенности OCR от 0 до 1; выше — строже</value>
+  </data>
+  <data name="U0030" xml:space="preserve">
+    <value>Порог совпадения шаблонов от 0 до 1; выше — строже</value>
+  </data>
+  <data name="U0031" xml:space="preserve">
+    <value>При ошибке задачи перезапускать игру и повторять попытку</value>
+  </data>
+  <data name="U0032" xml:space="preserve">
+    <value>Максимальное число повторов при ошибке задачи</value>
+  </data>
+  <data name="U0033" xml:space="preserve">
+    <value>Адрес фонового изображения: локальный путь или URL</value>
+  </data>
+  <data name="U0034" xml:space="preserve">
+    <value>Непрозрачность фонового изображения от 0 до 1</value>
+  </data>
+  <data name="U0035" xml:space="preserve">
+    <value>Непрозрачность панели управления от 0 до 1</value>
+  </data>
+  <data name="U0036" xml:space="preserve">
+    <value>Язык интерфейса: 0 — китайский, 1 — английский, 2 — русский</value>
+  </data>
+  <data name="U0037" xml:space="preserve">
+    <value>Запоминать положение и размер окна</value>
+  </data>
+  <data name="U0038" xml:space="preserve">
+    <value>Состояние окна: 0 — обычное, 1 — свёрнуто, 2 — развёрнуто</value>
+  </data>
+  <data name="U0039" xml:space="preserve">
+    <value>Координата X главного окна</value>
+  </data>
+  <data name="U0040" xml:space="preserve">
+    <value>Координата Y главного окна</value>
+  </data>
+  <data name="U0041" xml:space="preserve">
+    <value>Ширина главного окна</value>
+  </data>
+  <data name="U0042" xml:space="preserve">
+    <value>Высота главного окна</value>
+  </data>
+  <data name="U0043" xml:space="preserve">
+    <value>Включить уведомления</value>
+  </data>
+  <data name="U0044" xml:space="preserve">
+    <value>Включить системные уведомления</value>
+  </data>
+  <data name="U0045" xml:space="preserve">
+    <value>Включить уведомления Bark</value>
+  </data>
+  <data name="U0046" xml:space="preserve">
+    <value>Зашифрованное содержимое Bark, передаваемое параметром ciphertext</value>
+  </data>
+  <data name="U0047" xml:space="preserve">
+    <value>Ключ устройства Bark; несколько ключей разделяются запятыми</value>
+  </data>
+  <data name="U0048" xml:space="preserve">
+    <value>Группа сообщений Bark</value>
+  </data>
+  <data name="U0049" xml:space="preserve">
+    <value>URL значка уведомлений Bark</value>
+  </data>
+  <data name="U0050" xml:space="preserve">
+    <value>Важность уведомлений Bark: active/timeSensitive/passive</value>
+  </data>
+  <data name="U0051" xml:space="preserve">
+    <value>Адрес сервера Bark</value>
+  </data>
+  <data name="U0052" xml:space="preserve">
+    <value>Название звука уведомления Bark</value>
+  </data>
+  <data name="U0053" xml:space="preserve">
+    <value>Включить уведомления бота DingTalk</value>
+  </data>
+  <data name="U0054" xml:space="preserve">
+    <value>Ключ подписи бота DingTalk (начинается с SEC)</value>
+  </data>
+  <data name="U0055" xml:space="preserve">
+    <value>Адрес Webhook бота DingTalk</value>
+  </data>
+  <data name="U0056" xml:space="preserve">
+    <value>Включить уведомления Discord</value>
+  </data>
+  <data name="U0057" xml:space="preserve">
+    <value>Прикладывать снимки экрана к уведомлениям Discord</value>
+  </data>
+  <data name="U0058" xml:space="preserve">
+    <value>Адрес Webhook Discord</value>
+  </data>
+  <data name="U0059" xml:space="preserve">
+    <value>Включить уведомления Feishu</value>
+  </data>
+  <data name="U0060" xml:space="preserve">
+    <value>App ID приложения Feishu</value>
+  </data>
+  <data name="U0061" xml:space="preserve">
+    <value>App Secret приложения Feishu</value>
+  </data>
+  <data name="U0062" xml:space="preserve">
+    <value>ID получателя сообщений Feishu</value>
+  </data>
+  <data name="U0063" xml:space="preserve">
+    <value>Тип ID получателя Feishu: open_id, user_id, union_id или chat_id</value>
+  </data>
+  <data name="U0064" xml:space="preserve">
+    <value>Адрес Webhook бота Feishu</value>
+  </data>
+  <data name="U0065" xml:space="preserve">
+    <value>Включить уведомления OneBot</value>
+  </data>
+  <data name="U0066" xml:space="preserve">
+    <value>Прикладывать снимки экрана к уведомлениям OneBot</value>
+  </data>
+  <data name="U0067" xml:space="preserve">
+    <value>Номер группы для уведомлений OneBot</value>
+  </data>
+  <data name="U0068" xml:space="preserve">
+    <value>Токен доступа OneBot</value>
+  </data>
+  <data name="U0069" xml:space="preserve">
+    <value>Адрес HTTP API OneBot</value>
+  </data>
+  <data name="U0070" xml:space="preserve">
+    <value>Учётная запись бота OneBot</value>
+  </data>
+  <data name="U0071" xml:space="preserve">
+    <value>Включить уведомления ServerChan</value>
+  </data>
+  <data name="U0072" xml:space="preserve">
+    <value>SendKey сервиса ServerChan</value>
+  </data>
+  <data name="U0073" xml:space="preserve">
+    <value>Включить уведомления Telegram</value>
+  </data>
+  <data name="U0074" xml:space="preserve">
+    <value>Использовать прокси для Telegram</value>
+  </data>
+  <data name="U0075" xml:space="preserve">
+    <value>Прикладывать снимки экрана к уведомлениям Telegram</value>
+  </data>
+  <data name="U0076" xml:space="preserve">
+    <value>Включить уведомления WeCom</value>
+  </data>
+  <data name="U0077" xml:space="preserve">
+    <value>Прикладывать снимки экрана к уведомлениям WeCom</value>
+  </data>
+  <data name="U0078" xml:space="preserve">
+    <value>Адрес Webhook бота WeCom</value>
+  </data>
+  <data name="U0079" xml:space="preserve">
+    <value>Включить уведомления через другой Webhook</value>
+  </data>
+  <data name="U0080" xml:space="preserve">
+    <value>URL другого Webhook</value>
+  </data>
+  <data name="U0081" xml:space="preserve">
+    <value>Включить уведомления xxtui</value>
+  </data>
+  <data name="U0082" xml:space="preserve">
+    <value>Включить уведомления по электронной почте</value>
+  </data>
+  <data name="U0083" xml:space="preserve">
+    <value>Порт SMTP; для SSL обычно 465</value>
+  </data>
+  <data name="U0084" xml:space="preserve">
+    <value>Адрес почты получателя</value>
+  </data>
+  <data name="U0085" xml:space="preserve">
+    <value>Адрес почты отправителя</value>
+  </data>
+  <data name="U0086" xml:space="preserve">
+    <value>Адрес сервера SMTP</value>
+  </data>
+  <data name="U0087" xml:space="preserve">
+    <value>Пароль приложения SMTP (хранится в зашифрованном виде)</value>
+  </data>
+  <data name="U0088" xml:space="preserve">
+    <value>Адрес Telegram Bot API</value>
+  </data>
+  <data name="U0089" xml:space="preserve">
+    <value>Токен бота Telegram</value>
+  </data>
+  <data name="U0090" xml:space="preserve">
+    <value>ID чата для уведомлений Telegram</value>
+  </data>
+  <data name="U0091" xml:space="preserve">
+    <value>Адрес прокси для Telegram</value>
+  </data>
+  <data name="U0092" xml:space="preserve">
+    <value>Ключ API xxtui</value>
+  </data>
+  <data name="U0093" xml:space="preserve">
+    <value>Канал уведомлений xxtui</value>
+  </data>
+  <data name="U0094" xml:space="preserve">
+    <value>Источник сообщений xxtui</value>
+  </data>
+  <data name="U0095" xml:space="preserve">
+    <value>Список задач с уведомлениями о завершении</value>
+  </data>
+  <data name="U0096" xml:space="preserve">
+    <value>Список задач с уведомлениями о запуске</value>
+  </data>
+  <data name="U0097" xml:space="preserve">
+    <value>Источник загрузки: 0 — MirrorChyan, 1 — GitHub Release, 2 — AUTO-MAS</value>
+  </data>
+  <data name="U0098" xml:space="preserve">
+    <value>Автоматически загружать доступные обновления</value>
+  </data>
+  <data name="U0099" xml:space="preserve">
+    <value>Проверять обновления при запуске и уведомлять пользователя</value>
+  </data>
+  <data name="U0100" xml:space="preserve">
+    <value>Канал обновлений: 0 — Stable, 1 — Beta</value>
+  </data>
+  <data name="U0101" xml:space="preserve">
+    <value>Папка загрузки обновлений; пустое поле — SRA во временной папке системы</value>
+  </data>
+  <data name="U0102" xml:space="preserve">
+    <value>Код доступа MirrorChyan; хранится в зашифрованном виде</value>
+  </data>
+  <data name="U0103" xml:space="preserve">
+    <value>Аргументы запуска ядра</value>
+  </data>
+  <data name="U0104" xml:space="preserve">
+    <value>Использовать удалённое ядро</value>
+  </data>
+  <data name="U0105" xml:space="preserve">
+    <value>Адрес удалённого ядра</value>
+  </data>
+  <data name="U0106" xml:space="preserve">
+    <value>Показывать отладочную информацию в оверлее</value>
+  </data>
+  <data name="U0107" xml:space="preserve">
+    <value>Включить режим разработчика</value>
+  </data>
+  <data name="U0108" xml:space="preserve">
+    <value>Использовать другое ядро</value>
+  </data>
+  <data name="U0109" xml:space="preserve">
+    <value>Команда или исполняемый файл ядра: python, sra-cli, uv или путь к файлу</value>
+  </data>
+  <data name="U0110" xml:space="preserve">
+    <value>Аргументы запуска другого ядра, например main.py или -m SRACore</value>
+  </data>
+  <data name="U0111" xml:space="preserve">
+    <value>Рабочая папка другого ядра; пустое поле — текущая папка программы</value>
+  </data>
+  <data name="U0112" xml:space="preserve">
+    <value>Сохранять снимки OCR для отладки</value>
+  </data>
+  <data name="U0114" xml:space="preserve">
+    <value>Имя конфигурации задач</value>
+  </data>
+  <data name="U0115" xml:space="preserve">
+    <value>Настройки запуска игры</value>
+  </data>
+  <data name="U0116" xml:space="preserve">
+    <value>Настройки энергии Освоения</value>
+  </data>
+  <data name="U0117" xml:space="preserve">
+    <value>Настройки получения наград</value>
+  </data>
+  <data name="U0118" xml:space="preserve">
+    <value>Настройки космического противостояния</value>
+  </data>
+  <data name="U0119" xml:space="preserve">
+    <value>Действия после завершения задач</value>
+  </data>
+  <data name="U0120" xml:space="preserve">
+    <value>Версия файла конфигурации</value>
+  </data>
+  <data name="U0121" xml:space="preserve">
+    <value>Включить задачу запуска игры</value>
+  </data>
+  <data name="U0122" xml:space="preserve">
+    <value>Клиент игры: 0 — китайский официальный, 1 — Bilibili, 2 — международный</value>
+  </data>
+  <data name="U0123" xml:space="preserve">
+    <value>Путь к исполняемому файлу игры</value>
+  </data>
+  <data name="U0124" xml:space="preserve">
+    <value>Международный сервер: 0 — Азия, 1 — Европа, 2 — Америка, 3 — Тайвань/Гонконг/Макао</value>
+  </data>
+  <data name="U0125" xml:space="preserve">
+    <value>Использовать путь к игре из общих настроек</value>
+  </data>
+  <data name="U0126" xml:space="preserve">
+    <value>Задержка после запуска игры (секунды)</value>
+  </data>
+  <data name="U0127" xml:space="preserve">
+    <value>Автоматически входить в учётную запись</value>
+  </data>
+  <data name="U0128" xml:space="preserve">
+    <value>Повторно входить при неудачной авторизации</value>
+  </data>
+  <data name="U0129" xml:space="preserve">
+    <value>Зашифрованный пароль учётной записи</value>
+  </data>
+  <data name="U0130" xml:space="preserve">
+    <value>Зашифрованный логин учётной записи</value>
+  </data>
+  <data name="U0131" xml:space="preserve">
+    <value>Включить задачу расхода энергии Освоения</value>
+  </data>
+  <data name="U0132" xml:space="preserve">
+    <value>Целевой уровень золотого Чашелиста в событии «Сад множества»</value>
+  </data>
+  <data name="U0133" xml:space="preserve">
+    <value>Целевой уровень багрового Чашелиста в событии «Сад множества»</value>
+  </data>
+  <data name="U0134" xml:space="preserve">
+    <value>Использовать персонажа поддержки</value>
+  </data>
+  <data name="U0135" xml:space="preserve">
+    <value>Приоритетно выполнять цели развития персонажей</value>
+  </data>
+  <data name="U0136" xml:space="preserve">
+    <value>Приоритет материалов: если найдены подземелья материалов, пропускать извлечение украшений и Пещеры коррозии; иначе оставлять их</value>
+  </data>
+  <data name="U0137" xml:space="preserve">
+    <value>Приоритетно расходовать удвоенные награды событий «Сад множества», «Царство странностей» и «Планарный раскол»</value>
+  </data>
+  <data name="U0138" xml:space="preserve">
+    <value>Целевой уровень события «Планарный раскол»</value>
+  </data>
+  <data name="U0139" xml:space="preserve">
+    <value>Целевой уровень события «Царство странностей»</value>
+  </data>
+  <data name="U0140" xml:space="preserve">
+    <value>Число пополнений энергии</value>
+  </data>
+  <data name="U0141" xml:space="preserve">
+    <value>Пополнять энергию</value>
+  </data>
+  <data name="U0142" xml:space="preserve">
+    <value>Источник пополнения: 0 — резервная энергия Освоения, 1 — Топливо, 2 — Звёздный нефрит</value>
+  </data>
+  <data name="U0143" xml:space="preserve">
+    <value>Список задач</value>
+  </data>
+  <data name="U0144" xml:space="preserve">
+    <value>Включить получение наград</value>
+  </data>
+  <data name="U0145" xml:space="preserve">
+    <value>Получать награды поручений</value>
+  </data>
+  <data name="U0146" xml:space="preserve">
+    <value>Получать награды ежедневной тренировки</value>
+  </data>
+  <data name="U0147" xml:space="preserve">
+    <value>Получать награды события «Подарок Одиссеи»</value>
+  </data>
+  <data name="U0148" xml:space="preserve">
+    <value>Забирать награды из почты</value>
+  </data>
+  <data name="U0149" xml:space="preserve">
+    <value>Получать награды Чести Безымянных</value>
+  </data>
+  <data name="U0150" xml:space="preserve">
+    <value>Активировать промокоды</value>
+  </data>
+  <data name="U0151" xml:space="preserve">
+    <value>Получать награды Пропуска снабжения экспресса</value>
+  </data>
+  <data name="U0152" xml:space="preserve">
+    <value>Промокоды через пробел: код1 код2 код3</value>
+  </data>
+  <data name="U0153" xml:space="preserve">
+    <value>Включить космическое противостояние</value>
+  </data>
+  <data name="U0154" xml:space="preserve">
+    <value>Включить «Валютные войны»</value>
+  </data>
+  <data name="U0155" xml:space="preserve">
+    <value>Сложность «Валютных войн»: 0 — минимальная, 1 — максимальная, 2 — текущая</value>
+  </data>
+  <data name="U0156" xml:space="preserve">
+    <value>Режим «Валютных войн»: 0 — обычный, 1 — разгон, 2 — подбор старта</value>
+  </data>
+  <data name="U0157" xml:space="preserve">
+    <value>Пропускать «Валютные войны», если лимит очков космического противостояния достигнут</value>
+  </data>
+  <data name="U0158" xml:space="preserve">
+    <value>Модификаторы босса для подбора старта в «Валютных войнах»</value>
+  </data>
+  <data name="U0159" xml:space="preserve">
+    <value>Имя босса для подбора старта в «Валютных войнах»</value>
+  </data>
+  <data name="U0160" xml:space="preserve">
+    <value>Инвестиционная среда для подбора старта в «Валютных войнах»</value>
+  </data>
+  <data name="U0161" xml:space="preserve">
+    <value>Инвестиционная стратегия для подбора старта в «Валютных войнах»</value>
+  </data>
+  <data name="U0162" xml:space="preserve">
+    <value>Число партий «Валютных войн»; в подборе старта — число попыток</value>
+  </data>
+  <data name="U0163" xml:space="preserve">
+    <value>Название стратегии «Валютных войн»</value>
+  </data>
+  <data name="U0164" xml:space="preserve">
+    <value>Индекс стратегии «Валютных войн»</value>
+  </data>
+  <data name="U0165" xml:space="preserve">
+    <value>Имя Первопроходца в «Валютных войнах»</value>
+  </data>
+  <data name="U0166" xml:space="preserve">
+    <value>Включить «Расходящуюся вселенную»</value>
+  </data>
+  <data name="U0167" xml:space="preserve">
+    <value>Режим «Расходящейся вселенной»: 0 — один уровень, 1 — полное прохождение</value>
+  </data>
+  <data name="U0168" xml:space="preserve">
+    <value>Число прохождений «Расходящейся вселенной»</value>
+  </data>
+  <data name="U0169" xml:space="preserve">
+    <value>Использовать технику для ускоренного прохождения</value>
+  </data>
+  <data name="U0170" xml:space="preserve">
+    <value>Пропускать задачу при достижении недельного лимита очков</value>
+  </data>
+  <data name="U0171" xml:space="preserve">
+    <value>Включить действия после завершения задач</value>
+  </data>
+  <data name="U0172" xml:space="preserve">
+    <value>Закрывать приложение после завершения задач</value>
+  </data>
+  <data name="U0173" xml:space="preserve">
+    <value>Закрывать игру после завершения задач</value>
+  </data>
+  <data name="U0174" xml:space="preserve">
+    <value>Завершать сеанс пользователя Windows после выполнения</value>
+  </data>
+  <data name="U0175" xml:space="preserve">
+    <value>Выходить из учётной записи игры после выполнения</value>
+  </data>
+  <data name="U0176" xml:space="preserve">
+    <value>Выключать компьютер после выполнения</value>
+  </data>
+  <data name="U0177" xml:space="preserve">
+    <value>Переводить компьютер в спящий режим после выполнения</value>
+  </data>
+  <data name="U0178" xml:space="preserve">
+    <value>Название задачи</value>
+  </data>
+  <data name="U0179" xml:space="preserve">
+    <value>ID задачи, например calyx_golden или echo_of_war</value>
+  </data>
+  <data name="U0180" xml:space="preserve">
+    <value>Сложность уровня</value>
+  </data>
+  <data name="U0181" xml:space="preserve">
+    <value>Название уровня</value>
+  </data>
+  <data name="U0182" xml:space="preserve">
+    <value>Число выполнений одной задачи в ручном режиме</value>
+  </data>
+  <data name="U0183" xml:space="preserve">
+    <value>Число циклов в ручном режиме</value>
+  </data>
+  <data name="U0184" xml:space="preserve">
+    <value>Автоматически определять число выполнений по оставшейся энергии</value>
+  </data>
+  <data name="U0195" xml:space="preserve">
+    <value>Не удалось отправить: процесс не запущен (ввод: {0})</value>
+  </data>
+  <data name="U0196" xml:space="preserve">
+    <value>Не удалось отправить: {0} (ввод: {1})</value>
+  </data>
+  <data name="U0197" xml:space="preserve">
+    <value>Не удалось запустить: исполняемый файл ядра не найден (путь: {0})</value>
+  </data>
+  <data name="U0198" xml:space="preserve">
+    <value>Ошибка запуска: {0}</value>
+  </data>
+  <data name="U0199" xml:space="preserve">
+    <value>Процесс завершён (PID: {0}, код выхода: {1})</value>
+  </data>
+  <data name="U0206" xml:space="preserve">
+    <value>[RemoteBackend] Соединение разорвано, повтор через 3 секунды…</value>
+  </data>
+  <data name="U0207" xml:space="preserve">
+    <value>Неверные параметры URL получения версии</value>
+  </data>
+  <data name="U0208" xml:space="preserve">
+    <value>Срок действия CDK истёк</value>
+  </data>
+  <data name="U0209" xml:space="preserve">
+    <value>Неверный CDK</value>
+  </data>
+  <data name="U0210" xml:space="preserve">
+    <value>Достигнут суточный лимит загрузок для CDK</value>
+  </data>
+  <data name="U0211" xml:space="preserve">
+    <value>Тип CDK не соответствует загружаемым ресурсам</value>
+  </data>
+  <data name="U0212" xml:space="preserve">
+    <value>CDK заблокирован</value>
+  </data>
+  <data name="U0213" xml:space="preserve">
+    <value>Нет ресурсов для выбранной архитектуры и системы</value>
+  </data>
+  <data name="U0214" xml:space="preserve">
+    <value>Неверный параметр операционной системы</value>
+  </data>
+  <data name="U0215" xml:space="preserve">
+    <value>Неверный параметр архитектуры</value>
+  </data>
+  <data name="U0216" xml:space="preserve">
+    <value>Неверный канал обновлений</value>
+  </data>
+  <data name="U0217" xml:space="preserve">
+    <value>Текущая версия: {0}</value>
+  </data>
+  <data name="U0218" xml:space="preserve">
+    <value>Исправление: {0}</value>
+  </data>
+  <data name="U0219" xml:space="preserve">
+    <value>Список контрольных сумм MD5 не найден</value>
+  </data>
+  <data name="U0220" xml:space="preserve">
+    <value>Список MD5 пуст или имеет неверный формат</value>
+  </data>
+  <data name="U0221" xml:space="preserve">
+    <value>ZIP-архив не найден</value>
+  </data>
+  <data name="U0222" xml:space="preserve">
+    <value>Версия</value>
+  </data>
+  <data name="U0223" xml:space="preserve">
+    <value>Сегодня нет событий</value>
+  </data>
+  <data name="U0248" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="U0249" xml:space="preserve">
+    <value>Уровень</value>
+  </data>
+  <data name="U0250" xml:space="preserve">
+    <value>Повторов за заход</value>
+  </data>
+  <data name="U0251" xml:space="preserve">
+    <value>Число запусков</value>
+  </data>
+  <data name="U0252" xml:space="preserve">
+    <value>Автоматически</value>
+  </data>
+  <data name="U0253" xml:space="preserve">
+    <value>Число повторов: автоматически</value>
+  </data>
+  <data name="U0254" xml:space="preserve">
+    <value>Число выполнений</value>
+  </data>
+  <data name="U0255" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="U0414" xml:space="preserve">
+    <value>Перезапустить ядро</value>
+  </data>
+  <data name="U0416" xml:space="preserve">
+    <value>Экспортировать журналы консоли, интерфейса и ядра в ZIP-архив</value>
+  </data>
+  <data name="U0417" xml:space="preserve">
+    <value>Экспорт…</value>
+  </data>
+  <data name="U0418" xml:space="preserve">
+    <value>При сообщении об ошибке приложите файлы журналов, а не фотографию или снимок этой страницы</value>
+  </data>
+  <data name="U0419" xml:space="preserve">
+    <value>Фильтр:</value>
+  </data>
+  <data name="U0420" xml:space="preserve">
+    <value>Введите текст</value>
+  </data>
+  <data name="U0421" xml:space="preserve">
+    <value>Или укажите полный путь к JSON стратегии</value>
+  </data>
+  <data name="U0422" xml:space="preserve">
+    <value>Полный путь к JSON стратегии</value>
+  </data>
+  <data name="U0423" xml:space="preserve">
+    <value>Сканирование…</value>
+  </data>
+  <data name="U0424" xml:space="preserve">
+    <value>Загрузка настроек…</value>
+  </data>
+  <data name="U0425" xml:space="preserve">
+    <value>Друзья котиков-пирожных</value>
+  </data>
+  <data name="U0426" xml:space="preserve">
+    <value>Поиск котика-пирожного по UID</value>
+  </data>
+  <data name="U0427" xml:space="preserve">
+    <value>Найти котика-пирожное</value>
+  </data>
+  <data name="U0428" xml:space="preserve">
+    <value>Открыть список друзей котиков-пирожных в браузере</value>
+  </data>
+  <data name="U0429" xml:space="preserve">
+    <value>Доступные расширения</value>
+  </data>
+  <data name="U0430" xml:space="preserve">
+    <value>Заново получить список расширений от ядра</value>
+  </data>
+  <data name="U0431" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="U0432" xml:space="preserve">
+    <value>Запустить</value>
+  </data>
+  <data name="U0433" xml:space="preserve">
+    <value>Запустить расширение</value>
+  </data>
+  <data name="U0434" xml:space="preserve">
+    <value>Остановить</value>
+  </data>
+  <data name="U0435" xml:space="preserve">
+    <value>Остановить расширение</value>
+  </data>
+  <data name="U0436" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="U0437" xml:space="preserve">
+    <value>Открыть настройки расширения</value>
+  </data>
+  <data name="U0438" xml:space="preserve">
+    <value>Нет доступных расширений</value>
+  </data>
+  <data name="U0439" xml:space="preserve">
+    <value>Убедитесь, что ядро запущено, и нажмите «Обновить»</value>
+  </data>
+  <data name="U0440" xml:space="preserve">
+    <value>Переключить светлую/тёмную тему</value>
+  </data>
+  <data name="U0441" xml:space="preserve">
+    <value>События</value>
+  </data>
+  <data name="U0442" xml:space="preserve">
+    <value>Частые вопросы</value>
+  </data>
+  <data name="U0443" xml:space="preserve">
+    <value>Удаление…</value>
+  </data>
+  <data name="U0444" xml:space="preserve">
+    <value>Выбрать все</value>
+  </data>
+  <data name="U0445" xml:space="preserve">
+    <value>Автоматически искать установленную игру</value>
+  </data>
+  <data name="U0446" xml:space="preserve">
+    <value>Обзор и выбор файла</value>
+  </data>
+  <data name="U0447" xml:space="preserve">
+    <value>Указанные ниже параметры действуют только при включении</value>
+  </data>
+  <data name="U0448" xml:space="preserve">
+    <value>Пустое поле — официальный API</value>
+  </data>
+  <data name="U0449" xml:space="preserve">
+    <value>SCT… или sctp…</value>
+  </data>
+  <data name="U0450" xml:space="preserve">
+    <value>Пустое поле — не отправлять личные сообщения</value>
+  </data>
+  <data name="U0451" xml:space="preserve">
+    <value>Пустое поле — не отправлять сообщения в группу</value>
+  </data>
+  <data name="U0452" xml:space="preserve">
+    <value>Пустое поле — без авторизации</value>
+  </data>
+  <data name="U0453" xml:space="preserve">
+    <value>Скопируйте из Bark; несколько ключей через запятую</value>
+  </data>
+  <data name="U0454" xml:space="preserve">
+    <value>minuet (необязательно)</value>
+  </data>
+  <data name="U0455" xml:space="preserve">
+    <value>URL значка (необязательно)</value>
+  </data>
+  <data name="U0456" xml:space="preserve">
+    <value>Зашифрованное содержимое (необязательно)</value>
+  </data>
+  <data name="U0457" xml:space="preserve">
+    <value>AppSecret приложения</value>
+  </data>
+  <data name="U0458" xml:space="preserve">
+    <value>open_id (по умолчанию)</value>
+  </data>
+  <data name="U0459" xml:space="preserve">
+    <value>Адрес Webhook</value>
+  </data>
+  <data name="U0460" xml:space="preserve">
+    <value>SEC… (необязательно)</value>
+  </data>
+  <data name="U0461" xml:space="preserve">
+    <value>Получите на xxtui.com</value>
+  </data>
+  <data name="U0462" xml:space="preserve">
+    <value>Например, StarRailAssistant (необязательно)</value>
+  </data>
+  <data name="U0463" xml:space="preserve">
+    <value>Например, WX_MP (необязательно)</value>
+  </data>
+  <data name="U0464" xml:space="preserve">
+    <value>Заново загрузить и установить последнюю версию для восстановления повреждённых файлов</value>
+  </data>
+  <data name="U0465" xml:space="preserve">
+    <value>Папка загрузки обновлений; пустое поле — стандартная временная папка</value>
+  </data>
+  <data name="U0466" xml:space="preserve">
+    <value>Введите путь или выберите папку кнопкой справа</value>
+  </data>
+  <data name="U0467" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="U0468" xml:space="preserve">
+    <value>Открыть текущую папку загрузки</value>
+  </data>
+  <data name="U0469" xml:space="preserve">
+    <value>Проверить файлы приложения по списку контрольных сумм MD5 из пакета</value>
+  </data>
+  <data name="U0470" xml:space="preserve">
+    <value>Найти лишние файлы: остатки обновлений, журналы и другие. В результатах могут быть личные данные — будьте осторожны</value>
+  </data>
+  <data name="U0471" xml:space="preserve">
+    <value>python, sra-cli или путь к исполняемому файлу</value>
+  </data>
+  <data name="U0472" xml:space="preserve">
+    <value>Например, main.py или -m SRACore; пустое поле — без аргументов</value>
+  </data>
+  <data name="U0473" xml:space="preserve">
+    <value>Например, /path/to/working/dir; пустое поле — текущая папка</value>
+  </data>
+  <data name="U0474" xml:space="preserve">
+    <value>ID устройства: </value>
+  </data>
+  <data name="U0475" xml:space="preserve">
+    <value>简体中文</value>
+  </data>
+  <data name="U0476" xml:space="preserve">
+    <value>MirrorChyan</value>
+  </data>
+  <data name="U0477" xml:space="preserve">
+    <value>Космическое противостояние</value>
+  </data>
+  <data name="U0478" xml:space="preserve">
+    <value>Число запусков</value>
+  </data>
+  <data name="U0479" xml:space="preserve">
+    <value>Расходящаяся вселенная — Заметки о рае</value>
+  </data>
+  <data name="U0480" xml:space="preserve">
+    <value>Быстрое прохождение техникой</value>
+  </data>
+  <data name="U0481" xml:space="preserve">
+    <value>Учитывать лимит очков</value>
+  </data>
+  <data name="U0482" xml:space="preserve">
+    <value>Валютные войны — Игра с нулевой суммой</value>
+  </data>
+  <data name="U0483" xml:space="preserve">
+    <value>Имя Первопроходца </value>
+  </data>
+  <data name="U0484" xml:space="preserve">
+    <value>Введите имя Первопроходца в игре</value>
+  </data>
+  <data name="U0485" xml:space="preserve">
+    <value>Сайт стратегий</value>
+  </data>
+  <data name="U0486" xml:space="preserve">
+    <value>Пропускать при лимите очков</value>
+  </data>
+  <data name="U0487" xml:space="preserve">
+    <value>Укажите имена и модификаторы боссов, инвестиционную среду и стратегии. Формат описан в документации. Значения вводятся на языке игры.</value>
+  </data>
+  <data name="U0488" xml:space="preserve">
+    <value>Имя босса</value>
+  </data>
+  <data name="U0489" xml:space="preserve">
+    <value>Например: 巨鹿生物制药;增熵能源集团;金血记忆体联盟 (ввод на китайском)</value>
+  </data>
+  <data name="U0490" xml:space="preserve">
+    <value>Модификаторы босса</value>
+  </data>
+  <data name="U0491" xml:space="preserve">
+    <value>Например: 决战在即 !时间刺客 (ввод на китайском)</value>
+  </data>
+  <data name="U0492" xml:space="preserve">
+    <value>Инвестиционная среда</value>
+  </data>
+  <data name="U0493" xml:space="preserve">
+    <value>Например: 长线利好 ?轮岗 (ввод на китайском)</value>
+  </data>
+  <data name="U0494" xml:space="preserve">
+    <value>Инвестиционная стратегия</value>
+  </data>
+  <data name="U0495" xml:space="preserve">
+    <value>Стратегии первого мира через пробел; затем «;» и стратегии второго (на китайском)</value>
+  </data>
+  <data name="U0496" xml:space="preserve">
+    <value>Режим</value>
+  </data>
+  <data name="U0497" xml:space="preserve">
+    <value>Повторять первый уровень</value>
+  </data>
+  <data name="U0498" xml:space="preserve">
+    <value>Полное прохождение</value>
+  </data>
+  <data name="U0499" xml:space="preserve">
+    <value>Сначала пройдите обучение I и II и закройте все обучающие подсказки</value>
+  </data>
+  <data name="U0500" xml:space="preserve">
+    <value>Обычный режим</value>
+  </data>
+  <data name="U0501" xml:space="preserve">
+    <value>Режим разгона</value>
+  </data>
+  <data name="U0502" xml:space="preserve">
+    <value>Подбор старта</value>
+  </data>
+  <data name="U0503" xml:space="preserve">
+    <value>Сложность</value>
+  </data>
+  <data name="U0504" xml:space="preserve">
+    <value>Минимальная</value>
+  </data>
+  <data name="U0505" xml:space="preserve">
+    <value>Максимальная</value>
+  </data>
+  <data name="U0506" xml:space="preserve">
+    <value>Текущая</value>
+  </data>
+  <data name="U0507" xml:space="preserve">
+    <value>Стратегия</value>
+  </data>
+  <data name="U0508" xml:space="preserve">
+    <value>Импорт</value>
+  </data>
+  <data name="U0509" xml:space="preserve">
+    <value>Сначала пройдите режим вручную и закройте все обучающие подсказки</value>
+  </data>
+  <data name="U0510" xml:space="preserve">
+    <value>После выполнения задач</value>
+  </data>
+  <data name="U0511" xml:space="preserve">
+    <value>Выйти из учётной записи игры</value>
+  </data>
+  <data name="U0512" xml:space="preserve">
+    <value>Закрыть игру</value>
+  </data>
+  <data name="U0513" xml:space="preserve">
+    <value>Закрыть программу</value>
+  </data>
+  <data name="U0514" xml:space="preserve">
+    <value>Выключить компьютер</value>
+  </data>
+  <data name="U0515" xml:space="preserve">
+    <value>Спящий режим</value>
+  </data>
+  <data name="U0516" xml:space="preserve">
+    <value>Завершить сеанс Windows</value>
+  </data>
+  <data name="U0517" xml:space="preserve">
+    <value>Ничего не делать</value>
+  </data>
+  <data name="U0518" xml:space="preserve">
+    <value>Получение наград</value>
+  </data>
+  <data name="U0519" xml:space="preserve">
+    <value>Пропуск снабжения экспресса</value>
+  </data>
+  <data name="U0520" xml:space="preserve">
+    <value>Поручения</value>
+  </data>
+  <data name="U0521" xml:space="preserve">
+    <value>Почта</value>
+  </data>
+  <data name="U0522" xml:space="preserve">
+    <value>Ежедневная тренировка</value>
+  </data>
+  <data name="U0523" xml:space="preserve">
+    <value>Честь Безымянных</value>
+  </data>
+  <data name="U0524" xml:space="preserve">
+    <value>Подарок Одиссеи</value>
+  </data>
+  <data name="U0525" xml:space="preserve">
+    <value>Промокоды</value>
+  </data>
+  <data name="U0526" xml:space="preserve">
+    <value>Введите промокоды</value>
+  </data>
+  <data name="U0527" xml:space="preserve">
+    <value>Запуск игры</value>
+  </data>
+  <data name="U0528" xml:space="preserve">
+    <value>Клиент</value>
+  </data>
+  <data name="U0529" xml:space="preserve">
+    <value>Международный сервер</value>
+  </data>
+  <data name="U0530" xml:space="preserve">
+    <value>Из общих настроек</value>
+  </data>
+  <data name="U0531" xml:space="preserve">
+    <value>Время ожидания загрузки игры перед выполнением следующих задач (секунды).</value>
+  </data>
+  <data name="U0532" xml:space="preserve">
+    <value>Ожидание запуска (с)</value>
+  </data>
+  <data name="U0533" xml:space="preserve">
+    <value>Автовход</value>
+  </data>
+  <data name="U0534" xml:space="preserve">
+    <value>При запуске входить с указанными логином и паролем.</value>
+  </data>
+  <data name="U0535" xml:space="preserve">
+    <value>Всегда входить заново</value>
+  </data>
+  <data name="U0536" xml:space="preserve">
+    <value>При каждом запуске выходить из текущей учётной записи и входить заново.</value>
+  </data>
+  <data name="U0537" xml:space="preserve">
+    <value>Логин:</value>
+  </data>
+  <data name="U0538" xml:space="preserve">
+    <value>Пароль:</value>
+  </data>
+  <data name="U0539" xml:space="preserve">
+    <value>Официальный (Китай)</value>
+  </data>
+  <data name="U0540" xml:space="preserve">
+    <value>Bilibili</value>
+  </data>
+  <data name="U0541" xml:space="preserve">
+    <value>Международный</value>
+  </data>
+  <data name="U0542" xml:space="preserve">
+    <value>Включая автовход, вы подтверждаете ознакомление с пользовательским соглашением и политикой конфиденциальности</value>
+  </data>
+  <data name="U0543" xml:space="preserve">
+    <value>Расход энергии</value>
+  </data>
+  <data name="U0544" xml:space="preserve">
+    <value>Список задач</value>
+  </data>
+  <data name="U0545" xml:space="preserve">
+    <value>Пополнение энергии</value>
+  </data>
+  <data name="U0546" xml:space="preserve">
+    <value>Использовать</value>
+  </data>
+  <data name="U0547" xml:space="preserve">
+    <value>Резервная энергия Освоения</value>
+  </data>
+  <data name="U0548" xml:space="preserve">
+    <value>Топливо</value>
+  </data>
+  <data name="U0549" xml:space="preserve">
+    <value>Звёздный нефрит</value>
+  </data>
+  <data name="U0550" xml:space="preserve">
+    <value>Пополнить</value>
+  </data>
+  <data name="U0551" xml:space="preserve">
+    <value>раз</value>
+  </data>
+  <data name="U0552" xml:space="preserve">
+    <value>Персонаж поддержки</value>
+  </data>
+  <data name="U0553" xml:space="preserve">
+    <value>Цели развития</value>
+  </data>
+  <data name="U0554" xml:space="preserve">
+    <value>Приоритет материалов</value>
+  </data>
+  <data name="U0555" xml:space="preserve">
+    <value>Для целей развития выбирать только материалы, пропуская извлечение украшений и Пещеры коррозии</value>
+  </data>
+  <data name="U0556" xml:space="preserve">
+    <value>Обнаруживать удвоенные награды</value>
+  </data>
+  <data name="U0557" xml:space="preserve">
+    <value>Сад множества</value>
+  </data>
+  <data name="U0558" xml:space="preserve">
+    <value>Чашелист (золотой)</value>
+  </data>
+  <data name="U0559" xml:space="preserve">
+    <value>Чашелист (багровый)</value>
+  </data>
+  <data name="U0560" xml:space="preserve">
+    <value>Царство странностей</value>
+  </data>
+  <data name="U0561" xml:space="preserve">
+    <value>Пещера коррозии</value>
+  </data>
+  <data name="U0562" xml:space="preserve">
+    <value>Планарный раскол</value>
+  </data>
+  <data name="U0563" xml:space="preserve">
+    <value>Извлечение украшений</value>
+  </data>
+  <data name="U0011" xml:space="preserve">
+    <value>Оконный</value>
+  </data>
+  <data name="U0185" xml:space="preserve">
+    <value>Добро пожаловать в SRA</value>
+  </data>
+  <data name="U0186" xml:space="preserve">
+    <value>Устраивайтесь поудобнее</value>
+  </data>
+  <data name="U0187" xml:space="preserve">
+    <value>Это не
+'Sequence Read Archive'</value>
+  </data>
+  <data name="U0188" xml:space="preserve">
+    <value>Лаунчер запускает лаунчер</value>
+  </data>
+  <data name="U0189" xml:space="preserve">
+    <value>Светлячок летит к огню, обретая жизнь вопреки смерти</value>
+  </data>
+  <data name="U0190" xml:space="preserve">
+    <value>Сквозь вселенную — к далёким звёздам</value>
+  </data>
+  <data name="U0191" xml:space="preserve">
+    <value>Стремимся стать мастерами Star Rail</value>
+  </data>
+  <data name="U0192" xml:space="preserve">
+    <value>В прошлом мы высечем будущее</value>
+  </data>
+  <data name="U0193" xml:space="preserve">
+    <value>Летят искры, не оставляя пепла</value>
+  </data>
+  <data name="U0194" xml:space="preserve">
+    <value>Если всё нормально — это уже странно</value>
+  </data>
+  <data name="U0200" xml:space="preserve">
+    <value>Работа с реестром доступна только в Windows</value>
+  </data>
+  <data name="U0201" xml:space="preserve">
+    <value>Не удалось автоматически определить путь к игре</value>
+  </data>
+  <data name="U0202" xml:space="preserve">
+    <value>Доступ к реестру запрещён. Запустите программу от имени администратора</value>
+  </data>
+  <data name="U0203" xml:space="preserve">
+    <value>Раздел реестра не найден: {key}</value>
+  </data>
+  <data name="U0204" xml:space="preserve">
+    <value>Полноэкранный</value>
+  </data>
+  <data name="U0245" xml:space="preserve">
+    <value>dddd, d MMMM yyyy</value>
+  </data>
+  <data name="U0256" xml:space="preserve">
+    <value>Нажмите нужное сочетание клавиш</value>
+  </data>
+  <data name="U0364" xml:space="preserve">
+    <value>Ошибка сканирования: {e.Message}</value>
+  </data>
+  <data name="M0001" xml:space="preserve">
+    <value>Повторно импортировать модули задач без перезапуска</value>
+  </data>
+  <data name="M0004" xml:space="preserve">
+    <value>Показать схему настроек расширения</value>
+  </data>
+  <data name="M0005" xml:space="preserve">
+    <value>Повторно импортировать расширения, включая уже загруженные модули</value>
+  </data>
+  <data name="M0007" xml:space="preserve">
+    <value>Показать состояние расширений</value>
+  </data>
+  <data name="M0008" xml:space="preserve">
+    <value>Управление настройками расширений</value>
+  </data>
+  <data name="M0009" xml:space="preserve">
+    <value>Получить настройки расширения</value>
+  </data>
+  <data name="M0010" xml:space="preserve">
+    <value>Сохранить настройки расширения</value>
+  </data>
+  <data name="M0014" xml:space="preserve">
+    <value>Управление расширениями: просмотр и запуск</value>
+  </data>
+  <data name="M0015" xml:space="preserve">
+    <value>Разовые расширения выполняются в общем потоке, фоновые — в отдельном</value>
+  </data>
+  <data name="M0019" xml:space="preserve">
+    <value>Остановить фоновое или текущее разовое расширение</value>
+  </data>
+  <data name="M0024" xml:space="preserve">
+    <value>Вызвать метод Operator</value>
+  </data>
+  <data name="M0027" xml:space="preserve">
+    <value>Перечислить стратегии</value>
+  </data>
+  <data name="M0028" xml:space="preserve">
+    <value>Импортировать файл в папку стратегий</value>
+  </data>
+  <data name="M0029" xml:space="preserve">
+    <value>Показать настройки подземелий энергии Освоения</value>
+  </data>
+  <data name="M0034" xml:space="preserve">
+    <value>Играть по нотам JSON на игровой клавиатуре (пауза F8 / сначала F10 / остановка F9)</value>
+  </data>
+  <data name="M0035" xml:space="preserve">
+    <value>Название композиции или путь к нотам JSON</value>
+  </data>
+  <data name="M0036" xml:space="preserve">
+    <value>Множитель темпа (1.0 — исходный темп)</value>
+  </data>
+  <data name="M0037" xml:space="preserve">
+    <value>Число повторов композиции</value>
+  </data>
+  <data name="M0038" xml:space="preserve">
+    <value>Задержка перед началом для переключения в игру (секунды)</value>
+  </data>
+  <data name="M0039" xml:space="preserve">
+    <value>Репетиция: проверить ноты и тайминги без нажатия клавиш</value>
+  </data>
+  <data name="M0040" xml:space="preserve">
+    <value>Включить клавиши паузы и сброса</value>
+  </data>
+  <data name="M0041" xml:space="preserve">
+    <value>Клавиша паузы/продолжения</value>
+  </data>
+  <data name="M0042" xml:space="preserve">
+    <value>Клавиша сброса</value>
+  </data>
+  <data name="M0044" xml:space="preserve">
+    <value>Автоматически обрабатывать диалоги и при необходимости пропускать сюжет</value>
+  </data>
+  <data name="M0045" xml:space="preserve">
+    <value>Автоматически пропускать сюжетные диалоги</value>
+  </data>
+  <data name="M0048" xml:space="preserve">
+    <value>Введите имя Первопроходца точно как в игре.</value>
+  </data>
+  <data name="M0049" xml:space="preserve">
+    <value>Выберите стратегию. После добавления JSON просканируйте папку стратегий. Можно указать полный путь к файлу JSON.</value>
+  </data>
+  <data name="M0050" xml:space="preserve">
+    <value>Число партий за этот запуск.</value>
+  </data>
+  <data name="M0051" xml:space="preserve">
+    <value>Выберите минимальную, максимальную или текущую сложность.</value>
+  </data>
+  <data name="M0052" xml:space="preserve">
+    <value>Включено — режим разгона; выключено — обычный режим.</value>
+  </data>
+  <data name="M0053" xml:space="preserve">
+    <value>Имя Первопроходца</value>
+  </data>
+  <data name="M0059" xml:space="preserve">
+    <value>Оценка ресурсов для Прыжков до конца текущей версии</value>
+  </data>
+  <data name="M0060" xml:space="preserve">
+    <value>Дата начала версии (YYYY-MM-DD) для определения её сроков</value>
+  </data>
+  <data name="M0061" xml:space="preserve">
+    <value>Продолжительность версии в днях</value>
+  </data>
+  <data name="M0062" xml:space="preserve">
+    <value>За сколько дней до конца версии проходит стрим разработчиков</value>
+  </data>
+  <data name="M0063" xml:space="preserve">
+    <value>Состояние стрима: auto/done/not_done</value>
+  </data>
+  <data name="M0064" xml:space="preserve">
+    <value>Период обновления боевых режимов в днях</value>
+  </data>
+  <data name="M0065" xml:space="preserve">
+    <value>Смещение первого обновления боевых режимов в днях</value>
+  </data>
+  <data name="M0066" xml:space="preserve">
+    <value>Число обновлений боевых режимов; -1 — автоматически</value>
+  </data>
+  <data name="M0067" xml:space="preserve">
+    <value>Учитывать сегодняшнее обновление боевых режимов</value>
+  </data>
+  <data name="M0068" xml:space="preserve">
+    <value>День обновления недельных наград (0 — понедельник)</value>
+  </data>
+  <data name="M0069" xml:space="preserve">
+    <value>Число недельных обновлений; -1 — автоматически</value>
+  </data>
+  <data name="M0070" xml:space="preserve">
+    <value>Учитывать сегодняшнее обновление недельных наград</value>
+  </data>
+  <data name="M0071" xml:space="preserve">
+    <value>Звёздный нефрит за обновление версии</value>
+  </data>
+  <data name="M0072" xml:space="preserve">
+    <value>Есть Пропуск снабжения экспресса</value>
+  </data>
+  <data name="M0073" xml:space="preserve">
+    <value>Нефрит в день без Пропуска снабжения</value>
+  </data>
+  <data name="M0074" xml:space="preserve">
+    <value>Нефрит в день с Пропуском снабжения</value>
+  </data>
+  <data name="M0075" xml:space="preserve">
+    <value>Нефрит за одно обновление боевых режимов</value>
+  </data>
+  <data name="M0076" xml:space="preserve">
+    <value>Нефрит за недельные награды Виртуальной вселенной</value>
+  </data>
+  <data name="M0077" xml:space="preserve">
+    <value>Нефрит за промокоды стрима разработчиков</value>
+  </data>
+  <data name="M0078" xml:space="preserve">
+    <value>Автоматически распознавать ресурсы в первом ряду инвентаря</value>
+  </data>
+  <data name="M0079" xml:space="preserve">
+    <value>Текущее количество Звёздного нефрита вручную</value>
+  </data>
+  <data name="M0080" xml:space="preserve">
+    <value>Текущее количество Особых звёздных пропусков вручную</value>
+  </data>
+  <data name="M0081" xml:space="preserve">
+    <value>Текущее количество Звёздных пропусков вручную</value>
+  </data>
+  <data name="M0082" xml:space="preserve">
+    <value>Автоматически распознавать путеводитель наград</value>
+  </data>
+  <data name="M0083" xml:space="preserve">
+    <value>Тип наград: auto/jade/special_pass/normal_pass</value>
+  </data>
+  <data name="M0084" xml:space="preserve">
+    <value>Количество нефрита в путеводителе наград вручную</value>
+  </data>
+  <data name="M0085" xml:space="preserve">
+    <value>Количество Особых пропусков в путеводителе вручную</value>
+  </data>
+  <data name="M0086" xml:space="preserve">
+    <value>Количество обычных пропусков в путеводителе вручную</value>
+  </data>
+  <data name="X0674" xml:space="preserve">
+    <value>Сканировать папку стратегий</value>
+  </data>
+  <data name="G0004" xml:space="preserve">
+    <value>Выполняется</value>
+  </data>
+  <data name="G0102" xml:space="preserve">
+    <value>Сканировать папку стратегий</value>
+  </data>
+  <data name="R0003" xml:space="preserve">
+    <value>Показать текущее состояние задач</value>
+  </data>
+  <data name="R0005" xml:space="preserve">
+    <value>Перечислить зарегистрированные задачи</value>
+  </data>
+  <data name="G0097" xml:space="preserve">
+    <value>Имя Первопроходца</value>
+  </data>
+  <data name="G0099" xml:space="preserve">
+    <value>Число запусков</value>
+  </data>
+  <data name="G0104" xml:space="preserve">
+    <value>Химеко: ур. 5 — качество; ур. 7+ — Химеко 2★</value>
+  </data>
+  <data name="G0105" xml:space="preserve">
+    <value>Серебряный Волк ур. 999: экономная стратегия</value>
+  </data>
+  <data name="D0003" xml:space="preserve">
+    <value>Застойная тень</value>
+  </data>
+  <data name="D0005" xml:space="preserve">
+    <value>Эхо войны</value>
+  </data>
+  <data name="D0006" xml:space="preserve">
+    <value>Нашествие роя</value>
+  </data>
+  <data name="D0007" xml:space="preserve">
+    <value>Позолоченные воспоминания</value>
+  </data>
+  <data name="D0008" xml:space="preserve">
+    <value>Среди западных ветров</value>
+  </data>
+  <data name="D0009" xml:space="preserve">
+    <value>Багровая луна</value>
+  </data>
+  <data name="D0010" xml:space="preserve">
+    <value>Нескончаемая борьба</value>
+  </data>
+  <data name="D0011" xml:space="preserve">
+    <value>Голодные слуги</value>
+  </data>
+  <data name="D0012" xml:space="preserve">
+    <value>Вечная комедия</value>
+  </data>
+  <data name="D0013" xml:space="preserve">
+    <value>Спокойной ночи</value>
+  </data>
+  <data name="D0014" xml:space="preserve">
+    <value>Небесные мечи</value>
+  </data>
+  <data name="D0015" xml:space="preserve">
+    <value>Роковое плодоношение</value>
+  </data>
+  <data name="D0016" xml:space="preserve">
+    <value>Вечная мерзлота</value>
+  </data>
+  <data name="D0017" xml:space="preserve">
+    <value>Нежные слова</value>
+  </data>
+  <data name="D0018" xml:space="preserve">
+    <value>Стальное сердце в огне</value>
+  </data>
+  <data name="D0019" xml:space="preserve">
+    <value>Несокрушимая крепость</value>
+  </data>
+  <data name="D0028" xml:space="preserve">
+    <value>Форма морской грозди</value>
+  </data>
+  <data name="D0029" xml:space="preserve">
+    <value>Форма должности</value>
+  </data>
+  <data name="D0030" xml:space="preserve">
+    <value>Форма преисподней</value>
+  </data>
+  <data name="D0031" xml:space="preserve">
+    <value>Форма острия</value>
+  </data>
+  <data name="D0032" xml:space="preserve">
+    <value>Форма пепла</value>
+  </data>
+  <data name="D0033" xml:space="preserve">
+    <value>Форма гнева</value>
+  </data>
+  <data name="D0034" xml:space="preserve">
+    <value>Форма обжига</value>
+  </data>
+  <data name="D0035" xml:space="preserve">
+    <value>Форма пламени</value>
+  </data>
+  <data name="D0036" xml:space="preserve">
+    <value>Форма сирены</value>
+  </data>
+  <data name="D0037" xml:space="preserve">
+    <value>Форма нектара</value>
+  </data>
+  <data name="D0038" xml:space="preserve">
+    <value>Форма сосульки</value>
+  </data>
+  <data name="D0039" xml:space="preserve">
+    <value>Форма изморози</value>
+  </data>
+  <data name="D0040" xml:space="preserve">
+    <value>Форма звукового удара</value>
+  </data>
+  <data name="D0041" xml:space="preserve">
+    <value>Форма лютоволка</value>
+  </data>
+  <data name="D0042" xml:space="preserve">
+    <value>Форма погибели</value>
+  </data>
+  <data name="D0043" xml:space="preserve">
+    <value>Форма грохота</value>
+  </data>
+  <data name="D0044" xml:space="preserve">
+    <value>Форма угасающего солнца</value>
+  </data>
+  <data name="D0045" xml:space="preserve">
+    <value>Форма вечера</value>
+  </data>
+  <data name="D0046" xml:space="preserve">
+    <value>Форма небожителя</value>
+  </data>
+  <data name="D0047" xml:space="preserve">
+    <value>Форма порыва</value>
+  </data>
+  <data name="D0048" xml:space="preserve">
+    <value>Форма поглощения</value>
+  </data>
+  <data name="D0049" xml:space="preserve">
+    <value>Форма ледяной луны</value>
+  </data>
+  <data name="D0050" xml:space="preserve">
+    <value>Форма прожарки</value>
+  </data>
+  <data name="D0051" xml:space="preserve">
+    <value>Форма гибели</value>
+  </data>
+  <data name="D0052" xml:space="preserve">
+    <value>Форма миража</value>
+  </data>
+  <data name="D0053" xml:space="preserve">
+    <value>Форма колеса</value>
+  </data>
+  <data name="D0054" xml:space="preserve">
+    <value>Форма струнного звука</value>
+  </data>
+  <data name="D0055" xml:space="preserve">
+    <value>Форма марионетки</value>
+  </data>
+  <data name="D0056" xml:space="preserve">
+    <value>Форма кванта</value>
+  </data>
+  <data name="D0057" xml:space="preserve">
+    <value>Путь тайного актёра</value>
+  </data>
+  <data name="D0058" xml:space="preserve">
+    <value>Путь наблюдения за огнём</value>
+  </data>
+  <data name="D0059" xml:space="preserve">
+    <value>Путь магии и предсказания</value>
+  </data>
+  <data name="D0060" xml:space="preserve">
+    <value>Путь спасения и уединения</value>
+  </data>
+  <data name="D0061" xml:space="preserve">
+    <value>Путь грома и отваги</value>
+  </data>
+  <data name="D0062" xml:space="preserve">
+    <value>Путь песнопений</value>
+  </data>
+  <data name="D0063" xml:space="preserve">
+    <value>Путь заблуждения</value>
+  </data>
+  <data name="D0064" xml:space="preserve">
+    <value>Путь отважного всадника</value>
+  </data>
+  <data name="D0065" xml:space="preserve">
+    <value>Путь погружения в сон</value>
+  </data>
+  <data name="D0066" xml:space="preserve">
+    <value>Путь тьмы</value>
+  </data>
+  <data name="D0067" xml:space="preserve">
+    <value>Путь искателей эликсира</value>
+  </data>
+  <data name="D0068" xml:space="preserve">
+    <value>Путь бушующего пламени</value>
+  </data>
+  <data name="D0069" xml:space="preserve">
+    <value>Путь священного гимна</value>
+  </data>
+  <data name="D0070" xml:space="preserve">
+    <value>Путь провидения</value>
+  </data>
+  <data name="D0071" xml:space="preserve">
+    <value>Путь скитаний</value>
+  </data>
+  <data name="D0072" xml:space="preserve">
+    <value>Путь стремительного кулака</value>
+  </data>
+  <data name="D0073" xml:space="preserve">
+    <value>Путь ледяного ветра</value>
+  </data>
+  <data name="D0074" xml:space="preserve">
+    <value>Комедия разрушения</value>
+  </data>
+  <data name="D0075" xml:space="preserve">
+    <value>Ржавая гробница железных останков</value>
+  </data>
+  <data name="D0076" xml:space="preserve">
+    <value>Взгляд сквозь рассвет и сумерки</value>
+  </data>
+  <data name="D0077" xml:space="preserve">
+    <value>Поле битвы внутреннего зверя</value>
+  </data>
+  <data name="D0078" xml:space="preserve">
+    <value>Дань вежливости бренных грёз</value>
+  </data>
+  <data name="D0079" xml:space="preserve">
+    <value>Старый червоточинный кошмар</value>
+  </data>
+  <data name="D0080" xml:space="preserve">
+    <value>Семя бессмертия</value>
+  </data>
+  <data name="D0081" xml:space="preserve">
+    <value>Конец вечной мерзлоты</value>
+  </data>
+  <data name="D0082" xml:space="preserve">
+    <value>Начало разрушения</value>
+  </data>
+  <data name="D0083" xml:space="preserve">
+    <value>Многоцветие шута</value>
+  </data>
+  <data name="D0085" xml:space="preserve">
+    <value>Эпоха хмельного молока</value>
+  </data>
+  <data name="D0086" xml:space="preserve">
+    <value>Прах вознесшегося</value>
+  </data>
+  <data name="D0087" xml:space="preserve">
+    <value>Бутон сумеречного пепла</value>
+  </data>
+  <data name="D0088" xml:space="preserve">
+    <value>Остаток плавника сирены</value>
+  </data>
+  <data name="D0095" xml:space="preserve">
+    <value>Найти путь к программе или папке</value>
+  </data>
+  <data name="D0097" xml:space="preserve">
+    <value>Запустить сервер SRA</value>
+  </data>
+  <data name="D0104" xml:space="preserve">
+    <value>Порт падающих звёзд / Институт биологических исследований</value>
+  </data>
+  <data name="D0105" xml:space="preserve">
+    <value>Уровень Зеро Панклорда / Город тысячи звёзд</value>
+  </data>
+  <data name="D0106" xml:space="preserve">
+    <value>Вечная земля Амфореус / Тэнгоку @Стрим</value>
+  </data>
+  <data name="D0107" xml:space="preserve">
+    <value>Волшебная страна фей / Хмельная бухта</value>
+  </data>
+  <data name="D0108" xml:space="preserve">
+    <value>Безмолвная страна костей / Древо глубоких раздумий</value>
+  </data>
+  <data name="D0109" xml:space="preserve">
+    <value>Русалка, затопленные берега / Чудесный банановый рай</value>
+  </data>
+  <data name="D0110" xml:space="preserve">
+    <value>Дуранская династия волков / Лотосовый фонарь дворца</value>
+  </data>
+  <data name="D0111" xml:space="preserve">
+    <value>Бесплодная Сигония / Мир Идзумо и Царство Такама</value>
+  </data>
+  <data name="D0112" xml:space="preserve">
+    <value>Небесный фронт Глатирамер / Земля грёз Пенакония</value>
+  </data>
+  <data name="D0113" xml:space="preserve">
+    <value>Звездистая арена / Сломанный киль</value>
+  </data>
+  <data name="D0114" xml:space="preserve">
+    <value>Белобог Архитекторов / Замершее Салсотто</value>
+  </data>
+  <data name="D0115" xml:space="preserve">
+    <value>Пангалактическое коммерческое предприятие / Небесный дифференциатор</value>
+  </data>
+  <data name="D0116" xml:space="preserve">
+    <value>Талия - край бандитов / Живой Вонвак</value>
+  </data>
+  <data name="D0117" xml:space="preserve">
+    <value>Запечатывающая космос станция / Флот нестареющих</value>
+  </data>
+  <data name="D0118" xml:space="preserve">
+    <value>Бутон воспоминаний (Двумерный рай)</value>
+  </data>
+  <data name="D0119" xml:space="preserve">
+    <value>Путеводитель путешественника</value>
+  </data>
+  <data name="D0120" xml:space="preserve">
+    <value>Бутон эфира (Двумерный рай)</value>
+  </data>
+  <data name="D0121" xml:space="preserve">
+    <value>Очищенный эфир</value>
+  </data>
+  <data name="D0122" xml:space="preserve">
+    <value>Бутон сокровищ (Двумерный рай)</value>
+  </data>
+  <data name="D0123" xml:space="preserve">
+    <value>Кредиты</value>
+  </data>
+  <data name="D0124" xml:space="preserve">
+    <value>Бутон воспоминаний (Амфореус)</value>
+  </data>
+  <data name="D0125" xml:space="preserve">
+    <value>Бутон эфира (Амфореус)</value>
+  </data>
+  <data name="D0126" xml:space="preserve">
+    <value>Бутон сокровищ (Амфореус)</value>
+  </data>
+  <data name="D0127" xml:space="preserve">
+    <value>Бутон воспоминаний (Пенакония)</value>
+  </data>
+  <data name="D0128" xml:space="preserve">
+    <value>Бутон эфира (Пенакония)</value>
+  </data>
+  <data name="D0129" xml:space="preserve">
+    <value>Бутон сокровищ (Пенакония)</value>
+  </data>
+  <data name="D0130" xml:space="preserve">
+    <value>Бутон воспоминаний (Лофу Сяньчжоу)</value>
+  </data>
+  <data name="D0131" xml:space="preserve">
+    <value>Бутон эфира (Лофу Сяньчжоу)</value>
+  </data>
+  <data name="D0132" xml:space="preserve">
+    <value>Бутон сокровищ (Лофу Сяньчжоу)</value>
+  </data>
+  <data name="D0133" xml:space="preserve">
+    <value>Бутон воспоминаний (Ярило-VI)</value>
+  </data>
+  <data name="D0134" xml:space="preserve">
+    <value>Бутон эфира (Ярило-VI)</value>
+  </data>
+  <data name="D0135" xml:space="preserve">
+    <value>Бутон сокровищ (Ярило-VI)</value>
+  </data>
+  <data name="D0136" xml:space="preserve">
+    <value>Многоцветие шута (Разрушение)</value>
+  </data>
+  <data name="D0137" xml:space="preserve">
+    <value>Клыки лунного озверения (Разрушение)</value>
+  </data>
+  <data name="D0138" xml:space="preserve">
+    <value>Клыки лунного озверения</value>
+  </data>
+  <data name="D0139" xml:space="preserve">
+    <value>Всеразрушающий клинок (Разрушение)</value>
+  </data>
+  <data name="D0140" xml:space="preserve">
+    <value>Всеразрушающий клинок</value>
+  </data>
+  <data name="D0141" xml:space="preserve">
+    <value>Божественный янтарь (Сохранение)</value>
+  </data>
+  <data name="D0142" xml:space="preserve">
+    <value>Божественный янтарь</value>
+  </data>
+  <data name="D0143" xml:space="preserve">
+    <value>Страж янтаря (Сохранение)</value>
+  </data>
+  <data name="D0144" xml:space="preserve">
+    <value>Страж янтаря</value>
+  </data>
+  <data name="D0145" xml:space="preserve">
+    <value>Копьё возмездия (Охота)</value>
+  </data>
+  <data name="D0146" xml:space="preserve">
+    <value>Копьё возмездия</value>
+  </data>
+  <data name="D0147" xml:space="preserve">
+    <value>Выстрел против часовой (Охота)</value>
+  </data>
+  <data name="D0148" xml:space="preserve">
+    <value>Выстрел против часовой</value>
+  </data>
+  <data name="D0149" xml:space="preserve">
+    <value>Стрела охотника за звёздами (Охота)</value>
+  </data>
+  <data name="D0150" xml:space="preserve">
+    <value>Стрела охотника за звёздами</value>
+  </data>
+  <data name="D0151" xml:space="preserve">
+    <value>Плод многообразия (Изобилие)</value>
+  </data>
+  <data name="D0152" xml:space="preserve">
+    <value>Плод многообразия</value>
+  </data>
+  <data name="D0153" xml:space="preserve">
+    <value>Цветок вечности (Изобилие)</value>
+  </data>
+  <data name="D0154" xml:space="preserve">
+    <value>Цветок вечности</value>
+  </data>
+  <data name="D0155" xml:space="preserve">
+    <value>Космическая диорама (Эрудиция)</value>
+  </data>
+  <data name="D0156" xml:space="preserve">
+    <value>Космическая диорама</value>
+  </data>
+  <data name="D0157" xml:space="preserve">
+    <value>Мастерский цветной набросок (Эрудиция)</value>
+  </data>
+  <data name="D0158" xml:space="preserve">
+    <value>Мастерский цветной набросок</value>
+  </data>
+  <data name="D0159" xml:space="preserve">
+    <value>Ключ к мудрости (Эрудиция)</value>
+  </data>
+  <data name="D0160" xml:space="preserve">
+    <value>Ключ к мудрости</value>
+  </data>
+  <data name="D0161" xml:space="preserve">
+    <value>Небесная мелодия (Гармония)</value>
+  </data>
+  <data name="D0162" xml:space="preserve">
+    <value>Небесная мелодия</value>
+  </data>
+  <data name="D0163" xml:space="preserve">
+    <value>Симфония созвездий (Гармония)</value>
+  </data>
+  <data name="D0164" xml:space="preserve">
+    <value>Симфония созвездий</value>
+  </data>
+  <data name="D0165" xml:space="preserve">
+    <value>Сердце Фагусы (Небытие)</value>
+  </data>
+  <data name="D0166" xml:space="preserve">
+    <value>Сердце Фагусы</value>
+  </data>
+  <data name="D0167" xml:space="preserve">
+    <value>Небесный крематор (Небытие)</value>
+  </data>
+  <data name="D0168" xml:space="preserve">
+    <value>Небесный крематор</value>
+  </data>
+  <data name="D0169" xml:space="preserve">
+    <value>Обсидиан одержимости (Небытие)</value>
+  </data>
+  <data name="D0170" xml:space="preserve">
+    <value>Обсидиан одержимости</value>
+  </data>
+  <data name="D0171" xml:space="preserve">
+    <value>Бутон сознания (Память)</value>
+  </data>
+  <data name="D0172" xml:space="preserve">
+    <value>Бутон сознания</value>
+  </data>
+  <data name="D0173" xml:space="preserve">
+    <value>Коллекционное собрание «Пушистого скитальца» (Радость)</value>
+  </data>
+  <data name="D0174" xml:space="preserve">
+    <value>Коллекционное собрание «Пушистого скитальца»</value>
+  </data>
+  <data name="D0175" xml:space="preserve">
+    <value>Агрессивный сгусток</value>
+  </data>
+  <data name="D0176" xml:space="preserve">
+    <value>Разрешение на работу КММ</value>
+  </data>
+  <data name="D0177" xml:space="preserve">
+    <value>Призрачный пропуск</value>
+  </data>
+  <data name="D0178" xml:space="preserve">
+    <value>Сломанные зубы железного волка</value>
+  </data>
+  <data name="D0179" xml:space="preserve">
+    <value>Ослепительный протуберанец</value>
+  </data>
+  <data name="D0180" xml:space="preserve">
+    <value>Пылающее сердце</value>
+  </data>
+  <data name="D0181" xml:space="preserve">
+    <value>Раскалённое лезвие</value>
+  </data>
+  <data name="D0182" xml:space="preserve">
+    <value>Эндотермический хитин</value>
+  </data>
+  <data name="D0183" xml:space="preserve">
+    <value>Холодильник грёз</value>
+  </data>
+  <data name="D0184" xml:space="preserve">
+    <value>Гелидный хитин</value>
+  </data>
+  <data name="D0185" xml:space="preserve">
+    <value>Снежный рог</value>
+  </data>
+  <data name="D0186" xml:space="preserve">
+    <value>Громовое бренчание</value>
+  </data>
+  <data name="D0187" xml:space="preserve">
+    <value>Гвоздь звериного гроба</value>
+  </data>
+  <data name="D0188" xml:space="preserve">
+    <value>Электрический посох оборотня</value>
+  </data>
+  <data name="D0189" xml:space="preserve">
+    <value>Электрическая корона тени прошлого</value>
+  </data>
+  <data name="D0190" xml:space="preserve">
+    <value>Глаз бури</value>
+  </data>
+  <data name="D0191" xml:space="preserve">
+    <value>Ухмылка шута</value>
+  </data>
+  <data name="D0192" xml:space="preserve">
+    <value>Тусклый лунный блеск</value>
+  </data>
+  <data name="D0193" xml:space="preserve">
+    <value>Огнемёт грёз</value>
+  </data>
+  <data name="D0194" xml:space="preserve">
+    <value>Обезьяний шип</value>
+  </data>
+  <data name="D0195" xml:space="preserve">
+    <value>Чугун пустоты</value>
+  </data>
+  <data name="D0196" xml:space="preserve">
+    <value>Предвестник раздора</value>
+  </data>
+  <data name="D0197" xml:space="preserve">
+    <value>Аккордный мираж</value>
+  </data>
+  <data name="D0198" xml:space="preserve">
+    <value>Усмиряющий талисман</value>
+  </data>
+  <data name="D0199" xml:space="preserve">
+    <value>Золотая корона тени прошлого</value>
+  </data>
+  <data name="D0200" xml:space="preserve">
+    <value>Актёр звёздной точки / Пожирательница запретных плодов</value>
+  </data>
+  <data name="D0201" xml:space="preserve">
+    <value>Взор навигатора Взираи / Обращённый к небесам кузнец</value>
+  </data>
+  <data name="D0202" xml:space="preserve">
+    <value>Блистательная чародейка / Недосягаемый прорицатель</value>
+  </data>
+  <data name="D0203" xml:space="preserve">
+    <value>Воссоздающий мир спаситель / Таящий сияние отшельник</value>
+  </data>
+  <data name="D0204" xml:space="preserve">
+    <value>Воительница солнца и грозы / Преследующий волны капитан</value>
+  </data>
+  <data name="D0205" xml:space="preserve">
+    <value>Воспетый эпосом герой / Поющий элегии рапсод</value>
+  </data>
+  <data name="D0206" xml:space="preserve">
+    <value>Тернистый путь священника / Затерянный в знаниях учёный</value>
+  </data>
+  <data name="D0207" xml:space="preserve">
+    <value>Железная кавалерия против нашествия / Храбрость ветра</value>
+  </data>
+  <data name="D0208" xml:space="preserve">
+    <value>Первооткрыватель мёртвых вод / Часовщик сонных махинаций</value>
+  </data>
+  <data name="D0209" xml:space="preserve">
+    <value>Сжигающий дотла герцог / Пленник мрачной темницы</value>
+  </data>
+  <data name="D0210" xml:space="preserve">
+    <value>Долгоживущий ученик / Вестник, блуждающий в хакерском пространстве</value>
+  </data>
+  <data name="D0211" xml:space="preserve">
+    <value>Кузнец огня и лавы / Головорез бандитской пустыни</value>
+  </data>
+  <data name="D0212" xml:space="preserve">
+    <value>Рыцарь дворца чистоты / Бэнд испепеляющего грома</value>
+  </data>
+  <data name="D0213" xml:space="preserve">
+    <value>Страж снежной метели / Гений бриллиантовых звёзд</value>
+  </data>
+  <data name="D0214" xml:space="preserve">
+    <value>Скиталец блуждающего облака / Стрелок дикой пшеницы</value>
+  </data>
+  <data name="D0215" xml:space="preserve">
+    <value>Чемпион уличного бокса / Вор падающего метеора</value>
+  </data>
+  <data name="D0216" xml:space="preserve">
+    <value>Охотник ледникового леса / Орёл сумеречного рубежа</value>
+  </data>
+  <data name="D0217" xml:space="preserve">
+    <value>Надежды ложного просветления</value>
+  </data>
+  <data name="D0218" xml:space="preserve">
+    <value>Безмолвие поверженного потока</value>
+  </data>
+  <data name="D0219" xml:space="preserve">
+    <value>Воспоминания о солнце и грозе</value>
+  </data>
+  <data name="D0220" xml:space="preserve">
+    <value>Перья души</value>
+  </data>
+  <data name="D0221" xml:space="preserve">
+    <value>Потерянный отголосок единства желаний</value>
+  </data>
+  <data name="D0222" xml:space="preserve">
+    <value>Прошлые бедствия червоточины</value>
+  </data>
+  <data name="D0223" xml:space="preserve">
+    <value>Покаяние вечного ложного тела</value>
+  </data>
+  <data name="D0224" xml:space="preserve">
+    <value>Скорбь хранительницы</value>
+  </data>
+  <data name="D0225" xml:space="preserve">
+    <value>Последний путь разрушителя</value>
+  </data>
+  <data name="RussianLanguageName" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+  <data name="DeleteText" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="InfoText" xml:space="preserve">
+    <value>Информация</value>
+  </data>
+  <data name="ErrorText" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="SuccessText" xml:space="preserve">
+    <value>Готово</value>
+  </data>
+  <data name="JustIconText" xml:space="preserve">
+    <value>Значок приложения</value>
+  </data>
+  <data name="Final0000" xml:space="preserve">
+    <value>Счастливого пути</value>
+  </data>
+  <data name="Final0001" xml:space="preserve">
+    <value>Пусть путь будет светлым</value>
+  </data>
+  <data name="Final0002" xml:space="preserve">
+    <value>Пусть путь приведёт туда,
+где мечты чисты
+и прекрасны</value>
+  </data>
+</root>

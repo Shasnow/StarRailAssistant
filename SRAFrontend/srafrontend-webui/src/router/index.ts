@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { createRouter, createWebHistory } from 'vue-router'
 import type { Component } from 'vue'
 import { Document, HomeFilled, InfoFilled, Setting } from '@element-plus/icons-vue'
@@ -26,7 +27,7 @@ const router = createRouter({
       name: '首页',
       component: HomeView,
       meta: {
-        title: '首页',
+        title: t('W0111'),
         icon: HomeFilled,
       },
     },
@@ -36,7 +37,7 @@ const router = createRouter({
       // 懒加载：设置页依赖 OpenAPI 规范解析，独立 chunk 按需加载
       component: () => import('../views/SettingsView.vue'),
       meta: {
-        title: '设置',
+        title: t('W0112'),
         icon: Setting,
       },
     },
@@ -46,7 +47,7 @@ const router = createRouter({
       // 懒加载：日志页包含 SSE 流与分页渲染逻辑，独立 chunk 按需加载
       component: () => import('../views/LogView.vue'),
       meta: {
-        title: '日志',
+        title: t('W0113'),
         icon: Document,
       },
     },
@@ -58,7 +59,7 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
       meta: {
-        title: '关于',
+        title: t('W0114'),
         icon: InfoFilled,
       },
     },
@@ -68,7 +69,7 @@ const router = createRouter({
       // 懒加载：仅在后端启用了 access token 校验时才会进入
       component: () => import('../views/LoginView.vue'),
       meta: {
-        title: '登录',
+        title: t('W0115'),
         // 全屏独立页：不渲染导航栏 / Hero / 页脚，且不出现在导航链接中
         bare: true,
         hideInNav: true,

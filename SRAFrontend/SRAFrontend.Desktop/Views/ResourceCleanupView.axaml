@@ -1,4 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -8,10 +9,10 @@
              Width="620"
              x:Class="SRAFrontend.Desktop.Views.ResourceCleanupView"
              x:DataType="viewModels:ResourceCleanupViewModel">
-    <suki:BusyArea IsBusy="{Binding IsDeleting}" BusyText="正在删除...">
+    <suki:BusyArea IsBusy="{Binding IsDeleting}" BusyText="{x:Static lang:ExtraResources.U0443}">
         <StackPanel Margin="0,4" Spacing="8">
             <Grid ColumnDefinitions="Auto, *, Auto">
-                <CheckBox Content="全选"
+                <CheckBox Content="{x:Static lang:ExtraResources.U0444}"
                           IsChecked="{Binding IsAllSelected}" />
                 <TextBlock Grid.Column="2"
                            VerticalAlignment="Center"

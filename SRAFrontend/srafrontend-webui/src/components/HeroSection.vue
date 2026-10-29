@@ -30,7 +30,7 @@
     </div>
 
     <!-- 下滚指示器 -->
-    <button class="scroll-indicator" type="button" aria-label="滚动到内容区" @click="scrollToContent">
+    <button class="scroll-indicator" type="button" :aria-label="t('W0053')" @click="scrollToContent">
       <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.4"
         stroke-linecap="round" stroke-linejoin="round">
         <path d="m6 9 6 6 6-6" />
@@ -40,6 +40,8 @@
 </template>
 
 <script setup lang="ts">
+import { t, tr } from '@/i18n'
+
 import siteConfig from '@/configs/siteConfig'
 import { fetchPhrases } from '@/api/app'
 import { onMounted, onUnmounted, ref } from 'vue'
@@ -66,9 +68,9 @@ function scrollToContent() {
 /* ---------- 副标题打字机 + 轮换 ---------- */
 // 内置回退文案：后端 /api/App/phrases 不可用或返回空时使用
 const FALLBACK_PHRASES = [
-  '现代化 · 轻量级 · 开箱即用的 Vue 3 应用',
-  '简洁优雅的 UI，极致的开发体验',
-  '基于 Vue 3 + TypeScript + Vite 构建',
+  t('W0050'),
+  t('W0051'),
+  t('W0052'),
 ]
 
 // 文案由后端下发，接口失败时保持回退值
@@ -88,7 +90,7 @@ onMounted(async () => {
   try {
     const remote = await fetchPhrases(phrasesController.signal)
     // 后端返回空数组时同样沿用回退文案，避免打字机拿到 undefined
-    if (remote.length > 0) phrases.value = remote
+    if (remote.length > 0) phrases.value = remote.map(tr)
   } catch {
     // 后端不可用/接口异常：静默沿用回退文案
   }

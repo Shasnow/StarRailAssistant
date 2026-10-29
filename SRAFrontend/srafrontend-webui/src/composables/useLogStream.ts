@@ -1,3 +1,4 @@
+import { tf } from '@/i18n'
 import { useDebounceFn } from '@vueuse/core'
 import { ref } from 'vue'
 import { getStoredToken } from '@/api/http'
@@ -101,7 +102,7 @@ function ensureFlushTimer() {
 function scheduleReconnect() {
   if (reconnectAttempts >= MAX_RECONNECT) {
     status.value = 'disconnected'
-    lastError.value = `连接已断开：连续 ${MAX_RECONNECT} 次重连失败，请检查后端服务后手动重连`
+    lastError.value = tf('W0109', MAX_RECONNECT)
     return
   }
   reconnectAttempts += 1

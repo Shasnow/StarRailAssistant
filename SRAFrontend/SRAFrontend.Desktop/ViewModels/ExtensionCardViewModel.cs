@@ -32,7 +32,7 @@ public partial class ExtensionCardViewModel : ObservableObject
         HasConfig ? $"{ExtensionClass} / {ConfigClass}" : ExtensionClass;
 
     /// <summary>运行状态文案，用于卡片头部的状态标签。</summary>
-    public string StatusText => IsRunning ? "运行中" : "已停止";
+    public string StatusText => IsRunning ? global::SRAFrontend.Localization.UiText.T("运行中") : global::SRAFrontend.Localization.UiText.T("已停止");
 
     /// <summary>状态标签前景色（圆点与文字共用）。</summary>
     public string StatusBrush => IsRunning ? "#279F27" : "#8A8A8A";
@@ -75,7 +75,7 @@ public partial class ExtensionCardViewModel : ObservableObject
         _ = viewModel.LoadAsync();
         var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
-            Header = $"配置 - {Name}",
+            Header = global::SRAFrontend.Localization.UiText.F($"配置 - {Name}"),
             Content = view,
             ActionButtonsPreset = SukiMessageBoxButtons.OKCancel
         });

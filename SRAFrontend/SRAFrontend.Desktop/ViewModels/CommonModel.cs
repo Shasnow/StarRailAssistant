@@ -35,7 +35,7 @@ public class CommonModel(
     {
         SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
-            Header = "公告",
+            Header = global::SRAFrontend.Localization.UiText.T("公告"),
             Content = new AnnBoardViewModel
             {
                 Announcements = annService.CachedAnnouncements?.Announcements
@@ -62,7 +62,7 @@ public class CommonModel(
         if (currentVersion == null)
         {
             logger.LogError("Failed to parse current version: {Version}", AppSettings.Version);
-            ShowErrorToast("检查更新失败", "当前版本号格式无效");
+            ShowErrorToast(global::SRAFrontend.Localization.UiText.T("检查更新失败"), global::SRAFrontend.Localization.UiText.T("当前版本号格式无效"));
             return;
         }
 
@@ -70,7 +70,7 @@ public class CommonModel(
         if (response == null)
         {
             logger.LogError("Failed to check for updates: response is null");
-            ShowErrorToast("检查更新失败", "无法获取更新信息，请检查网络连接");
+            ShowErrorToast(global::SRAFrontend.Localization.UiText.T("检查更新失败"), global::SRAFrontend.Localization.UiText.T("无法获取更新信息，请检查网络连接"));
             return;
         }
 
@@ -79,7 +79,7 @@ public class CommonModel(
         if (remoteVersion == null)
         {
             logger.LogError("Failed to parse remote version: {VersionName}", response.Data.VersionName);
-            ShowErrorToast("检查更新失败", "远程版本号格式无效");
+            ShowErrorToast(global::SRAFrontend.Localization.UiText.T("检查更新失败"), global::SRAFrontend.Localization.UiText.T("远程版本号格式无效"));
             return;
         }
 
@@ -87,22 +87,22 @@ public class CommonModel(
         {
             var installedHotfix = SemVerParser.Parse(cacheService.Cache.HotfixVersion);
             var versionText = VersionHelper.GetVersionDisplayText(currentVersion, installedHotfix);
-            ShowSuccessToast("已是最新版本", versionText);
+            ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("已是最新版本"), versionText);
             return;
         }
 
         if (settingsService.Settings.Update.IsAutoUpdate)
         {
-            ShowInfoToast("发现新版本", $"正在自动下载更新包：{response.Data.VersionName}");
+            ShowInfoToast(global::SRAFrontend.Localization.UiText.T("发现新版本"), global::SRAFrontend.Localization.UiText.F($"正在自动下载更新包：{response.Data.VersionName}"));
             _ = HandleUpdateAsync(response, remoteVersion, channel);
         }
         else
         {
             var autoUpgradeButton =
-                SukiMessageBoxButtonsFactory.CreateButton("自动更新", SukiMessageBoxResult.Yes, "Flat");
+                SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("自动更新"), SukiMessageBoxResult.Yes, "Flat");
             var manualUpgradeButton =
-                SukiMessageBoxButtonsFactory.CreateButton("手动更新", SukiMessageBoxResult.OK, "Flat Accent");
-            var cancelButton = SukiMessageBoxButtonsFactory.CreateButton("忽略", SukiMessageBoxResult.Cancel);
+                SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("手动更新"), SukiMessageBoxResult.OK, "Flat Accent");
+            var cancelButton = SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("忽略"), SukiMessageBoxResult.Cancel);
             var releaseNoteViewer = new ThemedMarkdownScrollViewer
             {
                 Markdown = response.Data.ReleaseNote,
@@ -138,19 +138,19 @@ public class CommonModel(
         if (cacheService.Cache.NoNotifyForShortcut && !forceCheck) return;
         if (File.Exists(DataPath.DesktopShortcutPath))
         {
-            if (forceCheck) ShowSuccessToast("快捷方式已存在", "快捷方式已存在于桌面");
+            if (forceCheck) ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("快捷方式已存在"), global::SRAFrontend.Localization.UiText.T("快捷方式已存在于桌面"));
             return;
         }
 
         var createShortcutButton =
-            SukiMessageBoxButtonsFactory.CreateButton("创建快捷方式", SukiMessageBoxResult.Yes, "Flat");
-        var cancelButton = SukiMessageBoxButtonsFactory.CreateButton("取消", SukiMessageBoxResult.Cancel);
+            SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("创建快捷方式"), SukiMessageBoxResult.Yes, "Flat");
+        var cancelButton = SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("取消"), SukiMessageBoxResult.Cancel);
         var doNotAskButton =
-            SukiMessageBoxButtonsFactory.CreateButton("不再询问", SukiMessageBoxResult.No, "Flat Warning");
+            SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("不再询问"), SukiMessageBoxResult.No, "Flat Warning");
         var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
-            Header = "创建桌面快捷方式",
-            Content = "检测到桌面快捷方式不存在，是否现在创建？",
+            Header = global::SRAFrontend.Localization.UiText.T("创建桌面快捷方式"),
+            Content = global::SRAFrontend.Localization.UiText.T("检测到桌面快捷方式不存在，是否现在创建？"),
             ActionButtonsSource = [createShortcutButton, doNotAskButton, cancelButton]
         });
         switch (result)
@@ -160,9 +160,9 @@ public class CommonModel(
                 break;
             case SukiMessageBoxResult.Yes:
                 if (CreateDesktopShortcut(DataPath.DesktopShortcutPath, DataPath.SraExecutablePath))
-                    ShowSuccessToast("快捷方式创建成功", "已在桌面创建 SRA 快捷方式");
+                    ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("快捷方式创建成功"), global::SRAFrontend.Localization.UiText.T("已在桌面创建 SRA 快捷方式"));
                 else
-                    ShowErrorToast("快捷方式创建失败", "查看日志以获取更多信息");
+                    ShowErrorToast(global::SRAFrontend.Localization.UiText.T("快捷方式创建失败"), global::SRAFrontend.Localization.UiText.T("查看日志以获取更多信息"));
                 break;
         }
     }
@@ -182,7 +182,7 @@ public class CommonModel(
                 catch (Exception e)
                 {
                     logger.LogError(e, "Failed to delete old executable file: SRA_old.exe");
-                    ShowErrorToast("清理旧文件失败", $"无法删除旧可执行文件：{e.Message}");
+                    ShowErrorToast(global::SRAFrontend.Localization.UiText.T("清理旧文件失败"), global::SRAFrontend.Localization.UiText.F($"无法删除旧可执行文件：{e.Message}"));
                 }
             });
         }
@@ -235,13 +235,13 @@ public class CommonModel(
             else
             {
                 logger.LogWarning("Path does not exist: {Path}", path);
-                ShowErrorToast("打开失败", "指定的路径不存在");
+                ShowErrorToast(global::SRAFrontend.Localization.UiText.T("打开失败"), global::SRAFrontend.Localization.UiText.T("指定的路径不存在"));
             }
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error opening path: {Path}", path);
-            ShowErrorToast("打开失败", $"发生错误：{e.Message}");
+            ShowErrorToast(global::SRAFrontend.Localization.UiText.T("打开失败"), global::SRAFrontend.Localization.UiText.F($"发生错误：{e.Message}"));
         }
     }
 
@@ -253,7 +253,7 @@ public class CommonModel(
         var isHotfix = false; // 这是以后可能会用到的妙妙小工具
         var (progressPanel, progressLabel, progressBar, cts) = BuildDownloadProgressUi();
         
-        var toastBuilder = CreateStandardToastBuilder("正在下载...", progressPanel, NotificationType.Information);
+        var toastBuilder = CreateStandardToastBuilder(global::SRAFrontend.Localization.UiText.T("正在下载..."), progressPanel, NotificationType.Information);
         var downloadToast = toastBuilder.Queue();
         // 禁用自动关闭
         downloadToast.CanDismissByClicking = false;
@@ -276,13 +276,13 @@ public class CommonModel(
         catch (OperationCanceledException)
         {
             logger.LogInformation("Update download canceled by user");
-            ShowWarningToast("下载已取消", "您已取消更新包的下载");
+            ShowWarningToast(global::SRAFrontend.Localization.UiText.T("下载已取消"), global::SRAFrontend.Localization.UiText.T("您已取消更新包的下载"));
             return;
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error downloading update");
-            ShowErrorToast("下载更新失败", $"发生错误：{e.Message}");
+            ShowErrorToast(global::SRAFrontend.Localization.UiText.T("下载更新失败"), global::SRAFrontend.Localization.UiText.F($"发生错误：{e.Message}"));
             return;
         }
         finally
@@ -290,28 +290,28 @@ public class CommonModel(
             toastManager.Dismiss(downloadToast);
         }
 
-        ShowSuccessToast("下载完成", "更新包已就绪");
+        ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("下载完成"), global::SRAFrontend.Localization.UiText.T("更新包已就绪"));
         if (!settingsService.Settings.Update.IsAutoUpdate)
         {
             var extractNowButton =
-                SukiMessageBoxButtonsFactory.CreateButton("立即解压", SukiMessageBoxResult.Yes, "Flat Accent");
+                SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("立即解压"), SukiMessageBoxResult.Yes, "Flat Accent");
             var extractLaterButton =
-                SukiMessageBoxButtonsFactory.CreateButton("稍后", SukiMessageBoxResult.Cancel);
+                SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("稍后"), SukiMessageBoxResult.Cancel);
             var extractResult = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
             {
-                Header = "更新包已下载完成",
-                Content = "解压过程将短暂停止后端服务，是否现在开始解压？",
+                Header = global::SRAFrontend.Localization.UiText.T("更新包已下载完成"),
+                Content = global::SRAFrontend.Localization.UiText.T("解压过程将短暂停止后端服务，是否现在开始解压？"),
                 ActionButtonsSource = [extractNowButton, extractLaterButton]
             });
             if (extractResult is not SukiMessageBoxResult.Yes)
             {
-                ShowInfoToast("已推迟解压", "可稍后重新检查更新以继续");
+                ShowInfoToast(global::SRAFrontend.Localization.UiText.T("已推迟解压"), global::SRAFrontend.Localization.UiText.T("可稍后重新检查更新以继续"));
                 return;
             }
         }
         else
         {
-            ShowInfoToast("即将开始解压", "更新包将在3秒后解压");
+            ShowInfoToast(global::SRAFrontend.Localization.UiText.T("即将开始解压"), global::SRAFrontend.Localization.UiText.T("更新包将在3秒后解压"));
             await Task.Delay(3000);
         }
         backendService.StopBackend();
@@ -322,7 +322,7 @@ public class CommonModel(
             // 保存热修复版本（直接用已解析的 Version，避免重复转换）
             cacheService.Cache.HotfixVersion = remoteVersion.ToString();
             logger.LogDebug("Hotfix applied successfully: {Version}", remoteVersion);
-            ShowSuccessToast("热更新应用完成", "请重启控制台以使用最新版本");
+            ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("热更新应用完成"), global::SRAFrontend.Localization.UiText.T("请重启控制台以使用最新版本"));
         }
         else
         {
@@ -330,15 +330,15 @@ public class CommonModel(
                 Environment.CurrentDirectory);
             if (!await TryExtractFullPackageAsync(downloadFilePath)) return;
 
-            ShowSuccessToast("更新准备完成", "重启应用程序以应用最新版本");
+            ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("更新准备完成"), global::SRAFrontend.Localization.UiText.T("重启应用程序以应用最新版本"));
             var restartNowButton =
-                SukiMessageBoxButtonsFactory.CreateButton("立即重启", SukiMessageBoxResult.Yes, "Flat");
+                SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("立即重启"), SukiMessageBoxResult.Yes, "Flat");
             var restartLaterButton =
-                SukiMessageBoxButtonsFactory.CreateButton("稍后", SukiMessageBoxResult.Cancel);
+                SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("稍后"), SukiMessageBoxResult.Cancel);
             var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
             {
-                Header = "更新已准备就绪",
-                Content = "是否现在重启应用以应用最新版本？",
+                Header = global::SRAFrontend.Localization.UiText.T("更新已准备就绪"),
+                Content = global::SRAFrontend.Localization.UiText.T("是否现在重启应用以应用最新版本？"),
                 ActionButtonsSource = [restartNowButton, restartLaterButton]
             });
             if (result is SukiMessageBoxResult.Yes) RestartApplication();
@@ -352,12 +352,12 @@ public class CommonModel(
     public async Task ReinstallLatestAsync()
     {
         var confirmButton =
-            SukiMessageBoxButtonsFactory.CreateButton("确认", SukiMessageBoxResult.Yes, "Flat Accent");
-        var cancelButton = SukiMessageBoxButtonsFactory.CreateButton("取消", SukiMessageBoxResult.Cancel);
+            SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("确认"), SukiMessageBoxResult.Yes, "Flat Accent");
+        var cancelButton = SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("取消"), SukiMessageBoxResult.Cancel);
         var confirmResult = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
-            Header = "重新安装最新版本",
-            Content = "此操作将重新下载并安装最新版本安装包，以修复可能存在的问题。是否继续？",
+            Header = global::SRAFrontend.Localization.UiText.T("重新安装最新版本"),
+            Content = global::SRAFrontend.Localization.UiText.T("此操作将重新下载并安装最新版本安装包，以修复可能存在的问题。是否继续？"),
             ActionButtonsSource = [cancelButton, confirmButton]
         });
         if (confirmResult is not SukiMessageBoxResult.Yes) return;
@@ -368,7 +368,7 @@ public class CommonModel(
 
         var (progressPanel, progressLabel, progressBar, cts) = BuildDownloadProgressUi();
         var downloadToast =
-            CreateStandardToastBuilder("正在下载最新版本安装包...", progressPanel, NotificationType.Information).Queue();
+            CreateStandardToastBuilder(global::SRAFrontend.Localization.UiText.T("正在下载最新版本安装包..."), progressPanel, NotificationType.Information).Queue();
         downloadToast.CanDismissByClicking = false;
         downloadToast.CanDismissByTime = false;
         var progressHandler = new Progress<DownloadStatus>(value =>
@@ -390,20 +390,20 @@ public class CommonModel(
         catch (OperationCanceledException)
         {
             logger.LogInformation("Reinstall download canceled by user");
-            ShowWarningToast("操作已取消", "您已取消安装包的下载");
+            ShowWarningToast(global::SRAFrontend.Localization.UiText.T("操作已取消"), global::SRAFrontend.Localization.UiText.T("您已取消安装包的下载"));
             return;
         }
         catch (HttpRequestException e)
         {
             logger.LogError(e, "Network error while downloading latest package");
-            ShowErrorToast("重新安装失败",
-                "网络错误：无法下载最新版本安装包，请检查网络连接，或在更新设置中切换下载渠道后重试。");
+            ShowErrorToast(global::SRAFrontend.Localization.UiText.T("重新安装失败"),
+                global::SRAFrontend.Localization.UiText.T("网络错误：无法下载最新版本安装包，请检查网络连接，或在更新设置中切换下载渠道后重试。"));
             return;
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error reinstalling latest version");
-            ShowErrorToast("重新安装失败", e.Message);
+            ShowErrorToast(global::SRAFrontend.Localization.UiText.T("重新安装失败"), e.Message);
             return;
         }
         finally
@@ -411,13 +411,13 @@ public class CommonModel(
             toastManager.Dismiss(downloadToast);
         }
 
-        ShowSuccessToast("下载完成", $"版本 {latestVersion} 安装包 SHA256 校验通过，即将开始安装");
+        ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("下载完成"), global::SRAFrontend.Localization.UiText.F($"版本 {latestVersion} 安装包 SHA256 校验通过，即将开始安装"));
         await Task.Delay(1500);
 
         backendService.StopBackend();
         if (!await TryExtractFullPackageAsync(downloadFilePath)) return;
 
-        ShowInfoToast("安装完成", "应用将在 3 秒后自动重启");
+        ShowInfoToast(global::SRAFrontend.Localization.UiText.T("安装完成"), global::SRAFrontend.Localization.UiText.T("应用将在 3 秒后自动重启"));
         await Task.Delay(3000);
         RestartApplication();
     }
@@ -429,7 +429,7 @@ public class CommonModel(
     /// <returns>true 表示解压成功；false 表示失败且用户已选择手动处理或退出程序。</returns>
     private async Task<bool> TryExtractFullPackageAsync(string downloadFilePath)
     {
-        var unzipToast = ShowInfoToast("正在解压更新", "请稍候...");
+        var unzipToast = ShowInfoToast(global::SRAFrontend.Localization.UiText.T("正在解压更新"), global::SRAFrontend.Localization.UiText.T("请稍候..."));
         unzipToast.CanDismissByClicking = false;
         unzipToast.CanDismissByTime = false;
         try
@@ -446,13 +446,13 @@ public class CommonModel(
             toastManager.Dismiss(unzipToast);
             logger.LogError(e, "Error extracting update package");
             var manualExtractButton =
-                SukiMessageBoxButtonsFactory.CreateButton("手动解压", SukiMessageBoxResult.Yes, "Flat");
+                SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("手动解压"), SukiMessageBoxResult.Yes, "Flat");
             var exitButton =
-                SukiMessageBoxButtonsFactory.CreateButton("退出程序", SukiMessageBoxResult.OK, "Flat");
+                SukiMessageBoxButtonsFactory.CreateButton(global::SRAFrontend.Localization.UiText.T("退出程序"), SukiMessageBoxResult.OK, "Flat");
             var extractResult = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
             {
-                Header = "更新解压失败",
-                Content = $"自动解压失败：{e.Message}\n\n需要退出程序完成解压（退出后请等待5~10秒），或手动完成解压",
+                Header = global::SRAFrontend.Localization.UiText.T("更新解压失败"),
+                Content = global::SRAFrontend.Localization.UiText.F($"自动解压失败：{e.Message}\n\n需要退出程序完成解压（退出后请等待5~10秒），或手动完成解压"),
                 ActionButtonsSource = [manualExtractButton, exitButton]
             });
             if (extractResult is SukiMessageBoxResult.Yes)
@@ -486,7 +486,7 @@ public class CommonModel(
         catch (Exception e)
         {
             logger.LogError(e, "Error restarting application");
-            ShowErrorToast("重启失败", $"发生错误：{e.Message}");
+            ShowErrorToast(global::SRAFrontend.Localization.UiText.T("重启失败"), global::SRAFrontend.Localization.UiText.F($"发生错误：{e.Message}"));
         }
     }
 
@@ -606,15 +606,15 @@ public class CommonModel(
     /// </summary>
     private (StackPanel ProgressPanel, Label ProgressLabel, ProgressBar progressBar, CancellationTokenSource Cts) BuildDownloadProgressUi()
     {
-        var progressLabel = new Label { Content = "连接中..." };
+        var progressLabel = new Label { Content = global::SRAFrontend.Localization.UiText.T("连接中...") };
         var progressBar = new ProgressBar { Value = 0, ShowProgressText = true };
-        var cancelButton = new Button { Content = "取消下载" };
+        var cancelButton = new Button { Content = global::SRAFrontend.Localization.UiText.T("取消下载") };
         var cts = new CancellationTokenSource();
         cancelButton.Click += (_, _) =>
         {
             if (cts.IsCancellationRequested) return;
             cts.Cancel();
-            progressLabel.Content = "正在取消...";
+            progressLabel.Content = global::SRAFrontend.Localization.UiText.T("正在取消...");
             cancelButton.IsEnabled = false;
         };
         var progressPanel = new StackPanel { Children = { progressLabel, progressBar, cancelButton } };

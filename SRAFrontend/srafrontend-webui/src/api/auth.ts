@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { ApiError, http, statusMessage } from './http'
 import type { ApiEnvelope } from './http'
 
@@ -27,6 +28,6 @@ export async function verifyToken(token: string): Promise<void> {
   })
 
   if (response.status === 200) return
-  if (response.status === 401) throw new ApiError('Access Token 无效，请检查后重试', 401)
+  if (response.status === 401) throw new ApiError(t('W0001'), 401)
   throw new ApiError(statusMessage(response.status), response.status)
 }

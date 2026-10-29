@@ -24,6 +24,7 @@ from SRACore.notification.dispatcher import NotificationDispatcher
 from SRACore.notification.http_client import HttpClient
 from SRACore.notification.models import NotificationContext, format_notification_message
 from SRACore.util.logger import logger
+from SRACore.localization.presentation import translate
 
 _cached_game_screenshot_bytes: bytes | None = None
 _notification_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="notify_batch")
@@ -48,6 +49,7 @@ _CHANNEL_LABELS: dict[str, str] = {
 
 
 def build_notification_payload(title: str, message: str, result: str = "success") -> dict[str, str]:
+    title, message = translate(title), translate(message)
     return {
         "title": title,
         "message": message,
@@ -78,6 +80,8 @@ def try_send_notification(settings: NotificationSettings,
                           title: str, message: str, result: str = "success", image: Any | None = None) -> None:
     if not settings.isEnabled:
         return
+
+    title, message = translate(title), translate(message)
 
     screenshot_bytes = None
     if should_capture_notification_screenshot(settings):

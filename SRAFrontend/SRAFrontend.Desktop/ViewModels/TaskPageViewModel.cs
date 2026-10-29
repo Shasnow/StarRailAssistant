@@ -123,30 +123,30 @@ public partial class TaskPageViewModel : PageViewModel
 
     [ObservableProperty] public partial int TpTaskSingleTimes { get; set; } = 1;
 
-    public string[] TpTaskNames => [.. _tpTasks.Select(t => t.Name)];
+    public string[] TpTaskNames => [.. _tpTasks.Select(t => SRAFrontend.Localization.UiText.T(t.Name))];
 
     // _tpTasks 在后端就绪前为空，以下取值一律用 ElementAtOrDefault 兜底，避免绑定求值时抛越界异常
     public TpTaskLevel[] CurrentTpTaskLevels => _tpTasks.ElementAtOrDefault(SelectedTpTaskIndex)?.Levels ?? [];
 
     // 下标对应 tasks/config/trailblaze_power.toml 中 subtasks 的定义顺序
     public string[] GardenOfPlentyLevels1 =>
-        ["未选择", .. (_tpTasks.ElementAtOrDefault(1)?.Levels ?? []).Select(x => $"{x.Name}（{x.Result}）")];
+        [global::SRAFrontend.Localization.UiText.T("未选择"), .. (_tpTasks.ElementAtOrDefault(1)?.Levels ?? []).Select(x => $"{SRAFrontend.Localization.UiText.T(x.Name)}（{SRAFrontend.Localization.UiText.T(x.Result)}）")];
 
     public string[] GardenOfPlentyLevels2 =>
-        ["未选择", .. (_tpTasks.ElementAtOrDefault(2)?.Levels ?? []).Select(x => $"{x.Name}（{x.Result}）")];
+        [global::SRAFrontend.Localization.UiText.T("未选择"), .. (_tpTasks.ElementAtOrDefault(2)?.Levels ?? []).Select(x => $"{SRAFrontend.Localization.UiText.T(x.Name)}（{SRAFrontend.Localization.UiText.T(x.Result)}）")];
 
     public string[] PlanarFissureLevels =>
-        ["未选择", .. (_tpTasks.ElementAtOrDefault(0)?.Levels ?? []).Select(x => $"{x.Name}（{x.Result}）")];
+        [global::SRAFrontend.Localization.UiText.T("未选择"), .. (_tpTasks.ElementAtOrDefault(0)?.Levels ?? []).Select(x => $"{SRAFrontend.Localization.UiText.T(x.Name)}（{SRAFrontend.Localization.UiText.T(x.Result)}）")];
 
     public string[] RealmOfTheStrangeLevels =>
-        ["未选择", .. (_tpTasks.ElementAtOrDefault(4)?.Levels ?? []).Select(x => $"{x.Name}（{x.Result}）")];
+        [global::SRAFrontend.Localization.UiText.T("未选择"), .. (_tpTasks.ElementAtOrDefault(4)?.Levels ?? []).Select(x => $"{SRAFrontend.Localization.UiText.T(x.Name)}（{SRAFrontend.Localization.UiText.T(x.Result)}）")];
 
     public int CurrentTpTaskMaxSingleTimes => _tpTasks.ElementAtOrDefault(SelectedTpTaskIndex)?.MaxSingleTimes ?? 1;
 
     public string TaskListText =>
         TrailblazePowerConfig.TaskList.Count == 0
-            ? "暂无任务"
-            : $"{string.Join("、", TrailblazePowerConfig.TaskList.Select(x => x.Name).Take(3))} 等 {TrailblazePowerConfig.TaskList.Count} 个任务";
+            ? global::SRAFrontend.Localization.UiText.T("暂无任务")
+            : global::SRAFrontend.Localization.UiText.F($"{string.Join("、", TrailblazePowerConfig.TaskList.Select(x => SRAFrontend.Localization.UiText.T(x.Name)).Take(3))} 等 {TrailblazePowerConfig.TaskList.Count} 个任务");
 
     public CosmicStrifeConfig CosmicStrifeConfig => CurrentConfig.CosmicStrife;
     public MissionAccomplishedConfig MissionAccomplishedConfig => CurrentConfig.MissionAccomplished;
@@ -220,12 +220,12 @@ public partial class TaskPageViewModel : PageViewModel
         }
         catch (Exception ex)
         {
-            _commonModel.ShowErrorToast("副本配置加载失败", ex.Message);
+            _commonModel.ShowErrorToast(global::SRAFrontend.Localization.UiText.T("副本配置加载失败"), ex.Message);
             return;
         }
 
         if (_tpTasks.Length == 0)
-            _commonModel.ShowErrorToast("副本配置加载失败", "未能从后端获取副本配置，请尝试重启后端。");
+            _commonModel.ShowErrorToast(global::SRAFrontend.Localization.UiText.T("副本配置加载失败"), global::SRAFrontend.Localization.UiText.T("未能从后端获取副本配置，请尝试重启后端。"));
 
         OnPropertyChanged(nameof(TpTaskNames));
         OnPropertyChanged(nameof(CurrentTpTaskLevels));
@@ -255,7 +255,7 @@ public partial class TaskPageViewModel : PageViewModel
         }
         catch (Exception ex)
         {
-            _commonModel.ShowErrorToast("攻略加载失败", ex.Message);
+            _commonModel.ShowErrorToast(global::SRAFrontend.Localization.UiText.T("攻略加载失败"), ex.Message);
         }
     }
 
@@ -265,9 +265,9 @@ public partial class TaskPageViewModel : PageViewModel
         if (TopLevelObject is null) return;
         var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "选择攻略文件",
+            Title = global::SRAFrontend.Localization.UiText.T("选择攻略文件"),
             AllowMultiple = false,
-            FileTypeFilter = [new FilePickerFileType("JSON 攻略文件") { Patterns = ["*.json"] }]
+            FileTypeFilter = [new FilePickerFileType(global::SRAFrontend.Localization.UiText.T("JSON 攻略文件")) { Patterns = ["*.json"] }]
         });
         if (files.Count == 0) return;
 
@@ -276,15 +276,15 @@ public partial class TaskPageViewModel : PageViewModel
             var result = await _backendService.InstallStrategyAsync(files[0].Path.LocalPath);
             if (result is not { Success: true })
             {
-                _commonModel.ShowErrorToast("攻略导入失败", result?.Message ?? "后端无响应");
+                _commonModel.ShowErrorToast(global::SRAFrontend.Localization.UiText.T("攻略导入失败"), result?.Message ?? global::SRAFrontend.Localization.UiText.T("后端无响应"));
                 return;
             }
-            _commonModel.ShowSuccessToast("攻略导入成功", result.Message);
+            _commonModel.ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("攻略导入成功"), result.Message);
             await RefreshStrategies();
         }
         catch (Exception ex)
         {
-            _commonModel.ShowErrorToast("攻略导入失败", ex.Message);
+            _commonModel.ShowErrorToast(global::SRAFrontend.Localization.UiText.T("攻略导入失败"), ex.Message);
         }
     }
 
@@ -332,7 +332,7 @@ public partial class TaskPageViewModel : PageViewModel
     {
         if (SelectedTpTaskLevel is null)
         {
-            _commonModel.ShowInfoToast("Info", "请选择副本关卡后再添加任务");
+            _commonModel.ShowInfoToast(global::SRAFrontend.Localization.UiText.T("Info"), global::SRAFrontend.Localization.UiText.T("请选择副本关卡后再添加任务"));
             return;
         }
 

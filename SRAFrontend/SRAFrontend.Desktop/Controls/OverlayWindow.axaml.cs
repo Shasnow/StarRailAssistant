@@ -119,7 +119,7 @@ public partial class OverlayWindow : Window
 
         MousePosTextBlock.Text = inWindow
             ? $"X:{clientCursor.X,4} Y:{clientCursor.Y,4}\nScale X:{clientCursor.X / (double)w:0.0000} Y:{clientCursor.Y / (double)h:0.0000}"
-            : "鼠标不在游戏窗口";
+            : global::SRAFrontend.Localization.UiText.T("鼠标不在游戏窗口");
     }
 
     public void AppendLog(string message)

@@ -1,228 +1,309 @@
 [cli.noAdminWarning]
 zh-cn = "您没有以管理员权限运行 SRA-cli。某些命令可能无法正常工作。"
 en-us = "You are not running SRA-cli with administrative privileges. Some commands may not work as expected."
+ru-ru = "SRA-cli запущен без прав администратора. Некоторые команды могут работать некорректно."
 
 [cli.invalidArguments]
 zh-cn = "命令 '{command}' 的参数无效。输入 'help {command}' 获取用法说明。"
 en-us = "Invalid arguments for command '{command}'. Type 'help {command}' for usage."
+ru-ru = "Недопустимые аргументы команды «{command}». Справка: help {command}."
 
 [cli.defaultError]
 zh-cn = "{} 不是一个有效命令、别名、或宏。"
 en-us = "{} is not a recognized command, alias, or macro."
+ru-ru = "{} — неизвестная команда, псевдоним или макрос."
 
 [cli.run.started]
 zh-cn = "已启动任务执行。"
 en-us = "Task execution started."
+ru-ru = "Выполнение задач началось."
 
 [cli.task.taskAlreadyRunning]
 zh-cn = "任务已在运行中。"
 en-us = "Task is already running."
+ru-ru = "Задача уже выполняется."
 
 [cli.task.requestStop]
 zh-cn = "已请求停止正在运行的任务。"
 en-us = "Requested to stop running tasks."
+ru-ru = "Запрошена остановка выполняемых задач."
 
 [cli.task.timeout]
 zh-cn = "等待任务完成时超时。"
 en-us = "Timeout reached while waiting for tasks to complete."
+ru-ru = "Истекло время ожидания завершения задач."
 
 [cli.task.stopped]
 zh-cn = "所有正在运行的任务已停止。"
 en-us = "All running tasks have been stopped."
+ru-ru = "Все выполнявшиеся задачи остановлены."
 
 [cli.task.notRunning]
 zh-cn = "当前没有任务在运行。"
 en-us = "No tasks are currently running."
+ru-ru = "Сейчас нет выполняемых задач."
 
 [cli.trigger.alreadyRunning]
 zh-cn = "触发器服务已在运行中。"
 en-us = "Trigger service is already running."
+ru-ru = "Служба триггеров уже запущена."
 
 [cli.trigger.started]
 zh-cn = "触发器服务已启动。"
 en-us = "Trigger service started."
+ru-ru = "Служба триггеров запущена."
 
 [cli.trigger.stopped]
 zh-cn = "触发器服务已停止。"
 en-us = "Trigger service stopped."
+ru-ru = "Служба триггеров остановлена."
 
 [cli.trigger.notRunning]
 zh-cn = "触发器服务未运行。"
 en-us = "Trigger service is not running."
+ru-ru = "Служба триггеров не запущена."
 
 [cli.trigger.enabled]
 zh-cn = "触发器 '{trigger_name}' 已启用。"
 en-us = "Trigger '{trigger_name}' has been enabled."
+ru-ru = "Триггер «{trigger_name}» включён."
 
 [cli.trigger.disabled]
 zh-cn = "触发器 '{trigger_name}' 已禁用。"
 en-us = "Trigger '{trigger_name}' has been disabled."
+ru-ru = "Триггер «{trigger_name}» выключен."
 
 [cli.trigger.notFound]
 zh-cn = "未找到触发器 '{trigger_name}'。"
 en-us = "Trigger '{trigger_name}' not found."
+ru-ru = "Триггер «{trigger_name}» не найден."
 
 [cli.trigger.attrNotFound]
 zh-cn = "在触发器 '{trigger_name}' 中未找到属性 '{attr}'。"
 en-us = "Attribute '{attr}' not found in trigger '{trigger_name}'."
+ru-ru = "У триггера «{trigger_name}» нет атрибута «{attr}»."
 
 [cli.trigger.attrSet]
 zh-cn = "触发器 '{trigger_name}' 的属性 '{attr}' 已设置为 '{value}'。"
 en-us = "Attribute '{attr}' of trigger '{trigger_name}' has been set to '{value}'."
+ru-ru = "Атрибуту «{attr}» триггера «{trigger_name}» присвоено значение «{value}»."
 
 [cli.trigger.unknownType]
 zh-cn = "未知属性类型: '{type}'，支持: 'int'，'float'，'bool'，'str'。"
 en-us = "Unknown attribute type: '{type}', supports: 'int', 'float', 'bool', 'str'."
+ru-ru = "Неизвестный тип «{type}». Поддерживаются int, float, bool и str."
 
 [argparse.description]
 zh-cn = "SRA-cli：SRA 命令行工具"
 en-us = "SRA-cli: A command-line interface for SRA."
+ru-ru = "SRA-cli — командная строка SRA."
 
 [argparse.epilog]
 zh-cn = ""
 en-us = ""
+ru-ru = ""
 
 [argparse.inline_help]
 zh-cn = "内联模式（无命令提示符）"
 en-us = "Inline mode (no command prompt)"
+ru-ru = "Встроенный режим без приглашения командной строки"
 
 [argparse.version_help]
 zh-cn = "显示 SRA-cli 的版本并退出。"
 en-us = "Show the version of SRA-cli and exit."
+ru-ru = "Показать версию SRA-cli и выйти."
 
 [argparse.log_level_help]
 zh-cn = "设置日志记录级别（默认：TRACE）。"
 en-us = "Set the logging level (default: TRACE)."
+ru-ru = "Установить уровень журналирования (по умолчанию TRACE)."
 
 [task.description]
 zh-cn = "任务管理器 - 管理 SRA-cli 的任务。"
 en-us = "Task manager - Manages tasks for SRA-cli."
+ru-ru = "Управление задачами SRA-cli."
 
 [task.currentConfig]
 zh-cn = "当前配置：{config_name}"
 en-us = "Current config: {config_name}"
+ru-ru = "Текущая конфигурация: {config_name}"
 
 [task.noSelectedTasks]
 zh-cn = "{config_name} 配置中没有选中的任务, 跳过执行。"
 en-us = "No task is selected in {config_name}, skipping execution."
+ru-ru = "В конфигурации {config_name} не выбрано ни одной задачи. Пропуск."
 
 [task.taskFailed]
 zh-cn = "任务 '{name}' 失败。停止进一步执行。"
 en-us = "Task '{name}' failed. Stopping further execution."
+ru-ru = "Ошибка задачи «{name}». Дальнейшее выполнение остановлено."
 
 [task.taskCrashed]
 zh-cn = "任务 '{name}' 因意外错误崩溃：{error}"
 en-us = "Task '{name}' crashed due to an unexpected error: {error}"
+ru-ru = "Задача «{name}» аварийно завершилась: {error}"
 
 [task.taskCompleted]
 zh-cn = "任务 '{name}' 已完成。"
 en-us = "Task '{name}' has been completed."
+ru-ru = "Задача «{name}» выполнена."
 
 [task.configCompleted]
 zh-cn = "配置 '{config_name}' 中的所有任务已完成。"
 en-us = "All tasks in config '{config_name}' have been completed."
+ru-ru = "Все задачи конфигурации «{config_name}» выполнены."
 
 [task.notificationTitle]
 zh-cn = "任务通知"
 en-us = "Task Reminder"
+ru-ru = "Уведомление о задачах"
 
 [task.notificationMessage]
 zh-cn = "您的SRA任务运行完成。"
 en-us = "Your SRA task has completed."
+ru-ru = "Выполнение задач SRA завершено."
 
 [task.instantiateFailed]
 zh-cn = "实例化任务 '{name}' 失败：{error}"
 en-us = "Failed to instantiate task '{name}': {error}"
+ru-ru = "Не удалось создать задачу «{name}»: {error}"
 
 [task.noSuchTask]
 zh-cn = "没有此任务：'{identifier}'"
 en-us = "No such task: '{identifier}'"
+ru-ru = "Задача «{identifier}» не найдена."
 
 [task.managerCrashed]
 zh-cn = "任务管理器因意外错误崩溃：{error}"
 en-us = "Task manager crashed due to an unexpected error: {error}"
+ru-ru = "Диспетчер задач аварийно завершился: {error}"
 
 [run.description]
 zh-cn = "运行指定配置文件中的所有选中的任务。"
 en-us = "Run all selected tasks in specified configuration file(s). Type 'run --help' for more information."
+ru-ru = "Выполнить выбранные задачи из указанных конфигураций. Справка: run --help."
 
 [run.configHelp]
 zh-cn = "配置文件名称或路径。"
 en-us = "Configuration file name or path."
+ru-ru = "Имя или путь файла конфигурации."
 
 [single.description]
 zh-cn = "运行由其名称或索引指定的单个任务。"
 en-us = "Run a single task specified by its name or index. Type 'single --help' for more information."
+ru-ru = "Выполнить одну задачу по имени или индексу. Справка: single --help."
 
 [single.taskHelp]
 zh-cn = "要运行的任务的名称或索引。"
 en-us = "Name or index of the task to run."
+ru-ru = "Имя или индекс задачи."
 
 [single.configHelp]
 zh-cn = "配置文件名称或路径。"
 en-us = "Configuration file name or path."
+ru-ru = "Имя или путь файла конфигурации."
 
 [stop.description]
 zh-cn = "停止当前运行的任务。"
 en-us = "Stop the currently running task."
+ru-ru = "Остановить выполняемую задачу."
 
 [trigger.description]
 zh-cn = "触发器管理器 - 管理 SRA-cli 的触发器。"
 en-us = "Trigger manager - Manages triggers for SRA-cli."
+ru-ru = "Управление триггерами SRA-cli."
 
 [trigger.disable.description]
 zh-cn = "禁用指定触发器。"
 en-us = "Disable the specified trigger."
+ru-ru = "Выключить указанный триггер."
 
 [trigger.disable.nameHelp]
 zh-cn = "触发器名称。"
 en-us = "Name of the trigger to disable."
+ru-ru = "Имя выключаемого триггера."
 
 [trigger.enable.description]
 zh-cn = "启用指定触发器。"
 en-us = "Enable the specified trigger."
+ru-ru = "Включить указанный триггер."
 
 [trigger.enable.nameHelp]
 zh-cn = "触发器名称。"
 en-us = "Name of the trigger to enable."
+ru-ru = "Имя включаемого триггера."
 
 [trigger.run.description]
 zh-cn = "运行触发器线程。"
 en-us = "Run the trigger thread."
+ru-ru = "Запустить поток триггеров."
 
 [trigger.stop.description]
 zh-cn = "停止触发器线程。"
 en-us = "Stop running the trigger thread."
+ru-ru = "Остановить поток триггеров."
 
 [trigger.set.description]
 zh-cn = "设置触发器属性。"
 en-us = "Set the attribute of a trigger."
+ru-ru = "Изменить атрибут триггера."
 
 [trigger.set.nameHelp]
 zh-cn = "触发器名称。"
 en-us = "Name of the trigger to set the attribute of."
+ru-ru = "Имя триггера."
 
 [trigger.set.attrHelp]
 zh-cn = "属性名称。"
 en-us = "Name of the attribute to set."
+ru-ru = "Имя атрибута."
 
 [trigger.set.typeHelp]
 zh-cn = "属性类型。"
 en-us = "Type of the attribute to set."
+ru-ru = "Тип атрибута."
 
 [trigger.set.valueHelp]
 zh-cn = "属性值。"
 en-us = "Value of the attribute to set."
-
+ru-ru = "Значение атрибута."
 
 [config.fileNotFound]
 zh-cn = "找不到文件：'{path}'"
 en-us = "Could not find config file: '{path}'"
+ru-ru = "Файл конфигурации не найден: «{path}»."
 
 [config.parseError]
 zh-cn = "解析文件 '{path}' 失败：{error}"
 en-us = "Failed to parse config file '{path}': {error}"
+ru-ru = "Не удалось прочитать конфигурацию «{path}»: {error}"
 
 [config.exception]
 zh-cn = "加载文件 '{path}' 时发生错误：{error}"
 en-us = "An error occurred while loading config file '{path}': {error}"
+ru-ru = "Ошибка загрузки конфигурации «{path}»: {error}"
+
+[task.retryPreparing]
+zh-cn = "任务失败，准备重试 ({current}/{max_retries})..."
+en-us = "Task failed, preparing to retry ({current}/{max_retries})..."
+ru-ru = "Задача завершилась с ошибкой. Подготовка к повтору ({current}/{max_retries})…"
+
+[task.killingGameProcess]
+zh-cn = "正在终止游戏进程..."
+en-us = "Terminating game process..."
+ru-ru = "Завершение процесса игры…"
+
+[task.gameProcessKilled]
+zh-cn = "游戏进程已终止"
+en-us = "Game process terminated"
+ru-ru = "Процесс игры завершён"
+
+[task.waitingForRetry]
+zh-cn = "等待 {seconds} 秒后重试..."
+en-us = "Waiting {seconds} seconds before retry..."
+ru-ru = "Ожидание перед повтором: {seconds} с…"
+
+[task.retryFromConfig]
+zh-cn = "将从当前配置 [{config_name}] 重新开始执行"
+en-us = "Will restart from config [{config_name}]"
+ru-ru = "Повтор начнётся с конфигурации [{config_name}]"

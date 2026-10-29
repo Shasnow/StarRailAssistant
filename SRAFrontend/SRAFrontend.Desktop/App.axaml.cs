@@ -31,9 +31,9 @@ public class App : Application
         settingsService.Load();
         serviceProvider.GetRequiredService<CacheService>().Load();
         serviceProvider.GetRequiredService<ConfigService>().Load();
-        Localization.Resources.Culture =
-            new CultureInfo(
-                settingsService.Settings.Display.Language == 0 ? "zh-CN" : "en-US");
+        Localization.UiText.ApplyCulture(settingsService.Settings.Display.Language);
+        SukiUI.SukiTheme.GetInstance().Locale = Localization.UiText.CultureFor(settingsService.Settings.Display.Language).Name;
+        global::SRAFrontend.Desktop.Styles.RussianTypography.Apply(this, settingsService.Settings.Display.Language);
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 

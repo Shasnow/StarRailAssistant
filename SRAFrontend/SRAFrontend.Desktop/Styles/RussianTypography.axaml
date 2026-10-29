@@ -1,0 +1,17 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Quicksand in the upstream theme has no Cyrillic glyphs. Keep the
+         original sizes and weights, but avoid mixed Latin/Cyrillic faces.
+         Explicit local console fonts and Phosphor icon styles take precedence. -->
+    <Style Selector="TextBlock:not(.Icon), :is(TemplatedControl):not(.Icon)">
+        <Setter Property="TextElement.FontFamily" Value="Segoe UI,Microsoft YaHei UI,Microsoft YaHei,SimSun,MS Gothic" />
+    </Style>
+    <!-- Label 模板中的 AccessText 也需要换行。 -->
+    <Style Selector=":is(TextBlock)">
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <!-- 为新字体的控制台筛选标签保留完整行高。 -->
+    <Style Selector="ToggleButton">
+        <Setter Property="MinHeight" Value="24" />
+    </Style>
+</Styles>

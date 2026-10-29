@@ -1,8 +1,8 @@
 <template>
-  <PanelCard title="配置选择">
+  <PanelCard :title="t('W0044')">
     <div class="config-form">
       <!-- 运行中锁定配置，避免运行时切换方案 -->
-      <el-select :model-value="modelValue" class="config-select" placeholder="选择运行配置" :disabled="running"
+      <el-select :model-value="modelValue" class="config-select" :placeholder="t('W0045')" :disabled="running"
         :loading="loading" @update:model-value="$emit('update:modelValue', $event)">
         <el-option v-for="c in configs" :key="c" :label="c" :value="c" />
       </el-select>
@@ -10,28 +10,28 @@
       <!-- 列表加载失败：错误提示 + 重试 -->
       <div v-if="error" class="config-error" role="alert">
         <span class="error-text">{{ error }}</span>
-        <el-button size="small" text type="primary" @click="$emit('retry')">重试</el-button>
+        <el-button size="small" text type="primary" @click="$emit('retry')">{{ t('W0019') }}</el-button>
       </div>
 
       <!-- 配置管理：新建（弹窗输入名称）/ 删除（二次确认）当前选中配置 -->
       <div class="manage">
         <el-button type="primary" plain :icon="Plus" class="manage-btn" :disabled="running || saving" @click="onCreate">
-          新建
+          {{ t('W0046') }}
         </el-button>
         <el-button type="danger" plain :icon="Delete" class="manage-btn" :disabled="running || saving || !modelValue"
           @click="onRemove">
-          删除
+          {{ t('W0043') }}
         </el-button>
       </div>
 
       <div class="actions">
         <el-button type="success" :icon="VideoPlay" class="action-btn" :disabled="running || busy"
           @click="$emit('start')">
-          启动
+          {{ t('W0047') }}
         </el-button>
         <el-button type="danger" :icon="VideoPause" class="action-btn" :disabled="!running || busy"
           @click="$emit('stop')">
-          停止
+          {{ t('W0029') }}
         </el-button>
       </div>
     </div>
@@ -39,6 +39,8 @@
 </template>
 
 <script setup lang="ts">
+import { t, tf } from '@/i18n'
+
 import { ElMessageBox } from 'element-plus'
 import { Delete, Plus, VideoPause, VideoPlay } from '@element-plus/icons-vue'
 import PanelCard from './PanelCard.vue'
@@ -75,11 +77,11 @@ const emit = defineEmits<{
 /** 新建：弹窗收集配置名，确认后向上派发（名称合法性 / 重名由后端校验） */
 async function onCreate() {
   try {
-    const { value } = await ElMessageBox.prompt('请输入新的配置名称', '新建配置', {
-      confirmButtonText: '创建',
-      cancelButtonText: '取消',
+    const { value } = await ElMessageBox.prompt(t('W0037'), t('W0038'), {
+      confirmButtonText: t('W0039'),
+      cancelButtonText: t('W0024'),
       inputPattern: /\S/,
-      inputErrorMessage: '配置名不能为空',
+      inputErrorMessage: t('W0040'),
     })
     const name = value.trim()
     if (name) emit('create', name)
@@ -91,9 +93,9 @@ async function onCreate() {
 /** 删除当前选中配置：危险操作，二次确认后向上派发 */
 async function onRemove() {
   try {
-    await ElMessageBox.confirm(`确定删除配置「${props.modelValue}」？该操作不可恢复。`, '删除配置', {
-      confirmButtonText: '删除',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(tf('W0041', props.modelValue), t('W0042'), {
+      confirmButtonText: t('W0043'),
+      cancelButtonText: t('W0024'),
       type: 'warning',
     })
   } catch {

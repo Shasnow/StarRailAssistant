@@ -15,7 +15,7 @@ class Localization:
     """Automatically generated localization class."""
     __normalized_data: dict[str, str] = None
     lang: str = "zh-cn"
-    __available_languages = ['zh-cn', 'en-us']
+    __available_languages = ['zh-cn', 'en-us', 'ru-ru']
     __data_loaded: bool = False
 
     def __init__(self):
