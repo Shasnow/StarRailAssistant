@@ -28,6 +28,7 @@
     "marked": "^18.0.13",
     "pinia": "^4.0.3",
     "vue": "^3.5.42",
+    "vue-i18n": "^11.4.16",
     "vue-router": "^5.3.1"
   },
   "devDependencies": {

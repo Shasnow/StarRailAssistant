@@ -4,10 +4,12 @@ import { useRoute } from 'vue-router'
 import NavBar from './components/NavBar.vue'
 import HeroSection from './components/HeroSection.vue'
 import FooterSection from './components/FooterSection.vue'
-import { locale } from './i18n'
+import { useI18n } from 'vue-i18n'
 import ruLocale from 'element-plus/es/locale/lang/ru'
 import enLocale from 'element-plus/es/locale/lang/en'
 import zhLocale from 'element-plus/es/locale/lang/zh-cn'
+
+const { locale } = useI18n()
 const componentLocale = computed(() => locale.value === 'ru-RU' ? ruLocale : locale.value === 'en-US' ? enLocale : zhLocale)
 
 // 全屏独立页（登录页）：不渲染导航栏 / Hero / 页脚

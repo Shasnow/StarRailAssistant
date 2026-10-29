@@ -1,4 +1,4 @@
-import { t, tf } from '@/i18n'
+import { i18n } from '@/locales'
 /**
  * /api/Operator 实时画面服务模块（对应 OpenAPI OperatorController）：
  * - GET /api/Operator/screenshot → 200 image/png 原始字节（不走 R<T> 包装，直接二进制）
@@ -23,8 +23,8 @@ export async function fetchScreenshot(signal?: AbortSignal, cacheBust?: number):
   }
   const url = cacheBust ? `${SCREENSHOT_URL}?t=${cacheBust}` : SCREENSHOT_URL
   const res = await fetch(url, { signal })
-  if (!res.ok) throw new Error(tf('W0015', res.status))
+  if (!res.ok) throw new Error(i18n.global.t('live.screenshotFailed', [res.status]))
   const blob = await res.blob()
-  if (!blob.type.startsWith('image/')) throw new Error(t('W0016'))
+  if (!blob.type.startsWith('image/')) throw new Error(i18n.global.t('live.screenshotNotImage'))
   return blob
 }

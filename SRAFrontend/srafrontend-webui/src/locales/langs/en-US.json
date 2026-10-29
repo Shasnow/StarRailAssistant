@@ -1,0 +1,239 @@
+{
+  "about": {
+    "projectInfo": "Project information",
+    "viewOnGithub": "View {0} on GitHub"
+  },
+  "announcement": {
+    "empty": "No announcements",
+    "loadFailed": "Could not load announcements",
+    "title": "Announcements"
+  },
+  "app": {
+    "description": "Web console for the Honkai: Star Rail automation assistant"
+  },
+  "auth": {
+    "invalidToken": "Invalid access token. Check it and try again"
+  },
+  "backend": {
+    "controlHint": "Restarting interrupts running tasks. After stopping, logs and live view disconnect until the backend is restarted manually.",
+    "controlTitle": "Backend controls",
+    "restart": "Restart",
+    "restartConfirm": "Restart the backend? Running tasks will be interrupted.",
+    "restartFailed": "Could not restart the backend",
+    "restartSent": "Restart command sent",
+    "restartTitle": "Restart backend",
+    "stop": "Stop",
+    "stopConfirm": "Stop the backend? You will need to restart it manually.",
+    "stopFailed": "Could not stop the backend",
+    "stopSent": "Stop command sent",
+    "stopTitle": "Stop backend"
+  },
+  "buildEnv": {
+    "fromPackageManager": "From packageManager declaration",
+    "required": "Requires {0}",
+    "title": "Build environment"
+  },
+  "common": {
+    "add": "Add",
+    "cancel": "Cancel",
+    "clear": "Clear",
+    "delete": "Delete",
+    "reset": "Reset",
+    "retry": "Retry",
+    "unsaved": "Unsaved changes"
+  },
+  "config": {
+    "create": "Create",
+    "createFailed": "Could not create configuration",
+    "createTitle": "New configuration",
+    "created": "Configuration “{0}” created",
+    "current": "Current configuration: {0}",
+    "deleteConfirm": "Delete configuration “{0}”? This cannot be undone.",
+    "deleteFailed": "Could not delete configuration",
+    "deleteTitle": "Delete configuration",
+    "deleted": "Configuration “{0}” deleted",
+    "discardChanges": "Discard changes",
+    "nameRequired": "Configuration name cannot be empty",
+    "new": "New",
+    "newNamePrompt": "Enter a new configuration name",
+    "noneSelected": "No configuration selected",
+    "run": "Run",
+    "save": "Save configuration",
+    "saveAndSwitch": "Save and switch",
+    "saveFailed": "Could not save",
+    "saved": "Configuration saved",
+    "selectFirst": "Select a configuration first",
+    "selectPlaceholder": "Select a configuration",
+    "selectTitle": "Configuration",
+    "tasksTitle": "Task configuration",
+    "unsavedSwitchConfirm": "Configuration “{0}” has unsaved changes. Save before switching?",
+    "unsavedTitle": "Unsaved changes"
+  },
+  "github": {
+    "fetchFailed": "Live information unavailable. Showing local data"
+  },
+  "hero": {
+    "scrollToContent": "Scroll to content",
+    "tagline1": "Modern, lightweight Vue 3 application, ready to use",
+    "tagline2": "Clean interface and a great development experience",
+    "tagline3": "Built with Vue 3, TypeScript and Vite"
+  },
+  "http": {
+    "badRequest": "Invalid request parameters",
+    "canceled": "Request canceled",
+    "conflict": "Resource already exists or state conflict",
+    "forbidden": "Access denied",
+    "networkError": "Network error: cannot connect to the backend",
+    "notFound": "Resource not found",
+    "requestFailed": "Request failed",
+    "serverError": "Internal server error",
+    "statusFailed": "Request failed (HTTP {0})",
+    "timeout": "Request timed out. Check the backend service",
+    "unauthorized": "Authentication required",
+    "unavailable": "Service unavailable. Try again later",
+    "validationFailed": "Request validation failed"
+  },
+  "live": {
+    "fetching": "Fetching image…",
+    "framesUnit": "frames",
+    "interval": "Refresh interval",
+    "interval10s": "10 s",
+    "interval1s": "1 s",
+    "interval2s": "2 s",
+    "interval5s": "5 s",
+    "intervalHalfSecond": "0.5 s",
+    "lastUpdated": "Last update:",
+    "notStarted": "Live view is not running",
+    "receivedSuffix": "· Received:",
+    "screenshotFailed": "Screenshot request failed (HTTP {0})",
+    "screenshotNotImage": "Screenshot endpoint returned non-image content",
+    "start": "Start live view",
+    "title": "Live view",
+    "waiting": "Waiting for image data"
+  },
+  "log": {
+    "backToBottom": "↓ Back to bottom (automatic scrolling paused)",
+    "bufferLimit": "Memory / local cache limit",
+    "clearConfirm": "Clear the current logs and local cache?",
+    "clearTitle": "Clear logs",
+    "cleared": "Logs cleared",
+    "connected": "Connected",
+    "connecting": "Connecting",
+    "connectingService": "Connecting to log service…",
+    "copied": "Copied to clipboard",
+    "copiedCount": "Copied {0} log entries",
+    "copyEntry": "Copy this entry",
+    "copyFailed": "Could not copy",
+    "copyFiltered": "Copy all",
+    "copyFilteredAria": "Copy filtered entries",
+    "countUnit": "entries",
+    "decreaseFont": "Decrease font size",
+    "disconnected": "Disconnected",
+    "disconnectedHint": "Disconnected. Click the toolbar refresh button to reconnect",
+    "empty": "No logs yet. Waiting for the service…",
+    "emptyFiltered": "No entries match the current filter",
+    "export": "Export logs",
+    "exportText": "Export as text file",
+    "exportedCount": "Exported {0} log entries",
+    "fontSize": "Font size",
+    "increaseFont": "Increase font size",
+    "levelFilter": "Log level filter",
+    "loadEarlierPrefix": "↑ Load earlier entries (remaining:",
+    "loadEarlierSuffix": ")",
+    "nothingToCopy": "No matching log entries to copy",
+    "nothingToExport": "No matching log entries to export",
+    "reconnectButton": "Reconnect",
+    "reconnectExhausted": "Disconnected after {0} failed reconnection attempts. Check the backend and reconnect manually",
+    "reconnectTooltip": "Reconnect",
+    "reconnecting": "Reconnecting",
+    "reconnectingService": "Reconnecting to log service…",
+    "scrollHint": "entries · Scroll up to pause automatic scrolling",
+    "searchPlaceholder": "Search logs…",
+    "showSuffix": "· Showing:",
+    "title": "System logs",
+    "totalPrefix": "Total:"
+  },
+  "login": {
+    "authHint": "Authentication is enabled. Enter an access token to continue",
+    "authNote": "Find the access token in your backend service configuration",
+    "demoHint": "Demo mode: enter any access token",
+    "demoNote": "Demo mode accepts any nonempty token",
+    "failed": "Authentication failed. Try again later",
+    "submit": "Enter",
+    "success": "Authentication successful",
+    "tokenNoSpaces": "Access token must not contain spaces",
+    "tokenPlaceholder": "Enter access token",
+    "tokenRequired": "Enter an access token",
+    "tokenTooLong": "Access token must not exceed 512 characters",
+    "verifying": "Verifying…"
+  },
+  "nav": {
+    "demoBadge": "Demo mode",
+    "language": "Language",
+    "toDark": "Switch to dark mode",
+    "toLight": "Switch to light mode",
+    "toggleMenu": "Toggle menu"
+  },
+  "route": {
+    "about": "About",
+    "home": "Home",
+    "login": "Sign in",
+    "logs": "Logs",
+    "settings": "Settings"
+  },
+  "schema": {
+    "emptyItems": "No entries. Click “Add” to create one",
+    "entry": "Entry",
+    "fieldCountUnit": "entries",
+    "invalidInteger": "Enter a valid integer, e.g. 0, 3 or -5",
+    "invalidPattern": "Invalid format. Must match {0}",
+    "openApiLoadFailed": "Could not load OpenAPI specification",
+    "valueLabel": "Value"
+  },
+  "settings": {
+    "loadFailed": "Could not load settings",
+    "navAria": "Navigate to setting",
+    "navTitle": "Settings navigation",
+    "notLoaded": "Settings not loaded yet",
+    "save": "Save settings",
+    "saveFailed": "Could not save settings",
+    "saved": "Settings saved",
+    "schemaMissing": "AppSettings definition missing from OpenAPI specification",
+    "unsavedChanges": "Unsaved changes: {0}",
+    "upToDate": "Settings are up to date",
+    "updated": "Updated {0} settings"
+  },
+  "status": {
+    "completed": "Completed",
+    "configs": "Run configuration",
+    "current": "Current status",
+    "failed": "Failed",
+    "idle": "Idle",
+    "mode": "Run mode",
+    "pid": "Process PID",
+    "progress": "Progress",
+    "running": "Running",
+    "sessionId": "Session ID",
+    "stopped": "Stopped",
+    "title": "Execution status",
+    "unit": "Current task"
+  },
+  "system": {
+    "backendVersion": "Backend version",
+    "dotnetRuntime": ".NET runtime",
+    "frontendVersion": "Frontend version",
+    "os": "Operating system",
+    "title": "System information"
+  },
+  "task": {
+    "startFailed": "Could not start tasks",
+    "started": "Tasks started",
+    "stopFailed": "Could not stop tasks",
+    "stopSent": "Stop command sent"
+  },
+  "theme": {
+    "adjustHue": "Adjust theme hue",
+    "hue": "Theme hue",
+    "presetHue": "Preset hue {0}°"
+  }
+}

@@ -30,7 +30,7 @@
     </div>
 
     <!-- 下滚指示器 -->
-    <button class="scroll-indicator" type="button" :aria-label="t('W0053')" @click="scrollToContent">
+    <button class="scroll-indicator" type="button" :aria-label="t('hero.scrollToContent')" @click="scrollToContent">
       <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.4"
         stroke-linecap="round" stroke-linejoin="round">
         <path d="m6 9 6 6 6-6" />
@@ -40,11 +40,14 @@
 </template>
 
 <script setup lang="ts">
-import { t, tr } from '@/i18n'
+import { useI18n } from 'vue-i18n'
+import { tr } from '@/locales'
 
 import siteConfig from '@/configs/siteConfig'
 import { fetchPhrases } from '@/api/app'
 import { onMounted, onUnmounted, ref } from 'vue'
+
+const { t } = useI18n()
 
 // 后端背景图加载失败时隐藏 <img>，露出 .hero 的兜底渐变
 const bgFailed = ref(false)
@@ -68,9 +71,9 @@ function scrollToContent() {
 /* ---------- 副标题打字机 + 轮换 ---------- */
 // 内置回退文案：后端 /api/App/phrases 不可用或返回空时使用
 const FALLBACK_PHRASES = [
-  t('W0050'),
-  t('W0051'),
-  t('W0052'),
+  t('hero.tagline1'),
+  t('hero.tagline2'),
+  t('hero.tagline3'),
 ]
 
 // 文案由后端下发，接口失败时保持回退值

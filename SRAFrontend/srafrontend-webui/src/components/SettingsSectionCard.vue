@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { tr } from '@/i18n'
+import { tr } from '@/locales/index.ts'
 import { computed } from 'vue'
 import PanelCard from './PanelCard.vue'
 import SchemaForm from './SchemaForm.vue'

@@ -1,15 +1,15 @@
 <template>
-  <PanelCard :title="t('W0032')">
+  <PanelCard :title="t('backend.controlTitle')">
     <div class="backend-control">
-      <p class="hint">{{ t('W0033') }}</p>
+      <p class="hint">{{ t('backend.controlHint') }}</p>
       <div class="actions">
         <el-button type="warning" plain :icon="RefreshRight" class="control-btn" :loading="busy === 'restart'"
           :disabled="busy === 'stop'" @click="onRestart">
-          {{ t('W0022') }}
+          {{ t('backend.restartTitle') }}
         </el-button>
         <el-button type="danger" plain :icon="SwitchButton" class="control-btn" :loading="busy === 'stop'"
           :disabled="busy === 'restart'" @click="onStop">
-          {{ t('W0028') }}
+          {{ t('backend.stopTitle') }}
         </el-button>
       </div>
     </div>
@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { t } from '@/i18n'
+import { useI18n } from 'vue-i18n'
 
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { RefreshRight, SwitchButton } from '@element-plus/icons-vue'
@@ -25,15 +25,17 @@ import { ref } from 'vue'
 import PanelCard from './PanelCard.vue'
 import { restartBackend, stopBackend } from '@/api/backend'
 
+const { t } = useI18n()
+
 /** 当前进行中的操作，用于按钮 loading / 互斥禁用 */
 const busy = ref<'' | 'restart' | 'stop'>('')
 
 /** 重启后端：危险操作，二次确认后调用 /api/Backend/restart */
 async function onRestart() {
   try {
-    await ElMessageBox.confirm(t('W0021'), t('W0022'), {
-      confirmButtonText: t('W0023'),
-      cancelButtonText: t('W0024'),
+    await ElMessageBox.confirm(t('backend.restartConfirm'), t('backend.restartTitle'), {
+      confirmButtonText: t('backend.restart'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning',
     })
   } catch {
@@ -42,9 +44,9 @@ async function onRestart() {
   busy.value = 'restart'
   try {
     const message = await restartBackend()
-    ElMessage.success(message || t('W0025'))
+    ElMessage.success(message || t('backend.restartSent'))
   } catch (err) {
-    ElMessage.error(err instanceof Error ? err.message : t('W0026'))
+    ElMessage.error(err instanceof Error ? err.message : t('backend.restartFailed'))
   } finally {
     busy.value = ''
   }
@@ -53,9 +55,9 @@ async function onRestart() {
 /** 停止后端：危险操作，二次确认后调用 /api/Backend/stop */
 async function onStop() {
   try {
-    await ElMessageBox.confirm(t('W0027'), t('W0028'), {
-      confirmButtonText: t('W0029'),
-      cancelButtonText: t('W0024'),
+    await ElMessageBox.confirm(t('backend.stopConfirm'), t('backend.stopTitle'), {
+      confirmButtonText: t('backend.stop'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning',
     })
   } catch {
@@ -64,9 +66,9 @@ async function onStop() {
   busy.value = 'stop'
   try {
     const message = await stopBackend()
-    ElMessage.success(message || t('W0030'))
+    ElMessage.success(message || t('backend.stopSent'))
   } catch (err) {
-    ElMessage.error(err instanceof Error ? err.message : t('W0031'))
+    ElMessage.error(err instanceof Error ? err.message : t('backend.stopFailed'))
   } finally {
     busy.value = ''
   }

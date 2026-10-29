@@ -1,4 +1,4 @@
-import { t } from '@/i18n'
+import { i18n } from '@/locales'
 import { ApiError, http, statusMessage } from './http'
 import type { ApiEnvelope } from './http'
 
@@ -28,6 +28,6 @@ export async function verifyToken(token: string): Promise<void> {
   })
 
   if (response.status === 200) return
-  if (response.status === 401) throw new ApiError(t('W0001'), 401)
+  if (response.status === 401) throw new ApiError(i18n.global.t('auth.invalidToken'), 401)
   throw new ApiError(statusMessage(response.status), response.status)
 }

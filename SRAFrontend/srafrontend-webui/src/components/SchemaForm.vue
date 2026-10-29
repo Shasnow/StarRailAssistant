@@ -6,7 +6,7 @@
         <!-- 组标题条：仅前缀分组渲染，平铺字段无标题 -->
         <div v-if="section.prefix !== null" class="field-group-head">
           <span class="field-group-title">{{ tr(groupTitle(section.prefix)) }}</span>
-          <span class="field-group-count">{{ section.fields.length }} {{ t('W0076') }}</span>
+          <span class="field-group-count">{{ section.fields.length }} {{ t('schema.fieldCountUnit') }}</span>
         </div>
 
         <template v-for="[key, node] in section.fields" :key="key">
@@ -37,18 +37,21 @@
   </div>
 
   <!-- 叶子 schema：name / version 这类标量标签页直接渲染单控件 -->
-  <SchemaField v-else :field-key="fieldKey" :description="label ?? t('W0077')" :node="schema" :doc="doc" :model-value="model"
+  <SchemaField v-else :field-key="fieldKey" :description="label ?? t('schema.valueLabel')" :node="schema" :doc="doc" :model-value="model"
     :dirty="isSelfDirty" @update:model-value="model = $event" />
 </template>
 
 <script setup lang="ts">
-import { t, tr } from '@/i18n'
+import { useI18n } from 'vue-i18n'
+import { tr } from '@/locales/index.ts'
 
 import { computed } from 'vue'
 import type { OpenApiDocument, SchemaNode } from '@/utils/schemaForm'
 import { fieldKind, resolveNode, stableStringify } from '@/utils/schemaForm'
 import SchemaArrayEditor from './SchemaArrayEditor.vue'
 import SchemaField from './SchemaField.vue'
+
+const { t } = useI18n()
 
 // 递归 schema 表单：对象渲染字段集合，数组支持增删条目，$ref 由 resolveNode 解析
 defineOptions({ name: 'SchemaForm' })

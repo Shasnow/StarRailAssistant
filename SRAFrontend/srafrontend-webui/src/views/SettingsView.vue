@@ -7,9 +7,9 @@
 
     <!-- schema 加载失败：可重试 -->
     <div v-else-if="errorMsg" class="page-state">
-      <el-empty :description="t('W0191')" :image-size="72">
+      <el-empty :description="t('settings.loadFailed')" :image-size="72">
         <div class="error-detail">{{ errorMsg }}</div>
-        <el-button type="primary" @click="load">{{ t('W0019') }}</el-button>
+        <el-button type="primary" @click="load">{{ t('common.retry') }}</el-button>
       </el-empty>
     </div>
 
@@ -22,7 +22,7 @@
       <section class="content-col">
         <!-- 后端设置读取失败：不阻塞表单展示（仅展示 schema 默认值），可重试 -->
         <el-alert v-if="settingsError" class="settings-alert" type="error" :title="settingsError" :closable="false">
-          <el-button size="small" @click="loadSettings">{{ t('W0019') }}</el-button>
+          <el-button size="small" @click="loadSettings">{{ t('common.retry') }}</el-button>
         </el-alert>
 
         <!-- 每个 section 一张卡片，字段挂 data-anchor 供导航定位 -->
@@ -34,7 +34,7 @@
         <div class="settings-footer">
           <span class="footer-hint">{{ footerHint }}</span>
           <el-button type="primary" size="small" :disabled="!isDirty" :loading="saving" @click="save">
-            {{ t('W0192') }}
+            {{ t('settings.save') }}
           </el-button>
         </div>
       </section>
@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { t, tf } from '@/i18n'
+import { useI18n } from 'vue-i18n'
 
 import { ElMessage } from 'element-plus'
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
@@ -55,6 +55,8 @@ import type { NavSection } from '@/components/SettingsNavCard.vue'
 import SettingsSectionCard from '@/components/SettingsSectionCard.vue'
 import type { OpenApiDocument, SchemaNode } from '@/utils/schemaForm'
 import { buildDefaultModel, resolveNode, stableStringify } from '@/utils/schemaForm'
+
+const { t } = useI18n()
 
 /** AppSettings 在 OpenAPI 规范中的引用路径 */
 const SETTINGS_REF = '#/components/schemas/AppSettings'
@@ -115,10 +117,10 @@ const dirtyKeys = computed<Set<string>>(() => {
 const isDirty = computed(() => dirtyKeys.value.size > 0)
 
 const footerHint = computed(() => {
-  if (!baseline.value) return t('W0184')
-  if (!isDirty.value) return t('W0185')
+  if (!baseline.value) return t('settings.notLoaded')
+  if (!isDirty.value) return t('settings.upToDate')
   const labels = sections.value.filter((s) => dirtyKeys.value.has(s.key)).map((s) => s.label)
-  return tf('W0186', labels.join('、'))
+  return t('settings.unsavedChanges', [labels.join('、')])
 })
 
 /* ---------- 滚动联动：点击导航定位 + 滚动时反向高亮导航项 ---------- */
@@ -161,7 +163,7 @@ async function load() {
     const spec = await fetchOpenApiSpec()
     const root = resolveNode(spec, { $ref: SETTINGS_REF })
     const entries = Object.entries(root.properties ?? {})
-    if (!entries.length) throw new Error(t('W0187'))
+    if (!entries.length) throw new Error(t('settings.schemaMissing'))
 
     for (const key of Object.keys(model)) delete model[key]
     for (const [key, node] of entries) {
@@ -209,9 +211,9 @@ async function save() {
   try {
     const updated = await updateSettings(partial)
     baseline.value = stableStringify(model)
-    ElMessage.success(updated.length ? tf('W0188', updated.length) : t('W0189'))
+    ElMessage.success(updated.length ? t('settings.updated', [updated.length]) : t('settings.saved'))
   } catch (err) {
-    ElMessage.error(err instanceof Error ? err.message : t('W0190'))
+    ElMessage.error(err instanceof Error ? err.message : t('settings.saveFailed'))
   } finally {
     saving.value = false
   }

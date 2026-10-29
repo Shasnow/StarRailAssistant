@@ -9,6 +9,7 @@
 **/.vs/
 **/.idea/
 **/.workbuddy/
+**/output/
 
 # .NET 构建输出
 **/bin/

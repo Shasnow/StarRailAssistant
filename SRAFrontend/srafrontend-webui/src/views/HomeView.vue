@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { t, tf } from '@/i18n'
+import { useI18n } from 'vue-i18n'
 
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { computed, onMounted, ref } from 'vue'
@@ -32,6 +32,8 @@ import StatusCard from '@/components/StatusCard.vue'
 import TasksConfigPanel from '@/components/TasksConfigPanel.vue'
 import { useTaskRunner } from '@/composables/useTaskRunner'
 import { useConfigsStore } from '@/stores/configs'
+
+const { t } = useI18n()
 
 // 配置列表来自后端 /api/Configs；选中名由 store 持久化到 localStorage
 const configsStore = useConfigsStore()
@@ -61,11 +63,11 @@ async function handleConfigChange(next: string) {
   if (panel?.isDirty) {
     try {
       await ElMessageBox.confirm(
-        tf('W0119', selectedConfig.value),
-        t('W0120'),
+        t('config.unsavedSwitchConfirm', [selectedConfig.value]),
+        t('config.unsavedTitle'),
         {
-          confirmButtonText: t('W0121'),
-          cancelButtonText: t('W0122'),
+          confirmButtonText: t('config.saveAndSwitch'),
+          cancelButtonText: t('config.discardChanges'),
           distinguishCancelAndClose: true,
           type: 'warning',
         },
@@ -83,20 +85,20 @@ async function handleConfigChange(next: string) {
 /** 新建配置：成功后切换到新配置（复用切换流程，保留未保存更改检查） */
 async function handleConfigCreate(name: string) {
   if (!(await configsStore.createConfig(name))) {
-    ElMessage.error(configsStore.saveError || t('W0123'))
+    ElMessage.error(configsStore.saveError || t('config.createFailed'))
     return
   }
-  ElMessage.success(tf('W0124', name))
+  ElMessage.success(t('config.created', [name]))
   await handleConfigChange(name)
 }
 
 /** 删除配置：删除的是当前配置时回退选中第一个剩余配置 */
 async function handleConfigRemove(name: string) {
   if (!(await configsStore.removeConfig(name))) {
-    ElMessage.error(configsStore.saveError || t('W0125'))
+    ElMessage.error(configsStore.saveError || t('config.deleteFailed'))
     return
   }
-  ElMessage.success(tf('W0126', name))
+  ElMessage.success(t('config.deleted', [name]))
   configsStore.normalizeSelection()
 }
 
@@ -110,14 +112,14 @@ onMounted(async () => {
 /** 启动任务：以当前选中配置运行，结果通过消息提示 */
 async function handleStart() {
   if (!selectedConfig.value) {
-    ElMessage.warning(t('W0127'))
+    ElMessage.warning(t('config.selectFirst'))
     return
   }
   try {
     await task.start(selectedConfig.value)
-    ElMessage.success(t('W0128'))
+    ElMessage.success(t('task.started'))
   } catch (err) {
-    ElMessage.error(err instanceof Error ? err.message : t('W0129'))
+    ElMessage.error(err instanceof Error ? err.message : t('task.startFailed'))
   }
 }
 
@@ -125,9 +127,9 @@ async function handleStart() {
 async function handleStop() {
   try {
     await task.stop()
-    ElMessage.success(t('W0130'))
+    ElMessage.success(t('task.stopSent'))
   } catch (err) {
-    ElMessage.error(err instanceof Error ? err.message : t('W0131'))
+    ElMessage.error(err instanceof Error ? err.message : t('task.stopFailed'))
   }
 }
 </script>

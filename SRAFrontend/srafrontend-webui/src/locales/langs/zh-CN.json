@@ -1,0 +1,239 @@
+{
+  "about": {
+    "projectInfo": "项目信息",
+    "viewOnGithub": "在 GitHub 上查看 {0}"
+  },
+  "announcement": {
+    "empty": "暂无公告",
+    "loadFailed": "公告加载失败",
+    "title": "公告"
+  },
+  "app": {
+    "description": "基于 Web UI 的星穹铁道自动化助手控制台"
+  },
+  "auth": {
+    "invalidToken": "Access Token 无效，请检查后重试"
+  },
+  "backend": {
+    "controlHint": "重启会中断运行中的任务；停止后日志与实时画面将断开，需手动重启后端才能恢复。",
+    "controlTitle": "后端控制",
+    "restart": "重启",
+    "restartConfirm": "确定重启后端服务？运行中的任务将被中断。",
+    "restartFailed": "重启后端失败",
+    "restartSent": "重启指令已发送",
+    "restartTitle": "重启后端",
+    "stop": "停止",
+    "stopConfirm": "确定停止后端服务？停止后需手动重启才能恢复。",
+    "stopFailed": "停止后端失败",
+    "stopSent": "停止指令已发送",
+    "stopTitle": "停止后端"
+  },
+  "buildEnv": {
+    "fromPackageManager": "取自 packageManager 声明",
+    "required": "要求 {0}",
+    "title": "构建环境"
+  },
+  "common": {
+    "add": "添加",
+    "cancel": "取消",
+    "clear": "清除",
+    "delete": "删除",
+    "reset": "重置",
+    "retry": "重试",
+    "unsaved": "有未保存的更改"
+  },
+  "config": {
+    "create": "创建",
+    "createFailed": "新建配置失败",
+    "createTitle": "新建配置",
+    "created": "配置「{0}」已创建",
+    "current": "当前配置：{0}",
+    "deleteConfirm": "确定删除配置「{0}」？该操作不可恢复。",
+    "deleteFailed": "删除配置失败",
+    "deleteTitle": "删除配置",
+    "deleted": "配置「{0}」已删除",
+    "discardChanges": "放弃更改",
+    "nameRequired": "配置名不能为空",
+    "new": "新建",
+    "newNamePrompt": "请输入新的配置名称",
+    "noneSelected": "未选择配置",
+    "run": "启动",
+    "save": "保存配置",
+    "saveAndSwitch": "保存并切换",
+    "saveFailed": "保存失败",
+    "saved": "配置已保存",
+    "selectFirst": "请先选择运行配置",
+    "selectPlaceholder": "选择运行配置",
+    "selectTitle": "配置选择",
+    "tasksTitle": "任务配置",
+    "unsavedSwitchConfirm": "配置「{0}」有未保存的更改，切换前是否保存？",
+    "unsavedTitle": "未保存的更改"
+  },
+  "github": {
+    "fetchFailed": "实时信息获取失败，展示本地配置"
+  },
+  "hero": {
+    "scrollToContent": "滚动到内容区",
+    "tagline1": "现代化 · 轻量级 · 开箱即用的 Vue 3 应用",
+    "tagline2": "简洁优雅的 UI，极致的开发体验",
+    "tagline3": "基于 Vue 3 + TypeScript + Vite 构建"
+  },
+  "http": {
+    "badRequest": "请求参数无效",
+    "canceled": "请求已取消",
+    "conflict": "资源已存在或状态冲突",
+    "forbidden": "没有访问权限",
+    "networkError": "网络异常，无法连接到后端服务",
+    "notFound": "资源不存在",
+    "requestFailed": "请求失败",
+    "serverError": "服务器内部错误",
+    "statusFailed": "请求失败（HTTP {0}）",
+    "timeout": "请求超时，请检查后端服务是否可用",
+    "unauthorized": "未授权，请先完成认证",
+    "unavailable": "服务暂不可用，请稍后重试",
+    "validationFailed": "请求校验失败"
+  },
+  "live": {
+    "fetching": "正在获取画面…",
+    "framesUnit": "帧",
+    "interval": "轮询间隔",
+    "interval10s": "10 秒",
+    "interval1s": "1 秒",
+    "interval2s": "2 秒",
+    "interval5s": "5 秒",
+    "intervalHalfSecond": "0.5 秒",
+    "lastUpdated": "上次更新",
+    "notStarted": "实时查看未启动",
+    "receivedSuffix": "· 已接收",
+    "screenshotFailed": "截图请求失败（HTTP {0}）",
+    "screenshotNotImage": "截图接口返回了非图片内容",
+    "start": "启动实时查看",
+    "title": "实时画面",
+    "waiting": "等待画面数据"
+  },
+  "log": {
+    "backToBottom": "↓ 回到底部（自动滚动已暂停）",
+    "bufferLimit": "内存 / 本地缓存上限",
+    "clearConfirm": "将清空当前日志与本地缓存，确定继续？",
+    "clearTitle": "清除日志",
+    "cleared": "日志已清除",
+    "connected": "已连接",
+    "connecting": "连接中",
+    "connectingService": "正在连接日志服务…",
+    "copied": "已复制到剪贴板",
+    "copiedCount": "已复制 {0} 条日志",
+    "copyEntry": "复制该条日志",
+    "copyFailed": "复制失败",
+    "copyFiltered": "批量复制",
+    "copyFilteredAria": "复制当前筛选结果",
+    "countUnit": "条",
+    "decreaseFont": "减小字号",
+    "disconnected": "已断开",
+    "disconnectedHint": "连接已断开，请点击工具栏刷新按钮重连",
+    "empty": "暂无日志，等待服务推送…",
+    "emptyFiltered": "没有匹配当前筛选条件的日志",
+    "export": "导出日志",
+    "exportText": "导出为文本文件",
+    "exportedCount": "已导出 {0} 条日志",
+    "fontSize": "字体大小调整",
+    "increaseFont": "增大字号",
+    "levelFilter": "日志级别筛选",
+    "loadEarlierPrefix": "↑ 加载更早日志（剩余",
+    "loadEarlierSuffix": "条）",
+    "nothingToCopy": "当前筛选条件下没有可复制的日志",
+    "nothingToExport": "当前筛选条件下没有可导出的日志",
+    "reconnectButton": "重连",
+    "reconnectExhausted": "连接已断开：连续 {0} 次重连失败，请检查后端服务后手动重连",
+    "reconnectTooltip": "重新连接",
+    "reconnecting": "重连中",
+    "reconnectingService": "正在重连日志服务…",
+    "scrollHint": "条 · 向上滚动可暂停自动滚动",
+    "searchPlaceholder": "搜索日志…",
+    "showSuffix": "条 · 显示",
+    "title": "系统日志",
+    "totalPrefix": "共"
+  },
+  "login": {
+    "authHint": "该实例已启用访问认证，请输入 Access Token 继续",
+    "authNote": "请查看您的后端服务配置，获取 Access Token 后输入",
+    "demoHint": "演示模式：输入任意 Access Token 即可进入",
+    "demoNote": "演示环境不校验 Token 内容，任意非空文本均可通过",
+    "failed": "验证失败，请稍后重试",
+    "submit": "进入",
+    "success": "验证通过",
+    "tokenNoSpaces": "access token 不能包含空格",
+    "tokenPlaceholder": "请输入 Access Token",
+    "tokenRequired": "请输入 access token",
+    "tokenTooLong": "access token 长度不能超过 512 位",
+    "verifying": "正在验证…"
+  },
+  "nav": {
+    "demoBadge": "演示模式",
+    "language": "语言",
+    "toDark": "切换到深色模式",
+    "toLight": "切换到浅色模式",
+    "toggleMenu": "切换菜单"
+  },
+  "route": {
+    "about": "关于",
+    "home": "首页",
+    "login": "登录",
+    "logs": "日志",
+    "settings": "设置"
+  },
+  "schema": {
+    "emptyItems": "暂无条目，点击「添加」新增",
+    "entry": "条目",
+    "fieldCountUnit": "项",
+    "invalidInteger": "请输入有效整数（如 0、3、-5）",
+    "invalidPattern": "格式不正确，需匹配 {0}",
+    "openApiLoadFailed": "加载 OpenAPI 规范失败",
+    "valueLabel": "值"
+  },
+  "settings": {
+    "loadFailed": "加载设置项失败",
+    "navAria": "设置项导航",
+    "navTitle": "设置导航",
+    "notLoaded": "设置尚未加载",
+    "save": "保存设置",
+    "saveFailed": "保存设置失败",
+    "saved": "设置已保存",
+    "schemaMissing": "OpenAPI 规范中未找到 AppSettings 定义",
+    "unsavedChanges": "有未保存的更改：{0}",
+    "upToDate": "设置已是最新",
+    "updated": "已更新 {0} 项设置"
+  },
+  "status": {
+    "completed": "已完成",
+    "configs": "运行配置",
+    "current": "当前状态",
+    "failed": "失败",
+    "idle": "空闲",
+    "mode": "运行模式",
+    "pid": "进程 PID",
+    "progress": "进度",
+    "running": "运行中",
+    "sessionId": "会话 ID",
+    "stopped": "已停止",
+    "title": "运行状态",
+    "unit": "运行单元"
+  },
+  "system": {
+    "backendVersion": "后端版本",
+    "dotnetRuntime": ".NET 运行时",
+    "frontendVersion": "前端版本",
+    "os": "操作系统",
+    "title": "系统信息"
+  },
+  "task": {
+    "startFailed": "启动任务失败",
+    "started": "任务已启动",
+    "stopFailed": "停止任务失败",
+    "stopSent": "已发送停止指令"
+  },
+  "theme": {
+    "adjustHue": "调整主题色相",
+    "hue": "主题色相",
+    "presetHue": "预设色相 {0}°"
+  }
+}

@@ -3,7 +3,7 @@
     <div v-if="fieldKey || description" class="field-titles">
       <!-- 字段 key 总是作为主标签显示，方便对应后端配置字段；有未保存更改时在 key 旁标记圆点 -->
       <div v-if="fieldKey" class="field-label">
-        {{ tr(fieldKey) }}<span v-if="dirty" class="dirty-dot" :title="t('W0075')" />
+        {{ tr(fieldKey) }}<span v-if="dirty" class="dirty-dot" :title="t('common.unsaved')" />
       </div>
       <!-- description 作为辅助说明，以小字显示在 key 下方；截断时悬停 title 显示全文 -->
       <div v-if="description" class="field-desc" :title="tr(description)">{{ tr(description) }}</div>
@@ -29,11 +29,14 @@
 </template>
 
 <script setup lang="ts">
-import { t, tr } from '@/i18n'
+import { useI18n } from 'vue-i18n'
+import { tr } from '@/locales'
 
 import { computed, ref } from 'vue'
 import type { OpenApiDocument, SchemaNode } from '@/utils/schemaForm'
 import { fieldKind, isIntTextInput, resolveNode, validateValue } from '@/utils/schemaForm'
+
+const { t } = useI18n()
 
 // 单字段渲染：按 schema 类型选择控件，输入时实时校验并显示错误
 const props = defineProps<{

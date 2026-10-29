@@ -1,15 +1,15 @@
 <template>
-  <PanelCard :title="t('W0059')">
+  <PanelCard :title="t('live.title')">
     <div class="live-card">
       <!-- 画面区：恒深终端底（terminal-scope 固定深色寄存器），PNG 帧按比例缩放居中展示 -->
       <div class="live-screen terminal-scope">
-        <img v-if="frameUrl" :src="frameUrl" :alt="t('W0059')" class="live-img" />
+        <img v-if="frameUrl" :src="frameUrl" :alt="t('live.title')" class="live-img" />
         <div v-else class="live-placeholder">
           <template v-if="viewing">
             <span class="live-spinner" aria-hidden="true" />
-            <span>{{ t('W0060') }}</span>
+            <span>{{ t('live.fetching') }}</span>
           </template>
-          <template v-else>{{ t('W0061') }}</template>
+          <template v-else>{{ t('live.notStarted') }}</template>
         </div>
 
         <!-- LIVE 角标：轮询进行中时显示 -->
@@ -25,31 +25,31 @@
       <!-- 启动/停止实时查看 -->
       <div class="live-controls">
         <el-button type="success" :icon="VideoPlay" :disabled="viewing" @click="start">
-          {{ t('W0062') }}
+          {{ t('live.start') }}
         </el-button>
         <el-button type="danger" :icon="VideoPause" :disabled="!viewing" @click="stop">
-          {{ t('W0029') }}
+          {{ t('backend.stop') }}
         </el-button>
       </div>
 
       <!-- 轮询间隔调整：运行中修改立即按新间隔生效 -->
       <div class="live-settings">
-        <span class="live-label">{{ t('W0063') }}</span>
+        <span class="live-label">{{ t('live.interval') }}</span>
         <el-select v-model="intervalMs" size="small" class="interval-select">
           <el-option v-for="opt in INTERVAL_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
         </el-select>
       </div>
 
       <div class="live-meta">
-        <template v-if="frameUrl">{{ t('W0064') }} {{ lastUpdated }} {{ t('W0065') }} {{ frameCount }} {{ t('W0066') }}</template>
-        <template v-else>{{ t('W0067') }}</template>
+        <template v-if="frameUrl">{{ t('live.lastUpdated') }} {{ lastUpdated }} {{ t('live.receivedSuffix') }} {{ frameCount }} {{ t('live.framesUnit') }}</template>
+        <template v-else>{{ t('live.waiting') }}</template>
       </div>
     </div>
   </PanelCard>
 </template>
 
 <script setup lang="ts">
-import { t } from '@/i18n'
+import { useI18n } from 'vue-i18n'
 
 import { VideoPause, VideoPlay } from '@element-plus/icons-vue'
 import { useIntervalFn, useLocalStorage } from '@vueuse/core'
@@ -58,13 +58,15 @@ import { fetchScreenshot } from '@/api/live'
 import { formatTime } from '@/api/logs'
 import PanelCard from './PanelCard.vue'
 
+const { t } = useI18n()
+
 /** 可选轮询间隔 */
 const INTERVAL_OPTIONS = [
-  { label: t('W0054'), value: 500 },
-  { label: t('W0055'), value: 1000 },
-  { label: t('W0056'), value: 2000 },
-  { label: t('W0057'), value: 5000 },
-  { label: t('W0058'), value: 10000 },
+  { label: t('live.intervalHalfSecond'), value: 500 },
+  { label: t('live.interval1s'), value: 1000 },
+  { label: t('live.interval2s'), value: 2000 },
+  { label: t('live.interval5s'), value: 5000 },
+  { label: t('live.interval10s'), value: 10000 },
 ]
 
 const viewing = ref(false)

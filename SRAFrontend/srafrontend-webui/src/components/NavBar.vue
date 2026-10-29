@@ -19,11 +19,6 @@
 
       <!-- 右侧：用户状态 -->
       <div class="nav-right">
-        <select class="locale-select" :value="locale" aria-label="Language / Язык" @change="setLocale(($event.target as HTMLSelectElement).value)">
-          <option value="zh-CN">简体中文</option>
-          <option value="en-US">English</option>
-          <option value="ru-RU">Русский</option>
-        </select>
         <!-- 演示模式只读徽标（构建期确定，无切换交互） -->
         <span v-if="demoBadge" class="demo-badge">{{ demoBadge }}</span>
 
@@ -44,7 +39,7 @@
         <ThemeHuePicker />
 
         <!-- 深色模式切换 -->
-        <button class="theme-toggle" :aria-label="isDark ? t('W0069') : t('W0070')" @click="toggleTheme($event)">
+        <button class="theme-toggle" :aria-label="isDark ? t('nav.toLight') : t('nav.toDark')" @click="toggleTheme($event)">
           <svg v-if="isDark" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
             stroke-width="2" stroke-linecap="round">
             <circle cx="12" cy="12" r="4" />
@@ -58,7 +53,7 @@
         </button>
 
         <!-- 移动端汉堡按钮 -->
-        <button class="hamburger" :class="{ open: menuOpen }" :aria-label="t('W0071')" @click="menuOpen = !menuOpen">
+        <button class="hamburger" :class="{ open: menuOpen }" :aria-label="t('nav.toggleMenu')" @click="menuOpen = !menuOpen">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -78,7 +73,8 @@
 </template>
 
 <script lang="ts" setup>
-import { t, tr, locale, setLocale } from '@/i18n'
+import { useI18n } from 'vue-i18n'
+import { tr } from '@/locales'
 
 import { computed, nextTick, ref } from 'vue'
 import { useDark, useToggle, useWindowScroll } from '@vueuse/core'
@@ -86,10 +82,12 @@ import { useRouter } from 'vue-router'
 import siteConfig from '@/configs/siteConfig'
 import ThemeHuePicker from './ThemeHuePicker.vue'
 
+const { t } = useI18n()
+
 const router = useRouter()
 // 演示模式徽标文案：__IS_DEMO__ 为 define 注入的编译期常量，
 // 正式构建下三元被折叠为空串，分支与文案一并被消除
-const demoBadge = __IS_DEMO__ ? t('W0068') : ''
+const demoBadge = __IS_DEMO__ ? t('nav.demoBadge') : ''
 const status = ref('online')
 const menuOpen = ref(false)
 
@@ -501,11 +499,6 @@ html.dark .nav-bar {
   .nav-right {
     flex-shrink: 0;
     gap: 6px;
-  }
-
-  .locale-select {
-    max-width: 104px;
-    min-width: 0;
   }
 
   .user-info {

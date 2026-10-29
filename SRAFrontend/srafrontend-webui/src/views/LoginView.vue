@@ -16,7 +16,7 @@
         @submit.prevent="handleSubmit">
         <el-form-item label="Access Token" prop="token">
           <el-input v-model="form.token" type="password" size="large" show-password :prefix-icon="Key"
-            :placeholder="t('W0141')" autocomplete="current-password" :disabled="submitting" />
+            :placeholder="t('login.tokenPlaceholder')" autocomplete="current-password" :disabled="submitting" />
         </el-form-item>
 
         <p class="login-hint">{{ hintText }}</p>
@@ -24,7 +24,7 @@
         <el-alert v-if="error" class="login-error" :title="error" type="error" show-icon :closable="false" />
 
         <el-button class="login-submit" type="primary" size="large" native-type="submit" :loading="submitting">
-          {{ submitting ? t('W0142') : t('W0143') }}
+          {{ submitting ? t('login.verifying') : t('login.submit') }}
         </el-button>
       </el-form>
     </section>
@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { t } from '@/i18n'
+import { useI18n } from 'vue-i18n'
 
 import { Key } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -43,17 +43,19 @@ import siteConfig from '@/configs/siteConfig'
 import { verifyToken } from '@/api/auth'
 import { setStoredToken } from '@/api/http'
 
+const { t } = useI18n()
+
 const router = useRouter()
 const route = useRoute()
 
 // 演示模式提示文案：__IS_DEMO__ 为 define 注入的编译期常量，
 // 正式构建下三元折叠为正式文案，演示提示不进正式产物
 const descText = __IS_DEMO__
-  ? t('W0132')
-  : t('W0133')
+  ? t('login.demoHint')
+  : t('login.authHint')
 const hintText = __IS_DEMO__
-  ? t('W0134')
-  : t('W0135')
+  ? t('login.demoNote')
+  : t('login.authNote')
 
 const formRef = ref<FormInstance>()
 const form = ref({ token: '' })
@@ -66,13 +68,13 @@ const bgFailed = ref(false)
 // 基本格式校验：必填、不含空白字符、长度上限
 const rules: FormRules<typeof form> = {
   token: [
-    { required: true, message: t('W0136'), trigger: 'blur' },
+    { required: true, message: t('login.tokenRequired'), trigger: 'blur' },
     {
       validator: (_rule, value: string, callback) => {
         const token = (value ?? '').trim()
-        if (!token) return callback(new Error(t('W0136')))
-        if (/\s/.test(token)) return callback(new Error(t('W0137')))
-        if (token.length > 512) return callback(new Error(t('W0138')))
+        if (!token) return callback(new Error(t('login.tokenRequired')))
+        if (/\s/.test(token)) return callback(new Error(t('login.tokenNoSpaces')))
+        if (token.length > 512) return callback(new Error(t('login.tokenTooLong')))
         callback()
       },
       trigger: 'blur',
@@ -100,10 +102,10 @@ async function handleSubmit() {
     const token = form.value.token.trim()
     await verifyToken(token)
     setStoredToken(token)
-    ElMessage.success(t('W0139'))
+    ElMessage.success(t('login.success'))
     await router.replace(redirectTarget())
   } catch (err) {
-    error.value = err instanceof Error ? err.message : t('W0140')
+    error.value = err instanceof Error ? err.message : t('login.failed')
   } finally {
     submitting.value = false
   }

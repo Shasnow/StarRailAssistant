@@ -5,6 +5,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import { i18n } from './locales/index.ts'
 import { useThemeHue } from './composables/useThemeHue'
 
 // 应用启动前应用持久化的主题色相，避免首帧闪色
@@ -22,5 +23,6 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(i18n)
 
 app.mount('#app')

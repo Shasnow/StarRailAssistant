@@ -2,7 +2,7 @@
   <!-- 关于页：卡片式布局（项目信息 / 构建环境 / 技术栈），风格与设置、日志页一致 -->
   <div class="about-page">
     <div class="about-grid">
-      <PanelCard :title="t('W0118')" class="card" >
+      <PanelCard :title="t('about.projectInfo')" class="card" >
         <GitHubRepoCard/>
       </PanelCard>
       <SystemInfoCard class="card" />
@@ -12,12 +12,14 @@
 </template>
 
 <script setup lang="ts">
-import { t } from '@/i18n'
+import { useI18n } from 'vue-i18n'
 
 import BuildEnvCard from '@/components/BuildEnvCard.vue'
 import GitHubRepoCard from '@/components/GitHubRepoCard.vue'
 import PanelCard from '@/components/PanelCard.vue';
 import SystemInfoCard from '@/components/SystemInfoCard.vue'
+
+const { t } = useI18n()
 </script>
 
 <style scoped>

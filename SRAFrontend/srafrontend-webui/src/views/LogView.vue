@@ -2,7 +2,7 @@
   <!-- 页面容器：参考主页的卡片布局，左侧日志终端 + 右侧实时画面 -->
   <div class="log-page">
     <div class="log-layout">
-      <PanelCard :title="t('W0158')" class="log-panel">
+      <PanelCard :title="t('log.title')" class="log-panel">
         <!-- 终端外壳：深色区域（工具栏 + 滚动日志区 + 状态栏） -->
         <!-- terminal-scope：恒深终端底 + 语义色深色档寄存器（见 base.css） -->
         <div class="term-shell terminal-scope">
@@ -16,17 +16,17 @@
               </span>
 
               <div class="bar-actions">
-                <el-button size="small" :icon="Refresh" :title="t('W0159')" :aria-label="t('W0159')" @click="refresh" />
-                <el-button size="small" :icon="CopyDocument" :title="t('W0160')" :aria-label="t('W0161')" @click="copyAll" />
-                <el-button size="small" :icon="Download" :title="t('W0162')" :aria-label="t('W0163')" @click="exportLogs" />
-                <el-button size="small" :icon="Delete" :title="t('W0155')" :aria-label="t('W0155')" class="clear-btn"
+                <el-button size="small" :icon="Refresh" :title="t('log.reconnectTooltip')" :aria-label="t('log.reconnectTooltip')" @click="refresh" />
+                <el-button size="small" :icon="CopyDocument" :title="t('log.copyFilteredAria')" :aria-label="t('log.copyFiltered')" @click="copyAll" />
+                <el-button size="small" :icon="Download" :title="t('log.exportText')" :aria-label="t('log.export')" @click="exportLogs" />
+                <el-button size="small" :icon="Delete" :title="t('log.clearTitle')" :aria-label="t('log.clearTitle')" class="clear-btn"
                   @click="clearLogs" />
               </div>
             </div>
 
             <div class="bar-row">
               <!-- 日志级别筛选：点击切换该级别的显示/隐藏 -->
-              <div class="level-chips" role="group" :aria-label="t('W0164')">
+              <div class="level-chips" role="group" :aria-label="t('log.levelFilter')">
                 <button v-for="lv in LOG_LEVELS" :key="lv" class="chip"
                   :class="[`chip-${lv.toLowerCase()}`, { active: selectedLevels.has(lv) }]"
                   :aria-pressed="selectedLevels.has(lv)" @click="toggleLevel(lv)">
@@ -34,19 +34,19 @@
                 </button>
               </div>
 
-              <el-input v-model="keyword" class="search" size="small" clearable :placeholder="t('W0165')"
+              <el-input v-model="keyword" class="search" size="small" clearable :placeholder="t('log.searchPlaceholder')"
                 :prefix-icon="Search" />
 
-              <div class="font-size" role="group" :aria-label="t('W0166')">
-                <el-button size="small" :title="t('W0167')" @click="changeFont(-1)">A-</el-button>
-                <el-button size="small" :title="t('W0168')" @click="changeFont(1)">A+</el-button>
+              <div class="font-size" role="group" :aria-label="t('log.fontSize')">
+                <el-button size="small" :title="t('log.decreaseFont')" @click="changeFont(-1)">A-</el-button>
+                <el-button size="small" :title="t('log.increaseFont')" @click="changeFont(1)">A+</el-button>
               </div>
             </div>
 
             <!-- 断连错误提示（重连次数耗尽等） -->
             <div v-if="status === 'disconnected' && lastError" class="term-alert" role="alert">
               <span class="alert-text">{{ lastError }}</span>
-              <el-button size="small" type="warning" plain :icon="Refresh" @click="refresh">{{ t('W0169') }}</el-button>
+              <el-button size="small" type="warning" plain :icon="Refresh" @click="refresh">{{ t('log.reconnectButton') }}</el-button>
             </div>
           </header>
 
@@ -56,7 +56,7 @@
               <!-- 窗口分页渲染：仅渲染最新 visibleCount 条，向上「加载更早」扩充 -->
               <div class="term-inner">
                 <button v-if="hiddenCount > 0" class="load-earlier" @click="loadEarlier">
-                  {{ t('W0170') }} {{ hiddenCount }} {{ t('W0171') }}
+                  {{ t('log.loadEarlierPrefix') }} {{ hiddenCount }} {{ t('log.loadEarlierSuffix') }}
                 </button>
 
                 <div v-for="entry in visibleEntries" :key="entry.id" class="log-line"
@@ -70,7 +70,7 @@
                     </template>
                   </span>
                   <!-- 单条复制：悬停行时浮现 -->
-                  <button class="log-copy" :title="t('W0172')" :aria-label="t('W0172')" @click="copyEntry(entry)">
+                  <button class="log-copy" :title="t('log.copyEntry')" :aria-label="t('log.copyEntry')" @click="copyEntry(entry)">
                     <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"
                       stroke-linecap="round" stroke-linejoin="round">
                       <rect x="9" y="9" width="13" height="13" rx="2" />
@@ -81,11 +81,11 @@
 
                 <!-- 空态：区分连接中 / 断开 / 筛选无结果 / 等待推送 -->
                 <div v-if="!visibleEntries.length" class="term-empty">
-                  <p v-if="status === 'connecting'">{{ t('W0173') }}</p>
-                  <p v-else-if="status === 'reconnecting'">{{ t('W0174') }}</p>
-                  <p v-else-if="status === 'disconnected'">{{ t('W0175') }}</p>
-                  <p v-else-if="entries.length">{{ t('W0176') }}</p>
-                  <p v-else>{{ t('W0177') }}</p>
+                  <p v-if="status === 'connecting'">{{ t('log.connectingService') }}</p>
+                  <p v-else-if="status === 'reconnecting'">{{ t('log.reconnectingService') }}</p>
+                  <p v-else-if="status === 'disconnected'">{{ t('log.disconnectedHint') }}</p>
+                  <p v-else-if="entries.length">{{ t('log.emptyFiltered') }}</p>
+                  <p v-else>{{ t('log.empty') }}</p>
                 </div>
               </div>
             </main>
@@ -94,15 +94,15 @@
                  避免其出现/消失改变 scrollHeight 导致底部位置跳动 -->
             <transition name="fade">
               <button v-if="!autoScroll && visibleEntries.length" class="jump-bottom" @click="jumpToBottom">
-                {{ t('W0178') }}
+                {{ t('log.backToBottom') }}
               </button>
             </transition>
           </div>
 
           <!-- 底部状态栏 -->
           <footer class="term-status">
-            <span>{{ t('W0179') }} {{ entries.length }} {{ t('W0180') }} {{ visibleEntries.length }} {{ t('W0181') }}</span>
-            <span class="status-tip">{{ t('W0182') }} {{ MAX_LOGS }} {{ t('W0183') }}</span>
+            <span>{{ t('log.totalPrefix') }} {{ entries.length }} {{ t('log.showSuffix') }} {{ visibleEntries.length }} {{ t('log.countUnit') }}</span>
+            <span class="status-tip">{{ t('log.bufferLimit') }} {{ MAX_LOGS }} {{ t('log.scrollHint') }}</span>
           </footer>
         </div>
       </PanelCard>
@@ -117,7 +117,7 @@
 </template>
 
 <script setup lang="ts">
-import { t, tf } from '@/i18n'
+import { useI18n } from 'vue-i18n'
 
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { CopyDocument, Delete, Download, Refresh, Search } from '@element-plus/icons-vue'
@@ -130,15 +130,17 @@ import PanelCard from '@/components/PanelCard.vue'
 import LiveViewCard from '@/components/LiveViewCard.vue'
 import BackendControlCard from '@/components/BackendControlCard.vue'
 
+const { t } = useI18n()
+
 /* ---------- 日志流：连接 / 缓存 / 批量刷入 ---------- */
 const { entries, status, reconnectAttempt, lastError, refresh, ensureConnected, clear } =
   useLogStream()
 
 const STATUS_TEXT: Record<string, string> = {
-  connecting: t('W0144'),
-  connected: t('W0145'),
-  reconnecting: t('W0146'),
-  disconnected: t('W0147'),
+  connecting: t('log.connecting'),
+  connected: t('log.connected'),
+  reconnecting: t('log.reconnecting'),
+  disconnected: t('log.disconnected'),
 }
 const statusText = computed(() => STATUS_TEXT[status.value])
 
@@ -266,24 +268,24 @@ async function writeClipboard(text: string): Promise<boolean> {
 
 async function copyEntry(entry: LogEntry) {
   const ok = await writeClipboard(formatLine(entry))
-  if (ok) ElMessage.success(t('W0148'))
-  else ElMessage.error(t('W0149'))
+  if (ok) ElMessage.success(t('log.copied'))
+  else ElMessage.error(t('log.copyFailed'))
 }
 
 async function copyAll() {
   if (!filtered.value.length) {
-    ElMessage.warning(t('W0150'))
+    ElMessage.warning(t('log.nothingToCopy'))
     return
   }
   const ok = await writeClipboard(filtered.value.map(formatLine).join('\n'))
-  if (ok) ElMessage.success(tf('W0151', filtered.value.length))
-  else ElMessage.error(t('W0149'))
+  if (ok) ElMessage.success(t('log.copiedCount', [filtered.value.length]))
+  else ElMessage.error(t('log.copyFailed'))
 }
 
 /* ---------- 导出：当前筛选结果下载为 .log 文本文件 ---------- */
 function exportLogs() {
   if (!filtered.value.length) {
-    ElMessage.warning(t('W0152'))
+    ElMessage.warning(t('log.nothingToExport'))
     return
   }
   const text = filtered.value.map(formatLine).join('\n')
@@ -295,22 +297,22 @@ function exportLogs() {
   a.click()
   // 释放 Blob URL，避免内存泄漏
   URL.revokeObjectURL(url)
-  ElMessage.success(tf('W0153', filtered.value.length))
+  ElMessage.success(t('log.exportedCount', [filtered.value.length]))
 }
 
 /* ---------- 清除：确认后清空内存与本地缓存（连接保持） ---------- */
 async function clearLogs() {
   try {
-    await ElMessageBox.confirm(t('W0154'), t('W0155'), {
-      confirmButtonText: t('W0156'),
-      cancelButtonText: t('W0024'),
+    await ElMessageBox.confirm(t('log.clearConfirm'), t('log.clearTitle'), {
+      confirmButtonText: t('common.clear'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning',
     })
   } catch {
     return
   }
   clear()
-  ElMessage.success(t('W0157'))
+  ElMessage.success(t('log.cleared'))
 }
 
 /* ---------- 字号调整（12-18px，localStorage 持久化） ---------- */

@@ -1,4 +1,4 @@
-import { t, tf, tr } from '@/i18n'
+import { i18n, tr } from '@/locales'
 import axios, { type AxiosRequestConfig, type AxiosInstance } from 'axios'
 
 // axios 扩展：
@@ -77,25 +77,25 @@ export function setUnauthorizedHandler(handler: (() => void) | null): void {
 export function statusMessage(status: number): string {
   switch (status) {
     case 400:
-      return t('W0002')
+      return i18n.global.t('http.badRequest')
     case 401:
-      return t('W0003')
+      return i18n.global.t('http.unauthorized')
     case 403:
-      return t('W0004')
+      return i18n.global.t('http.forbidden')
     case 404:
-      return t('W0005')
+      return i18n.global.t('http.notFound')
     case 409:
-      return t('W0006')
+      return i18n.global.t('http.conflict')
     case 422:
-      return t('W0007')
+      return i18n.global.t('http.validationFailed')
     case 500:
-      return t('W0008')
+      return i18n.global.t('http.serverError')
     case 502:
     case 503:
     case 504:
-      return t('W0009')
+      return i18n.global.t('http.unavailable')
     default:
-      return tf('W0010', status)
+      return i18n.global.t('http.statusFailed', [status])
   }
 }
 
@@ -109,10 +109,10 @@ function toApiError(err: unknown): ApiError {
   if (err instanceof ApiError) return err
 
   if (axios.isAxiosError(err)) {
-    if (err.code === 'ERR_CANCELED') return new ApiError(t('W0011'), undefined, true)
+    if (err.code === 'ERR_CANCELED') return new ApiError(i18n.global.t('http.canceled'), undefined, true)
     if (err.code === 'ECONNABORTED')
-      return new ApiError(t('W0012'), err.response?.status)
-    if (!err.response) return new ApiError(t('W0013'))
+      return new ApiError(i18n.global.t('http.timeout'), err.response?.status)
+    if (!err.response) return new ApiError(i18n.global.t('http.networkError'))
 
     const status = err.response.status
     const body: unknown = err.response.data
@@ -157,7 +157,7 @@ export function createHttpClient(): AxiosInstance {
         typeof body.success === 'boolean' &&
         !body.success
       ) {
-        throw new ApiError(body.message || t('W0014'), response.status)
+        throw new ApiError(body.message || i18n.global.t('http.requestFailed'), response.status)
       }
       return response
     },

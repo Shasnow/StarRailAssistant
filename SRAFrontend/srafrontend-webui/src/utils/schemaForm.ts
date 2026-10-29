@@ -1,4 +1,4 @@
-import { t, tf } from '@/i18n'
+import { i18n } from '@/locales'
 // OpenAPI Schema 驱动表单的工具集：$ref 解析、类型推断、默认模型构建、字段校验
 
 export interface SchemaNode {
@@ -103,8 +103,8 @@ export function validateValue(node: SchemaNode, value: unknown): string | null {
   if ((kind === 'integer' || kind === 'string') && node.pattern) {
     if (!new RegExp(node.pattern).test(String(value))) {
       return kind === 'integer'
-        ? t('W0116')
-        : tf('W0117', node.pattern)
+        ? i18n.global.t('schema.invalidInteger')
+        : i18n.global.t('schema.invalidPattern', [node.pattern])
     }
   }
   return null

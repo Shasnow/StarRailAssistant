@@ -1,8 +1,8 @@
 <template>
-  <PanelCard :title="t('W0044')">
+  <PanelCard :title="t('config.selectTitle')">
     <div class="config-form">
       <!-- 运行中锁定配置，避免运行时切换方案 -->
-      <el-select :model-value="modelValue" class="config-select" :placeholder="t('W0045')" :disabled="running"
+      <el-select :model-value="modelValue" class="config-select" :placeholder="t('config.selectPlaceholder')" :disabled="running"
         :loading="loading" @update:model-value="$emit('update:modelValue', $event)">
         <el-option v-for="c in configs" :key="c" :label="c" :value="c" />
       </el-select>
@@ -10,28 +10,28 @@
       <!-- 列表加载失败：错误提示 + 重试 -->
       <div v-if="error" class="config-error" role="alert">
         <span class="error-text">{{ error }}</span>
-        <el-button size="small" text type="primary" @click="$emit('retry')">{{ t('W0019') }}</el-button>
+        <el-button size="small" text type="primary" @click="$emit('retry')">{{ t('common.retry') }}</el-button>
       </div>
 
       <!-- 配置管理：新建（弹窗输入名称）/ 删除（二次确认）当前选中配置 -->
       <div class="manage">
         <el-button type="primary" plain :icon="Plus" class="manage-btn" :disabled="running || saving" @click="onCreate">
-          {{ t('W0046') }}
+          {{ t('config.new') }}
         </el-button>
         <el-button type="danger" plain :icon="Delete" class="manage-btn" :disabled="running || saving || !modelValue"
           @click="onRemove">
-          {{ t('W0043') }}
+          {{ t('common.delete') }}
         </el-button>
       </div>
 
       <div class="actions">
         <el-button type="success" :icon="VideoPlay" class="action-btn" :disabled="running || busy"
           @click="$emit('start')">
-          {{ t('W0047') }}
+          {{ t('config.run') }}
         </el-button>
         <el-button type="danger" :icon="VideoPause" class="action-btn" :disabled="!running || busy"
           @click="$emit('stop')">
-          {{ t('W0029') }}
+          {{ t('backend.stop') }}
         </el-button>
       </div>
     </div>
@@ -39,11 +39,13 @@
 </template>
 
 <script setup lang="ts">
-import { t, tf } from '@/i18n'
+import { useI18n } from 'vue-i18n'
 
 import { ElMessageBox } from 'element-plus'
 import { Delete, Plus, VideoPause, VideoPlay } from '@element-plus/icons-vue'
 import PanelCard from './PanelCard.vue'
+
+const { t } = useI18n()
 
 const props = withDefaults(
   defineProps<{
@@ -77,11 +79,11 @@ const emit = defineEmits<{
 /** 新建：弹窗收集配置名，确认后向上派发（名称合法性 / 重名由后端校验） */
 async function onCreate() {
   try {
-    const { value } = await ElMessageBox.prompt(t('W0037'), t('W0038'), {
-      confirmButtonText: t('W0039'),
-      cancelButtonText: t('W0024'),
+    const { value } = await ElMessageBox.prompt(t('config.newNamePrompt'), t('config.createTitle'), {
+      confirmButtonText: t('config.create'),
+      cancelButtonText: t('common.cancel'),
       inputPattern: /\S/,
-      inputErrorMessage: t('W0040'),
+      inputErrorMessage: t('config.nameRequired'),
     })
     const name = value.trim()
     if (name) emit('create', name)
@@ -93,9 +95,9 @@ async function onCreate() {
 /** 删除当前选中配置：危险操作，二次确认后向上派发 */
 async function onRemove() {
   try {
-    await ElMessageBox.confirm(tf('W0041', props.modelValue), t('W0042'), {
-      confirmButtonText: t('W0043'),
-      cancelButtonText: t('W0024'),
+    await ElMessageBox.confirm(t('config.deleteConfirm', [props.modelValue]), t('config.deleteTitle'), {
+      confirmButtonText: t('common.delete'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning',
     })
   } catch {

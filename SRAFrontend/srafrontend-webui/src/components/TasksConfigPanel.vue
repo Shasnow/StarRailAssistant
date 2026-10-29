@@ -1,5 +1,5 @@
 <template>
-  <PanelCard :title="t('W0100')">
+  <PanelCard :title="t('config.tasksTitle')">
     <!-- 加载中 -->
     <div v-if="loading" class="panel-state">
       <el-skeleton :rows="6" animated />
@@ -7,9 +7,9 @@
 
     <!-- 加载失败：可重试 -->
     <div v-else-if="errorMsg" class="panel-state">
-      <el-empty :description="t('W0101')" :image-size="72">
+      <el-empty :description="t('schema.openApiLoadFailed')" :image-size="72">
         <div class="error-detail">{{ errorMsg }}</div>
-        <el-button type="primary" @click="load">{{ t('W0019') }}</el-button>
+        <el-button type="primary" @click="load">{{ t('common.retry') }}</el-button>
       </el-empty>
     </div>
 
@@ -18,14 +18,14 @@
       <!-- 后端配置读取失败提示（不影响 schema 表单展示） -->
       <el-alert v-if="configsStore.detailError" class="detail-alert" type="error" :title="configsStore.detailError"
         :closable="false">
-        <el-button size="small" @click="applyBackendValues">{{ t('W0019') }}</el-button>
+        <el-button size="small" @click="applyBackendValues">{{ t('common.retry') }}</el-button>
       </el-alert>
 
       <el-tabs v-model="activeTab" class="config-tabs">
         <el-tab-pane v-for="tab in tabs" :key="tab.key" :name="tab.key">
           <template #label>
             <span class="tab-label" :title="tab.key">{{ tr(tab.label) }}<span v-if="dirtyKeys.has(tab.key)"
-                class="dirty-dot" :title="t('W0075')" /></span>
+                class="dirty-dot" :title="t('common.unsaved')" /></span>
           </template>
           <div class="tab-pane-body">
             <SchemaForm :schema="tab.schema" :doc="doc" :model-value="configModel[tab.key]"
@@ -37,11 +37,11 @@
 
       <!-- 保存：把当前表单内容 PUT 回 /api/Configs/{name} -->
       <div class="panel-footer">
-        <span class="footer-hint">{{ isDirty ? t('W0075') : configName ? tf('W0102', configName) : t('W0103') }}</span>
+        <span class="footer-hint">{{ isDirty ? t('common.unsaved') : configName ? t('config.current', [configName]) : t('config.noneSelected') }}</span>
         <el-button type="primary" size="small"
           :disabled="!configName || !isDirty || !!configsStore.detailError || configsStore.detailLoading"
           :loading="configsStore.saving" @click="save">
-          {{ t('W0104') }}
+          {{ t('config.save') }}
         </el-button>
       </div>
     </template>
@@ -49,7 +49,8 @@
 </template>
 
 <script setup lang="ts">
-import { t, tf, tr } from '@/i18n'
+import { useI18n } from 'vue-i18n'
+import { tr } from '@/locales/index.ts'
 
 import { ElMessage } from 'element-plus'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
@@ -60,6 +61,8 @@ import type { OpenApiDocument, SchemaNode } from '@/utils/schemaForm'
 import { buildDefaultModel, resolveNode, stableStringify } from '@/utils/schemaForm'
 import PanelCard from './PanelCard.vue'
 import SchemaForm from './SchemaForm.vue'
+
+const { t } = useI18n()
 
 const TASKS_CONFIG_REF = '#/components/schemas/TasksConfig'
 
@@ -173,9 +176,9 @@ async function save(): Promise<boolean> {
   const ok = await configsStore.saveConfig(props.configName, payload)
   if (ok) {
     baseline.value = stableStringify(configModel)
-    ElMessage.success(t('W0098'))
+    ElMessage.success(t('config.saved'))
   } else {
-    ElMessage.error(configsStore.saveError || t('W0099'))
+    ElMessage.error(configsStore.saveError || t('config.saveFailed'))
   }
   return ok
 }

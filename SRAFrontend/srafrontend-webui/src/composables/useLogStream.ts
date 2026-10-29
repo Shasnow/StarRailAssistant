@@ -1,4 +1,4 @@
-import { tf } from '@/i18n'
+import { i18n } from '@/locales'
 import { useDebounceFn } from '@vueuse/core'
 import { ref } from 'vue'
 import { getStoredToken } from '@/api/http'
@@ -102,7 +102,7 @@ function ensureFlushTimer() {
 function scheduleReconnect() {
   if (reconnectAttempts >= MAX_RECONNECT) {
     status.value = 'disconnected'
-    lastError.value = tf('W0109', MAX_RECONNECT)
+    lastError.value = i18n.global.t('log.reconnectExhausted', [MAX_RECONNECT])
     return
   }
   reconnectAttempts += 1
