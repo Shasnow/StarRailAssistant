@@ -1550,7 +1550,9 @@ class CurrencyWars(Executable):
         width, height = frame.size
         crop = frame.crop((round(.775 * width), round(.175 * height),
                            round(.880 * width), round(.2315 * height)))
-        rows = self._vision._engine_ocr(crop.convert("L"), minimum_confidence=0.9)
+        # 复核与普通姓名使用同一配置，且不低于0.7；仍要求姓名、星级、两帧与前后布局一致。
+        confidence = max(0.7, getattr(self.operator, "ocr_confidence", 0.7))
+        rows = self._vision._engine_ocr(crop.convert("L"), minimum_confidence=confidence)
         char = parse_character_name(rows, self._lookup_known_character)
         if char is None or char.is_npc or char.is_locked:
             return None
