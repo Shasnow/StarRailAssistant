@@ -184,6 +184,9 @@ html.dark .nav-bar {
 
 /* ---------- 覆盖在 Hero 之上：全透明 + 白色文字 ---------- */
 .nav-bar.over-hero {
+  /* over-hero 的图标基色用变量承载，供 .theme-toggle / .hue-toggle 的 color 取值；
+     直接声明 color 会以更高优先级盖掉子组件的 :hover */
+  --nav-icon-color: #fff;
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -215,7 +218,6 @@ html.dark .nav-bar {
 
 .nav-bar.over-hero .theme-toggle,
 .nav-bar.over-hero :deep(.hue-toggle) {
-  color: #fff;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
 }
 
@@ -383,7 +385,7 @@ html.dark .nav-bar {
   border: none;
   border-radius: 50%;
   background: transparent;
-  color: var(--color-text);
+  color: var(--nav-icon-color, var(--color-text));
   cursor: pointer;
   transition:
     background-color 0.2s,

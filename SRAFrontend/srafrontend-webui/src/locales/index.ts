@@ -5,7 +5,19 @@ import ru from './langs/ru-RU.json'
 import russianDisplay from './langs/display.ru-RU.json'
 
 export type Locale = 'zh-CN' | 'en-US' | 'ru-RU'
-const LOCALES: readonly Locale[] = ['zh-CN', 'en-US', 'ru-RU']
+
+/** 语言展示名：用各自母语书写，不随界面语言变化 */
+const LOCALE_LABELS: Record<Locale, string> = {
+  'zh-CN': '简体中文',
+  'en-US': 'English',
+  'ru-RU': 'Русский',
+}
+
+/** 支持的语言清单（派生自 LOCALE_LABELS，作为唯一事实来源） */
+const LOCALES = Object.keys(LOCALE_LABELS) as Locale[]
+
+/** 语言选择器选项：由语言清单自动生成 */
+export const SUPPORTED_LOCALES = LOCALES.map((value) => ({ value, label: LOCALE_LABELS[value] }))
 
 /** 仅展示层文案覆盖表：键为后端下发的原始文本，值为俄语译文 */
 const display: Record<string, string> = russianDisplay
@@ -19,7 +31,8 @@ function savedLocale(): string | null {
 }
 
 const saved = savedLocale()
-const initialLocale: Locale = saved === 'ru-RU' || saved === 'en-US' ? saved : 'zh-CN'
+const initialLocale: Locale =
+  saved !== null && LOCALES.includes(saved as Locale) ? (saved as Locale) : 'zh-CN'
 
 /**
  * vue-i18n 实例：消息资源按命名空间嵌套（如 `route.settings`），模板用 `$t` /

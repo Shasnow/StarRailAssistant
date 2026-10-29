@@ -31,9 +31,7 @@
         <span class="hue-label">{{ t('nav.language') }}</span>
         <select class="lang-select" :value="locale" aria-label="Language / Язык"
           @change="setLocale(($event.target as HTMLSelectElement).value)">
-          <option value="zh-CN">简体中文</option>
-          <option value="en-US">English</option>
-          <option value="ru-RU">Русский</option>
+          <option v-for="l in SUPPORTED_LOCALES" :key="l.value" :value="l.value">{{ l.label }}</option>
         </select>
       </div>
     </div>
@@ -42,7 +40,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { setLocale } from '@/locales'
+import { setLocale, SUPPORTED_LOCALES } from '@/locales'
 import { useThemeHue } from '@/composables/useThemeHue'
 
 const { t, locale } = useI18n()
@@ -64,7 +62,7 @@ const PRESETS = [0, 30, 60, 163, 200, 250, 300, 330]
   border: none;
   border-radius: 50%;
   background: transparent;
-  color: var(--color-text);
+  color: var(--nav-icon-color, var(--color-text));
   cursor: pointer;
   transition:
     background-color 0.2s,
