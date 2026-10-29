@@ -374,11 +374,30 @@ def _field_structure(image):
 
 def _matches_field_structure(crop, structure):
     detail = _field_highpass(crop)
+    if all(sum(max(1, expected * 0.4) <= detail[index] <= expected + 6
+               for index, expected in band) >= 0.65 * len(band) for band in structure):
+        return True
+    # 仅为完整轮廓高度相关的细线开放一个网格像素的抗锯齿容差。
+    # 单靠邻域覆盖会误收密集噪点，先认证全局正轮廓相关性。
+    positive = tuple(value if value >= 3 else 0 for value in detail)
+    norm = sum(value * value for value in positive)
+    reference_norm = sum(expected * expected for band in structure for _, expected in band)
+    dot = sum(expected * positive[index] for band in structure for index, expected in band)
+    if not norm or dot * dot < 0.9 ** 2 * reference_norm * norm:
+        return False
+
+    def matches(index, expected):
+        low, high = max(1, expected * 0.4), expected + 6
+        if low <= detail[index] <= high:
+            return True
+        y, x = divmod(index, 64)
+        return any(low <= detail[row * 64 + column] <= high
+                   for row in range(max(0, y - 1), min(96, y + 2))
+                   for column in range(max(0, x - 1), min(64, x + 2)))
     # 逐段检查，避免孤立星星或被遮挡标志残留的一小部分
     # 认证整个部署槽位为空。
-    return all(sum(max(1, expected * 0.4) <= detail[index] <= expected + 6
-                   for index, expected in band) >= 0.65 * len(band)
-               for band in structure)
+    return all(sum(matches(index, expected) for index, expected in band) >= 0.65 * len(band)
+                for band in structure)
 
 
 def _safe_template_path(base_dir, relative):

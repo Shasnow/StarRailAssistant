@@ -1,0 +1,56 @@
+{
+  "round_1_1": {
+    "source_sha256": "89420c0bfafbeb1e36bf9a5d9f9641a369d7c597aba39eb11ba1ea654ad2262b",
+    "reviewed_label": "empty",
+    "area": "on_field",
+    "index": 2,
+    "position": [
+      0.536,
+      0.365
+    ],
+    "relative_box": [
+      -0.012041666666666728,
+      -0.04462962962962963,
+      0.01504166666666662,
+      0.05351851851851852
+    ],
+    "contains_account_or_uid": false,
+    "synthetic": false
+  },
+  "round_1_2": {
+    "source_sha256": "03928ef459ce3c8e917949bb1f0a3bac3585520814d76fba15aa011181aef502",
+    "reviewed_label": "empty",
+    "area": "on_field",
+    "index": 2,
+    "position": [
+      0.536,
+      0.365
+    ],
+    "relative_box": [
+      -0.012041666666666728,
+      -0.04462962962962963,
+      0.01504166666666662,
+      0.05351851851851852
+    ],
+    "contains_account_or_uid": false,
+    "synthetic": false
+  },
+  "earlier_run": {
+    "source_sha256": "b43f216b935e1007fae04d43bbcc1f0c20c00d9f83670dade8c9f16bca766000",
+    "reviewed_label": "empty",
+    "area": "on_field",
+    "index": 2,
+    "position": [
+      0.536,
+      0.365
+    ],
+    "relative_box": [
+      -0.012041666666666728,
+      -0.04462962962962963,
+      0.01504166666666662,
+      0.05351851851851852
+    ],
+    "contains_account_or_uid": false,
+    "synthetic": false
+  }
+}
