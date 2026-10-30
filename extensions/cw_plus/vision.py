@@ -153,6 +153,8 @@ def parse_squad_health(results, *, image_size=None, evidence="squad_health_ocr")
                 confident.add(value)
 
     for label, label_box, label_score in rows:
+        # 心形属于生命值标签；仅去除此标签后的字形，不改数值、置信度或框校验。
+        label = re.sub(r"^(小队生命值[:：]?)[❤♥♡]", r"\1", label)
         combined = re.fullmatch(r"小队生命值[:：]?([0-9]{1,3}(?:/[0-9]{1,3})?)", label)
         if combined:
             label_seen = True
@@ -1178,13 +1180,16 @@ class CurrencyWarsVision:
         output = self.operator.ocr_engine(image, use_det=True, use_cls=False, use_rec=True)
         self._check_stop()
         if hasattr(output, "txts"):
+            from numpy import bool_
+
             if output.txts is None:
                 return None
             threshold = (getattr(self.operator, "ocr_confidence", 0.7)
                          if minimum_confidence is None else minimum_confidence)
             return [(box.tolist() if hasattr(box, "tolist") else box, text, float(score))
                     for box, text, score in zip(output.boxes, output.txts, output.scores)
-                    if (score > threshold if minimum_confidence is None else score >= threshold)]
+                    if not isinstance(score, (bool, bool_))
+                    and (score > threshold if minimum_confidence is None else score >= threshold)]
         if isinstance(output, tuple) and len(output) == 2:
             return output[0]  # 较旧版本 RapidOCR 的元组输出。
         return output if isinstance(output, list) else None

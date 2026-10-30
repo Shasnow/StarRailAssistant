@@ -4,6 +4,7 @@ from threading import Event
 from types import SimpleNamespace
 
 from PIL import Image, ImageDraw
+import numpy as np
 import pytest
 
 from SRACore.operators.model import Box
@@ -30,6 +31,7 @@ class ImportOperator:
         self.read_text = None
         self.application_confirmed = True
         self.ocr_score = .99
+        self.modern_output = False
         self.stop_after_paste = False
         self.hide_control = None
         with Image.open(Path(__file__).parent / "fixtures/cw_strategy_code_dialog.png") as image:
@@ -113,7 +115,10 @@ class ImportOperator:
 
     def ocr_engine(self, image, **kwargs):
         text = self.read_text if self.read_text is not None else self.text or "请输入攻略码..."
-        return [([[0, 0], [700, 0], [700, 25], [0, 25]], text, self.ocr_score)]
+        box = [[0, 0], [700, 0], [700, 25], [0, 25]]
+        if self.modern_output:
+            return SimpleNamespace(boxes=[box], txts=[text], scores=[self.ocr_score])
+        return [(box, text, self.ocr_score)]
 
     def press_key(self, key, **kwargs):
         self.inputs.append(key)
@@ -208,3 +213,36 @@ def test_stop_after_single_paste_propagates_without_confirmation(strategy):
         task.handle_game_entered()
     assert operator.confirms == 0
     assert operator.native_pastes == 1
+
+
+@pytest.mark.parametrize("modern_output", [False, True], ids=["rows", "modern"])
+@pytest.mark.parametrize("score", [True, False, np.bool_(True), np.bool_(False)],
+                         ids=["true", "false", "numpy-true", "numpy-false"])
+def test_boolean_confidence_never_authorizes_submission(strategy, modern_output, score):
+    task, operator = strategy
+    operator.native_works = True
+    operator.modern_output, operator.ocr_score = modern_output, score
+
+    assert task.handle_game_entered() is False
+    assert operator.confirms == 0
+    assert engine.CWIMG.APPLY_STRATEGY not in operator.inputs
+
+
+@pytest.mark.parametrize("modern_output,score", [
+    pytest.param(False, .7, id="rows-threshold"),
+    pytest.param(False, .99, id="rows-float"),
+    pytest.param(False, 1, id="rows-integer"),
+    pytest.param(True, .7, id="modern-threshold"),
+    pytest.param(True, .99, id="modern-float"),
+    pytest.param(True, 1, id="modern-integer"),
+    pytest.param(True, np.float32(.99), id="modern-numpy-float32"),
+    pytest.param(True, np.float64(.99), id="modern-numpy-float64"),
+])
+def test_supported_numeric_confidence_preserves_normal_import(strategy, modern_output, score):
+    task, operator = strategy
+    operator.native_works = True
+    operator.modern_output, operator.ocr_score = modern_output, score
+
+    assert task.handle_game_entered() is True
+    assert operator.confirms == operator.native_pastes == 1
+    assert operator.phase == "preparation"

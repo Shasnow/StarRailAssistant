@@ -19,7 +19,7 @@ CurrencyWarsPlus itself, its transaction checks and its strategies already exist
 | An empty strategy field is submitted | A completed paste call is mistaken for visible input | Authenticate the native paste button, paste once, and require visible configured-code text before submit | `test_cw_strategy_reliability.py` |
 | A winning overclock summary never advances | The summary lacks the expected current-rank panel | Authenticate success header, health label, evaluation, exact action and button template on the same frame | `test_cw_terminal_reliability.py` |
 | Native OCR reads only a partial next-action label | Native-size action OCR truncates the last character | Retry the same action ROI at 2x, still requiring the complete high-confidence label | Same file |
-| Final HP stays unknown on a legible screenshot | RGB OCR merges the heart/label/value boxes | Same-frame, same-ROI gray retry only for missing label/value, not weak, invalid or conflicting readings | Same file |
+| Final HP stays unknown on a legible screenshot | RGB OCR merges the heart/label/value boxes | Recognize heart-bearing labels before classifying evidence; same-frame gray retry cannot replace parsed weak, invalid or conflicting HP | Same file |
 
 These are observation/input reliability changes, not new strategies. Two acceptance policies
 are deliberately changed and should be reviewed explicitly: ordinary-role review now follows
@@ -46,6 +46,12 @@ expired at entry, unknown rewards, layout changes and pending transactions remai
   result check remains necessary. Test strings are synthetic, not real share codes.
 - Terminal navigation still requires two agreeing fresh pages. An enlarged action cannot
   override a different confidently recognized native action. Missing HP remains unknown.
+- The HP parser recognizes `❤`, `♥` and `♡` immediately after the exact health label, retaining
+  the original boxes, 0.9 confidence, range and conflict checks. Parsed invalid/weak/conflicting
+  RGB HP cannot authorize gray replacement; genuinely missing label/value evidence may retry.
+- Strategy input rejects Python/NumPy boolean scores in supported raw rows and modern OCR
+  objects before they can authorize submission. Numeric scores retain the existing comparison
+  policy; arbitrary unknown OCR adapter formats are not claimed to be validated.
 - The program records challenge success/failure, not an inferred SSS rank. SSS below is visible
   historical screenshot evidence, not a new rank detector or a guaranteed run outcome.
 
@@ -67,13 +73,20 @@ point, blocks network downloads, and uses saved summary pixels plus synthetic fo
 pages and virtual clicks. It is not a live run. Without opt-in its two cases are skipped;
 Win32 input cases are explicitly skipped outside Windows.
 
-The frozen upstream baseline passes 1345 tests. The final candidate suite passes **1434 tests
+The frozen upstream baseline passes 1345 tests. The initial candidate passed **1434 tests
 in 635.97 seconds**, with **zero failures, errors or skips**, including the two opt-in real
-CPU OCR cases. The 14 selected defect regressions fail
+CPU OCR cases. Final review added 33 targeted public-reader/import cases for heart labels,
+fallback preservation, geometry, frame agreement and supported boolean/numeric output shapes.
+Against the initial candidate, 12 of these fail behaviorally and 21 preservation controls pass;
+all 33 pass their focused checks after the minimal fixes. The final frozen suite passes
+**1467 tests in 563.32 seconds**, with zero failures/errors/skips and real CPU OCR enabled.
+All 1434 previous test identities are retained. Of the baseline cases, 1318 concern localization,
+not CurrencyWarsPlus. Production/test/fixture bytes did not change after the final run.
+The original 14 selected defect regressions fail
 against those pristine production files, while 11 preservation controls pass there.
 Full blocking lint still reports the existing `F821 tokens` in
 `extensions/cw_plus/population_vision.py:240`; that file is unchanged. This does not claim
-the entire existing CI is green. No production/test/fixture bytes changed after that suite.
+the entire existing CI is green. The targeted fixes do not change models, providers or global OCR.
 
 ## Historical full-run evidence: scope and limitations
 
