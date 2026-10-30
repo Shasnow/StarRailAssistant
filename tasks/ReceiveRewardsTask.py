@@ -1,8 +1,14 @@
+import json
+from datetime import datetime
+from urllib.request import Request, urlopen
+
 from SRACore.task import BaseTask, task
 from SRACore.util.const import LogsScreenshotDir
 from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
 from tasks.img import DUIMG, IMG, RRIMG
+
+RedeemCodesUrl = "https://starrailassistant.top/api/v1/redeemCodes.json"
 
 
 @task(order=2)
@@ -111,7 +117,7 @@ class ReceiveRewardsTask(BaseTask):
             None
         """
         logger.info("执行任务：领取兑换码")
-        redeem_code_list = redeem_codes.split()
+        redeem_code_list = self._merge_redeem_codes(redeem_codes.split(), self._fetch_online_redeem_codes())
         if len(redeem_code_list) == 0:
             logger.warning("未填写兑换码")
         for code in redeem_code_list:
@@ -131,6 +137,52 @@ class ReceiveRewardsTask(BaseTask):
                 logger.error(SRAError(ErrorCode.MOUSE_CLICK_FAILED, "点击更多功能入口失败"))
         self.operator.sleep(1)
         logger.info("任务完成：领取兑换码")
+
+    def _fetch_online_redeem_codes(self) -> list[str]:
+        """按当前游戏渠道从远程接口拉取最新兑换码。
+
+        接口返回 JSON 对象：``cn``/``global`` 为兑换码列表，``expiredAt`` 为过期时间。
+        拉取失败、格式异常或已过期时返回空列表，仅使用本地配置的兑换码。
+        """
+        try:
+            request = Request(RedeemCodesUrl, headers={"User-Agent": "StarRailAssistant/1.0"})
+            with urlopen(request, timeout=10) as resp:
+                data = json.loads(resp.read().decode("utf-8", errors="replace"))
+        except Exception as e:
+            logger.warning(f"拉取最新兑换码失败：{e}")
+            return []
+        if not isinstance(data, dict):
+            logger.warning("拉取最新兑换码失败：返回格式异常")
+            return []
+
+        expired_at = data.get("expiredAt")
+        if isinstance(expired_at, str) and expired_at.strip():
+            try:
+                expire_time = datetime.fromisoformat(expired_at)
+            except ValueError:
+                logger.warning(f"最新兑换码过期时间格式异常：{expired_at}")
+            else:
+                if datetime.now(expire_time.tzinfo) > expire_time:
+                    logger.info(f"最新兑换码已于 {expired_at} 过期，跳过远程兑换码")
+                    return []
+
+        # 游戏渠道 2 为国际服，其余渠道（国服/B服）使用国服兑换码
+        key = "global" if self.config.StartGame.gameChannel == 2 else "cn"
+        raw_codes = data.get(key)
+        if not isinstance(raw_codes, list):
+            logger.warning(f"拉取最新兑换码失败：缺少 {key} 字段")
+            return []
+        codes = [code.strip() for code in raw_codes if isinstance(code, str) and code.strip()]
+        if codes:
+            logger.info(f"拉取到 {len(codes)} 个最新兑换码（{key}）")
+        else:
+            logger.info("未拉取到最新兑换码")
+        return codes
+
+    @staticmethod
+    def _merge_redeem_codes(local_codes: list[str], online_codes: list[str]) -> list[str]:
+        """合并本地配置与远程拉取的兑换码，保持顺序并去重。"""
+        return list(dict.fromkeys([*local_codes, *online_codes]))
 
     def mail(self):
         """Open mailbox and pick up mails."""

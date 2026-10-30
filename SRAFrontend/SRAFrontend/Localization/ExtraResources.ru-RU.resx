@@ -645,6 +645,9 @@
   <data name="U0595" xml:space="preserve">
     <value>Получить состояние задач</value>
   </data>
+  <data name="U0596" xml:space="preserve">
+    <value>Задача автоматически загружает новейшие промокоды с официального сайта и вводит их вместе с указанными выше.</value>
+  </data>
   <data name="U0001" xml:space="preserve">
     <value>Общие настройки</value>
   </data>

@@ -29,7 +29,10 @@
                     <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsNamelessHonorEnabled}" Content="{x:Static lang:ExtraResources.U0523}" />
                     <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsGiftOfOdysseyEnabled}" Content="{x:Static lang:ExtraResources.U0524}" />
                     <CheckBox IsChecked="{Binding ReceiveRewardsConfig.IsRedeemCodeEnabled}" Content="{x:Static lang:ExtraResources.U0525}" />
-                    <TextBox Text="{Binding ReceiveRewardsConfig.RedeemCodes}" PlaceholderText="{x:Static lang:ExtraResources.U0526}"></TextBox>
+                    <StackPanel Spacing="5">
+                        <TextBox Text="{Binding ReceiveRewardsConfig.RedeemCodes}" PlaceholderText="{x:Static lang:ExtraResources.U0526}"></TextBox>
+                        <TextBlock Margin="2,0,0,0" FontSize="12" Foreground="Gray" TextWrapping="Wrap"><x:Static Member="lang:ExtraResources.U0596" /></TextBlock>
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </suki:GroupBox>

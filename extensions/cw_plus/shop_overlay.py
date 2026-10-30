@@ -11,6 +11,8 @@ from dataclasses import dataclass
 import math
 import re
 
+import numpy as np
+
 
 SHOP_PROBABILITY_TITLE_ROI = (0.195, 0.220, 0.455, 0.278)
 _CLOSE_ROI = (0.766, 0.224, 0.795, 0.273)
@@ -43,7 +45,10 @@ def _pixels(image):
 
 def _fraction(image, roi, predicate):
     patch = image.crop(_bounds(image.size, roi))
-    return sum(predicate(*pixel) for pixel in _pixels(patch)) / (patch.width * patch.height)
+    # 全部原始像素参与原判据；有符号通道避免颜色差值回绕。
+    pixels = np.asarray(patch, dtype=np.int16)
+    return np.count_nonzero(predicate(pixels[..., 0], pixels[..., 1], pixels[..., 2])) / (
+        patch.width * patch.height)
 
 
 def _exact_title(results, size):
@@ -125,8 +130,8 @@ def observe_shop_probability_panel(image) -> ShopProbabilityPanelObservation:
         if width < 640 or height < 360 or abs(width / height - 16 / 9) > 0.02:
             return ShopProbabilityPanelObservation(image, frame, False)
         frame = image.convert("RGB")
-        blue = lambda r, g, b: b > 140 and b - r > 50 and b - g > 40
-        dark = lambda r, g, b: max(r, g, b) <= 70
+        blue = lambda r, g, b: (b > 140) & (b - r > 50) & (b - g > 40)
+        dark = lambda r, g, b: (r <= 70) & (g <= 70) & (b <= 70)
         present = (_fraction(frame, (0.45, 0.222, 0.745, 0.273), blue) >= 0.88
                 and _fraction(frame, (0.195, 0.258, 0.38, 0.276), blue) >= 0.70
                 and _fraction(frame, (0.205, 0.301, 0.795, 0.759), dark) >= 0.78)
@@ -140,7 +145,7 @@ def detect_shop_probability_overlay(image, title_results, *, panel_observation=N
     """仅为已认证的概率表返回关闭点。
     image 是完整的 PIL 客户区截图，游戏视口为 16:9。
     title_results 使用 RapidOCR 的四边形、文本、置信度格式，坐标相对于由 SHOP_PROBABILITY_TITLE_ROI 取整得到的裁剪区域。
-    OCR 由调用方提供；本辅助函数只使用截图已有的 PIL 方法。
+    OCR 由调用方提供；本辅助函数只计算传入截图的像素。
     """
     def rejected(reason):
         return ShopProbabilityOverlayObservation(False, None, reason)
@@ -156,7 +161,8 @@ def detect_shop_probability_overlay(image, title_results, *, panel_observation=N
         if not isinstance(panel, ShopProbabilityPanelObservation) or panel.image is not image:
             panel = observe_shop_probability_panel(image)
         frame = panel.frame if panel.frame is not None else image.convert("RGB")
-        white = lambda r, g, b: min(r, g, b) >= 190 and max(r, g, b) - min(r, g, b) <= 45
+        white = lambda r, g, b: (np.minimum(np.minimum(r, g), b) >= 190) & (
+            np.maximum(np.maximum(r, g), b) - np.minimum(np.minimum(r, g), b) <= 45)
         if not 0.015 <= _fraction(frame, SHOP_PROBABILITY_TITLE_ROI, white) <= 0.35:
             return rejected("probability_title_pixels_missing")
         # 两条独立标题带及完整的黑色十级概率表共同校验，
@@ -165,10 +171,10 @@ def detect_shop_probability_overlay(image, title_results, *, panel_observation=N
             return rejected("probability_panel_structure_missing")
         # 绿、蓝、紫、金色列标题是该概率表的特征。
         columns = (
-            ((0.433, 0.308, 0.477, 0.336), lambda r, g, b: g > 110 and r < g * 0.85 and b < g * 0.95),
-            ((0.533, 0.308, 0.577, 0.336), lambda r, g, b: b > 130 and b > r * 1.3 and b > g * 1.1),
-            ((0.633, 0.308, 0.677, 0.336), lambda r, g, b: r > 90 and b > 130 and b > g * 1.2 and r > g * 1.1),
-            ((0.731, 0.308, 0.774, 0.336), lambda r, g, b: r > 150 and g > 80 and r > g and b < g * 0.8),
+            ((0.433, 0.308, 0.477, 0.336), lambda r, g, b: (g > 110) & (r < g * 0.85) & (b < g * 0.95)),
+            ((0.533, 0.308, 0.577, 0.336), lambda r, g, b: (b > 130) & (b > r * 1.3) & (b > g * 1.1)),
+            ((0.633, 0.308, 0.677, 0.336), lambda r, g, b: (r > 90) & (b > 130) & (b > g * 1.2) & (r > g * 1.1)),
+            ((0.731, 0.308, 0.774, 0.336), lambda r, g, b: (r > 150) & (g > 80) & (r > g) & (b < g * 0.8)),
         )
         if any(_fraction(frame, roi, predicate) < 0.04 for roi, predicate in columns):
             return rejected("probability_columns_missing")

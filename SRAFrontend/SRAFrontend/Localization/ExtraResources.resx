@@ -645,6 +645,9 @@
   <data name="U0595" xml:space="preserve">
     <value>获取任务状态</value>
   </data>
+  <data name="U0596" xml:space="preserve">
+    <value>兑换码任务会自动从官网拉取最新兑换码，与上方填写的兑换码一并兑换。</value>
+  </data>
   <data name="U0001" xml:space="preserve">
     <value>通用设置</value>
   </data>
