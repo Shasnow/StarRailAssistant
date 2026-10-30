@@ -169,4 +169,5 @@ public static class ExtraResources
     public static string U0561 => UiText.Get("U0561");
     public static string U0562 => UiText.Get("U0562");
     public static string U0563 => UiText.Get("U0563");
+    public static string U0596 => UiText.Get("U0596");
 }

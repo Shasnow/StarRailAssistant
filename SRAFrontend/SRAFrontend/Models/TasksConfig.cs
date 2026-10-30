@@ -166,7 +166,7 @@ public partial class ReceiveRewardsConfig : ObservableObject, IJsonOnDeserialize
     [ObservableProperty] [property: JsonPropertyName("rewards.trailblazeProfile")] [property: Description("是否领取漫游签证奖励")]
     private bool _isTrailblazeProfileEnabled = true;
 
-    [ObservableProperty] [property: JsonPropertyName("redeemCodes")] [property: Description("兑换码列表，格式为：兑换码1 兑换码2 兑换码3")]
+    [ObservableProperty] [property: JsonPropertyName("redeemCodes")] [property: Description("兑换码列表，格式为：兑换码1 兑换码2 兑换码3；任务运行时会自动从官网拉取最新兑换码一并兑换")]
     private string _redeemCodes = "";
 
     /// <summary>
