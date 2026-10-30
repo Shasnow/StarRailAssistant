@@ -69,6 +69,23 @@ def load_match_template(template, grayscale):
     return _match_template(key, grayscale, template).copy()
 
 
+def locate_first(needle, haystack, *, confidence):
+    """已转换数组的逐行首个匹配；不裁剪、不改变候选顺序或严格阈值。"""
+    import cv2
+    import numpy as np
+
+    confidence = float(confidence)
+    height, width = needle.shape[:2]
+    if haystack.shape[0] < height or haystack.shape[1] < width:
+        raise ValueError("needle dimension(s) exceed the haystack image or region dimensions")
+    scores = cv2.matchTemplate(haystack, needle, cv2.TM_CCOEFF_NORMED)
+    accepted = scores > confidence
+    # 布尔 argmax 取 C 顺序的第一个 True；全 False 时仍需显式拒绝。
+    # 仅省去 Pyscreeze 的全屏 int64 索引网格，不能改为最高分位置。
+    y, x = np.unravel_index(accepted.argmax(), accepted.shape)
+    return (x, y, width, height) if accepted[y, x] else None
+
+
 class CachedOperatorOCR:
     """执行原宿主 OCR，只对相同模式、尺寸、完整像素缓存引擎输出。
 

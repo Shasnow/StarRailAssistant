@@ -19,7 +19,7 @@ from SRACore.util.errors import ErrorCode, SRAError, ThreadStoppedError
 from .characters import Character, Characters, Positioning
 from tasks.img import IMG, DUIMG
 from .images import CWIMG
-from .unicode_templates import load_template, load_match_template, template_cache_key
+from .unicode_templates import load_template, load_match_template, template_cache_key, locate_first
 from .paths import CALIBRATION_ROOT, RESOURCE_ROOT, default_data_dir, resolve_strategy_path
 from .logic import (
     SlotState, SlotObservation, ShopState, ActionResult, SellResult, ShoppingResult,
@@ -2964,8 +2964,10 @@ class CurrencyWars(Executable):
                     self._page_match_pixels[grayscale] = pyscreeze._load_cv2(frame, grayscale)
                 haystack = self._page_match_pixels[grayscale]
                 image = load_match_template(template, grayscale)
-            match = pyscreeze.locate(image, haystack,
-                confidence=self.operator.tm_confidence)
+                match = locate_first(image, haystack, confidence=self.operator.tm_confidence)
+            else:
+                match = pyscreeze.locate(image, haystack,
+                    confidence=self.operator.tm_confidence)
         except ThreadStoppedError:
             raise
         except pyscreeze.ImageNotFoundException:

@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 import math
 import re
 
+import numpy as np
+
 
 EQUIPMENT_CHOICE_TITLE_ROI = (0.53, 0.014, 0.625, 0.097)
 _CARD_ROI = (0.30, 0.095, 0.83, 0.285)
@@ -60,26 +62,20 @@ def _card_rectangles(image):
     """查找真实金色四边框；固定区域只限定搜索范围，不产生点击坐标。"""
     width, height = image.size
     left, top, right, bottom = _bounds(image.size, _CARD_ROI)
-    pixels = image.load()
-
-    def gold(x, y):
-        r, g, b = pixels[x, y]
-        return r >= 160 and g >= 125 and r >= g and r - b >= 45 and g - b >= 25
-
+    # 有符号差值与 Python 整数一致，避免 uint8 减法回绕。
+    pixels = np.asarray(image.crop((left, top, right, bottom)), dtype=np.int16)
+    r, g, b = pixels[..., 0], pixels[..., 1], pixels[..., 2]
+    gold = (r >= 160) & (g >= 125) & (r >= g) & (r - b >= 45) & (g - b >= 25)
+    ys, xs = np.nonzero(gold)
     horizontal = []
-    for y in range(top, bottom):
-        start, last, gaps = None, None, 0
-        for x in range(left, right + 1):
-            if x < right and gold(x, y):
-                if start is None:
-                    start = x
-                last, gaps = x, 0
-            elif start is not None:
-                gaps += 1
-                if gaps > 2 or x == right:
-                    if 0.10 * width <= last - start <= 0.18 * width:
-                        horizontal.append((start, last, y))
-                    start, last, gaps = None, None, 0
+    if xs.size:
+        # 按原逐行顺序分组；连续一到两个非金色像素仍属于同一条线。
+        starts = np.r_[0, np.flatnonzero((np.diff(ys) != 0) | (np.diff(xs) > 3)) + 1]
+        ends = np.r_[starts[1:] - 1, xs.size - 1]
+        lengths = xs[ends] - xs[starts]
+        accepted = (lengths >= 0.10 * width) & (lengths <= 0.18 * width)
+        horizontal = [(int(xs[start]) + left, int(xs[end]) + left, int(ys[start]) + top)
+                      for start, end in zip(starts[accepted], ends[accepted])]
     groups = []
     for x0, x1, y in horizontal:
         group = next((group for group in groups
@@ -95,8 +91,9 @@ def _card_rectangles(image):
         if not 0.13 * height <= y1 - y0 <= 0.20 * height:
             continue
         # 四边须实际存在，拒绝只有两个水平线、文字或不完整卡框。
-        if any(sum(any(gold(x, y) for x in range(max(left, edge - 2), min(right, edge + 3)))
-                   for y in range(y0, y1 + 1)) / (y1 - y0 + 1) < 0.90 for edge in (x0, x1)):
+        if any(np.count_nonzero(np.any(
+                gold[y0 - top:y1 - top + 1, max(left, edge - 2) - left:min(right, edge + 3) - left], axis=1))
+                / (y1 - y0 + 1) < 0.90 for edge in (x0, x1)):
             continue
         rectangles.append((x0 / width, y0 / height, x1 / width, y1 / height))
     rectangles.sort()
