@@ -12,7 +12,7 @@
       <img alt="PyPI Version" src="https://img.shields.io/pypi/v/starrailassistant">
     </a>
 </p>
-<p align="center"><a href="https://starrailassistant.top"><b>Homepage</b></a> | <a href="README.md"><b>中文</b></a></p>
+<p align="center"><a href="https://starrailassistant.top"><b>Homepage</b></a> | <a href="README.ru.md"><b>Русский</b></a> | <a href="README.en.md"><b>English</b></a> | <a href="README.md"><b>中文</b></a></p>
 
 #### [Troubleshooting](https://starrailassistant.top/getting-started/trouble-shooting/) | [FAQ](https://starrailassistant.top/getting-started/faq/) | [Download & Install](https://starrailassistant.top/getting-started/download/) | [Getting Started](https://starrailassistant.top/getting-started/getting-started/)
 
