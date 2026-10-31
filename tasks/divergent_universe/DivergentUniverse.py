@@ -553,7 +553,8 @@ class DivergentUniverse(Executable):
             IMG.ENTER,
             DUIMG.DIVERGENT_UNIVERSE_START,
             DUIMG.BONUS_POINTS,
-            DUIMG.DIVERGENT_UNIVERSE_QUIT
+            DUIMG.DIVERGENT_UNIVERSE_QUIT,
+            DUIMG.CLOSE
         ], interval=1)
         if page == 0:
             if self.operator.locate(DUIMG.DIVERGENT_UNIVERSE): # 差分宇宙门口
@@ -576,6 +577,9 @@ class DivergentUniverse(Executable):
             # 已在差分宇宙局内
             self.in_game = True
             return True
+        elif page == 4:
+            self.operator.press_key("esc")
+            return self.page_locate(depth + 1)
         else:
             logger.error("检测超时")
             return False
