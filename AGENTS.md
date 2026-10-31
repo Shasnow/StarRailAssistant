@@ -157,7 +157,9 @@ migrates legacy config shapes. Runtime logs and failure screenshots go to the re
   WebUI renders from OpenAPI, so both follow the backend.
 - **Release notes live in `ChangeLog2.0.md`.** `scripts/package.py` reads it, substitutes `${VERSION}` and writes the
   gitignored `version_info.txt` (first line = release name/tag) consumed by CI — edit the changelog, not
-  `version_info.txt`. `.github/workflows/python-app.yml` builds releases (内嵌 Python 运行时 + 源码 + Inno Setup + multi-zip artifacts),
+  `version_info.txt`. `.github/workflows/python-app.yml` builds releases (内嵌 Python 运行时 + 源码 + Inno Setup + multi-zip artifacts)；
+  构建步骤抽在可复用的 `.github/workflows/build-artifacts.yml`（`workflow_call` + `workflow_dispatch`），仅上传产物、不发布 release，
+  因此也不会触发 Mirror酱 / auto-mas，
   `pypi.yml` publishes to PyPI, and `scripts/package.py` decides which files land in the Lite/Core/Resources/Server
   zips.
 
