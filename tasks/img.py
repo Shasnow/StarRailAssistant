@@ -15,7 +15,7 @@
 """
 # region SRA专用
 class SRAIMG:
-    BASE = "resources"
+    BASE = "assets"
     ROBIN = f"{BASE}/Robin.gif"
     ROBIN2 = f"{BASE}/Robin2.gif"
     SRAICO_PNG = f"{BASE}/SRAico.png"

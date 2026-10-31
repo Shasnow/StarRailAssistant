@@ -130,7 +130,7 @@ def nuitka_build(version: str):
         sys.executable, "-m", "nuitka",
         "--standalone", "--mingw64",
         "--windows-console-mode=force",
-        "--windows-icon-from-ico=resources/SRAicon.ico",
+        "--windows-icon-from-ico=assets/SRAicon.ico",
         "--company-name=StarRailAssistant Team",
         "--product-name=StarRailAssistant",
         f"--file-version={file_version}",

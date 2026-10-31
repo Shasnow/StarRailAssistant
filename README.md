@@ -1,4 +1,4 @@
-<p align="center"><img src="/resources/SRAico.png" alt="icon"></p>
+<p align="center"><img src="/assets/SRAico.png" alt="icon"></p>
 <p align="center">
     <img src="https://img.shields.io/badge/platform-Windows-blue" alt="platform">
     <img alt="Static Badge" src="https://img.shields.io/badge/python-3.12-skyblue">

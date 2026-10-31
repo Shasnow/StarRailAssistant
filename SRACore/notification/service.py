@@ -192,7 +192,7 @@ def _image_to_bytes(image: Any | None = None) -> bytes | None:
 
 
 def _get_test_image_bytes() -> bytes | None:
-    icon_path = Path("resources") / "SRAico.png"
+    icon_path = Path("assets") / "SRAico.png"
     try:
         return icon_path.read_bytes()
     except Exception:
