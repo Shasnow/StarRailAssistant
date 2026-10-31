@@ -160,7 +160,12 @@ def run(cmd: list[str]):
 
 
 def configure_pth():
-    """启用 site 并加入 Lib/site-packages，使 embeddable 运行时能加载 pip 安装的依赖。"""
+    """启用 site 并配置 sys.path，使 embeddable 运行时能加载 pip 依赖与程序源码。
+
+    embeddable 运行时一旦存在 python3*._pth，sys.path 就完全由该文件决定，
+    不会自动加入脚本目录，因此必须显式加入程序根目录（``..``，相对 python 目录），
+    否则 ``python main.py`` 无法导入 SRACore。
+    """
     pth_files = list(DIST_PYTHON_DIR.glob("python3*._pth"))
     if not pth_files:
         print(f"[ERROR] python3*._pth not found in {DIST_PYTHON_DIR}")
@@ -168,8 +173,9 @@ def configure_pth():
     stdlib_zip = next((p.name for p in DIST_PYTHON_DIR.glob("python3*.zip")), "python312.zip")
     site_packages = DIST_PYTHON_DIR / "Lib" / "site-packages"
     site_packages.mkdir(parents=True, exist_ok=True)
+    # 条目顺序：标准库 → 运行时目录 → 程序根目录（源码）→ pip 依赖
     pth_files[0].write_text(
-        f"{stdlib_zip}\n.\nLib\\site-packages\nimport site\n",
+        f"{stdlib_zip}\n.\n..\nLib\\site-packages\nimport site\n",
         encoding="utf-8",
     )
 
@@ -181,6 +187,8 @@ def prepare_embedded_python():
     stamp = DIST_PYTHON_DIR / DEPS_STAMP_NAME
     python_exe = DIST_PYTHON_DIR / "python.exe"
     if python_exe.exists() and stamp.exists() and stamp.read_text(encoding="utf-8").strip() == digest:
+        # 复用的环境可能是旧版 _pth 生成的，这里幂等重写，保证 sys.path 配置与当前代码一致
+        configure_pth()
         print("[SKIP] Embedded Python is up to date")
         return
 
