@@ -7,7 +7,7 @@ import { readSettings, writeSettings } from '../state'
  * 确定性行为：登录仅要求非空 token；重启/停止仅返回提示，不产生任何副作用。
  */
 
-/** 演示用问候/文案列表（/App/phrases） */
+/** 演示用问候/文案列表（/app/phrases） */
 const PHRASES = [
   '开拓者，今天也要加油哦',
   '愿此行，终抵群星',

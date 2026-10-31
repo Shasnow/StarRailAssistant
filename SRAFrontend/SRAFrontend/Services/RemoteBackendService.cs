@@ -24,7 +24,7 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
     private CancellationTokenSource? _sseCts;
 
     /// <summary>远程服务器基础地址，例如 http://192.168.1.100:5073</summary>
-    public string BaseUrl { get; set; } = "http://localhost:5000";
+    public string BaseUrl { get; set; } = "http://localhost:5073";
 
     private HttpClient Client => httpClientFactory.CreateClient("GlobalClient");
 
@@ -107,7 +107,7 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
             }
 
             var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-            var response = await Client.PostAsync($"{BaseUrl}/Task/run", content);
+            var response = await Client.PostAsync($"{BaseUrl}/api/task/run", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -134,7 +134,7 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
     {
         try
         {
-            var response = await Client.PostAsync($"{BaseUrl}/Task/stop", null);
+            var response = await Client.PostAsync($"{BaseUrl}/api/task/stop", null);
 
             if (response.IsSuccessStatusCode)
             {
@@ -269,13 +269,18 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         }
     }
 
-    /// <summary>调用 GET /Task/status 同步当前任务运行状态。</summary>
+    /// <summary>调用 GET /api/task/status 同步当前任务运行状态（解析 R 信封中的 data.status）。</summary>
     private async Task SyncStatusAsync(CancellationToken ct)
     {
         try
         {
-            var running = await Client.GetFromJsonAsync<bool>($"{BaseUrl}/Task/status", ct);
-            IsTaskRunning = running;
+            using var document = await Client.GetFromJsonAsync<JsonDocument>($"{BaseUrl}/api/task/status", ct);
+            var root = document?.RootElement;
+            IsTaskRunning = root is { ValueKind: JsonValueKind.Object } rootElement
+                && rootElement.TryGetProperty("data", out var data)
+                && data.ValueKind == JsonValueKind.Object
+                && data.TryGetProperty("status", out var status)
+                && status.GetString() == "running";
         }
         catch (Exception ex)
         {
@@ -283,10 +288,10 @@ public class RemoteBackendService(IHttpClientFactory httpClientFactory, ILogger<
         }
     }
 
-    /// <summary>订阅 GET /Task/logs/stream SSE 流，解析日志并更新任务状态。</summary>
+    /// <summary>订阅 GET /api/backend/logs/stream SSE 流，解析日志并更新任务状态。</summary>
     private async Task SubscribeLogStreamAsync(CancellationToken ct)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{BaseUrl}/Task/logs/stream");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{BaseUrl}/api/backend/logs/stream");
         using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
         response.EnsureSuccessStatusCode();
 

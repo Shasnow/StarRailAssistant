@@ -1,21 +1,15 @@
 import argparse
-import dataclasses
 import json
 import sys
-import typing
 from collections.abc import Callable
 from typing import Any
 
 import cmd2
 from rich.text import Text
 
-from SRACore.extension import ExtensionConfigManager, ExtensionRunner, load_extensions
 from SRACore.localization import Resource
-from SRACore.localization.presentation import translate, localize_schema
-from SRACore.operators.factory import OperatorFactory, OperatorType
-from SRACore.runtime.event_listener import KeyboardListener
-from SRACore.service.setting_service import SettingsService
-from SRACore.thread.task_process import TaskManager
+from SRACore.localization.presentation import translate
+from SRACore.services.app_context import AppContext
 from SRACore.util import reload_package
 from SRACore.util.const import VERSION, CORE, SettingsJson
 
@@ -23,13 +17,14 @@ from SRACore.util.const import VERSION, CORE, SettingsJson
 class SRACli(cmd2.Cmd):
     DEFAULT_CATEGORY = translate("Build-in Commands")
 
-    def __init__(self, settings_service: SettingsService):
+    def __init__(self, context: AppContext):
         super().__init__(startup_script=".srarc",
                          auto_load_commands=True)
         self.intro = translate(f"Welcome to SRA-cli (version {VERSION}, core {CORE}). \nType 'help' to list commands.")
         self.prompt = 'sra> '
         self.default_error = Resource.cli_defaultError
-        self.settings_service = settings_service
+        self.context = context
+        self.settings = context.settings
         self._use_json: bool = False
 
         # 移除不需要的 settable 选项
@@ -42,21 +37,11 @@ class SRACli(cmd2.Cmd):
         for cmd_name in ["run_pyscript"]:
             if hasattr(cmd2.Cmd, f"do_{cmd_name}"):
                 delattr(cmd2.Cmd, f"do_{cmd_name}")
-        # 初始化任务管理器
-        self.task_manager = TaskManager(settings_service)
 
-        # 初始化键盘监听器（全局单实例，由 CLI 持有并注入给扩展）
-        stop_hotkey = settings_service.settings.General.hotkeyStop.lower() or 'f9'
-        self.event_listener = KeyboardListener()
-        self.event_listener.register_key_event(stop_hotkey, self._task_stop)
-        self.event_listener.start()
-
-        # 初始化扩展系统：动态导入扩展模块并创建运行器
-        load_extensions()
-        self.extension_config_manager = ExtensionConfigManager()
-        self.extension_runner = ExtensionRunner(
-            self.extension_config_manager, settings_service,
-            event_listener=self.event_listener)
+        # 任务/扩展编排与全局键盘监听由 AppContext 统一持有
+        self.task_manager = context.task_manager
+        self.extension_config_manager = context.extension_config_manager
+        self.extension_runner = context.extension_runner
 
     def precmd(self, statement: cmd2.Statement | str) -> cmd2.Statement:
         """在执行命令前检查是否需要使用 JSON 输出"""
@@ -83,10 +68,10 @@ class SRACli(cmd2.Cmd):
 
     @cmd2.as_subcommand_to("task", "run", _build_task_run_parser, help=Resource.run_description)
     def _task_run(self, args: argparse.Namespace) -> None:
-        if self.task_manager.is_thread_running():
+        if self.context.is_busy():
             self.err(Resource.cli_task_taskAlreadyRunning)
             return
-        self.task_manager.run_in_thread(*args.config)
+        self.context.run_configs(list(args.config))
 
     @staticmethod
     def _build_task_single_parser() -> cmd2.Cmd2ArgumentParser:
@@ -97,10 +82,10 @@ class SRACli(cmd2.Cmd):
 
     @cmd2.as_subcommand_to("task", "single", _build_task_single_parser, help=Resource.single_description)
     def _task_single(self, args: argparse.Namespace) -> None:
-        if self.task_manager.is_thread_running():
+        if self.context.is_busy():
             self.err(Resource.cli_task_taskAlreadyRunning)
             return
-        if self.task_manager.run_task_in_thread(args.task, args.config):
+        if self.context.run_single(args.task, args.config):
             self.ok(Resource.cli_run_started)
 
     @staticmethod
@@ -109,11 +94,8 @@ class SRACli(cmd2.Cmd):
 
     @cmd2.as_subcommand_to("task", "stop", _build_task_stop_parser, help=Resource.stop_description)
     def _task_stop(self, _) -> None:
-        # 任务与扩展共用全局工作线程，需同时向两个 Runner 请求停止：
-        # 否则 stop_thread 的 join 会因目标线程不响应本 Runner 的事件而空等超时
-        self.task_manager.request_stop()
-        self.extension_runner.request_stop()
-        self.task_manager.stop_thread()
+        # 任务与扩展共用全局工作线程，AppContext 会同时向两个 Runner 请求停止并等待结束
+        self.context.stop_running_work()
 
     @staticmethod
     def _build_task_status_parser() -> cmd2.Cmd2ArgumentParser:
@@ -121,17 +103,16 @@ class SRACli(cmd2.Cmd):
 
     @cmd2.as_subcommand_to("task", "status", _build_task_status_parser, help=translate("Show current task status"))
     def _task_status(self, _: argparse.Namespace) -> None:
-        if typing.TYPE_CHECKING:
-            from SRACore.thread.runner import RuntimeInfo
+        data = self.context.task_status()
 
-        def format_info(info: 'RuntimeInfo') -> str:
-            return (f"Session ID: {info.session_id}\n"
-                    f"PID: {info.pid}\nMode: {info.mode}\n"
-                    f"Status: {info.status}\nUnit: {info.unit}\n"
-                    f"Configs: {', '.join(info.configs) if info.configs else 'N/A'}\n"
-                    f"Progress: {info.progress[0]}/{info.progress[1]}\nError: {info.error}")
+        def format_info(info: dict[str, Any]) -> str:
+            return (f"Session ID: {info['session_id']}\n"
+                    f"PID: {info['pid']}\nMode: {info['mode']}\n"
+                    f"Status: {info['status']}\nUnit: {info['unit']}\n"
+                    f"Configs: {', '.join(info['configs']) if info['configs'] else 'N/A'}\n"
+                    f"Progress: {info['progress'][0]}/{info['progress'][1]}\nError: {info['error']}")
 
-        self.ok(translate("Task status"), self.task_manager.info, serializer=dataclasses.asdict, formatter=format_info)
+        self.ok(translate("Task status"), data, formatter=format_info)
 
     @staticmethod
     def _build_task_list_parser() -> cmd2.Cmd2ArgumentParser:
@@ -241,21 +222,10 @@ class SRACli(cmd2.Cmd):
 
     @cmd2.as_subcommand_to("extension", "list", _build_extension_list_parser, help=translate("列出所有已注册的扩展"))
     def _extension_list(self, _: argparse.Namespace) -> None:
-        from SRACore.extension import extension_registry
-
-        ids = extension_registry.get_ids()
-        if not ids:
+        data = self.context.extension_list()
+        if not data:
             self.err("没有已注册的扩展")
             return
-
-        data = []
-        for ext_id in ids:
-            entry = extension_registry.get(ext_id)
-            data.append({
-                "id": ext_id, "name": translate(entry.name), "description": translate(entry.description),
-                "extension_class": entry.extension_cls.__name__,
-                "config_class": entry.config_cls.__name__ if entry.config_cls else "",
-            })
 
         def format_list(items):
             lines = ["扩展："]
@@ -276,27 +246,11 @@ class SRACli(cmd2.Cmd):
 
     @cmd2.as_subcommand_to("extension", "run", _build_extension_run_parser, help=translate("运行指定的扩展"))
     def _extension_run(self, args: argparse.Namespace) -> None:
-        from SRACore.extension import extension_registry
-
-        if not extension_registry.has_id(args.name):
-            self.err(f"扩展 '{args.name}' 不存在，使用 'extension list' 查看可用扩展")
-            return
-        if args.config:
-            self.extension_config_manager.load(args.config)
-
-        if extension_registry.is_background(args.name):
-            ok = self.extension_runner.start_extension(args.name)
-            if ok:
-                self.ok(f"已启动后台扩展 '{args.name}'")
-            else:
-                self.err(f"无法启动后台扩展 '{args.name}'")
-            return
-
-        result = self.extension_runner.run_in_thread(args.name)
-        if result:
-            self.ok(f"已启动扩展 '{args.name}'")
+        ok, message = self.context.extension_run(args.name, args.config)
+        if ok:
+            self.ok(message)
         else:
-            self.err(f"无法启动扩展 '{args.name}'")
+            self.err(message)
 
     @staticmethod
     def _build_extension_schema_parser() -> cmd2.Cmd2ArgumentParser:
@@ -306,14 +260,11 @@ class SRACli(cmd2.Cmd):
 
     @cmd2.as_subcommand_to("extension", "schema", _build_extension_schema_parser, help=translate("显示扩展的配置 Schema 详情"))
     def _extension_schema(self, args: argparse.Namespace) -> None:
-        from SRACore.extension import extension_registry
-
-        if not extension_registry.has_id(args.name):
+        schema = self.context.extension_schema(args.name)
+        if schema is None:
             self.err(f"扩展 '{args.name}' 不存在")
             return
-        schema = localize_schema(extension_registry.get_schema(args.name))
-
-        self.ok(f"扩展 {args.name} 配置模式", schema, formatter=lambda s:json.dumps(s, ensure_ascii=False, indent=2))
+        self.ok(f"扩展 {args.name} 配置模式", schema, formatter=lambda s: json.dumps(s, ensure_ascii=False, indent=2))
 
     @staticmethod
     def _build_extension_reload_parser() -> cmd2.Cmd2ArgumentParser:
@@ -322,39 +273,13 @@ class SRACli(cmd2.Cmd):
     @cmd2.as_subcommand_to("extension", "reload", _build_extension_reload_parser,
                            help=translate("重新导入扩展模块（含已导入模块的热重载）"))
     def _extension_reload(self, _: argparse.Namespace) -> None:
-        from SRACore.extension import extension_registry, reload_extensions
-
-        if self.extension_runner.is_thread_running():
-            self.err("扩展线程正在运行中，无法执行重载操作")
+        ok, message = self.context.extension_reload()
+        if not ok:
+            self.err(message)
             return
+        from SRACore.extension import extension_registry
 
-        # 运行中的后台扩展持有旧模块的类实例：先停止，重载后按新类重启
-        active_background = [ext_id for ext_id in self.extension_runner.extensions
-                             if extension_registry.is_background(ext_id)]
-        for ext_id in active_background:
-            self.extension_runner.stop_extension(ext_id)
-
-        before, after = reload_extensions()
-        self.extension_config_manager.refresh()
-
-        restarted = [ext_id for ext_id in active_background
-                     if extension_registry.has_id(ext_id)
-                     and self.extension_runner.start_extension(ext_id)]
-
-        if not after:
-            self.err("重载完成，但没有已注册的扩展")
-            return
-        added = sorted(after - before)
-        removed = sorted(before - after)
-        updated = sorted(before & after)
-        message = f"已重载扩展，当前共 {len(after)} 个（更新 {len(updated)} 个）"
-        if added:
-            message += f"，新增: {', '.join(added)}"
-        if removed:
-            message += f"，移除: {', '.join(removed)}"
-        if restarted:
-            message += f"，已重启后台扩展: {', '.join(restarted)}"
-        self.ok(message, {"extensions": sorted(after)})
+        self.ok(message, {"extensions": sorted(extension_registry.get_ids())})
 
     @staticmethod
     def _build_extension_stop_parser() -> cmd2.Cmd2ArgumentParser:
@@ -366,26 +291,11 @@ class SRACli(cmd2.Cmd):
                            help=translate("停止指定后台扩展或当前正在运行的单次扩展"))
     def _extension_stop(self, args: argparse.Namespace) -> None:
         if args.name:
-            from SRACore.extension import extension_registry
-
-            if not extension_registry.has_id(args.name):
-                self.err(f"扩展 '{args.name}' 不存在")
-                return
-            if extension_registry.is_background(args.name):
-                stopped = self.extension_runner.stop_extension(args.name)
-                self.ok(f"已停止后台扩展 '{args.name}'" if stopped else f"后台扩展 '{args.name}' 未运行")
-                return
-
-            # 非后台扩展在共享工作线程中运行，只能通过停止线程来停止
-            info = self.extension_runner.info
-            if not self.extension_runner.is_thread_running():
-                self.err(f"扩展 '{args.name}' 未在运行")
-                return
-            if info.unit and info.unit != args.name:
-                self.err(f"当前正在运行的扩展是 '{info.unit}'，不是 '{args.name}'")
-                return
-            self.extension_runner.stop_thread()
-            self.ok(f"已停止扩展 '{args.name}'")
+            ok, message = self.context.extension_stop(args.name)
+            if ok:
+                self.ok(message)
+            else:
+                self.err(message)
             return
 
         if not self.extension_runner.is_thread_running():
@@ -424,16 +334,10 @@ class SRACli(cmd2.Cmd):
 
     @cmd2.as_subcommand_to("extension config", "get", _build_extension_config_get_parser, help=translate("获取扩展配置"))
     def _extension_config_get(self, args: argparse.Namespace) -> None:
-        from SRACore.extension import extension_registry
-
-        if not extension_registry.has_id(args.name):
+        data = self.context.extension_config_get(args.name)
+        if data is None:
             self.err(f"扩展 '{args.name}' 不存在")
             return
-        config = self.extension_config_manager.get(args.name)
-        if config is None:
-            self.ok("配置为空")
-            return
-        data = config.model_dump(by_alias=True)
         self.ok(f"扩展 {args.name} 配置", data, formatter=lambda x: '\n'.join(f"  {key}: {value}" for key, value in x.items()))
 
     @staticmethod
@@ -445,35 +349,20 @@ class SRACli(cmd2.Cmd):
 
     @cmd2.as_subcommand_to("extension config", "set", _build_extension_config_set_parser, help=translate("设置扩展配置"))
     def _extension_config_set(self, args: argparse.Namespace) -> None:
-        from SRACore.extension import extension_registry
-
-        if not extension_registry.has_id(args.name):
-            self.err(f"扩展 '{args.name}' 不存在")
-            return
         try:
             data = json.loads(args.json)
         except json.JSONDecodeError as e:
             self.err(f"JSON 格式错误: {e}")
             return
-        config_cls = extension_registry.get_config_class(args.name)
-        if config_cls is None:
-            self.err(f"扩展 '{args.name}' 没有配置")
-            return
-        try:
-            config = config_cls.model_validate(data, by_alias=True)
-        except Exception as e:
-            self.err(f"配置验证失败: {e}")
-            return
-        self.extension_config_manager.set(args.name, config)
-        self.extension_config_manager.save()
-        self.ok(f"扩展 {args.name} 配置已保存")
+        ok, message = self.context.extension_config_set(args.name, data)
+        if ok:
+            self.ok(message)
+        else:
+            self.err(message)
 
     # endregion
 
     # region Operator 统一调用
-
-    # 不需要暴露给用户的方法（内部/静态/构造器）
-    _OP_EXCLUDE = frozenset({"__init__", "sleep", "do_while", "wait_any", "login"})
 
     @staticmethod
     def _build_operator_parser() -> cmd2.Cmd2ArgumentParser:
@@ -487,16 +376,6 @@ class SRACli(cmd2.Cmd):
         args.cmd2_subcommand_func(args)
 
     @staticmethod
-    def _get_op_methods() -> list[str]:
-        """获取 IOperator 上所有可调用的公共方法名"""
-        import inspect
-        from SRACore.operators.ioperator import IOperator
-        return sorted(
-            name for name, _ in inspect.getmembers(IOperator, predicate=inspect.isfunction)
-            if not name.startswith("_") and name not in SRACli._OP_EXCLUDE
-        )
-
-    @staticmethod
     def _build_operator_list_parser() -> cmd2.Cmd2ArgumentParser:
         return SRACli.cmd2argumentparser_factory(description=translate("列出所有可用的 Operator 方法"))
 
@@ -505,7 +384,7 @@ class SRACli(cmd2.Cmd):
     def _operator_list(self, _: argparse.Namespace) -> None:
         from SRACore.operators.ioperator import IOperator
 
-        methods = self._get_op_methods()
+        methods = self.context.operator_list()
 
         def format_methods(_methods: list[str]) -> str:
             lines = ["可用方法:"]
@@ -526,35 +405,11 @@ class SRACli(cmd2.Cmd):
     @cmd2.as_subcommand_to("operator", "help", _build_operator_help_parser,
                            help=translate("获取 Operator 方法的详细帮助"))
     def _operator_help(self, args: argparse.Namespace) -> None:
-        import inspect
-
-        from SRACore.operators.ioperator import IOperator
-
-        method_name: str = args.method
-        method = getattr(IOperator, method_name, None)
-        if method is None or not callable(method):
-            self.err(f"方法 '{method_name}' 不存在")
+        data = self.context.operator_help(args.method)
+        if data is None:
+            self.err(f"方法 '{args.method}' 不存在")
             return
-
-        sig = inspect.signature(method)
-        params = []
-        for name, param in sig.parameters.items():
-            if name == "self":
-                continue
-            info = {"name": name}
-            if param.default is not inspect.Parameter.empty:
-                info["default"] = param.default
-            if param.annotation is not inspect.Parameter.empty:
-                info["type"] = str(param.annotation)
-            params.append(info)
-
-        doc = (method.__doc__ or "").strip()
-        summary = doc.split("\n")[0] if doc else ""
-
-        self.ok(method_name, {
-            "method": method_name,
-            "summary": summary, "parameters": params, "doc": doc,
-        })
+        self.ok(args.method, data)
 
     @staticmethod
     def _build_operator_call_parser() -> cmd2.Cmd2ArgumentParser:
@@ -564,32 +419,9 @@ class SRACli(cmd2.Cmd):
                             help=translate("JSON 格式的方法参数，例如 '{\"x\": 0.5, \"y\": 0.7}'"))
         return parser
 
-    def _create_operator(self):
-        """按当前设置创建 Operator 实例（云游戏时使用 Browser 实现）"""
-        optype = (OperatorType.Browser
-                  if self.settings_service.settings.General.isCloudGameEnabled
-                  else OperatorType.Local)
-        return OperatorFactory.get_operator(optype, self.settings_service.settings)
-
     @cmd2.as_subcommand_to("operator", "call", _build_operator_call_parser,
                            help=translate("调用 Operator 方法"))
     def _operator_call(self, args: argparse.Namespace) -> None:
-        import inspect
-
-        method_name: str = args.method
-
-        # 创建 Operator 实例，从实例获取实际方法（而非抽象类上的空方法）
-        try:
-            op = self._create_operator()
-        except Exception as e:
-            self.err(f"Operator 初始化失败: {e}")
-            return
-
-        method = getattr(op, method_name, None)
-        if method is None or not callable(method):
-            self.err(f"方法 '{method_name}' 不存在。可用方法: {', '.join(self._get_op_methods())}")
-            return
-
         # 解析 JSON 参数
         try:
             params: dict[str, object] = json.loads(args.params)
@@ -597,32 +429,11 @@ class SRACli(cmd2.Cmd):
             self.err(f"JSON 解析错误: {e}")
             return
 
-        def _serialize_result(res):
-            """通用序列化：将 Box、Image 等特殊类型转为可 JSON 化的 dict"""
-            from PIL.Image import Image as PILImage
-            if isinstance(res, PILImage):
-                path = params.get("save_path")
-                return {"path": path, "width": res.width, "height": res.height}
-            return res
-
-        try:
-            sig = inspect.signature(method)
-            bound = sig.bind(**params)
-            bound.apply_defaults()
-            # noinspection calling-non-callable
-            result = method(*bound.args, **bound.kwargs)
-
-            serialized = _serialize_result(result)
-            self.ok(f"{method_name} 执行成功", serialized)
-
-        except FileNotFoundError as e:
-            self.err(f"文件未找到: {e}")
-        except KeyError as e:
-            self.err(f"缺少必需参数: {e}")
-        except TypeError as e:
-            self.err(f"参数类型错误: {e}")
-        except Exception as e:
-            self.err(f"执行失败: {e}")
+        ok, message, data = self.context.operator_call(args.method, params)
+        if ok:
+            self.ok(message, data)
+        else:
+            self.err(message)
 
     # endregion
 
@@ -665,7 +476,7 @@ class SRACli(cmd2.Cmd):
         # R2 资源站：固定文件名区分正式版/beta（版本含 "-" 视为 beta），避免 beta 覆盖正式版包
         beta = "_beta" if "-" in VERSION else ""
         packages = [
-            f"SRAFrontend_Server{beta}.zip",
+            f"SRAFrontend_WebUI{beta}.zip",
             f"StarRailAssistant_Resources{beta}.zip",
         ]
         base_url = "https://resource.starrailassistant.top"
@@ -683,18 +494,22 @@ class SRACli(cmd2.Cmd):
             with zipfile.ZipFile(io.BytesIO(data)) as zf:
                 zf.extractall(cwd)
             self.ok(f"{package_name} extracted to {cwd}")
-        if sys.platform == "linux":
-            self.ok("Detected Linux platform, setting permissions for SRA-server.")
-            os.chmod("./SRA-server", 0o755)
 
         # 创建设置文件
         AppDataDir.mkdir(parents=True, exist_ok=True)
-        self.settings_service.settings.Advanced.isDeveloperModeEnabled = True
-        self.settings_service.settings.Advanced.isCustomBackendEnabled = True
-        self.settings_service.settings.Advanced.customBackendCommand = "sra-cli"
-        self.settings_service.settings.Advanced.customBackendArguments = ""
-        self.settings_service.settings.Advanced.customBackendWorkingDirectory = cwd
-        self.settings_service.save_settings()
+        self.settings.settings.Advanced.isDeveloperModeEnabled = True
+        self.settings.settings.Advanced.isCustomBackendEnabled = True
+        # 发布包内为内嵌运行时 python/python.exe；pip/uv 安装环境没有该文件，
+        # 回退到 console script sra-cli（随包分发时该命令并不存在）
+        bundled_python = os.path.join(cwd, "python", "python.exe")
+        if os.path.isfile(bundled_python):
+            self.settings.settings.Advanced.customBackendCommand = bundled_python
+            self.settings.settings.Advanced.customBackendArguments = "main.py"
+        else:
+            self.settings.settings.Advanced.customBackendCommand = "sra-cli"
+            self.settings.settings.Advanced.customBackendArguments = ""
+        self.settings.settings.Advanced.customBackendWorkingDirectory = cwd
+        self.settings.save_settings()
         self.ok(f"Created/Updated settings file: {SettingsJson}")
 
         # 创建默认配置文件
@@ -708,7 +523,7 @@ class SRACli(cmd2.Cmd):
         else:
             self.ok(f"Default config already exists: {config_path}")
 
-        self.ok("Initialization completed. Please restart the application or run `./SRA-server` to start the server.")
+        self.ok("Initialization completed. Please restart the application or run `sra serve` to start the server.")
         return True
 
     def do_version(self, _: str):
@@ -736,7 +551,7 @@ class SRACli(cmd2.Cmd):
             channel = args[1]
             from SRACore.notification import send_channel_test_notification
 
-            label, result = send_channel_test_notification(channel, self.settings_service.settings.Notification)
+            label, result = send_channel_test_notification(channel, self.settings.settings.Notification)
             if label:
                 msg = label + "测试通知发送" + ("成功" if result else "失败")
                 if result:
@@ -753,10 +568,8 @@ class SRACli(cmd2.Cmd):
     # region 生命周期管理
 
     def _cleanup(self):
-        """清理资源"""
-        self.task_manager.stop_thread(timeout=5.0)
-        self.extension_runner.stop_thread(timeout=5.0)
-        self.event_listener.stop()
+        """清理资源：停止运行中的工作并释放全局键盘监听"""
+        self.context.shutdown()
 
     # endregion
     @staticmethod

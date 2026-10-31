@@ -1,8 +1,8 @@
 import { request } from './http'
 
 /**
- * /api/App 服务模块：
- * - GET /api/App/system-info  后端运行时信息（.NET Environment 元数据）
+ * /api/app 服务模块：
+ * - GET /api/app/system-info  后端运行时信息（.NET Environment 元数据）
  *
  * 失败时抛出 ApiError，支持通过 AbortSignal 取消。
  */
@@ -25,9 +25,9 @@ export interface AppSystemInfo {
 
 /** 获取后端运行时信息 */
 export async function fetchSystemInfo(signal?: AbortSignal): Promise<AppSystemInfo> {
-  return request<AppSystemInfo>({ url: '/App/system-info', method: 'get', signal })
+  return request<AppSystemInfo>({ url: '/app/system-info', method: 'get', signal })
 }
 
 export async function fetchPhrases(signal?: AbortSignal): Promise<string[]> {
-  return request<string[]>({ url: '/App/phrases', method: 'get', signal })
+  return request<string[]>({ url: '/app/phrases', method: 'get', signal })
 }

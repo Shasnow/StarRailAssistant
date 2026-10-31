@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import * as configsApi from '@/api/configs'
 import { useConfigsStore } from '../configs'
 
-// mock 掉 /api/Configs 服务层：store 测试只关注状态管理逻辑
+// mock 掉 /api/configs 服务层：store 测试只关注状态管理逻辑
 vi.mock('@/api/configs', () => ({
   listConfigs: vi.fn(),
   getConfig: vi.fn(),

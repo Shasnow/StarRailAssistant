@@ -1,10 +1,10 @@
 import { http, requestEnvelope, type ApiEnvelope } from './http'
 
 /**
- * /api/Task 服务模块（对应 OpenAPI TaskController）：
- * - POST /api/Task/run     运行任务（400 参数无效 / 409 已有任务运行）
- * - POST /api/Task/stop    停止任务
- * - GET  /api/Task/status  获取任务状态（R.data 为 RuntimeInfo，字段名与后端一致）
+ * /api/task 服务模块（对应 OpenAPI TaskController）：
+ * - POST /api/task/run     运行任务（400 参数无效 / 409 已有任务运行）
+ * - POST /api/task/stop    停止任务
+ * - GET  /api/task/status  获取任务状态（R.data 为 RuntimeInfo，字段名与后端一致）
  *
  * 失败时抛出 ApiError，支持通过 AbortSignal 取消。
  */
@@ -81,13 +81,13 @@ export function normalizeTaskStatus(data: unknown): TaskStatus {
 
 /** 运行任务，返回后端提示 message */
 export async function runTask(body: RunRequest, signal?: AbortSignal): Promise<string> {
-  const envelope = await requestEnvelope({ url: '/Task/run', method: 'post', data: body, signal })
+  const envelope = await requestEnvelope({ url: '/task/run', method: 'post', data: body, signal })
   return envelope.message
 }
 
 /** 停止任务，返回后端提示 message */
 export async function stopTask(signal?: AbortSignal): Promise<string> {
-  const envelope = await requestEnvelope({ url: '/Task/stop', method: 'post', signal })
+  const envelope = await requestEnvelope({ url: '/task/stop', method: 'post', signal })
   return envelope.message
 }
 
@@ -97,7 +97,7 @@ export async function stopTask(signal?: AbortSignal): Promise<string> {
  */
 export async function fetchTaskStatus(signal?: AbortSignal): Promise<TaskStatus> {
   const response = await http.request<ApiEnvelope>({
-    url: '/Task/status',
+    url: '/task/status',
     method: 'get',
     signal,
     rawEnvelope: true,

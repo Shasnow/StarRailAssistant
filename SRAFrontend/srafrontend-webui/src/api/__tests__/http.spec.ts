@@ -98,7 +98,7 @@ describe('全局 401 回调', () => {
       called += 1
     })
     http.defaults.adapter = async () => failJson({}, 401)
-    await expect(request({ url: '/Configs' })).rejects.toMatchObject({ status: 401 })
+    await expect(request({ url: '/configs' })).rejects.toMatchObject({ status: 401 })
     expect(called).toBe(1)
   })
 
@@ -108,7 +108,7 @@ describe('全局 401 回调', () => {
       called += 1
     })
     http.defaults.adapter = async () => failJson({}, 500)
-    await expect(request({ url: '/Configs' })).rejects.toMatchObject({ status: 500 })
+    await expect(request({ url: '/configs' })).rejects.toMatchObject({ status: 500 })
     expect(called).toBe(0)
   })
 })
@@ -116,12 +116,12 @@ describe('全局 401 回调', () => {
 describe('R<T> 解包与业务失败', () => {
   it('request 解包返回 data 字段', async () => {
     http.defaults.adapter = async () => okJson({ success: true, message: 'ok', data: ['a', 'b'] })
-    await expect(request<string[]>({ url: '/Configs' })).resolves.toEqual(['a', 'b'])
+    await expect(request<string[]>({ url: '/configs' })).resolves.toEqual(['a', 'b'])
   })
 
   it('success=false 抛出 ApiError（后端 message + HTTP 状态码）', async () => {
     http.defaults.adapter = async () => okJson({ success: false, message: '配置已存在' }, 200)
-    const promise = request<string>({ url: '/Configs/x', method: 'post' })
+    const promise = request<string>({ url: '/configs/x', method: 'post' })
     await expect(promise).rejects.toBeInstanceOf(ApiError)
     await promise.catch((e: ApiError) => {
       expect(e.message).toBe('配置已存在')
@@ -134,7 +134,7 @@ describe('R<T> 解包与业务失败', () => {
 describe('HTTP 错误归一化', () => {
   it('404 ProblemDetails：取 title 作为错误信息', async () => {
     http.defaults.adapter = async () => failJson({ title: '配置不存在', status: 404 }, 404)
-    await expect(request({ url: '/Configs/x' })).rejects.toMatchObject({
+    await expect(request({ url: '/configs/x' })).rejects.toMatchObject({
       name: 'ApiError',
       message: '配置不存在',
       status: 404,
@@ -143,7 +143,7 @@ describe('HTTP 错误归一化', () => {
 
   it('409 无错误体：按状态码给出默认提示', async () => {
     http.defaults.adapter = async () => failJson('冲突', 409)
-    await expect(request({ url: '/Configs/x', method: 'post' })).rejects.toMatchObject({
+    await expect(request({ url: '/configs/x', method: 'post' })).rejects.toMatchObject({
       message: '资源已存在或状态冲突',
       status: 409,
     })

@@ -22,7 +22,7 @@ from SRACore.util.errors import ThreadStoppedError
 
 if TYPE_CHECKING:
     from SRACore.runtime.event_listener import KeyboardListener
-    from SRACore.service.setting_service import SettingsService
+    from SRACore.services.setting_service import SettingsService
     from SRACore.operators.ioperator import IOperator
 
 T = TypeVar('T', bound=BaseModel | None)
@@ -497,17 +497,17 @@ class ExtensionRunner(Runner):
 
         load_extensions()                          # 动态导入扩展模块
         config_manager = ExtensionConfigManager()
-        runner = ExtensionRunner(config_manager, settings_service)
+        runner = ExtensionRunner(config_manager, settings)
         runner.run_in_thread("MyExtension")        # 运行单个扩展（后台线程）
     """
 
     def __init__(self, config_manager: ExtensionConfigManager,
-                 settings_service: 'SettingsService',
+                 settings: 'SettingsService',
                  registry: ExtensionRegistry | None = None,
                  event_listener: 'KeyboardListener | None' = None):
         super().__init__()
         self._config_manager = config_manager
-        self._settings_service = settings_service
+        self._settings = settings
         self._event_listener = event_listener
         self._registry = registry or extension_registry
         self.extensions: dict[str, BaseExtension[Any]] = {}
@@ -517,7 +517,7 @@ class ExtensionRunner(Runner):
 
     def _create_operator(self) -> 'IOperator':
         """根据设置创建 IOperator 实例"""
-        settings = self._settings_service.settings
+        settings = self._settings.settings
         optype = (OperatorType.Browser
                   if settings.General.isCloudGameEnabled
                   else OperatorType.Local)

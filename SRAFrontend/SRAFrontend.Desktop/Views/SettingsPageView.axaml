@@ -909,7 +909,7 @@
                                         <Label Grid.Column="1" Content="{x:Static lang:Resources.RemoteServerAddressText}" />
                                         <TextBox Grid.Column="2"
                                                  MinWidth="300"
-                                                 PlaceholderText="http://localhost:5000"
+                                                 PlaceholderText="http://localhost:5073"
                                                  Text="{Binding AdvancedSettings.RemoteBaseUrl}" />
                                     </Grid>
                                     
