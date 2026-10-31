@@ -172,10 +172,13 @@ def configure_pth():
         sys.exit(1)
     stdlib_zip = next((p.name for p in DIST_PYTHON_DIR.glob("python3*.zip")), "python312.zip")
     site_packages = DIST_PYTHON_DIR / "Lib" / "site-packages"
+    # 必须先建目录：site.addsitedir 会跳过不存在的路径，
+    # 否则 `import site` 不会把 Lib/site-packages 加入 sys.path
     site_packages.mkdir(parents=True, exist_ok=True)
-    # 条目顺序：标准库 → 运行时目录 → 程序根目录（源码）→ pip 依赖
+    # 条目顺序：标准库 → 运行时目录 → 程序根目录（源码）；
+    # Lib/site-packages 由 `import site` 自动加入，无需在此列出
     pth_files[0].write_text(
-        f"{stdlib_zip}\n.\n..\nLib\\site-packages\nimport site\n",
+        f"{stdlib_zip}\n.\n..\nimport site\n",
         encoding="utf-8",
     )
 
