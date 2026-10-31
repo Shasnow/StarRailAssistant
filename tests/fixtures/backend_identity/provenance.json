@@ -1,0 +1,43 @@
+{
+  "source_commit": "d4625a8a1cfcd54b49fd069cb476435ca2d96396",
+  "source_fixture": "tests/fixtures/layout_performance/recorded.png",
+  "row_sha256": "e09632e10a35c038baad672d230401382ca1c893be4f650947e0f4f860e0a0bf",
+  "paste_at": [
+    192,
+    560
+  ],
+  "previous_positions": [
+    [
+      0.31484375,
+      0.6199074074074075
+    ],
+    [
+      0.3885416666666667,
+      0.6199074074074075
+    ],
+    [
+      0.4625,
+      0.6199074074074075
+    ],
+    [
+      0.5375,
+      0.6199074074074075
+    ],
+    [
+      0.6114583333333333,
+      0.6199074074074075
+    ],
+    [
+      0.68515625,
+      0.6199074074074075
+    ]
+  ],
+  "label": "recorded backend row; generic positioning badge at index 3, not an authenticated NPC",
+  "contains_uid_or_account": false,
+  "synthetic": false,
+  "review_name_scores": [
+    0.89194,
+    0.89328
+  ],
+  "ocr_source": "historical ordinary-name readings, not a new live panel scan"
+}

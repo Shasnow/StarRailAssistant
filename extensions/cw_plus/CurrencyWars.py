@@ -19,6 +19,7 @@ from SRACore.util.errors import ErrorCode, SRAError, ThreadStoppedError
 from .characters import Character, Characters, Positioning
 from tasks.img import IMG, DUIMG
 from .images import CWIMG
+from .game_input import adapt_game_input
 from .unicode_templates import load_template, load_match_template, template_cache_key, locate_first
 from .paths import CALIBRATION_ROOT, RESOURCE_ROOT, default_data_dir, resolve_strategy_path
 from .logic import (
@@ -135,7 +136,7 @@ class CurrencyWars(Executable):
     SHOP_EXPERIENCE_COST = 4  # 这是本玩法单次 F 输入的价格，并非整级升级价格。
 
     def __init__(self, operator, runtimes, *, data_dir=None):
-        super().__init__(operator)
+        super().__init__(adapt_game_input(operator))
         # 扩展存档和诊断使用独立目录，避免与原版任务互相覆盖。
         self._data_dir = Path(data_dir) if data_dir is not None else default_data_dir()
         self.runtimes = runtimes
@@ -1192,6 +1193,15 @@ class CurrencyWars(Executable):
     def _slot_needs_scan(self, area, index, now=None):
         observation = self._observations[area][index]
         key = (area, index)
+        # 逻辑空场基线没有逐槽OCR时间；只有未受动作或未知事件影响的槽仍可使用。
+        if (area != "in_hand" and observation.state == SlotState.EMPTY
+                and observation.evidence in {"new_game_empty", "zero_population"}
+                and key not in self._dirty_slots
+                and (area != "off_field" or self._layout_valid
+                     and index in self._backend_ordinary_slots
+                     and index not in self._backend_unknown_slots
+                     and index not in self._backend_support_slots)):
+            return False
         receipt = self._slot_evidence.get(key)
         return (key in self._dirty_slots or not self._complete_slot_observation(observation)
                 or receipt is None or receipt[0] is not observation
@@ -1235,7 +1245,10 @@ class CurrencyWars(Executable):
             for index, observation in enumerate(slots):
                 if self._slot_needs_scan(area, index, now):
                     return False
-                receipt = self._slot_evidence[(area, index)]
+                receipt = self._slot_evidence.get((area, index))
+                if receipt is None:
+                    # 通过上方检查的逻辑空场不是一次截图，不为它伪造时间。
+                    continue
                 if receipt[1] > now:
                     return False
                 observed_times.append(receipt[1])
@@ -1449,6 +1462,7 @@ class CurrencyWars(Executable):
             # 续局也可通过实时 0/N 读数建立同样的基线。
             # 文本冲突会使该基线也失效。
             if (area_type != "in_hand" and previous.state == SlotState.EMPTY
+                    and (area_type, index) not in self._dirty_slots
                     and empty is not False
                     and previous.evidence in ("new_game_empty", "zero_population")
                     and not any(str(item[1]).strip() and not str(item[1]).strip().isdecimal()
@@ -1536,7 +1550,9 @@ class CurrencyWars(Executable):
         width, height = frame.size
         crop = frame.crop((round(.775 * width), round(.175 * height),
                            round(.880 * width), round(.2315 * height)))
-        rows = self._vision._engine_ocr(crop.convert("L"), minimum_confidence=0.9)
+        # 复核与普通姓名使用同一配置，且不低于0.7；仍要求姓名、星级、两帧与前后布局一致。
+        confidence = max(0.7, getattr(self.operator, "ocr_confidence", 0.7))
+        rows = self._vision._engine_ocr(crop.convert("L"), minimum_confidence=confidence)
         char = parse_character_name(rows, self._lookup_known_character)
         if char is None or char.is_npc or char.is_locked:
             return None
@@ -2526,6 +2542,42 @@ class CurrencyWars(Executable):
             self.operator.click_point(0.5, 0.5, after_sleep=1)
             self.operator.click_img(IMG.ENSURE2, after_sleep=1)
 
+    def _strategy_code_controls(self, frame):
+        """同帧认证1080p攻略码弹窗，不能在其他页面盲点剪贴板坐标。"""
+        self._check_stop()
+        if frame is None or tuple(frame.size) != (1920, 1080) or tuple(frame.size) != (
+                self.operator.window_context.width, self.operator.window_context.height):
+            return None
+        title = self._locate_page_template(CWIMG.STRATEGY_CODE_TITLE, frame)
+        paste = self._locate_page_template(CWIMG.STRATEGY_CODE_PASTE, frame)
+        if title is None or paste is None:
+            return None
+        tx, ty = title.center
+        px, py = paste.center
+        if not (870 <= tx <= 1050 and 320 <= ty <= 365 and 1410 <= px <= 1480 and 500 <= py <= 570):
+            return None
+        return paste
+
+    def _strategy_code_text_state(self, frame):
+        """占位文字消失不等于成功，须在输入区域读到配置码的连续片段。"""
+        if self._strategy_code_controls(frame) is None:
+            return "unknown"
+        field = frame.crop((445, 430, 1395, 635))
+        if self._locate_page_template(CWIMG.STRATEGY_CODE_PLACEHOLDER, field) is not None:
+            return "empty"
+        rows = self._vision._engine_ocr(field, minimum_confidence=0.7)
+        for row in rows or ():
+            if not isinstance(row, (list, tuple)) or len(row) != 3:
+                continue
+            if (not isinstance(row[1], str) or not isinstance(row[2], (int, float))
+                    or isinstance(row[2], bool) or not 0.7 <= row[2] <= 1):
+                continue
+            text = re.sub(r"\s", "", row[1])
+            # 只证明配置码已经可见；游戏是否接受仍由后续应用结果认证。
+            if any(text[i:i + 12] in self.strategy_code for i in range(len(text) - 11)):
+                return "visible"
+        return "unknown"
+
     def handle_game_entered(self) -> bool:  # NOQA  # 保留原有静态检查指令。
         """初始化前应用新局攻略；开局重刷钩子保持独立。"""
         if not self.strategy_code or self.is_continue:
@@ -2554,18 +2606,30 @@ class CurrencyWars(Executable):
                 return self._fail_startup("strategy_code_entry_failed", "未能打开攻略码输入框")
             if self.operator.wait_img(IMG.ENSURE2, timeout=self.ENTRY_TRANSITION_TIMEOUT) is None:
                 return self._fail_startup("strategy_code_dialog_missing", "攻略码输入页面未确认")
-            self._check_stop()
-            if not self.operator.click_point(0.5, 0.5, after_sleep=1, tag="攻略码输入框"):
-                return self._fail_startup("strategy_code_focus_failed", "攻略码输入框点击失败")
+            frame = self._capture_page_frame()
+            paste = self._strategy_code_controls(frame)
+            if paste is None:
+                return self._fail_startup("strategy_code_dialog_unconfirmed", "攻略码标题与游戏粘贴按钮未确认")
             step = "paste_code"
             self._check_stop()
             self.operator.copy(self.strategy_code)
             self._check_stop()
-            self.operator.paste()
-            self.operator.sleep(1)
+            if not self.operator.click_box(paste, after_sleep=0.5):
+                return self._fail_startup("strategy_code_paste_failed", "游戏粘贴按钮点击失败")
+            # 只粘贴一次，有限读取新的字段截图；未知或空白不能授权提交。
+            for _ in range(3):
+                frame = self._capture_page_frame()
+                state = self._strategy_code_text_state(frame)
+                self._check_stop()
+                if state == "visible":
+                    break
+                self.operator.sleep(0.3)
+            else:
+                return self._fail_startup("strategy_code_empty" if state == "empty" else
+                    "strategy_code_text_unconfirmed", "攻略码字段文字未确认，禁止提交")
 
             step = "confirm_code"
-            confirm = self.operator.wait_img(IMG.ENSURE2, timeout=self.ENTRY_TRANSITION_TIMEOUT)
+            confirm = self._locate_page_template(IMG.ENSURE2, frame)
             self._check_stop()
             if confirm is None or not self.operator.click_box(confirm, after_sleep=1):
                 return self._fail_startup("strategy_code_confirm_failed", "攻略码提交失败")
@@ -6773,6 +6837,9 @@ class CurrencyWars(Executable):
                 logger.info("[购后增量核实] 缺全场完成标记，按真实逐槽收据补缺；不作废未受影响观测")
             for attempt in range(2):
                 self._check_stop()
+                # 以本次扫描开始时判断旧证据是否过期；串行读取自身可能超过60秒。
+                # 保留逐槽真实时间、脏标记与交易检查，不续签旧观测。
+                scan_started = time.monotonic()
                 incremental = reusable and not full_scan and attempt == 0
                 vacancies = self._read_bench_empty_observations()
                 if incremental and any(before["in_hand"][index].state == SlotState.KNOWN
@@ -6787,8 +6854,8 @@ class CurrencyWars(Executable):
                     vacancies = self._read_bench_empty_observations()
                 # 完整身份扫描仍必须遵守当前锁定槽位；
                 # 点击它们不会出现角色面板。
-                overrides = {index: obs for index, obs in vacancies.items()
-                             if not full_scan or obs.state == SlotState.LOCKED}
+                # 完整恢复不能丢弃布局重建后刚读取的双帧空位证据。
+                overrides = dict(vacancies)
                 if incremental:
                     for index, old in enumerate(before["in_hand"]):
                         if (index not in overrides and old is self._observations["in_hand"][index]
@@ -6806,7 +6873,7 @@ class CurrencyWars(Executable):
                         character = obs.character or historical
                         if (not full_scan and ((area, index) in self._dirty_slots
                                 or character is not None and character.name in names
-                                or self._slot_needs_scan(area, index, time.monotonic()))):
+                                or self._slot_needs_scan(area, index, scan_started))):
                             observed = self._observe_slot(area, index, count_stars=True,
                                 use_backup_ocr=area == "off_field")
                             self._set_observation(area, observed)
@@ -6835,7 +6902,7 @@ class CurrencyWars(Executable):
                          and all(self._complete_slot_observation(obs) and (area, index) not in self._dirty_slots
                              for area, slots in self._observations.items()
                              for index, obs in enumerate(slots))) for name in names)
-                        and all(not self._slot_needs_scan(area, index, time.monotonic())
+                        and all(not self._slot_needs_scan(area, index, scan_started)
                             for area in ("on_field", "off_field")
                             for index, obs in enumerate(self._observations[area]))):
                     return True
@@ -9561,7 +9628,7 @@ class CurrencyWars(Executable):
                     f"稳定={self.STAGE_SETTLE_SECONDS} 战斗复核={self.BATTLE_TIMEOUT} "
                     f"战斗总上限={self.BATTLE_MAX_WAIT_SECONDS}")
         paths = [Path(__file__).resolve()]
-        for name in ("logic", "formation", "vision", "characters", "preparation", "layout", "session", "economy", "shop_overlay", "equipment_choice", "policy", "equipment_policy", "shopping_batch", "coins", "images", "paths", "stop_compat"):
+        for name in ("logic", "formation", "vision", "characters", "preparation", "layout", "session", "economy", "shop_overlay", "equipment_choice", "policy", "equipment_policy", "shopping_batch", "coins", "images", "paths", "stop_compat", "game_input"):
             module = sys.modules.get(f"{__package__}.{name}")
             location = getattr(module, "__file__", None)
             if location:

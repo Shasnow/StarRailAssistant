@@ -14,7 +14,7 @@ _MODULE_ORDER = (
     "reward_fast", "session", "runtime_rebuild", "shop_overlay", "shop_stall_recovery",
     "shopping_batch", "stop_compat", "bench_full", "coins", "images",
     "population_vision", "scoped_logging", "silver_wolf_fee_recovery",
-    "strategy_catalog", "unicode_templates", "vision", "CurrencyWars",
+    "strategy_catalog", "unicode_templates", "game_input", "vision", "CurrencyWars",
 )
 
 

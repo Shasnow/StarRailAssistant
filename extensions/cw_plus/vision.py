@@ -153,6 +153,8 @@ def parse_squad_health(results, *, image_size=None, evidence="squad_health_ocr")
                 confident.add(value)
 
     for label, label_box, label_score in rows:
+        # 心形属于生命值标签；仅去除此标签后的字形，不改数值、置信度或框校验。
+        label = re.sub(r"^(小队生命值[:：]?)[❤♥♡]", r"\1", label)
         combined = re.fullmatch(r"小队生命值[:：]?([0-9]{1,3}(?:/[0-9]{1,3})?)", label)
         if combined:
             label_seen = True
@@ -372,13 +374,34 @@ def _field_structure(image):
     return bands
 
 
-def _matches_field_structure(crop, structure):
+def _matches_field_structure(crop, structure, *, allow_antialiasing=False):
     detail = _field_highpass(crop)
+    if all(sum(max(1, expected * 0.4) <= detail[index] <= expected + 6
+               for index, expected in band) >= 0.65 * len(band) for band in structure):
+        return True
+    if not allow_antialiasing:
+        return False
+    # 仅为完整轮廓高度相关的细线开放一个网格像素的抗锯齿容差。
+    # 单靠邻域覆盖会误收密集噪点，先认证全局正轮廓相关性。
+    positive = tuple(value if value >= 3 else 0 for value in detail)
+    norm = sum(value * value for value in positive)
+    reference_norm = sum(expected * expected for band in structure for _, expected in band)
+    dot = sum(expected * positive[index] for band in structure for index, expected in band)
+    if not norm or dot * dot < 0.9 ** 2 * reference_norm * norm:
+        return False
+
+    def matches(index, expected):
+        low, high = max(1, expected * 0.4), expected + 6
+        if low <= detail[index] <= high:
+            return True
+        y, x = divmod(index, 64)
+        return any(low <= detail[row * 64 + column] <= high
+                   for row in range(max(0, y - 1), min(96, y + 2))
+                   for column in range(max(0, x - 1), min(64, x + 2)))
     # 逐段检查，避免孤立星星或被遮挡标志残留的一小部分
     # 认证整个部署槽位为空。
-    return all(sum(max(1, expected * 0.4) <= detail[index] <= expected + 6
-                   for index, expected in band) >= 0.65 * len(band)
-               for band in structure)
+    return all(sum(matches(index, expected) for index, expected in band) >= 0.65 * len(band)
+                for band in structure)
 
 
 def _safe_template_path(base_dir, relative):
@@ -1157,13 +1180,16 @@ class CurrencyWarsVision:
         output = self.operator.ocr_engine(image, use_det=True, use_cls=False, use_rec=True)
         self._check_stop()
         if hasattr(output, "txts"):
+            from numpy import bool_
+
             if output.txts is None:
                 return None
             threshold = (getattr(self.operator, "ocr_confidence", 0.7)
                          if minimum_confidence is None else minimum_confidence)
             return [(box.tolist() if hasattr(box, "tolist") else box, text, float(score))
                     for box, text, score in zip(output.boxes, output.txts, output.scores)
-                    if (score > threshold if minimum_confidence is None else score >= threshold)]
+                    if not isinstance(score, (bool, bool_))
+                    and (score > threshold if minimum_confidence is None else score >= threshold)]
         if isinstance(output, tuple) and len(output) == 2:
             return output[0]  # 较旧版本 RapidOCR 的元组输出。
         return output if isinstance(output, list) else None
@@ -1465,9 +1491,30 @@ class CurrencyWarsVision:
                 failure_summary = (headers == {"挑战失败"}
                     and "小队生命值" in {text for text, _ in regions[0][0]}
                     and "对局评价" in identity_labels)
-                if {"对局评价", "当前职级"} <= identity_labels or failure_summary:
+                # 超频胜利汇总也可能没有当前职级；必须在同帧认证完整身份与精确动作。
+                success_identity = (headers == {"挑战成功"}
+                    and "对局评价" in identity_labels and any(text == "小队生命值" or
+                        re.fullmatch(r"小队生命值[:：]?[❤♥♡]?(?:100|[1-9]?[0-9])", text)
+                         for text, _ in regions[0][0]))
+                conflicting_actions = action_labels & {"下一页", "返回货币战争", "前往结算", "继续挑战", "点击空白加速"}
+                if success_identity and not conflicting_actions and "下一步" not in action_labels:
+                    # 原尺寸可能只读到“下一”；仅放大同一帧的原动作ROI，仍须完整高置信度文字。
+                    from PIL import Image
+                    action_crop = frame.crop(regions[1][1])
+                    action_crop = action_crop.resize((action_crop.width * 2, action_crop.height * 2),
+                                                     Image.Resampling.LANCZOS)
+                    action_lines, action_raw = _battle_result_lines(
+                        self._engine_ocr(action_crop, minimum_confidence=0.9), action_crop.size)
+                    self._check_stop()
+                    attempts.append({"method": "final_action_2x", "roi": list(BATTLE_RESULT_ACTION_ROI),
+                                     "text": action_raw, "reason": "exact_action_same_frame"})
+                    if "下一步" in {text for text, _ in action_lines}:
+                        action_labels.add("下一步")
+                success_summary = success_identity and not conflicting_actions and "下一步" in action_labels
+                if {"对局评价", "当前职级"} <= identity_labels or failure_summary or success_summary:
                     return BattleScreenObservation("final_summary", None, None,
-                        ("same_frame_failure_header_health_evaluation_and_next_step" if failure_summary
+                        ("same_frame_success_header_health_evaluation_and_next_step" if success_summary
+                         else "same_frame_failure_header_health_evaluation_and_next_step" if failure_summary
                          else "same_frame_final_header_labels_and_next_step"), (raw_text + " | " + raw)[:480],
                         outcome, point)
             if not headers:
@@ -1558,6 +1605,15 @@ class CurrencyWarsVision:
                                 round(roi[3] * height) - round(roi[1] * height))
                 self._check_stop()
                 answer = parse_squad_health(rows, image_size=size, evidence=method)
+                if (has_engine and tuple(roi) == FINAL_HEALTH_ROI
+                        and answer.reason in {"health_label_missing", "health_value_missing"}):
+                    # 仅补同帧同ROI缺失的标签/数值；冲突、低置信度和越界RGB结果不能被覆盖。
+                    gray_rows = self._engine_ocr(image.convert("L"), minimum_confidence=0.0)
+                    self._check_stop()
+                    gray_answer = parse_squad_health(gray_rows, image_size=size,
+                                                     evidence="health_same_frame_gray")
+                    if gray_answer.current is not None:
+                        answer, method = gray_answer, "health_same_frame_gray"
             except Exception as error:
                 self._failure(error)
                 answer = HealthObservation(None, None, method, type(error).__name__, "")
@@ -1817,7 +1873,7 @@ class CurrencyWarsVision:
         if positive <= slot.max_mae and negative - positive >= slot.min_margin:
             if slot.field_structures:
                 return True if any(distance <= slot.max_mae and negative - distance >= slot.min_margin
-                    and _matches_field_structure(crop, structure)
+                    and _matches_field_structure(crop, structure, allow_antialiasing=slot.area == "on_field")
                     for distance, structure in zip(positive_distances, slot.field_structures)) else None
             if not slot.require_empty_structure or any(
                     distance <= slot.max_mae and negative - distance >= slot.min_margin
