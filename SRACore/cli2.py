@@ -476,7 +476,7 @@ class SRACli(cmd2.Cmd):
         # R2 资源站：固定文件名区分正式版/beta（版本含 "-" 视为 beta），避免 beta 覆盖正式版包
         beta = "_beta" if "-" in VERSION else ""
         packages = [
-            f"SRAFrontend_Server{beta}.zip",
+            f"SRAFrontend_WebUI{beta}.zip",
             f"StarRailAssistant_Resources{beta}.zip",
         ]
         base_url = "https://resource.starrailassistant.top"

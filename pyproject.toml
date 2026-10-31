@@ -73,9 +73,6 @@ SRACore = [
     "localization/*.json",
     "assets/*"
 ]
-SRAServer = [
-    "static/**"
-]
 
 [tool.setuptools.dynamic]
 version = {attr = "SRACore.util.const.VERSION"}

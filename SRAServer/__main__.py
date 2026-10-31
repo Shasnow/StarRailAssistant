@@ -11,7 +11,6 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import sys
-from pathlib import Path
 
 from SRACore.util.const import VERSION
 
@@ -43,22 +42,11 @@ def missing_server_dependencies() -> list[str]:
     return [name for name in _SERVER_REQUIREMENTS if importlib.util.find_spec(name) is None]
 
 
-def prefer_local_server_package() -> None:
-    """若当前目录存在 ``sra init`` 下载解压的 ``SRAServer``（含构建好的 WebUI 静态），优先加载它。
-
-    通过 ``uv tool`` / ``pip`` 安装时，包内 ``SRAServer`` 不含构建产物 ``static/``（由 ``init``
-    下载的服务端包提供），因此让当前目录版本优先于已安装包，避免 WebUI 静态资源 404。
-    """
-    if not (Path.cwd() / "SRAServer" / "static" / "index.html").exists():
-        return
-    cwd = str(Path.cwd())
-    if cwd in sys.path:
-        sys.path.remove(cwd)
-    sys.path.insert(0, cwd)
-
-
 def run_server(*, host: bool = False, port: int | None = None, webui: bool | None = None) -> None:
     """启动服务端（``sra serve`` / ``sra-server`` / ``python -m SRAServer`` 共用）。
+
+    服务端代码随已安装的 ``SRAServer`` 包加载；WebUI 静态资源由 ``sra init`` 下载的 WebUI 包
+    解压到当前目录 ``SRAServer/static``，由 :func:`SRAServer.app._resolve_static_dir` 优先采用。
 
     Args:
         host: 是否暴露到公网（绑定 0.0.0.0）；``False`` 表示沿用 ServerConfig。
@@ -76,8 +64,6 @@ def run_server(*, host: bool = False, port: int | None = None, webui: bool | Non
             file=sys.stderr,
         )
         raise SystemExit(1)
-
-    prefer_local_server_package()
 
     import uvicorn
 

@@ -42,7 +42,7 @@ DESKTOP_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Desktop"
 DIST_DIR = ROOT_PATH / "main.dist"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
-# R2 自定义域名（绑定到上传桶的公开访问基址），CLI init 从此处下载 Server 包与资源包
+# R2 自定义域名（绑定到上传桶的公开访问基址），CLI init 从此处下载 WebUI 包与资源包
 R2_PUBLIC_BASE_URL = "https://resource.starrailassistant.top"
 SITE_PACKAGES_DIR = None
 for p in sys.path[1:]:
@@ -221,27 +221,32 @@ def package_resources(version: str) -> Path:
     return zip_path
 
 
-def server_package_object_key(version: str) -> str:
+def webui_package_object_key(version: str) -> str:
     """R2 对象键：区分正式版/beta 的固定文件名，避免发布 beta 时覆盖正式版压缩包。"""
-    return "SRAFrontend_Server_beta.zip" if "-" in version else "SRAFrontend_Server.zip"
+    return "SRAFrontend_WebUI_beta.zip" if "-" in version else "SRAFrontend_WebUI.zip"
 
 
 def resources_package_object_key(version: str) -> str:
-    """R2 对象键：资源包同样区分正式版/beta，规则与 Server 包一致。"""
+    """R2 对象键：资源包同样区分正式版/beta，规则与 WebUI 包一致。"""
     return "StarRailAssistant_Resources_beta.zip" if "-" in version else "StarRailAssistant_Resources.zip"
 
 
-def package_server(version: str) -> Path:
-    """打包 Python 服务端（SRAServer 源码 + 构建后的 WebUI 静态资源），供 CLI init 下载。"""
-    print("Packaging Server ...")
+def package_webui(version: str) -> Path:
+    """打包构建好的 WebUI 静态资源（SRAServer/static），供 CLI init 下载。
+
+    压缩包内条目为 ``SRAServer/static/**``，``sra init`` 解压到当前目录后，服务端即可从
+    ``<cwd>/SRAServer/static`` 托管 WebUI；服务端代码本身随 wheel 安装，用户无需再额外
+    安装 .NET / ASP.NET Core Runtime。
+    """
+    print("Packaging WebUI ...")
     static_dir = ROOT_PATH / "SRAServer" / "static"
     if not static_dir.exists() or not any(static_dir.iterdir()):
         print(f"[ERROR] WebUI static dir not found or empty: {static_dir}")
         print("        Run `pnpm run build` in SRAFrontend/srafrontend-webui first.")
         sys.exit(1)
-    zip_path = ROOT_PATH / f"SRAFrontend_Server_v{version}.zip"
+    zip_path = ROOT_PATH / f"SRAFrontend_WebUI_v{version}.zip"
     builder = ZipBuilder()
-    builder.add(ROOT_PATH / "SRAServer", ROOT_PATH / "SRAServer")
+    builder.add(static_dir, ROOT_PATH)
     builder.snapshot(zip_path)
     return zip_path
 
@@ -288,7 +293,7 @@ def upload_to_r2(zip_path: Path, object_key: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="StarRailAssistant 打包脚本")
     parser.add_argument("--resources-only", action="store_true", help="只打包资源，跳过 Nuitka 构建等其他操作")
-    parser.add_argument("--server-only", action="store_true", help="只打包并上传 Server 包，跳过 Nuitka 构建等其他操作")
+    parser.add_argument("--webui-only", action="store_true", help="只打包并上传 WebUI 包，跳过 Nuitka 构建等其他操作")
     args = parser.parse_args()
 
     with (ROOT_PATH / "package.json").open(encoding="utf-8") as f:
@@ -301,9 +306,9 @@ if __name__ == "__main__":
         print(f"\nPackaging completed! Version: v{version}")
         sys.exit(0)
 
-    if args.server_only:
-        server_zip = package_server(version)
-        upload_to_r2(server_zip, server_package_object_key(version))
+    if args.webui_only:
+        webui_zip = package_webui(version)
+        upload_to_r2(webui_zip, webui_package_object_key(version))
         print(f"\nPackaging completed! Version: v{version}")
         sys.exit(0)
 
@@ -332,9 +337,9 @@ if __name__ == "__main__":
     resources_zip = package_resources(version)
     upload_to_r2(resources_zip, resources_package_object_key(version))
 
-    # Server 包 → R2（供 CLI init 下载）
-    server_zip = package_server(version)
-    upload_to_r2(server_zip, server_package_object_key(version))
+    # WebUI 包 → R2（供 CLI init 下载）
+    webui_zip = package_webui(version)
+    upload_to_r2(webui_zip, webui_package_object_key(version))
 
     if DIST_DIR.exists():
         shutil.rmtree(DIST_DIR)

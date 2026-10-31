@@ -67,8 +67,9 @@ sra serve      # 启动 Litestar 服务端（sra-server / python -m SRAServer �
 ```
 
 `sra serve` 与 `sra-server` 共用 `SRAServer.__main__.run_server`：启动前会检查 `[server]` extra 依赖
-（缺失时提示 `--extra server` 安装命令），并优先加载当前目录下由 `sra init` 下载的 `SRAServer`
-（含构建好的 WebUI 静态资源），避免被已安装包遮盖。
+（缺失时提示 `--extra server` 安装命令）。服务端代码始终来自已安装的 `SRAServer` 包；WebUI 是独立产物，
+由 `sra init` 下载的 WebUI 包解压到当前目录 `SRAServer/static`，`SRAServer/app.py::_resolve_static_dir`
+优先采用该目录（包内不含构建产物）。
 
 Repo scripts:
 

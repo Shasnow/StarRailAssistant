@@ -23,7 +23,19 @@ from SRAServer.mcp.server import build_mcp_asgi
 from SRAServer.middleware import TokenAuthMiddleware
 from SRAServer.openapi import get_openapi_v1
 
-_STATIC_DIR = Path(__file__).resolve().parent / "static"
+_PACKAGE_STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+
+def _resolve_static_dir() -> Path:
+    """解析 WebUI 静态资源目录：优先 ``sra init`` 解压到当前目录的资源，其次包内 ``static``。
+
+    通过 ``uv tool`` / ``pip`` 安装时包内不含构建产物，WebUI 由 ``init`` 下载的 WebUI 包解压到
+    ``<cwd>/SRAServer/static``，因此这里以当前目录为准；仓库内开发时两者指向同一目录。
+    """
+    local = Path.cwd() / "SRAServer" / "static"
+    if (local / "index.html").is_file():
+        return local
+    return _PACKAGE_STATIC_DIR
 
 
 def _operation_id_creator(route_handler: Any, http_method: Any, path_components: Any) -> str:
@@ -96,7 +108,7 @@ def create_app(config: ServerConfig | None = None, core: ServerContext | None = 
         handlers.append(asgi("/mcp", is_mount=True, copy_scope=True)(_mcp_asgi_handler(mcp_app)))
 
     if config.webui:
-        handlers.extend(_build_spa_handler(_STATIC_DIR))
+        handlers.extend(_build_spa_handler(_resolve_static_dir()))
 
     @asynccontextmanager
     async def lifespan(_app: Litestar):

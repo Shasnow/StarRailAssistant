@@ -26,7 +26,6 @@
 /setup/install_info.txt
 /main.dist/
 /SRAServer/static/*
-!/SRAServer/static/.gitkeep
 *.zip
 
 # 构建产物
