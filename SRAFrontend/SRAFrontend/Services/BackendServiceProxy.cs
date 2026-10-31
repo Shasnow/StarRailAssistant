@@ -2,16 +2,15 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using SRAFrontend.Data;
 using SRAFrontend.Models;
 
 namespace SRAFrontend.Services;
 
-public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendService pyBackendService,
+public class BackendServiceProxy(BundledBackendService bundledBackendService, CustomBackendService customBackendService,
     IServiceProvider serviceProvider, SettingsService settingsService) : IBackendService
 {
     private RemoteBackendService? _remoteBackendService;
-    private IBackendService _currentBackend = cliBackendService;
+    private IBackendService _currentBackend = bundledBackendService;
     private string _lastStartArguments = string.Empty;
     private bool _initialized;
 
@@ -33,9 +32,9 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         if (isUsingRemote)
             _currentBackend = _remoteBackendService!;
         else if (isUsingPython)
-            _currentBackend = pyBackendService;
+            _currentBackend = customBackendService;
         else
-            _currentBackend = cliBackendService;
+            _currentBackend = bundledBackendService;
 
         AttachToCurrentBackend();
         IsTaskRunning = _currentBackend.IsTaskRunning;
@@ -180,11 +179,11 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
         var command = adv.CustomBackendCommand.Trim().Trim('"');
         var arguments = adv.CustomBackendArguments.Trim();
 
-        // 留空时回退到内置 python 运行 main.py（保持原默认行为）
-        pyBackendService.FileName = command.Length == 0 ? DataPath.PythonExe : command;
-        pyBackendService.MainArgument = command.Length == 0 && arguments.Length == 0 ? "main.py" : arguments;
+        // 留空时回退到系统 PATH 中的 python 运行 main.py
+        customBackendService.FileName = command.Length == 0 ? "python" : command;
+        customBackendService.MainArgument = command.Length == 0 && arguments.Length == 0 ? "main.py" : arguments;
 
-        pyBackendService.WorkingDirectory = string.IsNullOrWhiteSpace(adv.CustomBackendWorkingDirectory)
+        customBackendService.WorkingDirectory = string.IsNullOrWhiteSpace(adv.CustomBackendWorkingDirectory)
             ? Environment.CurrentDirectory
             : adv.CustomBackendWorkingDirectory;
     }
@@ -204,7 +203,7 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
             var useRemote = settingsService.Settings.Advanced.IsRemoteEnabled;
             IBackendService target = useRemote
                 ? _remoteBackendService
-                : settingsService.Settings.Advanced.IsCustomBackendEnabled ? pyBackendService : cliBackendService;
+                : settingsService.Settings.Advanced.IsCustomBackendEnabled ? customBackendService : bundledBackendService;
             SetCurrentBackend(target);
         }
 
@@ -213,7 +212,7 @@ public class BackendServiceProxy(CliBackendService cliBackendService, PyBackendS
             var useCustomBackend = settingsService.Settings.Advanced.IsCustomBackendEnabled;
             if (!settingsService.Settings.Advanced.IsRemoteEnabled)
             {
-                IBackendService target = useCustomBackend ? pyBackendService : cliBackendService;
+                IBackendService target = useCustomBackend ? customBackendService : bundledBackendService;
                 SetCurrentBackend(target);
             }
         }

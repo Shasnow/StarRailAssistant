@@ -19,7 +19,7 @@
 """
 崩坏：星穹铁道助手
 作者：雪影
-打包
+打包：内嵌 Python 运行时 + 源码分发
 """
 
 import argparse
@@ -29,6 +29,8 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
+import tomllib
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -40,18 +42,17 @@ DOTNET_EXE = os.environ.get("DOTNET_EXE", "dotnet")
 DESKTOP_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Desktop" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
 
 DIST_DIR = ROOT_PATH / "main.dist"
+DIST_PYTHON_DIR = DIST_DIR / "python"
+# 依赖清单指纹：依赖未变化时复用内嵌环境（CI 缓存 main.dist/python 后可跳过下载与安装）
+DEPS_STAMP_NAME = ".requirements.sha256"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
 # R2 自定义域名（绑定到上传桶的公开访问基址），CLI init 从此处下载 WebUI 包与资源包
 R2_PUBLIC_BASE_URL = "https://resource.starrailassistant.top"
-SITE_PACKAGES_DIR = None
-for p in sys.path[1:]:
-    if p.endswith("site-packages"):
-        SITE_PACKAGES_DIR = Path(p)
-        break
-if SITE_PACKAGES_DIR is None:
-    print(f"[ERROR] Could not find site-packages directory in sys.path: {sys.path}")
-    sys.exit(1)
+
+# 随包分发的 Python 源码目录与根文件
+SOURCE_DIRS = ["SRACore", "SRAServer", "tasks", "extensions", "resources", "assets"]
+SOURCE_FILES = ["main.py", "pyproject.toml", "README.md", "LICENSE"]
 
 class ZipBuilder:
     """增量构建 zip：收集文件条目，不同阶段快照写入不同 zip。"""
@@ -88,8 +89,15 @@ class ZipBuilder:
     def add_file(self, file: Path, arcname: str):
         self._entries[arcname] = file
 
+    def remove_prefix(self, prefix: str):
+        """移除指定前缀的条目（用于剔除 WebUI 等独立产物）。"""
+        prefix = self._arcname(Path(prefix)).rstrip("/")
+        for arcname in [n for n in self._entries if n == prefix or n.startswith(prefix + "/")]:
+            del self._entries[arcname]
+
     _EXCLUDESuffixes = (".pdb", ".pyc")
-    _EXCLUDENames = {"web.config"}
+    # 构建元数据（依赖指纹）只在本地/CI 复用内嵌环境时使用，不进发布包
+    _EXCLUDENames = {"web.config", DEPS_STAMP_NAME}
     # OpenCV 视频 IO 后端，本项目只用于截图与模板匹配，不使用 VideoCapture/VideoWriter
     _EXCLUDEPrefixes = ("opencv_videoio_ffmpeg",)
 
@@ -115,71 +123,124 @@ class ZipBuilder:
         print(f"[OK] {zip_path.name} ({len(self._entries)} files)")
 
 
-def collect_core_files(builder: ZipBuilder):
-    """收集 Core 层文件：Nuitka 产物 + 资源文件。"""
-    for item in DIST_DIR.iterdir():
-        builder.add(item)
+def download(url: str, dest: Path, timeout: int = 60, retries: int = 2):
+    """下载文件到指定路径：带超时与重试，最终失败时终止打包。"""
+    last_error: Exception | None = None
+    for attempt in range(retries + 1):
+        suffix = f" (attempt {attempt + 1}/{retries + 1})" if attempt else ""
+        print(f"Downloading {url} ...{suffix}")
+        try:
+            with urllib.request.urlopen(url, timeout=timeout) as resp, open(dest, "wb") as f:
+                shutil.copyfileobj(resp, f)
+            return
+        except (urllib.error.URLError, OSError) as e:
+            last_error = e
+            print(f"  [WARN] Download failed: {e}")
+    print(f"[ERROR] Failed to download {url}: {last_error}")
+    sys.exit(1)
 
 
-def nuitka_build(version: str):
-    file_version = version.split("-")[0]
-    print("Building Python program with Nuitka ...")
-    cmd = [
-        sys.executable, "-m", "nuitka",
-        "--standalone", "--mingw64",
-        "--windows-console-mode=force",
-        "--windows-icon-from-ico=assets/SRAicon.ico",
-        "--company-name=StarRailAssistant Team",
-        "--product-name=StarRailAssistant",
-        f"--file-version={file_version}",
-        f"--product-version={file_version}",
-        "--file-description=StarRailAssistant Component",
-        "--copyright=Copyright 2024 Shasnow",
-        "--assume-yes-for-downloads",
-        "--output-filename=SRA-cli",
-        "--remove-output",
-        "--include-package=selenium.webdriver.edge",
-        "--include-package=selenium.webdriver.firefox",
-        "--include-package=selenium.webdriver.chrome",
-        "--include-package=selenium.webdriver.common.action_chains",
-        "main.py",
-    ]
-    result = subprocess.run(cmd, cwd=ROOT_PATH)
+def runtime_requirements() -> list[str]:
+    """从 pyproject.toml 读取内嵌环境所需的依赖（基础 + standard + server）。"""
+    with (ROOT_PATH / "pyproject.toml").open("rb") as f:
+        project = tomllib.load(f)["project"]
+    requirements = list(project.get("dependencies", []))
+    extras = project.get("optional-dependencies", {})
+    for extra in ("standard", "server"):
+        requirements.extend(extras.get(extra, []))
+    return requirements
+
+
+def run(cmd: list[str]):
+    """执行命令，非零退出即终止打包。"""
+    result = subprocess.run(cmd)
     if result.returncode != 0:
-        print(f"[ERROR] Nuitka build failed (exit code: {result.returncode})")
+        print(f"[ERROR] Command failed (exit code: {result.returncode}): {' '.join(cmd)}")
         sys.exit(1)
-    print("[OK] Python program built successfully")
 
-def copy_core_resources(dist: Path):
-    print("Copying resources ...")
-    dist.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(ROOT_PATH / "LICENSE", dist / "LICENSE")
-    shutil.copy2(ROOT_PATH / "README.md", dist / "README.md")
-    # shutil.copy2(ROOT_PATH / "main.py", dist / "main.py")
-    # shutil.copytree(ROOT_PATH / "SRACore", dist / "SRACore")
-    (DIST_DIR / "SRACore" / "localization").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(ROOT_PATH / "SRACore" / "localization" / "resource_en-us.json", DIST_DIR / "SRACore" / "localization" / "resource_en-us.json")
-    shutil.copy2(ROOT_PATH / "SRACore" / "localization" / "resource_zh-cn.json", DIST_DIR / "SRACore" / "localization" / "resource_zh-cn.json")
-    shutil.copytree(ROOT_PATH / "resources", dist / "resources")
-    rapidocr_pkg = SITE_PACKAGES_DIR / "rapidocr"  # pyright: ignore[reportOptionalOperand]
-    if rapidocr_pkg.exists():
-        (dist / "rapidocr").mkdir(parents=True, exist_ok=True)
-        models_dir = rapidocr_pkg / "models"
-        if models_dir.exists():
-            shutil.copytree(models_dir, dist / "rapidocr" / "models")
-        config_path = rapidocr_pkg / "config.yaml"
-        if config_path.exists():
-            shutil.copy2(config_path, dist / "rapidocr" / "config.yaml")
-            shutil.copy2(rapidocr_pkg / "default_models.yaml", dist / "rapidocr" / "default_models.yaml")
-    else:
-        print(f"  [WARN] rapidocr not found in {SITE_PACKAGES_DIR}, skipping OCR model copy")
-    shutil.copytree(ROOT_PATH / "tasks", dist / "tasks")
-    extensions_dir = ROOT_PATH / "extensions"
-    if extensions_dir.exists():
-        shutil.copytree(extensions_dir, dist / "extensions")
-    else:
-        print(f"  [WARN] extensions directory not found, skipping")
-    print("[OK] Resources copied")
+
+def configure_pth():
+    """启用 site 并加入 Lib/site-packages，使 embeddable 运行时能加载 pip 安装的依赖。"""
+    pth_files = list(DIST_PYTHON_DIR.glob("python3*._pth"))
+    if not pth_files:
+        print(f"[ERROR] python3*._pth not found in {DIST_PYTHON_DIR}")
+        sys.exit(1)
+    stdlib_zip = next((p.name for p in DIST_PYTHON_DIR.glob("python3*.zip")), "python312.zip")
+    site_packages = DIST_PYTHON_DIR / "Lib" / "site-packages"
+    site_packages.mkdir(parents=True, exist_ok=True)
+    pth_files[0].write_text(
+        f"{stdlib_zip}\n.\nLib\\site-packages\nimport site\n",
+        encoding="utf-8",
+    )
+
+
+def prepare_embedded_python():
+    """准备内嵌 Python 3.12 运行时并安装 standard + server 依赖（依赖未变化时复用已有环境）。"""
+    requirements = runtime_requirements()
+    digest = hashlib.sha256("\n".join(requirements).encode("utf-8")).hexdigest()
+    stamp = DIST_PYTHON_DIR / DEPS_STAMP_NAME
+    python_exe = DIST_PYTHON_DIR / "python.exe"
+    if python_exe.exists() and stamp.exists() and stamp.read_text(encoding="utf-8").strip() == digest:
+        print("[SKIP] Embedded Python is up to date")
+        return
+
+    print("Preparing embedded Python ...")
+    if DIST_DIR.exists():
+        shutil.rmtree(DIST_DIR)
+    DIST_PYTHON_DIR.mkdir(parents=True)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        embed_zip = Path(tmp) / "python-embed-amd64.zip"
+        download(PYTHON31210_URL, embed_zip)
+        print("Extracting embedded Python ...")
+        with ZipFile(embed_zip) as zf:
+            zf.extractall(DIST_PYTHON_DIR)
+
+        configure_pth()
+
+        get_pip = Path(tmp) / "get-pip.py"
+        download(GET_PIP_URL, get_pip)
+        print("Installing pip into embedded Python ...")
+        run([str(python_exe), str(get_pip), "--no-warn-script-location"])
+
+        # embeddable 运行时存在 python3*._pth 时会忽略 PYTHONPATH，pip 的构建隔离
+        # 无法把临时构建环境注入 sys.path（pyscreeze 等 sdist 会报
+        # Cannot import 'setuptools.build_meta'），故预装构建工具并禁用构建隔离。
+        run([str(python_exe), "-m", "pip", "install", "--no-warn-script-location", "setuptools", "wheel"])
+
+        print(f"Installing {len(requirements)} runtime requirements ...")
+        # 保留 pip 的 wheel 缓存：CI 缓存 %LOCALAPPDATA%\pip\Cache 后可直接复用已下载的 wheel
+        run([
+            str(python_exe), "-m", "pip", "install",
+            "--no-warn-script-location", "--no-build-isolation",
+            *requirements,
+        ])
+
+    stamp.write_text(digest, encoding="utf-8")
+    print("[OK] Embedded Python prepared")
+
+
+def copy_python_sources():
+    """把 Python 源码、任务、扩展与资源复制到发布目录。"""
+    print("Copying Python sources ...")
+    ignore = shutil.ignore_patterns("__pycache__", "*.pyc")
+    for name in SOURCE_DIRS:
+        src = ROOT_PATH / name
+        if not src.exists():
+            print(f"  [WARN] Skipping non-existent directory: {src}")
+            continue
+        # 复用内嵌环境时 DIST_DIR 可能残留上次的源码，先删除目标目录避免旧文件混入
+        target = DIST_DIR / name
+        if target.exists():
+            shutil.rmtree(target)
+        shutil.copytree(src, target, ignore=ignore)
+    static_dir = DIST_DIR / "SRAServer" / "static"
+    if static_dir.exists():
+        # WebUI 是独立产物（sra init 下载），不随服务端包分发
+        shutil.rmtree(static_dir)
+    for name in SOURCE_FILES:
+        shutil.copy2(ROOT_PATH / name, DIST_DIR / name)
+    print("[OK] Python sources copied")
 
 
 def package_lite(version: str):
@@ -188,12 +249,28 @@ def package_lite(version: str):
     builder = ZipBuilder()
     for file in DESKTOP_WIN_X64_PUBLISH_PATH.iterdir():
         builder.add(file)
-    for item in ["SRACore", "SRAServer", "tasks", "extensions", "resources"]:
+    for item in ["SRACore", "SRAServer", "tasks", "extensions", "resources", "assets"]:
         builder.add(ROOT_PATH / item)
-    # pyproject.toml 随包分发：用户在解压目录执行 pip install ".[full]" 安装依赖
+    # WebUI 是独立产物（sra init 下载），不随服务端包分发
+    builder.remove_prefix("SRAServer/static")
+    # pyproject.toml 随包分发：用户在解压目录执行 pip install ".[standard]" 安装依赖
     for file in ["main.py", "README.md", "LICENSE", "pyproject.toml"]:
         builder.add(ROOT_PATH / file)
     builder.snapshot(lite_zip_path)
+
+
+def package_core_and_full(version: str):
+    """Core = 内嵌 Python + 源码；Full = Core + .NET 桌面端产物。"""
+    builder = ZipBuilder()
+
+    print("Packaging Core ...")
+    for item in DIST_DIR.iterdir():
+        builder.add(item)
+    builder.snapshot(ROOT_PATH / f"StarRailAssistant_Core_v{version}.zip")
+
+    print("Packaging Full ...")
+    builder.add(DESKTOP_WIN_X64_PUBLISH_PATH, DESKTOP_WIN_X64_PUBLISH_PATH)
+    builder.snapshot(ROOT_PATH / f"StarRailAssistant_v{version}.zip")
 
 
 def publish_dotnet_projects():
@@ -292,8 +369,8 @@ def upload_to_r2(zip_path: Path, object_key: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="StarRailAssistant 打包脚本")
-    parser.add_argument("--resources-only", action="store_true", help="只打包资源，跳过 Nuitka 构建等其他操作")
-    parser.add_argument("--webui-only", action="store_true", help="只打包并上传 WebUI 包，跳过 Nuitka 构建等其他操作")
+    parser.add_argument("--resources-only", action="store_true", help="只打包资源，跳过 Python 运行时与源码打包等其他操作")
+    parser.add_argument("--webui-only", action="store_true", help="只打包并上传 WebUI 包，跳过 Python 运行时与源码打包等其他操作")
     args = parser.parse_args()
 
     with (ROOT_PATH / "package.json").open(encoding="utf-8") as f:
@@ -315,23 +392,14 @@ if __name__ == "__main__":
     with (ROOT_PATH / "ChangeLog2.0.md").open(encoding="utf-8") as f:
         changelog = f.read().replace("${VERSION}", version)
 
-    nuitka_build(version)
-    copy_core_resources(DIST_DIR)
+    prepare_embedded_python()
+    copy_python_sources()
 
     # Lite
     package_lite(version)
 
-    # Core → Basic 增量构建
-    builder = ZipBuilder()
-
-    print("Packaging Core ...")
-    collect_core_files(builder)
-    builder.snapshot(ROOT_PATH / f"StarRailAssistant_Core_v{version}.zip")
-
-    print("Packaging Basic ...")
-    builder.add(DESKTOP_WIN_X64_PUBLISH_PATH, DESKTOP_WIN_X64_PUBLISH_PATH)
-    builder.add(ROOT_PATH / "SRAServer", ROOT_PATH / "SRAServer")
-    builder.snapshot(ROOT_PATH / f"StarRailAssistant_v{version}.zip")
+    # Core / Full
+    package_core_and_full(version)
 
     # 资源包 → R2（供 CLI init 下载）
     resources_zip = package_resources(version)
@@ -341,8 +409,7 @@ if __name__ == "__main__":
     webui_zip = package_webui(version)
     upload_to_r2(webui_zip, webui_package_object_key(version))
 
-    if DIST_DIR.exists():
-        shutil.rmtree(DIST_DIR)
-
+    # 保留 main.dist/python 供下次复用（CI 缓存该目录以跳过下载与安装），
+    # 打包产物已在压缩包内，源码目录下次会被重新复制覆盖
     (ROOT_PATH / "version_info.txt").write_text(f"v{version}\n\n{changelog}", encoding="utf-8")
     print(f"\nPackaging completed! Version: v{version}")

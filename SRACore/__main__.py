@@ -197,11 +197,13 @@ def restart_as_admin():
         cmdline = subprocess.list2cmdline(sys.argv)
         executable = sys.executable.removesuffix('.exe')
         executable += '.exe'
-        result = ctypes.windll.shell32.ShellExecuteW(None, 'runas', 'wt.exe', f'"{executable}" {cmdline}', None, 1)
+        # 保留当前工作目录：源码分发模式下 main.py、tasks/ 与 resources/ 均按 cwd 解析
+        cwd = os.getcwd()
+        result = ctypes.windll.shell32.ShellExecuteW(None, 'runas', 'wt.exe', f'"{executable}" {cmdline}', cwd, 1)
         if result > 32:
             sys.exit(0)
         else:
-            result = ctypes.windll.shell32.ShellExecuteW(None, 'runas', executable, cmdline, None, 1)
+            result = ctypes.windll.shell32.ShellExecuteW(None, 'runas', executable, cmdline, cwd, 1)
             sys.exit(result)
 
 

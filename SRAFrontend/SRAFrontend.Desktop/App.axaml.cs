@@ -82,8 +82,8 @@ public class App : Application
         services.AddSingleton<AppService>();
         services.AddSingleton<CacheService>();
         // Register backend implementations and proxy
-        services.AddSingleton<CliBackendService>();
-        services.AddSingleton<PyBackendService>();
+        services.AddSingleton<BundledBackendService>();
+        services.AddSingleton<CustomBackendService>();
         services.AddSingleton<RemoteBackendService>();
         services.AddSingleton<IBackendService, BackendServiceProxy>();
         services.AddSingleton<RegistryService>();

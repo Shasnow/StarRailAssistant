@@ -499,8 +499,15 @@ class SRACli(cmd2.Cmd):
         AppDataDir.mkdir(parents=True, exist_ok=True)
         self.settings.settings.Advanced.isDeveloperModeEnabled = True
         self.settings.settings.Advanced.isCustomBackendEnabled = True
-        self.settings.settings.Advanced.customBackendCommand = "sra-cli"
-        self.settings.settings.Advanced.customBackendArguments = ""
+        # 发布包内为内嵌运行时 python/python.exe；pip/uv 安装环境没有该文件，
+        # 回退到 console script sra-cli（随包分发时该命令并不存在）
+        bundled_python = os.path.join(cwd, "python", "python.exe")
+        if os.path.isfile(bundled_python):
+            self.settings.settings.Advanced.customBackendCommand = bundled_python
+            self.settings.settings.Advanced.customBackendArguments = "main.py"
+        else:
+            self.settings.settings.Advanced.customBackendCommand = "sra-cli"
+            self.settings.settings.Advanced.customBackendArguments = ""
         self.settings.settings.Advanced.customBackendWorkingDirectory = cwd
         self.settings.save_settings()
         self.ok(f"Created/Updated settings file: {SettingsJson}")

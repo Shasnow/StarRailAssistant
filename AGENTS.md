@@ -27,7 +27,7 @@ StarRailAssistant (SRA) automates *Honkai: Star Rail* via screen recognition. Wi
 Setup (Python 3.12 only, `requires-python >=3.12,<3.13`):
 
 ```bash
-pip install -e ".[full]"   # full = desktop deps (pyautogui/pywin32/...); ".[dev]" for pytest
+pip install -e ".[standard]"   # standard = desktop deps (pyautogui/pywin32/...); ".[dev]" for pytest
 ```
 
 Run the backend:
@@ -157,7 +157,7 @@ migrates legacy config shapes. Runtime logs and failure screenshots go to the re
   WebUI renders from OpenAPI, so both follow the backend.
 - **Release notes live in `ChangeLog2.0.md`.** `scripts/package.py` reads it, substitutes `${VERSION}` and writes the
   gitignored `version_info.txt` (first line = release name/tag) consumed by CI — edit the changelog, not
-  `version_info.txt`. `.github/workflows/python-app.yml` builds releases (Nuitka + Inno Setup + multi-zip artifacts),
+  `version_info.txt`. `.github/workflows/python-app.yml` builds releases (内嵌 Python 运行时 + 源码 + Inno Setup + multi-zip artifacts),
   `pypi.yml` publishes to PyPI, and `scripts/package.py` decides which files land in the Lite/Core/Resources/Server
   zips.
 

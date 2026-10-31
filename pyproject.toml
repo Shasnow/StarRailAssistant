@@ -35,7 +35,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-full = [
+standard = [
     "plyer==2.1.0",
     "pynput==1.8.2",
     "pyautogui==0.9.54; os_name == 'nt'",
