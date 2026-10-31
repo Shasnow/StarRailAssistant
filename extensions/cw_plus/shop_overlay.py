@@ -11,6 +11,8 @@ from dataclasses import dataclass
 import math
 import re
 
+from PIL import Image
+
 import numpy as np
 
 
@@ -46,7 +48,11 @@ def _pixels(image):
 def _fraction(image, roi, predicate):
     patch = image.crop(_bounds(image.size, roi))
     # 全部原始像素参与原判据；有符号通道避免颜色差值回绕。
-    pixels = np.asarray(patch, dtype=np.int16)
+    if type(patch) is Image.Image and patch.mode == "RGB":
+        pixels = np.frombuffer(patch.tobytes(), dtype=np.uint8)
+        pixels = pixels.reshape(patch.height, patch.width, 3).astype(np.int16, order="F")
+    else:
+        pixels = np.asarray(patch, dtype=np.int16, order="F")
     return np.count_nonzero(predicate(pixels[..., 0], pixels[..., 1], pixels[..., 2])) / (
         patch.width * patch.height)
 
@@ -131,10 +137,24 @@ def observe_shop_probability_panel(image) -> ShopProbabilityPanelObservation:
             return ShopProbabilityPanelObservation(image, frame, False)
         frame = image.convert("RGB")
         blue = lambda r, g, b: (b > 140) & (b - r > 50) & (b - g > 40)
-        dark = lambda r, g, b: (r <= 70) & (g <= 70) & (b <= 70)
+        dark = lambda r, g, b: np.maximum(np.maximum(r, g), b) <= 70
+
+        def dark_fraction():
+            patch = frame.crop(_bounds(frame.size, (0.205, 0.301, 0.795, 0.759)))
+            # RGB 阈值无需有符号转换；自定义图像保留原通道语义。
+            if type(patch) is Image.Image and patch.mode == "RGB":
+                r, g, b = (np.asarray(band) for band in patch.split())
+                maximum = np.maximum(r, g)
+                np.maximum(maximum, b, out=maximum)
+                mask = maximum <= 70
+            else:
+                pixels = np.asarray(patch, dtype=np.int16, order="F")
+                mask = dark(pixels[..., 0], pixels[..., 1], pixels[..., 2])
+            return np.count_nonzero(mask) / (patch.width * patch.height)
+
         present = (_fraction(frame, (0.45, 0.222, 0.745, 0.273), blue) >= 0.88
                 and _fraction(frame, (0.195, 0.258, 0.38, 0.276), blue) >= 0.70
-                and _fraction(frame, (0.205, 0.301, 0.795, 0.759), dark) >= 0.78)
+                and dark_fraction() >= 0.78)
         return ShopProbabilityPanelObservation(image, frame, present)
     except (AttributeError, TypeError, ValueError, ZeroDivisionError):
         return ShopProbabilityPanelObservation(image, frame, False)
