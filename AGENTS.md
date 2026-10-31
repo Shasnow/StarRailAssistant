@@ -8,13 +8,16 @@ StarRailAssistant (SRA) automates *Honkai: Star Rail* via screen recognition. Wi
 
 - `main.py` — backend entry point (delegates to `SRACore/__main__.py`).
 - `SRACore/` — CLI (`cli2.py`, cmd2-based), task/extension registries, operators (vision + input), notifications,
-  services, utils, generated models.
+  `services/`（进程内宿主 `AppContext` 与设置/配置/缓存/应用信息/后端/日志流等框架无关服务，CLI 与服务端复用）,
+  utils, generated models.
 - `tasks/` — task implementations.
 - `extensions/` — extension implementations; `extensions/cw_plus/` is a large self-contained subsystem.
 - `resources/img/**` — image templates, referenced only through `tasks/img.py` constants.
 - `tests/` — pytest suite for the backend.
-- `SRAFrontend/` — .NET solution: `SRAFrontend` (shared core), `SRAFrontend.Desktop` (Avalonia), `SRAFrontend.Server`
-  (ASP.NET Core API + MCP).
+- `SRAFrontend/` — .NET solution: `SRAFrontend` (shared core), `SRAFrontend.Desktop` (Avalonia).
+- `SRAServer/` — Litestar 装配层（`/api/**` REST、`/openapi/v1.json`、MCP 于 `/mcp`、WebUI 静态托管）：
+  `context.py::ServerContext` 组合 `SRACore.services.AppContext` 并叠加服务端配置（AccessToken / 访问模式），
+  业务实现全部来自 `SRACore`（不再以 stdio 子进程调用 CLI）。
 - `SRAFrontend/srafrontend-webui/` — Vue 3 + Element Plus WebUI. **It has its own `AGENTS.md`; read it before working
   in that subtree.**
 - `scripts/` — packaging, version bumping, model/localization generation, cleanup.
@@ -53,8 +56,19 @@ Frontend / server (from repo root):
 
 ```bash
 dotnet run --project SRAFrontend/SRAFrontend.Desktop/SRAFrontend.Desktop.csproj
-dotnet run --project SRAFrontend/SRAFrontend.Server/SRAFrontend.Server.csproj   # http://localhost:5073
+python -m SRAServer                                                            # http://localhost:5073（需 pip install -e ".[server]"）
 ```
+
+Console scripts (available after `pip install -e .`, `uv tool install starrailassistant`, `pipx install …`):
+
+```bash
+sra            # 统一入口，默认启动交互式 CLI（sra-cli 为等价别名）
+sra serve      # 启动 Litestar 服务端（sra-server / python -m SRAServer 等价）
+```
+
+`sra serve` 与 `sra-server` 共用 `SRAServer.__main__.run_server`：启动前会检查 `[server]` extra 依赖
+（缺失时提示 `--extra server` 安装命令），并优先加载当前目录下由 `sra init` 下载的 `SRAServer`
+（含构建好的 WebUI 静态资源），避免被已安装包遮盖。
 
 Repo scripts:
 
@@ -76,10 +90,17 @@ holds the exact commands issued (`task run <config>`, `task status --json`, `ope
 `extension schema <id> --json`, …). **Changing a `--json` payload shape is a cross-language API change** — update
 `LocalBackendService.cs` and the WebUI together.
 
-**Server surface.** `SRAFrontend.Server` exposes `/api/**` REST, `/openapi/v1.json`, Swagger in Debug, the static
-WebUI, and MCP tools at `/mcp` (`McpController.cs`: `sra_screenshot`, `sra_task_run`, `sra_operator_call`,
-`sra_config_update`, …). The WebUI generates its task and settings forms from the OpenAPI schema, so backend config
-models are the source of truth for the web UI.
+**Server surface.** `SRAServer` (Litestar, Python) exposes `/api/**` REST, `/openapi/v1.json`, the static WebUI,
+and MCP tools at `/mcp` (`SRAServer/mcp/server.py`: `sra_screenshot`, `sra_task_run`, `sra_operator_call`,
+`sra_config_update`, …). It runs as a single process hosting `SRACore` in-process, so task/extension/config/operator
+state is shared directly instead of being driven through the CLI. The WebUI generates its task and settings forms
+from the OpenAPI schema, so backend config models are the source of truth for the web UI.
+
+**Core services (`SRACore/services/`).** Framework-independent business logic lives here and is shared by both hosts:
+`app_context.py::AppContext` owns the task/extension/operator orchestration (plus hotkeys, screenshot, settings/config/
+cache/app-info/log-stream services). `SRACore/__main__.py` builds one for the CLI; `SRAServer/context.py::ServerContext`
+wraps one with the server config. `SRAServer` keeps only assembly (`controllers/`, `middleware.py`, `openapi.py`,
+`app.py`, `config.py`, `context.py`, `mcp/`, `schemas/`), so path/JSON envelopes and CLI `--json` output stay as they are.
 
 **Dynamic imports.** `tasks/` and `extensions/` are not packages (no `__init__.py`). `SRACore.util.dynamic_import`
 and `load_extensions()` scan `*.py` and import them, relying on `main.py` putting cwd on `sys.path`. Both are
@@ -118,7 +139,10 @@ migrates legacy config shapes. Runtime logs and failure screenshots go to the re
 - **Generated files — never hand-edit.** `SRACore/models/app_settings.py` and `SRACore/models/tasks_config.py` come
   from `SRAFrontend/SRAFrontend/Models/*.cs` via `npm run modelgen`; `SRACore/localization/resource.py`,
   `resource_zh-cn.json` and `resource_en-us.json` come from `resource.toml` via `npm run pyl10nc`. Edit the C# model
-  or the TOML, then regenerate. WebUI `ResX` localization is updated by hand.
+  or the TOML, then regenerate. WebUI `ResX` localization is updated by hand. The two model files are Pydantic models
+  and are the **only** Python model definitions: `SRACore` uses them for `settings.json` / `configs/*.json` and
+  `SRAServer` expands them into the `/openapi/v1.json` components (`SRAServer/openapi.py`), so never re-declare a
+  mirror model on the server side.
 - **Version lives in three files**: `SRACore/util/const.py` (`VERSION`, which drives `pyproject.toml`),
   `package.json` and `SRAFrontend/SRAFrontend/Models/AppSettings.cs`. Change them together with `npm run ver`.
 - **Localization** is attribute-style on the `Resource` singleton (`Resource.cli_intro`), resolved by

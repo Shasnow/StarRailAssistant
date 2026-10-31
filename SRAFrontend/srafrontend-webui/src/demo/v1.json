@@ -10,7 +10,7 @@
     }
   ],
   "paths": {
-    "/api/App/background": {
+    "/api/app/background": {
       "get": {
         "tags": [
           "App"
@@ -43,7 +43,7 @@
         }
       }
     },
-    "/api/App/system-info": {
+    "/api/app/system-info": {
       "get": {
         "tags": [
           "App"
@@ -73,7 +73,7 @@
         }
       }
     },
-    "/api/App/phrases": {
+    "/api/app/phrases": {
       "get": {
         "tags": [
           "App"
@@ -103,7 +103,7 @@
         }
       }
     },
-    "/api/Auth": {
+    "/api/auth": {
       "post": {
         "tags": [
           "Auth"
@@ -155,7 +155,7 @@
         }
       }
     },
-    "/api/Backend/restart": {
+    "/api/backend/restart": {
       "post": {
         "tags": [
           "Backend"
@@ -228,7 +228,7 @@
         }
       }
     },
-    "/api/Backend/stop": {
+    "/api/backend/stop": {
       "post": {
         "tags": [
           "Backend"
@@ -261,7 +261,7 @@
         }
       }
     },
-    "/api/Backend/logs": {
+    "/api/backend/logs": {
       "get": {
         "tags": [
           "Backend"
@@ -315,7 +315,7 @@
         }
       }
     },
-    "/api/Backend/logs/stream": {
+    "/api/backend/logs/stream": {
       "get": {
         "tags": [
           "Backend"
@@ -331,7 +331,7 @@
         }
       }
     },
-    "/api/Backend/screenshot": {
+    "/api/backend/screenshot": {
       "get": {
         "tags": [
           "Backend"
@@ -364,7 +364,7 @@
         }
       }
     },
-    "/api/Configs": {
+    "/api/configs": {
       "get": {
         "tags": [
           "Configs"
@@ -394,7 +394,7 @@
         }
       }
     },
-    "/api/Configs/{configName}": {
+    "/api/configs/{configName}": {
       "get": {
         "tags": [
           "Configs"
@@ -662,7 +662,7 @@
         }
       }
     },
-    "/api/Extensions": {
+    "/api/extensions": {
       "get": {
         "tags": [
           "Extensions"
@@ -695,7 +695,7 @@
         }
       }
     },
-    "/api/Extensions/{id}/schema": {
+    "/api/extensions/{id}/schema": {
       "get": {
         "tags": [
           "Extensions"
@@ -738,7 +738,7 @@
         }
       }
     },
-    "/api/Extensions/{id}/config": {
+    "/api/extensions/{id}/config": {
       "get": {
         "tags": [
           "Extensions"
@@ -842,7 +842,7 @@
         }
       }
     },
-    "/api/Extensions/{id}/run": {
+    "/api/extensions/{id}/run": {
       "post": {
         "tags": [
           "Extensions"
@@ -892,7 +892,7 @@
         }
       }
     },
-    "/api/Extensions/{id}/stop": {
+    "/api/extensions/{id}/stop": {
       "post": {
         "tags": [
           "Extensions"
@@ -935,7 +935,7 @@
         }
       }
     },
-    "/api/Extensions/reload": {
+    "/api/extensions/reload": {
       "post": {
         "tags": [
           "Extensions"
@@ -968,7 +968,7 @@
         }
       }
     },
-    "/api/Operator/list": {
+    "/api/operator/list": {
       "get": {
         "tags": [
           "Operator"
@@ -1001,7 +1001,7 @@
         }
       }
     },
-    "/api/Operator/help/{method}": {
+    "/api/operator/help/{method}": {
       "get": {
         "tags": [
           "Operator"
@@ -1044,7 +1044,7 @@
         }
       }
     },
-    "/api/Operator/call": {
+    "/api/operator/call": {
       "post": {
         "tags": [
           "Operator"
@@ -1117,7 +1117,7 @@
         }
       }
     },
-    "/api/Settings": {
+    "/api/settings": {
       "get": {
         "tags": [
           "Settings"
@@ -1211,7 +1211,7 @@
         }
       }
     },
-    "/api/Task/run": {
+    "/api/task/run": {
       "post": {
         "tags": [
           "Task"
@@ -1304,7 +1304,7 @@
         }
       }
     },
-    "/api/Task/single": {
+    "/api/task/single": {
       "post": {
         "tags": [
           "Task"
@@ -1377,7 +1377,7 @@
         }
       }
     },
-    "/api/Task/stop": {
+    "/api/task/stop": {
       "post": {
         "tags": [
           "Task"
@@ -1407,7 +1407,7 @@
         }
       }
     },
-    "/api/Task/status": {
+    "/api/task/status": {
       "get": {
         "tags": [
           "Task"

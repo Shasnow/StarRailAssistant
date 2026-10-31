@@ -35,7 +35,7 @@ const LATENCY_MAX = 500
 export interface RouteContext {
   /** 小写 HTTP 方法 */
   method: string
-  /** 请求路径（不含 query，如 /Configs/日常清体力 编码后原样） */
+  /** 请求路径（不含 query，如 /configs/日常清体力 编码后原样） */
   path: string
   /** 正则捕获组（如配置名） */
   params: string[]
@@ -61,24 +61,24 @@ export interface DemoRoute {
 /** 路由表：与 src/api 下各模块的 url 一一对应，未命中走兜底响应 */
 const routes: DemoRoute[] = [
   // Configs
-  { method: 'get', pattern: /^\/Configs$/, handler: handleListConfigs },
-  { method: 'get', pattern: /^\/Configs\/(.+)$/, handler: handleGetConfig },
-  { method: 'post', pattern: /^\/Configs\/(.+)$/, handler: handleCreateConfig },
-  { method: 'put', pattern: /^\/Configs\/(.+)$/, handler: handleUpdateConfig },
-  { method: 'delete', pattern: /^\/Configs\/(.+)$/, handler: handleDeleteConfig },
+  { method: 'get', pattern: /^\/configs$/, handler: handleListConfigs },
+  { method: 'get', pattern: /^\/configs\/(.+)$/, handler: handleGetConfig },
+  { method: 'post', pattern: /^\/configs\/(.+)$/, handler: handleCreateConfig },
+  { method: 'put', pattern: /^\/configs\/(.+)$/, handler: handleUpdateConfig },
+  { method: 'delete', pattern: /^\/configs\/(.+)$/, handler: handleDeleteConfig },
   // Task
-  { method: 'post', pattern: /^\/Task\/run$/, handler: handleRunTask },
-  { method: 'post', pattern: /^\/Task\/stop$/, handler: handleStopTask },
-  { method: 'get', pattern: /^\/Task\/status$/, handler: handleTaskStatus },
+  { method: 'post', pattern: /^\/task\/run$/, handler: handleRunTask },
+  { method: 'post', pattern: /^\/task\/stop$/, handler: handleStopTask },
+  { method: 'get', pattern: /^\/task\/status$/, handler: handleTaskStatus },
   // App
-  { method: 'get', pattern: /^\/App\/system-info$/, handler: handleSystemInfo },
-  { method: 'get', pattern: /^\/App\/phrases$/, handler: handlePhrases },
+  { method: 'get', pattern: /^\/app\/system-info$/, handler: handleSystemInfo },
+  { method: 'get', pattern: /^\/app\/phrases$/, handler: handlePhrases },
   // Auth / Backend / Settings
   { method: 'post', pattern: /^\/auth$/, handler: handleAuth },
-  { method: 'post', pattern: /^\/Backend\/restart$/, handler: handleBackendRestart },
-  { method: 'post', pattern: /^\/Backend\/stop$/, handler: handleBackendStop },
-  { method: 'get', pattern: /^\/Settings$/, handler: handleGetSettings },
-  { method: 'put', pattern: /^\/Settings$/, handler: handlePutSettings },
+  { method: 'post', pattern: /^\/backend\/restart$/, handler: handleBackendRestart },
+  { method: 'post', pattern: /^\/backend\/stop$/, handler: handleBackendStop },
+  { method: 'get', pattern: /^\/settings$/, handler: handleGetSettings },
+  { method: 'put', pattern: /^\/settings$/, handler: handlePutSettings },
 ]
 
 /** 解析请求体：axios transformRequest 已把对象序列化为 JSON 字符串，这里还原 */

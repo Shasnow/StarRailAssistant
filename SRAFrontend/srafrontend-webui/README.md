@@ -74,7 +74,7 @@ pnpm build       # 生产构建
 
 ### 构建产物
 
-`pnpm build` 完成后，`scripts/postbuild.mjs` 会自动将 `dist/` 复制到后端项目的 `SRAFrontend.Server/wwwroot/` 目录，供 .NET 后端托管前端静态文件。
+`pnpm build` 完成后，`scripts/postbuild.mjs` 会自动将 `dist/` 复制到后端项目的 `SRAServer/static/` 目录，供 Python（Litestar）后端托管前端静态文件。
 
 ### 项目结构
 

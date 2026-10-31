@@ -89,7 +89,7 @@ function redirectTarget(): string {
   return '/'
 }
 
-/** 提交：表单校验通过后请求 /api/Auth 校验 token，成功则保存并进入主界面 */
+/** 提交：表单校验通过后请求 /api/auth 校验 token，成功则保存并进入主界面 */
 async function handleSubmit() {
   if (submitting.value || !formRef.value) return
   error.value = ''

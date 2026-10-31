@@ -7,7 +7,7 @@ sys.path.append(os.getcwd())  # 将当前工作目录添加到 sys.path，以便
 
 from SRACore.localization import Resource
 from SRACore.localization.presentation import translate
-from SRACore.service.setting_service import SettingsService
+from SRACore.services.setting_service import SettingsService
 from SRACore.util.const import VERSION, AppDataDir, CacheDir, ConfigsDir, LogsDir, SettingsJson
 from SRACore.util.standard_io import configure_standard_streams
 
@@ -15,8 +15,8 @@ from SRACore.util.standard_io import configure_standard_streams
 def main():
     # Must precede argparse output and cmd2/Rich/logging stream capture.
     configure_standard_streams()
-    settings_service = SettingsService()
-    language: int = settings_service.settings.Display.Language
+    settings = SettingsService()
+    language: int = settings.settings.Display.Language
     Resource.set_language(language)
     parser = argparse.ArgumentParser(
         description=Resource.argparse_description,
@@ -36,9 +36,10 @@ def main():
             print(Resource.cli_noAdminWarning)
         else:
             restart_as_admin()
-    from SRACore.util.logger import logger, setup_logger
-    # 设置日志记录器
-    setup_logger(level=args.log_level)
+    # 构造进程内宿主：统一负责日志、tasks/extensions 动态导入与任务/扩展编排
+    from SRACore.services import AppContext
+    context = AppContext(log_level=args.log_level)
+    from SRACore.util.logger import logger
     logger.info(f"Current version: {VERSION}")
     logger.debug(f"cwd: {os.getcwd()}")
 
@@ -53,10 +54,8 @@ def main():
     if args.inline:
         sys.argv.remove('--inline')
     # 延迟导入 SRACli
-    from SRACore.util import dynamic_import
-    dynamic_import("tasks")  # 动态导入 tasks 包下的所有模块
     from SRACore.cli2 import SRACli
-    cli_instance = SRACli(settings_service)
+    cli_instance = SRACli(context)
     # 配置交互式模式（隐藏提示符）
     if args.inline:
         cli_instance.intro = ''
@@ -167,19 +166,20 @@ def serve_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         '--port',
         type=int,
-        default=5000,
+        default=None,
         help=translate('The port to use'),
+    )
+    parser.add_argument(
+        '--no-webui',
+        action='store_true',
+        help=translate('Do not host the WebUI static files'),
     )
     return parser
 
 def serve(args: argparse.Namespace) -> bool:
-    """启动服务器"""
-    executable = "./SRA-server.exe" if sys.platform == 'win32' else "./SRA-server"
-    if args.host:
-        urls = f'http://0.0.0.0:{args.port}'
-    else:
-        urls = f'http://localhost:{args.port}'
-    subprocess.run([executable, f"--urls '{urls}'"], cwd=os.getcwd())
+    """启动服务端（与 ``sra-server`` 共用 ``SRAServer.run_server``，进程内运行）。"""
+    from SRAServer.__main__ import run_server
+    run_server(host=args.host, port=args.port, webui=False if args.no_webui else None)
     return True
 
 

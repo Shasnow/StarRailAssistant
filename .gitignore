@@ -25,7 +25,8 @@
 /setup/SRA/
 /setup/install_info.txt
 /main.dist/
-SRAFrontend/SRAFrontend.Server/wwwroot/*
+/SRAServer/static/*
+!/SRAServer/static/.gitkeep
 *.zip
 
 # 构建产物

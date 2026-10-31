@@ -46,9 +46,18 @@ full = [
 dev = [
     "pytest",
 ]
+server = [
+    "litestar",
+    "uvicorn[standard]",
+    "mcp",
+    "anyio",
+    "cryptography",
+]
 
 [project.scripts]
+sra = "SRACore.__main__:main"
 sra-cli = "SRACore.__main__:main"
+sra-server = "SRAServer.__main__:main"
 
 [project.urls]
 Homepage = "https://starrailassistant.top"
@@ -56,12 +65,16 @@ Repository = "https://github.com/Shasnow/StarRailAssistant"
 Issues = "https://github.com/Shasnow/StarRailAssistant/issues"
 
 [tool.setuptools.packages.find]
-include = ["SRACore*"]
+include = ["SRACore*", "SRAServer*"]
 
 [tool.setuptools.package-data]
 SRACore = [
     "localization/*.toml",
-    "localization/*.json"
+    "localization/*.json",
+    "assets/*"
+]
+SRAServer = [
+    "static/**"
 ]
 
 [tool.setuptools.dynamic]

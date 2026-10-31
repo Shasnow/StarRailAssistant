@@ -43,7 +43,7 @@ describe('verifyToken 校验 Access Token', () => {
     })
   })
 
-  it('请求 /api/Auth，请求体为 { token } 且不携带本地遗留的 X-Access-Token', async () => {
+  it('请求 /api/auth，请求体为 { token } 且不携带本地遗留的 X-Access-Token', async () => {
     setStoredToken('stale-token')
     const seen: { url?: unknown; body?: unknown; header?: unknown } = { header: 'sentinel' }
     http.defaults.adapter = respond(200, undefined, (config) => {

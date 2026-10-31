@@ -38,8 +38,6 @@ from zipfile import ZipFile, ZIP_DEFLATED
 ROOT_PATH = Path(__file__).resolve().parent.parent
 DOTNET_EXE = os.environ.get("DOTNET_EXE", "dotnet")
 DESKTOP_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Desktop" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
-SERVER_WIN_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "bin" / "Release" / "net10.0" / "win-x64" / "publish"
-SERVER_LINUX_X64_PUBLISH_PATH = ROOT_PATH / "SRAFrontend" / "SRAFrontend.Server" / "bin" / "Release" / "net10.0" / "linux-x64" / "publish"
 
 DIST_DIR = ROOT_PATH / "main.dist"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
@@ -90,7 +88,7 @@ class ZipBuilder:
     def add_file(self, file: Path, arcname: str):
         self._entries[arcname] = file
 
-    _EXCLUDESuffixes = (".pdb",)
+    _EXCLUDESuffixes = (".pdb", ".pyc")
     _EXCLUDENames = {"web.config"}
     # OpenCV 视频 IO 后端，本项目只用于截图与模板匹配，不使用 VideoCapture/VideoWriter
     _EXCLUDEPrefixes = ("opencv_videoio_ffmpeg",)
@@ -190,9 +188,7 @@ def package_lite(version: str):
     builder = ZipBuilder()
     for file in DESKTOP_WIN_X64_PUBLISH_PATH.iterdir():
         builder.add(file)
-    for file in SERVER_WIN_X64_PUBLISH_PATH.iterdir():
-        builder.add(file)
-    for item in ["SRACore", "tasks", "extensions", "resources"]:
+    for item in ["SRACore", "SRAServer", "tasks", "extensions", "resources"]:
         builder.add(ROOT_PATH / item)
     # pyproject.toml 随包分发：用户在解压目录执行 pip install ".[full]" 安装依赖
     for file in ["main.py", "README.md", "LICENSE", "pyproject.toml"]:
@@ -204,8 +200,6 @@ def publish_dotnet_projects():
     print("Publishing .NET projects ...")
     commands = [
         [DOTNET_EXE, "publish", "-c", "Release", "-r", "win-x64", "SRAFrontend\\SRAFrontend.Desktop\\SRAFrontend.Desktop.csproj"],
-        [DOTNET_EXE, "publish", "-c", "Release", "-r", "win-x64", "SRAFrontend\\SRAFrontend.Server\\SRAFrontend.Server.csproj"],
-        [DOTNET_EXE, "publish", "-c", "Release", "-r", "linux-x64", "SRAFrontend\\SRAFrontend.Server\\SRAFrontend.Server.csproj"],
     ]
     for cmd in commands:
         result = subprocess.run(cmd, cwd=ROOT_PATH)
@@ -238,20 +232,16 @@ def resources_package_object_key(version: str) -> str:
 
 
 def package_server(version: str) -> Path:
-    """打包 SRAFrontend.Server 的发布产物，供 CLI init 命令下载。"""
+    """打包 Python 服务端（SRAServer 源码 + 构建后的 WebUI 静态资源），供 CLI init 下载。"""
     print("Packaging Server ...")
-    if not SERVER_WIN_X64_PUBLISH_PATH.exists():
-        print(f"[ERROR] Server publish path not found: {SERVER_WIN_X64_PUBLISH_PATH}")
-        print("        Run `dotnet publish -c Release -r win-x64 .\\SRAFrontend\\SRAFrontend.sln` first.")
+    static_dir = ROOT_PATH / "SRAServer" / "static"
+    if not static_dir.exists() or not any(static_dir.iterdir()):
+        print(f"[ERROR] WebUI static dir not found or empty: {static_dir}")
+        print("        Run `pnpm run build` in SRAFrontend/srafrontend-webui first.")
         sys.exit(1)
     zip_path = ROOT_PATH / f"SRAFrontend_Server_v{version}.zip"
-    if not SERVER_LINUX_X64_PUBLISH_PATH.exists():
-        print(f"[ERROR] Server publish path not found: {SERVER_LINUX_X64_PUBLISH_PATH}")
-        print("        Run `dotnet publish -c Release -r linux-x64 .\\SRAFrontend\\SRAFrontend.sln` first.")
-        sys.exit(1)
     builder = ZipBuilder()
-    builder.add(SERVER_WIN_X64_PUBLISH_PATH, SERVER_WIN_X64_PUBLISH_PATH)
-    builder.add(SERVER_LINUX_X64_PUBLISH_PATH, SERVER_LINUX_X64_PUBLISH_PATH)
+    builder.add(ROOT_PATH / "SRAServer", ROOT_PATH / "SRAServer")
     builder.snapshot(zip_path)
     return zip_path
 
@@ -335,7 +325,7 @@ if __name__ == "__main__":
 
     print("Packaging Basic ...")
     builder.add(DESKTOP_WIN_X64_PUBLISH_PATH, DESKTOP_WIN_X64_PUBLISH_PATH)
-    builder.add(SERVER_WIN_X64_PUBLISH_PATH, SERVER_WIN_X64_PUBLISH_PATH)
+    builder.add(ROOT_PATH / "SRAServer", ROOT_PATH / "SRAServer")
     builder.snapshot(ROOT_PATH / f"StarRailAssistant_v{version}.zip")
 
     # 资源包 → R2（供 CLI init 下载）
