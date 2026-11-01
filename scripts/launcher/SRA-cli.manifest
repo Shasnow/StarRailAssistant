@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  SRA-cli.exe 的清单。
+
+  权限与旧版 Nuitka 产物一致：requestedExecutionLevel 取 asInvoker，不强制提权。
+  需要管理员权限时由 SRACore.__main__ 的 restart_as_admin 在启动后自行提权，
+  这样 no-admin 参数仍然有效，普通场景也不会平白弹 UAC。
+
+  注意：XML 注释内不得出现连续两个连字符，否则 Windows 的 SXS 会判定清单无效，
+  启动时报错 14001（并行配置不正确）。
+
+  以资源方式内嵌（SRA-cli.rc 中的 1 24 条目），MSVC 编译时配合 /MANIFEST:NO，
+  避免链接器再生成一份清单。
+-->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity type="win32" name="StarRailAssistant.SRA-cli" version="1.0.0.0" processorArchitecture="amd64"/>
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+    <security>
+      <requestedPrivileges>
+        <requestedExecutionLevel level="asInvoker" uiAccess="false"/>
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+  <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+    <application>
+      <!-- Windows 10/11 -->
+      <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"/>
+    </application>
+  </compatibility>
+</assembly>

@@ -92,6 +92,14 @@ jobs:
         run: |
           python scripts/package.py
 
+      # 启动器由 MSVC 现场编译；工具链缺失时 package.py 只会告警跳过，这里显式兜底
+      - name: Verify SRA-cli.exe launcher
+        run: |
+          if (-not (Test-Path "main.dist\SRA-cli.exe")) {
+            throw "SRA-cli.exe launcher was not built. Ensure the runner has an MSVC C++ toolchain."
+          }
+          Get-Item "main.dist\SRA-cli.exe" | Format-List Name, Length
+
       - name: Read version
         id: read_version
         run: |

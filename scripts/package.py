@@ -47,6 +47,12 @@ DIST_PYTHON_DIR = DIST_DIR / "python"
 DEPS_STAMP_NAME = ".requirements.sha256"
 PYTHON31210_URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
+# SRA-cli.exe 启动器：取代旧版 Nuitka 构建的命令行可执行文件，转发到内嵌运行时
+LAUNCHER_DIR = ROOT_PATH / "scripts" / "launcher"
+LAUNCHER_NAME = "SRA-cli.exe"
+LAUNCHER_SOURCE = LAUNCHER_DIR / "SRA-cli.c"
+LAUNCHER_MANIFEST = LAUNCHER_DIR / "SRA-cli.manifest"
+LAUNCHER_ICON = ROOT_PATH / "assets" / "SRAicon.ico"
 # R2 自定义域名（绑定到上传桶的公开访问基址），CLI init 从此处下载 WebUI 包与资源包
 R2_PUBLIC_BASE_URL = "https://resource.starrailassistant.top"
 
@@ -151,12 +157,166 @@ def runtime_requirements() -> list[str]:
     return requirements
 
 
-def run(cmd: list[str]):
+def run(cmd: list[str], cwd: Path | None = None, env: dict[str, str] | None = None):
     """执行命令，非零退出即终止打包。"""
-    result = subprocess.run(cmd)
+    result = subprocess.run(cmd, cwd=cwd, env=env)
     if result.returncode != 0:
         print(f"[ERROR] Command failed (exit code: {result.returncode}): {' '.join(cmd)}")
         sys.exit(1)
+
+
+def msvc_environment() -> dict[str, str] | None:
+    """返回可用的 MSVC 工具链环境变量；cl.exe 不可用时返回 None。
+
+    优先复用当前环境（PATH 中已有 cl.exe），否则通过 vswhere 定位 Visual Studio
+    并执行 vcvars64.bat 导出环境，避免要求调用方预先打开开发者命令提示符。
+    """
+    env = os.environ.copy()
+    if shutil.which("cl"):
+        return env
+
+    vswhere = (
+        Path(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"))
+        / "Microsoft Visual Studio" / "Installer" / "vswhere.exe"
+    )
+    if not vswhere.is_file():
+        return None
+
+    installation = ""
+    for query in (
+        ["-latest", "-products", "*", "-requires", "Microsoft.VisualStudio.Component.VC.Tools.x86.x64"],
+        ["-latest", "-products", "*"],
+    ):
+        query_result = subprocess.run(
+            [str(vswhere), *query, "-property", "installationPath"],
+            capture_output=True, text=True, errors="replace",
+        )
+        if query_result.returncode == 0 and query_result.stdout.strip():
+            installation = query_result.stdout.strip().splitlines()[0].strip()
+            break
+    if not installation:
+        return None
+
+    vcvars = Path(installation) / "VC" / "Auxiliary" / "Build" / "vcvars64.bat"
+    if not vcvars.is_file():
+        return None
+
+    dump = subprocess.run(
+        ["cmd", "/c", f'"{vcvars}" && set'],
+        capture_output=True, text=True, errors="replace",
+    )
+    if dump.returncode != 0:
+        return None
+    for line in dump.stdout.splitlines():
+        name, separator, value = line.partition("=")
+        if separator and name:
+            env[name] = value
+    return env
+
+
+def gcc_toolchain() -> tuple[str, str] | None:
+    """返回 (gcc, windres) 可执行名；无可用 mingw-w64 工具链时返回 None。
+
+    MSVC 缺失时的降级路径（例如仅有 mingw 的开发机），CI 仍以 MSVC 为准。
+    """
+    windres = shutil.which("windres") or shutil.which("x86_64-w64-mingw32-windres")
+    if windres is None:
+        return None
+    for name in ("x86_64-w64-mingw32-gcc", "gcc"):
+        if shutil.which(name):
+            return name, windres
+    return None
+
+
+def launcher_rc(version: str) -> str:
+    """生成 SRA-cli.exe 的资源脚本：图标、管理员清单与版本信息。
+
+    编译在临时目录中进行，图标与清单按文件名引用，规避 rc 对反斜杠路径的转义差异。
+    """
+    release = version.split("-", 1)[0]
+    numbers = [int(part) for part in release.split(".")]
+    numbers = (numbers + [0, 0, 0, 0])[:4]
+    file_version = ",".join(str(number) for number in numbers)
+    return f'''1 ICON "SRAicon.ico"
+1 24 "SRA-cli.manifest"
+
+1 VERSIONINFO
+  FILEVERSION     {file_version}
+  PRODUCTVERSION  {file_version}
+  FILEOS          0x00040000L
+  FILETYPE        0x00000001L
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "080404b0"
+    BEGIN
+      VALUE "CompanyName", "StarRailAssistant Team"
+      VALUE "FileDescription", "StarRailAssistant Component"
+      VALUE "FileVersion", "{release}"
+      VALUE "LegalCopyright", "Copyright 2024 Shasnow"
+      VALUE "OriginalFilename", "SRA-cli.exe"
+      VALUE "ProductName", "StarRailAssistant"
+      VALUE "ProductVersion", "{release}"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x804, 1200
+  END
+END
+'''
+
+
+def build_launcher(version: str) -> Path | None:
+    """编译并放置 SRA-cli.exe 启动器；无 C 工具链时警告并跳过（Lite 包不含启动器）。
+
+    优先使用 MSVC（CI 环境），缺失时降级到 mingw-w64，便于开发机本地打包出同样的入口。
+    """
+    msvc_env = msvc_environment()
+    gcc = gcc_toolchain()
+    if msvc_env is None and gcc is None:
+        print("[WARN] Neither MSVC nor mingw-w64 was found, skipping SRA-cli.exe "
+              "(install Visual Studio Build Tools with the C++ workload, or mingw-w64)")
+        return None
+    if not LAUNCHER_ICON.is_file():
+        print(f"[WARN] Launcher icon not found: {LAUNCHER_ICON}, skipping SRA-cli.exe")
+        return None
+
+    print("Building SRA-cli.exe launcher ...")
+    with tempfile.TemporaryDirectory() as tmp:
+        work_dir = Path(tmp)
+        shutil.copy2(LAUNCHER_SOURCE, work_dir / LAUNCHER_SOURCE.name)
+        shutil.copy2(LAUNCHER_MANIFEST, work_dir / LAUNCHER_MANIFEST.name)
+        shutil.copy2(LAUNCHER_ICON, work_dir / "SRAicon.ico")
+        (work_dir / "SRA-cli.rc").write_text(launcher_rc(version), encoding="utf-8")
+
+        if msvc_env is not None:
+            print("  toolchain: MSVC")
+            run(["rc", "/nologo", "/fo", "SRA-cli.res", "SRA-cli.rc"], cwd=work_dir, env=msvc_env)
+            # /MT 静态链接 CRT，避免依赖 VC 运行库；/MANIFEST:NO 保留资源内自带的管理员清单
+            run([
+                "cl", "/nologo", "/O2", "/MT", "/W3", "SRA-cli.c", "SRA-cli.res",
+                "/Fe:SRA-cli.exe",
+                "/link", "/SUBSYSTEM:CONSOLE", "/INCREMENTAL:NO", "/MANIFEST:NO",
+            ], cwd=work_dir, env=msvc_env)
+        else:
+            gcc_name, windres_name = gcc
+            print(f"  toolchain: {gcc_name} (MSVC not available)")
+            run([windres_name, "SRA-cli.rc", "-O", "coff", "-o", "SRA-cli_res.o"], cwd=work_dir)
+            # -municode 提供 wmain 入口；-static 静态链接，避免依赖 mingw 运行库 DLL
+            run([
+                gcc_name, "SRA-cli.c", "SRA-cli_res.o",
+                "-municode", "-O2", "-static", "-s", "-o", LAUNCHER_NAME,
+            ], cwd=work_dir)
+
+        built = work_dir / LAUNCHER_NAME
+        if not built.is_file():
+            print(f"[ERROR] SRA-cli.exe was not produced in {work_dir}")
+            sys.exit(1)
+        DIST_DIR.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(built, DIST_DIR / LAUNCHER_NAME)
+        print(f"[OK] {LAUNCHER_NAME} built ({built.stat().st_size} bytes)")
+    return DIST_DIR / LAUNCHER_NAME
 
 
 def configure_pth():
@@ -405,6 +565,9 @@ if __name__ == "__main__":
 
     prepare_embedded_python()
     copy_python_sources()
+
+    # SRA-cli.exe 启动器：兼容旧版 Nuitka 构建的命令行入口，随 Core/Full 包分发
+    build_launcher(version)
 
     # Lite
     package_lite(version)
