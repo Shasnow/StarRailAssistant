@@ -57,7 +57,6 @@ server = [
 [project.scripts]
 sra = "SRACore.__main__:main"
 sra-cli = "SRACore.__main__:main"
-sra-server = "SRAServer.__main__:main"
 
 [project.urls]
 Homepage = "https://starrailassistant.top"

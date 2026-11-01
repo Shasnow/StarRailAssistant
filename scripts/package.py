@@ -95,12 +95,6 @@ class ZipBuilder:
     def add_file(self, file: Path, arcname: str):
         self._entries[arcname] = file
 
-    def remove_prefix(self, prefix: str):
-        """移除指定前缀的条目（用于剔除 WebUI 等独立产物）。"""
-        prefix = self._arcname(Path(prefix)).rstrip("/")
-        for arcname in [n for n in self._entries if n == prefix or n.startswith(prefix + "/")]:
-            del self._entries[arcname]
-
     _EXCLUDESuffixes = (".pdb", ".pyc")
     # 构建元数据（依赖指纹）只在本地/CI 复用内嵌环境时使用，不进发布包
     _EXCLUDENames = {"web.config", DEPS_STAMP_NAME}
@@ -405,10 +399,6 @@ def copy_python_sources():
         if target.exists():
             shutil.rmtree(target)
         shutil.copytree(src, target, ignore=ignore)
-    static_dir = DIST_DIR / "SRAServer" / "static"
-    if static_dir.exists():
-        # WebUI 是独立产物（sra init 下载），不随服务端包分发
-        shutil.rmtree(static_dir)
     for name in SOURCE_FILES:
         shutil.copy2(ROOT_PATH / name, DIST_DIR / name)
     print("[OK] Python sources copied")
@@ -422,8 +412,6 @@ def package_lite(version: str):
         builder.add(file)
     for item in ["SRACore", "SRAServer", "tasks", "extensions", "resources", "assets"]:
         builder.add(ROOT_PATH / item)
-    # WebUI 是独立产物（sra init 下载），不随服务端包分发
-    builder.remove_prefix("SRAServer/static")
     # pyproject.toml 随包分发：用户在解压目录执行 pip install ".[standard]" 安装依赖
     for file in ["main.py", "README.md", "LICENSE", "pyproject.toml"]:
         builder.add(ROOT_PATH / file)
