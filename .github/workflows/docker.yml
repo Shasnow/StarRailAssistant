@@ -1,0 +1,115 @@
+#   <StarRailAssistant:An automated program that helps you complete daily tasks of StarRail.>
+#   Copyright © <2024> <Shasnow>
+
+#   This file is part of StarRailAssistant.
+
+#   StarRailAssistant is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU Affero General Public License as published by the Free Software Foundation,
+#   either version 3 of the License, or (at your option) any later version.
+
+#   StarRailAssistant is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#   See the GNU Affero General Public License for more details.
+
+#   You should have received a copy of the GNU Affero General Public License along with StarRailAssistant.
+#   If not, see <https://www.gnu.org/licenses/>.
+
+#   yukikage@qq.com
+
+name: Build Docker Image
+
+# 只构建并冒烟测试服务端镜像，不发布、不推送镜像仓库。
+# 镜像内容全部来自本次修订版本（WebUI 由 Dockerfile 的阶段 1 现场构建），启动不需要联网。
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Server Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          push: false
+          tags: sra-server:ci
+          # 构建缓存：pip / pnpm 下载与 apt 安装是主要耗时，命中缓存后可显著缩短
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 镜像信息
+        run: docker images sra-server:ci --format '{{.Repository}}:{{.Tag}}  {{.Size}}'
+
+      # 同时验证：服务端能起来、WebUI 静态资源被托管、tasks/ 与 extensions/ 确实进了镜像
+      - name: 服务端冒烟测试
+        run: |
+          set -euo pipefail
+          # 令牌留空 = 关闭 /api 鉴权，冒烟测试无需带令牌
+          docker run -d --name sra-smoke -p 5073:5073 -e SRA_ACCESS_TOKEN= sra-server:ci
+
+          ready=false
+          for _ in $(seq 1 60); do
+            if curl -fsS -o /dev/null http://127.0.0.1:5073/openapi/v1.json; then ready=true; break; fi
+            sleep 2
+          done
+          if [ "$ready" != true ]; then
+            echo "::error::服务端未在 120s 内就绪"
+            docker logs sra-smoke 2>&1 | tail -n 100
+            exit 1
+          fi
+
+          if ! curl -fsS http://127.0.0.1:5073/ | grep -q '<div id="app"'; then
+            echo "::error::WebUI 静态资源未托管（SRAServer/static 是否由阶段 1 正确 COPY？）"
+            exit 1
+          fi
+
+          if ! curl -fsS http://127.0.0.1:5073/api/extensions | grep -q 'AutoPlot'; then
+            echo "::error::扩展未注册（extensions/ 是否进入镜像？）"
+            exit 1
+          fi
+
+          if ! docker logs sra-smoke 2>&1 | grep -q 'Successfully load task'; then
+            echo "::error::任务未加载（tasks/ 是否进入镜像？）"
+            exit 1
+          fi
+
+          echo "--- 容器日志（尾部）---"
+          docker logs sra-smoke 2>&1 | tail -n 30
+
+      - name: 打印容器日志（失败时）
+        if: failure()
+        run: docker logs sra-smoke 2>&1 | tail -n 100 || true
+
+      - name: 清理容器
+        if: always()
+        run: docker rm -f sra-smoke || true
+
+      # 直接驱动容器内的 Chromium，验证云游戏这条链路可用；
+      # binary_location 指向镜像内的包装脚本（负责补 --no-sandbox / --disable-dev-shm-usage）
+      - name: 云游戏浏览器自检（无头 Chromium + Selenium）
+        run: |
+          docker run --rm -i --entrypoint python sra-server:ci - <<'PY'
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+
+          options = Options()
+          options.binary_location = "/usr/local/bin/chromium-container"
+          options.add_argument("--headless")
+          options.add_argument("--user-data-dir=/tmp/selenium_profile")
+
+          driver = webdriver.Chrome(options=options)
+          driver.get("about:blank")
+          print("Selenium + Chromium OK, browserVersion =", driver.capabilities.get("browserVersion"))
+          driver.quit()
+          PY

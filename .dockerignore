@@ -1,0 +1,51 @@
+# 构建上下文裁剪。
+#
+# 镜像实际需要：pyproject.toml、README.md、SRACore/、SRAServer/（不含 static）、
+# tasks/、extensions/、resources/，以及 SRAFrontend/srafrontend-webui/ 的源码。
+# 其余全部排除。
+
+# 版本控制与 CI
+.git
+.github
+.gitignore
+
+# 本地环境与缓存
+.venv
+__pycache__
+**/__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+
+# IDE / 工具
+.idea
+.vscode
+.trae
+.workbuddy
+
+# 运行时产物
+log
+tmp
+output
+main.dist
+.screenshots
+version_info.txt
+*.zip
+
+# .NET 桌面端与解决方案（obj/bin 合计约 1.9GB，必须排除）
+SRAFrontend/.idea
+SRAFrontend/SRAFrontend
+SRAFrontend/SRAFrontend.*
+# WebUI 的依赖与历史产物：容器内由 pnpm install / pnpm build 生成
+SRAFrontend/srafrontend-webui/node_modules
+SRAFrontend/srafrontend-webui/dist
+SRAFrontend/srafrontend-webui/.eslintcache
+
+# 其他非服务端内容
+assets
+docs
+tests
+setup
+
+# WebUI 产物在 node 阶段构建，不能把开发机上的本地构建版带进镜像
+SRAServer/static

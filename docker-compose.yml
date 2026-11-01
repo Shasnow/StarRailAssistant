@@ -1,0 +1,48 @@
+# SRA 服务端容器编排：WebUI + /api + /mcp
+#
+#   docker compose up -d --build
+#   浏览器打开 http://localhost:5073 （令牌在下方 SRA_ACCESS_TOKEN，WebUI 会要求填入）
+#
+# WebUI、tasks/、extensions/、resources/ 均在构建镜像时打进容器，启动无需联网；
+# 更新它们需要重新构建镜像（docker compose up -d --build）。
+#
+# 云游戏（容器内 Chromium）：启动后在 WebUI 设置中开启「云游戏」，
+#   浏览器选 “Chrome for Testing”，浏览器路径填 /usr/local/bin/chromium-container，
+#   并勾选「无头模式」——容器内没有显示器，云游戏必须无头运行。
+services:
+  sra-server:
+    build: .
+    image: sra-server:local
+    container_name: sra-server
+    restart: unless-stopped
+    ports:
+      - "5073:5073"
+    environment:
+      # 为空则 /api 全部放行；暴露到公网前务必改成自己的强随机令牌
+      SRA_ACCESS_TOKEN: "change-me"
+      SRA_HOST: "0.0.0.0"
+      SRA_PORT: "5073"
+      SRA_LOG_LEVEL: "INFO"
+      # 访客模式下 /mcp 不挂载；需要 MCP 接入时保持 false
+      SRA_VISITOR_MODE: "false"
+      TZ: "Asia/Shanghai"
+    volumes:
+      # 状态盘：settings.json / configs/ / cache/（云游戏登录态在 cache/selenium_profile 下）
+      - sra-data:/root/.config/SRA
+      # 运行日志与失败截图（log/ 按 cwd 解析）
+      - sra-log:/app/log
+    healthcheck:
+      # /openapi/v1.json 不在 /api 前缀下，不受令牌鉴权影响
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:5073/openapi/v1.json', timeout=5).status == 200 else 1)"
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+volumes:
+  sra-data:
+  sra-log:
