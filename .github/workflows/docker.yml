@@ -18,45 +18,84 @@
 
 name: Build Docker Image
 
-# 只构建并冒烟测试服务端镜像，不发布、不推送镜像仓库。
+# 构建服务端镜像，先冒烟测试，全部通过后推送到 GHCR（ghcr.io/<owner>/starrailassistant）。
 # 镜像内容全部来自本次修订版本（WebUI 由 Dockerfile 的阶段 1 现场构建），启动不需要联网。
+#
+# 标签规则：sha-<短哈希> 每次都有；主线分支上额外打 v<版本号> 与通道标签
+# （版本含 "-" 视为 beta，对齐 package.py 区分正式版/beta 的做法）。
 on:
   workflow_dispatch:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   build:
     name: Build Server Image
     runs-on: ubuntu-latest
+    env:
+      LOCAL_TAG: sra-server:ci
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: 解析版本与镜像名
+        id: meta
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p 'require("./package.json").version')
+          if [[ "$VERSION" == *-* ]]; then CHANNEL=beta; else CHANNEL=stable; fi
+          # GHCR 要求仓库名全小写，GITHUB_REPOSITORY 含大写所有者名，这里统一转小写
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "channel=$CHANNEL" >> "$GITHUB_OUTPUT"
+          echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - name: 生成镜像标签
+        id: tags
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.meta.outputs.image }}
+          tags: |
+            type=sha,format=short
+            type=raw,value=v${{ steps.meta.outputs.version }},enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ steps.meta.outputs.channel == 'stable' && github.ref == 'refs/heads/main' }}
+            type=raw,value=beta,enable=${{ steps.meta.outputs.channel == 'beta' && github.ref == 'refs/heads/main' }}
+
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # load 而非 push：先落到本地 daemon 供后续验证，验证通过后再统一推送
       - name: Build image
         uses: docker/build-push-action@v6
         with:
           context: .
           load: true
           push: false
-          tags: sra-server:ci
+          tags: |
+            ${{ steps.tags.outputs.tags }}
+            ${{ env.LOCAL_TAG }}
+          labels: ${{ steps.tags.outputs.labels }}
           # 构建缓存：pip / pnpm 下载与 apt 安装是主要耗时，命中缓存后可显著缩短
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: 镜像信息
-        run: docker images sra-server:ci --format '{{.Repository}}:{{.Tag}}  {{.Size}}'
+        run: docker images "${{ env.LOCAL_TAG }}" --format '{{.Repository}}:{{.Tag}}  {{.Size}}'
 
       # 同时验证：服务端能起来、WebUI 静态资源被托管、tasks/ 与 extensions/ 确实进了镜像
       - name: 服务端冒烟测试
         run: |
           set -euo pipefail
           # 令牌留空 = 关闭 /api 鉴权，冒烟测试无需带令牌
-          docker run -d --name sra-smoke -p 5073:5073 -e SRA_ACCESS_TOKEN= sra-server:ci
+          docker run -d --name sra-smoke -p 5073:5073 -e SRA_ACCESS_TOKEN= "${{ env.LOCAL_TAG }}"
 
           ready=false
           for _ in $(seq 1 60); do
@@ -99,7 +138,7 @@ jobs:
       # binary_location 指向镜像内的包装脚本（负责补 --no-sandbox / --disable-dev-shm-usage）
       - name: 云游戏浏览器自检（无头 Chromium + Selenium）
         run: |
-          docker run --rm -i --entrypoint python sra-server:ci - <<'PY'
+          docker run --rm -i --entrypoint python "${{ env.LOCAL_TAG }}" - <<'PY'
           from selenium import webdriver
           from selenium.webdriver.chrome.options import Options
 
@@ -113,3 +152,15 @@ jobs:
           print("Selenium + Chromium OK, browserVersion =", driver.capabilities.get("browserVersion"))
           driver.quit()
           PY
+
+      # 只有以上验证全部通过才会走到这里（前序步骤失败时后续步骤默认跳过）
+      - name: 推送到 GHCR
+        env:
+          IMAGE: ${{ steps.meta.outputs.image }}
+          TAGS: ${{ steps.tags.outputs.tags }}
+        run: |
+          set -euo pipefail
+          docker push --all-tags "$IMAGE"
+          echo "已推送到 $IMAGE："
+          echo "$TAGS"
+          echo "提示：首次推送后包默认私有，如需公开请在仓库的 Packages 设置页调整可见性。"
