@@ -212,12 +212,13 @@ def convert_csharp_default(
 def class_docstring(class_name: str, parent_description: str | None) -> str:
     """生成类的文档字符串。
 
-    注意：Pydantic 生成 JSON Schema 时，若某个模型字段的说明与其 ``$ref`` 目标的说明
-    **完全同文**，会丢弃字段侧那份（视为重复）。因此这里在复用父属性说明时统一补上句号，
-    保证两者不同文，字段说明才能出现在 OpenAPI 组件里。
+    这里直接复用引用它的属性说明、保持原文不改写：类说明会成为 WebUI 的标签页/导航标题，
+    并按原文查后端文本翻译表（``display.<locale>.json``），追加标点会让标题多出句号、
+    译文查表也会失配。Pydantic 生成 JSON Schema 时，与 ``$ref`` 目标同文的字段说明会被去重，
+    但该文本已由目标类携带、展示层优先读取目标说明，因此不影响展示（列表字段说明不受影响）。
     """
     if parent_description:
-        return f'{parent_description}。'
+        return parent_description
     return f'自动生成的 {class_name} 类'
 
 

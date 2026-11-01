@@ -18,7 +18,7 @@ class _Model(BaseModel):
     model_config = ConfigDict(populate_by_name=True, extra="allow")
 
 class StartGameConfig(_Model):
-    """启动游戏配置。"""
+    """启动游戏配置"""
 
     isEnabled: bool = Field(True, alias="enabled", description='是否启用启动游戏任务')
     gameChannel: int = Field(0, alias="game.channel", description='游戏渠道，0-国服，1-B服，2-国际服')
@@ -41,7 +41,7 @@ class StartGameConfig(_Model):
         return cls.model_validate(data)
 
 class ReceiveRewardsConfig(_Model):
-    """领取奖励配置。"""
+    """领取奖励配置"""
 
     isEnabled: bool = Field(False, alias="enabled", description='是否启用领取奖励任务')
     isAssignmentsEnabled: bool = Field(True, alias="rewards.assignments", description='是否领取派遣奖励')
@@ -63,7 +63,7 @@ class ReceiveRewardsConfig(_Model):
         return cls.model_validate(data)
 
 class CosmicStrifeConfig(_Model):
-    """旷宇纷争配置。"""
+    """旷宇纷争配置"""
 
     isEnabled: bool = Field(False, alias="enabled", description='是否启用旷宇纷争任务')
     isCurrencyWarsEnabled: bool = Field(False, alias="currencyWars.enabled", description='货币战争总开关')
@@ -94,7 +94,7 @@ class CosmicStrifeConfig(_Model):
         return cls.model_validate(data)
 
 class MissionAccomplishedConfig(_Model):
-    """任务完成后操作。"""
+    """任务完成后操作"""
 
     isEnabled: bool = Field(False, alias="enabled", description='是否启用任务完成后操作')
     isExitApp: bool = Field(False, alias="exitApp", description='完成任务后是否退出应用')
@@ -114,7 +114,7 @@ class MissionAccomplishedConfig(_Model):
         return cls.model_validate(data)
 
 class TrailblazePowerTaskItem(_Model):
-    """任务列表。"""
+    """任务列表"""
 
     Name: str = Field("", alias="name", description='任务名称')
     Id: str = Field("", alias="id", description='任务标识ID，如 calyx_golden、echo_of_war')
@@ -134,7 +134,7 @@ class TrailblazePowerTaskItem(_Model):
         return cls.model_validate(data)
 
 class TrailblazePowerConfig(_Model):
-    """体力配置。"""
+    """体力配置"""
 
     isEnabled: bool = Field(False, alias="enabled", description='是否启用开拓力任务')
     gardenOfPlentyLevel1: int = Field(0, alias="activity.gardenOfPlenty.level1", description='花藏繁生中拟造花萼（金）的目标关卡')

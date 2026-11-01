@@ -18,12 +18,12 @@ class _Model(BaseModel):
     model_config = ConfigDict(populate_by_name=True, extra="allow")
 
 class GeneralSettings(_Model):
-    """通用设置。"""
+    """通用设置"""
 
     gamePathIndex: int = Field(0, alias="gamePath.index", description='游戏路径索引，指向 gamePath.uris 中的一个 URI')
     gamePaths: list[str] = Field(default_factory=list, alias="gamePath.uris", description='游戏路径列表，支持多个路径以便快速切换')
     isAutoDetectGamePath: bool = Field(True, alias="gamePath.autoDetect", description='是否自动检测游戏路径，启用后将扫描常见安装位置以找到游戏路径')
-    isGameArgsEnabled: bool = Field(False, alias="gameArgs.enabled", description='是否启用游戏启动参数，启用后将使用下面的参数启动游戏')
+    isGameArgsEnabled: bool = Field(True, alias="gameArgs.enabled", description='是否启用游戏启动参数，启用后将使用下面的参数启动游戏')
     gameArgsFullScreenMode: str = Field("窗口化", alias="gameArgs.fullScreenMode", description='游戏窗口模式，如 窗口化、全屏')
     gameArgsWindowSize: str = Field("1920x1080", alias="gameArgs.windowSize", description='游戏窗口尺寸，格式为 宽x高，如 1920x1080')
     isGameArgsPopupWindow: bool = Field(False, alias="gameArgs.popupWindow", description='是否使用无边框游戏窗口')
@@ -57,7 +57,7 @@ class GeneralSettings(_Model):
         return cls.model_validate(data)
 
 class DisplaySettings(_Model):
-    """显示设置。"""
+    """显示设置"""
 
     backgroundImageUri: str = Field("", alias="backgroundImage.uri", description='背景图片 URI，可以是本地路径或网络 URL')
     backgroundOpacity: float = Field(1.0, alias="backgroundImage.opacity", description='背景图片不透明度，范围 0-1')
@@ -80,7 +80,7 @@ class DisplaySettings(_Model):
         return cls.model_validate(data)
 
 class NotificationSettings(_Model):
-    """通知设置。"""
+    """通知设置"""
 
     isEnabled: bool = Field(False, alias="enabled", description='是否启用通知功能')
     isSystemEnabled: bool = Field(False, alias="system.enabled", description='是否启用系统通知')
@@ -147,7 +147,7 @@ class NotificationSettings(_Model):
         return cls.model_validate(data)
 
 class UpdateSettings(_Model):
-    """更新设置。"""
+    """更新设置"""
 
     downloadChannel: int = Field(0, alias="downloadChannel", description='下载渠道，0=Mirror Chyan, 1=Github Release, 2=AUTO-MAS')
     isAutoUpdate: bool = Field(False, alias="autoUpdate", description='是否启用自动更新: 将在有更新时直接开始下载')
@@ -166,7 +166,7 @@ class UpdateSettings(_Model):
         return cls.model_validate(data)
 
 class AdvancedSettings(_Model):
-    """高级设置。"""
+    """高级设置"""
 
     backendLaunchArgs: str = Field("--inline", alias="backend.launchArgs", description='后端启动参数')
     isRemoteEnabled: bool = Field(False, alias="backend.remote.enabled", description='是否使用远程后端')
