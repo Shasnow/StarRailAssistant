@@ -1,7 +1,11 @@
 <template>
-  <!-- 页面容器：参考主页的卡片布局，左侧日志终端 + 右侧实时画面 -->
+  <!-- 页面容器：上下布局，上方实时画面 + 下方日志终端 -->
   <div class="log-page">
     <div class="log-layout">
+      <!-- 上：实时画面（轮询后端截图接口），占满整行 -->
+      <LiveViewCard class="live-panel" />
+
+      <!-- 下：日志终端 + 后端控制并排 -->
       <PanelCard :title="t('log.title')" class="log-panel">
         <!-- 终端外壳：深色区域（工具栏 + 滚动日志区 + 状态栏） -->
         <!-- terminal-scope：恒深终端底 + 语义色深色档寄存器（见 base.css） -->
@@ -107,11 +111,7 @@
         </div>
       </PanelCard>
 
-      <!-- 右栏：实时画面（轮询后端截图接口）+ 后端控制 -->
-      <aside class="col-right">
-        <LiveViewCard class="live-panel" />
-        <BackendControlCard />
-      </aside>
+      <BackendControlCard class="side-controls" />
     </div>
   </div>
 </template>
@@ -342,35 +342,40 @@ onMounted(() => {
   padding: 32px 24px 48px;
 }
 
-/* 左日志 + 右实时画面双栏；窄屏折叠为单列 */
+/* 上下布局：上方实时画面独占一行，下方日志终端与后端控制并排 */
 .log-layout {
-  display: flex;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
   gap: 20px;
+  align-items: start;
+}
+
+/* 实时画面横跨两列 */
+.live-panel {
+  grid-column: 1 / -1;
+  min-width: 0;
 }
 
 .log-panel {
-  flex: 1;
+  grid-column: 1;
   min-width: 0;
 }
 
-/* 右栏：实时画面 + 后端控制，纵向排布（对齐主页 .col 栅格） */
-.col-right {
-  flex: none;
-  width: 320px;
-  display: grid;
-  gap: 20px;
-  align-content: start;
+.side-controls {
+  grid-column: 2;
   min-width: 0;
 }
 
+/* 窄屏：三块内容依次纵向排列 */
 @media (max-width: 1199px) {
   .log-layout {
-    flex-direction: column;
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .col-right {
-    width: auto;
+  .live-panel,
+  .log-panel,
+  .side-controls {
+    grid-column: 1;
   }
 }
 

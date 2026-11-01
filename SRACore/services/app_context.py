@@ -278,14 +278,19 @@ class AppContext:
     # ── Operator ──
 
     def create_operator(self) -> IOperator:
+        """创建 Operator 实例。
+
+        仅用于服务端截图与外部手动调用，不注入 ``task_manager.stop_event``：
+        截图本身不检查停止标志，而外部调用若被任务停止标志影响，
+        ``task stop`` 之后按键/点击会一直抛 ``ThreadStoppedError``。
+        任务与扩展各自通过 ``OperatorFactory`` 注入自己的停止事件。
+        """
         optype = (
             OperatorType.Browser
             if self.settings.settings.General.isCloudGameEnabled
             else OperatorType.Local
         )
-        return OperatorFactory.get_operator(
-            optype, self.settings.settings, self.task_manager.stop_event
-        )
+        return OperatorFactory.get_operator(optype, self.settings.settings)
 
     def operator_list(self) -> list[str]:
         return sorted(

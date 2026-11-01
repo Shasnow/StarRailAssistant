@@ -393,6 +393,32 @@ class Operator(IOperator):
             logger.debug(f"Failed to hold key: {e}")
             return False
 
+    def key_down(self, key: str, trace: bool = True) -> bool:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("按键中断", "线程已停止")
+        try:
+            if trace:
+                logger.debug(f"Key down: {key}")
+            for k in key.split("+"):
+                pyautogui.keyDown(k)
+            return True
+        except Exception as e:
+            logger.debug(f"Failed to press key down: {e}")
+            return False
+
+    def key_up(self, key: str, trace: bool = True) -> bool:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("按键中断", "线程已停止")
+        try:
+            if trace:
+                logger.debug(f"Key up: {key}")
+            for k in reversed(key.split("+")):
+                pyautogui.keyUp(k)
+            return True
+        except Exception as e:
+            logger.debug(f"Failed to release key: {e}")
+            return False
+
     def copy(self, text: str) -> None:
         pyperclip.copy(text)
 
@@ -440,18 +466,21 @@ class Operator(IOperator):
             logger.debug(f"Error moving cursor: {e}")
             return False
 
-    def mouse_down(self, x: int | float, y: int | float, trace: bool = True) -> bool:
+    def mouse_down(self, x: int | float, y: int | float, trace: bool = True, button: str = "left") -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("点击中断", "线程已停止")
+        if button not in ("left", "middle", "right"):
+            logger.debug(f"Invalid mouse button: {button!r}")
+            return False
         try:
             if trace:
-                logger.debug(f"Mouse down: ({x}, {y})")
+                logger.debug(f"Mouse down: ({x}, {y}), button: {button}")
             if isinstance(x, int) and isinstance(y, int):
-                pyautogui.mouseDown(x + self.window_context.left, y + self.window_context.top)
+                pyautogui.mouseDown(x + self.window_context.left, y + self.window_context.top, button=button)
             elif isinstance(x, float) and isinstance(y, float):
                 x = int(self.window_context.left + self.window_context.width * x)
                 y = int(self.window_context.top + self.window_context.height * y)
-                pyautogui.mouseDown(x, y)
+                pyautogui.mouseDown(x, y, button=button)
             else:
                 raise ValueError(
                     f"Invalid arguments: expected 'int, int' or 'float, float', got '{type(x).__name__}, {type(y).__name__}'")
@@ -460,13 +489,17 @@ class Operator(IOperator):
             logger.debug(f"Error pressing mouse button: {e}")
             return False
 
-    def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace: bool = True) -> bool:
+    def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace: bool = True,
+                 button: str = "left") -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("点击中断", "线程已停止")
+        if button not in ("left", "middle", "right"):
+            logger.debug(f"Invalid mouse button: {button!r}")
+            return False
         try:
             if trace:
-                logger.debug("Mouse up")
-            pyautogui.mouseUp(x, y)
+                logger.debug(f"Mouse up, button: {button}")
+            pyautogui.mouseUp(button=button)
             return True
         except Exception as e:
             logger.debug(f"Error releasing mouse button: {e}")

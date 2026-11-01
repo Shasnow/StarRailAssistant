@@ -16,6 +16,7 @@ pytest.importorskip("litestar")
 
 from litestar.testing import TestClient  # noqa: E402
 
+from SRACore.operators.factory import OperatorFactory  # noqa: E402
 from SRACore.util import data_persister  # noqa: E402
 from SRACore.util import logger as sra_logger  # noqa: E402
 from SRAServer.app import create_app  # noqa: E402
@@ -238,6 +239,76 @@ def test_operator_list_and_help(client: TestClient) -> None:
 
 def test_operator_call_requires_method(client: TestClient) -> None:
     assert client.post("/api/operator/call", json={"method": ""}).status_code == 400
+
+
+class _RecordingOperator:
+    """记录 operator_call 实际调用的输入方法，避免测试触发真实键鼠。"""
+
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, dict[str, Any]]] = []
+        self.stop_event = None
+
+    def is_window_active(self) -> bool:
+        return True
+
+    def __getattr__(self, name: str):
+        def record(*args: Any, **kwargs: Any) -> bool:
+            self.calls.append((name, {"args": args, "kwargs": kwargs}))
+            return True
+        return record
+
+
+def _patch_operator(monkeypatch: pytest.MonkeyPatch, operator: _RecordingOperator) -> None:
+    monkeypatch.setattr(app_context.AppContext, "create_operator", lambda self: operator)
+
+
+def test_operator_call_key_down_up(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    operator = _RecordingOperator()
+    _patch_operator(monkeypatch, operator)
+
+    assert client.post(
+        "/api/operator/call", json={"method": "key_down", "params": {"key": "w", "trace": False}}
+    ).json()["success"] is True
+    assert client.post(
+        "/api/operator/call", json={"method": "key_up", "params": {"key": "w", "trace": False}}
+    ).json()["success"] is True
+
+    assert operator.calls == [
+        ("key_down", {"args": (), "kwargs": {"key": "w", "trace": False}}),
+        ("key_up", {"args": (), "kwargs": {"key": "w", "trace": False}}),
+    ]
+
+
+def test_operator_call_mouse_button(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    operator = _RecordingOperator()
+    _patch_operator(monkeypatch, operator)
+
+    client.post(
+        "/api/operator/call",
+        json={"method": "mouse_down", "params": {"x": 0.5, "y": 0.5, "button": "right", "trace": False}},
+    )
+    client.post(
+        "/api/operator/call",
+        json={"method": "mouse_up", "params": {"button": "right", "trace": False}},
+    )
+
+    assert operator.calls[0][0] == "mouse_down"
+    assert operator.calls[0][1]["kwargs"] == {"x": 0.5, "y": 0.5, "button": "right", "trace": False}
+    assert operator.calls[1] == ("mouse_up", {"args": (), "kwargs": {"button": "right", "trace": False}})
+
+
+def test_create_operator_does_not_inject_task_stop_event(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_get_operator(cls, optype: Any, settings: Any = None, stop_event: Any = None):
+        captured["stop_event"] = stop_event
+        return _RecordingOperator()
+
+    monkeypatch.setattr(OperatorFactory, "get_operator", classmethod(fake_get_operator))
+    client.app.state.core.create_operator()
+    assert captured["stop_event"] is None
 
 
 def test_extensions_list_and_unknown(client: TestClient) -> None:

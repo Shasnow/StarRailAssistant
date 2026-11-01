@@ -785,6 +785,32 @@ class IOperator(ABC):
         """
         ...
 
+    @abstractmethod
+    def key_down(self, key: str, trace: bool = True) -> bool:
+        """按下按键并保持（不自动抬起），与 key_up 配对使用。
+
+        Args:
+            key: 按键名称，如 "a"、"ctrl"。
+            trace: 是否打印调试信息。
+
+        Returns:
+            bool: 按键成功返回 True，否则返回 False。
+        """
+        ...
+
+    @abstractmethod
+    def key_up(self, key: str, trace: bool = True) -> bool:
+        """抬起由 key_down 按下的按键。
+
+        Args:
+            key: 按键名称，如 "a"、"ctrl"。
+            trace: 是否打印调试信息。
+
+        Returns:
+            bool: 抬起成功返回 True，否则返回 False。
+        """
+        ...
+
     @staticmethod
     def sleep(seconds: float) -> None:
         """
@@ -846,26 +872,29 @@ class IOperator(ABC):
         ...
 
     @abstractmethod
-    def mouse_down(self, x: int | float, y: int | float, trace: bool = True) -> bool:
+    def mouse_down(self, x: int | float, y: int | float, trace: bool = True, button: str = "left") -> bool:
         """按下鼠标按钮。
 
         Args:
             x (int | float): X 坐标。
             y (int | float): Y 坐标。
             trace (bool): 是否打印调试信息。默认为 True。
+            button (str): 鼠标按钮，可选 left | middle | right。默认为 left。
         Returns:
             bool: 如果按下成功则返回 True，否则返回 False。
         """
         ...
 
     @abstractmethod
-    def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace: bool = True) -> bool:
+    def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace: bool = True,
+                 button: str = "left") -> bool:
         """释放鼠标按钮。
         
         Args:
             x (int | float): X 坐标。
             y (int | float): Y 坐标。
             trace (bool): 是否打印调试信息。默认为 True。
+            button (str): 鼠标按钮，可选 left | middle | right。默认为 left。
         Returns:
             bool: 如果释放成功则返回 True，否则返回 False。
         """

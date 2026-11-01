@@ -577,6 +577,33 @@ class BrowserOperator(IOperator):
             logger.debug(f"Failed to hold key: {e}")
             return False
 
+    def key_down(self, key: str, trace: bool = True) -> bool:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("按键中断", "线程已停止")
+        try:
+            if trace:
+                logger.debug(f"Key down: {key}")
+            for k in [self.convert_key(k.strip()) for k in key.split("+") if k.strip()]:
+                ActionChains(self.driver).key_down(k).perform()
+            return True
+        except Exception as e:
+            logger.debug(f"Failed to press key down: {e}")
+            return False
+
+    def key_up(self, key: str, trace: bool = True) -> bool:
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("按键中断", "线程已停止")
+        try:
+            if trace:
+                logger.debug(f"Key up: {key}")
+            keys = [self.convert_key(k.strip()) for k in key.split("+") if k.strip()]
+            for k in reversed(keys):
+                ActionChains(self.driver).key_up(k).perform()
+            return True
+        except Exception as e:
+            logger.debug(f"Failed to release key: {e}")
+            return False
+
     def copy(self, text: str) -> None:
         self.clipboard = text
 
@@ -620,23 +647,30 @@ class BrowserOperator(IOperator):
             logger.debug(f"Error moving cursor: {e}")
             return False
 
-    def mouse_down(self, x: int | float, y: int | float, trace: bool = True) -> bool:
+    # Selenium 指针按钮索引：0 = 左键，1 = 中键，2 = 右键
+    _POINTER_BUTTONS = {"left": 0, "middle": 1, "right": 2}
+
+    def mouse_down(self, x: int | float, y: int | float, trace: bool = True, button: str = "left") -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("点击中断", "线程已停止")
+        pointer_button = self._POINTER_BUTTONS.get(button)
+        if pointer_button is None:
+            logger.debug(f"Invalid mouse button: {button!r}")
+            return False
         try:
             if trace:
-                logger.debug(f"Mouse down: ({x}, {y})")
+                logger.debug(f"Mouse down: ({x}, {y}), button: {button}")
             if isinstance(x, int) and isinstance(y, int):
                 action = ActionBuilder(self.driver)
                 action.pointer_action.move_to_location(x, y)
-                action.pointer_action.pointer_down()
+                action.pointer_action.pointer_down(pointer_button)
                 action.perform()
             elif isinstance(x, float) and isinstance(y, float):
                 x = int(self.window_context.left + self.window_context.width * x)
                 y = int(self.window_context.top + self.window_context.height * y)
                 action = ActionBuilder(self.driver)
                 action.pointer_action.move_to_location(x, y)
-                action.pointer_action.pointer_down()
+                action.pointer_action.pointer_down(pointer_button)
                 action.perform()
             else:
                 raise ValueError(
@@ -647,14 +681,19 @@ class BrowserOperator(IOperator):
             logger.debug(f"Error pressing mouse button: {e}")
             return False
 
-    def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace: bool = True) -> bool:
+    def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace: bool = True,
+                 button: str = "left") -> bool:
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("点击中断", "线程已停止")
+        pointer_button = self._POINTER_BUTTONS.get(button)
+        if pointer_button is None:
+            logger.debug(f"Invalid mouse button: {button!r}")
+            return False
         try:
             if trace:
-                logger.debug("Mouse up")
+                logger.debug(f"Mouse up, button: {button}")
             action = ActionBuilder(self.driver)
-            action.pointer_action.pointer_up()
+            action.pointer_action.pointer_up(pointer_button)
             action.perform()
             self.sleep(0.2)
             return True
