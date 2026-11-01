@@ -3,7 +3,7 @@ import axios, { type AxiosRequestConfig, type AxiosInstance } from 'axios'
 
 // axios 扩展：
 // - rawEnvelope：跳过「success=false 抛错」的统一处理，
-//   供需要自行解读 R 包装的接口使用（如 /api/Task/status 空闲时返回 success=false）
+//   供需要自行解读 R 包装的接口使用（如 /api/task/status 空闲时返回 success=false）
 // - skipAuthHeader：不附加 X-Access-Token 请求头，
 //   供认证探测/校验接口使用（登录页提交新 token 时，本地遗留的旧 token 会先于请求体被后端校验）
 declare module 'axios' {
@@ -137,7 +137,7 @@ export function createHttpClient(): AxiosInstance {
     timeout: 15_000,
   })
 
-  // 请求拦截：附加认证 token（后端启用认证时 /api/Auth 校验通过后保存），
+  // 请求拦截：附加认证 token（后端启用认证时 /api/auth 校验通过后保存），
   // 所有业务请求自动携带 X-Access-Token；探测/校验接口用 skipAuthHeader 排除
   client.interceptors.request.use((config) => {
     const token = getStoredToken()

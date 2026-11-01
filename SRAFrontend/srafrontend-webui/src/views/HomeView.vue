@@ -35,7 +35,7 @@ import { useConfigsStore } from '@/stores/configs'
 
 const { t } = useI18n()
 
-// 配置列表来自后端 /api/Configs；选中名由 store 持久化到 localStorage
+// 配置列表来自后端 /api/configs；选中名由 store 持久化到 localStorage
 const configsStore = useConfigsStore()
 const selectedConfig = computed({
   get: () => configsStore.currentName,

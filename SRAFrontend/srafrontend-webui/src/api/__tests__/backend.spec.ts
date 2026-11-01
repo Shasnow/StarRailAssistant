@@ -10,13 +10,13 @@ beforeEach(() => {
   mockedRequestEnvelope.mockReset()
 })
 
-describe('/api/Backend 服务模块', () => {
+describe('/api/backend 服务模块', () => {
   it('restartBackend → POST /Backend/restart，返回 message', async () => {
     mockedRequestEnvelope.mockResolvedValueOnce({ success: true, message: '重启指令已发送' })
     const signal = new AbortController().signal
     await expect(restartBackend(signal)).resolves.toBe('重启指令已发送')
     expect(mockedRequestEnvelope).toHaveBeenCalledWith({
-      url: '/Backend/restart',
+      url: '/backend/restart',
       method: 'post',
       signal,
     })
@@ -26,7 +26,7 @@ describe('/api/Backend 服务模块', () => {
     mockedRequestEnvelope.mockResolvedValueOnce({ success: true, message: '已停止' })
     await expect(stopBackend()).resolves.toBe('已停止')
     expect(mockedRequestEnvelope).toHaveBeenCalledWith({
-      url: '/Backend/stop',
+      url: '/backend/stop',
       method: 'post',
       signal: undefined,
     })

@@ -58,14 +58,14 @@ cd StarRailAssistant
 ## 📦 安装依赖
 
 ```bash
-# 安装运行依赖（含桌面端 full 组，依赖声明单源于 pyproject.toml）
-pip install -e ".[full]"
+# 安装运行依赖（含桌面端 standard 组，依赖声明单源于 pyproject.toml）
+pip install -e ".[standard]"
 
 # 安装开发/测试依赖
 pip install -r requirements-dev.txt
 
 # 如果遇到安装失败，尝试使用国内镜像源
-pip install -e ".[full]" -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -e ".[standard]" -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 也可使用 npm 或 yarn:

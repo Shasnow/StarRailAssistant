@@ -1,0 +1,1 @@
+"""MCP 工具端点：以 Streamable HTTP 挂载于 ``/mcp``。"""

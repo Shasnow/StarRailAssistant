@@ -2,17 +2,17 @@
 
 ## 概述
 
-StarRailAssistant (SRA) 前端是一个模块化的 .NET 解决方案，负责 SRA 的 UI 和 API 层，分为三个项目：
+StarRailAssistant (SRA) 前端是一个模块化的 .NET 解决方案，负责 SRA 的桌面 UI 与共享核心层，分为两个项目：
 
 - **SRAFrontend** - 共享核心库（模型、服务、工具类，无 UI 依赖）
 - **SRAFrontend.Desktop** - Avalonia 桌面应用
-- **SRAFrontend.Server** - ASP.NET Core HTTP API 服务
+
+HTTP API 服务端已改用 Python 实现（Litestar），位于仓库根目录的 `SRAServer/`。
 
 ## 技术栈
 
 - .NET 10 / C# 13
 - Avalonia UI（桌面端）
-- ASP.NET Core（服务端）
 - CommunityToolkit.Mvvm
 - SukiUI
 
@@ -51,16 +51,6 @@ SRAFrontend/
 │   ├── App.axaml                    # 应用入口
 │   ├── Program.cs                   # 启动点
 │   └── ViewLocator.cs
-
-└── SRAFrontend.Server/              # ASP.NET Core API 服务
-    ├── Controllers/
-    │   ├── TaskController.cs        # 任务运行/停止/状态/日志（SSE）
-    │   ├── ConfigsController.cs     # 配置 CRUD（RESTful）
-    │   └── SettingsController.cs    # 设置
-    ├── Services/
-    │   ├── HostedService.cs         # 生命周期管理
-    │   └── LogStreamService.cs      # SSE 日志推送
-    └── Program.cs
 ```
 
 ## 构建与运行
@@ -86,13 +76,17 @@ dotnet run --project SRAFrontend.Desktop
 
 ### 运行服务端
 
+在仓库根目录执行（需先 `pip install -e ".[server]"`）：
+
 ```bash
-dotnet run --project SRAFrontend.Server
+python -m SRAServer            # http://localhost:5073
+python -m SRAServer --host     # 绑定 0.0.0.0 暴露公网
 ```
 
 ## API 接口
 
-运行服务端后，您可以在`http://localhost:5000/swagger`查看API文档。
+运行服务端后，可在 `http://localhost:5073/openapi/v1.json` 获取 OpenAPI 规范，
+或在 `http://localhost:5073/openapi/swagger` 查看 API 文档。
 
 ## 架构说明
 

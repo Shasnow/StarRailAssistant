@@ -1,7 +1,7 @@
 import { i18n } from '@/locales'
 /**
- * /api/Operator 实时画面服务模块（对应 OpenAPI OperatorController）：
- * - GET /api/Operator/screenshot → 200 image/png 原始字节（不走 R<T> 包装，直接二进制）
+ * /api/operator 实时画面服务模块（对应 OpenAPI OperatorController）：
+ * - GET /api/operator/screenshot → 200 image/png 原始字节（不走 R<T> 包装，直接二进制）
  *
  * 前端按固定间隔轮询该接口并渲染到 <img>，即构成实时画面。
  */

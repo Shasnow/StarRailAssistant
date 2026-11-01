@@ -20,11 +20,11 @@ pnpm build:demo   # 产出可直接静态托管的演示站（dist/）
 | 场景     | 命令              | 结果                                        |
 | -------- | ----------------- | ------------------------------------------- |
 | 正式开发 | `pnpm dev`        | 代理 `/api` → `localhost:5073` 真实后端     |
-| 正式构建 | `pnpm build`      | 正式产物，postbuild 照常拷贝到 wwwroot      |
+| 正式构建 | `pnpm build`      | 正式产物，postbuild 照常拷贝到 `SRAServer/static` |
 | 演示开发 | `pnpm dev:demo`   | 内置模拟层，无后端也完整可用                |
 | 演示构建 | `pnpm build:demo` | 静态演示产物（含 `404.html`、`_redirects`） |
 
-两个构建共用同一份源码；`build:demo` 不触发 `postbuild` 的 wwwroot 拷贝。
+两个构建共用同一份源码；`build:demo` 不触发 `postbuild` 的 `SRAServer/static` 拷贝。
 
 ## 2. 构建步骤与部署指南
 

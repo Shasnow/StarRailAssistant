@@ -27,30 +27,30 @@ const RUNNING_INFO = {
   progress: [3, 10],
 }
 
-describe('/api/Task 服务模块', () => {
-  it('runTask → POST /Task/run，携带 configName，返回 message', async () => {
+describe('/api/task 服务模块', () => {
+  it('runTask → POST /task/run，携带 configName，返回 message', async () => {
     mockedRequestEnvelope.mockResolvedValueOnce({ success: true, message: '任务已启动' })
     const signal = new AbortController().signal
     await expect(runTask({ configName: '默认配置' }, signal)).resolves.toBe('任务已启动')
     expect(mockedRequestEnvelope).toHaveBeenCalledWith({
-      url: '/Task/run',
+      url: '/task/run',
       method: 'post',
       data: { configName: '默认配置' },
       signal,
     })
   })
 
-  it('stopTask → POST /Task/stop，返回 message', async () => {
+  it('stopTask → POST /task/stop，返回 message', async () => {
     mockedRequestEnvelope.mockResolvedValueOnce({ success: true, message: '已停止' })
     await expect(stopTask()).resolves.toBe('已停止')
     expect(mockedRequestEnvelope).toHaveBeenCalledWith({
-      url: '/Task/stop',
+      url: '/task/stop',
       method: 'post',
       signal: undefined,
     })
   })
 
-  it('fetchTaskStatus → GET /Task/status，rawEnvelope 跳过统一抛错', async () => {
+  it('fetchTaskStatus → GET /task/status，rawEnvelope 跳过统一抛错', async () => {
     mockedHttpRequest.mockResolvedValueOnce({
       data: { success: true, message: 'ok', data: RUNNING_INFO },
     })
@@ -65,7 +65,7 @@ describe('/api/Task 服务模块', () => {
       progress: [3, 10],
     })
     expect(mockedHttpRequest).toHaveBeenCalledWith({
-      url: '/Task/status',
+      url: '/task/status',
       method: 'get',
       signal: undefined,
       rawEnvelope: true,

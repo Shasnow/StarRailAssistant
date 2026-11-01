@@ -160,7 +160,7 @@ def test_language_selection_survives_a_real_process_restart(language, tmp_path):
     (state / 'settings.json').write_text(json.dumps({'display': {'language': language}}), encoding='utf-8')
     env = dict(os.environ, APPDATA=str(tmp_path), HOME=str(tmp_path))
     code = ('import json; from pathlib import Path; '
-            'from SRACore.service.setting_service import SettingsService; '
+            'from SRACore.services.setting_service import SettingsService; '
             'from SRACore.localization import Resource; '
             'settings=SettingsService(); '
             'Path(settings.path).write_text(json.dumps(settings.settings.to_dict()), encoding="utf-8"); '

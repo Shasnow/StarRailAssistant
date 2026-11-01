@@ -10,51 +10,51 @@ beforeEach(() => {
   mockedRequest.mockReset()
 })
 
-describe('/api/Configs 服务模块', () => {
-  it('listConfigs → GET /Configs', async () => {
+describe('/api/configs 服务模块', () => {
+  it('listConfigs → GET /configs', async () => {
     mockedRequest.mockResolvedValueOnce(['默认配置', '每日'])
     const signal = new AbortController().signal
     await expect(listConfigs(signal)).resolves.toEqual(['默认配置', '每日'])
-    expect(mockedRequest).toHaveBeenCalledWith({ url: '/Configs', method: 'get', signal })
+    expect(mockedRequest).toHaveBeenCalledWith({ url: '/configs', method: 'get', signal })
   })
 
-  it('getConfig → GET /Configs/{name}，名称 encodeURIComponent', async () => {
+  it('getConfig → GET /configs/{name}，名称 encodeURIComponent', async () => {
     mockedRequest.mockResolvedValueOnce(null)
     await expect(getConfig('a b/c')).resolves.toBeNull()
     expect(mockedRequest).toHaveBeenCalledWith({
-      url: '/Configs/a%20b%2Fc',
+      url: '/configs/a%20b%2Fc',
       method: 'get',
       signal: undefined,
     })
   })
 
-  it('createConfig → POST /Configs/{name}', async () => {
+  it('createConfig → POST /configs/{name}', async () => {
     mockedRequest.mockResolvedValueOnce('新建成功')
     await expect(createConfig('新配置')).resolves.toBe('新建成功')
     expect(mockedRequest).toHaveBeenCalledWith({
-      url: '/Configs/%E6%96%B0%E9%85%8D%E7%BD%AE',
+      url: '/configs/%E6%96%B0%E9%85%8D%E7%BD%AE',
       method: 'post',
       signal: undefined,
     })
   })
 
-  it('updateConfig → PUT /Configs/{name}，body 为配置负载', async () => {
+  it('updateConfig → PUT /configs/{name}，body 为配置负载', async () => {
     mockedRequest.mockResolvedValueOnce('更新成功')
     const payload = { startGame: { enabled: true } }
     await expect(updateConfig('默认配置', payload)).resolves.toBe('更新成功')
     expect(mockedRequest).toHaveBeenCalledWith({
-      url: `/Configs/${encodeURIComponent('默认配置')}`,
+      url: `/configs/${encodeURIComponent('默认配置')}`,
       method: 'put',
       data: payload,
       signal: undefined,
     })
   })
 
-  it('removeConfig → DELETE /Configs/{name}', async () => {
+  it('removeConfig → DELETE /configs/{name}', async () => {
     mockedRequest.mockResolvedValueOnce('删除成功')
     await expect(removeConfig('默认配置')).resolves.toBe('删除成功')
     expect(mockedRequest).toHaveBeenCalledWith({
-      url: `/Configs/${encodeURIComponent('默认配置')}`,
+      url: `/configs/${encodeURIComponent('默认配置')}`,
       method: 'delete',
       signal: undefined,
     })

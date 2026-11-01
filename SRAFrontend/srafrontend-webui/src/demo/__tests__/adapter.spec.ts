@@ -39,8 +39,8 @@ beforeEach(() => {
 })
 
 describe('演示适配层：路由与信封', () => {
-  it('GET /Configs 命中路由，返回默认配置名列表', async () => {
-    const res = await adapter(cfg('get', '/Configs'))
+  it('GET /configs 命中路由，返回默认配置名列表', async () => {
+    const res = await adapter(cfg('get', '/configs'))
     const env = envelopeOf(res)
     expect(res.status).toBe(200)
     expect(env.success).toBe(true)
@@ -49,14 +49,14 @@ describe('演示适配层：路由与信封', () => {
   })
 
   it('GET 单个配置：命中已有配置名（URL 编码的中文名解码）', async () => {
-    const res = await adapter(cfg('get', `/Configs/${encodeURIComponent('日常清体力')}`))
+    const res = await adapter(cfg('get', `/configs/${encodeURIComponent('日常清体力')}`))
     const env = envelopeOf(res)
     expect(env.success).toBe(true)
     expect(env.data).toMatchObject({ name: '日常清体力' })
   })
 
   it('POST 创建配置成功返回 200 信封', async () => {
-    const res = await adapter(cfg('post', `/Configs/${encodeURIComponent('新配置')}`, {}))
+    const res = await adapter(cfg('post', `/configs/${encodeURIComponent('新配置')}`, {}))
     const env = envelopeOf(res)
     expect(env.success).toBe(true)
     expect(env.data).toContain('已创建')
@@ -66,29 +66,29 @@ describe('演示适配层：路由与信封', () => {
 describe('演示适配层：确定性错误', () => {
   it('重名创建返回 409（reject 携带 response，供拦截器归一化）', async () => {
     await expect(
-      adapter(cfg('post', `/Configs/${encodeURIComponent('日常清体力')}`, {})),
+      adapter(cfg('post', `/configs/${encodeURIComponent('日常清体力')}`, {})),
     ).rejects.toMatchObject({ response: { status: 409 } })
   })
 
   it('读取不存在的配置返回 404', async () => {
     await expect(
-      adapter(cfg('get', `/Configs/${encodeURIComponent('不存在的配置')}`)),
+      adapter(cfg('get', `/configs/${encodeURIComponent('不存在的配置')}`)),
     ).rejects.toMatchObject({ response: { status: 404 } })
   })
 
   it('配置名含非法字符返回 400', async () => {
     await expect(
-      adapter(cfg('post', `/Configs/${encodeURIComponent('坏/名字')}`, {})),
+      adapter(cfg('post', `/configs/${encodeURIComponent('坏/名字')}`, {})),
     ).rejects.toMatchObject({ response: { status: 400 } })
   })
 })
 
 describe('演示适配层：任务与未模拟接口', () => {
   it('运行中任务的 status 返回 demo 模式标记', async () => {
-    const run = await adapter(cfg('post', '/Task/run', { configName: '日常清体力' }))
+    const run = await adapter(cfg('post', '/task/run', { configName: '日常清体力' }))
     expect(envelopeOf(run).success).toBe(true)
 
-    const status = await adapter(cfg('get', '/Task/status'))
+    const status = await adapter(cfg('get', '/task/status'))
     const env = envelopeOf(status)
     expect(env.success).toBe(true)
     expect(env.data).toMatchObject({ status: 'running', mode: 'demo' })
@@ -107,7 +107,7 @@ describe('演示适配层：任务与未模拟接口', () => {
 describe('演示适配层：请求取消', () => {
   it('延迟期间 abort → 以 ERR_CANCELED 拒绝', async () => {
     const controller = new AbortController()
-    const promise = adapter(cfg('get', '/Configs', undefined, controller.signal))
+    const promise = adapter(cfg('get', '/configs', undefined, controller.signal))
     controller.abort()
     await expect(promise).rejects.toMatchObject({ code: 'ERR_CANCELED' })
   })
@@ -115,13 +115,13 @@ describe('演示适配层：请求取消', () => {
 
 describe('演示适配层：认证拦截（模拟启用认证的后端）', () => {
   it('未携带 X-Access-Token 的业务请求返回 401', async () => {
-    await expect(adapter(cfgAnonymous('get', '/Configs'))).rejects.toMatchObject({
+    await expect(adapter(cfgAnonymous('get', '/configs'))).rejects.toMatchObject({
       response: { status: 401 },
     })
   })
 
   it('携带任意非空 token 的业务请求正常通过', async () => {
-    const res = await adapter(cfg('get', '/Configs'))
+    const res = await adapter(cfg('get', '/configs'))
     expect(res.status).toBe(200)
   })
 

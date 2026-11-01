@@ -18,11 +18,11 @@
 
 ## 关键端点约定
 
-- 任务控制：POST `/api/Task/run`（RunRequest `{configName, config, persist}`）、POST `/api/Task/stop`、GET `/api/Task/status`
+- 任务控制：POST `/api/task/run`（RunRequest `{configName, config, persist}`）、POST `/api/task/stop`、GET `/api/task/status`
 - 后端 RuntimeInfo（Python dataclass，snake_case JSON）：status ∈ idle|running|completed|failed|stopped，另有 session_id/pid/mode/configs/unit/error/progress
 - 前端 `TaskStatus` 类型字段名与后端**完全一致**（用户明确要求，勿重命名）；`normalizeTaskStatus` 只做形状兜底（缺失/非法→默认值），不做字段映射
 - 后端运行时控制：POST `/api/backend/restart`、`/api/backend/stop`
-- 设置：GET `/api/Settings` → `R<AppSettings>`；PUT `/api/Settings`（按 section 部分提交 JSON）→ `R<string[]>` 更新的 key 列表
+- 设置：GET `/api/settings` → `R<AppSettings>`；PUT `/api/settings`（按 section 部分提交 JSON）→ `R<string[]>` 更新的 key 列表
 
 ## OpenAPI 驱动表单
 

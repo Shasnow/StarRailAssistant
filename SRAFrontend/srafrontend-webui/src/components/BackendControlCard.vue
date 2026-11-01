@@ -30,7 +30,7 @@ const { t } = useI18n()
 /** 当前进行中的操作，用于按钮 loading / 互斥禁用 */
 const busy = ref<'' | 'restart' | 'stop'>('')
 
-/** 重启后端：危险操作，二次确认后调用 /api/Backend/restart */
+/** 重启后端：危险操作，二次确认后调用 /api/backend/restart */
 async function onRestart() {
   try {
     await ElMessageBox.confirm(t('backend.restartConfirm'), t('backend.restartTitle'), {
@@ -52,7 +52,7 @@ async function onRestart() {
   }
 }
 
-/** 停止后端：危险操作，二次确认后调用 /api/Backend/stop */
+/** 停止后端：危险操作，二次确认后调用 /api/backend/stop */
 async function onStop() {
   try {
     await ElMessageBox.confirm(t('backend.stopConfirm'), t('backend.stopTitle'), {

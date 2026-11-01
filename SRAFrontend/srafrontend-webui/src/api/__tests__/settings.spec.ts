@@ -15,8 +15,8 @@ beforeEach(() => {
   mockedRequestEnvelope.mockReset()
 })
 
-describe('/api/Settings 服务模块', () => {
-  it('fetchSettings → GET /Settings，返回按 section 分组的设置', async () => {
+describe('/api/settings 服务模块', () => {
+  it('fetchSettings → GET /settings，返回按 section 分组的设置', async () => {
     const payload = {
       general: { 'gamePath.index': 0 },
       advanced: { 'backend.remote.enabled': true },
@@ -24,7 +24,7 @@ describe('/api/Settings 服务模块', () => {
     mockedRequest.mockResolvedValueOnce(payload)
     const signal = new AbortController().signal
     await expect(fetchSettings(signal)).resolves.toEqual(payload)
-    expect(mockedRequest).toHaveBeenCalledWith({ url: '/Settings', method: 'get', signal })
+    expect(mockedRequest).toHaveBeenCalledWith({ url: '/settings', method: 'get', signal })
   })
 
   it('fetchSettings：data 非对象时按空设置处理', async () => {
@@ -32,7 +32,7 @@ describe('/api/Settings 服务模块', () => {
     await expect(fetchSettings()).resolves.toEqual({})
   })
 
-  it('updateSettings → PUT /Settings，提交部分 JSON 并返回已更新字段列表', async () => {
+  it('updateSettings → PUT /settings，提交部分 JSON 并返回已更新字段列表', async () => {
     mockedRequestEnvelope.mockResolvedValueOnce({
       success: true,
       message: 'ok',
@@ -44,7 +44,7 @@ describe('/api/Settings 服务模块', () => {
       'general.gamePath.index',
     ])
     expect(mockedRequestEnvelope).toHaveBeenCalledWith({
-      url: '/Settings',
+      url: '/settings',
       method: 'put',
       data: partial,
       signal: undefined,

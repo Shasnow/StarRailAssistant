@@ -1,437 +1,207 @@
 #!/usr/bin/env python3
 """
-自动生成的Python类
-源文件: AppSettings.cs
+自动生成的 Pydantic 模型
+源文件: SRAFrontend/SRAFrontend/Models/AppSettings.cs
+
+SRACore 运行时与 SRAServer 的 OpenAPI 组件共用这一套模型定义，请勿手工编辑：
+改动请修改对应的 C# 模型并执行 `npm run modelgen`。
 """
 
 from __future__ import annotations
-from dataclasses import dataclass, field
 
-@dataclass
-class GeneralSettings:
-    """自动生成的 GeneralSettings 类"""
+from pydantic import BaseModel, ConfigDict, Field
 
-    gamePathIndex: int = 0
-    gamePaths: list[str] = field(default_factory=list)
-    isAutoDetectGamePath: bool = True
-    isGameArgsEnabled: bool = False
-    gameArgsFullScreenMode: str = "窗口化"
-    gameArgsWindowSize: str = "1920x1080"
-    isGameArgsPopupWindow: bool = False
-    isGameArgsAutoButtle: bool = True
-    isUseCmd: bool = False
-    gameArgsAdvanced: str = ""
-    isCloudGameEnabled: bool = False
-    cloudGameBrowser: str = "Microsoft Edge"
-    cloudGameBrowserPath: str = ""
-    isCloudGameBrowserHeadless: bool = False
-    isCloudGameBrowserMuteAudio: bool = False
-    hotkeyE: str = "E"
-    hotkeyF1: str = "F1"
-    hotkeyF2: str = "F2"
-    hotkeyF3: str = "F3"
-    hotkeyF4: str = "F4"
-    hotkeyStop: str = "F9"
-    isOverlayEnabled: bool = False
-    ocrMatchConfidence: float = 0.7
-    templateMatchConfidence: float = 0.9
-    isRetryOnTaskFailure: bool = False
-    maxRetryCount: int = 3
 
-    def to_dict(self) -> dict:
-        """转换为字典"""
-        return {
-            "gamePath.index": self.gamePathIndex,
-            "gamePath.uris": self.gamePaths,
-            "gamePath.autoDetect": self.isAutoDetectGamePath,
-            "gameArgs.enabled": self.isGameArgsEnabled,
-            "gameArgs.fullScreenMode": self.gameArgsFullScreenMode,
-            "gameArgs.windowSize": self.gameArgsWindowSize,
-            "gameArgs.popupWindow": self.isGameArgsPopupWindow,
-            "gameArgs.autoButtle": self.isGameArgsAutoButtle,
-            "gameArgs.useCmd": self.isUseCmd,
-            "gameArgs.advanced": self.gameArgsAdvanced,
-            "cloudGame.enabled": self.isCloudGameEnabled,
-            "cloudGame.browser": self.cloudGameBrowser,
-            "cloudGame.browser.path": self.cloudGameBrowserPath,
-            "cloudGame.browser.headless": self.isCloudGameBrowserHeadless,
-            "cloudGame.browser.muteAudio": self.isCloudGameBrowserMuteAudio,
-            "keybindings.e": self.hotkeyE,
-            "keybindings.f1": self.hotkeyF1,
-            "keybindings.f2": self.hotkeyF2,
-            "keybindings.f3": self.hotkeyF3,
-            "keybindings.f4": self.hotkeyF4,
-            "keybindings.stop": self.hotkeyStop,
-            "overlay.enabled": self.isOverlayEnabled,
-            "ocrMatchConfidence": self.ocrMatchConfidence,
-            "templateMatchConfidence": self.templateMatchConfidence,
-            "isRetryOnTaskFailure": self.isRetryOnTaskFailure,
-            "maxRetryCount": self.maxRetryCount
-        }
+class _Model(BaseModel):
+    """生成模型基类：允许按字段名或 JSON 别名构造，并保留未知键。"""
 
-    @classmethod
-    def from_dict(cls, data: dict):
-        """从字典创建对象"""
-        return cls(**{
-            "gamePathIndex": data.get("gamePath.index", 0),
-            "gamePaths": data.get("gamePath.uris", list()),
-            "isAutoDetectGamePath": data.get("gamePath.autoDetect", True),
-            "isGameArgsEnabled": data.get("gameArgs.enabled", False),
-            "gameArgsFullScreenMode": data.get("gameArgs.fullScreenMode", "窗口化"),
-            "gameArgsWindowSize": data.get("gameArgs.windowSize", "1920x1080"),
-            "isGameArgsPopupWindow": data.get("gameArgs.popupWindow", False),
-            "isGameArgsAutoButtle": data.get("gameArgs.autoButtle", True),
-            "isUseCmd": data.get("gameArgs.useCmd", False),
-            "gameArgsAdvanced": data.get("gameArgs.advanced", ""),
-            "isCloudGameEnabled": data.get("cloudGame.enabled", False),
-            "cloudGameBrowser": data.get("cloudGame.browser", "Microsoft Edge"),
-            "cloudGameBrowserPath": data.get("cloudGame.browser.path", ""),
-            "isCloudGameBrowserHeadless": data.get("cloudGame.browser.headless", False),
-            "isCloudGameBrowserMuteAudio": data.get("cloudGame.browser.muteAudio", False),
-            "hotkeyE": data.get("keybindings.e", "E"),
-            "hotkeyF1": data.get("keybindings.f1", "F1"),
-            "hotkeyF2": data.get("keybindings.f2", "F2"),
-            "hotkeyF3": data.get("keybindings.f3", "F3"),
-            "hotkeyF4": data.get("keybindings.f4", "F4"),
-            "hotkeyStop": data.get("keybindings.stop", "F9"),
-            "isOverlayEnabled": data.get("overlay.enabled", False),
-            "ocrMatchConfidence": data.get("ocrMatchConfidence", 0.7),
-            "templateMatchConfidence": data.get("templateMatchConfidence", 0.9),
-            "isRetryOnTaskFailure": data.get("isRetryOnTaskFailure", False),
-            "maxRetryCount": data.get("maxRetryCount", 3)
-        })
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
 
-@dataclass
-class DisplaySettings:
-    """自动生成的 DisplaySettings 类"""
+class GeneralSettings(_Model):
+    """通用设置。"""
 
-    backgroundImageUri: str = ""
-    backgroundOpacity: float = 1.0
-    controlPanelOpacity: float = 0.9
-    Language: int = 0
-    isRememberWindow: bool = False
-    WindowState: int = 0
-    WindowPositionX: int = 0
-    WindowPositionY: int = 0
-    WindowWidth: float = 0.0
-    WindowHeight: float = 0.0
+    gamePathIndex: int = Field(0, alias="gamePath.index", description='游戏路径索引，指向 gamePath.uris 中的一个 URI')
+    gamePaths: list[str] = Field(default_factory=list, alias="gamePath.uris", description='游戏路径列表，支持多个路径以便快速切换')
+    isAutoDetectGamePath: bool = Field(True, alias="gamePath.autoDetect", description='是否自动检测游戏路径，启用后将扫描常见安装位置以找到游戏路径')
+    isGameArgsEnabled: bool = Field(False, alias="gameArgs.enabled", description='是否启用游戏启动参数，启用后将使用下面的参数启动游戏')
+    gameArgsFullScreenMode: str = Field("窗口化", alias="gameArgs.fullScreenMode", description='游戏窗口模式，如 窗口化、全屏')
+    gameArgsWindowSize: str = Field("1920x1080", alias="gameArgs.windowSize", description='游戏窗口尺寸，格式为 宽x高，如 1920x1080')
+    isGameArgsPopupWindow: bool = Field(False, alias="gameArgs.popupWindow", description='是否使用无边框游戏窗口')
+    isGameArgsAutoButtle: bool = Field(True, alias="gameArgs.autoButtle", description='是否启用自动战斗')
+    isUseCmd: bool = Field(False, alias="gameArgs.useCmd", description='是否使用命令行启动游戏（避免一些直接启动导致的问题）')
+    gameArgsAdvanced: str = Field("", alias="gameArgs.advanced", description='高级启动参数，直接传递给游戏进程，覆盖其他参数设置')
+    isCloudGameEnabled: bool = Field(False, alias="cloudGame.enabled", description='是否使用云游戏')
+    cloudGameBrowser: str = Field("Microsoft Edge", alias="cloudGame.browser", description='云游戏使用的浏览器')
+    cloudGameBrowserPath: str = Field("", alias="cloudGame.browser.path", description='云游戏使用的浏览器路径')
+    isCloudGameBrowserHeadless: bool = Field(False, alias="cloudGame.browser.headless", description='云游戏使用的浏览器是否无头模式')
+    isCloudGameBrowserMuteAudio: bool = Field(False, alias="cloudGame.browser.muteAudio", description='云游戏使用的浏览器是否静音')
+    hotkeyE: str = Field("E", alias="keybindings.e", description='施放秘技的快捷键')
+    hotkeyF1: str = Field("F1", alias="keybindings.f1", description='打开活动界面的快捷键')
+    hotkeyF2: str = Field("F2", alias="keybindings.f2", description='打开纪行界面的快捷键')
+    hotkeyF3: str = Field("F3", alias="keybindings.f3", description='打开卡池界面的快捷键')
+    hotkeyF4: str = Field("F4", alias="keybindings.f4", description='打开指南界面的快捷键')
+    hotkeyStop: str = Field("F9", alias="keybindings.stop", description='停止运行任务的快捷键')
+    isOverlayEnabled: bool = Field(False, alias="overlay.enabled", description='是否启用叠加层')
+    ocrMatchConfidence: float = Field(0.7, alias="ocrMatchConfidence", description='OCR 识图置信度，范围 0-1，数值越高越严格')
+    templateMatchConfidence: float = Field(0.9, alias="templateMatchConfidence", description='模板匹配置信度（识图置信度），范围 0-1，数值越高越严格')
+    isRetryOnTaskFailure: bool = Field(False, alias="isRetryOnTaskFailure", description='任务失败后是否尝试重启游戏并重试')
+    maxRetryCount: int = Field(3, alias="maxRetryCount", description='任务失败后最大重试次数')
 
     def to_dict(self) -> dict:
-        """转换为字典"""
-        return {
-            "backgroundImage.uri": self.backgroundImageUri,
-            "backgroundImage.opacity": self.backgroundOpacity,
-            "controlPanel.opacity": self.controlPanelOpacity,
-            "language": self.Language,
-            "window.remember": self.isRememberWindow,
-            "window.state": self.WindowState,
-            "window.position.x": self.WindowPositionX,
-            "window.position.y": self.WindowPositionY,
-            "window.width": self.WindowWidth,
-            "window.height": self.WindowHeight
-        }
+        """转换为字典（键为 C# 侧的 JSON 名称）"""
+        return self.model_dump(by_alias=True)
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: dict) -> "GeneralSettings":
         """从字典创建对象"""
-        return cls(**{
-            "backgroundImageUri": data.get("backgroundImage.uri", ""),
-            "backgroundOpacity": data.get("backgroundImage.opacity", 1.0),
-            "controlPanelOpacity": data.get("controlPanel.opacity", 0.9),
-            "Language": data.get("language", 0),
-            "isRememberWindow": data.get("window.remember", False),
-            "WindowState": data.get("window.state", 0),
-            "WindowPositionX": data.get("window.position.x", 0),
-            "WindowPositionY": data.get("window.position.y", 0),
-            "WindowWidth": data.get("window.width", 0.0),
-            "WindowHeight": data.get("window.height", 0.0)
-        })
+        return cls.model_validate(data)
 
-@dataclass
-class NotificationSettings:
-    """自动生成的 NotificationSettings 类"""
+class DisplaySettings(_Model):
+    """显示设置。"""
 
-    isEnabled: bool = False
-    isSystemEnabled: bool = False
-    isBarkEnabled: bool = False
-    barkCiphertext: str = ""
-    barkDeviceKey: str = ""
-    barkGroup: str = "StarRailAssistant"
-    barkIcon: str = ""
-    barkLevel: str = ""
-    barkServerUrl: str = "https://api.day.app"
-    barkSound: str = ""
-    isDingTalkEnabled: bool = False
-    dingTalkSecret: str = ""
-    dingTalkWebhookUrl: str = ""
-    isDiscordEnabled: bool = False
-    isDiscordSendImage: bool = False
-    discordWebhookUrl: str = ""
-    isFeishuEnabled: bool = False
-    feishuAppId: str = ""
-    feishuAppSecret: str = ""
-    feishuReceiveId: str = ""
-    feishuReceiveIdType: str = ""
-    feishuWebhookUrl: str = ""
-    isOneBotEnabled: bool = False
-    isOneBotSendImage: bool = False
-    oneBotGroupId: str = ""
-    oneBotToken: str = ""
-    oneBotUrl: str = ""
-    oneBotUserId: str = ""
-    isServerChanEnabled: bool = False
-    serverChanSendKey: str = ""
-    isTelegramEnabled: bool = False
-    isTelegramProxyEnabled: bool = False
-    isTelegramSendImage: bool = False
-    isWeComEnabled: bool = False
-    isWeComSendImage: bool = False
-    weComWebhookUrl: str = ""
-    isWebhookEnabled: bool = False
-    webhookUrl: str = ""
-    isXxtuiEnabled: bool = False
-    isEmailEnabled: bool = False
-    smtpPort: int = 465
-    smtpReceiver: str = ""
-    smtpSender: str = ""
-    smtpServer: str = ""
-    EncryptedSmtpAuthCode: str = ""
-    telegramApiBaseUrl: str = "https://api.telegram.org"
-    telegramBotToken: str = ""
-    telegramChatId: str = ""
-    telegramProxyUrl: str = "http://127.0.0.1:7890"
-    xxtuiApiKey: str = ""
-    xxtuiChannel: str = ""
-    xxtuiSource: str = ""
-    onCompleted: list[str] = field(default_factory=list)
-    onStart: list[str] = field(default_factory=list)
+    backgroundImageUri: str = Field("", alias="backgroundImage.uri", description='背景图片 URI，可以是本地路径或网络 URL')
+    backgroundOpacity: float = Field(1.0, alias="backgroundImage.opacity", description='背景图片不透明度，范围 0-1')
+    controlPanelOpacity: float = Field(0.9, alias="controlPanel.opacity", description='控制面板不透明度，范围 0-1')
+    Language: int = Field(0, alias="language", description='界面语言，0=中文, 1=English')
+    isRememberWindow: bool = Field(False, alias="window.remember", description='是否记住窗口位置和大小')
+    WindowState: int = Field(0, alias="window.state", description='窗口状态，0=正常, 1=最小化, 2=最大化')
+    WindowPositionX: int = Field(0, alias="window.position.x", description='主窗口位置的 X 坐标')
+    WindowPositionY: int = Field(0, alias="window.position.y", description='主窗口位置的 Y 坐标')
+    WindowWidth: float = Field(0.0, alias="window.width", description='主窗口宽度')
+    WindowHeight: float = Field(0.0, alias="window.height", description='主窗口高度')
 
     def to_dict(self) -> dict:
-        """转换为字典"""
-        return {
-            "enabled": self.isEnabled,
-            "system.enabled": self.isSystemEnabled,
-            "bark.enabled": self.isBarkEnabled,
-            "bark.ciphertext": self.barkCiphertext,
-            "bark.deviceKey": self.barkDeviceKey,
-            "bark.group": self.barkGroup,
-            "bark.icon": self.barkIcon,
-            "bark.level": self.barkLevel,
-            "bark.serverUrl": self.barkServerUrl,
-            "bark.sound": self.barkSound,
-            "dingTalk.enabled": self.isDingTalkEnabled,
-            "dingTalk.secret": self.dingTalkSecret,
-            "dingTalk.webhookUrl": self.dingTalkWebhookUrl,
-            "discord.enabled": self.isDiscordEnabled,
-            "discord.sendImage": self.isDiscordSendImage,
-            "discord.webhookUrl": self.discordWebhookUrl,
-            "feishu.enabled": self.isFeishuEnabled,
-            "feishu.appId": self.feishuAppId,
-            "feishu.appSecret": self.feishuAppSecret,
-            "feishu.receiveId": self.feishuReceiveId,
-            "feishu.receiveIdType": self.feishuReceiveIdType,
-            "feishu.webhookUrl": self.feishuWebhookUrl,
-            "oneBot.enabled": self.isOneBotEnabled,
-            "oneBot.sendImage": self.isOneBotSendImage,
-            "oneBot.groupId": self.oneBotGroupId,
-            "oneBot.token": self.oneBotToken,
-            "oneBot.url": self.oneBotUrl,
-            "oneBot.userId": self.oneBotUserId,
-            "serverChan.enabled": self.isServerChanEnabled,
-            "serverChan.sendKey": self.serverChanSendKey,
-            "telegram.enabled": self.isTelegramEnabled,
-            "telegram.proxyEnabled": self.isTelegramProxyEnabled,
-            "telegram.sendImage": self.isTelegramSendImage,
-            "weCom.enabled": self.isWeComEnabled,
-            "weCom.sendImage": self.isWeComSendImage,
-            "weCom.webhookUrl": self.weComWebhookUrl,
-            "webhook.enabled": self.isWebhookEnabled,
-            "webhook.url": self.webhookUrl,
-            "xxtui.enabled": self.isXxtuiEnabled,
-            "email.enabled": self.isEmailEnabled,
-            "email.smtpPort": self.smtpPort,
-            "email.smtpReceiver": self.smtpReceiver,
-            "email.smtpSender": self.smtpSender,
-            "email.smtpServer": self.smtpServer,
-            "email.smtpAuthCode": self.EncryptedSmtpAuthCode,
-            "telegram.apiBaseUrl": self.telegramApiBaseUrl,
-            "telegram.botToken": self.telegramBotToken,
-            "telegram.chatId": self.telegramChatId,
-            "telegram.proxyUrl": self.telegramProxyUrl,
-            "xxtui.apiKey": self.xxtuiApiKey,
-            "xxtui.channel": self.xxtuiChannel,
-            "xxtui.source": self.xxtuiSource,
-            "onCompleted": self.onCompleted,
-            "onStart": self.onStart
-        }
+        """转换为字典（键为 C# 侧的 JSON 名称）"""
+        return self.model_dump(by_alias=True)
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: dict) -> "DisplaySettings":
         """从字典创建对象"""
-        return cls(**{
-            "isEnabled": data.get("enabled", False),
-            "isSystemEnabled": data.get("system.enabled", False),
-            "isBarkEnabled": data.get("bark.enabled", False),
-            "barkCiphertext": data.get("bark.ciphertext", ""),
-            "barkDeviceKey": data.get("bark.deviceKey", ""),
-            "barkGroup": data.get("bark.group", "StarRailAssistant"),
-            "barkIcon": data.get("bark.icon", ""),
-            "barkLevel": data.get("bark.level", ""),
-            "barkServerUrl": data.get("bark.serverUrl", "https://api.day.app"),
-            "barkSound": data.get("bark.sound", ""),
-            "isDingTalkEnabled": data.get("dingTalk.enabled", False),
-            "dingTalkSecret": data.get("dingTalk.secret", ""),
-            "dingTalkWebhookUrl": data.get("dingTalk.webhookUrl", ""),
-            "isDiscordEnabled": data.get("discord.enabled", False),
-            "isDiscordSendImage": data.get("discord.sendImage", False),
-            "discordWebhookUrl": data.get("discord.webhookUrl", ""),
-            "isFeishuEnabled": data.get("feishu.enabled", False),
-            "feishuAppId": data.get("feishu.appId", ""),
-            "feishuAppSecret": data.get("feishu.appSecret", ""),
-            "feishuReceiveId": data.get("feishu.receiveId", ""),
-            "feishuReceiveIdType": data.get("feishu.receiveIdType", ""),
-            "feishuWebhookUrl": data.get("feishu.webhookUrl", ""),
-            "isOneBotEnabled": data.get("oneBot.enabled", False),
-            "isOneBotSendImage": data.get("oneBot.sendImage", False),
-            "oneBotGroupId": data.get("oneBot.groupId", ""),
-            "oneBotToken": data.get("oneBot.token", ""),
-            "oneBotUrl": data.get("oneBot.url", ""),
-            "oneBotUserId": data.get("oneBot.userId", ""),
-            "isServerChanEnabled": data.get("serverChan.enabled", False),
-            "serverChanSendKey": data.get("serverChan.sendKey", ""),
-            "isTelegramEnabled": data.get("telegram.enabled", False),
-            "isTelegramProxyEnabled": data.get("telegram.proxyEnabled", False),
-            "isTelegramSendImage": data.get("telegram.sendImage", False),
-            "isWeComEnabled": data.get("weCom.enabled", False),
-            "isWeComSendImage": data.get("weCom.sendImage", False),
-            "weComWebhookUrl": data.get("weCom.webhookUrl", ""),
-            "isWebhookEnabled": data.get("webhook.enabled", False),
-            "webhookUrl": data.get("webhook.url", ""),
-            "isXxtuiEnabled": data.get("xxtui.enabled", False),
-            "isEmailEnabled": data.get("email.enabled", False),
-            "smtpPort": data.get("email.smtpPort", 465),
-            "smtpReceiver": data.get("email.smtpReceiver", ""),
-            "smtpSender": data.get("email.smtpSender", ""),
-            "smtpServer": data.get("email.smtpServer", ""),
-            "EncryptedSmtpAuthCode": data.get("email.smtpAuthCode", ""),
-            "telegramApiBaseUrl": data.get("telegram.apiBaseUrl", "https://api.telegram.org"),
-            "telegramBotToken": data.get("telegram.botToken", ""),
-            "telegramChatId": data.get("telegram.chatId", ""),
-            "telegramProxyUrl": data.get("telegram.proxyUrl", "http://127.0.0.1:7890"),
-            "xxtuiApiKey": data.get("xxtui.apiKey", ""),
-            "xxtuiChannel": data.get("xxtui.channel", ""),
-            "xxtuiSource": data.get("xxtui.source", ""),
-            "onCompleted": data.get("onCompleted", list()),
-            "onStart": data.get("onStart", list())
-        })
+        return cls.model_validate(data)
 
-@dataclass
-class UpdateSettings:
-    """自动生成的 UpdateSettings 类"""
+class NotificationSettings(_Model):
+    """通知设置。"""
 
-    downloadChannel: int = 0
-    isAutoUpdate: bool = False
-    isCheckForUpdates: bool = True
-    updateChannel: int = 0
-    downloadPath: str = ""
-    EncryptedMirrorChyanCdk: str = ""
+    isEnabled: bool = Field(False, alias="enabled", description='是否启用通知功能')
+    isSystemEnabled: bool = Field(False, alias="system.enabled", description='是否启用系统通知')
+    isBarkEnabled: bool = Field(False, alias="bark.enabled", description='是否启用 Bark 推送')
+    barkCiphertext: str = Field("", alias="bark.ciphertext", description='Bark 推送的密文内容，设置后作为 ciphertext 参数发送')
+    barkDeviceKey: str = Field("", alias="bark.deviceKey", description='Bark 设备 Key，支持逗号分隔多个设备')
+    barkGroup: str = Field("StarRailAssistant", alias="bark.group", description='Bark 消息分组')
+    barkIcon: str = Field("", alias="bark.icon", description='Bark 推送图标的 URL')
+    barkLevel: str = Field("", alias="bark.level", description='Bark 推送级别，active/timeSensitive/passive')
+    barkServerUrl: str = Field("https://api.day.app", alias="bark.serverUrl", description='Bark 服务器地址')
+    barkSound: str = Field("", alias="bark.sound", description='Bark 推送提示音名称')
+    isDingTalkEnabled: bool = Field(False, alias="dingTalk.enabled", description='是否启用钉钉机器人推送')
+    dingTalkSecret: str = Field("", alias="dingTalk.secret", description='钉钉机器人的加签密钥（SEC 开头）')
+    dingTalkWebhookUrl: str = Field("", alias="dingTalk.webhookUrl", description='钉钉机器人的 Webhook 地址')
+    isDiscordEnabled: bool = Field(False, alias="discord.enabled", description='是否启用 Discord 推送')
+    isDiscordSendImage: bool = Field(False, alias="discord.sendImage", description='是否在 Discord 推送中附带截图')
+    discordWebhookUrl: str = Field("", alias="discord.webhookUrl", description='Discord 的 Webhook 地址')
+    isFeishuEnabled: bool = Field(False, alias="feishu.enabled", description='是否启用飞书推送')
+    feishuAppId: str = Field("", alias="feishu.appId", description='飞书应用的 App ID')
+    feishuAppSecret: str = Field("", alias="feishu.appSecret", description='飞书应用的 App Secret')
+    feishuReceiveId: str = Field("", alias="feishu.receiveId", description='飞书消息接收者 ID')
+    feishuReceiveIdType: str = Field("", alias="feishu.receiveIdType", description='飞书接收者 ID 类型，如 open_id、user_id、union_id、chat_id')
+    feishuWebhookUrl: str = Field("", alias="feishu.webhookUrl", description='飞书机器人的 Webhook 地址')
+    isOneBotEnabled: bool = Field(False, alias="oneBot.enabled", description='是否启用 OneBot 推送')
+    isOneBotSendImage: bool = Field(False, alias="oneBot.sendImage", description='是否在 OneBot 推送中附带截图')
+    oneBotGroupId: str = Field("", alias="oneBot.groupId", description='OneBot 推送的目标群号')
+    oneBotToken: str = Field("", alias="oneBot.token", description='OneBot 的访问 Token')
+    oneBotUrl: str = Field("", alias="oneBot.url", description='OneBot 的 HTTP API 地址')
+    oneBotUserId: str = Field("", alias="oneBot.userId", description='OneBot 机器人的账号')
+    isServerChanEnabled: bool = Field(False, alias="serverChan.enabled", description='是否启用 Server酱 推送')
+    serverChanSendKey: str = Field("", alias="serverChan.sendKey", description='Server酱 的 SendKey')
+    isTelegramEnabled: bool = Field(False, alias="telegram.enabled", description='是否启用 Telegram 推送')
+    isTelegramProxyEnabled: bool = Field(False, alias="telegram.proxyEnabled", description='是否为 Telegram 推送启用代理')
+    isTelegramSendImage: bool = Field(False, alias="telegram.sendImage", description='是否在 Telegram 推送中附带截图')
+    isWeComEnabled: bool = Field(False, alias="weCom.enabled", description='是否启用企业微信推送')
+    isWeComSendImage: bool = Field(False, alias="weCom.sendImage", description='是否在企业微信推送中附带截图')
+    weComWebhookUrl: str = Field("", alias="weCom.webhookUrl", description='企业微信机器人的 Webhook 地址')
+    isWebhookEnabled: bool = Field(False, alias="webhook.enabled", description='是否启用自定义 Webhook 推送')
+    webhookUrl: str = Field("", alias="webhook.url", description='自定义 Webhook 的 URL')
+    isXxtuiEnabled: bool = Field(False, alias="xxtui.enabled", description='是否启用 息知(xxtui) 推送')
+    isEmailEnabled: bool = Field(False, alias="email.enabled", description='是否启用邮件推送')
+    smtpPort: int = Field(465, alias="email.smtpPort", description='SMTP 服务器端口，SSL 通常为 465')
+    smtpReceiver: str = Field("", alias="email.smtpReceiver", description='收件邮箱地址')
+    smtpSender: str = Field("", alias="email.smtpSender", description='发件邮箱地址')
+    smtpServer: str = Field("", alias="email.smtpServer", description='SMTP 服务器地址')
+    EncryptedSmtpAuthCode: str = Field("", alias="email.smtpAuthCode", description='SMTP 授权码（加密存储）')
+    telegramApiBaseUrl: str = Field("https://api.telegram.org", alias="telegram.apiBaseUrl", description='Telegram Bot API 地址')
+    telegramBotToken: str = Field("", alias="telegram.botToken", description='Telegram 机器人的 Bot Token')
+    telegramChatId: str = Field("", alias="telegram.chatId", description='Telegram 推送目标 Chat ID')
+    telegramProxyUrl: str = Field("http://127.0.0.1:7890", alias="telegram.proxyUrl", description='Telegram 代理服务器地址')
+    xxtuiApiKey: str = Field("", alias="xxtui.apiKey", description='息知(xxtui) 的 API Key')
+    xxtuiChannel: str = Field("", alias="xxtui.channel", description='息知(xxtui) 的推送通道')
+    xxtuiSource: str = Field("", alias="xxtui.source", description='息知(xxtui) 的消息来源')
+    onCompleted: list[str] = Field(default_factory=list, alias="onCompleted", description='任务完成时发送通知的任务名称列表')
+    onStart: list[str] = Field(default_factory=list, alias="onStart", description='任务开始时发送通知的任务名称列表')
 
     def to_dict(self) -> dict:
-        """转换为字典"""
-        return {
-            "downloadChannel": self.downloadChannel,
-            "autoUpdate": self.isAutoUpdate,
-            "checkForUpdates": self.isCheckForUpdates,
-            "updateChannel": self.updateChannel,
-            "downloadPath": self.downloadPath,
-            "mirrorChyanCdk": self.EncryptedMirrorChyanCdk
-        }
+        """转换为字典（键为 C# 侧的 JSON 名称）"""
+        return self.model_dump(by_alias=True)
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: dict) -> "NotificationSettings":
         """从字典创建对象"""
-        return cls(**{
-            "downloadChannel": data.get("downloadChannel", 0),
-            "isAutoUpdate": data.get("autoUpdate", False),
-            "isCheckForUpdates": data.get("checkForUpdates", True),
-            "updateChannel": data.get("updateChannel", 0),
-            "downloadPath": data.get("downloadPath", ""),
-            "EncryptedMirrorChyanCdk": data.get("mirrorChyanCdk", "")
-        })
+        return cls.model_validate(data)
 
-@dataclass
-class AdvancedSettings:
-    """自动生成的 AdvancedSettings 类"""
+class UpdateSettings(_Model):
+    """更新设置。"""
 
-    backendLaunchArgs: str = "--inline"
-    isRemoteEnabled: bool = False
-    remoteBaseUrl: str = "http://localhost:5000"
-    isDebugOverlayEnabled: bool = False
-    isDeveloperModeEnabled: bool = False
-    isCustomBackendEnabled: bool = False
-    customBackendCommand: str = ""
-    customBackendArguments: str = ""
-    customBackendWorkingDirectory: str = ""
-    isSaveOcrImage: bool = False
+    downloadChannel: int = Field(0, alias="downloadChannel", description='下载渠道，0=Mirror Chyan, 1=Github Release, 2=AUTO-MAS')
+    isAutoUpdate: bool = Field(False, alias="autoUpdate", description='是否启用自动更新: 将在有更新时直接开始下载')
+    isCheckForUpdates: bool = Field(True, alias="checkForUpdates", description='是否启用检查更新功能: 将在启动时检查更新并提示用户')
+    updateChannel: int = Field(0, alias="updateChannel", description='更新频道，0=Stable, 1=Beta')
+    downloadPath: str = Field("", alias="downloadPath", description='更新安装包的下载保存目录，留空则使用系统临时目录下的 SRA 文件夹')
+    EncryptedMirrorChyanCdk: str = Field("", alias="mirrorChyanCdk", description='Mirror Chyan 下载渠道的授权码，敏感信息将被加密存储')
 
     def to_dict(self) -> dict:
-        """转换为字典"""
-        return {
-            "backend.launchArgs": self.backendLaunchArgs,
-            "backend.remote.enabled": self.isRemoteEnabled,
-            "backend.remote.baseUrl": self.remoteBaseUrl,
-            "developerMode.overlay": self.isDebugOverlayEnabled,
-            "developerMode.enabled": self.isDeveloperModeEnabled,
-            "developerMode.customBackend.enabled": self.isCustomBackendEnabled,
-            "developerMode.customBackend.command": self.customBackendCommand,
-            "developerMode.customBackend.arguments": self.customBackendArguments,
-            "developerMode.customBackend.workingDirectory": self.customBackendWorkingDirectory,
-            "developerMode.saveOcrImage": self.isSaveOcrImage
-        }
+        """转换为字典（键为 C# 侧的 JSON 名称）"""
+        return self.model_dump(by_alias=True)
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: dict) -> "UpdateSettings":
         """从字典创建对象"""
-        return cls(**{
-            "backendLaunchArgs": data.get("backend.launchArgs", "--inline"),
-            "isRemoteEnabled": data.get("backend.remote.enabled", False),
-            "remoteBaseUrl": data.get("backend.remote.baseUrl", "http://localhost:5000"),
-            "isDebugOverlayEnabled": data.get("developerMode.overlay", False),
-            "isDeveloperModeEnabled": data.get("developerMode.enabled", False),
-            "isCustomBackendEnabled": data.get("developerMode.customBackend.enabled", False),
-            "customBackendCommand": data.get("developerMode.customBackend.command", ""),
-            "customBackendArguments": data.get("developerMode.customBackend.arguments", ""),
-            "customBackendWorkingDirectory": data.get("developerMode.customBackend.workingDirectory", ""),
-            "isSaveOcrImage": data.get("developerMode.saveOcrImage", False)
-        })
+        return cls.model_validate(data)
 
-@dataclass
-class AppSettings:
+class AdvancedSettings(_Model):
+    """高级设置。"""
+
+    backendLaunchArgs: str = Field("--inline", alias="backend.launchArgs", description='后端启动参数')
+    isRemoteEnabled: bool = Field(False, alias="backend.remote.enabled", description='是否使用远程后端')
+    remoteBaseUrl: str = Field("http://localhost:5073", alias="backend.remote.baseUrl", description='远程后端地址')
+    isDebugOverlayEnabled: bool = Field(False, alias="developerMode.overlay", description='是否在叠加层显示调试信息')
+    isDeveloperModeEnabled: bool = Field(False, alias="developerMode.enabled", description='是否启用开发者模式')
+    isCustomBackendEnabled: bool = Field(False, alias="developerMode.customBackend.enabled", description='是否启用自定义后端')
+    customBackendCommand: str = Field("", alias="developerMode.customBackend.command", description='自定义后端命令/可执行文件，如 python、sra-cli、uv 或可执行文件路径')
+    customBackendArguments: str = Field("", alias="developerMode.customBackend.arguments", description='自定义后端启动参数，如 main.py、-m SRACore')
+    customBackendWorkingDirectory: str = Field("", alias="developerMode.customBackend.workingDirectory", description='自定义后端工作目录，留空时使用程序当前目录')
+    isSaveOcrImage: bool = Field(False, alias="developerMode.saveOcrImage", description='是否保存 OCR 截图以便调试')
+
+    def to_dict(self) -> dict:
+        """转换为字典（键为 C# 侧的 JSON 名称）"""
+        return self.model_dump(by_alias=True)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "AdvancedSettings":
+        """从字典创建对象"""
+        return cls.model_validate(data)
+
+class AppSettings(_Model):
     """自动生成的 AppSettings 类"""
 
-    General: GeneralSettings = field(default_factory=GeneralSettings)
-    Display: DisplaySettings = field(default_factory=DisplaySettings)
-    Update: UpdateSettings = field(default_factory=UpdateSettings)
-    Advanced: AdvancedSettings = field(default_factory=AdvancedSettings)
-    Notification: NotificationSettings = field(default_factory=NotificationSettings)
+    General: GeneralSettings = Field(default_factory=GeneralSettings, alias="general", description='通用设置')
+    Display: DisplaySettings = Field(default_factory=DisplaySettings, alias="display", description='显示设置')
+    Update: UpdateSettings = Field(default_factory=UpdateSettings, alias="update", description='更新设置')
+    Advanced: AdvancedSettings = Field(default_factory=AdvancedSettings, alias="advanced", description='高级设置')
+    Notification: NotificationSettings = Field(default_factory=NotificationSettings, alias="notification", description='通知设置')
 
     def to_dict(self) -> dict:
-        """转换为字典"""
-        return {
-            "general": self.General.to_dict(),
-            "display": self.Display.to_dict(),
-            "update": self.Update.to_dict(),
-            "advanced": self.Advanced.to_dict(),
-            "notification": self.Notification.to_dict()
-        }
+        """转换为字典（键为 C# 侧的 JSON 名称）"""
+        return self.model_dump(by_alias=True)
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: dict) -> "AppSettings":
         """从字典创建对象"""
-        return cls(**{
-            "General": GeneralSettings.from_dict(data.get("general", {})),
-            "Display": DisplaySettings.from_dict(data.get("display", {})),
-            "Update": UpdateSettings.from_dict(data.get("update", {})),
-            "Advanced": AdvancedSettings.from_dict(data.get("advanced", {})),
-            "Notification": NotificationSettings.from_dict(data.get("notification", {}))
-        })
+        return cls.model_validate(data)

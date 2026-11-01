@@ -69,7 +69,7 @@ function scrollToContent() {
 }
 
 /* ---------- 副标题打字机 + 轮换 ---------- */
-// 内置回退文案：后端 /api/App/phrases 不可用或返回空时使用
+// 内置回退文案：后端 /api/app/phrases 不可用或返回空时使用
 const FALLBACK_PHRASES = [
   t('hero.tagline1'),
   t('hero.tagline2'),

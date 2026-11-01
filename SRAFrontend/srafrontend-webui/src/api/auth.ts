@@ -3,8 +3,8 @@ import { ApiError, http, statusMessage } from './http'
 import type { ApiEnvelope } from './http'
 
 /**
- * /api/Auth 认证模块（对应后端 AuthController）：
- * - POST /api/Auth  请求体 { token }，校验 access token
+ * /api/auth 认证模块（对应后端 AuthController）：
+ * - POST /api/auth  请求体 { token }，校验 access token
  *
  * 仅以 HTTP 状态码判定结果：
  * - validateStatus 放行非 2xx（axios 默认会把 401 变成异常，这里需要直接读状态码）

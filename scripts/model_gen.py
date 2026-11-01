@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """
-根据C#类自动生成对应的Python类
+根据 C# 模型自动生成统一的 Pydantic 模型。
+
+全仓库只保留这一套 Python 侧模型定义，它同时服务两端：
+- SRACore 运行时：``to_dict`` / ``from_dict`` 读写 settings.json 与 configs/*.json；
+- SRAServer：作为 ``/openapi/v1.json`` 中 WebUI 动态表单依赖的组件。
+
+字段名沿用 C# 侧的名字（``[ObservableProperty]`` 的私有字段去掉前导下划线，普通属性保持
+原样），因此运行时调用点无需改动；JSON 键名与中文说明分别来自 ``[JsonPropertyName]`` 和
+``[Description]``。
 """
 import os
 import re
@@ -14,7 +22,37 @@ CSHARP_TYPE_MAPPING = {
     'int': 'int',
     'bool': 'bool',
     'double': 'float',
+    'long': 'int',
+    'decimal': 'float',
+    'object': 'Any',
+    'JsonElement': 'Any',
 }
+
+# 无默认值时按类型回退的字面量
+TYPE_DEFAULTS = {
+    'str': '""',
+    'int': '0',
+    'bool': 'False',
+    'float': '0.0',
+}
+
+CLASS_PATTERN = re.compile(r'^\s*public\s+(partial\s+)?class\s+(\w+)\s*(:[^{}]*)?$', re.MULTILINE)
+
+# 属性声明：前置特性块（可同行/换行、可多个） + 类型 + 字段名 + 可选的默认值
+PROPERTY_PATTERN = re.compile(
+    r'(?P<attrs>(?:\[[^\]]*\]\s*)+)'
+    r'(?:private|public)\s+(?:partial\s+)?'
+    r'(?P<type>[^\s<>]+(?:<[^>]+>)?)\s+_?(?P<name>\w+)'
+    # 尾部 `;` 可选：自动属性（`public int Level { get; set; }`）不以分号结尾
+    r'\s*(?:\{[^}]*\})?(?:\s*=\s*(?P<default>[^;]+))?;?',
+    re.DOTALL,
+)
+
+JSON_NAME_PATTERN = re.compile(r'JsonPropertyName\("([^"]+)"\)')
+DESCRIPTION_PATTERN = re.compile(r'Description\("([^"]*)"\)')
+
+# 常量声明：如 `public static int StaticVersion => 4;`，用于解析默认值里引用的常量
+CONST_PATTERN = re.compile(r'(?:static|const)\s+[\w<>\[\]?.]+\s+(\w+)\s*(?:=>|=)\s*([^;]+);')
 
 
 def extract_class_content(content: str, start_index: int) -> str:
@@ -68,219 +106,204 @@ def get_list_inner_type(python_type: str) -> str:
     return python_type[len('list['):-1].strip()
 
 
-def parse_csharp_file(file_path: str) -> list[dict]:
-    """解析C#文件，提取类信息"""
+def parse_const_table(content: str) -> dict[str, str]:
+    """收集文件内的常量/静态属性表达式，用于把默认值中的标识符解析回字面量"""
+    return {name: value.strip() for name, value in CONST_PATTERN.findall(content)}
+
+
+def parse_csharp_file(file_path: str) -> tuple[list[dict], dict[str, str]]:
+    """解析C#文件，提取类信息与常量表"""
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    class_pattern = r'^\s*public\s+(partial\s+)?class\s+(\w+)\s*(:[^{}]*)?$'
-    matches = list(re.finditer(class_pattern, content, re.MULTILINE))
+    const_table = parse_const_table(content)
 
     classes = []
-    for match in matches:
+    for match in CLASS_PATTERN.finditer(content):
         class_name = match.group(2)
         brace_start = content.find('{', match.end())
         if brace_start == -1:
             continue
 
         class_content = extract_class_content(content, brace_start + 1)
-        properties = parse_properties(class_content)
-
         classes.append({
             'name': class_name,
-            'is_partial': bool(match.group(1)),
-            'base_classes': match.group(3).strip()[1:] if match.group(3) else '',
-            'properties': properties
+            'properties': parse_properties(class_content),
         })
 
-    return classes
+    return classes, const_table
 
 
 def parse_properties(class_content: str) -> list[dict]:
-    """从类内容中解析属性，包括默认值"""
-    # 匹配属性定义，支持以下格式：
-    # 格式1：[property: JsonPropertyName("xxx")]\nprivate Type _name = value;
-    # 格式2：[JsonPropertyName("xxx")]\npublic Type Name { get; set; } = value;
-    # 格式3：[JsonPropertyName("xxx"), Description("...")] public Type Name { get; init; } = new();
-    # 格式4：[JsonPropertyName("xxx")]\npublic partial Type Name { get; set; }
-    # 格式5：[ObservableProperty] [property: JsonPropertyName("xxx")] [property: Description("...")]（特性同行或换行均可）
-    # 支持有默认值和没有默认值的情况
-    property_pattern = (
-        r'\[(?:property:\s*)?JsonPropertyName\("([^"]+)"\)(?:\s*,\s*[^\]]*)?\]'  # 特性内逗号分隔的其他特性
-        r'(?:\s*\[[^\]]*\])*'                                                   # 后续其他特性（\s* 含换行，同行/换行均可）
-        r'\s*\n?\s*(?:private|public)\s+(?:partial\s+)?'
-        r'([^\s<>]+(?:<[^>]+>)?)\s+[_]?(\w+)'
-        r'\s*(?:\{[^}]+\})?(?:\s*=\s*([^;]+))?;?'
-    )
-    prop_matches = re.findall(property_pattern, class_content, re.DOTALL)
+    """从类内容中解析属性：JSON 键名、Python 字段名/类型、默认值与中文说明
 
+    支持的写法：
+    - 普通属性：``[JsonPropertyName("xxx")] public Type Name { get; set; } = value;``
+    - CommunityToolkit 属性：``[ObservableProperty] [property: JsonPropertyName("xxx")]
+      [property: Description("...")] private Type _name = value;``（同行或换行均可）
+    - 没有 ``[Description]`` 的属性其 description 为 None，生成时不输出该参数
+    """
     properties = []
-    for match in prop_matches:
-        json_name = match[0]
-        csharp_type = match[1]
-        prop_name = match[2]
-        csharp_default = match[3].strip() if match[3] else None
-        
+    for match in PROPERTY_PATTERN.finditer(class_content):
+        attrs = match.group('attrs')
+        json_match = JSON_NAME_PATTERN.search(attrs)
+        if not json_match:
+            # 没有 [JsonPropertyName] 的成员不参与 JSON 序列化，跳过
+            continue
+
+        description_match = DESCRIPTION_PATTERN.search(attrs)
+        csharp_type = match.group('type')
         properties.append({
-            'name': prop_name,
-            'json_name': json_name,
+            'name': match.group('name'),
+            'json_name': json_match.group(1),
             'csharp_type': csharp_type,
             'python_type': convert_csharp_type(csharp_type),
-            'csharp_default': csharp_default
+            'csharp_default': match.group('default').strip() if match.group('default') else None,
+            'description': description_match.group(1) if description_match else None,
         })
 
     return properties
 
 
-def convert_csharp_default(csharp_default: str | None, python_type: str, class_names: list[str] | None = None) -> str:
-    """将C#默认值转换为Python默认值"""
-    class_names = class_names or []
+def convert_csharp_default(
+    csharp_default: str | None,
+    python_type: str,
+    class_names: list[str],
+    const_table: dict[str, str],
+) -> str:
+    """将C#默认值转换为 ``Field(...)`` 的参数表达式"""
+    if csharp_default and csharp_default in const_table:
+        return convert_csharp_default(const_table[csharp_default], python_type, class_names, const_table)
 
-    # 嵌套自定义类对象（= new()）使用工厂默认值，保证 to_dict 可递归转换
-    if python_type in class_names and (
-        csharp_default is None
-        or csharp_default == 'new()'
-        or csharp_default.startswith('new ')
-    ):
-        return f'field(default_factory={python_type})'
+    # 嵌套自定义类：使用工厂默认值，保证可递归序列化
+    if python_type in class_names:
+        return f'default_factory={python_type}'
 
-    # 如果没有默认值，使用类型默认值
+    if is_list_type(python_type):
+        return 'default_factory=list'
+
     if csharp_default is None:
-        defaults = {
-            'str': '""',
-            'int': '0',
-            'bool': 'False',
-            'float': '0.0',
-        }
-        if python_type.startswith('list'):
-            return 'field(default_factory=list)'
-        return defaults.get(python_type, 'None')
-
-    if python_type.startswith('list') and (
-        csharp_default in ('[]', 'new()')
-        or csharp_default.startswith('new ')
-        or csharp_default.startswith('new(')
-    ):
-        return 'field(default_factory=list)'
+        return TYPE_DEFAULTS.get(python_type, 'None')
 
     if csharp_default == 'true':
         return 'True'
-    elif csharp_default == 'false':
+    if csharp_default == 'false':
         return 'False'
-    elif csharp_default == '[]':
-        return 'field(default_factory=list)'
-    elif csharp_default.startswith('new('):
+    if csharp_default == 'null':
         return 'None'
-    elif csharp_default.startswith('"') and csharp_default.endswith('"'):
+
+    if csharp_default.startswith('"') and csharp_default.endswith('"'):
         return csharp_default
-    elif csharp_default.startswith("'") and csharp_default.endswith("'"):
+    if csharp_default.startswith("'") and csharp_default.endswith("'"):
         return csharp_default
-    elif '.' in csharp_default and csharp_default.replace('.', '', 1).lstrip('-').isdigit():
-        return csharp_default
-    elif csharp_default.lstrip('-').isdigit():
-        # float 类型的整数字面量（如 double x = 1;）补成浮点形式
+
+    if re.fullmatch(r'-?\d+', csharp_default):
         return f'{csharp_default}.0' if python_type == 'float' else csharp_default
-    elif csharp_default.startswith('[') and csharp_default.endswith(']'):
-        return 'field(default_factory=list)'
-    else:
-        # 如果无法识别，使用类型默认值
-        defaults = {
-            'str': '""',
-            'int': '0',
-            'bool': 'False',
-            'float': '0.0',
-        }
-        if python_type.startswith('list'):
-            return 'field(default_factory=list)'
-        return defaults.get(python_type, 'None')
+    if re.fullmatch(r'-?\d+\.\d+', csharp_default):
+        return csharp_default
+
+    if csharp_default.startswith('new(') or csharp_default.startswith('new '):
+        return 'default_factory=list'
+
+    # 无法识别时按类型回退
+    return TYPE_DEFAULTS.get(python_type, 'None')
 
 
-def generate_python_class(class_info: dict, class_names: list[str]) -> str:
-    """生成Python类代码（使用dataclass）"""
-    lines = ['@dataclass',
-             f'class {class_info["name"]}:',
-             f'    """自动生成的 {class_info["name"]} 类"""',
-             '']
+def class_docstring(class_name: str, parent_description: str | None) -> str:
+    """生成类的文档字符串。
+
+    注意：Pydantic 生成 JSON Schema 时，若某个模型字段的说明与其 ``$ref`` 目标的说明
+    **完全同文**，会丢弃字段侧那份（视为重复）。因此这里在复用父属性说明时统一补上句号，
+    保证两者不同文，字段说明才能出现在 OpenAPI 组件里。
+    """
+    if parent_description:
+        return f'{parent_description}。'
+    return f'自动生成的 {class_name} 类'
+
+
+def generate_python_class(
+    class_info: dict,
+    class_names: list[str],
+    const_table: dict[str, str],
+    class_descriptions: dict[str, str],
+) -> str:
+    """生成 Pydantic 模型类代码"""
+    class_name = class_info['name']
+    docstring = class_docstring(class_name, class_descriptions.get(class_name))
+
+    lines = [
+        f'class {class_name}(_Model):',
+        f'    """{docstring}"""',
+        '',
+    ]
 
     for prop in class_info['properties']:
-        # 使用从C#代码中提取的实际默认值
-        default_value = convert_csharp_default(prop['csharp_default'], prop['python_type'], class_names)
-        lines.append(f'    {prop["name"]}: {prop["python_type"]} = {default_value}')
+        default = convert_csharp_default(
+            prop['csharp_default'], prop['python_type'], class_names, const_table
+        )
+        params = [default, f'alias="{prop["json_name"]}"']
+        if prop['description']:
+            params.append(f'description={prop["description"]!r}')
+        lines.append(f'    {prop["name"]}: {prop["python_type"]} = Field({", ".join(params)})')
 
-    lines.append('')
-    lines.append('    def to_dict(self) -> dict:')
-    lines.append('        """转换为字典"""')
-
-    # 生成to_dict方法的内容，处理子对象的递归转换
-    to_dict_lines = []
-    for prop in class_info['properties']:
-        json_name = prop['json_name']
-        prop_name = prop['name']
-        prop_type = prop['python_type']
-
-        # 如果属性类型是另一个自定义类，则调用其to_dict方法，添加空值检查
-        if prop_type in class_names:
-            to_dict_lines.append(f'"{json_name}": self.{prop_name}.to_dict()')
-        else:
-            to_dict_lines.append(f'"{json_name}": self.{prop_name}')
-
-    lines.append('        return {')
-    lines.append('            ' + ',\n            '.join(to_dict_lines))
-    lines.append('        }')
-    lines.append('')
-    lines.append('    @classmethod')
-    lines.append('    def from_dict(cls, data: dict):')
-    lines.append('        """从字典创建对象"""')
-
-    # 生成from_dict方法的内容，处理子对象的实例化
-    from_dict_lines = []
-    for prop in class_info['properties']:
-        json_name = prop['json_name']
-        prop_name = prop['name']
-        prop_type = prop['python_type']
-
-        # 如果属性类型是另一个自定义类，则调用其from_dict方法
-        if prop_type in class_names:
-            from_dict_lines.append(f'"{prop_name}": {prop_type}.from_dict(data.get("{json_name}", {{}}))')
-        elif is_list_type(prop_type):
-            inner_type = get_list_inner_type(prop_type)
-            if inner_type in class_names:
-                from_dict_lines.append(
-                    f'"{prop_name}": [{inner_type}.from_dict(item) for item in data.get("{json_name}", list())]'
-                )
-            else:
-                from_dict_lines.append(f'"{prop_name}": data.get("{json_name}", list())')
-        else:
-            default_value = convert_csharp_default(prop['csharp_default'], prop['python_type'], class_names)
-            if default_value == "field(default_factory=list)":
-                default_value = 'list()'
-            from_dict_lines.append(f'"{prop_name}": data.get("{json_name}", {default_value})')
-
-    lines.append('        return cls(**{')
-    lines.append('            ' + ',\n            '.join(from_dict_lines))
-    lines.append('        })')
+    lines.extend([
+        '',
+        '    def to_dict(self) -> dict:',
+        '        """转换为字典（键为 C# 侧的 JSON 名称）"""',
+        '        return self.model_dump(by_alias=True)',
+        '',
+        '    @classmethod',
+        f'    def from_dict(cls, data: dict) -> "{class_name}":',
+        '        """从字典创建对象"""',
+        '        return cls.model_validate(data)',
+    ])
 
     return '\n'.join(lines)
 
 
-def generate_header(file_path: str) -> list[str]:
-    """生成Python文件头部"""
-    return [
+def generate_header(source_name: str, needs_any: bool) -> list[str]:
+    """生成Python文件头部（模块说明与生成模型基类）"""
+    lines = [
         '#!/usr/bin/env python3',
         '"""',
-        '自动生成的Python类',
-        f'源文件: {os.path.basename(file_path)}',
+        '自动生成的 Pydantic 模型',
+        f'源文件: {source_name}',
+        '',
+        'SRACore 运行时与 SRAServer 的 OpenAPI 组件共用这一套模型定义，请勿手工编辑：',
+        '改动请修改对应的 C# 模型并执行 `npm run modelgen`。',
         '"""',
         '',
         'from __future__ import annotations',
-        'from dataclasses import dataclass, field',
         '',
     ]
+    if needs_any:
+        lines.extend(['from typing import Any', ''])
+    lines.extend([
+        'from pydantic import BaseModel, ConfigDict, Field',
+        '',
+        '',
+        'class _Model(BaseModel):',
+        '    """生成模型基类：允许按字段名或 JSON 别名构造，并保留未知键。"""',
+        '',
+        '    model_config = ConfigDict(populate_by_name=True, extra="allow")',
+        '',
+    ])
+    return lines
+
+
+def class_dependencies(class_info: dict, class_names: list[str]) -> set[str]:
+    """类依赖的其他类（含列表元素类型），用于排序与前向引用检测"""
+    dependencies = set()
+    for prop in class_info['properties']:
+        for candidate in (prop['python_type'], get_list_inner_type(prop['python_type'])):
+            if candidate in class_names and candidate != class_info['name']:
+                dependencies.add(candidate)
+    return dependencies
 
 
 def sort_classes_by_dependency(classes: list[dict], class_names: list[str]) -> list[dict]:
-    """按依赖关系排序类：被嵌套引用的类先输出，避免前向引用导致 NameError"""
-    ordered = []
+    """按依赖关系排序类：被嵌套引用的类先输出，避免前向引用导致解析失败"""
+    ordered: list[dict] = []
     emitted: set[str] = set()
     pending = list(classes)
 
@@ -288,12 +311,7 @@ def sort_classes_by_dependency(classes: list[dict], class_names: list[str]) -> l
         progress = False
         remaining = []
         for class_info in pending:
-            deps = {
-                prop['python_type']
-                for prop in class_info['properties']
-                if prop['python_type'] in class_names and prop['python_type'] != class_info['name']
-            }
-            if deps <= emitted:
+            if class_dependencies(class_info, class_names) <= emitted:
                 ordered.append(class_info)
                 emitted.add(class_info['name'])
                 progress = True
@@ -305,6 +323,27 @@ def sort_classes_by_dependency(classes: list[dict], class_names: list[str]) -> l
         pending = remaining
 
     return ordered
+
+
+def find_forward_references(ordered: list[dict], class_names: list[str]) -> list[str]:
+    """找出引用了后置类（循环依赖等）的类名，需要在其后补 ``model_rebuild()``"""
+    index = {class_info['name']: i for i, class_info in enumerate(ordered)}
+    forward = []
+    for i, class_info in enumerate(ordered):
+        if any(index[dep] > i for dep in class_dependencies(class_info, class_names)):
+            forward.append(class_info['name'])
+    return forward
+
+
+def build_class_descriptions(classes: list[dict]) -> dict[str, str]:
+    """用引用它的属性说明作为类的文档字符串（如 ``startGame`` 的"启动游戏配置"）"""
+    descriptions: dict[str, str] = {}
+    for class_info in classes:
+        for prop in class_info['properties']:
+            for candidate in (prop['python_type'], get_list_inner_type(prop['python_type'])):
+                if prop['description'] and candidate not in descriptions:
+                    descriptions[candidate] = prop['description']
+    return descriptions
 
 
 def main():
@@ -319,14 +358,27 @@ def main():
         print(f'[ERROR] 文件不存在: {args.input}')
         sys.exit(1)
 
-    classes = parse_csharp_file(args.input)
-    output_lines = generate_header(args.input)
+    classes, const_table = parse_csharp_file(args.input)
+    class_names = [class_info['name'] for class_info in classes]
+    needs_any = any(
+        'Any' in prop['python_type']
+        for class_info in classes
+        for prop in class_info['properties']
+    )
 
-    # 获取所有类名，用于在from_dict中判断是否需要递归实例化
-    class_names = [c['name'] for c in classes]
+    output_lines = generate_header(args.input, needs_any)
+    ordered = sort_classes_by_dependency(classes, class_names)
+    class_descriptions = build_class_descriptions(classes)
 
-    for class_info in sort_classes_by_dependency(classes, class_names):
-        output_lines.append(generate_python_class(class_info, class_names))
+    for class_info in ordered:
+        output_lines.append(generate_python_class(class_info, class_names, const_table, class_descriptions))
+        output_lines.append('')
+
+    forward_references = find_forward_references(ordered, class_names)
+    if forward_references:
+        output_lines.append('# 存在前向引用（循环依赖），统一在此解析')
+        for class_name in forward_references:
+            output_lines.append(f'{class_name}.model_rebuild()')
         output_lines.append('')
 
     output = '\n'.join(output_lines)

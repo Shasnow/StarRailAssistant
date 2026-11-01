@@ -531,7 +531,7 @@ public partial class AdvancedSettings : ObservableObject
     [ObservableProperty]
     [property: JsonPropertyName("backend.remote.baseUrl")]
     [property: Description("远程后端地址")]
-    private string _remoteBaseUrl = "http://localhost:5000";
+    private string _remoteBaseUrl = "http://localhost:5073";
 
     [ObservableProperty]
     [property: JsonPropertyName("developerMode.overlay")]

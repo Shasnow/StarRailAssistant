@@ -35,7 +35,7 @@
         </el-tab-pane>
       </el-tabs>
 
-      <!-- 保存：把当前表单内容 PUT 回 /api/Configs/{name} -->
+      <!-- 保存：把当前表单内容 PUT 回 /api/configs/{name} -->
       <div class="panel-footer">
         <span class="footer-hint">{{ isDirty ? t('common.unsaved') : configName ? t('config.current', [configName]) : t('config.noneSelected') }}</span>
         <el-button type="primary" size="small"

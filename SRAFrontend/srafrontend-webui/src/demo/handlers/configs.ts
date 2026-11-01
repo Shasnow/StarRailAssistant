@@ -9,12 +9,12 @@ import {
 } from '../state'
 
 /**
- * /api/Configs 演示处理器：
- * - GET    /Configs        → 所有配置名
- * - GET    /Configs/{name} → 配置内容（404 资源不存在）
- * - POST   /Configs/{name} → 新建（400 空名/非法名，409 重名）
- * - PUT    /Configs/{name} → 更新（404 不存在，400 请求体无效）
- * - DELETE /Configs/{name} → 删除（404 不存在）
+ * /api/configs 演示处理器：
+ * - GET    /configs        → 所有配置名
+ * - GET    /configs/{name} → 配置内容（404 资源不存在）
+ * - POST   /configs/{name} → 新建（400 空名/非法名，409 重名）
+ * - PUT    /configs/{name} → 更新（404 不存在，400 请求体无效）
+ * - DELETE /configs/{name} → 删除（404 不存在）
  */
 
 /** 后端拒绝的配置名字符集 */

@@ -6,7 +6,7 @@ import type { TasksConfigPayload } from '@/api/configs'
 import { isCanceledError } from '@/api/http'
 
 /**
- * 配置数据 store：连接 /api/Configs 服务与界面。
+ * 配置数据 store：连接 /api/configs 服务与界面。
  *
  * state 分组：
  * - 配置名列表：names / namesLoading / namesError

@@ -3,10 +3,10 @@ import type { RunRequest } from '../../api/task'
 import { getTaskStatus, hasConfig, startDemoTask, stopDemoTask } from '../state'
 
 /**
- * /api/Task 演示处理器：
- * - POST /Task/run   → 启动模拟任务（409 已有任务，400 参数无效/配置不存在）
- * - POST /Task/stop  → 停止模拟任务（409 无运行中任务）
- * - GET  /Task/status → 运行中返回 RuntimeInfo；空闲返回 success:false（配合 rawEnvelope 解读）
+ * /api/task 演示处理器：
+ * - POST /task/run   → 启动模拟任务（409 已有任务，400 参数无效/配置不存在）
+ * - POST /task/stop  → 停止模拟任务（409 无运行中任务）
+ * - GET  /task/status → 运行中返回 RuntimeInfo；空闲返回 success:false（配合 rawEnvelope 解读）
  */
 
 export function handleRunTask(ctx: RouteContext): RouteResult {

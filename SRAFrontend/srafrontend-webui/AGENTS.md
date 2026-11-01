@@ -35,8 +35,8 @@ Single-page Vue 3 app (not a monorepo). Entry: `src/main.ts` → `App.vue`.
 src/
   api/           # API service modules — one file per backend controller
     http.ts      # Axios client with R<T> envelope unwrapping, auth token, error normalization
-    configs.ts   # /api/Configs CRUD
-    task.ts      # /api/Task run/stop/status
+    configs.ts   # /api/configs CRUD
+    task.ts      # /api/task run/stop/status
     logs.ts      # SSE log streaming endpoint
     live.ts      # Screenshot polling endpoint
     anno.ts      # External announcements (starrailassistant.top, CORS-enabled)
@@ -54,7 +54,7 @@ src/
 
 - **Backend envelope**: All API responses use `R<T>` shape `{ success, message, data }`. The Axios interceptor in `http.ts` auto-unwraps `data` on success and throws `ApiError` on `success=false`. Use `rawEnvelope: true` in request config only when you need to handle `success=false` yourself (e.g. `Task/status` returns `success=false` when idle).
 - **Auth token**: Stored in `localStorage` as `sra_token`, attached as `Bearer` header. EventSource (SSE) passes it as `?access_token=` query param since EventSource can't set headers.
-- **Dev proxy**: Vite proxies `/api` and `/openapi` to `http://localhost:5073` (the .NET backend). Logs SSE endpoint is `/api/backend/logs/stream`, screenshot is `/api/backend/screenshot`.
+- **Dev proxy**: Vite proxies `/api` and `/openapi` to `http://localhost:5073` (the Python/Litestar `SRAServer`). Logs SSE endpoint is `/api/backend/logs/stream`, screenshot is `/api/backend/screenshot`.
 - **OpenAPI-driven forms**: `TasksConfigPanel` component fetches `/openapi/v1.json` and generates form fields dynamically from the OpenAPI schema — config structure is defined by the backend, not the frontend.
 - **Test mocking**: API tests mock `request` from `http.ts` (not Axios directly). HTTP-level tests swap `http.defaults.adapter` to avoid network calls. Tests live alongside source in `__tests__/` directories.
 - **Locale**: `index.html` sets `<html lang="zh">`. UI text is in Chinese. Comments in code are also in Chinese.
