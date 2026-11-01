@@ -89,6 +89,11 @@ jobs:
             pip-${{ runner.os }}-
 
       - name: Built with package.py
+        # Cloudflare R2 凭据：package.py 用于上传 WebUI 包与资源包，缺失时会跳过上传
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_API_TOKEN: ${{ secrets.R2_API_TOKEN }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
         run: |
           python scripts/package.py
 
