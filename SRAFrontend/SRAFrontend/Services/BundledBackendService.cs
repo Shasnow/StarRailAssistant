@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
 
@@ -14,4 +15,9 @@ public class BundledBackendService(ILogger<LocalBackendService> logger) : LocalB
     public override string WorkingDirectory { get; set; } = DataPath.AppRoot;
 
     public override string MainArgument { get; set; } = "main.py";
+
+    // 内嵌运行时启用了 site，会把用户级 site-packages（%APPDATA%\Python\Python3xx）纳入 sys.path，
+    // 可能覆盖随包分发的依赖版本；与 SRA-cli.exe 启动器保持一致地禁用
+    public override IReadOnlyDictionary<string, string>? EnvironmentVariables { get; } =
+        new Dictionary<string, string> { ["PYTHONNOUSERSITE"] = "1" };
 }

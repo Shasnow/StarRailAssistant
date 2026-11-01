@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -434,11 +435,14 @@ public class CommonModel(
         unzipToast.CanDismissByTime = false;
         try
         {
+            // 记录更新前的文件清单：增量解压只覆盖不删除，解压完成后据此回收旧版本残留
+            ZipUtil.TryLoadManifest(Environment.CurrentDirectory, out var previousManifest);
             // 重命名当前可执行文件（以防更新过程中被占用），覆盖上次更新残留的旧文件
             File.Move(DataPath.SraExecutablePath, DataPath.SraOldExecutablePath, true);
             // 解压更新包（后台线程执行，避免阻塞 UI）
             await Task.Run(() => ZipUtil.Unzip(downloadFilePath, Environment.CurrentDirectory));
             toastManager.Dismiss(unzipToast);
+            await CleanupObsoleteFilesAsync(previousManifest);
             return true;
         }
         catch (Exception e)
@@ -467,6 +471,33 @@ public class CommonModel(
                 Environment.Exit(0);
             }
             return false;
+        }
+    }
+
+    /// <summary>
+    ///     回收旧版本残留：应用内更新只做 MD5 增量覆盖、不删除旧文件，更新成功后按新旧清单差集
+    ///     删除被移除的依赖、旧运行时等文件（日志与用户自建文件不在清单中，不会被删除）。
+    ///     清单缺失（如安装包直接安装）或删除失败（文件被占用）时静默跳过，不影响更新结果。
+    /// </summary>
+    private async Task CleanupObsoleteFilesAsync(IReadOnlyDictionary<string, string> previousManifest)
+    {
+        if (previousManifest.Count == 0) return;
+        try
+        {
+            var (deletedCount, freedBytes, failedFiles) = await Task.Run(() =>
+                ZipUtil.RemoveObsoleteFiles(Environment.CurrentDirectory, previousManifest));
+            logger.LogInformation(
+                "Cleaned up {DeletedCount} obsolete files, freed {FreedSize}, {FailedCount} failed",
+                deletedCount, ZipUtil.FormatFileSize(freedBytes), failedFiles.Count);
+            if (deletedCount == 0) return;
+            ShowInfoToast(global::SRAFrontend.Localization.UiText.T("已清理旧版本残留"),
+                global::SRAFrontend.Localization.UiText.F(
+                    $"删除 {deletedCount} 个文件，释放 {ZipUtil.FormatFileSize(freedBytes)}"));
+        }
+        catch (Exception e)
+        {
+            // 清理属于附加操作，失败不应让更新流程失败
+            logger.LogWarning(e, "Failed to clean up obsolete files after update");
         }
     }
 

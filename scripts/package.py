@@ -53,6 +53,18 @@ LAUNCHER_NAME = "SRA-cli.exe"
 LAUNCHER_SOURCE = LAUNCHER_DIR / "SRA-cli.c"
 LAUNCHER_MANIFEST = LAUNCHER_DIR / "SRA-cli.manifest"
 LAUNCHER_ICON = ROOT_PATH / "assets" / "SRAicon.ico"
+# 从内嵌运行时中裁剪的依赖：litestar 2.25.0 把 polyfactory（进而 faker，约 16MB）声明为核心依赖，
+# 但其代码中并无引用；上游把 polyfactory 改为可选依赖后，此列表可清空。
+# setuptools / wheel 只在安装依赖阶段需要（构建隔离已关闭），运行期没有任何包依赖它们。
+UNUSED_RUNTIME_PACKAGES = ("polyfactory", "faker", "setuptools", "wheel")
+# 裁剪后必须仍可导入的模块：任一缺失即说明裁剪过头或依赖没装上，直接终止打包。
+# 名称取导入名而非发行包名（如 opencv-python → cv2、pywin32 → win32api）。
+RUNTIME_IMPORT_CHECKS = (
+    "cv2", "PIL", "pyscreeze", "psutil", "rich", "loguru", "selenium", "cmd2",
+    "rapidocr", "onnxruntime", "pydantic", "plyer", "pynput", "pyautogui",
+    "pyperclip", "win32api", "pygetwindow", "litestar", "uvicorn", "mcp",
+    "anyio", "cryptography",
+)
 # R2 自定义域名（绑定到上传桶的公开访问基址），CLI init 从此处下载 WebUI 包与资源包
 R2_PUBLIC_BASE_URL = "https://resource.starrailassistant.top"
 
@@ -337,6 +349,68 @@ def configure_pth():
     )
 
 
+def prune_unused_packages():
+    """删除内嵌运行时中未被引用的依赖包（连同 dist-info 与控制台脚本），减小 Core / Full 发布包体积。
+
+    复用 CI 缓存的 ``main.dist/python`` 时也会执行，保证旧缓存同样被裁剪。
+    """
+    site_packages = DIST_PYTHON_DIR / "Lib" / "site-packages"
+    if not site_packages.is_dir():
+        return
+    scripts_dir = DIST_PYTHON_DIR / "Scripts"
+    removed: list[str] = []
+    for name in UNUSED_RUNTIME_PACKAGES:
+        package = site_packages / name
+        if package.is_dir():
+            shutil.rmtree(package)
+            removed.append(name)
+        for dist_info in site_packages.glob(f"{name}-*.dist-info"):
+            shutil.rmtree(dist_info)
+        # pip 安装的控制台入口在 Scripts 下另存为 `<名>.exe`（新版 pip 另有 `-script.py`），
+        # 删除包目录不会带走它们，需一并清理
+        for script in (scripts_dir / f"{name}.exe", scripts_dir / f"{name}-script.py"):
+            if script.is_file():
+                script.unlink()
+    if removed:
+        print(f"[OK] Pruned unused packages: {', '.join(removed)}")
+
+
+def verify_runtime_imports():
+    """用内嵌运行时逐个导入关键依赖，确认裁剪与安装后运行期仍然可用。
+
+    以 ``PYTHONNOUSERSITE=1`` 且不带 ``PYTHONPATH`` 的子进程执行，与 SRA-cli.exe 启动
+    时的环境一致：否则本机用户级 site-packages 会掩盖随包依赖的缺失，导致本地打包正常、
+    用户机上却启动失败。
+    """
+    python_exe = DIST_PYTHON_DIR / "python.exe"
+    if not python_exe.is_file():
+        return
+    env = os.environ.copy()
+    env["PYTHONNOUSERSITE"] = "1"
+    env.pop("PYTHONPATH", None)
+    script = (
+        "import importlib, sys\n"
+        f"mods = {list(RUNTIME_IMPORT_CHECKS)!r}\n"
+        "failed = []\n"
+        "for name in mods:\n"
+        "    try:\n"
+        "        importlib.import_module(name)\n"
+        "    except Exception as exc:\n"
+        "        failed.append(f'{name}: {type(exc).__name__}: {exc}')\n"
+        "if failed:\n"
+        "    print('[FAIL] ' + '; '.join(failed))\n"
+        "    sys.exit(1)\n"
+        "print(f'[OK] {len(mods)} runtime imports succeeded')\n"
+    )
+    print("Verifying embedded runtime imports ...")
+    result = subprocess.run([str(python_exe), "-c", script], cwd=DIST_DIR, env=env)
+    if result.returncode != 0:
+        print("[ERROR] Embedded runtime is missing importable dependencies; "
+              "check UNUSED_RUNTIME_PACKAGES and the installed requirements")
+        sys.exit(1)
+    print("[OK] Embedded runtime imports verified")
+
+
 def prepare_embedded_python():
     """准备内嵌 Python 3.12 运行时并安装 standard + server 依赖（依赖未变化时复用已有环境）。"""
     requirements = runtime_requirements()
@@ -346,6 +420,8 @@ def prepare_embedded_python():
     if python_exe.exists() and stamp.exists() and stamp.read_text(encoding="utf-8").strip() == digest:
         # 复用的环境可能是旧版 _pth 生成的，这里幂等重写，保证 sys.path 配置与当前代码一致
         configure_pth()
+        prune_unused_packages()
+        verify_runtime_imports()
         print("[SKIP] Embedded Python is up to date")
         return
 
@@ -381,6 +457,8 @@ def prepare_embedded_python():
             *requirements,
         ])
 
+    prune_unused_packages()
+    verify_runtime_imports()
     stamp.write_text(digest, encoding="utf-8")
     print("[OK] Embedded Python prepared")
 

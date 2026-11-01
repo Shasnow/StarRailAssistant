@@ -251,6 +251,11 @@ int wmain(int argc, wchar_t **argv)
 
     SetConsoleCtrlHandler(on_console_event, TRUE);
 
+    /* 禁止加载用户级 site-packages（%APPDATA%\Python\Python3xx）。内嵌运行时启用了 site，
+     * 会把本机全局安装的包也纳入 sys.path，可能覆盖随包分发的依赖版本；
+     * 子进程环境块传 NULL 即继承父进程环境，故在此设置 */
+    SetEnvironmentVariableW(L"PYTHONNOUSERSITE", L"1");
+
     if (!CreateProcessW(NULL, command_line, NULL, NULL, TRUE, 0, NULL, home, &startup, &process))
     {
         write_error(L"SRA-cli: 启动内嵌 Python 运行时失败。\n");

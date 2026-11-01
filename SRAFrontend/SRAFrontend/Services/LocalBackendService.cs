@@ -21,6 +21,8 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
     public abstract string FileName { get; set; }
     public abstract string WorkingDirectory { get; set; }
     public abstract string MainArgument { get; set; }
+    /// <summary>启动后端进程时附加/覆盖的环境变量；默认不覆盖任何变量</summary>
+    public virtual IReadOnlyDictionary<string, string>? EnvironmentVariables => null;
     public event PropertyChangedEventHandler? PropertyChanged;
     public event Action<string>? Outputted;
 
@@ -127,6 +129,9 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
                 CreateNoWindow = true,
                 WorkingDirectory = WorkingDirectory
             };
+            if (EnvironmentVariables is not null)
+                foreach (var (key, value) in EnvironmentVariables)
+                    _backendProcess.StartInfo.Environment[key] = value;
             _backendProcess.EnableRaisingEvents = true; // 启用Exited事件
             _backendProcess.OutputDataReceived += OnBackendProcessOutputDataReceived;
             _backendProcess.ErrorDataReceived += OnBackendProcessErrorDataReceived;
