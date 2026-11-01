@@ -492,7 +492,13 @@ class SRACli(cmd2.Cmd):
 
             self.ok(f"Extracting {package_name} ...")
             with zipfile.ZipFile(io.BytesIO(data)) as zf:
-                zf.extractall(cwd)
+                # 跳过包内 MD5 清单：它是整包（Core / Full / Lite）的完整性清单，
+                # WebUI / 资源包若带同名清单会覆盖目标目录的 manifest.md5.json，
+                # 导致完整性校验与更新后的冗余文件清理误判（含已发布的历史包）
+                for member in zf.infolist():
+                    if member.filename.replace("\\", "/").rsplit("/", 1)[-1] == "manifest.md5.json":
+                        continue
+                    zf.extract(member, cwd)
             self.ok(f"{package_name} extracted to {cwd}")
 
         # 创建设置文件

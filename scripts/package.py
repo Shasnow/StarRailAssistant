@@ -116,8 +116,13 @@ class ZipBuilder:
     # MD5 校验清单在压缩包内的固定路径，便于统一读取
     MD5_MANIFEST_NAME = "manifest.md5.json"
 
-    def snapshot(self, zip_path: Path):
-        """将当前所有条目写入 zip 文件，并在压缩包内写入固定命名的 MD5 校验清单。"""
+    def snapshot(self, zip_path: Path, *, include_manifest: bool = True):
+        """将当前所有条目写入 zip 文件，并按需在压缩包根部写入固定命名的 MD5 校验清单。
+
+        清单供应用端校验完整性、识别更新后的冗余文件，只有「整包」产物（Core / Full / Lite）需要；
+        WebUI 包与资源包是被 ``sra init`` 解压到任意目录，若也带同名清单会把目标目录的
+        ``manifest.md5.json`` 覆盖成只描述部分文件的版本，导致完整性校验与更新后清理误判。
+        """
         md5_dict: dict[str, str] = {}
         entries: list[tuple[str, Path]] = []
         for arcname, src in self._entries.items():
@@ -131,7 +136,8 @@ class ZipBuilder:
         with ZipFile(zip_path, "w", compression=ZIP_DEFLATED) as zipf:
             for arcname, src in entries:
                 zipf.write(src, arcname)
-            zipf.writestr(self.MD5_MANIFEST_NAME, json.dumps(md5_dict, indent=2, ensure_ascii=False))
+            if include_manifest:
+                zipf.writestr(self.MD5_MANIFEST_NAME, json.dumps(md5_dict, indent=2, ensure_ascii=False))
         print(f"[OK] {zip_path.name} ({len(self._entries)} files)")
 
 
@@ -531,7 +537,8 @@ def package_resources(version: str) -> Path:
     resources_zip.add(ROOT_PATH / "resources")
     resources_zip.add_file(ROOT_PATH / "package.json", "package.json")
     zip_path = ROOT_PATH / f"StarRailAssistant_Resources_v{version}.zip"
-    resources_zip.snapshot(zip_path)
+    # 解压目标是应用根目录，不能带清单以免覆盖整包的 manifest.md5.json
+    resources_zip.snapshot(zip_path, include_manifest=False)
     return zip_path
 
 
@@ -561,7 +568,8 @@ def package_webui(version: str) -> Path:
     zip_path = ROOT_PATH / f"SRAFrontend_WebUI_v{version}.zip"
     builder = ZipBuilder()
     builder.add(static_dir, ROOT_PATH)
-    builder.snapshot(zip_path)
+    # 解压目标是应用根目录，不能带清单以免覆盖整包的 manifest.md5.json
+    builder.snapshot(zip_path, include_manifest=False)
     return zip_path
 
 
