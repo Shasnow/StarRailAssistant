@@ -21,10 +21,16 @@ name: Build Docker Image
 # 构建服务端镜像，先冒烟测试，全部通过后推送到 GHCR（ghcr.io/<owner>/starrailassistant）。
 # 镜像内容全部来自本次修订版本（WebUI 由 Dockerfile 的阶段 1 现场构建），启动不需要联网。
 #
-# 标签规则：sha-<短哈希> 每次都有；主线分支上额外打 v<版本号> 与通道标签
-# （版本含 "-" 视为 beta，对齐 package.py 区分正式版/beta 的做法）。
+# 标签规则：sha-<短哈希> 每次都有；main 分支与 v* 发布 tag 上额外打 v<版本号> 与通道标签
+# （正式版 :latest，版本号含 "-" 的 beta 版 :beta，对齐 package.py 区分正式版/beta 的做法）。
 on:
   workflow_dispatch:
+  # 发布流程会自动出镜像：python-app.yml 用 secrets.WORKFLOW_TOKEN（PAT）执行 gh release create，
+  # 由此产生的 v* tag 会触发本工作流。前提是 PAT——若换成默认 GITHUB_TOKEN 创建 tag/release，
+  # GitHub 不会触发其它工作流，届时需改为在发布流程里显式 gh workflow run。
+  push:
+    tags:
+      - "v*"
 
 permissions:
   contents: read
@@ -50,9 +56,16 @@ jobs:
           set -euo pipefail
           VERSION=$(node -p 'require("./package.json").version')
           if [[ "$VERSION" == *-* ]]; then CHANNEL=beta; else CHANNEL=stable; fi
+          # 版本号/通道标签只在 main 与 v* 发布 tag 上打，避免任意分支的构建覆盖正式标签
+          if [[ "$GITHUB_REF" == refs/heads/main || "$GITHUB_REF" == refs/tags/v* ]]; then
+            PUBLISH_LANE=true
+          else
+            PUBLISH_LANE=false
+          fi
           # GHCR 要求仓库名全小写，GITHUB_REPOSITORY 含大写所有者名，这里统一转小写
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "channel=$CHANNEL" >> "$GITHUB_OUTPUT"
+          echo "publish_lane=$PUBLISH_LANE" >> "$GITHUB_OUTPUT"
           echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
       - name: 生成镜像标签
@@ -62,9 +75,9 @@ jobs:
           images: ${{ steps.meta.outputs.image }}
           tags: |
             type=sha,format=short
-            type=raw,value=v${{ steps.meta.outputs.version }},enable=${{ github.ref == 'refs/heads/main' }}
-            type=raw,value=latest,enable=${{ steps.meta.outputs.channel == 'stable' && github.ref == 'refs/heads/main' }}
-            type=raw,value=beta,enable=${{ steps.meta.outputs.channel == 'beta' && github.ref == 'refs/heads/main' }}
+            type=raw,value=v${{ steps.meta.outputs.version }},enable=${{ steps.meta.outputs.publish_lane == 'true' }}
+            type=raw,value=latest,enable=${{ steps.meta.outputs.publish_lane == 'true' && steps.meta.outputs.channel == 'stable' }}
+            type=raw,value=beta,enable=${{ steps.meta.outputs.publish_lane == 'true' && steps.meta.outputs.channel == 'beta' }}
 
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
