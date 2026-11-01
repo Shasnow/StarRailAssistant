@@ -150,6 +150,23 @@ jobs:
             exit 1
           }
 
+          # 首次启动应已由入口脚本预置云游戏设置（浏览器/路径/无头）
+          curl -fsS http://127.0.0.1:5073/api/settings -o "$RUNNER_TEMP/settings.json"
+          python3 - "$RUNNER_TEMP/settings.json" <<'PY'
+          import json, sys
+
+          general = json.load(open(sys.argv[1], encoding="utf-8"))["data"]["general"]
+          expected = {
+              "cloudGame.enabled": True,
+              "cloudGame.browser": "Chrome for Testing",
+              "cloudGame.browser.path": "/usr/local/bin/chromium-container",
+              "cloudGame.browser.headless": True,
+          }
+          wrong = {k: general.get(k) for k, v in expected.items() if general.get(k) != v}
+          assert not wrong, f"容器默认设置未生效: {wrong}"
+          print("容器默认设置已生效:", expected)
+          PY
+
           # 任务加载
           grep -q 'Successfully load task' "$RUNNER_TEMP/smoke.log" || {
             echo "::error::任务未加载（tasks/ 是否进入镜像？）"
