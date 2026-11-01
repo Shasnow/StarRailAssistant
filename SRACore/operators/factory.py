@@ -16,6 +16,7 @@ class OperatorType(enum.StrEnum):
 class OperatorFactory:
     # noinspection bad-assignment
     __ocr_instance: RapidOCR = None  # pyright: ignore[reportAssignmentType]
+    __ocr_lock = threading.Lock()
     __window_context = WindowContext()
 
     @classmethod
@@ -35,10 +36,13 @@ class OperatorFactory:
 
     @classmethod
     def get_ocr_instance(cls) -> RapidOCR:
-        if cls.__ocr_instance is None:
-            config_path = AppRootDir / 'rapidocr' / 'config.yaml'
-            if not config_path.exists():
-                config_path = None
-            cls.__ocr_instance = RapidOCR(config_path=config_path, params={"Global.log_level": "error"})  # pyright: ignore[reportArgumentType]
+        with cls.__ocr_lock:
+            if cls.__ocr_instance is None:
+                from SRACore.operators.ocr_engine import create_ocr
+
+                config_path = AppRootDir / 'rapidocr' / 'config.yaml'
+                if not config_path.exists():
+                    config_path = None
+                cls.__ocr_instance = create_ocr(config_path)
         # noinspection bad-return
         return cls.__ocr_instance

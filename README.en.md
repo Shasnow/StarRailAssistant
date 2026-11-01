@@ -25,6 +25,8 @@ If you run into any issues while using SRA, please read the [Troubleshooting](ht
 
 If you find this project helpful, a Star ⭐ would be appreciated!
 
+Optional: [Windows DirectML OCR acceleration with CPU fallback](docs/DirectML.md) (defaults unchanged).
+
 ## ❓ What is SRA?
 
 🤖 An image-recognition based automation program for Honkai: Star Rail that takes care of your dailies from launching the game to closing it.

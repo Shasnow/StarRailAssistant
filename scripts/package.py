@@ -175,6 +175,11 @@ def copy_core_resources(dist: Path):
             shutil.copy2(rapidocr_pkg / "default_models.yaml", dist / "rapidocr" / "default_models.yaml")
     else:
         print(f"  [WARN] rapidocr not found in {SITE_PACKAGES_DIR}, skipping OCR model copy")
+    try:
+        from .directml_runtime import copy_directml_runtime
+    except ImportError:
+        from directml_runtime import copy_directml_runtime
+    copy_directml_runtime(dist)
     shutil.copytree(ROOT_PATH / "tasks", dist / "tasks")
     extensions_dir = ROOT_PATH / "extensions"
     if extensions_dir.exists():
