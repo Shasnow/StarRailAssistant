@@ -180,4 +180,4 @@ jobs:
           docker push --all-tags "$IMAGE"
           echo "已推送到 $IMAGE："
           echo "$TAGS"
-          echo "提示：首次推送后包默认私有，如需公开请在仓库的 Packages 设置页调整可见性。"
+          echo "提示：本仓库为公开仓库，镜像可匿名拉取；如需限制，请在仓库的 Packages 设置页改为私有。"
