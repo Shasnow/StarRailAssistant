@@ -40,6 +40,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # compose 文件不参与镜像构建，单独校验语法：否则 compose 写错了要等到部署时才发现
+      - name: 校验 docker-compose.yml
+        run: docker compose config -q
+
       - name: 解析版本与镜像名
         id: meta
         run: |
