@@ -91,6 +91,9 @@ jobs:
         run: docker images "${{ env.LOCAL_TAG }}" --format '{{.Repository}}:{{.Tag}}  {{.Size}}'
 
       # 同时验证：服务端能起来、WebUI 静态资源被托管、tasks/ 与 extensions/ 确实进了镜像
+      # 两个坑：`cmd | grep -q` 在 set -o pipefail 下会因 grep 提前退出触发上游 SIGPIPE
+      # 而把整条管道判为失败；容器 stdout 落到 docker 日志驱动也有极短延迟。
+      # 因此校验一律先落盘再 grep，并对日志断言轮询重试。
       - name: 服务端冒烟测试
         run: |
           set -euo pipefail
@@ -104,27 +107,41 @@ jobs:
           done
           if [ "$ready" != true ]; then
             echo "::error::服务端未在 120s 内就绪"
-            docker logs sra-smoke 2>&1 | tail -n 100
+            docker logs sra-smoke > "$RUNNER_TEMP/smoke.log" 2>&1 || true
+            tail -n 100 "$RUNNER_TEMP/smoke.log"
             exit 1
           fi
 
-          if ! curl -fsS http://127.0.0.1:5073/ | grep -q '<div id="app"'; then
+          # 容器 stdout 落到 docker 日志驱动有极短延迟，这里轮询等日志齐了再判定
+          for _ in $(seq 1 10); do
+            docker logs sra-smoke > "$RUNNER_TEMP/smoke.log" 2>&1 || true
+            grep -q 'Successfully load task' "$RUNNER_TEMP/smoke.log" && break
+            sleep 1
+          done
+
+          # WebUI 静态资源
+          curl -fsS http://127.0.0.1:5073/ -o "$RUNNER_TEMP/index.html"
+          grep -q '<div id="app"' "$RUNNER_TEMP/index.html" || {
             echo "::error::WebUI 静态资源未托管（SRAServer/static 是否由阶段 1 正确 COPY？）"
             exit 1
-          fi
+          }
 
-          if ! curl -fsS http://127.0.0.1:5073/api/extensions | grep -q 'AutoPlot'; then
+          # 扩展注册
+          curl -fsS http://127.0.0.1:5073/api/extensions -o "$RUNNER_TEMP/extensions.json"
+          grep -q 'AutoPlot' "$RUNNER_TEMP/extensions.json" || {
             echo "::error::扩展未注册（extensions/ 是否进入镜像？）"
             exit 1
-          fi
+          }
 
-          if ! docker logs sra-smoke 2>&1 | grep -q 'Successfully load task'; then
+          # 任务加载
+          grep -q 'Successfully load task' "$RUNNER_TEMP/smoke.log" || {
             echo "::error::任务未加载（tasks/ 是否进入镜像？）"
+            tail -n 60 "$RUNNER_TEMP/smoke.log"
             exit 1
-          fi
+          }
 
           echo "--- 容器日志（尾部）---"
-          docker logs sra-smoke 2>&1 | tail -n 30
+          tail -n 30 "$RUNNER_TEMP/smoke.log"
 
       - name: 打印容器日志（失败时）
         if: failure()
