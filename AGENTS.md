@@ -71,6 +71,17 @@ sra serve      # 启动 Litestar 服务端（sra-server / python -m SRAServer �
 由 `sra init` 下载的 WebUI 包解压到当前目录 `SRAServer/static`，`SRAServer/app.py::_resolve_static_dir`
 优先采用该目录（包内不含构建产物）。
 
+Docker（只打包服务端；镜像内已含 WebUI、tasks/extensions/resources 与 Chromium，启动不需要联网）：
+
+```bash
+docker compose up -d                                 # 拉取 CI 构建的镜像并启动，http://localhost:5073
+docker build -t sra-server .                         # 本地构建（阶段 1 用 pnpm 构建 WebUI）
+SRA_IMAGE_TAG=v2.25.0-beta.3 docker compose up -d    # 固定镜像版本
+```
+
+镜像由 `.github/workflows/docker.yml` 构建并推送到 `ghcr.io/shasnow/starrailassistant`（`beta` / `latest` /
+`v<版本>` / `sha-<短哈希>`）：先做本地冒烟测试与无头 Chromium 自检，全部通过才推送；推送 `v*` tag 会触发一次发布构建。
+
 Repo scripts:
 
 ```bash
@@ -96,6 +107,13 @@ and MCP tools at `/mcp` (`SRAServer/mcp/server.py`: `sra_screenshot`, `sra_task_
 `sra_config_update`, …). It runs as a single process hosting `SRACore` in-process, so task/extension/config/operator
 state is shared directly instead of being driven through the CLI. The WebUI generates its task and settings forms
 from the OpenAPI schema, so backend config models are the source of truth for the web UI.
+
+**Containers.** `Dockerfile` packages the server only: stage 1 builds the WebUI with pnpm into `SRAServer/static`, then
+the runtime image adds `tasks/`, `extensions/`, `resources/` and Chromium — so the container starts with no network
+access and never runs `sra init`. **Local automation does not work in the container** (pyautogui/pywin32 are
+Windows-only); only cloud game does, by letting Selenium drive the bundled Chromium — point the browser path at
+`/usr/local/bin/chromium-container`, a wrapper that adds `--no-sandbox --disable-dev-shm-usage` since the setuid
+sandbox is unusable when running as root in a container. State lives in `/root/.config/SRA`, logs in `/app/log`.
 
 **Core services (`SRACore/services/`).** Framework-independent business logic lives here and is shared by both hosts:
 `app_context.py::AppContext` owns the task/extension/operator orchestration (plus hotkeys, screenshot, settings/config/
