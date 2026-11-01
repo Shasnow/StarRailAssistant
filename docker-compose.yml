@@ -1,18 +1,22 @@
 # SRA 服务端容器编排：WebUI + /api + /mcp
 #
-#   docker compose up -d --build
+#   docker compose up -d
 #   浏览器打开 http://localhost:5073 （令牌在下方 SRA_ACCESS_TOKEN，WebUI 会要求填入）
 #
-# WebUI、tasks/、extensions/、resources/ 均在构建镜像时打进容器，启动无需联网；
-# 更新它们需要重新构建镜像（docker compose up -d --build）。
+# 镜像直接拉取 CI 构建好的产物（ghcr.io 公开，无需登录）。WebUI、tasks/、extensions/、
+# resources/ 都已打进镜像，启动不需要联网；要更新它们得等新的镜像标签，或改为本地构建。
 #
 # 云游戏（容器内 Chromium）：启动后在 WebUI 设置中开启「云游戏」，
 #   浏览器选 “Chrome for Testing”，浏览器路径填 /usr/local/bin/chromium-container，
 #   并勾选「无头模式」——容器内没有显示器，云游戏必须无头运行。
 services:
   sra-server:
-    build: .
-    image: sra-server:local
+    # 默认 beta 通道：版本号含 "-" 的构建（当前 2.25.0-beta.3）；正式版对应 :latest
+    # 可用 SRA_IMAGE_TAG 固定到具体版本或提交，如 v2.25.0-beta.3 / sha-9dfb20b
+    image: ghcr.io/shasnow/starrailassistant:${SRA_IMAGE_TAG:-beta}
+    # 想改用本仓库源码本地构建时，把上面一行换成：
+    #   image: sra-server:local
+    #   build: .
     container_name: sra-server
     restart: unless-stopped
     ports:
