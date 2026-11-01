@@ -10,3 +10,6 @@
 /.dockerignore text eol=lf
 /docker-compose.yml text eol=lf
 /.github/workflows/docker.yml text eol=lf
+
+# shell 脚本按 LF 检出：CRLF 会让容器里的 /bin/sh 解析失败
+*.sh text eol=lf
