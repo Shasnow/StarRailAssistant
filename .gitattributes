@@ -4,3 +4,9 @@
 /extensions/currency_wars_plus.py text eol=lf
 /extensions/cw_plus/** text=auto eol=lf
 /extensions/cw_plus/**/*.png -text
+
+# Docker 相关文件按 LF 检出：CRLF 会破坏 Dockerfile 的续行语义与 .dockerignore 的路径匹配。
+/Dockerfile text eol=lf
+/.dockerignore text eol=lf
+/docker-compose.yml text eol=lf
+/.github/workflows/docker.yml text eol=lf
