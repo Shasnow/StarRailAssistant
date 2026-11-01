@@ -111,9 +111,11 @@ from the OpenAPI schema, so backend config models are the source of truth for th
 **Containers.** `Dockerfile` packages the server only: stage 1 builds the WebUI with pnpm into `SRAServer/static`, then
 the runtime image adds `tasks/`, `extensions/`, `resources/` and Chromium — so the container starts with no network
 access and never runs `sra init`. **Local automation does not work in the container** (pyautogui/pywin32 are
-Windows-only); only cloud game does, by letting Selenium drive the bundled Chromium — point the browser path at
-`/usr/local/bin/chromium-container`, a wrapper that adds `--no-sandbox --disable-dev-shm-usage` since the setuid
-sandbox is unusable when running as root in a container. State lives in `/root/.config/SRA`, logs in `/app/log`.
+Windows-only); only cloud game does, by letting Selenium drive the bundled Chromium through
+`/usr/local/bin/chromium-container` (a wrapper that adds `--no-sandbox --disable-dev-shm-usage`, since the setuid
+sandbox is unusable as root in a container). `scripts/docker-entrypoint.sh` seeds those cloud-game settings into a
+fresh `settings.json` on first start and never touches an existing one. State lives in `/root/.config/SRA`, logs in
+`/app/log`.
 
 **Core services (`SRACore/services/`).** Framework-independent business logic lives here and is shared by both hosts:
 `app_context.py::AppContext` owns the task/extension/operator orchestration (plus hotkeys, screenshot, settings/config/

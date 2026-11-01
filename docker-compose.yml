@@ -6,9 +6,9 @@
 # 镜像直接拉取 CI 构建好的产物（ghcr.io 公开，无需登录）。WebUI、tasks/、extensions/、
 # resources/ 都已打进镜像，启动不需要联网；要更新它们得等新的镜像标签，或改为本地构建。
 #
-# 云游戏（容器内 Chromium）：启动后在 WebUI 设置中开启「云游戏」，
-#   浏览器选 “Chrome for Testing”，浏览器路径填 /usr/local/bin/chromium-container，
-#   并勾选「无头模式」——容器内没有显示器，云游戏必须无头运行。
+# 云游戏：容器内没有桌面会话，只能用云游戏，首次启动时入口脚本会把
+#   「云游戏 + Chrome for Testing + /usr/local/bin/chromium-container + 无头模式」
+#   直接写进 settings.json，开箱即用；账号密码仍需在 WebUI 里按配置填写（加密存储）。
 services:
   sra-server:
     # 默认 beta 通道：版本号含 "-" 的构建（当前 2.25.0-beta.3）；正式版对应 :latest

@@ -55,8 +55,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # 容器内以 root 运行，Chromium 的 setuid 沙箱在此环境不可用，故用包装脚本补齐
-# --no-sandbox 与 --disable-dev-shm-usage。在 WebUI 设置中把「云游戏浏览器路径」
-# 指向该脚本即可（SRACore 不提供注入额外 Chromium 参数的口子）。
+# --no-sandbox 与 --disable-dev-shm-usage（SRACore 不提供注入额外 Chromium 参数的口子）。
+# 该路径由入口脚本在首次启动时写进设置，用户不需要手动指定。
 RUN printf '#!/bin/sh\nexec /usr/bin/chromium --no-sandbox --disable-dev-shm-usage "$@"\n' \
         > /usr/local/bin/chromium-container \
     && chmod +x /usr/local/bin/chromium-container
@@ -78,10 +78,13 @@ COPY resources ./resources
 # 阶段 1 构建的 WebUI 产物
 COPY --from=webui /build/SRAServer/static/ /app/SRAServer/static/
 
+COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # 状态盘（settings.json / configs / cache，云游戏的 selenium_profile 登录态在其下）与运行日志
 VOLUME ["/root/.config/SRA", "/app/log"]
 
 EXPOSE 5073
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["python", "-m", "SRAServer", "--no-admin"]
+# 入口脚本：首次启动预置云游戏设置，然后 exec 启动 SRAServer
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint.sh"]
