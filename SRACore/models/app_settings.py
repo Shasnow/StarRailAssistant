@@ -62,7 +62,7 @@ class DisplaySettings(_Model):
     backgroundImageUri: str = Field("", alias="backgroundImage.uri", description='背景图片 URI，可以是本地路径或网络 URL')
     backgroundOpacity: float = Field(1.0, alias="backgroundImage.opacity", description='背景图片不透明度，范围 0-1')
     controlPanelOpacity: float = Field(0.9, alias="controlPanel.opacity", description='控制面板不透明度，范围 0-1')
-    Language: int = Field(0, alias="language", description='界面语言，0=中文, 1=English')
+    Language: int = Field(0, alias="language", description='界面语言，0=中文, 1=English, 2=Русский', json_schema_extra={'enum': [0, 1, 2], 'x-enum-labels': {'zh-CN': ['简体中文', 'English', 'Русский']}})
     isRememberWindow: bool = Field(False, alias="window.remember", description='是否记住窗口位置和大小')
     WindowState: int = Field(0, alias="window.state", description='窗口状态，0=正常, 1=最小化, 2=最大化')
     WindowPositionX: int = Field(0, alias="window.position.x", description='主窗口位置的 X 坐标')

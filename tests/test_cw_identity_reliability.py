@@ -8,9 +8,9 @@ from PIL import Image
 import pytest
 
 from SRACore.util.errors import ThreadStoppedError
-from extensions.cw_plus.logic import SlotState
-from extensions.cw_plus.preparation import Readiness
-from extensions.cw_plus.unicode_templates import load_template
+from extensions.currency_wars_plus.cw_plus.logic import SlotState
+from extensions.currency_wars_plus.cw_plus.preparation import Readiness
+from extensions.currency_wars_plus.cw_plus.unicode_templates import load_template
 from tests.cw_reliability_replay import ReplayOperator, engine, replay  # noqa: F401
 
 FIXTURES = Path(__file__).parent / "fixtures/backend_identity"

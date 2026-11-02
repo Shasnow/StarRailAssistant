@@ -3,9 +3,9 @@ from dataclasses import replace
 
 import pytest
 
-from extensions.cw_plus.characters import Characters
-from extensions.cw_plus.logic import ActionResult, SlotObservation, SlotState
-from extensions.cw_plus.preparation import Readiness
+from extensions.currency_wars_plus.cw_plus.characters import Characters
+from extensions.currency_wars_plus.cw_plus.logic import ActionResult, SlotObservation, SlotState
+from extensions.currency_wars_plus.cw_plus.preparation import Readiness
 from tests.cw_reliability_replay import replay  # noqa: F401
 
 

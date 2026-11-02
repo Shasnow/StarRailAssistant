@@ -7,22 +7,21 @@ from typing import Any
 import cmd2
 from rich.text import Text
 
-from SRACore.localization import Resource
-from SRACore.localization.presentation import translate
+from SRACore.localization import Resources
 from SRACore.services.app_context import AppContext
 from SRACore.util import reload_package
 from SRACore.util.const import VERSION, CORE, SettingsJson
 
 
 class SRACli(cmd2.Cmd):
-    DEFAULT_CATEGORY = translate("Build-in Commands")
+    DEFAULT_CATEGORY = Resources.cli_buildInCategory
 
     def __init__(self, context: AppContext):
         super().__init__(startup_script=".srarc",
                          auto_load_commands=True)
-        self.intro = translate(f"Welcome to SRA-cli (version {VERSION}, core {CORE}). \nType 'help' to list commands.")
+        self.intro = Resources.cli_intro(VERSION, CORE)
         self.prompt = 'sra> '
-        self.default_error = Resource.cli_defaultError
+        self.default_error = Resources.cli_defaultError
         self.context = context
         self.settings = context.settings
         self._use_json: bool = False
@@ -51,7 +50,7 @@ class SRACli(cmd2.Cmd):
     # region 任务管理
     @staticmethod
     def _build_task_parser() -> cmd2.Cmd2ArgumentParser:
-        task_description = Text.assemble(Resource.task_description)
+        task_description = Text.assemble(Resources.task_description)
         task_parser = cmd2.Cmd2ArgumentParser(description=task_description)
         task_parser.add_subparsers(metavar="SUBCOMMAND", required=True)
         return task_parser
@@ -62,95 +61,97 @@ class SRACli(cmd2.Cmd):
 
     @staticmethod
     def _build_task_run_parser() -> cmd2.Cmd2ArgumentParser:
-        task_run_parser = SRACli.cmd2argumentparser_factory(description=Text.assemble(Resource.run_description))
-        task_run_parser.add_argument('config', nargs='*', help=Resource.run_configHelp)
+        task_run_parser = SRACli.cmd2argumentparser_factory(description=Text.assemble(Resources.run_description))
+        task_run_parser.add_argument('config', nargs='*', help=Resources.run_configHelp)
         return task_run_parser
 
-    @cmd2.as_subcommand_to("task", "run", _build_task_run_parser, help=Resource.run_description)
+    @cmd2.as_subcommand_to("task", "run", _build_task_run_parser, help=Resources.run_description)
     def _task_run(self, args: argparse.Namespace) -> None:
         if self.context.is_busy():
-            self.err(Resource.cli_task_taskAlreadyRunning)
+            self.err(Resources.cli_task_taskAlreadyRunning)
             return
         self.context.run_configs(list(args.config))
 
     @staticmethod
     def _build_task_single_parser() -> cmd2.Cmd2ArgumentParser:
-        task_single_parser = SRACli.cmd2argumentparser_factory(description=Text.assemble(Resource.single_description))
-        task_single_parser.add_argument('task', help=Resource.single_taskHelp)
-        task_single_parser.add_argument('--config', help=Resource.single_configHelp)
+        task_single_parser = SRACli.cmd2argumentparser_factory(description=Text.assemble(Resources.single_description))
+        task_single_parser.add_argument('task', help=Resources.single_taskHelp)
+        task_single_parser.add_argument('--config', help=Resources.single_configHelp)
         return task_single_parser
 
-    @cmd2.as_subcommand_to("task", "single", _build_task_single_parser, help=Resource.single_description)
+    @cmd2.as_subcommand_to("task", "single", _build_task_single_parser, help=Resources.single_description)
     def _task_single(self, args: argparse.Namespace) -> None:
         if self.context.is_busy():
-            self.err(Resource.cli_task_taskAlreadyRunning)
+            self.err(Resources.cli_task_taskAlreadyRunning)
             return
         if self.context.run_single(args.task, args.config):
-            self.ok(Resource.cli_run_started)
+            self.ok(Resources.cli_run_started)
 
     @staticmethod
     def _build_task_stop_parser() -> cmd2.Cmd2ArgumentParser:
-        return SRACli.cmd2argumentparser_factory(description=Text.assemble(Resource.stop_description))
+        return SRACli.cmd2argumentparser_factory(description=Text.assemble(Resources.stop_description))
 
-    @cmd2.as_subcommand_to("task", "stop", _build_task_stop_parser, help=Resource.stop_description)
+    @cmd2.as_subcommand_to("task", "stop", _build_task_stop_parser, help=Resources.stop_description)
     def _task_stop(self, _) -> None:
         # 任务与扩展共用全局工作线程，AppContext 会同时向两个 Runner 请求停止并等待结束
         self.context.stop_running_work()
 
     @staticmethod
     def _build_task_status_parser() -> cmd2.Cmd2ArgumentParser:
-        return SRACli.cmd2argumentparser_factory(description=translate("Show current task status"))
+        return SRACli.cmd2argumentparser_factory(description=Resources.cli_task_statusDescription)
 
-    @cmd2.as_subcommand_to("task", "status", _build_task_status_parser, help=translate("Show current task status"))
+    @cmd2.as_subcommand_to("task", "status", _build_task_status_parser, help=Resources.cli_task_statusDescription)
     def _task_status(self, _: argparse.Namespace) -> None:
         data = self.context.task_status()
 
         def format_info(info: dict[str, Any]) -> str:
-            return (f"Session ID: {info['session_id']}\n"
-                    f"PID: {info['pid']}\nMode: {info['mode']}\n"
-                    f"Status: {info['status']}\nUnit: {info['unit']}\n"
-                    f"Configs: {', '.join(info['configs']) if info['configs'] else 'N/A'}\n"
-                    f"Progress: {info['progress'][0]}/{info['progress'][1]}\nError: {info['error']}")
+            return (f"{Resources.cli_status_sessionId}: {info['session_id']}\n"
+                    f"{Resources.cli_status_pid}: {info['pid']}\n{Resources.cli_status_mode}: {info['mode']}\n"
+                    f"{Resources.cli_status_status}: {info['status']}\n{Resources.cli_status_unit}: {info['unit']}\n"
+                    f"{Resources.cli_status_configs}: "
+                    f"{', '.join(info['configs']) if info['configs'] else Resources.cli_status_none}\n"
+                    f"{Resources.cli_status_progress}: {info['progress'][0]}/{info['progress'][1]}\n"
+                    f"{Resources.cli_status_error}: {info['error']}")
 
-        self.ok(translate("Task status"), data, formatter=format_info)
+        self.ok(Resources.cli_task_statusTitle, data, formatter=format_info)
 
     @staticmethod
     def _build_task_list_parser() -> cmd2.Cmd2ArgumentParser:
-        return SRACli.cmd2argumentparser_factory(description=translate("List all registered tasks"))
+        return SRACli.cmd2argumentparser_factory(description=Resources.cli_task_listDescription)
 
-    @cmd2.as_subcommand_to("task", "list", _build_task_list_parser, help=translate("List all registered tasks"))
+    @cmd2.as_subcommand_to("task", "list", _build_task_list_parser, help=Resources.cli_task_listDescription)
     def _task_list(self, _: argparse.Namespace) -> None:
         from SRACore.task import task_registry
         entries = sorted(task_registry.get_entries(), key=lambda e: (e.order, e.name))
         if not entries:
-            self.err("没有已注册的任务")
+            self.err(Resources.cli_task_listEmpty)
             return
         items = [{"id": e.name, "order": e.order, "class": e.task_cls.__name__,
                       "doc": (e.task_cls.__doc__ or "").strip() or None} for e in entries]
         def format_item(_items: list[dict[str, str]]) -> str:
-            str_buffer = ["可用任务:"]
+            str_buffer = [Resources.cli_task_listHeader]
             for i in _items:
-                str_buffer.append(f" {i['order']}: {i['id']} # {i['doc'] or 'No description'}")
+                str_buffer.append(f" {i['order']}: {i['id']} # {i['doc'] or Resources.cli_task_listNoDescription}")
             return "\n".join(str_buffer)
-        self.ok(f"已注册 {len(items)} 个任务", items, formatter=format_item)
+        self.ok(Resources.cli_task_listRegistered(len(items)), items, formatter=format_item)
 
     @staticmethod
     def _build_task_reload_parser() -> cmd2.Cmd2ArgumentParser:
-        return SRACli.cmd2argumentparser_factory(description=translate("重新导入任务模块，实现热重载"))
+        return SRACli.cmd2argumentparser_factory(description=Resources.cli_task_reloadDescription)
 
-    @cmd2.as_subcommand_to("task", "reload", _build_task_reload_parser, help=translate("重新导入任务模块，实现热重载"))
+    @cmd2.as_subcommand_to("task", "reload", _build_task_reload_parser, help=Resources.cli_task_reloadDescription)
     def _task_reload(self, _: argparse.Namespace) -> None:
         from pathlib import Path
 
         from SRACore.task import task_registry
 
         if self.task_manager.is_thread_running():
-            self.err("任务线程正在运行中，无法执行重载操作")
+            self.err(Resources.cli_task_reloadBusy)
             return
 
         package_dir = Path("tasks")
         if not package_dir.is_dir():
-            self.err(f"任务目录不存在: {package_dir.resolve()}")
+            self.err(Resources.cli_task_reloadNotFound(str(package_dir.resolve())))
             return
 
         before = set(task_registry.get_ids())
@@ -160,27 +161,27 @@ class SRACli(cmd2.Cmd):
 
         after = set(task_registry.get_ids())
         if not after:
-            self.err("重载完成，但没有已注册的任务")
+            self.err(Resources.cli_task_reloadEmpty)
             return
         added = sorted(after - before)
         removed = sorted(before - after)
-        message = f"已重载任务，当前共 {len(after)} 个任务"
+        message = Resources.cli_task_reloadSummary(len(after))
         if added:
-            message += f"，新增: {', '.join(added)}"
+            message += Resources.cli_task_reloadAdded(', '.join(added))
         if removed:
-            message += f"，移除: {', '.join(removed)}"
+            message += Resources.cli_task_reloadRemoved(', '.join(removed))
         self.ok(message, {"tasks": task_registry.get_ids()})
 
     @staticmethod
     def _build_run_parser() -> cmd2.Cmd2ArgumentParser:
-        run_parser = SRACli.cmd2argumentparser_factory(description=Text.assemble(Resource.run_description))
-        run_parser.add_argument('config', nargs='*', help=Resource.run_configHelp)
+        run_parser = SRACli.cmd2argumentparser_factory(description=Text.assemble(Resources.run_description))
+        run_parser.add_argument('config', nargs='*', help=Resources.run_configHelp)
         return run_parser
 
     @cmd2.with_argparser(_build_run_parser)
     def do_run(self, args: argparse.Namespace) -> None:
         """Run specified tasks, will block current command line until tasks complete"""
-        self.ok(Resource.cli_run_started)
+        self.ok(Resources.cli_run_started)
         try:
             self.task_manager.run_and_wait(*args.config)
         except KeyboardInterrupt:
@@ -188,15 +189,15 @@ class SRACli(cmd2.Cmd):
 
     @staticmethod
     def _build_single_parser() -> cmd2.Cmd2ArgumentParser:
-        single_parser = SRACli.cmd2argumentparser_factory(description=Text.assemble(Resource.single_description))
-        single_parser.add_argument('task', help=Resource.single_taskHelp)
-        single_parser.add_argument('--config', help=Resource.single_configHelp)
+        single_parser = SRACli.cmd2argumentparser_factory(description=Text.assemble(Resources.single_description))
+        single_parser.add_argument('task', help=Resources.single_taskHelp)
+        single_parser.add_argument('--config', help=Resources.single_configHelp)
         return single_parser
 
     @cmd2.with_argparser(_build_single_parser)
     def do_single(self, args: argparse.Namespace) -> None:
         """Run a single specified task, will block current command line until task complete"""
-        self.ok(Resource.cli_run_started)
+        self.ok(Resources.cli_run_started)
         try:
             self.task_manager.run_task_and_wait(args.task, args.config)
         except KeyboardInterrupt:
@@ -208,7 +209,7 @@ class SRACli(cmd2.Cmd):
 
     @staticmethod
     def _build_extension_parser() -> cmd2.Cmd2ArgumentParser:
-        extension_parser = cmd2.Cmd2ArgumentParser(description=translate("扩展管理：查看、运行已注册的扩展"))
+        extension_parser = cmd2.Cmd2ArgumentParser(description=Resources.cli_extension_description)
         extension_parser.add_subparsers(metavar="SUBCOMMAND", required=True)
         return extension_parser
 
@@ -218,33 +219,33 @@ class SRACli(cmd2.Cmd):
 
     @staticmethod
     def _build_extension_list_parser() -> cmd2.Cmd2ArgumentParser:
-        return SRACli.cmd2argumentparser_factory(description=translate("列出所有已注册的扩展"))
+        return SRACli.cmd2argumentparser_factory(description=Resources.cli_extension_listDescription)
 
-    @cmd2.as_subcommand_to("extension", "list", _build_extension_list_parser, help=translate("列出所有已注册的扩展"))
+    @cmd2.as_subcommand_to("extension", "list", _build_extension_list_parser, help=Resources.cli_extension_listDescription)
     def _extension_list(self, _: argparse.Namespace) -> None:
         data = self.context.extension_list()
         if not data:
-            self.err("没有已注册的扩展")
+            self.err(Resources.cli_extension_listEmpty)
             return
 
         def format_list(items):
-            lines = ["扩展："]
+            lines = [Resources.cli_extension_listHeader]
             for i in items:
                 desc = f"  - {i['description']}" if i['description'] else ""
                 config_str = f" (config: {i['config_class']})" if i['config_class'] else ""
                 lines.append(f"  {i['id']} ({i['name']})  ->  {i['extension_class']}{config_str}{desc}")
             return "\n".join(lines)
 
-        self.output(True, f"已注册 {len(data)} 个扩展", data, formatter=format_list)
+        self.output(True, Resources.cli_extension_listRegistered(len(data)), data, formatter=format_list)
 
     @staticmethod
     def _build_extension_run_parser() -> cmd2.Cmd2ArgumentParser:
-        parser = SRACli.cmd2argumentparser_factory(description=translate("按扩展类型自动分发：非后台扩展走共享线程，后台扩展走专用线程"))
-        parser.add_argument('name', help=translate("扩展标识（可通过 extension list 查看）"))
-        parser.add_argument('--config', help=translate("扩展配置文件名（不带 .json 后缀），不指定则不加载文件配置"))
+        parser = SRACli.cmd2argumentparser_factory(description=Resources.cli_extension_runDescription)
+        parser.add_argument('name', help=Resources.cli_extension_runNameHelp)
+        parser.add_argument('--config', help=Resources.cli_extension_runConfigHelp)
         return parser
 
-    @cmd2.as_subcommand_to("extension", "run", _build_extension_run_parser, help=translate("运行指定的扩展"))
+    @cmd2.as_subcommand_to("extension", "run", _build_extension_run_parser, help=Resources.cli_extension_runDescription)
     def _extension_run(self, args: argparse.Namespace) -> None:
         ok, message = self.context.extension_run(args.name, args.config)
         if ok:
@@ -254,24 +255,24 @@ class SRACli(cmd2.Cmd):
 
     @staticmethod
     def _build_extension_schema_parser() -> cmd2.Cmd2ArgumentParser:
-        parser = SRACli.cmd2argumentparser_factory(description=translate("显示扩展的配置 Schema 详情"))
-        parser.add_argument('name', help=translate("扩展键名"))
+        parser = SRACli.cmd2argumentparser_factory(description=Resources.cli_extension_schemaDescription)
+        parser.add_argument('name', help=Resources.cli_extension_schemaNameHelp)
         return parser
 
-    @cmd2.as_subcommand_to("extension", "schema", _build_extension_schema_parser, help=translate("显示扩展的配置 Schema 详情"))
+    @cmd2.as_subcommand_to("extension", "schema", _build_extension_schema_parser, help=Resources.cli_extension_schemaDescription)
     def _extension_schema(self, args: argparse.Namespace) -> None:
         schema = self.context.extension_schema(args.name)
         if schema is None:
-            self.err(f"扩展 '{args.name}' 不存在")
+            self.err(Resources.cli_extension_schemaNotFound(args.name))
             return
-        self.ok(f"扩展 {args.name} 配置模式", schema, formatter=lambda s: json.dumps(s, ensure_ascii=False, indent=2))
+        self.ok(Resources.cli_extension_schemaTitle(args.name), schema, formatter=lambda s: json.dumps(s, ensure_ascii=False, indent=2))
 
     @staticmethod
     def _build_extension_reload_parser() -> cmd2.Cmd2ArgumentParser:
-        return SRACli.cmd2argumentparser_factory(description=translate("重新导入扩展模块（含已导入模块的热重载）"))
+        return SRACli.cmd2argumentparser_factory(description=Resources.cli_extension_reloadDescription)
 
     @cmd2.as_subcommand_to("extension", "reload", _build_extension_reload_parser,
-                           help=translate("重新导入扩展模块（含已导入模块的热重载）"))
+                           help=Resources.cli_extension_reloadDescription)
     def _extension_reload(self, _: argparse.Namespace) -> None:
         ok, message = self.context.extension_reload()
         if not ok:
@@ -283,12 +284,12 @@ class SRACli(cmd2.Cmd):
 
     @staticmethod
     def _build_extension_stop_parser() -> cmd2.Cmd2ArgumentParser:
-        parser = SRACli.cmd2argumentparser_factory(description=translate("停止指定的后台扩展或当前正在运行的单次扩展"))
-        parser.add_argument('name', nargs='?', help=translate("扩展标识；若不传则停止当前单次扩展"))
+        parser = SRACli.cmd2argumentparser_factory(description=Resources.cli_extension_stopDescription)
+        parser.add_argument('name', nargs='?', help=Resources.cli_extension_stopNameHelp)
         return parser
 
     @cmd2.as_subcommand_to("extension", "stop", _build_extension_stop_parser,
-                           help=translate("停止指定后台扩展或当前正在运行的单次扩展"))
+                           help=Resources.cli_extension_stopCurrentHelp)
     def _extension_stop(self, args: argparse.Namespace) -> None:
         if args.name:
             ok, message = self.context.extension_stop(args.name)
@@ -299,60 +300,61 @@ class SRACli(cmd2.Cmd):
             return
 
         if not self.extension_runner.is_thread_running():
-            self.ok("当前没有正在运行的扩展")
+            self.ok(Resources.cli_extension_stopNone)
             return
         self.extension_runner.stop_thread()
-        self.ok("扩展已停止")
+        self.ok(Resources.cli_extension_stopped)
 
     @staticmethod
     def _build_extension_status_parser() -> cmd2.Cmd2ArgumentParser:
-        return SRACli.cmd2argumentparser_factory(description=translate("显示扩展运行状态"))
+        return SRACli.cmd2argumentparser_factory(description=Resources.cli_extension_statusDescription)
 
-    @cmd2.as_subcommand_to("extension", "status", _build_extension_status_parser, help=translate("显示扩展运行状态"))
+    @cmd2.as_subcommand_to("extension", "status", _build_extension_status_parser, help=Resources.cli_extension_statusDescription)
     def _extension_status(self, _: argparse.Namespace) -> None:
         info = self.extension_runner.info
         data = {"status": info.status, "unit": info.unit, "error": info.error}
-        self.ok("Extension status", data,
-                formatter=lambda d: f"Status: {d['status']}\nUnit: {d['unit']}"
-                + (f"\nError: {d['error']}" if d['error'] else ""))
+        self.ok(Resources.cli_extension_statusTitle, data,
+                formatter=lambda d: f"{Resources.cli_status_status}: {d['status']}\n"
+                                    f"{Resources.cli_status_unit}: {d['unit']}"
+                + (f"\n{Resources.cli_status_error}: {d['error']}" if d['error'] else ""))
 
     @staticmethod
     def _build_extension_config_parser() -> cmd2.Cmd2ArgumentParser:
-        parser = cmd2.Cmd2ArgumentParser(description=translate("扩展配置管理"))
+        parser = cmd2.Cmd2ArgumentParser(description=Resources.cli_extension_configDescription)
         parser.add_subparsers(metavar="SUBCOMMAND", required=True)
         return parser
 
     @staticmethod
     def _build_extension_config_get_parser() -> cmd2.Cmd2ArgumentParser:
-        parser = SRACli.cmd2argumentparser_factory(description=translate("获取扩展配置"))
-        parser.add_argument('name', help=translate("扩展标识"))
+        parser = SRACli.cmd2argumentparser_factory(description=Resources.cli_extension_configGetDescription)
+        parser.add_argument('name', help=Resources.cli_extension_configGetNameHelp)
         return parser
 
-    @cmd2.as_subcommand_to("extension", "config", _build_extension_config_parser, help=translate("扩展配置管理"))
+    @cmd2.as_subcommand_to("extension", "config", _build_extension_config_parser, help=Resources.cli_extension_configDescription)
     def _extension_config(self, args: argparse.Namespace) -> None:
         args.cmd2_subcommand_func(args)
 
-    @cmd2.as_subcommand_to("extension config", "get", _build_extension_config_get_parser, help=translate("获取扩展配置"))
+    @cmd2.as_subcommand_to("extension config", "get", _build_extension_config_get_parser, help=Resources.cli_extension_configGetDescription)
     def _extension_config_get(self, args: argparse.Namespace) -> None:
         data = self.context.extension_config_get(args.name)
         if data is None:
-            self.err(f"扩展 '{args.name}' 不存在")
+            self.err(Resources.cli_extension_schemaNotFound(args.name))
             return
-        self.ok(f"扩展 {args.name} 配置", data, formatter=lambda x: '\n'.join(f"  {key}: {value}" for key, value in x.items()))
+        self.ok(Resources.cli_extension_configGetTitle(args.name), data, formatter=lambda x: '\n'.join(f"  {key}: {value}" for key, value in x.items()))
 
     @staticmethod
     def _build_extension_config_set_parser() -> cmd2.Cmd2ArgumentParser:
-        parser = SRACli.cmd2argumentparser_factory(description=translate("设置扩展配置"))
-        parser.add_argument('name', help=translate("扩展标识"))
-        parser.add_argument('json', help=translate("配置 JSON 字符串"))
+        parser = SRACli.cmd2argumentparser_factory(description=Resources.cli_extension_configSetDescription)
+        parser.add_argument('name', help=Resources.cli_extension_configSetNameHelp)
+        parser.add_argument('json', help=Resources.cli_extension_configSetJsonHelp)
         return parser
 
-    @cmd2.as_subcommand_to("extension config", "set", _build_extension_config_set_parser, help=translate("设置扩展配置"))
+    @cmd2.as_subcommand_to("extension config", "set", _build_extension_config_set_parser, help=Resources.cli_extension_configSetDescription)
     def _extension_config_set(self, args: argparse.Namespace) -> None:
         try:
             data = json.loads(args.json)
         except json.JSONDecodeError as e:
-            self.err(f"JSON 格式错误: {e}")
+            self.err(Resources.cli_extension_configSetJsonError(str(e)))
             return
         ok, message = self.context.extension_config_set(args.name, data)
         if ok:
@@ -366,7 +368,7 @@ class SRACli(cmd2.Cmd):
 
     @staticmethod
     def _build_operator_parser() -> cmd2.Cmd2ArgumentParser:
-        description = Text.assemble("统一调用 Operator 方法，与游戏交互")
+        description = Text.assemble(Resources.cli_operator_description)
         parser = cmd2.Cmd2ArgumentParser(description=description)
         parser.add_subparsers(metavar="SUBCOMMAND", required=True)
         return parser
@@ -377,56 +379,56 @@ class SRACli(cmd2.Cmd):
 
     @staticmethod
     def _build_operator_list_parser() -> cmd2.Cmd2ArgumentParser:
-        return SRACli.cmd2argumentparser_factory(description=translate("列出所有可用的 Operator 方法"))
+        return SRACli.cmd2argumentparser_factory(description=Resources.cli_operator_listDescription)
 
     @cmd2.as_subcommand_to("operator", "list", _build_operator_list_parser,
-                           help=translate("列出所有可用的 Operator 方法"))
+                           help=Resources.cli_operator_listDescription)
     def _operator_list(self, _: argparse.Namespace) -> None:
         from SRACore.operators.ioperator import IOperator
 
         methods = self.context.operator_list()
 
         def format_methods(_methods: list[str]) -> str:
-            lines = ["可用方法:"]
+            lines = [Resources.cli_operator_listHeader]
             for name in _methods:
                 doc = getattr(IOperator, name).__doc__
                 summary = (doc.split("\n")[0].strip() if doc else "")
                 lines.append(f"  {name:20s} {summary}")
             return "\n".join(lines)
 
-        self.ok("Operator methods", methods, formatter=format_methods)
+        self.ok(Resources.cli_operator_listTitle, methods, formatter=format_methods)
 
     @staticmethod
     def _build_operator_help_parser() -> cmd2.Cmd2ArgumentParser:
-        parser = SRACli.cmd2argumentparser_factory(description=translate("获取 Operator 方法的详细帮助"))
-        parser.add_argument('method', help=translate("方法名称"))
+        parser = SRACli.cmd2argumentparser_factory(description=Resources.cli_operator_helpDescription)
+        parser.add_argument('method', help=Resources.cli_operator_methodHelp)
         return parser
 
     @cmd2.as_subcommand_to("operator", "help", _build_operator_help_parser,
-                           help=translate("获取 Operator 方法的详细帮助"))
+                           help=Resources.cli_operator_helpDescription)
     def _operator_help(self, args: argparse.Namespace) -> None:
         data = self.context.operator_help(args.method)
         if data is None:
-            self.err(f"方法 '{args.method}' 不存在")
+            self.err(Resources.cli_operator_helpNotFound(args.method))
             return
         self.ok(args.method, data)
 
     @staticmethod
     def _build_operator_call_parser() -> cmd2.Cmd2ArgumentParser:
-        parser = SRACli.cmd2argumentparser_factory(description=translate("调用指定的 Operator 方法"))
-        parser.add_argument('method', help=translate("方法名称（可通过 operator list 查看）"))
+        parser = SRACli.cmd2argumentparser_factory(description=Resources.cli_operator_callDescription)
+        parser.add_argument('method', help=Resources.cli_operator_callMethodHelp)
         parser.add_argument('params', nargs='?', default='{}',
-                            help=translate("JSON 格式的方法参数，例如 '{\"x\": 0.5, \"y\": 0.7}'"))
+                            help=Resources.cli_operator_callParamsHelp)
         return parser
 
     @cmd2.as_subcommand_to("operator", "call", _build_operator_call_parser,
-                           help=translate("调用 Operator 方法"))
+                           help=Resources.cli_operator_callDescription)
     def _operator_call(self, args: argparse.Namespace) -> None:
         # 解析 JSON 参数
         try:
             params: dict[str, object] = json.loads(args.params)
         except json.JSONDecodeError as e:
-            self.err(f"JSON 解析错误: {e}")
+            self.err(Resources.cli_operator_callJsonError(str(e)))
             return
 
         ok, message, data = self.context.operator_call(args.method, params)
@@ -529,12 +531,12 @@ class SRACli(cmd2.Cmd):
         else:
             self.ok(f"Default config already exists: {config_path}")
 
-        self.ok("Initialization completed. Please restart the application or run `sra serve` to start the server.")
+        self.ok(Resources.cli_initCompleted)
         return True
 
     def do_version(self, _: str):
         """Show version information"""
-        self.ok("Version", VERSION)
+        self.ok(Resources.cli_versionTitle, VERSION)
 
     def do_quit(self, _) -> bool | None:
         """Exit this application."""
@@ -549,7 +551,7 @@ class SRACli(cmd2.Cmd):
         """Notification command - support test email/webhook/telegram/serverchan/onebot notification"""
         args = arg.split()
         if not args:
-            self.err(Resource.cli_invalidArguments('notify'))
+            self.err(Resources.cli_invalidArguments('notify'))
             return
 
         command = args[0]
@@ -565,9 +567,9 @@ class SRACli(cmd2.Cmd):
                 else:
                     self.err(msg)
             else:
-                self.err(Resource.cli_invalidArguments("notify"))
+                self.err(Resources.cli_invalidArguments("notify"))
         else:
-            self.err(Resource.cli_invalidArguments('notify'))
+            self.err(Resources.cli_invalidArguments('notify'))
 
     # endregion
 
@@ -581,7 +583,7 @@ class SRACli(cmd2.Cmd):
     @staticmethod
     def cmd2argumentparser_factory(**kwargs) -> cmd2.Cmd2ArgumentParser:
         parser = cmd2.Cmd2ArgumentParser(**kwargs)
-        parser.add_argument('--json', action='store_true', help=translate('Output JSON instead of plain text'))
+        parser.add_argument('--json', action='store_true', help=Resources.cli_jsonHelp)
         return parser
 
     def output(self,
@@ -594,7 +596,6 @@ class SRACli(cmd2.Cmd):
 
         JSON 模式由 precmd 自动检测 --json 参数设置 self._use_json
         """
-        message = translate(message)
         if self._use_json:
             response = {"success": success, "message": message}
             if data is not None:
@@ -604,7 +605,7 @@ class SRACli(cmd2.Cmd):
             prefix = "[OK]" if success else "[FAIL]"
             self.poutput(f"{prefix} {message}", highlight=True)
             if data is not None:
-                self.poutput("\n".join(translate(line) for line in (formatter(data) if formatter else str(data)).split("\n")), highlight=True)
+                self.poutput("\n".join((formatter(data) if formatter else str(data)).split("\n")), highlight=True)
 
     def ok(self, message: str, data=None,
            serializer: Callable[[Any], Any] | None = None,

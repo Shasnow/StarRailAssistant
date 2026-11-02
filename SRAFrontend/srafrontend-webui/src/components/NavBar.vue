@@ -31,7 +31,7 @@
           </span>
           <span class="status">
             <span class="status-dot" :class="status"></span>
-            {{ tr(status) }}
+            {{ status }}
           </span>
         </div>
 
@@ -74,7 +74,6 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
-import { tr } from '@/locales'
 
 import { computed, nextTick, ref } from 'vue'
 import { useDark, useToggle, useWindowScroll } from '@vueuse/core'

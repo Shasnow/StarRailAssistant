@@ -1,0 +1,9 @@
+{
+  "name": "Hello World! Sample extension",
+  "description": "Demonstrates how to use the extension system",
+  "message.description": "Message to print",
+  "repeat.description": "Repeat count",
+  "delay.description": "Delay between repetitions",
+  "say.description": "Print the message prefixed with the name",
+  "name.description": "Name"
+}

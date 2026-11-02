@@ -7,6 +7,7 @@ from typing import Any
 from litestar import Request, delete, get, post, put
 from litestar.params import FromPath, JSONBody
 from litestar.response import Response
+from loguru import logger
 
 from SRAServer.controllers._responses import core_of, json_response
 from SRAServer.schemas.envelope import R
@@ -48,7 +49,8 @@ async def update_config(request: Request, config_name: FromPath[str], data: JSON
         return json_response(R(False, "not found"), 404)
     error = core.configs.update(config_name, data, access_token=core.config.access_token)
     if error:
-        return json_response(R(False, error), 400)
+        logger.warning(f"Config '{config_name}' update rejected: {error}")
+        return json_response(R(False, "Invalid config payload"), 400)
     return json_response(R(True, "updated"))
 
 

@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from urllib.request import Request, urlopen
 
+from SRACore.localization import Resources
 from SRACore.task import BaseTask, task
 from SRACore.util.const import LogsScreenshotDir
 from SRACore.util.errors import ErrorCode, SRAError
@@ -428,7 +429,7 @@ class ReceiveRewardsTask(BaseTask):
                 max_iterations=5
             )
 
-            self.send_notification(f"任务 {self.__class__.__name__} 执行完成。",
+            self.send_notification(Resources.notification_taskCompleted(self.__class__.__name__),
                                    "success",
                                    self.operator.screenshot())
             self.operator.press_key('esc')

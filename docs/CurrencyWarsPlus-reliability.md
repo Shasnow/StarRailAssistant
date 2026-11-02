@@ -85,7 +85,7 @@ not CurrencyWarsPlus. Production/test/fixture bytes did not change after the fin
 The original 14 selected defect regressions fail
 against those pristine production files, while 11 preservation controls pass there.
 Full blocking lint still reports the existing `F821 tokens` in
-`extensions/cw_plus/population_vision.py:240`; that file is unchanged. This does not claim
+`extensions/currency_wars_plus/cw_plus/population_vision.py:240`; that file is unchanged. This does not claim
 the entire existing CI is green. The targeted fixes do not change models, providers or global OCR.
 
 ## Historical full-run evidence: scope and limitations

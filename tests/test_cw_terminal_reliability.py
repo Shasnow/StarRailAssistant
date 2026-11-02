@@ -13,9 +13,9 @@ import pytest
 
 from SRACore.operators.model import Box
 from SRACore.util.errors import ThreadStoppedError
-from extensions.cw_plus.paths import CALIBRATION_ROOT, RESOURCE_ROOT
-from extensions.cw_plus.unicode_templates import load_template
-from extensions.cw_plus.vision import CurrencyWarsVision, FINAL_HEALTH_ROI
+from extensions.currency_wars_plus.cw_plus.paths import CALIBRATION_ROOT, RESOURCE_ROOT
+from extensions.currency_wars_plus.cw_plus.unicode_templates import load_template
+from extensions.currency_wars_plus.cw_plus.vision import CurrencyWarsVision, FINAL_HEALTH_ROI
 from tests.cw_reliability_replay import ReplayClock, engine
 
 FIXTURES = Path(__file__).parent / "fixtures/terminal_overclock"

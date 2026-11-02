@@ -89,7 +89,7 @@ OCR 控制为每轮 3 次、每次 6 个 RGB/灰度模板输入；同样预热 3
 - 当前干净基线：1345 passed；优化后：1401 passed（新增 56），无跳过或新增失败。
 - 修改文件的 blocking flake8 为零；新增 Python 文件的完整 flake8 为零。
   全项目 blocking flake8 仍有原来的
-  `extensions/cw_plus/population_vision.py:240`：`F821 undefined name 'tokens'`。
+  `extensions/currency_wars_plus/cw_plus/population_vision.py:240`：`F821 undefined name 'tokens'`。
   非阻断的全项目风格/复杂度告警也未在此 PR 中全面修复。
 - 补充离线检查：真实页面匹配调用方的缓存、停止、换帧、缺失文件及 Pillow 后备行为保持一致；
   真实 `IOperator.ocr` 的 36 组 CPU 调用文本、框、分数和阈值过滤结果精确相等。

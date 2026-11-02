@@ -195,7 +195,7 @@ npm run build
 
 ## 辅助脚本
 ```bash
-npm run pyl10nc # 运行 pyl10nc 本地化工具，编辑 SRACore/localization/resource.toml 文件以添加/修改翻译
+npm run pyl10nc # 运行 pyl10nc 本地化工具，编辑 SRACore/localization/resources.toml 文件以添加/修改翻译
 npm run model-gen # 运行模型生成脚本，根据 C# 业务模型生成对应的 Python 数据类，保持前后端数据结构一致
 npm run build # 构建项目，包括前端发布包和后端可执行文件，并生成完整的发布包
 ```
@@ -230,7 +230,7 @@ pytest
 ### 本地化支持
 
 1. 克隆仓库
-2. 在 `SRACore/localization/` 目录下编辑 `resource.toml` 文件，添加新的语言支持
+2. 在 `SRACore/localization/` 目录下编辑 `resources.toml` 文件，添加新的语言支持
 
    示例：
     ```toml

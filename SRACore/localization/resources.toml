@@ -1,0 +1,762 @@
+[cli.noAdminWarning]
+zh-cn = "您没有以管理员权限运行 SRA-cli。某些命令可能无法正常工作。"
+en-us = "You are not running SRA-cli with administrative privileges. Some commands may not work as expected."
+ru-ru = "SRA-cli запущен без прав администратора. Некоторые команды могут работать некорректно."
+
+[cli.invalidArguments]
+zh-cn = "命令 '{command}' 的参数无效。输入 'help {command}' 获取用法说明。"
+en-us = "Invalid arguments for command '{command}'. Type 'help {command}' for usage."
+ru-ru = "Недопустимые аргументы команды «{command}». Справка: help {command}."
+
+[cli.defaultError]
+zh-cn = "{} 不是一个有效命令、别名、或宏。"
+en-us = "{} is not a recognized command, alias, or macro."
+ru-ru = "{} — неизвестная команда, псевдоним или макрос."
+
+[cli.run.started]
+zh-cn = "已启动任务执行。"
+en-us = "Task execution started."
+ru-ru = "Выполнение задач началось."
+
+[cli.task.taskAlreadyRunning]
+zh-cn = "任务已在运行中。"
+en-us = "Task is already running."
+ru-ru = "Задача уже выполняется."
+
+[argparse.description]
+zh-cn = "SRA-cli：SRA 命令行工具"
+en-us = "SRA-cli: A command-line interface for SRA."
+ru-ru = "SRA-cli — командная строка SRA."
+
+[argparse.epilog]
+zh-cn = ""
+en-us = ""
+ru-ru = ""
+
+[argparse.inline_help]
+zh-cn = "内联模式（无命令提示符）"
+en-us = "Inline mode (no command prompt)"
+ru-ru = "Встроенный режим без приглашения командной строки"
+
+[argparse.version_help]
+zh-cn = "显示 SRA-cli 的版本并退出。"
+en-us = "Show the version of SRA-cli and exit."
+ru-ru = "Показать версию SRA-cli и выйти."
+
+[argparse.log_level_help]
+zh-cn = "设置日志记录级别（默认：TRACE）。"
+en-us = "Set the logging level (default: TRACE)."
+ru-ru = "Установить уровень журналирования (по умолчанию TRACE)."
+
+[task.description]
+zh-cn = "任务管理器 - 管理 SRA-cli 的任务。"
+en-us = "Task manager - Manages tasks for SRA-cli."
+ru-ru = "Управление задачами SRA-cli."
+
+[task.currentConfig]
+zh-cn = "当前配置：{config_name}"
+en-us = "Current config: {config_name}"
+ru-ru = "Текущая конфигурация: {config_name}"
+
+[task.noSelectedTasks]
+zh-cn = "{config_name} 配置中没有选中的任务, 跳过执行。"
+en-us = "No task is selected in {config_name}, skipping execution."
+ru-ru = "В конфигурации {config_name} не выбрано ни одной задачи. Пропуск."
+
+[task.taskFailed]
+zh-cn = "任务 '{name}' 失败。停止进一步执行。"
+en-us = "Task '{name}' failed. Stopping further execution."
+ru-ru = "Ошибка задачи «{name}». Дальнейшее выполнение остановлено."
+
+[task.taskCrashed]
+zh-cn = "任务 '{name}' 因意外错误崩溃：{error}"
+en-us = "Task '{name}' crashed due to an unexpected error: {error}"
+ru-ru = "Задача «{name}» аварийно завершилась: {error}"
+
+[task.taskCompleted]
+zh-cn = "任务 '{name}' 已完成。"
+en-us = "Task '{name}' has been completed."
+ru-ru = "Задача «{name}» выполнена."
+
+[task.configCompleted]
+zh-cn = "配置 '{config_name}' 中的所有任务已完成。"
+en-us = "All tasks in config '{config_name}' have been completed."
+ru-ru = "Все задачи конфигурации «{config_name}» выполнены."
+
+[task.notificationTitle]
+zh-cn = "任务通知"
+en-us = "Task Reminder"
+ru-ru = "Уведомление о задачах"
+
+[task.notificationMessage]
+zh-cn = "您的SRA任务运行完成。"
+en-us = "Your SRA task has completed."
+ru-ru = "Выполнение задач SRA завершено."
+
+[task.instantiateFailed]
+zh-cn = "实例化任务 '{name}' 失败：{error}"
+en-us = "Failed to instantiate task '{name}': {error}"
+ru-ru = "Не удалось создать задачу «{name}»: {error}"
+
+[task.noSuchTask]
+zh-cn = "没有此任务：'{identifier}'"
+en-us = "No such task: '{identifier}'"
+ru-ru = "Задача «{identifier}» не найдена."
+
+[run.description]
+zh-cn = "运行指定配置文件中的所有选中的任务。"
+en-us = "Run all selected tasks in specified configuration file(s). Type 'run --help' for more information."
+ru-ru = "Выполнить выбранные задачи из указанных конфигураций. Справка: run --help."
+
+[run.configHelp]
+zh-cn = "配置文件名称或路径。"
+en-us = "Configuration file name or path."
+ru-ru = "Имя или путь файла конфигурации."
+
+[single.description]
+zh-cn = "运行由其名称或索引指定的单个任务。"
+en-us = "Run a single task specified by its name or index. Type 'single --help' for more information."
+ru-ru = "Выполнить одну задачу по имени или индексу. Справка: single --help."
+
+[single.taskHelp]
+zh-cn = "要运行的任务的名称或索引。"
+en-us = "Name or index of the task to run."
+ru-ru = "Имя или индекс задачи."
+
+[single.configHelp]
+zh-cn = "配置文件名称或路径。"
+en-us = "Configuration file name or path."
+ru-ru = "Имя или путь файла конфигурации."
+
+[stop.description]
+zh-cn = "停止当前运行的任务。"
+en-us = "Stop the currently running task."
+ru-ru = "Остановить выполняемую задачу."
+
+[config.fileNotFound]
+zh-cn = "找不到文件：'{path}'"
+en-us = "Could not find config file: '{path}'"
+ru-ru = "Файл конфигурации не найден: «{path}»."
+
+[config.parseError]
+zh-cn = "解析文件 '{path}' 失败：{error}"
+en-us = "Failed to parse config file '{path}': {error}"
+ru-ru = "Не удалось прочитать конфигурацию «{path}»: {error}"
+
+[config.exception]
+zh-cn = "加载文件 '{path}' 时发生错误：{error}"
+en-us = "An error occurred while loading config file '{path}': {error}"
+ru-ru = "Ошибка загрузки конфигурации «{path}»: {error}"
+
+[task.retryPreparing]
+zh-cn = "任务失败，准备重试 ({current}/{max_retries})..."
+en-us = "Task failed, preparing to retry ({current}/{max_retries})..."
+ru-ru = "Задача завершилась с ошибкой. Подготовка к повтору ({current}/{max_retries})…"
+
+[task.killingGameProcess]
+zh-cn = "正在终止游戏进程..."
+en-us = "Terminating game process..."
+ru-ru = "Завершение процесса игры…"
+
+[task.gameProcessKilled]
+zh-cn = "游戏进程已终止"
+en-us = "Game process terminated"
+ru-ru = "Процесс игры завершён"
+
+[task.waitingForRetry]
+zh-cn = "等待 {seconds} 秒后重试..."
+en-us = "Waiting {seconds} seconds before retry..."
+ru-ru = "Ожидание перед повтором: {seconds} с…"
+
+[task.retryFromConfig]
+zh-cn = "将从当前配置 [{config_name}] 重新开始执行"
+en-us = "Will restart from config [{config_name}]"
+ru-ru = "Повтор начнётся с конфигурации [{config_name}]"
+
+[notification.taskStarted]
+zh-cn = "任务 {task} 开始执行。"
+en-us = "Task {task} started."
+ru-ru = "Задача {task} запущена."
+
+[notification.taskCompleted]
+zh-cn = "任务 {task} 执行完成。"
+en-us = "Task {task} completed."
+ru-ru = "Задача {task} выполнена."
+
+[notification.taskFailed]
+zh-cn = "任务 {task} 执行失败。"
+en-us = "Task {task} failed."
+ru-ru = "Задача {task} завершилась с ошибкой."
+
+[notification.testTitle]
+zh-cn = "通知渠道测试"
+en-us = "Notification channel test"
+ru-ru = "Проверка канала уведомлений"
+
+[notification.testMessage]
+zh-cn = "这是一条测试通知, 如果你收到此通知，证明你的渠道配置正确"
+en-us = "This is a test notification. If you received it, your channel is configured correctly."
+ru-ru = "Это тестовое уведомление. Если вы его получили, канал настроен верно."
+
+[notification.payloadHeader]
+zh-cn = "[SRA 通知]"
+en-us = "[SRA notification]"
+ru-ru = "[Уведомление SRA]"
+
+[notification.payloadEvent]
+zh-cn = "事件: "
+en-us = "Event: "
+ru-ru = "Событие: "
+
+[notification.payloadResult]
+zh-cn = "结果: "
+en-us = "Result: "
+ru-ru = "Результат: "
+
+[notification.payloadTime]
+zh-cn = "时间: "
+en-us = "Time: "
+ru-ru = "Время: "
+
+[notification.payloadMessage]
+zh-cn = "消息: "
+en-us = "Message: "
+ru-ru = "Сообщение: "
+
+[notification.channelEmail]
+zh-cn = "邮件"
+en-us = "Email"
+ru-ru = "Эл. почта"
+
+[notification.channelFeishu]
+zh-cn = "飞书"
+en-us = "Feishu"
+ru-ru = "Feishu"
+
+[notification.channelWeCom]
+zh-cn = "企业微信"
+en-us = "WeCom"
+ru-ru = "WeCom"
+
+[notification.channelDingTalk]
+zh-cn = "钉钉"
+en-us = "DingTalk"
+ru-ru = "DingTalk"
+
+[notification.channelSystem]
+zh-cn = "系统"
+en-us = "System"
+ru-ru = "Система"
+
+[extension.notFound]
+zh-cn = "扩展 '{ext_id}' 不存在"
+en-us = "Extension '{ext_id}' not found."
+ru-ru = "Расширение «{ext_id}» не найдено."
+
+[extension.noConfig]
+zh-cn = "扩展 '{ext_id}' 没有配置"
+en-us = "Extension '{ext_id}' has no configuration."
+ru-ru = "У расширения «{ext_id}» нет конфигурации."
+
+[extension.configInvalid]
+zh-cn = "配置验证失败: {error}"
+en-us = "Config validation failed: {error}"
+ru-ru = "Ошибка проверки конфигурации: {error}"
+
+[extension.configSaved]
+zh-cn = "扩展 {ext_id} 配置已保存"
+en-us = "Configuration saved for extension {ext_id}."
+ru-ru = "Конфигурация расширения {ext_id} сохранена."
+
+[extension.notFoundHint]
+zh-cn = "扩展 '{ext_id}' 不存在，使用 'extension list' 查看可用扩展"
+en-us = "Extension '{ext_id}' not found. Use 'extension list' to see available extensions."
+ru-ru = "Расширение «{ext_id}» не найдено. Список доступных расширений: 'extension list'."
+
+[extension.backgroundStarted]
+zh-cn = "已启动后台扩展 '{ext_id}'"
+en-us = "Background extension '{ext_id}' started."
+ru-ru = "Фоновое расширение «{ext_id}» запущено."
+
+[extension.backgroundStartFailed]
+zh-cn = "无法启动后台扩展 '{ext_id}'"
+en-us = "Failed to start background extension '{ext_id}'."
+ru-ru = "Не удалось запустить фоновое расширение «{ext_id}»."
+
+[extension.started]
+zh-cn = "已启动扩展 '{ext_id}'"
+en-us = "Extension '{ext_id}' started."
+ru-ru = "Расширение «{ext_id}» запущено."
+
+[extension.startFailed]
+zh-cn = "无法启动扩展 '{ext_id}'"
+en-us = "Failed to start extension '{ext_id}'."
+ru-ru = "Не удалось запустить расширение «{ext_id}»."
+
+[extension.backgroundStopped]
+zh-cn = "已停止后台扩展 '{ext_id}'"
+en-us = "Background extension '{ext_id}' stopped."
+ru-ru = "Фоновое расширение «{ext_id}» остановлено."
+
+[extension.backgroundNotRunning]
+zh-cn = "后台扩展 '{ext_id}' 未运行"
+en-us = "Background extension '{ext_id}' is not running."
+ru-ru = "Фоновое расширение «{ext_id}» не запущено."
+
+[extension.notRunning]
+zh-cn = "扩展 '{ext_id}' 未在运行"
+en-us = "Extension '{ext_id}' is not running."
+ru-ru = "Расширение «{ext_id}» не запущено."
+
+[extension.otherRunning]
+zh-cn = "当前正在运行的扩展是 '{current}'，不是 '{ext_id}'"
+en-us = "The running extension is '{current}', not '{ext_id}'."
+ru-ru = "Сейчас запущено расширение «{current}», а не «{ext_id}»."
+
+[extension.stopped]
+zh-cn = "已停止扩展 '{ext_id}'"
+en-us = "Extension '{ext_id}' stopped."
+ru-ru = "Расширение «{ext_id}» остановлено."
+
+[extension.reloadBusy]
+zh-cn = "扩展线程正在运行中，无法执行重载操作"
+en-us = "Cannot reload while an extension thread is running."
+ru-ru = "Нельзя перезагрузить расширения во время работы потока расширения."
+
+[extension.reloadEmpty]
+zh-cn = "重载完成，但没有已注册的扩展"
+en-us = "Reload completed, but no extensions are registered."
+ru-ru = "Перезагрузка завершена, но расширения не зарегистрированы."
+
+[extension.reloaded]
+zh-cn = "已重载扩展，当前共 {count} 个（更新 {updated} 个）"
+en-us = "Extensions reloaded: {count} total ({updated} updated)."
+ru-ru = "Расширения перезагружены: всего {count} (обновлено {updated})."
+
+[extension.reloadAdded]
+zh-cn = "，新增: {names}"
+en-us = ", added: {names}"
+ru-ru = ", добавлено: {names}"
+
+[extension.reloadRemoved]
+zh-cn = "，移除: {names}"
+en-us = ", removed: {names}"
+ru-ru = ", удалено: {names}"
+
+[extension.reloadRestarted]
+zh-cn = "，已重启后台扩展: {names}"
+en-us = ", restarted background extensions: {names}"
+ru-ru = ", перезапущены фоновые расширения: {names}"
+
+[operator.initFailed]
+zh-cn = "Operator 初始化失败: {error}"
+en-us = "Operator initialization failed: {error}"
+ru-ru = "Ошибка инициализации Operator: {error}"
+
+[operator.methodNotFound]
+zh-cn = "方法 '{method}' 不存在。可用方法: {methods}"
+en-us = "Method '{method}' not found. Available methods: {methods}"
+ru-ru = "Метод «{method}» не найден. Доступные методы: {methods}"
+
+[operator.fileNotFound]
+zh-cn = "文件未找到: {error}"
+en-us = "File not found: {error}"
+ru-ru = "Файл не найден: {error}"
+
+[operator.missingParam]
+zh-cn = "缺少必需参数: {error}"
+en-us = "Missing required parameter: {error}"
+ru-ru = "Не указан обязательный параметр: {error}"
+
+[operator.typeError]
+zh-cn = "参数类型错误: {error}"
+en-us = "Invalid parameter type: {error}"
+ru-ru = "Неверный тип параметра: {error}"
+
+[operator.executionFailed]
+zh-cn = "执行失败: {error}"
+en-us = "Execution failed: {error}"
+ru-ru = "Ошибка выполнения: {error}"
+
+[operator.callSucceeded]
+zh-cn = "{method} 执行成功"
+en-us = "{method} succeeded"
+ru-ru = "{method}: выполнено успешно"
+
+[cli.buildInCategory]
+zh-cn = "内置命令"
+en-us = "Build-in Commands"
+ru-ru = "Встроенные команды"
+
+[cli.intro]
+zh-cn = "欢迎使用 SRA-cli（版本 {version}，内核 {core}）。\n输入 'help' 查看命令列表。"
+en-us = "Welcome to SRA-cli (version {version}, core {core}).\nType 'help' to list commands."
+ru-ru = "Добро пожаловать в SRA-cli (версия {version}, ядро {core}).\nВведите 'help' для списка команд."
+
+[cli.task.statusDescription]
+zh-cn = "显示当前任务状态"
+en-us = "Show current task status"
+ru-ru = "Показать текущее состояние задач"
+
+[cli.task.statusTitle]
+zh-cn = "任务状态"
+en-us = "Task status"
+ru-ru = "Состояние задач"
+
+[cli.task.listDescription]
+zh-cn = "列出所有已注册的任务"
+en-us = "List all registered tasks"
+ru-ru = "Список всех зарегистрированных задач"
+
+[cli.task.listEmpty]
+zh-cn = "没有已注册的任务"
+en-us = "No registered tasks"
+ru-ru = "Зарегистрированных задач нет"
+
+[cli.task.listHeader]
+zh-cn = "可用任务:"
+en-us = "Available tasks:"
+ru-ru = "Доступные задачи:"
+
+[cli.task.listRegistered]
+zh-cn = "已注册 {count} 个任务"
+en-us = "Registered {count} task(s)"
+ru-ru = "Зарегистрировано задач: {count}"
+
+[cli.task.reloadDescription]
+zh-cn = "重新导入任务模块，实现热重载"
+en-us = "Re-import task modules to hot reload"
+ru-ru = "Переимпортировать модули задач для горячей перезагрузки"
+
+[cli.task.reloadBusy]
+zh-cn = "任务线程正在运行中，无法执行重载操作"
+en-us = "Cannot reload while the task thread is running"
+ru-ru = "Нельзя перезагрузить задачи во время работы потока задач"
+
+[cli.task.reloadNotFound]
+zh-cn = "任务目录不存在: {path}"
+en-us = "Task directory not found: {path}"
+ru-ru = "Каталог задач не найден: {path}"
+
+[cli.task.reloadEmpty]
+zh-cn = "重载完成，但没有已注册的任务"
+en-us = "Reload completed, but no tasks are registered"
+ru-ru = "Перезагрузка завершена, но задачи не зарегистрированы"
+
+[cli.task.reloadSummary]
+zh-cn = "已重载任务，当前共 {count} 个任务"
+en-us = "Tasks reloaded: {count} total"
+ru-ru = "Задачи перезагружены: всего {count}"
+
+[cli.task.reloadAdded]
+zh-cn = "，新增: {names}"
+en-us = ", added: {names}"
+ru-ru = ", добавлено: {names}"
+
+[cli.task.reloadRemoved]
+zh-cn = "，移除: {names}"
+en-us = ", removed: {names}"
+ru-ru = ", удалено: {names}"
+
+[cli.extension.description]
+zh-cn = "扩展管理：查看、运行已注册的扩展"
+en-us = "Extension management: list and run registered extensions"
+ru-ru = "Управление расширениями: просмотр и запуск"
+
+[cli.extension.listDescription]
+zh-cn = "列出所有已注册的扩展"
+en-us = "List all registered extensions"
+ru-ru = "Список всех зарегистрированных расширений"
+
+[cli.extension.listEmpty]
+zh-cn = "没有已注册的扩展"
+en-us = "No registered extensions"
+ru-ru = "Зарегистрированных расширений нет"
+
+[cli.extension.listHeader]
+zh-cn = "扩展："
+en-us = "Extensions:"
+ru-ru = "Расширения:"
+
+[cli.extension.listRegistered]
+zh-cn = "已注册 {count} 个扩展"
+en-us = "Registered {count} extension(s)"
+ru-ru = "Зарегистрировано расширений: {count}"
+
+[cli.extension.runDescription]
+zh-cn = "按扩展类型自动分发：非后台扩展走共享线程，后台扩展走专用线程"
+en-us = "Dispatch by extension type: foreground extensions use the shared thread, background ones use a dedicated thread"
+ru-ru = "Распределение по типу: обычные расширения используют общий поток, фоновые — отдельный"
+
+[cli.extension.runNameHelp]
+zh-cn = "扩展标识（可通过 extension list 查看）"
+en-us = "Extension id (see 'extension list')"
+ru-ru = "Идентификатор расширения (см. 'extension list')"
+
+[cli.extension.runConfigHelp]
+zh-cn = "扩展配置文件名（不带 .json 后缀），不指定则不加载文件配置"
+en-us = "Extension config name (without .json); omit to skip loading a config file"
+ru-ru = "Имя конфигурации расширения (без .json); не указывайте, чтобы не загружать файл"
+
+[cli.extension.schemaDescription]
+zh-cn = "显示扩展的配置 Schema 详情"
+en-us = "Show the extension configuration schema"
+ru-ru = "Показать схему конфигурации расширения"
+
+[cli.extension.schemaNameHelp]
+zh-cn = "扩展键名"
+en-us = "Extension id"
+ru-ru = "Идентификатор расширения"
+
+[cli.extension.schemaNotFound]
+zh-cn = "扩展 '{name}' 不存在"
+en-us = "Extension '{name}' not found"
+ru-ru = "Расширение «{name}» не найдено"
+
+[cli.extension.schemaTitle]
+zh-cn = "扩展 {name} 配置模式"
+en-us = "Extension {name} configuration schema"
+ru-ru = "Схема конфигурации расширения {name}"
+
+[cli.extension.reloadDescription]
+zh-cn = "重新导入扩展模块（含已导入模块的热重载）"
+en-us = "Re-import extension modules (hot reload)"
+ru-ru = "Переимпортировать расширения (горячая перезагрузка)"
+
+[cli.extension.stopDescription]
+zh-cn = "停止指定的后台扩展或当前正在运行的单次扩展"
+en-us = "Stop a background extension or the currently running single-run extension"
+ru-ru = "Остановить фоновое расширение или текущий разовый запуск"
+
+[cli.extension.stopNameHelp]
+zh-cn = "扩展标识；若不传则停止当前单次扩展"
+en-us = "Extension id; omit to stop the current single-run extension"
+ru-ru = "Идентификатор расширения; не указывайте, чтобы остановить текущий разовый запуск"
+
+[cli.extension.stopCurrentHelp]
+zh-cn = "停止指定后台扩展或当前正在运行的单次扩展"
+en-us = "Stop a background extension or the currently running single-run extension"
+ru-ru = "Остановить фоновое расширение или текущий разовый запуск"
+
+[cli.extension.stopNone]
+zh-cn = "当前没有正在运行的扩展"
+en-us = "No extension is currently running"
+ru-ru = "Сейчас нет запущенных расширений"
+
+[cli.extension.stopped]
+zh-cn = "扩展已停止"
+en-us = "Extension stopped"
+ru-ru = "Расширение остановлено"
+
+[cli.extension.statusDescription]
+zh-cn = "显示扩展运行状态"
+en-us = "Show extension status"
+ru-ru = "Показать состояние расширений"
+
+[cli.extension.configDescription]
+zh-cn = "扩展配置管理"
+en-us = "Extension configuration"
+ru-ru = "Конфигурация расширений"
+
+[cli.extension.configGetDescription]
+zh-cn = "获取扩展配置"
+en-us = "Get extension configuration"
+ru-ru = "Получить конфигурацию расширения"
+
+[cli.extension.configGetNameHelp]
+zh-cn = "扩展标识"
+en-us = "Extension id"
+ru-ru = "Идентификатор расширения"
+
+[cli.extension.configGetTitle]
+zh-cn = "扩展 {name} 配置"
+en-us = "Extension {name} configuration"
+ru-ru = "Конфигурация расширения {name}"
+
+[cli.extension.configSetDescription]
+zh-cn = "设置扩展配置"
+en-us = "Set extension configuration"
+ru-ru = "Задать конфигурацию расширения"
+
+[cli.extension.configSetJsonHelp]
+zh-cn = "配置 JSON 字符串"
+en-us = "Configuration JSON string"
+ru-ru = "Строка JSON конфигурации"
+
+[cli.extension.configSetJsonError]
+zh-cn = "JSON 格式错误: {error}"
+en-us = "Invalid JSON: {error}"
+ru-ru = "Ошибка JSON: {error}"
+
+[cli.operator.description]
+zh-cn = "统一调用 Operator 方法，与游戏交互"
+en-us = "Call Operator methods to interact with the game"
+ru-ru = "Вызов методов Operator для взаимодействия с игрой"
+
+[cli.operator.listDescription]
+zh-cn = "列出所有可用的 Operator 方法"
+en-us = "List all available Operator methods"
+ru-ru = "Список доступных методов Operator"
+
+[cli.operator.listHeader]
+zh-cn = "可用方法:"
+en-us = "Available methods:"
+ru-ru = "Доступные методы:"
+
+[cli.operator.helpDescription]
+zh-cn = "获取 Operator 方法的详细帮助"
+en-us = "Get detailed help for an Operator method"
+ru-ru = "Подробная справка по методу Operator"
+
+[cli.operator.methodHelp]
+zh-cn = "方法名称"
+en-us = "Method name"
+ru-ru = "Имя метода"
+
+[cli.operator.helpNotFound]
+zh-cn = "方法 '{method}' 不存在"
+en-us = "Method '{method}' not found"
+ru-ru = "Метод «{method}» не найден"
+
+[cli.operator.callDescription]
+zh-cn = "调用指定的 Operator 方法"
+en-us = "Call the specified Operator method"
+ru-ru = "Вызвать указанный метод Operator"
+
+[cli.operator.callMethodHelp]
+zh-cn = "方法名称（可通过 operator list 查看）"
+en-us = "Method name (see 'operator list')"
+ru-ru = "Имя метода (см. 'operator list')"
+
+[cli.operator.callParamsHelp]
+zh-cn = "JSON 格式的方法参数"
+en-us = "Method parameters as JSON"
+ru-ru = "Параметры метода в формате JSON"
+
+[cli.operator.callJsonError]
+zh-cn = "JSON 解析错误: {error}"
+en-us = "Invalid JSON: {error}"
+ru-ru = "Ошибка JSON: {error}"
+
+[cli.jsonHelp]
+zh-cn = "以 JSON 格式输出"
+en-us = "Output JSON instead of plain text"
+ru-ru = "Выводить в формате JSON"
+
+[cli.operator.listTitle]
+zh-cn = "Operator 方法"
+en-us = "Operator methods"
+ru-ru = "Методы Operator"
+
+[cli.extension.statusTitle]
+zh-cn = "扩展状态"
+en-us = "Extension status"
+ru-ru = "Состояние расширений"
+
+[cli.argHelp.command]
+zh-cn = "启动后执行的命令"
+en-us = "The command to execute AFTER launch"
+ru-ru = "Команда, выполняемая после запуска"
+
+[cli.argHelp.noAdmin]
+zh-cn = "不要求管理员权限"
+en-us = "Do not require admin privileges"
+ru-ru = "Не требовать права администратора"
+
+[cli.argHelp.subcommand]
+zh-cn = "子命令；输入 '<子命令> --help' 查看详细说明"
+en-us = "Subcommands; type '<subcommand> --help' for more information"
+ru-ru = "Подкоманды; '<subcommand> --help' для подробностей"
+
+[cli.argHelp.whereDescription]
+zh-cn = "查找可执行文件或目录的路径"
+en-us = "Find the path of the executable file or a directory"
+ru-ru = "Найти путь к исполняемому файлу или каталогу"
+
+[cli.argHelp.wherePath]
+zh-cn = "要查找的路径"
+en-us = "The path to find"
+ru-ru = "Искомый путь"
+
+[cli.argHelp.serverDescription]
+zh-cn = "启动 SRA 服务端"
+en-us = "Start the SRA server"
+ru-ru = "Запустить сервер SRA"
+
+[cli.argHelp.serverHost]
+zh-cn = "将服务端暴露到公网"
+en-us = "Expose the server to the public network"
+ru-ru = "Открыть сервер в публичную сеть"
+
+[cli.argHelp.serverPort]
+zh-cn = "使用的端口"
+en-us = "The port to use"
+ru-ru = "Используемый порт"
+
+[cli.argHelp.serverNoWebui]
+zh-cn = "不托管 WebUI 静态文件"
+en-us = "Do not host the WebUI static files"
+ru-ru = "Не размещать статические файлы WebUI"
+
+[cli.initCompleted]
+zh-cn = "初始化完成。请重启应用，或运行 `sra serve` 启动服务端。"
+en-us = "Initialization completed. Please restart the application or run `sra serve` to start the server."
+ru-ru = "Инициализация завершена. Перезапустите приложение или выполните `sra serve`."
+
+[cli.versionTitle]
+zh-cn = "版本"
+en-us = "Version"
+ru-ru = "Версия"
+
+[cli.status.sessionId]
+zh-cn = "会话 ID"
+en-us = "Session ID"
+ru-ru = "ID сессии"
+
+[cli.status.pid]
+zh-cn = "PID"
+en-us = "PID"
+ru-ru = "PID"
+
+[cli.status.mode]
+zh-cn = "模式"
+en-us = "Mode"
+ru-ru = "Режим"
+
+[cli.status.status]
+zh-cn = "状态"
+en-us = "Status"
+ru-ru = "Состояние"
+
+[cli.status.unit]
+zh-cn = "单元"
+en-us = "Unit"
+ru-ru = "Модуль"
+
+[cli.status.configs]
+zh-cn = "配置"
+en-us = "Configs"
+ru-ru = "Конфигурации"
+
+[cli.status.progress]
+zh-cn = "进度"
+en-us = "Progress"
+ru-ru = "Прогресс"
+
+[cli.status.error]
+zh-cn = "错误"
+en-us = "Error"
+ru-ru = "Ошибка"
+
+[cli.status.none]
+zh-cn = "无"
+en-us = "N/A"
+ru-ru = "Н/Д"
+
+[cli.task.listNoDescription]
+zh-cn = "无描述"
+en-us = "No description"
+ru-ru = "Без описания"
+
+
+

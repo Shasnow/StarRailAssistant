@@ -1,0 +1,5 @@
+{
+  "description": "自动检测并处理剧情对话，可按配置跳过剧情",
+  "name": "自动对话",
+  "skip_plot.description": "是否自动跳过剧情对话"
+}

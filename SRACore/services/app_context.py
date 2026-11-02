@@ -19,8 +19,7 @@ from SRACore.extension import (
     load_extensions,
     reload_extensions,
 )
-from SRACore.localization import Resource
-from SRACore.localization.presentation import localize_schema
+from SRACore.localization import Resources
 from SRACore.operators.factory import OperatorFactory, OperatorType
 from SRACore.operators.ioperator import IOperator
 from SRACore.services.app_info_service import AppInfoService
@@ -57,7 +56,7 @@ class AppContext:
         configure_standard_streams()
 
         self.settings: SettingsService = SettingsService()
-        Resource.set_language(self.settings.settings.Display.Language)
+        Resources.set_language(self.settings.settings.Display.Language)
         setup_logger(level=log_level)
 
         self.log_stream = LogStreamService()
@@ -180,15 +179,14 @@ class AppContext:
     # ── 扩展 ──
 
     def extension_list(self) -> list[dict[str, Any]]:
-        from SRACore.localization.presentation import translate
-
         data = []
         for ext_id in extension_registry.get_ids():
             entry = extension_registry.get(ext_id)
+            meta = extension_registry.get_meta(ext_id)
             data.append({
                 "id": ext_id,
-                "name": translate(entry.name),
-                "description": translate(entry.description),
+                "name": meta.get("name") or entry.name,
+                "description": meta.get("description") or entry.description,
                 "extension_class": entry.extension_cls.__name__,
                 "config_class": entry.config_cls.__name__ if entry.config_cls else "",
             })
@@ -197,7 +195,7 @@ class AppContext:
     def extension_schema(self, ext_id: str) -> dict[str, Any] | None:
         if not extension_registry.has_id(ext_id):
             return None
-        return localize_schema(extension_registry.get_schema(ext_id))
+        return extension_registry.get_schema(ext_id)
 
     def extension_config_get(self, ext_id: str) -> dict[str, Any] | None:
         if not extension_registry.has_id(ext_id):
@@ -207,46 +205,48 @@ class AppContext:
 
     def extension_config_set(self, ext_id: str, data: dict[str, Any]) -> tuple[bool, str]:
         if not extension_registry.has_id(ext_id):
-            return False, f"扩展 '{ext_id}' 不存在"
+            return False, Resources.extension_notFound(ext_id)
         config_cls = extension_registry.get_config_class(ext_id)
         if config_cls is None:
-            return False, f"扩展 '{ext_id}' 没有配置"
+            return False, Resources.extension_noConfig(ext_id)
         try:
             config = config_cls.model_validate(data, by_alias=True)
         except Exception as e:
-            return False, f"配置验证失败: {e}"
+            return False, Resources.extension_configInvalid(str(e))
         self.extension_config_manager.set(ext_id, config)
         self.extension_config_manager.save()
-        return True, f"扩展 {ext_id} 配置已保存"
+        return True, Resources.extension_configSaved(ext_id)
 
     def extension_run(self, ext_id: str, config_name: str | None = None) -> tuple[bool, str]:
         if not extension_registry.has_id(ext_id):
-            return False, f"扩展 '{ext_id}' 不存在，使用 'extension list' 查看可用扩展"
+            return False, Resources.extension_notFoundHint(ext_id)
         if config_name:
             self.extension_config_manager.load(config_name)
         if extension_registry.is_background(ext_id):
             ok = self.extension_runner.start_extension(ext_id)
-            return ok, (f"已启动后台扩展 '{ext_id}'" if ok else f"无法启动后台扩展 '{ext_id}'")
+            return ok, (Resources.extension_backgroundStarted(ext_id) if ok
+                        else Resources.extension_backgroundStartFailed(ext_id))
         ok = self.extension_runner.run_in_thread(ext_id)
-        return ok, (f"已启动扩展 '{ext_id}'" if ok else f"无法启动扩展 '{ext_id}'")
+        return ok, (Resources.extension_started(ext_id) if ok else Resources.extension_startFailed(ext_id))
 
     def extension_stop(self, ext_id: str) -> tuple[bool, str]:
         if not extension_registry.has_id(ext_id):
-            return False, f"扩展 '{ext_id}' 不存在"
+            return False, Resources.extension_notFound(ext_id)
         if extension_registry.is_background(ext_id):
             stopped = self.extension_runner.stop_extension(ext_id)
-            return True, (f"已停止后台扩展 '{ext_id}'" if stopped else f"后台扩展 '{ext_id}' 未运行")
+            return True, (Resources.extension_backgroundStopped(ext_id) if stopped
+                          else Resources.extension_backgroundNotRunning(ext_id))
         info = self.extension_runner.info
         if not self.extension_runner.is_thread_running():
-            return False, f"扩展 '{ext_id}' 未在运行"
+            return False, Resources.extension_notRunning(ext_id)
         if info.unit and info.unit != ext_id:
-            return False, f"当前正在运行的扩展是 '{info.unit}'，不是 '{ext_id}'"
+            return False, Resources.extension_otherRunning(info.unit, ext_id)
         self.extension_runner.stop_thread()
-        return True, f"已停止扩展 '{ext_id}'"
+        return True, Resources.extension_stopped(ext_id)
 
     def extension_reload(self) -> tuple[bool, str]:
         if self.extension_runner.is_thread_running():
-            return False, "扩展线程正在运行中，无法执行重载操作"
+            return False, Resources.extension_reloadBusy
         active_background = [
             ext_id for ext_id in self.extension_runner.extensions
             if extension_registry.is_background(ext_id)
@@ -263,16 +263,16 @@ class AppContext:
                 restarted.append(ext_id)
 
         if not after:
-            return False, "重载完成，但没有已注册的扩展"
+            return False, Resources.extension_reloadEmpty
         added = sorted(after - before)
         removed = sorted(before - after)
-        message = f"已重载扩展，当前共 {len(after)} 个（更新 {len(sorted(before & after))} 个）"
+        message = Resources.extension_reloaded(len(after), len(sorted(before & after)))
         if added:
-            message += f"，新增: {', '.join(added)}"
+            message += Resources.extension_reloadAdded(', '.join(added))
         if removed:
-            message += f"，移除: {', '.join(removed)}"
+            message += Resources.extension_reloadRemoved(', '.join(removed))
         if restarted:
-            message += f"，已重启后台扩展: {', '.join(restarted)}"
+            message += Resources.extension_reloadRestarted(', '.join(restarted))
         return True, message
 
     # ── Operator ──
@@ -323,11 +323,11 @@ class AppContext:
         try:
             operator = self.create_operator()
         except Exception as e:
-            return False, f"Operator 初始化失败: {e}", None
+            return False, Resources.operator_initFailed(str(e)), None
 
         fn = getattr(operator, method, None)
         if fn is None or not callable(fn):
-            return False, f"方法 '{method}' 不存在。可用方法: {', '.join(self.operator_list())}", None
+            return False, Resources.operator_methodNotFound(method, ', '.join(self.operator_list())), None
 
         if not isinstance(params, dict):
             params = {}
@@ -337,15 +337,15 @@ class AppContext:
             bound.apply_defaults()
             result = fn(*bound.args, **bound.kwargs)
         except FileNotFoundError as e:
-            return False, f"文件未找到: {e}", None
+            return False, Resources.operator_fileNotFound(str(e)), None
         except KeyError as e:
-            return False, f"缺少必需参数: {e}", None
+            return False, Resources.operator_missingParam(str(e)), None
         except TypeError as e:
-            return False, f"参数类型错误: {e}", None
+            return False, Resources.operator_typeError(str(e)), None
         except Exception as e:
-            return False, f"执行失败: {e}", None
+            return False, Resources.operator_executionFailed(str(e)), None
 
-        return True, f"{method} 执行成功", self._serialize_operator_result(result, params)
+        return True, Resources.operator_callSucceeded(method), self._serialize_operator_result(result, params)
 
     @staticmethod
     def _serialize_operator_result(result: Any, params: dict[str, Any]) -> Any:

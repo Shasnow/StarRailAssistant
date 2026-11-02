@@ -1,6 +1,6 @@
 """游戏自动演奏扩展。
 
-读取 SRA 乐谱（JSON 格式，规范见 ``extensions/scores/README.md``），
+读取 SRA 乐谱（JSON 格式，规范见 ``extensions/auto_player/scores/README.md``），
 将音符序列按节拍转换为游戏键盘按键（高八度 QWERTYU / 基本音 ASDFGHJ /
 低八度 ZXCVBNM），并以绝对时间锚点调度保证音符间隔误差不超过 50ms。
 
@@ -89,7 +89,7 @@ class NoteEvent:
 def resolve_score_path(score: str) -> Path:
     """将乐谱名称或路径解析为实际 JSON 文件路径。
 
-    支持绝对/相对路径或乐谱名（自动在 ``extensions/scores/`` 下查找，
+    支持绝对/相对路径或乐谱名（自动在 ``extensions/auto_player/scores/`` 下查找，
     可省略 ``.json`` 后缀）。
     """
     raw = Path(score.strip())
@@ -100,7 +100,7 @@ def resolve_score_path(score: str) -> Path:
             return path
     available = sorted(p.stem for p in SCORE_DIR.glob("*.json"))
     raise ScoreError(
-        f"找不到乐谱 {score!r}；extensions/scores/ 下可用乐谱：{', '.join(available) or '（无）'}"
+        f"找不到乐谱 {score!r}；extensions/auto_player/scores/ 下可用乐谱：{', '.join(available) or '（无）'}"
     )
 
 
@@ -213,14 +213,14 @@ def build_timeline(score: Score, *, beat_sec: float) -> list[NoteEvent]:
 
 class AutoPlayerConfig(BaseModel):
     """自动演奏扩展配置。"""
-    score: str = Field(default="远航星的告别", description="乐谱名称或 JSON 文件路径")
-    speed: float = Field(default=1.0, ge=0.25, le=4.0, description="演奏速度倍率（1.0 = 乐谱原速）")
-    loop: int = Field(default=1, ge=1, le=99, description="演奏遍数")
-    start_delay: float = Field(default=2.0, ge=0.0, le=30.0, description="首次开始前的延迟（秒），用于切换到游戏窗口")
-    dry_run: bool = Field(default=False, description="演练模式：不实际按键，仅校验乐谱与时序")
-    enable_hotkeys: bool = Field(default=True, description="启用演奏热键（暂停/重置）")
-    hotkey_pause: str = Field(default="f8", description="暂停/继续热键")
-    hotkey_reset: str = Field(default="f10", description="重置热键")
+    score: str = Field(default="远航星的告别", description='乐谱名称或 JSON 文件路径')
+    speed: float = Field(default=1.0, ge=0.25, le=4.0, description='演奏速度倍率（1.0 = 乐谱原速）')
+    loop: int = Field(default=1, ge=1, le=99, description='演奏遍数')
+    start_delay: float = Field(default=2.0, ge=0.0, le=30.0, description='首次开始前的延迟（秒），用于切换到游戏窗口')
+    dry_run: bool = Field(default=False, description='演练模式：不实际按键，仅校验乐谱与时序')
+    enable_hotkeys: bool = Field(default=True, description='启用演奏热键（暂停/重置）')
+    hotkey_pause: str = Field(default="f8", description='暂停/继续热键')
+    hotkey_reset: str = Field(default="f10", description='重置热键')
 
 
 # ── 演奏引擎 ──

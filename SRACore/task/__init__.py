@@ -8,7 +8,7 @@ from typing import TypeVar, overload
 from PIL.Image import Image
 from loguru import logger
 
-from SRACore.localization import Resource
+from SRACore.localization import Resources
 from SRACore.models.tasks_config import TasksConfig
 from SRACore.notification import try_send_notification
 from SRACore.operators.ioperator import IOperator
@@ -41,7 +41,7 @@ class BaseTask(Executable, ABC):
     def send_notification(self, message: str, result: str, image: Image | None = None) -> None:
         try_send_notification(
             self.settings.Notification,
-            Resource.task_notificationTitle,
+            Resources.task_notificationTitle,
             message,
             result=result,
             image=image
@@ -50,12 +50,12 @@ class BaseTask(Executable, ABC):
     def on_start(self) -> None:
         on_start = self.settings.Notification.onStart
         if self.__class__.__name__ in on_start:
-            self.send_notification(f"任务 {self.__class__.__name__} 开始执行。", "success")
+            self.send_notification(Resources.notification_taskStarted(self.__class__.__name__), "success")
 
     def on_completed(self) -> None:
         on_complete = self.settings.Notification.onCompleted
         if self.__class__.__name__ in on_complete:
-            self.send_notification(f"任务 {self.__class__.__name__} 执行完成。", "success")
+            self.send_notification(Resources.notification_taskCompleted(self.__class__.__name__), "success")
 
     def on_failed(self) -> None:
         if self.operator.window_context.width != 1920 or self.operator.window_context.height != 1080:
@@ -71,7 +71,7 @@ class BaseTask(Executable, ABC):
             image.save(LogsScreenshotDir / f"{self.__class__.__name__}_lastfailed.png")
         except Exception:
             pass
-        self.send_notification(f"任务 {self.__class__.__name__} 执行失败。", "error", image=image)
+        self.send_notification(Resources.notification_taskFailed(self.__class__.__name__), "error", image=image)
 
     def __str__(self):
         return f"{self.__class__.__name__}"

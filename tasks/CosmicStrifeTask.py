@@ -1,3 +1,4 @@
+from SRACore.localization import Resources
 from SRACore.task import BaseTask, task
 from SRACore.util.errors import ErrorCode, SRAError
 from SRACore.util.logger import logger
@@ -88,7 +89,7 @@ class CosmicStrifeTask(BaseTask):
             self.operator.click_point(0.235, 0.81, after_sleep=1)  # 打开积分奖励面板
             self.operator.wait_img(DUIMG.BONUS_POINTS, timeout=5)
             self.send_notification(
-                f"任务 {self.__class__.__name__} 执行完成。",
+                Resources.notification_taskCompleted(self.__class__.__name__),
                 "success",
                 self.operator.screenshot())
             self.operator.press_key('esc', presses=2, interval=1)

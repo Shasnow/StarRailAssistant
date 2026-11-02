@@ -1,3 +1,3 @@
-from SRACore.localization.resource import Resource
+from SRACore.localization.resources import Resources
 
-__all__ = ['Resource']
+__all__ = ['Resources']

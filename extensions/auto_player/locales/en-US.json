@@ -1,0 +1,12 @@
+{
+  "description": "Auto-play the game keyboard from a JSON score (pause F8 / reset F10 / stop F9)",
+  "dry_run.description": "Rehearsal mode: validate score and timing without pressing keys",
+  "enable_hotkeys.description": "Enable performance hotkeys (pause/reset)",
+  "hotkey_pause.description": "Pause/resume hotkey",
+  "hotkey_reset.description": "Reset hotkey",
+  "loop.description": "Playback repeats",
+  "name": "Auto performance",
+  "score.description": "Score name or JSON file path",
+  "speed.description": "Playback speed multiplier (1.0 = original tempo)",
+  "start_delay.description": "Delay before the first start (seconds) to switch to the game window"
+}

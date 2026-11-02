@@ -5,9 +5,44 @@ import tomllib
 from pathlib import Path
 
 import cmd2
+from loguru import logger
 
 from SRACore.cli2 import SRACli
+from SRACore.localization import Resources
 from SRACore.util.const import AppRootDir
+
+# 界面语言 → 关卡名称译文文件后缀
+_LEVEL_LANG_FILES = {"en-us": "en-US", "ru-ru": "ru-RU"}
+
+
+def localize_subtasks(subtasks: dict) -> dict:
+    """按界面语言把副本名、关卡名与产出替换为单语；中文直接沿用 TOML。
+
+    译文按副本 id + 关卡 id 命中，缺失时回退中文，识别与匹配仍使用 TOML 原文。
+    """
+    tag = _LEVEL_LANG_FILES.get(str(getattr(Resources, "lang", "zh-cn")).lower())
+    if tag is None:
+        return subtasks
+    path = AppRootDir / "tasks" / "config" / f"trailblaze_power.{tag}.json"
+    try:
+        tables = json.loads(path.read_text(encoding="utf-8")).get("subtasks", {})
+    except (OSError, json.JSONDecodeError) as exc:
+        logger.warning(f"关卡名称译文不可用，回退中文 {path}: {exc}")
+        return subtasks
+    localized: dict = {}
+    for tid, subtask in subtasks.items():
+        entry = tables.get(tid, {})
+        level_table = entry.get("levels", {})
+        levels = []
+        for level in subtask.get("levels", []):
+            text = level_table.get(str(level.get("id")), {})
+            levels.append({
+                **level,
+                "name": text.get("name") or level.get("name", ""),
+                "result": text.get("result") or level.get("result", ""),
+            })
+        localized[tid] = {**subtask, "name": entry.get("name") or subtask.get("name", ""), "levels": levels}
+    return localized
 
 
 class TrailblazePowerCommands(cmd2.CommandSet[SRACli]):
@@ -36,6 +71,7 @@ class TrailblazePowerCommands(cmd2.CommandSet[SRACli]):
                 self._cmd.err(f"未找到子任务: {args.subtask}")
                 return
             subtasks = {args.subtask: subtasks[args.subtask]}
+        subtasks = localize_subtasks(subtasks)
 
         def format_subtasks(data: dict) -> str:
             lines = []

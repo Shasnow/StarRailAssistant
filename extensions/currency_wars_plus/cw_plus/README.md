@@ -11,12 +11,12 @@
 | 界面设置 | 含义 |
 | --- | --- |
 | 开拓者名称 | 填游戏内名称，不能为空；攻略角色仍统一写“开拓者” |
-| 攻略 | 从列表选择攻略；新增 JSON 后点击“扫描攻略文件夹”，也可填写完整文件路径 |
+| 攻略 | 从列表选择攻略；新增 JSON 后点击配置对话框的“刷新”，也可填写完整文件路径 |
 | 运行次数 | 1–99999，默认 1 |
 | 难度 | 最低难度、最高难度或保持当前难度 |
 | 超频博弈 | 开启运行超频博弈，关闭运行常规博弈 |
 
-攻略存放于 `extensions/cw_plus/strategies/`。选择值对应文件名，列表展示攻略标题。配置细节见 [CONFIGURATION.md](CONFIGURATION.md)，完整填写参考见[中文注释模板](strategies/货币战争增强版_标准配置填写规范.annotated.jsonc)。模板使用 JSONC，正式攻略必须保存为不含注释的 UTF-8 JSON。
+攻略存放于 `extensions/currency_wars_plus/cw_plus/strategies/`。选择值对应文件名，列表展示攻略标题。配置细节见 [CONFIGURATION.md](CONFIGURATION.md)，完整填写参考见[中文注释模板](strategies/货币战争增强版_标准配置填写规范.annotated.jsonc)。模板使用 JSONC，正式攻略必须保存为不含注释的 UTF-8 JSON。
 
 使用官方整包更新会替换桌面程序和文件清单；更新后需重新部署配套扩展版本，再执行资源清理，以免新增扩展文件被列为冗余。
 

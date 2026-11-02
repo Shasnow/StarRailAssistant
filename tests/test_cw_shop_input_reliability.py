@@ -6,8 +6,8 @@ from types import SimpleNamespace
 import pytest
 
 from SRACore.util.errors import ThreadStoppedError
-from extensions.cw_plus.logic import SlotObservation, SlotState
-from extensions.cw_plus.unicode_templates import load_template
+from extensions.currency_wars_plus.cw_plus.logic import SlotObservation, SlotState
+from extensions.currency_wars_plus.cw_plus.unicode_templates import load_template
 from tests.cw_reliability_replay import ReplayClock, ReplayOperator, engine, paint_slots
 
 pytestmark = pytest.mark.skipif(sys.platform != "win32", reason="Win32 input boundary")

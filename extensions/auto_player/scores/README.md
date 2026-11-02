@@ -1,7 +1,7 @@
 # SRA 乐谱格式规范（sra-score v1）
 
-SRA 自动演奏扩展（`extensions/auto_player.py`）使用的 JSON 乐谱格式。
-乐谱文件可放在 `extensions/scores/` 目录下（推荐），或使用任意路径引用。
+SRA 自动演奏扩展（`extensions/auto_player/`）使用的 JSON 乐谱格式。
+乐谱文件可放在 `extensions/auto_player/scores/` 目录下（推荐），或使用任意路径引用。
 
 ## 1. 完整结构示例
 

@@ -12,14 +12,19 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 from mcp.types import ImageContent, TextContent
+from loguru import logger
 
 from SRACore.util.const import VERSION
 
 from SRAServer.schemas.envelope import R
 
-_NO_RESPONSE_MSG = "(No response from backend, is the backend running?)"
 _OCR_COORD_NOTE = "Coordinates are in 1080p game window pixels."
 _SCREENSHOT_NOTE = "You must convert coordinates from 720p to 1080p if you want to use them in other tools."
+
+
+def _operator_text(method: str, ok: bool) -> str:
+    """R 信封固定英文：操作器结果只给出英文状态，中文细节写日志。"""
+    return f"Method '{method}' called" if ok else f"Operator call '{method}' failed"
 
 
 def _dump(payload: Any) -> str:
@@ -44,7 +49,7 @@ def build_mcp_server(core) -> MCPServer:  # core: SRAServer.context.ServerContex
         if not data:
             return [TextContent(type="text", text="Failed to take screenshot from backend.")]
         return [
-            ImageContent(type="image", data=_b64(data), mimeType="image/jpeg"),
+            ImageContent(type="image", data=_b64(data), mime_type="image/jpeg"),
             TextContent(type="text", text=_SCREENSHOT_NOTE),
         ]
 
@@ -82,7 +87,7 @@ def build_mcp_server(core) -> MCPServer:  # core: SRAServer.context.ServerContex
             }
             for e in entries
         ]
-        return _dump(R(True, f"已注册 {len(items)} 个任务", items))
+        return _dump(R(True, f"Registered {len(items)} task(s)", items))
 
     @mcp.tool(name="sra_task_run", description="Run all selected tasks in given config(s)")
     async def run_tasks(configNames: str | None = None) -> str:
@@ -113,8 +118,10 @@ def build_mcp_server(core) -> MCPServer:  # core: SRAServer.context.ServerContex
     # ── Operator ──
 
     async def _operator_call(method: str, params: dict[str, Any]) -> str:
-        _ok, message, data = await asyncio.to_thread(core.operator_call, method, params)
-        return _dump(R(_ok, message, data))
+        ok, message, data = await asyncio.to_thread(core.operator_call, method, params)
+        if not ok:
+            logger.warning(f"MCP operator call '{method}' failed: {message}")
+        return _dump(R(ok, _operator_text(method, ok), data))
 
     @mcp.tool(name="sra_ocr", description="Perform OCR on the game window, returns all recognized texts")
     async def perform_ocr(
@@ -140,8 +147,10 @@ def build_mcp_server(core) -> MCPServer:  # core: SRAServer.context.ServerContex
     async def click_point(mode: str, x: float, y: float) -> str:
         if mode not in ("abs", "rel"):
             return f'Invalid mode \'{mode}\', expected "abs" or "rel".'
-        _ok, message, _data = await asyncio.to_thread(core.operator_call, "click_point", {"mode": mode, "x": x, "y": y})
-        return message or _NO_RESPONSE_MSG
+        ok, message, _data = await asyncio.to_thread(core.operator_call, "click_point", {"mode": mode, "x": x, "y": y})
+        if not ok:
+            logger.warning(f"MCP operator call 'click_point' failed: {message}")
+        return _operator_text("click_point", ok)
 
     @mcp.tool(name="sra_operator_list", description="List all available operator methods")
     async def list_operator_methods() -> str:
@@ -153,7 +162,7 @@ def build_mcp_server(core) -> MCPServer:  # core: SRAServer.context.ServerContex
             return f"Invalid method name '{method}'."
         data = core.operator_help(method)
         if data is None:
-            return _dump(R(False, f"方法 '{method}' 不存在"))
+            return _dump(R(False, f"Method '{method}' not found"))
         return _dump(R(True, method, data))
 
     @mcp.tool(
@@ -179,20 +188,26 @@ def build_mcp_server(core) -> MCPServer:  # core: SRAServer.context.ServerContex
 
     @mcp.tool(name="sra_scroll", description="Scroll the mouse wheel")
     async def scroll(clicks: int, x: int | None = None, y: int | None = None) -> str:
-        _ok, message, _data = await asyncio.to_thread(core.operator_call, "scroll", {"clicks": clicks, "x": x, "y": y})
-        return message or _NO_RESPONSE_MSG
+        ok, message, _data = await asyncio.to_thread(core.operator_call, "scroll", {"clicks": clicks, "x": x, "y": y})
+        if not ok:
+            logger.warning(f"MCP operator call 'scroll' failed: {message}")
+        return _operator_text("scroll", ok)
 
     @mcp.tool(name="sra_press_key", description="Press a key on the keyboard")
     async def press_key(key: str) -> str:
-        _ok, message, _data = await asyncio.to_thread(core.operator_call, "press_key", {"key": key})
-        return message or _NO_RESPONSE_MSG
+        ok, message, _data = await asyncio.to_thread(core.operator_call, "press_key", {"key": key})
+        if not ok:
+            logger.warning(f"MCP operator call 'press_key' failed: {message}")
+        return _operator_text("press_key", ok)
 
     @mcp.tool(name="sra_hold_key", description="Hold a key on the keyboard")
     async def hold_key(key: str, duration: float = 1.0) -> str:
-        _ok, message, _data = await asyncio.to_thread(
+        ok, message, _data = await asyncio.to_thread(
             core.operator_call, "hold_key", {"key": key, "duration": duration}
         )
-        return message or _NO_RESPONSE_MSG
+        if not ok:
+            logger.warning(f"MCP operator call 'hold_key' failed: {message}")
+        return _operator_text("hold_key", ok)
 
     @mcp.tool(name="sra_sleep", description="Pause the execution for a specified number of seconds")
     async def sleep(seconds: int) -> str:

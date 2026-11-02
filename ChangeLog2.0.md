@@ -53,7 +53,7 @@ SRA 现在支持 Docker 部署，详见 [Docker 部署说明](https://starrailas
 - 提供动作结果核实、动态后台与锁定支援识别、会话恢复、两份正式攻略和中文配置说明。
 - 配置表单支持枚举标签、真实数值、选项扫描与自定义路径。
 - plusv1 补齐后台身份、事件观测、采购确认、出战门槛、事件交接、费用补读、结算血量与同线程任务重建。
-- 完整的重大／一般／bug修复清单、测试结果和已知限制见[扩展 README](extensions/cw_plus/README.md)。
+- 完整的重大／一般／bug修复清单、测试结果和已知限制见[扩展 README](extensions/currency_wars_plus/cw_plus/README.md)。
 - 开发者：**YukkiSSYB**。
 
 #### 发布包结构

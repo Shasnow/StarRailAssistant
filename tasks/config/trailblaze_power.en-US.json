@@ -1,0 +1,450 @@
+{
+  "subtasks": {
+    "ornament_extraction": {
+      "name": "Ornament Extraction",
+      "levels": {
+        "14": {
+          "name": "Swarm Onslaught",
+          "result": "Fallen Star Anchorage / Cosmic Life Sciences Institute"
+        },
+        "1": {
+          "name": "Gilded Recollection",
+          "result": "Punklorde Level Zero / City of Myriad Stars"
+        },
+        "2": {
+          "name": "Amidst the Westward Winds",
+          "result": "Amphoreus, the Eternal Land / Paradise@Livestream"
+        },
+        "3": {
+          "name": "Crimson Beneath the Moon",
+          "result": "Paradise Where Fae Weave Dreams / Seaside Where Revels Drown"
+        },
+        "4": {
+          "name": "Endless Strife",
+          "result": "Tranquil Bone-Gathering Ground / Tree of Deep Contemplation"
+        },
+        "5": {
+          "name": "Starving Vermin",
+          "result": "Lushaka, the Sunken Seas / The Wondrous BananAmusement Park"
+        },
+        "6": {
+          "name": "Eternal Comedy",
+          "result": "Duran, Dynasty of Running Wolves / Forge of the Kalpagni Lantern"
+        },
+        "7": {
+          "name": "Sleep With You",
+          "result": "Sigonia, the Unclaimed Desolation / Izumo Gensei and Takama Divine Realm"
+        },
+        "8": {
+          "name": "Rain of Heavenly Swords",
+          "result": "Firmament Frontline: Glamoth / Penacony, Land of the Dreams"
+        },
+        "9": {
+          "name": "Fruit of Evil",
+          "result": "Rutilant Arena / Broken Keel"
+        },
+        "10": {
+          "name": "Centennial Permafrost",
+          "result": "Belobog of the Architects / Inert Salsotto"
+        },
+        "11": {
+          "name": "Gentle Words",
+          "result": "Pan-Cosmic Commercial Enterprise / Celestial Differentiator"
+        },
+        "12": {
+          "name": "Steel Heart in Fire",
+          "result": "Talia: Kingdom of Banditry / Sprightly Vonwacq"
+        },
+        "13": {
+          "name": "Untoppled Walls",
+          "result": "Space Sealing Station / Fleet of the Ageless"
+        }
+      }
+    },
+    "calyx_golden": {
+      "name": "Calyx (Golden)",
+      "levels": {
+        "1": {
+          "name": "Bud of Memories (Planarcadia)",
+          "result": "Traveler's Guide"
+        },
+        "2": {
+          "name": "Bud of Aether (Planarcadia)",
+          "result": "Refined Aether"
+        },
+        "3": {
+          "name": "Bud of Treasures (Planarcadia)",
+          "result": "Credit"
+        },
+        "4": {
+          "name": "Bud of Memories (Amphoreus)",
+          "result": "Traveler's Guide"
+        },
+        "5": {
+          "name": "Bud of Aether (Amphoreus)",
+          "result": "Refined Aether"
+        },
+        "6": {
+          "name": "Bud of Treasures (Amphoreus)",
+          "result": "Credit"
+        },
+        "7": {
+          "name": "Bud of Memories (Penacony)",
+          "result": "Traveler's Guide"
+        },
+        "8": {
+          "name": "Bud of Aether (Penacony)",
+          "result": "Refined Aether"
+        },
+        "9": {
+          "name": "Bud of Treasures (Penacony)",
+          "result": "Credit"
+        },
+        "10": {
+          "name": "Bud of Memories (The Xianzhou Luofu)",
+          "result": "Traveler's Guide"
+        },
+        "11": {
+          "name": "Bud of Aether (The Xianzhou Luofu)",
+          "result": "Refined Aether"
+        },
+        "12": {
+          "name": "Bud of Treasures (The Xianzhou Luofu)",
+          "result": "Credit"
+        },
+        "13": {
+          "name": "Bud of Memories (Jarilo-VI)",
+          "result": "Traveler's Guide"
+        },
+        "14": {
+          "name": "Bud of Aether (Jarilo-VI)",
+          "result": "Refined Aether"
+        },
+        "15": {
+          "name": "Bud of Treasures (Jarilo-VI)",
+          "result": "Credit"
+        }
+      }
+    },
+    "calyx_crimson": {
+      "name": "Calyx (Crimson)",
+      "levels": {
+        "1": {
+          "name": "Myriad Hues, the Fool's Gambit (Destruction)",
+          "result": "Myriad Hues, the Fool's Gambit"
+        },
+        "2": {
+          "name": "Moon-Mad Fangs (Destruction)",
+          "result": "Moon-Mad Fangs"
+        },
+        "3": {
+          "name": "Shattered Blade (Destruction)",
+          "result": "Shattered Blade"
+        },
+        "4": {
+          "name": "Divine Body Amber (Preservation)",
+          "result": "Divine Body Amber"
+        },
+        "5": {
+          "name": "Amber's Endurance (Preservation)",
+          "result": "Amber's Endurance"
+        },
+        "6": {
+          "name": "Blood Spear of Retribution (The Hunt)",
+          "result": "Blood Spear of Retribution"
+        },
+        "7": {
+          "name": "Strike Against Time (The Hunt)",
+          "result": "Strike Against Time"
+        },
+        "8": {
+          "name": "Star-Chasing Arrow (The Hunt)",
+          "result": "Star-Chasing Arrow"
+        },
+        "9": {
+          "name": "Myriad Fruit (Abundance)",
+          "result": "Myriad Fruit"
+        },
+        "10": {
+          "name": "Eternal Flower (Abundance)",
+          "result": "Eternal Flower"
+        },
+        "11": {
+          "name": "Galactic Sandbox (Erudition)",
+          "result": "Galactic Sandbox"
+        },
+        "12": {
+          "name": "Fine Color Draft (Erudition)",
+          "result": "Fine Color Draft"
+        },
+        "13": {
+          "name": "Key of Erudition (Erudition)",
+          "result": "Key of Erudition"
+        },
+        "14": {
+          "name": "Otherworldly Movement (Harmony)",
+          "result": "Otherworldly Movement"
+        },
+        "15": {
+          "name": "Symphony of Stars (Harmony)",
+          "result": "Symphony of Stars"
+        },
+        "16": {
+          "name": "Heart of Phagousa (Nihility)",
+          "result": "Heart of Phagousa"
+        },
+        "17": {
+          "name": "Fiend That Burns the Sky (Nihility)",
+          "result": "Fiend That Burns the Sky"
+        },
+        "18": {
+          "name": "Obsidian of Dread (Nihility)",
+          "result": "Obsidian of Dread"
+        },
+        "19": {
+          "name": "Alaya Splendor (Remembrance)",
+          "result": "Alaya Splendor"
+        },
+        "20": {
+          "name": "The Fluffy: Collector's Edition (Elation)",
+          "result": "The Fluffy: Collector's Edition"
+        }
+      }
+    },
+    "stagnant_shadow": {
+      "name": "Stagnant Shadow",
+      "levels": {
+        "1": {
+          "name": "Shape of Deepsheaf",
+          "result": "Invasive Clot"
+        },
+        "2": {
+          "name": "Shape of Duty",
+          "result": "IPC Work Permit"
+        },
+        "3": {
+          "name": "Shape of Perdition",
+          "result": "Netherworld Token"
+        },
+        "4": {
+          "name": "Shape of Spike",
+          "result": "Broken Teeth of Iron Wolf"
+        },
+        "5": {
+          "name": "Shape of Ashes",
+          "result": "Radiant Prominence"
+        },
+        "6": {
+          "name": "Shape of Ire",
+          "result": "Raging Heart"
+        },
+        "7": {
+          "name": "Shape of Scorch",
+          "result": "Searing Steel Blade"
+        },
+        "8": {
+          "name": "Shape of Blaze",
+          "result": "Endotherm Chitin"
+        },
+        "9": {
+          "name": "Shape of Sirens",
+          "result": "Sea Siren's Torn Fin"
+        },
+        "10": {
+          "name": "Shape of Nectar",
+          "result": "Dream Fridge"
+        },
+        "11": {
+          "name": "Shape of Icicle",
+          "result": "Gelid Chitin"
+        },
+        "12": {
+          "name": "Shape of Rime",
+          "result": "Horn of Snow"
+        },
+        "13": {
+          "name": "Shape of Soundburst",
+          "result": "Thunder Strum"
+        },
+        "14": {
+          "name": "Shape of Mechwolf",
+          "result": "Nail of the Beast Coffin"
+        },
+        "15": {
+          "name": "Shape of Doom",
+          "result": "Shape Shifter's Lightning Staff"
+        },
+        "16": {
+          "name": "Shape of Fulmination",
+          "result": "Lightning Crown of the Past Shadow"
+        },
+        "17": {
+          "name": "Shape of Cinders",
+          "result": "Charred Bud of Twilight"
+        },
+        "18": {
+          "name": "Shape of Gloam",
+          "result": "A Glass of the Besotted Era"
+        },
+        "19": {
+          "name": "Shape of Celestial",
+          "result": "Ascendant Debris"
+        },
+        "20": {
+          "name": "Shape of Gust",
+          "result": "Storm Eye"
+        },
+        "21": {
+          "name": "Shape of Devour",
+          "result": "Sneering Harlequin"
+        },
+        "22": {
+          "name": "Shape of Gelidmoon",
+          "result": "Darkveil Moonlight"
+        },
+        "23": {
+          "name": "Shape of Roast",
+          "result": "Dream Flamer"
+        },
+        "24": {
+          "name": "Shape of Abomination",
+          "result": "Nail of the Ape"
+        },
+        "25": {
+          "name": "Shape of Quanta",
+          "result": "Void Cast Iron"
+        },
+        "26": {
+          "name": "Shape of Sloggyre",
+          "result": "Harbinger of Strife"
+        },
+        "27": {
+          "name": "Shape of Timbre",
+          "result": "Chordal Mirage"
+        },
+        "28": {
+          "name": "Shape of Puppetry",
+          "result": "Suppressing Edict"
+        },
+        "29": {
+          "name": "Shape of Mirage",
+          "result": "Golden Crown of the Past Shadow"
+        }
+      }
+    },
+    "caver_of_corrosion": {
+      "name": "Cavern of Corrosion",
+      "levels": {
+        "17": {
+          "name": "Path of the Secret Actor",
+          "result": "Dreamlit Actor / Heretic Who Devours the Forbidden Fruit"
+        },
+        "1": {
+          "name": "Path of Insight",
+          "result": "As Navigator Isee Sees It / Master Artisan Who Queries Heaven"
+        },
+        "2": {
+          "name": "Path of Possession",
+          "result": "Ever-Glorious Magical Girl / Diviner of Distant Reach"
+        },
+        "3": {
+          "name": "Path of Hidden Salvation",
+          "result": "World-Remaking Deliverer / Hermit Hiding Among the Stars"
+        },
+        "4": {
+          "name": "Path of Thundersurge",
+          "result": "Warrior Goddess of Sun and Thunder / Captain Who Rides the Wicked Seas"
+        },
+        "5": {
+          "name": "Path of Aria",
+          "result": "Hero of Triumphant Song / Poet Whose Elegy Topples Nations"
+        },
+        "6": {
+          "name": "Path of Uncertainty",
+          "result": "Priest of the Painful Pilgrimage / Scholar Lost in Erudition"
+        },
+        "7": {
+          "name": "Path of Cavalier",
+          "result": "Iron Cavalry Against the Scourge / Valor That Rides the Winds"
+        },
+        "8": {
+          "name": "Path of Dreamdive",
+          "result": "Pioneer Diver of Dead Waters / Watchmaker, Master of Dream Machinations"
+        },
+        "9": {
+          "name": "Path of Darkness",
+          "result": "The Ashblazing Grand Duke / Prisoner in Deep Confinement"
+        },
+        "10": {
+          "name": "Path of Elixir Seekers",
+          "result": "Longevous Disciple / Messenger Traversing Hackerspace"
+        },
+        "11": {
+          "name": "Path of Conflagration",
+          "result": "Firesmith of Lava-Forging / Wastelander of Banditry Desert"
+        },
+        "12": {
+          "name": "Path of Holy Hymn",
+          "result": "Knight of Purity Palace / Band of Sizzling Thunder"
+        },
+        "13": {
+          "name": "Path of Providence",
+          "result": "Guard of Wuthering Snow / Genius of Brilliant Stars"
+        },
+        "14": {
+          "name": "Path of Drifting",
+          "result": "Passerby of Wandering Cloud / Musketeer of Wild Wheat"
+        },
+        "15": {
+          "name": "Path of Jabbing Punch",
+          "result": "Champion of Streetwise Boxing / Thief of Shooting Meteor"
+        },
+        "16": {
+          "name": "Path of Gelid Wind",
+          "result": "Hunter of Glacial Forest / Eagle of Twilight Line"
+        }
+      }
+    },
+    "echo_of_war": {
+      "name": "Echo of War",
+      "levels": {
+        "9": {
+          "name": "Comedy of Ruin",
+          "result": "Expectations of the False Awakened"
+        },
+        "1": {
+          "name": "Rusted Crypt of the Iron Carcass",
+          "result": "Silence of the Annihilating Torrent"
+        },
+        "2": {
+          "name": "Glance of Twilight",
+          "result": "Reverie of Solar Thunder"
+        },
+        "3": {
+          "name": "Inner Beast's Battlefield",
+          "result": "Precious Fragment"
+        },
+        "4": {
+          "name": "Salutations of Ashen Dreams",
+          "result": "Echo of Shared Wishes"
+        },
+        "5": {
+          "name": "Borehole Planet's Old Crater",
+          "result": "Old Evil That Bred Calamity in the Stars"
+        },
+        "6": {
+          "name": "Divine Seed",
+          "result": "Grudge of the Infinite False Body"
+        },
+        "7": {
+          "name": "End of the Eternal Freeze",
+          "result": "Guardian's Sorrowful Wish"
+        },
+        "8": {
+          "name": "Destruction's Beginning",
+          "result": "Destroyer's End"
+        }
+      }
+    }
+  }
+}

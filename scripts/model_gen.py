@@ -13,6 +13,7 @@
 import os
 import re
 import sys
+import json
 import argparse
 
 
@@ -50,6 +51,16 @@ PROPERTY_PATTERN = re.compile(
 
 JSON_NAME_PATTERN = re.compile(r'JsonPropertyName\("([^"]+)"\)')
 DESCRIPTION_PATTERN = re.compile(r'Description\("([^"]*)"\)')
+
+# 枚举声明与成员：成员标签取 [Description]，数值缺省时按 C# 规则递增
+ENUM_PATTERN = re.compile(r'public\s+enum\s+(\w+)\s*\{', re.MULTILINE)
+ENUM_MEMBER_PATTERN = re.compile(
+    r'(?P<attrs>(?:\[[^\]]*\]\s*)*)'
+    r'(?P<name>[A-Za-z_]\w*)'
+    r'(?:\s*=\s*(?P<value>-?\d+))?'
+    r'\s*,?',
+    re.DOTALL,
+)
 
 # 常量声明：如 `public static int StaticVersion => 4;`，用于解析默认值里引用的常量
 CONST_PATTERN = re.compile(r'(?:static|const)\s+[\w<>\[\]?.]+\s+(\w+)\s*(?:=>|=)\s*([^;]+);')
@@ -111,6 +122,35 @@ def parse_const_table(content: str) -> dict[str, str]:
     return {name: value.strip() for name, value in CONST_PATTERN.findall(content)}
 
 
+def parse_enums(content: str) -> dict[str, dict]:
+    """解析 C# 数值枚举声明，返回 ``{枚举名: {python_type, members}}``。
+
+    成员标签取 ``[Description]``，缺失时用成员名；未写数值时按 C# 规则顺序递增。
+    """
+    enums: dict[str, dict] = {}
+    for match in ENUM_PATTERN.finditer(content):
+        enum_name = match.group(1)
+        body = extract_class_content(content, match.end())
+        body = re.sub(r'//[^\n]*', '', body)
+        body = re.sub(r'/\*.*?\*/', '', body, flags=re.DOTALL)
+        members: list[dict] = []
+        next_value = 0
+        for member in ENUM_MEMBER_PATTERN.finditer(body):
+            raw_value = member.group('value')
+            if raw_value is not None:
+                next_value = int(raw_value)
+            label_match = DESCRIPTION_PATTERN.search(member.group('attrs') or '')
+            members.append({
+                'name': member.group('name'),
+                'value': next_value,
+                'label': label_match.group(1) if label_match else member.group('name'),
+            })
+            next_value += 1
+        if members:
+            enums[enum_name] = {'python_type': 'int', 'members': members}
+    return enums
+
+
 def parse_csharp_file(file_path: str) -> tuple[list[dict], dict[str, str]]:
     """解析C#文件，提取类信息与常量表"""
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -130,6 +170,15 @@ def parse_csharp_file(file_path: str) -> tuple[list[dict], dict[str, str]]:
             'name': class_name,
             'properties': parse_properties(class_content),
         })
+
+    enums = parse_enums(content)
+    for class_info in classes:
+        for prop in class_info['properties']:
+            enum = enums.get(prop['csharp_type'])
+            if enum:
+                prop['python_type'] = enum['python_type']
+                prop['enum_values'] = [member['value'] for member in enum['members']]
+                prop['enum_labels'] = [member['label'] for member in enum['members']]
 
     return classes, const_table
 
@@ -245,6 +294,10 @@ def generate_python_class(
         params = [default, f'alias="{prop["json_name"]}"']
         if prop['description']:
             params.append(f'description={prop["description"]!r}')
+        enum_values = prop.get('enum_values')
+        if enum_values is not None:
+            extra = {'enum': enum_values, 'x-enum-labels': {'zh-CN': prop['enum_labels']}}
+            params.append(f'json_schema_extra={extra!r}')
         lines.append(f'    {prop["name"]}: {prop["python_type"]} = Field({", ".join(params)})')
 
     lines.extend([
@@ -347,19 +400,82 @@ def build_class_descriptions(classes: list[dict]) -> dict[str, str]:
     return descriptions
 
 
+def build_terms(classes: list[dict]) -> tuple[dict[str, dict[str, str]], list[str]]:
+    """按「类名 → {JsonPropertyName: 中文说明}」汇总术语。
+
+    键使用类名作作用域：C# 模型中存在重名别名（如 ``enabled`` / ``name``），
+    裸别名会互相覆盖，因此必须带模型前缀。
+
+    Returns:
+        (术语字典, 缺少 ``[Description]`` 的 ``类名.别名`` 列表)
+    """
+    terms: dict[str, dict[str, str]] = {}
+    missing: list[str] = []
+    for class_info in classes:
+        entries: dict[str, str] = {}
+        for prop in class_info['properties']:
+            if prop['description']:
+                entries[prop['json_name']] = prop['description']
+            else:
+                missing.append(f'{class_info["name"]}.{prop["json_name"]}')
+        if entries:
+            terms[class_info['name']] = entries
+    return terms, missing
+
+
+def write_terms(path: str, terms: dict[str, dict[str, str]]) -> None:
+    """整体覆盖写入中文术语表。
+
+    由一次调用汇总全部 C# 模型后生成，因此不会残留已删除的类；
+    不再读取旧文件做增量合并。
+    """
+    ordered = {name: terms[name] for name in sorted(terms)}
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(ordered, f, ensure_ascii=False, indent=2)
+        f.write('\n')
+
+
 def main():
     """主函数"""
     parser = argparse.ArgumentParser(description='根据C#类自动生成对应的Python类')
-    parser.add_argument('input', help='C#文件路径')
-    parser.add_argument('-o', '--output', help='输出Python文件路径')
+    parser.add_argument('input', nargs='+', help='C#文件路径；多个时仅用于整体生成术语表')
+    parser.add_argument('-o', '--output', help='输出Python文件路径（仅支持单个输入）')
+    parser.add_argument('--terms', help='中文术语表输出路径（多个输入汇总后整体覆盖写入）')
 
     args = parser.parse_args()
 
-    if not os.path.exists(args.input):
-        print(f'[ERROR] 文件不存在: {args.input}')
+    for path in args.input:
+        if not os.path.exists(path):
+            print(f'[ERROR] 文件不存在: {path}')
+            sys.exit(1)
+
+    if args.output and len(args.input) > 1:
+        print('[ERROR] -o/--output 仅支持单个输入文件')
+        sys.exit(1)
+    if args.output and args.terms:
+        # 术语表是整体覆盖写入；与单文件 Python 输出混用会用局部数据冲掉其他模型
+        print('[ERROR] 生成术语表请单独执行并一次传入全部模型文件，不要与 -o 同时使用')
+        sys.exit(1)
+    if len(args.input) > 1 and not args.terms:
+        print('[ERROR] 多个输入文件仅用于 --terms 术语表生成')
         sys.exit(1)
 
-    classes, const_table = parse_csharp_file(args.input)
+    if args.terms:
+        all_classes: list[dict] = []
+        for path in args.input:
+            classes, _ = parse_csharp_file(path)
+            all_classes.extend(classes)
+        terms, missing = build_terms(all_classes)
+        write_terms(args.terms, terms)
+        total = sum(len(entries) for entries in terms.values())
+        print(f'[OK] 中文术语已覆盖写入: {args.terms}（{len(terms)} 个类，{total} 条）')
+        if missing:
+            print(f'[WARN] {len(missing)} 个字段缺少 [Description]，未写入术语表:')
+            for item in missing:
+                print(f'  - {item}')
+        return
+
+    classes, const_table = parse_csharp_file(args.input[0])
     class_names = [class_info['name'] for class_info in classes]
     needs_any = any(
         'Any' in prop['python_type']
@@ -367,7 +483,7 @@ def main():
         for prop in class_info['properties']
     )
 
-    output_lines = generate_header(args.input, needs_any)
+    output_lines = generate_header(args.input[0], needs_any)
     ordered = sort_classes_by_dependency(classes, class_names)
     class_descriptions = build_class_descriptions(classes)
 

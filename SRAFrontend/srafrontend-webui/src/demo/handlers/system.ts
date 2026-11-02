@@ -45,7 +45,7 @@ export function handleSystemInfo(_ctx: RouteContext): RouteResult {
 }
 
 export function handlePhrases(_ctx: RouteContext): RouteResult {
-  return { envelope: { success: true, message: '', data: [...PHRASES] } }
+  return { envelope: { success: true, message: '', data: { 'zh-CN': [...PHRASES] } } }
 }
 
 export function handleBackendRestart(_ctx: RouteContext): RouteResult {

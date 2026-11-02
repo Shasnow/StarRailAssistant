@@ -9,7 +9,7 @@ import pytest
 
 from SRACore.operators.model import Box
 from SRACore.util.errors import ThreadStoppedError
-from extensions.cw_plus.unicode_templates import load_template
+from extensions.currency_wars_plus.cw_plus.unicode_templates import load_template
 from tests.cw_reliability_replay import ReplayClock, engine
 
 CODE = "TEST_ONLY_NOT_A_SHARE_CODE_0123456789"

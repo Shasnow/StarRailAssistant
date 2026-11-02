@@ -24,7 +24,7 @@ from SRACore.notification.dispatcher import NotificationDispatcher
 from SRACore.notification.http_client import HttpClient
 from SRACore.notification.models import NotificationContext, format_notification_message
 from SRACore.util.logger import logger
-from SRACore.localization.presentation import translate
+from SRACore.localization import Resources
 
 _cached_game_screenshot_bytes: bytes | None = None
 _notification_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="notify_batch")
@@ -33,23 +33,33 @@ _http_client = HttpClient(timeout=10, retries=1)
 
 
 _CHANNEL_LABELS: dict[str, str] = {
-    "email": "邮件",
     "webhook": "Webhook",
     "telegram": "Telegram",
     "serverchan": "ServerChan",
     "onebot": "OneBot",
     "bark": "Bark",
-    "feishu": "飞书",
-    "wecom": "企业微信",
-    "dingtalk": "钉钉",
     "discord": "Discord",
     "xxtui": "xxtui",
-    "system": "System",
+}
+
+_CHANNEL_LABEL_KEYS: dict[str, str] = {
+    "email": "notification.channelEmail",
+    "feishu": "notification.channelFeishu",
+    "wecom": "notification.channelWeCom",
+    "dingtalk": "notification.channelDingTalk",
+    "system": "notification.channelSystem",
 }
 
 
+def _channel_label(channel: str) -> str:
+    """渠道显示名：品牌名保持原样，其余跟随界面语言。"""
+    resource_key = _CHANNEL_LABEL_KEYS.get(channel)
+    if resource_key:
+        return Resources.get_translation(resource_key)
+    return _CHANNEL_LABELS.get(channel, "")
+
+
 def build_notification_payload(title: str, message: str, result: str = "success") -> dict[str, str]:
-    title, message = translate(title), translate(message)
     return {
         "title": title,
         "message": message,
@@ -81,8 +91,6 @@ def try_send_notification(settings: NotificationSettings,
     if not settings.isEnabled:
         return
 
-    title, message = translate(title), translate(message)
-
     screenshot_bytes = None
     if should_capture_notification_screenshot(settings):
         screenshot_bytes = _image_to_bytes(image)
@@ -104,13 +112,13 @@ def try_send_notification(settings: NotificationSettings,
 def send_channel_test_notification(channel: str, settings: NotificationSettings) -> tuple[str, bool]:
     cfg = settings
     key = channel.strip().lower()
-    label = _CHANNEL_LABELS.get(key, "")
+    label = _channel_label(key)
     if not label:
         return "", False
 
     payload = build_notification_payload(
-        "通知渠道测试",
-        "这是一条测试通知, 如果你收到此通知，证明你的渠道配置正确",
+        Resources.notification_testTitle,
+        Resources.notification_testMessage,
         "success")
     test_image = _get_test_image_bytes() if _channel_needs_test_image(key, cfg) else None
 

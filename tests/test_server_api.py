@@ -8,6 +8,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from functools import partial
 from pathlib import Path
+import re
 from typing import Any, Iterator
 
 import pytest
@@ -93,8 +94,10 @@ def test_system_info(client: TestClient) -> None:
 def test_phrases(client: TestClient) -> None:
     payload = client.get("/api/app/phrases").json()
     assert payload["success"] is True
-    assert isinstance(payload["data"], list)
-    assert payload["data"]
+    data = payload["data"]
+    assert isinstance(data, dict)
+    assert {"zh-CN", "en-US", "ru-RU"} <= set(data)
+    assert data["zh-CN"] and data["en-US"] and data["ru-RU"]
 
 
 def test_background_is_jpeg(client: TestClient) -> None:
@@ -239,6 +242,18 @@ def test_operator_list_and_help(client: TestClient) -> None:
 
 def test_operator_call_requires_method(client: TestClient) -> None:
     assert client.post("/api/operator/call", json={"method": ""}).status_code == 400
+
+
+def test_r_envelope_messages_stay_english(client: TestClient) -> None:
+    responses = (
+        client.get("/api/operator/help/not_a_method"),
+        client.get("/api/extensions/not-an-extension/schema"),
+        client.post("/api/operator/call", json={"method": ""}),
+    )
+    for response in responses:
+        message = response.json()["message"]
+        assert message
+        assert not re.search(r"[\u4e00-\u9fff]", message), message
 
 
 class _RecordingOperator:

@@ -7,7 +7,11 @@ export interface SchemaNode {
   format?: string
   pattern?: string
   description?: string
+  /** 该节点 description 的多语言译文（BCP-47 语言 → 文案），由后端 schema 提供 */
+  'x-i18n'?: Record<string, string>
   enum?: unknown[]
+  /** 枚举项显示标签（与 enum 逐项对应）：可为 BCP-47 语言 → 标签数组的映射，也兼容旧的扁平数组 */
+  'x-enum-labels'?: string[] | Record<string, string[]>
   default?: unknown
   properties?: Record<string, SchemaNode>
   items?: SchemaNode
@@ -59,6 +63,17 @@ export function isIntTextInput(node: SchemaNode): boolean {
 /** 按字段标识（description/key）查找对应的属性 schema 节点 */
 export function findProperty(node: SchemaNode, key: string): SchemaNode | undefined {
   return node.properties?.[key]
+}
+
+/**
+ * 取节点的本地化说明：优先 `x-i18n[当前语言]`，未命中时回退 `description`
+ * （兼容没有 x-i18n 的扩展 schema）。
+ */
+export function localizedDescription(
+  node: SchemaNode | undefined,
+  description: string | undefined,
+): string {
+  return node?.['x-i18n']?.[i18n.global.locale.value] ?? description ?? ''
 }
 
 /** 按 schema 递归构建默认模型：对象→逐属性递归，数组→[]，布尔→false，其余→default ?? '' */

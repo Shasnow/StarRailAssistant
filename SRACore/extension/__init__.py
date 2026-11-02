@@ -11,7 +11,7 @@ from typing import Any, Generic, TYPE_CHECKING, get_args, overload, TypeVar
 from loguru import logger
 from pydantic import BaseModel
 
-from SRACore.localization.resource import Resource
+from SRACore.localization import Resources
 from SRACore.models.app_settings import AppSettings
 from SRACore.notification import try_send_notification
 from SRACore.operators.factory import OperatorFactory, OperatorType
@@ -95,7 +95,7 @@ class BaseExtension(Executable, Generic[T], ABC):
         """发送通知，与 BaseTask.send_notification 行为一致。"""
         try_send_notification(
             self.settings.Notification,
-            Resource.task_notificationTitle,
+            Resources.task_notificationTitle,
             message,
             result=result,
             image=image
@@ -116,6 +116,7 @@ class ExtensionEntry:
     name: str = ""
     description: str = ""
     is_background: bool = False
+    package_dir: Path | None = None
 
 
 class ExtensionRegistry:
@@ -126,12 +127,13 @@ class ExtensionRegistry:
 
     def register(self, extension_id: str, extension_cls: type[BaseExtension[Any]],
                  config_cls: type[BaseModel] | None = None, *, name: str = "", description: str = "",
-                 is_background: bool = False) -> None:
+                 is_background: bool = False, package_dir: Path | None = None) -> None:
         if extension_id in self._storage:
             raise KeyError(f"Extension '{extension_id}' already exists")
         self._storage[extension_id] = ExtensionEntry(
             extension_cls=extension_cls, config_cls=config_cls,
             name=name, description=description, is_background=is_background,
+            package_dir=package_dir,
         )
 
     def get(self, extension_id: str) -> ExtensionEntry:
@@ -175,12 +177,32 @@ class ExtensionRegistry:
         entry = self._storage.get(extension_id)
         if entry is None or entry.config_cls is None:
             return None
-        return entry.config_cls.model_json_schema()
+        from SRACore.extension import locales
+
+        schema = entry.config_cls.model_json_schema()
+        locales.apply(schema, locales.load(entry.package_dir))
+        return schema
 
     def get_all_schemas(self) -> dict[str, Any]:
-        return {ext_id: entry.config_cls.model_json_schema()
-                for ext_id, entry in self._storage.items()
-                if entry.config_cls is not None}
+        from SRACore.extension import locales
+
+        result: dict[str, Any] = {}
+        for ext_id, entry in self._storage.items():
+            if entry.config_cls is None:
+                continue
+            schema = entry.config_cls.model_json_schema()
+            locales.apply(schema, locales.load(entry.package_dir))
+            result[ext_id] = schema
+        return result
+
+    def get_meta(self, extension_id: str) -> dict[str, str]:
+        """返回当前语言的扩展展示名/说明（来自扩展目录的 locales）。"""
+        from SRACore.extension import locales
+
+        entry = self._storage.get(extension_id)
+        if entry is None:
+            return {}
+        return locales.meta(locales.load(entry.package_dir))
 
     def get_ids(self) -> list[str]:
         return list(self._storage.keys())
@@ -218,21 +240,54 @@ def _get_extension_dependencies(
     return dependencies
 
 
-def _import_extension_modules(package: str, *, reload_existing: bool) -> None:
-    """扫描扩展目录并导入全部模块；``reload_existing`` 为真时热重载已导入模块。
+def _reload_extension_package(package_name: str, package_dir: Path) -> None:
+    """重载扩展包：先由深到浅重载子模块，最后重载包 ``__init__``。"""
+    prefix = f"{package_name}."
+    root = package_dir.resolve()
+    modules: list[str] = []
+    for name, module in list(sys.modules.items()):
+        if name != package_name and not name.startswith(prefix):
+            continue
+        module_file = getattr(module, "__file__", None)
+        if module_file is None:
+            continue
+        try:
+            Path(module_file).resolve().relative_to(root)
+        except (OSError, ValueError):
+            continue
+        modules.append(name)
+    modules.sort(key=lambda name: (name == package_name, -name.count(".")))
+    for name in modules:
+        try:
+            importlib.reload(sys.modules[name])
+        except Exception as e:
+            logger.exception(f"Failed to reload extension module '{name}': {e}")
 
-    单个模块导入/重载失败不影响其余模块。
+
+def _import_extension_modules(package: str, *, reload_existing: bool) -> None:
+    """扫描扩展目录并导入全部扩展包；``reload_existing`` 为真时热重载。
+
+    只有包含 ``__init__.py`` 的一级子目录会被视为扩展；遗留的 ``*.py`` 单文件
+    会被忽略并提示迁移。单个包导入/重载失败不影响其余包。
     """
     pkg_path = Path(package)
     if not pkg_path.is_dir():
         logger.debug(f"Extensions directory '{package}' not found, skipping")
         return
-    for file in pkg_path.glob("*.py"):
-        if file.stem == "__init__":
+    for entry in sorted(pkg_path.iterdir()):
+        if entry.is_dir():
+            if entry.name.startswith("__") or not (entry / "__init__.py").is_file():
+                continue
+            module_name = f"{package}.{entry.name}"
+            package_dir = entry
+        elif entry.suffix == ".py" and entry.stem != "__init__":
+            logger.warning(f"扩展必须为包含 __init__.py 的目录，已忽略: {entry}")
             continue
-        module_name = f"{package}.{file.stem}"
-        existing = None
+        else:
+            continue
+
         modules_before = set(sys.modules)
+        existing = sys.modules.get(module_name)
         known_dependencies = _get_extension_dependencies(
             package,
             pkg_path,
@@ -240,20 +295,8 @@ def _import_extension_modules(package: str, *, reload_existing: bool) -> None:
             module_name,
         )
         try:
-            existing = sys.modules.get(module_name)
             if existing is not None and reload_existing:
-                for dependency_name in _extension_dependencies.get(module_name, set()):
-                    dependency = sys.modules.get(dependency_name)
-                    if dependency is None:
-                        continue
-                    try:
-                        importlib.reload(dependency)
-                    except Exception as e:
-                        logger.exception(
-                            f"Failed to reload dependency '{dependency_name}' "
-                            f"of extension module '{file.stem}': {e}"
-                        )
-                importlib.reload(existing)
+                _reload_extension_package(module_name, package_dir)
             else:
                 importlib.import_module(module_name)
             _extension_dependencies[module_name] = (
@@ -265,10 +308,11 @@ def _import_extension_modules(package: str, *, reload_existing: bool) -> None:
                     module_name,
                 )
             )
-            logger.debug(f"Extension module '{file.stem}' imported, dependencies: {_extension_dependencies[module_name]}")
+            logger.debug(f"Extension '{entry.name}' imported, dependencies: "
+                         f"{_extension_dependencies[module_name]}")
         except Exception as e:
             action = "reload" if existing is not None and reload_existing else "import"
-            logger.exception(f"Failed to {action} extension module '{file.stem}': {e}")
+            logger.exception(f"Failed to {action} extension '{entry.name}': {e}")
 
 
 def load_extensions(package: str = "extensions") -> None:
@@ -311,6 +355,21 @@ def reload_extensions(package: str = "extensions") -> tuple[set[str], set[str]]:
 
 
 _ExtCls = TypeVar("_ExtCls", bound="type[BaseExtension[Any]]")
+
+
+def _resolve_package_dir(cls: type) -> Path | None:
+    """根据扩展类的模块名定位其扩展目录（``extensions/<ext>``）。"""
+    module = sys.modules.get(cls.__module__)
+    module_file = getattr(module, "__file__", None)
+    if module_file is None:
+        return None
+    parts = cls.__module__.split(".")
+    if len(parts) < 2 or parts[0] != "extensions":
+        return None
+    for parent in Path(module_file).resolve().parents:
+        if parent.name == "extensions":
+            return parent / parts[1]
+    return None
 
 
 @overload
@@ -365,7 +424,7 @@ def extension(_cls: _ExtCls | None = None, /, *, extension_id: str | None = None
         _name = name or cls.__name__
         _desc = description or (cls.__doc__.strip().splitlines()[0] if cls.__doc__ else "")
         reg.register(_id, cls, resolved_config, name=_name, description=_desc,
-                    is_background=background)
+                    is_background=background, package_dir=_resolve_package_dir(cls))
         _config_name = resolved_config.__name__ if resolved_config else "None"
         logger.debug(f"Registered extension: {_id} -> {cls.__name__} "
                      f"(config={_config_name}, background={background})")

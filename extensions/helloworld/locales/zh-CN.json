@@ -1,0 +1,9 @@
+{
+    "name": "Hello World! 示例扩展",
+    "description": "展示如何使用扩展系统",
+    "message.description": "要打印的消息",
+    "repeat.description": "重复次数",
+    "delay.description": "每次重复之间的延迟时间",
+    "say.description": "是否以姓名开头打印消息",
+    "name.description": "姓名"
+}

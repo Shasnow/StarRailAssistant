@@ -10,34 +10,9 @@
   "documentation": "cw_plus/README.md",
   "files": [
     {
-      "path": "currency_wars_plus.py",
-      "bytes": 5148,
-      "sha256": "61e608ac123c7cfaf1767f6bdfafd4f2df80db8cd7b4694b48f0ae4ebec17fcd"
-    },
-    {
-      "path": "cw_plus/CHANGELOG.md",
-      "bytes": 10739,
-      "sha256": "1acdfceb52de2e4de86cfca07189167ac77297ce958105da1da28daae1c193e5"
-    },
-    {
-      "path": "cw_plus/CONFIGURATION.md",
-      "bytes": 11970,
-      "sha256": "c884dc252a88c626a232439ffef859972349a98b17c3b569caa295a8d1f0caba"
-    },
-    {
-      "path": "cw_plus/CurrencyWars.py",
-      "bytes": 555301,
-      "sha256": "d6d0095f4cab0778274bca9524ec50d8ac0b06573e59184e27bd3f64440fe675"
-    },
-    {
-      "path": "cw_plus/LICENSE",
-      "bytes": 34523,
-      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
-    },
-    {
-      "path": "cw_plus/README.md",
-      "bytes": 13536,
-      "sha256": "ce3a3e350e5b005bc65c06d3bddac300db5156710074ea64e27fc6eb2add616a"
+      "path": "__init__.py",
+      "bytes": 5061,
+      "sha256": "70c89ebbe0c867ee270c420595d70c226b23bf48faf3ccd2563db26091076423"
     },
     {
       "path": "cw_plus/__init__.py",
@@ -550,6 +525,11 @@
       "sha256": "a4291cc5fc9d2231842bc95c3a5aed17667974c20efbdf88da4d3c6d52b835d2"
     },
     {
+      "path": "cw_plus/CHANGELOG.md",
+      "bytes": 10739,
+      "sha256": "1acdfceb52de2e4de86cfca07189167ac77297ce958105da1da28daae1c193e5"
+    },
+    {
       "path": "cw_plus/characters.py",
       "bytes": 10285,
       "sha256": "cf928f76e8773e0287a15b2164d87c52761f14884c70b9ef58036dae0590f111"
@@ -560,14 +540,24 @@
       "sha256": "f9edab72a5827784a067cb88eed9de4dd8fa0deb7ed56c145dfdad11a7fa1f9b"
     },
     {
+      "path": "cw_plus/CONFIGURATION.md",
+      "bytes": 11970,
+      "sha256": "c884dc252a88c626a232439ffef859972349a98b17c3b569caa295a8d1f0caba"
+    },
+    {
+      "path": "cw_plus/CurrencyWars.py",
+      "bytes": 559356,
+      "sha256": "f264ebfe351dd802a66190004ebdd4ed4cf670bc70ef00436d90dac95d83008a"
+    },
+    {
       "path": "cw_plus/economy.py",
       "bytes": 19103,
       "sha256": "4e947277f7b0aca355f2ee10ac71b8f84ddf65bd192201bee35a15bfa8919302"
     },
     {
       "path": "cw_plus/equipment_choice.py",
-      "bytes": 9270,
-      "sha256": "88f6176fbd56a18332d7ca9c5606368cc00a28346947da7d8bc85205479b1d10"
+      "bytes": 9467,
+      "sha256": "e97a9375d441224675532f7febcdf53e3a9241c970cd5091df8db8f2fbccf681"
     },
     {
       "path": "cw_plus/equipment_policy.py",
@@ -580,14 +570,24 @@
       "sha256": "8980fbc7a480e9178f7eac7eaab4f509a6cdc83d5cbb2c4487be9918020aaa82"
     },
     {
+      "path": "cw_plus/game_input.py",
+      "bytes": 3450,
+      "sha256": "49aba690b553bca7891da365d528f8ea2798f31c0045a084a5cb4b8572ed73c9"
+    },
+    {
       "path": "cw_plus/images.py",
-      "bytes": 2710,
-      "sha256": "56689175eb43e108358ffcc95943ab772befd8270a62f19a205bafd4f0f85325"
+      "bytes": 2902,
+      "sha256": "33aa420c94c403f08cd95c50b5f0bc8ed90537737fb5f5848468373e5b5a1f3f"
     },
     {
       "path": "cw_plus/layout.py",
       "bytes": 34387,
       "sha256": "2288a26a6b023460dca2677afa923b2ac4d6bc9e858db0c613792fefa015b6ba"
+    },
+    {
+      "path": "cw_plus/LICENSE",
+      "bytes": 34523,
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
     },
     {
       "path": "cw_plus/logic.py",
@@ -596,8 +596,8 @@
     },
     {
       "path": "cw_plus/module_runtime.py",
-      "bytes": 3216,
-      "sha256": "d45fa012d78ab64a372d229e800647639c2261872dbdf59b0f26a5da3967aaea"
+      "bytes": 3230,
+      "sha256": "49f7ed7c4bef280ae4694aa74e280735779582bdd912b8700a9a8e6b09926f82"
     },
     {
       "path": "cw_plus/ocr_geometry.py",
@@ -625,14 +625,9 @@
       "sha256": "7bdccba7c21e617e550094426dad1c52ee04d003ed28da2abb6c652814e4d250"
     },
     {
-      "path": "cw_plus/resources/FortuneTeller.png",
-      "bytes": 4661,
-      "sha256": "2c6548ba6249f6142b933e4c3e5b1740bd2774472dd0c1b077f5c164b3afbe21"
-    },
-    {
-      "path": "cw_plus/resources/ThePlanetOfFestivities.png",
-      "bytes": 4448,
-      "sha256": "86f68f66a927dd4b9c89ef52ad41e5f106e26d49348255883c4aece3f7b6db0a"
+      "path": "cw_plus/README.md",
+      "bytes": 13678,
+      "sha256": "87cb7d3c6ca11b943cf50f476902c09a6c5d256a82e94da87dab1ea555ebc7cd"
     },
     {
       "path": "cw_plus/resources/apply_strategy.png",
@@ -760,6 +755,11 @@
       "sha256": "eb01eb61089806dff529215d5d804dd2393cb6c56933a4eb41f10d05a5576755"
     },
     {
+      "path": "cw_plus/resources/FortuneTeller.png",
+      "bytes": 4661,
+      "sha256": "2c6548ba6249f6142b933e4c3e5b1740bd2774472dd0c1b077f5c164b3afbe21"
+    },
+    {
       "path": "cw_plus/resources/hot_strategies.png",
       "bytes": 4591,
       "sha256": "dfabb53c831259600e155d0727b21f242266f88d8871e7f13e9f782ac459e7f4"
@@ -880,9 +880,29 @@
       "sha256": "cb0797b3c1b22d98200a61764e5c3cc16bd798352a0fec4a774b68a115036b68"
     },
     {
+      "path": "cw_plus/resources/strategy_code_paste.png",
+      "bytes": 2778,
+      "sha256": "f3410a4d2a32c756434084d54fcb0e01f19f8caf2f5ba8bb980ae5363967d8b4"
+    },
+    {
+      "path": "cw_plus/resources/strategy_code_placeholder.png",
+      "bytes": 6448,
+      "sha256": "92755b31d86957f1a98492b0e6bebd6e8a3ce6b9f484d905737e858d2e097952"
+    },
+    {
+      "path": "cw_plus/resources/strategy_code_title.png",
+      "bytes": 7679,
+      "sha256": "6b91e32f3f1b2dcf74af2a858def4acdd37cd107a2539f5e598873e51335139c"
+    },
+    {
       "path": "cw_plus/resources/synthesis.png",
       "bytes": 1255,
       "sha256": "d257ea9a299828cb3578e5b63e55d6e64bd0aadec8407dfc3f37506825ed2d2c"
+    },
+    {
+      "path": "cw_plus/resources/ThePlanetOfFestivities.png",
+      "bytes": 4448,
+      "sha256": "86f68f66a927dd4b9c89ef52ad41e5f106e26d49348255883c4aece3f7b6db0a"
     },
     {
       "path": "cw_plus/resources/win.png",
@@ -916,8 +936,8 @@
     },
     {
       "path": "cw_plus/shop_overlay.py",
-      "bytes": 8427,
-      "sha256": "34ccf4d091eabbb64b7bcc7e9dc1cab8f8eb3619269386d9e5c1ef57abd11a96"
+      "bytes": 8705,
+      "sha256": "18474e8d1070abec5f96e4839c040abd9a20eedc31908c42ce4f7023728890d6"
     },
     {
       "path": "cw_plus/shop_stall_recovery.py",
@@ -951,8 +971,8 @@
     },
     {
       "path": "cw_plus/strategies/货币战争增强版_标准配置填写规范.annotated.jsonc",
-      "bytes": 27396,
-      "sha256": "18df00ffc48a843698678f538c8112368072b758092005869b9fb05662f9b73b"
+      "bytes": 27815,
+      "sha256": "49e9721f2286b60b3587827b3d143242ab5e66414544436a0dad34f05957af86"
     },
     {
       "path": "cw_plus/strategy_catalog.py",
@@ -961,13 +981,28 @@
     },
     {
       "path": "cw_plus/unicode_templates.py",
-      "bytes": 12272,
-      "sha256": "4a90ad69d3b6b81acc79d92c2bc87786b3f6131c12a655951a3ea0735149a254"
+      "bytes": 13101,
+      "sha256": "c633f64f3ad8e81ee79cf4023131beb48d4c282e8bc7551cd9203beb31680f0c"
     },
     {
       "path": "cw_plus/vision.py",
-      "bytes": 129300,
-      "sha256": "ce364385527a644c7057d78afa364ff5722b2220f5a8a97fc03b35961042caaf"
+      "bytes": 133388,
+      "sha256": "25aef76124004c635516ab69fdc86b92acd05662eaeb319ea04e2f3dd58cb7bb"
+    },
+    {
+      "path": "locales/en-US.json",
+      "bytes": 761,
+      "sha256": "3f54cbb42dbcba038fe1f271eee44a3356047674e0330390d0e297fd2586cf98"
+    },
+    {
+      "path": "locales/ru-RU.json",
+      "bytes": 1046,
+      "sha256": "66af26be4bc1480451eef5502cb3785413977dce8c607756f06a3a4c4762ec94"
+    },
+    {
+      "path": "locales/zh-CN.json",
+      "bytes": 661,
+      "sha256": "36b309bf38c8897c35e9c4c43d253ea3bc25a74ed96f792544bcd96346f3f763"
     }
   ]
 }

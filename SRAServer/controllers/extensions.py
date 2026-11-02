@@ -9,6 +9,7 @@ from typing import Any
 from litestar import Request, get, post, put
 from litestar.params import FromPath, FromQuery, JSONBody
 from litestar.response import Response
+from loguru import logger
 
 from SRAServer.controllers._responses import core_of, json_response
 from SRAServer.schemas.envelope import R
@@ -44,7 +45,10 @@ async def set_config(request: Request, ext_id: FromPath[str], data: JSONBody[Any
     if payload is None:
         return json_response(R(False, "Invalid config payload"), 400)
     ok, message = await asyncio.to_thread(core.extension_config_set, ext_id, payload)
-    return json_response(R(ok, "Config updated" if ok else message))
+    if not ok:
+        logger.warning(f"Extension '{ext_id}' config update rejected: {message}")
+        return json_response(R(False, "Failed to update extension config"))
+    return json_response(R(True, "Config updated"))
 
 
 @post("/api/extensions/{ext_id:str}/run", status_code=200, summary="运行指定扩展")
@@ -55,7 +59,10 @@ async def run_extension(
     if core.config.visitor_mode:
         return json_response(R(True, f"Extension '{ext_id}' started"))
     ok, message = await asyncio.to_thread(core.extension_run, ext_id, config)
-    return json_response(R(ok, message))
+    if not ok:
+        logger.warning(f"Extension '{ext_id}' start failed: {message}")
+        return json_response(R(False, f"Failed to start extension '{ext_id}'"))
+    return json_response(R(True, f"Extension '{ext_id}' started"))
 
 
 @post("/api/extensions/{ext_id:str}/stop", status_code=200, summary="停止指定扩展")
@@ -64,7 +71,10 @@ async def stop_extension(request: Request, ext_id: FromPath[str]) -> Response:
     if core.config.visitor_mode:
         return json_response(R(True, f"Extension '{ext_id}' stopped"))
     ok, message = await asyncio.to_thread(core.extension_stop, ext_id)
-    return json_response(R(ok, message))
+    if not ok:
+        logger.warning(f"Extension '{ext_id}' stop failed: {message}")
+        return json_response(R(False, f"Failed to stop extension '{ext_id}'"))
+    return json_response(R(True, f"Extension '{ext_id}' stopped"))
 
 
 @post("/api/extensions/reload", status_code=200, summary="重新扫描并导入扩展模块")
@@ -73,7 +83,10 @@ async def reload_extensions(request: Request) -> Response:
     if core.config.visitor_mode:
         return json_response(R(True, "Extensions reloaded"))
     ok, message = await asyncio.to_thread(core.extension_reload)
-    return json_response(R(ok, message))
+    if not ok:
+        logger.warning(f"Extension reload failed: {message}")
+        return json_response(R(False, "Failed to reload extensions"))
+    return json_response(R(True, "Extensions reloaded"))
 
 
 def _as_dict(data: Any) -> dict[str, Any] | None:

@@ -1,0 +1,14 @@
+{
+  "description": "Standard and overclock strategy; includes latest coin, support recognition, and failure summary fixes.",
+  "name": "Currency Wars Plus",
+  "开拓者名称.description": "Enter the in-game Trailblazer name.",
+  "攻略.description": "Choose a strategy; after adding a JSON file, click Refresh. You can also enter the full path to a strategy JSON.",
+  "超频博弈.description": "When enabled, runs the overclock strategy; otherwise the standard strategy.",
+  "运行次数.description": "Number of rounds for this run.",
+  "难度.description": "Choose the lowest difficulty, highest difficulty, or keep the current one.",
+  "难度.labels": [
+    "Lowest difficulty",
+    "Highest difficulty",
+    "Current difficulty"
+  ]
+}

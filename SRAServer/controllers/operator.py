@@ -7,6 +7,7 @@ import asyncio
 from litestar import Request, get, post
 from litestar.params import FromPath, JSONBody
 from litestar.response import Response
+from loguru import logger
 
 from SRAServer.controllers._responses import core_of, json_response
 from SRAServer.schemas.envelope import R
@@ -22,7 +23,7 @@ async def list_methods(request: Request) -> Response:
 async def get_method_help(request: Request, method: FromPath[str]) -> Response:
     data = core_of(request).operator_help(method)
     if data is None:
-        return json_response(R(False, f"方法 '{method}' 不存在"))
+        return json_response(R(False, f"Method '{method}' not found"))
     return json_response(R(True, method, data))
 
 
@@ -34,7 +35,10 @@ async def call_method(request: Request, data: JSONBody[OperatorCallRequest]) -> 
     if core.config.visitor_mode:
         return json_response(R(True, "Method called"))
     ok, message, result = await asyncio.to_thread(core.operator_call, data.method, data.params)
-    return json_response(R(ok, message, result))
+    if not ok:
+        logger.warning(f"Operator call '{data.method}' failed: {message}")
+    text = f"Method '{data.method}' called" if ok else f"Operator call '{data.method}' failed"
+    return json_response(R(ok, text, result))
 
 
 HANDLERS = [list_methods, get_method_help, call_method]

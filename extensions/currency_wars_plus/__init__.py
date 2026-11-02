@@ -22,12 +22,11 @@ class CurrencyWarsPlusConfig(BaseModel):
     """通过配置结构提供攻略扫描与难度选项，高级策略保留在攻略文件中。"""
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="forbid")
 
-    username: str = Field(default="", alias="开拓者名称", description="填写游戏内开拓者名称。")
-    strategy: str = Field(default=DEFAULT_STRATEGY, alias="攻略", description="选择攻略；新增 JSON 后点击扫描攻略文件夹。也可填写攻略 JSON 的完整路径。")
-    runtimes: int = Field(default=1, ge=1, le=99999, alias="运行次数", description="本次运行的局数。")
-    difficulty: int = Field(default=0, ge=0, le=2, alias="难度", description="选择最低难度、最高难度或保持当前难度。",
-        json_schema_extra={"enum": [0, 1, 2], "x-enum-labels": ["最低难度", "最高难度", "当前难度"]})
-    overclock: bool = Field(default=False, alias="超频博弈", description="开启后运行超频博弈，关闭后运行常规博弈。")
+    username: str = Field(default="", alias="开拓者名称", description='填写游戏内开拓者名称。')
+    strategy: str = Field(default=DEFAULT_STRATEGY, alias="攻略", description='选择攻略；新增 JSON 后点击刷新。也可填写攻略 JSON 的完整路径。')
+    runtimes: int = Field(default=1, ge=1, le=99999, alias="运行次数", description='本次运行的局数。')
+    difficulty: int = Field(default=0, ge=0, le=2, alias="难度", description='选择最低难度、最高难度或保持当前难度。', json_schema_extra={"enum": [0, 1, 2]})
+    overclock: bool = Field(default=False, alias="超频博弈", description='开启后运行超频博弈，关闭后运行常规博弈。')
 
     # Yukki：选项扫描只重建显示列表，保存值继续使用攻略文件名。
     @classmethod
@@ -40,7 +39,6 @@ class CurrencyWarsPlusConfig(BaseModel):
             if prop is not None:
                 prop.update({"enum": [value for value, _ in options],
                     "x-enum-labels": [label for _, label in options],
-                    "x-refreshable": True, "x-refresh-label": "扫描攻略文件夹",
                     "x-allow-custom": True})
         return schema
 

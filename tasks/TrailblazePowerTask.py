@@ -1,6 +1,7 @@
 import tomllib
 from typing import Callable, TypedDict
 
+from SRACore.localization import Resources
 from SRACore.models.tasks_config import TrailblazePowerTaskItem
 from SRACore.operators.model import Box
 from SRACore.task import BaseTask, task
@@ -842,7 +843,7 @@ class TrailblazePowerTask(BaseTask):
         if self.__class__.__name__ in on_complete:
             self.goto_survival_index()  # 在生存索引页面发送通知
             self.send_notification(
-                f"任务 {self.__class__.__name__} 执行完成。",
+                Resources.notification_taskCompleted(self.__class__.__name__),
                 "success",
                 self.operator.screenshot())
             self.operator.press_key('esc')

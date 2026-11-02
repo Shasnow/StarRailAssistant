@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { tr } from '@/locales'
+import { i18n } from '@/locales'
 
 import siteConfig from '@/configs/siteConfig'
 import { fetchPhrases } from '@/api/app'
@@ -92,8 +92,9 @@ onMounted(async () => {
   phrasesController = new AbortController()
   try {
     const remote = await fetchPhrases(phrasesController.signal)
-    // 后端返回空数组时同样沿用回退文案，避免打字机拿到 undefined
-    if (remote.length > 0) phrases.value = remote.map(tr)
+    // 按当前语言取短语；后端缺该语言时回退中文，空数组则沿用回退文案
+    const localized = remote[i18n.global.locale.value] ?? remote['zh-CN']
+    if (localized && localized.length > 0) phrases.value = localized
   } catch {
     // 后端不可用/接口异常：静默沿用回退文案
   }

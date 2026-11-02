@@ -28,6 +28,6 @@ export async function fetchSystemInfo(signal?: AbortSignal): Promise<AppSystemIn
   return request<AppSystemInfo>({ url: '/app/system-info', method: 'get', signal })
 }
 
-export async function fetchPhrases(signal?: AbortSignal): Promise<string[]> {
-  return request<string[]>({ url: '/app/phrases', method: 'get', signal })
+export async function fetchPhrases(signal?: AbortSignal): Promise<Record<string, string[]>> {
+  return request<Record<string, string[]>>({ url: '/app/phrases', method: 'get', signal })
 }

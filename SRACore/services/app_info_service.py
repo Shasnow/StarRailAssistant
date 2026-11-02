@@ -10,7 +10,7 @@ import sys
 import urllib.request
 from pathlib import Path
 
-from SRACore.localization.presentation import translate
+from SRACore.localization.presentation import to_russian
 from SRACore.services.setting_service import SettingsService
 from SRACore.util.const import VERSION, AppDataDir
 
@@ -72,14 +72,13 @@ class AppInfoService:
             "cultureInfo": (locale.getlocale()[0] or ""),
         }
 
-    def phrases(self) -> list[str]:
-        """按界面语言返回首页短语。"""
-        language = self._settings.settings.Display.Language
-        if language == 1:
-            return list(_PHRASES_EN)
-        if language == 2:
-            return [translate(phrase) for phrase in _PHRASES_ZH]
-        return list(_PHRASES_ZH)
+    def phrases(self) -> dict[str, list[str]]:
+        """返回三语首页短语映射，由客户端按当前语言选取。"""
+        return {
+            "zh-CN": list(_PHRASES_ZH),
+            "en-US": list(_PHRASES_EN),
+            "ru-RU": [to_russian(phrase) for phrase in _PHRASES_ZH],
+        }
 
     async def background(self) -> bytes:
         """返回背景图字节；配置为空/加载失败时回退内置默认图。"""

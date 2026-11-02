@@ -1,0 +1,5 @@
+{
+  "description": "Detect and handle story dialogue; optionally skip the story",
+  "name": "Auto dialogue",
+  "skip_plot.description": "Automatically skip story dialogue"
+}

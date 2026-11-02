@@ -1,0 +1,9 @@
+{
+  "name": "Hello World! Пример расширения",
+  "description": "Показывает, как использовать систему расширений",
+  "message.description": "Сообщение для вывода",
+  "repeat.description": "Число повторов",
+  "delay.description": "Задержка между повторами",
+  "say.description": "Выводить сообщение с именем в начале",
+  "name.description": "Имя"
+}

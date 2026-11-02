@@ -9,7 +9,8 @@ StarRailAssistant (SRA) automates *Honkai: Star Rail* via screen recognition. Wi
 - `main.py` — 后端入口（委托 `SRACore/__main__.py`）。
 - `SRACore/` — CLI（`cli2.py`，cmd2）、任务/扩展注册表、operators（视觉+输入）、通知、`services/`
   （框架无关宿主 `AppContext` 与设置/配置/缓存/应用信息/后端/日志流服务，CLI 与服务端复用）、utils、生成的模型。
-- `tasks/`、`extensions/` — 任务与扩展实现（`extensions/cw_plus/` 为大型自包含子系统）。
+- `tasks/`、`extensions/` — 任务与扩展实现。每个扩展是含 `__init__.py` 的目录包，可带
+  `locales/<lang>.json` 与子包（`extensions/currency_wars_plus/cw_plus/` 为大型自包含子系统）。
 - `resources/img/**` — 模板图片，只经 `tasks/img.py` 常量引用。
 - `tests/` — 后端 pytest 套件。
 - `SRAServer/` — Litestar 装配层（`/api/**`、`/openapi/v1.json`、MCP 于 `/mcp`、WebUI 静态托管）：
@@ -19,6 +20,8 @@ StarRailAssistant (SRA) automates *Honkai: Star Rail* via screen recognition. Wi
 - `scripts/` — 打包、版本、模型/本地化生成、清理。
 
 ## Commands
+
+**python命令需要使用venv环境**
 
 ```bash
 pip install -e ".[standard]"                          # standard = 桌面依赖；跑测试用 ".[dev]"
@@ -45,7 +48,8 @@ Docker 镜像由 `.github/workflows/docker.yml` 构建并推送 `ghcr.io/shasnow
 
 **Frontend ↔ backend is CLI-over-stdio.** 前端把 Python 后端作为子进程，用 stdin 写命令；`-c`/repl 输入追加到
 `sys.argv` 后由 `SRACore/cli2.py` 执行。每条命令都支持 `--json`，输出 `{success,message,data}` 信封
-（`SRACore/cli2.py::output`），HTTP API 以 `R` 返回同一结构。`SRAFrontend/SRAFrontend/Services/LocalBackendService.cs`
+（`SRACore/cli2.py::output`），HTTP API 以 `R` 返回同一结构；`R.message` 固定英文、不做本地化，
+需要本地化的展示文本放在 `data` 中。`SRAFrontend/SRAFrontend/Services/LocalBackendService.cs`
 保存了确切的命令串（`task run <config>`、`task status --json`、`operator call …`）；**改 `--json` payload 是跨语言
 契约变更**，需同步 `LocalBackendService.cs` 与 WebUI。
 
@@ -58,13 +62,16 @@ WebUI 的任务与设置表单由 OpenAPI schema 生成，后端配置模型即 
 `SRAServer/context.py::ServerContext` 组合它并叠加服务端配置。`SRAServer` 只保留装配（`controllers/`、
 `middleware.py`、`openapi.py`、`app.py`、`config.py`、`context.py`、`mcp/`、`schemas/`）。
 
-**Dynamic imports.** `tasks/`、`extensions/` 不是包（无 `__init__.py`），由 `SRACore.util.dynamic_import` 与
-`load_extensions()` 扫描 `*.py` 导入，依赖 `main.py` 把 cwd 加入 `sys.path`；因此从仓库根运行，且
-`tasks/config/*.toml`、`resources/img/...` 都按 cwd 相对解析。
+**Dynamic imports.** `tasks/` 不是包（无 `__init__.py`），由 `SRACore.util.dynamic_import` 扫描 `*.py` 导入；
+`extensions/` 只加载含 `__init__.py` 的一级目录包（`load_extensions()`），遗留单文件会被忽略并告警。
+两者都依赖 `main.py` 把 cwd 加入 `sys.path`，因此从仓库根运行，`tasks/config/*.toml`、`resources/img/...`
+都按 cwd 相对解析。
 
-**Registries.** 任务用 `@task(order=N)`、扩展用 `@extension(extension_id=..., background=...)`，导入即注册，
-放入目录通常即可；`task reload` / `extension reload` 原地重导入。扩展配置模型取自装饰器泛型参数，转 JSON Schema
-供表单生成。
+**Registries.** 任务用 `@task(order=N)`、扩展用 `@extension(extension_id=..., background=...)`，导入即注册；
+`task reload` / `extension reload` 原地重导入（扩展包会递归重载子模块）。扩展配置模型取自装饰器泛型参数，
+转 JSON Schema 供表单生成；字段说明的多语言文案放在扩展目录的 `locales/<lang>.json`
+（键为 schema 字段键名，有 `alias` 用 alias），注册表在 `get_schema()` 时按 `settings.json`
+的界面语言合成单语 `description` / `x-enum-labels`（缺失回退中文）。
 
 **Task contract.** 继承 `BaseTask` 实现 `run() -> bool`（`False` 为失败）。`TaskManager.run()` 遍历每个配置中
 启用的任务，调用 `on_start`/`on_failed`/`on_completed`（分发通知），失败时经 `SRACore/util/task_recovery.py`
@@ -91,13 +98,13 @@ Full（Core + 桌面端 publish）、Lite（桌面端 + 源码 + `pyproject.toml
 - **Language.** 提交消息中文约定式（`.trae/rules/git-commit-message.md`）；注释、文档、日志、任务名、UI 文案中文。
   `README.md` 为中文源文件，改动同步 `README.en.md`，两者顶部保留语言切换链接。
 - **Generated files — never hand-edit.** `SRACore/models/app_settings.py`、`tasks_config.py` 由
-  `SRAFrontend/SRAFrontend/Models/*.cs` 经 `npm run modelgen` 生成；`SRACore/localization/resource.py` 与
-  `resource_*.json` 由 `resource.toml` 经 `npm run pyl10nc` 生成。改 C# 模型或 TOML 后重新生成。这两个模型文件是
+  `SRAFrontend/SRAFrontend/Models/*.cs` 经 `npm run modelgen` 生成；`SRACore/localization/resources.py` 与
+  `resources_*.json` 由 `resources.toml` 经 `npm run pyl10nc` 生成。改 C# 模型或 TOML 后重新生成。这两个模型文件是
   唯一的 Python 模型定义（`SRACore` 读写 `settings.json`/`configs/*.json`，`SRAServer` 经 `openapi.py` 展开成
   `/openapi/v1.json` 组件），**不要在服务端再声明镜像模型**。WebUI `ResX` 本地化为手工维护。
 - **Version lives in three files**: `SRACore/util/const.py`（`VERSION`，驱动 `pyproject.toml`）、`package.json`、
   `SRAFrontend/SRAFrontend/Models/AppSettings.cs`，三者配合 `npm run ver` 一起改。
-- **Localization** 为 `Resource` 单例的属性式访问（`Resource.cli_intro`），由 `__getattribute__` 从生成 JSON 解析，
+- **Localization** 为 `Resources` 单例的属性式访问（`Resources.cli_intro`），由 `__getattribute__` 从生成 JSON 解析，
   TOML 值中使用 `str.format` 占位符。
 - **Logging** 用 `loguru`（`SRACore/util/logger.py`），不要用 `print` 做诊断。
 - **Errors** 用 `SRACore/util/errors.py` 的编码枚举（`SRA-XXXX-YYYY`，级别前缀 1xxx 系统 … 9xxx 其他）；

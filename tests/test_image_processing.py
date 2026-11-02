@@ -5,8 +5,8 @@ from dataclasses import asdict
 
 import pytest
 
-from extensions.cw_plus import equipment_choice as equipment
-from extensions.cw_plus import shop_overlay as probability
+from extensions.currency_wars_plus.cw_plus import equipment_choice as equipment
+from extensions.currency_wars_plus.cw_plus import shop_overlay as probability
 from tests.image_processing_cases import equipment_cases, equipment_frame, probability_cases, probability_frame, row
 
 

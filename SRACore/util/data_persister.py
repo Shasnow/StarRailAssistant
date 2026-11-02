@@ -2,7 +2,7 @@
 import json
 from typing import Any
 
-from SRACore.localization import Resource
+from SRACore.localization import Resources
 from SRACore.models.app_settings import AppSettings
 from SRACore.models.tasks_config import TasksConfig
 from SRACore.util.const import AppDataDir, ConfigsDir
@@ -43,13 +43,13 @@ def load_config(name: str) -> TasksConfig | None:
         data = _migrate_legacy_rewards(data)
         return TasksConfig.from_dict(data)
     except FileNotFoundError:
-        logger.error(Resource.config_fileNotFound(path))
+        logger.error(Resources.config_fileNotFound(path))
         return None
     except json.JSONDecodeError as e:
-        logger.error(Resource.config_parseError(path, str(e)))
+        logger.error(Resources.config_parseError(path, str(e)))
         return None
     except Exception as e:
-        logger.error(Resource.config_exception(path, str(e)))
+        logger.error(Resources.config_exception(path, str(e)))
         return None
 
 def load_data(typ: str) -> dict[Any, Any]:
@@ -66,13 +66,13 @@ def load_data(typ: str) -> dict[Any, Any]:
         with open(path, 'r', encoding='utf-8-sig') as f:
             return json.load(f)
     except FileNotFoundError:
-        logger.error(Resource.config_fileNotFound(path))
+        logger.error(Resources.config_fileNotFound(path))
         return {}
     except json.JSONDecodeError as e:
-        logger.error(Resource.config_parseError(path, str(e)))
+        logger.error(Resources.config_parseError(path, str(e)))
         return {}
     except Exception as e:
-        logger.error(Resource.config_exception(path, str(e)))
+        logger.error(Resources.config_exception(path, str(e)))
         return {}
 
 

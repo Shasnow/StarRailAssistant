@@ -12,21 +12,26 @@ from litestar.response import Response
 
 from SRACore.models.app_settings import AppSettings
 from SRACore.models.tasks_config import TasksConfig
+from SRACore.localization.terms import attach_i18n
 
 from SRAServer.controllers._responses import json_response
 
 
-def openapi_components() -> dict[str, object]:
+def openapi_components() -> dict[str, dict]:
     """把生成模型展开为 OpenAPI 组件（含嵌套 ``$ref`` 目标）。
+
+    每个组件会附带三语 ``x-i18n``，供 WebUI / 桌面端按当前语言取字段说明，
+    无需重新请求 schema；``description`` 保留中文兜底。
 
     Returns:
         {组件名: schema}，键包含 ``TasksConfig``、``AppSettings`` 及其嵌套模型。
     """
-    components: dict[str, object] = {}
+    components: dict[str, dict] = {}
     for model in (TasksConfig, AppSettings):
         schema = model.model_json_schema(ref_template="#/components/schemas/{model}")
         components.update(schema.pop("$defs", {}))
         components[model.__name__] = schema
+    attach_i18n(components)
     return components
 
 

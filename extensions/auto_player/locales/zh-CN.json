@@ -1,0 +1,12 @@
+{
+  "description": "按 JSON 乐谱自动演奏游戏键盘（暂停 F8 / 重置 F10 / 停止 F9）",
+  "dry_run.description": "演练模式：不实际按键，仅校验乐谱与时序",
+  "enable_hotkeys.description": "启用演奏热键（暂停/重置）",
+  "hotkey_pause.description": "暂停/继续热键",
+  "hotkey_reset.description": "重置热键",
+  "loop.description": "演奏遍数",
+  "name": "自动演奏",
+  "score.description": "乐谱名称或 JSON 文件路径",
+  "speed.description": "演奏速度倍率（1.0 = 乐谱原速）",
+  "start_delay.description": "首次开始前的延迟（秒），用于切换到游戏窗口"
+}

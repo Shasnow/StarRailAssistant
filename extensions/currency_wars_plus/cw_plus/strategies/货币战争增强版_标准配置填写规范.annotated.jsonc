@@ -7,8 +7,8 @@
 // 示例采用姬子七级稳搜与人口优先规则，数值用于演示，不是所有阵容的默认值。
 // 本文件不会出现在攻略列表；使用时复制、改名、删除注释，保存为 my_strategy.json。
 // 不能只把 .jsonc 改名为 .json：运行时使用严格 JSON，不支持任何注释或尾随逗号。
-// 配置目录：extensions/cw_plus/strategies/
-// 在扩展配置中点击“扫描攻略文件夹”，按 title 选择新攻略，再启动本扩展。
+// 配置目录：extensions/currency_wars_plus/cw_plus/strategies/
+// 在扩展配置中点击“刷新”，按 title 选择新攻略，再启动本扩展。
 // 扫描只检查 JSON 能否读取，不等于已通过运行时字段校验；不要在运行中途修改攻略。
 // 裸文件名从本扩展 strategies 目录读取；带目录的路径按指定位置读取。
 //
@@ -388,7 +388,7 @@
 // - 区分常规购买底线R、刷新/经验底线R+P，以及首搜底线和首搜专用购牌余量，理解3-7强制覆盖。
 // - 配置能加载只证明结构合法，不能证明阵容、游戏内效果或实战强度。
 //
-// 【核对来源：均相对于 extensions/cw_plus】
+// 【核对来源：均相对于 extensions/currency_wars_plus/cw_plus】
 // ../currency_wars_plus.py：扩展窗口字段；paths.py、strategy_catalog.py：目录与扫描。
 // CurrencyWars.py：load_strategy、主 C、事件优先级、购物/装备/速战与3-7实际执行分支。
 // formation.py：validate_formation_config、阶段/席位/职责、普通人口与位置冲突规则。

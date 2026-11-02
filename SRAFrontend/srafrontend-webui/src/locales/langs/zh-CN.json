@@ -102,7 +102,6 @@
     "inputExit": "退出输入",
     "inputFocusHint": "手动输入直接操控游戏窗口；请确保游戏窗口在前台，建议从其他设备或副屏访问本页面。",
     "inputHint": "点击画面进入输入模式；点「退出输入」或切换窗口结束",
-    "inputMode": "手动输入",
     "inputNeedLive": "请先启动实时查看，再进入输入模式",
     "inputSendFailed": "输入发送失败：{0}",
     "inputWindowInactive": "游戏窗口未处于前台，无法发送输入",

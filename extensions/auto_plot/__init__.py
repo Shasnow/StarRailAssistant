@@ -5,7 +5,7 @@ from SRACore.extension import BaseExtension, extension
 
 class AutoPlotConfig(BaseModel):
     """自动剧情对话扩展配置。"""
-    skip_plot: bool = Field(default=False, description="是否自动跳过剧情对话")
+    skip_plot: bool = Field(default=False, description='是否自动跳过剧情对话')
 
 
 @extension(

@@ -6,7 +6,7 @@ import numpy as np
 import pyscreeze
 import pytest
 
-from extensions.cw_plus.unicode_templates import locate_first
+from extensions.currency_wars_plus.cw_plus.unicode_templates import locate_first
 
 
 def original_match(needle, haystack, confidence):

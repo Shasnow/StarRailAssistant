@@ -2,8 +2,8 @@
 
 # ssyb：发行清单按统一换行校验，跨平台检出保持相同字节。
 /extensions/currency_wars_plus.py text eol=lf
-/extensions/cw_plus/** text=auto eol=lf
-/extensions/cw_plus/**/*.png -text
+/extensions/currency_wars_plus/cw_plus/** text=auto eol=lf
+/extensions/currency_wars_plus/cw_plus/**/*.png -text
 
 # Docker 相关文件按 LF 检出：CRLF 会破坏 Dockerfile 的续行语义与 .dockerignore 的路径匹配。
 /Dockerfile text eol=lf

@@ -5,7 +5,7 @@
             <div class="array-titles">
                 <template v-if="label">
                     <div class="array-label">{{ label }}</div>
-                    <div v-if="description" class="array-desc" :title="tr(description)">{{ tr(description) }}</div>
+                    <div v-if="description" class="array-desc" :title="localizedDescription(node, description)">{{ localizedDescription(node, description) }}</div>
                 </template>
             </div>
             <el-button size="small" plain :icon="Plus" @click="addItem">{{ t('common.add') }}</el-button>
@@ -38,12 +38,11 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { tr } from '@/locales/index.ts'
 
 import { computed } from 'vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
 import type { OpenApiDocument, SchemaNode } from '@/utils/schemaForm'
-import { buildDefaultModel, fieldKind, resolveNode } from '@/utils/schemaForm'
+import { buildDefaultModel, fieldKind, localizedDescription, resolveNode } from '@/utils/schemaForm'
 import SchemaField from './SchemaField.vue'
 import SchemaForm from './SchemaForm.vue'
 

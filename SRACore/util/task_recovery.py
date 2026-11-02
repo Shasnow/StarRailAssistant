@@ -7,7 +7,7 @@
 """
 import time
 
-from SRACore.localization import Resource
+from SRACore.localization import Resources
 from SRACore.models.app_settings import AppSettings
 from SRACore.util import sys_util
 from SRACore.util.logger import logger
@@ -61,7 +61,7 @@ class TaskRecovery:
         self._retry_count += 1
         max_retries = self._settings.General.maxRetryCount
         logger.warning(
-            Resource.task_retryPreparing(self._retry_count, max_retries)
+            Resources.task_retryPreparing(self._retry_count, max_retries)
         )
 
         # 杀死游戏进程
@@ -69,7 +69,7 @@ class TaskRecovery:
 
         # 等待一段时间让进程完全退出
         wait_seconds = 5
-        logger.info(Resource.task_waitingForRetry(wait_seconds))
+        logger.info(Resources.task_waitingForRetry(wait_seconds))
         time.sleep(wait_seconds)
 
         return True
@@ -79,14 +79,14 @@ class TaskRecovery:
         """杀死游戏进程"""
         try:
             if sys_util.is_process_running(_GAME_PROCESS):
-                logger.info(Resource.task_killingGameProcess)
+                logger.info(Resources.task_killingGameProcess)
                 sys_util.task_kill(_GAME_PROCESS)
                 # 等待进程完全退出
                 for _ in range(10):
                     if not sys_util.is_process_running(_GAME_PROCESS):
                         break
                     time.sleep(0.5)
-                logger.info(Resource.task_gameProcessKilled)
+                logger.info(Resources.task_gameProcessKilled)
             else:
                 logger.debug("游戏进程未在运行，无需终止")
         except Exception as e:

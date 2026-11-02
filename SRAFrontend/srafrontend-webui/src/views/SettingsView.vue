@@ -54,7 +54,7 @@ import SettingsNavCard from '@/components/SettingsNavCard.vue'
 import type { NavSection } from '@/components/SettingsNavCard.vue'
 import SettingsSectionCard from '@/components/SettingsSectionCard.vue'
 import type { OpenApiDocument, SchemaNode } from '@/utils/schemaForm'
-import { buildDefaultModel, resolveNode, stableStringify } from '@/utils/schemaForm'
+import { buildDefaultModel, localizedDescription, resolveNode, stableStringify } from '@/utils/schemaForm'
 
 const { t } = useI18n()
 
@@ -91,7 +91,7 @@ const sections = computed<ViewSection[]>(() => {
     const resolved = resolveNode(d, node)
     return {
       key,
-      label: resolved.description ?? node.description ?? key,
+      label: localizedDescription(resolved, resolved.description ?? node.description ?? key),
       node,
     }
   })

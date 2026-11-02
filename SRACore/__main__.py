@@ -5,8 +5,7 @@ import sys
 
 sys.path.append(os.getcwd())  # 将当前工作目录添加到 sys.path，以便导入 tasks
 
-from SRACore.localization import Resource
-from SRACore.localization.presentation import translate
+from SRACore.localization import Resources
 from SRACore.services.setting_service import SettingsService
 from SRACore.util.const import VERSION, AppDataDir, CacheDir, ConfigsDir, LogsDir, SettingsJson
 from SRACore.util.standard_io import configure_standard_streams
@@ -17,10 +16,10 @@ def main():
     configure_standard_streams()
     settings = SettingsService()
     language: int = settings.settings.Display.Language
-    Resource.set_language(language)
+    Resources.set_language(language)
     parser = argparse.ArgumentParser(
-        description=Resource.argparse_description,
-        epilog=Resource.argparse_epilog,
+        description=Resources.argparse_description,
+        epilog=Resources.argparse_epilog,
         formatter_class=argparse.RawTextHelpFormatter
     )
     setup_argumentparser(parser)
@@ -33,7 +32,7 @@ def main():
         sys.argv.remove('--no-admin')  # 移除参数，不向下传递（无论是否已是管理员）
     if not is_admin():
         if args.no_admin:
-            print(Resource.cli_noAdminWarning)
+            print(Resources.cli_noAdminWarning)
         else:
             restart_as_admin()
     # 构造进程内宿主：统一负责日志、tasks/extensions 动态导入与任务/扩展编排
@@ -67,31 +66,31 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         '--inline',
         action='store_true',
-        help=Resource.argparse_inline_help
+        help=Resources.argparse_inline_help
     )
     parser.add_argument(
         '--command', '-c', '--execute', '-e',
         nargs='*',
         type=str,
-        help=translate('The command to execute AFTER launch'),
+        help=Resources.cli_argHelp_command,
     )
     parser.add_argument(
         '-v', '--version',
         action='version',
         version=f'{VERSION}',
-        help=Resource.argparse_version_help
+        help=Resources.argparse_version_help
     )
     parser.add_argument(
         '--log-level',
         type=str,
         choices=['TRACE', 'DEBUG', 'INFO', 'SUCCESS', 'WARNING', 'ERROR', 'CRITICAL'],
         default='TRACE',
-        help=Resource.argparse_log_level_help
+        help=Resources.argparse_log_level_help
     )
     parser.add_argument(
         '--no-admin',
         action='store_true',
-        help=translate("Do not require admin privileges")
+        help=Resources.cli_argHelp_noAdmin
     )
 
     parser.add_argument(
@@ -100,7 +99,7 @@ def setup_argumentparser(parser: argparse.ArgumentParser) -> None:
         nargs='?',
         default='',
         metavar=f'{{{",".join(subcommands.keys())}}}',
-        help=translate("Subcommands, type '{subcommand} --help' for more information")
+        help=Resources.cli_argHelp_subcommand
     )
 
     parser.add_argument(
@@ -123,7 +122,7 @@ def where_parser() -> argparse.ArgumentParser:
     """返回路径查找解析器"""
     parser = argparse.ArgumentParser(
         prog=f'{os.path.basename(sys.argv[0])} where',
-        description=translate('Find the path of the executable file or a directory'),
+        description=Resources.cli_argHelp_whereDescription,
     )
     parser.add_argument(
         'path',
@@ -131,7 +130,7 @@ def where_parser() -> argparse.ArgumentParser:
         nargs='?',
         choices=['configs', 'logs', 'cache', 'data', 'settings', ''],
         default='',
-        help=translate('The path to find'),
+        help=Resources.cli_argHelp_wherePath,
     )
     return parser
 
@@ -156,23 +155,23 @@ def serve_parser() -> argparse.ArgumentParser:
     """返回服务器解析器"""
     parser = argparse.ArgumentParser(
         prog=f'{os.path.basename(sys.argv[0])} serve',
-        description=translate('Start the SRA server'),
+        description=Resources.cli_argHelp_serverDescription,
     )
     parser.add_argument(
         '--host',
         action='store_true',
-        help=translate('Expose the server to the public network'),
+        help=Resources.cli_argHelp_serverHost,
     )
     parser.add_argument(
         '--port',
         type=int,
         default=None,
-        help=translate('The port to use'),
+        help=Resources.cli_argHelp_serverPort,
     )
     parser.add_argument(
         '--no-webui',
         action='store_true',
-        help=translate('Do not host the WebUI static files'),
+        help=Resources.cli_argHelp_serverNoWebui,
     )
     return parser
 

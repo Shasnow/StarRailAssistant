@@ -5,7 +5,7 @@
       <div :class="section.prefix === null ? 'field-group-flat' : 'field-group'">
         <!-- 组标题条：仅前缀分组渲染，平铺字段无标题 -->
         <div v-if="section.prefix !== null" class="field-group-head">
-          <span class="field-group-title">{{ tr(groupTitle(section.prefix)) }}</span>
+          <span class="field-group-title">{{ groupTitle(section.prefix) }}</span>
           <span class="field-group-count">{{ section.fields.length }} {{ t('schema.fieldCountUnit') }}</span>
         </div>
 
@@ -21,7 +21,7 @@
           <div v-else-if="kindOf(node) === 'object'" class="field-block">
             <div class="field-titles">
               <div class="block-label">{{ displayKey(key, section.prefix) }}</div>
-              <div v-if="node.description" class="field-desc" :title="tr(node.description)">{{ tr(node.description) }}</div>
+              <div v-if="node.description" class="field-desc" :title="localizedDescription(node, node.description)">{{ localizedDescription(node, node.description) }}</div>
             </div>
             <SchemaForm :schema="node" :doc="doc" :model-value="recordValue()[key]" :baseline="baselineRecord()[key]"
               @update:model-value="setField(key, $event)" />
@@ -43,11 +43,10 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { tr } from '@/locales/index.ts'
 
 import { computed } from 'vue'
 import type { OpenApiDocument, SchemaNode } from '@/utils/schemaForm'
-import { fieldKind, resolveNode, stableStringify } from '@/utils/schemaForm'
+import { fieldKind, localizedDescription, resolveNode, stableStringify } from '@/utils/schemaForm'
 import SchemaArrayEditor from './SchemaArrayEditor.vue'
 import SchemaField from './SchemaField.vue'
 

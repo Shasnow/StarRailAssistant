@@ -6,7 +6,7 @@ import importlib
 import pytest
 
 from SRACore import task as task_module
-from SRACore.localization import Resource
+from SRACore.localization import Resources
 from SRACore.models.app_settings import AppSettings
 from SRACore.models.tasks_config import TasksConfig
 from SRACore.notification import service as notification_service
@@ -49,10 +49,10 @@ class FakeOperator:
 
 @pytest.fixture(params=[0, 1, 2])
 def notification_language(request):
-    original = Resource.lang
-    Resource.set_language(request.param)
+    original = Resources.lang
+    Resources.set_language(request.param)
     yield request.param
-    Resource.set_language(original)
+    Resources.set_language(original)
 
 
 def test_load_all_tasks_and_trigger_start_complete_notifications(monkeypatch, notification_language) -> None:
@@ -102,11 +102,7 @@ def test_load_all_tasks_and_trigger_start_complete_notifications(monkeypatch, no
         task.on_completed()
 
         assert len(sent_notifications) == 2
-        assert all(title == Resource.task_notificationTitle for title, _, _ in sent_notifications)
-        if notification_language == 2:
-            assert sent_notifications[0][1] == f"Задача {task_name} запущена."
-            assert sent_notifications[1][1] == f"Задача {task_name} выполнена."
-        else:
-            assert sent_notifications[0][1] == f"任务 {task_name} 开始执行。"
-            assert sent_notifications[1][1] == f"任务 {task_name} 执行完成。"
+        assert all(title == Resources.task_notificationTitle for title, _, _ in sent_notifications)
+        assert sent_notifications[0][1] == Resources.notification_taskStarted(task_name)
+        assert sent_notifications[1][1] == Resources.notification_taskCompleted(task_name)
         assert all(result == "success" for _, _, result in sent_notifications)

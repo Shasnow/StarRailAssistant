@@ -24,7 +24,7 @@
       <el-tabs v-model="activeTab" class="config-tabs">
         <el-tab-pane v-for="tab in tabs" :key="tab.key" :name="tab.key">
           <template #label>
-            <span class="tab-label" :title="tab.key">{{ tr(tab.label) }}<span v-if="dirtyKeys.has(tab.key)"
+            <span class="tab-label" :title="tab.key">{{ tab.label }}<span v-if="dirtyKeys.has(tab.key)"
                 class="dirty-dot" :title="t('common.unsaved')" /></span>
           </template>
           <div class="tab-pane-body">
@@ -50,7 +50,6 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { tr } from '@/locales/index.ts'
 
 import { ElMessage } from 'element-plus'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
@@ -58,7 +57,7 @@ import { fetchOpenApiSpec } from '@/api/openapi'
 import type { TasksConfigPayload } from '@/api/configs'
 import { useConfigsStore } from '@/stores/configs'
 import type { OpenApiDocument, SchemaNode } from '@/utils/schemaForm'
-import { buildDefaultModel, resolveNode, stableStringify } from '@/utils/schemaForm'
+import { buildDefaultModel, localizedDescription, resolveNode, stableStringify } from '@/utils/schemaForm'
 import PanelCard from './PanelCard.vue'
 import SchemaForm from './SchemaForm.vue'
 
@@ -119,7 +118,7 @@ const tabs = computed<{ key: string; label: string; schema: SchemaNode }[]>(() =
       const schema = resolveNode(d, node)
       return {
         key,
-        label: schema.description ?? node.description ?? key,
+        label: localizedDescription(schema, schema.description ?? node.description ?? key),
         schema,
       }
     })

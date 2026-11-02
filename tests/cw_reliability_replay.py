@@ -11,13 +11,13 @@ from PIL import Image
 import pytest
 
 from SRACore.operators.model import Box
-from extensions.cw_plus.characters import Characters
-from extensions.cw_plus.logic import SlotObservation, SlotState
-from extensions.cw_plus.paths import CALIBRATION_ROOT
-from extensions.cw_plus.unicode_templates import load_template
-from extensions.cw_plus.vision import POPULATION_ROI
+from extensions.currency_wars_plus.cw_plus.characters import Characters
+from extensions.currency_wars_plus.cw_plus.logic import SlotObservation, SlotState
+from extensions.currency_wars_plus.cw_plus.paths import CALIBRATION_ROOT
+from extensions.currency_wars_plus.cw_plus.unicode_templates import load_template
+from extensions.currency_wars_plus.cw_plus.vision import POPULATION_ROI
 
-engine = importlib.import_module("extensions.cw_plus.CurrencyWars")
+engine = importlib.import_module("extensions.currency_wars_plus.cw_plus.CurrencyWars")
 
 
 class ReplayClock:

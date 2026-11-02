@@ -10,7 +10,7 @@ import re
 from functools import lru_cache
 from pathlib import Path
 
-from SRACore.localization.resource import Resource
+from SRACore.localization import Resources
 
 _FIELD = re.compile(r"\{(\d+)\}")
 
@@ -60,35 +60,11 @@ def _russian(text: str) -> str:
 
 
 def translate(text: str) -> str:
-    return _russian(text) if Resource.lang == "ru-ru" else text
+    return _russian(text) if Resources.lang == "ru-ru" else text
 
 
-def localize_record(record) -> None:
-    record["message"] = translate(record["message"])
+def to_russian(text: str) -> str:
+    """无条件返回俄语译文；用于接口一次返回多语、不依赖全局语言的场景。"""
+    return _russian(text)
 
 
-def localize_schema(schema):
-    """Copy schema labels; never rename properties, aliases, enum values, or defaults."""
-    if Resource.lang != "ru-ru":
-        return schema
-    if isinstance(schema, list):
-        return [localize_schema(item) for item in schema]
-    if not isinstance(schema, dict):
-        return schema
-    result = {}
-    for key, value in schema.items():
-        if key in ("title", "description", "x-refresh-label") and isinstance(value, str):
-            result[key] = translate(value)
-        elif key == "x-enum-labels" and isinstance(value, list):
-            result[key] = [translate(item) if isinstance(item, str) else item for item in value]
-        elif key in ("properties", "$defs", "definitions"):
-            result[key] = {name: localize_schema(prop) for name, prop in value.items()}
-            if key == "properties":
-                for name, prop in result[key].items():
-                    if isinstance(prop, dict):
-                        prop["title"] = translate(value[name].get("title", name))
-        elif key not in ("enum", "default", "const", "required", "examples"):
-            result[key] = localize_schema(value)
-        else:
-            result[key] = value
-    return result

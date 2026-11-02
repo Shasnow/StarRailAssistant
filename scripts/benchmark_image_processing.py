@@ -23,14 +23,14 @@ import pyscreeze
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from extensions.cw_plus import equipment_choice, shop_overlay  # noqa: E402
+from extensions.currency_wars_plus.cw_plus import equipment_choice, shop_overlay  # noqa: E402
 from tests.image_processing_cases import (  # noqa: E402
     equipment_cases, equipment_frame, probability_cases, probability_frame,
 )
 
 
 def reference(ref, filename):
-    source = subprocess.check_output(["git", "show", f"{ref}:extensions/cw_plus/{filename}.py"], cwd=ROOT)
+    source = subprocess.check_output(["git", "show", f"{ref}:extensions/currency_wars_plus/cw_plus/{filename}.py"], cwd=ROOT)
     name = f"_image_baseline_{filename}"
     module = types.ModuleType(name)
     sys.modules[name] = module
@@ -87,7 +87,7 @@ def workloads(before_equipment, before_probability, only_baseline):
     if only_baseline:
         matcher = original_match
     else:
-        from extensions.cw_plus.unicode_templates import locate_first
+        from extensions.currency_wars_plus.cw_plus.unicode_templates import locate_first
 
         def matcher(needle, haystack, confidence):
             return locate_first(needle, haystack, confidence=confidence)
@@ -161,7 +161,7 @@ def ocr_control(trials, repeats, only_baseline):
     assert all(value == ["CPUExecutionProvider"] for value in providers.values()), providers
     images, hashes = [], {}
     for name in ("next_step", "next_page", "preparation_stage"):
-        path = ROOT / "extensions/cw_plus/resources" / f"{name}.png"
+        path = ROOT / "extensions/currency_wars_plus/cw_plus/resources" / f"{name}.png"
         hashes[name] = hashlib.sha256(path.read_bytes()).hexdigest()
         with Image.open(path) as image:
             images.extend((image.convert("RGB"), image.convert("L")))
