@@ -3,11 +3,12 @@
 **升级前请先阅读「破坏性变更」。**
 
 - SRA-Cli 与 SRA-Server 现在是一款统一的产品。
-- 桌面端默认后端改为「内嵌 Python 运行时 + 源码」，取代 Nuitka 单文件编译；`SRA-cli.exe` 改为轻量原生启动器，命令行用法不变。
 - 新增 `CurrencyWarsPlus` 拓展，支持货币战争常规与超频博弈、阶段阵容与职责、阶段经济及 3-7 终局运营。 by YukkiSSYB、sososos662
 - 清体力培养目标新增“材料优先”选项，开启后若识别到材料型副本，则跳过饰品提取与侵蚀隧洞；未识别到材料型副本时仍保留原有副本。
 - 新增自动拉取兑换码功能，兑换码任务将自动从官网拉取最新兑换码，与本地配置合并后兑换。
 - 添加俄语本地化支持 by sososos662
+- 添加 Docker 部署支持
+- WebUI: 支持在实时预览画面时直接发送键鼠操作
 
 ### 问题修复：
 
@@ -17,7 +18,7 @@
 - 修复了货币战争中当前台区域无角色时，程序卡死的问题。
 - 修复了历战余响战斗结束时获得光锥时，程序卡死的问题。
 - 修复了差分宇宙更新弹窗导致程序卡死的问题。
-- 修复了在 WebUI 中保存任务配置后，账号密码在下次运行时失效的问题（前端回传的密文先用访问令牌解密，再用 DPAPI 重新加密保存）。
+- 修复了在 WebUI 中保存任务配置后，账号密码在下次运行时失效的问题。
 
 ### 更新说明：
 
@@ -32,13 +33,17 @@
 - 命令行参数：`--host`（绑定 `0.0.0.0` 对外暴露）、`--port`；`sra serve` 另支持 `--no-webui`
 - Core / Full / Lite 发行包均已内置 WebUI，开箱即用；通过 `uv` / `pip` 安装（wheel 不含构建产物）时需执行一次 `sra init` 下载 WebUI，未下载时 REST 与 MCP 仍可用，只是没有 Web 界面。
 
+#### 新增 Docker 部署支持
+
+SRA 现在支持 Docker 部署，详见 [Docker 部署说明](https://starrailassistant.top/guides/docker/)。
+
 #### 破坏性变更:
 
-- 移除了 `SRA-server.exe`
-- REST 路径统一为小写
-- 远程模式默认地址改为 `http://localhost:5073`（原 5000），请求路径同步改为 `/api/**`。
-- Python 依赖分组 `full` extra 更名为 `standard`：`pip install ".[full]"` 失效，改用 `pip install ".[standard]"`。
-- 不再需要 ASP.NET Core。
+- Server: 移除了 `SRA-server.exe`, 请使用 `SRA-cli.exe serve` 启动服务端。
+- Server: 服务器 REST 路径统一为小写。
+- Server: 远程模式默认地址改为 `http://localhost:5073`（原 5000），请求路径同步改为 `/api/**`。
+- Server: 不再需要 ASP.NET Core。
+- Core: Python 依赖分组 `full` extra 更名为 `standard`：`pip install ".[full]"` 失效，改用 `pip install ".[standard]"`。
 
 #### 新增货币战争 plus 独立优化扩展
 
