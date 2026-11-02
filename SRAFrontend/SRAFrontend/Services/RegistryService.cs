@@ -8,6 +8,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using SRAFrontend.Models;
+using SRAFrontend.Localization;
 
 namespace SRAFrontend.Services;
 
@@ -20,10 +21,10 @@ public class RegistryService(
     SettingsService settingsService)
 {
     // 提示文本
-    private static string MsgUnsupportedOs => Localization.UiText.T("非Windows系统不支持注册表操作");
+    private static string MsgUnsupportedOs => Localization.Resources.RegistryUnsupportedError;
     private const string MsgGamePathNotFound = "无法自动检测游戏路径";
-    private static string MsgAccessDenied => Localization.UiText.T("注册表访问被拒绝，请以管理员身份运行");
-    private static string MsgRegKeyNotFound => Localization.UiText.T("未找到注册表项: {key}");
+    private static string MsgAccessDenied => Localization.Resources.RegistryAccessDeniedError;
+    private static string MsgRegKeyNotFound => Localization.Resources.RegistryKeyNotFoundError;
 
     /// <summary>
     ///     获取星穹铁道游戏安装路径

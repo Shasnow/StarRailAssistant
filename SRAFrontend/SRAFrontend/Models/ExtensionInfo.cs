@@ -25,6 +25,8 @@ public class ExtensionSchemaProperty
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "";
+    [JsonPropertyName("title")]
+    public string Title { get; set; } = "";
     [JsonPropertyName("description")]
     public string Description { get; set; } = "";
     [JsonPropertyName("default")]
@@ -36,12 +38,9 @@ public class ExtensionSchemaProperty
     // Yukki：枚举标签与真实配置值分别传递。
     [JsonPropertyName("enum")]
     public List<JsonElement>? Enum { get; set; }
+    // 后端已按界面语言返回单语标签。
     [JsonPropertyName("x-enum-labels")]
     public List<string>? EnumLabels { get; set; }
-    [JsonPropertyName("x-refreshable")]
-    public bool Refreshable { get; set; }
-    [JsonPropertyName("x-refresh-label")]
-    public string RefreshLabel { get; set; } = "扫描";
     [JsonPropertyName("x-allow-custom")]
     public bool AllowCustom { get; set; }
 }

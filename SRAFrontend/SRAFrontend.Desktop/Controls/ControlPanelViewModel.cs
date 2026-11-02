@@ -69,20 +69,20 @@ public partial class ControlPanelViewModel : ViewModelBase
             case "Current":
                 Save();
                 if (await _backendService.TaskRunAsync(Cache.CurrentConfigName))
-                    _commonModel.ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("任务启动成功"), global::SRAFrontend.Localization.UiText.F($"已启动配置：{Cache.CurrentConfigName}"));
+                    _commonModel.ShowSuccessToast(Resources.TaskStartSuccessMessage, string.Format(Resources.Culture, Resources.ConfigurationStartedMessage, Cache.CurrentConfigName));
                 else
-                    _commonModel.ShowErrorToast(global::SRAFrontend.Localization.UiText.T("任务启动失败"), global::SRAFrontend.Localization.UiText.F($"无法启动配置：{Cache.CurrentConfigName}，请检查后端状态。"));
+                    _commonModel.ShowErrorToast(Resources.TaskStartFailedError, string.Format(Resources.Culture, Resources.ConfigurationStartFailedError, Cache.CurrentConfigName));
                 break;
             case "All":
                 Save();
                 if (await _backendService.TaskRunAsync(null))
-                    _commonModel.ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("任务启动成功"), global::SRAFrontend.Localization.UiText.T("已启动所有配置任务。"));
+                    _commonModel.ShowSuccessToast(Resources.TaskStartSuccessMessage, Resources.AllConfigurationsStartedMessage);
                 else
-                    _commonModel.ShowErrorToast(global::SRAFrontend.Localization.UiText.T("任务启动失败"), global::SRAFrontend.Localization.UiText.T("无法启动所有配置任务，请检查后端状态。"));
+                    _commonModel.ShowErrorToast(Resources.TaskStartFailedError, Resources.AllConfigurationsStartFailedError);
                 break;
             case "Save Only":
                 Save();
-                _commonModel.ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("保存成功"), global::SRAFrontend.Localization.UiText.T("已保存当前配置。"));
+                _commonModel.ShowSuccessToast(Resources.SaveSuccessMessage, Resources.ConfigurationSavedMessage);
                 break;
         }
     }
@@ -91,9 +91,9 @@ public partial class ControlPanelViewModel : ViewModelBase
     {
         Save();
         if (await _backendService.TaskSingleAsync(configName, null))
-            _commonModel.ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("任务启动成功"), global::SRAFrontend.Localization.UiText.T("已启动任务"));
+            _commonModel.ShowSuccessToast(Resources.TaskStartSuccessMessage, Resources.TaskStartedMessage);
         else
-            _commonModel.ShowErrorToast(global::SRAFrontend.Localization.UiText.T("任务启动失败"), global::SRAFrontend.Localization.UiText.T("无法启动任务，请检查后端状态。"));
+            _commonModel.ShowErrorToast(Resources.TaskStartFailedError, Resources.TaskStartBackendErrorMessage);
     }
 
     [RelayCommand]
@@ -123,7 +123,7 @@ public partial class ControlPanelViewModel : ViewModelBase
             return;
         if (NewConfigName.IndexOfAny(['\\', '/', ':', '*', '?', '"', '<', '>', '|']) != -1)
         {
-            _commonModel.ShowErrorToast(global::SRAFrontend.Localization.UiText.T("无效的配置名称"), global::SRAFrontend.Localization.UiText.T("配置名称不能包含以下字符：\\ / : * ? \" < > |"));
+            _commonModel.ShowErrorToast(Resources.InvalidConfigurationNameError, Resources.InvalidConfigurationNameCharsMessage);
             return;
         }
         Cache.ConfigNames.Add(NewConfigName);

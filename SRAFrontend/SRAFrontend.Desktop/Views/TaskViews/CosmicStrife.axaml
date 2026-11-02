@@ -13,11 +13,11 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="{x:Static lang:ExtraResources.U0477}" IsChecked="{Binding CosmicStrifeConfig.IsEnabled}"/>
+                    <CheckBox Content="{x:Static lang:Resources.CosmicStrifeNameText}" IsChecked="{Binding CosmicStrifeConfig.IsEnabled}"/>
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="CosmicStrifeTask"
-                            ToolTip.Tip="{x:Static lang:ExtraResources.U0478}"/>
+                            ToolTip.Tip="{x:Static lang:Resources.SingleRunCountText}"/>
                 </StackPanel>
                 
             </suki:GroupBox.Header>
@@ -26,111 +26,111 @@
                     <suki:GlassCard>
                         <StackPanel>
                             <CheckBox IsChecked="{Binding CosmicStrifeConfig.IsDivergentUniverseEnabled}"
-                                      Content="{x:Static lang:ExtraResources.U0479}"/>
+                                      Content="{x:Static lang:Resources.DivergentUniverseParadiseText}"/>
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Label><x:Static Member="lang:ExtraResources.U0496" /></Label>
+                                <Label><x:Static Member="lang:Resources.ModeLabelText" /></Label>
                                 <ComboBox SelectedIndex="{Binding CosmicStrifeConfig.DivergentUniverseMode}">
-                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0497" /></ComboBoxItem>
-                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0498" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:Resources.ModeFarmFirstLevelText" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:Resources.ModeFullRunText" /></ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="10">
-                                <Label><x:Static Member="lang:ExtraResources.U0251" /></Label>
+                                <Label><x:Static Member="lang:Resources.RunCountLabelText" /></Label>
                                 <NumericUpDown FormatString="0" Value="{Binding CosmicStrifeConfig.DivergentUniverseRuntimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
-                            <ToggleSwitch OnContent="{x:Static lang:ExtraResources.U0480}" IsChecked="{Binding CosmicStrifeConfig.IsDivergentUniverseUseTechnique}" />
-                            <ToggleSwitch OnContent="{x:Static lang:ExtraResources.U0481}" IsChecked="{Binding CosmicStrifeConfig.IsPointRewardsEnabled}" />
+                            <ToggleSwitch OnContent="{x:Static lang:Resources.TechniqueFastFarmText}" IsChecked="{Binding CosmicStrifeConfig.IsDivergentUniverseUseTechnique}" />
+                            <ToggleSwitch OnContent="{x:Static lang:Resources.EnablePointRewardsText}" IsChecked="{Binding CosmicStrifeConfig.IsPointRewardsEnabled}" />
                         </StackPanel>
                     </suki:GlassCard>
-                    <TextBlock><x:Static Member="lang:ExtraResources.U0499" /></TextBlock>
+                    <TextBlock><x:Static Member="lang:Resources.DivergentUniverseTutorialHint" /></TextBlock>
                     <suki:GlassCard>
                         <StackPanel>
                             <CheckBox IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsEnabled}"
-                                      Content="{x:Static lang:ExtraResources.U0482}" />
+                                      Content="{x:Static lang:Resources.CurrencyWarsZeroSumText}" />
                             <Grid ColumnDefinitions="Auto, Auto">
-                                <Label Content="{x:Static lang:ExtraResources.U0483}" />
+                                <Label Content="{x:Static lang:Resources.TrailblazerNameLabelText}" />
                                 <TextBox Grid.Column="1"
                                          Width="320"
                                          Text="{Binding CosmicStrifeConfig.CurrencyWarsUsername}"
-                                         PlaceholderText="{x:Static lang:ExtraResources.U0484}"/>
+                                         PlaceholderText="{x:Static lang:Resources.TrailblazerNamePlaceholder}"/>
                             </Grid>
                             
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Label><x:Static Member="lang:ExtraResources.U0248" /></Label>
+                                <Label><x:Static Member="lang:Resources.TypeLabelText" /></Label>
                                 <ComboBox SelectedIndex="{Binding CurrencyWarsModeIndex}" Width="200" HorizontalAlignment="Left">
-                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0500" /></ComboBoxItem>
-                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0501" /></ComboBoxItem>
-                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0502" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:Resources.ModeStandardMatchText" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:Resources.ModeOverclockMatchText" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:Resources.ModeOpeningRerollText" /></ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Label><x:Static Member="lang:ExtraResources.U0503" /></Label>
+                                <Label><x:Static Member="lang:Resources.DifficultyLabelText" /></Label>
                                 <ComboBox SelectedIndex="{Binding CosmicStrifeConfig.CurrencyWarsDifficulty}" Width="200">
-                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0504" /></ComboBoxItem>
-                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0505" /></ComboBoxItem>
-                                    <ComboBoxItem><x:Static Member="lang:ExtraResources.U0506" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:Resources.DifficultyLowestText" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:Resources.DifficultyHighestText" /></ComboBoxItem>
+                                    <ComboBoxItem><x:Static Member="lang:Resources.DifficultyCurrentText" /></ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Label><x:Static Member="lang:ExtraResources.U0507" /></Label>
+                                <Label><x:Static Member="lang:Resources.StrategyLabelText" /></Label>
                                 <ComboBox ItemsSource="{Binding Cache.Strategies}"
                                           SelectedIndex="{Binding CurrencyWarsStrategyIndex}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Title, Converter={x:Static controls:LocalizedStringConverter.Instance}}"/>
+                                            <TextBlock Text="{Binding Title}"/>
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
-                                <Button Command="{Binding RefreshStrategiesCommand}"><x:Static Member="lang:ExtraResources.U0431" /></Button>
-                                <Button Command="{Binding InstallStrategyCommand}"><x:Static Member="lang:ExtraResources.U0508" /></Button>
-                                <HyperlinkButton Content="{x:Static lang:ExtraResources.U0485}" NavigateUri="https://starrailassistant.top/sra-strategy-site/"/>
+                                <Button Command="{Binding RefreshStrategiesCommand}"><x:Static Member="lang:Resources.RefreshText" /></Button>
+                                <Button Command="{Binding InstallStrategyCommand}"><x:Static Member="lang:Resources.ImportText" /></Button>
+                                <HyperlinkButton Content="{x:Static lang:Resources.StrategySiteText}" NavigateUri="https://starrailassistant.top/sra-strategy-site/"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Spacing="10">
-                                <Label><x:Static Member="lang:ExtraResources.U0251" /></Label>
+                                <Label><x:Static Member="lang:Resources.RunCountLabelText" /></Label>
                                 <NumericUpDown FormatString="0" Value="{Binding CosmicStrifeConfig.CurrencyWarsRuntimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
 
-                            <ToggleSwitch OnContent="{x:Static lang:ExtraResources.U0486}" IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsPointRewardsEnabled}" />
+                            <ToggleSwitch OnContent="{x:Static lang:Resources.SkipWhenPointsFullText}" IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsPointRewardsEnabled}" />
 
                             <Separator/>
 
                             <StackPanel IsVisible="{Binding !IsCwNormalMode}" Margin="0,4,0,0" Spacing="4">
                                 <TextBlock Foreground="Gray"
-                                           Text="{x:Static lang:ExtraResources.U0487}" />
+                                           Text="{x:Static lang:Resources.CurrencyWarsBossConfigHint}" />
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Label Content="{x:Static lang:ExtraResources.U0488}" />
+                                    <Label Content="{x:Static lang:Resources.CurrencyWarsBossNameText}" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollBossNames}"
-                                             PlaceholderText="{x:Static lang:ExtraResources.U0489}" />
+                                             PlaceholderText="{x:Static lang:Resources.CurrencyWarsBossNamePlaceholder}" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Label Content="{x:Static lang:ExtraResources.U0490}" />
+                                    <Label Content="{x:Static lang:Resources.CurrencyWarsBossAffixText}" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollBossAffixes}"
-                                             PlaceholderText="{x:Static lang:ExtraResources.U0491}" />
+                                             PlaceholderText="{x:Static lang:Resources.CurrencyWarsBossAffixPlaceholder}" />
                                 </StackPanel>
                                 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Label Content="{x:Static lang:ExtraResources.U0492}" />
+                                    <Label Content="{x:Static lang:Resources.CurrencyWarsInvestmentEnvText}" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollInvestEnvironments}"
-                                             PlaceholderText="{x:Static lang:ExtraResources.U0493}" />
+                                             PlaceholderText="{x:Static lang:Resources.CurrencyWarsInvestmentEnvPlaceholder}" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Label Content="{x:Static lang:ExtraResources.U0494}" />
+                                    <Label Content="{x:Static lang:Resources.CurrencyWarsInvestmentStrategyText}" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollInvestStrategies}"
-                                             PlaceholderText="{x:Static lang:ExtraResources.U0495}" />
+                                             PlaceholderText="{x:Static lang:Resources.CurrencyWarsStrategyExamplePlaceholder}" />
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </suki:GlassCard>
-                    <TextBlock><x:Static Member="lang:ExtraResources.U0509" /></TextBlock>
+                    <TextBlock><x:Static Member="lang:Resources.CurrencyWarsManualClearHint" /></TextBlock>
                 </StackPanel>
             </ScrollViewer>
         </suki:GroupBox>

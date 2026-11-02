@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SRAFrontend.Utils;
+using SRAFrontend.Localization;
 
 namespace SRAFrontend.Desktop.ViewModels;
 
@@ -90,7 +91,7 @@ public partial class ResourceCleanupViewModel : ObservableObject
         var selectedSize = Files.Where(f => f.IsSelected).Sum(f => f.Size);
         var totalSize = Files.Sum(f => f.Size);
         SelectedSummary =
-            global::SRAFrontend.Localization.UiText.F($"已选 {selectedCount}/{Files.Count} 个，共 {ZipUtil.FormatFileSize(selectedSize)}（冗余合计 {ZipUtil.FormatFileSize(totalSize)}）");
+            string.Format(Resources.Culture, Resources.SelectionSummaryFormat, selectedCount, Files.Count, ZipUtil.FormatFileSize(selectedSize), ZipUtil.FormatFileSize(totalSize));
         OnPropertyChanged(nameof(IsAllSelected));
     }
 

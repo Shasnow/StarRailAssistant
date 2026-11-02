@@ -12,21 +12,21 @@
         <suki:GroupBox>
             <suki:GroupBox.Header>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <CheckBox Content="{x:Static lang:ExtraResources.U0543}" IsChecked="{Binding TrailblazePowerConfig.IsEnabled}" />
+                    <CheckBox Content="{x:Static lang:Resources.TrailblazePowerTaskText}" IsChecked="{Binding TrailblazePowerConfig.IsEnabled}" />
                     <Button Content="&#xE3D0;" Classes="Flat Icon" Height="20" FontSize="14"
                             Command="{Binding SingleTaskCommand}"
                             CommandParameter="TrailblazePowerTask"
-                            ToolTip.Tip="{x:Static lang:ExtraResources.U0478}" />
+                            ToolTip.Tip="{x:Static lang:Resources.SingleRunCountText}" />
                 </StackPanel>
 
             </suki:GroupBox.Header>
             <ScrollViewer>
                 <StackPanel Spacing="10">
                     <suki:GlassCard>
-                        <suki:GroupBox Header="{x:Static lang:ExtraResources.U0544}">
+                        <suki:GroupBox Header="{x:Static lang:Resources.TaskChecklistText}">
                             <Grid ColumnDefinitions="Auto,*, Auto">
                                 <Label Grid.Column="1" Content="{Binding TaskListText}"/>
-                                <Button Grid.Column="2" Content="{x:Static lang:ExtraResources.U0436}" Command="{Binding ShowTaskListControlCommand}"/>
+                                <Button Grid.Column="2" Content="{x:Static lang:Resources.ConfigsText}" Command="{Binding ShowTaskListControlCommand}"/>
                             </Grid>
                         </suki:GroupBox>
                     </suki:GlassCard>
@@ -34,35 +34,35 @@
                         <StackPanel >
                             <CheckBox
                                 IsChecked="{Binding TrailblazePowerConfig.IsReplenishEnabled}"
-                                Content="{x:Static lang:ExtraResources.U0545}" />
+                                Content="{x:Static lang:Resources.ReplenishPowerText}" />
                             <Grid
                                 ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="10">
-                                <Label Grid.Column="0" Content="{x:Static lang:ExtraResources.U0546}" />
+                                <Label Grid.Column="0" Content="{x:Static lang:Resources.UseText}" />
                                 <ComboBox Grid.Column="1"
                                           SelectedIndex="{Binding TrailblazePowerConfig.ReplenishWay}">
-                                    <ComboBoxItem Content="{x:Static lang:ExtraResources.U0547}" />
-                                    <ComboBoxItem Content="{x:Static lang:ExtraResources.U0548}" />
-                                    <ComboBoxItem Content="{x:Static lang:ExtraResources.U0549}" />
+                                    <ComboBoxItem Content="{x:Static lang:Resources.ReservedPowerText}" />
+                                    <ComboBoxItem Content="{x:Static lang:Resources.FuelText}" />
+                                    <ComboBoxItem Content="{x:Static lang:Resources.StellarJadeText}" />
                                 </ComboBox>
-                                <Label Grid.Column="2" Content="{x:Static lang:ExtraResources.U0550}" />
+                                <Label Grid.Column="2" Content="{x:Static lang:Resources.ReplenishButtonText}" />
                                 <NumericUpDown Grid.Column="3" Minimum="1" Maximum="99" FormatString="0"
                                                Height="20"
                                                Value="{Binding TrailblazePowerConfig.ReplenishTimes}" />
-                                <Label Grid.Column="4" Content="{x:Static lang:ExtraResources.U0551}" />
+                                <Label Grid.Column="4" Content="{x:Static lang:Resources.CountUnitText}" />
                             </Grid>
 
                             <ToggleSwitch
                                 IsChecked="{Binding TrailblazePowerConfig.IsUseAssistant}"
-                                OnContent="{x:Static lang:ExtraResources.U0552}" />
+                                OnContent="{x:Static lang:Resources.SupportCharacterText}" />
                             <StackPanel Orientation="Horizontal" Spacing="16">
                                 <ToggleSwitch
                                     IsChecked="{Binding TrailblazePowerConfig.IsUseBuildTarget}"
-                                    OnContent="{x:Static lang:ExtraResources.U0553}"
-                                    ToolTip.Tip="{x:Static lang:ExtraResources.U0135}" />
+                                    OnContent="{x:Static lang:Resources.TrainingTargetText}"
+                                    ToolTip.Tip="{x:Static lang:Resources.TrainingTargetEnableDescription}" />
                                 <ToggleSwitch
                                     IsChecked="{Binding TrailblazePowerConfig.IsMaterialPriority}"
-                                    OnContent="{x:Static lang:ExtraResources.U0554}"
-                                    ToolTip.Tip="{x:Static lang:ExtraResources.U0555}" />
+                                    OnContent="{x:Static lang:Resources.MaterialPriorityText}"
+                                    ToolTip.Tip="{x:Static lang:Resources.MaterialPriorityDescription}" />
                             </StackPanel>
                         </StackPanel>
                     </suki:GlassCard>
@@ -70,34 +70,34 @@
                         <suki:GroupBox>
                             <suki:GroupBox.Header>
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="{x:Static lang:ExtraResources.U0556}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{x:Static lang:Resources.DoubleEventDetectionText}" VerticalAlignment="Center"/>
                                     <ToggleSwitch IsChecked="{Binding TrailblazePowerConfig.IsActivityEnabled}"/>
                                 </StackPanel>
                             </suki:GroupBox.Header>
                             <StackPanel>
                                 <Grid ColumnDefinitions="Auto, Auto,*" RowDefinitions="Auto, Auto">
-                                    <Label Grid.Row="0" Grid.Column="0" Content="{x:Static lang:ExtraResources.U0557}"/>
+                                    <Label Grid.Row="0" Grid.Column="0" Content="{x:Static lang:Resources.GardenOfPlentyText}"/>
                                     <TextBlock Grid.Row="0" Grid.Column="1" Width="180" VerticalAlignment="Center" TextAlignment="Center"
-                                        Text="{x:Static lang:ExtraResources.U0558}"/>
+                                        Text="{x:Static lang:Resources.CalyxGoldenText}"/>
                                     <ComboBox Grid.Row="0" Grid.Column="2"
                                               SelectedIndex="{Binding SelectedGardenOfPlentyLevels1Index}"
                                               ItemsSource="{Binding GardenOfPlentyLevels1}"/>
                                     <TextBlock Grid.Row="1" Grid.Column="1" Width="180" VerticalAlignment="Center" TextAlignment="Center"
-                                               Text="{x:Static lang:ExtraResources.U0559}"/>
+                                               Text="{x:Static lang:Resources.CalyxCrimsonText}"/>
                                     <ComboBox Grid.Row="1" Grid.Column="2"
                                               SelectedIndex="{Binding SelectedGardenOfPlentyLevels2Index}"
                                               ItemsSource="{Binding GardenOfPlentyLevels2}"/>
                                 </Grid>
                                 <Grid ColumnDefinitions="Auto, Auto,*">
-                                    <Label Grid.Column="0" Content="{x:Static lang:ExtraResources.U0560}"/>
-                                    <TextBlock Grid.Column="1" Width="180" Text="{x:Static lang:ExtraResources.U0561}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                    <Label Grid.Column="0" Content="{x:Static lang:Resources.RealmOfStrangeText}"/>
+                                    <TextBlock Grid.Column="1" Width="180" Text="{x:Static lang:Resources.CavernOfCorrosionText}" VerticalAlignment="Center" TextAlignment="Center"/>
                                     <ComboBox Grid.Column="2"
                                               SelectedIndex="{Binding SelectedRealmOfTheStrangeLevelsIndex}"
                                               ItemsSource="{Binding RealmOfTheStrangeLevels}"/>
                                 </Grid>
                                 <Grid ColumnDefinitions="Auto, Auto,*">
-                                    <Label Grid.Column="0" Content="{x:Static lang:ExtraResources.U0562}"/>
-                                    <TextBlock Grid.Column="1" Width="180" Text="{x:Static lang:ExtraResources.U0563}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                    <Label Grid.Column="0" Content="{x:Static lang:Resources.PlanarFissureText}"/>
+                                    <TextBlock Grid.Column="1" Width="180" Text="{x:Static lang:Resources.OrnamentExtractionText}" VerticalAlignment="Center" TextAlignment="Center"/>
                                     <ComboBox Grid.Column="2"
                                               SelectedIndex="{Binding SelectedPlanarFissureLevelsIndex}"
                                               ItemsSource="{Binding PlanarFissureLevels}"/>

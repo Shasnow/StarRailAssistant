@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
 using SRAFrontend.Utils;
+using SRAFrontend.Localization;
 
 namespace SRAFrontend.Services;
 
@@ -46,16 +47,16 @@ public class UpdateService(IHttpClientFactory httpClientFactory, ILogger<UpdateS
 
     private readonly Dictionary<int, string> _errorCodes = new()
     {
-        { 1001, global::SRAFrontend.Localization.UiText.T("获取版本信息的URL参数不正确") },
-        { 7001, global::SRAFrontend.Localization.UiText.T("填入的 CDK 已过期") },
-        { 7002, global::SRAFrontend.Localization.UiText.T("填入的 CDK 错误") },
-        { 7003, global::SRAFrontend.Localization.UiText.T("填入的 CDK 今日下载次数已达上限") },
-        { 7004, global::SRAFrontend.Localization.UiText.T("填入的 CDK 类型和待下载的资源不匹配") },
-        { 7005, global::SRAFrontend.Localization.UiText.T("填入的 CDK 已被封禁") },
-        { 8001, global::SRAFrontend.Localization.UiText.T("对应架构和系统下的资源不存在") },
-        { 8002, global::SRAFrontend.Localization.UiText.T("错误的系统参数") },
-        { 8003, global::SRAFrontend.Localization.UiText.T("错误的架构参数") },
-        { 8004, global::SRAFrontend.Localization.UiText.T("错误的更新通道参数") }
+        { 1001, Resources.VersionUrlParameterError },
+        { 7001, Resources.CdkExpiredError },
+        { 7002, Resources.CdkInvalidError },
+        { 7003, Resources.CdkDailyLimitError },
+        { 7004, Resources.CdkTypeMismatchError },
+        { 7005, Resources.CdkBannedError },
+        { 8001, Resources.ResourceUnavailableError },
+        { 8002, Resources.SystemParameterInvalidError },
+        { 8003, Resources.ArchitectureParameterInvalidError },
+        { 8004, Resources.UpdateChannelParameterInvalidError }
     };
 
     public async Task<VersionResponse?> VerifyCdkAsync(string cdk)

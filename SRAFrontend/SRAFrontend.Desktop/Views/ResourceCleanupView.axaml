@@ -9,10 +9,10 @@
              Width="620"
              x:Class="SRAFrontend.Desktop.Views.ResourceCleanupView"
              x:DataType="viewModels:ResourceCleanupViewModel">
-    <suki:BusyArea IsBusy="{Binding IsDeleting}" BusyText="{x:Static lang:ExtraResources.U0443}">
+    <suki:BusyArea IsBusy="{Binding IsDeleting}" BusyText="{x:Static lang:Resources.DeletingMessage}">
         <StackPanel Margin="0,4" Spacing="8">
             <Grid ColumnDefinitions="Auto, *, Auto">
-                <CheckBox Content="{x:Static lang:ExtraResources.U0444}"
+                <CheckBox Content="{x:Static lang:Resources.SelectAllText}"
                           IsChecked="{Binding IsAllSelected}" />
                 <TextBlock Grid.Column="2"
                            VerticalAlignment="Center"

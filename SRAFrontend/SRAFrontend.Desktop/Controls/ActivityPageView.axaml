@@ -21,7 +21,7 @@
                             <TextBlock FontSize="24" FontWeight="Bold" VerticalAlignment="Center"
                                        Text="{Binding VersionNumber}" />
                             <TextBlock FontSize="18" Opacity="0.7" VerticalAlignment="Center"
-                                       Text="{x:Static lang:ExtraResources.U0222}" />
+                                       Text="{x:Static lang:Resources.VersionLabelText}" />
                         </StackPanel>
                         <TextBlock FontSize="18" Text="{Binding VersionName}" />
                         <StackPanel Orientation="Horizontal" Spacing="16">
@@ -81,7 +81,7 @@
 
                             <!-- 空状态提示 -->
                             <TextBlock IsVisible="{Binding SelectedDateActivities.Count, Converter={x:Static controls:ZeroToBooleanConverter.Instance}}"
-                                       Text="{x:Static lang:ExtraResources.U0223}"
+                                       Text="{x:Static lang:Resources.NoEventsTodayMessage}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Opacity="0.5" FontSize="14"
                                        Margin="0,40" />

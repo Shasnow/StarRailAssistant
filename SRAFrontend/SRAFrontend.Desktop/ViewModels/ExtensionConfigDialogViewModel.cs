@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
+using SRAFrontend.Localization;
 
 namespace SRAFrontend.Desktop.ViewModels;
 
@@ -15,6 +18,12 @@ public partial class ExtensionConfigDialogViewModel : ObservableObject
     private readonly IBackendService _backendService;
 
     [ObservableProperty] private bool _isLoading = true;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasRefreshError))]
+    private string _refreshError = "";
+
+    public bool HasRefreshError => !string.IsNullOrWhiteSpace(RefreshError);
 
     public ObservableCollection<ConfigFieldViewModel> Fields { get; } = [];
 
@@ -68,16 +77,13 @@ public partial class ExtensionConfigDialogViewModel : ObservableObject
     private ConfigFieldViewModel CreateFieldByType(string key, ExtensionSchemaProperty prop)
     {
         // Yukki：枚举优先于基础类型，难度数字仍按数字保存。
-        // 空枚举也保留下拉和扫描入口，方便用户添加攻略后重新扫描。
+        // 空枚举也保留下拉和自定义输入，方便用户添加攻略后刷新选项。
         if (prop.Enum != null)
         {
             var field = new EnumFieldViewModel
             {
-                Key = key, Label = SRAFrontend.Localization.UiText.T(key), Description = SRAFrontend.Localization.UiText.T(prop.Description),
-                AllowCustom = prop.AllowCustom && prop.Type == "string",
-                Refreshable = prop.Refreshable,
-                RefreshLabel = string.IsNullOrWhiteSpace(prop.RefreshLabel) ? global::SRAFrontend.Localization.UiText.T("扫描") : SRAFrontend.Localization.UiText.T(prop.RefreshLabel),
-                RefreshOptionsRequested = RefreshFieldOptionsAsync
+                Key = key, Label = string.IsNullOrEmpty(prop.Title) ? key : prop.Title, Description = prop.Description,
+                AllowCustom = prop.AllowCustom && prop.Type == "string"
             };
             field.UpdateOptions(prop.Enum, prop.EnumLabels);
             return field;
@@ -89,29 +95,49 @@ public partial class ExtensionConfigDialogViewModel : ObservableObject
         {
             "integer" => new IntegerFieldViewModel
             {
-                Key = key, Label = SRAFrontend.Localization.UiText.T(key), Description = SRAFrontend.Localization.UiText.T(prop.Description),
+                Key = key, Label = string.IsNullOrEmpty(prop.Title) ? key : prop.Title, Description = prop.Description,
                 Minimum = prop.Minimum ?? decimal.MinValue,
                 Maximum = prop.Maximum ?? decimal.MaxValue
             },
             "boolean" => new BooleanFieldViewModel
             {
-                Key = key, Label = SRAFrontend.Localization.UiText.T(key), Description = SRAFrontend.Localization.UiText.T(prop.Description)
+                Key = key, Label = string.IsNullOrEmpty(prop.Title) ? key : prop.Title, Description = prop.Description
             },
             _ => new StringFieldViewModel
             {
-                Key = key, Label = SRAFrontend.Localization.UiText.T(key), Description = SRAFrontend.Localization.UiText.T(prop.Description)
+                Key = key, Label = string.IsNullOrEmpty(prop.Title) ? key : prop.Title, Description = prop.Description
             }
         };
     }
 
-    private async Task RefreshFieldOptionsAsync(EnumFieldViewModel field)
+    /// <summary>重新读取 schema，只更新枚举字段的可选项，保留当前值与未保存的修改。</summary>
+    [RelayCommand]
+    private async Task RefreshAsync()
     {
-        var schema = await _backendService.GetExtensionSchemaAsync(_extensionId);
-        if (schema == null || !schema.Properties.TryGetValue(field.Key, out var prop) || prop.Enum == null)
-            throw new InvalidOperationException(global::SRAFrontend.Localization.UiText.T("未能获取可选项，请确认后端已启动后重试。"));
+        if (IsLoading) return;
+        IsLoading = true;
+        RefreshError = "";
+        try
+        {
+            var schema = await _backendService.GetExtensionSchemaAsync(_extensionId);
+            if (schema == null)
+            {
+                RefreshError = Resources.OptionsBackendErrorMessage;
+                return;
+            }
 
-        // 只更新此字段的选项，当前选择及其他未保存的配置均保持原值。
-        field.UpdateOptions(prop.Enum, prop.EnumLabels);
+            foreach (var field in Fields.OfType<EnumFieldViewModel>())
+                if (schema.Properties.TryGetValue(field.Key, out var prop) && prop.Enum != null)
+                    field.UpdateOptions(prop.Enum, prop.EnumLabels);
+        }
+        catch (Exception error)
+        {
+            RefreshError = string.Format(Resources.Culture, Resources.RefreshFailedError, error.Message);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     private static void ApplyValue(ConfigFieldViewModel field, JsonElement value)

@@ -17,6 +17,7 @@ using SRAFrontend.Data;
 using SRAFrontend.Desktop.Utilities;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
+using SRAFrontend.Localization;
 
 namespace SRAFrontend.Desktop.ViewModels;
 
@@ -103,13 +104,13 @@ public partial class ConsolePageViewModel : PageViewModel
         switch (command)
         {
             case "connect":
-                AddConsoleLine(global::SRAFrontend.Localization.UiText.T("未来版本支持WebSocket连接命令"));
+                AddConsoleLine(Resources.WebSocketFutureHint);
                 break;
             case "disconnect":
-                AddConsoleLine(global::SRAFrontend.Localization.UiText.T("未连接到任何WebSocket服务器"));
+                AddConsoleLine(Resources.WebSocketNotConnectedMessage);
                 break;
             default:
-                AddConsoleLine(global::SRAFrontend.Localization.UiText.F($"未知命令: {command}"));
+                AddConsoleLine(string.Format(Resources.Culture, Resources.UnknownCommandMessage, command));
                 break;
         }
     }
@@ -143,10 +144,10 @@ public partial class ConsolePageViewModel : PageViewModel
         // 1. 弹出保存路径选择器（含确认/取消），默认文件名 logs_YYYYMMDD_HHMMSS.zip
         var saveFile = await TopLevelObject.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = global::SRAFrontend.Localization.UiText.T("导出日志"),
+            Title = Resources.ExportLogsText,
             SuggestedFileName = $"logs_{DateTime.Now:yyyyMMdd_HHmmss}",
             DefaultExtension = "zip",
-            FileTypeChoices = [new FilePickerFileType(global::SRAFrontend.Localization.UiText.T("ZIP 压缩包")) { Patterns = ["*.zip"] }],
+            FileTypeChoices = [new FilePickerFileType(Resources.ZipArchiveText) { Patterns = ["*.zip"] }],
             ShowOverwritePrompt = true
         });
         if (saveFile is null) return; // 用户取消
@@ -154,20 +155,20 @@ public partial class ConsolePageViewModel : PageViewModel
 
         // 2. 收集日志并打包（后台线程执行，避免阻塞UI）
         IsExporting = true;
-        _commonModel.ShowInfoToast(global::SRAFrontend.Localization.UiText.T("正在导出日志"), global::SRAFrontend.Localization.UiText.T("正在收集日志文件并打包，请稍候..."));
+        _commonModel.ShowInfoToast(Resources.ExportingLogsMessage, Resources.LogCollectionMessage);
         try
         {
             var (consoleLines, frontendFiles, backendFiles) = await Task.Run(() => ExportLogsCore(targetPath));
             _logger.LogInformation(
                 "Log export completed: {TargetPath} (console {Console} lines, frontend {Frontend} files, backend {Backend} files)",
                 targetPath, consoleLines, frontendFiles, backendFiles);
-            _commonModel.ShowSuccessToast(global::SRAFrontend.Localization.UiText.T("日志导出成功"),
-                global::SRAFrontend.Localization.UiText.F($"已保存至：{targetPath}"));
+            _commonModel.ShowSuccessToast(Resources.LogsExportedMessage,
+                string.Format(Resources.Culture, Resources.SavedToFormat, targetPath));
         }
         catch (Exception e)
         {
             _logger.LogError(e, "日志导出失败: {TargetPath}", targetPath);
-            _commonModel.ShowErrorToast(global::SRAFrontend.Localization.UiText.T("日志导出失败"), global::SRAFrontend.Localization.UiText.F($"发生错误：{e.Message}\n请检查目标路径是否可写后重试"));
+            _commonModel.ShowErrorToast(Resources.LogExportFailedError, string.Format(Resources.Culture, Resources.LogExportWriteErrorMessage, e.Message));
         }
         finally
         {

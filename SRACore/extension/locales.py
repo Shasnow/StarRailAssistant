@@ -78,6 +78,10 @@ def apply(schema: dict, tables: dict[str, dict[str, object]]) -> None:
         if not isinstance(node, dict):
             continue
 
+        title = _pick(tables, f"{key}.title", lang)
+        if isinstance(title, str):
+            node["title"] = title
+
         description = _pick(tables, f"{key}.description", lang)
         if isinstance(description, str):
             node["description"] = description

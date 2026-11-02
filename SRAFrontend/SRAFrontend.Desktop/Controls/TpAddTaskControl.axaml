@@ -11,12 +11,12 @@
              x:DataType="viewModels:TaskPageViewModel"
              Width="640" Height="440">
     <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-        <Label Grid.Row="0" Grid.Column="0" Content="{x:Static lang:ExtraResources.U0248}" />
+        <Label Grid.Row="0" Grid.Column="0" Content="{x:Static lang:Resources.TypeLabelText}" />
         <ComboBox Grid.Row="0" Grid.Column="1"
                   Width="450"
                   ItemsSource="{Binding TpTaskNames}"
                   SelectedIndex="{Binding SelectedTpTaskIndex}" />
-        <Label Grid.Row="1" Grid.Column="0" Content="{x:Static lang:ExtraResources.U0249}" />
+        <Label Grid.Row="1" Grid.Column="0" Content="{x:Static lang:Resources.LevelLabelText}" />
         <ComboBox Grid.Row="1" Grid.Column="1"
                   Width="450"
                   ItemsSource="{Binding CurrentTpTaskLevels}"
@@ -24,23 +24,23 @@
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="models:TpTaskLevel">
                     <TextBlock>
-                        <Run Text="{Binding Name, Converter={x:Static controls:LocalizedStringConverter.Instance}}" />
+                        <Run Text="{Binding Name}" />
                         <Run Text="-" />
-                        <Run Text="{Binding Result, Converter={x:Static controls:LocalizedStringConverter.Instance}}" />
+                        <Run Text="{Binding Result}" />
                     </TextBlock>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Label Grid.Row="2" Grid.Column="0" Content="{x:Static lang:ExtraResources.U0250}" />
+        <Label Grid.Row="2" Grid.Column="0" Content="{x:Static lang:Resources.CountPerRunLabelText}" />
         <NumericUpDown Grid.Row="2" Grid.Column="1" Minimum="1" Maximum="{Binding CurrentTpTaskMaxSingleTimes}"
                        FormatString="0"
                        Width="440"
                        Value="{Binding TpTaskSingleTimes}" />
-        <Label Grid.Row="3" Grid.Column="0" Content="{x:Static lang:ExtraResources.U0251}" />
+        <Label Grid.Row="3" Grid.Column="0" Content="{x:Static lang:Resources.RunCountLabelText}" />
         <NumericUpDown Grid.Row="3" Grid.Column="1" Minimum="1" Maximum="99" FormatString="0"
                        Width="440"
                        Value="{Binding TpTaskRunTimes}" />
-        <Label Grid.Row="4" Grid.Column="0" Content="{x:Static lang:ExtraResources.U0252}" />
+        <Label Grid.Row="4" Grid.Column="0" Content="{x:Static lang:Resources.AutoDetectLabelText}" />
         <ToggleSwitch Grid.Row="4" Grid.Column="1" IsChecked="{Binding IsTpTaskAutoDetect}" />
     </Grid>
 </UserControl>

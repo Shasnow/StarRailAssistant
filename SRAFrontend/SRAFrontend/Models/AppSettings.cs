@@ -5,6 +5,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SRAFrontend.Models;
 
+/// <summary>界面语言；数值与 settings.json 中的存储值一致。</summary>
+public enum UiLanguage
+{
+    [Description("简体中文")] Chinese = 0,
+    [Description("English")] English = 1,
+    [Description("Русский")] Russian = 2,
+}
+
 public class AppSettings
 {
     public const string Version = "2.25.0-beta.3"; // 应用版本号
@@ -175,8 +183,8 @@ public partial class DisplaySettings : ObservableObject
 
     [ObservableProperty]
     [JsonPropertyName("language")]
-    [Description("界面语言，0=中文, 1=English")]
-    public partial int Language { get; set; }
+    [Description("界面语言，0=中文, 1=English, 2=Русский")]
+    public partial UiLanguage Language { get; set; }
 
     [ObservableProperty]
     [property: JsonPropertyName("window.remember")]

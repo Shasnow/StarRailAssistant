@@ -10,5 +10,10 @@
     "Lowest difficulty",
     "Highest difficulty",
     "Current difficulty"
-  ]
+  ],
+  "开拓者名称.title": "Trailblazer name",
+  "攻略.title": "Strategy",
+  "运行次数.title": "Rounds",
+  "难度.title": "Difficulty",
+  "超频博弈.title": "Overclock"
 }

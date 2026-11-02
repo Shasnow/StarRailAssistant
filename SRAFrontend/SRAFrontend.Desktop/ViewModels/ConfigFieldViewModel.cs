@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+using SRAFrontend.Localization;
 
 namespace SRAFrontend.Desktop.ViewModels;
 
@@ -75,21 +73,8 @@ public partial class EnumFieldViewModel : ConfigFieldViewModel
     [ObservableProperty] private EnumOption? _selectedOption;
     [ObservableProperty] private string _rawText = "";
     [ObservableProperty] private bool _allowCustom;
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(RefreshOptionsCommand))]
-    private bool _refreshable;
-    [ObservableProperty] private string _refreshLabel = global::SRAFrontend.Localization.UiText.T("扫描");
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(RefreshOptionsCommand))]
-    private bool _isRefreshing;
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasRefreshError))]
-    private string _refreshError = "";
-    [ObservableProperty] private string _optionsStatus = "";
 
     public ObservableCollection<EnumOption> Options { get; } = [];
-    public bool HasRefreshError => !string.IsNullOrWhiteSpace(RefreshError);
-    public Func<EnumFieldViewModel, Task>? RefreshOptionsRequested { get; set; }
 
     public void SetValue(JsonElement value)
     {
@@ -99,19 +84,18 @@ public partial class EnumFieldViewModel : ConfigFieldViewModel
 
     public void UpdateOptions(IReadOnlyList<JsonElement> values, IReadOnlyList<string>? labels)
     {
-        // 先构造新选项，再替换旧列表；扫描失败时旧列表仍可继续使用。
+        // 先构造新选项，再替换旧列表；刷新失败时旧列表仍可继续使用。
         var options = new List<EnumOption>();
         for (var index = 0; index < values.Count; index++)
         {
             var value = values[index];
             var label = labels?.Count == values.Count ? labels[index] : ValueText(value);
-            options.Add(new EnumOption(SRAFrontend.Localization.UiText.T(label), value));
+            options.Add(new EnumOption(label, value));
         }
 
         _availableOptions.Clear();
         _availableOptions.AddRange(options);
         SynchronizeOptions();
-        OptionsStatus = global::SRAFrontend.Localization.UiText.F($"可选项：{options.Count} 个");
     }
 
     private void SynchronizeOptions()
@@ -125,9 +109,9 @@ public partial class EnumFieldViewModel : ConfigFieldViewModel
             var selected = Options.FirstOrDefault(option => JsonElement.DeepEquals(option.Value, _currentValue));
             if (selected == null)
             {
-                // 新扫描未包含已选文件或自定义路径时，保留当前配置供用户检查。
+                // 刷新后未包含已选文件或自定义路径时，保留当前配置供用户检查。
                 var text = ValueText(_currentValue);
-                selected = new EnumOption(global::SRAFrontend.Localization.UiText.F($"{(text.Length == 0 ? "（空）" : text)}（当前值）"), _currentValue);
+                selected = new EnumOption(string.Format(Resources.Culture, Resources.CurrentValueFormat, (text.Length == 0 ? Resources.EmptyValueText : text)), _currentValue);
                 Options.Add(selected);
             }
             SelectedOption = selected;
@@ -166,29 +150,6 @@ public partial class EnumFieldViewModel : ConfigFieldViewModel
 
     private static string ValueText(JsonElement value) =>
         value.ValueKind == JsonValueKind.String ? value.GetString() ?? "" : value.ToString();
-
-    private bool CanRefreshOptions() => Refreshable && !IsRefreshing;
-
-    [RelayCommand(CanExecute = nameof(CanRefreshOptions))]
-    private async Task RefreshOptionsAsync()
-    {
-        if (!CanRefreshOptions() || RefreshOptionsRequested == null)
-            return;
-        IsRefreshing = true;
-        RefreshError = "";
-        try
-        {
-            await RefreshOptionsRequested(this);
-        }
-        catch (Exception error)
-        {
-            RefreshError = global::SRAFrontend.Localization.UiText.F($"扫描失败：{error.Message}");
-        }
-        finally
-        {
-            IsRefreshing = false;
-        }
-    }
 
     public override JsonElement GetValueAsJson() => _currentValue.Clone();
 }

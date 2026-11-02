@@ -75,25 +75,25 @@ def test_toml_is_authoritative_for_all_generated_languages():
         assert generated == {key: value[language] for key, value in data.items()}
 
 
-@pytest.mark.parametrize('stem', ['Resources', 'ExtraResources'])
-def test_gui_resource_keys_and_placeholders(stem):
+def test_gui_resource_keys_and_placeholders():
     directory = ROOT / 'SRAFrontend/SRAFrontend/Localization'
     sets = [{node.attrib['name']: node.findtext('value') or ''
-             for node in ET.parse(directory / f'{stem}{language}.resx').findall('data')}
+             for node in ET.parse(directory / f'Resources{language}.resx').findall('data')}
             for language in ('', '.zh', '.ru-RU')]
     assert sets[0].keys() == sets[1].keys() == sets[2].keys()
     for key, russian in sets[2].items():
         assert '\ufffd' not in russian and '???' not in russian
         assert russian.strip() or not sets[1][key].strip()
         assert fields(sets[1][key]) == fields(russian), key
+        assert fields(sets[0][key]) == fields(sets[1][key]), key
 
 
 def test_xaml_keys_and_literal_cyrillic_have_resources():
     directory = ROOT / 'SRAFrontend/SRAFrontend/Localization'
-    extra = {node.attrib['name'] for node in ET.parse(directory / 'ExtraResources.resx').findall('data')}
+    keys = {node.attrib['name'] for node in ET.parse(directory / 'Resources.resx').findall('data')}
     for path in (ROOT / 'SRAFrontend/SRAFrontend.Desktop').rglob('*.axaml'):
-        for key in re.findall(r'ExtraResources\.(\w+)', path.read_text(encoding='utf-8-sig')):
-            assert key in extra, (str(path), key)
+        for key in re.findall(r'lang:Resources\.(\w+)', path.read_text(encoding='utf-8-sig')):
+            assert key in keys, (str(path), key)
 
 
 def test_currency_wars_schema_carries_locales_metadata():
@@ -154,6 +154,33 @@ def test_language_selection_survives_a_real_process_restart(language, tmp_path):
                                 capture_output=True, timeout=20)
         assert result.returncode == 0, result.stderr
         assert result.stdout.decode('utf-8').strip() == ['zh-cn', 'en-us', 'ru-ru'][language]
+
+
+def test_trailblaze_power_level_names_follow_interface_language():
+    from tasks.taskcli import localize_subtasks
+
+    subtasks = tomllib.loads((ROOT / 'tasks/config/trailblaze_power.toml').read_text(encoding='utf-8'))['subtasks']
+
+    Resources.set_language(0)
+    assert localize_subtasks(subtasks) == subtasks
+
+    cases = ((1, 'Ornament Extraction', 'Fruit of Evil'), (2, 'Извлечение украшений', 'Роковое плодоношение'))
+    for language, subtask_name, level_name in cases:
+        Resources.set_language(language)
+        localized = localize_subtasks(subtasks)
+        assert localized['ornament_extraction']['name'] == subtask_name
+        assert set(localized) == set(subtasks)
+        for tid, subtask in subtasks.items():
+            entry = localized[tid]
+            # 识别与执行依赖的字段保持原样
+            assert entry['func'] == subtask['func']
+            assert entry['cost'] == subtask['cost']
+            assert entry['max_count'] == subtask['max_count']
+            assert [level['id'] for level in entry['levels']] == [level['id'] for level in subtask['levels']]
+            for level in entry['levels']:
+                assert not re.search(r'[\u4e00-\u9fff]', level['name'] + level['result']), (tid, level['id'])
+        level = next(lv for lv in localized['ornament_extraction']['levels'] if lv['id'] == 9)
+        assert level['name'] == level_name
 
 
 def test_notification_payload_localizes_text_not_protocol_fields(monkeypatch):

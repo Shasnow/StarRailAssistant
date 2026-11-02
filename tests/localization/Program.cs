@@ -15,6 +15,7 @@ using Avalonia.VisualTree;
 using Microsoft.Extensions.Logging.Abstractions;
 using SRAFrontend.Desktop.Styles;
 using SRAFrontend.Desktop.ViewModels;
+using SRAFrontend.Desktop;
 using SRAFrontend.Desktop.Views;
 using SRAFrontend.Desktop.Views.TaskViews;
 using SRAFrontend.Localization;
@@ -71,11 +72,12 @@ internal static class Program
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("ja-JP");
             foreach (var language in new[] { 0, 1, 2 })
             {
-                UiText.ApplyCulture(language);
-                Check(CultureInfo.CurrentCulture.Name == "en-US", "UI language preserves parsing culture");
-                Check(CultureInfo.DefaultThreadCurrentCulture.Name == "ja-JP", "UI language preserves default parsing culture");
+                App.ConfigureCulture((UiLanguage)language);
+                var expected = new[] { "zh-CN", "en-US", "ru-RU" }[language];
+                Check(CultureInfo.CurrentCulture.Name == expected, "Parsing culture follows UI language");
+                Check(CultureInfo.DefaultThreadCurrentCulture.Name == expected, "Default parsing culture follows UI language");
             }
-            Check(UiText.F($"剩余 {1.5} 小时") == "Осталось: 1,5 ч.", "Russian display formatting uses UI culture");
+            Check(string.Format(Resources.Culture, Resources.RemainingHoursFormat, 1.5) == "Осталось: 1,5 ч.", "Russian display formatting uses UI culture");
         }
         finally
         {
@@ -84,41 +86,42 @@ internal static class Program
         }
         foreach (var language in new[] { 0, 1, 2 })
         {
-            UiText.ApplyCulture(language);
-            Check(Resources.Culture?.Name == new[] { "zh-CN", "en-US", "ru-RU" }[language], "Culture mapping");
+            App.ConfigureCulture((UiLanguage)language);
+            Check(Resources.Culture?.Name == new[] { "zh-CN", "en-US", "ru-RU" }[(int)language], "Culture mapping");
             var settings = new AppSettings();
-            settings.Display.Language = language;
+            settings.Display.Language = (UiLanguage)language;
             var path = Path.Combine(output, $"settings-{language}.json");
             File.WriteAllText(path, JsonSerializer.Serialize(settings), Encoding.UTF8);
             var restored = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(path))!;
-            Check(restored.Display.Language == language, "Persisted numeric language");
+            Check(restored.Display.Language == (UiLanguage)language, "Persisted numeric language");
             // These paths are explicit fixtures, never DataPath.SettingsJson or SettingsService.Load().
         }
-        UiText.ApplyCulture(2);
-        Check(UiText.T("并非\n'Sequence Read Archive'").StartsWith("Это не"), "Greeting LF");
-        Check(UiText.T("并非\r\n'Sequence Read Archive'").StartsWith("Это не"), "Greeting CRLF");
-        Check(UiText.F($"剩余 {2} 天 {3} 小时") == "Осталось: 2 дн. 3 ч.", "Formatted arguments");
-        Check(UiText.T("private-user-value") == "private-user-value", "Unknown values preserved");
-        foreach (var stem in new[] { "Resources", "ExtraResources" })
+        App.ConfigureCulture(UiLanguage.Russian);
+        Check(Resources.NotSequenceReadArchiveText.StartsWith("Это не"), "Greeting translation");
+        Check(string.Format(Resources.Culture, Resources.RemainingDaysHoursFormat, 2, 3) == "Осталось: 2 дн. 3 ч.", "Formatted arguments");
+        foreach (var stem in new[] { "Resources" })
         {
-            var manager = new ResourceManager($"SRAFrontend.Localization.{stem}", typeof(UiText).Assembly);
+            var manager = new ResourceManager($"SRAFrontend.Localization.{stem}", typeof(Resources).Assembly);
             var source = manager.GetResourceSet(CultureInfo.GetCultureInfo("zh-CN"), true, true)!;
+            var neutral = manager.GetResourceSet(CultureInfo.GetCultureInfo("en-US"), true, true)!;
             var russian = manager.GetResourceSet(CultureInfo.GetCultureInfo("ru-RU"), true, true)!;
             foreach (DictionaryEntry item in source)
+            {
+                Check(neutral.GetString((string)item.Key) != null, $"English key: {stem}.{item.Key}");
                 Check(russian.GetString((string)item.Key) != null, $"Russian satellite key: {stem}.{item.Key}");
+            }
         }
-        var field = new EnumFieldViewModel { Key = "难度", Label = UiText.T("难度") };
+        var field = new EnumFieldViewModel { Key = "难度", Label = Resources.DifficultyLabelText };
         field.SetValue(JsonSerializer.SerializeToElement(2));
         field.UpdateOptions(new[] { 0, 1, 2 }.Select(value => JsonSerializer.SerializeToElement(value)).ToArray(),
-                            new[] { "最低难度", "最高难度", "当前难度" });
+                            new[] { Resources.DifficultyLowestText, Resources.DifficultyHighestText, Resources.DifficultyCurrentText });
         Check(field.Key == "难度", "Stored alias unchanged");
         Check(field.GetValueAsJson().GetInt32() == 2, "Stored enum type/value unchanged");
         Check(field.SelectedOption?.Label == "Текущая", "Localized enum label");
-        foreach (var language in new[] { 0, 1 })
-        {
-            UiText.ApplyCulture(language);
-            Check(UiText.T("最低难度") == "最低难度", "Existing language text unchanged");
-        }
+        App.ConfigureCulture(UiLanguage.Chinese);
+        Check(Resources.DifficultyLowestText == "最低难度", "Chinese resource text");
+        App.ConfigureCulture(UiLanguage.English);
+        Check(Resources.DifficultyLowestText != "最低难度", "English resource text");
     }
 
     private static async Task CheckPipes(string root, string python)
@@ -157,9 +160,8 @@ internal static class Program
     {
         foreach (var language in new[] { 0, 1, 2 })
         {
-            UiText.ApplyCulture(language);
-            SukiTheme.GetInstance().Locale = UiText.CultureFor(language).Name;
-            if (language == 2) RussianTypography.Apply(Application.Current!, language);
+            App.ConfigureCulture((UiLanguage)language);
+            if (language == 2) RussianTypography.Apply(Application.Current!, (UiLanguage)language);
             foreach (var theme in new[] { ThemeVariant.Light, ThemeVariant.Dark })
             {
                 Application.Current!.RequestedThemeVariant = theme;
@@ -195,7 +197,7 @@ internal static class Program
                         }
                         if (language == 2 && page == "console")
                         {
-                            var hint = text.Single(node => node.Text == ExtraResources.U0418);
+                            var hint = text.Single(node => node.Text == Resources.LogReportHint);
                             Check(hint.TextWrapping == TextWrapping.Wrap, "Long console instruction wraps");
                             Check(hint.Bounds.Width > 0 && hint.Bounds.Right <= content.Bounds.Width, "Console instruction fits");
                             foreach (var filter in text.Where(node => node.Text is "Trace" or "Debug" or "Info" or "Warn" or "Error"))
@@ -219,13 +221,13 @@ internal static class Program
         var model = new ExtensionConfigDialogViewModel("CurrencyWarsPlus", null!) { IsLoading = false };
         model.Fields.Add(new StringFieldViewModel
         {
-            Key = "开拓者名称", Label = UiText.T("开拓者名称"),
-            Description = UiText.T("填写游戏内开拓者名称。"), Value = "Тест"
+            Key = "开拓者名称", Label = Resources.M0053,
+            Description = Resources.M0048, Value = "Тест"
         });
         model.Fields.Add(new IntegerFieldViewModel
         {
-            Key = "运行次数", Label = UiText.T("运行次数"),
-            Description = UiText.T("本次运行的局数。"), Value = 1, Minimum = 1, Maximum = 99999
+            Key = "运行次数", Label = Resources.RunCountLabelText,
+            Description = Resources.M0050, Value = 1, Minimum = 1, Maximum = 99999
         });
         return new ExtensionConfigDialogView { DataContext = model };
     }

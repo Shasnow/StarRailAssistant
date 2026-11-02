@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Models;
+using SRAFrontend.Localization;
 
 namespace SRAFrontend.Services;
 
@@ -49,7 +50,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         {
             logger.LogWarning("Attempted to send input to backend process, but it is not running. Input: {Input}",
                 input);
-            Outputted?.Invoke(global::SRAFrontend.Localization.UiText.F($"发送失败: 进程未运行（输入: {input}）"));
+            Outputted?.Invoke(string.Format(Resources.Culture, Resources.InputSendProcessErrorMessage, input));
             return false;
         }
 
@@ -62,7 +63,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         catch (IOException e)
         {
             logger.LogError(e, "Fail to send input to backend process: {Message}", e.Message);
-            Outputted?.Invoke(global::SRAFrontend.Localization.UiText.F($"发送失败: {e.Message}（输入: {input}）"));
+            Outputted?.Invoke(string.Format(Resources.Culture, Resources.InputSendFailedMessage, e.Message, input));
             return false;
         }
     }
@@ -79,7 +80,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         {
             logger.LogWarning("Attempted to send input to backend process, but it is not running. Input: {Input}",
                 input);
-            Outputted?.Invoke(global::SRAFrontend.Localization.UiText.F($"发送失败: 进程未运行（输入: {input}）"));
+            Outputted?.Invoke(string.Format(Resources.Culture, Resources.InputSendProcessErrorMessage, input));
             return false;
         }
 
@@ -92,7 +93,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         catch (IOException e)
         {
             logger.LogError(e, "Fail to send input to backend process: {Message}", e.Message);
-            Outputted?.Invoke(global::SRAFrontend.Localization.UiText.F($"发送失败: {e.Message}（输入: {input}）"));
+            Outputted?.Invoke(string.Format(Resources.Culture, Resources.InputSendFailedMessage, e.Message, input));
             return false;
         }
     }
@@ -106,7 +107,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         if (isExplicitPath && !File.Exists(FileName))
         {
             logger.LogError("Backend executable not found: {FileName}", FileName);
-            Outputted?.Invoke(global::SRAFrontend.Localization.UiText.F($"启动失败: 未找到后端可执行文件（路径: {FileName}）"));
+            Outputted?.Invoke(string.Format(Resources.Culture, Resources.BackendExecutableMissingError, FileName));
             return false;
         }
 
@@ -146,7 +147,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         catch (Exception e)
         {
             logger.LogError(e, "Fail to start SRA: {Message}", e.Message);
-            Outputted?.Invoke(global::SRAFrontend.Localization.UiText.F($"启动失败: {e.Message}"));
+            Outputted?.Invoke(string.Format(Resources.Culture, Resources.BackendLaunchFailedError, e.Message));
             CleanupProcessResources();
             return false;
         }
@@ -348,7 +349,7 @@ public abstract class LocalBackendService(ILogger<LocalBackendService> logger)
         logger.LogInformation("Process exited (PID: {Pid}, Exit Code: {ExitCode})", processId, exitCode);
 
         IsTaskRunning = false;
-        Outputted?.Invoke(global::SRAFrontend.Localization.UiText.F($"进程已退出（PID: {processId}，退出代码为: {exitCode}）"));
+        Outputted?.Invoke(string.Format(Resources.Culture, Resources.BackendProcessExitedMessage, processId, exitCode));
 
         // 清理资源
         CleanupProcessResources();

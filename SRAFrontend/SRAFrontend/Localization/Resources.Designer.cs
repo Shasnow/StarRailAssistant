@@ -67,7 +67,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AboutText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to AccessToken.
         /// </summary>
@@ -76,7 +76,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AccessTokenText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Account:.
+        /// </summary>
+        public static string AccountLabelText {
+            get {
+                return ResourceManager.GetString("AccountLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Account password stored encrypted.
+        /// </summary>
+        public static string AccountPasswordDescription {
+            get {
+                return ResourceManager.GetString("AccountPasswordDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Account username stored encrypted.
+        /// </summary>
+        public static string AccountUsernameDescription {
+            get {
+                return ResourceManager.GetString("AccountUsernameDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Activity.
         /// </summary>
@@ -85,16 +112,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ActivityText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Advanced Parameters.
+        ///   Looks up a localized string similar to Add.
         /// </summary>
-        public static string AdvancedParametersText {
+        public static string AddButtonText {
             get {
-                return ResourceManager.GetString("AdvancedParametersText", resourceCulture);
+                return ResourceManager.GetString("AddButtonText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Advance.
         /// </summary>
@@ -103,7 +130,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AdvanceText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced launch arguments, passed directly to the game process and overriding other argument settings.
+        /// </summary>
+        public static string AdvancedLaunchArgsDescription {
+            get {
+                return ResourceManager.GetString("AdvancedLaunchArgsDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced Parameters.
+        /// </summary>
+        public static string AdvancedParametersText {
+            get {
+                return ResourceManager.GetString("AdvancedParametersText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced settings.
+        /// </summary>
+        public static string AdvancedSettingsText {
+            get {
+                return ResourceManager.GetString("AdvancedSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to After tasks complete.
+        /// </summary>
+        public static string AfterTasksCompleteText {
+            get {
+                return ResourceManager.GetString("AfterTasksCompleteText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Run all configurations.
         /// </summary>
@@ -112,16 +175,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AllButtonTipText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Allow Notification.
+        ///   Looks up a localized string similar to Unable to start all configuration tasks. Please check the backend status..
         /// </summary>
-        public static string AllowNotificationText {
+        public static string AllConfigurationsStartFailedError {
             get {
-                return ResourceManager.GetString("AllowNotificationText", resourceCulture);
+                return ResourceManager.GetString("AllConfigurationsStartFailedError", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to All configuration tasks started..
+        /// </summary>
+        public static string AllConfigurationsStartedMessage {
+            get {
+                return ResourceManager.GetString("AllConfigurationsStartedMessage", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Launch All.
         /// </summary>
@@ -130,7 +202,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AllText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Allow Notification.
+        /// </summary>
+        public static string AllowNotificationText {
+            get {
+                return ResourceManager.GetString("AllowNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to When checked, the current account is logged out and logged in again every time the game starts..
+        /// </summary>
+        public static string AlwaysReloginDescription {
+            get {
+                return ResourceManager.GetString("AlwaysReloginDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Always log in again.
+        /// </summary>
+        public static string AlwaysReloginText {
+            get {
+                return ResourceManager.GetString("AlwaysReloginText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Announcements.
+        /// </summary>
+        public static string AnnouncementsText {
+            get {
+                return ResourceManager.GetString("AnnouncementsText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to API Address.
         /// </summary>
@@ -139,7 +247,115 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ApiAddressText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Call an Operator method.
+        /// </summary>
+        public static string ApiCallOperatorMethodText {
+            get {
+                return ResourceManager.GetString("ApiCallOperatorMethodText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get extension configuration schema.
+        /// </summary>
+        public static string ApiExtensionSchemaText {
+            get {
+                return ResourceManager.GetString("ApiExtensionSchemaText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get background image.
+        /// </summary>
+        public static string ApiGetBackgroundImageText {
+            get {
+                return ResourceManager.GetString("ApiGetBackgroundImageText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get all configuration names.
+        /// </summary>
+        public static string ApiGetConfigNamesText {
+            get {
+                return ResourceManager.GetString("ApiGetConfigNamesText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get the specified configuration.
+        /// </summary>
+        public static string ApiGetConfigurationText {
+            get {
+                return ResourceManager.GetString("ApiGetConfigurationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get the current application settings.
+        /// </summary>
+        public static string ApiGetCurrentSettingsText {
+            get {
+                return ResourceManager.GetString("ApiGetCurrentSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get extension configuration values.
+        /// </summary>
+        public static string ApiGetExtensionConfigText {
+            get {
+                return ResourceManager.GetString("ApiGetExtensionConfigText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get phrases.
+        /// </summary>
+        public static string ApiGetPhrasesText {
+            get {
+                return ResourceManager.GetString("ApiGetPhrasesText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get recent logs.
+        /// </summary>
+        public static string ApiGetRecentLogsText {
+            get {
+                return ResourceManager.GetString("ApiGetRecentLogsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get settings.
+        /// </summary>
+        public static string ApiGetSettingsText {
+            get {
+                return ResourceManager.GetString("ApiGetSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get system information.
+        /// </summary>
+        public static string ApiGetSystemInfoText {
+            get {
+                return ResourceManager.GetString("ApiGetSystemInfoText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get task status.
+        /// </summary>
+        public static string ApiGetTaskStatusText {
+            get {
+                return ResourceManager.GetString("ApiGetTaskStatusText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to API Key.
         /// </summary>
@@ -148,7 +364,160 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ApiKeyText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to List all registered extensions.
+        /// </summary>
+        public static string ApiListExtensionsText {
+            get {
+                return ResourceManager.GetString("ApiListExtensionsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to List all available Operator methods.
+        /// </summary>
+        public static string ApiListOperatorMethodsText {
+            get {
+                return ResourceManager.GetString("ApiListOperatorMethodsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to New configuration.
+        /// </summary>
+        public static string ApiNewConfigurationText {
+            get {
+                return ResourceManager.GetString("ApiNewConfigurationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get detailed help for an Operator method.
+        /// </summary>
+        public static string ApiOperatorMethodHelpText {
+            get {
+                return ResourceManager.GetString("ApiOperatorMethodHelpText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get Operator screenshot.
+        /// </summary>
+        public static string ApiOperatorScreenshotText {
+            get {
+                return ResourceManager.GetString("ApiOperatorScreenshotText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Rescan and import extension modules.
+        /// </summary>
+        public static string ApiReloadExtensionsText {
+            get {
+                return ResourceManager.GetString("ApiReloadExtensionsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Restart backend.
+        /// </summary>
+        public static string ApiRestartBackendText {
+            get {
+                return ResourceManager.GetString("ApiRestartBackendText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Run the specified extension.
+        /// </summary>
+        public static string ApiRunExtensionText {
+            get {
+                return ResourceManager.GetString("ApiRunExtensionText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Run a single specified task.
+        /// </summary>
+        public static string ApiRunSingleTaskText {
+            get {
+                return ResourceManager.GetString("ApiRunSingleTaskText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Run tasks.
+        /// </summary>
+        public static string ApiRunTasksText {
+            get {
+                return ResourceManager.GetString("ApiRunTasksText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Set extension configuration values.
+        /// </summary>
+        public static string ApiSetExtensionConfigText {
+            get {
+                return ResourceManager.GetString("ApiSetExtensionConfigText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to SSE log stream.
+        /// </summary>
+        public static string ApiSseLogStreamText {
+            get {
+                return ResourceManager.GetString("ApiSseLogStreamText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stop backend.
+        /// </summary>
+        public static string ApiStopBackendText {
+            get {
+                return ResourceManager.GetString("ApiStopBackendText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stop the specified extension.
+        /// </summary>
+        public static string ApiStopExtensionText {
+            get {
+                return ResourceManager.GetString("ApiStopExtensionText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stop tasks.
+        /// </summary>
+        public static string ApiStopTasksText {
+            get {
+                return ResourceManager.GetString("ApiStopTasksText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Update settings by field; only the fields to change need to be sent. The request body is a partial AppSettings JSON, e.g.
+        /// </summary>
+        public static string ApiUpdateSettingsDescription {
+            get {
+                return ResourceManager.GetString("ApiUpdateSettingsDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Update settings.
+        /// </summary>
+        public static string ApiUpdateSettingsText {
+            get {
+                return ResourceManager.GetString("ApiUpdateSettingsText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Application Channel.
         /// </summary>
@@ -157,7 +526,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AppChannelText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to App data folder.
         /// </summary>
@@ -166,7 +535,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AppDataFolder", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to App AppSecret.
+        /// </summary>
+        public static string AppSecretPlaceholder {
+            get {
+                return ResourceManager.GetString("AppSecretPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid architecture parameter.
+        /// </summary>
+        public static string ArchitectureParameterInvalidError {
+            get {
+                return ResourceManager.GetString("ArchitectureParameterInvalidError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Assignments.
+        /// </summary>
+        public static string AssignmentsText {
+            get {
+                return ResourceManager.GetString("AssignmentsText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Authorization Code.
         /// </summary>
@@ -175,7 +571,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AuthorCodeText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable auto battle.
+        /// </summary>
+        public static string AutoBattleDescription {
+            get {
+                return ResourceManager.GetString("AutoBattleDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Auto Battle.
         /// </summary>
@@ -184,7 +589,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AutoBattleText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Count: auto-detect.
+        /// </summary>
+        public static string AutoDetectCountLabelText {
+            get {
+                return ResourceManager.GetString("AutoDetectCountLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable to automatically detect the game on this computer.
+        /// </summary>
+        public static string AutoDetectGameText {
+            get {
+                return ResourceManager.GetString("AutoDetectGameText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Auto-detect.
+        /// </summary>
+        public static string AutoDetectLabelText {
+            get {
+                return ResourceManager.GetString("AutoDetectLabelText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Auto Detect.
         /// </summary>
@@ -193,7 +625,61 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AutoDetectText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Auto extraction failed: {0} Exit the application to finish extraction (wait 5-10 seconds after exiting), or extract manu.
+        /// </summary>
+        public static string AutoExtractFailedError {
+            get {
+                return ResourceManager.GetString("AutoExtractFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to By enabling auto login, you confirm that you have read and understood the User Agreement and Privacy Policy.
+        /// </summary>
+        public static string AutoLoginAgreementHint {
+            get {
+                return ResourceManager.GetString("AutoLoginAgreementHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to When checked, the game logs in automatically with the specified account and password after launch..
+        /// </summary>
+        public static string AutoLoginDescription {
+            get {
+                return ResourceManager.GetString("AutoLoginDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to log in automatically.
+        /// </summary>
+        public static string AutoLoginEnableDescription {
+            get {
+                return ResourceManager.GetString("AutoLoginEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Auto login.
+        /// </summary>
+        public static string AutoLoginText {
+            get {
+                return ResourceManager.GetString("AutoLoginText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to log in again automatically after a login failure.
+        /// </summary>
+        public static string AutoReloginDescription {
+            get {
+                return ResourceManager.GetString("AutoReloginDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Auto Set Game Resolution.
         /// </summary>
@@ -202,7 +688,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AutoResolutionText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to The application will restart automatically in 3 seconds.
+        /// </summary>
+        public static string AutoRestartCountdownMessage {
+            get {
+                return ResourceManager.GetString("AutoRestartCountdownMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable auto update: starts downloading immediately when an update is available.
+        /// </summary>
+        public static string AutoUpdateEnableDescription {
+            get {
+                return ResourceManager.GetString("AutoUpdateEnableDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Auto Update.
         /// </summary>
@@ -211,7 +715,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AutoUpdateText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Automatically download and unzip when updates are available.
         /// </summary>
@@ -220,34 +724,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("AutoUpdateTipText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Backend Command.
+        ///   Looks up a localized string similar to Available extensions.
         /// </summary>
-        public static string BackendCommandText {
+        public static string AvailableExtensionsText {
             get {
-                return ResourceManager.GetString("BackendCommandText", resourceCulture);
+                return ResourceManager.GetString("AvailableExtensionsText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Leave empty to use the default (script: main.py folder, otherwise: app directory).
+        ///   Looks up a localized string similar to e.g. main.py, -m SRACore; leave empty for no arguments.
         /// </summary>
-        public static string BackendWorkingDirectoryHintText {
+        public static string BackendArgsPlaceholder {
             get {
-                return ResourceManager.GetString("BackendWorkingDirectoryHintText", resourceCulture);
+                return ResourceManager.GetString("BackendArgsPlaceholder", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Working Directory.
-        /// </summary>
-        public static string BackendWorkingDirectoryText {
-            get {
-                return ResourceManager.GetString("BackendWorkingDirectoryText", resourceCulture);
-            }
-        }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Launch Arguments.
         /// </summary>
@@ -256,7 +751,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("BackendArgumentsText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to python, sra-cli, or an executable path.
+        /// </summary>
+        public static string BackendCommandPlaceholder {
+            get {
+                return ResourceManager.GetString("BackendCommandPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Command / Executable.
+        /// </summary>
+        public static string BackendCommandText {
+            get {
+                return ResourceManager.GetString("BackendCommandText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Launch failed: backend executable not found (path: {0}).
+        /// </summary>
+        public static string BackendExecutableMissingError {
+            get {
+                return ResourceManager.GetString("BackendExecutableMissingError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Backend launch arguments.
+        /// </summary>
+        public static string BackendLaunchArgsDescription {
+            get {
+                return ResourceManager.GetString("BackendLaunchArgsDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Backend Launch Arguments.
         /// </summary>
@@ -265,7 +796,70 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("BackendLaunchArgsText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Launch failed: {0}.
+        /// </summary>
+        public static string BackendLaunchFailedError {
+            get {
+                return ResourceManager.GetString("BackendLaunchFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Backend not responding.
+        /// </summary>
+        public static string BackendNotRespondingError {
+            get {
+                return ResourceManager.GetString("BackendNotRespondingError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Process exited (PID: {0}, exit code: {1}).
+        /// </summary>
+        public static string BackendProcessExitedMessage {
+            get {
+                return ResourceManager.GetString("BackendProcessExitedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to e.g. /path/to/working/dir; leave empty to use the current directory.
+        /// </summary>
+        public static string BackendWorkdirPlaceholder {
+            get {
+                return ResourceManager.GetString("BackendWorkdirPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Leave empty to use the application directory.
+        /// </summary>
+        public static string BackendWorkingDirectoryHintText {
+            get {
+                return ResourceManager.GetString("BackendWorkingDirectoryHintText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Working Directory.
+        /// </summary>
+        public static string BackendWorkingDirectoryText {
+            get {
+                return ResourceManager.GetString("BackendWorkingDirectoryText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Background image opacity, range 0-1.
+        /// </summary>
+        public static string BackgroundImageOpacityDescription {
+            get {
+                return ResourceManager.GetString("BackgroundImageOpacityDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Background Image Opacity.
         /// </summary>
@@ -274,7 +868,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("BackgroundImageOpacityText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Background Image.
         /// </summary>
@@ -283,7 +877,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("BackgroundImageText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Background image URI, either a local path or a web URL.
+        /// </summary>
+        public static string BackgroundImageUriDescription {
+            get {
+                return ResourceManager.GetString("BackgroundImageUriDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Bark API Endpoint.
         /// </summary>
@@ -292,7 +895,79 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("BarkApiEndpointText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ciphertext for Bark push, sent as the ciphertext parameter when set.
+        /// </summary>
+        public static string BarkCiphertextDescription {
+            get {
+                return ResourceManager.GetString("BarkCiphertextDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bark device key, supports multiple devices separated by commas.
+        /// </summary>
+        public static string BarkDeviceKeyDescription {
+            get {
+                return ResourceManager.GetString("BarkDeviceKeyDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the device key first.
+        /// </summary>
+        public static string BarkDeviceKeyRequiredMessage {
+            get {
+                return ResourceManager.GetString("BarkDeviceKeyRequiredMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable Bark push.
+        /// </summary>
+        public static string BarkEnableDescription {
+            get {
+                return ResourceManager.GetString("BarkEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bark message group.
+        /// </summary>
+        public static string BarkGroupDescription {
+            get {
+                return ResourceManager.GetString("BarkGroupDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to URL of the Bark push icon.
+        /// </summary>
+        public static string BarkIconUrlDescription {
+            get {
+                return ResourceManager.GetString("BarkIconUrlDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Copy from the Bark app; separate multiple keys with commas.
+        /// </summary>
+        public static string BarkKeyPlaceholder {
+            get {
+                return ResourceManager.GetString("BarkKeyPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bark push level, active/timeSensitive/passive.
+        /// </summary>
+        public static string BarkLevelDescription {
+            get {
+                return ResourceManager.GetString("BarkLevelDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Bark Notification (iOS).
         /// </summary>
@@ -301,7 +976,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("BarkNotificationText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bark server address.
+        /// </summary>
+        public static string BarkServerAddressDescription {
+            get {
+                return ResourceManager.GetString("BarkServerAddressDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Bark Settings.
         /// </summary>
@@ -310,7 +994,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("BarkSettingsText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Name of the Bark push sound.
+        /// </summary>
+        public static string BarkSoundDescription {
+            get {
+                return ResourceManager.GetString("BarkSoundDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test message sent, please check your iPhone.
+        /// </summary>
+        public static string BarkTestSentMessage {
+            get {
+                return ResourceManager.GetString("BarkTestSentMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bark test.
+        /// </summary>
+        public static string BarkTestText {
+            get {
+                return ResourceManager.GetString("BarkTestText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Backend logs folder.
         /// </summary>
@@ -319,7 +1030,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("BeLogsFolderText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Please enter the image path.
         /// </summary>
@@ -328,7 +1039,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("BgImagePathWatermarkText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bilibili.
+        /// </summary>
+        public static string BilibiliServerText {
+            get {
+                return ResourceManager.GetString("BilibiliServerText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to use a borderless game window.
+        /// </summary>
+        public static string BorderlessWindowDescription {
+            get {
+                return ResourceManager.GetString("BorderlessWindowDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Borderless Window.
         /// </summary>
@@ -337,7 +1066,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("BorderlessWindowText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Bot Token.
         /// </summary>
@@ -346,7 +1075,196 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("BotTokenText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Browse and select a file.
+        /// </summary>
+        public static string BrowseFileText {
+            get {
+                return ResourceManager.GetString("BrowseFileText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cake Cat Friends.
+        /// </summary>
+        public static string CakeCatFriendsText {
+            get {
+                return ResourceManager.GetString("CakeCatFriendsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Look up a Cake Cat's UID.
+        /// </summary>
+        public static string CakeCatUidLookupText {
+            get {
+                return ResourceManager.GetString("CakeCatUidLookupText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Target stage for Calyx (Crimson) in Garden of Plenty.
+        /// </summary>
+        public static string CalyxCrimsonStageDescription {
+            get {
+                return ResourceManager.GetString("CalyxCrimsonStageDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Calyx (Crimson).
+        /// </summary>
+        public static string CalyxCrimsonText {
+            get {
+                return ResourceManager.GetString("CalyxCrimsonText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Target stage for Calyx (Golden) in Garden of Plenty.
+        /// </summary>
+        public static string CalyxGoldenStageDescription {
+            get {
+                return ResourceManager.GetString("CalyxGoldenStageDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Calyx (Golden).
+        /// </summary>
+        public static string CalyxGoldenText {
+            get {
+                return ResourceManager.GetString("CalyxGoldenText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel download.
+        /// </summary>
+        public static string CancelDownloadText {
+            get {
+                return ResourceManager.GetString("CancelDownloadText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string CancelText {
+            get {
+                return ResourceManager.GetString("CancelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Canceling....
+        /// </summary>
+        public static string CancelingMessage {
+            get {
+                return ResourceManager.GetString("CancelingMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to We shall carve the future in the past.
+        /// </summary>
+        public static string CarveFuturePhraseText {
+            get {
+                return ResourceManager.GetString("CarveFuturePhraseText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cavern of Corrosion.
+        /// </summary>
+        public static string CavernOfCorrosionText {
+            get {
+                return ResourceManager.GetString("CavernOfCorrosionText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The CDK has been banned.
+        /// </summary>
+        public static string CdkBannedError {
+            get {
+                return ResourceManager.GetString("CdkBannedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The CDK has reached its download limit for today.
+        /// </summary>
+        public static string CdkDailyLimitError {
+            get {
+                return ResourceManager.GetString("CdkDailyLimitError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The CDK has expired.
+        /// </summary>
+        public static string CdkExpiredError {
+            get {
+                return ResourceManager.GetString("CdkExpiredError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid CDK.
+        /// </summary>
+        public static string CdkInvalidError {
+            get {
+                return ResourceManager.GetString("CdkInvalidError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid CDK length, must be 24 characters.
+        /// </summary>
+        public static string CdkLengthError {
+            get {
+                return ResourceManager.GetString("CdkLengthError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The CDK type does not match the resources to download.
+        /// </summary>
+        public static string CdkTypeMismatchError {
+            get {
+                return ResourceManager.GetString("CdkTypeMismatchError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to CDK valid until: {0:yyyy-MM-dd HH:mm:ss}.
+        /// </summary>
+        public static string CdkValidUntilFormat {
+            get {
+                return ResourceManager.GetString("CdkValidUntilFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Change.
+        /// </summary>
+        public static string ChangeText {
+            get {
+                return ResourceManager.GetString("ChangeText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Channel.
+        /// </summary>
+        public static string ChannelLabelText {
+            get {
+                return ResourceManager.GetString("ChannelLabelText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Chat ID.
         /// </summary>
@@ -355,7 +1273,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ChatIdText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Check failed: {0}.
+        /// </summary>
+        public static string CheckFailedError {
+            get {
+                return ResourceManager.GetString("CheckFailedError", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Check for update.
         /// </summary>
@@ -364,7 +1291,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("CheckForUpdateText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Check the logs for more information.
+        /// </summary>
+        public static string CheckLogsHint {
+            get {
+                return ResourceManager.GetString("CheckLogsHint", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Check.
         /// </summary>
@@ -373,7 +1309,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("CheckText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Chronicle.
         /// </summary>
@@ -382,7 +1318,97 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ChronicleText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ciphertext (optional).
+        /// </summary>
+        public static string CiphertextPlaceholder {
+            get {
+                return ResourceManager.GetString("CiphertextPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to claim Assignment rewards.
+        /// </summary>
+        public static string ClaimAssignmentsDescription {
+            get {
+                return ResourceManager.GetString("ClaimAssignmentsDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to claim Daily Training rewards.
+        /// </summary>
+        public static string ClaimDailyTrainingDescription {
+            get {
+                return ResourceManager.GetString("ClaimDailyTrainingDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to claim Gift of Odyssey rewards.
+        /// </summary>
+        public static string ClaimGiftOfOdysseyDescription {
+            get {
+                return ResourceManager.GetString("ClaimGiftOfOdysseyDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to claim mail rewards.
+        /// </summary>
+        public static string ClaimMailRewardsDescription {
+            get {
+                return ResourceManager.GetString("ClaimMailRewardsDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to claim Nameless Honor rewards.
+        /// </summary>
+        public static string ClaimNamelessHonorDescription {
+            get {
+                return ResourceManager.GetString("ClaimNamelessHonorDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Claim rewards settings.
+        /// </summary>
+        public static string ClaimRewardsSettingsText {
+            get {
+                return ResourceManager.GetString("ClaimRewardsSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable the claim rewards task.
+        /// </summary>
+        public static string ClaimRewardsTaskEnableDescription {
+            get {
+                return ResourceManager.GetString("ClaimRewardsTaskEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Claim rewards.
+        /// </summary>
+        public static string ClaimRewardsText {
+            get {
+                return ResourceManager.GetString("ClaimRewardsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to claim Trailblazer Profile rewards.
+        /// </summary>
+        public static string ClaimTrailblazerProfileDescription {
+            get {
+                return ResourceManager.GetString("ClaimTrailblazerProfileDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Clean Up.
         /// </summary>
@@ -391,7 +1417,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("CleanupText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Clear Stamina.
         /// </summary>
@@ -400,7 +1426,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ClearPowerText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Close the program.
+        /// </summary>
+        public static string CloseProgramText {
+            get {
+                return ResourceManager.GetString("CloseProgramText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Off.
         /// </summary>
@@ -409,7 +1444,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("CloseText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Browser used for cloud gaming.
+        /// </summary>
+        public static string CloudBrowserDescription {
+            get {
+                return ResourceManager.GetString("CloudBrowserDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether the cloud gaming browser runs headless.
+        /// </summary>
+        public static string CloudBrowserHeadlessDescription {
+            get {
+                return ResourceManager.GetString("CloudBrowserHeadlessDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether the cloud gaming browser is muted.
+        /// </summary>
+        public static string CloudBrowserMuteDescription {
+            get {
+                return ResourceManager.GetString("CloudBrowserMuteDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Path to the browser used for cloud gaming.
+        /// </summary>
+        public static string CloudBrowserPathDescription {
+            get {
+                return ResourceManager.GetString("CloudBrowserPathDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Use StarRail Cloud Game (Experimental).
         /// </summary>
@@ -418,7 +1489,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("CloudGameText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to use cloud gaming.
+        /// </summary>
+        public static string CloudGamingDescription {
+            get {
+                return ResourceManager.GetString("CloudGamingDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to launch the game via the command line (avoids issues caused by direct launching).
+        /// </summary>
+        public static string CommandLineLaunchDescription {
+            get {
+                return ResourceManager.GetString("CommandLineLaunchDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Image Recognition Confidence.
         /// </summary>
@@ -427,7 +1516,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ConfidenceText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Config file version.
+        /// </summary>
+        public static string ConfigFileVersionDescription {
+            get {
+                return ResourceManager.GetString("ConfigFileVersionDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Please enter a config name.
         /// </summary>
@@ -436,7 +1534,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ConfigInputMarkText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Name contains invalid characters.
+        /// </summary>
+        public static string ConfigNameInvalidError {
+            get {
+                return ResourceManager.GetString("ConfigNameInvalidError", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Configs folder.
         /// </summary>
@@ -445,7 +1552,79 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ConfigsFolder", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Configs.
+        /// </summary>
+        public static string ConfigsText {
+            get {
+                return ResourceManager.GetString("ConfigsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Configuration already exists.
+        /// </summary>
+        public static string ConfigurationExistsError {
+            get {
+                return ResourceManager.GetString("ConfigurationExistsError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Current configuration saved..
+        /// </summary>
+        public static string ConfigurationSavedMessage {
+            get {
+                return ResourceManager.GetString("ConfigurationSavedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to start configuration: {0}. Please check the backend status..
+        /// </summary>
+        public static string ConfigurationStartFailedError {
+            get {
+                return ResourceManager.GetString("ConfigurationStartFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Configuration started: {0}.
+        /// </summary>
+        public static string ConfigurationStartedMessage {
+            get {
+                return ResourceManager.GetString("ConfigurationStartedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Configuration - {0}.
+        /// </summary>
+        public static string ConfigurationTitleFormat {
+            get {
+                return ResourceManager.GetString("ConfigurationTitleFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm.
+        /// </summary>
+        public static string ConfirmText {
+            get {
+                return ResourceManager.GetString("ConfirmText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Connecting....
+        /// </summary>
+        public static string ConnectingMessage {
+            get {
+                return ResourceManager.GetString("ConnectingMessage", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Console.
         /// </summary>
@@ -454,7 +1633,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ConsoleText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Control panel opacity, range 0-1.
+        /// </summary>
+        public static string ControlPanelOpacityDescription {
+            get {
+                return ResourceManager.GetString("ControlPanelOpacityDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Control Panel Opacity.
         /// </summary>
@@ -463,7 +1651,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ControlPanelOpacityText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to The following files failed verification (corrupted or version mismatch).
+        /// </summary>
+        public static string CorruptedFilesMessage {
+            get {
+                return ResourceManager.GetString("CorruptedFilesMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cosmic Strife.
+        /// </summary>
+        public static string CosmicStrifeNameText {
+            get {
+                return ResourceManager.GetString("CosmicStrifeNameText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cosmic Strife settings.
+        /// </summary>
+        public static string CosmicStrifeSettingsText {
+            get {
+                return ResourceManager.GetString("CosmicStrifeSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable the Cosmic Strife task.
+        /// </summary>
+        public static string CosmicStrifeTaskEnableDescription {
+            get {
+                return ResourceManager.GetString("CosmicStrifeTaskEnableDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Cosmic Strife.
         /// </summary>
@@ -472,7 +1696,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("CosmicStrifeText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Count per run.
+        /// </summary>
+        public static string CountPerRunLabelText {
+            get {
+                return ResourceManager.GetString("CountPerRunLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to time(s).
+        /// </summary>
+        public static string CountUnitText {
+            get {
+                return ResourceManager.GetString("CountUnitText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Create desktop shortcut.
+        /// </summary>
+        public static string CreateDesktopShortcutText {
+            get {
+                return ResourceManager.GetString("CreateDesktopShortcutText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Create shortcut.
+        /// </summary>
+        public static string CreateShortcutActionText {
+            get {
+                return ResourceManager.GetString("CreateShortcutActionText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Create a desktop shortcut.
         /// </summary>
@@ -481,7 +1741,223 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("CreateShortcutText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Boss affixes for Currency Wars opening reroll.
+        /// </summary>
+        public static string CurrencyWarsBossAffixDescription {
+            get {
+                return ResourceManager.GetString("CurrencyWarsBossAffixDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to e.g. 决战在即 !时间刺客.
+        /// </summary>
+        public static string CurrencyWarsBossAffixPlaceholder {
+            get {
+                return ResourceManager.GetString("CurrencyWarsBossAffixPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Boss affixes.
+        /// </summary>
+        public static string CurrencyWarsBossAffixText {
+            get {
+                return ResourceManager.GetString("CurrencyWarsBossAffixText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to You can configure boss names, boss affixes, investment environments, and investment strategies below. See the documentat.
+        /// </summary>
+        public static string CurrencyWarsBossConfigHint {
+            get {
+                return ResourceManager.GetString("CurrencyWarsBossConfigHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Boss names for Currency Wars opening reroll.
+        /// </summary>
+        public static string CurrencyWarsBossNameDescription {
+            get {
+                return ResourceManager.GetString("CurrencyWarsBossNameDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to e.g. 巨鹿生物制药;增熵能源集团;金血记忆体联盟.
+        /// </summary>
+        public static string CurrencyWarsBossNamePlaceholder {
+            get {
+                return ResourceManager.GetString("CurrencyWarsBossNamePlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Boss names.
+        /// </summary>
+        public static string CurrencyWarsBossNameText {
+            get {
+                return ResourceManager.GetString("CurrencyWarsBossNameText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Currency Wars difficulty, 0=lowest, 1=highest, 2=current difficulty.
+        /// </summary>
+        public static string CurrencyWarsDifficultyDescription {
+            get {
+                return ResourceManager.GetString("CurrencyWarsDifficultyDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Investment environments for Currency Wars opening reroll.
+        /// </summary>
+        public static string CurrencyWarsInvestmentEnvDescription {
+            get {
+                return ResourceManager.GetString("CurrencyWarsInvestmentEnvDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to e.g. 长线利好 ?轮岗.
+        /// </summary>
+        public static string CurrencyWarsInvestmentEnvPlaceholder {
+            get {
+                return ResourceManager.GetString("CurrencyWarsInvestmentEnvPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Investment environments.
+        /// </summary>
+        public static string CurrencyWarsInvestmentEnvText {
+            get {
+                return ResourceManager.GetString("CurrencyWarsInvestmentEnvText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Investment strategies for Currency Wars opening reroll.
+        /// </summary>
+        public static string CurrencyWarsInvestmentStrategyHint {
+            get {
+                return ResourceManager.GetString("CurrencyWarsInvestmentStrategyHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Investment strategies.
+        /// </summary>
+        public static string CurrencyWarsInvestmentStrategyText {
+            get {
+                return ResourceManager.GetString("CurrencyWarsInvestmentStrategyText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Complete it manually once first to clear all beginner tips.
+        /// </summary>
+        public static string CurrencyWarsManualClearHint {
+            get {
+                return ResourceManager.GetString("CurrencyWarsManualClearHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Master switch for Currency Wars.
+        /// </summary>
+        public static string CurrencyWarsMasterSwitchDescription {
+            get {
+                return ResourceManager.GetString("CurrencyWarsMasterSwitchDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Currency Wars mode, 0=Standard match, 1=Overclock match, 2=opening reroll.
+        /// </summary>
+        public static string CurrencyWarsModeDescription {
+            get {
+                return ResourceManager.GetString("CurrencyWarsModeDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Standard and Overclock matches, with the latest coin recognition, support character detection, and failure summary fixes.
+        /// </summary>
+        public static string CurrencyWarsPlusDescription {
+            get {
+                return ResourceManager.GetString("CurrencyWarsPlusDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Number of runs for Currency Wars opening reroll.
+        /// </summary>
+        public static string CurrencyWarsRerollRunCountDescription {
+            get {
+                return ResourceManager.GetString("CurrencyWarsRerollRunCountDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to When enabled, skip the Currency Wars task if Cosmic Strife point rewards are full.
+        /// </summary>
+        public static string CurrencyWarsSkipWhenFullDescription {
+            get {
+                return ResourceManager.GetString("CurrencyWarsSkipWhenFullDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Plane 1 strategy 1, Plane 1 strategy 2; Plane 2 strategy 1, Plane 2 strategy 2.
+        /// </summary>
+        public static string CurrencyWarsStrategyExamplePlaceholder {
+            get {
+                return ResourceManager.GetString("CurrencyWarsStrategyExamplePlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy index used in Currency Wars.
+        /// </summary>
+        public static string CurrencyWarsStrategyIndexDescription {
+            get {
+                return ResourceManager.GetString("CurrencyWarsStrategyIndexDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy name used in Currency Wars.
+        /// </summary>
+        public static string CurrencyWarsStrategyNameDescription {
+            get {
+                return ResourceManager.GetString("CurrencyWarsStrategyNameDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Trailblazer name in Currency Wars.
+        /// </summary>
+        public static string CurrencyWarsTrailblazerNameDescription {
+            get {
+                return ResourceManager.GetString("CurrencyWarsTrailblazerNameDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Currency Wars - Zero-Sum Game.
+        /// </summary>
+        public static string CurrencyWarsZeroSumText {
+            get {
+                return ResourceManager.GetString("CurrencyWarsZeroSumText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Run the currently selected config.
         /// </summary>
@@ -490,7 +1966,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("CurrentButtonTipText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Current configuration.
         /// </summary>
@@ -499,7 +1975,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("CurrentConfigText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Launch Current.
         /// </summary>
@@ -508,7 +1984,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("CurrentText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} (current value).
+        /// </summary>
+        public static string CurrentValueFormat {
+            get {
+                return ResourceManager.GetString("CurrentValueFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Current version: {0}.
+        /// </summary>
+        public static string CurrentVersionFormat {
+            get {
+                return ResourceManager.GetString("CurrentVersionFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid current version format.
+        /// </summary>
+        public static string CurrentVersionInvalidError {
+            get {
+                return ResourceManager.GetString("CurrentVersionInvalidError", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Custom API Address.
         /// </summary>
@@ -517,7 +2020,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("CustomApiAddressText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Custom backend launch arguments, e.g. main.py, -m SRACore.
+        /// </summary>
+        public static string CustomBackendArgsDescription {
+            get {
+                return ResourceManager.GetString("CustomBackendArgsDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Custom backend command/executable, e.g. python, sra-cli, uv, or an executable path.
+        /// </summary>
+        public static string CustomBackendCommandDescription {
+            get {
+                return ResourceManager.GetString("CustomBackendCommandDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable a custom backend.
+        /// </summary>
+        public static string CustomBackendEnableDescription {
+            get {
+                return ResourceManager.GetString("CustomBackendEnableDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Use a custom backend.
         /// </summary>
@@ -526,7 +2056,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("CustomBackendText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Custom backend working directory; uses the program's current directory when empty.
+        /// </summary>
+        public static string CustomBackendWorkingDirDescription {
+            get {
+                return ResourceManager.GetString("CustomBackendWorkingDirDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable custom Webhook push.
+        /// </summary>
+        public static string CustomWebhookEnableDescription {
+            get {
+                return ResourceManager.GetString("CustomWebhookEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to URL of the custom Webhook.
+        /// </summary>
+        public static string CustomWebhookUrlDescription {
+            get {
+                return ResourceManager.GetString("CustomWebhookUrlDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Daily Training.
+        /// </summary>
+        public static string DailyTrainingText {
+            get {
+                return ResourceManager.GetString("DailyTrainingText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Dark.
         /// </summary>
@@ -535,7 +2101,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("DarkText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to dddd, MMMM d, yyyy.
+        /// </summary>
+        public static string DateDisplayFormat {
+            get {
+                return ResourceManager.GetString("DateDisplayFormat", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Default Start Page.
         /// </summary>
@@ -544,7 +2119,88 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("DefaultPageText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Delete selected.
+        /// </summary>
+        public static string DeleteSelectedText {
+            get {
+                return ResourceManager.GetString("DeleteSelectedText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string DeleteText {
+            get {
+                return ResourceManager.GetString("DeleteText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting....
+        /// </summary>
+        public static string DeletingMessage {
+            get {
+                return ResourceManager.GetString("DeletingMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shortcut already exists on the desktop.
+        /// </summary>
+        public static string DesktopShortcutExistsMessage {
+            get {
+                return ResourceManager.GetString("DesktopShortcutExistsMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No desktop shortcut found. Create one now?.
+        /// </summary>
+        public static string DesktopShortcutMissingMessage {
+            get {
+                return ResourceManager.GetString("DesktopShortcutMissingMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to You are in developer mode!.
+        /// </summary>
+        public static string DeveloperModeActiveMessage {
+            get {
+                return ResourceManager.GetString("DeveloperModeActiveMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} more actions to enter developer mode..
+        /// </summary>
+        public static string DeveloperModeCountdownFormat {
+            get {
+                return ResourceManager.GetString("DeveloperModeCountdownFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable developer mode.
+        /// </summary>
+        public static string DeveloperModeEnableDescription {
+            get {
+                return ResourceManager.GetString("DeveloperModeEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Developer mode.
+        /// </summary>
+        public static string DeveloperModeText {
+            get {
+                return ResourceManager.GetString("DeveloperModeText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Developer Options.
         /// </summary>
@@ -553,7 +2209,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("DeveloperOptionsText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Device ID:.
+        /// </summary>
+        public static string DeviceIdLabelText {
+            get {
+                return ResourceManager.GetString("DeviceIdLabelText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Device Key.
         /// </summary>
@@ -562,7 +2227,61 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("DeviceKeyText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Current difficulty.
+        /// </summary>
+        public static string DifficultyCurrentText {
+            get {
+                return ResourceManager.GetString("DifficultyCurrentText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Highest difficulty.
+        /// </summary>
+        public static string DifficultyHighestText {
+            get {
+                return ResourceManager.GetString("DifficultyHighestText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Difficulty.
+        /// </summary>
+        public static string DifficultyLabelText {
+            get {
+                return ResourceManager.GetString("DifficultyLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Lowest difficulty.
+        /// </summary>
+        public static string DifficultyLowestText {
+            get {
+                return ResourceManager.GetString("DifficultyLowestText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Across the universe to the dim stars beyond.
+        /// </summary>
+        public static string DimStarsBeyondPhraseText {
+            get {
+                return ResourceManager.GetString("DimStarsBeyondPhraseText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable DingTalk bot push.
+        /// </summary>
+        public static string DingTalkEnableDescription {
+            get {
+                return ResourceManager.GetString("DingTalkEnableDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to DingTalk Notification.
         /// </summary>
@@ -571,7 +2290,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("DingTalkNotificationText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to SEC... (optional).
+        /// </summary>
+        public static string DingTalkSecretPlaceholder {
+            get {
+                return ResourceManager.GetString("DingTalkSecretPlaceholder", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to DingTalk Settings.
         /// </summary>
@@ -580,7 +2308,70 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("DingTalkSettingsText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Signing secret of the DingTalk bot (starts with SEC).
+        /// </summary>
+        public static string DingTalkSignSecretDescription {
+            get {
+                return ResourceManager.GetString("DingTalkSignSecretDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test message sent, please check DingTalk.
+        /// </summary>
+        public static string DingTalkTestSentMessage {
+            get {
+                return ResourceManager.GetString("DingTalkTestSentMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to DingTalk test.
+        /// </summary>
+        public static string DingTalkTestText {
+            get {
+                return ResourceManager.GetString("DingTalkTestText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Webhook URL of the DingTalk bot.
+        /// </summary>
+        public static string DingTalkWebhookDescription {
+            get {
+                return ResourceManager.GetString("DingTalkWebhookDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Leave empty to disable authentication.
+        /// </summary>
+        public static string DisableAuthPlaceholder {
+            get {
+                return ResourceManager.GetString("DisableAuthPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable Discord push.
+        /// </summary>
+        public static string DiscordEnableDescription {
+            get {
+                return ResourceManager.GetString("DiscordEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to attach screenshots to Discord push.
+        /// </summary>
+        public static string DiscordScreenshotDescription {
+            get {
+                return ResourceManager.GetString("DiscordScreenshotDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Discord Settings.
         /// </summary>
@@ -589,7 +2380,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("DiscordSettingsText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test message sent, please check Discord.
+        /// </summary>
+        public static string DiscordTestSentMessage {
+            get {
+                return ResourceManager.GetString("DiscordTestSentMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Discord test.
+        /// </summary>
+        public static string DiscordTestText {
+            get {
+                return ResourceManager.GetString("DiscordTestText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Discord Webhook URL.
+        /// </summary>
+        public static string DiscordWebhookDescription {
+            get {
+                return ResourceManager.GetString("DiscordWebhookDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Discord Webhook Notification.
         /// </summary>
@@ -598,7 +2416,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("DiscordWebhookNotificationText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Display Mode.
         /// </summary>
@@ -607,7 +2425,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("DisplayModeText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Display settings.
+        /// </summary>
+        public static string DisplaySettingsText {
+            get {
+                return ResourceManager.GetString("DisplaySettingsText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Display.
         /// </summary>
@@ -616,7 +2443,124 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("DisplayText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Master switch for Divergent Universe.
+        /// </summary>
+        public static string DivergentUniverseMasterSwitchDescription {
+            get {
+                return ResourceManager.GetString("DivergentUniverseMasterSwitchDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Divergent Universe mode: 0=single-layer farm, 1=full run.
+        /// </summary>
+        public static string DivergentUniverseModeDescription {
+            get {
+                return ResourceManager.GetString("DivergentUniverseModeDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Divergent Universe - Paradise Memoir.
+        /// </summary>
+        public static string DivergentUniverseParadiseText {
+            get {
+                return ResourceManager.GetString("DivergentUniverseParadiseText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable point rewards; when enabled, skip this task once the weekly point cap is reached.
+        /// </summary>
+        public static string DivergentUniversePointRewardDescription {
+            get {
+                return ResourceManager.GetString("DivergentUniversePointRewardDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Number of Divergent Universe runs.
+        /// </summary>
+        public static string DivergentUniverseRunCountDescription {
+            get {
+                return ResourceManager.GetString("DivergentUniverseRunCountDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to use Technique for fast Divergent Universe farming.
+        /// </summary>
+        public static string DivergentUniverseTechniqueDescription {
+            get {
+                return ResourceManager.GetString("DivergentUniverseTechniqueDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Complete Tutorial I and Tutorial II, and clear all beginner tips.
+        /// </summary>
+        public static string DivergentUniverseTutorialHint {
+            get {
+                return ResourceManager.GetString("DivergentUniverseTutorialHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Don't ask again.
+        /// </summary>
+        public static string DoNotAskAgainText {
+            get {
+                return ResourceManager.GetString("DoNotAskAgainText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable double event detection; when enabled, Garden of Plenty/Realm of the Strange/Planar Fissure stages are .
+        /// </summary>
+        public static string DoubleEventDetectionDescription {
+            get {
+                return ResourceManager.GetString("DoubleEventDetectionDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable double event detection.
+        /// </summary>
+        public static string DoubleEventDetectionText {
+            get {
+                return ResourceManager.GetString("DoubleEventDetectionText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Download canceled.
+        /// </summary>
+        public static string DownloadCanceledMessage {
+            get {
+                return ResourceManager.GetString("DownloadCanceledMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Download channel, 0=Mirror Chyan, 1=Github Release, 2=AUTO-MAS.
+        /// </summary>
+        public static string DownloadChannelDescription {
+            get {
+                return ResourceManager.GetString("DownloadChannelDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Download complete.
+        /// </summary>
+        public static string DownloadCompleteMessage {
+            get {
+                return ResourceManager.GetString("DownloadCompleteMessage", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Download Dir.
         /// </summary>
@@ -625,7 +2569,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("DownloadDirText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Edit directly, or click the button on the right to choose a folder.
+        /// </summary>
+        public static string DownloadFolderEditHint {
+            get {
+                return ResourceManager.GetString("DownloadFolderEditHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Choose the folder for downloaded files.
+        /// </summary>
+        public static string DownloadFolderPickerTitle {
+            get {
+                return ResourceManager.GetString("DownloadFolderPickerTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Downloading....
+        /// </summary>
+        public static string DownloadingMessage {
+            get {
+                return ResourceManager.GetString("DownloadingMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable email push.
+        /// </summary>
+        public static string EmailEnableDescription {
+            get {
+                return ResourceManager.GetString("EmailEnableDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Email Notification.
         /// </summary>
@@ -634,7 +2614,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("EmailNotificationText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test email sent, please check your inbox.
+        /// </summary>
+        public static string EmailTestSentMessage {
+            get {
+                return ResourceManager.GetString("EmailTestSentMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Email test.
+        /// </summary>
+        public static string EmailTestText {
+            get {
+                return ResourceManager.GetString("EmailTestText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Email.
+        /// </summary>
+        public static string EmailText {
+            get {
+                return ResourceManager.GetString("EmailText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to (empty).
+        /// </summary>
+        public static string EmptyValueText {
+            get {
+                return ResourceManager.GetString("EmptyValueText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Enable Developer Options.
         /// </summary>
@@ -643,7 +2659,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("EnableDeveloperOptionsText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Enable Launch Arguments.
         /// </summary>
@@ -652,7 +2668,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("EnableGameArgsText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Enable Overlay.
         /// </summary>
@@ -661,7 +2677,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("EnableOverlayText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable point rewards.
+        /// </summary>
+        public static string EnablePointRewardsText {
+            get {
+                return ResourceManager.GetString("EnablePointRewardsText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Enable Proxy.
         /// </summary>
@@ -670,7 +2695,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("EnableProxyText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Enable tray icon.
         /// </summary>
@@ -679,7 +2704,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("EnableTrayIconText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to The parameters below take effect only when enabled.
+        /// </summary>
+        public static string EnabledParametersHint {
+            get {
+                return ResourceManager.GetString("EnabledParametersHint", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Encryption Key.
         /// </summary>
@@ -688,7 +2722,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("EncryptionKeyText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ended {0} days {1} hours ago.
+        /// </summary>
+        public static string EndedDaysHoursAgoFormat {
+            get {
+                return ResourceManager.GetString("EndedDaysHoursAgoFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ended {0} hours ago.
+        /// </summary>
+        public static string EndedHoursAgoFormat {
+            get {
+                return ResourceManager.GetString("EndedHoursAgoFormat", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Ensure.
         /// </summary>
@@ -697,7 +2749,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("EnsureText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Enter Your CDK.
         /// </summary>
@@ -706,7 +2758,124 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("EnterCdkText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string ErrorText {
+            get {
+                return ResourceManager.GetString("ErrorText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Event calendar.
+        /// </summary>
+        public static string EventCalendarText {
+            get {
+                return ResourceManager.GetString("EventCalendarText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ended.
+        /// </summary>
+        public static string EventStatusEndedText {
+            get {
+                return ResourceManager.GetString("EventStatusEndedText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to In progress.
+        /// </summary>
+        public static string EventStatusInProgressText {
+            get {
+                return ResourceManager.GetString("EventStatusInProgressText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Not started.
+        /// </summary>
+        public static string EventStatusNotStartedText {
+            get {
+                return ResourceManager.GetString("EventStatusNotStartedText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hotkey for opening the events screen.
+        /// </summary>
+        public static string EventsScreenHotkeyDescription {
+            get {
+                return ResourceManager.GetString("EventsScreenHotkeyDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Events.
+        /// </summary>
+        public static string EventsText {
+            get {
+                return ResourceManager.GetString("EventsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Execution count.
+        /// </summary>
+        public static string ExecutionCountLabelText {
+            get {
+                return ResourceManager.GetString("ExecutionCountLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Exit the game.
+        /// </summary>
+        public static string ExitGameText {
+            get {
+                return ResourceManager.GetString("ExitGameText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Exit.
+        /// </summary>
+        public static string ExitProgramText {
+            get {
+                return ResourceManager.GetString("ExitProgramText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Export logs.
+        /// </summary>
+        public static string ExportLogsText {
+            get {
+                return ResourceManager.GetString("ExportLogsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Exporting logs.
+        /// </summary>
+        public static string ExportingLogsMessage {
+            get {
+                return ResourceManager.GetString("ExportingLogsMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Exporting....
+        /// </summary>
+        public static string ExportingMessage {
+            get {
+                return ResourceManager.GetString("ExportingMessage", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Extension.
         /// </summary>
@@ -715,7 +2884,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ExtensionText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Make sure the backend is running, then click Refresh to reload.
+        /// </summary>
+        public static string ExtensionsBackendHint {
+            get {
+                return ResourceManager.GetString("ExtensionsBackendHint", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Let SRA.exe connect to an SRA backend service provided by another machine or another process..
         /// </summary>
@@ -724,52 +2902,97 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ExternalBackendDescriptionText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Feishu AppId.
+        ///   Looks up a localized string similar to Extract manually.
         /// </summary>
-        public static string FeishuAppIdText {
+        public static string ExtractManuallyText {
             get {
-                return ResourceManager.GetString("FeishuAppIdText", resourceCulture);
+                return ResourceManager.GetString("ExtractManuallyText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Feishu AppSecret.
+        ///   Looks up a localized string similar to Extract now.
         /// </summary>
-        public static string FeishuAppSecretText {
+        public static string ExtractNowText {
             get {
-                return ResourceManager.GetString("FeishuAppSecretText", resourceCulture);
+                return ResourceManager.GetString("ExtractNowText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Feishu Notification Address.
+        ///   Looks up a localized string similar to Extraction will briefly stop the backend service. Start extraction now?.
         /// </summary>
-        public static string FeishuNotificationAddressText {
+        public static string ExtractionConfirmMessage {
             get {
-                return ResourceManager.GetString("FeishuNotificationAddressText", resourceCulture);
+                return ResourceManager.GetString("ExtractionConfirmMessage", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Feishu Notification.
+        ///   Looks up a localized string similar to The update package will be extracted in 3 seconds.
         /// </summary>
-        public static string FeishuNotificationText {
+        public static string ExtractionCountdownMessage {
             get {
-                return ResourceManager.GetString("FeishuNotificationText", resourceCulture);
+                return ResourceManager.GetString("ExtractionCountdownMessage", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Feishu Settings.
+        ///   Looks up a localized string similar to Extraction postponed.
         /// </summary>
-        public static string FeishuSettingsText {
+        public static string ExtractionPostponedMessage {
             get {
-                return ResourceManager.GetString("FeishuSettingsText", resourceCulture);
+                return ResourceManager.GetString("ExtractionPostponedMessage", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Starting extraction.
+        /// </summary>
+        public static string ExtractionStartingMessage {
+            get {
+                return ResourceManager.GetString("ExtractionStartingMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FAQ.
+        /// </summary>
+        public static string FaqText {
+            get {
+                return ResourceManager.GetString("FaqText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bon voyage.
+        /// </summary>
+        public static string FarewellPhraseOne {
+            get {
+                return ResourceManager.GetString("FarewellPhraseOne", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to May you get to where dreams are all crystalline and sweet.
+        /// </summary>
+        public static string FarewellPhraseThree {
+            get {
+                return ResourceManager.GetString("FarewellPhraseThree", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to May your path be clear.
+        /// </summary>
+        public static string FarewellPhraseTwo {
+            get {
+                return ResourceManager.GetString("FarewellPhraseTwo", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Frontend logs folder.
         /// </summary>
@@ -778,7 +3001,196 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("FeLogsFolder", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to App ID of the Feishu app.
+        /// </summary>
+        public static string FeishuAppIdDescription {
+            get {
+                return ResourceManager.GetString("FeishuAppIdDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Feishu AppId.
+        /// </summary>
+        public static string FeishuAppIdText {
+            get {
+                return ResourceManager.GetString("FeishuAppIdText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to App Secret of the Feishu app.
+        /// </summary>
+        public static string FeishuAppSecretDescription {
+            get {
+                return ResourceManager.GetString("FeishuAppSecretDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Feishu AppSecret.
+        /// </summary>
+        public static string FeishuAppSecretText {
+            get {
+                return ResourceManager.GetString("FeishuAppSecretText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable Feishu push.
+        /// </summary>
+        public static string FeishuEnableDescription {
+            get {
+                return ResourceManager.GetString("FeishuEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Feishu receiver ID type, e.g. open_id, user_id, union_id, chat_id.
+        /// </summary>
+        public static string FeishuIdTypeDescription {
+            get {
+                return ResourceManager.GetString("FeishuIdTypeDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Feishu Notification Address.
+        /// </summary>
+        public static string FeishuNotificationAddressText {
+            get {
+                return ResourceManager.GetString("FeishuNotificationAddressText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Feishu Notification.
+        /// </summary>
+        public static string FeishuNotificationText {
+            get {
+                return ResourceManager.GetString("FeishuNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Feishu message receiver ID.
+        /// </summary>
+        public static string FeishuReceiverIdDescription {
+            get {
+                return ResourceManager.GetString("FeishuReceiverIdDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Feishu Settings.
+        /// </summary>
+        public static string FeishuSettingsText {
+            get {
+                return ResourceManager.GetString("FeishuSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test message sent, please check Feishu.
+        /// </summary>
+        public static string FeishuTestSentMessage {
+            get {
+                return ResourceManager.GetString("FeishuTestSentMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Feishu test.
+        /// </summary>
+        public static string FeishuTestText {
+            get {
+                return ResourceManager.GetString("FeishuTestText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Webhook URL of the Feishu bot.
+        /// </summary>
+        public static string FeishuWebhookDescription {
+            get {
+                return ResourceManager.GetString("FeishuWebhookDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} ({1} files).
+        /// </summary>
+        public static string FileCountFormat {
+            get {
+                return ResourceManager.GetString("FileCountFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Deleted {0} files, freed {1}.
+        /// </summary>
+        public static string FilesDeletedFormat {
+            get {
+                return ResourceManager.GetString("FilesDeletedFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Deleted {0} file(s), {1} failed (possibly in use): {2}{3}.
+        /// </summary>
+        public static string FilesDeletedWithFailuresMessage {
+            get {
+                return ResourceManager.GetString("FilesDeletedWithFailuresMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Filter:.
+        /// </summary>
+        public static string FilterLabelText {
+            get {
+                return ResourceManager.GetString("FilterLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Find Cake Cat.
+        /// </summary>
+        public static string FindCakeCatText {
+            get {
+                return ResourceManager.GetString("FindCakeCatText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The firefly rushes to the flame, born unto death.
+        /// </summary>
+        public static string FireflyFlamePhraseText {
+            get {
+                return ResourceManager.GetString("FireflyFlamePhraseText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to create or access the selected folder: {0} Please choose another folder..
+        /// </summary>
+        public static string FolderAccessErrorMessage {
+            get {
+                return ResourceManager.GetString("FolderAccessErrorMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Folder unavailable.
+        /// </summary>
+        public static string FolderUnavailableMessage {
+            get {
+                return ResourceManager.GetString("FolderUnavailableMessage", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Follow System.
         /// </summary>
@@ -787,7 +3199,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("FollowSystemText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fuel.
+        /// </summary>
+        public static string FuelText {
+            get {
+                return ResourceManager.GetString("FuelText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Full Screen.
         /// </summary>
@@ -796,16 +3217,88 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("FullScreenText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to If you don&apos;t know what this does, please leave it blank.
+        ///   Looks up a localized string similar to Fullscreen.
+        /// </summary>
+        public static string FullscreenModeText {
+            get {
+                return ResourceManager.GetString("FullscreenModeText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Running.
+        /// </summary>
+        public static string G0004 {
+            get {
+                return ResourceManager.GetString("G0004", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to username.
+        /// </summary>
+        public static string G0097 {
+            get {
+                return ResourceManager.GetString("G0097", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to runtimes.
+        /// </summary>
+        public static string G0099 {
+            get {
+                return ResourceManager.GetString("G0099", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Scan strategy folder.
+        /// </summary>
+        public static string G0102 {
+            get {
+                return ResourceManager.GetString("G0102", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to [4 Express 3 Quantum] Himeko to Lv. 5 for quality · Lv. 7 unlocks 2★.
+        /// </summary>
+        public static string G0104 {
+            get {
+                return ResourceManager.GetString("G0104", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to [5 Elation 3 Quantum] Silver Wolf budget build · find the core at Lv. 5, complete at Lv. 9.
+        /// </summary>
+        public static string G0105 {
+            get {
+                return ResourceManager.GetString("G0105", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to If you don't know what this does, please leave it blank.
         /// </summary>
         public static string GameArgsHintText {
             get {
                 return ResourceManager.GetString("GameArgsHintText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Game channel, 0=CN, 1=Bilibili, 2=Global.
+        /// </summary>
+        public static string GameChannelDescription {
+            get {
+                return ResourceManager.GetString("GameChannelDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Note: The in-game language needs to be set to Simplified Chinese (简体中文).
         /// </summary>
@@ -814,7 +3307,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("GameChineseLanguageTip", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Game executable path.
+        /// </summary>
+        public static string GameExecutablePathDescription {
+            get {
+                return ResourceManager.GetString("GameExecutablePathDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable game launch arguments; when enabled, launches the game with the arguments below.
+        /// </summary>
+        public static string GameLaunchArgsEnableDescription {
+            get {
+                return ResourceManager.GetString("GameLaunchArgsEnableDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Game Launch Arguments.
         /// </summary>
@@ -823,7 +3334,52 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("GameLaunchArgumentsText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Wait delay after launching the game (seconds).
+        /// </summary>
+        public static string GameLaunchDelayDescription {
+            get {
+                return ResourceManager.GetString("GameLaunchDelayDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to auto-detect the game path; when enabled, scans common install locations to find the game path.
+        /// </summary>
+        public static string GamePathAutoDetectDescription {
+            get {
+                return ResourceManager.GetString("GamePathAutoDetectDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to auto-detect the game path.
+        /// </summary>
+        public static string GamePathAutoDetectFailedError {
+            get {
+                return ResourceManager.GetString("GamePathAutoDetectFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Game path index, pointing to one URI in gamePath.uris.
+        /// </summary>
+        public static string GamePathIndexDescription {
+            get {
+                return ResourceManager.GetString("GamePathIndexDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to List of game paths, supports multiple paths for quick switching.
+        /// </summary>
+        public static string GamePathListDescription {
+            get {
+                return ResourceManager.GetString("GamePathListDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Game Path.
         /// </summary>
@@ -832,7 +3388,52 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("GamePathText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Game window mode, e.g. windowed, fullscreen.
+        /// </summary>
+        public static string GameWindowModeDescription {
+            get {
+                return ResourceManager.GetString("GameWindowModeDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Game window size in widthxheight format, e.g. 1920x1080.
+        /// </summary>
+        public static string GameWindowSizeDescription {
+            get {
+                return ResourceManager.GetString("GameWindowSizeDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Garden of Plenty.
+        /// </summary>
+        public static string GardenOfPlentyText {
+            get {
+                return ResourceManager.GetString("GardenOfPlentyText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to General settings.
+        /// </summary>
+        public static string GeneralSettingsText {
+            get {
+                return ResourceManager.GetString("GeneralSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Gift of Odyssey.
+        /// </summary>
+        public static string GiftOfOdysseyText {
+            get {
+                return ResourceManager.GetString("GiftOfOdysseyText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Open On GitHub.
         /// </summary>
@@ -841,7 +3442,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("GithubToolTipText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Global server, 0=Asia, 1=Europe, 2=America, 3=TW/HK/MO, only effective for Global.
+        /// </summary>
+        public static string GlobalServerDescription {
+            get {
+                return ResourceManager.GetString("GlobalServerDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Global server.
+        /// </summary>
+        public static string GlobalServerLabelText {
+            get {
+                return ResourceManager.GetString("GlobalServerLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Global.
+        /// </summary>
+        public static string GlobalServerText {
+            get {
+                return ResourceManager.GetString("GlobalServerText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Got it.
+        /// </summary>
+        public static string GotItText {
+            get {
+                return ResourceManager.GetString("GotItText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Welcome to SRA.
         /// </summary>
@@ -850,7 +3487,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("GreetingText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hotkey for opening the guide screen.
+        /// </summary>
+        public static string GuideScreenHotkeyDescription {
+            get {
+                return ResourceManager.GetString("GuideScreenHotkeyDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Guide.
         /// </summary>
@@ -859,7 +3505,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("GuideText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Home.
         /// </summary>
@@ -868,7 +3514,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("HomeText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hot update applied.
+        /// </summary>
+        public static string HotUpdateAppliedMessage {
+            get {
+                return ResourceManager.GetString("HotUpdateAppliedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hotfix: {0}.
+        /// </summary>
+        public static string HotfixFormat {
+            get {
+                return ResourceManager.GetString("HotfixFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Press the keys to set a shortcut.
+        /// </summary>
+        public static string HotkeyCaptureHint {
+            get {
+                return ResourceManager.GetString("HotkeyCaptureHint", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Hotkeys in Game.
         /// </summary>
@@ -877,7 +3550,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("HotkeysText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Icon URL (optional).
+        /// </summary>
+        public static string IconUrlPlaceholder {
+            get {
+                return ResourceManager.GetString("IconUrlPlaceholder", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to ID Type.
         /// </summary>
@@ -886,7 +3568,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("IdTypeText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ignore.
+        /// </summary>
+        public static string IgnoreText {
+            get {
+                return ResourceManager.GetString("IgnoreText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Import.
+        /// </summary>
+        public static string ImportText {
+            get {
+                return ResourceManager.GetString("ImportText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to In the End.
         /// </summary>
@@ -895,7 +3595,178 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("InTheEndText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Info.
+        /// </summary>
+        public static string InfoText {
+            get {
+                return ResourceManager.GetString("InfoText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Send failed: {0} (input: {1}).
+        /// </summary>
+        public static string InputSendFailedMessage {
+            get {
+                return ResourceManager.GetString("InputSendFailedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Send failed: process is not running (input: {0}).
+        /// </summary>
+        public static string InputSendProcessErrorMessage {
+            get {
+                return ResourceManager.GetString("InputSendProcessErrorMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Installation complete.
+        /// </summary>
+        public static string InstallationCompleteMessage {
+            get {
+                return ResourceManager.GetString("InstallationCompleteMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to You canceled the installer download.
+        /// </summary>
+        public static string InstallerDownloadCanceledMessage {
+            get {
+                return ResourceManager.GetString("InstallerDownloadCanceledMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Network error: unable to download the latest installer. Please check your network connection, or switch the download cha.
+        /// </summary>
+        public static string InstallerDownloadNetworkError {
+            get {
+                return ResourceManager.GetString("InstallerDownloadNetworkError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Downloading the latest installer....
+        /// </summary>
+        public static string InstallerDownloadingMessage {
+            get {
+                return ResourceManager.GetString("InstallerDownloadingMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to SHA256 check passed for version {0} installer, starting installation.
+        /// </summary>
+        public static string InstallerSha256PassedMessage {
+            get {
+                return ResourceManager.GetString("InstallerSha256PassedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Verify app file integrity using the MD5 manifest bundled with the installer.
+        /// </summary>
+        public static string IntegrityCheckDescription {
+            get {
+                return ResourceManager.GetString("IntegrityCheckDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Integrity check passed, {0} files verified.
+        /// </summary>
+        public static string IntegrityCheckPassedMessage {
+            get {
+                return ResourceManager.GetString("IntegrityCheckPassedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Integrity manifest (manifest.md5.json) not found. Please reinstall via the in-app updater and try again.
+        /// </summary>
+        public static string IntegrityManifestMissingMessage {
+            get {
+                return ResourceManager.GetString("IntegrityManifestMissingMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The configuration name cannot contain these characters: \ / : * ? "   |.
+        /// </summary>
+        public static string InvalidConfigurationNameCharsMessage {
+            get {
+                return ResourceManager.GetString("InvalidConfigurationNameCharsMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid configuration name.
+        /// </summary>
+        public static string InvalidConfigurationNameError {
+            get {
+                return ResourceManager.GetString("InvalidConfigurationNameError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Iron sparks fly, graceful without leaving ash.
+        /// </summary>
+        public static string IronSparksPhraseText {
+            get {
+                return ResourceManager.GetString("IronSparksPhraseText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to JSON strategy file.
+        /// </summary>
+        public static string JsonStrategyFileText {
+            get {
+                return ResourceManager.GetString("JsonStrategyFileText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Just Icon..
+        /// </summary>
+        public static string JustIconText {
+            get {
+                return ResourceManager.GetString("JustIconText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: {1}.
+        /// </summary>
+        public static string LabelValueFormat {
+            get {
+                return ResourceManager.GetString("LabelValueFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Language changed.
+        /// </summary>
+        public static string LanguageChangedMessage {
+            get {
+                return ResourceManager.GetString("LanguageChangedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The application must be restarted to apply the new language. Restart now?.
+        /// </summary>
+        public static string LanguageRestartConfirmMessage {
+            get {
+                return ResourceManager.GetString("LanguageRestartConfirmMessage", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Language.
         /// </summary>
@@ -904,7 +3775,52 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("LanguageText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Later.
+        /// </summary>
+        public static string LaterText {
+            get {
+                return ResourceManager.GetString("LaterText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Time to wait after launching the game for it to finish loading before running subsequent tasks, in seconds..
+        /// </summary>
+        public static string LaunchWaitTimeDescription {
+            get {
+                return ResourceManager.GetString("LaunchWaitTimeDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Launch wait time (s).
+        /// </summary>
+        public static string LaunchWaitTimeText {
+            get {
+                return ResourceManager.GetString("LaunchWaitTimeText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Launcher launches the launcher.
+        /// </summary>
+        public static string LauncherInceptionText {
+            get {
+                return ResourceManager.GetString("LauncherInceptionText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Level.
+        /// </summary>
+        public static string LevelLabelText {
+            get {
+                return ResourceManager.GetString("LevelLabelText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Light.
         /// </summary>
@@ -913,7 +3829,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("LightText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Links.
         /// </summary>
@@ -922,7 +3838,673 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("LinksText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to ,.
+        /// </summary>
+        public static string ListSeparatorText {
+            get {
+                return ResourceManager.GetString("ListSeparatorText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Loading configuration....
+        /// </summary>
+        public static string LoadingConfigurationMessage {
+            get {
+                return ResourceManager.GetString("LoadingConfigurationMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Collecting and packaging log files, please wait....
+        /// </summary>
+        public static string LogCollectionMessage {
+            get {
+                return ResourceManager.GetString("LogCollectionMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Package the console, frontend, and backend logs into a ZIP file.
+        /// </summary>
+        public static string LogExportDescription {
+            get {
+                return ResourceManager.GetString("LogExportDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Log export failed.
+        /// </summary>
+        public static string LogExportFailedError {
+            get {
+                return ResourceManager.GetString("LogExportFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Log export failed: {TargetPath}.
+        /// </summary>
+        public static string LogExportPathFailedError {
+            get {
+                return ResourceManager.GetString("LogExportPathFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred: {0} Please check that the target path is writable and try again.
+        /// </summary>
+        public static string LogExportWriteErrorMessage {
+            get {
+                return ResourceManager.GetString("LogExportWriteErrorMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to When reporting an issue, please send the log files instead of a photo or screenshot of this page.
+        /// </summary>
+        public static string LogReportHint {
+            get {
+                return ResourceManager.GetString("LogReportHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Log off current user.
+        /// </summary>
+        public static string LogoffUserText {
+            get {
+                return ResourceManager.GetString("LogoffUserText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Log out of the current account.
+        /// </summary>
+        public static string LogoutAccountText {
+            get {
+                return ResourceManager.GetString("LogoutAccountText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Logs exported.
+        /// </summary>
+        public static string LogsExportedMessage {
+            get {
+                return ResourceManager.GetString("LogsExportedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Re-import task modules to hot reload.
+        /// </summary>
+        public static string M0001 {
+            get {
+                return ResourceManager.GetString("M0001", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show the extension configuration schema.
+        /// </summary>
+        public static string M0004 {
+            get {
+                return ResourceManager.GetString("M0004", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Re-import extension modules (hot reload).
+        /// </summary>
+        public static string M0005 {
+            get {
+                return ResourceManager.GetString("M0005", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show extension status.
+        /// </summary>
+        public static string M0007 {
+            get {
+                return ResourceManager.GetString("M0007", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Extension configuration.
+        /// </summary>
+        public static string M0008 {
+            get {
+                return ResourceManager.GetString("M0008", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get extension configuration.
+        /// </summary>
+        public static string M0009 {
+            get {
+                return ResourceManager.GetString("M0009", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Set extension configuration.
+        /// </summary>
+        public static string M0010 {
+            get {
+                return ResourceManager.GetString("M0010", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Extension management: list and run registered extensions.
+        /// </summary>
+        public static string M0014 {
+            get {
+                return ResourceManager.GetString("M0014", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Dispatch by extension type: foreground extensions use the shared thread, background ones use a dedicated thread.
+        /// </summary>
+        public static string M0015 {
+            get {
+                return ResourceManager.GetString("M0015", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stop a background extension or the currently running single-run extension.
+        /// </summary>
+        public static string M0019 {
+            get {
+                return ResourceManager.GetString("M0019", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Call the specified Operator method.
+        /// </summary>
+        public static string M0024 {
+            get {
+                return ResourceManager.GetString("M0024", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to List all strategies.
+        /// </summary>
+        public static string M0027 {
+            get {
+                return ResourceManager.GetString("M0027", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Import a strategy file into the strategy folder.
+        /// </summary>
+        public static string M0028 {
+            get {
+                return ResourceManager.GetString("M0028", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show Trailblaze Power stage configuration.
+        /// </summary>
+        public static string M0029 {
+            get {
+                return ResourceManager.GetString("M0029", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Play the in-game keyboard from a JSON score (pause F8 / reset F10 / stop F9).
+        /// </summary>
+        public static string M0034 {
+            get {
+                return ResourceManager.GetString("M0034", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Score name or JSON file path.
+        /// </summary>
+        public static string M0035 {
+            get {
+                return ResourceManager.GetString("M0035", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Playback speed multiplier (1.0 = original tempo).
+        /// </summary>
+        public static string M0036 {
+            get {
+                return ResourceManager.GetString("M0036", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Number of playthroughs.
+        /// </summary>
+        public static string M0037 {
+            get {
+                return ResourceManager.GetString("M0037", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Delay before the first play (seconds), used to switch to the game window.
+        /// </summary>
+        public static string M0038 {
+            get {
+                return ResourceManager.GetString("M0038", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Rehearsal mode: no actual key presses, only validates the score and timing.
+        /// </summary>
+        public static string M0039 {
+            get {
+                return ResourceManager.GetString("M0039", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable playback hotkeys (pause/reset).
+        /// </summary>
+        public static string M0040 {
+            get {
+                return ResourceManager.GetString("M0040", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Pause/resume hotkey.
+        /// </summary>
+        public static string M0041 {
+            get {
+                return ResourceManager.GetString("M0041", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reset hotkey.
+        /// </summary>
+        public static string M0042 {
+            get {
+                return ResourceManager.GetString("M0042", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically detect and handle story dialogue, can skip the story based on configuration.
+        /// </summary>
+        public static string M0044 {
+            get {
+                return ResourceManager.GetString("M0044", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to skip story dialogue automatically.
+        /// </summary>
+        public static string M0045 {
+            get {
+                return ResourceManager.GetString("M0045", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the in-game Trailblazer name..
+        /// </summary>
+        public static string M0048 {
+            get {
+                return ResourceManager.GetString("M0048", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Select a strategy; click Refresh after adding a JSON file. You can also enter the full path to a strategy JSON..
+        /// </summary>
+        public static string M0049 {
+            get {
+                return ResourceManager.GetString("M0049", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Number of matches to run this time..
+        /// </summary>
+        public static string M0050 {
+            get {
+                return ResourceManager.GetString("M0050", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Select the lowest difficulty, highest difficulty, or keep the current difficulty..
+        /// </summary>
+        public static string M0051 {
+            get {
+                return ResourceManager.GetString("M0051", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to When enabled, runs Overclock match; when disabled, runs Standard match..
+        /// </summary>
+        public static string M0052 {
+            get {
+                return ResourceManager.GetString("M0052", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Trailblazer name.
+        /// </summary>
+        public static string M0053 {
+            get {
+                return ResourceManager.GetString("M0053", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Predict warp resources before the current version ends.
+        /// </summary>
+        public static string M0059 {
+            get {
+                return ResourceManager.GetString("M0059", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Version start date (YYYY-MM-DD), used to infer the current version range.
+        /// </summary>
+        public static string M0060 {
+            get {
+                return ResourceManager.GetString("M0060", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Days per version.
+        /// </summary>
+        public static string M0061 {
+            get {
+                return ResourceManager.GetString("M0061", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Days between the special program and the end of the version.
+        /// </summary>
+        public static string M0062 {
+            get {
+                return ResourceManager.GetString("M0062", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Special program status: auto/done/not_done.
+        /// </summary>
+        public static string M0063 {
+            get {
+                return ResourceManager.GetString("M0063", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Endgame refresh interval in days.
+        /// </summary>
+        public static string M0064 {
+            get {
+                return ResourceManager.GetString("M0064", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Offset in days for the first endgame refresh.
+        /// </summary>
+        public static string M0065 {
+            get {
+                return ResourceManager.GetString("M0065", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Endgame refresh count override, -1 for automatic.
+        /// </summary>
+        public static string M0066 {
+            get {
+                return ResourceManager.GetString("M0066", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether an endgame refresh counts for today.
+        /// </summary>
+        public static string M0067 {
+            get {
+                return ResourceManager.GetString("M0067", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Weekly reset day of week (0=Monday).
+        /// </summary>
+        public static string M0068 {
+            get {
+                return ResourceManager.GetString("M0068", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Weekly count override, -1 for automatic.
+        /// </summary>
+        public static string M0069 {
+            get {
+                return ResourceManager.GetString("M0069", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether a weekly reset counts for today.
+        /// </summary>
+        public static string M0070 {
+            get {
+                return ResourceManager.GetString("M0070", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Version update compensation Stellar Jade.
+        /// </summary>
+        public static string M0071 {
+            get {
+                return ResourceManager.GetString("M0071", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether the Express Supply Pass is active.
+        /// </summary>
+        public static string M0072 {
+            get {
+                return ResourceManager.GetString("M0072", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Daily Stellar Jade without the Express Supply Pass.
+        /// </summary>
+        public static string M0073 {
+            get {
+                return ResourceManager.GetString("M0073", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Daily Stellar Jade with the Express Supply Pass.
+        /// </summary>
+        public static string M0074 {
+            get {
+                return ResourceManager.GetString("M0074", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stellar Jade per endgame refresh.
+        /// </summary>
+        public static string M0075 {
+            get {
+                return ResourceManager.GetString("M0075", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Weekly Simulated Universe Stellar Jade.
+        /// </summary>
+        public static string M0076 {
+            get {
+                return ResourceManager.GetString("M0076", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stellar Jade from special program redemption codes.
+        /// </summary>
+        public static string M0077 {
+            get {
+                return ResourceManager.GetString("M0077", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically scan the resources in the first row of the inventory.
+        /// </summary>
+        public static string M0078 {
+            get {
+                return ResourceManager.GetString("M0078", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the current Stellar Jade manually.
+        /// </summary>
+        public static string M0079 {
+            get {
+                return ResourceManager.GetString("M0079", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the current Star Rail Special Pass manually.
+        /// </summary>
+        public static string M0080 {
+            get {
+                return ResourceManager.GetString("M0080", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the current Star Rail Pass manually.
+        /// </summary>
+        public static string M0081 {
+            get {
+                return ResourceManager.GetString("M0081", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically scan the rewards guide.
+        /// </summary>
+        public static string M0082 {
+            get {
+                return ResourceManager.GetString("M0082", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Rewards guide type: auto/jade/special_pass/normal_pass.
+        /// </summary>
+        public static string M0083 {
+            get {
+                return ResourceManager.GetString("M0083", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the Stellar Jade in the rewards guide manually.
+        /// </summary>
+        public static string M0084 {
+            get {
+                return ResourceManager.GetString("M0084", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the Special Pass in the rewards guide manually.
+        /// </summary>
+        public static string M0085 {
+            get {
+                return ResourceManager.GetString("M0085", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the Pass in the rewards guide manually.
+        /// </summary>
+        public static string M0086 {
+            get {
+                return ResourceManager.GetString("M0086", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Main window height.
+        /// </summary>
+        public static string MainWindowHeightDescription {
+            get {
+                return ResourceManager.GetString("MainWindowHeightDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Main window width.
+        /// </summary>
+        public static string MainWindowWidthDescription {
+            get {
+                return ResourceManager.GetString("MainWindowWidthDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to X coordinate of the main window.
+        /// </summary>
+        public static string MainWindowXDescription {
+            get {
+                return ResourceManager.GetString("MainWindowXDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Y coordinate of the main window.
+        /// </summary>
+        public static string MainWindowYDescription {
+            get {
+                return ResourceManager.GetString("MainWindowYDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Map.
         /// </summary>
@@ -931,7 +4513,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("MapText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether training targets only recognize material stages; when enabled, skips Ornament Extraction and Cavern of Corrosion.
+        /// </summary>
+        public static string MaterialPriorityDescription {
+            get {
+                return ResourceManager.GetString("MaterialPriorityDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Material priority.
+        /// </summary>
+        public static string MaterialPriorityText {
+            get {
+                return ResourceManager.GetString("MaterialPriorityText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Max Retry Count.
         /// </summary>
@@ -940,7 +4540,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("MaxRetryCountText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to MD5 manifest is empty or malformed.
+        /// </summary>
+        public static string Md5ManifestInvalidError {
+            get {
+                return ResourceManager.GetString("Md5ManifestInvalidError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to MD5 integrity manifest not found.
+        /// </summary>
+        public static string Md5ManifestMissingError {
+            get {
+                return ResourceManager.GetString("Md5ManifestMissingError", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Method 1: Group Bot Webhook.
         /// </summary>
@@ -949,7 +4567,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("MethodOneText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Method 2: App API (Can send to specified users).
         /// </summary>
@@ -958,7 +4576,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("MethodTwoText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to minuet (optional).
+        /// </summary>
+        public static string MinuetPlaceholder {
+            get {
+                return ResourceManager.GetString("MinuetPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Authorization code for the Mirror Chyan download channel; sensitive information is stored encrypted.
+        /// </summary>
+        public static string MirrorChyanAuthCodeDescription {
+            get {
+                return ResourceManager.GetString("MirrorChyanAuthCodeDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mirror Chyan.
+        /// </summary>
+        public static string MirrorChyanDisplayText {
+            get {
+                return ResourceManager.GetString("MirrorChyanDisplayText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Mirror Chyan.
         /// </summary>
@@ -967,7 +4612,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("MirrorChyanText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Mirror Chyan‘s high-speed download service.
         /// </summary>
@@ -976,7 +4621,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("MirrorChyanTipText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to MirrorChyan.
         /// </summary>
@@ -985,7 +4630,70 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("MirrorText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to The following files are missing.
+        /// </summary>
+        public static string MissingFilesMessage {
+            get {
+                return ResourceManager.GetString("MissingFilesMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Farm the first level.
+        /// </summary>
+        public static string ModeFarmFirstLevelText {
+            get {
+                return ResourceManager.GetString("ModeFarmFirstLevelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Full run.
+        /// </summary>
+        public static string ModeFullRunText {
+            get {
+                return ResourceManager.GetString("ModeFullRunText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mode.
+        /// </summary>
+        public static string ModeLabelText {
+            get {
+                return ResourceManager.GetString("ModeLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Opening reroll.
+        /// </summary>
+        public static string ModeOpeningRerollText {
+            get {
+                return ResourceManager.GetString("ModeOpeningRerollText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Overclock match.
+        /// </summary>
+        public static string ModeOverclockMatchText {
+            get {
+                return ResourceManager.GetString("ModeOverclockMatchText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Standard match.
+        /// </summary>
+        public static string ModeStandardMatchText {
+            get {
+                return ResourceManager.GetString("ModeStandardMatchText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Hold to modify.
         /// </summary>
@@ -994,7 +4702,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ModifyHoldText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to etc..
+        /// </summary>
+        public static string MoreFilesSuffix {
+            get {
+                return ResourceManager.GetString("MoreFilesSuffix", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mouse is not over the game window.
+        /// </summary>
+        public static string MouseOutsideGameWindowHint {
+            get {
+                return ResourceManager.GetString("MouseOutsideGameWindowHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hotkey for opening the Nameless Honor screen.
+        /// </summary>
+        public static string NamelessHonorHotkeyDescription {
+            get {
+                return ResourceManager.GetString("NamelessHonorHotkeyDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Nameless Honor.
+        /// </summary>
+        public static string NamelessHonorText {
+            get {
+                return ResourceManager.GetString("NamelessHonorText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to New config.
         /// </summary>
@@ -1003,61 +4747,88 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("NewConfigText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Notification Channel.
+        ///   Looks up a localized string similar to New version available.
         /// </summary>
-        public static string NotificationChannelText {
+        public static string NewVersionAvailableMessage {
             get {
-                return ResourceManager.GetString("NotificationChannelText", resourceCulture);
+                return ResourceManager.GetString("NewVersionAvailableMessage", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Notification Group.
+        ///   Looks up a localized string similar to No action.
         /// </summary>
-        public static string NotificationGroupText {
+        public static string NoActionText {
             get {
-                return ResourceManager.GetString("NotificationGroupText", resourceCulture);
+                return ResourceManager.GetString("NoActionText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Notification Icon.
+        ///   Looks up a localized string similar to No events today.
         /// </summary>
-        public static string NotificationIconText {
+        public static string NoEventsTodayMessage {
             get {
-                return ResourceManager.GetString("NotificationIconText", resourceCulture);
+                return ResourceManager.GetString("NoEventsTodayMessage", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Notification Sound.
+        ///   Looks up a localized string similar to No extensions available.
         /// </summary>
-        public static string NotificationSoundText {
+        public static string NoExtensionsMessage {
             get {
-                return ResourceManager.GetString("NotificationSoundText", resourceCulture);
+                return ResourceManager.GetString("NoExtensionsMessage", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Notification Source.
+        ///   Looks up a localized string similar to No files to clean up.
         /// </summary>
-        public static string NotificationSourceText {
+        public static string NoFilesToCleanMessage {
             get {
-                return ResourceManager.GetString("NotificationSourceText", resourceCulture);
+                return ResourceManager.GetString("NoFilesToCleanMessage", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Notification.
+        ///   Looks up a localized string similar to No tasks.
         /// </summary>
-        public static string NotificationText {
+        public static string NoTasksMessage {
             get {
-                return ResourceManager.GetString("NotificationText", resourceCulture);
+                return ResourceManager.GetString("NoTasksMessage", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to If everything is normal, that is the abnormality.
+        /// </summary>
+        public static string NormalIsAbnormalText {
+            get {
+                return ResourceManager.GetString("NormalIsAbnormalText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Not selected.
+        /// </summary>
+        public static string NotSelectedText {
+            get {
+                return ResourceManager.GetString("NotSelectedText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Not 'Sequence Read Archive'.
+        /// </summary>
+        public static string NotSequenceReadArchiveText {
+            get {
+                return ResourceManager.GetString("NotSequenceReadArchiveText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Not Set.
         /// </summary>
@@ -1066,25 +4837,160 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("NotSetText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to OneBot QQ Notification.
+        ///   Looks up a localized string similar to Notification Channel.
         /// </summary>
-        public static string OneBotNotificationText {
+        public static string NotificationChannelText {
             get {
-                return ResourceManager.GetString("OneBotNotificationText", resourceCulture);
+                return ResourceManager.GetString("NotificationChannelText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to OneBot Settings.
+        ///   Looks up a localized string similar to Whether to enable notifications.
         /// </summary>
-        public static string OneBotSettingsText {
+        public static string NotificationEnableDescription {
             get {
-                return ResourceManager.GetString("OneBotSettingsText", resourceCulture);
+                return ResourceManager.GetString("NotificationEnableDescription", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to e.g. StarRailAssistant (optional).
+        /// </summary>
+        public static string NotificationGroupPlaceholder {
+            get {
+                return ResourceManager.GetString("NotificationGroupPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Notification Group.
+        /// </summary>
+        public static string NotificationGroupText {
+            get {
+                return ResourceManager.GetString("NotificationGroupText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Notification Icon.
+        /// </summary>
+        public static string NotificationIconText {
+            get {
+                return ResourceManager.GetString("NotificationIconText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Notification settings.
+        /// </summary>
+        public static string NotificationSettingsText {
+            get {
+                return ResourceManager.GetString("NotificationSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Notification Sound.
+        /// </summary>
+        public static string NotificationSoundText {
+            get {
+                return ResourceManager.GetString("NotificationSoundText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Notification Source.
+        /// </summary>
+        public static string NotificationSourceText {
+            get {
+                return ResourceManager.GetString("NotificationSourceText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Notification.
+        /// </summary>
+        public static string NotificationText {
+            get {
+                return ResourceManager.GetString("NotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Obsolete files cleaned up.
+        /// </summary>
+        public static string ObsoleteFilesCleanedText {
+            get {
+                return ResourceManager.GetString("ObsoleteFilesCleanedText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Removed {0} file(s), freeing {1}.
+        /// </summary>
+        public static string ObsoleteFilesDeletedMessage {
+            get {
+                return ResourceManager.GetString("ObsoleteFilesDeletedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to OCR recognition confidence, range 0-1, higher is stricter.
+        /// </summary>
+        public static string OcrConfidenceDescription {
+            get {
+                return ResourceManager.GetString("OcrConfidenceDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Leave empty to use the official API.
+        /// </summary>
+        public static string OfficialApiPlaceholder {
+            get {
+                return ResourceManager.GetString("OfficialApiPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Official.
+        /// </summary>
+        public static string OfficialServerText {
+            get {
+                return ResourceManager.GetString("OfficialServerText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to delete the old executable: {0}.
+        /// </summary>
+        public static string OldExecutableDeleteFailedError {
+            get {
+                return ResourceManager.GetString("OldExecutableDeleteFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to clean up old files.
+        /// </summary>
+        public static string OldFilesCleanupFailedError {
+            get {
+                return ResourceManager.GetString("OldFilesCleanupFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to …and {0} more files omitted.
+        /// </summary>
+        public static string OmittedFilesFormat {
+            get {
+                return ResourceManager.GetString("OmittedFilesFormat", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to On.
         /// </summary>
@@ -1093,7 +4999,151 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("OnText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to OneBot access Token.
+        /// </summary>
+        public static string OneBotAccessTokenDescription {
+            get {
+                return ResourceManager.GetString("OneBotAccessTokenDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to OneBot bot account.
+        /// </summary>
+        public static string OneBotAccountDescription {
+            get {
+                return ResourceManager.GetString("OneBotAccountDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to OneBot HTTP API address.
+        /// </summary>
+        public static string OneBotApiAddressDescription {
+            get {
+                return ResourceManager.GetString("OneBotApiAddressDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable OneBot push.
+        /// </summary>
+        public static string OneBotEnableDescription {
+            get {
+                return ResourceManager.GetString("OneBotEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Target group number for OneBot push.
+        /// </summary>
+        public static string OneBotGroupNumberDescription {
+            get {
+                return ResourceManager.GetString("OneBotGroupNumberDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to OneBot QQ Notification.
+        /// </summary>
+        public static string OneBotNotificationText {
+            get {
+                return ResourceManager.GetString("OneBotNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to attach screenshots to OneBot push.
+        /// </summary>
+        public static string OneBotScreenshotDescription {
+            get {
+                return ResourceManager.GetString("OneBotScreenshotDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to OneBot Settings.
+        /// </summary>
+        public static string OneBotSettingsText {
+            get {
+                return ResourceManager.GetString("OneBotSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the API address and at least one QQ number or group number.
+        /// </summary>
+        public static string OneBotTargetRequiredMessage {
+            get {
+                return ResourceManager.GetString("OneBotTargetRequiredMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test message sent, please check QQ.
+        /// </summary>
+        public static string OneBotTestSentMessage {
+            get {
+                return ResourceManager.GetString("OneBotTestSentMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to OneBot test.
+        /// </summary>
+        public static string OneBotTestText {
+            get {
+                return ResourceManager.GetString("OneBotTestText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open Cake Cat Friends in the browser.
+        /// </summary>
+        public static string OpenCakeCatFriendsText {
+            get {
+                return ResourceManager.GetString("OpenCakeCatFriendsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open the current download folder.
+        /// </summary>
+        public static string OpenDownloadFolderTooltip {
+            get {
+                return ResourceManager.GetString("OpenDownloadFolderTooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open extension configuration.
+        /// </summary>
+        public static string OpenExtensionConfigTooltip {
+            get {
+                return ResourceManager.GetString("OpenExtensionConfigTooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to open.
+        /// </summary>
+        public static string OpenFailedError {
+            get {
+                return ResourceManager.GetString("OpenFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to open_id (default).
+        /// </summary>
+        public static string OpenIdPlaceholder {
+            get {
+                return ResourceManager.GetString("OpenIdPlaceholder", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Open.
         /// </summary>
@@ -1102,7 +5152,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("OpenText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Operation canceled.
+        /// </summary>
+        public static string OperationCanceledMessage {
+            get {
+                return ResourceManager.GetString("OperationCanceledMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to get options. Make sure the backend is running and try again..
+        /// </summary>
+        public static string OptionsBackendErrorMessage {
+            get {
+                return ResourceManager.GetString("OptionsBackendErrorMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ornament Extraction.
+        /// </summary>
+        public static string OrnamentExtractionText {
+            get {
+                return ResourceManager.GetString("OrnamentExtractionText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to show debug info in the overlay.
+        /// </summary>
+        public static string OverlayDebugInfoDescription {
+            get {
+                return ResourceManager.GetString("OverlayDebugInfoDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Overlay Show Debug Info.
         /// </summary>
@@ -1111,7 +5197,133 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("OverlayDebugInfoText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable the overlay.
+        /// </summary>
+        public static string OverlayEnableDescription {
+            get {
+                return ResourceManager.GetString("OverlayEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Password:.
+        /// </summary>
+        public static string PasswordLabelText {
+            get {
+                return ResourceManager.GetString("PasswordLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The specified path does not exist.
+        /// </summary>
+        public static string PathNotExistError {
+            get {
+                return ResourceManager.GetString("PathNotExistError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Target stage for Planar Fissure.
+        /// </summary>
+        public static string PlanarFissureStageDescription {
+            get {
+                return ResourceManager.GetString("PlanarFissureStageDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Planar Fissure.
+        /// </summary>
+        public static string PlanarFissureText {
+            get {
+                return ResourceManager.GetString("PlanarFissureText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Please wait....
+        /// </summary>
+        public static string PleaseWaitMessage {
+            get {
+                return ResourceManager.GetString("PleaseWaitMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable post-task actions.
+        /// </summary>
+        public static string PostTaskActionEnableDescription {
+            get {
+                return ResourceManager.GetString("PostTaskActionEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Post-task actions.
+        /// </summary>
+        public static string PostTaskActionsText {
+            get {
+                return ResourceManager.GetString("PostTaskActionsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to exit the app after completing tasks.
+        /// </summary>
+        public static string PostTaskExitAppDescription {
+            get {
+                return ResourceManager.GetString("PostTaskExitAppDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to exit the game after completing tasks.
+        /// </summary>
+        public static string PostTaskExitGameDescription {
+            get {
+                return ResourceManager.GetString("PostTaskExitGameDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to log off the current user after completing tasks.
+        /// </summary>
+        public static string PostTaskLogoffUserDescription {
+            get {
+                return ResourceManager.GetString("PostTaskLogoffUserDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to log out of the account after completing tasks.
+        /// </summary>
+        public static string PostTaskLogoutAccountDescription {
+            get {
+                return ResourceManager.GetString("PostTaskLogoutAccountDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to shut down the computer after completing tasks.
+        /// </summary>
+        public static string PostTaskShutdownDescription {
+            get {
+                return ResourceManager.GetString("PostTaskShutdownDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to put the computer to sleep after completing tasks.
+        /// </summary>
+        public static string PostTaskSleepDescription {
+            get {
+                return ResourceManager.GetString("PostTaskSleepDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Proxy Address.
         /// </summary>
@@ -1120,7 +5332,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ProxyAddressText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Push Address.
         /// </summary>
@@ -1129,7 +5341,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("PushAddressText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Push Level.
         /// </summary>
@@ -1138,7 +5350,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("PushLevelText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Group Number (Group Chat).
         /// </summary>
@@ -1147,7 +5359,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("QQGroupText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to QQ Number (Private Chat).
         /// </summary>
@@ -1156,43 +5368,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("QQPrivateText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Receiver.
+        ///   Looks up a localized string similar to Show current task status.
         /// </summary>
-        public static string ReceiverEmailAddrText {
+        public static string R0003 {
             get {
-                return ResourceManager.GetString("ReceiverEmailAddrText", resourceCulture);
+                return ResourceManager.GetString("R0003", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Receive Rewards.
+        ///   Looks up a localized string similar to List all registered tasks.
         /// </summary>
-        public static string ReceiveRewardsText {
+        public static string R0005 {
             get {
-                return ResourceManager.GetString("ReceiveRewardsText", resourceCulture);
+                return ResourceManager.GetString("R0005", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Receiver ID.
-        /// </summary>
-        public static string ReceiverIdText {
-            get {
-                return ResourceManager.GetString("ReceiverIdText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Regular.
-        /// </summary>
-        public static string RegularText {
-            get {
-                return ResourceManager.GetString("RegularText", resourceCulture);
-            }
-        }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Reinstall the latest app.
         /// </summary>
@@ -1201,7 +5395,250 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ReInstallText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Target stage for Realm of the Strange.
+        /// </summary>
+        public static string RealmOfStrangeStageDescription {
+            get {
+                return ResourceManager.GetString("RealmOfStrangeStageDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Realm of the Strange.
+        /// </summary>
+        public static string RealmOfStrangeText {
+            get {
+                return ResourceManager.GetString("RealmOfStrangeText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Receive Rewards.
+        /// </summary>
+        public static string ReceiveRewardsText {
+            get {
+                return ResourceManager.GetString("ReceiveRewardsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Receiver.
+        /// </summary>
+        public static string ReceiverEmailAddrText {
+            get {
+                return ResourceManager.GetString("ReceiverEmailAddrText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Receiver ID.
+        /// </summary>
+        public static string ReceiverIdText {
+            get {
+                return ResourceManager.GetString("ReceiverIdText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Recipient email address.
+        /// </summary>
+        public static string RecipientEmailDescription {
+            get {
+                return ResourceManager.GetString("RecipientEmailDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to redeem codes.
+        /// </summary>
+        public static string RedeemCodesEnableDescription {
+            get {
+                return ResourceManager.GetString("RedeemCodesEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The redemption code task automatically fetches the latest redemption codes from the official website and redeems them to.
+        /// </summary>
+        public static string RedemptionCodeAutoFetchHint {
+            get {
+                return ResourceManager.GetString("RedemptionCodeAutoFetchHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to List of redemption codes, format: code1 code2 code3.
+        /// </summary>
+        public static string RedemptionCodeListDescription {
+            get {
+                return ResourceManager.GetString("RedemptionCodeListDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter redemption codes here.
+        /// </summary>
+        public static string RedemptionCodePlaceholder {
+            get {
+                return ResourceManager.GetString("RedemptionCodePlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Redemption codes.
+        /// </summary>
+        public static string RedemptionCodesText {
+            get {
+                return ResourceManager.GetString("RedemptionCodesText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Scan for redundant files in the app directory (update leftovers, logs, etc.). Results may contain personal data, proceed.
+        /// </summary>
+        public static string RedundantFileScanDescription {
+            get {
+                return ResourceManager.GetString("RedundantFileScanDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Integrity manifest (manifest.md5.json) not found, unable to identify redundant files. Please reinstall via the in-app up.
+        /// </summary>
+        public static string RedundantManifestMissingMessage {
+            get {
+                return ResourceManager.GetString("RedundantManifestMissingMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh failed: {0}.
+        /// </summary>
+        public static string RefreshFailedError {
+            get {
+                return ResourceManager.GetString("RefreshFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh.
+        /// </summary>
+        public static string RefreshText {
+            get {
+                return ResourceManager.GetString("RefreshText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Registry access denied. Please run as administrator.
+        /// </summary>
+        public static string RegistryAccessDeniedError {
+            get {
+                return ResourceManager.GetString("RegistryAccessDeniedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Registry key not found: {key}.
+        /// </summary>
+        public static string RegistryKeyNotFoundError {
+            get {
+                return ResourceManager.GetString("RegistryKeyNotFoundError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Registry operations are not supported on non-Windows systems.
+        /// </summary>
+        public static string RegistryUnsupportedError {
+            get {
+                return ResourceManager.GetString("RegistryUnsupportedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Regular.
+        /// </summary>
+        public static string RegularText {
+            get {
+                return ResourceManager.GetString("RegularText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This will re-download and install the latest version to fix possible issues. Continue?.
+        /// </summary>
+        public static string ReinstallConfirmMessage {
+            get {
+                return ResourceManager.GetString("ReinstallConfirmMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Re-download and install the latest version to fix possible file corruption and other issues.
+        /// </summary>
+        public static string ReinstallDescription {
+            get {
+                return ResourceManager.GetString("ReinstallDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reinstall failed.
+        /// </summary>
+        public static string ReinstallFailedError {
+            get {
+                return ResourceManager.GetString("ReinstallFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reinstall the latest version.
+        /// </summary>
+        public static string ReinstallLatestText {
+            get {
+                return ResourceManager.GetString("ReinstallLatestText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reload the extension list from the backend.
+        /// </summary>
+        public static string ReloadExtensionsText {
+            get {
+                return ResourceManager.GetString("ReloadExtensionsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} days {1} hours remaining.
+        /// </summary>
+        public static string RemainingDaysHoursFormat {
+            get {
+                return ResourceManager.GetString("RemainingDaysHoursFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} hours remaining.
+        /// </summary>
+        public static string RemainingHoursFormat {
+            get {
+                return ResourceManager.GetString("RemainingHoursFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to remember window position and size.
+        /// </summary>
+        public static string RememberWindowPositionDescription {
+            get {
+                return ResourceManager.GetString("RememberWindowPositionDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Remember Window Size and Position.
         /// </summary>
@@ -1210,16 +5647,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("RememberWindowSizeText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to When enabled, SRA will remember the window&apos;s position and size, and restore them on next startup.
+        ///   Looks up a localized string similar to When enabled, SRA will remember the window's position and size, and restore them on next startup.
         /// </summary>
         public static string RememberWindowSizeTipText {
             get {
                 return ResourceManager.GetString("RememberWindowSizeTipText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remote backend address.
+        /// </summary>
+        public static string RemoteBackendAddressDescription {
+            get {
+                return ResourceManager.GetString("RemoteBackendAddressDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to use a remote backend.
+        /// </summary>
+        public static string RemoteBackendEnableDescription {
+            get {
+                return ResourceManager.GetString("RemoteBackendEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to [RemoteBackend] Connection lost, reconnecting in 3 seconds....
+        /// </summary>
+        public static string RemoteBackendReconnectMessage {
+            get {
+                return ResourceManager.GetString("RemoteBackendReconnectMessage", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Remote Server Address.
         /// </summary>
@@ -1228,7 +5692,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("RemoteServerAddressText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid remote version format.
+        /// </summary>
+        public static string RemoteVersionInvalidError {
+            get {
+                return ResourceManager.GetString("RemoteVersionInvalidError", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Remove current config.
         /// </summary>
@@ -1237,25 +5710,115 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("RemoveConfigText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Resource cleanup.
+        ///   Looks up a localized string similar to Replenish.
+        /// </summary>
+        public static string ReplenishButtonText {
+            get {
+                return ResourceManager.GetString("ReplenishButtonText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Replenish Trailblaze Power.
+        /// </summary>
+        public static string ReplenishPowerText {
+            get {
+                return ResourceManager.GetString("ReplenishPowerText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reserved Trailblaze Power.
+        /// </summary>
+        public static string ReservedPowerText {
+            get {
+                return ResourceManager.GetString("ReservedPowerText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Resources cleanup.
         /// </summary>
         public static string ResourceCleanupText {
             get {
                 return ResourceManager.GetString("ResourceCleanupText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Resource integrity check.
+        ///   Looks up a localized string similar to Resources integrity check.
         /// </summary>
         public static string ResourceIntegrityCheckText {
             get {
                 return ResourceManager.GetString("ResourceIntegrityCheckText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to No resources available for the selected architecture and system.
+        /// </summary>
+        public static string ResourceUnavailableError {
+            get {
+                return ResourceManager.GetString("ResourceUnavailableError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Restart backend.
+        /// </summary>
+        public static string RestartBackendText {
+            get {
+                return ResourceManager.GetString("RestartBackendText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Restart the application now to apply the latest version?.
+        /// </summary>
+        public static string RestartConfirmMessage {
+            get {
+                return ResourceManager.GetString("RestartConfirmMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Please restart the console to use the latest version.
+        /// </summary>
+        public static string RestartConsoleHint {
+            get {
+                return ResourceManager.GetString("RestartConsoleHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Restart failed.
+        /// </summary>
+        public static string RestartFailedError {
+            get {
+                return ResourceManager.GetString("RestartFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Restart now.
+        /// </summary>
+        public static string RestartNowText {
+            get {
+                return ResourceManager.GetString("RestartNowText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Restart the application to apply the latest version.
+        /// </summary>
+        public static string RestartToApplyHint {
+            get {
+                return ResourceManager.GetString("RestartToApplyHint", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Retry After Task Failure.
         /// </summary>
@@ -1264,7 +5827,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("RetryAfterTaskFailureText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Run count.
+        /// </summary>
+        public static string RunCountLabelText {
+            get {
+                return ResourceManager.GetString("RunCountLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Run.
+        /// </summary>
+        public static string RunText {
+            get {
+                return ResourceManager.GetString("RunText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Running.
+        /// </summary>
+        public static string RunningStatusText {
+            get {
+                return ResourceManager.GetString("RunningStatusText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Русский.
+        /// </summary>
+        public static string RussianLanguageName {
+            get {
+                return ResourceManager.GetString("RussianLanguageName", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Save OCR Image.
         /// </summary>
@@ -1273,7 +5872,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SaveOcrImageText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to save OCR screenshots for debugging.
+        /// </summary>
+        public static string SaveOcrScreenshotDescription {
+            get {
+                return ResourceManager.GetString("SaveOcrScreenshotDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Save data only without running.
         /// </summary>
@@ -1282,7 +5890,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SaveOnlyButtonTipText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Save Only.
         /// </summary>
@@ -1291,16 +5899,88 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SaveOnlyText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Sender.
+        ///   Looks up a localized string similar to Saved successfully.
         /// </summary>
-        public static string SenderEmailAddrText {
+        public static string SaveSuccessMessage {
             get {
-                return ResourceManager.GetString("SenderEmailAddrText", resourceCulture);
+                return ResourceManager.GetString("SaveSuccessMessage", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Saved to: {0}.
+        /// </summary>
+        public static string SavedToFormat {
+            get {
+                return ResourceManager.GetString("SavedToFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Scan failed: {e.Message}.
+        /// </summary>
+        public static string ScanFailedError {
+            get {
+                return ResourceManager.GetString("ScanFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Scan strategy folder.
+        /// </summary>
+        public static string ScanStrategyFolderText {
+            get {
+                return ResourceManager.GetString("ScanStrategyFolderText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to SCT... or sctp....
+        /// </summary>
+        public static string SctTokenPlaceholder {
+            get {
+                return ResourceManager.GetString("SctTokenPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Select all.
+        /// </summary>
+        public static string SelectAllText {
+            get {
+                return ResourceManager.GetString("SelectAllText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Select a strategy file.
+        /// </summary>
+        public static string SelectStrategyFileText {
+            get {
+                return ResourceManager.GetString("SelectStrategyFileText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Selected {0}/{1}, total {2} (redundant total {3}).
+        /// </summary>
+        public static string SelectionSummaryFormat {
+            get {
+                return ResourceManager.GetString("SelectionSummaryFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the SendKey first.
+        /// </summary>
+        public static string SendKeyRequiredMessage {
+            get {
+                return ResourceManager.GetString("SendKeyRequiredMessage", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to SendKey.
         /// </summary>
@@ -1309,7 +5989,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SendKeyText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Send Screenshot.
         /// </summary>
@@ -1318,7 +5998,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SendScreenshotText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sender.
+        /// </summary>
+        public static string SenderEmailAddrText {
+            get {
+                return ResourceManager.GetString("SenderEmailAddrText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sender email address.
+        /// </summary>
+        public static string SenderEmailDescription {
+            get {
+                return ResourceManager.GetString("SenderEmailDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable ServerChan push.
+        /// </summary>
+        public static string ServerChanEnableDescription {
+            get {
+                return ResourceManager.GetString("ServerChanEnableDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to ServerChan WeChat Notification.
         /// </summary>
@@ -1327,7 +6034,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ServerChanNotificationText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to ServerChan SendKey.
+        /// </summary>
+        public static string ServerChanSendKeyDescription {
+            get {
+                return ResourceManager.GetString("ServerChanSendKeyDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to ServerChan Settings.
         /// </summary>
@@ -1336,7 +6052,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ServerChanSettingsText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test message sent, please check WeChat.
+        /// </summary>
+        public static string ServerChanTestSentMessage {
+            get {
+                return ResourceManager.GetString("ServerChanTestSentMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to ServerChan test.
+        /// </summary>
+        public static string ServerChanTestText {
+            get {
+                return ResourceManager.GetString("ServerChanTestText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Setting.
         /// </summary>
@@ -1345,7 +6079,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SettingText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to create shortcut.
+        /// </summary>
+        public static string ShortcutCreateFailedError {
+            get {
+                return ResourceManager.GetString("ShortcutCreateFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shortcut created.
+        /// </summary>
+        public static string ShortcutCreatedMessage {
+            get {
+                return ResourceManager.GetString("ShortcutCreatedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shortcut already exists.
+        /// </summary>
+        public static string ShortcutExistsMessage {
+            get {
+                return ResourceManager.GetString("ShortcutExistsMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shut down.
+        /// </summary>
+        public static string ShutdownText {
+            get {
+                return ResourceManager.GetString("ShutdownText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Sign Secret.
         /// </summary>
@@ -1354,7 +6124,88 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SignSecretText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to 简体中文.
+        /// </summary>
+        public static string SimplifiedChineseText {
+            get {
+                return ResourceManager.GetString("SimplifiedChineseText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Runs this time.
+        /// </summary>
+        public static string SingleRunCountText {
+            get {
+                return ResourceManager.GetString("SingleRunCountText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sit back and relax.
+        /// </summary>
+        public static string SitBackAndRelaxText {
+            get {
+                return ResourceManager.GetString("SitBackAndRelaxText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Leave empty to skip group chat.
+        /// </summary>
+        public static string SkipGroupChatPlaceholder {
+            get {
+                return ResourceManager.GetString("SkipGroupChatPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Leave empty to skip private chat.
+        /// </summary>
+        public static string SkipPrivateChatPlaceholder {
+            get {
+                return ResourceManager.GetString("SkipPrivateChatPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Skip when points are full.
+        /// </summary>
+        public static string SkipWhenPointsFullText {
+            get {
+                return ResourceManager.GetString("SkipWhenPointsFullText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sleep.
+        /// </summary>
+        public static string SleepText {
+            get {
+                return ResourceManager.GetString("SleepText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to SMTP authorization code (stored encrypted).
+        /// </summary>
+        public static string SmtpAuthCodeDescription {
+            get {
+                return ResourceManager.GetString("SmtpAuthCodeDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to SMTP server port, usually 465 for SSL.
+        /// </summary>
+        public static string SmtpPortDescription {
+            get {
+                return ResourceManager.GetString("SmtpPortDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to SMTP Port.
         /// </summary>
@@ -1363,7 +6214,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SmtpPortText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to SMTP server address.
+        /// </summary>
+        public static string SmtpServerDescription {
+            get {
+                return ResourceManager.GetString("SmtpServerDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to SMTP Server.
         /// </summary>
@@ -1372,7 +6232,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SmtpServerText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to SMTP Settings.
         /// </summary>
@@ -1381,7 +6241,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SmtpSettingsText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Configure the SMTP settings first.
+        /// </summary>
+        public static string SmtpSetupRequiredMessage {
+            get {
+                return ResourceManager.GetString("SmtpSetupRequiredMessage", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to GitHub.
         /// </summary>
@@ -1390,7 +6259,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SourceRepositoryText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Sponsor.
         /// </summary>
@@ -1399,7 +6268,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SponsorText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to SRA shortcut created on the desktop.
+        /// </summary>
+        public static string SraShortcutCreatedMessage {
+            get {
+                return ResourceManager.GetString("SraShortcutCreatedMessage", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to SRA Official Website.
         /// </summary>
@@ -1408,7 +6286,61 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SraWebsiteText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to get stage configuration from the backend. Try restarting the backend..
+        /// </summary>
+        public static string StageConfigBackendErrorMessage {
+            get {
+                return ResourceManager.GetString("StageConfigBackendErrorMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load stage configuration.
+        /// </summary>
+        public static string StageConfigLoadFailedError {
+            get {
+                return ResourceManager.GetString("StageConfigLoadFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stage level.
+        /// </summary>
+        public static string StageLevelDescription {
+            get {
+                return ResourceManager.GetString("StageLevelDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stage name.
+        /// </summary>
+        public static string StageNameDescription {
+            get {
+                return ResourceManager.GetString("StageNameDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Select a stage before adding a task.
+        /// </summary>
+        public static string StageRequiredMessage {
+            get {
+                return ResourceManager.GetString("StageRequiredMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Determined to become a Star Rail master.
+        /// </summary>
+        public static string StarRailMasterPhraseText {
+            get {
+                return ResourceManager.GetString("StarRailMasterPhraseText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Run the task in the current mode.
         /// </summary>
@@ -1417,7 +6349,43 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("StartButtonTipText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Start this extension.
+        /// </summary>
+        public static string StartExtensionTooltip {
+            get {
+                return ResourceManager.GetString("StartExtensionTooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Start game.
+        /// </summary>
+        public static string StartGameLabelText {
+            get {
+                return ResourceManager.GetString("StartGameLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Start game settings.
+        /// </summary>
+        public static string StartGameSettingsText {
+            get {
+                return ResourceManager.GetString("StartGameSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable the start game task.
+        /// </summary>
+        public static string StartGameTaskEnableDescription {
+            get {
+                return ResourceManager.GetString("StartGameTaskEnableDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Start Game.
         /// </summary>
@@ -1426,7 +6394,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("StartGameText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Start Up.
         /// </summary>
@@ -1435,7 +6403,52 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("StartUpText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Starts in {0} days {1} hours.
+        /// </summary>
+        public static string StartsInDaysHoursFormat {
+            get {
+                return ResourceManager.GetString("StartsInDaysHoursFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Starts in {0} hours.
+        /// </summary>
+        public static string StartsInHoursFormat {
+            get {
+                return ResourceManager.GetString("StartsInHoursFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stellar Jade.
+        /// </summary>
+        public static string StellarJadeText {
+            get {
+                return ResourceManager.GetString("StellarJadeText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stop.
+        /// </summary>
+        public static string StopActionText {
+            get {
+                return ResourceManager.GetString("StopActionText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stop this extension.
+        /// </summary>
+        public static string StopExtensionTooltip {
+            get {
+                return ResourceManager.GetString("StopExtensionTooltip", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Stop Hotkey.
         /// </summary>
@@ -1444,7 +6457,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("StopHotkeyText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hotkey for stopping running tasks.
+        /// </summary>
+        public static string StopTaskHotkeyDescription {
+            get {
+                return ResourceManager.GetString("StopTaskHotkeyDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Stop.
         /// </summary>
@@ -1453,7 +6475,115 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("StopText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stopped.
+        /// </summary>
+        public static string StoppedStatusText {
+            get {
+                return ResourceManager.GetString("StoppedStatusText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Full path to the strategy JSON.
+        /// </summary>
+        public static string StrategyFullPathText {
+            get {
+                return ResourceManager.GetString("StrategyFullPathText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to import strategy.
+        /// </summary>
+        public static string StrategyImportFailedError {
+            get {
+                return ResourceManager.GetString("StrategyImportFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy imported.
+        /// </summary>
+        public static string StrategyImportedMessage {
+            get {
+                return ResourceManager.GetString("StrategyImportedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy.
+        /// </summary>
+        public static string StrategyLabelText {
+            get {
+                return ResourceManager.GetString("StrategyLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load strategy.
+        /// </summary>
+        public static string StrategyLoadFailedError {
+            get {
+                return ResourceManager.GetString("StrategyLoadFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Or enter the full path to a strategy JSON.
+        /// </summary>
+        public static string StrategyPathPlaceholder {
+            get {
+                return ResourceManager.GetString("StrategyPathPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy site.
+        /// </summary>
+        public static string StrategySiteText {
+            get {
+                return ResourceManager.GetString("StrategySiteText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Success.
+        /// </summary>
+        public static string SuccessText {
+            get {
+                return ResourceManager.GetString("SuccessText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to use support characters.
+        /// </summary>
+        public static string SupportCharacterDescription {
+            get {
+                return ResourceManager.GetString("SupportCharacterDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Use support characters.
+        /// </summary>
+        public static string SupportCharacterText {
+            get {
+                return ResourceManager.GetString("SupportCharacterText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable system notifications.
+        /// </summary>
+        public static string SystemNotificationEnableDescription {
+            get {
+                return ResourceManager.GetString("SystemNotificationEnableDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to System Notification.
         /// </summary>
@@ -1462,7 +6592,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("SystemNotificationText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid system parameter.
+        /// </summary>
+        public static string SystemParameterInvalidError {
+            get {
+                return ResourceManager.GetString("SystemParameterInvalidError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Task list.
+        /// </summary>
+        public static string TaskChecklistText {
+            get {
+                return ResourceManager.GetString("TaskChecklistText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to List of task names to send notifications when completed.
+        /// </summary>
+        public static string TaskCompleteNotificationListDescription {
+            get {
+                return ResourceManager.GetString("TaskCompleteNotificationListDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Notify on Task Complete.
         /// </summary>
@@ -1471,7 +6628,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("TaskCompleteNotificationText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Task Complete.
         /// </summary>
@@ -1480,7 +6637,79 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("TaskCompleteText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Task config name.
+        /// </summary>
+        public static string TaskConfigNameDescription {
+            get {
+                return ResourceManager.GetString("TaskConfigNameDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to automatically allocate execution counts based on remaining Trailblaze Power.
+        /// </summary>
+        public static string TaskExecutionAutoAllocateDescription {
+            get {
+                return ResourceManager.GetString("TaskExecutionAutoAllocateDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Number of executions per task in manual mode.
+        /// </summary>
+        public static string TaskExecutionCountDescription {
+            get {
+                return ResourceManager.GetString("TaskExecutionCountDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Number of execution rounds in manual mode.
+        /// </summary>
+        public static string TaskExecutionRoundDescription {
+            get {
+                return ResourceManager.GetString("TaskExecutionRoundDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Task ID, e.g. calyx_golden, echo_of_war.
+        /// </summary>
+        public static string TaskIdDescription {
+            get {
+                return ResourceManager.GetString("TaskIdDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Task list.
+        /// </summary>
+        public static string TaskListText {
+            get {
+                return ResourceManager.GetString("TaskListText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum number of retries after a task failure.
+        /// </summary>
+        public static string TaskMaxRetryDescription {
+            get {
+                return ResourceManager.GetString("TaskMaxRetryDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Task name.
+        /// </summary>
+        public static string TaskNameDescription {
+            get {
+                return ResourceManager.GetString("TaskNameDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Task Name.
         /// </summary>
@@ -1489,7 +6718,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("TaskNameText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Task Notification Configuration.
         /// </summary>
@@ -1498,7 +6727,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("TaskNotificationConfigText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to restart the game and retry after a task failure.
+        /// </summary>
+        public static string TaskRetryDescription {
+            get {
+                return ResourceManager.GetString("TaskRetryDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Task Settings.
         /// </summary>
@@ -1507,7 +6745,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("TaskSettingsText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to start the task. Please check the backend status..
+        /// </summary>
+        public static string TaskStartBackendErrorMessage {
+            get {
+                return ResourceManager.GetString("TaskStartBackendErrorMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to start task.
+        /// </summary>
+        public static string TaskStartFailedError {
+            get {
+                return ResourceManager.GetString("TaskStartFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to List of task names to send notifications when started.
+        /// </summary>
+        public static string TaskStartNotificationListDescription {
+            get {
+                return ResourceManager.GetString("TaskStartNotificationListDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Notify on Task Start.
         /// </summary>
@@ -1516,7 +6781,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("TaskStartNotificationText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Task started successfully.
+        /// </summary>
+        public static string TaskStartSuccessMessage {
+            get {
+                return ResourceManager.GetString("TaskStartSuccessMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Task started.
+        /// </summary>
+        public static string TaskStartedMessage {
+            get {
+                return ResourceManager.GetString("TaskStartedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} and others, {1} tasks in total.
+        /// </summary>
+        public static string TaskSummaryFormat {
+            get {
+                return ResourceManager.GetString("TaskSummaryFormat", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Task.
         /// </summary>
@@ -1525,7 +6817,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("TaskText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fast farming with Technique.
+        /// </summary>
+        public static string TechniqueFastFarmText {
+            get {
+                return ResourceManager.GetString("TechniqueFastFarmText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hotkey for casting Technique.
+        /// </summary>
+        public static string TechniqueHotkeyDescription {
+            get {
+                return ResourceManager.GetString("TechniqueHotkeyDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Technique.
         /// </summary>
@@ -1534,7 +6844,52 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("TechniqueText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Telegram Bot API address.
+        /// </summary>
+        public static string TelegramApiAddressDescription {
+            get {
+                return ResourceManager.GetString("TelegramApiAddressDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bot Token of the Telegram bot.
+        /// </summary>
+        public static string TelegramBotTokenDescription {
+            get {
+                return ResourceManager.GetString("TelegramBotTokenDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Telegram push target Chat ID.
+        /// </summary>
+        public static string TelegramChatIdDescription {
+            get {
+                return ResourceManager.GetString("TelegramChatIdDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the Bot Token and Chat ID first.
+        /// </summary>
+        public static string TelegramCredentialsRequiredMessage {
+            get {
+                return ResourceManager.GetString("TelegramCredentialsRequiredMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable Telegram push.
+        /// </summary>
+        public static string TelegramEnableDescription {
+            get {
+                return ResourceManager.GetString("TelegramEnableDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Telegram Notification.
         /// </summary>
@@ -1543,7 +6898,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("TelegramNotificationText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Telegram proxy server address.
+        /// </summary>
+        public static string TelegramProxyAddressDescription {
+            get {
+                return ResourceManager.GetString("TelegramProxyAddressDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable a proxy for Telegram push.
+        /// </summary>
+        public static string TelegramProxyEnableDescription {
+            get {
+                return ResourceManager.GetString("TelegramProxyEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to attach screenshots to Telegram push.
+        /// </summary>
+        public static string TelegramScreenshotDescription {
+            get {
+                return ResourceManager.GetString("TelegramScreenshotDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Telegram Settings.
         /// </summary>
@@ -1552,7 +6934,52 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("TelegramSettingsText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test message sent, please check Telegram.
+        /// </summary>
+        public static string TelegramTestSentMessage {
+            get {
+                return ResourceManager.GetString("TelegramTestSentMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Telegram test.
+        /// </summary>
+        public static string TelegramTestText {
+            get {
+                return ResourceManager.GetString("TelegramTestText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Template matching confidence (recognition confidence), range 0-1, higher is stricter.
+        /// </summary>
+        public static string TemplateMatchConfidenceDescription {
+            get {
+                return ResourceManager.GetString("TemplateMatchConfidenceDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test message sent.
+        /// </summary>
+        public static string TestMessageSentMessage {
+            get {
+                return ResourceManager.GetString("TestMessageSentMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter text.
+        /// </summary>
+        public static string TextInputPlaceholder {
+            get {
+                return ResourceManager.GetString("TextInputPlaceholder", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Theme.
         /// </summary>
@@ -1561,7 +6988,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ThemeText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Thread Safety.
         /// </summary>
@@ -1570,7 +6997,70 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("ThreadSafetyText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle dark/light mode.
+        /// </summary>
+        public static string ToggleThemeTooltip {
+            get {
+                return ResourceManager.GetString("ToggleThemeTooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Number of Trailblaze Power refills.
+        /// </summary>
+        public static string TrailblazePowerRefillCountDescription {
+            get {
+                return ResourceManager.GetString("TrailblazePowerRefillCountDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to replenish Trailblaze Power.
+        /// </summary>
+        public static string TrailblazePowerRefillEnableDescription {
+            get {
+                return ResourceManager.GetString("TrailblazePowerRefillEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Trailblaze Power replenish method, 0=Reserved Trailblaze Power, 1=Fuel, 2=Stellar Jade.
+        /// </summary>
+        public static string TrailblazePowerRefillMethodDescription {
+            get {
+                return ResourceManager.GetString("TrailblazePowerRefillMethodDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Trailblaze Power settings.
+        /// </summary>
+        public static string TrailblazePowerSettingsText {
+            get {
+                return ResourceManager.GetString("TrailblazePowerSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable the Trailblaze Power task.
+        /// </summary>
+        public static string TrailblazePowerTaskEnableDescription {
+            get {
+                return ResourceManager.GetString("TrailblazePowerTaskEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Use Trailblaze Power.
+        /// </summary>
+        public static string TrailblazePowerTaskText {
+            get {
+                return ResourceManager.GetString("TrailblazePowerTaskText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Trailblaze Power.
         /// </summary>
@@ -1579,7 +7069,97 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("TrailblazePowerText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Trailblazer name.
+        /// </summary>
+        public static string TrailblazerNameLabelText {
+            get {
+                return ResourceManager.GetString("TrailblazerNameLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the Trailblazer's character name.
+        /// </summary>
+        public static string TrailblazerNamePlaceholder {
+            get {
+                return ResourceManager.GetString("TrailblazerNamePlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Trailblazer Profile.
+        /// </summary>
+        public static string TrailblazerProfileText {
+            get {
+                return ResourceManager.GetString("TrailblazerProfileText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable training targets; when enabled, training targets are completed first.
+        /// </summary>
+        public static string TrainingTargetEnableDescription {
+            get {
+                return ResourceManager.GetString("TrainingTargetEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Training target material priority: skip Ornament Extraction and Cavern of Corrosion when material stages are detected, k.
+        /// </summary>
+        public static string TrainingTargetPriorityDescription {
+            get {
+                return ResourceManager.GetString("TrainingTargetPriorityDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable training targets.
+        /// </summary>
+        public static string TrainingTargetText {
+            get {
+                return ResourceManager.GetString("TrainingTargetText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Type.
+        /// </summary>
+        public static string TypeLabelText {
+            get {
+                return ResourceManager.GetString("TypeLabelText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to UI language, 0=Chinese, 1=English.
+        /// </summary>
+        public static string UiLanguageDescription {
+            get {
+                return ResourceManager.GetString("UiLanguageDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred: {0}.
+        /// </summary>
+        public static string UnexpectedErrorMessage {
+            get {
+                return ResourceManager.GetString("UnexpectedErrorMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown command: {0}.
+        /// </summary>
+        public static string UnknownCommandMessage {
+            get {
+                return ResourceManager.GetString("UnknownCommandMessage", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Unknown.
         /// </summary>
@@ -1588,7 +7168,52 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("UnknownText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Already up to date.
+        /// </summary>
+        public static string UpToDateMessage {
+            get {
+                return ResourceManager.GetString("UpToDateMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Downloading update package automatically: {0}.
+        /// </summary>
+        public static string UpdateAutoDownloadMessage {
+            get {
+                return ResourceManager.GetString("UpdateAutoDownloadMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Auto update.
+        /// </summary>
+        public static string UpdateAutoModeText {
+            get {
+                return ResourceManager.GetString("UpdateAutoModeText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid update channel parameter.
+        /// </summary>
+        public static string UpdateChannelParameterInvalidError {
+            get {
+                return ResourceManager.GetString("UpdateChannelParameterInvalidError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Update channel, 0=Stable, 1=Beta.
+        /// </summary>
+        public static string UpdateChannelSettingDescription {
+            get {
+                return ResourceManager.GetString("UpdateChannelSettingDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Update Channel.
         /// </summary>
@@ -1597,7 +7222,151 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("UpdateChannelText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable update checking: checks for updates at startup and notifies the user.
+        /// </summary>
+        public static string UpdateCheckEnableDescription {
+            get {
+                return ResourceManager.GetString("UpdateCheckEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to check for updates.
+        /// </summary>
+        public static string UpdateCheckFailedError {
+            get {
+                return ResourceManager.GetString("UpdateCheckFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to You can check for updates again later to continue.
+        /// </summary>
+        public static string UpdateCheckLaterHint {
+            get {
+                return ResourceManager.GetString("UpdateCheckLaterHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to You canceled the update package download.
+        /// </summary>
+        public static string UpdateDownloadCanceledMessage {
+            get {
+                return ResourceManager.GetString("UpdateDownloadCanceledMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to download update.
+        /// </summary>
+        public static string UpdateDownloadFailedError {
+            get {
+                return ResourceManager.GetString("UpdateDownloadFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Download folder for update installers; if empty, uses the default temp directory.
+        /// </summary>
+        public static string UpdateDownloadFolderDescription {
+            get {
+                return ResourceManager.GetString("UpdateDownloadFolderDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to extract update.
+        /// </summary>
+        public static string UpdateExtractFailedError {
+            get {
+                return ResourceManager.GetString("UpdateExtractFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Extracting update.
+        /// </summary>
+        public static string UpdateExtractingMessage {
+            get {
+                return ResourceManager.GetString("UpdateExtractingMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to get update information. Please check your network connection.
+        /// </summary>
+        public static string UpdateInfoNetworkError {
+            get {
+                return ResourceManager.GetString("UpdateInfoNetworkError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Directory for saving downloaded update installers; if empty, uses the SRA folder in the system temp directory.
+        /// </summary>
+        public static string UpdateInstallerDirectoryDescription {
+            get {
+                return ResourceManager.GetString("UpdateInstallerDirectoryDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Manual update.
+        /// </summary>
+        public static string UpdateManualModeText {
+            get {
+                return ResourceManager.GetString("UpdateManualModeText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Update package downloaded.
+        /// </summary>
+        public static string UpdatePackageDownloadedMessage {
+            get {
+                return ResourceManager.GetString("UpdatePackageDownloadedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Update package ready.
+        /// </summary>
+        public static string UpdatePackageReadyMessage {
+            get {
+                return ResourceManager.GetString("UpdatePackageReadyMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Update preparation complete.
+        /// </summary>
+        public static string UpdatePreparationCompleteMessage {
+            get {
+                return ResourceManager.GetString("UpdatePreparationCompleteMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Update ready.
+        /// </summary>
+        public static string UpdateReadyMessage {
+            get {
+                return ResourceManager.GetString("UpdateReadyMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Update settings.
+        /// </summary>
+        public static string UpdateSettingsText {
+            get {
+                return ResourceManager.GetString("UpdateSettingsText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Update.
         /// </summary>
@@ -1606,7 +7375,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("UpdateText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Launch Game Using CMD.
         /// </summary>
@@ -1615,7 +7384,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("UseCmdLaunchText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Use External SRA Backend.
         /// </summary>
@@ -1624,7 +7393,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("UseExternalBackendText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to use the game path from global settings.
+        /// </summary>
+        public static string UseGlobalGamePathDescription {
+            get {
+                return ResourceManager.GetString("UseGlobalGamePathDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Use global settings.
+        /// </summary>
+        public static string UseGlobalSettingsText {
+            get {
+                return ResourceManager.GetString("UseGlobalSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Use.
+        /// </summary>
+        public static string UseText {
+            get {
+                return ResourceManager.GetString("UseText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to User Group (QQ).
         /// </summary>
@@ -1633,7 +7429,34 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("UserGroupText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Verification failed, unable to connect to the verification service.
+        /// </summary>
+        public static string VerificationServiceError {
+            get {
+                return ResourceManager.GetString("VerificationServiceError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Verifying....
+        /// </summary>
+        public static string VerifyingMessage {
+            get {
+                return ResourceManager.GetString("VerifyingMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        public static string VersionLabelText {
+            get {
+                return ResourceManager.GetString("VersionLabelText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Version.
         /// </summary>
@@ -1642,7 +7465,25 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("VersionText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect URL parameters for fetching version information.
+        /// </summary>
+        public static string VersionUrlParameterError {
+            get {
+                return ResourceManager.GetString("VersionUrlParameterError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hotkey for opening the warp screen.
+        /// </summary>
+        public static string WarpScreenHotkeyDescription {
+            get {
+                return ResourceManager.GetString("WarpScreenHotkeyDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Warp.
         /// </summary>
@@ -1651,34 +7492,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("WarpText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Webhook Notification.
+        ///   Looks up a localized string similar to Whether to enable WeCom push.
         /// </summary>
-        public static string WebhookNotificationText {
+        public static string WeComEnableDescription {
             get {
-                return ResourceManager.GetString("WebhookNotificationText", resourceCulture);
+                return ResourceManager.GetString("WeComEnableDescription", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Webhook Settings.
-        /// </summary>
-        public static string WebhookSettingsText {
-            get {
-                return ResourceManager.GetString("WebhookSettingsText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Open Official Website.
-        /// </summary>
-        public static string WebsiteToolTipText {
-            get {
-                return ResourceManager.GetString("WebsiteToolTipText", resourceCulture);
-            }
-        }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to WeCom Notification.
         /// </summary>
@@ -1687,7 +7510,16 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("WeComNotificationText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to attach screenshots to WeCom push.
+        /// </summary>
+        public static string WeComScreenshotDescription {
+            get {
+                return ResourceManager.GetString("WeComScreenshotDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to WeCom Settings.
         /// </summary>
@@ -1696,16 +7528,124 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("WeComSettingsText", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Windowed.
+        ///   Looks up a localized string similar to Test message sent, please check WeCom.
         /// </summary>
-        public static string WindowedText {
+        public static string WeComTestSentMessage {
             get {
-                return ResourceManager.GetString("WindowedText", resourceCulture);
+                return ResourceManager.GetString("WeComTestSentMessage", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to WeCom test.
+        /// </summary>
+        public static string WeComTestText {
+            get {
+                return ResourceManager.GetString("WeComTestText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Webhook URL of the WeCom bot.
+        /// </summary>
+        public static string WeComWebhookDescription {
+            get {
+                return ResourceManager.GetString("WeComWebhookDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to WebSocket command connection will be supported in a future version.
+        /// </summary>
+        public static string WebSocketFutureHint {
+            get {
+                return ResourceManager.GetString("WebSocketFutureHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Not connected to any WebSocket server.
+        /// </summary>
+        public static string WebSocketNotConnectedMessage {
+            get {
+                return ResourceManager.GetString("WebSocketNotConnectedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Webhook Notification.
+        /// </summary>
+        public static string WebhookNotificationText {
+            get {
+                return ResourceManager.GetString("WebhookNotificationText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Webhook Settings.
+        /// </summary>
+        public static string WebhookSettingsText {
+            get {
+                return ResourceManager.GetString("WebhookSettingsText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test request sent to: {0}.
+        /// </summary>
+        public static string WebhookTestSentMessage {
+            get {
+                return ResourceManager.GetString("WebhookTestSentMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Webhook test.
+        /// </summary>
+        public static string WebhookTestText {
+            get {
+                return ResourceManager.GetString("WebhookTestText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Webhook URL.
+        /// </summary>
+        public static string WebhookUrlPlaceholder {
+            get {
+                return ResourceManager.GetString("WebhookUrlPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the Webhook URL first.
+        /// </summary>
+        public static string WebhookUrlRequiredMessage {
+            get {
+                return ResourceManager.GetString("WebhookUrlRequiredMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open Official Website.
+        /// </summary>
+        public static string WebsiteToolTipText {
+            get {
+                return ResourceManager.GetString("WebsiteToolTipText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Welcome to SRA.
+        /// </summary>
+        public static string WelcomeToSraText {
+            get {
+                return ResourceManager.GetString("WelcomeToSraText", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Window Size.
         /// </summary>
@@ -1714,7 +7654,97 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("WindowSizeText", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Window state, 0=normal, 1=minimized, 2=maximized.
+        /// </summary>
+        public static string WindowStateDescription {
+            get {
+                return ResourceManager.GetString("WindowStateDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Windowed.
+        /// </summary>
+        public static string WindowedModeText {
+            get {
+                return ResourceManager.GetString("WindowedModeText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Windowed.
+        /// </summary>
+        public static string WindowedText {
+            get {
+                return ResourceManager.GetString("WindowedText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to API Key of xxtui.
+        /// </summary>
+        public static string XxtuiApiKeyDescription {
+            get {
+                return ResourceManager.GetString("XxtuiApiKeyDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Get it from xxtui.com.
+        /// </summary>
+        public static string XxtuiApiKeyPlaceholder {
+            get {
+                return ResourceManager.GetString("XxtuiApiKeyPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the API Key first.
+        /// </summary>
+        public static string XxtuiApiKeyRequiredMessage {
+            get {
+                return ResourceManager.GetString("XxtuiApiKeyRequiredMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Push channel of xxtui.
+        /// </summary>
+        public static string XxtuiChannelDescription {
+            get {
+                return ResourceManager.GetString("XxtuiChannelDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to e.g. WX_MP (optional).
+        /// </summary>
+        public static string XxtuiChannelPlaceholder {
+            get {
+                return ResourceManager.GetString("XxtuiChannelPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to enable xxtui push.
+        /// </summary>
+        public static string XxtuiEnableDescription {
+            get {
+                return ResourceManager.GetString("XxtuiEnableDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Message source of xxtui.
+        /// </summary>
+        public static string XxtuiMessageSourceDescription {
+            get {
+                return ResourceManager.GetString("XxtuiMessageSourceDescription", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Xxtui Notification.
         /// </summary>
@@ -1723,7 +7753,7 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("XxtuiNotificationText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Xxtui Settings.
         /// </summary>
@@ -1732,5 +7762,33 @@ namespace SRAFrontend.Localization {
                 return ResourceManager.GetString("XxtuiSettingsText", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to xxtui test.
+        /// </summary>
+        public static string XxtuiTestText {
+            get {
+                return ResourceManager.GetString("XxtuiTestText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to ZIP archive.
+        /// </summary>
+        public static string ZipArchiveText {
+            get {
+                return ResourceManager.GetString("ZipArchiveText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to ZIP file does not exist.
+        /// </summary>
+        public static string ZipFileMissingError {
+            get {
+                return ResourceManager.GetString("ZipFileMissingError", resourceCulture);
+            }
+        }
+
     }
 }
