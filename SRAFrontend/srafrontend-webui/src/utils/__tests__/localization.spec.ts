@@ -37,13 +37,11 @@ describe('Russian localization', () => {
 
   it('loads the saved Russian locale on a fresh module instance', async () => {
     localStorage.setItem('sra_locale', 'ru-RU')
-    const { i18n, tr } = await import('../../locales/index')
+    const { i18n } = await import('../../locales/index')
     expect(i18n.global.locale.value).toBe('ru-RU')
     expect(document.documentElement.lang).toBe('ru-RU')
     expect(i18n.global.t('route.settings')).toBe('Настройки')
     expect(i18n.global.t('log.copiedCount', [12])).toBe('Скопировано записей: 12')
-    expect(tr('开拓者名称')).toBe('Имя Первопроходца')
-    expect(tr('CurrencyWarsPlus')).toBe('CurrencyWarsPlus')
     expect(localStorage.getItem('sra_locale')).toBe('ru-RU')
   })
 
@@ -67,15 +65,5 @@ describe('Russian localization', () => {
     expect(restarted.i18n.global.t('route.settings')).toBe('Настройки')
     setLocale('invalid')
     expect(localStorage.getItem('sra_locale')).toBe('ru-RU')
-  })
-
-  it('translates labels without replacing technical or user values', async () => {
-    localStorage.setItem('sra_locale', 'ru-RU')
-    const { tr } = await import('../../locales/index')
-    expect(tr('开拓者名称')).toBe('Имя Первопроходца')
-    expect(tr('himeko_level5_quality_level7_two_star_20261018')).toBe(
-      'himeko_level5_quality_level7_two_star_20261018',
-    )
-    expect(tr('Тестовый профиль')).toBe('Тестовый профиль')
   })
 })

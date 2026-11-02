@@ -1,4 +1,4 @@
-import { i18n, tr } from '@/locales'
+import { i18n } from '@/locales'
 import axios, { type AxiosRequestConfig, type AxiosInstance } from 'axios'
 
 // axios 扩展：
@@ -27,7 +27,7 @@ export class ApiError extends Error {
   readonly canceled: boolean
 
   constructor(message: string, status?: number, canceled = false) {
-    super(tr(message))
+    super(message)
     this.name = 'ApiError'
     this.status = status
     this.canceled = canceled

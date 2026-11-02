@@ -10,7 +10,6 @@ import sys
 import urllib.request
 from pathlib import Path
 
-from SRACore.localization.presentation import to_russian
 from SRACore.services.setting_service import SettingsService
 from SRACore.util.const import VERSION, AppDataDir
 
@@ -53,6 +52,23 @@ _PHRASES_EN = [
     "Neverness To Everness",
 ]
 
+_PHRASES_RU = [
+    "Добро пожаловать в SRA",
+    "Устраивайтесь поудобнее",
+    "Это не\n'Sequence Read Archive'",
+    "Лаунчер запускает лаунчер",
+    "-1073741819",
+    "Светлячок летит к огню, обретая жизнь вопреки смерти",
+    "Сквозь вселенную — к далёким звёздам",
+    "Стремимся стать мастерами Star Rail",
+    "Счастливого пути",
+    "Пусть путь будет светлым",
+    "Пусть путь приведёт туда,\nгде мечты чисты\nи прекрасны",
+    "В прошлом мы высечем будущее",
+    "Летят искры, не оставляя пепла",
+    "Если всё нормально — это уже странно",
+]
+
 
 class AppInfoService:
     """应用元信息与静态资源。"""
@@ -77,7 +93,7 @@ class AppInfoService:
         return {
             "zh-CN": list(_PHRASES_ZH),
             "en-US": list(_PHRASES_EN),
-            "ru-RU": [to_russian(phrase) for phrase in _PHRASES_ZH],
+            "ru-RU": list(_PHRASES_RU),
         }
 
     async def background(self) -> bytes:

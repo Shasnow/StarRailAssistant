@@ -14,10 +14,8 @@ import xml.etree.ElementTree as ET
 import pytest
 
 from SRACore.localization import Resources
-from SRACore.localization.presentation import translate
 
 ROOT = Path(__file__).resolve().parents[1]
-CATALOG = json.loads((ROOT / 'SRACore/localization/presentation.json').read_text(encoding='utf-8'))
 
 
 @pytest.fixture(autouse=True)
@@ -29,26 +27,6 @@ def restore_language():
 
 def fields(text):
     return Counter(re.findall(r'\{(\d+)(?:[^{}]*)\}', text))
-
-
-@pytest.mark.parametrize('entry', CATALOG, ids=lambda item: item['key'])
-def test_presentation_placeholders_and_translation(entry):
-    assert fields(entry['source']) == fields(entry['ru'])
-    assert '\ufffd' not in entry['ru']
-    assert '???' not in entry['ru']
-    assert entry['ru'].strip()
-    Resources.set_language('ru-RU')
-    source = re.sub(r'\{(\d+)\}', lambda m: f'VALUE_{m[1]}', entry['source'])
-    expected = re.sub(r'\{(\d+)\}', lambda m: f'VALUE_{m[1]}', entry['ru'])
-    if len(re.sub(r'\{\d+\}', '', entry['source'])) >= 3 or not fields(entry['source']):
-        assert translate(source) == expected
-
-
-def test_original_languages_are_untouched():
-    for language in (0, 1):
-        Resources.set_language(language)
-        for entry in CATALOG:
-            assert translate(entry['source']) == entry['source']
 
 
 def test_existing_resource_keys_and_placeholders():

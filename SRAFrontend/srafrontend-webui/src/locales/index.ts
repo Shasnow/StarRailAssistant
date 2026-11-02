@@ -2,7 +2,6 @@ import { createI18n } from 'vue-i18n'
 import zh from './langs/zh-CN.json'
 import en from './langs/en-US.json'
 import ru from './langs/ru-RU.json'
-import russianDisplay from './langs/display.ru-RU.json'
 
 export type Locale = 'zh-CN' | 'en-US' | 'ru-RU'
 
@@ -18,9 +17,6 @@ const LOCALES = Object.keys(LOCALE_LABELS) as Locale[]
 
 /** 语言选择器选项：由语言清单自动生成 */
 export const SUPPORTED_LOCALES = LOCALES.map((value) => ({ value, label: LOCALE_LABELS[value] }))
-
-/** 仅展示层文案覆盖表：键为后端下发的原始文本，值为俄语译文 */
-const display: Record<string, string> = russianDisplay
 
 function savedLocale(): string | null {
   try {
@@ -44,23 +40,8 @@ export const i18n = createI18n({
   globalInjection: true,
   locale: initialLocale,
   fallbackLocale: 'zh-CN',
-  // 后端下发的原始文本经 `tr` 兜底展示，未命中的 key 属预期行为，关闭告警
-  missingWarn: false,
-  fallbackWarn: false,
   messages: { 'zh-CN': zh, 'en-US': en, 'ru-RU': ru },
 })
-
-/**
- * Display text only: never use this result for keys, API parameters, or saved values.
- *
- * 后端下发的文本（字段描述、错误消息、枚举项等）无法预先登记为消息键，
- * 这里按「原始文本 → 俄语译文」查表覆盖；未命中（含非俄语环境）原样返回。
- * 该表含 `{0}` 占位符与字面花括号，不能交给 vue-i18n 的消息编译器处理。
- */
-export function tr(source: string | undefined): string {
-  if (!source) return ''
-  return i18n.global.locale.value === 'ru-RU' ? (display[source] ?? source) : source
-}
 
 export function setLocale(value: string) {
   if (!LOCALES.includes(value as Locale)) return
