@@ -1,7 +1,6 @@
 import enum
 import time
 import typing
-import re
 
 from SRACore.util.strutil import EqualsMatcher, RegexMatcher, StrMatcher
 
@@ -137,8 +136,6 @@ class StartGameTask(BaseTask):
                     return status
             else:
                 return status
-        if self._try_history_account_login():  # 密码留空时的免密码历史账号切号
-            return 1
         return self._account_login()
 
     def _browser_login(self) -> int:
@@ -371,118 +368,3 @@ class StartGameTask(BaseTask):
             return True
         else:
             return False
-    def _try_history_account_login(self) -> bool:
-        """免密码历史账号切号：密码留空且账号非空时，账号字段作为切号提示词。
-
-        在登录页点击账号信息框触发客户端历史账号下拉，选中目标账号后由客户端
-        回填其记住的密码完成登录，SRA 侧零密码存储。失败时回退原有登录流程。
-
-        Returns:
-            bool: 是否已通过历史账号完成登录
-        """
-        user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
-        passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
-        if user == "" or passwd != "":
-            return False  # 密码已配置或账号为空，走原有账号密码流程
-        if self._game_channel() == 'gb':
-            # 国际服登录页布局与国服不同（账号输入框直接暴露、文案为英文），
-            # 未经实测，暂不支持；后续可在此分支单独实现
-            logger.info("历史账号切号暂不支持国际服，走原有登录流程")
-            return False
-        logger.info(f"密码未配置，尝试历史账号切号（提示词: {user}）")
-        try:
-            ok = self._switch_by_history(user)
-        except RuntimeError as e:
-            logger.error(f"历史账号切号失败: {e}")
-            return False
-        if not ok:
-            return False
-        if self.operator.wait_ocr_any(
-            ["欢迎", "开始游戏", "点击进入"],
-            from_x=0.44, from_y=0.07, to_x=0.6, to_y=0.9, timeout=180,
-        ):
-            return True
-        logger.warning("切号后等待欢迎界面超时，请检查游戏状态")
-        return False
-
-    @staticmethod
-    def _norm_acct(s: str) -> str:
-        """去除星号等非字母数字字符，用于账号比对"""
-        return re.sub(r"[^0-9A-Za-z]", "", s or "")
-
-    def _acct_match(self, hint: str, raw: str) -> bool:
-        """提示词与界面显示文本的归一化比对。
-
-        完整手机号/邮箱对掩码显示（如 123****21）按「前缀+后缀+总长度」匹配，
-        避免单纯去星号让两个首尾相同的账号撞在一起。
-        """
-        h, t = self._norm_acct(hint), self._norm_acct(raw)
-        if not h or not t:
-            return False
-        if h in t or t in h:
-            return True
-        m = re.search(r"(\d{2,4})\*{2,}(\d{2,4})", (raw or "").strip())
-        if m and h.isdigit():
-            pre, suf = m.group(1), m.group(2)
-            if len(h) >= len(pre) + len(suf) and h.startswith(pre) and h.endswith(suf):
-                return True
-        return False
-
-    def _switch_by_history(self, hint: str) -> bool:
-        """点击账号信息框触发历史账号下拉 → 选中目标账号 → 确认登录。
-
-        下拉候选只取账号框下方、水平位置邻近的文本，避免「账号密码」
-        「忘记密码」等同屏文本混入；未命中时把候选写入日志便于排查。
-        Returns:
-            bool: 是否选中了目标账号并点击了登录
-        """
-        boxes = self.operator.ocr_boxes()
-        if boxes is None:
-            raise RuntimeError("未检测到登录界面")
-        acct = login = None
-        for box in boxes:
-            src = box.source or ""
-            if ("登录" in src or "进入游戏" in src) and "其他账号" not in src:
-                login = box  # 「登录其他账号」是入口按钮，不是确认键
-            if acct is None and (re.search(r"\d{2,4}\*{2,}\d{2,4}", src) or "邮箱" in src):
-                acct = box  # 快速登录页的脱敏账号框 / 账密页的邮箱输入框
-        if acct is None or login is None:
-            raise RuntimeError("未检测到账号信息框或登录按钮，请检查游戏画面")
-
-        self.operator.click_box(acct, after_sleep=1)  # 触发历史账号下拉
-        acct_cx = acct.left + acct.width // 2
-        span = max(acct.width * 3, 200)
-        target, seen = None, []
-        deadline = time.time() + 8
-        while time.time() < deadline and target is None:
-            for box in self.operator.ocr_boxes() or []:
-                cx = box.left + box.width // 2
-                if box.top < acct.top or abs(cx - acct_cx) > span:
-                    continue  # 只认账号框下方、水平邻近的条目（下拉列表区域）
-                txt = box.source or ""
-                if txt and txt not in seen:
-                    seen.append(txt)
-                if txt != (acct.source or "") and self._acct_match(hint, txt):
-                    target = box
-                    break
-            if target is None:
-                self.operator.sleep(0.5)
-        if target is None:
-            logger.error(f"下拉列表中未找到账号「{hint}」，识别到的候选: {seen[:10]}")
-            return False
-        logger.info(f"选中历史账号: {target.source}")
-        self.operator.click_box(target, after_sleep=2)  # 客户端自动回填记住的密码
-
-        confirm = None  # 下拉可能遮挡原坐标，重新定位确认按钮
-        for box in self.operator.ocr_boxes() or []:
-            src = box.source or ""
-            if ("登录" in src or "进入游戏" in src) and "其他账号" not in src:
-                confirm = box
-                break
-        if confirm is not None:
-            self.operator.click_box(confirm, after_sleep=1)
-        for box in self.operator.ocr_boxes() or []:  # 同意隐私政策弹窗兜底
-            if box.source in ("同意", "同意并继续"):
-                self.operator.click_box(box, after_sleep=1)
-                break
-        return True
