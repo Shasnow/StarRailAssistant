@@ -196,7 +196,7 @@ npm run build
 ## 辅助脚本
 ```bash
 npm run pyl10nc # 运行 pyl10nc 本地化工具，编辑 SRACore/localization/resources.toml 文件以添加/修改翻译
-npm run model-gen # 运行模型生成脚本，根据 C# 业务模型生成对应的 Python 数据类，保持前后端数据结构一致
+npm run modelgen # 运行模型生成脚本，根据 C# 业务模型生成对应的 Python 数据类，保持前后端数据结构一致
 npm run build # 构建项目，包括前端发布包和后端可执行文件，并生成完整的发布包
 ```
 
@@ -229,26 +229,75 @@ pytest
 
 ### 本地化支持
 
-1. 克隆仓库
-2. 在 `SRACore/localization/` 目录下编辑 `resources.toml` 文件，添加新的语言支持
+SRA 目前提供多语言支持。下面以新增西班牙语（资源后缀 `es-es`，BCP-47 标识 `es-ES`）
+为例，列出需要改动的位置。
 
-   示例：
+#### Python 后端与 CLI
+
+1. 在 `SRACore/localization/resources.toml` 里为**每个**键补上新语言一列（`zh-cn` 是基准，占位符 `{name}`
+   必须与其他语言一致）：
+
     ```toml
     [cli.intro] # 资源键
-    en-us = "SRA-cli {version} ({core})\nType 'help' or '?' to list commands." # 现有的英文翻译
-    zh-cn = "SRA-cli {version} ({core})\n输入 'help' 或 '?' 来查看命令列表。" # 现有的中文翻译
+    zh-cn = "SRA-cli {version} ({core})\n输入 'help' 或 '?' 来查看命令列表。"
+    en-us = "SRA-cli {version} ({core})\nType 'help' or '?' to list commands."
+    ru-ru = "SRA-cli {version} ({core})\nВведите 'help' или '?' для списка команд."
+    es-es = "SRA-cli {version} ({core})\nEscriba 'help' o '?' para listar los comandos."
     ```
 
-   新增语言键：
-    ```toml
-    [cli.intro]
-    # ......
-    es-es = "SRA-cli {version} ({core})\nEscriba 'help' o '?' para listar los comandos." # 新增的西班牙语翻译
-    ```
+2. 运行 `npm run pyl10nc`：生成 `resources_es-es.json`，`SRACore/localization/resources.py` 的
+   `available_languages` 会自动包含新语言（生成物不要手改）。
+3. **列顺序即枚举下标**：`Resources.set_language(int)` 按 `available_languages[值]` 取语言，因此 TOML 中
+   语言列的顺序必须与 `AppSettings.cs` 里 `UiLanguage` 的枚举值一致；新增语言统一追加到末尾。
+4. 术语表（OpenAPI `x-i18n` 的来源）：新增 `SRACore/localization/terms.es-es.json`，键结构照抄
+   `terms.zh-cn.json`；在 `SRACore/localization/terms.py` 的 `_LANG_FILES` 里补 `"es-es": "es-ES"`；
+   在 `scripts/i18n_check.py` 的 `LANGS` 里加上 `es-es`。
+5. 扩展本地化：在 `SRACore/extension/locales.py` 的 `SUPPORTED_LANGS` 与 `_LANG_TAGS` 各加一项。
 
-3. 提交 Pull Request
+#### .NET 桌面端
 
-SRA 前端采用 `ResX` 进行本地化支持，推荐使用 `Rider` 或 `Visual Studio` 进行编辑。
+1. `SRAFrontend/SRAFrontend/Models/AppSettings.cs` 的 `UiLanguage` 追加枚举值（顺序与 TOML 一致），
+   `[Description]` 写该语言的母语名；改完执行 `npm run modelgen` 同步 `SRACore/models/app_settings.py`。
+2. 新增卫星资源 `SRAFrontend/SRAFrontend/Localization/Resources.es-ES.resx`，键集与 `Resources.resx` 完全一致
+   （从一个现成的 resx 复制翻译，并重新生成 `Resources.Designer.cs`）。
+3. `SRAFrontend/SRAFrontend.Desktop/App.axaml.cs` 的 `CultureFor` 增加对应分支，
+   如 `UiLanguage.Spanish => new CultureInfo("es-ES")`。
+4. `SRAFrontend/SRAFrontend.Desktop/Views/SettingsPageView.axaml` 的语言下拉框追加一项 `ComboBoxItem`，
+   顺序与枚举一致（`SelectedIndex` 直接绑定 `LanguageIndex`）；语言名取自 resx，不要硬编码。
+
+#### Vue WebUI
+
+1. 新增 `SRAFrontend/srafrontend-webui/src/locales/langs/es-ES.json`，键结构照抄 `zh-CN.json`。
+2. `src/locales/index.ts` 的 `Locale` 联合类型与 `LOCALE_LABELS` 各加一项，`SUPPORTED_LOCALES` 会随之派生。
+3. 后端字段说明会自动从 `x-i18n` 取新语言，未命中时回退 `description`（中文）。
+
+#### 扩展
+
+在每个扩展目录下补 `locales/es-ES.json`，键为 schema 字段键名（字段有 `alias` 时用 `alias`）：
+
+- `name` / `description`：扩展展示名与说明；
+- `<字段>.title` / `<字段>.description`：字段标题与说明；
+- `<字段>.labels`：枚举标签数组，顺序与 `enum` 声明一致。
+
+缺失的语言文件会回退中文，不影响扩展加载。
+
+#### 校验
+
+测试里的语言列表目前是写死的（`tests/test_russian_localization.py`、`tests/localization`、WebUI 的
+`localization.spec.ts`），新增语言后需同步扩展用例，然后跑：
+
+```bash
+npm run pyl10nc && npm run i18n:check
+python -m pytest tests/test_russian_localization.py tests/test_standard_io_utf8.py
+dotnet test -c Release tests/localization/SRALocalizationChecks.csproj
+cd SRAFrontend/srafrontend-webui && pnpm test
+```
+
+`tests/localization` 会无头渲染每种语言 × 明暗主题 × 800/1024 两档宽度的页面，具体见该目录的 `README.md`。
+
+#### 本地化边界
+
+日志是排查和定位问题的重要工具，本地化日志会导致日志内容变动，难以定位代码，因此不对日志进行本地化。
 
 ### 另辟蹊径
 
