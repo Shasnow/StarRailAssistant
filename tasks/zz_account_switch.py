@@ -1,4 +1,4 @@
-"""SRA 账号切号插件（免密码）v2.4。
+"""SRA 账号切号插件（免密码）v2.5。
 
 放入 SRA 的 tasks/ 目录即生效。目标账号来源按优先级：
 1. AUTO-MAS 花名册：被 MAS 拉起时从命令行的 sra-config 路径反查
@@ -75,7 +75,7 @@ def _match(hint: str, raw: str) -> bool:
     h, t = _norm(hint), _norm(raw)
     if not h or not t:
         return False
-    if h in t or t in h:
+    if len(h) >= 3 and len(t) >= 3 and (h in t or t in h):
         return True
     hm, rm = _split_mask(hint), _split_mask(raw)
     if hm and rm:
@@ -462,11 +462,11 @@ def _confirm_logout_keep(self) -> bool:
             self.operator.click_box(cancel, after_sleep=1)
         return False
     self.operator.click_point(0.363, 0.530, after_sleep=1)  # 「保留」单选方块
-    self.operator.click_point(0.567, 0.630, after_sleep=2)  # 「退出」确认键
-    for _ in range(2):
+    self.operator.click_point(0.567, 0.630, after_sleep=3)  # 「退出」确认键
+    for _ in range(3):  # 过渡期 OCR 可能有残影，多等多验
+        self.operator.sleep(2)
         boxes = self.operator.ocr_boxes() or []
         if not any("登录记录" in (b.source or "") for b in boxes):
-            self.operator.sleep(1)
             return True
         logger.warning("[切号] 登出弹窗未关闭，兜底重试")
         cancel = next((b for b in boxes if (b.source or "") == "取消"), None)
@@ -549,6 +549,8 @@ def _switch_by_history(self, hint: str) -> bool:
     while time.time() < deadline:
         for b in (self.operator.ocr_boxes() or []):
             txt = b.source or ""
+            if re.search(r"(分钟|小时|天|周|月|年)前|刚刚|昨天|今天", txt):
+                continue  # 条目的时间戳行，点了会选中错误账号
             if txt not in seen:
                 seen.append(txt)
             if _match(hint, txt):
@@ -696,13 +698,18 @@ if StartGameTask is not None:
             target = _mas_target() or _load_hint()
             if not target:
                 return r
-            got = _read_game_uid(self, timeout=10)
+            got = _read_game_uid(self, timeout=12)
+            fresh = bool(_FLOW_LOGGED)
+            if not got and fresh:
+                got = _read_game_uid(self, timeout=15)  # 刚登录，画面可能还在加载
             if not got:
-                logger.warning("[切号] 未能读取游戏内 UID，跳过校验与记录")
-                return r
+                if fresh:  # 插件刚选的号，身份可信
+                    logger.warning("[切号] 未能读取游戏内 UID，插件登录会话放行")
+                    return r
+                logger.error("[切号] 沿用会话且读不到 UID，宁报错勿错号")
+                return False
             want = _target_uid(target)
             owner = _uid_owner(got)
-            fresh = bool(_FLOW_LOGGED)
             if want and got != want:
                 logger.error(f"[切号] UID 校验失败: 游戏内 {got} ≠ 目标 {want}")
                 return _uid_retry(self, target, _retry_count)
@@ -764,4 +771,4 @@ if StartGameTask is not None:
     StartGameTask._uid_owner = staticmethod(_uid_owner)
     StartGameTask._target_uid = staticmethod(_target_uid)
     StartGameTask._load_uid_map = staticmethod(_load_uid_map)
-    logger.info("[切号] 插件已启用 v2.4")
+    logger.info("[切号] 插件已启用 v2.5")
