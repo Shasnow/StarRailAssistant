@@ -742,6 +742,13 @@ if StartGameTask is not None:
         logger.info("[切号] 已退回登录界面，重新切号登录")
         return _laeg_with_uid(self, _retry_count + 1)
 
+    # CLI 默认 --log-level TRACE，OCR 坐标/模板探测刷屏；降为 INFO（放 zz_debug.txt 可恢复）
+    if not (Path.cwd() / "zz_debug.txt").exists():
+        try:
+            from SRACore.util.logger import setup_logger
+            setup_logger(level="INFO")
+        except Exception:
+            pass
     if _orig_fill is not None:
         StartGameTask._fill_credentials = _fill_credentials
     if _orig_login is not None:
