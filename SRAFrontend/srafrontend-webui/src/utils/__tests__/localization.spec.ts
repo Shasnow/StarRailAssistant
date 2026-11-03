@@ -53,12 +53,13 @@ describe('Russian localization', () => {
   })
 
   it('persists the selected locale and reapplies it after reload', async () => {
-    const assign = vi.fn()
-    vi.stubGlobal('location', { assign })
+    const reload = vi.fn()
+    vi.stubGlobal('location', { reload })
     const { setLocale } = await import('../../locales/index')
     setLocale('ru-RU')
     expect(localStorage.getItem('sra_locale')).toBe('ru-RU')
-    expect(assign).toHaveBeenCalledWith(import.meta.env.BASE_URL)
+    // 原地重载以保留当前路由（服务端对非 /api 路径回退到 index.html）
+    expect(reload).toHaveBeenCalled()
     vi.resetModules()
     const restarted = await import('../../locales/index')
     expect(restarted.i18n.global.locale.value).toBe('ru-RU')

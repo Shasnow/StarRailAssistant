@@ -46,10 +46,9 @@ export const i18n = createI18n({
 export function setLocale(value: string) {
   if (!LOCALES.includes(value as Locale)) return
   localStorage.setItem('sra_locale', value)
-  // Recreate setup-time option labels and third-party dialogs consistently.
-  // Upstream does not provide an ASP.NET SPA deep-link fallback. Restart at
-  // the supported base entry instead of requesting /settings or /logs as HTML.
-  location.assign(import.meta.env.BASE_URL)
+  // 整页重载以重建 setup 期的选项标签与第三方组件语言；服务端对非 /api 路径回退到
+  // index.html，因此直接 reload 可以保留当前路由。
+  location.reload()
 }
 
 if (typeof document !== 'undefined') document.documentElement.lang = i18n.global.locale.value
