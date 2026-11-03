@@ -28,8 +28,8 @@ class StartGameConfig(_Model):
     launchDelay: int = Field(5, alias="game.launchDelay", description='启动游戏后的等待延迟（秒）')
     isAutoLogin: bool = Field(True, alias="autologin", description='是否自动登录账号')
     isReLogin: bool = Field(True, alias="relogin", description='是否在登录失败后自动重新登录')
-    EncryptedPassword: str = Field("", alias="password", description='加密存储的账号密码；留空时启用免密码历史账号切号')
-    EncryptedUsername: str = Field("", alias="username", description='加密存储的账号用户名；密码留空时作为历史账号切号的提示词')
+    EncryptedPassword: str = Field("", alias="password", description='加密存储的账号密码')
+    EncryptedUsername: str = Field("", alias="username", description='加密存储的账号用户名')
 
     def to_dict(self) -> dict:
         """转换为字典（键为 C# 侧的 JSON 名称）"""
