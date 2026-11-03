@@ -867,14 +867,14 @@ class CurrencyWars(Executable):
 
         img_list = [cfg[0] for cfg in stage_config]
 
-        # 等待初始状态
-        stage_index, _ = self.operator.wait_any_img(img_list, timeout=30, interval=1)
-        self.operator.sleep(1.5)
-        prev_stage_name: StageName | None = None
-
         while True:  # 用无限循环 + 内部break控制退出
+            stage_index, _ = self.operator.wait_any_img(img_list, timeout=15, interval=1)
+            self.operator.sleep(1.5)
+            prev_stage_name: StageName | None = None
             # 检查是否超时（未识别到任何状态）
             if stage_index == -1:
+                if self.operator.click_img(CWIMG.STORE):
+                    continue
                 raise RuntimeError("关卡状态检测超时，未识别到任何图片")
 
             # 获取当前状态配置
@@ -895,10 +895,6 @@ class CurrencyWars(Executable):
             if is_terminal:
                 logger.info(f"达到终止状态：{stage_name}，退出关卡切换流程")
                 return self.handle_stage_transitioned()
-
-            # 非终止状态，继续等待下一个状态
-            stage_index, _ = self.operator.wait_any_img(img_list, timeout=30, interval=1)
-            self.operator.sleep(1.5)
 
     def handle_main_menu(self, _: StageName | None) -> bool:
         """处理主菜单界面的逻辑"""

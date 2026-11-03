@@ -189,6 +189,7 @@ class CWIMG:
     SYNTHESIS = f"{BASE}/synthesis.png"
     SILVER_WOLF_LV999 = f"{BASE}/silver_wolf_lv999.png"
     SELECT_SIMPLE_EQUIPMENT = f"{BASE}/select_simple_equipment.png"
+    STORE = f"{BASE}/store.png"
     THE_PLANET_OF_FESTIVITIES = f"{BASE}/ThePlanetOfFestivities.png"
     WITHDRAW_AND_SETTLE = f"{BASE}/withdraw_and_settle.png"
 # endregion
