@@ -316,14 +316,13 @@ def _import_extension_modules(package: str, *, reload_existing: bool) -> None:
 
 
 def load_extensions(package: str = "extensions") -> None:
-    """动态导入指定目录下的所有扩展模块。
+    """导入指定目录下的所有扩展包。
 
-    与 ``dynamic_import("tasks")`` 行为一致：扫描 ``package`` 目录下的所有
-    ``.py`` 文件（不含 ``__init__``），通过 ``importlib.import_module`` 导入，
-    触发模块顶层的 ``@extension`` 装饰器完成注册。
+    只加载包含 ``__init__.py`` 的一级子目录（目录包）；遗留的 ``*.py`` 单文件扩展
+    会被忽略并记录 warning。导入过程触发模块顶层的 ``@extension`` 装饰器完成注册。
 
     Args:
-        package: 扩展模块所在目录名，默认为 ``"extensions"``。
+        package: 扩展所在目录名，默认为 ``"extensions"``。
     """
     _import_extension_modules(package, reload_existing=False)
     logger.info(f"Loaded {len(extension_registry.get_ids())} extension(s): "

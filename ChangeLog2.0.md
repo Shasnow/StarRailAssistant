@@ -44,6 +44,8 @@ SRA 现在支持 Docker 部署，详见 [Docker 部署说明](https://starrailas
 - Server: 远程模式默认地址改为 `http://localhost:5073`（原 5000），请求路径同步改为 `/api/**`。
 - Server: 不再需要 ASP.NET Core。
 - Core: Python 依赖分组 `full` extra 更名为 `standard`：`pip install ".[full]"` 失效，改用 `pip install ".[standard]"`。
+- Extensions: 扩展改为目录包（一级目录 + `__init__.py`）才加载，旧的单文件 `extensions/xxx.py` 只记录 warning 后忽略。
+  第三方扩展需迁移为 `extensions/<名称>/__init__.py`，原文件内的相对导入与同目录资源一并移入该目录。
 
 #### 新增货币战争 plus 独立优化扩展
 

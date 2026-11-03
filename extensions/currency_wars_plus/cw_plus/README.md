@@ -105,7 +105,7 @@
 
 ## 文件与运行数据
 
-入口为 `extensions/currency_wars_plus.py`；本目录包含流程和纯逻辑，`strategies/` 为攻略，`resources/` 为页面模板，`calibration/` 为局部校准素材。任务重建仍在原进程、原宿主线程执行，运行数据不会因此获得新的动作额度。
+入口为 `extensions/currency_wars_plus/__init__.py`；本目录包含流程和纯逻辑，`strategies/` 为攻略，`resources/` 为页面模板，`calibration/` 为局部校准素材。任务重建仍在原进程、原宿主线程执行，运行数据不会因此获得新的动作额度。
 
 运行数据位于宿主应用数据目录的 `currency_wars_plus/` 下：Windows 通常为 `%APPDATA%/SRA/currency_wars_plus/`，Linux 为 `~/.config/SRA/currency_wars_plus/`。`state/` 保存会话，`logs/` 保存独立日志，`diagnostics/` 保存诊断素材。反馈前请筛选个人信息。
 
