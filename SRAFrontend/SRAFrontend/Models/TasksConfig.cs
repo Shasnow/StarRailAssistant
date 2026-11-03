@@ -75,11 +75,11 @@ public partial class StartGameConfig : ObservableObject
     private string _username = "";
 
     [JsonPropertyName("password")]
-    [Description("加密存储的账号密码；留空时启用免密码历史账号切号")]
+    [Description("加密存储的账号密码")]
     public string EncryptedPassword { get; set; } = string.Empty;
 
     [JsonPropertyName("username")]
-    [Description("加密存储的账号用户名；密码留空时作为历史账号切号的提示词")]
+    [Description("加密存储的账号用户名")]
     public string EncryptedUsername { get; set; } = string.Empty;
 }
 
