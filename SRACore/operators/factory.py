@@ -19,7 +19,7 @@ class OperatorFactory:
     __window_context = WindowContext()
 
     @classmethod
-    def get_operator(cls, optype: str | OperatorType, settings: AppSettings | None = None,
+    def get_operator(cls, optype: str | OperatorType = OperatorType.Local, settings: AppSettings | None = None,
                      stop_event: threading.Event | None = None) -> IOperator:
         if optype == OperatorType.Local:
             from SRACore.operators.operator import Operator
