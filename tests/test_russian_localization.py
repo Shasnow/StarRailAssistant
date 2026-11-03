@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 from collections import Counter
 from copy import deepcopy
 import json
@@ -51,6 +52,37 @@ def test_toml_is_authoritative_for_all_generated_languages():
     for language in ('zh-cn', 'en-us', 'ru-ru'):
         generated = json.loads((ROOT / f'SRACore/localization/resources_{language}.json').read_text(encoding='utf-8'))
         assert generated == {key: value[language] for key, value in data.items()}
+
+
+def test_resource_attributes_used_in_code_are_generated():
+    """`Resources.<attr>` 必须对应生成类里的真实成员。
+
+    `Localization.__getattribute__` 在属性缺失时回退到 `get_translation(name)`，
+    再退化为原样返回键名，因此 `hasattr` 恒为真，只能静态比对 AST。
+    """
+    from SRACore.localization.resources import Localization
+
+    available = {name for name in dir(Localization) if not name.startswith('_')}
+    missing: list[str] = []
+    for path in ROOT.rglob('*.py'):
+        if {'.venv', 'node_modules', 'static', 'log'} & set(path.parts):
+            continue
+        if path == ROOT / 'SRACore/localization/resources.py':
+            continue
+        source = path.read_text(encoding='utf-8')
+        if 'Resources' not in source:
+            continue
+        tree = ast.parse(source)
+        if not any(isinstance(node, ast.ImportFrom)
+                   and node.module in {'SRACore.localization', 'SRACore.localization.resources'}
+                   and any(alias.name == 'Resources' for alias in node.names)
+                   for node in ast.walk(tree)):
+            continue
+        for node in ast.walk(tree):
+            if (isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name)
+                    and node.value.id == 'Resources' and node.attr not in available):
+                missing.append(f'{path.relative_to(ROOT).as_posix()}:{node.lineno}: Resources.{node.attr}')
+    assert not missing, '未定义的资源属性:\n' + '\n'.join(missing)
 
 
 def test_gui_resource_keys_and_placeholders():

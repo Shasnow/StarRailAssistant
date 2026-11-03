@@ -609,18 +609,15 @@ public partial class SettingsPageViewModel : PageViewModel
 
     private async Task AskRestartAsync()
     {
-        var isChinese = DisplaySettings.Language != UiLanguage.English;
         var restartButton = SukiMessageBoxButtonsFactory.CreateButton(
-            isChinese ? Resources.RestartNowText : "Restart Now", SukiMessageBoxResult.Yes, "Flat");
+            Resources.RestartNowText, SukiMessageBoxResult.Yes, "Flat");
         var laterButton = SukiMessageBoxButtonsFactory.CreateButton(
-            isChinese ? Resources.LaterText : "Later", SukiMessageBoxResult.Cancel);
+            Resources.LaterText, SukiMessageBoxResult.Cancel);
 
         var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
-            Header = isChinese ? Resources.LanguageChangedMessage : "Language Changed",
-            Content = isChinese
-                ? Resources.LanguageRestartConfirmMessage
-                : "The application needs to restart to apply the new language. Restart now?",
+            Header = Resources.LanguageChangedMessage,
+            Content = Resources.LanguageRestartConfirmMessage,
             ActionButtonsSource = [restartButton, laterButton]
         });
 
@@ -644,10 +641,7 @@ public partial class SettingsPageViewModel : PageViewModel
         }
         catch (Exception e)
         {
-            var isChinese = DisplaySettings.Language != UiLanguage.English;
-            _commonModel.ShowErrorToast(
-                isChinese ? Resources.RestartFailedError : "Restart Failed",
-                string.Format(Resources.Culture, Resources.LabelValueFormat, (isChinese ? "发生错误" : "An error occurred"), e.Message));
+            _commonModel.ShowErrorToast(Resources.RestartFailedError, e.Message);
         }
     }
 

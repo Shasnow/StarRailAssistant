@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SRAFrontend.Localization;
 
 namespace SRAFrontend.Desktop.Models;
 
@@ -55,7 +56,7 @@ public partial class CustomizableKey : ObservableObject
 
         _tempKey = CurrentKey;
         IsListening = true;
-        CurrentKey = "按键盘设置快捷键";
+        CurrentKey = Resources.HotkeyCaptureHint;
 
         _topLevel.KeyUp += OnKeyUp;
         _topLevel.PointerPressed += OnPointerPressed;

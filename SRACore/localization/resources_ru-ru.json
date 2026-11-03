@@ -44,6 +44,7 @@
     "cli.extension.configGetNameHelp": "Идентификатор расширения",
     "cli.extension.configGetTitle": "Конфигурация расширения {name}",
     "cli.extension.configSetDescription": "Задать конфигурацию расширения",
+    "cli.extension.configSetNameHelp": "Идентификатор расширения",
     "cli.extension.configSetJsonHelp": "Строка JSON конфигурации",
     "cli.extension.configSetJsonError": "Ошибка JSON: {error}",
     "cli.extension.statusTitle": "Состояние расширений",

@@ -44,6 +44,7 @@
     "cli.extension.configGetNameHelp": "Extension id",
     "cli.extension.configGetTitle": "Extension {name} configuration",
     "cli.extension.configSetDescription": "Set extension configuration",
+    "cli.extension.configSetNameHelp": "Extension id",
     "cli.extension.configSetJsonHelp": "Configuration JSON string",
     "cli.extension.configSetJsonError": "Invalid JSON: {error}",
     "cli.extension.statusTitle": "Extension status",

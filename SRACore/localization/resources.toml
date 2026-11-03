@@ -578,6 +578,11 @@ zh-cn = "设置扩展配置"
 en-us = "Set extension configuration"
 ru-ru = "Задать конфигурацию расширения"
 
+[cli.extension.configSetNameHelp]
+zh-cn = "扩展标识"
+en-us = "Extension id"
+ru-ru = "Идентификатор расширения"
+
 [cli.extension.configSetJsonHelp]
 zh-cn = "配置 JSON 字符串"
 en-us = "Configuration JSON string"

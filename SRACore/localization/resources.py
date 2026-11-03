@@ -394,6 +394,13 @@ class Localization:
         return self.get_translation("cli.extension.configSetDescription")
 
     @property
+    def cli_extension_configSetNameHelp(self) -> str:
+        """扩展标识
+
+        From cli.extension.configSetNameHelp"""
+        return self.get_translation("cli.extension.configSetNameHelp")
+
+    @property
     def cli_extension_configSetJsonHelp(self) -> str:
         """配置 JSON 字符串
 

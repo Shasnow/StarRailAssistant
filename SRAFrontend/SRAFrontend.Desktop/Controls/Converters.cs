@@ -44,9 +44,8 @@ public class DateToStringConverter : IValueConverter
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is DateTime dt)
-            return dt.ToString(Resources.DateDisplayFormat,
-                SRAFrontend.Localization.Resources.Culture?.Name == "ru-RU"
-                    ? SRAFrontend.Localization.Resources.Culture : new CultureInfo("zh-CN"));
+            // 格式串与格式化文化都跟随界面语言：ru-RU / en-US / zh-CN。
+            return dt.ToString(Resources.DateDisplayFormat, Resources.Culture ?? CultureInfo.CurrentUICulture);
         return "";
     }
 

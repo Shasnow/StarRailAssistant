@@ -44,6 +44,7 @@
     "cli.extension.configGetNameHelp": "扩展标识",
     "cli.extension.configGetTitle": "扩展 {name} 配置",
     "cli.extension.configSetDescription": "设置扩展配置",
+    "cli.extension.configSetNameHelp": "扩展标识",
     "cli.extension.configSetJsonHelp": "配置 JSON 字符串",
     "cli.extension.configSetJsonError": "JSON 格式错误: {error}",
     "cli.extension.statusTitle": "扩展状态",
