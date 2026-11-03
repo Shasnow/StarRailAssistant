@@ -126,16 +126,21 @@ public class App : Application
         };
     }
     
+    /// <summary>
+    /// 界面语言对应的资源文化；也用于在切换语言后按新语言取提示文案。
+    /// </summary>
+    public static CultureInfo CultureFor(UiLanguage language) => language switch
+    {
+        UiLanguage.Chinese => new CultureInfo("zh-CN"),
+        UiLanguage.Russian => new CultureInfo("ru-RU"),
+        _ => new CultureInfo("en-US")
+    };
+
     public static void ConfigureCulture(UiLanguage language)
     {
         // ResourceManager 按 CurrentUICulture（或 Resources.Culture）查找 resx 卫星程序集，
         // 只设置 CurrentCulture 不会影响界面文案，俄语等非系统语言会继续回退到默认资源。
-        var culture = language switch
-        {
-            UiLanguage.Chinese => new CultureInfo("zh-CN"),
-            UiLanguage.Russian => new CultureInfo("ru-RU"),
-            _ => new CultureInfo("en-US")
-        };
+        var culture = CultureFor(language);
         CultureInfo.CurrentCulture = culture;
         CultureInfo.CurrentUICulture = culture;
         CultureInfo.DefaultThreadCurrentCulture = culture;

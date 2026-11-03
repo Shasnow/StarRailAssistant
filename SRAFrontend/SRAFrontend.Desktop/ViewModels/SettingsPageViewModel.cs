@@ -609,15 +609,19 @@ public partial class SettingsPageViewModel : PageViewModel
 
     private async Task AskRestartAsync()
     {
+        // 用户刚选了新语言，提示按新语言显示，而不是重启前的界面语言
+        var culture = App.CultureFor(DisplaySettings.Language);
+        string Localized(string name) => Resources.ResourceManager.GetString(name, culture) ?? name;
+
         var restartButton = SukiMessageBoxButtonsFactory.CreateButton(
-            Resources.RestartNowText, SukiMessageBoxResult.Yes, "Flat");
+            Localized(nameof(Resources.RestartNowText)), SukiMessageBoxResult.Yes, "Flat");
         var laterButton = SukiMessageBoxButtonsFactory.CreateButton(
-            Resources.LaterText, SukiMessageBoxResult.Cancel);
+            Localized(nameof(Resources.LaterText)), SukiMessageBoxResult.Cancel);
 
         var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
-            Header = Resources.LanguageChangedMessage,
-            Content = Resources.LanguageRestartConfirmMessage,
+            Header = Localized(nameof(Resources.LanguageChangedMessage)),
+            Content = Localized(nameof(Resources.LanguageRestartConfirmMessage)),
             ActionButtonsSource = [restartButton, laterButton]
         });
 
