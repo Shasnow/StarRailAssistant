@@ -1,4 +1,4 @@
-"""SRA 账号切号插件（免密码）v2.6。
+"""SRA 账号切号插件（免密码）v2.6.1。
 
 放入 SRA 的 tasks/ 目录即生效。目标账号来源按优先级：
 1. AUTO-MAS 花名册：被 MAS 拉起时从命令行的 sra-config 路径反查
@@ -49,7 +49,8 @@ _MAS_TARGET = ""
 _MAS_USER = ""  # 花名册用户名，zz_uid_map.txt 的优先键
 _MAS_RESOLVED = False
 _FLOW_LOGGED_AT = 0.0  # 插件本次登录的时间戳；0=非插件登录
-_FLOW_WINDOW = 300  # fresh 判定窗口（秒），防时间戳残留导致跨任务误判
+_FLOW_WINDOW = 600  # fresh 判定窗口（秒）：hint 手动路径在切号前打点，最坏需覆盖
+# 切号+等进游戏+UID 读取全程（约 375s），防时间戳残留导致跨任务误判
 
 
 def _load_hint() -> str:
@@ -341,10 +342,11 @@ def _record_uid(self, target: str, got: str) -> None:
         _FLOW_LOGGED_AT = 0.0  # 只记一次
 
 
-def _at_login_dialog(self) -> bool:
-    """当前是否已停在账号登录对话框（账号框+登录按钮同时在场）"""
+def _at_login_dialog(self, boxes=None) -> bool:
+    """当前是否已停在账号登录对话框（账号框+登录按钮同时在场）；
+    已有 OCR 结果时可传入 boxes 复用，省一次全屏扫描"""
     acct = btn = False
-    for b in (self.operator.ocr_boxes() or []):
+    for b in (self.operator.ocr_boxes() if boxes is None else boxes or []):
         src = b.source or ""
         if _ACCT_PAT.search(src) or "邮箱" in src:
             acct = True
@@ -358,9 +360,10 @@ def _open_login_dialog(self, timeout: float = 25) -> bool:
     deadline = time.time() + timeout
     clicked = False
     while time.time() < deadline:
-        if _at_login_dialog(self):
+        boxes = self.operator.ocr_boxes() or []  # 一次扫描同时用于在位判断和找按钮
+        if _at_login_dialog(self, boxes):
             return True
-        box = self.operator.ocr_match("登入")
+        box = next((b for b in boxes if "登入" in (b.source or "")), None)
         if box is not None:
             self.operator.click_box(box, after_sleep=2)
             clicked = True
@@ -384,7 +387,7 @@ def _safe_logout(self, timeout: float = 45) -> bool:
     while time.time() < deadline:
         boxes = self.operator.ocr_boxes() or []
         srcs = [b.source or "" for b in boxes]
-        if _at_login_dialog(self):
+        if _at_login_dialog(self, boxes):  # 复用本轮扫描结果
             return True
         if any("登录记录" in s for s in srcs):  # 保留/清除弹窗悬空，优先处理
             if not _confirm_logout_keep(self):
@@ -793,6 +796,6 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
     StartGameTask._mask_acct = staticmethod(_mask_acct)
     StartGameTask._mask_text = staticmethod(_mask_text)
     StartGameTask._zz_patched = True  # 幂等标记：防热重载/二次 import 后 _orig_login 捕获到已打补丁的方法
-    logger.info("[切号] 插件已启用 v2.6")
+    logger.info("[切号] 插件已启用 v2.6.1")
 elif StartGameTask is not None:
     logger.warning("[切号] 插件已挂载过，跳过重复加载")
