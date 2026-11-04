@@ -1,4 +1,4 @@
-"""SRA 账号切号插件（免密码）v2.6.1。
+"""SRA 账号切号插件（免密码）v2.6.2。
 
 放入 SRA 的 tasks/ 目录即生效。目标账号来源按优先级：
 1. AUTO-MAS 花名册：被 MAS 拉起时从命令行的 sra-config 路径反查
@@ -109,7 +109,7 @@ def _match(hint: str, raw: str) -> bool:
     if m and "@" in (hint or ""):
         local, domain = m.group(0).split("@", 1)
         pre = _norm(local.split("*")[0])
-        suf = _norm("@" + domain) if "@" in hint else _norm(domain)
+        suf = _norm(domain)  # _norm 会去掉 @，加不加都一样
         if pre and suf and h.startswith(pre) and h.endswith(suf):
             return True
     return False
@@ -334,7 +334,9 @@ def _record_uid(self, target: str, got: str) -> None:
                     logger.error(f"[切号] UID 记录冲突: 现有 {_mask_text(k)}={v}，实际 {got}，不覆盖，请人工核对")
                 return
         lines.append(f"{key}={got}")
-        p.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        tmp = p.with_name(p.name + ".tmp")  # 先写临时文件再原子替换，防进程被杀截断
+        tmp.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        tmp.replace(p)
         logger.info(f"[切号] UID 已记录: {_mask_text(key)}={got}")
     except Exception as e:
         logger.warning(f"[切号] 写入 zz_uid_map.txt 失败: {e}")
@@ -482,6 +484,16 @@ def _confirm_logout_keep(self) -> bool:
     return False
 
 
+def _dismiss_agreement(self, tries: int = 3) -> None:
+    """隐私协议弹窗兜底：点「同意」后复检最多 tries 轮；没弹窗只扫一次不拖时间"""
+    for _ in range(tries):
+        box = next((b for b in (self.operator.ocr_boxes() or [])
+                    if (b.source or "").strip() in ("同意", "同意并继续")), None)
+        if box is None:
+            return
+        self.operator.click_box(box, after_sleep=2)
+
+
 def _quick_login(self) -> int:
     """快速登录页直点「进入游戏」；找不到按钮则报错"""
     btn = None
@@ -495,10 +507,7 @@ def _quick_login(self) -> int:
         logger.error("[切号] 未找到「进入游戏」按钮，交由 AUTO-MAS 重试")
         return -1
     self.operator.click_box(btn, after_sleep=1)
-    for b in (self.operator.ocr_boxes() or []):  # 隐私协议弹窗兜底
-        if b.source in ("同意", "同意并继续"):
-            self.operator.click_box(b, after_sleep=1)
-            break
+    _dismiss_agreement(self)  # 隐私协议弹窗兜底
     return _wait_entered(self)
 
 
@@ -556,7 +565,7 @@ def _switch_by_history(self, hint: str) -> bool:
     while time.time() < deadline:
         for b in (self.operator.ocr_boxes() or []):
             txt = b.source or ""
-            if re.search(r"(分钟|小时|天|周|月|年)前|刚刚|昨天|今天", txt):
+            if re.search(r"(秒|分钟|小时|天|周|月|年)前|刚刚|昨天|今天", txt):
                 continue  # 条目的时间戳行，点了会选中错误账号
             if txt not in seen:
                 seen.append(txt)
@@ -580,10 +589,7 @@ def _switch_by_history(self, hint: str) -> bool:
             break
     if confirm is not None:
         self.operator.click_box(confirm, after_sleep=1)
-    for b in (self.operator.ocr_boxes() or []):  # 隐私协议弹窗兜底
-        if b.source in ("同意", "同意并继续"):
-            self.operator.click_box(b, after_sleep=1)
-            break
+    _dismiss_agreement(self)  # 隐私协议弹窗兜底
     return True
 
 
@@ -796,6 +802,6 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
     StartGameTask._mask_acct = staticmethod(_mask_acct)
     StartGameTask._mask_text = staticmethod(_mask_text)
     StartGameTask._zz_patched = True  # 幂等标记：防热重载/二次 import 后 _orig_login 捕获到已打补丁的方法
-    logger.info("[切号] 插件已启用 v2.6.1")
+    logger.info("[切号] 插件已启用 v2.6.2")
 elif StartGameTask is not None:
     logger.warning("[切号] 插件已挂载过，跳过重复加载")
