@@ -1,4 +1,4 @@
-"""SRA 账号切号插件（免密码）v2.5。
+"""SRA 账号切号插件（免密码）v2.6。
 
 放入 SRA 的 tasks/ 目录即生效。目标账号来源按优先级：
 1. AUTO-MAS 花名册：被 MAS 拉起时从命令行的 sra-config 路径反查
@@ -48,7 +48,8 @@ _VERIFIED_TTL = 900  # 已核对标记有效期（秒）
 _MAS_TARGET = ""
 _MAS_USER = ""  # 花名册用户名，zz_uid_map.txt 的优先键
 _MAS_RESOLVED = False
-_FLOW_LOGGED = ""  # 非空 = 本次进游戏是插件自己登录的
+_FLOW_LOGGED_AT = 0.0  # 插件本次登录的时间戳；0=非插件登录
+_FLOW_WINDOW = 300  # fresh 判定窗口（秒），防时间戳残留导致跨任务误判
 
 
 def _load_hint() -> str:
@@ -63,6 +64,20 @@ def _norm(s: str) -> str:
     return re.sub(r"[^0-9A-Za-z]", "", s or "")
 
 
+def _mask_acct(acct: str) -> str:
+    """账号打码只露后 2 位（日志常被贴进 issue，不出现明文）"""
+    a = acct or ""
+    return "*" * max(len(a) - 2, 3) + a[-2:]
+
+
+def _mask_text(s: str) -> str:
+    """OCR 候选等自由文本打码：≥5 位数字串只露后 2 位，邮箱本地段打码"""
+    s = re.sub(r"\d{5,}", lambda m: "*" * (len(m.group()) - 2) + m.group()[-2:], s or "")
+    if "@" in s:
+        s = re.sub(r"([A-Za-z0-9._%-])[A-Za-z0-9._%*-]{2,}@", r"\1***@", s)
+    return s
+
+
 def _split_mask(s: str):
     """提取「前缀数字+星号+后缀数字」掩码段，无则 None"""
     m = re.search(r"(\d{2,4})\*{2,}(\d{2,4})", s or "")
@@ -75,7 +90,8 @@ def _match(hint: str, raw: str) -> bool:
     h, t = _norm(hint), _norm(raw)
     if not h or not t:
         return False
-    if len(h) >= 3 and len(t) >= 3 and (h in t or t in h):
+    # 纯子串分支要求双方 ≥5 位：排除「7分钟前」等短数字串误命中
+    if len(h) >= 5 and len(t) >= 5 and (h in t or t in h):
         return True
     hm, rm = _split_mask(hint), _split_mask(raw)
     if hm and rm:
@@ -192,7 +208,7 @@ def _mas_target() -> str:
         if not acct:
             logger.warning(f"[切号] 用户「{name}」账号为空或解密失败，跳过切号")
             return ""
-        logger.info(f"[切号] 目标账号 {name} {acct[:3]}****{acct[-3:]}")
+        logger.info(f"[切号] 目标账号 {name} {_mask_acct(acct)}")
         _MAS_TARGET = acct
         _MAS_USER = name
     except Exception as e:
@@ -201,11 +217,11 @@ def _mas_target() -> str:
 
 
 def _mark_verified(self, target: str) -> None:
-    """记「已核对=目标号」标记（类属性跨实例可见）及 _FLOW_LOGGED"""
+    """记「已核对=目标号」标记（类属性跨实例可见）及插件登录时间戳"""
     try:
         type(self)._zz_verified = (target, time.time())
-        global _FLOW_LOGGED
-        _FLOW_LOGGED = target
+        global _FLOW_LOGGED_AT
+        _FLOW_LOGGED_AT = time.time()
     except Exception:
         pass
 
@@ -255,9 +271,9 @@ def _load_uid_map() -> dict:
         return {}
 
 
-def _target_uid(target: str) -> str:
-    """查目标 UID：优先花名册用户名，其次账号字符串"""
-    m = _load_uid_map()
+def _target_uid(target: str, umap=None) -> str:
+    """查目标 UID：优先花名册用户名，其次账号字符串；umap 可传入已读映射表"""
+    m = _load_uid_map() if umap is None else umap
     if not m:
         return ""
     if _MAS_USER and _MAS_USER in m:
@@ -280,25 +296,9 @@ def _read_game_uid(self, timeout: float = 15) -> str:
     return ""
 
 
-def _uid_ok(self, target: str) -> bool:
-    """UID 终验；未配置映射表或读不到 UID 时跳过放行"""
-    want = _target_uid(target)
-    if not want:
-        return True
-    got = _read_game_uid(self)
-    if not got:
-        logger.warning("[切号] 未能读取游戏内 UID，跳过终验")
-        return True
-    if got == want:
-        logger.info(f"[切号] UID 校验通过: {got}")
-        return True
-    logger.error(f"[切号] UID 校验失败: 游戏内 {got} ≠ 目标 {want}")
-    return False
-
-
-def _uid_owner(uid: str) -> str:
-    """查 UID 在映射表中的归属键，未见过的 UID 返回空"""
-    for k, v in _load_uid_map().items():
+def _uid_owner(uid: str, umap=None) -> str:
+    """查 UID 在映射表中的归属键，未见过的 UID 返回空；umap 可传入已读映射表"""
+    for k, v in (_load_uid_map() if umap is None else umap).items():
         if v == uid:
             return k
     return ""
@@ -307,7 +307,7 @@ def _uid_owner(uid: str) -> str:
 def _record_uid(self, target: str, got: str) -> None:
     """把 UID 自动写入 zz_uid_map.txt（键优先花名册用户名）；
     已有条目值不同只报错不覆盖，防错号污染映射表"""
-    global _FLOW_LOGGED
+    global _FLOW_LOGGED_AT
     key = _MAS_USER or target
     p = Path(__file__).resolve().parent.parent / "zz_uid_map.txt"
     try:
@@ -338,7 +338,7 @@ def _record_uid(self, target: str, got: str) -> None:
     except Exception as e:
         logger.warning(f"[切号] 写入 zz_uid_map.txt 失败: {e}")
     finally:
-        _FLOW_LOGGED = ""  # 只记一次
+        _FLOW_LOGGED_AT = 0.0  # 只记一次
 
 
 def _at_login_dialog(self) -> bool:
@@ -461,8 +461,12 @@ def _confirm_logout_keep(self) -> bool:
         if cancel is not None:
             self.operator.click_box(cancel, after_sleep=1)
         return False
-    self.operator.click_point(0.363, 0.530, after_sleep=1)  # 「保留」单选方块
-    self.operator.click_point(0.567, 0.630, after_sleep=3)  # 「退出」确认键
+    self.operator.click_point(0.363, 0.530, after_sleep=1)  # 「保留」单选方块（无文本，仅此一处用固定点）
+    cancel = next((b for b in boxes if (b.source or "") == "取消"), None)
+    if _click_dialog_confirm(self, cancel):  # 优先「取消」同行右侧的「退出」几何定位
+        self.operator.sleep(2)
+    else:
+        self.operator.click_point(0.567, 0.630, after_sleep=3)  # 几何定位失效退回固定坐标
     for _ in range(3):  # 过渡期 OCR 可能有残影，多等多验
         self.operator.sleep(2)
         boxes = self.operator.ocr_boxes() or []
@@ -560,9 +564,9 @@ def _switch_by_history(self, hint: str) -> bool:
             break
         self.operator.sleep(0.5)
     if target is None:
-        logger.error(f"[切号] 下拉中未找到账号「{hint}」，候选: {seen[:10]}")
+        logger.error(f"[切号] 下拉中未找到账号「{_mask_text(hint)}」，候选: {[_mask_text(s) for s in seen[:10]]}")
         return False
-    logger.info(f"[切号] 选中历史账号: {target.source}")
+    logger.info(f"[切号] 选中历史账号: {_mask_text(target.source or '')}")
     self.operator.click_box(target, after_sleep=2)  # 客户端自动回填记住的密码
 
     confirm = None  # 下拉可能遮挡原坐标，重新定位确认按钮
@@ -628,7 +632,7 @@ def _mas_switch_login(self, target: str) -> int:
     return int(state)
 
 
-if StartGameTask is not None:
+if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False):
     _orig_fill = _orig_login = _orig_laeg = None
     try:
         _orig_fill = StartGameTask._fill_credentials
@@ -647,6 +651,7 @@ if StartGameTask is not None:
 
     def _fill_credentials(self):
         """账密填全走原逻辑；未填全且有提示词时走历史账号切号"""
+        global _FLOW_LOGGED_AT
         try:
             user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
             passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
@@ -657,9 +662,8 @@ if StartGameTask is not None:
             hint = _load_hint()
             if hint:
                 try:
-                    logger.info(f"[切号] 账密未填全，改用历史账号切号（提示词: {hint}）")
-                    global _FLOW_LOGGED
-                    _FLOW_LOGGED = hint
+                    logger.info(f"[切号] 账密未填全，改用历史账号切号（提示词: {_mask_text(hint)}）")
+                    _FLOW_LOGGED_AT = time.time()
                     return _switch_by_history(self, hint)
                 except Exception as e:
                     logger.error(f"[切号] 切号流程异常，放弃自动登录: {e!r}")
@@ -690,57 +694,66 @@ if StartGameTask is not None:
     def _laeg_with_uid(self, _retry_count: int = 0):
         """login_and_enter_game 包装：进游戏后做 UID 校验与自动记录；
         沿用会话的 UID 未见或属他人 → 登出重切，最多 2 次"""
-        r = _orig_laeg(self, _retry_count)
-        if r is not True:
-            return r
+        global _FLOW_LOGGED_AT
         try:
-            global _FLOW_LOGGED
-            target = _mas_target() or _load_hint()
-            if not target:
+            r = _orig_laeg(self, _retry_count)
+            if r is not True:
                 return r
-            got = _read_game_uid(self, timeout=12)
-            fresh = bool(_FLOW_LOGGED)
-            if not got and fresh:
-                got = _read_game_uid(self, timeout=15)  # 刚登录，画面可能还在加载
-            if not got:
-                if fresh:  # 插件刚选的号，身份可信
-                    logger.warning("[切号] 未能读取游戏内 UID，插件登录会话放行")
+            try:
+                target = _mas_target() or _load_hint()
+                if not target:
                     return r
-                logger.error("[切号] 沿用会话且读不到 UID，宁报错勿错号")
+                now = time.time()
+                fresh = 0 < _FLOW_LOGGED_AT <= now and now - _FLOW_LOGGED_AT <= _FLOW_WINDOW
+                got = _read_game_uid(self, timeout=12)
+                if not got and fresh:
+                    got = _read_game_uid(self, timeout=15)  # 刚登录，画面可能还在加载
+                if not got:
+                    if fresh:  # 插件刚选的号，身份可信
+                        logger.warning("[切号] 未能读取游戏内 UID，插件登录会话放行")
+                        return r
+                    logger.error("[切号] 沿用会话且读不到 UID，宁报错勿错号")
+                    return False
+                umap = _load_uid_map()  # 只读一次，target/owner 共用
+                want = _target_uid(target, umap)
+                owner = _uid_owner(got, umap)
+                if want and got != want:
+                    logger.error(f"[切号] UID 校验失败: 游戏内 {got} ≠ 目标 {want}")
+                    return _uid_retry(self, target, _retry_count)
+                if not want:
+                    trusted = owner == _MAS_USER or _match(owner, target) or _match(target, owner)
+                    if owner and not trusted:
+                        logger.error(f"[切号] UID {got} 属于「{owner}」，非目标账号，登出重切")
+                        return _uid_retry(self, target, _retry_count)
+                    if not owner and not fresh:
+                        logger.warning(f"[切号] UID {got} 未见过且非本次登录会话，登出重切")
+                        return _uid_retry(self, target, _retry_count)
+                logger.info(f"[切号] UID 校验通过: {got}" + (f"（目标 {want}）" if want else ""))
+                if fresh:
+                    _record_uid(self, target, got)
+                return r
+            except Exception as e:
+                logger.error(f"[切号] UID 校验流程异常: {e!r}")
                 return False
-            want = _target_uid(target)
-            owner = _uid_owner(got)
-            if want and got != want:
-                logger.error(f"[切号] UID 校验失败: 游戏内 {got} ≠ 目标 {want}")
-                return _uid_retry(self, target, _retry_count)
-            if not want:
-                trusted = owner == _MAS_USER or _match(owner, target) or _match(target, owner)
-                if owner and not trusted:
-                    logger.error(f"[切号] UID {got} 属于「{owner}」，非目标账号，登出重切")
-                    return _uid_retry(self, target, _retry_count)
-                if not owner and not fresh:
-                    logger.warning(f"[切号] UID {got} 未见过且非本次登录会话，登出重切")
-                    return _uid_retry(self, target, _retry_count)
-            logger.info(f"[切号] UID 校验通过: {got}" + (f"（目标 {want}）" if want else ""))
-            if fresh:
-                _record_uid(self, target, got)
-            return r
-        except Exception as e:
-            logger.error(f"[切号] UID 校验流程异常: {e!r}")
-            return False
+        finally:
+            _FLOW_LOGGED_AT = 0.0  # 离开流程即清，防异常中断后残留误判下一会话
 
     def _uid_retry(self, target: str, _retry_count: int):
-        """UID 校验失败：清标记 → 安全登出 → 递归重跑原版流程"""
-        global _FLOW_LOGGED
+        """UID 校验失败：清标记 → 安全登出 → 重新走原版流程（最多 2 次）"""
+        global _FLOW_LOGGED_AT
         _clear_verified(self)
-        _FLOW_LOGGED = ""
+        _FLOW_LOGGED_AT = 0.0
         if _retry_count >= 2:
             logger.error("[切号] 重切 2 次 UID 仍不匹配，请核对 zz_uid_map.txt")
             return False
         if not _safe_logout(self):
             return False
         logger.info("[切号] 已退回登录界面，重新切号登录")
-        return _laeg_with_uid(self, _retry_count + 1)
+        try:
+            return _laeg_with_uid(self, _retry_count + 1)
+        except Exception as e:
+            logger.error(f"[切号] 重切流程异常: {e!r}，交由 AUTO-MAS 重试")
+            return False
 
     # CLI 默认 --log-level TRACE，OCR 坐标/模板探测刷屏；降为 INFO（放 zz_debug.txt 可恢复）
     if not (Path.cwd() / "zz_debug.txt").exists():
@@ -773,9 +786,13 @@ if StartGameTask is not None:
     StartGameTask._open_login_dialog = _open_login_dialog
     StartGameTask._confirm_logout_keep = _confirm_logout_keep
     StartGameTask._click_dialog_confirm = _click_dialog_confirm
-    StartGameTask._uid_ok = _uid_ok
     StartGameTask._read_game_uid = _read_game_uid
     StartGameTask._uid_owner = staticmethod(_uid_owner)
     StartGameTask._target_uid = staticmethod(_target_uid)
     StartGameTask._load_uid_map = staticmethod(_load_uid_map)
-    logger.info("[切号] 插件已启用 v2.5")
+    StartGameTask._mask_acct = staticmethod(_mask_acct)
+    StartGameTask._mask_text = staticmethod(_mask_text)
+    StartGameTask._zz_patched = True  # 幂等标记：防热重载/二次 import 后 _orig_login 捕获到已打补丁的方法
+    logger.info("[切号] 插件已启用 v2.6")
+elif StartGameTask is not None:
+    logger.warning("[切号] 插件已挂载过，跳过重复加载")
