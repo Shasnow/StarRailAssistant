@@ -328,13 +328,13 @@ def _record_uid(self, target: str, got: str) -> None:
                 continue
             if k == key or _match(k, target) or _match(target, k):
                 if v == got:
-                    logger.info(f"[切号] UID 已记录: {k}={got}")
+                    logger.info(f"[切号] UID 已记录: {_mask_text(k)}={got}")
                 else:
-                    logger.error(f"[切号] UID 记录冲突: 现有 {k}={v}，实际 {got}，不覆盖，请人工核对")
+                    logger.error(f"[切号] UID 记录冲突: 现有 {_mask_text(k)}={v}，实际 {got}，不覆盖，请人工核对")
                 return
         lines.append(f"{key}={got}")
         p.write_text("\n".join(lines) + "\n", encoding="utf-8")
-        logger.info(f"[切号] UID 已记录: {key}={got}")
+        logger.info(f"[切号] UID 已记录: {_mask_text(key)}={got}")
     except Exception as e:
         logger.warning(f"[切号] 写入 zz_uid_map.txt 失败: {e}")
     finally:
@@ -723,7 +723,7 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
                 if not want:
                     trusted = owner == _MAS_USER or _match(owner, target) or _match(target, owner)
                     if owner and not trusted:
-                        logger.error(f"[切号] UID {got} 属于「{owner}」，非目标账号，登出重切")
+                        logger.error(f"[切号] UID {got} 属于「{_mask_text(owner)}」，非目标账号，登出重切")
                         return _uid_retry(self, target, _retry_count)
                     if not owner and not fresh:
                         logger.warning(f"[切号] UID {got} 未见过且非本次登录会话，登出重切")
