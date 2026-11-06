@@ -1,4 +1,4 @@
-"""SRA 账号切号插件（免密码）v2.6.2。
+"""SRA 账号切号插件（免密码）v2.6.3。
 
 放入 SRA 的 tasks/ 目录即生效。目标账号来源按优先级：
 1. AUTO-MAS 花名册：被 MAS 拉起时从命令行的 sra-config 路径反查
@@ -630,32 +630,8 @@ def _ocr_shown_account(self) -> str:
     return ""
 
 
-def _mas_switch_login(self, target: str) -> int:
-    """花名册模式登录：核对/切换到目标账号后再进游戏"""
-    state = self._detect_login_state()
-    if state is None:
-        logger.error("[切号] 未等到登录界面，交由 AUTO-MAS 重试")
-        return -1
-    if state == LoginStatus.NEW_VERSION_PAGE:
-        logger.error("[切号] 游戏需要更新，交由 AUTO-MAS 重试")
-        return -1
-    if state == LoginStatus.LOGIN_PAGE:
-        shown = _ocr_shown_account(self)
-        if shown and _match(target, shown):
-            logger.info(f"[切号] 记住账号 {shown} 与目标一致，直接登录")
-            r = _quick_login(self)
-            if r == 1:
-                _mark_verified(self, target)
-            return r
-        logger.info(f"[切号] 记住账号({shown or '未识别'}) ≠ 目标，执行切号")
-        if _switch_by_history(self, target):
-            r = _wait_entered(self)
-            if r == 1:
-                _mark_verified(self, target)
-            return r
-        logger.error("[切号] 切号失败，交由 AUTO-MAS 重试")
-        return -1
-    # 已在游戏主界面：核对过且目标一致则沿用，否则登出重核
+def _handle_entered(self, target: str, state) -> int:
+    """已登录状态处理：核对过则沿用，否则登出重切"""
     if _check_verified(self, target):
         logger.info("[切号] 游戏内会话为已核对的目标账号，沿用")
         return int(state)
@@ -667,6 +643,44 @@ def _mas_switch_login(self, target: str) -> int:
         return r
     logger.error("[切号] 登出/切号失败，沿用当前登录状态（错号风险）")
     return int(state)
+
+
+def _mas_switch_login(self, target: str) -> int:
+    """花名册模式登录：核对/切换到目标账号后再进游戏"""
+    state = self._detect_login_state()
+    if state is None:
+        logger.error("[切号] 未等到登录界面，交由 AUTO-MAS 重试")
+        return -1
+    if state == LoginStatus.NEW_VERSION_PAGE:
+        logger.error("[切号] 游戏需要更新，交由 AUTO-MAS 重试")
+        return -1
+    if state != LoginStatus.LOGIN_PAGE:
+        return _handle_entered(self, target, state)
+    shown = _ocr_shown_account(self)
+    if shown and _match(target, shown):
+        logger.info(f"[切号] 记住账号 {shown} 与目标一致，直接登录")
+        r = _quick_login(self)
+        if r == 1:
+            _mark_verified(self, target)
+        return r
+    logger.info(f"[切号] 记住账号({shown or '未识别'}) ≠ 目标，执行切号")
+    try:
+        switched = _switch_by_history(self, target)
+    except RuntimeError:
+        # 「登录」命中可能是自动登录过场的瞬时态（记忆密码登录页一闪即进主界面），
+        # 复核真实状态：已在游戏内则按已登录处理，其余维持报错交 MAS 重试
+        state2 = self._detect_login_state()
+        if state2 is None or state2 == LoginStatus.LOGIN_PAGE:
+            raise
+        logger.info("[切号] 登录页等待超时但游戏已在主界面，按已登录复核处理")
+        return _handle_entered(self, target, state2)
+    if switched:
+        r = _wait_entered(self)
+        if r == 1:
+            _mark_verified(self, target)
+        return r
+    logger.error("[切号] 切号失败，交由 AUTO-MAS 重试")
+    return -1
 
 
 if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False):
@@ -824,6 +838,6 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
     StartGameTask._mask_acct = staticmethod(_mask_acct)
     StartGameTask._mask_text = staticmethod(_mask_text)
     StartGameTask._zz_patched = True  # 幂等标记：防热重载/二次 import 后 _orig_login 捕获到已打补丁的方法
-    logger.info("[切号] 插件已启用 v2.6.2")
+    logger.info("[切号] 插件已启用 v2.6.3")
 elif StartGameTask is not None:
     logger.warning("[切号] 插件已挂载过，跳过重复加载")
