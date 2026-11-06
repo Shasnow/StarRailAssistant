@@ -20,9 +20,37 @@ import re
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 from SRACore.util import encryption
 from SRACore.util.logger import logger
+
+_raw_logger = logger
+
+# 本插件只对自身输出降级：全局 setup_logger(level="INFO") 会 logger.remove() 重建全部 sink，
+# 既吞掉别处的 DEBUG 日志（服务端冒烟测试靠 "Successfully load task" 判断任务是否加载），
+# 也会删掉服务端 SSE 日志流 sink。放 zz_debug.txt 可恢复本插件自身的 DEBUG 输出。
+_DEBUG_ENABLED = (Path.cwd() / "zz_debug.txt").exists()
+
+
+class _ScopedLogger:
+    """按级别过滤的 logger 代理：仅影响本插件自己的日志调用，不动全局配置。"""
+
+    _LEVELS = {"TRACE": 0, "DEBUG": 1, "INFO": 2, "SUCCESS": 3,
+               "WARNING": 4, "ERROR": 5, "CRITICAL": 6}
+
+    def __init__(self, sink: Any, min_level: str = "INFO") -> None:
+        self._sink = sink
+        self._min = self._LEVELS.get(min_level.upper(), 2)
+
+    def __getattr__(self, name: str):
+        level = self._LEVELS.get(name.upper())
+        if level is not None and level < self._min:
+            return lambda *args, **kwargs: None
+        return getattr(self._sink, name)
+
+
+logger = _ScopedLogger(_raw_logger, "DEBUG" if _DEBUG_ENABLED else "INFO")
 
 try:
     from tasks.StartGameTask import LoginStatus, StartGameTask
@@ -764,13 +792,7 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
             logger.error(f"[切号] 重切流程异常: {e!r}，交由 AUTO-MAS 重试")
             return False
 
-    # CLI 默认 --log-level TRACE，OCR 坐标/模板探测刷屏；降为 INFO（放 zz_debug.txt 可恢复）
-    if not (Path.cwd() / "zz_debug.txt").exists():
-        try:
-            from SRACore.util.logger import setup_logger
-            setup_logger(level="INFO")
-        except Exception:
-            pass
+    # 日志降级已在模块导入时按插件自身作用域处理（见 _ScopedLogger），此处不再动全局配置
     if _orig_fill is not None:
         StartGameTask._fill_credentials = _fill_credentials
     if _orig_login is not None:
