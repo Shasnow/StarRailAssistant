@@ -1,4 +1,4 @@
-"""SRA 账号切号插件（免密码）v2.6.3。
+"""SRA 账号切号插件（免密码）v2.6.4。
 
 放入 SRA 的 tasks/ 目录即生效。目标账号来源按优先级：
 1. AUTO-MAS 花名册：被 MAS 拉起时从命令行的 sra-config 路径反查
@@ -271,6 +271,18 @@ def _check_verified(self, target: str) -> bool:
     except Exception:
         pass
     return False
+
+
+def _save_error_shot(self, tag: str) -> None:
+    """失败现场截图留证：log/zz_error/<时间戳>_<tag>.png，失败静默不影响主流程"""
+    try:
+        d = Path.cwd() / "log" / "zz_error"
+        d.mkdir(parents=True, exist_ok=True)
+        p = d / f"{time.strftime('%Y%m%d-%H%M%S')}_{tag}.png"
+        self.operator.screenshot(save_path=str(p))
+        logger.warning(f"[切号] 失败现场已截图: log/zz_error/{p.name}")
+    except Exception:
+        pass
 
 
 def _wait_entered(self) -> int:
@@ -642,6 +654,7 @@ def _handle_entered(self, target: str, state) -> int:
             _mark_verified(self, target)
         return r
     logger.error("[切号] 登出/切号失败，沿用当前登录状态（错号风险）")
+    _save_error_shot(self, "logout_switch_fail")
     return int(state)
 
 
@@ -680,6 +693,7 @@ def _mas_switch_login(self, target: str) -> int:
             _mark_verified(self, target)
         return r
     logger.error("[切号] 切号失败，交由 AUTO-MAS 重试")
+    _save_error_shot(self, "switch_fail")
     return -1
 
 
@@ -717,6 +731,7 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
                     _FLOW_LOGGED_AT = time.time()
                     return _switch_by_history(self, hint)
                 except Exception as e:
+                    _save_error_shot(self, "hint_switch_error")
                     logger.error(f"[切号] 切号流程异常，放弃自动登录: {e!r}")
                     return False
             logger.error("[切号] 登录账密未设置且 account_hint.txt 为空")
@@ -739,6 +754,7 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
         try:
             return _mas_switch_login(self, target)
         except Exception as e:
+            _save_error_shot(self, "mas_switch_error")
             logger.error(f"[切号] 花名册切号流程异常: {e!r}，交由 AUTO-MAS 重试")
             return -1
 
@@ -764,6 +780,7 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
                         logger.warning("[切号] 未能读取游戏内 UID，插件登录会话放行")
                         return r
                     logger.error("[切号] 沿用会话且读不到 UID，宁报错勿错号")
+                    _save_error_shot(self, "uid_unreadable")
                     return False
                 umap = _load_uid_map()  # 只读一次，target/owner 共用
                 want = _target_uid(target, umap)
@@ -784,6 +801,7 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
                     _record_uid(self, target, got)
                 return r
             except Exception as e:
+                _save_error_shot(self, "uid_check_error")
                 logger.error(f"[切号] UID 校验流程异常: {e!r}")
                 return False
         finally:
@@ -796,6 +814,7 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
         _FLOW_LOGGED_AT = 0.0
         if _retry_count >= 2:
             logger.error("[切号] 重切 2 次 UID 仍不匹配，请核对 zz_uid_map.txt")
+            _save_error_shot(self, "uid_mismatch")
             return False
         if not _safe_logout(self):
             return False
@@ -838,6 +857,6 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
     StartGameTask._mask_acct = staticmethod(_mask_acct)
     StartGameTask._mask_text = staticmethod(_mask_text)
     StartGameTask._zz_patched = True  # 幂等标记：防热重载/二次 import 后 _orig_login 捕获到已打补丁的方法
-    logger.info("[切号] 插件已启用 v2.6.3")
+    logger.info("[切号] 插件已启用 v2.6.4")
 elif StartGameTask is not None:
     logger.warning("[切号] 插件已挂载过，跳过重复加载")
