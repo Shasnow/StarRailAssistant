@@ -1,4 +1,4 @@
-"""SRA 账号切号插件（免密码）v2.6.5。
+"""SRA 账号切号插件（免密码）v2.6.6。
 
 放入 SRA 的 tasks/ 目录即生效。目标账号来源按优先级：
 1. AUTO-MAS 花名册：被 MAS 拉起时从命令行的 sra-config 路径反查
@@ -79,6 +79,12 @@ _MAS_RESOLVED = False
 _FLOW_LOGGED_AT = 0.0  # 插件本次登录的时间戳；0=非插件登录
 _FLOW_WINDOW = 600  # fresh 判定窗口（秒）：hint 手动路径在切号前打点，最坏需覆盖
 # 切号+等进游戏+UID 读取全程（约 375s），防时间戳残留导致跨任务误判
+
+
+_LOGIN_BTN_WORDS = ("登录", "进入游戏")  # 登录页确认键
+_CONFIRM_BTN_WORDS = _LOGIN_BTN_WORDS + ("开始游戏",)  # 选号后确认键，兼容欢迎页文案
+_BOX_SCAN_TIMEOUT = 6  # 登录页按钮定位短轮询窗口（秒），抗 OCR 瞬时空帧
+_UID_PRECHECK_TIMEOUT = 3  # 主界面沿用判定的 UID 快速探测窗口（秒）
 
 
 def _load_hint() -> str:
@@ -582,20 +588,29 @@ def _wait_login_page(self, timeout: float = 40) -> None:
     raise RuntimeError("等待登录界面超时")
 
 
+def _scan_login_boxes(self, need_acct: bool = True, timeout=None):
+    """登录页元素短轮询定位：返回 (账号框, 登录按钮)；OCR 空帧不直接判失败"""
+    deadline = time.time() + (_BOX_SCAN_TIMEOUT if timeout is None else timeout)
+    words = _LOGIN_BTN_WORDS if need_acct else _CONFIRM_BTN_WORDS
+    while time.time() < deadline:
+        acct = login = None
+        for b in (self.operator.ocr_boxes() or []):
+            src = b.source or ""
+            if any(w in src for w in words) and "其他账号" not in src and "退出" not in src:
+                login = b
+            if acct is None and (_ACCT_PAT.search(src) or "邮箱" in src):
+                acct = b
+        if login is not None and (acct is not None or not need_acct):
+            return acct, login
+        self.operator.sleep(0.5)
+    return None, None
+
+
 def _switch_by_history(self, hint: str) -> bool:
     """点账号框触发历史账号下拉 → 选目标号 → 确认登录（不进入游戏）"""
     _wait_login_page(self)
-    boxes = self.operator.ocr_boxes()
-    if boxes is None:
-        raise RuntimeError("未检测到登录界面")
-    acct = login = None
-    for b in boxes:
-        src = b.source or ""
-        if ("登录" in src or "进入游戏" in src) and "其他账号" not in src and "退出" not in src:
-            login = b
-        if acct is None and (_ACCT_PAT.search(src) or "邮箱" in src):
-            acct = b
-    if acct is None or login is None:
+    acct, _ = _scan_login_boxes(self)
+    if acct is None:
         raise RuntimeError("未找到账号信息框或登录按钮")
 
     self.operator.click_box(acct, after_sleep=1)  # 触发历史账号下拉
@@ -621,14 +636,12 @@ def _switch_by_history(self, hint: str) -> bool:
     logger.info(f"[切号] 选中历史账号: {_mask_text(target.source or '')}")
     self.operator.click_box(target, after_sleep=2)  # 客户端自动回填记住的密码
 
-    confirm = None  # 下拉可能遮挡原坐标，重新定位确认按钮
-    for b in (self.operator.ocr_boxes() or []):
-        src = b.source or ""
-        if ("登录" in src or "进入游戏" in src) and "其他账号" not in src and "退出" not in src:
-            confirm = b
-            break
-    if confirm is not None:
-        self.operator.click_box(confirm, after_sleep=1)
+    _, confirm = _scan_login_boxes(self, need_acct=False)  # 下拉可能遮挡原坐标，重新定位
+    if confirm is None:
+        logger.error("[切号] 选中账号后未找到登录按钮，放弃本次切号")
+        _save_error_shot(self, "confirm_missing")
+        return False
+    self.operator.click_box(confirm, after_sleep=1)
     _dismiss_agreement(self)  # 隐私协议弹窗兜底
     return True
 
@@ -647,6 +660,16 @@ def _handle_entered(self, target: str, state) -> int:
     if _check_verified(self, target):
         logger.info("[切号] 游戏内会话为已核对的目标账号，沿用")
         return int(state)
+    # 新进程里核对标记必然丢失；主界面 UID 可读且与目标一致时直接沿用，
+    # 省掉一轮完整登出+切号（约 80s），读不到或不匹配仍走原流程
+    try:
+        want = _target_uid(target, _load_uid_map())
+        if want and _read_game_uid(self, timeout=_UID_PRECHECK_TIMEOUT) == want:
+            logger.info("[切号] 游戏内 UID 与目标一致，沿用当前会话，跳过登出切号")
+            _mark_verified(self, target)
+            return int(state)
+    except Exception:
+        pass
     logger.info("[切号] 游戏已登录，登出后切到目标账号")
     if _safe_logout(self) and _switch_by_history(self, target):
         r = _wait_entered(self)
@@ -671,12 +694,12 @@ def _mas_switch_login(self, target: str) -> int:
         return _handle_entered(self, target, state)
     shown = _ocr_shown_account(self)
     if shown and _match(target, shown):
-        logger.info(f"[切号] 记住账号 {shown} 与目标一致，直接登录")
+        logger.info(f"[切号] 记住账号 {_mask_text(shown)} 与目标一致，直接登录")
         r = _quick_login(self)
         if r == 1:
             _mark_verified(self, target)
         return r
-    logger.info(f"[切号] 记住账号({shown or '未识别'}) ≠ 目标，执行切号")
+    logger.info(f"[切号] 记住账号({_mask_text(shown) if shown else '未识别'}) ≠ 目标，执行切号")
     try:
         switched = _switch_by_history(self, target)
     except RuntimeError:
@@ -723,7 +746,7 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
         except Exception as e:
             logger.warning(f"[切号] 读取登录配置失败，交还原版逻辑: {e}")
             return _orig_fill(self)
-        if user == "" or passwd == "":
+        if not user or not passwd:
             hint = _load_hint()
             if hint:
                 try:
@@ -857,6 +880,6 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
     StartGameTask._mask_acct = staticmethod(_mask_acct)
     StartGameTask._mask_text = staticmethod(_mask_text)
     StartGameTask._zz_patched = True  # 幂等标记：防热重载/二次 import 后 _orig_login 捕获到已打补丁的方法
-    logger.info("[切号] 插件已启用 v2.6.5")
+    logger.info("[切号] 插件已启用 v2.6.6")
 elif StartGameTask is not None:
     logger.warning("[切号] 插件已挂载过，跳过重复加载")
