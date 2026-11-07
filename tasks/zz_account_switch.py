@@ -1,4 +1,4 @@
-"""SRA 账号切号插件（免密码）v2.6.4。
+"""SRA 账号切号插件（免密码）v2.6.5。
 
 放入 SRA 的 tasks/ 目录即生效。目标账号来源按优先级：
 1. AUTO-MAS 花名册：被 MAS 拉起时从命令行的 sra-config 路径反查
@@ -227,7 +227,7 @@ def _mas_target() -> str:
         if ctx is None:
             return ""
         root, uid = ctx
-        cfg = json.loads((root / "config" / "ScriptConfig.json").read_text(encoding="utf-8"))
+        cfg = json.loads((root / "config" / "ScriptConfig.json").read_text(encoding="utf-8-sig"))
         info = _find_user(cfg, uid)
         if info is None:
             logger.warning("[切号] 花名册中未找到当前用户，跳过切号")
@@ -857,6 +857,6 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
     StartGameTask._mask_acct = staticmethod(_mask_acct)
     StartGameTask._mask_text = staticmethod(_mask_text)
     StartGameTask._zz_patched = True  # 幂等标记：防热重载/二次 import 后 _orig_login 捕获到已打补丁的方法
-    logger.info("[切号] 插件已启用 v2.6.4")
+    logger.info("[切号] 插件已启用 v2.6.5")
 elif StartGameTask is not None:
     logger.warning("[切号] 插件已挂载过，跳过重复加载")
