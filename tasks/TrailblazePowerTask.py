@@ -403,7 +403,7 @@ class TrailblazePowerTask(BaseTask):
             return False
         if not self.find_level(level):
             return False
-        if not self.operator.click_img(level, x_offset=700):
+        if not self.operator.click_img(level, x_offset=770):
             logger.error("点击关卡失败")
             return False
         if not self.operator.wait_img(TPIMG.ORNAMENT_EXTRACTION_PAGE, timeout=20):  # 等待传送
