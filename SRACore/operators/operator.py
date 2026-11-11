@@ -330,8 +330,10 @@ class Operator(IOperator):
             x, y = float(x), float(y)
         elif mode != "auto":
             raise ValueError(f"Invalid mode: {mode!r}, expected 'abs', 'rel' or 'auto'")
-        if isinstance(x_offset, float) and isinstance(y_offset, float):
+        # 偏移量按各自类型换算：int 为像素，float 为窗口比例（允许只给一个方向传比例）
+        if isinstance(x_offset, float):
             x_offset = int(self.window_context.width * x_offset)
+        if isinstance(y_offset, float):
             y_offset = int(self.window_context.height * y_offset)
 
         if isinstance(x, int) and isinstance(y, int):

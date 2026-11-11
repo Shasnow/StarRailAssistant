@@ -446,7 +446,7 @@ class IOperator(ABC):
     def wait_ocr_any(self,
                      texts: Sequence[str | StrMatcher],
                      confidence: float | None = None,
-                     interval: float = 0.2,
+                     interval: float = 0.5,
                      timeout: float = 10,
                      *args: Any,
                      **kwargs: Any) -> tuple[int, Box | None]:
