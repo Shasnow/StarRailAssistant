@@ -10,6 +10,7 @@
 - 添加 Docker 部署支持
 - WebUI: 支持在实时预览画面时直接发送键鼠操作
 - 新增免密码历史账号切号插件，密码留空时支持免密码从历史账号切号
+- 适配4.7版本「此刻，将群星付之一笑」
 
 ### 问题修复：
 
@@ -69,10 +70,10 @@ SRA 现在支持 Docker 部署，详见 [Docker 部署说明](https://starrailas
 [已有 Mirror酱 CDK ？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=StarRailAssistant&source=sra-release)
 
 下载说明: 
-- [StarRailAssistant_v${VERSION}.zip](https://github.com/StarRailAssistant/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_v${VERSION}.zip) - 主程序包（推荐）
-- [StarRailAssistant_v${VERSION}_Setup.exe](https://github.com/StarRailAssistant/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_v${VERSION}_Setup.exe) - 主程序安装包（推荐）
-- [StarRailAssistant_Core_v${VERSION}.zip](https://github.com/StarRailAssistant/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_Core_v${VERSION}.zip) - 核心包（内嵌 Python 3.12 运行时与源码）
-- [StarRailAssistant_Lite_v${VERSION}.zip](https://github.com/StarRailAssistant/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_Lite_v${VERSION}.zip) - 轻量版（需要手动安装和配置 Python 环境）
+- [StarRailAssistant_v${VERSION}.zip](https://github.com/Shasnow/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_v${VERSION}.zip) - 主程序包（推荐）
+- [StarRailAssistant_v${VERSION}_Setup.exe](https://github.com/Shasnow/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_v${VERSION}_Setup.exe) - 主程序安装包（推荐）
+- [StarRailAssistant_Core_v${VERSION}.zip](https://github.com/Shasnow/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_Core_v${VERSION}.zip) - 核心包（内嵌 Python 3.12 运行时与源码）
+- [StarRailAssistant_Lite_v${VERSION}.zip](https://github.com/Shasnow/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_Lite_v${VERSION}.zip) - 轻量版（需要手动安装和配置 Python 环境）
 
 需要安装 [.NET 桌面运行时 10.0](https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0) 才能运行
 主程序包与核心包已内置 Python 3.12 运行时，无需额外安装；轻量版需自行安装 Python 3.12

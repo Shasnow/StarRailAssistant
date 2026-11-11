@@ -73,6 +73,7 @@ class Character:
     # schools: list[School]  # 派系
     cost: int  # 费用
     positioning: Positioning  # 默认站位
+    alias: list[str] = dataclasses.field(default_factory=list)  # 别名
     position: Positioning | None = None  # 实际站位（适配攻略的特殊情况）
     priority: int | None = None  # 优先级
     is_placed: bool = False  # 是否已放置
@@ -105,7 +106,7 @@ class Characters:
     Cyrene = Character('昔涟', 4, Positioning.OnField)
     DanHeng_PermansorTerrae = Character('丹恒·腾荒', 2, Positioning.OffField)
     Evernight = Character('长夜月', 1, Positioning.OnOffField)
-    Cerydra = Character('刻律德菈', 1, Positioning.OffField)
+    Cerydra = Character('刻律德菈', 1, Positioning.OffField, alias=['刻律德拉', '刻律德'])
     Hysilens = Character('海瑟音', 2, Positioning.OnOffField)
     Archer = Character('Archer', 5, Positioning.OnField)
     Saber = Character('Saber', 3, Positioning.OnOffField)
@@ -164,7 +165,7 @@ class Characters:
     Herta = Character('黑塔', 1, Positioning.OnOffField)
     Trailblazer = Character('开拓者', 3, Positioning.OnOffField)
     TheDahlia = Character('大丽花', 3, Positioning.OnOffField)
-    YaoGuang = Character('爻光', 3, Positioning.OffField)
+    YaoGuang = Character('爻光', 3, Positioning.OffField, alias=['交光'])
     Sparxie = Character('火花', 1, Positioning.OnOffField)
     Ashveil = Character('不死途', 5, Positioning.OffField)
     SilverWolfLV999 = Character('银狼LV.999', 5, Positioning.OnField)
@@ -187,83 +188,14 @@ class Characters:
 
 
 
-    # 角色列表
-    characters: dict[str, Character] = {
-        '貊泽': Moze,
-        '乱破': Rappa,
-        '花火': Sparkle,
-        '遐蝶': Castorice,
-        '银枝': Argenti,
-        '丹恒·饮月': DanHeng_ImbibitorLunae,
-        '灵砂': Lingsha,
-        '大黑塔': TheHerta,
-        '托帕&账账': TopazAndNumby,
-        '景元': JingYuan,
-        '云璃': Yunli,
-        '昔涟': Cyrene,
-        '布洛妮娅': Bronya,
-        '罗刹': Luocha,
-        '知更鸟': Robin,
-        '姬子': Himeko,
-        '镜流': Jingliu,
-        '真理医生': DrRatio,
-        '那刻夏': Anaxa,
-        '长夜月': Evernight,
-        '飞霄': Feixiao,
-        '阮·梅': RuanMei,
-        '砂金': Aventurine,
-        '缇宝': Tribbie,
-        '万敌': Mydei,
-        '风堇': Hyacine,
-        '丹恒·腾荒': DanHeng_PermansorTerrae,
-        '黑塔': Herta,
-        '赛飞儿': Cipher,
-        '青雀': Qingque,
-        '刃': Blade,
-        '翡翠': Jade,
-        '瓦尔特': Welt,
-        'Archer': Archer,
-        '黑天鹅': BlackSwan,
-        '流萤': Firefly,
-        '银狼': SilverWolf,
-        '杰帕德': Gepard,
-        '符玄': FuXuan,
-        '波提欧': Boothill,
-        '彦卿': Yanqing,
-        '海瑟音': Hysilens,
-        'Saber': Saber,
-        '希儿': Seele,
-        '娜塔莎': Natasha,
-        '忘归人': Fugue,
-        '黄泉': Acheron,
-        '星期日': Sunday,
-        '白厄': Phainon,
-        '刻律德拉': Cerydra,
-        '刻律德菈': Cerydra,
-        '刻律德': Cerydra,
-        '卡芙卡': Kafka,
-        '佩拉': Pela,
-        '藿藿': Huohuo,
-        '三月七': March7th,
-        '艾丝妲': Asta,
-        '桑博': Sampo,
-        '停云': Tingyun,
-        '椒丘': Jiaoqiu,
-        '加拉赫': Gallagher,
-        '阿格莱雅': Aglaea,
-        '开拓者': Trailblazer,
-        '大丽花': TheDahlia,
-        '交光': YaoGuang,
-        '爻光': YaoGuang,
-        '火花': Sparxie,
-        '不死途': Ashveil,
-        '银狼LV.999': SilverWolfLV999,
-        '绯英': Evanescia,
-        '姬子·启行': Himoko_Nova,
-        '千冶·刃': Mortenax_Blade,
-        '远坂凛': Rin_Tohsaka,
-        '吉尔伽美什': Gilgamesh,
-    }
+    # 角色列表: 由类属性中的 Character 实例及其别名自动生成
+    characters: dict[str, Character] = {}
+    for _character in list(locals().values()):
+        if isinstance(_character, Character):
+            characters[_character.name] = _character
+            for _alias in _character.alias:
+                characters[_alias] = _character
+    del _character, _alias
     username = '开拓者'  # 角色名称
 
     @classmethod

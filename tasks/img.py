@@ -191,6 +191,7 @@ class CWIMG:
     SELECT_SIMPLE_EQUIPMENT = f"{BASE}/select_simple_equipment.png"
     STORE = f"{BASE}/store.png"
     THE_PLANET_OF_FESTIVITIES = f"{BASE}/ThePlanetOfFestivities.png"
+    TEA_BREAK = f"{BASE}/tea_break.png"
     WITHDRAW_AND_SETTLE = f"{BASE}/withdraw_and_settle.png"
 # endregion
 

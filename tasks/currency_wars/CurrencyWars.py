@@ -49,7 +49,9 @@ class CurrencyWars(Executable):
             "盛会之星": ("盛会之星", self.handle_the_planet_of_festivities),
             "命运圣杯": ("祈愿试炼", self.handle_wish_trial),
             "头号玩家": ("我来当策划", self.handle_silver_wolf_lv999),
-            "命运卜者": ("命运卜者", self.handle_fortune_teller)
+            "命运卜者": ("命运卜者", self.handle_fortune_teller),
+            "开拓银轨": ("开拓商店", self.handle_trailblaze_store),
+            "奇兽花园": ("奇兽花园", self.handle_beast_garden)
         }
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
@@ -358,7 +360,12 @@ class CurrencyWars(Executable):
         # 处理Boss信息 + 点击下一步
         self.operator.sleep(0.5)
         self.handle_boss_info()
-        if not self.operator.click_box(next_step_box, after_sleep=2):
+        if not self.operator.do_while(
+            lambda: self.operator.click_box(next_step_box, after_sleep=1),
+            lambda: self.operator.locate(CWIMG.NEXT_STEP) is not None,
+            interval=1,
+            max_iterations=10
+        ):
             logger.error("[Boss信息] 点击下一步按钮失败")
             return False
         # 点击空白处
@@ -782,12 +789,19 @@ class CurrencyWars(Executable):
         logger.info("出售操作完成")
 
     def battle(self) -> bool:
-        index, battle_box = self.operator.wait_any_img([CWIMG.BATTLE, CWIMG.SKIP], timeout=3, interval=0.5)
-        if battle_box is None or not self.operator.click_box(battle_box, after_sleep=1.5):
-            logger.error("未识别到战斗按钮或跳过按钮")
-            return False
+        index, box = self.operator.wait_ocr_any(["出战", "跳过", "幕后茶歇", "选择主角"], from_x=0.9, from_y=0.65, to_x=0.98, to_y=0.75)
+        if index == -1:
+            # 没有识别到任何已知按钮
+            raise RuntimeError("未识别到战斗按钮或跳过按钮")
+        self.operator.click_box(box, after_sleep=1.5)
         if index == 1:  # 点击的是跳过按钮，战斗直接结束
             logger.info("跳过战斗")
+        if index == 2:  # 幕后茶歇
+            self.handle_tea_break()
+            return True
+        if index == 3:  # 选择主角
+            self.handle_protagonist_selection()
+            return self.battle()  # 选择完主角后重新进入战斗流程
         else:
             ocr_i, ocr_b = self.operator.ocr_match_any(["无角色", "未达上限"], from_x=0.36, from_y=0.44, to_x=0.64, to_y=0.5)
             # 检查前台区域是否有角色
@@ -1014,6 +1028,15 @@ class CurrencyWars(Executable):
         """处理命运圣杯事件的逻辑"""
         return self._handle_selection_event((0.22, 0.42, 0.85, 0.465), self.strategy_special_events.get("命运圣杯", ""))
 
+    def handle_trailblaze_store(self):
+        """处理开拓银轨事件的逻辑"""
+        return self.operator.click_point(0.5, 0.6)
+
+    def handle_beast_garden(self):
+        """处理奇兽花园事件的逻辑"""
+        return self._handle_selection_event((0.22, 0.34, 0.85, 0.4),
+                                            self.strategy_special_events.get("奇兽花园", ""))
+
     def detect_special_event(self) -> str:
         """检测当前是否有特殊事件发生，并返回事件名称"""
         result = self.operator.ocr(from_x=0.49, from_y=0.038, to_x=0.60, to_y=0.11)
@@ -1046,6 +1069,78 @@ class CurrencyWars(Executable):
                 raise RuntimeError("特殊事件处理失败")
             self.handle_special_event()  # 递归处理
         # 未检测到事件，退出
+
+    # ==================== 幕后茶歇节点 ====================
+    def handle_tea_break(self) -> bool:
+        """处理「幕后茶歇」奇遇节点。
+
+        该节点出现时界面右侧不会显示出战按钮，而是显示「幕后茶歇」按钮。
+        点击后在「与奇遇伙伴对话（触发特殊事件）」与「享用茶歇（回复 20 点小队生命值）」中二选一，
+        并推进后续对话、奖励选择与开箱流程，直到回到备战界面。
+
+        :return: True-已处理完茶歇事件并回到备战界面；False-当前不是茶歇节点或处理失败
+        """
+
+        def _is_tea_break_health_low() -> bool:
+            """读取茶歇界面顶部的生命值，判断是否需要优先回复生命"""
+            result = self.operator.ocr(from_x=0.49, from_y=0.03, to_x=0.57, to_y=0.12)
+            for item in result or []:
+                text = str(item[1]).strip()
+                if text.isdigit():
+                    health = int(text)
+                    logger.info(f"[幕后茶歇] 当前生命值：{health}")
+                    return health <= 40
+            return False
+
+        def _drive_tea_break(_option: tuple[float, float]) -> bool:
+            """推进茶歇事件：处理对话、特殊事件奖励与开箱，直到回到备战界面"""
+            self.operator.click_point(*_option, after_sleep=1)
+            self.operator.do_while(
+                lambda : self.operator.locate(CWIMG.TEA_BREAK, from_x=0.65, from_y=0.8, to_x=0.9, to_y=0.9) is not None,
+                lambda : self.operator.click_point(0.5, 0.5, after_sleep=1),
+                max_iterations=5
+            )
+            return_box = self.operator.wait_ocr("返回", from_x=0.58, from_y=0.38, to_x=0.96, to_y=0.8, timeout=3)
+            if return_box is None:
+                logger.error("[幕后茶歇] 未识别到返回按钮，茶歇事件推进失败")
+                return False
+            self.operator.click_box(return_box, y_offset=-0.1, after_sleep=0.5)  # 点击返回选项的上一个选项
+            ensure_box = self.operator.wait_ocr("确认", from_x=0.58, from_y=0.38, to_x=0.96, to_y=0.8, timeout=3)
+            if ensure_box is None:
+                logger.error("[幕后茶歇] 未识别到确认按钮，茶歇事件推进失败")
+                return False
+            self.operator.click_box(ensure_box, after_sleep=0.5)
+            self.operator.do_while(
+                lambda: self.operator.locate(CWIMG.CLICK_BLANK, from_x=0.65, from_y=0.8, to_x=0.9, to_y=0.9) is None,
+                lambda: self.operator.click_point(0.5, 0.9, after_sleep=1),
+                max_iterations=5
+            )  # 点击空白处推进对话，直到出现「点击空白处继续」提示
+            return True
+
+        if self.operator.ocr_match("享用茶歇", from_x=0.70, from_y=0.56, to_x=0.90, to_y=0.62) is None:
+            logger.error("[幕后茶歇] 未识别到茶歇事件界面")
+            return False
+        # 生命值偏低时优先享用茶歇回复生命，否则与奇遇伙伴对话获取特殊奖励
+        option = (0.8, 0.5) if _is_tea_break_health_low() else (0.2, 0.5)
+        return _drive_tea_break(option)
+
+    def handle_protagonist_selection(self) -> bool:
+        """处理「选择主角」奇遇节点。"""
+        self.operator.click_point(0.2, 0.3, after_sleep=1, tag="选择左侧效果")
+        target = (0.5, 0.4)
+        origin = None
+        for i, c in enumerate(self.on_field_character):
+            if c is None:
+                continue
+            else:
+                origin = (0.42+i*0.5, 0.56)
+                break
+        if origin is None:
+            raise RuntimeError("未检测到前台角色，无法选择主角")
+        self.operator.drag_to(origin[0], origin[1], target[0], target[1])  # 拖动角色到主角位置
+        self.operator.sleep(0.5)
+        self.operator.click_point(0.5, 0.888, after_sleep=1, tag="点击确认选择主角")
+        return True
 
     def shopping(self):
         def scan_characters_in_store() -> list[Character] | None:
@@ -1207,6 +1302,8 @@ class CurrencyWars(Executable):
         # 在攻略中的角色设置成最高优先级
         strategy_on_field: dict[str, int] = strategy_data.get("on_field", {})
         strategy_off_field: dict[str, int] = strategy_data.get("off_field", {})
+        # 攻略里的角色名可能带 OCR 无法输入的字符（如“知更鸟•晴歌”），统一按角色表的标准名称记录
+        on_field_names: set[str] = set()
         for i, cn in enumerate(strategy_on_field.keys()):
             c = Characters.get_character(cn)
             if c is None:
@@ -1214,18 +1311,19 @@ class CurrencyWars(Executable):
                 continue
             c.priority = 99 - i  # 确保攻略中的前台角色优先级都大于其他角色，同时有所差别
             c.position = Positioning.OnField
-            self.strategy_characters[cn] = strategy_on_field[cn]
+            on_field_names.add(c.name)
+            self.strategy_characters[c.name] = strategy_on_field[cn]
         for i, cn in enumerate(strategy_off_field):
             c = Characters.get_character(cn)
             if c is None:
                 logger.warning(f"攻略角色不存在，跳过：{cn}")
                 continue
             c.priority = 99 - i  # 确保攻略中的后台角色优先级都大于其他角色
-            if cn in strategy_on_field:
+            if c.name in on_field_names:
                 c.position = Positioning.OnOffField
             else:
                 c.position = Positioning.OffField
-                self.strategy_characters[cn] = strategy_off_field[cn]
+                self.strategy_characters[c.name] = strategy_off_field[cn]
         # 兼容旧配置: 1 -> 1星，3 -> 2星，9 -> 3星
         for sc in self.strategy_characters.keys():
             if 3 < self.strategy_characters[sc] < 9:
