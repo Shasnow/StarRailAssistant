@@ -88,7 +88,8 @@ class CurrencyWars(Executable):
             "头号玩家": ("我来当策划", self.handle_silver_wolf_lv999),
             "命运卜者": ("命运卜者", self.handle_fortune_teller),
             "开拓银轨": ("开拓商店", self.handle_trailblaze_store),
-            "奇兽花园": ("奇兽花园", self.handle_beast_garden)
+            "奇兽花园": ("奇兽花园", self.handle_beast_garden),
+            "梦境交织": ("梦境交织", self.handle_dream_interference)
         }
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
@@ -1033,28 +1034,34 @@ class CurrencyWars(Executable):
                                             self.strategy_special_events.get("命运卜者", ""))
 
     def _handle_selection_event(self, ocr_region: tuple[float, float, float, float],
-                                keyword: str):
+                                keyword: str, count: int = 1):
         """
         通用事件选择处理
         :param ocr_region: OCR识别区域 (from_x, from_y, to_x, to_y)
-        :param keyword: 目标关键词
+        :param keyword: 目标关键词（空格分隔的多个关键词按顺序各匹配一个选项）
+        :param count: 需要同时选中的选项数量（如“梦境交织”需要选择两个）
         """
         boxes = self.operator.ocr_boxes(from_x=ocr_region[0], from_y=ocr_region[1],
                                         to_x=ocr_region[2], to_y=ocr_region[3])
         if not boxes:
             return False
-        target_box = None
-        candidates = keyword.split()
-        for box in boxes:
-            text = box.source.strip()
-            # 当前box包含任意一个候选关键词即命中
-            if any(k in text for k in candidates):
-                target_box = box
-                break
-        if target_box is None:
+        # 每个关键词各匹配一个尚未选中的选项
+        chosen: list[int] = []
+        for candidate in keyword.split() or [""]:
+            for index, box in enumerate(boxes):
+                if index not in chosen and candidate in box.source.strip():
+                    chosen.append(index)
+                    break
+        if not chosen:
             # 如果没有匹配的关键词，则默认选择最后一个选项
-            target_box = boxes[-1]
-        self.operator.click_box(target_box, after_sleep=1)
+            chosen = [len(boxes) - 1]
+        if len(chosen) < count:
+            # 需要多选时，按 OCR 顺序补齐未选中的选项
+            chosen += [index for index in range(len(boxes)) if index not in chosen][:count - len(chosen)]
+        if len(chosen) < count:
+            logger.warning(f"事件选项不足：需要选择 {count} 个，仅识别到 {len(chosen)} 个")
+        for index in chosen:
+            self.operator.click_box(boxes[index], after_sleep=1)
         self.operator.click_img(CWIMG.CONFIRM_SELECTION, after_sleep=1)
         return True
 
@@ -1082,6 +1089,12 @@ class CurrencyWars(Executable):
         """处理奇兽花园事件的逻辑"""
         return self._handle_selection_event((0.22, 0.34, 0.85, 0.4),
                                             self.strategy_special_events.get("奇兽花园", ""))
+
+    def handle_dream_interference(self):
+        """处理梦境交织事件的逻辑（该事件需要同时选择两个选项）"""
+        return self._handle_selection_event((0.22, 0.3, 0.85, 0.36),
+                                            self.strategy_special_events.get("梦境交织", ""),
+                                            count=2)
 
     def detect_special_event(self) -> str:
         """检测当前是否有特殊事件发生，并返回事件名称"""
