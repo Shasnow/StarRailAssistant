@@ -94,6 +94,23 @@ nothing to do with it.
 * 如需使用 WebUI，无需单独下载：WebUI 已内嵌于包含服务端的完整包 `StarRailAssistant_vX.X.X.zip` 中（或安装 `ServerDLC`），解压后由服务端直接托管，启动服务端即可访问。
 * 从源码运行SRA，请阅读 [贡献指南](CONTRIBUTING.md)。
 
+## 🐳 Docker 部署
+
+容器里没有桌面会话，只能以**云游戏**模式运行，适合 Linux 服务器 / NAS 长期挂机。
+
+```bash
+docker compose up -d          # 默认拉取 ghcr.io/shasnow/starrailassistant:beta
+```
+
+浏览器打开 <http://localhost:5073> 即是 WebUI，用 `docker-compose.yml` 里的 `SRA_ACCESS_TOKEN` 登录（部署到公网前务必改掉默认值）。
+
+* **镜像标签**：`beta`（预发布）、`latest`（正式版）、`v<版本>`、`sha-<哈希>`，可用 `SRA_IMAGE_TAG` 固定到具体版本。
+* **数据持久化**：`sra-data` 卷挂载到 `/root/.config/SRA`（`settings.json`、`configs/`、`cache/`，云游戏登录态在 `cache/selenium_profile` 下），`sra-log` 卷挂载到 `/app/log`。
+* **开箱即用**：镜像内置 Chromium 与 chromedriver，首次启动时入口脚本会自动写入云游戏开关、浏览器路径与无头模式；账号密码在 WebUI 中填写（加密存储）。
+* **本地构建**：`docker build -t sra-server:local .`，再把 compose 里的 `image:` 换成它，或启用注释中的 `build: .`。
+* **环境变量**：`SRA_ACCESS_TOKEN`（为空则 `/api` 全部放行）、`SRA_HOST`、`SRA_PORT`、`SRA_LOG_LEVEL`、`SRA_VISITOR_MODE`。
+* 本地游戏模式依赖 Windows 窗口句柄，在 Linux 容器内无法使用；Windows 桌面用户仍建议直接用桌面端。
+
 ## 🐛 你这代码保熟吗？
 
 我们无法保证代码能完美的运行，这便是 **`issues`** 存在的意义。

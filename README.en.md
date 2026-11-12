@@ -91,6 +91,23 @@ Builds containing `StarRailAssistant_ServerDLC` require the [ASP.NET Core Runtim
 * To use the WebUI, no separate download is needed: the WebUI is embedded in the full server package `StarRailAssistant_vX.X.X.zip` (or install the `ServerDLC`). After extraction it is hosted directly by the server — just start the server and access it from your browser.
 * To run SRA from source, read the [Contributing Guide](CONTRIBUTING.md).
 
+## 🐳 Docker deployment
+
+There is no desktop session inside the container, so it can only run in **cloud game** mode. This suits long-running setups on a Linux server or NAS.
+
+```bash
+docker compose up -d          # pulls ghcr.io/shasnow/starrailassistant:beta by default
+```
+
+Open <http://localhost:5073> for the WebUI and sign in with the `SRA_ACCESS_TOKEN` from `docker-compose.yml` (change the default before exposing it to the internet).
+
+* **Image tags**: `beta` (pre-release), `latest` (stable), `v<version>`, `sha-<hash>`; pin one with `SRA_IMAGE_TAG`.
+* **Persistence**: the `sra-data` volume mounts at `/root/.config/SRA` (`settings.json`, `configs/`, `cache/`, with the cloud game session under `cache/selenium_profile`), and `sra-log` mounts at `/app/log`.
+* **Works out of the box**: Chromium and chromedriver are bundled, and the entrypoint writes the cloud game switch, browser path and headless mode into the settings on first start; fill in accounts and passwords in the WebUI (stored encrypted).
+* **Build locally**: `docker build -t sra-server:local .`, then point `image:` at it (or enable the commented `build: .`).
+* **Environment variables**: `SRA_ACCESS_TOKEN` (empty means `/api` is wide open), `SRA_HOST`, `SRA_PORT`, `SRA_LOG_LEVEL`, `SRA_VISITOR_MODE`.
+* Local game mode relies on Win32 window handles and does not work in a Linux container; Windows desktop users should keep using the desktop build.
+
 ## 🐛 Any bugs?
 
 We cannot guarantee that the code runs perfectly — that is what **`issues`** are for.
