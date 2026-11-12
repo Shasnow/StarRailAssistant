@@ -9,6 +9,7 @@ import cv2
 # noinspection package-requirements
 import numpy as np
 import pyscreeze
+from PIL import ImageDraw, ImageFont
 from PIL.Image import Image
 from loguru import logger
 from rapidocr import RapidOCR
@@ -22,6 +23,36 @@ from SRACore.util.errors import ThreadStoppedError
 from SRACore.util.strutil import StrMatcher, ContainsMatcher
 
 type Waitable = Callable[[], Box | None | tuple[int, Box | None]]
+
+_OCR_FONT_CANDIDATES = ("msyh.ttc", "simhei.ttf", "simsun.ttc")
+
+
+def _load_ocr_font(size: int = 14) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    """加载支持中文的字体用于标注，缺失时退回 PIL 默认字体。"""
+    for name in _OCR_FONT_CANDIDATES:
+        try:
+            return ImageFont.truetype(name, size)
+        except OSError:
+            continue
+    return ImageFont.load_default()
+
+
+def _annotate_ocr_image(image: Image, result: list[tuple[list[tuple[int, int]], str, float]] | None) -> Image:
+    """在截图副本上绘制 OCR 识别框、文本与置信度，便于排查识别问题。"""
+    annotated = image.convert("RGB")
+    if not result:
+        return annotated
+    draw = ImageDraw.Draw(annotated)
+    font = _load_ocr_font()
+    for points, text, score in result:
+        draw.polygon([tuple(point) for point in points], outline=(0, 255, 0), width=1)
+        x = min(point[0] for point in points)
+        label_top = max(min(point[1] for point in points) - 16, 0)
+        label = f"{text} {score:.2f}"
+        left, top, right, bottom = draw.textbbox((x, label_top), label, font=font)
+        draw.rectangle((left, top, right, bottom), fill=(0, 0, 0))
+        draw.text((x, label_top), label, fill=(0, 255, 0), font=font)
+    return annotated
 
 class IOperator(ABC):
 
@@ -299,7 +330,7 @@ class IOperator(ABC):
                           zip(rapid_output.boxes, rapid_output.txts, rapid_output.scores) if # pyright: ignore[reportArgumentType]
                           score > ocr_confidence]
             if self.is_save_ocr_image:
-                screenshot.save(LogsOCRDir / f"{time.time_ns()}.png")
+                _annotate_ocr_image(screenshot, result).save(LogsOCRDir / f"{time.time_ns()}.png")
             if trace:
                 logger.debug(f"OCR Result: {result}")
             return result
