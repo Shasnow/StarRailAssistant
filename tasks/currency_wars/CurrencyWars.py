@@ -1,6 +1,7 @@
 import enum
 import json
 import re
+import time
 from collections.abc import Callable
 from typing import Any
 
@@ -371,7 +372,9 @@ class CurrencyWars(Executable):
             return False
 
         # 5. 处理投资环境
-        return self._handle_invest_environment_flow()
+        self._handle_invest_environment_flow()
+        self.operator.sleep(8)  # 等待开局补给
+        return True
 
     def _select_difficulty(self) -> None:
         """难度选择逻辑（抽离后更易维护）"""
@@ -426,7 +429,6 @@ class CurrencyWars(Executable):
         # 有些情况下点击投资环境界面后会再次弹出投资环境界面，需要再次处理
         if self.operator.locate(CWIMG.INVEST_ENVIRONMENT):
             self.handle_invest_environment()
-        self.operator.sleep(4)
         return True
 
     # ==================== 继续进度进入逻辑（重构后） ====================
@@ -885,11 +887,20 @@ class CurrencyWars(Executable):
                 logger.info("前台区域未达上限，继续战斗")
                 self.operator.click_img(IMG.ENSURE)
             logger.info("战斗开始，等待挑战结束")
-            if self.operator.wait_img(IMG.Q):
-                self.operator.press_key("v")
+            # 战斗中持续检测“未开启自动战斗”图标（Q），出现即按 V 开启；
+            # IMG.Q 放在结算/继续之后，保证战斗结束时优先判定为结束
+            waiting_templates = [CWIMG.SETTLE, CWIMG.CONTINUE, IMG.Q]
         else:  # 跳过战斗：对局已结束，直接等待结算界面
             logger.info("跳过战斗")
-        result, _ = self.operator.wait_any_img([CWIMG.SETTLE, CWIMG.CONTINUE], timeout=600, interval=1, trace=False)
+            waiting_templates = [CWIMG.SETTLE, CWIMG.CONTINUE]
+        deadline = time.time() + 600
+        while True:
+            result, _ = self.operator.wait_any_img(waiting_templates, timeout=max(deadline - time.time(), 0),
+                                                   interval=1, trace=False)
+            if result != 2:  # 结算/继续按钮或超时（跳过战斗时没有索引 2）
+                break
+            self.operator.press_key("v")  # 按 V 开启自动战斗，继续等待
+            self.operator.sleep(1)
         if result == -1:
             logger.warning("等待挑战结束超时")
             for _ in range(5):

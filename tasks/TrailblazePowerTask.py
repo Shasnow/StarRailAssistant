@@ -553,9 +553,6 @@ class TrailblazePowerTask(BaseTask):
 
     def battle_start(self, run_time: int):
         logger.info("开始战斗")
-        if self.operator.wait_img(IMG.Q):
-            self.operator.press_key("v")
-        logger.info("请检查自动战斗和倍速是否开启")
         while run_time > 1:
             logger.info(f"剩余次数{run_time}")
             battle_status = self.wait_battle_end()
@@ -631,13 +628,17 @@ class TrailblazePowerTask(BaseTask):
                 logger.error(f"等待战斗结束超时（{timeout}秒）")
                 return -1
             self.operator.sleep(1)
-            # 检查战斗结束状态
+            # 检查战斗结束状态；IMG.Q 表示未开启自动战斗，出现即按 V 开启并继续等待
             index, _ = self.operator.locate_any([
                 TPIMG.QUIT_BATTLE,
                 TPIMG.BATTLE_FAILURE,
+                IMG.Q,
             ], trace=False)
             if index == -1:
                 continue  # 继续等待战斗结束
+            if index == 2:
+                self.operator.press_key("v")
+                continue
 
             logger.info("战斗结束")
             return index

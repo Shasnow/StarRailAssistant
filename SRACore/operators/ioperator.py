@@ -682,7 +682,7 @@ class IOperator(ABC):
         logger.debug(f"Timeout: {template} -> NotFound in {timeout} seconds")
         return None
 
-    def wait_any_img(self, templates: list[str], timeout: int = 10, interval: float = 0.5, trace: bool = True) -> tuple[
+    def wait_any_img(self, templates: list[str], timeout: int | float = 10, interval: float = 0.5, trace: bool = True) -> tuple[
         int, Box | None]:
         """等待任意一张图片出现
         
