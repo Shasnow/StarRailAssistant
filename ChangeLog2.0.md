@@ -1,6 +1,6 @@
 ### 主要更新内容:
 
-**升级前请先阅读「破坏性变更」。**
+**包含「破坏性变更」。请在更新后运行资源清理来删除旧资源。**
 
 - SRA-Cli 与 SRA-Server 现在是一款统一的产品。
 - 新增 `CurrencyWarsPlus` 拓展，支持货币战争常规与超频博弈、阶段阵容与职责、阶段经济及 3-7 终局运营。 by YukkiSSYB、sososos662
@@ -9,7 +9,7 @@
 - 添加俄语本地化支持 by sososos662
 - 添加 Docker 部署支持
 - WebUI: 支持在实时预览画面时直接发送键鼠操作
-- 新增免密码历史账号切号插件，密码留空时支持免密码从历史账号切号
+- 新增免密码历史账号切号插件，密码留空时支持免密码从历史账号切号 by Camellune
 - 适配4.7版本「此刻，将群星付之一笑」
 
 ### 问题修复：
@@ -42,6 +42,7 @@ SRA 现在支持 Docker 部署，详见 [Docker 部署说明](https://starrailas
 
 #### 破坏性变更:
 
+- 打包方式变更：不再使用Nuitka打包，而是直接嵌入 Python 运行时。
 - Server: 移除了 `SRA-server.exe`, 请使用 `SRA-cli.exe serve` 启动服务端。
 - Server: 服务器 REST 路径统一为小写。
 - Server: 远程模式默认地址改为 `http://localhost:5073`（原 5000），请求路径同步改为 `/api/**`。
@@ -61,7 +62,7 @@ SRA 现在支持 Docker 部署，详见 [Docker 部署说明](https://starrailas
 - 完整的重大／一般／bug修复清单、测试结果和已知限制见[扩展 README](extensions/currency_wars_plus/cw_plus/README.md)。
 - 开发者：**YukkiSSYB**。
 
-#### 发布包结构
+### 发布包结构
 
 - 主程序包（Full）：内嵌 Python 运行时 + 源码 + .NET 桌面端，开箱即用。
 - 核心包（Core）：内嵌 Python 运行时 + 源码，不含桌面端。
@@ -75,7 +76,7 @@ SRA 现在支持 Docker 部署，详见 [Docker 部署说明](https://starrailas
 - [StarRailAssistant_Core_v${VERSION}.zip](https://github.com/Shasnow/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_Core_v${VERSION}.zip) - 核心包（内嵌 Python 3.12 运行时与源码）
 - [StarRailAssistant_Lite_v${VERSION}.zip](https://github.com/Shasnow/StarRailAssistant/releases/download/v${VERSION}/StarRailAssistant_Lite_v${VERSION}.zip) - 轻量版（需要手动安装和配置 Python 环境）
 
-需要安装 [.NET 桌面运行时 10.0](https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0) 才能运行
+需要安装 [.NET 桌面运行时 10.0](https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0) 才能运行GUI界面。
 主程序包与核心包已内置 Python 3.12 运行时，无需额外安装；轻量版需自行安装 Python 3.12
 首次使用建议下载主程序包。
 **看准文件名再下载！**
