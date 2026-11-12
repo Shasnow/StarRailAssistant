@@ -1104,6 +1104,6 @@ if StartGameTask is not None and not getattr(StartGameTask, "_zz_patched", False
     StartGameTask._mask_acct = staticmethod(_mask_acct)
     StartGameTask._mask_text = staticmethod(_mask_text)
     StartGameTask._zz_patched = True  # 幂等标记：防热重载/二次 import 后 _orig_login 捕获到已打补丁的方法
-    logger.info("[切号] 插件已启用 v2.6.8")
+    logger.info("[切号] 插件已启用 v2.6.9")
 elif StartGameTask is not None:
     logger.warning("[切号] 插件已挂载过，跳过重复加载")
