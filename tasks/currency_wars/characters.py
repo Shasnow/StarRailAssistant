@@ -179,7 +179,7 @@ class Characters:
     Aventurine_Waveflair = Character('砂金·戏浪', 4, Positioning.OnField)
     Guinaifen = Character('桂乃芬', 1, Positioning.OnOffField)
     Pearl = Character('真珠', 1, Positioning.OffField)
-    Aeon_Aha = Character('星神·阿哈', 7, Positioning.OnField)
+    Aeon_Aha = Character('星神★阿哈', 7, Positioning.OnField)
     Clara = Character('克拉拉', 5, Positioning.OnOffField)
     Xueyi = Character('雪衣', 5, Positioning.OnField)
     KingPomPom = Character('帕姆王', 5, Positioning.OffField)
