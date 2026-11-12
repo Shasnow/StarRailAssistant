@@ -39,6 +39,38 @@ class StageName(enum.StrEnum):
     MAIN_MENU = '主界面'
 
 
+def _merge_ocr_text(fragments: list[tuple[list[tuple[int, int]], str, float]]) -> str:
+    """按文本框坐标拼接 OCR 片段，去掉检测框重叠处被重复识别的字。
+
+    RapidOCR 有时会把同一行文本切成多个互相重叠的文本框（例如“知更鸟·晴歌”被切成
+    “知更鸟”和“鸟·晴歌”），直接按顺序拼接会多出重叠的字。这里按片段的横向范围与
+    字符平均宽度估算重叠的字数，只保留新出现的部分；换行产生的片段（纵向几乎不重叠）
+    仍按顺序直接拼接。
+    """
+    ordered = sorted(fragments, key=lambda item: (min(p[1] for p in item[0]), min(p[0] for p in item[0])))
+    text = ''
+    line_right = line_top = line_bottom = 0
+    for points, fragment, _ in ordered:
+        left = min(point[0] for point in points)
+        right = max(point[0] for point in points)
+        top = min(point[1] for point in points)
+        bottom = max(point[1] for point in points)
+        same_line = bool(text) and top < line_bottom and bottom > line_top
+        if same_line and left < line_right:
+            char_width = (right - left) / len(fragment) if fragment else 0
+            if char_width > 0:
+                overlap_chars = int(round((line_right - left) / char_width))
+                fragment = fragment[min(overlap_chars, len(fragment)):]
+        if same_line:
+            line_right = max(line_right, right)
+            line_top = min(line_top, top)
+            line_bottom = max(line_bottom, bottom)
+        else:
+            line_right, line_top, line_bottom = right, top, bottom
+        text += fragment
+    return text
+
+
 class CurrencyWars(Executable):
     def __init__(self, operator, runtimes, isPointRewardsEnabled: bool = False):
         super().__init__(operator)
@@ -541,12 +573,16 @@ class CurrencyWars(Executable):
         self.operator.sleep(0.3)
         boxes = self.operator.rectangle_detect(120, 150, 130, 150,
                                                from_x=0.1, from_y=0.52, to_x=0.86, to_y=0.7,
-                                               trace=False)
+                                               trace=True)
         if boxes:
-            sorted_boxes = sorted(boxes, key=lambda b: b.left)
+            # 去重：中心距离小于 100 的矩形视为同一个位置
+            unique_boxes: list[Box] = []
+            for b in sorted(boxes, key=lambda b: b.left):
+                if all(b.distance(u) >= 100 for u in unique_boxes):
+                    unique_boxes.append(b)
             self.off_field_area = [
                 (b.center[0] / self.operator.window_context.width, b.center[1] / self.operator.window_context.height)
-                for b in sorted_boxes
+                for b in unique_boxes
             ]
             # 同步调整角色列表长度
             if len(self.off_field_area) > len(self.off_field_character):
@@ -612,7 +648,9 @@ class CurrencyWars(Executable):
                 # 点击区域（带延迟，确保界面响应）
                 if target_character_list[index] is not None and not force:
                     continue  # 已有角色则跳过
-                self.operator.click_point(*area, after_sleep=0.2, trace=False)
+                self.operator.mouse_down(*area, trace=False)
+                self.operator.sleep(0.2)
+                self.operator.mouse_up(*area, trace=False)
 
                 # OCR识别角色名称
                 character_names = self.operator.ocr(
@@ -635,10 +673,8 @@ class CurrencyWars(Executable):
 
                 # 更新角色列表
                 if character_names and len(character_names) > 0:
-                    name = ''
-                    # OCR可能会将角色名称分成多行或多个部分，需拼接后再识别
-                    for char_name in character_names:
-                        name += char_name[1]
+                    # OCR 可能把同一行名字切成多个重叠的文本框，按坐标去重后再拼接
+                    name = _merge_ocr_text(character_names)
                     char = Characters.get_character(name)
                     if char is None:
                         logger.warning(f"OCR识别到角色名称：{name}，但未在角色列表中找到匹配项")
@@ -650,11 +686,11 @@ class CurrencyWars(Executable):
                     if equip and not char.is_npc:
                         if char.name not in self.strategy_characters.keys():
                             continue  # 不给不在攻略中的角色穿戴装备
-                        self.operator.click_img(CWIMG.EQUIPMENT_RECOMMEND, after_sleep=1)
+                        self.operator.click_point(0.77, 0.75, after_sleep=0.5, trace=False)  # 点击装备推荐按钮
                         _, box = self.operator.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS], confidence=0.8)
                         if box:
                             self.operator.click_box(box, after_sleep=0.5)
-                    self.operator.click_point(0.5, 0.5, trace=False)  # 点击空白处关闭信息框
+                    self.operator.click_point(0.3, 0.5, trace=False)  # 点击空白处关闭信息框
                 else:
                     target_character_list[index] = None  # 未识别到角色
 
@@ -1030,7 +1066,9 @@ class CurrencyWars(Executable):
 
     def handle_trailblaze_store(self):
         """处理开拓银轨事件的逻辑"""
-        return self.operator.click_point(0.5, 0.6)
+        self.operator.click_point(0.5, 0.2)
+        self.operator.click_point(0.5, 0.5)
+        return True
 
     def handle_beast_garden(self):
         """处理奇兽花园事件的逻辑"""
@@ -1045,7 +1083,7 @@ class CurrencyWars(Executable):
         text = result[0][1]
         # 遍历特殊事件列表，匹配标题
         for event, (title, handler) in self.special_events.items():
-            if text == title:
+            if title in text:
                 return event
         return ""
 
@@ -1126,6 +1164,7 @@ class CurrencyWars(Executable):
 
     def handle_protagonist_selection(self) -> bool:
         """处理「选择主角」奇遇节点。"""
+        logger.info("选择主角")
         self.operator.click_point(0.2, 0.3, after_sleep=1, tag="选择左侧效果")
         target = (0.5, 0.4)
         origin = None
