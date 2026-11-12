@@ -264,15 +264,15 @@ def _yaml_user_info(text: str, uid: str):
 
 
 def _load_roster_info(root: Path, uid: str):
-    """查花名册用户 Info：旧 JSON 优先，否则读 v2 的 scripts.yaml。
+    """查花名册用户 Info：scripts.yaml 优先，仅文件不存在时读旧 JSON。
 
     PyYAML 可用就整表解析，不可用（或解析异常）退回轻量缩进解析。
     """
-    legacy = root / "config" / "ScriptConfig.json"
-    if legacy.is_file():
-        return _find_user(json.loads(legacy.read_text(encoding="utf-8-sig")), uid)
     yml = root / "config" / "scripts.yaml"
     if not yml.is_file():
+        legacy = root / "config" / "ScriptConfig.json"
+        if legacy.is_file():
+            return _find_user(json.loads(legacy.read_text(encoding="utf-8-sig")), uid)
         return None
     text = yml.read_text(encoding="utf-8-sig")
     try:
