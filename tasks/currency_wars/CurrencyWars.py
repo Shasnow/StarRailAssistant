@@ -43,8 +43,9 @@ def _merge_ocr_text(fragments: list[tuple[list[tuple[int, int]], str, float]]) -
     """按文本框坐标拼接 OCR 片段，去掉检测框重叠处被重复识别的字。
 
     RapidOCR 有时会把同一行文本切成多个互相重叠的文本框（例如“知更鸟·晴歌”被切成
-    “知更鸟”和“鸟·晴歌”），直接按顺序拼接会多出重叠的字。这里按片段的横向范围与
-    字符平均宽度估算重叠的字数，只保留新出现的部分；换行产生的片段（纵向几乎不重叠）
+    “知更鸟”和“鸟·晴歌”），直接按顺序拼接会多出重叠的字。这里按片段的横向重叠范围
+    估算可重复字数上限，再比对文本实际重复的前缀（检测框边界不精确，且“·”等窄字符
+    会拉偏平均字宽，所以只按几何估算会误删有效字符）；换行产生的片段（纵向几乎不重叠）
     仍按顺序直接拼接。
     """
     ordered = sorted(fragments, key=lambda item: (min(p[1] for p in item[0]), min(p[0] for p in item[0])))
@@ -59,8 +60,12 @@ def _merge_ocr_text(fragments: list[tuple[list[tuple[int, int]], str, float]]) -
         if same_line and left < line_right:
             char_width = (right - left) / len(fragment) if fragment else 0
             if char_width > 0:
-                overlap_chars = int(round((line_right - left) / char_width))
-                fragment = fragment[min(overlap_chars, len(fragment)):]
+                # 几何重叠字数只作为上限（再多容一个字符），实际去掉多少由重复文本决定
+                limit = min(int(round((line_right - left) / char_width)) + 1, len(fragment), len(text))
+                for k in range(limit, 0, -1):
+                    if fragment[:k] == text[-k:]:
+                        fragment = fragment[k:]
+                        break
         if same_line:
             line_right = max(line_right, right)
             line_top = min(line_top, top)
@@ -553,6 +558,7 @@ class CurrencyWars(Executable):
                     self.sort_all_areas_by_priority()  # 优先级排序
                     continue
                 break
+            self.handle_special_event()
             if not self.stage_transition():
                 break
             if self.is_game_over:  # 任务已被标记为停止, 需要退出循环
@@ -641,7 +647,7 @@ class CurrencyWars(Executable):
             return len(valid_boxes)
 
         # 角色名称OCR区域
-        ocr_from_x, ocr_from_y, ocr_to_x, ocr_to_y = (0.775, 0.175, 0.880, 0.2315)
+        ocr_from_x, ocr_from_y, ocr_to_x, ocr_to_y = (0.775, 0.185, 0.880, 0.235)
 
         for index, area in enumerate(areas):
             try:
@@ -867,7 +873,9 @@ class CurrencyWars(Executable):
                 return False
         logger.info("挑战结束")
         self.operator.sleep(0.5)
-        return self.operator.click_point(0.5, 0.824, after_sleep=1, tag="点击继续按钮")
+        self.operator.click_point(0.5, 0.824, tag="点击继续按钮")
+        self.operator.sleep(3)
+        return True
 
     def stage_transition(self):
         """实现关卡切换逻辑，通过识别图片状态执行对应操作"""
@@ -1396,7 +1404,7 @@ class CurrencyWars(Executable):
             if character.position == Positioning.OffField:
                 continue
             if self.place_on_field_character(i):
-                self.operator.sleep(1)
+                self.operator.sleep(2)
                 self.handle_special_event()
 
         # 第二次遍历：仅处理后台角色（Positioning.OffField），填充剩余空位或替换
@@ -1407,7 +1415,7 @@ class CurrencyWars(Executable):
             if character.position == Positioning.OnField:
                 continue
             if self.place_off_field_character(i):
-                self.operator.sleep(1)
+                self.operator.sleep(2)
                 self.handle_special_event()
 
         # 若前台为空，则从后台提升一个角色到前台第一个位置，避免出现前台全空的情况
