@@ -895,6 +895,24 @@ Please check that the target path is writable and try again</value>
     <data name="StoppedStatusText" xml:space="preserve">
         <value>Stopped</value>
     </data>
+    <data name="EnabledStatusText" xml:space="preserve">
+        <value>Enabled</value>
+    </data>
+    <data name="DisabledStatusText" xml:space="preserve">
+        <value>Disabled</value>
+    </data>
+    <data name="EnableText" xml:space="preserve">
+        <value>Enable</value>
+    </data>
+    <data name="DisableText" xml:space="preserve">
+        <value>Disable</value>
+    </data>
+    <data name="EnableExtensionTooltip" xml:space="preserve">
+        <value>Enable this extension</value>
+    </data>
+    <data name="DisableExtensionTooltip" xml:space="preserve">
+        <value>Disable this extension</value>
+    </data>
     <data name="ConfigurationTitleFormat" xml:space="preserve">
         <value>Configuration - {0}</value>
     </data>

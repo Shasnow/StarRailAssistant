@@ -75,6 +75,8 @@ class AppContext:
             self.settings,
             event_listener=self._event_listener,
         )
+        # 任务注册后钩子：扩展可在此时包装/修改已注册的任务类
+        self.extension_runner.apply_task_hooks()
 
         # 服务层
         self.cache = CacheService()
@@ -146,6 +148,7 @@ class AppContext:
 
         reload_extensions()
         self.extension_config_manager.refresh()
+        self.extension_runner.apply_task_hooks()
         # 触发设置按 mtime 重新加载
         _ = self.settings.settings
         logger.info("Backend restarted.")
@@ -189,8 +192,33 @@ class AppContext:
                 "description": meta.get("description") or entry.description,
                 "extension_class": entry.extension_cls.__name__,
                 "config_class": entry.config_cls.__name__ if entry.config_cls else "",
+                "executable": entry.executable,
+                "enabled": self._extension_enabled_state(ext_id),
             })
         return data
+
+    def _extension_enabled_state(self, ext_id: str) -> bool | None:
+        """读取扩展配置中的 enabled 开关；配置模型没有该字段时返回 None。"""
+        config = self.extension_config_manager.get(ext_id)
+        return getattr(config, "enabled", None) if config is not None else None
+
+    def extension_set_enabled(self, ext_id: str, enabled: bool) -> tuple[bool, str]:
+        """切换扩展配置中的 enabled 开关（用于无执行逻辑扩展的启用/禁用）。"""
+        if not extension_registry.has_id(ext_id):
+            return False, Resources.extension_notFound(ext_id)
+        config_cls = extension_registry.get_config_class(ext_id)
+        config = self.extension_config_manager.get(ext_id)
+        if config_cls is None or config is None or "enabled" not in config_cls.model_fields:
+            return False, Resources.extension_enableNotSupported(ext_id)
+        data = config.model_dump(by_alias=True)
+        data[config_cls.model_fields["enabled"].alias or "enabled"] = enabled
+        try:
+            new_config = config_cls.model_validate(data, by_alias=True)
+        except Exception as e:
+            return False, Resources.extension_configInvalid(str(e))
+        self.extension_config_manager.set(ext_id, new_config)
+        self.extension_config_manager.save()
+        return True, Resources.extension_configSaved(ext_id)
 
     def extension_schema(self, ext_id: str) -> dict[str, Any] | None:
         if not extension_registry.has_id(ext_id):
@@ -220,6 +248,8 @@ class AppContext:
     def extension_run(self, ext_id: str, config_name: str | None = None) -> tuple[bool, str]:
         if not extension_registry.has_id(ext_id):
             return False, Resources.extension_notFoundHint(ext_id)
+        if not extension_registry.is_executable(ext_id):
+            return False, Resources.extension_notExecutable(ext_id)
         if config_name:
             self.extension_config_manager.load(config_name)
         if extension_registry.is_background(ext_id):
@@ -256,6 +286,7 @@ class AppContext:
 
         before, after = reload_extensions()
         self.extension_config_manager.refresh()
+        self.extension_runner.apply_task_hooks()
 
         restarted = []
         for ext_id in active_background:

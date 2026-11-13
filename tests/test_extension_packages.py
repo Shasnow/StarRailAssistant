@@ -10,7 +10,14 @@ from SRACore.localization import Resources
 def test_directory_packages_are_registered() -> None:
     load_extensions()
     ids = set(extension_registry.get_ids())
-    assert {'CurrencyWarsPlus', 'HelloWorld'} <= ids
+    assert {'AccountSwitch', 'CurrencyWarsPlus', 'HelloWorld'} <= ids
+
+
+def test_extension_executable_flag() -> None:
+    load_extensions()
+    assert extension_registry.is_executable('HelloWorld')
+    # 自动切号没有执行逻辑，前端只提供启用/禁用
+    assert not extension_registry.is_executable('AccountSwitch')
 
 
 def test_schema_and_meta_follow_language() -> None:

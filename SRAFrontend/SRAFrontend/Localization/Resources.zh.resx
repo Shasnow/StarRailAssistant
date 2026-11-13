@@ -891,6 +891,24 @@
     <data name="StoppedStatusText" xml:space="preserve">
         <value>已停止</value>
     </data>
+    <data name="EnabledStatusText" xml:space="preserve">
+        <value>已启用</value>
+    </data>
+    <data name="DisabledStatusText" xml:space="preserve">
+        <value>已停用</value>
+    </data>
+    <data name="EnableText" xml:space="preserve">
+        <value>启用</value>
+    </data>
+    <data name="DisableText" xml:space="preserve">
+        <value>禁用</value>
+    </data>
+    <data name="EnableExtensionTooltip" xml:space="preserve">
+        <value>启用该扩展</value>
+    </data>
+    <data name="DisableExtensionTooltip" xml:space="preserve">
+        <value>禁用该扩展</value>
+    </data>
     <data name="ConfigurationTitleFormat" xml:space="preserve">
         <value>配置 - {0}</value>
     </data>

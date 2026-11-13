@@ -133,7 +133,7 @@
                                                        Text="{Binding ClassSummary}"
                                                        ToolTip.Tip="{Binding ClassSummary}" />
 
-                                            <!-- 操作区：运行/停止为大号主按钮，配置为次要按钮 -->
+                                            <!-- 操作区：可执行扩展显示运行/停止，无执行逻辑的显示启用/禁用，配置为次要按钮 -->
                                             <Grid Grid.Row="3"
                                                   ColumnDefinitions="*,Auto"
                                                   ColumnSpacing="8"
@@ -146,7 +146,7 @@
                                                             HorizontalContentAlignment="Center"
                                                             ToolTip.Tip="{x:Static lang:Resources.StartExtensionTooltip}"
                                                             Command="{Binding RunCommand}"
-                                                            IsVisible="{Binding !IsRunning}" />
+                                                            IsVisible="{Binding ShowRun}" />
                                                     <Button Classes="Flat Rounded"
                                                             Content="{x:Static lang:Resources.StopActionText}"
                                                             Height="36"
@@ -154,7 +154,23 @@
                                                             HorizontalContentAlignment="Center"
                                                             ToolTip.Tip="{x:Static lang:Resources.StopExtensionTooltip}"
                                                             Command="{Binding StopCommand}"
-                                                            IsVisible="{Binding IsRunning}" />
+                                                            IsVisible="{Binding ShowStop}" />
+                                                    <Button Classes="Flat Rounded"
+                                                            Content="{x:Static lang:Resources.EnableText}"
+                                                            Height="36"
+                                                            HorizontalAlignment="Stretch"
+                                                            HorizontalContentAlignment="Center"
+                                                            ToolTip.Tip="{x:Static lang:Resources.EnableExtensionTooltip}"
+                                                            Command="{Binding EnableCommand}"
+                                                            IsVisible="{Binding ShowEnable}" />
+                                                    <Button Classes="Flat Rounded"
+                                                            Content="{x:Static lang:Resources.DisableText}"
+                                                            Height="36"
+                                                            HorizontalAlignment="Stretch"
+                                                            HorizontalContentAlignment="Center"
+                                                            ToolTip.Tip="{x:Static lang:Resources.DisableExtensionTooltip}"
+                                                            Command="{Binding DisableCommand}"
+                                                            IsVisible="{Binding ShowDisable}" />
                                                 </Panel>
                                                 <Button Grid.Column="1"
                                                         Classes="Basic"

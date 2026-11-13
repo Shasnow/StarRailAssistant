@@ -16,6 +16,12 @@ public class ExtensionInfo
     public string ExtensionClass { get; set; } = "";
     [JsonPropertyName("config_class")]
     public string ConfigClass { get; set; } = "";
+    /// <summary>是否包含执行逻辑；false 时只提供启用/禁用。</summary>
+    [JsonPropertyName("executable")]
+    public bool Executable { get; set; } = true;
+    /// <summary>无执行逻辑扩展的启用状态；配置中没有 enabled 字段时为 null。</summary>
+    [JsonPropertyName("enabled")]
+    public bool? Enabled { get; set; }
 }
 
 /// <summary>

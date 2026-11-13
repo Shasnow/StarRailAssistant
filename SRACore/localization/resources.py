@@ -359,6 +359,48 @@ class Localization:
         return self.get_translation("cli.extension.statusDescription")
 
     @property
+    def cli_extension_enableDescription(self) -> str:
+        """启用无执行逻辑的扩展
+
+        From cli.extension.enableDescription"""
+        return self.get_translation("cli.extension.enableDescription")
+
+    @property
+    def cli_extension_enableNameHelp(self) -> str:
+        """扩展标识
+
+        From cli.extension.enableNameHelp"""
+        return self.get_translation("cli.extension.enableNameHelp")
+
+    def cli_extension_enableDone(self, ext_id) -> str:
+        """扩展 '{ext_id}' 已启用
+
+        From cli.extension.enableDone"""
+        template = self.get_translation("cli.extension.enableDone")
+        return template.format(ext_id=ext_id)
+
+    @property
+    def cli_extension_disableDescription(self) -> str:
+        """禁用无执行逻辑的扩展
+
+        From cli.extension.disableDescription"""
+        return self.get_translation("cli.extension.disableDescription")
+
+    @property
+    def cli_extension_disableNameHelp(self) -> str:
+        """扩展标识
+
+        From cli.extension.disableNameHelp"""
+        return self.get_translation("cli.extension.disableNameHelp")
+
+    def cli_extension_disableDone(self, ext_id) -> str:
+        """扩展 '{ext_id}' 已禁用
+
+        From cli.extension.disableDone"""
+        template = self.get_translation("cli.extension.disableDone")
+        return template.format(ext_id=ext_id)
+
+    @property
     def cli_extension_configDescription(self) -> str:
         """扩展配置管理
 
@@ -984,6 +1026,20 @@ class Localization:
 
         From extension.configSaved"""
         template = self.get_translation("extension.configSaved")
+        return template.format(ext_id=ext_id)
+
+    def extension_notExecutable(self, ext_id) -> str:
+        """扩展 '{ext_id}' 没有执行逻辑，只能启用或禁用
+
+        From extension.notExecutable"""
+        template = self.get_translation("extension.notExecutable")
+        return template.format(ext_id=ext_id)
+
+    def extension_enableNotSupported(self, ext_id) -> str:
+        """扩展 '{ext_id}' 的配置中没有可切换的 enabled 开关
+
+        From extension.enableNotSupported"""
+        template = self.get_translation("extension.enableNotSupported")
         return template.format(ext_id=ext_id)
 
     def extension_notFoundHint(self, ext_id) -> str:

@@ -6476,6 +6476,60 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        public static string EnabledStatusText {
+            get {
+                return ResourceManager.GetString("EnabledStatusText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disabled.
+        /// </summary>
+        public static string DisabledStatusText {
+            get {
+                return ResourceManager.GetString("DisabledStatusText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable.
+        /// </summary>
+        public static string EnableText {
+            get {
+                return ResourceManager.GetString("EnableText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable.
+        /// </summary>
+        public static string DisableText {
+            get {
+                return ResourceManager.GetString("DisableText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable this extension.
+        /// </summary>
+        public static string EnableExtensionTooltip {
+            get {
+                return ResourceManager.GetString("EnableExtensionTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable this extension.
+        /// </summary>
+        public static string DisableExtensionTooltip {
+            get {
+                return ResourceManager.GetString("DisableExtensionTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hotkey for stopping running tasks.
         /// </summary>
         public static string StopTaskHotkeyDescription {

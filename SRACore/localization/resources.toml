@@ -268,6 +268,16 @@ zh-cn = "扩展 {ext_id} 配置已保存"
 en-us = "Configuration saved for extension {ext_id}."
 ru-ru = "Конфигурация расширения {ext_id} сохранена."
 
+[extension.notExecutable]
+zh-cn = "扩展 '{ext_id}' 没有执行逻辑，只能启用或禁用"
+en-us = "Extension '{ext_id}' has no executable logic; it can only be enabled or disabled."
+ru-ru = "У расширения «{ext_id}» нет исполняемой логики; его можно только включить или отключить."
+
+[extension.enableNotSupported]
+zh-cn = "扩展 '{ext_id}' 的配置中没有可切换的 enabled 开关"
+en-us = "Extension '{ext_id}' has no toggleable 'enabled' setting."
+ru-ru = "У расширения «{ext_id}» нет переключателя «enabled»."
+
 [extension.notFoundHint]
 zh-cn = "扩展 '{ext_id}' 不存在，使用 'extension list' 查看可用扩展"
 en-us = "Extension '{ext_id}' not found. Use 'extension list' to see available extensions."
@@ -552,6 +562,36 @@ ru-ru = "Расширение остановлено"
 zh-cn = "显示扩展运行状态"
 en-us = "Show extension status"
 ru-ru = "Показать состояние расширений"
+
+[cli.extension.enableDescription]
+zh-cn = "启用无执行逻辑的扩展"
+en-us = "Enable a non-executable extension"
+ru-ru = "Включить расширение без исполняемой логики"
+
+[cli.extension.enableNameHelp]
+zh-cn = "扩展标识"
+en-us = "Extension id"
+ru-ru = "Идентификатор расширения"
+
+[cli.extension.enableDone]
+zh-cn = "扩展 '{ext_id}' 已启用"
+en-us = "Extension '{ext_id}' enabled"
+ru-ru = "Расширение «{ext_id}» включено"
+
+[cli.extension.disableDescription]
+zh-cn = "禁用无执行逻辑的扩展"
+en-us = "Disable a non-executable extension"
+ru-ru = "Отключить расширение без исполняемой логики"
+
+[cli.extension.disableNameHelp]
+zh-cn = "扩展标识"
+en-us = "Extension id"
+ru-ru = "Идентификатор расширения"
+
+[cli.extension.disableDone]
+zh-cn = "扩展 '{ext_id}' 已禁用"
+en-us = "Extension '{ext_id}' disabled"
+ru-ru = "Расширение «{ext_id}» отключено"
 
 [cli.extension.configDescription]
 zh-cn = "扩展配置管理"

@@ -1,0 +1,5 @@
+{
+    "name": "Auto Account Switch",
+    "description": "Switch accounts without a password (AUTO-MAS roster / account_hint.txt)",
+    "enabled.description": "Enable automatic account switching"
+}

@@ -2,7 +2,7 @@ import importlib
 import json
 import sys
 import threading
-from abc import abstractmethod, ABC
+from abc import ABC
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,7 +15,7 @@ from SRACore.localization import Resources
 from SRACore.models.app_settings import AppSettings
 from SRACore.notification import try_send_notification
 from SRACore.operators.factory import OperatorFactory, OperatorType
-from SRACore.task import Executable
+from SRACore.task import Executable, TaskRegistry, task_registry
 from SRACore.thread.runner import Runner
 from SRACore.util.const import AppDataDir, ConfigsDir
 from SRACore.util.errors import ThreadStoppedError
@@ -74,10 +74,23 @@ class BaseExtension(Executable, Generic[T], ABC):
         """子类可重写此方法以进行额外初始化"""
         pass
 
-    @abstractmethod
     def run(self) -> bool:
-        """执行扩展逻辑，返回是否成功"""
-        ...
+        """执行扩展逻辑，返回是否成功。
+
+        无执行逻辑的声明式扩展（``executable=False``）无需重写，默认返回 True。
+        """
+        return True
+
+    @classmethod
+    def on_tasks_registered(cls, tasks: TaskRegistry, config: T | None = None) -> None:
+        """任务（重新）注册后的回调（可选重写）。
+
+        在应用启动、任务热重载、扩展热重载与自身配置变更后调用，扩展可在此
+        读取/包装任务类。实现必须幂等：同一进程内可能被多次调用；``config``
+        为该扩展当前的配置实例（无配置模型时为 None），扩展需自行判断启用状态，
+        并在禁用时撤销此前的修改。
+        """
+        pass
 
     def on_start(self) -> None:
         """扩展开始执行前的回调（可选重写）"""
@@ -117,6 +130,7 @@ class ExtensionEntry:
     description: str = ""
     is_background: bool = False
     package_dir: Path | None = None
+    executable: bool = True  # 是否包含执行逻辑（无执行逻辑的扩展只能启用/禁用）
 
 
 class ExtensionRegistry:
@@ -127,13 +141,14 @@ class ExtensionRegistry:
 
     def register(self, extension_id: str, extension_cls: type[BaseExtension[Any]],
                  config_cls: type[BaseModel] | None = None, *, name: str = "", description: str = "",
-                 is_background: bool = False, package_dir: Path | None = None) -> None:
+                 is_background: bool = False, package_dir: Path | None = None,
+                 executable: bool = True) -> None:
         if extension_id in self._storage:
             raise KeyError(f"Extension '{extension_id}' already exists")
         self._storage[extension_id] = ExtensionEntry(
             extension_cls=extension_cls, config_cls=config_cls,
             name=name, description=description, is_background=is_background,
-            package_dir=package_dir,
+            package_dir=package_dir, executable=executable,
         )
 
     def get(self, extension_id: str) -> ExtensionEntry:
@@ -155,6 +170,10 @@ class ExtensionRegistry:
 
     def is_background(self, extension_id: str) -> bool:
         return self.get(extension_id).is_background
+
+    def is_executable(self, extension_id: str) -> bool:
+        """扩展是否包含执行逻辑（可运行/停止）。"""
+        return self.get(extension_id).executable
 
     def get_background_ids(self) -> list[str]:
         return [ext_id for ext_id, entry in self._storage.items() if entry.is_background]
@@ -374,18 +393,21 @@ def _resolve_package_dir(cls: type) -> Path | None:
 @overload
 def extension(_cls: _ExtCls, /, *, extension_id: str | None = None,
               name: str | None = None, description: str | None = None,
-              background: bool = False, registry: ExtensionRegistry | None = None) -> _ExtCls: ...
+              background: bool = False, registry: ExtensionRegistry | None = None,
+              executable: bool = True) -> _ExtCls: ...
 
 
 @overload
 def extension(_cls: None = None, /, *, extension_id: str | None = None,
               name: str | None = None, description: str | None = None,
-              background: bool = False, registry: ExtensionRegistry | None = None) -> Callable[[_ExtCls], _ExtCls]: ...
+              background: bool = False, registry: ExtensionRegistry | None = None,
+              executable: bool = True) -> Callable[[_ExtCls], _ExtCls]: ...
 
 
 def extension(_cls: _ExtCls | None = None, /, *, extension_id: str | None = None,
               name: str | None = None, description: str | None = None,
-              background: bool = False, registry: ExtensionRegistry | None = None) -> _ExtCls | Callable[[_ExtCls], _ExtCls]:
+              background: bool = False, registry: ExtensionRegistry | None = None,
+              executable: bool = True) -> _ExtCls | Callable[[_ExtCls], _ExtCls]:
     """扩展注册装饰器，将扩展类及其配置模型注册到注册表中。
 
     配置模型通过泛型参数声明::
@@ -401,6 +423,7 @@ def extension(_cls: _ExtCls | None = None, /, *, extension_id: str | None = None
         description: 扩展描述，默认使用类 docstring 首行。
         registry: 目标注册表，默认使用全局 ``extension_registry``。
         background: 是否为后台扩展。
+        executable: 是否包含执行逻辑。为 False 时前端只提供启用/禁用（如切号扩展）。
     """
     reg = registry or extension_registry
 
@@ -423,10 +446,13 @@ def extension(_cls: _ExtCls | None = None, /, *, extension_id: str | None = None
         _name = name or cls.__name__
         _desc = description or (cls.__doc__.strip().splitlines()[0] if cls.__doc__ else "")
         reg.register(_id, cls, resolved_config, name=_name, description=_desc,
-                    is_background=background, package_dir=_resolve_package_dir(cls))
+                    is_background=background, package_dir=_resolve_package_dir(cls),
+                    executable=executable)
+        if executable and cls.run is BaseExtension.run:
+            logger.warning(f"Extension '{_id}' 标记为可执行但没有重写 run()")
         _config_name = resolved_config.__name__ if resolved_config else "None"
         logger.debug(f"Registered extension: {_id} -> {cls.__name__} "
-                     f"(config={_config_name}, background={background})")
+                     f"(config={_config_name}, background={background}, executable={executable})")
         return cls
 
     if _cls is None:
@@ -545,6 +571,24 @@ class ExtensionConfigManager:
         return list(self._configs.keys())
 
 
+def run_task_hooks(config_manager: ExtensionConfigManager,
+                   registry: ExtensionRegistry | None = None) -> None:
+    """对所有已注册扩展执行 ``on_tasks_registered``。
+
+    扩展可在任务（重新）注册后读取/包装任务类；单个扩展的钩子失败只记录日志，
+    不影响其余扩展。
+    """
+    reg = registry or extension_registry
+    for ext_id in reg.get_ids():
+        hook = getattr(reg.get_extension_class(ext_id), "on_tasks_registered", None)
+        if hook is None:
+            continue
+        try:
+            hook(task_registry, config_manager.get(ext_id))
+        except Exception as e:
+            logger.exception(f"Extension '{ext_id}' task hook failed: {e}")
+
+
 class ExtensionRunner(Runner):
     """扩展运行器，负责实例化扩展并执行其 ``run`` 逻辑。
 
@@ -580,6 +624,10 @@ class ExtensionRunner(Runner):
                   if settings.General.isCloudGameEnabled
                   else OperatorType.Local)
         return OperatorFactory.get_operator(optype, settings, self.stop_event)
+
+    def apply_task_hooks(self) -> None:
+        """对所有已注册扩展执行任务注册后钩子（见 ``run_task_hooks``）。"""
+        run_task_hooks(self._config_manager, self._registry)
 
     def create(self, extension_id: str) -> BaseExtension[Any]:
         """根据标识实例化扩展（不含运行）。
@@ -722,6 +770,9 @@ class ExtensionRunner(Runner):
         重新实例化时停止并重启整个线程；应仅替换当前实例，保留线程
         持续运行，避免无意义的线程重建。
         """
+        # 配置变更后先重新应用任务钩子：非后台扩展（如自动切号）依赖它即时生效
+        self.apply_task_hooks()
+
         if extension_id not in extension_registry.get_background_ids():
             return
 

@@ -158,6 +158,8 @@ class SRACli(cmd2.Cmd):
         task_registry.clear()
 
         reload_package("tasks")
+        # 任务类已重新生成，让扩展在任务注册后钩子中重新应用修改
+        self.context.extension_runner.apply_task_hooks()
 
         after = set(task_registry.get_ids())
         if not after:
@@ -317,6 +319,36 @@ class SRACli(cmd2.Cmd):
                 formatter=lambda d: f"{Resources.cli_status_status}: {d['status']}\n"
                                     f"{Resources.cli_status_unit}: {d['unit']}"
                 + (f"\n{Resources.cli_status_error}: {d['error']}" if d['error'] else ""))
+
+    @staticmethod
+    def _build_extension_enable_parser() -> cmd2.Cmd2ArgumentParser:
+        parser = SRACli.cmd2argumentparser_factory(description=Resources.cli_extension_enableDescription)
+        parser.add_argument('name', help=Resources.cli_extension_enableNameHelp)
+        return parser
+
+    @cmd2.as_subcommand_to("extension", "enable", _build_extension_enable_parser,
+                           help=Resources.cli_extension_enableDescription)
+    def _extension_enable(self, args: argparse.Namespace) -> None:
+        ok, message = self.context.extension_set_enabled(args.name, True)
+        if ok:
+            self.ok(Resources.cli_extension_enableDone(args.name), {"id": args.name, "enabled": True})
+        else:
+            self.err(message)
+
+    @staticmethod
+    def _build_extension_disable_parser() -> cmd2.Cmd2ArgumentParser:
+        parser = SRACli.cmd2argumentparser_factory(description=Resources.cli_extension_disableDescription)
+        parser.add_argument('name', help=Resources.cli_extension_disableNameHelp)
+        return parser
+
+    @cmd2.as_subcommand_to("extension", "disable", _build_extension_disable_parser,
+                           help=Resources.cli_extension_disableDescription)
+    def _extension_disable(self, args: argparse.Namespace) -> None:
+        ok, message = self.context.extension_set_enabled(args.name, False)
+        if ok:
+            self.ok(Resources.cli_extension_disableDone(args.name), {"id": args.name, "enabled": False})
+        else:
+            self.err(message)
 
     @staticmethod
     def _build_extension_config_parser() -> cmd2.Cmd2ArgumentParser:

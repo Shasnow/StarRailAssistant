@@ -1,0 +1,5 @@
+{
+    "name": "自动切号",
+    "description": "免密码历史账号切号（AUTO-MAS 花名册 / account_hint.txt）",
+    "enabled.description": "是否启用自动切号"
+}

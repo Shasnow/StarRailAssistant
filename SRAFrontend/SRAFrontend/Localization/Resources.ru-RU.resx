@@ -895,6 +895,24 @@
     <data name="StoppedStatusText" xml:space="preserve">
         <value>Остановлено</value>
     </data>
+    <data name="EnabledStatusText" xml:space="preserve">
+        <value>Включено</value>
+    </data>
+    <data name="DisabledStatusText" xml:space="preserve">
+        <value>Отключено</value>
+    </data>
+    <data name="EnableText" xml:space="preserve">
+        <value>Включить</value>
+    </data>
+    <data name="DisableText" xml:space="preserve">
+        <value>Отключить</value>
+    </data>
+    <data name="EnableExtensionTooltip" xml:space="preserve">
+        <value>Включить это расширение</value>
+    </data>
+    <data name="DisableExtensionTooltip" xml:space="preserve">
+        <value>Отключить это расширение</value>
+    </data>
     <data name="ConfigurationTitleFormat" xml:space="preserve">
         <value>Настройки — {0}</value>
     </data>
