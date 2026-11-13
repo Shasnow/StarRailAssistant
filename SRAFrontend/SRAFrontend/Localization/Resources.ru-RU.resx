@@ -2053,7 +2053,7 @@
         <value>Быстрое прохождение техникой</value>
     </data>
     <data name="EnablePointRewardsText" xml:space="preserve">
-        <value>Учитывать лимит очков</value>
+        <value>Включить циклические бонусы</value>
     </data>
     <data name="CurrencyWarsZeroSumText" xml:space="preserve">
         <value>Валютные войны — Путешествие в полотно</value>
@@ -2618,5 +2618,8 @@
     </data>
     <data name="ListSeparatorText" xml:space="preserve">
         <value>, </value>
+    </data>
+    <data name="EnablePointRewardsToolTip" xml:space="preserve">
+        <value>при достижении недельного лимита баллов пропустить это задание.</value>
     </data>
 </root>

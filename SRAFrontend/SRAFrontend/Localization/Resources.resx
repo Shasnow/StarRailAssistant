@@ -2053,7 +2053,7 @@ Please choose another folder.</value>
         <value>Fast farming with Technique</value>
     </data>
     <data name="EnablePointRewardsText" xml:space="preserve">
-        <value>Enable point rewards</value>
+        <value>Enable weekly point rewards</value>
     </data>
     <data name="CurrencyWarsZeroSumText" xml:space="preserve">
         <value>Currency Wars - Voyage Into the Canvas</value>
@@ -2618,5 +2618,8 @@ crystalline and sweet</value>
     </data>
     <data name="ListSeparatorText" xml:space="preserve">
         <value>, </value>
+    </data>
+    <data name="EnablePointRewardsToolTip" xml:space="preserve">
+        <value>Receive the rewards and skip this task when the weekly point cap is reached.</value>
     </data>
 </root>

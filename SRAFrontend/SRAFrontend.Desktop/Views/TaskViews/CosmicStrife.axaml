@@ -39,7 +39,9 @@
                                 <NumericUpDown FormatString="0" Value="{Binding CosmicStrifeConfig.DivergentUniverseRuntimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
                             <ToggleSwitch OnContent="{x:Static lang:Resources.TechniqueFastFarmText}" IsChecked="{Binding CosmicStrifeConfig.IsDivergentUniverseUseTechnique}" />
-                            <ToggleSwitch OnContent="{x:Static lang:Resources.EnablePointRewardsText}" IsChecked="{Binding CosmicStrifeConfig.IsPointRewardsEnabled}" />
+                            <ToggleSwitch OnContent="{x:Static lang:Resources.EnablePointRewardsText}"
+                                          ToolTip.Tip="{x:Static lang:Resources.EnablePointRewardsToolTip}"
+                                          IsChecked="{Binding CosmicStrifeConfig.IsPointRewardsEnabled}" />
                         </StackPanel>
                     </suki:GlassCard>
                     <TextBlock><x:Static Member="lang:Resources.DivergentUniverseTutorialHint" /></TextBlock>
@@ -92,7 +94,9 @@
                                 <NumericUpDown FormatString="0" Value="{Binding CosmicStrifeConfig.CurrencyWarsRuntimes}" Minimum="1" Maximum="99999" />
                             </StackPanel>
 
-                            <ToggleSwitch OnContent="{x:Static lang:Resources.SkipWhenPointsFullText}" IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsPointRewardsEnabled}" />
+                            <ToggleSwitch OnContent="{x:Static lang:Resources.EnablePointRewardsText}"
+                                          ToolTip.Tip="{x:Static lang:Resources.EnablePointRewardsToolTip}"
+                                          IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsPointRewardsEnabled}" />
 
                             <Separator/>
 

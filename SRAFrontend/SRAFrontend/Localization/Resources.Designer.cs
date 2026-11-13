@@ -2357,6 +2357,33 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disabled.
+        /// </summary>
+        public static string DisabledStatusText {
+            get {
+                return ResourceManager.GetString("DisabledStatusText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable this extension.
+        /// </summary>
+        public static string DisableExtensionTooltip {
+            get {
+                return ResourceManager.GetString("DisableExtensionTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable.
+        /// </summary>
+        public static string DisableText {
+            get {
+                return ResourceManager.GetString("DisableText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Whether to enable Discord push.
         /// </summary>
         public static string DiscordEnableDescription {
@@ -2672,6 +2699,24 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        public static string EnabledStatusText {
+            get {
+                return ResourceManager.GetString("EnabledStatusText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable this extension.
+        /// </summary>
+        public static string EnableExtensionTooltip {
+            get {
+                return ResourceManager.GetString("EnableExtensionTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enable Launch Arguments.
         /// </summary>
         public static string EnableGameArgsText {
@@ -2690,11 +2735,20 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable point rewards.
+        ///   Looks up a localized string similar to Enable weekly point rewards.
         /// </summary>
         public static string EnablePointRewardsText {
             get {
                 return ResourceManager.GetString("EnablePointRewardsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Receive the rewards and skip this task when the weekly point cap is reached..
+        /// </summary>
+        public static string EnablePointRewardsToolTip {
+            get {
+                return ResourceManager.GetString("EnablePointRewardsToolTip", resourceCulture);
             }
         }
         
@@ -2704,6 +2758,15 @@ namespace SRAFrontend.Localization {
         public static string EnableProxyText {
             get {
                 return ResourceManager.GetString("EnableProxyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable.
+        /// </summary>
+        public static string EnableText {
+            get {
+                return ResourceManager.GetString("EnableText", resourceCulture);
             }
         }
         
@@ -6472,60 +6535,6 @@ namespace SRAFrontend.Localization {
         public static string StoppedStatusText {
             get {
                 return ResourceManager.GetString("StoppedStatusText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enabled.
-        /// </summary>
-        public static string EnabledStatusText {
-            get {
-                return ResourceManager.GetString("EnabledStatusText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Disabled.
-        /// </summary>
-        public static string DisabledStatusText {
-            get {
-                return ResourceManager.GetString("DisabledStatusText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enable.
-        /// </summary>
-        public static string EnableText {
-            get {
-                return ResourceManager.GetString("EnableText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Disable.
-        /// </summary>
-        public static string DisableText {
-            get {
-                return ResourceManager.GetString("DisableText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enable this extension.
-        /// </summary>
-        public static string EnableExtensionTooltip {
-            get {
-                return ResourceManager.GetString("EnableExtensionTooltip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Disable this extension.
-        /// </summary>
-        public static string DisableExtensionTooltip {
-            get {
-                return ResourceManager.GetString("DisableExtensionTooltip", resourceCulture);
             }
         }
         

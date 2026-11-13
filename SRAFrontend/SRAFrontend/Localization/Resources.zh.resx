@@ -2049,7 +2049,7 @@
         <value>秘技速刷</value>
     </data>
     <data name="EnablePointRewardsText" xml:space="preserve">
-        <value>启用积分奖励</value>
+        <value>启用周期积分奖励</value>
     </data>
     <data name="CurrencyWarsZeroSumText" xml:space="preserve">
         <value>货币战争 - 入画奇航</value>
@@ -2614,5 +2614,8 @@ crystalline and sweet</value>
     </data>
     <data name="ListSeparatorText" xml:space="preserve">
         <value>、</value>
+    </data>
+    <data name="EnablePointRewardsToolTip" xml:space="preserve">
+        <value>本周积分达到上限时领取奖励并跳过此任务</value>
     </data>
 </root>
