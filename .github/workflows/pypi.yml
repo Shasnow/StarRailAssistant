@@ -16,6 +16,9 @@ on:
       version:
         description: 'Version to publish (e.g. 2.17.0)'
         required: true
+  push:
+    tags:
+      - 'v*'
 
 
 permissions:
