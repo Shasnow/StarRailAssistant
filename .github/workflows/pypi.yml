@@ -1,4 +1,4 @@
-# This workflow will upload a Python Package to PyPI when a release is created
+# 推送 v* 标签（或手动指定版本）时把 Python 包发布到 PyPI
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
 
 # This workflow uses actions that are not certified by GitHub.
@@ -9,16 +9,14 @@
 name: Upload Python Package
 
 on:
-  release:
-    types: [released]
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       version:
         description: 'Version to publish (e.g. 2.17.0)'
         required: true
-  push:
-    tags:
-      - 'v*'
 
 
 permissions:
@@ -34,11 +32,17 @@ jobs:
       - name: Determine version
         id: version
         run: |
-          if [ "${{ github.event_name }}" = "release" ]; then
-            TAG="${{ github.event.release.tag_name }}"
-            VERSION="${TAG#v}"
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "push" ]; then
+            # 推送 v* 标签时用标签名，不能用 github.event.inputs.version（该事件下为空）
+            TAG="${{ github.ref_name }}"
           else
-            VERSION="${{ github.event.inputs.version }}"
+            TAG="${{ github.event.inputs.version }}"
+          fi
+          VERSION="${TAG#v}"
+          if [ -z "$VERSION" ]; then
+            echo "::error::无法确定发布版本号（tag='$TAG'）"
+            exit 1
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Resolved version: $VERSION"
@@ -94,3 +98,5 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
+          # 重跑工作流时同版本文件已在 PyPI 上，跳过而不是报 400 File already exists
+          skip-existing: true
