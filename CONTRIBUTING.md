@@ -218,6 +218,14 @@ pytest
 
 ## 🤝 参与开发
 
+### 拓展开发
+
+`拓展` 指放置在 `extensions/` 目录下的软件包，用于扩展 SRA 功能，由SRA在启动时加载。
+
+拓展开发文档：[拓展开发](https://starrailassistant.top/tutorials/add-extension/)
+
+拓展维护者应当提供 `README.md` 文件，介绍拓展的功能、使用方法、配置选项等。
+
 ### 后端开发
 
 * 🐍 熟悉 `Python`
