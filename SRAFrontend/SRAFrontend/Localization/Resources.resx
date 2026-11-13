@@ -290,7 +290,7 @@
         <value>Game Launch Arguments</value>
     </data>
     <data name="EnableGameArgsText" xml:space="preserve">
-        <value>Enable Launch Arguments</value>
+        <value>Enable window settings</value>
     </data>
     <data name="WindowSizeText" xml:space="preserve">
         <value>Window Size</value>
@@ -1273,7 +1273,7 @@ Please choose another folder.</value>
         <value>Browse and select a file</value>
     </data>
     <data name="EnabledParametersHint" xml:space="preserve">
-        <value>The parameters below take effect only when enabled</value>
+        <value>Writes the window settings below when enabled</value>
     </data>
     <data name="OfficialApiPlaceholder" xml:space="preserve">
         <value>Leave empty to use the official API</value>

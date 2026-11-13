@@ -1,5 +1,4 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:controls="clr-namespace:SRAFrontend.Desktop.Controls"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -100,7 +99,7 @@
 
                                     <Expander Header="{x:Static lang:Resources.GameLaunchArgumentsText}" IsExpanded="True">
                                         <StackPanel>
-                                            <!-- 启用开关 -->
+                                            <!-- 自动设置窗口：只控制下面的窗口尺寸、显示模式、无边框窗口 -->
                                             <Grid ColumnDefinitions="Auto, *, Auto" ToolTip.Tip="{x:Static lang:Resources.EnabledParametersHint}">
                                                 <Label Classes="Icon">&#xE47E;</Label>
                                                 <Label Grid.Column="1" Content="{x:Static lang:Resources.EnableGameArgsText}" />
@@ -109,7 +108,8 @@
                                             </Grid>
 
                                             <!-- 窗口尺寸 -->
-                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                            <Grid ColumnDefinitions="Auto, *, Auto"
+                                                  IsEnabled="{Binding GeneralSettings.IsGameArgsEnabled}">
                                                 <Label Classes="Icon">&#xED6E;</Label>
                                                 <Label Grid.Column="1" Content="{x:Static lang:Resources.WindowSizeText}" />
                                                 <ComboBox Grid.Column="2"
@@ -119,7 +119,8 @@
                                             </Grid>
 
                                             <!-- 显示模式 -->
-                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                            <Grid ColumnDefinitions="Auto, *, Auto"
+                                                  IsEnabled="{Binding GeneralSettings.IsGameArgsEnabled}">
                                                 <Label Classes="Icon">&#xE626;</Label>
                                                 <Label Grid.Column="1" Content="{x:Static lang:Resources.DisplayModeText}" />
                                                 <ComboBox Grid.Column="2"
@@ -128,7 +129,8 @@
                                             </Grid>
 
                                             <!-- 无边框窗口 -->
-                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                            <Grid ColumnDefinitions="Auto, *, Auto"
+                                                  IsEnabled="{Binding GeneralSettings.IsGameArgsEnabled}">
                                                 <Label Classes="Icon">&#xE5DA;</Label>
                                                 <Label Grid.Column="1" Content="{x:Static lang:Resources.BorderlessWindowText}" />
                                                 <ToggleSwitch Grid.Column="2"

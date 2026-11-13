@@ -23,7 +23,7 @@ class GeneralSettings(_Model):
     gamePathIndex: int = Field(0, alias="gamePath.index", description='游戏路径索引，指向 gamePath.uris 中的一个 URI')
     gamePaths: list[str] = Field(default_factory=list, alias="gamePath.uris", description='游戏路径列表，支持多个路径以便快速切换')
     isAutoDetectGamePath: bool = Field(True, alias="gamePath.autoDetect", description='是否自动检测游戏路径，启用后将扫描常见安装位置以找到游戏路径')
-    isGameArgsEnabled: bool = Field(True, alias="gameArgs.enabled", description='是否启用游戏启动参数，启用后将使用下面的参数启动游戏')
+    isGameArgsEnabled: bool = Field(True, alias="gameArgs.enabled", description='是否自动设置游戏窗口，启用后按窗口尺寸与显示模式写入游戏配置')
     gameArgsFullScreenMode: str = Field("窗口化", alias="gameArgs.fullScreenMode", description='游戏窗口模式，如 窗口化、全屏')
     gameArgsWindowSize: str = Field("1920x1080", alias="gameArgs.windowSize", description='游戏窗口尺寸，格式为 宽x高，如 1920x1080')
     isGameArgsPopupWindow: bool = Field(False, alias="gameArgs.popupWindow", description='是否使用无边框游戏窗口')

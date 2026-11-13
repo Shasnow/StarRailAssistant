@@ -289,9 +289,9 @@
   <data name="GameLaunchArgumentsText" xml:space="preserve">
     <value>Параметры запуска игры</value>
   </data>
-  <data name="EnableGameArgsText" xml:space="preserve">
-    <value>Использовать параметры запуска</value>
-  </data>
+    <data name="EnableGameArgsText" xml:space="preserve">
+        <value>Включить настройки окна</value>
+    </data>
   <data name="WindowSizeText" xml:space="preserve">
     <value>Размер окна</value>
   </data>
@@ -1273,7 +1273,7 @@
         <value>Обзор и выбор файла</value>
     </data>
     <data name="EnabledParametersHint" xml:space="preserve">
-        <value>Указанные ниже параметры действуют только при включении</value>
+        <value>При включении параметры окна ниже применяются автоматически</value>
     </data>
     <data name="OfficialApiPlaceholder" xml:space="preserve">
         <value>Пустое поле — официальный API</value>

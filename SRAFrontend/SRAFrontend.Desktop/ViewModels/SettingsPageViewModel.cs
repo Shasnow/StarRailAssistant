@@ -106,6 +106,7 @@ public partial class SettingsPageViewModel : PageViewModel
 
         DetectGamePath();
         SetGameResolution();
+        _registryService.SetAutoBattleSettings(Settings.General.IsGameArgsAutoButtle, true);
         if (IsOverlayEnabled) _overlayService.ShowOverlay();
         _overlayService.SetOverlayDebugInfoEnabled(Settings.Advanced.IsDebugOverlayEnabled);
 
@@ -587,9 +588,13 @@ public partial class SettingsPageViewModel : PageViewModel
 
     private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(Settings.General.GameArgsWindowSize)
+        if (e.PropertyName is nameof(Settings.General.IsGameArgsEnabled)
+            or nameof(Settings.General.GameArgsWindowSize)
             or nameof(Settings.General.GameArgsFullScreenMode))
             SetGameResolution();
+
+        if (e.PropertyName == nameof(Settings.General.IsGameArgsAutoButtle))
+            _registryService.SetAutoBattleSettings(Settings.General.IsGameArgsAutoButtle, true);
 
         if (e.PropertyName == nameof(UpdateSettings.DownloadPath))
             OnPropertyChanged(nameof(EffectiveDownloadPath));

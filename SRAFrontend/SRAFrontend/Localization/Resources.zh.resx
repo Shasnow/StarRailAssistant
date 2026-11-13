@@ -286,7 +286,7 @@
         <value>游戏启动参数</value>
     </data>
     <data name="EnableGameArgsText" xml:space="preserve">
-        <value>启用启动参数</value>
+        <value>启用窗口设置</value>
     </data>
     <data name="WindowSizeText" xml:space="preserve">
         <value>窗口尺寸</value>
@@ -1269,7 +1269,7 @@
         <value>浏览并选择文件</value>
     </data>
     <data name="EnabledParametersHint" xml:space="preserve">
-        <value>启用后，下面的参数才会生效</value>
+        <value>启用后自动写入下方窗口设置</value>
     </data>
     <data name="OfficialApiPlaceholder" xml:space="preserve">
         <value>留空使用官方 API</value>

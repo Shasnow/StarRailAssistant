@@ -10,6 +10,7 @@
 namespace SRAFrontend.Localization {
     using System;
     
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -1690,7 +1691,7 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The parameters below take effect only when enabled.
+        ///   Looks up a localized string similar to Writes the window settings below when enabled.
         /// </summary>
         public static string EnabledParametersHint {
             get {
@@ -1717,7 +1718,7 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable Launch Arguments.
+        ///   Looks up a localized string similar to Enable window settings.
         /// </summary>
         public static string EnableGameArgsText {
             get {

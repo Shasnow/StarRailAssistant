@@ -54,7 +54,7 @@
     "gamePath.index": "游戏路径索引，指向 gamePath.uris 中的一个 URI",
     "gamePath.uris": "游戏路径列表，支持多个路径以便快速切换",
     "gamePath.autoDetect": "是否自动检测游戏路径，启用后将扫描常见安装位置以找到游戏路径",
-    "gameArgs.enabled": "是否启用游戏启动参数，启用后将使用下面的参数启动游戏",
+    "gameArgs.enabled": "是否自动设置游戏窗口，启用后按窗口尺寸与显示模式写入游戏配置",
     "gameArgs.fullScreenMode": "游戏窗口模式，如 窗口化、全屏",
     "gameArgs.windowSize": "游戏窗口尺寸，格式为 宽x高，如 1920x1080",
     "gameArgs.popupWindow": "是否使用无边框游戏窗口",

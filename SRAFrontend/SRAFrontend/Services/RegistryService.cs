@@ -86,7 +86,6 @@ public class RegistryService(
     {
         SetResolutionForServer(RegistryConfig.CnGameRegPath);
         SetResolutionForServer(RegistryConfig.GlobalGameRegPath);
-        SetAutoBattleSettings(true, true);
     }
 
     /// <summary>
@@ -99,7 +98,10 @@ public class RegistryService(
         RestoreResolutionForServer(RegistryConfig.GlobalGameRegPath);
     }
 
-    private void SetAutoBattleSettings(bool isEnabled, bool isSaveSpeed)
+    /// <summary>
+    ///     设置游戏内自动战斗与保存战斗速度
+    /// </summary>
+    public void SetAutoBattleSettings(bool isEnabled, bool isSaveSpeed)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
