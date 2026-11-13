@@ -12,9 +12,6 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="GreetingText" xml:space="preserve">
-        <value>欢迎来到 SRA</value>
-    </data>
     <data name="HomeText" xml:space="preserve">
         <value>主页</value>
     </data>
@@ -47,9 +44,6 @@
     </data>
     <data name="StartUpText" xml:space="preserve">
         <value>开机自启动</value>
-    </data>
-    <data name="ThreadSafetyText" xml:space="preserve">
-        <value>线程安全</value>
     </data>
     <data name="AllowNotificationText" xml:space="preserve">
         <value>允许通知</value>
@@ -87,9 +81,6 @@
     <data name="LightText" xml:space="preserve">
         <value>浅色</value>
     </data>
-    <data name="FollowSystemText" xml:space="preserve">
-        <value>跟随系统</value>
-    </data>
     <data name="AboutText" xml:space="preserve">
         <value>关于</value>
     </data>
@@ -126,9 +117,6 @@
     <data name="ControlPanelOpacityText" xml:space="preserve">
         <value>控制面板不透明度</value>
     </data>
-    <data name="NotSetText" xml:space="preserve">
-        <value>未设置</value>
-    </data>
     <data name="HotkeysText" xml:space="preserve">
         <value>游戏内快捷键</value>
     </data>
@@ -143,9 +131,6 @@
     </data>
     <data name="GuideText" xml:space="preserve">
         <value>指南</value>
-    </data>
-    <data name="MapText" xml:space="preserve">
-        <value>地图</value>
     </data>
     <data name="TechniqueText" xml:space="preserve">
         <value>秘技</value>
@@ -264,9 +249,6 @@
     <data name="CurrentConfigText" xml:space="preserve">
         <value>当前配置</value>
     </data>
-    <data name="AutoResolutionText" xml:space="preserve">
-        <value>自动设置游戏分辨率</value>
-    </data>
     <data name="DeveloperOptionsText" xml:space="preserve">
         <value>开发者选项</value>
     </data>
@@ -287,9 +269,6 @@
     </data>
     <data name="BackendWorkingDirectoryText" xml:space="preserve">
         <value>工作目录</value>
-    </data>
-    <data name="BackendWorkingDirectoryHintText" xml:space="preserve">
-        <value>留空则使用程序当前目录</value>
     </data>
     <data name="CloudGameText" xml:space="preserve">
         <value>使用云·星穹铁道（实验性）</value>
@@ -314,12 +293,6 @@
     </data>
     <data name="DisplayModeText" xml:space="preserve">
         <value>显示模式</value>
-    </data>
-    <data name="WindowedText" xml:space="preserve">
-        <value>窗口化</value>
-    </data>
-    <data name="FullScreenText" xml:space="preserve">
-        <value>全屏</value>
     </data>
     <data name="BorderlessWindowText" xml:space="preserve">
         <value>无边框窗口</value>
@@ -570,9 +543,6 @@
     <data name="CheckText" xml:space="preserve">
         <value>检查</value>
     </data>
-    <data name="CurrencyWarsPlusDescription" xml:space="preserve">
-        <value>常规与超频博弈，包含最新金币、支援识别和失败汇总修复。</value>
-    </data>
     <data name="EventStatusEndedText" xml:space="preserve">
         <value>已结束</value>
     </data>
@@ -657,9 +627,6 @@
     <data name="UpdateAutoDownloadMessage" xml:space="preserve">
         <value>正在自动下载更新包：{0}</value>
     </data>
-    <data name="UpdateAutoModeText" xml:space="preserve">
-        <value>自动更新</value>
-    </data>
     <data name="UpdateManualModeText" xml:space="preserve">
         <value>手动更新</value>
     </data>
@@ -680,9 +647,6 @@
     </data>
     <data name="DoNotAskAgainText" xml:space="preserve">
         <value>不再询问</value>
-    </data>
-    <data name="CreateDesktopShortcutText" xml:space="preserve">
-        <value>创建桌面快捷方式</value>
     </data>
     <data name="DesktopShortcutMissingMessage" xml:space="preserve">
         <value>检测到桌面快捷方式不存在，是否现在创建？</value>
@@ -777,12 +741,6 @@
     <data name="RestartConfirmMessage" xml:space="preserve">
         <value>是否现在重启应用以应用最新版本？</value>
     </data>
-    <data name="ConfirmText" xml:space="preserve">
-        <value>确认</value>
-    </data>
-    <data name="ReinstallLatestText" xml:space="preserve">
-        <value>重新安装最新版本</value>
-    </data>
     <data name="ReinstallConfirmMessage" xml:space="preserve">
         <value>此操作将重新下载并安装最新版本安装包，以修复可能存在的问题。是否继续？</value>
     </data>
@@ -874,9 +832,6 @@
     </data>
     <data name="SavedToFormat" xml:space="preserve">
         <value>已保存至：{0}</value>
-    </data>
-    <data name="LogExportPathFailedError" xml:space="preserve">
-        <value>日志导出失败: {TargetPath}</value>
     </data>
     <data name="LogExportFailedError" xml:space="preserve">
         <value>日志导出失败</value>
@@ -982,9 +937,6 @@
     </data>
     <data name="LanguageRestartConfirmMessage" xml:space="preserve">
         <value>需要重启应用以应用新语言，是否立即重启？</value>
-    </data>
-    <data name="LabelValueFormat" xml:space="preserve">
-        <value>{0}：{1}</value>
     </data>
     <data name="EmailTestText" xml:space="preserve">
         <value>邮件测试</value>
@@ -1118,647 +1070,17 @@
     <data name="StageRequiredMessage" xml:space="preserve">
         <value>请选择副本关卡后再添加任务</value>
     </data>
-    <data name="ApiGetBackgroundImageText" xml:space="preserve">
-        <value>获取背景图</value>
-    </data>
-    <data name="ApiGetSystemInfoText" xml:space="preserve">
-        <value>获取系统信息</value>
-    </data>
-    <data name="ApiGetPhrasesText" xml:space="preserve">
-        <value>获取短语</value>
-    </data>
-    <data name="ApiRestartBackendText" xml:space="preserve">
-        <value>重启后端</value>
-    </data>
     <data name="ApiStopBackendText" xml:space="preserve">
         <value>停止后端</value>
-    </data>
-    <data name="ApiGetRecentLogsText" xml:space="preserve">
-        <value>获取最近日志</value>
-    </data>
-    <data name="ApiSseLogStreamText" xml:space="preserve">
-        <value>SSE 日志流</value>
-    </data>
-    <data name="ApiOperatorScreenshotText" xml:space="preserve">
-        <value>获取 Operator 截图</value>
-    </data>
-    <data name="ApiGetConfigNamesText" xml:space="preserve">
-        <value>获取所有配置名称</value>
-    </data>
-    <data name="ApiGetConfigurationText" xml:space="preserve">
-        <value>获取指定配置</value>
-    </data>
-    <data name="ApiNewConfigurationText" xml:space="preserve">
-        <value>新建配置</value>
-    </data>
-    <data name="ConfigNameInvalidError" xml:space="preserve">
-        <value>名称包含非法字符</value>
-    </data>
-    <data name="ConfigurationExistsError" xml:space="preserve">
-        <value>配置已存在</value>
-    </data>
-    <data name="ApiListExtensionsText" xml:space="preserve">
-        <value>列出所有已注册的扩展</value>
-    </data>
-    <data name="ApiExtensionSchemaText" xml:space="preserve">
-        <value>获取扩展配置 Schema</value>
-    </data>
-    <data name="ApiGetExtensionConfigText" xml:space="preserve">
-        <value>获取扩展配置值</value>
-    </data>
-    <data name="ApiSetExtensionConfigText" xml:space="preserve">
-        <value>设置扩展配置值</value>
-    </data>
-    <data name="ApiRunExtensionText" xml:space="preserve">
-        <value>运行指定扩展</value>
-    </data>
-    <data name="ApiStopExtensionText" xml:space="preserve">
-        <value>停止指定扩展</value>
-    </data>
-    <data name="ApiReloadExtensionsText" xml:space="preserve">
-        <value>重新扫描并导入扩展模块</value>
-    </data>
-    <data name="ApiListOperatorMethodsText" xml:space="preserve">
-        <value>列出所有可用的 Operator 方法</value>
-    </data>
-    <data name="ApiOperatorMethodHelpText" xml:space="preserve">
-        <value>获取 Operator 方法的详细帮助</value>
-    </data>
-    <data name="ApiCallOperatorMethodText" xml:space="preserve">
-        <value>调用 Operator 方法</value>
-    </data>
-    <data name="ApiGetSettingsText" xml:space="preserve">
-        <value>获取设置</value>
-    </data>
-    <data name="ApiGetCurrentSettingsText" xml:space="preserve">
-        <value>获取当前应用程序的设置</value>
-    </data>
-    <data name="ApiUpdateSettingsText" xml:space="preserve">
-        <value>修改设置</value>
-    </data>
-    <data name="ApiUpdateSettingsDescription" xml:space="preserve">
-        <value>按字段修改设置，支持只传需要修改的部分。请求体为 AppSettings 的部分 JSON，例如 { "advanced": { "backend.remote.enabled": true } }</value>
-    </data>
-    <data name="ApiRunTasksText" xml:space="preserve">
-        <value>运行任务</value>
-    </data>
-    <data name="ApiRunSingleTaskText" xml:space="preserve">
-        <value>运行单个指定任务</value>
-    </data>
-    <data name="ApiStopTasksText" xml:space="preserve">
-        <value>停止任务</value>
-    </data>
-    <data name="ApiGetTaskStatusText" xml:space="preserve">
-        <value>获取任务状态</value>
     </data>
     <data name="RedemptionCodeAutoFetchHint" xml:space="preserve">
         <value>兑换码任务会自动从官网拉取最新兑换码，与上方填写的兑换码一并兑换。</value>
     </data>
-    <data name="GeneralSettingsText" xml:space="preserve">
-        <value>通用设置</value>
-    </data>
-    <data name="DisplaySettingsText" xml:space="preserve">
-        <value>显示设置</value>
-    </data>
-    <data name="UpdateSettingsText" xml:space="preserve">
-        <value>更新设置</value>
-    </data>
-    <data name="AdvancedSettingsText" xml:space="preserve">
-        <value>高级设置</value>
-    </data>
-    <data name="NotificationSettingsText" xml:space="preserve">
-        <value>通知设置</value>
-    </data>
-    <data name="GamePathIndexDescription" xml:space="preserve">
-        <value>游戏路径索引，指向 gamePath.uris 中的一个 URI</value>
-    </data>
-    <data name="GamePathListDescription" xml:space="preserve">
-        <value>游戏路径列表，支持多个路径以便快速切换</value>
-    </data>
-    <data name="GamePathAutoDetectDescription" xml:space="preserve">
-        <value>是否自动检测游戏路径，启用后将扫描常见安装位置以找到游戏路径</value>
-    </data>
-    <data name="GameLaunchArgsEnableDescription" xml:space="preserve">
-        <value>是否启用游戏启动参数，启用后将使用下面的参数启动游戏</value>
-    </data>
-    <data name="GameWindowModeDescription" xml:space="preserve">
-        <value>游戏窗口模式，如 窗口化、全屏</value>
-    </data>
-    <data name="GameWindowSizeDescription" xml:space="preserve">
-        <value>游戏窗口尺寸，格式为 宽x高，如 1920x1080</value>
-    </data>
-    <data name="BorderlessWindowDescription" xml:space="preserve">
-        <value>是否使用无边框游戏窗口</value>
-    </data>
-    <data name="AutoBattleDescription" xml:space="preserve">
-        <value>是否启用自动战斗</value>
-    </data>
-    <data name="CommandLineLaunchDescription" xml:space="preserve">
-        <value>是否使用命令行启动游戏（避免一些直接启动导致的问题）</value>
-    </data>
-    <data name="AdvancedLaunchArgsDescription" xml:space="preserve">
-        <value>高级启动参数，直接传递给游戏进程，覆盖其他参数设置</value>
-    </data>
-    <data name="CloudGamingDescription" xml:space="preserve">
-        <value>是否使用云游戏</value>
-    </data>
-    <data name="CloudBrowserDescription" xml:space="preserve">
-        <value>云游戏使用的浏览器</value>
-    </data>
-    <data name="CloudBrowserPathDescription" xml:space="preserve">
-        <value>云游戏使用的浏览器路径</value>
-    </data>
-    <data name="CloudBrowserHeadlessDescription" xml:space="preserve">
-        <value>云游戏使用的浏览器是否无头模式</value>
-    </data>
-    <data name="CloudBrowserMuteDescription" xml:space="preserve">
-        <value>云游戏使用的浏览器是否静音</value>
-    </data>
-    <data name="TechniqueHotkeyDescription" xml:space="preserve">
-        <value>施放秘技的快捷键</value>
-    </data>
-    <data name="EventsScreenHotkeyDescription" xml:space="preserve">
-        <value>打开活动界面的快捷键</value>
-    </data>
-    <data name="NamelessHonorHotkeyDescription" xml:space="preserve">
-        <value>打开纪行界面的快捷键</value>
-    </data>
-    <data name="WarpScreenHotkeyDescription" xml:space="preserve">
-        <value>打开卡池界面的快捷键</value>
-    </data>
-    <data name="GuideScreenHotkeyDescription" xml:space="preserve">
-        <value>打开指南界面的快捷键</value>
-    </data>
-    <data name="StopTaskHotkeyDescription" xml:space="preserve">
-        <value>停止运行任务的快捷键</value>
-    </data>
-    <data name="OverlayEnableDescription" xml:space="preserve">
-        <value>是否启用叠加层</value>
-    </data>
-    <data name="OcrConfidenceDescription" xml:space="preserve">
-        <value>OCR 识图置信度，范围 0-1，数值越高越严格</value>
-    </data>
-    <data name="TemplateMatchConfidenceDescription" xml:space="preserve">
-        <value>模板匹配置信度（识图置信度），范围 0-1，数值越高越严格</value>
-    </data>
-    <data name="TaskRetryDescription" xml:space="preserve">
-        <value>任务失败后是否尝试重启游戏并重试</value>
-    </data>
-    <data name="TaskMaxRetryDescription" xml:space="preserve">
-        <value>任务失败后最大重试次数</value>
-    </data>
-    <data name="BackgroundImageUriDescription" xml:space="preserve">
-        <value>背景图片 URI，可以是本地路径或网络 URL</value>
-    </data>
-    <data name="BackgroundImageOpacityDescription" xml:space="preserve">
-        <value>背景图片不透明度，范围 0-1</value>
-    </data>
-    <data name="ControlPanelOpacityDescription" xml:space="preserve">
-        <value>控制面板不透明度，范围 0-1</value>
-    </data>
-    <data name="UiLanguageDescription" xml:space="preserve">
-        <value>界面语言，0=中文, 1=English</value>
-    </data>
-    <data name="RememberWindowPositionDescription" xml:space="preserve">
-        <value>是否记住窗口位置和大小</value>
-    </data>
-    <data name="WindowStateDescription" xml:space="preserve">
-        <value>窗口状态，0=正常, 1=最小化, 2=最大化</value>
-    </data>
-    <data name="MainWindowXDescription" xml:space="preserve">
-        <value>主窗口位置的 X 坐标</value>
-    </data>
-    <data name="MainWindowYDescription" xml:space="preserve">
-        <value>主窗口位置的 Y 坐标</value>
-    </data>
-    <data name="MainWindowWidthDescription" xml:space="preserve">
-        <value>主窗口宽度</value>
-    </data>
-    <data name="MainWindowHeightDescription" xml:space="preserve">
-        <value>主窗口高度</value>
-    </data>
-    <data name="NotificationEnableDescription" xml:space="preserve">
-        <value>是否启用通知功能</value>
-    </data>
-    <data name="SystemNotificationEnableDescription" xml:space="preserve">
-        <value>是否启用系统通知</value>
-    </data>
-    <data name="BarkEnableDescription" xml:space="preserve">
-        <value>是否启用 Bark 推送</value>
-    </data>
-    <data name="BarkCiphertextDescription" xml:space="preserve">
-        <value>Bark 推送的密文内容，设置后作为 ciphertext 参数发送</value>
-    </data>
-    <data name="BarkDeviceKeyDescription" xml:space="preserve">
-        <value>Bark 设备 Key，支持逗号分隔多个设备</value>
-    </data>
-    <data name="BarkGroupDescription" xml:space="preserve">
-        <value>Bark 消息分组</value>
-    </data>
-    <data name="BarkIconUrlDescription" xml:space="preserve">
-        <value>Bark 推送图标的 URL</value>
-    </data>
-    <data name="BarkLevelDescription" xml:space="preserve">
-        <value>Bark 推送级别，active/timeSensitive/passive</value>
-    </data>
-    <data name="BarkServerAddressDescription" xml:space="preserve">
-        <value>Bark 服务器地址</value>
-    </data>
-    <data name="BarkSoundDescription" xml:space="preserve">
-        <value>Bark 推送提示音名称</value>
-    </data>
-    <data name="DingTalkEnableDescription" xml:space="preserve">
-        <value>是否启用钉钉机器人推送</value>
-    </data>
-    <data name="DingTalkSignSecretDescription" xml:space="preserve">
-        <value>钉钉机器人的加签密钥（SEC 开头）</value>
-    </data>
-    <data name="DingTalkWebhookDescription" xml:space="preserve">
-        <value>钉钉机器人的 Webhook 地址</value>
-    </data>
-    <data name="DiscordEnableDescription" xml:space="preserve">
-        <value>是否启用 Discord 推送</value>
-    </data>
-    <data name="DiscordScreenshotDescription" xml:space="preserve">
-        <value>是否在 Discord 推送中附带截图</value>
-    </data>
-    <data name="DiscordWebhookDescription" xml:space="preserve">
-        <value>Discord 的 Webhook 地址</value>
-    </data>
-    <data name="FeishuEnableDescription" xml:space="preserve">
-        <value>是否启用飞书推送</value>
-    </data>
-    <data name="FeishuAppIdDescription" xml:space="preserve">
-        <value>飞书应用的 App ID</value>
-    </data>
-    <data name="FeishuAppSecretDescription" xml:space="preserve">
-        <value>飞书应用的 App Secret</value>
-    </data>
-    <data name="FeishuReceiverIdDescription" xml:space="preserve">
-        <value>飞书消息接收者 ID</value>
-    </data>
-    <data name="FeishuIdTypeDescription" xml:space="preserve">
-        <value>飞书接收者 ID 类型，如 open_id、user_id、union_id、chat_id</value>
-    </data>
-    <data name="FeishuWebhookDescription" xml:space="preserve">
-        <value>飞书机器人的 Webhook 地址</value>
-    </data>
-    <data name="OneBotEnableDescription" xml:space="preserve">
-        <value>是否启用 OneBot 推送</value>
-    </data>
-    <data name="OneBotScreenshotDescription" xml:space="preserve">
-        <value>是否在 OneBot 推送中附带截图</value>
-    </data>
-    <data name="OneBotGroupNumberDescription" xml:space="preserve">
-        <value>OneBot 推送的目标群号</value>
-    </data>
-    <data name="OneBotAccessTokenDescription" xml:space="preserve">
-        <value>OneBot 的访问 Token</value>
-    </data>
-    <data name="OneBotApiAddressDescription" xml:space="preserve">
-        <value>OneBot 的 HTTP API 地址</value>
-    </data>
-    <data name="OneBotAccountDescription" xml:space="preserve">
-        <value>OneBot 机器人的账号</value>
-    </data>
-    <data name="ServerChanEnableDescription" xml:space="preserve">
-        <value>是否启用 Server酱 推送</value>
-    </data>
-    <data name="ServerChanSendKeyDescription" xml:space="preserve">
-        <value>Server酱 的 SendKey</value>
-    </data>
-    <data name="TelegramEnableDescription" xml:space="preserve">
-        <value>是否启用 Telegram 推送</value>
-    </data>
-    <data name="TelegramProxyEnableDescription" xml:space="preserve">
-        <value>是否为 Telegram 推送启用代理</value>
-    </data>
-    <data name="TelegramScreenshotDescription" xml:space="preserve">
-        <value>是否在 Telegram 推送中附带截图</value>
-    </data>
-    <data name="WeComEnableDescription" xml:space="preserve">
-        <value>是否启用企业微信推送</value>
-    </data>
-    <data name="WeComScreenshotDescription" xml:space="preserve">
-        <value>是否在企业微信推送中附带截图</value>
-    </data>
-    <data name="WeComWebhookDescription" xml:space="preserve">
-        <value>企业微信机器人的 Webhook 地址</value>
-    </data>
-    <data name="CustomWebhookEnableDescription" xml:space="preserve">
-        <value>是否启用自定义 Webhook 推送</value>
-    </data>
-    <data name="CustomWebhookUrlDescription" xml:space="preserve">
-        <value>自定义 Webhook 的 URL</value>
-    </data>
-    <data name="XxtuiEnableDescription" xml:space="preserve">
-        <value>是否启用 息知(xxtui) 推送</value>
-    </data>
-    <data name="EmailEnableDescription" xml:space="preserve">
-        <value>是否启用邮件推送</value>
-    </data>
-    <data name="SmtpPortDescription" xml:space="preserve">
-        <value>SMTP 服务器端口，SSL 通常为 465</value>
-    </data>
-    <data name="RecipientEmailDescription" xml:space="preserve">
-        <value>收件邮箱地址</value>
-    </data>
-    <data name="SenderEmailDescription" xml:space="preserve">
-        <value>发件邮箱地址</value>
-    </data>
-    <data name="SmtpServerDescription" xml:space="preserve">
-        <value>SMTP 服务器地址</value>
-    </data>
-    <data name="SmtpAuthCodeDescription" xml:space="preserve">
-        <value>SMTP 授权码（加密存储）</value>
-    </data>
-    <data name="TelegramApiAddressDescription" xml:space="preserve">
-        <value>Telegram Bot API 地址</value>
-    </data>
-    <data name="TelegramBotTokenDescription" xml:space="preserve">
-        <value>Telegram 机器人的 Bot Token</value>
-    </data>
-    <data name="TelegramChatIdDescription" xml:space="preserve">
-        <value>Telegram 推送目标 Chat ID</value>
-    </data>
-    <data name="TelegramProxyAddressDescription" xml:space="preserve">
-        <value>Telegram 代理服务器地址</value>
-    </data>
-    <data name="XxtuiApiKeyDescription" xml:space="preserve">
-        <value>息知(xxtui) 的 API Key</value>
-    </data>
-    <data name="XxtuiChannelDescription" xml:space="preserve">
-        <value>息知(xxtui) 的推送通道</value>
-    </data>
-    <data name="XxtuiMessageSourceDescription" xml:space="preserve">
-        <value>息知(xxtui) 的消息来源</value>
-    </data>
-    <data name="TaskCompleteNotificationListDescription" xml:space="preserve">
-        <value>任务完成时发送通知的任务名称列表</value>
-    </data>
-    <data name="TaskStartNotificationListDescription" xml:space="preserve">
-        <value>任务开始时发送通知的任务名称列表</value>
-    </data>
-    <data name="DownloadChannelDescription" xml:space="preserve">
-        <value>下载渠道，0=Mirror Chyan, 1=Github Release, 2=AUTO-MAS</value>
-    </data>
-    <data name="AutoUpdateEnableDescription" xml:space="preserve">
-        <value>是否启用自动更新: 将在有更新时直接开始下载</value>
-    </data>
-    <data name="UpdateCheckEnableDescription" xml:space="preserve">
-        <value>是否启用检查更新功能: 将在启动时检查更新并提示用户</value>
-    </data>
-    <data name="UpdateChannelSettingDescription" xml:space="preserve">
-        <value>更新频道，0=Stable, 1=Beta</value>
-    </data>
-    <data name="UpdateInstallerDirectoryDescription" xml:space="preserve">
-        <value>更新安装包的下载保存目录，留空则使用系统临时目录下的 SRA 文件夹</value>
-    </data>
-    <data name="MirrorChyanAuthCodeDescription" xml:space="preserve">
-        <value>Mirror Chyan 下载渠道的授权码，敏感信息将被加密存储</value>
-    </data>
-    <data name="BackendLaunchArgsDescription" xml:space="preserve">
-        <value>后端启动参数</value>
-    </data>
-    <data name="RemoteBackendEnableDescription" xml:space="preserve">
-        <value>是否使用远程后端</value>
-    </data>
-    <data name="RemoteBackendAddressDescription" xml:space="preserve">
-        <value>远程后端地址</value>
-    </data>
-    <data name="OverlayDebugInfoDescription" xml:space="preserve">
-        <value>是否在叠加层显示调试信息</value>
-    </data>
-    <data name="DeveloperModeEnableDescription" xml:space="preserve">
-        <value>是否启用开发者模式</value>
-    </data>
-    <data name="CustomBackendEnableDescription" xml:space="preserve">
-        <value>是否启用自定义后端</value>
-    </data>
-    <data name="CustomBackendCommandDescription" xml:space="preserve">
-        <value>自定义后端命令/可执行文件，如 python、sra-cli、uv 或可执行文件路径</value>
-    </data>
-    <data name="CustomBackendArgsDescription" xml:space="preserve">
-        <value>自定义后端启动参数，如 main.py、-m SRACore</value>
-    </data>
-    <data name="CustomBackendWorkingDirDescription" xml:space="preserve">
-        <value>自定义后端工作目录，留空时使用程序当前目录</value>
-    </data>
-    <data name="SaveOcrScreenshotDescription" xml:space="preserve">
-        <value>是否保存 OCR 截图以便调试</value>
-    </data>
-    <data name="TaskConfigNameDescription" xml:space="preserve">
-        <value>任务配置名称</value>
-    </data>
-    <data name="StartGameSettingsText" xml:space="preserve">
-        <value>启动游戏配置</value>
-    </data>
-    <data name="TrailblazePowerSettingsText" xml:space="preserve">
-        <value>体力配置</value>
-    </data>
-    <data name="ClaimRewardsSettingsText" xml:space="preserve">
-        <value>领取奖励配置</value>
-    </data>
-    <data name="CosmicStrifeSettingsText" xml:space="preserve">
-        <value>旷宇纷争配置</value>
-    </data>
-    <data name="PostTaskActionsText" xml:space="preserve">
-        <value>任务完成后操作</value>
-    </data>
-    <data name="ConfigFileVersionDescription" xml:space="preserve">
-        <value>配置文件版本号</value>
-    </data>
-    <data name="StartGameTaskEnableDescription" xml:space="preserve">
-        <value>是否启用启动游戏任务</value>
-    </data>
-    <data name="GameChannelDescription" xml:space="preserve">
-        <value>游戏渠道，0-国服，1-B服，2-国际服</value>
-    </data>
-    <data name="GameExecutablePathDescription" xml:space="preserve">
-        <value>游戏启动程序路径</value>
-    </data>
-    <data name="GlobalServerDescription" xml:space="preserve">
-        <value>国际服服务器，0-亚洲，1-欧洲，2-美洲，3-台港澳，仅国际服有效</value>
-    </data>
-    <data name="UseGlobalGamePathDescription" xml:space="preserve">
-        <value>是否使用全局设置中的游戏路径</value>
-    </data>
-    <data name="GameLaunchDelayDescription" xml:space="preserve">
-        <value>启动游戏后的等待延迟（秒）</value>
-    </data>
-    <data name="AutoLoginEnableDescription" xml:space="preserve">
-        <value>是否自动登录账号</value>
-    </data>
-    <data name="AutoReloginDescription" xml:space="preserve">
-        <value>是否在登录失败后自动重新登录</value>
-    </data>
-    <data name="AccountPasswordDescription" xml:space="preserve">
-        <value>加密存储的账号密码</value>
-    </data>
-    <data name="AccountUsernameDescription" xml:space="preserve">
-        <value>加密存储的账号用户名</value>
-    </data>
-    <data name="TrailblazePowerTaskEnableDescription" xml:space="preserve">
-        <value>是否启用开拓力任务</value>
-    </data>
-    <data name="CalyxGoldenStageDescription" xml:space="preserve">
-        <value>花藏繁生中拟造花萼（金）的目标关卡</value>
-    </data>
-    <data name="CalyxCrimsonStageDescription" xml:space="preserve">
-        <value>花藏繁生中拟造花萼（赤）的目标关卡</value>
-    </data>
-    <data name="SupportCharacterDescription" xml:space="preserve">
-        <value>是否使用支援角色</value>
-    </data>
     <data name="TrainingTargetEnableDescription" xml:space="preserve">
         <value>是否启用培养目标，开启后将优先完成培养目标</value>
     </data>
-    <data name="TrainingTargetPriorityDescription" xml:space="preserve">
-        <value>培养目标材料优先：识别到材料型副本时跳过饰品提取与侵蚀隧洞，未识别到时仍保留</value>
-    </data>
-    <data name="DoubleEventDetectionDescription" xml:space="preserve">
-        <value>是否启用多倍活动检测，启用后将优先刷取花藏繁生/异器盈界/位面分裂副本</value>
-    </data>
-    <data name="PlanarFissureStageDescription" xml:space="preserve">
-        <value>位面分裂的目标关卡</value>
-    </data>
-    <data name="RealmOfStrangeStageDescription" xml:space="preserve">
-        <value>异器盈界的目标关卡</value>
-    </data>
-    <data name="TrailblazePowerRefillCountDescription" xml:space="preserve">
-        <value>补充体力的次数</value>
-    </data>
-    <data name="TrailblazePowerRefillEnableDescription" xml:space="preserve">
-        <value>是否补充体力</value>
-    </data>
-    <data name="TrailblazePowerRefillMethodDescription" xml:space="preserve">
-        <value>补充体力的方式，0-后备开拓力，1-燃料，2-星琼</value>
-    </data>
-    <data name="TaskListText" xml:space="preserve">
-        <value>任务列表</value>
-    </data>
-    <data name="ClaimRewardsTaskEnableDescription" xml:space="preserve">
-        <value>是否启用领取奖励任务</value>
-    </data>
-    <data name="ClaimAssignmentsDescription" xml:space="preserve">
-        <value>是否领取派遣奖励</value>
-    </data>
-    <data name="ClaimDailyTrainingDescription" xml:space="preserve">
-        <value>是否领取每日实训奖励</value>
-    </data>
-    <data name="ClaimGiftOfOdysseyDescription" xml:space="preserve">
-        <value>是否领取巡星之礼奖励</value>
-    </data>
-    <data name="ClaimMailRewardsDescription" xml:space="preserve">
-        <value>是否领取邮件奖励</value>
-    </data>
-    <data name="ClaimNamelessHonorDescription" xml:space="preserve">
-        <value>是否领取无名勋礼奖励</value>
-    </data>
-    <data name="RedeemCodesEnableDescription" xml:space="preserve">
-        <value>是否执行兑换码兑换</value>
-    </data>
-    <data name="ClaimTrailblazerProfileDescription" xml:space="preserve">
-        <value>是否领取漫游签证奖励</value>
-    </data>
-    <data name="RedemptionCodeListDescription" xml:space="preserve">
-        <value>兑换码列表，格式为：兑换码1 兑换码2 兑换码3</value>
-    </data>
-    <data name="CosmicStrifeTaskEnableDescription" xml:space="preserve">
-        <value>是否启用旷宇纷争任务</value>
-    </data>
-    <data name="CurrencyWarsMasterSwitchDescription" xml:space="preserve">
-        <value>货币战争总开关</value>
-    </data>
-    <data name="CurrencyWarsDifficultyDescription" xml:space="preserve">
-        <value>货币战争难度，0-最低难度，1-最高难度，2-当前难度</value>
-    </data>
-    <data name="CurrencyWarsModeDescription" xml:space="preserve">
-        <value>货币战争模式，0-标准博弈，1-超频博弈，2-刷开局</value>
-    </data>
-    <data name="CurrencyWarsSkipWhenFullDescription" xml:space="preserve">
-        <value>启用后，若旷宇纷争积分奖励已满则跳过货币战争任务</value>
-    </data>
-    <data name="CurrencyWarsBossAffixDescription" xml:space="preserve">
-        <value>货币战争刷开局时的Boss词缀</value>
-    </data>
-    <data name="CurrencyWarsBossNameDescription" xml:space="preserve">
-        <value>货币战争刷开局时的Boss名称</value>
-    </data>
-    <data name="CurrencyWarsInvestmentEnvDescription" xml:space="preserve">
-        <value>货币战争刷开局时的投资环境</value>
-    </data>
-    <data name="CurrencyWarsInvestmentStrategyHint" xml:space="preserve">
-        <value>货币战争刷开局时的投资策略</value>
-    </data>
-    <data name="CurrencyWarsRerollRunCountDescription" xml:space="preserve">
-        <value>货币战争刷开局时的运行次数</value>
-    </data>
-    <data name="CurrencyWarsStrategyNameDescription" xml:space="preserve">
-        <value>货币战争使用的攻略名称</value>
-    </data>
-    <data name="CurrencyWarsStrategyIndexDescription" xml:space="preserve">
-        <value>货币战争使用的攻略索引</value>
-    </data>
-    <data name="CurrencyWarsTrailblazerNameDescription" xml:space="preserve">
-        <value>货币战争中开拓者的名字</value>
-    </data>
-    <data name="DivergentUniverseMasterSwitchDescription" xml:space="preserve">
-        <value>差分宇宙总开关</value>
-    </data>
-    <data name="DivergentUniverseModeDescription" xml:space="preserve">
-        <value>差分宇宙模式：0-刷单层，1-完整对局</value>
-    </data>
-    <data name="DivergentUniverseRunCountDescription" xml:space="preserve">
-        <value>差分宇宙运行次数</value>
-    </data>
-    <data name="DivergentUniverseTechniqueDescription" xml:space="preserve">
-        <value>差分宇宙是否使用秘技速刷</value>
-    </data>
-    <data name="DivergentUniversePointRewardDescription" xml:space="preserve">
-        <value>是否启用积分奖励，启用后当达到周积分上限时跳过此任务</value>
-    </data>
-    <data name="PostTaskActionEnableDescription" xml:space="preserve">
-        <value>是否启用任务完成后操作</value>
-    </data>
-    <data name="PostTaskExitAppDescription" xml:space="preserve">
-        <value>完成任务后是否退出应用</value>
-    </data>
-    <data name="PostTaskExitGameDescription" xml:space="preserve">
-        <value>完成任务后是否退出游戏</value>
-    </data>
-    <data name="PostTaskLogoffUserDescription" xml:space="preserve">
-        <value>完成任务后是否注销当前用户</value>
-    </data>
-    <data name="PostTaskLogoutAccountDescription" xml:space="preserve">
-        <value>完成任务后是否登出账号</value>
-    </data>
-    <data name="PostTaskShutdownDescription" xml:space="preserve">
-        <value>完成任务后是否关机</value>
-    </data>
-    <data name="PostTaskSleepDescription" xml:space="preserve">
-        <value>完成任务后是否睡眠</value>
-    </data>
-    <data name="TaskNameDescription" xml:space="preserve">
-        <value>任务名称</value>
-    </data>
-    <data name="TaskIdDescription" xml:space="preserve">
-        <value>任务标识ID，如 calyx_golden、echo_of_war</value>
-    </data>
-    <data name="StageLevelDescription" xml:space="preserve">
-        <value>关卡等级</value>
-    </data>
     <data name="StageNameDescription" xml:space="preserve">
         <value>关卡名称</value>
-    </data>
-    <data name="TaskExecutionCountDescription" xml:space="preserve">
-        <value>手动模式下单个任务的执行次数</value>
-    </data>
-    <data name="TaskExecutionRoundDescription" xml:space="preserve">
-        <value>手动模式下的执行轮数</value>
-    </data>
-    <data name="TaskExecutionAutoAllocateDescription" xml:space="preserve">
-        <value>是否根据剩余体力自动分配执行次数</value>
     </data>
     <data name="InputSendProcessErrorMessage" xml:space="preserve">
         <value>发送失败: 进程未运行（输入: {0}）</value>
@@ -2063,9 +1385,6 @@
     <data name="StrategySiteText" xml:space="preserve">
         <value>攻略站</value>
     </data>
-    <data name="SkipWhenPointsFullText" xml:space="preserve">
-        <value>积分已满时跳过</value>
-    </data>
     <data name="CurrencyWarsBossConfigHint" xml:space="preserve">
         <value>下方可配置Boss名称、Boss词条、投资环境与投资策略。格式参见文档。</value>
     </data>
@@ -2300,42 +1619,12 @@
     <data name="WindowedModeText" xml:space="preserve">
         <value>窗口化</value>
     </data>
-    <data name="WelcomeToSraText" xml:space="preserve">
-        <value>欢迎使用 SRA</value>
-    </data>
-    <data name="SitBackAndRelaxText" xml:space="preserve">
-        <value>坐和放宽</value>
-    </data>
     <data name="NotSequenceReadArchiveText" xml:space="preserve">
         <value>并非
 'Sequence Read Archive'</value>
     </data>
-    <data name="LauncherInceptionText" xml:space="preserve">
-        <value>启动器启动启动器</value>
-    </data>
-    <data name="FireflyFlamePhraseText" xml:space="preserve">
-        <value>飞荧扑火，向死而生</value>
-    </data>
-    <data name="DimStarsBeyondPhraseText" xml:space="preserve">
-        <value>跨越寰宇终抵黯淡星外</value>
-    </data>
-    <data name="StarRailMasterPhraseText" xml:space="preserve">
-        <value>立志成为崩铁糕手</value>
-    </data>
-    <data name="CarveFuturePhraseText" xml:space="preserve">
-        <value>我们将在过去篆刻未来</value>
-    </data>
-    <data name="IronSparksPhraseText" xml:space="preserve">
-        <value>铁花飞，飘逸不残灰</value>
-    </data>
-    <data name="NormalIsAbnormalText" xml:space="preserve">
-        <value>一切正常就是异常</value>
-    </data>
     <data name="RegistryUnsupportedError" xml:space="preserve">
         <value>非Windows系统不支持注册表操作</value>
-    </data>
-    <data name="GamePathAutoDetectFailedError" xml:space="preserve">
-        <value>无法自动检测游戏路径</value>
     </data>
     <data name="RegistryAccessDeniedError" xml:space="preserve">
         <value>注册表访问被拒绝，请以管理员身份运行</value>
@@ -2355,209 +1644,14 @@
     <data name="ScanFailedError" xml:space="preserve">
         <value>扫描失败：{e.Message}</value>
     </data>
-    <data name="M0001" xml:space="preserve">
-        <value>重新导入任务模块，实现热重载</value>
-    </data>
-    <data name="M0004" xml:space="preserve">
-        <value>显示扩展的配置 Schema 详情</value>
-    </data>
-    <data name="M0005" xml:space="preserve">
-        <value>重新导入扩展模块（含已导入模块的热重载）</value>
-    </data>
-    <data name="M0007" xml:space="preserve">
-        <value>显示扩展运行状态</value>
-    </data>
-    <data name="M0008" xml:space="preserve">
-        <value>扩展配置管理</value>
-    </data>
-    <data name="M0009" xml:space="preserve">
-        <value>获取扩展配置</value>
-    </data>
-    <data name="M0010" xml:space="preserve">
-        <value>设置扩展配置</value>
-    </data>
-    <data name="M0014" xml:space="preserve">
-        <value>扩展管理：查看、运行已注册的扩展</value>
-    </data>
-    <data name="M0015" xml:space="preserve">
-        <value>按扩展类型自动分发：非后台扩展走共享线程，后台扩展走专用线程</value>
-    </data>
-    <data name="M0019" xml:space="preserve">
-        <value>停止指定的后台扩展或当前正在运行的单次扩展</value>
-    </data>
-    <data name="M0024" xml:space="preserve">
-        <value>调用指定的 Operator 方法</value>
-    </data>
-    <data name="M0027" xml:space="preserve">
-        <value>列出所有攻略</value>
-    </data>
-    <data name="M0028" xml:space="preserve">
-        <value>导入攻略文件到攻略目录</value>
-    </data>
-    <data name="M0029" xml:space="preserve">
-        <value>查看开拓力副本配置</value>
-    </data>
-    <data name="M0034" xml:space="preserve">
-        <value>按 JSON 乐谱自动演奏游戏键盘（暂停 F8 / 重置 F10 / 停止 F9）</value>
-    </data>
-    <data name="M0035" xml:space="preserve">
-        <value>乐谱名称或 JSON 文件路径</value>
-    </data>
-    <data name="M0036" xml:space="preserve">
-        <value>演奏速度倍率（1.0 = 乐谱原速）</value>
-    </data>
-    <data name="M0037" xml:space="preserve">
-        <value>演奏遍数</value>
-    </data>
-    <data name="M0038" xml:space="preserve">
-        <value>首次开始前的延迟（秒），用于切换到游戏窗口</value>
-    </data>
-    <data name="M0039" xml:space="preserve">
-        <value>演练模式：不实际按键，仅校验乐谱与时序</value>
-    </data>
-    <data name="M0040" xml:space="preserve">
-        <value>启用演奏热键（暂停/重置）</value>
-    </data>
-    <data name="M0041" xml:space="preserve">
-        <value>暂停/继续热键</value>
-    </data>
-    <data name="M0042" xml:space="preserve">
-        <value>重置热键</value>
-    </data>
-    <data name="M0044" xml:space="preserve">
-        <value>自动检测并处理剧情对话，可按配置跳过剧情</value>
-    </data>
-    <data name="M0045" xml:space="preserve">
-        <value>是否自动跳过剧情对话</value>
-    </data>
     <data name="M0048" xml:space="preserve">
         <value>填写游戏内开拓者名称。</value>
-    </data>
-    <data name="M0049" xml:space="preserve">
-        <value>选择攻略；新增 JSON 后点击刷新。也可填写攻略 JSON 的完整路径。</value>
     </data>
     <data name="M0050" xml:space="preserve">
         <value>本次运行的局数。</value>
     </data>
-    <data name="M0051" xml:space="preserve">
-        <value>选择最低难度、最高难度或保持当前难度。</value>
-    </data>
-    <data name="M0052" xml:space="preserve">
-        <value>开启后运行超频博弈，关闭后运行常规博弈。</value>
-    </data>
     <data name="M0053" xml:space="preserve">
         <value>开拓者名称</value>
-    </data>
-    <data name="M0059" xml:space="preserve">
-        <value>预测当前版本结束前的抽卡资源</value>
-    </data>
-    <data name="M0060" xml:space="preserve">
-        <value>版本起始日（YYYY-MM-DD），用于推算当前版本区间</value>
-    </data>
-    <data name="M0061" xml:space="preserve">
-        <value>每个版本持续天数</value>
-    </data>
-    <data name="M0062" xml:space="preserve">
-        <value>前瞻直播距版本结束的天数</value>
-    </data>
-    <data name="M0063" xml:space="preserve">
-        <value>前瞻状态：auto/done/not_done</value>
-    </data>
-    <data name="M0064" xml:space="preserve">
-        <value>深渊刷新间隔天数</value>
-    </data>
-    <data name="M0065" xml:space="preserve">
-        <value>首次深渊刷新偏移天数</value>
-    </data>
-    <data name="M0066" xml:space="preserve">
-        <value>深渊刷新次数覆写，-1为自动</value>
-    </data>
-    <data name="M0067" xml:space="preserve">
-        <value>深渊是否计入今天刷新</value>
-    </data>
-    <data name="M0068" xml:space="preserve">
-        <value>周常刷新星期几（0=周一）</value>
-    </data>
-    <data name="M0069" xml:space="preserve">
-        <value>周常次数覆写，-1为自动</value>
-    </data>
-    <data name="M0070" xml:space="preserve">
-        <value>周常是否计入今天刷新</value>
-    </data>
-    <data name="M0071" xml:space="preserve">
-        <value>版本更新补偿星琼</value>
-    </data>
-    <data name="M0072" xml:space="preserve">
-        <value>是否有小月卡</value>
-    </data>
-    <data name="M0073" xml:space="preserve">
-        <value>无月卡每日星琼</value>
-    </data>
-    <data name="M0074" xml:space="preserve">
-        <value>有月卡每日星琼</value>
-    </data>
-    <data name="M0075" xml:space="preserve">
-        <value>每次深渊刷新星琼</value>
-    </data>
-    <data name="M0076" xml:space="preserve">
-        <value>每周模拟宇宙星琼</value>
-    </data>
-    <data name="M0077" xml:space="preserve">
-        <value>前瞻兑换码星琼</value>
-    </data>
-    <data name="M0078" xml:space="preserve">
-        <value>自动扫描背包第一排资源</value>
-    </data>
-    <data name="M0079" xml:space="preserve">
-        <value>手动填写当前星琼</value>
-    </data>
-    <data name="M0080" xml:space="preserve">
-        <value>手动填写当前星轨专票</value>
-    </data>
-    <data name="M0081" xml:space="preserve">
-        <value>手动填写当前星轨通票</value>
-    </data>
-    <data name="M0082" xml:space="preserve">
-        <value>自动扫描奖励指南</value>
-    </data>
-    <data name="M0083" xml:space="preserve">
-        <value>奖励指南类型：auto/jade/special_pass/normal_pass</value>
-    </data>
-    <data name="M0084" xml:space="preserve">
-        <value>手动填写奖励指南星琼</value>
-    </data>
-    <data name="M0085" xml:space="preserve">
-        <value>手动填写奖励指南专票</value>
-    </data>
-    <data name="M0086" xml:space="preserve">
-        <value>手动填写奖励指南通票</value>
-    </data>
-    <data name="ScanStrategyFolderText" xml:space="preserve">
-        <value>扫描攻略文件夹</value>
-    </data>
-    <data name="G0004" xml:space="preserve">
-        <value>运行中</value>
-    </data>
-    <data name="G0102" xml:space="preserve">
-        <value>扫描攻略文件夹</value>
-    </data>
-    <data name="R0003" xml:space="preserve">
-        <value>Show current task status</value>
-    </data>
-    <data name="R0005" xml:space="preserve">
-        <value>List all registered tasks</value>
-    </data>
-    <data name="G0097" xml:space="preserve">
-        <value>username</value>
-    </data>
-    <data name="G0099" xml:space="preserve">
-        <value>runtimes</value>
-    </data>
-    <data name="G0104" xml:space="preserve">
-        <value>【4列车3量子】姬子五级补质量·七级二星放行</value>
-    </data>
-    <data name="G0105" xml:space="preserve">
-        <value>【5欢愉3量子】银狼低配·五级找核九级成型</value>
     </data>
     <data name="RussianLanguageName" xml:space="preserve">
         <value>Русский</value>
@@ -2568,25 +1662,8 @@
     <data name="InfoText" xml:space="preserve">
         <value>Info</value>
     </data>
-    <data name="ErrorText" xml:space="preserve">
-        <value>Error</value>
-    </data>
-    <data name="SuccessText" xml:space="preserve">
-        <value>Success</value>
-    </data>
     <data name="JustIconText" xml:space="preserve">
         <value>Just Icon.</value>
-    </data>
-    <data name="FarewellPhraseOne" xml:space="preserve">
-        <value>Bon voyage</value>
-    </data>
-    <data name="FarewellPhraseTwo" xml:space="preserve">
-        <value>May your path be clear</value>
-    </data>
-    <data name="FarewellPhraseThree" xml:space="preserve">
-        <value>May you get to where
-dreams are all
-crystalline and sweet</value>
     </data>
     <data name="EmptyValueText" xml:space="preserve">
         <value>（空）</value>

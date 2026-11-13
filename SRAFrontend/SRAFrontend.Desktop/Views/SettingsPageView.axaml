@@ -816,8 +816,7 @@
                                     <Grid ColumnDefinitions="Auto, *, *">
                                         <Label Classes="Icon">&#xe77e;</Label>
                                         <Label Grid.Column="1"
-                                               Content="{x:Static lang:Resources.AppChannelText}"
-                                               ToolTip.Tip="y" />
+                                               Content="{x:Static lang:Resources.AppChannelText}"/>
                                         <ComboBox Grid.Column="2" SelectedIndex="{Binding UpdateSettings.UpdateChannel}">
                                             <ComboBoxItem>stable</ComboBoxItem>
                                             <ComboBoxItem>beta</ComboBoxItem>

@@ -16,9 +16,6 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="GreetingText" xml:space="preserve">
-        <value>Welcome to SRA</value>
-    </data>
     <data name="HomeText" xml:space="preserve">
         <value>Home</value>
     </data>
@@ -51,9 +48,6 @@
     </data>
     <data name="StartUpText" xml:space="preserve">
         <value>Start Up</value>
-    </data>
-    <data name="ThreadSafetyText" xml:space="preserve">
-        <value>Thread Safety</value>
     </data>
     <data name="AllowNotificationText" xml:space="preserve">
         <value>Allow Notification</value>
@@ -91,9 +85,6 @@
     <data name="LightText" xml:space="preserve">
         <value>Light</value>
     </data>
-    <data name="FollowSystemText" xml:space="preserve">
-        <value>Follow System</value>
-    </data>
     <data name="AboutText" xml:space="preserve">
         <value>About</value>
     </data>
@@ -130,9 +121,6 @@
     <data name="ControlPanelOpacityText" xml:space="preserve">
         <value>Control Panel Opacity</value>
     </data>
-    <data name="NotSetText" xml:space="preserve">
-        <value>Not Set</value>
-    </data>
     <data name="HotkeysText" xml:space="preserve">
         <value>Hotkeys in Game</value>
     </data>
@@ -147,9 +135,6 @@
     </data>
     <data name="GuideText" xml:space="preserve">
         <value>Guide</value>
-    </data>
-    <data name="MapText" xml:space="preserve">
-        <value>Map</value>
     </data>
     <data name="TechniqueText" xml:space="preserve">
         <value>Technique</value>
@@ -268,9 +253,6 @@
     <data name="CurrentConfigText" xml:space="preserve">
         <value>Current configuration</value>
     </data>
-    <data name="AutoResolutionText" xml:space="preserve">
-        <value>Auto Set Game Resolution</value>
-    </data>
     <data name="DeveloperOptionsText" xml:space="preserve">
         <value>Developer Options</value>
     </data>
@@ -291,9 +273,6 @@
     </data>
     <data name="BackendWorkingDirectoryText" xml:space="preserve">
         <value>Working Directory</value>
-    </data>
-    <data name="BackendWorkingDirectoryHintText" xml:space="preserve">
-        <value>Leave empty to use the application directory</value>
     </data>
     <data name="CloudGameText" xml:space="preserve">
         <value>Use StarRail Cloud Game (Experimental)</value>
@@ -318,12 +297,6 @@
     </data>
     <data name="DisplayModeText" xml:space="preserve">
         <value>Display Mode</value>
-    </data>
-    <data name="WindowedText" xml:space="preserve">
-        <value>Windowed</value>
-    </data>
-    <data name="FullScreenText" xml:space="preserve">
-        <value>Full Screen</value>
     </data>
     <data name="BorderlessWindowText" xml:space="preserve">
         <value>Borderless Window</value>
@@ -574,9 +547,6 @@
     <data name="AutoBattleText" xml:space="preserve">
         <value>Auto Battle</value>
     </data>
-    <data name="CurrencyWarsPlusDescription" xml:space="preserve">
-        <value>Standard and Overclock matches, with the latest coin recognition, support character detection, and failure summary fixes.</value>
-    </data>
     <data name="EventStatusEndedText" xml:space="preserve">
         <value>Ended</value>
     </data>
@@ -661,9 +631,6 @@
     <data name="UpdateAutoDownloadMessage" xml:space="preserve">
         <value>Downloading update package automatically: {0}</value>
     </data>
-    <data name="UpdateAutoModeText" xml:space="preserve">
-        <value>Auto update</value>
-    </data>
     <data name="UpdateManualModeText" xml:space="preserve">
         <value>Manual update</value>
     </data>
@@ -684,9 +651,6 @@
     </data>
     <data name="DoNotAskAgainText" xml:space="preserve">
         <value>Don't ask again</value>
-    </data>
-    <data name="CreateDesktopShortcutText" xml:space="preserve">
-        <value>Create desktop shortcut</value>
     </data>
     <data name="DesktopShortcutMissingMessage" xml:space="preserve">
         <value>No desktop shortcut found. Create one now?</value>
@@ -781,12 +745,6 @@
     <data name="RestartConfirmMessage" xml:space="preserve">
         <value>Restart the application now to apply the latest version?</value>
     </data>
-    <data name="ConfirmText" xml:space="preserve">
-        <value>Confirm</value>
-    </data>
-    <data name="ReinstallLatestText" xml:space="preserve">
-        <value>Reinstall the latest version</value>
-    </data>
     <data name="ReinstallConfirmMessage" xml:space="preserve">
         <value>This will re-download and install the latest version to fix possible issues. Continue?</value>
     </data>
@@ -878,9 +836,6 @@ Exit the application to finish extraction (wait 5-10 seconds after exiting), or 
     </data>
     <data name="SavedToFormat" xml:space="preserve">
         <value>Saved to: {0}</value>
-    </data>
-    <data name="LogExportPathFailedError" xml:space="preserve">
-        <value>Log export failed: {TargetPath}</value>
     </data>
     <data name="LogExportFailedError" xml:space="preserve">
         <value>Log export failed</value>
@@ -986,9 +941,6 @@ Please choose another folder.</value>
     </data>
     <data name="LanguageRestartConfirmMessage" xml:space="preserve">
         <value>The application must be restarted to apply the new language. Restart now?</value>
-    </data>
-    <data name="LabelValueFormat" xml:space="preserve">
-        <value>{0}: {1}</value>
     </data>
     <data name="EmailTestText" xml:space="preserve">
         <value>Email test</value>
@@ -1122,647 +1074,17 @@ Please choose another folder.</value>
     <data name="StageRequiredMessage" xml:space="preserve">
         <value>Select a stage before adding a task</value>
     </data>
-    <data name="ApiGetBackgroundImageText" xml:space="preserve">
-        <value>Get background image</value>
-    </data>
-    <data name="ApiGetSystemInfoText" xml:space="preserve">
-        <value>Get system information</value>
-    </data>
-    <data name="ApiGetPhrasesText" xml:space="preserve">
-        <value>Get phrases</value>
-    </data>
-    <data name="ApiRestartBackendText" xml:space="preserve">
-        <value>Restart backend</value>
-    </data>
     <data name="ApiStopBackendText" xml:space="preserve">
         <value>Stop backend</value>
-    </data>
-    <data name="ApiGetRecentLogsText" xml:space="preserve">
-        <value>Get recent logs</value>
-    </data>
-    <data name="ApiSseLogStreamText" xml:space="preserve">
-        <value>SSE log stream</value>
-    </data>
-    <data name="ApiOperatorScreenshotText" xml:space="preserve">
-        <value>Get Operator screenshot</value>
-    </data>
-    <data name="ApiGetConfigNamesText" xml:space="preserve">
-        <value>Get all configuration names</value>
-    </data>
-    <data name="ApiGetConfigurationText" xml:space="preserve">
-        <value>Get the specified configuration</value>
-    </data>
-    <data name="ApiNewConfigurationText" xml:space="preserve">
-        <value>New configuration</value>
-    </data>
-    <data name="ConfigNameInvalidError" xml:space="preserve">
-        <value>Name contains invalid characters</value>
-    </data>
-    <data name="ConfigurationExistsError" xml:space="preserve">
-        <value>Configuration already exists</value>
-    </data>
-    <data name="ApiListExtensionsText" xml:space="preserve">
-        <value>List all registered extensions</value>
-    </data>
-    <data name="ApiExtensionSchemaText" xml:space="preserve">
-        <value>Get extension configuration schema</value>
-    </data>
-    <data name="ApiGetExtensionConfigText" xml:space="preserve">
-        <value>Get extension configuration values</value>
-    </data>
-    <data name="ApiSetExtensionConfigText" xml:space="preserve">
-        <value>Set extension configuration values</value>
-    </data>
-    <data name="ApiRunExtensionText" xml:space="preserve">
-        <value>Run the specified extension</value>
-    </data>
-    <data name="ApiStopExtensionText" xml:space="preserve">
-        <value>Stop the specified extension</value>
-    </data>
-    <data name="ApiReloadExtensionsText" xml:space="preserve">
-        <value>Rescan and import extension modules</value>
-    </data>
-    <data name="ApiListOperatorMethodsText" xml:space="preserve">
-        <value>List all available Operator methods</value>
-    </data>
-    <data name="ApiOperatorMethodHelpText" xml:space="preserve">
-        <value>Get detailed help for an Operator method</value>
-    </data>
-    <data name="ApiCallOperatorMethodText" xml:space="preserve">
-        <value>Call an Operator method</value>
-    </data>
-    <data name="ApiGetSettingsText" xml:space="preserve">
-        <value>Get settings</value>
-    </data>
-    <data name="ApiGetCurrentSettingsText" xml:space="preserve">
-        <value>Get the current application settings</value>
-    </data>
-    <data name="ApiUpdateSettingsText" xml:space="preserve">
-        <value>Update settings</value>
-    </data>
-    <data name="ApiUpdateSettingsDescription" xml:space="preserve">
-        <value>Update settings by field; only the fields to change need to be sent. The request body is a partial AppSettings JSON, e.g. { "advanced": { "backend.remote.enabled": true } }</value>
-    </data>
-    <data name="ApiRunTasksText" xml:space="preserve">
-        <value>Run tasks</value>
-    </data>
-    <data name="ApiRunSingleTaskText" xml:space="preserve">
-        <value>Run a single specified task</value>
-    </data>
-    <data name="ApiStopTasksText" xml:space="preserve">
-        <value>Stop tasks</value>
-    </data>
-    <data name="ApiGetTaskStatusText" xml:space="preserve">
-        <value>Get task status</value>
     </data>
     <data name="RedemptionCodeAutoFetchHint" xml:space="preserve">
         <value>The redemption code task automatically fetches the latest redemption codes from the official website and redeems them together with the codes entered above.</value>
     </data>
-    <data name="GeneralSettingsText" xml:space="preserve">
-        <value>General settings</value>
-    </data>
-    <data name="DisplaySettingsText" xml:space="preserve">
-        <value>Display settings</value>
-    </data>
-    <data name="UpdateSettingsText" xml:space="preserve">
-        <value>Update settings</value>
-    </data>
-    <data name="AdvancedSettingsText" xml:space="preserve">
-        <value>Advanced settings</value>
-    </data>
-    <data name="NotificationSettingsText" xml:space="preserve">
-        <value>Notification settings</value>
-    </data>
-    <data name="GamePathIndexDescription" xml:space="preserve">
-        <value>Game path index, pointing to one URI in gamePath.uris</value>
-    </data>
-    <data name="GamePathListDescription" xml:space="preserve">
-        <value>List of game paths, supports multiple paths for quick switching</value>
-    </data>
-    <data name="GamePathAutoDetectDescription" xml:space="preserve">
-        <value>Whether to auto-detect the game path; when enabled, scans common install locations to find the game path</value>
-    </data>
-    <data name="GameLaunchArgsEnableDescription" xml:space="preserve">
-        <value>Whether to enable game launch arguments; when enabled, launches the game with the arguments below</value>
-    </data>
-    <data name="GameWindowModeDescription" xml:space="preserve">
-        <value>Game window mode, e.g. windowed, fullscreen</value>
-    </data>
-    <data name="GameWindowSizeDescription" xml:space="preserve">
-        <value>Game window size in widthxheight format, e.g. 1920x1080</value>
-    </data>
-    <data name="BorderlessWindowDescription" xml:space="preserve">
-        <value>Whether to use a borderless game window</value>
-    </data>
-    <data name="AutoBattleDescription" xml:space="preserve">
-        <value>Whether to enable auto battle</value>
-    </data>
-    <data name="CommandLineLaunchDescription" xml:space="preserve">
-        <value>Whether to launch the game via the command line (avoids issues caused by direct launching)</value>
-    </data>
-    <data name="AdvancedLaunchArgsDescription" xml:space="preserve">
-        <value>Advanced launch arguments, passed directly to the game process and overriding other argument settings</value>
-    </data>
-    <data name="CloudGamingDescription" xml:space="preserve">
-        <value>Whether to use cloud gaming</value>
-    </data>
-    <data name="CloudBrowserDescription" xml:space="preserve">
-        <value>Browser used for cloud gaming</value>
-    </data>
-    <data name="CloudBrowserPathDescription" xml:space="preserve">
-        <value>Path to the browser used for cloud gaming</value>
-    </data>
-    <data name="CloudBrowserHeadlessDescription" xml:space="preserve">
-        <value>Whether the cloud gaming browser runs headless</value>
-    </data>
-    <data name="CloudBrowserMuteDescription" xml:space="preserve">
-        <value>Whether the cloud gaming browser is muted</value>
-    </data>
-    <data name="TechniqueHotkeyDescription" xml:space="preserve">
-        <value>Hotkey for casting Technique</value>
-    </data>
-    <data name="EventsScreenHotkeyDescription" xml:space="preserve">
-        <value>Hotkey for opening the events screen</value>
-    </data>
-    <data name="NamelessHonorHotkeyDescription" xml:space="preserve">
-        <value>Hotkey for opening the Nameless Honor screen</value>
-    </data>
-    <data name="WarpScreenHotkeyDescription" xml:space="preserve">
-        <value>Hotkey for opening the warp screen</value>
-    </data>
-    <data name="GuideScreenHotkeyDescription" xml:space="preserve">
-        <value>Hotkey for opening the guide screen</value>
-    </data>
-    <data name="StopTaskHotkeyDescription" xml:space="preserve">
-        <value>Hotkey for stopping running tasks</value>
-    </data>
-    <data name="OverlayEnableDescription" xml:space="preserve">
-        <value>Whether to enable the overlay</value>
-    </data>
-    <data name="OcrConfidenceDescription" xml:space="preserve">
-        <value>OCR recognition confidence, range 0-1, higher is stricter</value>
-    </data>
-    <data name="TemplateMatchConfidenceDescription" xml:space="preserve">
-        <value>Template matching confidence (recognition confidence), range 0-1, higher is stricter</value>
-    </data>
-    <data name="TaskRetryDescription" xml:space="preserve">
-        <value>Whether to restart the game and retry after a task failure</value>
-    </data>
-    <data name="TaskMaxRetryDescription" xml:space="preserve">
-        <value>Maximum number of retries after a task failure</value>
-    </data>
-    <data name="BackgroundImageUriDescription" xml:space="preserve">
-        <value>Background image URI, either a local path or a web URL</value>
-    </data>
-    <data name="BackgroundImageOpacityDescription" xml:space="preserve">
-        <value>Background image opacity, range 0-1</value>
-    </data>
-    <data name="ControlPanelOpacityDescription" xml:space="preserve">
-        <value>Control panel opacity, range 0-1</value>
-    </data>
-    <data name="UiLanguageDescription" xml:space="preserve">
-        <value>UI language, 0=Chinese, 1=English</value>
-    </data>
-    <data name="RememberWindowPositionDescription" xml:space="preserve">
-        <value>Whether to remember window position and size</value>
-    </data>
-    <data name="WindowStateDescription" xml:space="preserve">
-        <value>Window state, 0=normal, 1=minimized, 2=maximized</value>
-    </data>
-    <data name="MainWindowXDescription" xml:space="preserve">
-        <value>X coordinate of the main window</value>
-    </data>
-    <data name="MainWindowYDescription" xml:space="preserve">
-        <value>Y coordinate of the main window</value>
-    </data>
-    <data name="MainWindowWidthDescription" xml:space="preserve">
-        <value>Main window width</value>
-    </data>
-    <data name="MainWindowHeightDescription" xml:space="preserve">
-        <value>Main window height</value>
-    </data>
-    <data name="NotificationEnableDescription" xml:space="preserve">
-        <value>Whether to enable notifications</value>
-    </data>
-    <data name="SystemNotificationEnableDescription" xml:space="preserve">
-        <value>Whether to enable system notifications</value>
-    </data>
-    <data name="BarkEnableDescription" xml:space="preserve">
-        <value>Whether to enable Bark push</value>
-    </data>
-    <data name="BarkCiphertextDescription" xml:space="preserve">
-        <value>Ciphertext for Bark push, sent as the ciphertext parameter when set</value>
-    </data>
-    <data name="BarkDeviceKeyDescription" xml:space="preserve">
-        <value>Bark device key, supports multiple devices separated by commas</value>
-    </data>
-    <data name="BarkGroupDescription" xml:space="preserve">
-        <value>Bark message group</value>
-    </data>
-    <data name="BarkIconUrlDescription" xml:space="preserve">
-        <value>URL of the Bark push icon</value>
-    </data>
-    <data name="BarkLevelDescription" xml:space="preserve">
-        <value>Bark push level, active/timeSensitive/passive</value>
-    </data>
-    <data name="BarkServerAddressDescription" xml:space="preserve">
-        <value>Bark server address</value>
-    </data>
-    <data name="BarkSoundDescription" xml:space="preserve">
-        <value>Name of the Bark push sound</value>
-    </data>
-    <data name="DingTalkEnableDescription" xml:space="preserve">
-        <value>Whether to enable DingTalk bot push</value>
-    </data>
-    <data name="DingTalkSignSecretDescription" xml:space="preserve">
-        <value>Signing secret of the DingTalk bot (starts with SEC)</value>
-    </data>
-    <data name="DingTalkWebhookDescription" xml:space="preserve">
-        <value>Webhook URL of the DingTalk bot</value>
-    </data>
-    <data name="DiscordEnableDescription" xml:space="preserve">
-        <value>Whether to enable Discord push</value>
-    </data>
-    <data name="DiscordScreenshotDescription" xml:space="preserve">
-        <value>Whether to attach screenshots to Discord push</value>
-    </data>
-    <data name="DiscordWebhookDescription" xml:space="preserve">
-        <value>Discord Webhook URL</value>
-    </data>
-    <data name="FeishuEnableDescription" xml:space="preserve">
-        <value>Whether to enable Feishu push</value>
-    </data>
-    <data name="FeishuAppIdDescription" xml:space="preserve">
-        <value>App ID of the Feishu app</value>
-    </data>
-    <data name="FeishuAppSecretDescription" xml:space="preserve">
-        <value>App Secret of the Feishu app</value>
-    </data>
-    <data name="FeishuReceiverIdDescription" xml:space="preserve">
-        <value>Feishu message receiver ID</value>
-    </data>
-    <data name="FeishuIdTypeDescription" xml:space="preserve">
-        <value>Feishu receiver ID type, e.g. open_id, user_id, union_id, chat_id</value>
-    </data>
-    <data name="FeishuWebhookDescription" xml:space="preserve">
-        <value>Webhook URL of the Feishu bot</value>
-    </data>
-    <data name="OneBotEnableDescription" xml:space="preserve">
-        <value>Whether to enable OneBot push</value>
-    </data>
-    <data name="OneBotScreenshotDescription" xml:space="preserve">
-        <value>Whether to attach screenshots to OneBot push</value>
-    </data>
-    <data name="OneBotGroupNumberDescription" xml:space="preserve">
-        <value>Target group number for OneBot push</value>
-    </data>
-    <data name="OneBotAccessTokenDescription" xml:space="preserve">
-        <value>OneBot access Token</value>
-    </data>
-    <data name="OneBotApiAddressDescription" xml:space="preserve">
-        <value>OneBot HTTP API address</value>
-    </data>
-    <data name="OneBotAccountDescription" xml:space="preserve">
-        <value>OneBot bot account</value>
-    </data>
-    <data name="ServerChanEnableDescription" xml:space="preserve">
-        <value>Whether to enable ServerChan push</value>
-    </data>
-    <data name="ServerChanSendKeyDescription" xml:space="preserve">
-        <value>ServerChan SendKey</value>
-    </data>
-    <data name="TelegramEnableDescription" xml:space="preserve">
-        <value>Whether to enable Telegram push</value>
-    </data>
-    <data name="TelegramProxyEnableDescription" xml:space="preserve">
-        <value>Whether to enable a proxy for Telegram push</value>
-    </data>
-    <data name="TelegramScreenshotDescription" xml:space="preserve">
-        <value>Whether to attach screenshots to Telegram push</value>
-    </data>
-    <data name="WeComEnableDescription" xml:space="preserve">
-        <value>Whether to enable WeCom push</value>
-    </data>
-    <data name="WeComScreenshotDescription" xml:space="preserve">
-        <value>Whether to attach screenshots to WeCom push</value>
-    </data>
-    <data name="WeComWebhookDescription" xml:space="preserve">
-        <value>Webhook URL of the WeCom bot</value>
-    </data>
-    <data name="CustomWebhookEnableDescription" xml:space="preserve">
-        <value>Whether to enable custom Webhook push</value>
-    </data>
-    <data name="CustomWebhookUrlDescription" xml:space="preserve">
-        <value>URL of the custom Webhook</value>
-    </data>
-    <data name="XxtuiEnableDescription" xml:space="preserve">
-        <value>Whether to enable xxtui push</value>
-    </data>
-    <data name="EmailEnableDescription" xml:space="preserve">
-        <value>Whether to enable email push</value>
-    </data>
-    <data name="SmtpPortDescription" xml:space="preserve">
-        <value>SMTP server port, usually 465 for SSL</value>
-    </data>
-    <data name="RecipientEmailDescription" xml:space="preserve">
-        <value>Recipient email address</value>
-    </data>
-    <data name="SenderEmailDescription" xml:space="preserve">
-        <value>Sender email address</value>
-    </data>
-    <data name="SmtpServerDescription" xml:space="preserve">
-        <value>SMTP server address</value>
-    </data>
-    <data name="SmtpAuthCodeDescription" xml:space="preserve">
-        <value>SMTP authorization code (stored encrypted)</value>
-    </data>
-    <data name="TelegramApiAddressDescription" xml:space="preserve">
-        <value>Telegram Bot API address</value>
-    </data>
-    <data name="TelegramBotTokenDescription" xml:space="preserve">
-        <value>Bot Token of the Telegram bot</value>
-    </data>
-    <data name="TelegramChatIdDescription" xml:space="preserve">
-        <value>Telegram push target Chat ID</value>
-    </data>
-    <data name="TelegramProxyAddressDescription" xml:space="preserve">
-        <value>Telegram proxy server address</value>
-    </data>
-    <data name="XxtuiApiKeyDescription" xml:space="preserve">
-        <value>API Key of xxtui</value>
-    </data>
-    <data name="XxtuiChannelDescription" xml:space="preserve">
-        <value>Push channel of xxtui</value>
-    </data>
-    <data name="XxtuiMessageSourceDescription" xml:space="preserve">
-        <value>Message source of xxtui</value>
-    </data>
-    <data name="TaskCompleteNotificationListDescription" xml:space="preserve">
-        <value>List of task names to send notifications when completed</value>
-    </data>
-    <data name="TaskStartNotificationListDescription" xml:space="preserve">
-        <value>List of task names to send notifications when started</value>
-    </data>
-    <data name="DownloadChannelDescription" xml:space="preserve">
-        <value>Download channel, 0=Mirror Chyan, 1=Github Release, 2=AUTO-MAS</value>
-    </data>
-    <data name="AutoUpdateEnableDescription" xml:space="preserve">
-        <value>Whether to enable auto update: starts downloading immediately when an update is available</value>
-    </data>
-    <data name="UpdateCheckEnableDescription" xml:space="preserve">
-        <value>Whether to enable update checking: checks for updates at startup and notifies the user</value>
-    </data>
-    <data name="UpdateChannelSettingDescription" xml:space="preserve">
-        <value>Update channel, 0=Stable, 1=Beta</value>
-    </data>
-    <data name="UpdateInstallerDirectoryDescription" xml:space="preserve">
-        <value>Directory for saving downloaded update installers; if empty, uses the SRA folder in the system temp directory</value>
-    </data>
-    <data name="MirrorChyanAuthCodeDescription" xml:space="preserve">
-        <value>Authorization code for the Mirror Chyan download channel; sensitive information is stored encrypted</value>
-    </data>
-    <data name="BackendLaunchArgsDescription" xml:space="preserve">
-        <value>Backend launch arguments</value>
-    </data>
-    <data name="RemoteBackendEnableDescription" xml:space="preserve">
-        <value>Whether to use a remote backend</value>
-    </data>
-    <data name="RemoteBackendAddressDescription" xml:space="preserve">
-        <value>Remote backend address</value>
-    </data>
-    <data name="OverlayDebugInfoDescription" xml:space="preserve">
-        <value>Whether to show debug info in the overlay</value>
-    </data>
-    <data name="DeveloperModeEnableDescription" xml:space="preserve">
-        <value>Whether to enable developer mode</value>
-    </data>
-    <data name="CustomBackendEnableDescription" xml:space="preserve">
-        <value>Whether to enable a custom backend</value>
-    </data>
-    <data name="CustomBackendCommandDescription" xml:space="preserve">
-        <value>Custom backend command/executable, e.g. python, sra-cli, uv, or an executable path</value>
-    </data>
-    <data name="CustomBackendArgsDescription" xml:space="preserve">
-        <value>Custom backend launch arguments, e.g. main.py, -m SRACore</value>
-    </data>
-    <data name="CustomBackendWorkingDirDescription" xml:space="preserve">
-        <value>Custom backend working directory; uses the program's current directory when empty</value>
-    </data>
-    <data name="SaveOcrScreenshotDescription" xml:space="preserve">
-        <value>Whether to save OCR screenshots for debugging</value>
-    </data>
-    <data name="TaskConfigNameDescription" xml:space="preserve">
-        <value>Task config name</value>
-    </data>
-    <data name="StartGameSettingsText" xml:space="preserve">
-        <value>Start game settings</value>
-    </data>
-    <data name="TrailblazePowerSettingsText" xml:space="preserve">
-        <value>Trailblaze Power settings</value>
-    </data>
-    <data name="ClaimRewardsSettingsText" xml:space="preserve">
-        <value>Claim rewards settings</value>
-    </data>
-    <data name="CosmicStrifeSettingsText" xml:space="preserve">
-        <value>Cosmic Strife settings</value>
-    </data>
-    <data name="PostTaskActionsText" xml:space="preserve">
-        <value>Post-task actions</value>
-    </data>
-    <data name="ConfigFileVersionDescription" xml:space="preserve">
-        <value>Config file version</value>
-    </data>
-    <data name="StartGameTaskEnableDescription" xml:space="preserve">
-        <value>Whether to enable the start game task</value>
-    </data>
-    <data name="GameChannelDescription" xml:space="preserve">
-        <value>Game channel, 0=CN, 1=Bilibili, 2=Global</value>
-    </data>
-    <data name="GameExecutablePathDescription" xml:space="preserve">
-        <value>Game executable path</value>
-    </data>
-    <data name="GlobalServerDescription" xml:space="preserve">
-        <value>Global server, 0=Asia, 1=Europe, 2=America, 3=TW/HK/MO, only effective for Global</value>
-    </data>
-    <data name="UseGlobalGamePathDescription" xml:space="preserve">
-        <value>Whether to use the game path from global settings</value>
-    </data>
-    <data name="GameLaunchDelayDescription" xml:space="preserve">
-        <value>Wait delay after launching the game (seconds)</value>
-    </data>
-    <data name="AutoLoginEnableDescription" xml:space="preserve">
-        <value>Whether to log in automatically</value>
-    </data>
-    <data name="AutoReloginDescription" xml:space="preserve">
-        <value>Whether to log in again automatically after a login failure</value>
-    </data>
-    <data name="AccountPasswordDescription" xml:space="preserve">
-        <value>Account password stored encrypted</value>
-    </data>
-    <data name="AccountUsernameDescription" xml:space="preserve">
-        <value>Account username stored encrypted</value>
-    </data>
-    <data name="TrailblazePowerTaskEnableDescription" xml:space="preserve">
-        <value>Whether to enable the Trailblaze Power task</value>
-    </data>
-    <data name="CalyxGoldenStageDescription" xml:space="preserve">
-        <value>Target stage for Calyx (Golden) in Garden of Plenty</value>
-    </data>
-    <data name="CalyxCrimsonStageDescription" xml:space="preserve">
-        <value>Target stage for Calyx (Crimson) in Garden of Plenty</value>
-    </data>
-    <data name="SupportCharacterDescription" xml:space="preserve">
-        <value>Whether to use support characters</value>
-    </data>
     <data name="TrainingTargetEnableDescription" xml:space="preserve">
         <value>Whether to enable training targets; when enabled, training targets are completed first</value>
     </data>
-    <data name="TrainingTargetPriorityDescription" xml:space="preserve">
-        <value>Training target material priority: skip Ornament Extraction and Cavern of Corrosion when material stages are detected, keep them otherwise</value>
-    </data>
-    <data name="DoubleEventDetectionDescription" xml:space="preserve">
-        <value>Whether to enable double event detection; when enabled, Garden of Plenty/Realm of the Strange/Planar Fissure stages are prioritized</value>
-    </data>
-    <data name="PlanarFissureStageDescription" xml:space="preserve">
-        <value>Target stage for Planar Fissure</value>
-    </data>
-    <data name="RealmOfStrangeStageDescription" xml:space="preserve">
-        <value>Target stage for Realm of the Strange</value>
-    </data>
-    <data name="TrailblazePowerRefillCountDescription" xml:space="preserve">
-        <value>Number of Trailblaze Power refills</value>
-    </data>
-    <data name="TrailblazePowerRefillEnableDescription" xml:space="preserve">
-        <value>Whether to replenish Trailblaze Power</value>
-    </data>
-    <data name="TrailblazePowerRefillMethodDescription" xml:space="preserve">
-        <value>Trailblaze Power replenish method, 0=Reserved Trailblaze Power, 1=Fuel, 2=Stellar Jade</value>
-    </data>
-    <data name="TaskListText" xml:space="preserve">
-        <value>Task list</value>
-    </data>
-    <data name="ClaimRewardsTaskEnableDescription" xml:space="preserve">
-        <value>Whether to enable the claim rewards task</value>
-    </data>
-    <data name="ClaimAssignmentsDescription" xml:space="preserve">
-        <value>Whether to claim Assignment rewards</value>
-    </data>
-    <data name="ClaimDailyTrainingDescription" xml:space="preserve">
-        <value>Whether to claim Daily Training rewards</value>
-    </data>
-    <data name="ClaimGiftOfOdysseyDescription" xml:space="preserve">
-        <value>Whether to claim Gift of Odyssey rewards</value>
-    </data>
-    <data name="ClaimMailRewardsDescription" xml:space="preserve">
-        <value>Whether to claim mail rewards</value>
-    </data>
-    <data name="ClaimNamelessHonorDescription" xml:space="preserve">
-        <value>Whether to claim Nameless Honor rewards</value>
-    </data>
-    <data name="RedeemCodesEnableDescription" xml:space="preserve">
-        <value>Whether to redeem codes</value>
-    </data>
-    <data name="ClaimTrailblazerProfileDescription" xml:space="preserve">
-        <value>Whether to claim Trailblazer Profile rewards</value>
-    </data>
-    <data name="RedemptionCodeListDescription" xml:space="preserve">
-        <value>List of redemption codes, format: code1 code2 code3</value>
-    </data>
-    <data name="CosmicStrifeTaskEnableDescription" xml:space="preserve">
-        <value>Whether to enable the Cosmic Strife task</value>
-    </data>
-    <data name="CurrencyWarsMasterSwitchDescription" xml:space="preserve">
-        <value>Master switch for Currency Wars</value>
-    </data>
-    <data name="CurrencyWarsDifficultyDescription" xml:space="preserve">
-        <value>Currency Wars difficulty, 0=lowest, 1=highest, 2=current difficulty</value>
-    </data>
-    <data name="CurrencyWarsModeDescription" xml:space="preserve">
-        <value>Currency Wars mode, 0=Standard match, 1=Overclock match, 2=opening reroll</value>
-    </data>
-    <data name="CurrencyWarsSkipWhenFullDescription" xml:space="preserve">
-        <value>When enabled, skip the Currency Wars task if Cosmic Strife point rewards are full</value>
-    </data>
-    <data name="CurrencyWarsBossAffixDescription" xml:space="preserve">
-        <value>Boss affixes for Currency Wars opening reroll</value>
-    </data>
-    <data name="CurrencyWarsBossNameDescription" xml:space="preserve">
-        <value>Boss names for Currency Wars opening reroll</value>
-    </data>
-    <data name="CurrencyWarsInvestmentEnvDescription" xml:space="preserve">
-        <value>Investment environments for Currency Wars opening reroll</value>
-    </data>
-    <data name="CurrencyWarsInvestmentStrategyHint" xml:space="preserve">
-        <value>Investment strategies for Currency Wars opening reroll</value>
-    </data>
-    <data name="CurrencyWarsRerollRunCountDescription" xml:space="preserve">
-        <value>Number of runs for Currency Wars opening reroll</value>
-    </data>
-    <data name="CurrencyWarsStrategyNameDescription" xml:space="preserve">
-        <value>Strategy name used in Currency Wars</value>
-    </data>
-    <data name="CurrencyWarsStrategyIndexDescription" xml:space="preserve">
-        <value>Strategy index used in Currency Wars</value>
-    </data>
-    <data name="CurrencyWarsTrailblazerNameDescription" xml:space="preserve">
-        <value>Trailblazer name in Currency Wars</value>
-    </data>
-    <data name="DivergentUniverseMasterSwitchDescription" xml:space="preserve">
-        <value>Master switch for Divergent Universe</value>
-    </data>
-    <data name="DivergentUniverseModeDescription" xml:space="preserve">
-        <value>Divergent Universe mode: 0=single-layer farm, 1=full run</value>
-    </data>
-    <data name="DivergentUniverseRunCountDescription" xml:space="preserve">
-        <value>Number of Divergent Universe runs</value>
-    </data>
-    <data name="DivergentUniverseTechniqueDescription" xml:space="preserve">
-        <value>Whether to use Technique for fast Divergent Universe farming</value>
-    </data>
-    <data name="DivergentUniversePointRewardDescription" xml:space="preserve">
-        <value>Whether to enable point rewards; when enabled, skip this task once the weekly point cap is reached</value>
-    </data>
-    <data name="PostTaskActionEnableDescription" xml:space="preserve">
-        <value>Whether to enable post-task actions</value>
-    </data>
-    <data name="PostTaskExitAppDescription" xml:space="preserve">
-        <value>Whether to exit the app after completing tasks</value>
-    </data>
-    <data name="PostTaskExitGameDescription" xml:space="preserve">
-        <value>Whether to exit the game after completing tasks</value>
-    </data>
-    <data name="PostTaskLogoffUserDescription" xml:space="preserve">
-        <value>Whether to log off the current user after completing tasks</value>
-    </data>
-    <data name="PostTaskLogoutAccountDescription" xml:space="preserve">
-        <value>Whether to log out of the account after completing tasks</value>
-    </data>
-    <data name="PostTaskShutdownDescription" xml:space="preserve">
-        <value>Whether to shut down the computer after completing tasks</value>
-    </data>
-    <data name="PostTaskSleepDescription" xml:space="preserve">
-        <value>Whether to put the computer to sleep after completing tasks</value>
-    </data>
-    <data name="TaskNameDescription" xml:space="preserve">
-        <value>Task name</value>
-    </data>
-    <data name="TaskIdDescription" xml:space="preserve">
-        <value>Task ID, e.g. calyx_golden, echo_of_war</value>
-    </data>
-    <data name="StageLevelDescription" xml:space="preserve">
-        <value>Stage level</value>
-    </data>
     <data name="StageNameDescription" xml:space="preserve">
         <value>Stage name</value>
-    </data>
-    <data name="TaskExecutionCountDescription" xml:space="preserve">
-        <value>Number of executions per task in manual mode</value>
-    </data>
-    <data name="TaskExecutionRoundDescription" xml:space="preserve">
-        <value>Number of execution rounds in manual mode</value>
-    </data>
-    <data name="TaskExecutionAutoAllocateDescription" xml:space="preserve">
-        <value>Whether to automatically allocate execution counts based on remaining Trailblaze Power</value>
     </data>
     <data name="InputSendProcessErrorMessage" xml:space="preserve">
         <value>Send failed: process is not running (input: {0})</value>
@@ -2067,9 +1389,6 @@ Please choose another folder.</value>
     <data name="StrategySiteText" xml:space="preserve">
         <value>Strategy site</value>
     </data>
-    <data name="SkipWhenPointsFullText" xml:space="preserve">
-        <value>Skip when points are full</value>
-    </data>
     <data name="CurrencyWarsBossConfigHint" xml:space="preserve">
         <value>You can configure boss names, boss affixes, investment environments, and investment strategies below. See the documentation for the format.</value>
     </data>
@@ -2304,42 +1623,12 @@ Please choose another folder.</value>
     <data name="WindowedModeText" xml:space="preserve">
         <value>Windowed</value>
     </data>
-    <data name="WelcomeToSraText" xml:space="preserve">
-        <value>Welcome to SRA</value>
-    </data>
-    <data name="SitBackAndRelaxText" xml:space="preserve">
-        <value>Sit back and relax</value>
-    </data>
     <data name="NotSequenceReadArchiveText" xml:space="preserve">
         <value>Not
 'Sequence Read Archive'</value>
     </data>
-    <data name="LauncherInceptionText" xml:space="preserve">
-        <value>Launcher launches the launcher</value>
-    </data>
-    <data name="FireflyFlamePhraseText" xml:space="preserve">
-        <value>The firefly rushes to the flame, born unto death</value>
-    </data>
-    <data name="DimStarsBeyondPhraseText" xml:space="preserve">
-        <value>Across the universe to the dim stars beyond</value>
-    </data>
-    <data name="StarRailMasterPhraseText" xml:space="preserve">
-        <value>Determined to become a Star Rail master</value>
-    </data>
-    <data name="CarveFuturePhraseText" xml:space="preserve">
-        <value>We shall carve the future in the past</value>
-    </data>
-    <data name="IronSparksPhraseText" xml:space="preserve">
-        <value>Iron sparks fly, graceful without leaving ash</value>
-    </data>
-    <data name="NormalIsAbnormalText" xml:space="preserve">
-        <value>If everything is normal, that is the abnormality</value>
-    </data>
     <data name="RegistryUnsupportedError" xml:space="preserve">
         <value>Registry operations are not supported on non-Windows systems</value>
-    </data>
-    <data name="GamePathAutoDetectFailedError" xml:space="preserve">
-        <value>Unable to auto-detect the game path</value>
     </data>
     <data name="RegistryAccessDeniedError" xml:space="preserve">
         <value>Registry access denied. Please run as administrator</value>
@@ -2359,209 +1648,14 @@ Please choose another folder.</value>
     <data name="ScanFailedError" xml:space="preserve">
         <value>Scan failed: {e.Message}</value>
     </data>
-    <data name="M0001" xml:space="preserve">
-        <value>Re-import task modules to hot reload</value>
-    </data>
-    <data name="M0004" xml:space="preserve">
-        <value>Show the extension configuration schema</value>
-    </data>
-    <data name="M0005" xml:space="preserve">
-        <value>Re-import extension modules (hot reload)</value>
-    </data>
-    <data name="M0007" xml:space="preserve">
-        <value>Show extension status</value>
-    </data>
-    <data name="M0008" xml:space="preserve">
-        <value>Extension configuration</value>
-    </data>
-    <data name="M0009" xml:space="preserve">
-        <value>Get extension configuration</value>
-    </data>
-    <data name="M0010" xml:space="preserve">
-        <value>Set extension configuration</value>
-    </data>
-    <data name="M0014" xml:space="preserve">
-        <value>Extension management: list and run registered extensions</value>
-    </data>
-    <data name="M0015" xml:space="preserve">
-        <value>Dispatch by extension type: foreground extensions use the shared thread, background ones use a dedicated thread</value>
-    </data>
-    <data name="M0019" xml:space="preserve">
-        <value>Stop a background extension or the currently running single-run extension</value>
-    </data>
-    <data name="M0024" xml:space="preserve">
-        <value>Call the specified Operator method</value>
-    </data>
-    <data name="M0027" xml:space="preserve">
-        <value>List all strategies</value>
-    </data>
-    <data name="M0028" xml:space="preserve">
-        <value>Import a strategy file into the strategy folder</value>
-    </data>
-    <data name="M0029" xml:space="preserve">
-        <value>Show Trailblaze Power stage configuration</value>
-    </data>
-    <data name="M0034" xml:space="preserve">
-        <value>Play the in-game keyboard from a JSON score (pause F8 / reset F10 / stop F9)</value>
-    </data>
-    <data name="M0035" xml:space="preserve">
-        <value>Score name or JSON file path</value>
-    </data>
-    <data name="M0036" xml:space="preserve">
-        <value>Playback speed multiplier (1.0 = original tempo)</value>
-    </data>
-    <data name="M0037" xml:space="preserve">
-        <value>Number of playthroughs</value>
-    </data>
-    <data name="M0038" xml:space="preserve">
-        <value>Delay before the first play (seconds), used to switch to the game window</value>
-    </data>
-    <data name="M0039" xml:space="preserve">
-        <value>Rehearsal mode: no actual key presses, only validates the score and timing</value>
-    </data>
-    <data name="M0040" xml:space="preserve">
-        <value>Enable playback hotkeys (pause/reset)</value>
-    </data>
-    <data name="M0041" xml:space="preserve">
-        <value>Pause/resume hotkey</value>
-    </data>
-    <data name="M0042" xml:space="preserve">
-        <value>Reset hotkey</value>
-    </data>
-    <data name="M0044" xml:space="preserve">
-        <value>Automatically detect and handle story dialogue, can skip the story based on configuration</value>
-    </data>
-    <data name="M0045" xml:space="preserve">
-        <value>Whether to skip story dialogue automatically</value>
-    </data>
     <data name="M0048" xml:space="preserve">
         <value>Enter the in-game Trailblazer name.</value>
-    </data>
-    <data name="M0049" xml:space="preserve">
-        <value>Select a strategy; click Refresh after adding a JSON file. You can also enter the full path to a strategy JSON.</value>
     </data>
     <data name="M0050" xml:space="preserve">
         <value>Number of matches to run this time.</value>
     </data>
-    <data name="M0051" xml:space="preserve">
-        <value>Select the lowest difficulty, highest difficulty, or keep the current difficulty.</value>
-    </data>
-    <data name="M0052" xml:space="preserve">
-        <value>When enabled, runs Overclock match; when disabled, runs Standard match.</value>
-    </data>
     <data name="M0053" xml:space="preserve">
         <value>Trailblazer name</value>
-    </data>
-    <data name="M0059" xml:space="preserve">
-        <value>Predict warp resources before the current version ends</value>
-    </data>
-    <data name="M0060" xml:space="preserve">
-        <value>Version start date (YYYY-MM-DD), used to infer the current version range</value>
-    </data>
-    <data name="M0061" xml:space="preserve">
-        <value>Days per version</value>
-    </data>
-    <data name="M0062" xml:space="preserve">
-        <value>Days between the special program and the end of the version</value>
-    </data>
-    <data name="M0063" xml:space="preserve">
-        <value>Special program status: auto/done/not_done</value>
-    </data>
-    <data name="M0064" xml:space="preserve">
-        <value>Endgame refresh interval in days</value>
-    </data>
-    <data name="M0065" xml:space="preserve">
-        <value>Offset in days for the first endgame refresh</value>
-    </data>
-    <data name="M0066" xml:space="preserve">
-        <value>Endgame refresh count override, -1 for automatic</value>
-    </data>
-    <data name="M0067" xml:space="preserve">
-        <value>Whether an endgame refresh counts for today</value>
-    </data>
-    <data name="M0068" xml:space="preserve">
-        <value>Weekly reset day of week (0=Monday)</value>
-    </data>
-    <data name="M0069" xml:space="preserve">
-        <value>Weekly count override, -1 for automatic</value>
-    </data>
-    <data name="M0070" xml:space="preserve">
-        <value>Whether a weekly reset counts for today</value>
-    </data>
-    <data name="M0071" xml:space="preserve">
-        <value>Version update compensation Stellar Jade</value>
-    </data>
-    <data name="M0072" xml:space="preserve">
-        <value>Whether the Express Supply Pass is active</value>
-    </data>
-    <data name="M0073" xml:space="preserve">
-        <value>Daily Stellar Jade without the Express Supply Pass</value>
-    </data>
-    <data name="M0074" xml:space="preserve">
-        <value>Daily Stellar Jade with the Express Supply Pass</value>
-    </data>
-    <data name="M0075" xml:space="preserve">
-        <value>Stellar Jade per endgame refresh</value>
-    </data>
-    <data name="M0076" xml:space="preserve">
-        <value>Weekly Simulated Universe Stellar Jade</value>
-    </data>
-    <data name="M0077" xml:space="preserve">
-        <value>Stellar Jade from special program redemption codes</value>
-    </data>
-    <data name="M0078" xml:space="preserve">
-        <value>Automatically scan the resources in the first row of the inventory</value>
-    </data>
-    <data name="M0079" xml:space="preserve">
-        <value>Enter the current Stellar Jade manually</value>
-    </data>
-    <data name="M0080" xml:space="preserve">
-        <value>Enter the current Star Rail Special Pass manually</value>
-    </data>
-    <data name="M0081" xml:space="preserve">
-        <value>Enter the current Star Rail Pass manually</value>
-    </data>
-    <data name="M0082" xml:space="preserve">
-        <value>Automatically scan the rewards guide</value>
-    </data>
-    <data name="M0083" xml:space="preserve">
-        <value>Rewards guide type: auto/jade/special_pass/normal_pass</value>
-    </data>
-    <data name="M0084" xml:space="preserve">
-        <value>Enter the Stellar Jade in the rewards guide manually</value>
-    </data>
-    <data name="M0085" xml:space="preserve">
-        <value>Enter the Special Pass in the rewards guide manually</value>
-    </data>
-    <data name="M0086" xml:space="preserve">
-        <value>Enter the Pass in the rewards guide manually</value>
-    </data>
-    <data name="ScanStrategyFolderText" xml:space="preserve">
-        <value>Scan strategy folder</value>
-    </data>
-    <data name="G0004" xml:space="preserve">
-        <value>Running</value>
-    </data>
-    <data name="G0102" xml:space="preserve">
-        <value>Scan strategy folder</value>
-    </data>
-    <data name="R0003" xml:space="preserve">
-        <value>Show current task status</value>
-    </data>
-    <data name="R0005" xml:space="preserve">
-        <value>List all registered tasks</value>
-    </data>
-    <data name="G0097" xml:space="preserve">
-        <value>username</value>
-    </data>
-    <data name="G0099" xml:space="preserve">
-        <value>runtimes</value>
-    </data>
-    <data name="G0104" xml:space="preserve">
-        <value>[4 Express 3 Quantum] Himeko to Lv. 5 for quality · Lv. 7 unlocks 2★</value>
-    </data>
-    <data name="G0105" xml:space="preserve">
-        <value>[5 Elation 3 Quantum] Silver Wolf budget build · find the core at Lv. 5, complete at Lv. 9</value>
     </data>
     <data name="RussianLanguageName" xml:space="preserve">
         <value>Русский</value>
@@ -2572,25 +1666,8 @@ Please choose another folder.</value>
     <data name="InfoText" xml:space="preserve">
         <value>Info</value>
     </data>
-    <data name="ErrorText" xml:space="preserve">
-        <value>Error</value>
-    </data>
-    <data name="SuccessText" xml:space="preserve">
-        <value>Success</value>
-    </data>
     <data name="JustIconText" xml:space="preserve">
         <value>Just Icon.</value>
-    </data>
-    <data name="FarewellPhraseOne" xml:space="preserve">
-        <value>Bon voyage</value>
-    </data>
-    <data name="FarewellPhraseTwo" xml:space="preserve">
-        <value>May your path be clear</value>
-    </data>
-    <data name="FarewellPhraseThree" xml:space="preserve">
-        <value>May you get to where
-dreams are all
-crystalline and sweet</value>
     </data>
     <data name="EmptyValueText" xml:space="preserve">
         <value>(empty)</value>

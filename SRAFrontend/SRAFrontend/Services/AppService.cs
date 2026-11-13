@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SRAFrontend.Data;
 using SRAFrontend.Models;
-using SRAFrontend.Localization;
 
 namespace SRAFrontend.Services;
 
@@ -49,25 +48,6 @@ public class AppService(SettingsService settingsService, ILogger<AppService> log
         "May you get to where\ndreams are all\ncrystalline and sweet",
         "We will mark the past with the future",
         "Neverness To Everness"
-    ];
-    
-    // 俄语短语取资源表，顺序与 PhrasesZh 对齐
-    private static string[] PhrasesRu =>
-    [
-        Resources.WelcomeToSraText,
-        Resources.SitBackAndRelaxText,
-        Resources.NotSequenceReadArchiveText,
-        Resources.LauncherInceptionText,
-        "-1073741819",
-        Resources.FireflyFlamePhraseText,
-        Resources.DimStarsBeyondPhraseText,
-        Resources.StarRailMasterPhraseText,
-        Resources.FarewellPhraseOne,
-        Resources.FarewellPhraseTwo,
-        Resources.FarewellPhraseThree,
-        Resources.CarveFuturePhraseText,
-        Resources.IronSparksPhraseText,
-        Resources.NormalIsAbnormalText,
     ];
 
     private static byte[] DefaultImage { get; } = LoadDefaultImage();
@@ -192,9 +172,7 @@ public class AppService(SettingsService settingsService, ILogger<AppService> log
         return settingsService.Settings.Display.Language switch
         {
             UiLanguage.Chinese => PhrasesZh,
-            UiLanguage.English => PhrasesEn,
-            UiLanguage.Russian => PhrasesRu,
-            _ => PhrasesZh
+            _ => PhrasesEn
         };
     }
     

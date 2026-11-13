@@ -16,9 +16,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="GreetingText" xml:space="preserve">
-    <value>Добро пожаловать в SRA</value>
-  </data>
   <data name="HomeText" xml:space="preserve">
     <value>Главная</value>
   </data>
@@ -52,10 +49,7 @@
   <data name="StartUpText" xml:space="preserve">
     <value>Запуск</value>
   </data>
-  <data name="ThreadSafetyText" xml:space="preserve">
-    <value>Безопасность потоков</value>
-  </data>
-  <data name="AllowNotificationText" xml:space="preserve">
+    <data name="AllowNotificationText" xml:space="preserve">
     <value>Разрешить уведомления</value>
   </data>
   <data name="DisplayText" xml:space="preserve">
@@ -90,9 +84,6 @@
   </data>
   <data name="LightText" xml:space="preserve">
     <value>Светлая</value>
-  </data>
-  <data name="FollowSystemText" xml:space="preserve">
-    <value>Как в системе</value>
   </data>
   <data name="AboutText" xml:space="preserve">
     <value>О программе</value>
@@ -130,9 +121,6 @@
   <data name="ControlPanelOpacityText" xml:space="preserve">
     <value>Непрозрачность панели управления</value>
   </data>
-  <data name="NotSetText" xml:space="preserve">
-    <value>Не задано</value>
-  </data>
   <data name="HotkeysText" xml:space="preserve">
     <value>Клавиши в игре</value>
   </data>
@@ -147,9 +135,6 @@
   </data>
   <data name="GuideText" xml:space="preserve">
     <value>Путеводитель межзвёздного мира</value>
-  </data>
-  <data name="MapText" xml:space="preserve">
-    <value>Карта</value>
   </data>
   <data name="TechniqueText" xml:space="preserve">
     <value>Техника</value>
@@ -268,9 +253,6 @@
   <data name="CurrentConfigText" xml:space="preserve">
     <value>Текущая конфигурация</value>
   </data>
-  <data name="AutoResolutionText" xml:space="preserve">
-    <value>Автонастройка разрешения игры</value>
-  </data>
   <data name="DeveloperOptionsText" xml:space="preserve">
     <value>Для разработчиков</value>
   </data>
@@ -291,9 +273,6 @@
   </data>
   <data name="BackendWorkingDirectoryText" xml:space="preserve">
     <value>Рабочая папка</value>
-  </data>
-  <data name="BackendWorkingDirectoryHintText" xml:space="preserve">
-    <value>Пустое поле — папка приложения</value>
   </data>
   <data name="CloudGameText" xml:space="preserve">
     <value>Облачная версия игры (экспериментально)</value>
@@ -318,12 +297,6 @@
   </data>
   <data name="DisplayModeText" xml:space="preserve">
     <value>Режим экрана</value>
-  </data>
-  <data name="WindowedText" xml:space="preserve">
-    <value>Оконный</value>
-  </data>
-  <data name="FullScreenText" xml:space="preserve">
-    <value>Полноэкранный</value>
   </data>
   <data name="BorderlessWindowText" xml:space="preserve">
     <value>Окно без рамки</value>
@@ -574,9 +547,6 @@
   <data name="AutoBattleText" xml:space="preserve">
     <value>Автобой</value>
   </data>
-    <data name="CurrencyWarsPlusDescription" xml:space="preserve">
-        <value>Обычный режим и разгон с исправлениями распознавания монет, персонажей поддержки и сводки ошибок.</value>
-    </data>
     <data name="EventStatusEndedText" xml:space="preserve">
         <value>Завершено</value>
     </data>
@@ -661,9 +631,6 @@
     <data name="UpdateAutoDownloadMessage" xml:space="preserve">
         <value>Автоматическая загрузка обновления: {0}</value>
     </data>
-    <data name="UpdateAutoModeText" xml:space="preserve">
-        <value>Обновить автоматически</value>
-    </data>
     <data name="UpdateManualModeText" xml:space="preserve">
         <value>Обновить вручную</value>
     </data>
@@ -684,9 +651,6 @@
     </data>
     <data name="DoNotAskAgainText" xml:space="preserve">
         <value>Больше не спрашивать</value>
-    </data>
-    <data name="CreateDesktopShortcutText" xml:space="preserve">
-        <value>Создать ярлык на рабочем столе</value>
     </data>
     <data name="DesktopShortcutMissingMessage" xml:space="preserve">
         <value>На рабочем столе нет ярлыка. Создать его сейчас?</value>
@@ -781,12 +745,6 @@
     <data name="RestartConfirmMessage" xml:space="preserve">
         <value>Перезапустить приложение для применения обновления?</value>
     </data>
-    <data name="ConfirmText" xml:space="preserve">
-        <value>Подтвердить</value>
-    </data>
-    <data name="ReinstallLatestText" xml:space="preserve">
-        <value>Переустановить последнюю версию</value>
-    </data>
     <data name="ReinstallConfirmMessage" xml:space="preserve">
         <value>Будет загружена и установлена последняя версия для исправления возможных ошибок. Продолжить?</value>
     </data>
@@ -878,9 +836,6 @@
     </data>
     <data name="SavedToFormat" xml:space="preserve">
         <value>Сохранено: {0}</value>
-    </data>
-    <data name="LogExportPathFailedError" xml:space="preserve">
-        <value>Не удалось экспортировать журналы: {TargetPath}</value>
     </data>
     <data name="LogExportFailedError" xml:space="preserve">
         <value>Не удалось экспортировать журналы</value>
@@ -986,9 +941,6 @@
     </data>
     <data name="LanguageRestartConfirmMessage" xml:space="preserve">
         <value>Для применения языка нужно перезапустить приложение. Перезапустить сейчас?</value>
-    </data>
-    <data name="LabelValueFormat" xml:space="preserve">
-        <value>{0}: {1}</value>
     </data>
     <data name="EmailTestText" xml:space="preserve">
         <value>Проверка почты</value>
@@ -1122,647 +1074,17 @@
     <data name="StageRequiredMessage" xml:space="preserve">
         <value>Перед добавлением задачи выберите подземелье</value>
     </data>
-    <data name="ApiGetBackgroundImageText" xml:space="preserve">
-        <value>Получить фон</value>
-    </data>
-    <data name="ApiGetSystemInfoText" xml:space="preserve">
-        <value>Получить сведения о системе</value>
-    </data>
-    <data name="ApiGetPhrasesText" xml:space="preserve">
-        <value>Получить фразы</value>
-    </data>
-    <data name="ApiRestartBackendText" xml:space="preserve">
-        <value>Перезапустить ядро</value>
-    </data>
     <data name="ApiStopBackendText" xml:space="preserve">
         <value>Остановить ядро</value>
-    </data>
-    <data name="ApiGetRecentLogsText" xml:space="preserve">
-        <value>Получить последние записи журнала</value>
-    </data>
-    <data name="ApiSseLogStreamText" xml:space="preserve">
-        <value>Поток журналов SSE</value>
-    </data>
-    <data name="ApiOperatorScreenshotText" xml:space="preserve">
-        <value>Получить снимок Operator</value>
-    </data>
-    <data name="ApiGetConfigNamesText" xml:space="preserve">
-        <value>Получить имена всех конфигураций</value>
-    </data>
-    <data name="ApiGetConfigurationText" xml:space="preserve">
-        <value>Получить выбранную конфигурацию</value>
-    </data>
-    <data name="ApiNewConfigurationText" xml:space="preserve">
-        <value>Создать конфигурацию</value>
-    </data>
-    <data name="ConfigNameInvalidError" xml:space="preserve">
-        <value>Имя содержит недопустимые символы</value>
-    </data>
-    <data name="ConfigurationExistsError" xml:space="preserve">
-        <value>Конфигурация уже существует</value>
-    </data>
-    <data name="ApiListExtensionsText" xml:space="preserve">
-        <value>Перечислить зарегистрированные расширения</value>
-    </data>
-    <data name="ApiExtensionSchemaText" xml:space="preserve">
-        <value>Получить схему настроек расширения</value>
-    </data>
-    <data name="ApiGetExtensionConfigText" xml:space="preserve">
-        <value>Получить настройки расширения</value>
-    </data>
-    <data name="ApiSetExtensionConfigText" xml:space="preserve">
-        <value>Сохранить настройки расширения</value>
-    </data>
-    <data name="ApiRunExtensionText" xml:space="preserve">
-        <value>Запустить расширение</value>
-    </data>
-    <data name="ApiStopExtensionText" xml:space="preserve">
-        <value>Остановить расширение</value>
-    </data>
-    <data name="ApiReloadExtensionsText" xml:space="preserve">
-        <value>Повторно найти и импортировать расширения</value>
-    </data>
-    <data name="ApiListOperatorMethodsText" xml:space="preserve">
-        <value>Перечислить доступные методы Operator</value>
-    </data>
-    <data name="ApiOperatorMethodHelpText" xml:space="preserve">
-        <value>Получить справку по методу Operator</value>
-    </data>
-    <data name="ApiCallOperatorMethodText" xml:space="preserve">
-        <value>Вызвать метод Operator</value>
-    </data>
-    <data name="ApiGetSettingsText" xml:space="preserve">
-        <value>Получить настройки</value>
-    </data>
-    <data name="ApiGetCurrentSettingsText" xml:space="preserve">
-        <value>Получить текущие настройки приложения</value>
-    </data>
-    <data name="ApiUpdateSettingsText" xml:space="preserve">
-        <value>Изменить настройки</value>
-    </data>
-    <data name="ApiUpdateSettingsDescription" xml:space="preserve">
-        <value>Изменить только указанные поля. Тело запроса — часть JSON AppSettings, например { "advanced": { "backend.remote.enabled": true } }</value>
-    </data>
-    <data name="ApiRunTasksText" xml:space="preserve">
-        <value>Запустить задачи</value>
-    </data>
-    <data name="ApiRunSingleTaskText" xml:space="preserve">
-        <value>Запустить одну задачу</value>
-    </data>
-    <data name="ApiStopTasksText" xml:space="preserve">
-        <value>Остановить задачи</value>
-    </data>
-    <data name="ApiGetTaskStatusText" xml:space="preserve">
-        <value>Получить состояние задач</value>
     </data>
     <data name="RedemptionCodeAutoFetchHint" xml:space="preserve">
         <value>Задача автоматически загружает новейшие промокоды с официального сайта и вводит их вместе с указанными выше.</value>
     </data>
-    <data name="GeneralSettingsText" xml:space="preserve">
-        <value>Общие настройки</value>
-    </data>
-    <data name="DisplaySettingsText" xml:space="preserve">
-        <value>Настройки интерфейса</value>
-    </data>
-    <data name="UpdateSettingsText" xml:space="preserve">
-        <value>Настройки обновлений</value>
-    </data>
-    <data name="AdvancedSettingsText" xml:space="preserve">
-        <value>Дополнительные настройки</value>
-    </data>
-    <data name="NotificationSettingsText" xml:space="preserve">
-        <value>Настройки уведомлений</value>
-    </data>
-    <data name="GamePathIndexDescription" xml:space="preserve">
-        <value>Индекс пути к игре в списке gamePath.uris</value>
-    </data>
-    <data name="GamePathListDescription" xml:space="preserve">
-        <value>Список путей к игре для быстрого переключения</value>
-    </data>
-    <data name="GamePathAutoDetectDescription" xml:space="preserve">
-        <value>Автоматически искать игру в стандартных папках установки</value>
-    </data>
-    <data name="GameLaunchArgsEnableDescription" xml:space="preserve">
-        <value>Запускать игру с указанными ниже параметрами</value>
-    </data>
-    <data name="GameWindowModeDescription" xml:space="preserve">
-        <value>Режим окна игры: оконный или полноэкранный</value>
-    </data>
-    <data name="GameWindowSizeDescription" xml:space="preserve">
-        <value>Размер окна в формате ширинаxвысота, например 1920x1080</value>
-    </data>
-    <data name="BorderlessWindowDescription" xml:space="preserve">
-        <value>Использовать окно игры без рамки</value>
-    </data>
-    <data name="AutoBattleDescription" xml:space="preserve">
-        <value>Включить автобой</value>
-    </data>
-    <data name="CommandLineLaunchDescription" xml:space="preserve">
-        <value>Запускать игру через командную строку для устранения проблем прямого запуска</value>
-    </data>
-    <data name="AdvancedLaunchArgsDescription" xml:space="preserve">
-        <value>Дополнительные параметры передаются игре напрямую и имеют приоритет над остальными</value>
-    </data>
-    <data name="CloudGamingDescription" xml:space="preserve">
-        <value>Использовать облачную версию игры</value>
-    </data>
-    <data name="CloudBrowserDescription" xml:space="preserve">
-        <value>Браузер для облачной игры</value>
-    </data>
-    <data name="CloudBrowserPathDescription" xml:space="preserve">
-        <value>Путь к браузеру для облачной игры</value>
-    </data>
-    <data name="CloudBrowserHeadlessDescription" xml:space="preserve">
-        <value>Запускать браузер облачной игры без окна</value>
-    </data>
-    <data name="CloudBrowserMuteDescription" xml:space="preserve">
-        <value>Отключить звук в браузере облачной игры</value>
-    </data>
-    <data name="TechniqueHotkeyDescription" xml:space="preserve">
-        <value>Клавиша применения техники</value>
-    </data>
-    <data name="EventsScreenHotkeyDescription" xml:space="preserve">
-        <value>Клавиша открытия событий</value>
-    </data>
-    <data name="NamelessHonorHotkeyDescription" xml:space="preserve">
-        <value>Клавиша открытия Чести Безымянных</value>
-    </data>
-    <data name="WarpScreenHotkeyDescription" xml:space="preserve">
-        <value>Клавиша открытия Прыжка</value>
-    </data>
-    <data name="GuideScreenHotkeyDescription" xml:space="preserve">
-        <value>Клавиша открытия Путеводителя межзвёздного мира</value>
-    </data>
-    <data name="StopTaskHotkeyDescription" xml:space="preserve">
-        <value>Клавиша остановки задач</value>
-    </data>
-    <data name="OverlayEnableDescription" xml:space="preserve">
-        <value>Включить оверлей</value>
-    </data>
-    <data name="OcrConfidenceDescription" xml:space="preserve">
-        <value>Порог уверенности OCR от 0 до 1; выше — строже</value>
-    </data>
-    <data name="TemplateMatchConfidenceDescription" xml:space="preserve">
-        <value>Порог совпадения шаблонов от 0 до 1; выше — строже</value>
-    </data>
-    <data name="TaskRetryDescription" xml:space="preserve">
-        <value>При ошибке задачи перезапускать игру и повторять попытку</value>
-    </data>
-    <data name="TaskMaxRetryDescription" xml:space="preserve">
-        <value>Максимальное число повторов при ошибке задачи</value>
-    </data>
-    <data name="BackgroundImageUriDescription" xml:space="preserve">
-        <value>Адрес фонового изображения: локальный путь или URL</value>
-    </data>
-    <data name="BackgroundImageOpacityDescription" xml:space="preserve">
-        <value>Непрозрачность фонового изображения от 0 до 1</value>
-    </data>
-    <data name="ControlPanelOpacityDescription" xml:space="preserve">
-        <value>Непрозрачность панели управления от 0 до 1</value>
-    </data>
-    <data name="UiLanguageDescription" xml:space="preserve">
-        <value>Язык интерфейса: 0 — китайский, 1 — английский, 2 — русский</value>
-    </data>
-    <data name="RememberWindowPositionDescription" xml:space="preserve">
-        <value>Запоминать положение и размер окна</value>
-    </data>
-    <data name="WindowStateDescription" xml:space="preserve">
-        <value>Состояние окна: 0 — обычное, 1 — свёрнуто, 2 — развёрнуто</value>
-    </data>
-    <data name="MainWindowXDescription" xml:space="preserve">
-        <value>Координата X главного окна</value>
-    </data>
-    <data name="MainWindowYDescription" xml:space="preserve">
-        <value>Координата Y главного окна</value>
-    </data>
-    <data name="MainWindowWidthDescription" xml:space="preserve">
-        <value>Ширина главного окна</value>
-    </data>
-    <data name="MainWindowHeightDescription" xml:space="preserve">
-        <value>Высота главного окна</value>
-    </data>
-    <data name="NotificationEnableDescription" xml:space="preserve">
-        <value>Включить уведомления</value>
-    </data>
-    <data name="SystemNotificationEnableDescription" xml:space="preserve">
-        <value>Включить системные уведомления</value>
-    </data>
-    <data name="BarkEnableDescription" xml:space="preserve">
-        <value>Включить уведомления Bark</value>
-    </data>
-    <data name="BarkCiphertextDescription" xml:space="preserve">
-        <value>Зашифрованное содержимое Bark, передаваемое параметром ciphertext</value>
-    </data>
-    <data name="BarkDeviceKeyDescription" xml:space="preserve">
-        <value>Ключ устройства Bark; несколько ключей разделяются запятыми</value>
-    </data>
-    <data name="BarkGroupDescription" xml:space="preserve">
-        <value>Группа сообщений Bark</value>
-    </data>
-    <data name="BarkIconUrlDescription" xml:space="preserve">
-        <value>URL значка уведомлений Bark</value>
-    </data>
-    <data name="BarkLevelDescription" xml:space="preserve">
-        <value>Важность уведомлений Bark: active/timeSensitive/passive</value>
-    </data>
-    <data name="BarkServerAddressDescription" xml:space="preserve">
-        <value>Адрес сервера Bark</value>
-    </data>
-    <data name="BarkSoundDescription" xml:space="preserve">
-        <value>Название звука уведомления Bark</value>
-    </data>
-    <data name="DingTalkEnableDescription" xml:space="preserve">
-        <value>Включить уведомления бота DingTalk</value>
-    </data>
-    <data name="DingTalkSignSecretDescription" xml:space="preserve">
-        <value>Ключ подписи бота DingTalk (начинается с SEC)</value>
-    </data>
-    <data name="DingTalkWebhookDescription" xml:space="preserve">
-        <value>Адрес Webhook бота DingTalk</value>
-    </data>
-    <data name="DiscordEnableDescription" xml:space="preserve">
-        <value>Включить уведомления Discord</value>
-    </data>
-    <data name="DiscordScreenshotDescription" xml:space="preserve">
-        <value>Прикладывать снимки экрана к уведомлениям Discord</value>
-    </data>
-    <data name="DiscordWebhookDescription" xml:space="preserve">
-        <value>Адрес Webhook Discord</value>
-    </data>
-    <data name="FeishuEnableDescription" xml:space="preserve">
-        <value>Включить уведомления Feishu</value>
-    </data>
-    <data name="FeishuAppIdDescription" xml:space="preserve">
-        <value>App ID приложения Feishu</value>
-    </data>
-    <data name="FeishuAppSecretDescription" xml:space="preserve">
-        <value>App Secret приложения Feishu</value>
-    </data>
-    <data name="FeishuReceiverIdDescription" xml:space="preserve">
-        <value>ID получателя сообщений Feishu</value>
-    </data>
-    <data name="FeishuIdTypeDescription" xml:space="preserve">
-        <value>Тип ID получателя Feishu: open_id, user_id, union_id или chat_id</value>
-    </data>
-    <data name="FeishuWebhookDescription" xml:space="preserve">
-        <value>Адрес Webhook бота Feishu</value>
-    </data>
-    <data name="OneBotEnableDescription" xml:space="preserve">
-        <value>Включить уведомления OneBot</value>
-    </data>
-    <data name="OneBotScreenshotDescription" xml:space="preserve">
-        <value>Прикладывать снимки экрана к уведомлениям OneBot</value>
-    </data>
-    <data name="OneBotGroupNumberDescription" xml:space="preserve">
-        <value>Номер группы для уведомлений OneBot</value>
-    </data>
-    <data name="OneBotAccessTokenDescription" xml:space="preserve">
-        <value>Токен доступа OneBot</value>
-    </data>
-    <data name="OneBotApiAddressDescription" xml:space="preserve">
-        <value>Адрес HTTP API OneBot</value>
-    </data>
-    <data name="OneBotAccountDescription" xml:space="preserve">
-        <value>Учётная запись бота OneBot</value>
-    </data>
-    <data name="ServerChanEnableDescription" xml:space="preserve">
-        <value>Включить уведомления ServerChan</value>
-    </data>
-    <data name="ServerChanSendKeyDescription" xml:space="preserve">
-        <value>SendKey сервиса ServerChan</value>
-    </data>
-    <data name="TelegramEnableDescription" xml:space="preserve">
-        <value>Включить уведомления Telegram</value>
-    </data>
-    <data name="TelegramProxyEnableDescription" xml:space="preserve">
-        <value>Использовать прокси для Telegram</value>
-    </data>
-    <data name="TelegramScreenshotDescription" xml:space="preserve">
-        <value>Прикладывать снимки экрана к уведомлениям Telegram</value>
-    </data>
-    <data name="WeComEnableDescription" xml:space="preserve">
-        <value>Включить уведомления WeCom</value>
-    </data>
-    <data name="WeComScreenshotDescription" xml:space="preserve">
-        <value>Прикладывать снимки экрана к уведомлениям WeCom</value>
-    </data>
-    <data name="WeComWebhookDescription" xml:space="preserve">
-        <value>Адрес Webhook бота WeCom</value>
-    </data>
-    <data name="CustomWebhookEnableDescription" xml:space="preserve">
-        <value>Включить уведомления через другой Webhook</value>
-    </data>
-    <data name="CustomWebhookUrlDescription" xml:space="preserve">
-        <value>URL другого Webhook</value>
-    </data>
-    <data name="XxtuiEnableDescription" xml:space="preserve">
-        <value>Включить уведомления xxtui</value>
-    </data>
-    <data name="EmailEnableDescription" xml:space="preserve">
-        <value>Включить уведомления по электронной почте</value>
-    </data>
-    <data name="SmtpPortDescription" xml:space="preserve">
-        <value>Порт SMTP; для SSL обычно 465</value>
-    </data>
-    <data name="RecipientEmailDescription" xml:space="preserve">
-        <value>Адрес почты получателя</value>
-    </data>
-    <data name="SenderEmailDescription" xml:space="preserve">
-        <value>Адрес почты отправителя</value>
-    </data>
-    <data name="SmtpServerDescription" xml:space="preserve">
-        <value>Адрес сервера SMTP</value>
-    </data>
-    <data name="SmtpAuthCodeDescription" xml:space="preserve">
-        <value>Пароль приложения SMTP (хранится в зашифрованном виде)</value>
-    </data>
-    <data name="TelegramApiAddressDescription" xml:space="preserve">
-        <value>Адрес Telegram Bot API</value>
-    </data>
-    <data name="TelegramBotTokenDescription" xml:space="preserve">
-        <value>Токен бота Telegram</value>
-    </data>
-    <data name="TelegramChatIdDescription" xml:space="preserve">
-        <value>ID чата для уведомлений Telegram</value>
-    </data>
-    <data name="TelegramProxyAddressDescription" xml:space="preserve">
-        <value>Адрес прокси для Telegram</value>
-    </data>
-    <data name="XxtuiApiKeyDescription" xml:space="preserve">
-        <value>Ключ API xxtui</value>
-    </data>
-    <data name="XxtuiChannelDescription" xml:space="preserve">
-        <value>Канал уведомлений xxtui</value>
-    </data>
-    <data name="XxtuiMessageSourceDescription" xml:space="preserve">
-        <value>Источник сообщений xxtui</value>
-    </data>
-    <data name="TaskCompleteNotificationListDescription" xml:space="preserve">
-        <value>Список задач с уведомлениями о завершении</value>
-    </data>
-    <data name="TaskStartNotificationListDescription" xml:space="preserve">
-        <value>Список задач с уведомлениями о запуске</value>
-    </data>
-    <data name="DownloadChannelDescription" xml:space="preserve">
-        <value>Источник загрузки: 0 — MirrorChyan, 1 — GitHub Release, 2 — AUTO-MAS</value>
-    </data>
-    <data name="AutoUpdateEnableDescription" xml:space="preserve">
-        <value>Автоматически загружать доступные обновления</value>
-    </data>
-    <data name="UpdateCheckEnableDescription" xml:space="preserve">
-        <value>Проверять обновления при запуске и уведомлять пользователя</value>
-    </data>
-    <data name="UpdateChannelSettingDescription" xml:space="preserve">
-        <value>Канал обновлений: 0 — Stable, 1 — Beta</value>
-    </data>
-    <data name="UpdateInstallerDirectoryDescription" xml:space="preserve">
-        <value>Папка загрузки обновлений; пустое поле — SRA во временной папке системы</value>
-    </data>
-    <data name="MirrorChyanAuthCodeDescription" xml:space="preserve">
-        <value>Код доступа MirrorChyan; хранится в зашифрованном виде</value>
-    </data>
-    <data name="BackendLaunchArgsDescription" xml:space="preserve">
-        <value>Аргументы запуска ядра</value>
-    </data>
-    <data name="RemoteBackendEnableDescription" xml:space="preserve">
-        <value>Использовать удалённое ядро</value>
-    </data>
-    <data name="RemoteBackendAddressDescription" xml:space="preserve">
-        <value>Адрес удалённого ядра</value>
-    </data>
-    <data name="OverlayDebugInfoDescription" xml:space="preserve">
-        <value>Показывать отладочную информацию в оверлее</value>
-    </data>
-    <data name="DeveloperModeEnableDescription" xml:space="preserve">
-        <value>Включить режим разработчика</value>
-    </data>
-    <data name="CustomBackendEnableDescription" xml:space="preserve">
-        <value>Использовать другое ядро</value>
-    </data>
-    <data name="CustomBackendCommandDescription" xml:space="preserve">
-        <value>Команда или исполняемый файл ядра: python, sra-cli, uv или путь к файлу</value>
-    </data>
-    <data name="CustomBackendArgsDescription" xml:space="preserve">
-        <value>Аргументы запуска другого ядра, например main.py или -m SRACore</value>
-    </data>
-    <data name="CustomBackendWorkingDirDescription" xml:space="preserve">
-        <value>Рабочая папка другого ядра; пустое поле — текущая папка программы</value>
-    </data>
-    <data name="SaveOcrScreenshotDescription" xml:space="preserve">
-        <value>Сохранять снимки OCR для отладки</value>
-    </data>
-    <data name="TaskConfigNameDescription" xml:space="preserve">
-        <value>Имя конфигурации задач</value>
-    </data>
-    <data name="StartGameSettingsText" xml:space="preserve">
-        <value>Настройки запуска игры</value>
-    </data>
-    <data name="TrailblazePowerSettingsText" xml:space="preserve">
-        <value>Настройки энергии Освоения</value>
-    </data>
-    <data name="ClaimRewardsSettingsText" xml:space="preserve">
-        <value>Настройки получения наград</value>
-    </data>
-    <data name="CosmicStrifeSettingsText" xml:space="preserve">
-        <value>Настройки космического противостояния</value>
-    </data>
-    <data name="PostTaskActionsText" xml:space="preserve">
-        <value>Действия после завершения задач</value>
-    </data>
-    <data name="ConfigFileVersionDescription" xml:space="preserve">
-        <value>Версия файла конфигурации</value>
-    </data>
-    <data name="StartGameTaskEnableDescription" xml:space="preserve">
-        <value>Включить задачу запуска игры</value>
-    </data>
-    <data name="GameChannelDescription" xml:space="preserve">
-        <value>Клиент игры: 0 — китайский официальный, 1 — Bilibili, 2 — международный</value>
-    </data>
-    <data name="GameExecutablePathDescription" xml:space="preserve">
-        <value>Путь к исполняемому файлу игры</value>
-    </data>
-    <data name="GlobalServerDescription" xml:space="preserve">
-        <value>Международный сервер: 0 — Азия, 1 — Европа, 2 — Америка, 3 — Тайвань/Гонконг/Макао</value>
-    </data>
-    <data name="UseGlobalGamePathDescription" xml:space="preserve">
-        <value>Использовать путь к игре из общих настроек</value>
-    </data>
-    <data name="GameLaunchDelayDescription" xml:space="preserve">
-        <value>Задержка после запуска игры (секунды)</value>
-    </data>
-    <data name="AutoLoginEnableDescription" xml:space="preserve">
-        <value>Автоматически входить в учётную запись</value>
-    </data>
-    <data name="AutoReloginDescription" xml:space="preserve">
-        <value>Повторно входить при неудачной авторизации</value>
-    </data>
-    <data name="AccountPasswordDescription" xml:space="preserve">
-        <value>Зашифрованный пароль учётной записи</value>
-    </data>
-    <data name="AccountUsernameDescription" xml:space="preserve">
-        <value>Зашифрованный логин учётной записи</value>
-    </data>
-    <data name="TrailblazePowerTaskEnableDescription" xml:space="preserve">
-        <value>Включить задачу расхода энергии Освоения</value>
-    </data>
-    <data name="CalyxGoldenStageDescription" xml:space="preserve">
-        <value>Целевой уровень золотого Чашелиста в событии «Сад множества»</value>
-    </data>
-    <data name="CalyxCrimsonStageDescription" xml:space="preserve">
-        <value>Целевой уровень багрового Чашелиста в событии «Сад множества»</value>
-    </data>
-    <data name="SupportCharacterDescription" xml:space="preserve">
-        <value>Использовать персонажа поддержки</value>
-    </data>
     <data name="TrainingTargetEnableDescription" xml:space="preserve">
         <value>Приоритетно выполнять цели развития персонажей</value>
     </data>
-    <data name="TrainingTargetPriorityDescription" xml:space="preserve">
-        <value>Приоритет материалов: если найдены подземелья материалов, пропускать извлечение украшений и Пещеры коррозии; иначе оставлять их</value>
-    </data>
-    <data name="DoubleEventDetectionDescription" xml:space="preserve">
-        <value>Приоритетно расходовать удвоенные награды событий «Сад множества», «Царство странностей» и «Планарный раскол»</value>
-    </data>
-    <data name="PlanarFissureStageDescription" xml:space="preserve">
-        <value>Целевой уровень события «Планарный раскол»</value>
-    </data>
-    <data name="RealmOfStrangeStageDescription" xml:space="preserve">
-        <value>Целевой уровень события «Царство странностей»</value>
-    </data>
-    <data name="TrailblazePowerRefillCountDescription" xml:space="preserve">
-        <value>Число пополнений энергии</value>
-    </data>
-    <data name="TrailblazePowerRefillEnableDescription" xml:space="preserve">
-        <value>Пополнять энергию</value>
-    </data>
-    <data name="TrailblazePowerRefillMethodDescription" xml:space="preserve">
-        <value>Источник пополнения: 0 — резервная энергия Освоения, 1 — Топливо, 2 — Звёздный нефрит</value>
-    </data>
-    <data name="TaskListText" xml:space="preserve">
-        <value>Список задач</value>
-    </data>
-    <data name="ClaimRewardsTaskEnableDescription" xml:space="preserve">
-        <value>Включить получение наград</value>
-    </data>
-    <data name="ClaimAssignmentsDescription" xml:space="preserve">
-        <value>Получать награды поручений</value>
-    </data>
-    <data name="ClaimDailyTrainingDescription" xml:space="preserve">
-        <value>Получать награды ежедневной тренировки</value>
-    </data>
-    <data name="ClaimGiftOfOdysseyDescription" xml:space="preserve">
-        <value>Получать награды события «Подарок Одиссеи»</value>
-    </data>
-    <data name="ClaimMailRewardsDescription" xml:space="preserve">
-        <value>Забирать награды из почты</value>
-    </data>
-    <data name="ClaimNamelessHonorDescription" xml:space="preserve">
-        <value>Получать награды Чести Безымянных</value>
-    </data>
-    <data name="RedeemCodesEnableDescription" xml:space="preserve">
-        <value>Активировать промокоды</value>
-    </data>
-    <data name="ClaimTrailblazerProfileDescription" xml:space="preserve">
-        <value>Получать награды Пропуска снабжения экспресса</value>
-    </data>
-    <data name="RedemptionCodeListDescription" xml:space="preserve">
-        <value>Промокоды через пробел: код1 код2 код3</value>
-    </data>
-    <data name="CosmicStrifeTaskEnableDescription" xml:space="preserve">
-        <value>Включить космическое противостояние</value>
-    </data>
-    <data name="CurrencyWarsMasterSwitchDescription" xml:space="preserve">
-        <value>Включить «Валютные войны»</value>
-    </data>
-    <data name="CurrencyWarsDifficultyDescription" xml:space="preserve">
-        <value>Сложность «Валютных войн»: 0 — минимальная, 1 — максимальная, 2 — текущая</value>
-    </data>
-    <data name="CurrencyWarsModeDescription" xml:space="preserve">
-        <value>Режим «Валютных войн»: 0 — обычный, 1 — разгон, 2 — подбор старта</value>
-    </data>
-    <data name="CurrencyWarsSkipWhenFullDescription" xml:space="preserve">
-        <value>Пропускать «Валютные войны», если лимит очков космического противостояния достигнут</value>
-    </data>
-    <data name="CurrencyWarsBossAffixDescription" xml:space="preserve">
-        <value>Модификаторы босса для подбора старта в «Валютных войнах»</value>
-    </data>
-    <data name="CurrencyWarsBossNameDescription" xml:space="preserve">
-        <value>Имя босса для подбора старта в «Валютных войнах»</value>
-    </data>
-    <data name="CurrencyWarsInvestmentEnvDescription" xml:space="preserve">
-        <value>Инвестиционная среда для подбора старта в «Валютных войнах»</value>
-    </data>
-    <data name="CurrencyWarsInvestmentStrategyHint" xml:space="preserve">
-        <value>Инвестиционная стратегия для подбора старта в «Валютных войнах»</value>
-    </data>
-    <data name="CurrencyWarsRerollRunCountDescription" xml:space="preserve">
-        <value>Число партий «Валютных войн»; в подборе старта — число попыток</value>
-    </data>
-    <data name="CurrencyWarsStrategyNameDescription" xml:space="preserve">
-        <value>Название стратегии «Валютных войн»</value>
-    </data>
-    <data name="CurrencyWarsStrategyIndexDescription" xml:space="preserve">
-        <value>Индекс стратегии «Валютных войн»</value>
-    </data>
-    <data name="CurrencyWarsTrailblazerNameDescription" xml:space="preserve">
-        <value>Имя Первопроходца в «Валютных войнах»</value>
-    </data>
-    <data name="DivergentUniverseMasterSwitchDescription" xml:space="preserve">
-        <value>Включить «Расходящуюся вселенную»</value>
-    </data>
-    <data name="DivergentUniverseModeDescription" xml:space="preserve">
-        <value>Режим «Расходящейся вселенной»: 0 — один уровень, 1 — полное прохождение</value>
-    </data>
-    <data name="DivergentUniverseRunCountDescription" xml:space="preserve">
-        <value>Число прохождений «Расходящейся вселенной»</value>
-    </data>
-    <data name="DivergentUniverseTechniqueDescription" xml:space="preserve">
-        <value>Использовать технику для ускоренного прохождения</value>
-    </data>
-    <data name="DivergentUniversePointRewardDescription" xml:space="preserve">
-        <value>Пропускать задачу при достижении недельного лимита очков</value>
-    </data>
-    <data name="PostTaskActionEnableDescription" xml:space="preserve">
-        <value>Включить действия после завершения задач</value>
-    </data>
-    <data name="PostTaskExitAppDescription" xml:space="preserve">
-        <value>Закрывать приложение после завершения задач</value>
-    </data>
-    <data name="PostTaskExitGameDescription" xml:space="preserve">
-        <value>Закрывать игру после завершения задач</value>
-    </data>
-    <data name="PostTaskLogoffUserDescription" xml:space="preserve">
-        <value>Завершать сеанс пользователя Windows после выполнения</value>
-    </data>
-    <data name="PostTaskLogoutAccountDescription" xml:space="preserve">
-        <value>Выходить из учётной записи игры после выполнения</value>
-    </data>
-    <data name="PostTaskShutdownDescription" xml:space="preserve">
-        <value>Выключать компьютер после выполнения</value>
-    </data>
-    <data name="PostTaskSleepDescription" xml:space="preserve">
-        <value>Переводить компьютер в спящий режим после выполнения</value>
-    </data>
-    <data name="TaskNameDescription" xml:space="preserve">
-        <value>Название задачи</value>
-    </data>
-    <data name="TaskIdDescription" xml:space="preserve">
-        <value>ID задачи, например calyx_golden или echo_of_war</value>
-    </data>
-    <data name="StageLevelDescription" xml:space="preserve">
-        <value>Сложность уровня</value>
-    </data>
     <data name="StageNameDescription" xml:space="preserve">
         <value>Название уровня</value>
-    </data>
-    <data name="TaskExecutionCountDescription" xml:space="preserve">
-        <value>Число выполнений одной задачи в ручном режиме</value>
-    </data>
-    <data name="TaskExecutionRoundDescription" xml:space="preserve">
-        <value>Число циклов в ручном режиме</value>
-    </data>
-    <data name="TaskExecutionAutoAllocateDescription" xml:space="preserve">
-        <value>Автоматически определять число выполнений по оставшейся энергии</value>
     </data>
     <data name="InputSendProcessErrorMessage" xml:space="preserve">
         <value>Не удалось отправить: процесс не запущен (ввод: {0})</value>
@@ -2067,9 +1389,6 @@
     <data name="StrategySiteText" xml:space="preserve">
         <value>Сайт стратегий</value>
     </data>
-    <data name="SkipWhenPointsFullText" xml:space="preserve">
-        <value>Пропускать при лимите очков</value>
-    </data>
     <data name="CurrencyWarsBossConfigHint" xml:space="preserve">
         <value>Укажите имена и модификаторы боссов, инвестиционную среду и стратегии. Формат описан в документации. Значения вводятся на языке игры.</value>
     </data>
@@ -2304,42 +1623,12 @@
     <data name="WindowedModeText" xml:space="preserve">
         <value>Оконный</value>
     </data>
-    <data name="WelcomeToSraText" xml:space="preserve">
-        <value>Добро пожаловать в SRA</value>
-    </data>
-    <data name="SitBackAndRelaxText" xml:space="preserve">
-        <value>Устраивайтесь поудобнее</value>
-    </data>
     <data name="NotSequenceReadArchiveText" xml:space="preserve">
         <value>Это не
 'Sequence Read Archive'</value>
     </data>
-    <data name="LauncherInceptionText" xml:space="preserve">
-        <value>Лаунчер запускает лаунчер</value>
-    </data>
-    <data name="FireflyFlamePhraseText" xml:space="preserve">
-        <value>Светлячок летит к огню, обретая жизнь вопреки смерти</value>
-    </data>
-    <data name="DimStarsBeyondPhraseText" xml:space="preserve">
-        <value>Сквозь вселенную — к далёким звёздам</value>
-    </data>
-    <data name="StarRailMasterPhraseText" xml:space="preserve">
-        <value>Стремимся стать мастерами Star Rail</value>
-    </data>
-    <data name="CarveFuturePhraseText" xml:space="preserve">
-        <value>В прошлом мы высечем будущее</value>
-    </data>
-    <data name="IronSparksPhraseText" xml:space="preserve">
-        <value>Летят искры, не оставляя пепла</value>
-    </data>
-    <data name="NormalIsAbnormalText" xml:space="preserve">
-        <value>Если всё нормально — это уже странно</value>
-    </data>
     <data name="RegistryUnsupportedError" xml:space="preserve">
         <value>Работа с реестром доступна только в Windows</value>
-    </data>
-    <data name="GamePathAutoDetectFailedError" xml:space="preserve">
-        <value>Не удалось автоматически определить путь к игре</value>
     </data>
     <data name="RegistryAccessDeniedError" xml:space="preserve">
         <value>Доступ к реестру запрещён. Запустите программу от имени администратора</value>
@@ -2359,209 +1648,14 @@
     <data name="ScanFailedError" xml:space="preserve">
         <value>Ошибка сканирования: {e.Message}</value>
     </data>
-    <data name="M0001" xml:space="preserve">
-        <value>Повторно импортировать модули задач без перезапуска</value>
-    </data>
-    <data name="M0004" xml:space="preserve">
-        <value>Показать схему настроек расширения</value>
-    </data>
-    <data name="M0005" xml:space="preserve">
-        <value>Повторно импортировать расширения, включая уже загруженные модули</value>
-    </data>
-    <data name="M0007" xml:space="preserve">
-        <value>Показать состояние расширений</value>
-    </data>
-    <data name="M0008" xml:space="preserve">
-        <value>Управление настройками расширений</value>
-    </data>
-    <data name="M0009" xml:space="preserve">
-        <value>Получить настройки расширения</value>
-    </data>
-    <data name="M0010" xml:space="preserve">
-        <value>Сохранить настройки расширения</value>
-    </data>
-    <data name="M0014" xml:space="preserve">
-        <value>Управление расширениями: просмотр и запуск</value>
-    </data>
-    <data name="M0015" xml:space="preserve">
-        <value>Разовые расширения выполняются в общем потоке, фоновые — в отдельном</value>
-    </data>
-    <data name="M0019" xml:space="preserve">
-        <value>Остановить фоновое или текущее разовое расширение</value>
-    </data>
-    <data name="M0024" xml:space="preserve">
-        <value>Вызвать метод Operator</value>
-    </data>
-    <data name="M0027" xml:space="preserve">
-        <value>Перечислить стратегии</value>
-    </data>
-    <data name="M0028" xml:space="preserve">
-        <value>Импортировать файл в папку стратегий</value>
-    </data>
-    <data name="M0029" xml:space="preserve">
-        <value>Показать настройки подземелий энергии Освоения</value>
-    </data>
-    <data name="M0034" xml:space="preserve">
-        <value>Играть по нотам JSON на игровой клавиатуре (пауза F8 / сначала F10 / остановка F9)</value>
-    </data>
-    <data name="M0035" xml:space="preserve">
-        <value>Название композиции или путь к нотам JSON</value>
-    </data>
-    <data name="M0036" xml:space="preserve">
-        <value>Множитель темпа (1.0 — исходный темп)</value>
-    </data>
-    <data name="M0037" xml:space="preserve">
-        <value>Число повторов композиции</value>
-    </data>
-    <data name="M0038" xml:space="preserve">
-        <value>Задержка перед началом для переключения в игру (секунды)</value>
-    </data>
-    <data name="M0039" xml:space="preserve">
-        <value>Репетиция: проверить ноты и тайминги без нажатия клавиш</value>
-    </data>
-    <data name="M0040" xml:space="preserve">
-        <value>Включить клавиши паузы и сброса</value>
-    </data>
-    <data name="M0041" xml:space="preserve">
-        <value>Клавиша паузы/продолжения</value>
-    </data>
-    <data name="M0042" xml:space="preserve">
-        <value>Клавиша сброса</value>
-    </data>
-    <data name="M0044" xml:space="preserve">
-        <value>Автоматически обрабатывать диалоги и при необходимости пропускать сюжет</value>
-    </data>
-    <data name="M0045" xml:space="preserve">
-        <value>Автоматически пропускать сюжетные диалоги</value>
-    </data>
     <data name="M0048" xml:space="preserve">
         <value>Введите имя Первопроходца точно как в игре.</value>
-    </data>
-    <data name="M0049" xml:space="preserve">
-        <value>Выберите стратегию. После добавления JSON нажмите «Обновить». Можно указать полный путь к файлу JSON.</value>
     </data>
     <data name="M0050" xml:space="preserve">
         <value>Число партий за этот запуск.</value>
     </data>
-    <data name="M0051" xml:space="preserve">
-        <value>Выберите минимальную, максимальную или текущую сложность.</value>
-    </data>
-    <data name="M0052" xml:space="preserve">
-        <value>Включено — режим разгона; выключено — обычный режим.</value>
-    </data>
     <data name="M0053" xml:space="preserve">
         <value>Имя Первопроходца</value>
-    </data>
-    <data name="M0059" xml:space="preserve">
-        <value>Оценка ресурсов для Прыжков до конца текущей версии</value>
-    </data>
-    <data name="M0060" xml:space="preserve">
-        <value>Дата начала версии (YYYY-MM-DD) для определения её сроков</value>
-    </data>
-    <data name="M0061" xml:space="preserve">
-        <value>Продолжительность версии в днях</value>
-    </data>
-    <data name="M0062" xml:space="preserve">
-        <value>За сколько дней до конца версии проходит стрим разработчиков</value>
-    </data>
-    <data name="M0063" xml:space="preserve">
-        <value>Состояние стрима: auto/done/not_done</value>
-    </data>
-    <data name="M0064" xml:space="preserve">
-        <value>Период обновления боевых режимов в днях</value>
-    </data>
-    <data name="M0065" xml:space="preserve">
-        <value>Смещение первого обновления боевых режимов в днях</value>
-    </data>
-    <data name="M0066" xml:space="preserve">
-        <value>Число обновлений боевых режимов; -1 — автоматически</value>
-    </data>
-    <data name="M0067" xml:space="preserve">
-        <value>Учитывать сегодняшнее обновление боевых режимов</value>
-    </data>
-    <data name="M0068" xml:space="preserve">
-        <value>День обновления недельных наград (0 — понедельник)</value>
-    </data>
-    <data name="M0069" xml:space="preserve">
-        <value>Число недельных обновлений; -1 — автоматически</value>
-    </data>
-    <data name="M0070" xml:space="preserve">
-        <value>Учитывать сегодняшнее обновление недельных наград</value>
-    </data>
-    <data name="M0071" xml:space="preserve">
-        <value>Звёздный нефрит за обновление версии</value>
-    </data>
-    <data name="M0072" xml:space="preserve">
-        <value>Есть Пропуск снабжения экспресса</value>
-    </data>
-    <data name="M0073" xml:space="preserve">
-        <value>Нефрит в день без Пропуска снабжения</value>
-    </data>
-    <data name="M0074" xml:space="preserve">
-        <value>Нефрит в день с Пропуском снабжения</value>
-    </data>
-    <data name="M0075" xml:space="preserve">
-        <value>Нефрит за одно обновление боевых режимов</value>
-    </data>
-    <data name="M0076" xml:space="preserve">
-        <value>Нефрит за недельные награды Виртуальной вселенной</value>
-    </data>
-    <data name="M0077" xml:space="preserve">
-        <value>Нефрит за промокоды стрима разработчиков</value>
-    </data>
-    <data name="M0078" xml:space="preserve">
-        <value>Автоматически распознавать ресурсы в первом ряду инвентаря</value>
-    </data>
-    <data name="M0079" xml:space="preserve">
-        <value>Текущее количество Звёздного нефрита вручную</value>
-    </data>
-    <data name="M0080" xml:space="preserve">
-        <value>Текущее количество Особых звёздных пропусков вручную</value>
-    </data>
-    <data name="M0081" xml:space="preserve">
-        <value>Текущее количество Звёздных пропусков вручную</value>
-    </data>
-    <data name="M0082" xml:space="preserve">
-        <value>Автоматически распознавать путеводитель наград</value>
-    </data>
-    <data name="M0083" xml:space="preserve">
-        <value>Тип наград: auto/jade/special_pass/normal_pass</value>
-    </data>
-    <data name="M0084" xml:space="preserve">
-        <value>Количество нефрита в путеводителе наград вручную</value>
-    </data>
-    <data name="M0085" xml:space="preserve">
-        <value>Количество Особых пропусков в путеводителе вручную</value>
-    </data>
-    <data name="M0086" xml:space="preserve">
-        <value>Количество обычных пропусков в путеводителе вручную</value>
-    </data>
-    <data name="ScanStrategyFolderText" xml:space="preserve">
-        <value>Сканировать папку стратегий</value>
-    </data>
-    <data name="G0004" xml:space="preserve">
-        <value>Выполняется</value>
-    </data>
-    <data name="G0102" xml:space="preserve">
-        <value>Сканировать папку стратегий</value>
-    </data>
-    <data name="R0003" xml:space="preserve">
-        <value>Показать текущее состояние задач</value>
-    </data>
-    <data name="R0005" xml:space="preserve">
-        <value>Перечислить зарегистрированные задачи</value>
-    </data>
-    <data name="G0097" xml:space="preserve">
-        <value>Имя Первопроходца</value>
-    </data>
-    <data name="G0099" xml:space="preserve">
-        <value>Число запусков</value>
-    </data>
-    <data name="G0104" xml:space="preserve">
-        <value>Химеко: ур. 5 — качество; ур. 7+ — Химеко 2★</value>
-    </data>
-    <data name="G0105" xml:space="preserve">
-        <value>Серебряный Волк ур. 999: экономная стратегия</value>
     </data>
     <data name="RussianLanguageName" xml:space="preserve">
         <value>Русский</value>
@@ -2572,25 +1666,8 @@
     <data name="InfoText" xml:space="preserve">
         <value>Информация</value>
     </data>
-    <data name="ErrorText" xml:space="preserve">
-        <value>Ошибка</value>
-    </data>
-    <data name="SuccessText" xml:space="preserve">
-        <value>Готово</value>
-    </data>
     <data name="JustIconText" xml:space="preserve">
         <value>Значок приложения</value>
-    </data>
-    <data name="FarewellPhraseOne" xml:space="preserve">
-        <value>Счастливого пути</value>
-    </data>
-    <data name="FarewellPhraseTwo" xml:space="preserve">
-        <value>Пусть путь будет светлым</value>
-    </data>
-    <data name="FarewellPhraseThree" xml:space="preserve">
-        <value>Пусть путь приведёт туда,
-где мечты чисты
-и прекрасны</value>
     </data>
     <data name="EmptyValueText" xml:space="preserve">
         <value>(пусто)</value>
