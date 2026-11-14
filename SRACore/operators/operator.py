@@ -90,8 +90,6 @@ class Operator(IOperator):
             return False
         if self._win is not None and not self._win.isActive:  # type: ignore
             self.press_key("ctrl")  # 通过模拟键使系统认为是“用户操作”，从而允许 SetForegroundWindow
-            if not self.window_context.full_screen:
-                self.click_point(0.5, 0.5)  # 点击窗口中心，确保窗口被激活（全屏模式下中心点是屏幕中心，跳过）
             self._win.activate()
             logger.info(f"已激活窗口 '{self.window_context.window_title}'")
             return True
