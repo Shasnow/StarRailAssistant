@@ -1,6 +1,6 @@
 {
   "name": "sra",
-  "version": "2.25.3",
+  "version": "2.25.4",
   "scripts": {
     "dev": "python main.py",
     "dev:frontend": "cd SRAFrontend/SRAFrontend.Desktop && dotnet run",
