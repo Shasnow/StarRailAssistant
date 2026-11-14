@@ -154,14 +154,16 @@ class CurrencyWars(Executable):
         if self.runtimes == 0:
             logger.warning("货币战争运行次数为 0 ，本次将跳过运行。")
             return True
-        if self.isPointRewardsEnabled:
-            page = self.page_locate()
-            if page == CurrencyWarsPage.START and self.check_point_rewards():
-                logger.info("旷宇纷争积分奖励已满，跳过货币战争任务")
-                return True
+        
         for i in range(self.runtimes):
             if not self.is_running:
                 break
+            if self.isPointRewardsEnabled:
+                page = self.page_locate()
+                if page == CurrencyWarsPage.START and self.check_point_rewards():
+                    logger.info("旷宇纷争积分奖励已满，跳过货币战争任务")
+                    self.receive_point_rewards()
+                    break
             logger.info(f"第{i + 1}次进入货币战争，剩余{self.runtimes - i - 1}次")
             try:
                 if self.start_game():
@@ -187,6 +189,11 @@ class CurrencyWars(Executable):
             if re.match(r'^18000.*18000$', current):
                 return True
         return False
+
+    def receive_point_rewards(self):
+        self.operator.click_point(0.15, 0.93, tag="领取积分奖励", after_sleep=1)
+        self.operator.click_img(DUIMG.RECEIVE, after_sleep=1)
+        self.operator.press_key("esc")
 
     def reset_character(self):
         """ 重置所有角色信息 """
