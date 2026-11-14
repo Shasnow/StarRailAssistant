@@ -1047,7 +1047,7 @@ class CurrencyWars(Executable):
         """处理投资策略选择界面的逻辑"""
         if not self.operator.click_img(CWIMG.COLLECTION):
             self.operator.click_point(0.5, 0.3, after_sleep=0.5, tag="选择中间的投资策略")
-        self.operator.click_img(IMG.ENSURE2, after_sleep=1)
+        self.operator.click_img(IMG.ENSURE2, after_sleep=1, retry=3)
         self.post_invest_strategy()
         return False
 
@@ -1207,7 +1207,7 @@ class CurrencyWars(Executable):
             if return_box is None:
                 logger.error("[幕后茶歇] 未识别到返回按钮，茶歇事件推进失败")
                 return False
-            self.operator.click_box(return_box, y_offset=-0.1, after_sleep=0.5)  # 点击返回选项的上一个选项
+            self.operator.click_box(return_box, y_offset=-0.2, after_sleep=0.5)  # 点击返回选项的上一个选项
             ensure_box = self.operator.wait_ocr("确认", from_x=0.58, from_y=0.38, to_x=0.96, to_y=0.8, timeout=3)
             if ensure_box is None:
                 logger.error("[幕后茶歇] 未识别到确认按钮，茶歇事件推进失败")
