@@ -502,7 +502,7 @@ class CurrencyWars(Executable):
         """
         if self.is_continue or not self.strategy_code:
             return True
-        self.operator.click_img(CWIMG.STRATEGY, after_sleep=1)
+        self.operator.click_img(CWIMG.STRATEGY, after_sleep=1, retry=3)
         self.operator.click_img(CWIMG.HOT_STRATEGIES, after_sleep=0.5)
         self.operator.move_to(0.5, 0.5)
         self.operator.sleep(0.5)

@@ -645,22 +645,35 @@ class IOperator(ABC):
         return self.click_point(x, y, x_offset, y_offset, after_sleep, trace=False)
 
     def click_img(self, template: str, x_offset: int | float = 0, y_offset: int | float = 0,
-                  after_sleep: float = 0) -> bool:
-        """查找图片并点击其中心位置
+                  after_sleep: float = 0, retry: int = 0, retry_interval: float = 0.5) -> bool:
+        """查找图片并点击其中心位置，可选重试直到图片消失
         
-        先调用locate方法查找图片位置，如果找到则调用click_box方法点击
+        先调用locate方法查找图片位置，如果找到则调用click_box方法点击；
+        每次点击后把鼠标移到窗口左上角再重新检测，模板消失即视为点击生效。
         Args:
             template (str): 模板图片路径
             x_offset (int | float, optional): x偏移量(px)或百分比(float)。默认值为0。
             y_offset (int | float, optional): y偏移量(px)或百分比(float)。默认值为0。
             after_sleep (float, optional): 点击后等待时间，单位秒。默认值为0。
+            retry (int, optional): 点击后最多重试的次数，0 表示只点击一次。默认值为0。
+            retry_interval (float, optional): 每次重试前的等待时间，单位秒。默认值为0.5。
         Returns:
-            bool: 点击成功返回True，否则返回False
+            bool: 点击成功返回True；模板始终未出现时返回False
         """
-        box = self.locate(template)
-        if box is None:
-            return False
-        return self.click_box(box, x_offset, y_offset, after_sleep)
+        retry = max(0, retry)
+        for attempt in range(retry + 1):
+            box = self.locate(template)
+            if box is None:
+                # 点击后模板消失说明已生效；首次就找不到则视为失败
+                return attempt > 0
+            if attempt > 0:
+                logger.debug(f"Retry click image: {template} ({attempt}/{retry})")
+            self.click_box(box, x_offset, y_offset, after_sleep)
+            if attempt < retry:
+                self.move_to(0, 0, trace=False)
+                if retry_interval > 0:
+                    self.sleep(retry_interval)
+        return True
 
     def wait_img(self, template: str, timeout: int = 10, interval: float = 0.5) -> Box | None:
         """等待模板图片出现
