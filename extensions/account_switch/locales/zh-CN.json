@@ -1,5 +1,7 @@
 {
     "name": "自动切号",
-    "description": "免密码历史账号切号（AUTO-MAS 花名册 / account_hint.txt）",
-    "enabled.description": "是否启用自动切号"
+    "description": "免密码历史账号切号（AUTO-MAS 花名册 / 配置中的账号提示）",
+    "enabled.description": "是否启用自动切号",
+    "account_hint.title": "目标账号",
+    "account_hint.description": "完整手机号/账号、脱敏片段（138****5678）或邮箱（qin***@qq.com）"
 }

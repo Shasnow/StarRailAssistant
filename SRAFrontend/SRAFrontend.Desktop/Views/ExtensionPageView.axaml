@@ -133,9 +133,9 @@
                                                        Text="{Binding ClassSummary}"
                                                        ToolTip.Tip="{Binding ClassSummary}" />
 
-                                            <!-- 操作区：可执行扩展显示运行/停止，无执行逻辑的显示启用/禁用，配置为次要按钮 -->
+                                            <!-- 操作区：可执行扩展显示运行/停止，无执行逻辑的显示启用/禁用，文档与配置为次要按钮 -->
                                             <Grid Grid.Row="3"
-                                                  ColumnDefinitions="*,Auto"
+                                                  ColumnDefinitions="*,Auto,Auto"
                                                   ColumnSpacing="8"
                                                   Margin="0,12,0,0">
                                                 <Panel Grid.Column="0">
@@ -173,6 +173,14 @@
                                                             IsVisible="{Binding ShowDisable}" />
                                                 </Panel>
                                                 <Button Grid.Column="1"
+                                                        Classes="Basic"
+                                                        Content="{x:Static lang:Resources.ExtensionDocText}"
+                                                        Height="36"
+                                                        Padding="16,0"
+                                                        ToolTip.Tip="{x:Static lang:Resources.OpenExtensionDocTooltip}"
+                                                        Command="{Binding ShowDocCommand}"
+                                                        IsVisible="{Binding HasReadme}" />
+                                                <Button Grid.Column="2"
                                                         Classes="Basic"
                                                         Content="{x:Static lang:Resources.ConfigsText}"
                                                         Height="36"

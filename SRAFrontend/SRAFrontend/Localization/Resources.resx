@@ -1239,11 +1239,17 @@ Please choose another folder.</value>
     <data name="StopExtensionTooltip" xml:space="preserve">
         <value>Stop this extension</value>
     </data>
+    <data name="ExtensionDocText" xml:space="preserve">
+        <value>Docs</value>
+    </data>
     <data name="ConfigsText" xml:space="preserve">
         <value>Configs</value>
     </data>
     <data name="OpenExtensionConfigTooltip" xml:space="preserve">
         <value>Open extension configuration</value>
+    </data>
+    <data name="OpenExtensionDocTooltip" xml:space="preserve">
+        <value>View extension documentation</value>
     </data>
     <data name="NoExtensionsMessage" xml:space="preserve">
         <value>No extensions available</value>

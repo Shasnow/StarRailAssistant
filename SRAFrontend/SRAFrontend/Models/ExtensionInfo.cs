@@ -22,6 +22,9 @@ public class ExtensionInfo
     /// <summary>无执行逻辑扩展的启用状态；配置中没有 enabled 字段时为 null。</summary>
     [JsonPropertyName("enabled")]
     public bool? Enabled { get; set; }
+    /// <summary>扩展目录下的 README.md 内容；没有文档时为空串。</summary>
+    [JsonPropertyName("readme")]
+    public string Readme { get; set; } = "";
 }
 
 /// <summary>

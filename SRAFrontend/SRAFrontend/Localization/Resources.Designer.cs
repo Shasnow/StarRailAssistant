@@ -1934,6 +1934,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Docs.
+        /// </summary>
+        public static string ExtensionDocText {
+            get {
+                return ResourceManager.GetString("ExtensionDocText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Extension.
         /// </summary>
         public static string ExtensionText {
@@ -3176,6 +3185,15 @@ namespace SRAFrontend.Localization {
         public static string OpenDownloadFolderTooltip {
             get {
                 return ResourceManager.GetString("OpenDownloadFolderTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View extension documentation.
+        /// </summary>
+        public static string OpenExtensionDocTooltip {
+            get {
+                return ResourceManager.GetString("OpenExtensionDocTooltip", resourceCulture);
             }
         }
         

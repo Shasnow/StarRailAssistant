@@ -1,4 +1,8 @@
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Models;
@@ -19,6 +23,8 @@ public partial class ExtensionCardViewModel : ObservableObject
     public string Description { get; }
     public string ExtensionClass { get; }
     public string ConfigClass { get; }
+    /// <summary>扩展目录下 README.md 的原始文本，用于「文档」按钮。</summary>
+    public string Readme { get; }
 
     /// <summary>是否包含执行逻辑：可执行扩展显示运行/停止，其余显示启用/禁用。</summary>
     public bool IsExecutable { get; }
@@ -40,6 +46,7 @@ public partial class ExtensionCardViewModel : ObservableObject
     private bool _isEnabled;
 
     public bool HasConfig => !string.IsNullOrEmpty(ConfigClass);
+    public bool HasReadme => !string.IsNullOrWhiteSpace(Readme);
 
     public bool ShowRun => IsExecutable && !IsRunning;
     public bool ShowStop => IsExecutable && IsRunning;
@@ -72,6 +79,7 @@ public partial class ExtensionCardViewModel : ObservableObject
         Description = info.Description;
         ExtensionClass = info.ExtensionClass;
         ConfigClass = info.ConfigClass;
+        Readme = info.Readme;
         IsExecutable = info.Executable;
         IsEnabled = info.Enabled ?? false;
     }
@@ -121,5 +129,35 @@ public partial class ExtensionCardViewModel : ObservableObject
         });
         if (result is SukiMessageBoxResult.OK)
             await viewModel.SaveAsync();
+    }
+
+    [RelayCommand]
+    private async Task ShowDocAsync()
+    {
+        if (!HasReadme) return;
+        var body = new SelectableTextBlock
+        {
+            Text = Readme,
+            TextWrapping = TextWrapping.Wrap,
+            LineHeight = 20
+        };
+        var content = new ScrollViewer
+        {
+            Width = 660,
+            MaxHeight = 480,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Content = new Border
+            {
+                Padding = new Thickness(4, 0, 12, 0),
+                Child = body
+            }
+        };
+        await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+        {
+            Header = $"{Name} · {Resources.ExtensionDocText}",
+            Content = content,
+            ActionButtonsPreset = SukiMessageBoxButtons.OK
+        });
     }
 }

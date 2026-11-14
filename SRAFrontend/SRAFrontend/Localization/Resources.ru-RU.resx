@@ -1239,11 +1239,17 @@
     <data name="StopExtensionTooltip" xml:space="preserve">
         <value>Остановить расширение</value>
     </data>
+    <data name="ExtensionDocText" xml:space="preserve">
+        <value>Документация</value>
+    </data>
     <data name="ConfigsText" xml:space="preserve">
         <value>Настройки</value>
     </data>
     <data name="OpenExtensionConfigTooltip" xml:space="preserve">
         <value>Открыть настройки расширения</value>
+    </data>
+    <data name="OpenExtensionDocTooltip" xml:space="preserve">
+        <value>Открыть документацию расширения</value>
     </data>
     <data name="NoExtensionsMessage" xml:space="preserve">
         <value>Нет доступных расширений</value>

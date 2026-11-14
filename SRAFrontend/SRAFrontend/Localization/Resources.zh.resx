@@ -1235,11 +1235,17 @@
     <data name="StopExtensionTooltip" xml:space="preserve">
         <value>停止该扩展</value>
     </data>
+    <data name="ExtensionDocText" xml:space="preserve">
+        <value>文档</value>
+    </data>
     <data name="ConfigsText" xml:space="preserve">
         <value>配置</value>
     </data>
     <data name="OpenExtensionConfigTooltip" xml:space="preserve">
         <value>打开扩展配置</value>
+    </data>
+    <data name="OpenExtensionDocTooltip" xml:space="preserve">
+        <value>查看扩展使用说明</value>
     </data>
     <data name="NoExtensionsMessage" xml:space="preserve">
         <value>暂无可用扩展</value>

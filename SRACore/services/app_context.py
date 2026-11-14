@@ -194,8 +194,25 @@ class AppContext:
                 "config_class": entry.config_cls.__name__ if entry.config_cls else "",
                 "executable": entry.executable,
                 "enabled": self._extension_enabled_state(ext_id),
+                "readme": self._extension_readme(ext_id),
             })
         return data
+
+    @staticmethod
+    def _extension_readme(ext_id: str) -> str:
+        """扩展目录下 README.md 的文本；不存在时返回空串。"""
+        entry = extension_registry.get(ext_id)
+        package_dir = entry.package_dir
+        if package_dir is None:
+            return ""
+        for name in ("README.md", "readme.md"):
+            path = package_dir / name
+            try:
+                if path.is_file():
+                    return path.read_text(encoding="utf-8-sig")
+            except OSError:
+                continue
+        return ""
 
     def _extension_enabled_state(self, ext_id: str) -> bool | None:
         """读取扩展配置中的 enabled 开关；配置模型没有该字段时返回 None。"""

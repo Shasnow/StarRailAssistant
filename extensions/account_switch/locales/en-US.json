@@ -1,5 +1,7 @@
 {
     "name": "Auto Account Switch",
-    "description": "Switch accounts without a password (AUTO-MAS roster / account_hint.txt)",
-    "enabled.description": "Enable automatic account switching"
+    "description": "Switch accounts without a password (AUTO-MAS roster / account hint in config)",
+    "enabled.description": "Enable automatic account switching",
+    "account_hint.title": "Target account",
+    "account_hint.description": "Full phone number/account, masked fragment (138****5678), or email (qin***@qq.com)"
 }
