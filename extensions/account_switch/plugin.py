@@ -6,9 +6,9 @@
 1. AUTO-MAS 花名册：被 MAS 拉起时从命令行的 sra-config 路径反查
    config/scripts.yaml（旧版为 config/ScriptConfig.json），解密该用户
    Info.Id 作为目标账号；v2 配置里的 Id 带 DPAPI: 前缀。
-2. account_hint.txt（手动跑 SRA 时兜底）：支持脱敏片段/完整手机号/邮箱。
+2. 扩展配置 ``account_hint``（手动跑 SRA 时兜底）：支持脱敏片段/完整手机号/邮箱。
    它是全局单值，MAS 多账号场景下绝不顶替花名册。
-3. 挂机守护脚本置环境变量 ZZ_SRA_OVERNIGHT=1 时，直接用 account_hint.txt
+3. 挂机守护脚本置环境变量 ZZ_SRA_OVERNIGHT=1 时，直接用扩展配置 ``account_hint``
    走花名册那条「账号选择页选号 → 客户端回填密码」路径（无 sra-config 也能切号）。
 
 切号动作：登录页点账号框触发历史账号下拉 → 选目标号 → 确认登录，
@@ -90,6 +90,8 @@ _ACCT_PAT = re.compile(r"\d{2,4}\*{2,}\d{2,4}")
 _MAIL_PAT = re.compile(r"[A-Za-z0-9._-]+\*+[A-Za-z0-9._-]*@[A-Za-z0-9.-]+")
 _VERIFIED_TTL = 900  # 已核对标记有效期（秒）
 
+_ACCOUNT_HINT = ""  # 扩展配置里的目标账号提示词，install() 时从 config.account_hint 刷新
+
 _MAS_TARGET = ""
 _MAS_USER = ""  # 花名册用户名，zz_uid_map.txt 的优先键
 _MAS_RESOLVED = False
@@ -134,11 +136,8 @@ def _is_login_button_text(src: str, words=_LOGIN_BTN_WORDS) -> bool:
 
 
 def _load_hint() -> str:
-    p = AppRootDir / "account_hint.txt"
-    try:
-        return p.read_text(encoding="utf-8-sig").strip()
-    except Exception:
-        return ""
+    """目标账号提示词，来自扩展配置的 ``account_hint`` 字段（install 时刷新）"""
+    return _ACCOUNT_HINT
 
 
 def _norm(s: str) -> str:
@@ -369,7 +368,7 @@ def _mas_target() -> str:
 def _uid_check_target() -> str:
     """UID 终验的目标账号：花名册优先，非 MAS 场景才允许 hint 兜底。
 
-    account_hint.txt 是全局单值，MAS 多账号下拉起时若花名册解析失败，
+    account_hint 是全局单值，MAS 多账号下拉起时若花名册解析失败，
     绝不能拿它顶替（会算成别的号，目标和实际一起错、日志反显「校验通过」）。
     """
     t = _mas_target()
@@ -931,9 +930,10 @@ _AUX_ATTRS = (
 )
 
 
-def install(_tasks=None) -> bool:
-    """给当前 StartGameTask 打补丁；本模块实例已打过则直接返回 True。"""
-    global StartGameTask, LoginStatus
+def install(_tasks=None, config: Any = None) -> bool:
+    """给当前 StartGameTask 打补丁并刷新配置；本模块实例已打过则只更新配置。"""
+    global StartGameTask, LoginStatus, _ACCOUNT_HINT
+    _ACCOUNT_HINT = str(getattr(config, "account_hint", "") or "").strip()
     try:
         from tasks.StartGameTask import LoginStatus as login_status
         from tasks.StartGameTask import StartGameTask as start_game_task
@@ -984,7 +984,7 @@ def install(_tasks=None) -> bool:
                     _save_error_shot(self, "hint_switch_error")
                     logger.error(f"[切号] 切号流程异常，放弃自动登录: {e!r}")
                     return False
-            logger.error("[切号] 登录账密未设置且 account_hint.txt 为空")
+            logger.error("[切号] 登录账密未设置且扩展配置 account_hint 为空")
             return False
         return _orig_fill(self)
 
@@ -1004,7 +1004,7 @@ def install(_tasks=None) -> bool:
         if not target and overnight:
             target = _load_hint()
             if target:
-                logger.info(f"[切号] 挂机模式：目标账号取 account_hint.txt → {_mask_text(target)}")
+                logger.info(f"[切号] 挂机模式：目标账号取扩展配置 account_hint → {_mask_text(target)}")
         if not target:
             if _MAS_CONTEXT_OK:
                 logger.error("[切号] MAS 花名册不可用，拒绝用记住的账号自动登录（防错号）")
