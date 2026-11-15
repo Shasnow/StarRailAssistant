@@ -28,7 +28,6 @@ pip install -e ".[standard]"                          # standard = 桌面依赖�
 python main.py                                        # 交互式 CLI；自提权（--no-admin 跳过）
 python main.py -c "task run Default"                  # 单次执行；'+' 串联多条
 python -m pytest tests/test_main.py -q                # 单文件测试；全量套件很慢，不要每次都跑
-flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics   # CI 阻塞项（无本地配置）
 dotnet run --project SRAFrontend/SRAFrontend.Desktop/SRAFrontend.Desktop.csproj
 python -m SRAServer                                   # http://localhost:5073（需 ".[server]"）
 sra | sra-cli                                         # 统一入口，默认交互式 CLI
@@ -36,13 +35,6 @@ sra serve                                             # = sra-server = python -m
 docker compose up -d                                  # 服务端镜像，http://localhost:5073
 npm run build | modelgen | pyl10nc | ver | clean
 ```
-
-`sra serve` 与 `sra-server` 共用 `SRAServer.__main__.run_server`。服务端代码始终来自已安装的 `SRAServer` 包；
-WebUI 是独立产物，由 `sra init` 下载的 WebUI 包解压到当前目录 `SRAServer/static`，`SRAServer/app.py::
-_resolve_static_dir` 优先采用该目录（包内不含构建产物，wheel 场景必须 `sra init`）。
-
-Docker 镜像由 `.github/workflows/docker.yml` 构建并推送 `ghcr.io/shasnow/starrailassistant`（`beta`/`latest`/
-`v<版本>`/`sha-<哈希>`），内含 WebUI、tasks/extensions/resources 与 Chromium，启动不联网，也从不执行 `sra init`。
 
 ## Architecture
 
@@ -95,7 +87,7 @@ Full（Core + 桌面端 publish）、Lite（桌面端 + 源码 + `pyproject.toml
 
 ## Conventions
 
-- **Language.** 提交消息中文约定式（`.trae/rules/git-commit-message.md`）；注释、文档、日志、任务名、UI 文案中文。
+- **Language.** 提交消息中文；注释、文档、日志、任务名、UI 文案中文。
   `README.md` 为中文源文件，改动同步 `README.en.md`，两者顶部保留语言切换链接。
 - **Generated files — never hand-edit.** `SRACore/models/app_settings.py`、`tasks_config.py` 由
   `SRAFrontend/SRAFrontend/Models/*.cs` 经 `npm run modelgen` 生成；`SRACore/localization/resources.py` 与
@@ -107,21 +99,10 @@ Full（Core + 桌面端 publish）、Lite（桌面端 + 源码 + `pyproject.toml
 - **Localization** 为 `Resources` 单例的属性式访问（`Resources.cli_intro`），由 `__getattribute__` 从生成 JSON 解析，
   TOML 值中使用 `str.format` 占位符。
 - **Logging** 用 `loguru`（`SRACore/util/logger.py`），不要用 `print` 做诊断。
-- **Errors** 用 `SRACore/util/errors.py` 的编码枚举（`SRA-XXXX-YYYY`，级别前缀 1xxx 系统 … 9xxx 其他）；
-  `ThreadStoppedError` 是 `Runner` 与 operators 识别的协作停止信号。
-- **Types**: 使用 `from __future__ import annotations`、`StrEnum`、dataclass，以及 `@task`/`@extension` 装饰器处的
-  `# pyright: ignore[...]`；保持风格而不是放松类型。
+- **Errors** `ThreadStoppedError` 是 `Runner` 与 operators 识别的协作停止信号。
 - **Adding a user-visible field** 必须改后端模型/schema：桌面端绑定任务配置、WebUI 由 OpenAPI 渲染，两者跟随后端。
 - **Release notes live in `ChangeLog2.0.md`.** `scripts/package.py` 读取它、替换 `${VERSION}` 并写出 gitignore 的
   `version_info.txt`（首行为发布名/tag）供 CI 使用——改 changelog，不要改 `version_info.txt`。
   `.github/workflows/python-app.yml` 构建发布（内嵌 Python + 源码 + `SRA-cli.exe` 启动器 + Inno Setup + 多 zip）；
   构建步骤抽在可复用的 `build-artifacts.yml`（仅上传产物、不发布 release，不触发 Mirror酱 / auto-mas）。
   `pypi.yml` 发布 PyPI。
-
-## Known issues
-
-`main` 上曾有 3 个测试因漂移失败，若未修复请一并处理（不要当成自己改动的回归）：
-`test_main.py::test_main_version_option_exits_cleanly`（patch 已不存在的 `main.load_app_settings`）、
-`test_notification_system.py::test_channel_test_notification_catches_channel_exception`（patch 已不存在的
-`service.load_notification_settings`）、`test_tasks_notifications.py::test_load_all_tasks_and_trigger_*`
-（需自行导入五个核心任务才能注册）。
