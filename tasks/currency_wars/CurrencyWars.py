@@ -574,11 +574,11 @@ class CurrencyWars(Executable):
                     self.sort_all_areas_by_priority()  # 优先级排序
                     continue
                 break
-            self.handle_special_event()
             if not self.stage_transition():
                 break
             if self.is_game_over:  # 任务已被标记为停止, 需要退出循环
                 break
+            self.handle_special_event()
             self.shopping()
 
             run_times += 1
