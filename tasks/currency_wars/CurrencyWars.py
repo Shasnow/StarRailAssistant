@@ -97,7 +97,8 @@ class CurrencyWars(Executable):
             "开拓银轨": ("开拓商店", self.handle_trailblaze_store),
             "奇兽花园": ("奇兽花园", self.handle_beast_garden),
             "梦境交织": ("梦境交织", self.handle_dream_interference),
-            "巡海游侠": ("巡海游侠", self.handle_sea_trader)
+            "巡海游侠": ("巡海游侠", self.handle_sea_trader),
+            "黑市主理人": ("黑市主理人", self.handle_black_market_manager)
         }
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
@@ -1144,7 +1145,10 @@ class CurrencyWars(Executable):
         return self._handle_selection_event((0.22, 0.30, 0.85, 0.36),
                                             self.strategy_special_events.get("巡海游侠", ""))
 
-    
+    def handle_black_market_manager(self):
+        """处理黑市主理人事件的逻辑"""
+        return self.operator.press_key("esc")
+
     def detect_special_event(self) -> str:
         """检测当前是否有特殊事件发生，并返回事件名称"""
         result = self.operator.ocr(from_x=0.49, from_y=0.038, to_x=0.60, to_y=0.11)
