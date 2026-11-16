@@ -43,6 +43,7 @@ class RerollStart(CurrencyWars):
         self.hate_boss_affixes: list[strutil.StrMatcher] | None = None  # 讨厌的boss词缀，出现就重开
         self.invest_strategy_stage = 0  # 投资策略阶段
         self.invest_strategy_satisfied = False  # 满意标志
+        self.invest_env_satisfied = False  # 本轮进入对局时是否已刷到符合要求的投资环境
 
     def handle_ending(self):
         # 刷开局不需要结束游戏
@@ -133,6 +134,8 @@ class RerollStart(CurrencyWars):
                 logger.info("Boss词缀符合要求，继续游戏...")
 
     def handle_invest_environment(self) -> None:
+        # 每次判定前重置，避免上一次的匹配结果影响本轮
+        self.invest_env_satisfied = False
         if not (self.wanted_invest_env or self.optional_invest_env):
             super().handle_invest_environment()
             return
@@ -143,6 +146,7 @@ class RerollStart(CurrencyWars):
             if result != -1:
                 self.operator.click_point(0.25 * (result + 1), 0.27, tag="投资环境", trace=True)  # 根据投资环境的位置计算点击坐标，每个环境占屏幕宽度的25%
                 self.operator.click_img(IMG.ENSURE2, after_sleep=1, retry=3)
+                self.invest_env_satisfied = True
                 logger.info("投资环境符合要求，继续游戏...")
                 break
             
@@ -157,11 +161,21 @@ class RerollStart(CurrencyWars):
                 super().handle_invest_environment()
 
     def handle_game_entered(self) -> bool:
+        # 本轮是否刷到了符合要求的投资环境；每次进入对局只判定一次
+        invest_env_satisfied = self.invest_env_satisfied
+        self.invest_env_satisfied = False
+
         if self.reroll:
             self.abort_and_return()
             self.reroll = False
             return False
         if not self.wanted_invest_strategies:
+            # 未配置投资策略阶段要求时，仍需确认投资环境达标才可结束刷开局；
+            # 从「继续进度」/准备阶段直接进入对局不会经过投资环境判定，此时必须重开
+            if (self.wanted_invest_env or self.optional_invest_env) and not invest_env_satisfied:
+                logger.info("尚未刷到符合要求的投资环境，准备重开...")
+                self.abort_and_return()
+                return False
             # 如果不需要重开，且没有投资策略要求，可中止刷开局
             logger.info("已刷到满足要求的开局，停止刷开局")
             self.is_running = False

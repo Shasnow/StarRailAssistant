@@ -543,19 +543,43 @@ class CurrencyWars(Executable):
         """
         return True
 
-    def abort_and_return(self) -> bool:
-        """中止当前对局并返回开始页面"""
-        logger.info("中止当前对局并返回开始页面")
+    def abort_and_return(self, retries: int = 3) -> bool:
+        """中止当前对局并返回开始页面
+
+        退出流程常因确认弹窗延迟弹出或被其他弹窗遮挡而识别失败，
+        因此整体重试：每次失败先按 ESC 关闭残留弹窗，再重新定位退出按钮。
+        """
+        for attempt in range(1, retries + 1):
+            logger.info("中止当前对局并返回开始页面")
+            if self._abort_current_game():
+                return True
+            if attempt < retries:
+                self.operator.press_key("esc")
+                self.operator.sleep(1)
+        logger.error(f"退出对局失败，已重试{retries}次")
+        return False
+
+    def _abort_current_game(self) -> bool:
+        """执行一次退出对局流程，成功返回 True"""
+        # 已经回到开始页面时无需再退出
+        if self.operator.locate(CWIMG.START_CURRENCY_WARS) is not None:
+            return True
+
         index, box = self.operator.wait_any_img([CWIMG.QUIT, CWIMG.WITHDRAW_AND_SETTLE])
-        if index<0:
+        if index < 0:
             return False
         if index == 0:
+            self.operator.click_box(box, after_sleep=0.5)
+            # 确认按钮可能延迟弹出，先等待再点击
+            confirm_box = self.operator.wait_img(CWIMG.WITHDRAW_AND_SETTLE, timeout=8)
+            if confirm_box is None:
+                return False
+            self.operator.click_box(confirm_box, after_sleep=1)
+        else:
             self.operator.click_box(box, after_sleep=1)
-            self.operator.click_img(CWIMG.WITHDRAW_AND_SETTLE)
-        elif index == 1:
-            self.operator.click_box(box)
-        b = self.operator.wait_img(CWIMG.NEXT_STEP)
-        if b is None:
+
+        # 结算页面出现较慢，延长等待时间
+        if self.operator.wait_img(CWIMG.NEXT_STEP, timeout=20) is None:
             return False
         self.handle_game_over(None)
         return True
