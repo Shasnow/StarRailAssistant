@@ -1233,6 +1233,7 @@ class CurrencyWars(Executable):
     def handle_protagonist_selection(self) -> bool:
         """处理「选择主角」奇遇节点。"""
         logger.info("选择主角")
+        self.operator.wait_ocr("选择", from_x=0.42, from_y=0.06, to_x=0.58, to_y=0.11)
         self.operator.click_point(0.2, 0.3, after_sleep=1, tag="选择左侧效果")
         target = (0.5, 0.4)
         # 从前台角色中按优先级从高到低依次尝试

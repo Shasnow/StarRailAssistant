@@ -168,7 +168,7 @@ class Characters:
     YaoGuang = Character('爻光', 3, Positioning.OffField, alias=['交光'])
     Sparxie = Character('火花', 1, Positioning.OnOffField)
     Ashveil = Character('不死途', 5, Positioning.OffField)
-    SilverWolfLV999 = Character('银狼LV.999', 5, Positioning.OnField)
+    SilverWolfLV999 = Character('银狼LV.999', 3, Positioning.OnField)
     Evanescia = Character('绯英', 2, Positioning.OnOffField)
     Himoko_Nova = Character('姬子·启行', 4, Positioning.OnField)
     Mortenax_Blade = Character('千冶·刃', 4, Positioning.OnOffField)
