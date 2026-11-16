@@ -789,8 +789,6 @@ class CurrencyWars(Executable):
                 for y in range(20, 41, 5):
                     self.operator.click_point(x / 100, y / 100, trace=False)
 
-        self.detect_silver_wolf_lv999()  # 也许开出银狼了
-
     def sell_character(self):
         """
         实现角色出售逻辑，确保备战席不超过8个角色
@@ -1062,7 +1060,6 @@ class CurrencyWars(Executable):
         """处理补给阶段的逻辑"""
         self.operator.click_point(0.53, 0.52, after_sleep=1)  # 选择固定位置
         self.operator.click_point(0.88, 0.91, after_sleep=1)  # 点击确认按钮
-        self.detect_silver_wolf_lv999()  # 也许选到银狼了
         return False
 
     def handle_encounter_node(self, _: StageName | None) -> bool:
@@ -1162,11 +1159,6 @@ class CurrencyWars(Executable):
             if title in text:
                 return event
         return ""
-
-    def detect_silver_wolf_lv999(self):
-        """处理银狼LV.999 2星事件的逻辑"""
-        if self.operator.locate(CWIMG.SILVER_WOLF_LV999):
-            self.handle_silver_wolf_lv999()
 
     def handle_silver_wolf_lv999(self):
         return self._handle_selection_event((0.22, 0.34, 0.85, 0.4),
@@ -1306,7 +1298,7 @@ class CurrencyWars(Executable):
                     logger.info(f"购买角色：{c.name}")
                     # 特殊处理
                     if c.name == Characters.SilverWolfLV999.name:
-                        self.detect_silver_wolf_lv999()
+                        self.handle_special_event()
                     self.operator.move_to(0.5, 0.5)  # 移动鼠标避免遮挡
 
             logger.info("当前商店无目标角色可购买")
