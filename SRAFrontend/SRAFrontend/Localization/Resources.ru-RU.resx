@@ -520,6 +520,9 @@
   <data name="SraWebsiteText" xml:space="preserve">
     <value>Официальный сайт SRA</value>
   </data>
+  <data name="PrivacyPolicyText" xml:space="preserve">
+    <value>Политика конфиденциальности</value>
+  </data>
   <data name="SourceRepositoryText" xml:space="preserve">
     <value>GitHub</value>
   </data>

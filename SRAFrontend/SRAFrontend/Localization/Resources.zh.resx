@@ -513,6 +513,9 @@
     <data name="SraWebsiteText" xml:space="preserve">
         <value>SRA官网</value>
     </data>
+    <data name="PrivacyPolicyText" xml:space="preserve">
+        <value>隐私政策</value>
+    </data>
     <data name="SourceRepositoryText" xml:space="preserve">
         <value>GitHub</value>
     </data>

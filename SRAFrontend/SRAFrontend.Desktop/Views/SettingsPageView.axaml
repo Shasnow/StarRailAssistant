@@ -1008,6 +1008,7 @@
                                         <HyperlinkButton NavigateUri="https://avaloniaui.net/" Content="Avalonia UI" Margin="0,0,20,5" />
                                         <HyperlinkButton NavigateUri="https://dotnet.microsoft.com" Content=".NET" Margin="0,0,20,5" />
                                         <HyperlinkButton NavigateUri="https://www.python.org/" Content="Python" Margin="0,0,20,5" />
+                                        <HyperlinkButton NavigateUri="https://starrailassistant.top/ann/privacy/" Content="{x:Static lang:Resources.PrivacyPolicyText}" Margin="0,0,20,5" />
                                     </WrapPanel> 
                                 </StackPanel>
                             </suki:SettingsLayoutItem.Content>

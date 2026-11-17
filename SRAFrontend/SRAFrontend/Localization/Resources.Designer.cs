@@ -3324,6 +3324,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Privacy Policy.
+        /// </summary>
+        public static string PrivacyPolicyText {
+            get {
+                return ResourceManager.GetString("PrivacyPolicyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Proxy Address.
         /// </summary>
         public static string ProxyAddressText {
