@@ -129,11 +129,7 @@ public partial class MainWindow : SukiWindow
     {
         base.OnLoaded(e);
         UpdatePaletteTheme();
-        // 命令面板可直接导出日志：即使没打开控制台页，也先给它一个 TopLevel 用于保存对话框
-        if (DataContext is MainWindowViewModel viewModel)
-            foreach (var page in viewModel.Pages)
-                if (page is ConsolePageViewModel consolePage)
-                    consolePage.TopLevelObject = this;
+       
         if (_settingsService == null) return;
         var displaySettings = _settingsService.Settings.Display;
         if (displaySettings.IsRememberWindow)

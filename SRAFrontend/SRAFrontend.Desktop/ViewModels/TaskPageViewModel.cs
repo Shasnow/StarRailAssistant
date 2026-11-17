@@ -2,12 +2,13 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Data;
 using SRAFrontend.Desktop.Controls;
+using SRAFrontend.Desktop.Models;
+using SRAFrontend.Desktop.Services;
 using SRAFrontend.Models;
 using SRAFrontend.Services;
 using SukiUI.Controls;
@@ -31,7 +32,8 @@ public partial class TaskPageViewModel : PageViewModel
         ControlPanelViewModel controlPanelViewModel,
         ConfigService configService,
         CacheService cacheService,
-        IBackendService backendService) : base(
+        IBackendService backendService,
+        CommandPaletteService commandPaletteService) : base(
         PageName.Task, "\uE1BC")
     {
         ControlPanelViewModel = controlPanelViewModel;
@@ -43,6 +45,11 @@ public partial class TaskPageViewModel : PageViewModel
 
         _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
 
+        commandPaletteService.Register(new PaletteCommand("货币战争：导入攻略", "cw.importStrategy", PaletteCategory.Tools)
+        {
+            Execute = () => InstallStrategyCommand.Execute(null)
+        });
+        
         if (Cache.Strategies.Count == 0) _ = RefreshStrategies();
         return;
 
@@ -190,8 +197,6 @@ public partial class TaskPageViewModel : PageViewModel
 
     public ControlPanelViewModel ControlPanelViewModel { get; }
 
-    public TopLevel? TopLevelObject { get; set; }
-
     public bool EnableContextMenu => SelectedTaskItem is not null;
 
     public int CurrencyWarsModeIndex
@@ -273,8 +278,8 @@ public partial class TaskPageViewModel : PageViewModel
     [RelayCommand]
     private async Task InstallStrategy()
     {
-        if (TopLevelObject is null) return;
-        var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        if (App.TopLevelObject is null) return;
+        var files = await App.TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = Resources.SelectStrategyFileText,
             AllowMultiple = false,
@@ -302,8 +307,8 @@ public partial class TaskPageViewModel : PageViewModel
     [RelayCommand]
     private async Task SelectedPath()
     {
-        if (TopLevelObject is null) return;
-        var files = await TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
+        if (App.TopLevelObject is null) return;
+        var files = await App.TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
         if (files.Count == 0) return;
         StartGameConfig.GamePath = files[0].Path.LocalPath;
     }

@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,7 @@ namespace SRAFrontend.Desktop;
 
 public class App : Application
 {
+    public static TopLevel? TopLevelObject { get; private set; }
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
     public override void OnFrameworkInitializationCompleted()
     {
@@ -43,6 +45,8 @@ public class App : Application
             desktop.MainWindow = serviceProvider.GetRequiredService<MainWindow>();
             desktop.MainWindow.DataContext = serviceProvider.GetRequiredService<MainWindowViewModel>();
             desktop.MainWindow.Closed += (_, _) => serviceProvider.GetRequiredService<OverlayService>().CloseOverlay();
+            TopLevelObject = desktop.MainWindow;
+            serviceProvider.GetRequiredService<HotkeyCaptureService>().Attach(desktop.MainWindow);
             desktop.Exit += (_, _) =>
             {
                 Log.Information("Application is exiting. Saving settings and stopping SRA process.");
@@ -79,6 +83,7 @@ public class App : Application
         services.AddTransient<ActivityService>();
         services.AddTransient<CommonModel>();
         services.AddSingleton<CommandPaletteService>();
+        services.AddSingleton<HotkeyCaptureService>();
         services.AddSingleton<ControlPanelViewModel>();
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
         services.AddSingleton<SettingsService>();

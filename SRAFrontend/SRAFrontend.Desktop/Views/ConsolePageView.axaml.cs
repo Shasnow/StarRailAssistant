@@ -63,7 +63,6 @@ public partial class ConsolePageView : UserControl
         ConsoleScrollViewer.LayoutUpdated += ScrollToEndAfterLayout;
         if (DataContext is ConsolePageViewModel model)
         {
-            model.TopLevelObject = TopLevel.GetTopLevel(this);
             model.PropertyChanged += OnModelOnPropertyChanged;
         }
     }

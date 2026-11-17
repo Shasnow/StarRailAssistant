@@ -1,19 +1,18 @@
-﻿using System;
-using Avalonia.Controls;
-using Avalonia.Input;
+using System;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SRAFrontend.Desktop.Services;
 using SRAFrontend.Localization;
 
 namespace SRAFrontend.Desktop.Models;
 
-public partial class CustomizableKey : ObservableObject
+public partial class CustomizableKey(HotkeyCaptureService hotkeyCaptureService) : ObservableObject
 {
     [ObservableProperty] private string _currentKey = "";
     [ObservableProperty] private bool _isListening;
 
     private string _tempKey = "";
-    private TopLevel? _topLevel;
     private Action<string>? _setValue;
 
     public string IconText { get; set; } = "";
@@ -21,7 +20,7 @@ public partial class CustomizableKey : ObservableObject
     public string DefaultKey { get; init; } = "";
 
     /// <summary>
-    /// 配置绑定参数（不立即绑定，等待 TopLevel 可用）
+    /// 配置绑定参数：读取初始键值，并在录制成功后写回。
     /// </summary>
     public CustomizableKey Configure(Func<string> getValue, Action<string> setValue)
     {
@@ -30,66 +29,32 @@ public partial class CustomizableKey : ObservableObject
         return this;
     }
 
-    /// <summary>
-    /// 绑定到 TopLevel 并完成初始化
-    /// </summary>
-    public void AttachTopLevel(TopLevel topLevel)
-    {
-        _topLevel = topLevel;
-        PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(CurrentKey) && !IsListening)
-                _setValue?.Invoke(CurrentKey);
-        };
-    }
-
     [RelayCommand]
     private void ResetToDefault()
     {
         CurrentKey = DefaultKey;
+        _setValue?.Invoke(DefaultKey);
     }
 
     [RelayCommand]
-    private void ModifyKey()
+    private async Task ModifyKey()
     {
-        if (_topLevel is null || IsListening) return;
+        if (IsListening) return;
 
         _tempKey = CurrentKey;
         IsListening = true;
         CurrentKey = Resources.HotkeyCaptureHint;
 
-        _topLevel.KeyUp += OnKeyUp;
-        _topLevel.PointerPressed += OnPointerPressed;
-    }
-
-    private void StopListening(bool save)
-    {
-        if (_topLevel is null || !IsListening) return;
-
-        _topLevel.KeyUp -= OnKeyUp;
-        _topLevel.PointerPressed -= OnPointerPressed;
+        var key = await hotkeyCaptureService.CaptureAsync();
 
         IsListening = false;
-
-        if (save)
-            _setValue?.Invoke(CurrentKey);
-        else
-            CurrentKey = _tempKey;
-    }
-
-    private void OnKeyUp(object? sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Escape)
+        if (key is null)
         {
-            StopListening(false);
+            CurrentKey = _tempKey;
             return;
         }
-        CurrentKey = e.Key.ToString();
-        StopListening(true);
-    }
 
-    private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        StopListening(false);
+        CurrentKey = key;
+        _setValue?.Invoke(key);
     }
 }
