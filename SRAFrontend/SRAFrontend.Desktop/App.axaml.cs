@@ -78,6 +78,7 @@ public class App : Application
         services.AddTransient<AnnService>();
         services.AddTransient<ActivityService>();
         services.AddTransient<CommonModel>();
+        services.AddSingleton<CommandPaletteService>();
         services.AddSingleton<ControlPanelViewModel>();
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
         services.AddSingleton<SettingsService>();

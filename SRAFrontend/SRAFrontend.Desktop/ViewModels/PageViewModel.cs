@@ -5,6 +5,7 @@ namespace SRAFrontend.Desktop.ViewModels;
 
 public partial class PageViewModel(PageName pageName, string iconText) : ViewModelBase
 {
+    public string PageId => pageName.ToString();
     public string DisplayName =>
         Resources.ResourceManager.GetString(pageName + "Text", Resources.Culture) ??
         pageName.ToString();

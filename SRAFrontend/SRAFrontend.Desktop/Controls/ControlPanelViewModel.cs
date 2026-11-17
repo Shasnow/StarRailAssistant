@@ -2,6 +2,8 @@ using System;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SRAFrontend.Desktop.Models;
+using SRAFrontend.Desktop.Services;
 using SRAFrontend.Desktop.ViewModels;
 using SRAFrontend.Localization;
 using SRAFrontend.Models;
@@ -33,7 +35,8 @@ public partial class ControlPanelViewModel : ViewModelBase
         CacheService cacheService,
         ConfigService configService,
         SettingsService settingsService,
-        CommonModel commonModel)
+        CommonModel commonModel,
+        CommandPaletteService commandPaletteService)
     {
         _settingsService = settingsService;
         _configService = configService;
@@ -44,6 +47,22 @@ public partial class ControlPanelViewModel : ViewModelBase
         {
             if (args.PropertyName == nameof(IBackendService.IsTaskRunning)) OnPropertyChanged(nameof(CanStart));
         };
+        commandPaletteService.Register(new PaletteCommand(Resources.CurrentText, "task.runCurrent", PaletteCategory.Task)
+        {
+            Execute = () => _ = StartCurrentConfigAsync()
+        });
+        commandPaletteService.Register(new PaletteCommand(Resources.AllText, "task.runAll", PaletteCategory.Task)
+        {
+            Execute = () => _ = StartAllConfigsAsync()
+        });
+        commandPaletteService.Register(new PaletteCommand(Resources.SaveOnlyText, "task.save", PaletteCategory.Task)
+        {
+            Execute = SaveConfigs
+        });
+        commandPaletteService.Register(new PaletteCommand(Resources.StopText, "task.stop", PaletteCategory.Task)
+        {
+            Execute = () => _ = StopButton()
+        });
     }
 
     public string StartModeText
@@ -77,26 +96,50 @@ public partial class ControlPanelViewModel : ViewModelBase
         switch (Cache.StartMode)
         {
             case "Current":
-                Save();
-                _lastStartRequestUtc = DateTime.UtcNow;
-                if (await _backendService.TaskRunAsync(Cache.CurrentConfigName))
-                    _commonModel.ShowSuccessToast(Resources.TaskStartSuccessMessage, string.Format(Resources.Culture, Resources.ConfigurationStartedMessage, Cache.CurrentConfigName));
-                else
-                    _commonModel.ShowErrorToast(Resources.TaskStartFailedError, string.Format(Resources.Culture, Resources.ConfigurationStartFailedError, Cache.CurrentConfigName));
+                await StartCurrentConfigAsync();
                 break;
             case "All":
-                Save();
-                _lastStartRequestUtc = DateTime.UtcNow;
-                if (await _backendService.TaskRunAsync(null))
-                    _commonModel.ShowSuccessToast(Resources.TaskStartSuccessMessage, Resources.AllConfigurationsStartedMessage);
-                else
-                    _commonModel.ShowErrorToast(Resources.TaskStartFailedError, Resources.AllConfigurationsStartFailedError);
+                await StartAllConfigsAsync();
                 break;
             case "Save Only":
-                Save();
-                _commonModel.ShowSuccessToast(Resources.SaveSuccessMessage, Resources.ConfigurationSavedMessage);
+                SaveConfigs();
                 break;
         }
+    }
+
+    /// <summary>保存配置并运行当前配置（命令面板复用）。</summary>
+    public async Task StartCurrentConfigAsync()
+    {
+        if (!CanStart) return;
+        Save();
+        _lastStartRequestUtc = DateTime.UtcNow;
+        if (await _backendService.TaskRunAsync(Cache.CurrentConfigName))
+            _commonModel.ShowSuccessToast(Resources.TaskStartSuccessMessage,
+                string.Format(Resources.Culture, Resources.ConfigurationStartedMessage, Cache.CurrentConfigName));
+        else
+            _commonModel.ShowErrorToast(Resources.TaskStartFailedError,
+                string.Format(Resources.Culture, Resources.ConfigurationStartFailedError, Cache.CurrentConfigName));
+    }
+
+    /// <summary>保存配置并运行全部配置（命令面板复用）。</summary>
+    public async Task StartAllConfigsAsync()
+    {
+        if (!CanStart) return;
+        Save();
+        _lastStartRequestUtc = DateTime.UtcNow;
+        if (await _backendService.TaskRunAsync(null))
+            _commonModel.ShowSuccessToast(Resources.TaskStartSuccessMessage,
+                Resources.AllConfigurationsStartedMessage);
+        else
+            _commonModel.ShowErrorToast(Resources.TaskStartFailedError,
+                Resources.AllConfigurationsStartFailedError);
+    }
+
+    /// <summary>仅保存当前配置（命令面板复用）。</summary>
+    public void SaveConfigs()
+    {
+        Save();
+        _commonModel.ShowSuccessToast(Resources.SaveSuccessMessage, Resources.ConfigurationSavedMessage);
     }
     
     public async Task StartSingleTask(string configName)

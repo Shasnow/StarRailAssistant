@@ -5,6 +5,7 @@
         xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
         xmlns:lang="clr-namespace:SRAFrontend.Localization;assembly=SRAFrontend"
         xmlns:viewModels="clr-namespace:SRAFrontend.Desktop.ViewModels"
+        xmlns:models="clr-namespace:SRAFrontend.Desktop.Models"
         mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
         Width="1024" Height="600"
         x:Class="SRAFrontend.Desktop.Views.MainWindow"
@@ -30,7 +31,8 @@
         </Button>
     </suki:SukiWindow.RightWindowTitleBarControls>
 
-    <suki:SukiSideMenu ItemsSource="{Binding Pages}">
+    <Grid>
+    <suki:SukiSideMenu ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage, Mode=TwoWay}">
         <suki:SukiSideMenu.Styles>
             <Style Selector="Image.AppIcon">
                 <Setter Property="Transitions">
@@ -99,5 +101,82 @@
         </suki:SukiSideMenu.FooterContent>
         <!-- ReSharper restore Xaml.StyleClassNotFound -->
     </suki:SukiSideMenu>
-    
+
+    <!-- 命令面板：Ctrl+Shift+P 打开，点击遮罩关闭；颜色随深浅色模式切换 -->
+    <Grid IsVisible="{Binding IsPaletteOpen}"
+          Background="{DynamicResource PaletteBackdropBrush}"
+          PointerPressed="OnPaletteBackdropPressed">
+        <Border Width="640"
+                MaxHeight="460"
+                VerticalAlignment="Top"
+                Margin="0,72,0,0"
+                CornerRadius="8"
+                BoxShadow="0 16 40 0 #55000000"
+                Background="{DynamicResource PalettePanelBrush}"
+                BorderBrush="{DynamicResource PaletteBorderBrush}"
+                BorderThickness="1">
+            <Grid RowDefinitions="Auto,Auto,*">
+                <TextBox x:Name="PaletteSearchBox"
+                         Margin="12"
+                         Height="36"
+                         Foreground="{DynamicResource PaletteForegroundBrush}"
+                         Background="{DynamicResource PaletteInputBackgroundBrush}"
+                         BorderBrush="{DynamicResource PaletteInputBorderBrush}"
+                         Text="{Binding PaletteQuery, Mode=TwoWay}"
+                         PlaceholderText="{x:Static lang:Resources.CommandPalettePlaceholder}" />
+                <TextBlock Grid.Row="1"
+                           Margin="16,0,16,10"
+                           Foreground="{DynamicResource PaletteSecondaryForegroundBrush}"
+                           Text="{x:Static lang:Resources.CommandPaletteNoResults}"
+                           IsVisible="{Binding HasNoPaletteResults}" />
+                <ListBox Grid.Row="2"
+                         Margin="8,0,8,8"
+                         MaxHeight="340"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         ItemsSource="{Binding PaletteResults}"
+                         SelectedItem="{Binding PaletteSelected, Mode=TwoWay}"
+                         PointerReleased="OnPaletteListPointerReleased">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="10,6" />
+                            <Setter Property="Margin" Value="0,1" />
+                            <Setter Property="CornerRadius" Value="6" />
+                            <Setter Property="Background" Value="Transparent" />
+                        </Style>
+                        <Style Selector="ListBoxItem:pointerover">
+                            <Setter Property="Background" Value="Transparent" />
+                        </Style>
+                        <Style Selector="ListBoxItem:selected">
+                            <Setter Property="Background" Value="Transparent" />
+                        </Style>
+                        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="Transparent" />
+                        </Style>
+                        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                            <Setter Property="Background" Value="Transparent" />
+                        </Style>
+                    </ListBox.Styles>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:PaletteCommand">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <StackPanel Spacing="2">
+                                    <TextBlock FontSize="14" Foreground="{DynamicResource PaletteForegroundBrush}" Text="{Binding Title}" />
+                                    <TextBlock FontSize="14" Foreground="{DynamicResource PaletteSecondaryForegroundBrush}" Text="{Binding Subtitle}" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="1"
+                                           VerticalAlignment="Center"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource PaletteSecondaryForegroundBrush}"
+                                           Text="{Binding Shortcut}"
+                                           IsVisible="{Binding HasShortcut}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+    </Grid>
+    </Grid>
+
 </suki:SukiWindow>

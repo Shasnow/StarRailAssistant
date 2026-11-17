@@ -908,6 +908,24 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No matching commands.
+        /// </summary>
+        public static string CommandPaletteNoResults {
+            get {
+                return ResourceManager.GetString("CommandPaletteNoResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search commands....
+        /// </summary>
+        public static string CommandPalettePlaceholder {
+            get {
+                return ResourceManager.GetString("CommandPalettePlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Image Recognition Confidence.
         /// </summary>
         public static string ConfidenceText {
@@ -1115,7 +1133,7 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to e.g. 杨叔 阮·梅.
+        ///   Looks up a localized string similar to e.g. 杨叔 阮·梅 (separated by spaces).
         /// </summary>
         public static string CurrencyWarsEncounterPartnerPlaceholder {
             get {
@@ -1372,6 +1390,15 @@ namespace SRAFrontend.Localization {
         public static string DeveloperOptionsText {
             get {
                 return ResourceManager.GetString("DeveloperOptionsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Developer: capture game screenshot.
+        /// </summary>
+        public static string DeveloperScreenshotText {
+            get {
+                return ResourceManager.GetString("DeveloperScreenshotText", resourceCulture);
             }
         }
         
@@ -1943,20 +1970,20 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Make sure the backend is running, then click Refresh to reload.
-        /// </summary>
-        public static string ExtensionsBackendHint {
-            get {
-                return ResourceManager.GetString("ExtensionsBackendHint", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Docs.
         /// </summary>
         public static string ExtensionDocText {
             get {
                 return ResourceManager.GetString("ExtensionDocText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Make sure the backend is running, then click Refresh to reload.
+        /// </summary>
+        public static string ExtensionsBackendHint {
+            get {
+                return ResourceManager.GetString("ExtensionsBackendHint", resourceCulture);
             }
         }
         
@@ -3062,16 +3089,6 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Not
-        ///&apos;Sequence Read Archive&apos;.
-        /// </summary>
-        public static string NotSequenceReadArchiveText {
-            get {
-                return ResourceManager.GetString("NotSequenceReadArchiveText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Obsolete files cleaned up.
         /// </summary>
         public static string ObsoleteFilesCleanedText {
@@ -3207,20 +3224,20 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to View extension documentation.
-        /// </summary>
-        public static string OpenExtensionDocTooltip {
-            get {
-                return ResourceManager.GetString("OpenExtensionDocTooltip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Open extension configuration.
         /// </summary>
         public static string OpenExtensionConfigTooltip {
             get {
                 return ResourceManager.GetString("OpenExtensionConfigTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View extension documentation.
+        /// </summary>
+        public static string OpenExtensionDocTooltip {
+            get {
+                return ResourceManager.GetString("OpenExtensionDocTooltip", resourceCulture);
             }
         }
         
@@ -3837,6 +3854,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to capture screenshot.
+        /// </summary>
+        public static string ScreenshotFailedError {
+            get {
+                return ResourceManager.GetString("ScreenshotFailedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SCT... or sctp....
         /// </summary>
         public static string SctTokenPlaceholder {
@@ -4260,7 +4286,7 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Stop.
+        ///   Looks up a localized string similar to Stop Task.
         /// </summary>
         public static string StopText {
             get {

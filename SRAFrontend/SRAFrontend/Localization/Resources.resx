@@ -161,7 +161,7 @@
         <value>In the End</value>
     </data>
     <data name="StopText" xml:space="preserve">
-        <value>Stop</value>
+        <value>Stop Task</value>
     </data>
     <data name="CurrentText" xml:space="preserve">
         <value>Launch Current</value>
@@ -1245,6 +1245,18 @@ Please choose another folder.</value>
     <data name="ExtensionDocText" xml:space="preserve">
         <value>Docs</value>
     </data>
+    <data name="CommandPaletteNoResults" xml:space="preserve">
+        <value>No matching commands</value>
+    </data>
+    <data name="CommandPalettePlaceholder" xml:space="preserve">
+        <value>Search commands...</value>
+    </data>
+    <data name="DeveloperScreenshotText" xml:space="preserve">
+        <value>Developer: capture game screenshot</value>
+    </data>
+    <data name="ScreenshotFailedError" xml:space="preserve">
+        <value>Failed to capture screenshot</value>
+    </data>
     <data name="ConfigsText" xml:space="preserve">
         <value>Configs</value>
     </data>
@@ -1637,10 +1649,6 @@ Please choose another folder.</value>
     </data>
     <data name="WindowedModeText" xml:space="preserve">
         <value>Windowed</value>
-    </data>
-    <data name="NotSequenceReadArchiveText" xml:space="preserve">
-        <value>Not
-'Sequence Read Archive'</value>
     </data>
     <data name="RegistryUnsupportedError" xml:space="preserve">
         <value>Registry operations are not supported on non-Windows systems</value>

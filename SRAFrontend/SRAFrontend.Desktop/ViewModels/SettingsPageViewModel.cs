@@ -13,6 +13,7 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SRAFrontend.Data;
+using SRAFrontend.Desktop.Models;
 using SRAFrontend.Desktop.Services;
 using SRAFrontend.Desktop.Views;
 using SRAFrontend.Localization;
@@ -45,7 +46,9 @@ public partial class SettingsPageViewModel : PageViewModel
         CommonModel commonModel,
         RegistryService registryService,
         IBackendService backendService,
-        OverlayService overlayService, ReportService reportService) : base(PageName.Setting,
+        OverlayService overlayService,
+        ReportService reportService,
+        CommandPaletteService commandPaletteService) : base(PageName.Setting,
         "\uE272")
     {
         _settingsService = settingsService;
@@ -111,6 +114,10 @@ public partial class SettingsPageViewModel : PageViewModel
         _overlayService.SetOverlayDebugInfoEnabled(Settings.Advanced.IsDebugOverlayEnabled);
 
         _settingsService.SettingsPropertyChanged += OnSettingsPropertyChanged;
+        commandPaletteService.Register(new PaletteCommand(Resources.CheckForUpdateText, "settings.checkForUpdates", PaletteCategory.Sra)
+        {
+            Execute = CheckForUpdates
+        });
     }
 
     public IAvaloniaReadOnlyList<CustomizableKey> CustomizableKeys => _customizableKeys;

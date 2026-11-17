@@ -160,9 +160,9 @@
   <data name="InTheEndText" xml:space="preserve">
     <value>После выполнения</value>
   </data>
-  <data name="StopText" xml:space="preserve">
-    <value>Остановить</value>
-  </data>
+    <data name="StopText" xml:space="preserve">
+        <value>Остановить задачу</value>
+    </data>
   <data name="CurrentText" xml:space="preserve">
     <value>Текущая</value>
   </data>
@@ -1245,6 +1245,18 @@
     <data name="ExtensionDocText" xml:space="preserve">
         <value>Документация</value>
     </data>
+    <data name="CommandPaletteNoResults" xml:space="preserve">
+        <value>Команды не найдены</value>
+    </data>
+    <data name="CommandPalettePlaceholder" xml:space="preserve">
+        <value>Поиск команд...</value>
+    </data>
+    <data name="DeveloperScreenshotText" xml:space="preserve">
+        <value>Разработчик: снимок экрана игры</value>
+    </data>
+    <data name="ScreenshotFailedError" xml:space="preserve">
+        <value>Не удалось сделать снимок экрана</value>
+    </data>
     <data name="ConfigsText" xml:space="preserve">
         <value>Настройки</value>
     </data>
@@ -1637,10 +1649,6 @@
     </data>
     <data name="WindowedModeText" xml:space="preserve">
         <value>Оконный</value>
-    </data>
-    <data name="NotSequenceReadArchiveText" xml:space="preserve">
-        <value>Это не
-'Sequence Read Archive'</value>
     </data>
     <data name="RegistryUnsupportedError" xml:space="preserve">
         <value>Работа с реестром доступна только в Windows</value>

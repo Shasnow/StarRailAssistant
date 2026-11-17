@@ -157,7 +157,7 @@
         <value>任务结束</value>
     </data>
     <data name="StopText" xml:space="preserve">
-        <value>停止</value>
+        <value>停止任务</value>
     </data>
     <data name="CurrentText" xml:space="preserve">
         <value>启动当前配置</value>
@@ -1241,6 +1241,18 @@
     <data name="ExtensionDocText" xml:space="preserve">
         <value>文档</value>
     </data>
+    <data name="CommandPaletteNoResults" xml:space="preserve">
+        <value>没有匹配的命令</value>
+    </data>
+    <data name="CommandPalettePlaceholder" xml:space="preserve">
+        <value>搜索命令...</value>
+    </data>
+    <data name="DeveloperScreenshotText" xml:space="preserve">
+        <value>开发人员：获取游戏截图</value>
+    </data>
+    <data name="ScreenshotFailedError" xml:space="preserve">
+        <value>获取截图失败</value>
+    </data>
     <data name="ConfigsText" xml:space="preserve">
         <value>配置</value>
     </data>
@@ -1633,10 +1645,6 @@
     </data>
     <data name="WindowedModeText" xml:space="preserve">
         <value>窗口化</value>
-    </data>
-    <data name="NotSequenceReadArchiveText" xml:space="preserve">
-        <value>并非
-'Sequence Read Archive'</value>
     </data>
     <data name="RegistryUnsupportedError" xml:space="preserve">
         <value>非Windows系统不支持注册表操作</value>
