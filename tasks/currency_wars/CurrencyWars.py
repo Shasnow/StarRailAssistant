@@ -1224,10 +1224,15 @@ class CurrencyWars(Executable):
 
         def _drive_tea_break(_option: tuple[float, float]) -> bool:
             """推进茶歇事件：处理对话、特殊事件奖励与开箱，直到回到备战界面"""
-            self.operator.click_point(*_option, after_sleep=1)
             self.operator.do_while(
-                lambda : self.operator.locate(CWIMG.TEA_BREAK, from_x=0.65, from_y=0.8, to_x=0.9, to_y=0.9) is not None,
+                lambda : self.operator.click_point(*_option, after_sleep=1),
+                lambda : self.operator.ocr_match("幕后", from_x=0.46, from_y=0.13, to_x=0.53, to_y=0.18) is not None,
+                max_iterations=3
+            )
+            logger.info("[幕后茶歇] 已选择茶歇选项，推进对话")
+            self.operator.do_while(
                 lambda : self.operator.click_point(0.5, 0.5, after_sleep=1),
+                lambda : self.operator.locate(CWIMG.TEA_BREAK, from_x=0.65, from_y=0.8, to_x=0.9, to_y=0.9) is not None,
                 max_iterations=5
             )
             return_box = self.operator.wait_ocr("返回", from_x=0.58, from_y=0.38, to_x=0.96, to_y=0.8, timeout=3)
@@ -1243,11 +1248,12 @@ class CurrencyWars(Executable):
             self.operator.do_while(
                 lambda: self.operator.locate(CWIMG.CLICK_BLANK, from_x=0.65, from_y=0.8, to_x=0.9, to_y=0.9) is None,
                 lambda: self.operator.click_point(0.5, 0.9, after_sleep=1),
+                interval=1,
                 max_iterations=5
             )  # 点击空白处推进对话，直到出现「点击空白处继续」提示
             return True
 
-        if self.operator.ocr_match("享用茶歇", from_x=0.70, from_y=0.56, to_x=0.90, to_y=0.62) is None:
+        if self.operator.wait_ocr("幕后", from_x=0.46, from_y=0.13, to_x=0.53, to_y=0.18) is None:
             logger.error("[幕后茶歇] 未识别到茶歇事件界面")
             return False
         # 生命值偏低时优先享用茶歇回复生命，否则与奇遇伙伴对话获取特殊奖励
