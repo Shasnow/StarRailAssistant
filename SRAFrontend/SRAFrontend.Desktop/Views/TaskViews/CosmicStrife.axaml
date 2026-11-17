@@ -112,6 +112,13 @@
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Label Content="{x:Static lang:Resources.CurrencyWarsEncounterPartnerText}" />
+                                    <TextBox Width="320"
+                                             Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollPartners}"
+                                             PlaceholderText="{x:Static lang:Resources.CurrencyWarsEncounterPartnerPlaceholder}" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Label Content="{x:Static lang:Resources.CurrencyWarsBossAffixText}" />
                                     <TextBox Width="320"
                                              Text="{Binding CosmicStrifeConfig.CurrencyWarsRerollBossAffixes}"

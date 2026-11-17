@@ -1238,7 +1238,7 @@ class CurrencyWars(Executable):
             logger.info("[幕后茶歇] 已选择茶歇选项，推进对话")
             self.operator.do_while(
                 lambda : self.operator.click_point(0.5, 0.5, after_sleep=1),
-                lambda : self.operator.locate(CWIMG.TEA_BREAK, from_x=0.65, from_y=0.8, to_x=0.9, to_y=0.9) is not None,
+                lambda : self.operator.ocr_match("返回", from_x=0.58, from_y=0.38, to_x=0.96, to_y=0.8) is None,
                 max_iterations=5
             )
             return_box = self.operator.wait_ocr("返回", from_x=0.58, from_y=0.38, to_x=0.96, to_y=0.8, timeout=3)

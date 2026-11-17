@@ -26,6 +26,7 @@
     "currencyWars.pointRewards": "Пропускать «Валютные войны», если лимит очков космического противостояния достигнут",
     "currencyWars.reroll.bossAffixes": "Модификаторы босса для подбора старта в «Валютных войнах»",
     "currencyWars.reroll.bossNames": "Имя босса для подбора старта в «Валютных войнах»",
+    "currencyWars.reroll.partners": "Случайные спутники для подбора старта в «Валютных войнах»",
     "currencyWars.reroll.investEnvironments": "Инвестиционная среда для подбора старта в «Валютных войнах»",
     "currencyWars.reroll.investStrategies": "Инвестиционная стратегия для подбора старта в «Валютных войнах»",
     "currencyWars.runtimes": "Число партий «Валютных войн»; в подборе старта — число попыток",

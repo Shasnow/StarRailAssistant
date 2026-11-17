@@ -26,6 +26,7 @@
     "currencyWars.pointRewards": "When enabled, skip the Currency Wars task if Cosmic Strife point rewards are full",
     "currencyWars.reroll.bossAffixes": "Boss affixes for Currency Wars opening reroll",
     "currencyWars.reroll.bossNames": "Boss names for Currency Wars opening reroll",
+    "currencyWars.reroll.partners": "Encounter partners for Currency Wars opening reroll",
     "currencyWars.reroll.investEnvironments": "Investment environments for Currency Wars opening reroll",
     "currencyWars.reroll.investStrategies": "Investment strategies for Currency Wars opening reroll",
     "currencyWars.runtimes": "Number of runs for Currency Wars opening reroll",

@@ -1410,6 +1410,12 @@
     <data name="CurrencyWarsBossAffixPlaceholder" xml:space="preserve">
         <value>Например: 决战在即 !时间刺客 (ввод на китайском)</value>
     </data>
+    <data name="CurrencyWarsEncounterPartnerText" xml:space="preserve">
+        <value>Случайные спутники</value>
+    </data>
+    <data name="CurrencyWarsEncounterPartnerPlaceholder" xml:space="preserve">
+        <value>Например: 杨叔 阮·梅 (через пробел, ввод на китайском)</value>
+    </data>
     <data name="CurrencyWarsInvestmentEnvText" xml:space="preserve">
         <value>Инвестиционная среда</value>
     </data>

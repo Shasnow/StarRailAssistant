@@ -26,6 +26,7 @@
     "currencyWars.pointRewards": "启用后，若旷宇纷争积分奖励已满则跳过货币战争任务",
     "currencyWars.reroll.bossAffixes": "货币战争刷开局时的Boss词缀",
     "currencyWars.reroll.bossNames": "货币战争刷开局时的Boss名称",
+    "currencyWars.reroll.partners": "货币战争刷开局时的奇遇伙伴",
     "currencyWars.reroll.investEnvironments": "货币战争刷开局时的投资环境",
     "currencyWars.reroll.investStrategies": "货币战争刷开局时的投资策略",
     "currencyWars.runtimes": "货币战争刷开局时的运行次数",

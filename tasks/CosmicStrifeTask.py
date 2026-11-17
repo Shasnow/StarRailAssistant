@@ -51,6 +51,7 @@ class CosmicStrifeTask(BaseTask):
             rs_task.set_difficulty(difficulty)
             rs_task.load_strategy(strategy)
             rs_task.set_boss_name(self.config.CosmicStrife.currencyWarsRerollBossNames)
+            rs_task.set_encounter_partner(self.config.CosmicStrife.currencyWarsRerollPartners)
             rs_task.set_boss_affix(self.config.CosmicStrife.currencyWarsRerollBossAffixes)
             rs_task.set_invest_env(self.config.CosmicStrife.currencyWarsRerollInvestEnvironments)
             rs_task.set_invest_strategy(self.config.CosmicStrife.currencyWarsRerollInvestStrategies)

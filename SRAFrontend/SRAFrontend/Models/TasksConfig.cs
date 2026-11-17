@@ -226,6 +226,11 @@ public partial class CosmicStrifeConfig : ObservableObject
     private string _currencyWarsRerollBossNames = "";
 
     [ObservableProperty]
+    [property: JsonPropertyName("currencyWars.reroll.partners")]
+    [property: Description("货币战争刷开局时的奇遇伙伴")]
+    private string _currencyWarsRerollPartners = "";
+
+    [ObservableProperty]
     [property: JsonPropertyName("currencyWars.reroll.investEnvironments")]
     [property: Description("货币战争刷开局时的投资环境")]
     private string _currencyWarsRerollInvestEnvironments = "";

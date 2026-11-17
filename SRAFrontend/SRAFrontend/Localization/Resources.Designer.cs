@@ -1115,6 +1115,24 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to e.g. 杨叔 阮·梅.
+        /// </summary>
+        public static string CurrencyWarsEncounterPartnerPlaceholder {
+            get {
+                return ResourceManager.GetString("CurrencyWarsEncounterPartnerPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Encounter partners.
+        /// </summary>
+        public static string CurrencyWarsEncounterPartnerText {
+            get {
+                return ResourceManager.GetString("CurrencyWarsEncounterPartnerText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to e.g. 长线利好 ?轮岗.
         /// </summary>
         public static string CurrencyWarsInvestmentEnvPlaceholder {

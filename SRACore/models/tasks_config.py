@@ -72,6 +72,7 @@ class CosmicStrifeConfig(_Model):
     isCurrencyWarsPointRewardsEnabled: bool = Field(False, alias="currencyWars.pointRewards", description='启用后，若旷宇纷争积分奖励已满则跳过货币战争任务')
     currencyWarsRerollBossAffixes: str = Field("", alias="currencyWars.reroll.bossAffixes", description='货币战争刷开局时的Boss词缀')
     currencyWarsRerollBossNames: str = Field("", alias="currencyWars.reroll.bossNames", description='货币战争刷开局时的Boss名称')
+    currencyWarsRerollPartners: str = Field("", alias="currencyWars.reroll.partners", description='货币战争刷开局时的奇遇伙伴')
     currencyWarsRerollInvestEnvironments: str = Field("", alias="currencyWars.reroll.investEnvironments", description='货币战争刷开局时的投资环境')
     currencyWarsRerollInvestStrategies: str = Field("", alias="currencyWars.reroll.investStrategies", description='货币战争刷开局时的投资策略')
     currencyWarsRuntimes: int = Field(1, alias="currencyWars.runtimes", description='货币战争刷开局时的运行次数')

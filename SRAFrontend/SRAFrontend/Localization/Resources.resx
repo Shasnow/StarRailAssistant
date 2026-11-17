@@ -1410,6 +1410,12 @@ Please choose another folder.</value>
     <data name="CurrencyWarsBossAffixPlaceholder" xml:space="preserve">
         <value>e.g. 决战在即 !时间刺客</value>
     </data>
+    <data name="CurrencyWarsEncounterPartnerText" xml:space="preserve">
+        <value>Encounter partners</value>
+    </data>
+    <data name="CurrencyWarsEncounterPartnerPlaceholder" xml:space="preserve">
+        <value>e.g. 杨叔 阮·梅 (separated by spaces)</value>
+    </data>
     <data name="CurrencyWarsInvestmentEnvText" xml:space="preserve">
         <value>Investment environments</value>
     </data>

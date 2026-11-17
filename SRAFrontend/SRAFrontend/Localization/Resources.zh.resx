@@ -1406,6 +1406,12 @@
     <data name="CurrencyWarsBossAffixPlaceholder" xml:space="preserve">
         <value>例如：决战在即 !时间刺客</value>
     </data>
+    <data name="CurrencyWarsEncounterPartnerText" xml:space="preserve">
+        <value>奇遇伙伴</value>
+    </data>
+    <data name="CurrencyWarsEncounterPartnerPlaceholder" xml:space="preserve">
+        <value>例如：杨叔 阮·梅（空格分隔）</value>
+    </data>
     <data name="CurrencyWarsInvestmentEnvText" xml:space="preserve">
         <value>投资环境</value>
     </data>
