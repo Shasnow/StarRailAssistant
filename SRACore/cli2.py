@@ -1,6 +1,7 @@
 import argparse
 import json
 import sys
+import threading
 from collections.abc import Callable
 from typing import Any
 
@@ -41,6 +42,11 @@ class SRACli(cmd2.Cmd):
         self.task_manager = context.task_manager
         self.extension_config_manager = context.extension_config_manager
         self.extension_runner = context.extension_runner
+
+        # 后台服务端（serve 命令）
+        self._serve_server: Any = None
+        self._serve_thread: threading.Thread | None = None
+        self._serve_url: str = ""
 
     def precmd(self, statement: cmd2.Statement | str) -> cmd2.Statement:
         """在执行命令前检查是否需要使用 JSON 输出"""
@@ -566,6 +572,81 @@ class SRACli(cmd2.Cmd):
         self.ok(Resources.cli_initCompleted)
         return True
 
+    @staticmethod
+    def _build_serve_parser() -> cmd2.Cmd2ArgumentParser:
+        parser = cmd2.Cmd2ArgumentParser(description=Resources.cli_argHelp_serverDescription)
+        parser.add_argument('action', nargs='?', choices=('start', 'stop', 'status'), default='start',
+                            help="start 后台启动（默认）/ stop 停止 / status 查看状态")
+        parser.add_argument('--host', action='store_true', help=Resources.cli_argHelp_serverHost)
+        parser.add_argument('--port', type=int, default=None, help=Resources.cli_argHelp_serverPort)
+        parser.add_argument('--no-webui', action='store_true', help=Resources.cli_argHelp_serverNoWebui)
+        return parser
+
+    def _is_serve_running(self) -> bool:
+        return self._serve_thread is not None and self._serve_thread.is_alive()
+
+    def _stop_serve(self) -> bool:
+        """请求服务端优雅退出并等待线程结束。"""
+        if not self._is_serve_running():
+            self._serve_server = None
+            self._serve_thread = None
+            self._serve_url = ""
+            return False
+
+        self._serve_server.should_exit = True
+        self._serve_thread.join(5.0)  # pyright: ignore[reportOptionalMemberAccess]
+        if self._serve_thread.is_alive():  # pyright: ignore[reportOptionalMemberAccess]
+            self.err("服务端停止超时")
+            return False
+
+        self._serve_server = None
+        self._serve_thread = None
+        self._serve_url = ""
+        return True
+
+    @cmd2.with_argparser(_build_serve_parser)
+    def do_serve(self, args: argparse.Namespace) -> None:
+        """Expose the current context through the HTTP server (runs in background)."""
+        if args.action == 'stop':
+            if self._stop_serve():
+                self.ok("服务端已停止")
+            else:
+                self.err("服务端未运行")
+            return
+
+        if args.action == 'status':
+            if self._is_serve_running():
+                self.ok(f"服务端正在运行：{self._serve_url}")
+            else:
+                self.ok("服务端未运行")
+            return
+
+        if self._is_serve_running():
+            self.err(f"服务端已在运行：{self._serve_url}（serve stop 停止）")
+            return
+
+        from SRAServer.__main__ import create_server
+
+        try:
+            server = create_server(
+                host=args.host,
+                port=args.port,
+                webui=False if args.no_webui else None,
+                context=self.context,
+            )
+        except SystemExit:
+            # create_server 已打印缺失依赖的安装提示
+            return
+
+        # 服务端控制台（SSE）复用当前进程的日志流
+        self.context.enable_log_stream()
+        thread = threading.Thread(target=server.run, name="sra-server", daemon=True)
+        thread.start()
+        self._serve_server = server
+        self._serve_thread = thread
+        self._serve_url = f"http://{server.config.host}:{server.config.port}"
+        self.ok(f"服务端已在后台启动：{self._serve_url}（serve stop 停止）")
+
     def do_version(self, _: str):
         """Show version information"""
         self.ok(Resources.cli_versionTitle, VERSION)
@@ -608,7 +689,9 @@ class SRACli(cmd2.Cmd):
     # region 生命周期管理
 
     def _cleanup(self):
-        """清理资源：停止运行中的工作并释放全局键盘监听"""
+        """清理资源：先停后台服务端，再停止运行中的工作并释放全局键盘监听"""
+        if self._is_serve_running():
+            self._stop_serve()
         self.context.shutdown()
 
     # endregion

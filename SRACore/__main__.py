@@ -173,12 +173,28 @@ def serve_parser() -> argparse.ArgumentParser:
         action='store_true',
         help=Resources.cli_argHelp_serverNoWebui,
     )
+    parser.add_argument(
+        '--no-admin',
+        action='store_true',
+        help=Resources.cli_argHelp_noAdmin,
+    )
     return parser
 
 def serve(args: argparse.Namespace) -> bool:
-    """启动服务端（与 ``sra-server`` 共用 ``SRAServer.run_server``，进程内运行）。"""
-    from SRAServer.__main__ import run_server
-    run_server(host=args.host, port=args.port, webui=False if args.no_webui else None)
+    """启动服务端：转交 ``SRAServer.main``，复用其参数解析与管理员自提权。"""
+    from SRAServer.__main__ import main as server_main
+
+    argv: list[str] = []
+    if args.host:
+        argv.append('--host')
+    if args.port is not None:
+        argv.extend(('--port', str(args.port)))
+    if args.no_webui:
+        argv.append('--no-webui')
+    # 写在 subcommand 之前的 --no-admin 已被顶层解析器消费，sys.argv 里仍保留原始参数
+    if args.no_admin or '--no-admin' in sys.argv:
+        argv.append('--no-admin')
+    server_main(argv)
     return True
 
 

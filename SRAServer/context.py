@@ -29,9 +29,17 @@ from SRAServer.config import ServerConfig
 class ServerContext:
     """服务端宿主：AppContext + 服务端配置（AccessToken / 访问模式等）。"""
 
-    def __init__(self, config: ServerConfig) -> None:
+    def __init__(self, config: ServerConfig, context: AppContext | None = None) -> None:
+        """构造服务端宿主。
+
+        Args:
+            config: 服务端配置。
+            context: 复用的 ``AppContext``（CLI 内嵌服务端时传入，与命令行共享任务/扩展状态）；
+                缺省时新建，并在服务停止时负责释放。
+        """
         self.config = config
-        self._context = AppContext(log_level=config.log_level, with_log_stream=True)
+        self._context = context or AppContext(log_level=config.log_level, with_log_stream=True)
+        self._owns_context = context is None
 
     # ── 服务层（委托 AppContext）──
 
@@ -77,8 +85,15 @@ class ServerContext:
         self._context.bind_event_loop(loop)
 
     def shutdown(self) -> None:
-        """停止运行中的工作并释放全局键盘监听（进程退出时调用）。"""
-        self._context.shutdown()
+        """停止运行中的工作并释放全局键盘监听（进程退出时调用）。
+
+        复用外部 ``AppContext``（CLI 内嵌模式）时只解除事件循环绑定，
+        让命令行在服务停止后继续可用。
+        """
+        if self._owns_context:
+            self._context.shutdown()
+        else:
+            self._context.log_stream.bind_loop(None)
 
     def request_stop_all(self) -> None:
         self._context.request_stop_all()

@@ -60,9 +60,11 @@ class AppContext:
         setup_logger(level=log_level)
 
         self.log_stream = LogStreamService()
+        self._log_level = log_level
+        self._log_format = log_format
+        self._log_stream_sink_id: int | None = None
         if with_log_stream:
-            # CLI 不接 SSE，默认不注册 sink；服务端显式开启
-            logger.add(self.log_stream.sink, level=log_level, format=log_format, enqueue=False)
+            self.enable_log_stream()
 
         dynamic_import("tasks")
         load_extensions()
@@ -88,6 +90,14 @@ class AppContext:
         logger.info(f"SRA core ready (language={self.settings.settings.Display.Language}).")
 
     # ── 基础设施 ──
+
+    def enable_log_stream(self) -> None:
+        """把日志同步到 ``LogStreamService``（CLI 内嵌服务端时按需开启，重复调用无副作用）。"""
+        if self._log_stream_sink_id is not None:
+            return
+        self._log_stream_sink_id = logger.add(
+            self.log_stream.sink, level=self._log_level, format=self._log_format, enqueue=False
+        )
 
     @staticmethod
     def _ensure_dirs() -> None:

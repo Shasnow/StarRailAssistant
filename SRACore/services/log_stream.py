@@ -21,8 +21,8 @@ class LogStreamService:
         self._subscribers: list[asyncio.Queue[str]] = []
         self._loop: asyncio.AbstractEventLoop | None = None
 
-    def bind_loop(self, loop: asyncio.AbstractEventLoop) -> None:
-        """绑定事件循环，供其他线程中的 sink 调度广播。"""
+    def bind_loop(self, loop: asyncio.AbstractEventLoop | None) -> None:
+        """绑定事件循环，供其他线程中的 sink 调度广播；传 ``None`` 解除绑定。"""
         self._loop = loop
 
     def sink(self, message: Any) -> None:
