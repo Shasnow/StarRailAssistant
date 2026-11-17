@@ -98,7 +98,8 @@ class CurrencyWars(Executable):
             "奇兽花园": ("奇兽花园", self.handle_beast_garden),
             "梦境交织": ("梦境交织", self.handle_dream_interference),
             "巡海游侠": ("巡海游侠", self.handle_sea_trader),
-            "黑市主理人": ("黑市主理人", self.handle_black_market_manager)
+            "黑市主理人": ("黑市主理人", self.handle_black_market_manager),
+            "双龙吟": ("双龙吟", self.handle_double_dragon),
         }
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
@@ -1169,6 +1170,11 @@ class CurrencyWars(Executable):
     def handle_black_market_manager(self):
         """处理黑市主理人事件的逻辑"""
         return self.operator.press_key("esc")
+
+    def handle_double_dragon(self):
+        """处理双龙吟事件的逻辑"""
+        return self._handle_selection_event((0.22, 0.30, 0.85, 0.35),
+                                            self.strategy_special_events.get("双龙吟", ""))
 
     def detect_special_event(self) -> str:
         """检测当前是否有特殊事件发生，并返回事件名称"""
