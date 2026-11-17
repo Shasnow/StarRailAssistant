@@ -100,6 +100,7 @@ class CurrencyWars(Executable):
             "巡海游侠": ("巡海游侠", self.handle_sea_trader),
             "黑市主理人": ("黑市主理人", self.handle_black_market_manager),
             "双龙吟": ("双龙吟", self.handle_double_dragon),
+            "苍龙濯世": ("苍龙濯世", self.handle_world_cleansing_dragon),
         }
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
@@ -601,6 +602,7 @@ class CurrencyWars(Executable):
                     self.sort_all_areas_by_priority()  # 优先级排序
                     continue
                 break
+            self.handle_special_event()
             if not self.stage_transition():
                 break
             if self.is_game_over:  # 任务已被标记为停止, 需要退出循环
@@ -1176,6 +1178,11 @@ class CurrencyWars(Executable):
         return self._handle_selection_event((0.22, 0.30, 0.85, 0.35),
                                             self.strategy_special_events.get("双龙吟", ""))
 
+    def handle_world_cleansing_dragon(self):
+        """处理苍龙濯世事件的逻辑"""
+        return self._handle_selection_event((0.22, 0.12, 0.85, 0.17),
+                                            self.strategy_special_events.get("苍龙濯世", ""))
+
     def detect_special_event(self) -> str:
         """检测当前是否有特殊事件发生，并返回事件名称"""
         result = self.operator.ocr(from_x=0.49, from_y=0.038, to_x=0.60, to_y=0.11)
@@ -1196,6 +1203,7 @@ class CurrencyWars(Executable):
 
     def handle_special_event(self):
         """处理特殊事件的逻辑"""
+        logger.debug("检测特殊事件")
         event = self.detect_special_event()
 
         if event:
