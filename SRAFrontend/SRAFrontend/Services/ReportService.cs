@@ -67,7 +67,7 @@ public class ReportService(
         }
     }
 
-    public void Report(string eventType, string eventData, int timeoutMs = 2000)
+    public void Report(string eventType, string eventData, int timeoutMs = 5000)
     {
         try
         {
@@ -76,16 +76,20 @@ public class ReportService(
             httpClient.Timeout = TimeSpan.FromMilliseconds(timeoutMs);
 
             var appEvent = CreateAppEvent(eventType, eventData);
-            var response = httpClient.PostAsJsonAsync(ReportUrl, appEvent).Result;
+            var response = httpClient.PostAsJsonAsync(ReportUrl, appEvent).GetAwaiter().GetResult();
             response.EnsureSuccessStatusCode();
             logger.LogInformation("Reported event {EventType} successfully.", eventType);
         }
-        catch (AggregateException ex)
+        catch (TaskCanceledException ex)
         {
-            // 捕获Result的聚合异常，解析实际错误
-            var innerEx = ex.InnerException ?? ex;
-            logger.LogError(innerEx, "Failed to report event {EventType}, inner error: {Msg}",
-                eventType, innerEx.Message);
+            // 程序退出或超时导致请求被取消，属于上报的预期内失败，不输出堆栈
+            logger.LogWarning("Report event {EventType} canceled or timed out: {Message}",
+                eventType, ex.Message);
+        }
+        catch (HttpRequestException ex)
+        {
+            // 网络不可用等连接问题同样只记录简要信息
+            logger.LogWarning("Failed to report event {EventType}: {Message}", eventType, ex.Message);
         }
         catch (Exception ex)
         {
