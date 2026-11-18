@@ -15,7 +15,7 @@ public enum UiLanguage
 
 public class AppSettings
 {
-    public const string Version = "2.25.6"; // 应用版本号
+    public const string Version = "2.26.0"; // 应用版本号
 
     [JsonPropertyName("general"), Description("通用设置")] public GeneralSettings General { get; init; } = new();
 
