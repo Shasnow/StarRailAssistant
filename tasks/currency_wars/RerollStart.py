@@ -232,7 +232,11 @@ class RerollStart(CurrencyWars):
             # 当前阶段的必需策略未匹配到，直接重开
             logger.info(f"阶段{self.invest_strategy_stage}投资策略未满足要求，准备重开...")
             self.operator.click_img(CWIMG.BACK_PREPARE_PAGE, after_sleep=0.5)
-            self.abort_and_return()
+            if not self.abort_and_return():
+                # 退出对局失败，画面可能停在未知界面；停止任务避免后续流程在错误页面误操作
+                logger.error("投资策略重开失败，停止刷开局任务")
+                self.is_game_over = True
+                self.is_running = False
             self.invest_strategy_stage = 0
 
         # 检测是否为同一阶段的re-trigger（游戏连续两次弹出投资策略选择界面）
@@ -296,7 +300,11 @@ class RerollStart(CurrencyWars):
 
     def handle_stage_transitioned(self) -> bool:
         if self.reroll:
-            self.abort_and_return()
+            if not self.abort_and_return():
+                # 退出对局失败，停止任务避免后续流程在错误页面误操作
+                logger.error("刷开局重开失败，停止刷开局任务")
+                self.is_game_over = True
+                self.is_running = False
             self.reroll = False
             return False
         return self.is_running

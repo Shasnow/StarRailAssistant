@@ -581,7 +581,7 @@ class CurrencyWars(Executable):
             self.operator.click_box(box, after_sleep=1)
 
         # 结算页面出现较慢，延长等待时间
-        if self.operator.wait_img(CWIMG.NEXT_STEP, timeout=20) is None:
+        if self.operator.wait_img(CWIMG.NEXT_STEP, timeout=120) is None:
             return False
         self.handle_game_over(None)
         return True
@@ -1000,10 +1000,10 @@ class CurrencyWars(Executable):
 
         img_list = [cfg[0] for cfg in stage_config]
 
+        prev_stage_name: StageName | None = None
         while True:  # 用无限循环 + 内部break控制退出
             stage_index, _ = self.operator.wait_any_img(img_list, timeout=15, interval=1)
             self.operator.sleep(1.5)
-            prev_stage_name: StageName | None = None
             # 检查是否超时（未识别到任何状态）
             if stage_index == -1:
                 if self.operator.click_img(CWIMG.STORE):
