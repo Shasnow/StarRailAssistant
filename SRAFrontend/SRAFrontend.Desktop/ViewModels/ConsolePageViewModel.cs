@@ -55,19 +55,15 @@ public partial class ConsolePageViewModel : PageViewModel
         _backendService.StartBackend(Arguments);
         FilterOptions.CollectionChanged += (_, _) => OnPropertyChanged(nameof(ConsoleLines));
         // 命令面板：导出日志
-        commandPalette.Register(new PaletteCommand(Resources.ExportLogsText, "console.exportLogs", PaletteCategory.Tools)
-        {
-            Execute = () => ExportLogsCommand.Execute(null)
-        });
-        commandPalette.Register(new PaletteCommand(Resources.DeveloperScreenshotText, "developer.screenshot",
-            PaletteCategory.Developer)
-        {
-            Execute = () => _ = CaptureScreenshotAsync()
-        });
-        commandPalette.Register(new PaletteCommand("开发人员：重载任务", "developer.reloadTask", PaletteCategory.Developer)
-        {
-            Execute = () => _ = ReloadTasksAsync()
-        });
+        commandPalette.Register(
+            new PaletteCommand("console.exportLogs", Resources.ExportLogsText, PaletteCategory.Tools),
+            () => ExportLogsCommand.Execute(null));
+        commandPalette.Register(
+            new PaletteCommand("developer.screenshot", Resources.DeveloperScreenshotText, PaletteCategory.Developer),
+            () => _ = CaptureScreenshotAsync());
+        commandPalette.Register(
+            new PaletteCommand("developer.reloadTask", "开发人员：重载任务", PaletteCategory.Developer),
+            () => _ = ReloadTasksAsync());
     }
 
     /// <summary>命令面板入口：保存一张游戏截图，失败时提示（命令面板不展示返回值）。</summary>

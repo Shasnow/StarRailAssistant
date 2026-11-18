@@ -45,10 +45,9 @@ public partial class TaskPageViewModel : PageViewModel
 
         _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
 
-        commandPaletteService.Register(new PaletteCommand("货币战争：导入攻略", "cw.importStrategy", PaletteCategory.Tools)
-        {
-            Execute = () => InstallStrategyCommand.Execute(null)
-        });
+        commandPaletteService.Register(
+            new PaletteCommand("cw.importStrategy", "货币战争：导入攻略", PaletteCategory.Tools),
+            () => InstallStrategyCommand.Execute(null));
         
         if (Cache.Strategies.Count == 0) _ = RefreshStrategies();
         return;

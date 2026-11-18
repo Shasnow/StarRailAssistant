@@ -47,22 +47,18 @@ public partial class ControlPanelViewModel : ViewModelBase
         {
             if (args.PropertyName == nameof(IBackendService.IsTaskRunning)) OnPropertyChanged(nameof(CanStart));
         };
-        commandPaletteService.Register(new PaletteCommand(Resources.CurrentText, "task.runCurrent", PaletteCategory.Task)
-        {
-            Execute = () => _ = StartCurrentConfigAsync()
-        });
-        commandPaletteService.Register(new PaletteCommand(Resources.AllText, "task.runAll", PaletteCategory.Task)
-        {
-            Execute = () => _ = StartAllConfigsAsync()
-        });
-        commandPaletteService.Register(new PaletteCommand(Resources.SaveOnlyText, "task.saveOnly", PaletteCategory.Task)
-        {
-            Execute = SaveConfigs
-        });
-        commandPaletteService.Register(new PaletteCommand(Resources.StopText, "task.stop", PaletteCategory.Task)
-        {
-            Execute = () => _ = StopButton()
-        });
+        commandPaletteService.Register(
+            new PaletteCommand("task.runCurrent", Resources.CurrentText, PaletteCategory.Task),
+            () => _ = StartCurrentConfigAsync());
+        commandPaletteService.Register(
+            new PaletteCommand("task.runAll", Resources.AllText, PaletteCategory.Task),
+            () => _ = StartAllConfigsAsync());
+        commandPaletteService.Register(
+            new PaletteCommand("task.saveOnly", Resources.SaveOnlyText, PaletteCategory.Task),
+            SaveConfigs);
+        commandPaletteService.Register(
+            new PaletteCommand("task.stop", Resources.StopText, PaletteCategory.Task),
+            () => _ = StopButton());
     }
 
     public string StartModeText

@@ -54,8 +54,7 @@ public partial class MainWindowViewModel : ViewModelBase
         Pages = new AvaloniaList<PageViewModel>(pages);
         SelectedPage = Pages[0];
         RegisterPaletteCommands();
-        PaletteResults = new ObservableCollection<PaletteCommand>(
-            _commandPaletteService.Commands.OrderBy(command => command.Category));
+        PaletteResults = new ObservableCollection<PaletteCommand>(_commandPaletteService.Commands);
         PaletteSelected = PaletteResults.FirstOrDefault();
         // 其他视图模型可能在使用过程中补充命令，集合变化后刷新过滤结果
         _commandPaletteService.Changed += (_, _) => Dispatcher.UIThread.Post(RefreshPaletteResults);
@@ -117,40 +116,32 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         foreach (var page in Pages)
         {
-            _commandPaletteService.Register(new PaletteCommand(page.DisplayName, $"view.toggle{page.PageId}", PaletteCategory.View)
-            {
-                Execute = () => SelectedPage = page
-            });
+            _commandPaletteService.Register(
+                new PaletteCommand($"view.toggle{page.PageId}", page.DisplayName, PaletteCategory.View),
+                () => SelectedPage = page);
         }
 
-        _commandPaletteService.Register(new PaletteCommand(Resources.ToggleThemeTooltip, "view.toggleTheme", PaletteCategory.View)
-        {
-            Execute = SwitchLightMode
-        });
-        _commandPaletteService.Register(new PaletteCommand(Resources.AnnouncementsText, "view.announcements", PaletteCategory.View)
-        {
-            Execute = ShowAnnouncementBoard
-        });
-        _commandPaletteService.Register(new PaletteCommand(Resources.EventCalendarText, "view.events", PaletteCategory.View)
-        {
-            Execute = ShowActivity
-        });
-        _commandPaletteService.Register(new PaletteCommand(Resources.GithubToolTipText, "open.github", PaletteCategory.Link)
-        {
-            Execute = () => UrlUtil.OpenUrl("https://github.com/Shasnow/StarRailAssistant")
-        });
-        _commandPaletteService.Register(new PaletteCommand(Resources.WebsiteToolTipText, "open.website", PaletteCategory.Link)
-        {
-            Execute = () => UrlUtil.OpenUrl("https://starrailassistant.top")
-        });
-        _commandPaletteService.Register(new PaletteCommand(Resources.FaqText, "open.faq", PaletteCategory.Link)
-        {
-            Execute = () => UrlUtil.OpenUrl("https://starrailassistant.top/getting-started/faq/")
-        });
-        _commandPaletteService.Register(new PaletteCommand(Resources.SponsorText, "open.sponsor", PaletteCategory.Link)
-        {
-            Execute = () => UrlUtil.OpenUrl("https://starrailassistant.top/sponsor/")
-        });
+        _commandPaletteService.Register(
+            new PaletteCommand("view.toggleTheme", Resources.ToggleThemeTooltip, PaletteCategory.View),
+            SwitchLightMode);
+        _commandPaletteService.Register(
+            new PaletteCommand("view.announcements", Resources.AnnouncementsText, PaletteCategory.View),
+            ShowAnnouncementBoard);
+        _commandPaletteService.Register(
+            new PaletteCommand("view.events", Resources.EventCalendarText, PaletteCategory.View),
+            ShowActivity);
+        _commandPaletteService.Register(
+            new PaletteCommand("open.github", Resources.GithubToolTipText, PaletteCategory.Link),
+            () => UrlUtil.OpenUrl("https://github.com/Shasnow/StarRailAssistant"));
+        _commandPaletteService.Register(
+            new PaletteCommand("open.website", Resources.WebsiteToolTipText, PaletteCategory.Link),
+            () => UrlUtil.OpenUrl("https://starrailassistant.top"));
+        _commandPaletteService.Register(
+            new PaletteCommand("open.faq", Resources.FaqText, PaletteCategory.Link),
+            () => UrlUtil.OpenUrl("https://starrailassistant.top/getting-started/faq/"));
+        _commandPaletteService.Register(
+            new PaletteCommand("open.sponsor", Resources.SponsorText, PaletteCategory.Link),
+            () => UrlUtil.OpenUrl("https://starrailassistant.top/sponsor/"));
     }
 
     [RelayCommand]
@@ -173,7 +164,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var command = PaletteSelected;
         if (command is null) return;
         ClosePalette();
-        command.Execute?.Invoke();
+        _commandPaletteService.Execute(command.Id);
     }
 
     /// <summary>命令面板中上下移动选中项，超出两端时循环。</summary>
@@ -196,8 +187,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var matched = _commandPaletteService.Commands.Where(command =>
                 query.Length == 0 ||
                 command.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                command.Subtitle.Contains(query, StringComparison.OrdinalIgnoreCase))
-            .OrderBy(command => command.Category)
+                command.Id.Contains(query, StringComparison.OrdinalIgnoreCase))
             .ToList();
         PaletteResults.Clear();
         foreach (var command in matched) PaletteResults.Add(command);

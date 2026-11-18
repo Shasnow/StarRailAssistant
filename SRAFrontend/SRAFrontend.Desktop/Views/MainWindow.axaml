@@ -162,7 +162,7 @@
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                                 <StackPanel Spacing="2">
                                     <TextBlock FontSize="14" Foreground="{DynamicResource PaletteForegroundBrush}" Text="{Binding Title}" />
-                                    <TextBlock FontSize="14" Foreground="{DynamicResource PaletteSecondaryForegroundBrush}" Text="{Binding Subtitle}" />
+                                    <TextBlock FontSize="14" Foreground="{DynamicResource PaletteSecondaryForegroundBrush}" Text="{Binding Id}" />
                                 </StackPanel>
                                 <TextBlock Grid.Column="1"
                                            VerticalAlignment="Center"

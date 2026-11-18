@@ -115,10 +115,15 @@ public partial class SettingsPageViewModel : PageViewModel
         _overlayService.SetOverlayDebugInfoEnabled(Settings.Advanced.IsDebugOverlayEnabled);
 
         _settingsService.SettingsPropertyChanged += OnSettingsPropertyChanged;
-        commandPaletteService.Register(new PaletteCommand(Resources.CheckForUpdateText, "settings.checkForUpdates", PaletteCategory.Sra)
-        {
-            Execute = CheckForUpdates
-        });
+        commandPaletteService.Register(
+            new PaletteCommand("settings.checkForUpdates", Resources.CheckForUpdateText, PaletteCategory.Sra),
+            CheckForUpdates);
+        commandPaletteService.Register(
+            new PaletteCommand("advanced.startServer", "启动 SRAServer", PaletteCategory.Sra),
+            () => backendService.SendInput("serve"));
+        commandPaletteService.Register(
+            new PaletteCommand("advanced.stopServer", "停止 SRAServer", PaletteCategory.Sra),
+            () => backendService.SendInput("serve stop"));
     }
 
     public IAvaloniaReadOnlyList<CustomizableKey> CustomizableKeys => _customizableKeys;
