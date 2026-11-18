@@ -20,6 +20,8 @@
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Include="Assets\background\default.jpg" />
+        <!-- 随日志压缩包导出的 AI 分析指引（只含日志阅读说明，不含开发约定） -->
+        <EmbeddedResource Include="Assets\AGENTS.md" />
     </ItemGroup>
 
     <ItemGroup>
