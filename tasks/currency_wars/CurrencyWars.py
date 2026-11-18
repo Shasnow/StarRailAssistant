@@ -887,6 +887,96 @@ class CurrencyWars(Executable):
             self.operator.sleep(0.5)
         logger.info("出售操作完成")
 
+    # 人口计数（当前/上限）的识别区域：某些事件会让原本只占 1 个人口的角色改为占 2 个，
+    # 原本刚好满编的阵容就会超出上限，此时游戏会静默拒绝出战（点了没有任何反应）。
+    POPULATION_AREA = {"from_x": 0.44, "from_y": 0.19, "to_x": 0.57, "to_y": 0.29}
+
+    def get_population(self) -> tuple[int, int] | None:
+        """读取人口计数（当前/上限），读数不完整时返回 None。"""
+        result = self.operator.ocr(**self.POPULATION_AREA)
+        if not result:
+            return None
+        text = _merge_ocr_text(result)
+        match = re.search(r"(\d{1,2})\s*[/／]\s*(\d{1,2})", text)
+        if match is None:
+            logger.debug(f"人口计数无法解析：{text}")
+            return None
+        current, capacity = int(match.group(1)), int(match.group(2))
+        # 上限最大为等级上限，当前人数最多是每个位置都占 2 个人口
+        if not 1 <= capacity <= 12 or not 0 <= current <= 2 * capacity:
+            logger.debug(f"人口计数超出合理范围：{text}")
+            return None
+        logger.debug(f"人口计数：{current}/{capacity}")
+        return current, capacity
+
+    def ensure_population_allows_battle(self) -> bool:
+        """确认人口未超上限，超限时撤下角色腾出人口。
+
+        :return: 处理后可出战（人口未超限，或读数不可用无法判断）返回 True，仍超限返回 False
+        """
+        population = self.get_population()
+        if population is None:
+            logger.debug("未读取到人口计数，跳过人口超限处理")
+            return True
+        current, capacity = population
+        if current <= capacity:
+            return True
+        logger.warning(f"人口超出上限：{current}/{capacity}，撤下角色腾出人口后再出战")
+        for area_type, index in self._population_withdraw_candidates():
+            if not self._withdraw_character(area_type, index):
+                continue
+            population = self.get_population()
+            if population is None:
+                return True
+            current, capacity = population
+            logger.info(f"腾出人口后：{current}/{capacity}")
+            if current <= capacity:
+                return True
+        logger.warning(f"未能腾出足够人口：{current}/{capacity}")
+        return False
+
+    def _population_withdraw_candidates(self) -> list[tuple[str, int]]:
+        """按撤离代价从低到高列出场上角色：先后台、后前台，优先级低的先撤。"""
+        def by_priority(characters: list[Character | None]) -> list[int]:
+            present = [(c.priority or 0, i) for i, c in enumerate(characters)
+                       if c is not None and not c.is_locked]
+            return [i for _, i in sorted(present)]
+
+        candidates = [('off_field', i) for i in by_priority(self.off_field_character)]
+        on_field = by_priority(self.on_field_character)
+        # 前台至少要留一名角色，否则无法出战
+        if len(on_field) > 1:
+            candidates += [('on_field', i) for i in on_field[:-1]]
+        return candidates
+
+    def _withdraw_character(self, area_type: str, index: int) -> bool:
+        """把场上角色撤回备战席；备战席已满时改为出售该角色。"""
+        if area_type == 'off_field':
+            characters, areas, area_name = self.off_field_character, self.off_field_area, "后台"
+        else:
+            characters, areas, area_name = self.on_field_character, self.on_field_area, "前台"
+        character = characters[index]
+        if character is None:
+            return False
+        free_index = self._free_in_hand_index()
+        if free_index is not None:
+            logger.info(f"将{area_name}角色 {character.name} 撤回备战席以腾出人口")
+            return self.swap_character_between_areas(area_type, index, 'in_hand', free_index)
+        logger.info(f"备战席已满，出售{area_name}角色 {character.name} 以腾出人口")
+        self.operator.drag_to(areas[index][0], areas[index][1], 0.05, 0.86)
+        self.operator.sleep(0.5)
+        characters[index] = None
+        character.is_placed = False
+        return True
+
+    def _free_in_hand_index(self) -> int | None:
+        """找一个空的备战席位置；本地数据没有空位时重新识别一次。"""
+        free = next((i for i, c in enumerate(self.in_hand_character) if c is None), None)
+        if free is not None:
+            return free
+        self.get_in_hand_area(True)
+        return next((i for i, c in enumerate(self.in_hand_character) if c is None), None)
+
     def battle(self) -> bool:
         # 按钮偶现点击不生效：点击后需确认按钮消失，未消失则重试
         button_labels = ["出战", "跳过", "幕后茶歇", "选择主角"]
@@ -898,6 +988,9 @@ class CurrencyWars(Executable):
             if index == -1:
                 # 没有识别到任何已知按钮
                 raise RuntimeError("未识别到战斗按钮或跳过按钮")
+            if index == 0:
+                # 出战前复核人口：超出上限时点击出战不会生效
+                self.ensure_population_allows_battle()
             for _ in range(3):
                 self.operator.click_box(box, after_sleep=1.5)
                 retry_box = self.operator.ocr_match(button_labels[index], **button_region)  # pyright: ignore[reportArgumentType]
@@ -906,9 +999,17 @@ class CurrencyWars(Executable):
                 box = retry_box  # 用重新定位的位置重试
             else:
                 logger.warning(f"点击「{button_labels[index]}」后按钮未消失，点击可能未生效")
+                if index == 0:
+                    if not self.ensure_population_allows_battle():
+                        raise RuntimeError(f"人口超出上限且无法腾出：{self.get_population()}")
+                    # 腾出人口后再补点一次
+                    retry_box = self.operator.ocr_match(button_labels[index], **button_region)
+                    if retry_box is not None:
+                        self.operator.click_box(retry_box, after_sleep=1.5)
             if index != 3:  # 不是选择主角，继续后续战斗流程
                 break
             self.handle_protagonist_selection()  # 选择完主角后重新进入战斗流程
+            self.handle_special_event()
         else:
             raise RuntimeError("战斗流程异常")
         if index == 2:  # 幕后茶歇
