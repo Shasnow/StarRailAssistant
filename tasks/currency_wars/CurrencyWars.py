@@ -85,6 +85,11 @@ def _merge_ocr_text(fragments: list[tuple[list[tuple[int, int]], str, float]]) -
 
 
 class CurrencyWars(Executable):
+    # FOLD（无）状态下需要连续识别到多少次才认定为真的回到备战界面。
+    # 战斗结束后画面还在过渡时，偶尔只有「收起」图标能被匹配到，单次命中就终止
+    # 会抢跑跳过刚弹出的遭遇节点/补给阶段界面。
+    FOLD_CONFIRM_TIMES = 3
+
     def __init__(self, operator, runtimes, isPointRewardsEnabled: bool = False):
         super().__init__(operator)
         self.runtimes = runtimes
@@ -1001,6 +1006,7 @@ class CurrencyWars(Executable):
         img_list = [cfg[0] for cfg in stage_config]
 
         prev_stage_name: StageName | None = None
+        fold_hits = 0  # 连续识别到 FOLD（无）的次数
         while True:  # 用无限循环 + 内部break控制退出
             stage_index, _ = self.operator.wait_any_img(img_list, timeout=15, interval=1)
             self.operator.sleep(1.5)
@@ -1012,6 +1018,17 @@ class CurrencyWars(Executable):
 
             # 获取当前状态配置
             img_path, stage_name, handle_func = stage_config[stage_index]
+
+            # FOLD（无）表示已回到备战界面、本轮没有待处理的关卡；
+            # 要求连续命中才认定，避免过渡画面里的「收起」抢跑跳过真正的关卡界面
+            if stage_name == StageName.FOLD:
+                fold_hits += 1
+                if fold_hits < self.FOLD_CONFIRM_TIMES:
+                    logger.debug(f"识别到无状态（{fold_hits}/{self.FOLD_CONFIRM_TIMES}），继续等待确认")
+                    continue
+            else:
+                fold_hits = 0
+
             logger.info(f"检测到状态：{stage_name}({img_path})")
 
             # 执行状态处理函数
