@@ -55,7 +55,7 @@ public partial class ControlPanelViewModel : ViewModelBase
         {
             Execute = () => _ = StartAllConfigsAsync()
         });
-        commandPaletteService.Register(new PaletteCommand(Resources.SaveOnlyText, "task.save", PaletteCategory.Task)
+        commandPaletteService.Register(new PaletteCommand(Resources.SaveOnlyText, "task.saveOnly", PaletteCategory.Task)
         {
             Execute = SaveConfigs
         });
