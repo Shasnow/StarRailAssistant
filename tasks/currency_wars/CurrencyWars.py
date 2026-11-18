@@ -106,6 +106,7 @@ class CurrencyWars(Executable):
             "黑市主理人": ("黑市主理人", self.handle_black_market_manager),
             "双龙吟": ("双龙吟", self.handle_double_dragon),
             "苍龙濯世": ("苍龙濯世", self.handle_world_cleansing_dragon),
+            "从师": ("从师", self.handle_apprentice_selection),
         }
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
@@ -984,6 +985,9 @@ class CurrencyWars(Executable):
         # 限制处理次数，避免识别异常时无限递归
         max_protagonist_selections = 3
         for _ in range(max_protagonist_selections + 1):
+            # 「从师」等主角光环会直接盖在备战界面上且不替换「出战」按钮，
+            # 此时点击出战不会生效，先处理掉事件再继续
+            self.handle_special_event()
             index, box = self.operator.wait_ocr_any(button_labels, **button_region)
             if index == -1:
                 # 没有识别到任何已知按钮
@@ -1009,7 +1013,6 @@ class CurrencyWars(Executable):
             if index != 3:  # 不是选择主角，继续后续战斗流程
                 break
             self.handle_protagonist_selection()  # 选择完主角后重新进入战斗流程
-            self.handle_special_event()
         else:
             raise RuntimeError("战斗流程异常")
         if index == 2:  # 幕后茶歇
@@ -1303,7 +1306,8 @@ class CurrencyWars(Executable):
 
     def detect_special_event(self) -> str:
         """检测当前是否有特殊事件发生，并返回事件名称"""
-        result = self.operator.ocr(from_x=0.49, from_y=0.038, to_x=0.60, to_y=0.11)
+        # 标题按字数居中，两字标题（如“从师”）会超出 0.49 左边界，识别区域需要留出余量
+        result = self.operator.ocr(from_x=0.42, from_y=0.038, to_x=0.60, to_y=0.11)
         if not result:
             return ""
         # OCR 可能把标题切成多个片段，括号等符号也容易被识别成噪声（如“我来当(?策划”），
@@ -1418,6 +1422,11 @@ class CurrencyWars(Executable):
                 continue
             return True
         raise RuntimeError("未能选择主角：所有前台角色都已有主角效果")
+
+    def handle_apprentice_selection(self) -> bool:
+        """处理「从师」节点的逻辑（候选为角色卡牌，名字在同一行）"""
+        return self._handle_selection_event((0.24, 0.31, 0.85, 0.37),
+                                            self.strategy_special_events.get("从师", ""))
 
     def shopping(self):
         def scan_characters_in_store() -> list[Character] | None:
