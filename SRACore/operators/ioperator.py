@@ -55,10 +55,36 @@ def _annotate_ocr_image(image: Image, result: list[tuple[list[tuple[int, int]], 
     return annotated
 
 class IOperator(ABC):
+    """操作器抽象基类。
+
+    统一封装视觉识别（模板匹配、OCR、颜色/矩形检测）与输入模拟（键鼠、剪贴板），
+    由 ``Operator``（本地 PyAutoGUI）与 ``BrowserOperator``（云游戏 Selenium）实现。
+
+    坐标约定：
+        - ``int``：窗口内的绝对像素坐标；
+        - ``float``：相对窗口宽高的比例（0-1）；
+        - 偏移量 ``x_offset``/``y_offset``/``from_x`` 等遵循同一规则。
+
+    线程协作：
+        构造时传入的 ``stop_event`` 被置位后，各识别方法会抛出 ``ThreadStoppedError``，
+        使任务或扩展被停止时能立即中断，而不必等待识别超时。
+    """
 
     def __init__(self, ocr_engine: RapidOCR, settings: AppSettings,
                  stop_event: threading.Event | None = None,
                  window_context: WindowContext | None = None):
+        """初始化操作器。
+
+        Args:
+            ocr_engine: OCR 引擎实例，由工厂创建后在多个操作器间共享。
+            settings: 应用设置，用于读取模板匹配/OCR 置信度、开发者模式与 OCR 标注开关。
+            stop_event: 协作停止信号；置位后识别类方法抛出 ``ThreadStoppedError``。
+            window_context: 窗口上下文（标题、进程名、整屏模式），缺省时使用默认实例。
+
+        Note:
+            ``type`` 标识实现类型（本地实现为 "Local"），``screenshot_background``
+            控制截图的默认是否走后台方式，子类可覆盖。
+        """
         self.type = "Local"
         self.settings = settings
         self.window_context: WindowContext = window_context or WindowContext()
@@ -72,36 +98,39 @@ class IOperator(ABC):
 
     @abstractmethod
     def is_window_active(self) -> bool:
-        """检查目标窗口是否为当前活动窗口"""
+        """检查目标窗口是否为当前活动（前台）窗口。
+
+        Returns:
+            bool: 目标窗口处于前台返回 True；窗口不存在或不在前台返回 False。
+        """
         ...
 
     def launch(self, channel: int, path: str):
-        """启动目标应用程序
+        """启动目标应用程序（由子类实现）。
 
         Args:
-            channel: 启动渠道，可能是应用程序路径或其他标识符
-            path: 启动路径，可能是应用程序的工作目录或其他相关路径
+            channel: 启动渠道，0-国服，1-B服，2-国际服。
+            path: 游戏启动程序路径，本地实现会据此定位 config.ini 等文件。
 
         Returns:
-            bool: 如果启动成功则返回 True，否则返回 False
+            bool: 本地实现返回是否启动成功；基类默认实现不返回结果。
         """
         ...
 
     def kill(self):
-        """终止目标应用程序"""
+        """终止目标应用程序进程，并清理已缓存的窗口句柄。"""
         ...
 
     def set_window_context(self, window_title: str | None = None, executable: str | None = None, full_screen: bool | None = None) -> WindowContext:
-        """设置窗口上下文
-
-        设置窗口上下文，包括窗口标题、进程名和整屏操作模式。
+        """设置窗口上下文，包括窗口标题、进程名和整屏操作模式。
 
         Args:
-            window_title (str): 目标窗口标题
-            executable (str): 目标应用程序进程名
-            full_screen (bool): 是否开启整屏操作模式。
+            window_title (str, optional): 目标窗口标题，为 None 时保留原值。
+            executable (str, optional): 目标应用程序进程名，为 None 时保留原值。
+            full_screen (bool, optional): 是否开启整屏操作模式，
+                开启后比例坐标按整屏而非窗口计算。
         Returns:
-            WindowContext: 设置后的窗口上下文
+            WindowContext: 设置后的窗口上下文（与 ``self.window_context`` 为同一对象）。
         """
         self.window_context.window_title = window_title or self.window_context.window_title
         self.window_context.executable = executable or self.window_context.executable
@@ -109,6 +138,16 @@ class IOperator(ABC):
         return self.window_context
 
     def login(self, account, password, relogin: bool = False) -> int:
+        """登录目标应用（云游戏实现用于登录网页端）。
+
+        Args:
+            account: 账号。
+            password: 密码。
+            relogin: 是否先清除登录态 Cookie 后重新登录。
+
+        Returns:
+            int: 1 表示登录成功，-1 表示登录失败。
+        """
         ...
 
     @abstractmethod
@@ -163,7 +202,7 @@ class IOperator(ABC):
             confidence (float | None, optional): 匹配置信度阈值 (0-1), 如果为None则使用默认值。默认为None。
             trace (bool, optional): 是否打印调试信息。默认为True。
         Returns:
-            Box | None: 找到的图片位置，如果未找到则返回None
+            list[Box] | None: 所有匹配到的图片位置；未找到或识别出错时返回 None。
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
@@ -207,10 +246,12 @@ class IOperator(ABC):
             from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
             to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
             to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
-            confidence (float | None, optional): 匹配度, 0-1之间的浮点数, 默认为self.confidence
+            confidence (float | None, optional): 匹配置信度阈值 (0-1)，为 None 时使用
+                ``self.tm_confidence``。
             trace (bool, optional): 是否打印调试信息。默认为True。
         Returns:
-            tuple[int, Box | None]: 找到的图片索引和位置，如果未找到则返回-1和None
+            tuple[int, Box | None]: 按传入顺序找到的第一张图片的索引和位置；
+                全部未找到时返回 ``(-1, None)``。
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
@@ -303,11 +344,13 @@ class IOperator(ABC):
             from_y (float, optional): 起始点Y坐标比例 (0-1)，相对于窗口左上角
             to_x (float, optional): 结束点X坐标比例 (0-1)，相对于窗口左上角
             to_y (float, optional): 结束点Y坐标比例 (0-1)，相对于窗口左上角
-            grayscale (bool, optional): 是否将截图转换为灰度图像。默认为True。
-            confidence (float, optional): 识别置信度。默认为0.7。
+            grayscale (bool, optional): 是否将截图转换为灰度图像，可提升识别稳定性。默认为True。
+            confidence (float | None, optional): 结果过滤置信度阈值 (0-1)，为 None 时使用
+                ``self.ocr_confidence``；低于该值的结果会被丢弃。
             trace (bool, optional): 是否打印调试信息。默认为True。
         Returns:
-            list[tuple[list[tuple[int, int]], str, float]] | None: OCR 引擎返回的原始结果。如果发生错误，返回None。
+            list[tuple[list[tuple[int, int]], str, float]] | None: OCR 引擎返回的原始结果，
+                每项为 (四点多边形坐标, 文本, 置信度)。发生错误或未识别到任何文本时返回 None。
         Raises:
             ValueError: 如果坐标比例参数不完整或不在0-1范围内
         """
@@ -351,8 +394,9 @@ class IOperator(ABC):
         """OCR识别并匹配指定文本，返回文本位置
 
         Args:
-            text (str | StrMatcher): 要识别的文本或匹配器
-            confidence (float, optional): 识别置信度。默认为0.9。
+            text (str | StrMatcher): 要匹配的文本（按包含关系匹配）或自定义匹配器
+            confidence (float | None, optional): 识别置信度阈值，为 None 时使用
+                ``self.ocr_confidence``。
             from_x (float, optional): 识别区域起始x坐标比例(0-1)。
             from_y (float, optional): 识别区域起始y坐标比例(0-1)。
             to_x (float, optional): 识别区域结束x坐标比例(0-1)。
@@ -385,8 +429,9 @@ class IOperator(ABC):
         """OCR识别并匹配任意指定文本，返回文本索引和位置
 
         Args:
-            texts (Sequence[str | StrMatcher]): 要识别的文字或匹配器对象列表
-            confidence (float, optional): 识别置信度。默认为0.9。
+            texts (Sequence[str | StrMatcher]): 要匹配的文本（按包含关系匹配）或自定义匹配器列表
+            confidence (float | None, optional): 识别置信度阈值，为 None 时使用
+                ``self.ocr_confidence``。
             from_x (float, optional): 识别区域起始x坐标比例(0-1)。
             from_y (float, optional): 识别区域起始y坐标比例(0-1)。
             to_x (float, optional): 识别区域结束x坐标比例(0-1)。
@@ -456,14 +501,15 @@ class IOperator(ABC):
         """等待OCR识别到指定文本
 
         Args:
-            text (str | StrMatcher): 要识别的文本或匹配器
+            text (str | StrMatcher): 要匹配的文本或匹配器
+            confidence (float | None, optional): 识别置信度阈值，为 None 时使用
+                ``self.ocr_confidence``。
+            interval (float, optional): 检查间隔时间，单位秒。默认值为0.5秒。
             timeout (float, optional): 超时时间，单位秒。默认值为10秒。
-            interval (float, optional): 检查间隔时间，单位秒。默认值为0.2秒。
-            confidence (float, optional): 识别置信度。默认值为0.9。
             *args: 传递给ocr_match的其他位置参数。
             **kwargs: 传递给ocr_match的其他关键字参数。
         Returns:
-            Box | None: 找到的文本位置，如果未找到则返回None。
+            Box | None: 找到的文本位置；超时或未找到时返回 None。
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
@@ -484,14 +530,15 @@ class IOperator(ABC):
         """等待OCR识别到任意指定文本
 
         Args:
-            texts (Sequence[str | StrMatcher]): 要识别的文本列表
+            texts (Sequence[str | StrMatcher]): 要匹配的文本或匹配器列表
+            confidence (float | None, optional): 识别置信度阈值，为 None 时使用
+                ``self.ocr_confidence``。
+            interval (float, optional): 检查间隔时间，单位秒。默认值为0.5秒。
             timeout (float, optional): 超时时间，单位秒。默认值为10秒。
-            interval (float, optional): 检查间隔时间，单位秒。默认值为0.2秒。
-            confidence (float, optional): 识别置信度。默认值为0.9。
             *args: 传递给ocr_match_any的其他位置参数。
             **kwargs: 传递给ocr_match_any的其他关键字参数。
         Returns:
-            tuple[int, Box | None]: 找到的文本索引和位置，如果未找到则返回-1和None
+            tuple[int, Box | None]: 找到的文本索引和位置；超时或未找到时返回 ``(-1, None)``
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
@@ -681,9 +728,9 @@ class IOperator(ABC):
         Args:
             template (str): 模板图片路径
             timeout (int, optional): 超时时间，单位秒。默认值为10秒。
-            interval (float, optional): 检查间隔时间，单位秒，默认为0.5秒。默认值为0.5秒。
+            interval (float, optional): 检查间隔时间，单位秒。默认值为0.5秒。
         Returns:
-            Box | None: 找到的图片位置，如果未找到则返回None
+            Box | None: 找到的图片位置；超时或未找到时返回 None。
         """
         start_time = time.time()
         logger.debug(f"Waiting for image: {template}")
@@ -702,10 +749,11 @@ class IOperator(ABC):
         Args:
             templates (list[str]): 模板图片路径列表
             timeout (int, optional): 超时时间，单位秒。默认值为10秒。
-            interval (float, optional): 检查间隔时间，单位秒，默认为0.2秒。默认值为0.2秒。
+            interval (float, optional): 检查间隔时间，单位秒。默认值为0.5秒。
             trace (bool, optional): 是否打印调试信息。默认为True。
         Returns:
-            tuple[int, Box | None]: 找到的图片索引(如果未找到则返回-1)和图片位置(如果未找到则返回None)
+            tuple[int, Box | None]: 按传入顺序找到的第一张图片的索引与位置；
+                超时后返回 ``(-1, None)``。
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
@@ -737,9 +785,11 @@ class IOperator(ABC):
             from_y (float, optional): 搜索区域起始 Y 坐标比例 (0-1)。
             to_x (float, optional): 搜索区域结束 X 坐标比例 (0-1)。
             to_y (float, optional): 搜索区域结束 Y 坐标比例 (0-1)。
-            trace (bool, optional): 是否保存调试图片。默认为True。
+            trace (bool, optional): 是否将标注框与边缘图拼接后保存到日志目录，便于排查。
+                默认为False。
         Returns:
-            list[Box]: 检测到的矩形框列表。
+            list[Box]: 尺寸落在 [min_w, max_w] × [min_h, max_h] 范围内的矩形框列表；
+                未检测到或发生错误时返回空列表。
         """
         if self.stop_event is not None and self.stop_event.is_set():
             raise ThreadStoppedError("矩形检测中断", "线程已停止")
@@ -779,11 +829,13 @@ class IOperator(ABC):
         """等待任意条件满足
 
         Args:
-            conditions (list[Waitable]): 条件列表，每个条件是一个可调用对象
+            conditions (list[Waitable]): 条件列表，每个条件为无参可调用对象，
+                返回 Box/None，或返回 ``(索引, Box)`` 元组（``-1`` 表示未满足）。
             timeout (int, optional): 超时时间，单位秒。默认值为10秒
             interval (float, optional): 检查间隔时间，单位秒。默认值为0.5秒
         Returns:
-            tuple[int, Box | None | tuple[int, Box | None]]: 满足条件的索引和Box，如果超时未满足任何条件则返回-1和None
+            tuple[int, Box | None | tuple[int, Box | None]]: 第一个满足条件的索引及其返回值；
+                超时未满足任何条件时返回 ``(-1, None)``。
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
@@ -816,16 +868,15 @@ class IOperator(ABC):
 
     @abstractmethod
     def hold_key(self, key: str, duration: float = 0, trace: bool = True) -> bool:
-        """
-        按下按键一段时间
+        """按住按键一段时间后释放。
 
         Args:
-            key: 按键名称，支持组合键，如 "a"、"ctrl+shift"
-            duration: 按下时间
-            trace: 是否打印调试信息
+            key: 按键名称，支持组合键，如 "a"、"ctrl+shift"。
+            duration: 按住时长（秒）；为 0 时按下后立即抬起。
+            trace: 是否打印调试信息。
 
         Returns:
-            按键成功返回True，否则返回False
+            bool: 按键成功返回 True，否则返回 False。
         """
         ...
 
@@ -857,34 +908,25 @@ class IOperator(ABC):
 
     @staticmethod
     def sleep(seconds: float) -> None:
-        """
-        Sleep for the specified number of seconds.
-        
+        """等待指定秒数。
+
         Args:
-            seconds (float): The number of seconds to sleep.
-        Returns:
-            None
+            seconds (float): 等待时长，单位为秒。
         """
         time.sleep(seconds)
 
     @abstractmethod
     def copy(self, text: str) -> None:
-        """Copy the text to clipboard.
-        
+        """将文本复制到剪贴板。
+
         Args:
-            text (str): The text to copy.
-        Returns:
-            None
+            text (str): 要复制的文本。
         """
         ...
 
     @abstractmethod
     def paste(self) -> None:
-        """Paste the text from clipboard.
-        
-        Returns:
-            None
-        """
+        """将剪贴板内容粘贴到当前焦点位置。"""
         ...
 
     @abstractmethod
@@ -933,10 +975,10 @@ class IOperator(ABC):
     def mouse_up(self, x: int | float | None = None, y: int | float | None = None, trace: bool = True,
                  button: str = "left") -> bool:
         """释放鼠标按钮。
-        
+
         Args:
-            x (int | float): X 坐标。
-            y (int | float): Y 坐标。
+            x (int | float | None): X 坐标；为 None 时在当前位置释放。
+            y (int | float | None): Y 坐标；为 None 时在当前位置释放。
             trace (bool): 是否打印调试信息。默认为 True。
             button (str): 鼠标按钮，可选 left | middle | right。默认为 left。
         Returns:
@@ -966,13 +1008,15 @@ class IOperator(ABC):
                 to_y: int | float,
                 duration: float = 0.5,
                 trace: bool = True) -> bool:
-        """拖动鼠标到指定位置。
+        """按下鼠标并从起点拖动到终点，随后释放。
+
+        起点与终点坐标规则同 ``click_point``：int 为绝对像素，float 为窗口比例。
 
         Args:
-            from_x (int | float): 目标 X 坐标。
-            from_y (int | float): 目标 Y 坐标。
-            to_x (int | float): 目标 X 坐标。
-            to_y (int | float): 目标 Y 坐标。
+            from_x (int | float): 拖动起点 X 坐标。
+            from_y (int | float): 拖动起点 Y 坐标。
+            to_x (int | float): 拖动终点 X 坐标。
+            to_y (int | float): 拖动终点 Y 坐标。
             duration (float): 拖动持续时间，单位为秒。
             trace (bool): 是否打印调试信息。默认为 True。
         Returns:
@@ -986,16 +1030,19 @@ class IOperator(ABC):
     @staticmethod
     def do_while(action: Callable[[], Any], condition: Callable[[], bool], interval: float = 0.5,
                  max_iterations: int = 50) -> bool:
-        """在满足条件时重复执行操作。
+        """先执行一次操作，再在条件成立时重复执行（do-while 语义）。
 
-        操作函数会先被执行一次，然后在每次检查条件前等待指定的时间。如果条件不再满足或达到最大迭代次数，循环将停止。
+        流程：执行 ``action`` → 等待 ``interval`` → 检查 ``condition``；
+        条件成立且未达 ``max_iterations`` 时继续循环。
+
         Args:
-            action (Callable[[], None]): 操作函数。
-            condition (Callable[[], bool]): 条件函数，返回布尔值。
-            interval (float): 每次检查条件前的等待时间，单位为秒。
-            max_iterations (int): 最大迭代次数，防止无限循环。
+            action (Callable[[], Any]): 操作函数，返回值会被忽略。
+            condition (Callable[[], bool]): 条件函数，返回 True 时继续循环。
+            interval (float): 每次检查条件前的等待时间，单位为秒。默认为 0.5。
+            max_iterations (int): 最大迭代次数，防止条件永真时无限循环。默认为 50。
+
         Returns:
-            bool: 因不再满足条件而退出返回 True，达到最大迭代次数返回 False。
+            bool: 因条件不再成立而退出返回 True；达到最大迭代次数返回 False。
         """
         iterations = 0
         action()
@@ -1007,7 +1054,11 @@ class IOperator(ABC):
         return iterations != max_iterations
 
     def active_window(self):
-        pass
+        """将目标窗口切换到前台。
+
+        基类为空实现（云游戏等无窗口场景无需处理），本地实现会调用系统 API 激活窗口。
+        """
+        ...
 
     @property
     def hwnd(self) -> int:
