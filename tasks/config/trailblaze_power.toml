@@ -140,7 +140,7 @@ func = "echo_of_war"
 cost = 30
 max_count = 3
 levels = [
-    { id = 10, name = "贪欢的月亮", result = "贪欢的月亮" },
+    { id = 10, name = "贪欢的月亮", result = "饥饿的乳牙" },
     { id = 9, name = "坏灭的喜剧", result = "伪觉者的期许" },
     { id = 1, name = "铁骸的锈冢", result = "灭流绝溢的缄默" },
     { id = 2, name = "晨昏的回眸", result = "阳雷的遥想" },
