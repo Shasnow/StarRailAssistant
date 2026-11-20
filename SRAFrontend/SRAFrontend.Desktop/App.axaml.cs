@@ -79,6 +79,7 @@ public class App : Application
         services.AddTransient<PageViewModel, ConsolePageViewModel>();
         services.AddTransient<PageViewModel, SettingsPageViewModel>();
         services.AddTransient<UpdateService>();
+        services.AddTransient<HotfixService>();
         services.AddTransient<AnnService>();
         services.AddTransient<ActivityService>();
         services.AddTransient<CommonModel>();

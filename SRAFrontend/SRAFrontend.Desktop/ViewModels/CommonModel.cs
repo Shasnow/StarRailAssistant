@@ -25,6 +25,7 @@ public class CommonModel(
     SettingsService settingsService,
     CacheService cacheService,
     UpdateService updateService,
+    HotfixService hotfixService,
     IBackendService backendService,
     AnnService annService,
     ILogger<CommonModel> logger,
@@ -68,7 +69,8 @@ public class CommonModel(
             return;
         }
 
-        var response = await updateService.GetRemoteVersionAsync(currentVersion.ToString(), cdk, channel);
+        var effectiveVersion = VersionHelper.GetEffectiveVersion(currentVersion, cacheService.Cache.HotfixVersion);
+        var response = await updateService.GetRemoteVersionAsync(effectiveVersion.ToString(), cdk, channel);
         if (response == null)
         {
             logger.LogError("Failed to check for updates: response is null");
@@ -93,10 +95,22 @@ public class CommonModel(
             return;
         }
 
+        // patch 递增且清单可用时优先热更新；否则继续完整更新
+        if (CanUseHotfix())
+        {
+            var manifest = await hotfixService.GetApplicableManifestAsync(
+                effectiveVersion, remoteVersion, settingsService.Settings.Update.UpdateChannel);
+            if (manifest != null)
+            {
+                await HandleHotfixAsync(manifest);
+                return;
+            }
+        }
+
         if (settingsService.Settings.Update.IsAutoUpdate)
         {
             ShowInfoToast(Resources.NewVersionAvailableMessage, string.Format(Resources.Culture, Resources.UpdateAutoDownloadMessage, response.Data.VersionName));
-            _ = HandleUpdateAsync(response, remoteVersion, channel);
+            _ = HandleUpdateAsync(response, channel);
         }
         else
         {
@@ -124,7 +138,7 @@ public class CommonModel(
             switch (result)
             {
                 case SukiMessageBoxResult.Yes:
-                    _ = HandleUpdateAsync(response, remoteVersion, channel);
+                    _ = HandleUpdateAsync(response, channel);
                     break;
                 case SukiMessageBoxResult.OK:
                     UrlUtil.OpenUrl("https://github.com/Shasnow/StarRailAssistant/releases/latest");
@@ -247,12 +261,8 @@ public class CommonModel(
         }
     }
 
-    private async Task HandleUpdateAsync(VersionResponse versionResponse, SemVerInfo remoteVersion,
-        string updateChannel)
+    private async Task HandleUpdateAsync(VersionResponse versionResponse, string updateChannel)
     {
-        // var currentVersion = SemVerParser.Parse(Settings.Version)!;
-        // var isHotfix = VersionHelper.IsHotfix(currentVersion, remoteVersion);
-        var isHotfix = false; // 这是以后可能会用到的妙妙小工具
         var (progressPanel, progressLabel, progressBar, cts) = BuildDownloadProgressUi();
         
         var toastBuilder = CreateStandardToastBuilder(Resources.DownloadingMessage, progressPanel, NotificationType.Information);
@@ -270,10 +280,8 @@ public class CommonModel(
         string downloadFilePath;
         try
         {
-            downloadFilePath = isHotfix
-                ? await updateService.DownloadHotfixAsync(versionResponse, progressHandler, cts.Token)
-                : await updateService.DownloadUpdateAsync(versionResponse, downloadChannel, updateChannel,
-                    progressHandler, cts.Token, downloadDir);
+            downloadFilePath = await updateService.DownloadUpdateAsync(versionResponse, downloadChannel, updateChannel,
+                progressHandler, cts.Token, downloadDir);
         }
         catch (OperationCanceledException)
         {
@@ -317,33 +325,122 @@ public class CommonModel(
             await Task.Delay(3000);
         }
         backendService.StopBackend();
-        if (isHotfix)
+
+        logger.LogDebug("Extracting full update: {Source} -> {Destination}", downloadFilePath,
+            Environment.CurrentDirectory);
+        if (!await TryExtractFullPackageAsync(downloadFilePath)) return;
+
+        // 完整更新已包含全部运行文件，清空热修版本记录
+        cacheService.Cache.HotfixVersion = "";
+        cacheService.SaveCache();
+
+        ShowSuccessToast(Resources.UpdatePreparationCompleteMessage, Resources.RestartToApplyHint);
+        var restartNowButton =
+            SukiMessageBoxButtonsFactory.CreateButton(Resources.RestartNowText, SukiMessageBoxResult.Yes, "Flat");
+        var restartLaterButton =
+            SukiMessageBoxButtonsFactory.CreateButton(Resources.LaterText, SukiMessageBoxResult.Cancel);
+        var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
         {
-            logger.LogDebug("Extracting hotfix: {Source} -> {Destination}", downloadFilePath, DataPath.SourceCodeDir);
-            ZipUtil.UnzipExternal(downloadFilePath, DataPath.SourceCodeDir);
-            // 保存热修复版本（直接用已解析的 Version，避免重复转换）
-            cacheService.Cache.HotfixVersion = remoteVersion.ToString();
-            logger.LogDebug("Hotfix applied successfully: {Version}", remoteVersion);
+            Header = Resources.UpdateReadyMessage,
+            Content = Resources.RestartConfirmMessage,
+            ActionButtonsSource = [restartNowButton, restartLaterButton]
+        });
+        if (result is SukiMessageBoxResult.Yes) RestartApplication();
+    }
+
+    /// <summary>
+    ///     当前是否适合原地热更新：自定义后端与远程后端下，应用目录中的源码未必是实际运行代码。
+    /// </summary>
+    private bool CanUseHotfix()
+    {
+        var advanced = settingsService.Settings.Advanced;
+        // --use-python 与自定义后端开关任意一个都会让 BackendServiceProxy 使用自定义后端
+        return !advanced.IsCustomBackendEnabled
+               && !advanced.IsRemoteEnabled
+               && Array.IndexOf(Environment.GetCommandLineArgs(), "--use-python") < 0;
+    }
+
+    /// <summary>
+    ///     执行 patch 热更新：确认、下载校验、替换文件、记录热修版本并重启后端。
+    /// </summary>
+    private async Task HandleHotfixAsync(HotfixManifest manifest)
+    {
+        if (!settingsService.Settings.Update.IsAutoUpdate)
+        {
+            var applyButton =
+                SukiMessageBoxButtonsFactory.CreateButton(Resources.EnsureText, SukiMessageBoxResult.Yes, "Flat Accent");
+            var cancelButton =
+                SukiMessageBoxButtonsFactory.CreateButton(Resources.CancelText, SukiMessageBoxResult.Cancel);
+            var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
+            {
+                Header = $"{Resources.NewVersionAvailableMessage} - {manifest.Version}",
+                Content = string.Format(Resources.Culture, Resources.HotfixFormat, manifest.Version),
+                ActionButtonsSource = [applyButton, cancelButton]
+            });
+            if (result is not SukiMessageBoxResult.Yes) return;
+        }
+
+        var (progressPanel, progressLabel, progressBar, cts) = BuildDownloadProgressUi();
+        var downloadToast =
+            CreateStandardToastBuilder(Resources.DownloadingMessage, progressPanel, NotificationType.Information).Queue();
+        downloadToast.CanDismissByClicking = false;
+        downloadToast.CanDismissByTime = false;
+        var progressHandler = new Progress<DownloadStatus>(value =>
+        {
+            progressBar.Value = value.ProgressPercent;
+            progressLabel.Content = $"{value.FormattedDownloadedSize} / {value.FormattedTotalSize} {value.FormattedSpeed}";
+        });
+        var stagingDir = Path.Combine(DataPath.TempDir, $"hotfix_{manifest.Version}_{Guid.NewGuid():N}");
+        try
+        {
+            await hotfixService.DownloadAndStageAsync(manifest, stagingDir, progressHandler, cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            HotfixService.CleanupStaging(stagingDir);
+            logger.LogInformation("Hotfix download canceled by user");
+            ShowWarningToast(Resources.DownloadCanceledMessage, Resources.UpdateDownloadCanceledMessage);
+            return;
+        }
+        catch (Exception e)
+        {
+            HotfixService.CleanupStaging(stagingDir);
+            logger.LogError(e, "Error downloading hotfix");
+            ShowErrorToast(Resources.UpdateDownloadFailedError,
+                string.Format(Resources.Culture, Resources.UnexpectedErrorMessage, e.Message));
+            return;
+        }
+        finally
+        {
+            toastManager.Dismiss(downloadToast);
+        }
+
+        try
+        {
+            backendService.StopBackend();
+            await hotfixService.ApplyAsync(manifest, stagingDir, cts.Token);
+        }
+        catch (Exception e)
+        {
+            HotfixService.CleanupStaging(stagingDir);
+            logger.LogError(e, "Error applying hotfix");
+            ShowErrorToast(Resources.HotUpdateFailedError,
+                string.Format(Resources.Culture, Resources.UnexpectedErrorMessage, e.Message));
+            return;
+        }
+
+        cacheService.Cache.HotfixVersion = manifest.Version;
+        cacheService.SaveCache();
+        // 沿用用户配置的启动参数，避免热更后后端以默认参数启动（丢失 --inline、--no-admin 等）
+        if (await backendService.RestartBackendAsync(settingsService.Settings.Advanced.BackendLaunchArgs))
+        {
+            logger.LogInformation("Hotfix applied successfully: {Version}", manifest.Version);
             ShowSuccessToast(Resources.HotUpdateAppliedMessage, Resources.RestartConsoleHint);
         }
         else
         {
-            logger.LogDebug("Extracting full update: {Source} -> {Destination}", downloadFilePath,
-                Environment.CurrentDirectory);
-            if (!await TryExtractFullPackageAsync(downloadFilePath)) return;
-
-            ShowSuccessToast(Resources.UpdatePreparationCompleteMessage, Resources.RestartToApplyHint);
-            var restartNowButton =
-                SukiMessageBoxButtonsFactory.CreateButton(Resources.RestartNowText, SukiMessageBoxResult.Yes, "Flat");
-            var restartLaterButton =
-                SukiMessageBoxButtonsFactory.CreateButton(Resources.LaterText, SukiMessageBoxResult.Cancel);
-            var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
-            {
-                Header = Resources.UpdateReadyMessage,
-                Content = Resources.RestartConfirmMessage,
-                ActionButtonsSource = [restartNowButton, restartLaterButton]
-            });
-            if (result is SukiMessageBoxResult.Yes) RestartApplication();
+            logger.LogWarning("Hotfix applied but backend restart failed: {Version}", manifest.Version);
+            ShowErrorToast(Resources.RestartFailedError, Resources.RestartConsoleHint);
         }
     }
 

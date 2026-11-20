@@ -1143,6 +1143,9 @@
     <data name="HotfixFormat" xml:space="preserve">
         <value>Исправление: {0}</value>
     </data>
+    <data name="HotUpdateFailedError" xml:space="preserve">
+        <value>Ошибка горячего обновления</value>
+    </data>
     <data name="Md5ManifestMissingError" xml:space="preserve">
         <value>Список контрольных сумм MD5 не найден</value>
     </data>

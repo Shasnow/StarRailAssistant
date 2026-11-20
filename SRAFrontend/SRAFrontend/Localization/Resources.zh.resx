@@ -1139,6 +1139,9 @@
     <data name="HotfixFormat" xml:space="preserve">
         <value>热修复：{0}</value>
     </data>
+    <data name="HotUpdateFailedError" xml:space="preserve">
+        <value>热更新失败</value>
+    </data>
     <data name="Md5ManifestMissingError" xml:space="preserve">
         <value>未找到 MD5 完整性清单</value>
     </data>

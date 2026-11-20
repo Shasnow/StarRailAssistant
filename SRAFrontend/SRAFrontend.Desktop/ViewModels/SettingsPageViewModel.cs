@@ -115,6 +115,7 @@ public partial class SettingsPageViewModel : PageViewModel
         _overlayService.SetOverlayDebugInfoEnabled(Settings.Advanced.IsDebugOverlayEnabled);
 
         _settingsService.SettingsPropertyChanged += OnSettingsPropertyChanged;
+        _cacheService.Cache.PropertyChanged += OnCachePropertyChanged;
         commandPaletteService.Register(
             new PaletteCommand("settings.checkForUpdates", Resources.CheckForUpdateText, PaletteCategory.Sra),
             CheckForUpdates);
@@ -153,7 +154,17 @@ public partial class SettingsPageViewModel : PageViewModel
     public UpdateSettings UpdateSettings => Settings.Update;
     public AdvancedSettings AdvancedSettings => Settings.Advanced;
     public Cache Cache => _cacheService.Cache;
-    public static string VersionText => AppSettings.Version;
+
+    /// <summary>显示当前版本；已安装更高热修时显示热修版本。</summary>
+    public string VersionText
+    {
+        get
+        {
+            var current = SemVerParser.Parse(AppSettings.Version);
+            if (current == null) return AppSettings.Version;
+            return VersionHelper.GetVersionDisplayText(current, SemVerParser.Parse(Cache.HotfixVersion));
+        }
+    }
     public string DeviceId => _reportService.GetDeviceId();
     /// <summary>ComboBox 绑定用：对外仍是 0/1/2 的索引。</summary>
     public int LanguageIndex
@@ -580,6 +591,12 @@ public partial class SettingsPageViewModel : PageViewModel
     {
         if (!Settings.General.IsGameArgsEnabled) return;
         _registryService.SetTargetPcResolution();
+    }
+
+    private void OnCachePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Cache.HotfixVersion))
+            OnPropertyChanged(nameof(VersionText));
     }
 
     private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)

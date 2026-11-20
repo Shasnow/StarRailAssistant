@@ -52,6 +52,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # 热更新清单需要基于历史 tag 计算差量
+          fetch-depth: 0
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
@@ -104,6 +107,15 @@ jobs:
           gh release create "$TAGNAME" --target "main" --title "$NAME" --notes "$NOTES" --prerelease artifacts/*
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+
+      # 清单必须在 tag 创建之后发布：文档站为主，R2 兜底；非 patch 版本会自动跳过
+      - name: Publish hotfix manifest
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_API_TOKEN: ${{ secrets.R2_API_TOKEN }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          DOCS_REPO_TOKEN: ${{ secrets.DOCS_REPO_TOKEN || secrets.WORKFLOW_TOKEN }}
+        run: python3 scripts/package.py --hotfix-only
 
   mirrorchyan:
     needs: publish_release

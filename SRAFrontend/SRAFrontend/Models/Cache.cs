@@ -22,7 +22,7 @@ public partial class Cache : ObservableObject
     public ObservableCollection<Strategy> Strategies { get; set; } = []; // 攻略列表
 
     // 以下字段无UI绑定
-    public string HotfixVersion { get; set; } = ""; // 热更版本号
+    [ObservableProperty] private string _hotfixVersion = ""; // 热更版本号
     public ResolutionCache CnGameResolution { get; set; } = new(); // 国服游戏分辨率设置
     public ResolutionCache GlobalGameResolution { get; set; } = new(); // 国际服游戏分辨率设置
     public bool NoNotifyForShortcut { get; set; } // 是否不再提示创建桌面快捷方式

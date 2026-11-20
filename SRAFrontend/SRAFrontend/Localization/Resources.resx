@@ -1143,6 +1143,9 @@ Please choose another folder.</value>
     <data name="HotfixFormat" xml:space="preserve">
         <value>Hotfix: {0}</value>
     </data>
+    <data name="HotUpdateFailedError" xml:space="preserve">
+        <value>Hot update failed</value>
+    </data>
     <data name="Md5ManifestMissingError" xml:space="preserve">
         <value>MD5 integrity manifest not found</value>
     </data>

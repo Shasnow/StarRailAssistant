@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using SRAFrontend.Localization;
 
@@ -157,6 +158,36 @@ public static class ZipUtil
             .Where(relativePath => File.Exists(Path.Combine(baseDir, relativePath)))
             .ToList();
         return DeleteFiles(baseDir, obsolete);
+    }
+
+    /// <summary>
+    ///     热更新替换文件后同步更新 MD5 完整性清单：覆盖已替换/新增文件的条目，
+    ///     并移除被删除文件的条目，避免后续完整性检查把热更新文件误判为损坏。
+    /// </summary>
+    /// <param name="baseDir">应用根目录</param>
+    /// <param name="changedMd5">需要写入或覆盖的「相对路径 → MD5」</param>
+    /// <param name="deleted">需要从清单中移除的相对路径</param>
+    /// <returns>清单存在并成功写回时返回 true；清单缺失时返回 false</returns>
+    public static bool UpdateManifest(
+        string baseDir,
+        IReadOnlyDictionary<string, string> changedMd5,
+        IEnumerable<string> deleted)
+    {
+        if (!TryLoadManifest(baseDir, out var manifest)) return false;
+        foreach (var (relativePath, md5) in changedMd5)
+            manifest[relativePath] = md5;
+        foreach (var relativePath in deleted)
+            manifest.Remove(relativePath);
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            // 保持中文路径可读，与打包脚本写出的清单风格一致
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+        File.WriteAllText(
+            Path.Combine(baseDir, ManifestFileName),
+            JsonSerializer.Serialize(manifest, options));
+        return true;
     }
 
     /// <summary>

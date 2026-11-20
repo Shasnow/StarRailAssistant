@@ -2341,6 +2341,15 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hot update failed.
+        /// </summary>
+        public static string HotUpdateFailedError {
+            get {
+                return ResourceManager.GetString("HotUpdateFailedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Press the keys to set a shortcut.
         /// </summary>
         public static string HotkeyCaptureHint {

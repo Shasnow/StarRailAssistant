@@ -16,12 +16,16 @@ public static class DownloadUtil
     /// <param name="savePath">保存路径</param>
     /// <param name="statusProgress">状态回调</param>
     /// <param name="cancellationToken">取消下载token</param>
+    /// <param name="offsetBytes">多文件下载时，本文件之前已完成的字节数</param>
+    /// <param name="totalBytesOverride">多文件下载时的总字节数；为 0 时使用当前文件的 Content-Length</param>
     public static async Task DownloadFileWithDetailsAsync(
         HttpClient httpClient,
         string url,
         string savePath,
         IProgress<DownloadStatus> statusProgress,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        long offsetBytes = 0,
+        long totalBytesOverride = 0)
     {
         using var response = await httpClient.GetAsync(
             url,
@@ -29,8 +33,10 @@ public static class DownloadUtil
             cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        // 获取文件总大小（回调给UI）
-        var totalBytes = response.Content.Headers.ContentLength ?? 0;
+        // 获取文件总大小（回调给UI）；多文件下载时使用调用方传入的合计值
+        var totalBytes = totalBytesOverride > 0
+            ? totalBytesOverride
+            : response.Content.Headers.ContentLength ?? 0;
         long downloadedBytes = 0;
         var buffer = new byte[8192]; // 8KB缓冲区
 
@@ -68,14 +74,14 @@ public static class DownloadUtil
                     bytesSinceLastUpdate = 0;
                 }
 
-                // 构建状态信息并回调
+                // 构建状态信息并回调（多文件下载时叠加此前已完成的字节数）
                 var status = new DownloadStatus
                 {
                     TotalBytes = totalBytes,
-                    DownloadedBytes = downloadedBytes,
+                    DownloadedBytes = offsetBytes + downloadedBytes,
                     BytesPerSecond = currentSpeed,
                     ProgressPercent = totalBytes > 0
-                        ? (float)downloadedBytes / totalBytes * 100
+                        ? (float)(offsetBytes + downloadedBytes) / totalBytes * 100
                         : -0.5f // 无法获取总大小时的标记
                 };
                 statusProgress.Report(status);
@@ -86,9 +92,11 @@ public static class DownloadUtil
         statusProgress.Report(new DownloadStatus
         {
             TotalBytes = totalBytes,
-            DownloadedBytes = totalBytes,
+            DownloadedBytes = offsetBytes + downloadedBytes,
             BytesPerSecond = 0,
-            ProgressPercent = 100
+            ProgressPercent = totalBytes > 0
+                ? (float)(offsetBytes + downloadedBytes) / totalBytes * 100
+                : 100
         });
     }
 }

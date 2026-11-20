@@ -23,6 +23,7 @@
 """
 
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -30,10 +31,10 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import tomllib
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 
@@ -67,6 +68,21 @@ RUNTIME_IMPORT_CHECKS = (
 )
 # R2 自定义域名（绑定到上传桶的公开访问基址），CLI init 从此处下载 WebUI 包与资源包
 R2_PUBLIC_BASE_URL = "https://resource.starrailassistant.top"
+
+# 热更新（patch 级差量）可覆盖的运行时路径：源码、任务、扩展、资源与入口
+HOTFIX_ROOTS = ("SRACore", "SRAServer", "tasks", "extensions", "resources", "assets")
+HOTFIX_FILES = ("main.py",)
+# 单文件下载模板：CNB 国内镜像优先，GitHub raw 兜底，随清单下发
+HOTFIX_SOURCES = (
+    "https://cnb.cool/StarRailAssistant/StarRailAssistant/-/git/raw/v{version}/{path}",
+    "https://raw.githubusercontent.com/Shasnow/StarRailAssistant/v{version}/{path}",
+)
+# 清单主托管：文档站（GitHub Pages + CDN），R2 同内容兜底
+DOCS_REPO = os.environ.get("DOCS_REPO", "Shasnow/starrailassistant.top")
+DOCS_BRANCH = os.environ.get("DOCS_BRANCH", "main")
+DOCS_MANIFEST_DIR = "public/api/v1/hotfix"
+DOCS_MANIFEST_PUBLIC_URL = "https://starrailassistant.top/api/v1/hotfix"
+R2_MANIFEST_PREFIX = "hotfix"
 
 # 随包分发的 Python 源码目录与根文件
 SOURCE_DIRS = ["SRACore", "SRAServer", "tasks", "extensions", "resources", "assets"]
@@ -158,8 +174,231 @@ def download(url: str, dest: Path, timeout: int = 60, retries: int = 2):
     sys.exit(1)
 
 
+def parse_stable_version(version: str) -> tuple[int, int, int] | None:
+    """解析稳定版 SemVer；beta 或非法版本返回 None。"""
+    if "-" in version:
+        return None
+    parts = version.split(".")
+    if len(parts) != 3 or not all(part.isdigit() for part in parts):
+        return None
+    return int(parts[0]), int(parts[1]), int(parts[2])
+
+
+def git_output(*args: str) -> list[str] | None:
+    """执行 git 命令并按行返回 stdout；失败返回 None。"""
+    result = subprocess.run(
+        # 关闭 core.quotepath：否则中文等非 ASCII 路径会被输出成带引号的八进制转义，
+        # 与清单中的实际路径对不上，导致这些文件在差量清单中被静默丢弃
+        ["git", "-c", "core.quotepath=false", *args], cwd=ROOT_PATH, capture_output=True, text=True,
+        encoding="utf-8", errors="replace",
+    )
+    if result.returncode != 0:
+        return None
+    return result.stdout.splitlines()
+
+
+def git_blob(spec: str) -> bytes | None:
+    """读取 git 对象内容（不做换行转换），用于与 raw 下载内容保持完全一致。"""
+    result = subprocess.run(
+        ["git", "cat-file", "blob", spec], cwd=ROOT_PATH, capture_output=True,
+    )
+    return result.stdout if result.returncode == 0 else None
+
+
+def git_changed_files(base_tag: str, target_ref: str = "HEAD") -> list[tuple[str, str]] | None:
+    """返回 base_tag..target_ref 的 (状态, 路径) 列表；重命名拆成删除旧路径 + 新增新路径。"""
+    lines = git_output("diff", "--name-status", "--find-renames", f"{base_tag}..{target_ref}")
+    if lines is None:
+        return None
+    entries: list[tuple[str, str]] = []
+    for line in lines:
+        parts = line.split("\t")
+        if len(parts) < 2:
+            continue
+        status = parts[0]
+        if status.startswith("R"):
+            if len(parts) >= 3:
+                entries.append(("D", parts[1]))
+                entries.append(("A", parts[2]))
+            continue
+        if status.startswith("C"):
+            if len(parts) >= 3:
+                entries.append(("A", parts[2]))
+            continue
+        entries.append((status[0], parts[1]))
+    return entries
+
+
+def is_hotfix_path(path: str) -> bool:
+    """路径是否属于可热更的运行时文件。"""
+    return path in HOTFIX_FILES or any(
+        path == root or path.startswith(f"{root}/") for root in HOTFIX_ROOTS
+    )
+
+
+def is_version_only_frontend_change(base_tag: str, target_ref: str, path: str) -> bool:
+    """AppSettings.cs 的改动是否仅为版本号行（版本发布脚本会改动该文件）。"""
+    if path != "SRAFrontend/SRAFrontend/Models/AppSettings.cs":
+        return False
+    lines = git_output("diff", "-U0", f"{base_tag}..{target_ref}", "--", path)
+    if lines is None:
+        return False
+    changed = [
+        line for line in lines
+        if (line.startswith("+") or line.startswith("-"))
+        and not line.startswith(("+++", "---"))
+    ]
+    return bool(changed) and all("Version = " in line for line in changed)
+
+
+def build_hotfix_manifest(version: str) -> Path | None:
+    """生成 patch 热更新差量清单；非热更版本、缺少基线 tag 或含非热更改动时返回 None。"""
+    parsed = parse_stable_version(version)
+    if parsed is None:
+        print("[SKIP] Hotfix manifest: only stable versions are supported")
+        return None
+    major, minor, patch = parsed
+    if patch == 0:
+        print("[SKIP] Hotfix manifest: patch version must be greater than 0")
+        return None
+
+    base_tag = f"v{major}.{minor}.0"
+    if git_output("rev-parse", "--verify", f"refs/tags/{base_tag}") is None:
+        print(f"[WARN] Hotfix manifest skipped: base tag {base_tag} not found (run `git fetch --tags`)")
+        return None
+
+    # 发布期 tag 已存在时以 tag 为准，保证清单哈希与 raw 下载内容完全一致；
+    # 构建期 tag 尚未创建，退回 HEAD。
+    target_tag = f"v{version}"
+    target_ref = target_tag if git_output(
+        "rev-parse", "--verify", f"refs/tags/{target_tag}") is not None else "HEAD"
+
+    changes = git_changed_files(base_tag, target_ref)
+    if changes is None:
+        print(f"[WARN] Hotfix manifest skipped: unable to diff {base_tag}..{target_ref}")
+        return None
+
+    unsafe: list[str] = []
+    files: list[dict[str, object]] = []
+    deleted: list[str] = []
+    for status, path in changes:
+        if path == "pyproject.toml" or (
+            path.startswith("SRAFrontend/") and not is_version_only_frontend_change(base_tag, target_ref, path)
+        ):
+            unsafe.append(path)
+            continue
+        if not is_hotfix_path(path):
+            continue
+        if status == "D":
+            deleted.append(path)
+            continue
+        blob = git_blob(f"{target_ref}:{path}")
+        if blob is None:
+            print(f"[WARN] Hotfix manifest skipped: missing git blob {target_ref}:{path}")
+            return None
+        files.append({"path": path, "sha256": hashlib.sha256(blob).hexdigest(), "size": len(blob)})
+
+    if unsafe:
+        print("[WARN] Hotfix manifest skipped: patch contains non-hotfixable changes:")
+        for path in unsafe:
+            print(f"        {path}")
+        return None
+
+    # 没有任何可热更文件时不发布空清单，避免客户端记录一个没有实际内容的补丁版本
+    if not files and not deleted:
+        print("[WARN] Hotfix manifest skipped: no hotfixable changes")
+        return None
+
+    files.sort(key=lambda item: str(item["path"]))
+    deleted.sort()
+    manifest = {
+        "schema": 1,
+        "channel": "stable",
+        "version": version,
+        "baseVersion": f"{major}.{minor}.0",
+        "generatedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "sources": list(HOTFIX_SOURCES),
+        "files": files,
+        "deleted": deleted,
+    }
+    manifest_path = ROOT_PATH / f"hotfix_v{version}.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"[OK] {manifest_path.name} ({len(files)} files, {len(deleted)} deleted)")
+    return manifest_path
+
+
+def publish_manifest_to_docs(manifest_path: Path, version: str) -> bool:
+    """把清单提交到文档仓库，触发 GitHub Pages 部署；缺少令牌时跳过。"""
+    token = os.environ.get("DOCS_REPO_TOKEN") or os.environ.get("WORKFLOW_TOKEN", "")
+    if not token:
+        print("[WARN] Missing DOCS_REPO_TOKEN/WORKFLOW_TOKEN, skipping docs-site manifest publish")
+        return False
+
+    remote_path = f"{DOCS_MANIFEST_DIR}/v{version}.json"
+    api_url = f"https://api.github.com/repos/{DOCS_REPO}/contents/{remote_path}"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "SRA-packager",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    sha: str | None = None
+    try:
+        request = urllib.request.Request(f"{api_url}?ref={DOCS_BRANCH}", headers=headers)
+        with urllib.request.urlopen(request, timeout=30) as response:
+            sha = json.loads(response.read().decode("utf-8")).get("sha")
+    except urllib.error.HTTPError as e:
+        if e.code != 404:
+            print(f"[WARN] Unable to read existing docs manifest: HTTP {e.code}")
+            return False
+    except urllib.error.URLError as e:
+        print(f"[WARN] Unable to reach GitHub API: {e.reason}")
+        return False
+
+    body = {
+        "message": f"chore: 发布热更新清单 v{version}",
+        "content": base64.b64encode(manifest_path.read_bytes()).decode("ascii"),
+        "branch": DOCS_BRANCH,
+    }
+    if sha:
+        body["sha"] = sha
+    request = urllib.request.Request(
+        api_url,
+        data=json.dumps(body).encode("utf-8"),
+        method="PUT",
+        headers={**headers, "Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            response.read()
+    except urllib.error.HTTPError as e:
+        print(f"[WARN] Docs-site manifest publish failed: HTTP {e.code} "
+              f"{e.read().decode('utf-8', errors='replace')}")
+        return False
+    except urllib.error.URLError as e:
+        print(f"[WARN] Docs-site manifest publish failed: {e.reason}")
+        return False
+    print(f"[OK] Uploaded to {DOCS_MANIFEST_PUBLIC_URL}/v{version}.json")
+    return True
+
+
+def publish_hotfix_manifest(version: str):
+    """生成并发布热更新清单（文档站主 + R2 兜底）。"""
+    manifest_path = build_hotfix_manifest(version)
+    if manifest_path is None:
+        return
+    publish_manifest_to_docs(manifest_path, version)
+    upload_to_r2(
+        manifest_path,
+        f"{R2_MANIFEST_PREFIX}/v{version}.json",
+        content_type="application/json",
+    )
+
+
 def runtime_requirements() -> list[str]:
     """从 pyproject.toml 读取内嵌环境所需的依赖（基础 + standard + server）。"""
+    import tomllib  # Python 3.11+；仅完整打包需要，--hotfix-only 不依赖
+
     with (ROOT_PATH / "pyproject.toml").open("rb") as f:
         project = tomllib.load(f)["project"]
     requirements = list(project.get("dependencies", []))
@@ -573,8 +812,8 @@ def package_webui(version: str) -> Path:
     return zip_path
 
 
-def upload_to_r2(zip_path: Path, object_key: str):
-    """通过 Cloudflare R2 REST API（Bearer Token + PUT 对象）上传压缩包到指定对象键。
+def upload_to_r2(path: Path, object_key: str, content_type: str = "application/zip"):
+    """通过 Cloudflare R2 REST API（Bearer Token + PUT 对象）上传文件到指定对象键。
 
     文档：https://developers.cloudflare.com/api/resources/r2/
     凭据从环境变量读取：R2_ACCOUNT_ID、R2_API_TOKEN、R2_BUCKET。
@@ -591,14 +830,14 @@ def upload_to_r2(zip_path: Path, object_key: str):
     api_token = values["R2_API_TOKEN"]
     bucket = values["R2_BUCKET"]
 
-    print(f"Uploading {zip_path.name} to r2://{bucket}/{object_key} ...")
+    print(f"Uploading {path.name} to r2://{bucket}/{object_key} ...")
     url = (
         f"https://api.cloudflare.com/client/v4/accounts/{account_id}"
         f"/r2/buckets/{bucket}/objects/{urllib.parse.quote(object_key, safe='/.-')}"
     )
-    req = urllib.request.Request(url, data=zip_path.read_bytes(), method="PUT", headers={
+    req = urllib.request.Request(url, data=path.read_bytes(), method="PUT", headers={
         "Authorization": f"Bearer {api_token}",
-        "Content-Type": "application/zip",
+        "Content-Type": content_type,
     })
     try:
         with urllib.request.urlopen(req) as resp:
@@ -616,11 +855,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="StarRailAssistant 打包脚本")
     parser.add_argument("--resources-only", action="store_true", help="只打包资源，跳过 Python 运行时与源码打包等其他操作")
     parser.add_argument("--webui-only", action="store_true", help="只打包并上传 WebUI 包，跳过 Python 运行时与源码打包等其他操作")
+    parser.add_argument("--hotfix-only", action="store_true", help="只生成并发布热更新清单，跳过其他打包操作")
     args = parser.parse_args()
 
     with (ROOT_PATH / "package.json").open(encoding="utf-8") as f:
         data = json.load(f)
     version = data["version"]
+
+    if args.hotfix_only:
+        publish_hotfix_manifest(version)
+        print(f"\nHotfix manifest completed! Version: v{version}")
+        sys.exit(0)
 
     if args.resources_only:
         resources_zip = package_resources(version)
@@ -660,4 +905,8 @@ if __name__ == "__main__":
     # 保留 main.dist/python 供下次复用（CI 缓存该目录以跳过下载与安装），
     # 打包产物已在压缩包内，源码目录下次会被重新复制覆盖
     (ROOT_PATH / "version_info.txt").write_text(f"v{version}\n\n{changelog}", encoding="utf-8")
+
+    # 构建期只生成热更新清单（发布期由 python-app.yml 在 tag 创建后执行 --hotfix-only 上传）
+    build_hotfix_manifest(version)
+
     print(f"\nPackaging completed! Version: v{version}")

@@ -31,6 +31,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # 热更新清单需要基于历史 tag 计算差量
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4

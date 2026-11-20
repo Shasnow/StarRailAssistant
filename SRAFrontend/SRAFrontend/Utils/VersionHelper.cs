@@ -28,11 +28,22 @@ public static class VersionHelper
     }
 
     /// <summary>
-    /// 判断是否需要更新（新版本 > 当前版本，且未安装该热修复）
+    ///     计算当前有效版本：已安装热修比程序版本新时取热修版本，否则取程序版本。
+    /// </summary>
+    public static SemVerInfo GetEffectiveVersion(SemVerInfo currentVersion, string? installedHotfixVersion)
+    {
+        var installedHotfix = SemVerParser.Parse(installedHotfixVersion);
+        return installedHotfix != null && installedHotfix > currentVersion
+            ? installedHotfix
+            : currentVersion;
+    }
+
+    /// <summary>
+    /// 判断是否需要更新（新版本 > 当前有效版本）
     /// </summary>
     public static bool NeedUpdate(SemVerInfo currentVersion, SemVerInfo newVersion, string installedHotfixVersion)
     {
-        return currentVersion < newVersion;
+        return GetEffectiveVersion(currentVersion, installedHotfixVersion) < newVersion;
         // 这些是以后可能用到的妙妙小代码
         // // 1. 新版本 <= 当前版本 → 无需更新
         // if (newVersion <= currentVersion)
@@ -50,9 +61,8 @@ public static class VersionHelper
     /// </summary>
     public static string GetVersionDisplayText(SemVerInfo currentVersion, SemVerInfo? installedHotfixVersion)
     {
-        if (installedHotfixVersion == null) return string.Format(Resources.Culture, Resources.CurrentVersionFormat, currentVersion);
-        return currentVersion > installedHotfixVersion
-            ? string.Format(Resources.Culture, Resources.CurrentVersionFormat, currentVersion)
-            : string.Format(Resources.Culture, Resources.HotfixFormat, installedHotfixVersion);
+        if (installedHotfixVersion == null || installedHotfixVersion <= currentVersion)
+            return string.Format(Resources.Culture, Resources.CurrentVersionFormat, currentVersion);
+        return string.Format(Resources.Culture, Resources.HotfixFormat, installedHotfixVersion);
     }
 }
