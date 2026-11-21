@@ -72,7 +72,7 @@ public partial class ConsolePageViewModel : PageViewModel
         try
         {
             var result = await _backendService.OperatorCallAsync("screenshot",
-                new { save_path = $"{DataPath.TempDir}/screenshot.png" });
+                new { save_path = $"{Environment.CurrentDirectory}/screenshot.png" });
             if (result is { Success: false })
             {
                 _logger.LogError("Screenshot capture failed: {Message}", result.Message);

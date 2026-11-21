@@ -107,6 +107,7 @@ class CurrencyWars(Executable):
             "双龙吟": ("双龙吟", self.handle_double_dragon),
             "苍龙濯世": ("苍龙濯世", self.handle_world_cleansing_dragon),
             "从师": ("从师", self.handle_apprentice_selection),
+            "机心巧匠": ("机心巧匠", self.handle_machine_master),
         }
         self.is_continue = False  # 是否是继续挑战
         self.is_game_over = False
@@ -1427,6 +1428,11 @@ class CurrencyWars(Executable):
         """处理「从师」节点的逻辑（候选为角色卡牌，名字在同一行）"""
         return self._handle_selection_event((0.24, 0.31, 0.85, 0.37),
                                             self.strategy_special_events.get("从师", ""))
+
+    def handle_machine_master(self) -> bool:
+        """处理「机心巧匠」节点的逻辑"""
+        return self._handle_selection_event((0.24, 0.31, 0.85, 0.37),
+                                            self.strategy_special_events.get("机心巧匠", ""))
 
     def shopping(self):
         def scan_characters_in_store() -> list[Character] | None:
