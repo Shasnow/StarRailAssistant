@@ -96,16 +96,15 @@ public class CommonModel(
         }
 
         // patch 递增且清单可用时优先热更新；否则继续完整更新
-        if (CanUseHotfix())
+        var manifest = await hotfixService.GetApplicableManifestAsync(effectiveVersion, remoteVersion);
+        if (manifest != null)
         {
-            var manifest = await hotfixService.GetApplicableManifestAsync(
-                effectiveVersion, remoteVersion, settingsService.Settings.Update.UpdateChannel);
-            if (manifest != null)
-            {
-                await HandleHotfixAsync(manifest);
-                return;
-            }
+            await HandleHotfixAsync(manifest);
+            return;
         }
+
+        logger.LogInformation(
+            "Hotfix manifest unavailable for {Version}; falling back to full update", remoteVersion);
 
         if (settingsService.Settings.Update.IsAutoUpdate)
         {
@@ -346,18 +345,6 @@ public class CommonModel(
             ActionButtonsSource = [restartNowButton, restartLaterButton]
         });
         if (result is SukiMessageBoxResult.Yes) RestartApplication();
-    }
-
-    /// <summary>
-    ///     当前是否适合原地热更新：自定义后端与远程后端下，应用目录中的源码未必是实际运行代码。
-    /// </summary>
-    private bool CanUseHotfix()
-    {
-        var advanced = settingsService.Settings.Advanced;
-        // --use-python 与自定义后端开关任意一个都会让 BackendServiceProxy 使用自定义后端
-        return !advanced.IsCustomBackendEnabled
-               && !advanced.IsRemoteEnabled
-               && Array.IndexOf(Environment.GetCommandLineArgs(), "--use-python") < 0;
     }
 
     /// <summary>

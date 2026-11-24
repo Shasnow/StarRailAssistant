@@ -34,15 +34,14 @@ public class HotfixService(IHttpClientFactory httpClientFactory, ILogger<HotfixS
     /// </summary>
     /// <param name="effectiveVersion">当前有效版本（程序版本与已装热修取较大者）</param>
     /// <param name="remoteVersion">远端版本</param>
-    /// <param name="updateChannel">更新通道，0=Stable</param>
     /// <param name="cancellationToken">取消 Token</param>
     public async Task<HotfixManifest?> GetApplicableManifestAsync(
         SemVerInfo effectiveVersion,
         SemVerInfo remoteVersion,
-        int updateChannel,
         CancellationToken cancellationToken = default)
     {
-        if (updateChannel != 0) return null;
+        // 只要求目标版本是稳定补丁版；不限制用户所在的更新通道，
+        // 否则 Beta 通道用户即使目标是稳定 patch 也会被强制走完整更新。
         if (effectiveVersion.PreRelease != null || remoteVersion.PreRelease != null) return null;
         if (remoteVersion.Major != effectiveVersion.Major ||
             remoteVersion.Minor != effectiveVersion.Minor ||
