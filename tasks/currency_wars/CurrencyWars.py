@@ -88,7 +88,7 @@ class CurrencyWars(Executable):
     # FOLD（无）状态下需要连续识别到多少次才认定为真的回到备战界面。
     # 战斗结束后画面还在过渡时，偶尔只有「收起」图标能被匹配到，单次命中就终止
     # 会抢跑跳过刚弹出的遭遇节点/补给阶段界面。
-    FOLD_CONFIRM_TIMES = 3
+    FOLD_CONFIRM_TIMES = 5
 
     def __init__(self, operator, runtimes, isPointRewardsEnabled: bool = False):
         super().__init__(operator)
@@ -609,7 +609,6 @@ class CurrencyWars(Executable):
                     self.sort_all_areas_by_priority()  # 优先级排序
                     continue
                 break
-            self.handle_special_event()
             if not self.stage_transition():
                 break
             if self.is_game_over:  # 任务已被标记为停止, 需要退出循环
@@ -895,7 +894,7 @@ class CurrencyWars(Executable):
 
     def get_population(self) -> tuple[int, int] | None:
         """读取人口计数（当前/上限），读数不完整时返回 None。"""
-        result = self.operator.ocr(**self.POPULATION_AREA)
+        result = self.operator.ocr(**self.POPULATION_AREA)  # pyright: ignore[reportArgumentType]
         if not result:
             return None
         text = _merge_ocr_text(result)
@@ -1008,7 +1007,7 @@ class CurrencyWars(Executable):
                     if not self.ensure_population_allows_battle():
                         raise RuntimeError(f"人口超出上限且无法腾出：{self.get_population()}")
                     # 腾出人口后再补点一次
-                    retry_box = self.operator.ocr_match(button_labels[index], **button_region)
+                    retry_box = self.operator.ocr_match(button_labels[index], **button_region)  # pyright: ignore[reportArgumentType]
                     if retry_box is not None:
                         self.operator.click_box(retry_box, after_sleep=1.5)
             if index != 3:  # 不是选择主角，继续后续战斗流程
@@ -1127,6 +1126,11 @@ class CurrencyWars(Executable):
             # FOLD（无）表示已回到备战界面、本轮没有待处理的关卡；
             # 要求连续命中才认定，避免过渡画面里的「收起」抢跑跳过真正的关卡界面
             if stage_name == StageName.FOLD:
+                # 特殊事件界面同样带「收起」按钮，且战斗结束后事件界面是延迟弹出的：
+                # 若直接当作 FOLD 终止，会漏掉事件处理完才出现的遭遇节点界面，导致后续流程卡死
+                if self.handle_special_event():
+                    fold_hits = 0
+                    continue
                 fold_hits += 1
                 if fold_hits < self.FOLD_CONFIRM_TIMES:
                     logger.debug(f"识别到无状态（{fold_hits}/{self.FOLD_CONFIRM_TIMES}），继续等待确认")
@@ -1324,18 +1328,18 @@ class CurrencyWars(Executable):
         return self._handle_selection_event((0.22, 0.34, 0.85, 0.4),
                                             self.strategy_special_events.get("头号玩家", ""))
 
-    def handle_special_event(self):
-        """处理特殊事件的逻辑"""
+    def handle_special_event(self) -> bool:
+        """处理特殊事件的逻辑，返回是否检测到并处理了事件"""
         logger.debug("检测特殊事件")
         event = self.detect_special_event()
-
-        if event:
-            logger.info(f"检测到特殊事件：{event}")
-            handler = self.special_events[event][1]
-            if not handler():
-                raise RuntimeError("特殊事件处理失败")
-            self.handle_special_event()  # 递归处理
-        # 未检测到事件，退出
+        if not event:
+            return False
+        logger.info(f"检测到特殊事件：{event}")
+        handler = self.special_events[event][1]
+        if not handler():
+            raise RuntimeError("特殊事件处理失败")
+        self.handle_special_event()  # 递归处理
+        return True
 
     # ==================== 幕后茶歇节点 ====================
     def handle_tea_break(self) -> bool:
