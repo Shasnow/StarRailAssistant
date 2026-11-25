@@ -192,7 +192,7 @@ public partial class ReceiveRewardsConfig : ObservableObject, IJsonOnDeserialize
     }
 }
 
-public partial class CosmicStrifeConfig : ObservableObject
+public partial class CosmicStrifeConfig : ObservableObject, IJsonOnDeserialized
 {
     [ObservableProperty] [property: JsonPropertyName("enabled")] [property: Description("是否启用旷宇纷争任务")]
     private bool _isEnabled;
@@ -207,7 +207,7 @@ public partial class CosmicStrifeConfig : ObservableObject
 
     [ObservableProperty]
     [property: JsonPropertyName("currencyWars.mode")]
-    [property: Description("货币战争模式，0-标准博弈，1-超频博弈，2-刷开局")]
+    [property: Description("货币战争模式，0-标准博弈，1-超频博弈")]
     private int _currencyWarsMode;
 
     [ObservableProperty]
@@ -239,6 +239,11 @@ public partial class CosmicStrifeConfig : ObservableObject
     [property: JsonPropertyName("currencyWars.reroll.investStrategies")]
     [property: Description("货币战争刷开局时的投资策略")]
     private string _currencyWarsRerollInvestStrategies = "";
+
+    [ObservableProperty]
+    [property: JsonPropertyName("currencyWars.reroll.enabled")]
+    [property: Description("货币战争是否刷开局，开启后按刷开局条件重开对局")]
+    private bool _isCurrencyWarsRerollEnabled;
 
     [ObservableProperty] [property: JsonPropertyName("currencyWars.runtimes")] [property: Description("货币战争刷开局时的运行次数")]
     private int _currencyWarsRuntimes = 1;
@@ -274,6 +279,14 @@ public partial class CosmicStrifeConfig : ObservableObject
     [property: JsonPropertyName("pointRewards.enabled")]
     [property: Description("是否启用积分奖励，启用后当达到周积分上限时跳过此任务")]
     private bool _isPointRewardsEnabled;
+
+    /// <summary>旧版刷开局使用 mode=2，这里迁移为独立开关。</summary>
+    public void OnDeserialized()
+    {
+        if (CurrencyWarsMode != 2) return;
+        CurrencyWarsMode = 0;
+        IsCurrencyWarsRerollEnabled = true;
+    }
 }
 
 public partial class MissionAccomplishedConfig : ObservableObject

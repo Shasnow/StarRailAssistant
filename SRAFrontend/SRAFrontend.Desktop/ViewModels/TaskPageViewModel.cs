@@ -201,14 +201,8 @@ public partial class TaskPageViewModel : PageViewModel
     public int CurrencyWarsModeIndex
     {
         get => CosmicStrifeConfig.CurrencyWarsMode;
-        set
-        {
-            CosmicStrifeConfig.CurrencyWarsMode = value;
-            OnPropertyChanged(nameof(IsCwNormalMode));
-        }
+        set => CosmicStrifeConfig.CurrencyWarsMode = value;
     }
-
-    public bool IsCwNormalMode => CosmicStrifeConfig.CurrencyWarsMode != 2;
 
     public Cache Cache => _cacheService.Cache;
 

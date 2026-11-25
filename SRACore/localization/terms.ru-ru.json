@@ -9,7 +9,8 @@
     "developerMode.customBackend.command": "Команда или исполняемый файл ядра: python, sra-cli, uv или путь к файлу",
     "developerMode.customBackend.arguments": "Аргументы запуска другого ядра, например main.py или -m SRACore",
     "developerMode.customBackend.workingDirectory": "Рабочая папка другого ядра; пустое поле — текущая папка программы",
-    "developerMode.saveOcrImage": "Сохранять снимки OCR для отладки"
+    "developerMode.saveOcrImage": "Сохранять снимки OCR для отладки",
+    "llmVision": "Настройки мультимодальной визуальной локализации"
   },
   "AppSettings": {
     "general": "Общие настройки",
@@ -22,13 +23,14 @@
     "enabled": "Включить космическое противостояние",
     "currencyWars.enabled": "Включить «Валютные войны»",
     "currencyWars.difficulty": "Сложность «Валютных войн»: 0 — минимальная, 1 — максимальная, 2 — текущая",
-    "currencyWars.mode": "Режим «Валютных войн»: 0 — обычный, 1 — разгон, 2 — подбор старта",
+    "currencyWars.mode": "Режим «Валютных войн»: 0 — обычный, 1 — разгон",
     "currencyWars.pointRewards": "Пропускать «Валютные войны», если лимит очков космического противостояния достигнут",
     "currencyWars.reroll.bossAffixes": "Модификаторы босса для подбора старта в «Валютных войнах»",
     "currencyWars.reroll.bossNames": "Имя босса для подбора старта в «Валютных войнах»",
     "currencyWars.reroll.partners": "Случайные спутники для подбора старта в «Валютных войнах»",
     "currencyWars.reroll.investEnvironments": "Инвестиционная среда для подбора старта в «Валютных войнах»",
     "currencyWars.reroll.investStrategies": "Инвестиционная стратегия для подбора старта в «Валютных войнах»",
+    "currencyWars.reroll.enabled": "Перебирать старты в «Валютных войнах»: перезапускать партию, пока не выполнены условия подбора",
     "currencyWars.runtimes": "Число партий «Валютных войн»; в подборе старта — число попыток",
     "currencyWars.strategy": "Название стратегии «Валютных войн»",
     "currencyWars.strategyIndex": "Индекс стратегии «Валютных войн»",
@@ -78,6 +80,14 @@
     "templateMatchConfidence": "Порог совпадения шаблонов от 0 до 1; выше — строже",
     "isRetryOnTaskFailure": "При ошибке задачи перезапускать игру и повторять попытку",
     "maxRetryCount": "Максимальное число повторов при ошибке задачи"
+  },
+  "LlmVisionSettings": {
+    "enabled": "Включить мультимодальную визуальную локализацию (LLM-резерв при неудаче сопоставления шаблона)",
+    "baseUrl": "Адрес мультимодальной модели; должен поддерживать протокол OpenAI chat/completions",
+    "model": "Название мультимодальной модели, например gpt-4o-mini",
+    "timeout": "Таймаут запроса в секундах",
+    "proxyUrl": "Прокси для запросов к модели; пусто — без прокси",
+    "apiKey": "API-ключ мультимодальной модели (хранится в зашифрованном виде)"
   },
   "MissionAccomplishedConfig": {
     "enabled": "Включить действия после завершения задач",

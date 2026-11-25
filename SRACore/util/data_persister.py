@@ -31,6 +31,16 @@ def _migrate_legacy_rewards(data: dict) -> dict:
     return data
 
 
+def _migrate_legacy_currency_wars_mode(data: dict) -> dict:
+    """旧版配置兼容：刷开局原为 currencyWars.mode=2，现拆分为独立开关"""
+    cosmic = data.get("cosmicStrife")
+    if not isinstance(cosmic, dict) or cosmic.get("currencyWars.mode") != 2:
+        return data
+    cosmic["currencyWars.mode"] = 0
+    cosmic.setdefault("currencyWars.reroll.enabled", True)
+    return data
+
+
 def load_config(name: str) -> TasksConfig | None:
     path = ''
     try:
@@ -41,6 +51,7 @@ def load_config(name: str) -> TasksConfig | None:
         with open(path, 'r', encoding='utf-8-sig') as f:
             data = json.load(f)
         data = _migrate_legacy_rewards(data)
+        data = _migrate_legacy_currency_wars_mode(data)
         return TasksConfig.from_dict(data)
     except FileNotFoundError:
         logger.error(Resources.config_fileNotFound(path))

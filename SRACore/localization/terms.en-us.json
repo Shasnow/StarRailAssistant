@@ -9,7 +9,8 @@
     "developerMode.customBackend.command": "Custom backend command/executable, e.g. python, sra-cli, uv, or an executable path",
     "developerMode.customBackend.arguments": "Custom backend launch arguments, e.g. main.py, -m SRACore",
     "developerMode.customBackend.workingDirectory": "Custom backend working directory; uses the program's current directory when empty",
-    "developerMode.saveOcrImage": "Whether to save OCR screenshots for debugging"
+    "developerMode.saveOcrImage": "Whether to save OCR screenshots for debugging",
+    "llmVision": "Multimodal visual localization settings"
   },
   "AppSettings": {
     "general": "General settings",
@@ -22,13 +23,14 @@
     "enabled": "Whether to enable the Cosmic Strife task",
     "currencyWars.enabled": "Master switch for Currency Wars",
     "currencyWars.difficulty": "Currency Wars difficulty, 0=lowest, 1=highest, 2=current difficulty",
-    "currencyWars.mode": "Currency Wars mode, 0=Standard match, 1=Overclock match, 2=opening reroll",
+    "currencyWars.mode": "Currency Wars mode, 0=Standard match, 1=Overclock match",
     "currencyWars.pointRewards": "When enabled, skip the Currency Wars task if Cosmic Strife point rewards are full",
     "currencyWars.reroll.bossAffixes": "Boss affixes for Currency Wars opening reroll",
     "currencyWars.reroll.bossNames": "Boss names for Currency Wars opening reroll",
     "currencyWars.reroll.partners": "Encounter partners for Currency Wars opening reroll",
     "currencyWars.reroll.investEnvironments": "Investment environments for Currency Wars opening reroll",
     "currencyWars.reroll.investStrategies": "Investment strategies for Currency Wars opening reroll",
+    "currencyWars.reroll.enabled": "Whether to reroll the opening in Currency Wars; restarts the run until the reroll requirements are met",
     "currencyWars.runtimes": "Number of runs for Currency Wars opening reroll",
     "currencyWars.strategy": "Strategy name used in Currency Wars",
     "currencyWars.strategyIndex": "Strategy index used in Currency Wars",
@@ -78,6 +80,14 @@
     "templateMatchConfidence": "Template matching confidence (recognition confidence), range 0-1, higher is stricter",
     "isRetryOnTaskFailure": "Whether to restart the game and retry after a task failure",
     "maxRetryCount": "Maximum number of retries after a task failure"
+  },
+  "LlmVisionSettings": {
+    "enabled": "Whether to enable multimodal visual localization (LLM fallback when template matching fails)",
+    "baseUrl": "Endpoint of the multimodal model; must be compatible with the OpenAI chat/completions protocol",
+    "model": "Multimodal model name, e.g. gpt-4o-mini",
+    "timeout": "Request timeout in seconds",
+    "proxyUrl": "Proxy used when calling the model; leave empty for no proxy",
+    "apiKey": "API key of the multimodal model (stored encrypted)"
   },
   "MissionAccomplishedConfig": {
     "enabled": "Whether to enable post-task actions",

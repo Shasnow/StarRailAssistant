@@ -41,7 +41,7 @@ class CosmicStrifeTask(BaseTask):
             return False
         Characters.set_username(username)
 
-        if cw_mode==2:
+        if self.config.CosmicStrife.isCurrencyWarsRerollEnabled:
             # noinspection PyAttributeOutsideInit
             self.notify = False  # 刷开局时关闭任务通知
             logger.info("执行任务：旷宇纷争-货币战争 刷开局")
@@ -49,6 +49,8 @@ class CosmicStrifeTask(BaseTask):
             rs_task = RerollStart(operator=self.operator, runtimes=runtimes)
             # 刷开局难度选择：和标准模式使用同一个难度配置项
             rs_task.set_difficulty(difficulty)
+            # 刷开局的博弈类型沿用模式选择：0=标准博弈，1=超频博弈
+            rs_task.set_overclock(cw_mode == 1)
             rs_task.load_strategy(strategy)
             rs_task.set_boss_name(self.config.CosmicStrife.currencyWarsRerollBossNames)
             rs_task.set_encounter_partner(self.config.CosmicStrife.currencyWarsRerollPartners)
@@ -59,7 +61,7 @@ class CosmicStrifeTask(BaseTask):
                 logger.error("旷宇纷争-货币战争刷开局任务失败")
                 return False
 
-        elif cw_mode==1 or cw_mode==0:
+        else:
             logger.info("执行任务：旷宇纷争-货币战争 常规")
             from tasks.currency_wars import CurrencyWars
             cw_task = CurrencyWars(operator=self.operator, runtimes=runtimes,

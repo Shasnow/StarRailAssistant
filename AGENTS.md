@@ -101,7 +101,8 @@ Full（Core + 桌面端 publish）、Lite（桌面端 + 源码 + `pyproject.toml
 - **Logging** 用 `loguru`（`SRACore/util/logger.py`），不要用 `print` 做诊断。
 - **Errors** `ThreadStoppedError` 是 `Runner` 与 operators 识别的协作停止信号。
 - **Adding a user-visible field** 必须改后端模型/schema：桌面端绑定任务配置、WebUI 由 OpenAPI 渲染，两者跟随后端。
-- **Release notes live in `ChangeLog2.0.md`.** `scripts/package.py` 读取它、替换 `${VERSION}` 并写出 gitignore 的
+- **Release notes live in `ChangeLog2.0.md`.** 每次新增功能或修复问题都必须同步更新该文件（功能/修复各写一条用户可读的说明）。
+  `scripts/package.py` 读取它、替换 `${VERSION}` 并写出 gitignore 的
   `version_info.txt`（首行为发布名/tag）供 CI 使用——改 changelog，不要改 `version_info.txt`。
   `.github/workflows/python-app.yml` 构建发布（内嵌 Python + 源码 + `SRA-cli.exe` 启动器 + Inno Setup + 多 zip）；
   构建步骤抽在可复用的 `build-artifacts.yml`（仅上传产物、不发布 release，不触发 Mirror酱 / auto-mas）。
