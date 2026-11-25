@@ -7,7 +7,7 @@ on:
 
 jobs:
   mirrorchyan:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'Shasnow' }}
 
     steps:
