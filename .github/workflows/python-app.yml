@@ -119,7 +119,7 @@ jobs:
 
   mirrorchyan:
     needs: publish_release
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'Shasnow' }}
     steps:
       - name: upload
