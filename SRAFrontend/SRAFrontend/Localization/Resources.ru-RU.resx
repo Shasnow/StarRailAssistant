@@ -1488,6 +1488,18 @@
     <data name="CurrencyWarsManualClearHint" xml:space="preserve">
         <value>Сначала пройдите режим вручную и закройте все обучающие подсказки</value>
     </data>
+    <data name="CurrencyWarsSkipShopRefreshText" xml:space="preserve">
+        <value>Не обновлять магазин (покупать только текущий ассортимент, без обновления и повышения уровня)</value>
+    </data>
+    <data name="CurrencyWarsSkipApplyStrategyText" xml:space="preserve">
+        <value>Не применять стратегию (не вставлять код стратегии)</value>
+    </data>
+    <data name="CurrencyWarsSkipHarvestCrystalsText" xml:space="preserve">
+        <value>Не собирать кристаллы</value>
+    </data>
+    <data name="CurrencyWarsSkipEquipText" xml:space="preserve">
+        <value>Не надевать снаряжение автоматически</value>
+    </data>
     <data name="AfterTasksCompleteText" xml:space="preserve">
         <value>После выполнения задач</value>
     </data>

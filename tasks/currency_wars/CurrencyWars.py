@@ -159,6 +159,11 @@ class CurrencyWars(Executable):
         self.strategy_special_events: dict[str, str] = dict()  # 攻略中的特殊事件处理
         self.is_overclock = False  # 超频博弈
         self.is_complex_invest_strategy_selection_enabled = False  # 是否启用复杂投资策略选择逻辑
+        # 高级设置：跳过指定流程
+        self.skip_shop_refresh = False  # 跳过商店刷新
+        self.skip_apply_strategy = False  # 跳过应用攻略
+        self.skip_harvest_crystals = False  # 跳过收集晶矿
+        self.skip_equip = False  # 跳过穿戴装备
 
     def run(self):
         self.is_running = True
@@ -230,6 +235,17 @@ class CurrencyWars(Executable):
 
     def set_overclock(self, overclock: bool):
         self.is_overclock = overclock
+
+    def set_skip_options(self, *,
+                         shop_refresh: bool = False,
+                         apply_strategy: bool = False,
+                         harvest_crystals: bool = False,
+                         equip: bool = False):
+        """高级设置：跳过指定流程"""
+        self.skip_shop_refresh = shop_refresh
+        self.skip_apply_strategy = apply_strategy
+        self.skip_harvest_crystals = harvest_crystals
+        self.skip_equip = equip
 
     def page_locate(self, depth = 0) -> CurrencyWarsPage:
         """
@@ -518,7 +534,7 @@ class CurrencyWars(Executable):
         Returns:
             True-继续执行后续初始化和游戏循环；False-中止进入流程
         """
-        if self.is_continue or not self.strategy_code:
+        if self.skip_apply_strategy or self.is_continue or not self.strategy_code:
             return True
         self.operator.click_img(CWIMG.STRATEGY, after_sleep=1, retry=3)
         self.operator.click_img(CWIMG.HOT_STRATEGIES, after_sleep=0.5)
@@ -750,7 +766,7 @@ class CurrencyWars(Executable):
                     if count_stars and not char.is_npc:
                         char.stars = get_stars(merge=3)
                     target_character_list[index] = char
-                    if equip and not char.is_npc:
+                    if equip and not self.skip_equip and not char.is_npc:
                         if char.name in self.strategy_characters.keys():
                             self.operator.click_point(0.77, 0.75, after_sleep=0.5, trace=False)  # 点击装备推荐按钮
                             _, box = self.operator.locate_any([CWIMG.EQUIP, CWIMG.SYNTHESIS], confidence=0.8)
@@ -804,6 +820,9 @@ class CurrencyWars(Executable):
 
     def harvest_crystals(self):
         # 实现水晶收集逻辑
+        if self.skip_harvest_crystals:
+            logger.debug("已跳过收集晶矿")
+            return
         logger.info("收集水晶")
         if self.operator.type == "Local":
             self.operator.drag_to(0.68, 0.20, 0.82, 0.18, trace=False)
@@ -1489,6 +1508,12 @@ class CurrencyWars(Executable):
         cs = scan_characters_in_store()
         if cs:
             purchase_target_character(cs)
+        if self.skip_shop_refresh:
+            # 高级设置：只购买当前商店角色，不刷新、不升级
+            logger.info("已跳过商店刷新，仅购买当前商店中已有的目标角色")
+            self.operator.click_point(0.5, 0.55, after_sleep=1.5)
+            logger.info("购物流程结束，关闭商店")
+            return
         prev_coins = -1
         while True:
             purchased = False

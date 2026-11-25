@@ -140,6 +140,19 @@
                                              PlaceholderText="{x:Static lang:Resources.CurrencyWarsStrategyExamplePlaceholder}" />
                                 </StackPanel>
                             </StackPanel>
+
+                            <Expander Header="{x:Static lang:Resources.AdvanceText}" Margin="0,4,0,0">
+                                <StackPanel Spacing="4">
+                                    <ToggleSwitch OnContent="{x:Static lang:Resources.CurrencyWarsSkipShopRefreshText}"
+                                                  IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsSkipShopRefresh}" />
+                                    <ToggleSwitch OnContent="{x:Static lang:Resources.CurrencyWarsSkipApplyStrategyText}"
+                                                  IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsSkipApplyStrategy}" />
+                                    <ToggleSwitch OnContent="{x:Static lang:Resources.CurrencyWarsSkipHarvestCrystalsText}"
+                                                  IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsSkipHarvestCrystals}" />
+                                    <ToggleSwitch OnContent="{x:Static lang:Resources.CurrencyWarsSkipEquipText}"
+                                                  IsChecked="{Binding CosmicStrifeConfig.IsCurrencyWarsSkipEquip}" />
+                                </StackPanel>
+                            </Expander>
                         </StackPanel>
                     </suki:GlassCard>
                     <TextBlock><x:Static Member="lang:Resources.CurrencyWarsManualClearHint" /></TextBlock>

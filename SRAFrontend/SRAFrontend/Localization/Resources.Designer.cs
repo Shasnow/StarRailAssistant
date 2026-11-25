@@ -1187,6 +1187,42 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Skip shop refresh (buy current shop only, no reroll or level-up).
+        /// </summary>
+        public static string CurrencyWarsSkipShopRefreshText {
+            get {
+                return ResourceManager.GetString("CurrencyWarsSkipShopRefreshText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skip applying strategy (do not paste the strategy code).
+        /// </summary>
+        public static string CurrencyWarsSkipApplyStrategyText {
+            get {
+                return ResourceManager.GetString("CurrencyWarsSkipApplyStrategyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skip crystal collection.
+        /// </summary>
+        public static string CurrencyWarsSkipHarvestCrystalsText {
+            get {
+                return ResourceManager.GetString("CurrencyWarsSkipHarvestCrystalsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skip equipping gear automatically.
+        /// </summary>
+        public static string CurrencyWarsSkipEquipText {
+            get {
+                return ResourceManager.GetString("CurrencyWarsSkipEquipText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Plane 1 strategy 1, Plane 1 strategy 2; Plane 2 strategy 1, Plane 2 strategy 2.
         /// </summary>
         public static string CurrencyWarsStrategyExamplePlaceholder {

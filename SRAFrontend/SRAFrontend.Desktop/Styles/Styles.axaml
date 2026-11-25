@@ -7,6 +7,10 @@
     </Design.PreviewWith>
 
     <!-- Add Styles Here -->
+    <!-- SukiUI 的 ToggleSwitch 主题自带 1.1 倍缩放，文字较长时会溢出父容器边界 -->
+    <Style Selector="ToggleSwitch">
+        <Setter Property="RenderTransform" Value="{x:Null}" />
+    </Style>
     <Style Selector="Button.Icon">
         <Setter Property="FontFamily" Value="{DynamicResource Phosphor}"/>
     </Style>

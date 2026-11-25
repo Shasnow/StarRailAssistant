@@ -1484,6 +1484,18 @@
     <data name="CurrencyWarsManualClearHint" xml:space="preserve">
         <value>请先手动完成一次以清除所有新手提示</value>
     </data>
+    <data name="CurrencyWarsSkipShopRefreshText" xml:space="preserve">
+        <value>跳过商店刷新（只购买当前商店角色，不刷新、不升级）</value>
+    </data>
+    <data name="CurrencyWarsSkipApplyStrategyText" xml:space="preserve">
+        <value>跳过应用攻略（不粘贴攻略码）</value>
+    </data>
+    <data name="CurrencyWarsSkipHarvestCrystalsText" xml:space="preserve">
+        <value>跳过收集晶矿</value>
+    </data>
+    <data name="CurrencyWarsSkipEquipText" xml:space="preserve">
+        <value>跳过穿戴装备</value>
+    </data>
     <data name="AfterTasksCompleteText" xml:space="preserve">
         <value>任务完成后</value>
     </data>

@@ -1488,6 +1488,18 @@ Please choose another folder.</value>
     <data name="CurrencyWarsManualClearHint" xml:space="preserve">
         <value>Complete it manually once first to clear all beginner tips</value>
     </data>
+    <data name="CurrencyWarsSkipShopRefreshText" xml:space="preserve">
+        <value>Skip shop refresh (buy current shop only, no reroll or level-up)</value>
+    </data>
+    <data name="CurrencyWarsSkipApplyStrategyText" xml:space="preserve">
+        <value>Skip applying strategy (do not paste the strategy code)</value>
+    </data>
+    <data name="CurrencyWarsSkipHarvestCrystalsText" xml:space="preserve">
+        <value>Skip crystal collection</value>
+    </data>
+    <data name="CurrencyWarsSkipEquipText" xml:space="preserve">
+        <value>Skip equipping gear automatically</value>
+    </data>
     <data name="AfterTasksCompleteText" xml:space="preserve">
         <value>After tasks complete</value>
     </data>
