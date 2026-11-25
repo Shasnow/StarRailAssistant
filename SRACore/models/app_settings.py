@@ -17,6 +17,25 @@ class _Model(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True, extra="allow")
 
+class LlmVisionSettings(_Model):
+    """多模态视觉定位设置"""
+
+    isEnabled: bool = Field(False, alias="enabled", description='是否启用多模态视觉定位（模板匹配失败时由大模型兜底）')
+    baseUrl: str = Field("", alias="baseUrl", description='多模态模型的接口地址，需兼容 OpenAI 的 chat/completions 协议')
+    model: str = Field("", alias="model", description='多模态模型名称，如 gpt-4o-mini')
+    timeout: float = Field(30.0, alias="timeout", description='请求超时时间（秒）')
+    proxyUrl: str = Field("", alias="proxyUrl", description='调用模型时使用的代理地址，留空表示不使用代理')
+    EncryptedApiKey: str = Field("", alias="apiKey", description='多模态模型的 API Key（加密存储）')
+
+    def to_dict(self) -> dict:
+        """转换为字典（键为 C# 侧的 JSON 名称）"""
+        return self.model_dump(by_alias=True)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "LlmVisionSettings":
+        """从字典创建对象"""
+        return cls.model_validate(data)
+
 class GeneralSettings(_Model):
     """通用设置"""
 
@@ -178,6 +197,7 @@ class AdvancedSettings(_Model):
     customBackendArguments: str = Field("", alias="developerMode.customBackend.arguments", description='自定义后端启动参数，如 main.py、-m SRACore')
     customBackendWorkingDirectory: str = Field("", alias="developerMode.customBackend.workingDirectory", description='自定义后端工作目录，留空时使用程序当前目录')
     isSaveOcrImage: bool = Field(False, alias="developerMode.saveOcrImage", description='是否保存 OCR 截图以便调试')
+    LlmVision: LlmVisionSettings = Field(default_factory=LlmVisionSettings, alias="llmVision", description='多模态视觉定位设置')
 
     def to_dict(self) -> dict:
         """转换为字典（键为 C# 侧的 JSON 名称）"""

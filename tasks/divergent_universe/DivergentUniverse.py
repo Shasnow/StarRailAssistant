@@ -19,7 +19,7 @@ class DivergentUniverse(Executable):
     # 视角旋转最大尝试次数
     MAX_ROTATE_ATTEMPTS = 8
     # 前进超时时间（秒）
-    FORWARD_TIMEOUT = 20
+    FORWARD_TIMEOUT = 15
     # 前进时分段持键时长（秒）
     FORWARD_HOLD_INTERVAL = 0.5
     # 对齐阈值（像素），小于此值视为已居中
@@ -29,11 +29,23 @@ class DivergentUniverse(Executable):
     # 站点刷新最大次数
     MAX_REROLL_ATTEMPTS = 3
     # 事件扫描：一周内转动+识别的步数
-    SCAN_STEPS = 10
+    SCAN_STEPS = 8
     # 事件扫描：轮数上限（每轮 = 旋转一周识别 + 前进识别）
-    MAX_SCAN_ROUNDS = 4
+    MAX_SCAN_ROUNDS = 3
     # 事件扫描：每轮前进时长（秒）
-    SCAN_FORWARD_DURATION = 1.0
+    SCAN_FORWARD_DURATION = 1.2
+    # 多模态定位事件画框的最低可信度，低于此值视为未找到并回落到 OCR
+    LLM_EVENT_MIN_CONFIDENCE = 0.7
+    # 多模态定位事件画框的目标说明。画的内容每个事件都不同，只能描述画框；
+    # 末句显式要求"没有就返回 false"，否则模型倾向于把粉色传送门之类的矩形当画框。
+    LLM_EVENT_DESCRIPTION = (
+        "漂浮在半空的画作，装在雕花画框内，只需识别画框，画的内容可以不同。"
+        "如果画面中没有这样的画框，success 必须为 false"
+    )
+    # 未知站点：站点卡没识别出来时先置为该值，进入站点后由左上角 HUD 兜底识别
+    UNKNOWN_STATION = "未知"
+    # 左上角站点名 HUD 的识别区域（比例坐标），形如「(16/20) 第三位面-奖励」
+    STATION_HUD_REGION = (0.0, 0.0, 0.2, 0.06)
 
     def __init__(self,
                  operator,
@@ -83,7 +95,7 @@ class DivergentUniverse(Executable):
         self.in_game = False
         self.is_running = False
         self.mode = mode
-        self.current_station = "战斗"
+        self.current_station = self.UNKNOWN_STATION
         
 
     def run(self):
@@ -91,7 +103,7 @@ class DivergentUniverse(Executable):
         logger.info("执行任务：差分宇宙-周期演算")
 
         for exe_time in range(self.run_times):
-            self.current_station = "战斗"  # 每次新对局重置默认站点（第一站固定为战斗）
+            self.current_station = self.UNKNOWN_STATION  # 每次新对局重置，进入站点后按 HUD 识别
             if not self.page_locate():
                 return False
             if not self.in_game:
@@ -121,6 +133,8 @@ class DivergentUniverse(Executable):
                 return False
             if not self.select():
                 return False
+            if not self.is_running:
+                break  # 探索成功等终态界面已返回主界面，不再导航到下一站
             if self.mode == 0:
                 if self._quit_game():
                     self.in_game = False  # 已退出差分宇宙，下次循环需重新进入
@@ -202,15 +216,50 @@ class DivergentUniverse(Executable):
             if event is None:
                 logger.info("扫描未找到事件，结束事件站点处理")
                 break
-            matcher = ContainsMatcher(event.source)
-            self._align_horizontal(event, lambda: self.operator.ocr_match(text=matcher, from_x=0.24, from_y=0.0, to_x=0.77, to_y=0.5))
+            self._align_horizontal(event, self._event_redetector(event))
             self._move_forward_until_found("事件")
             self.operator.press_key("f")
             self.select()
         return True
 
-    def _detect_event(self) -> Box | None:
-        """识别视野内的事件名称，过滤以数字开头的干扰文本"""
+    def _event_redetector(self, event: Box) -> Callable[[], Box | list[Box] | None]:
+        """返回"重新定位同一个事件"的回调
+
+        多模态定位给的 ``source`` 是模板图路径，没有文本可比，只能重跑一次检测；
+        OCR 给的是事件名，按名字重匹配，避免旋转后跳到另一个事件上。
+        """
+        if event.source == DUIMG.EVENT_FRAME:
+            return lambda: self._locate_event_frame(trace=False)
+        matcher = ContainsMatcher(event.source)
+        return lambda: self.operator.ocr_match(text=matcher, from_x=0.24, from_y=0.0, to_x=0.77, to_y=0.5)
+
+    def _locate_event_frame(self, *, trace: bool = True) -> Box | None:
+        """多模态在当前这一帧里直接定位事件画框
+
+        画框是场景里的实体，多远的距离、什么角度都是完整的雕纹边框，单帧就能认出来。
+        这一点决定了它不需要"前进再扫"：走近并不会让画框从无到有。
+
+        Args:
+            trace: 是否输出定位日志（对齐阶段每帧都调，压到 debug）。
+
+        Returns:
+            Box | None: 未启用多模态或未命中时返回 None。
+        """
+        if not self.operator.llm_vision.enabled:
+            return None
+        frame = self.operator.llm_locate(
+            DUIMG.EVENT_FRAME,
+            description=self.LLM_EVENT_DESCRIPTION,
+            min_confidence=self.LLM_EVENT_MIN_CONFIDENCE,
+            trace=trace,
+        )
+        if frame is not None:
+            log = logger.info if trace else logger.debug
+            log(f"多模态定位到事件画框: {frame}")
+        return frame
+
+    def _detect_event_by_name(self) -> Box | None:
+        """OCR 识别视野内的事件名称，过滤以数字开头的干扰文本"""
         events = self.operator.ocr_boxes(from_x=0.24, from_y=0.0, to_x=0.77, to_y=0.5, confidence=0.8)
         for box in events or []:
             if len(box.source) < 2 or box.source.isascii() or box.source == "造物调试台":  # 事件不可能为纯ASCII文本
@@ -220,7 +269,32 @@ class DivergentUniverse(Executable):
         return None
 
     def _scan_for_event(self) -> Box | None:
-        """扫描寻找事件：重置视角 → 向右旋转一周并穿插识别 → 未找到则前进后重新扫描，循环直到找到或达到轮数上限"""
+        """寻找事件：多模态转一圈，OCR 转一圈后还要前进重扫
+
+        两者都要转视角——进站点时角色朝向是随机的，画框可能在身后。差别在"找不到之后"：
+        画框是实体，转完一圈看不到就是这片区域没有，多模态到此结束；事件名要走近才显示，
+        所以 OCR 还得前进一段再看，最多 ``MAX_SCAN_ROUNDS`` 轮。
+        """
+        if self.operator.llm_vision.enabled:
+            return self._scan_for_event_by_frame()
+        return self._scan_for_event_by_name()
+
+    def _scan_for_event_by_frame(self) -> Box | None:
+        """多模态扫描：重置视角后转一圈，仍找不到就结束（不前进重扫）"""
+        step = int(self.operator.window_context.width * 0.5) - 1
+        self.operator.press_key("capslock")  # 视角重置到角色面向方向
+        self.operator.sleep(0.5)
+        for _ in range(self.SCAN_STEPS):
+            frame = self._locate_event_frame()
+            if frame is not None:
+                return frame
+            self.operator.move_rel(step, 0)
+            self.operator.sleep(0.3)
+        logger.info("转完一圈未找到事件画框，结束事件站点处理")
+        return None
+
+    def _scan_for_event_by_name(self) -> Box | None:
+        """OCR 扫描：重置视角 → 向右旋转一周并穿插识别 → 未找到则前进后重新扫描，循环直到找到或达到轮数上限"""
         step = int(self.operator.window_context.width * 0.5) - 1
         for round_ in range(1, self.MAX_SCAN_ROUNDS + 1):
             self.operator.press_key("capslock")  # 视角重置到角色面向方向
@@ -229,14 +303,16 @@ class DivergentUniverse(Executable):
             for _ in range(self.SCAN_STEPS):
                 self.operator.move_rel(step, 0)
                 self.operator.sleep(0.3)
-                event = self._detect_event()
+                event = self._detect_event_by_name()
                 if event is not None:
                     return event
             logger.info(f"{round_}/{self.MAX_SCAN_ROUNDS} 未找到事件，前进后重试")
             # 前进一段距离后识别，再进入下一轮
+            self.operator.press_key("capslock")
+            self.operator.sleep(0.5)
             self.operator.hold_key("w", self.SCAN_FORWARD_DURATION)
             self.operator.sleep(0.3)
-            event = self._detect_event()
+            event = self._detect_event_by_name()
             if event is not None:
                 return event
         logger.warning("扫描完成仍未找到事件")
@@ -270,17 +346,19 @@ class DivergentUniverse(Executable):
 
     def navigate_to_next_station(self):
         """导航到下一个站点：定位随意门 → 水平对齐 → 前进 → 交互"""
-        if not self._find_door_and_align():
+        logger.info("开始导航到下一个站点")
+        for attempt in range(1, 3):
+            if self._find_door_and_align():
+                if self._move_forward_until_found("随意门"):
+                    self.operator.press_key('f')
+                    return True
+            logger.warning(f"第 {attempt} 次未检测到随意门，尝试重新定位")
             self._quit_game(temporary=True)
             self._start_divergent_universe(0)
             self.page_locate()
             self.operator.hold_key("d", duration=1)
-            if not self._find_door_and_align():
-                return False
-        if not self._move_forward_until_found("随意门"):
-            logger.warning("前进超时未检测到交互提示，尝试直接交互")
-        self.operator.press_key('f')
-        return True
+            self.operator.press_key("w")
+        return False
 
     def _find_door(self):
         """检测随意门，未找到则旋转视角重试"""
@@ -309,28 +387,30 @@ class DivergentUniverse(Executable):
 
         Args:
             box: 初始检测到的目标框
-            detect: 重新检测目标位置的回调，返回 Box 列表
+            detect: 重新检测目标位置的回调，返回 Box 或 Box 列表
         """
         screen_center_x = self.operator.window_context.width // 2
         for attempt in range(1, self.MAX_ALIGN_ATTEMPTS + 1):
             delta = box.center[0] - screen_center_x
-
             if abs(delta) < self.ALIGN_THRESHOLD:
                 logger.debug(f"第 {attempt} 次对齐：偏差 {delta}px，已居中")
                 return
-
             logger.debug(f"第 {attempt} 次对齐：偏差 {delta}px，旋转视角")
             self.operator.move_rel(delta, 0)
             self.operator.sleep(0.5)
-
-            # 重新检测目标位置
-            boxes = detect()
-            if not boxes:
+            box = self._detect_target(detect)
+            if box is None:
                 logger.warning(f"第 {attempt} 次对齐：旋转后丢失目标，终止对齐")
                 return
-            box = boxes[0] if isinstance(boxes, list) else boxes
-
         logger.warning(f"已尝试 {self.MAX_ALIGN_ATTEMPTS} 次仍未对齐，继续执行")
+
+    @staticmethod
+    def _detect_target(detect: Callable[[], Box | list[Box] | None]) -> Box | None:
+        """取回调返回的单个目标；回调可能给 Box、Box 列表或空列表"""
+        found = detect()
+        if isinstance(found, list):
+            return found[0] if found else None
+        return found
 
     def _find_door_and_align(self):
         """检测随意门，未找到则旋转视角重试，对齐到屏幕中心"""
@@ -345,7 +425,7 @@ class DivergentUniverse(Executable):
                 min_area=self.MIN_DOOR_AREA, trace=False))
         return True
 
-    def _move_forward_until_found(self, text: str = "", forward_hold_interval: float | None = None):
+    def _move_forward_until_found(self, text: str = "", forward_hold_interval: float | None = None) -> bool:
         """分段按住 w 前进，检测到 IMG.F 或超时后停止"""
         logger.info(f"开始前进，超时 {self.FORWARD_TIMEOUT}s，等待检测交互提示")
         if forward_hold_interval is None:
@@ -370,7 +450,7 @@ class DivergentUniverse(Executable):
                     self._move_forward_until_found(text, forward_hold_interval) # 递归调用，继续前进
         else:
             logger.warning(f"前进超时（{self.FORWARD_TIMEOUT}s），停止前进")
-        return found
+        return False
 
     def select(self):
         """选择操作"""
@@ -390,7 +470,7 @@ class DivergentUniverse(Executable):
             if is_terminal:
                 break
             self.operator.sleep(0.5)
-            selection_index, _ = self.operator.wait_any_img(self.selection_template_list, timeout=30)
+            selection_index, _ = self.operator.wait_any_img(self.selection_template_list, timeout=300)
 
         return True
 
@@ -398,11 +478,32 @@ class DivergentUniverse(Executable):
         """站点操作"""
         if self.current_station == '':
             return True
+        if self._known_station_name(self.current_station) is None:
+            # 站点卡没识别出来（或选中了无法识别的选项）时，用左上角 HUD 的站点名兜底
+            self.current_station = self._detect_station_name()
+            if self.current_station == self.UNKNOWN_STATION:
+                raise RuntimeError("无法识别当前站点")
         for station_name, handler in self.stations:
             if self.current_station in station_name:
                 self.current_station = ''  # 处理完后，将当前站点重置为空字符串
                 return handler()
         raise RuntimeError(f"无法处理站点 {self.current_station}")
+
+    def _known_station_name(self, text: str) -> str | None:
+        """返回文本中包含的第一个已知站点名，没有则返回 None"""
+        return next((name for name, _ in self.stations if name in text), None)
+
+    def _detect_station_name(self) -> str:
+        """OCR 左上角 HUD 识别当前站点名（形如「(16/20) 第三位面-奖励」）"""
+        boxes = self.operator.ocr_boxes(*self.STATION_HUD_REGION, trace=False)
+        # OCR 可能把 HUD 文本切成多段，拼起来再匹配
+        texts = [box.text for box in boxes or []]
+        station_name = self._known_station_name("".join(texts))
+        if station_name is None:
+            logger.warning(f"左上角未识别到站点名: {texts}")
+            return self.UNKNOWN_STATION
+        logger.info(f"左上角识别到站点: {station_name}")
+        return station_name
 
     def handle_mask_select(self):
         self.operator.click_point(0.1713, 0.80, tag="选择下面的面具")
@@ -446,37 +547,58 @@ class DivergentUniverse(Executable):
     def handle_next_station_select(self):
         """选择下一个站点：优先选择 station_priority 中的站点，未刷出则点击刷新重试"""
         self.operator.click_point(0.5, 0.5)  # 点击中心，确保选择到下一个站点，防止只有单个站点时未识别到
-        boxes = self.operator.ocr_boxes(from_x=0.1, from_y=0.675, to_x=0.9, to_y=0.76)  # 识别选项
-        if not boxes:
-            raise RuntimeError("未找到下一个站点")
-        logger.info(f"识别到 {len(boxes)} 个选项")
-        target = self._match_priority_station(boxes)
-        for reroll in range(1, self.MAX_REROLL_ATTEMPTS + 1):
-            if target is not None:
-                break
-            logger.info(f"未找到目标站点，第 {reroll}/{self.MAX_REROLL_ATTEMPTS} 次刷新站点")
-            if not self.operator.click_img(DUIMG.REROLL, after_sleep=1):
-                logger.warning("未找到刷新按钮，停止刷新")
-                break
-            self.operator.click_img(IMG.ENSURE, after_sleep=1)  # 可能需要点击确认刷新
-            boxes = self.operator.ocr_boxes(from_x=0.1, from_y=0.675, to_x=0.9, to_y=0.75)  # 刷新后重新识别
-            if not boxes:
-                raise RuntimeError("刷新后未找到站点选项")
-            target = self._match_priority_station(boxes)
-        if target is None:
-            logger.info("未刷出目标站点，选择第一个选项")
-            target = boxes[0]
-        logger.info(f"选择站点: {target.text}")
-        self.operator.click_box(target)
-        self.current_station = target.text
+        options = self._station_options()
+        if not options:
+            logger.warning("未找到下一个站点")
+            self.current_station = self.UNKNOWN_STATION  # 进入站点后用左上角 HUD 兜底识别
+        else:
+            logger.info(f"识别到 {len(options)} 个选项: {[name for name, _ in options]}")
+            target = self._match_priority_station(options)
+            for reroll in range(1, self.MAX_REROLL_ATTEMPTS + 1):
+                if target is not None:
+                    break
+                logger.info(f"未找到目标站点，第 {reroll}/{self.MAX_REROLL_ATTEMPTS} 次刷新站点")
+                if not self.operator.click_img(DUIMG.REROLL, after_sleep=1):
+                    logger.warning("未找到刷新按钮，停止刷新")
+                    break
+                self.operator.click_img(IMG.ENSURE, after_sleep=1)  # 可能需要点击确认刷新
+                options = self._station_options()  # 刷新后重新识别
+                if not options:
+                    raise RuntimeError("刷新后未找到站点选项")
+                target = self._match_priority_station(options)
+            if target is None:
+                logger.info("未刷出目标站点，选择第一个选项")
+                target = options[0]
+            station_name, box = target
+            logger.info(f"选择站点: {station_name}")
+            self.operator.click_box(box)
+            self.current_station = station_name
         self.operator.sleep(0.5)
-        self.operator.click_img(DUIMG.ENSURE, after_sleep=0.5)
+        if not self.operator.click_img(DUIMG.ENSURE, after_sleep=0.5, retry=3):
+            raise RuntimeError("选择下一个站点失败！")
         return True
 
-    def _match_priority_station(self, boxes):
-        """返回第一个匹配 station_priority 的选项，没有则返回 None"""
+    def _station_options(self) -> list[tuple[str, Box]]:
+        """识别站点卡选项，按从左到右排序
+
+        OCR 区域里除了三张站点卡，还会混入界面上的其他文字（步数、装饰贴图被误识别的
+        短串等），这些结果既无法用来判断优先级，选中后也没有对应处理器。因此只保留
+        文本含已知站点名的结果，并归一成站点名，避免把噪声当成选项。
+        """
+        boxes = self.operator.ocr_boxes(from_x=0.1, from_y=0.675, to_x=0.9, to_y=0.76)
+        options = []
+        for box in boxes or []:
+            station_name = self._known_station_name(box.text)
+            if station_name is not None:
+                options.append((station_name, box))
+        options.sort(key=lambda option: option[1].left)
+        return options
+
+    def _match_priority_station(self, options):
+        """返回第一个匹配 station_priority 的站点选项，没有则返回 None"""
         return next(
-            (box for box in boxes if any(station in box.text for station in self.station_priority)),
+            (option for option in options
+             if any(station in option[0] for station in self.station_priority)),
             None,
         )
 
@@ -491,12 +613,13 @@ class DivergentUniverse(Executable):
             raise RuntimeError("未找到探索成功按钮")
         self.operator.click_box(boxes, after_sleep=0.5)
         self.operator.click_img(IMG.ENSURE)
+        self.is_running = False  # 本次对局已结束，game_loop 不再导航到下一站
 
     def handle_wealth_station(self):
         """处理财富站点"""
         self._find_door_and_align()
-        self._move_forward_until_found("战利品")
-        self.operator.press_key("f")
+        # self._move_forward_until_found("战利品")
+        # self.operator.press_key("f")
         self.select()
         return True
 

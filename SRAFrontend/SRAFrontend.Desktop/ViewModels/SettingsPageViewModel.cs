@@ -153,6 +153,7 @@ public partial class SettingsPageViewModel : PageViewModel
     public NotificationSettings NotificationSettings => Settings.Notification;
     public UpdateSettings UpdateSettings => Settings.Update;
     public AdvancedSettings AdvancedSettings => Settings.Advanced;
+    public LlmVisionSettings LlmVisionSettings => Settings.Advanced.LlmVision;
     public Cache Cache => _cacheService.Cache;
 
     /// <summary>显示当前版本；已安装更高热修时显示热修版本。</summary>

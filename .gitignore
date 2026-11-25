@@ -3,6 +3,9 @@
 /log/
 /tmp/
 
+# 测试相关
+test*
+
 # IDE / 编辑器
 /.vscode/
 **/.trae/

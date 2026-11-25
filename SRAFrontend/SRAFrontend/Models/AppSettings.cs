@@ -28,6 +28,45 @@ public class AppSettings
     [JsonPropertyName("notification"), Description("通知设置")] public NotificationSettings Notification { get; init; } = new();
 }
 
+/// <summary>
+/// 多模态视觉定位：模板匹配失败时，把模板图与游戏截图交给视觉模型兜底识别。
+/// </summary>
+public partial class LlmVisionSettings : ObservableObject
+{
+    [ObservableProperty]
+    [property: JsonPropertyName("enabled")]
+    [property: Description("是否启用多模态视觉定位（模板匹配失败时由大模型兜底）")]
+    private bool _isEnabled;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("baseUrl")]
+    [property: Description("多模态模型的接口地址，需兼容 OpenAI 的 chat/completions 协议")]
+    private string _baseUrl = "";
+
+    [ObservableProperty]
+    [property: JsonPropertyName("model")]
+    [property: Description("多模态模型名称，如 gpt-4o-mini")]
+    private string _model = "";
+
+    [ObservableProperty]
+    [property: JsonPropertyName("timeout")]
+    [property: Description("请求超时时间（秒）")]
+    private double _timeout = 30;
+
+    [ObservableProperty]
+    [property: JsonPropertyName("proxyUrl")]
+    [property: Description("调用模型时使用的代理地址，留空表示不使用代理")]
+    private string _proxyUrl = "";
+
+    [JsonPropertyName("apiKey")]
+    [Description("多模态模型的 API Key（加密存储）")]
+    public string EncryptedApiKey { get; set; } = "";
+
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private string _apiKey = "";
+}
+
 public partial class GeneralSettings : ObservableObject
 {
     [ObservableProperty]
@@ -575,4 +614,7 @@ public partial class AdvancedSettings : ObservableObject
     [property: JsonPropertyName("developerMode.saveOcrImage")]
     [property: Description("是否保存 OCR 截图以便调试")]
     private bool _isSaveOcrImage;
+
+    [JsonPropertyName("llmVision"), Description("多模态视觉定位设置")]
+    public LlmVisionSettings LlmVision { get; init; } = new();
 }

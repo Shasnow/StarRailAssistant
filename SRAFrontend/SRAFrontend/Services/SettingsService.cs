@@ -72,12 +72,14 @@ public class SettingsService(ILogger<SettingsService> logger)
     {
         Settings.Update.EncryptedMirrorChyanCdk = EncryptUtil.EncryptString(Settings.Update.MirrorChyanCdk);
         Settings.Notification.EncryptedSmtpAuthCode = EncryptUtil.EncryptString(Settings.Notification.SmtpAuthCode);
+        Settings.Advanced.LlmVision.EncryptedApiKey = EncryptUtil.EncryptString(Settings.Advanced.LlmVision.ApiKey);
     }
 
     private void DecryptSensitiveFields()
     {
         Settings.Update.MirrorChyanCdk = EncryptUtil.DecryptString(Settings.Update.EncryptedMirrorChyanCdk);
         Settings.Notification.SmtpAuthCode = EncryptUtil.DecryptString(Settings.Notification.EncryptedSmtpAuthCode);
+        Settings.Advanced.LlmVision.ApiKey = EncryptUtil.DecryptString(Settings.Advanced.LlmVision.EncryptedApiKey);
     }
 
     private void SubscribeAll()
@@ -87,6 +89,7 @@ public class SettingsService(ILogger<SettingsService> logger)
         Subscribe(Settings.Update);
         Subscribe(Settings.Display);
         Subscribe(Settings.Advanced);
+        Subscribe(Settings.Advanced.LlmVision);
 
         // 订阅所有 ObservableCollection 的 CollectionChanged 事件
         SubscribeObservableCollection(Settings.General.GamePaths);

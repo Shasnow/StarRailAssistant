@@ -9,7 +9,8 @@
     "developerMode.customBackend.command": "自定义后端命令/可执行文件，如 python、sra-cli、uv 或可执行文件路径",
     "developerMode.customBackend.arguments": "自定义后端启动参数，如 main.py、-m SRACore",
     "developerMode.customBackend.workingDirectory": "自定义后端工作目录，留空时使用程序当前目录",
-    "developerMode.saveOcrImage": "是否保存 OCR 截图以便调试"
+    "developerMode.saveOcrImage": "是否保存 OCR 截图以便调试",
+    "llmVision": "多模态视觉定位设置"
   },
   "AppSettings": {
     "general": "通用设置",
@@ -78,6 +79,14 @@
     "templateMatchConfidence": "模板匹配置信度（识图置信度），范围 0-1，数值越高越严格",
     "isRetryOnTaskFailure": "任务失败后是否尝试重启游戏并重试",
     "maxRetryCount": "任务失败后最大重试次数"
+  },
+  "LlmVisionSettings": {
+    "enabled": "是否启用多模态视觉定位（模板匹配失败时由大模型兜底）",
+    "baseUrl": "多模态模型的接口地址，需兼容 OpenAI 的 chat/completions 协议",
+    "model": "多模态模型名称，如 gpt-4o-mini",
+    "timeout": "请求超时时间（秒）",
+    "proxyUrl": "调用模型时使用的代理地址，留空表示不使用代理",
+    "apiKey": "多模态模型的 API Key（加密存储）"
   },
   "MissionAccomplishedConfig": {
     "enabled": "是否启用任务完成后操作",

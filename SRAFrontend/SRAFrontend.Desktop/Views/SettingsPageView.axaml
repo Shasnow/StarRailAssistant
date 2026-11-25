@@ -911,7 +911,69 @@
                                                  PlaceholderText="http://localhost:5073"
                                                  Text="{Binding AdvancedSettings.RemoteBaseUrl}" />
                                     </Grid>
+
+                                    <Expander Header="{x:Static lang:Resources.LlmVisionText}">
+                                        <StackPanel>
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE7BE;</Label>
+                                                <StackPanel Grid.Column="1">
+                                                    <Label Content="{x:Static lang:Resources.EnableLlmVisionText}" />
+                                                    <TextBlock FontSize="12"
+                                                               Opacity="0.72"
+                                                               Text="{x:Static lang:Resources.LlmVisionDescriptionText}"
+                                                               TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <ToggleSwitch Grid.Column="2"
+                                                              IsChecked="{Binding LlmVisionSettings.IsEnabled}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE0AC;</Label>
+                                                <Label Grid.Column="1"
+                                                       Content="{x:Static lang:Resources.LlmVisionBaseUrlText}" />
+                                                <TextBox Grid.Column="2"
+                                                         MinWidth="300"
+                                                         PlaceholderText="https://api.openai.com/v1"
+                                                         Text="{Binding LlmVisionSettings.BaseUrl}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE76E;</Label>
+                                                <Label Grid.Column="1"
+                                                       Content="{x:Static lang:Resources.LlmVisionModelText}" />
+                                                <TextBox Grid.Column="2"
+                                                         MinWidth="300"
+                                                         PlaceholderText="gpt-4o-mini"
+                                                         Text="{Binding LlmVisionSettings.Model}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE192;</Label>
+                                                <Label Grid.Column="1"
+                                                       Content="{x:Static lang:Resources.LlmVisionApiKeyText}" />
+                                                <TextBox Grid.Column="2"
+                                                         MinWidth="300"
+                                                         Text="{Binding LlmVisionSettings.ApiKey}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE916;</Label>
+                                                <Label Grid.Column="1"
+                                                       Content="{x:Static lang:Resources.LlmVisionTimeoutText}" />
+                                                <TextBox Grid.Column="2"
+                                                         MinWidth="300"
+                                                         PlaceholderText="30"
+                                                         Text="{Binding LlmVisionSettings.Timeout}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                                <Label Classes="Icon">&#xE968;</Label>
+                                                <Label Grid.Column="1"
+                                                       Content="{x:Static lang:Resources.LlmVisionProxyText}" />
+                                                <TextBox Grid.Column="2"
+                                                         MinWidth="300"
+                                                         PlaceholderText="http://127.0.0.1:7890"
+                                                         Text="{Binding LlmVisionSettings.ProxyUrl}" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Expander>
                                     
+                                    <!-- 开发者选项，固定在底部 -->
                                     <Expander Header="{x:Static lang:Resources.DeveloperOptionsText}"
                                               IsVisible="{Binding AdvancedSettings.IsDeveloperModeEnabled}"
                                               IsExpanded="True">

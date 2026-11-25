@@ -1670,15 +1670,6 @@
     <data name="ScanFailedError" xml:space="preserve">
         <value>扫描失败：{e.Message}</value>
     </data>
-    <data name="M0048" xml:space="preserve">
-        <value>填写游戏内开拓者名称。</value>
-    </data>
-    <data name="M0050" xml:space="preserve">
-        <value>本次运行的局数。</value>
-    </data>
-    <data name="M0053" xml:space="preserve">
-        <value>开拓者名称</value>
-    </data>
     <data name="RussianLanguageName" xml:space="preserve">
         <value>Русский</value>
     </data>
@@ -1720,5 +1711,29 @@
     </data>
     <data name="EnablePointRewardsToolTip" xml:space="preserve">
         <value>本周积分达到上限时领取奖励并跳过此任务</value>
+    </data>
+    <data name="LlmVisionText" xml:space="preserve">
+        <value>多模态大模型视觉</value>
+    </data>
+    <data name="EnableLlmVisionText" xml:space="preserve">
+        <value>启用多模态视觉定位</value>
+    </data>
+    <data name="LlmVisionDescriptionText" xml:space="preserve">
+        <value>在部分场景下优先使用基于多模态大模型的界面元素定位，以提高准确性，可能产生资金消耗</value>
+    </data>
+    <data name="LlmVisionBaseUrlText" xml:space="preserve">
+        <value>接口地址</value>
+    </data>
+    <data name="LlmVisionModelText" xml:space="preserve">
+        <value>模型ID</value>
+    </data>
+    <data name="LlmVisionApiKeyText" xml:space="preserve">
+        <value>API Key</value>
+    </data>
+    <data name="LlmVisionTimeoutText" xml:space="preserve">
+        <value>请求超时（秒）</value>
+    </data>
+    <data name="LlmVisionProxyText" xml:space="preserve">
+        <value>代理地址</value>
     </data>
 </root>

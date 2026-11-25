@@ -230,6 +230,7 @@ class DUIMG:
     EVENT_SELECTION = f"{BASE}/event_selection.png"
     EVENT_SELECT = f"{BASE}/event_select.png"
     EVENT_NEXT = f"{BASE}/event_next.png"
+    EVENT_FRAME = f"{BASE}/event_frame.png"
 
     SELECT_GRAND_MIRACLE = f"{BASE}/select_grand_miracle.png"
     SELECT_YOUR_MIRACLE = f"{BASE}/select_your_miracle.png"

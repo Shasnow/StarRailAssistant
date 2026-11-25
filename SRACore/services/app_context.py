@@ -409,6 +409,16 @@ class AppContext:
     def _serialize_operator_result(result: Any, params: dict[str, Any]) -> Any:
         from PIL.Image import Image as PILImage
 
+        from SRACore.operators.model import Box
+
         if isinstance(result, PILImage):
             return {"path": params.get("save_path"), "width": result.width, "height": result.height}
+        # CLI 与 HTTP 两端都直接用 json.dumps（无 dataclass 编码器），
+        # 因此 Box 及其列表必须在这里转成普通字典，否则输出会抛 TypeError。
+        if isinstance(result, Box):
+            return {"left": result.left, "top": result.top,
+                    "width": result.width, "height": result.height,
+                    "center": list(result.center), "source": result.source}
+        if isinstance(result, list) and result and all(isinstance(item, Box) for item in result):
+            return [AppContext._serialize_operator_result(item, {}) for item in result]
         return result

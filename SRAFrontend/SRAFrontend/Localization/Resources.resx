@@ -1674,15 +1674,6 @@ Please choose another folder.</value>
     <data name="ScanFailedError" xml:space="preserve">
         <value>Scan failed: {e.Message}</value>
     </data>
-    <data name="M0048" xml:space="preserve">
-        <value>Enter the in-game Trailblazer name.</value>
-    </data>
-    <data name="M0050" xml:space="preserve">
-        <value>Number of matches to run this time.</value>
-    </data>
-    <data name="M0053" xml:space="preserve">
-        <value>Trailblazer name</value>
-    </data>
     <data name="RussianLanguageName" xml:space="preserve">
         <value>Русский</value>
     </data>
@@ -1724,5 +1715,29 @@ Please choose another folder.</value>
     </data>
     <data name="EnablePointRewardsToolTip" xml:space="preserve">
         <value>Receive the rewards and skip this task when the weekly point cap is reached.</value>
+    </data>
+    <data name="LlmVisionText" xml:space="preserve">
+        <value>MLLM Vision</value>
+    </data>
+    <data name="EnableLlmVisionText" xml:space="preserve">
+        <value>Enable multimodal vision</value>
+    </data>
+    <data name="LlmVisionDescriptionText" xml:space="preserve">
+        <value>In some scenarios, it is preferable to use interface element positioning based on multimodal large language model vision to enhance accuracy. However, this may result in increased costs.</value>
+    </data>
+    <data name="LlmVisionBaseUrlText" xml:space="preserve">
+        <value>API base URL</value>
+    </data>
+    <data name="LlmVisionModelText" xml:space="preserve">
+        <value>Model</value>
+    </data>
+    <data name="LlmVisionApiKeyText" xml:space="preserve">
+        <value>API key</value>
+    </data>
+    <data name="LlmVisionTimeoutText" xml:space="preserve">
+        <value>Request timeout (seconds)</value>
+    </data>
+    <data name="LlmVisionProxyText" xml:space="preserve">
+        <value>Proxy URL</value>
     </data>
 </root>

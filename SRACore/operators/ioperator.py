@@ -9,6 +9,7 @@ import cv2
 # noinspection package-requirements
 import numpy as np
 import pyscreeze
+import PIL.Image as PILImage
 from PIL import ImageDraw, ImageFont
 from PIL.Image import Image
 from loguru import logger
@@ -16,6 +17,7 @@ from rapidocr import RapidOCR
 from rapidocr.utils.output import RapidOCROutput
 
 from SRACore.models.app_settings import AppSettings
+from SRACore.operators import llm_vision
 from SRACore.operators.color_detector import ColorTargetDetector, ContourSort
 from SRACore.operators.model import Box, WindowContext
 from SRACore.util.const import LogsOCRDir
@@ -37,6 +39,15 @@ def _load_ocr_font(size: int = 14) -> ImageFont.FreeTypeFont | ImageFont.ImageFo
     return ImageFont.load_default()
 
 
+def _to_bgr(image: Image) -> np.ndarray:
+    """PIL RGB 图像转 OpenCV 用的连续 BGR 数组。
+
+    不要写成 ``np.array(image)[:, :, ::-1]``：那样得到的是负步长视图，
+    每次 OpenCV 调用都要先复制一份，检测类算法会慢几倍（实测 1.3s → 9.1s）。
+    """
+    return cv2.cvtColor(np.array(image.convert("RGB")), cv2.COLOR_RGB2BGR)
+
+
 def _annotate_ocr_image(image: Image, result: list[tuple[list[tuple[int, int]], str, float]] | None) -> Image:
     """在截图副本上绘制 OCR 识别框、文本与置信度，便于排查识别问题。"""
     annotated = image.convert("RGB")
@@ -53,6 +64,25 @@ def _annotate_ocr_image(image: Image, result: list[tuple[list[tuple[int, int]], 
         draw.rectangle((left, top, right, bottom), fill=(0, 0, 0))
         draw.text((x, label_top), label, fill=(0, 255, 0), font=font)
     return annotated
+
+
+def _annotate_llm_vision_image(image: Image,
+                               box: tuple[int, int, int, int] | None,
+                               label: str,
+                               *,
+                               found: bool) -> Image:
+    """在截图副本上标注 LLM 视觉定位结果（命中为绿色框，未命中为红色提示）。"""
+    annotated = image.convert("RGB")
+    draw = ImageDraw.Draw(annotated)
+    font = _load_ocr_font()
+    color = (0, 255, 0) if found else (255, 64, 64)
+    if box is not None:
+        draw.rectangle(box, outline=color, width=2)
+    left, top, right, bottom = draw.textbbox((8, 8), label, font=font)
+    draw.rectangle((left - 2, top - 2, right + 2, bottom + 2), fill=(0, 0, 0))
+    draw.text((8, 8), label, fill=color, font=font)
+    return annotated
+
 
 class IOperator(ABC):
     """操作器抽象基类。
@@ -95,6 +125,7 @@ class IOperator(ABC):
         self.stop_event: threading.Event | None = stop_event
         self.ocr_engine: RapidOCR = ocr_engine
         self.screenshot_background = True
+        self._llm_vision: llm_vision.LlmVision | None = None
 
     @abstractmethod
     def is_window_active(self) -> bool:
@@ -181,6 +212,13 @@ class IOperator(ABC):
             SRAError: 截图出现错误
         """
         ...
+
+    @property
+    def llm_vision(self) -> llm_vision.LlmVision:
+        """获取 LLM 识别客户端。"""
+        if self._llm_vision is None:
+            self._llm_vision = llm_vision.LlmVision.from_settings(self.settings)
+        return self._llm_vision
 
     def locate_all(self,
                    template: str,
@@ -327,6 +365,105 @@ class IOperator(ABC):
             if trace:
                 logger.trace(f"ImageNotFound: {template} -> {e}")
             return None
+
+    def llm_locate(self,
+                        template: str,
+                        *,
+                        description: str | None = None,
+                        from_x: float | None = None,
+                        from_y: float | None = None,
+                        to_x: float | None = None,
+                        to_y: float | None = None,
+                        min_confidence: float | None = None,
+                        debug: bool = False,
+                        trace: bool = True) -> Box | None:
+        """用多模态大模型在截图中定位模板图片。
+
+        把模板图与当前截图一起发送给支持图像输入的对话模型，要求其返回结构化 JSON
+        （是否命中、相对外接矩形、可信度、理由），再换算成窗口坐标，可作为 ``locate``
+        在缩放、半透明遮罩、动态特效下失效时的兜底。
+
+        模型与接口在设置的“多模态视觉定位”中配置（``settings.json`` 的 ``advanced.llmVision`` 段），
+        未启用或缺少接口地址/模型时直接返回 ``None``。
+
+        Args:
+            template (str): 模板图片路径，与 ``locate`` 使用同一套资源。
+            description (str, optional): 额外的目标说明，例如“金色描边的出战按钮”。
+            from_x/from_y/to_x/to_y (float, optional): 仅在该窗口比例区域内查找。
+            min_confidence (float, optional): 模型可信度低于该值时视为未找到。
+            debug (bool): 是否把标注了定位结果的截图保存到 ``log/ocr``。
+                开发者模式下勾选“保存 OCR 图片”时也会自动保存。默认为 False。
+            trace (bool): 是否输出调试信息。默认为 True。
+        Returns:
+            Box | None: 命中返回窗口坐标下的外接矩形；未命中、未配置或调用失败返回 None。
+        """
+        def _llm_box(screenshot: Image, box: tuple[float, float, float, float]) -> tuple[int, int, int, int]:
+            """把归一化矩形换算成截图内的像素坐标 (left, top, right, bottom)。"""
+            x1, y1, x2, y2 = box
+            return (round(x1 * screenshot.width), round(y1 * screenshot.height),
+                    round(x2 * screenshot.width), round(y2 * screenshot.height))
+
+        def _save_llm_vision_debug(screenshot: Image, box: tuple[int, int, int, int] | None,
+                                label: str, *, found: bool) -> None:
+            """保存标注了 LLM 定位结果的截图，便于排查模型判断。"""
+            try:
+                LogsOCRDir.mkdir(parents=True, exist_ok=True)
+                path = LogsOCRDir / f"llm_vision_{time.time_ns()}.png"
+                _annotate_llm_vision_image(screenshot, box, label, found=found).save(path)
+                logger.debug(f"LLM 视觉定位调试图已保存：{path}")
+            except Exception as error:
+                logger.warning(f"保存 LLM 视觉定位调试图失败：{error}")
+                
+        if self.stop_event is not None and self.stop_event.is_set():
+            raise ThreadStoppedError("Operation stopped")
+        client = self.llm_vision
+        if not client.enabled:
+            if trace:
+                logger.warning("未启用多模态视觉定位或缺少接口地址/模型配置，跳过")
+            return None
+        if not Path(template).exists():
+            raise FileNotFoundError("无法找到或读取文件 " + template)
+        save_debug = debug or self.is_save_ocr_image
+        try:
+            screenshot = self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
+            with PILImage.open(template) as image:
+                template_image = image.convert("RGB")
+            result = client.locate(template_image, screenshot, description=description or "")
+        except llm_vision.LlmVisionError as error:
+            if trace:
+                logger.warning(f"LLM 视觉定位失败：{error}")
+            return None
+        except Exception as error:  # 编码/网络等异常不应中断任务
+            if trace:
+                logger.warning(f"LLM 视觉定位异常：{type(error).__name__}: {error}")
+            return None
+        name = Path(template).stem
+        reason = result.reason[:60]
+        confidence = "N/A" if result.confidence is None else f"{result.confidence:.2f}"
+        if not result.found or result.box is None:
+            if trace:
+                logger.debug(f"LLM 未定位到 {template}：{result.reason}")
+            if save_debug:
+                _save_llm_vision_debug(screenshot, None, f"LLM 未找到 {name}：{reason}", found=False)
+            return None
+        if min_confidence is not None and (result.confidence or 0.0) < min_confidence:
+            if trace:
+                logger.debug(f"LLM 定位可信度不足（{result.confidence} < {min_confidence}）：{template}")
+            if save_debug:
+                _save_llm_vision_debug(screenshot, _llm_box(screenshot, result.box),
+                                           f"LLM 可信度不足 {name} {confidence}：{reason}", found=False)
+            return None
+        local_box = _llm_box(screenshot, result.box)
+        offset_x = int((from_x or 0.0) * self.window_context.width)
+        offset_y = int((from_y or 0.0) * self.window_context.height)
+        box = Box(offset_x + local_box[0], offset_y + local_box[1],
+                  max(1, local_box[2] - local_box[0]), max(1, local_box[3] - local_box[1]),
+                  source=template)
+        if save_debug:
+            _save_llm_vision_debug(screenshot, local_box, f"LLM {name} {confidence}：{reason}", found=True)
+        if trace:
+            logger.info(f"LLM 定位 {template} -> {box}（可信度 {result.confidence}）：{result.reason}")
+        return box
 
     def ocr(self,
             from_x: float | None = None,
@@ -585,7 +722,7 @@ class IOperator(ABC):
             raise ThreadStoppedError("颜色检测中断", "线程已停止")
         try:
             screenshot = self.screenshot(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y)
-            frame = np.array(screenshot)[:, :, ::-1]  # PIL RGB → BGR
+            frame = _to_bgr(screenshot)
             detector = ColorTargetDetector(
                 hsv_lower=hsv_lower, hsv_upper=hsv_upper,
                 min_area=min_area, max_targets=max_targets, sort_by=sort_by,
