@@ -25,7 +25,23 @@ describe('fetchScreenshot', () => {
     const result = await fetchScreenshot(undefined, 123456)
 
     expect(result).toBe(blob)
-    expect(fetchMock).toHaveBeenCalledWith(`${SCREENSHOT_URL}?t=123456`, { signal: undefined })
+    expect(fetchMock).toHaveBeenCalledWith(`${SCREENSHOT_URL}?t=123456`, {
+      signal: undefined,
+      headers: undefined,
+    })
+  })
+
+  it('已登录时附带 X-Access-Token 请求头', async () => {
+    vi.stubGlobal('fetch', fetchMock)
+    vi.stubGlobal('localStorage', { getItem: () => 'secret' })
+    mockResponse(true, 200, new Blob(['png'], { type: 'image/png' }))
+
+    await fetchScreenshot()
+
+    expect(fetchMock).toHaveBeenCalledWith(SCREENSHOT_URL, {
+      signal: undefined,
+      headers: { 'X-Access-Token': 'secret' },
+    })
   })
 
   it('HTTP 非 2xx 时抛出错误', async () => {

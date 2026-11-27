@@ -1,3 +1,4 @@
+import { getStoredToken } from '@/api/http'
 import { i18n } from '@/locales'
 /**
  * /api/operator 实时画面服务模块（对应 OpenAPI OperatorController）：
@@ -22,7 +23,13 @@ export async function fetchScreenshot(signal?: AbortSignal, cacheBust?: number):
     return renderDemoScreenshot()
   }
   const url = cacheBust ? `${SCREENSHOT_URL}?t=${cacheBust}` : SCREENSHOT_URL
-  const res = await fetch(url, { signal })
+  // 与 Axios 客户端保持一致的认证头：启用认证后直接 fetch 不带 token 会得到 401。
+  // 非浏览器环境（单元测试的 node 环境）没有 localStorage，此时不附带认证头
+  const token = typeof localStorage === 'undefined' ? '' : getStoredToken()
+  const res = await fetch(url, {
+    signal,
+    headers: token ? { 'X-Access-Token': token } : undefined,
+  })
   if (!res.ok) throw new Error(i18n.global.t('live.screenshotFailed', [res.status]))
   const blob = await res.blob()
   if (!blob.type.startsWith('image/')) throw new Error(i18n.global.t('live.screenshotNotImage'))

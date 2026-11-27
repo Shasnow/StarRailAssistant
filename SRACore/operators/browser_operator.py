@@ -40,6 +40,8 @@ class WebDriverManager:
     _driver_pool: dict[BrowserType, WebDriver] = {}
     # 全局常量统一管理
     CLOUD_URL = "https://sr.mihoyo.com/cloud"
+    # 云游戏页面语言，跟随 Accept-Language；容器内默认 en-US 会让界面变英文
+    ACCEPT_LANGUAGES = "zh-CN,zh"
     WINDOW_SIZE = {
         BrowserType.EDGE: (1936, 1164),
         BrowserType.CHROME: (1936, 1112),
@@ -158,6 +160,12 @@ class WebDriverManager:
         for arg in WebDriverManager.COMMON_CLI_ARGS:
             opt.add_argument(arg)
         opt.add_argument(f"--app={WebDriverManager.CLOUD_URL}")
+        # 强制网页语言为简体中文：Docker 等环境默认 en-US，云游戏界面会变成英文导致识别失败
+        if isinstance(opt, webdriver.FirefoxOptions):
+            opt.set_preference("intl.accept_languages", WebDriverManager.ACCEPT_LANGUAGES)
+        else:
+            opt.add_experimental_option("prefs", {"intl.accept_languages": WebDriverManager.ACCEPT_LANGUAGES})
+        opt.add_argument(f"--accept-lang={WebDriverManager.ACCEPT_LANGUAGES}")
 
     @classmethod
     def close_browser(cls, browser: BrowserType):
