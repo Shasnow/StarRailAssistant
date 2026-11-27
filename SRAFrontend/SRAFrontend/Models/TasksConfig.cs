@@ -68,6 +68,11 @@ public partial class StartGameConfig : ObservableObject
     [ObservableProperty] [property: JsonPropertyName("relogin")] [property: Description("是否在登录失败后自动重新登录")]
     private bool _isReLogin = true;
 
+    [ObservableProperty]
+    [property: JsonPropertyName("loginMethod")]
+    [property: Description("登录方式，0-账号密码，1-扫码登录（仅云游戏）")]
+    private int _loginMethod;
+
     [ObservableProperty] [property: JsonIgnore]
     private string _password = "";
 

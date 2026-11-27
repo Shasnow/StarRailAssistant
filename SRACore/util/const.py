@@ -32,3 +32,5 @@ CacheDir = AppDataDir / "cache"
 LogsDir = Path("log").absolute()
 LogsOCRDir = LogsDir / "ocr"
 LogsScreenshotDir = LogsDir / "screenshot"
+# 云游戏扫码登录的二维码图片，操作器写入、服务端接口读取
+QrcodeLoginImage = LogsDir / "qrcode_login.png"

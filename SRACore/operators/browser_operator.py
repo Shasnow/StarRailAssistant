@@ -1,10 +1,12 @@
 import base64
 import enum
 import json
+import re
 import threading
 import time
 from collections.abc import Callable
 from io import BytesIO
+from pathlib import Path
 
 import psutil
 from PIL import Image
@@ -22,7 +24,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 from SRACore.models.app_settings import AppSettings
 from SRACore.operators.ioperator import IOperator
 from SRACore.operators.model import WindowContext
-from SRACore.util.const import CacheDir
+from SRACore.util import encryption
+from SRACore.util.const import CacheDir, LogsDir, QrcodeLoginImage
 from SRACore.util.errors import ThreadStoppedError
 
 
@@ -232,19 +235,8 @@ class BrowserOperator(IOperator):
         except Exception as e:
             logger.warning(f"无头模式禁用 Pointer Lock 失败: {e}")
 
-    def login(self, account, password, relogin: bool = False):
-        if relogin:
-            # 精确删除登录态 cookies，保留 DEVICEFP_SEED_TIME、DEVICEFP、_MHYUUID 等非登录信息
-            login_cookies = [
-                "uni_web_token", 
-                "Ituid_v2", "Ituid", "Itoken_v2", "Itoken", "Itmid_v2",
-                "cookie_token_v2", "cookie_token",
-                "account_mid_v2", "account_id_v2", "account_id",
-            ]
-            for name in login_cookies:
-                self.driver.delete_cookie(name)
-            self.driver.refresh()
-            logger.info("已清除登录态 Cookie，准备重新登录")
+    def login(self, account, password, relogin: bool = False, account_tag: str = ""):
+        self._prepare_login_session(account_tag, relogin)
         start_btn_xpath = '//*[@id="app"]/div[1]/div[3]/div[1]/div/div[2]/div[2]'
         try:
             WebDriverWait(self.driver, 10).until(
@@ -258,6 +250,240 @@ class BrowserOperator(IOperator):
             logger.error("登录失败")
             return -1
 
+        result = self._enter_game_after_login()
+        if result == 1:
+            self._save_login_session(account_tag)
+        return result
+
+    # 登录 iframe 内的二维码登录入口（图标按钮）、图标与二维码图片
+    QR_LOGIN_TOGGLE = (By.CSS_SELECTOR, ".qr-login-btn, .qr-login-btn--wrapper")
+    QR_LOGIN_ICON = (By.CSS_SELECTOR, ".qr-login-btn svg, .qr-login-btn--wrapper svg")
+    QRCODE_IMG = (By.CSS_SELECTOR, "img.qr-loaded")
+    # 二维码外层容器，截图时连带四周留白一起保存，否则缺少静区无法扫描
+    QRCODE_CONTAINER = (By.CSS_SELECTOR, ".qr-wrap")
+    QRCODE_REFRESH = (By.CSS_SELECTOR, ".qr-wrap")
+    # SVG 元素没有 click() 方法，统一用脚本派发可冒泡的点击事件
+    _CLICK_SCRIPT = """
+        const el = arguments[0];
+        if (typeof el.click === 'function') {
+            el.click();
+        } else {
+            el.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
+        }
+    """
+
+    def _clear_login_cookies(self) -> None:
+        """清除登录态 Cookie，保留 DEVICEFP_SEED_TIME、DEVICEFP、_MHYUUID 等非登录信息。"""
+        login_cookies = [
+            "uni_web_token",
+            "Ituid_v2", "Ituid", "Itoken_v2", "Itoken", "Itmid_v2",
+            "cookie_token_v2", "cookie_token",
+            "account_mid_v2", "account_id_v2", "account_id",
+        ]
+        for name in login_cookies:
+            self.driver.delete_cookie(name)
+
+    @staticmethod
+    def _cookie_store_path(account_tag: str) -> Path:
+        """账号标识对应的登录态文件，文件名做非法字符替换。"""
+        safe = re.sub(r'[\\/:*?"<>|\s]+', "_", account_tag.strip()) or "default"
+        return CacheDir / "cloudgame" / f"{safe}.json"
+
+    def _prepare_login_session(self, account_tag: str, relogin: bool) -> None:
+        """登录前准备登录态：强制重登只清空，指定账号时恢复该账号保存的 Cookie。"""
+        if relogin:
+            self._clear_login_cookies()
+            self.driver.refresh()
+            logger.info("已清除登录态 Cookie，准备重新登录")
+        elif account_tag:
+            self._restore_login_session(account_tag)
+
+    def _restore_login_session(self, account_tag: str) -> None:
+        """用保存的 Cookie 恢复指定账号的登录态（加密存储，读取失败按未保存处理）。"""
+        path = self._cookie_store_path(account_tag)
+        cookies: list = []
+        if path.is_file():
+            try:
+                cookies = json.loads(encryption.decryptor(path.read_text(encoding="utf-8")))
+            except Exception as e:
+                logger.warning(f"读取账号 {account_tag} 的登录态失败: {e}")
+        if not isinstance(cookies, list) or not cookies:
+            # 该账号还没有保存过登录态：清掉浏览器里可能残留的其他账号，强制走登录流程
+            self._clear_login_cookies()
+            self.driver.refresh()
+            logger.info(f"账号 {account_tag} 尚未保存登录态，需要登录一次")
+            return
+
+        self._clear_login_cookies()
+        self.driver.get(WebDriverManager.CLOUD_URL)
+        added = 0
+        keys = ("name", "value", "path", "domain", "secure", "httpOnly", "expiry", "sameSite")
+        for cookie in cookies:
+            if not isinstance(cookie, dict):
+                continue
+            data = {key: cookie[key] for key in keys if key in cookie}
+            if isinstance(data.get("expiry"), float):
+                data["expiry"] = int(data["expiry"])  # Selenium 只接受整数时间戳
+            try:
+                self.driver.add_cookie(data)
+                added += 1
+            except Exception:
+                continue
+        if added:
+            self.driver.refresh()
+            logger.info(f"已恢复账号 {account_tag} 的登录态（{added} 个 Cookie）")
+
+    def _save_login_session(self, account_tag: str) -> None:
+        """把当前登录态 Cookie 加密保存到账号标识对应的文件，留空则跳过。"""
+        if not account_tag.strip():
+            return
+        try:
+            cookies = self.driver.get_cookies()
+            if not cookies:
+                return
+            path = self._cookie_store_path(account_tag)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(encryption.encryptor(json.dumps(cookies, ensure_ascii=False)), encoding="utf-8")
+            logger.info(f"已保存账号 {account_tag} 的登录态")
+        except Exception as e:
+            logger.warning(f"保存账号 {account_tag} 的登录态失败: {e}")
+
+    def qrcode_login(self, timeout: float = 180.0, relogin: bool = False, account_tag: str = "") -> int:
+        """打开二维码登录界面，并轮询等待用户扫码完成登录。
+
+        二维码截图保存到 ``log/qrcode_login.png``，等待期间轮询登录成功标志，
+        二维码失效时自动点击刷新；超时或中途停止返回 -1。
+
+        Args:
+            timeout: 最长等待扫码的秒数。
+            relogin: 是否忽略已保存的登录态，强制重新扫码登录。
+            account_tag: 账号标识，用于保存/恢复该账号的登录态 Cookie；留空则不保存。
+        """
+        start_btn_xpath = '//*[@id="app"]/div[1]/div[3]/div[1]/div/div[2]/div[2]'
+        self._prepare_login_session(account_tag, relogin)
+        try:
+            WebDriverWait(self.driver, 10).until(
+                expected_conditions.presence_of_element_located((By.XPATH, start_btn_xpath)))
+            logger.info("检测到已登录状态")
+            result = self._enter_game_after_login()
+            if result == 1:
+                self._save_login_session(account_tag)
+            return result
+        except Exception:
+            pass
+
+        qrcode_path = self._open_qrcode_login()
+        if qrcode_path is None:
+            return -1
+
+        logger.info(f"请在 {timeout:.0f} 秒内使用米游社 App 扫描二维码登录，二维码图片：{qrcode_path}")
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            if self.stop_event and self.stop_event.is_set():
+                logger.warning("线程已停止，扫码登录中断")
+                return -1
+            time.sleep(2)
+            self.driver.switch_to.default_content()
+            try:
+                self.driver.find_element(By.XPATH, start_btn_xpath)
+                logger.info("扫码登录成功")
+                result = self._enter_game_after_login()
+                if result == 1:
+                    self._save_login_session(account_tag)
+                return result
+            except NoSuchElementException:
+                self._refresh_qrcode()
+        logger.error("等待扫码登录超时")
+        return -1
+
+    def _open_qrcode_login(self) -> str | None:
+        """切换到二维码登录页并保存二维码图片，返回图片路径；失败返回 None。"""
+        logger.info("打开二维码登录界面...")
+        try:
+            wait = WebDriverWait(self.driver, 60)
+            wait.until(expected_conditions.presence_of_element_located((By.TAG_NAME, "iframe")))
+            self.driver.switch_to.frame("mihoyo-login-platform-iframe")
+            # 等待登录卡片渲染：可能直接是二维码视图，也可能是短信登录页
+            wait.until(lambda d: d.find_elements(*self.QRCODE_IMG)
+                       or d.find_elements(*self.QR_LOGIN_TOGGLE)
+                       or d.find_elements(*self.QR_LOGIN_ICON))
+            # 默认是短信登录页，需要点击左上角的扫码图标切换到二维码登录
+            if not self.driver.find_elements(*self.QRCODE_IMG):
+                self._click_qr_toggle()
+            wait.until(expected_conditions.presence_of_element_located(self.QRCODE_IMG))
+            path = self._save_qrcode()
+            self.driver.switch_to.default_content()
+            return path
+        except Exception as e:
+            logger.error(f"打开二维码登录界面失败: {e}")
+            try:
+                self.driver.switch_to.default_content()
+                LogsDir.mkdir(parents=True, exist_ok=True)
+                shot = LogsDir / "qrcode_login_error.png"
+                self.driver.save_screenshot(str(shot))
+                logger.info(f"已保存失败截图：{shot}")
+            except Exception:
+                pass
+            return None
+
+    def _click_qr_toggle(self) -> None:
+        """点击二维码登录切换按钮。
+
+        图标 svg 覆盖在按钮上层会拦截原生点击（ElementClickInterceptedException），
+        因此按 图标 → 内层按钮 → 外层容器 的顺序用脚本点击。
+        """
+        for by, value in (self.QR_LOGIN_ICON, self.QR_LOGIN_TOGGLE):
+            elements = self.driver.find_elements(by, value)
+            if elements:
+                self.driver.execute_script(self._CLICK_SCRIPT, elements[0])
+                return
+        raise NoSuchElementException("未找到二维码登录切换按钮")
+
+    def _save_qrcode(self) -> str:
+        """保存当前二维码图片到日志目录，返回图片路径（调用前需已切到登录 iframe）。
+
+        优先截取外层容器，把二维码四周的白色静区一起保存，否则单独截二维码图片会无法扫描。
+        """
+        LogsDir.mkdir(parents=True, exist_ok=True)
+        path = QrcodeLoginImage
+        containers = self.driver.find_elements(*self.QRCODE_CONTAINER)
+        element = containers[0] if containers else self.driver.find_element(*self.QRCODE_IMG)
+        element.screenshot(str(path))
+        return str(path)
+
+    def _refresh_qrcode(self) -> None:
+        """二维码失效时点击刷新并重新保存图片；已扫码待确认或页面关闭时不做处理。"""
+        try:
+            self.driver.switch_to.frame("mihoyo-login-platform-iframe")
+        except Exception:
+            # iframe 消失通常代表登录已完成，交由主循环判断
+            return
+        try:
+            if self.driver.find_elements(*self.QRCODE_IMG):
+                return
+            page_text = self.driver.find_element(By.TAG_NAME, "body").text
+            if "扫描成功" in page_text or "确认登录" in page_text:
+                return  # 已扫码，等待手机端确认
+            if self.driver.find_elements(*self.QRCODE_REFRESH):
+                self.driver.execute_script(self._CLICK_SCRIPT, self.driver.find_element(*self.QRCODE_REFRESH))
+                logger.info("二维码已失效，正在刷新")
+            else:
+                # 二维码视图被关闭（退回短信登录），重新切回扫码登录
+                self._click_qr_toggle()
+            WebDriverWait(self.driver, 10).until(
+                expected_conditions.presence_of_element_located(self.QRCODE_IMG))
+            path = self._save_qrcode()
+            logger.info(f"二维码已更新：{path}")
+        except Exception as e:
+            logger.debug(f"检查二维码状态失败: {e}")
+        finally:
+            try:
+                self.driver.switch_to.default_content()
+            except Exception:
+                pass
+
+    def _enter_game_after_login(self) -> int:
+        """登录成功后关闭弹窗、点击开始游戏并等待进入对局。"""
         try:
             self.driver.find_element(By.XPATH, '/html/body/div[6]/div[3]/button[1]').click()  # 下次再说
         except NoSuchElementException:
@@ -271,8 +497,7 @@ class BrowserOperator(IOperator):
         if self._wait_in_queue(3600):
             self.confirm()
             return 1
-        else:
-            return -1
+        return -1
 
     def _password_login(self, account, password, start_btn_xpath) -> bool:
         logger.info("使用账号密码登录...")

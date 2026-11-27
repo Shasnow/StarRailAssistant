@@ -178,6 +178,7 @@
     "game.launchDelay": "Wait delay after launching the game (seconds)",
     "autologin": "Whether to log in automatically",
     "relogin": "Whether to log in again automatically after a login failure",
+    "loginMethod": "Login method, 0=account & password, 1=QR code (cloud game only)",
     "password": "Account password stored encrypted",
     "username": "Account username stored encrypted"
   },

@@ -73,6 +73,13 @@
                                   IsChecked="{Binding StartGameConfig.IsReLogin}"
                                   ToolTip.Tip="{x:Static lang:Resources.AlwaysReloginDescription}"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,15">
+                        <Label Content="{x:Static lang:Resources.LoginMethodText}" VerticalAlignment="Center" />
+                        <ComboBox SelectedIndex="{Binding StartGameConfig.LoginMethod}">
+                            <ComboBoxItem><x:Static Member="lang:Resources.LoginMethodPasswordText" /></ComboBoxItem>
+                            <ComboBoxItem><x:Static Member="lang:Resources.LoginMethodQrcodeText" /></ComboBoxItem>
+                        </ComboBox>
+                    </StackPanel>
                     <Grid RowDefinitions="*, *" ColumnDefinitions="Auto, *, Auto" Width="400" HorizontalAlignment="Left">
                         <Label Grid.Row="0" Grid.Column="0" Content="{x:Static lang:Resources.AccountLabelText}" />
                         <!-- ReSharper disable Xaml.StyleClassNotFound -->

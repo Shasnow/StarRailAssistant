@@ -28,6 +28,7 @@ class StartGameConfig(_Model):
     launchDelay: int = Field(5, alias="game.launchDelay", description='启动游戏后的等待延迟（秒）')
     isAutoLogin: bool = Field(True, alias="autologin", description='是否自动登录账号')
     isReLogin: bool = Field(True, alias="relogin", description='是否在登录失败后自动重新登录')
+    loginMethod: int = Field(0, alias="loginMethod", description='登录方式，0-账号密码，1-扫码登录（仅云游戏）')
     EncryptedPassword: str = Field("", alias="password", description='加密存储的账号密码')
     EncryptedUsername: str = Field("", alias="username", description='加密存储的账号用户名')
 

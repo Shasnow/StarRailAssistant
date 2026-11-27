@@ -273,6 +273,18 @@
     <data name="CloudGameText" xml:space="preserve">
         <value>使用云·星穹铁道（实验性）</value>
     </data>
+    <data name="CloudGameBrowserText" xml:space="preserve">
+        <value>浏览器</value>
+    </data>
+    <data name="CloudGameBrowserPathText" xml:space="preserve">
+        <value>浏览器可执行文件路径</value>
+    </data>
+    <data name="CloudGameHeadlessText" xml:space="preserve">
+        <value>浏览器无头模式</value>
+    </data>
+    <data name="CloudGameMuteAudioText" xml:space="preserve">
+        <value>浏览器静音</value>
+    </data>
     <data name="EnableOverlayText" xml:space="preserve">
         <value>启用叠加层</value>
     </data>
@@ -1564,6 +1576,15 @@
     </data>
     <data name="LaunchWaitTimeText" xml:space="preserve">
         <value>启动等待时间（秒）</value>
+    </data>
+    <data name="LoginMethodText" xml:space="preserve">
+        <value>登录方式</value>
+    </data>
+    <data name="LoginMethodPasswordText" xml:space="preserve">
+        <value>账号密码</value>
+    </data>
+    <data name="LoginMethodQrcodeText" xml:space="preserve">
+        <value>扫码登录（云游戏）</value>
     </data>
     <data name="AutoLoginText" xml:space="preserve">
         <value>自动登录</value>

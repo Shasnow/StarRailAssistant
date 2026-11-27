@@ -168,16 +168,33 @@ class IOperator(ABC):
         self.window_context.full_screen = full_screen or self.window_context.full_screen
         return self.window_context
 
-    def login(self, account, password, relogin: bool = False) -> int:
+    def login(self, account, password, relogin: bool = False, account_tag: str = "") -> int:
         """登录目标应用（云游戏实现用于登录网页端）。
 
         Args:
             account: 账号。
             password: 密码。
-            relogin: 是否先清除登录态 Cookie 后重新登录。
+            relogin: 是否忽略已保存的登录态，强制重新登录。
+            account_tag: 账号标识，用于保存/恢复该账号的登录态 Cookie；留空则不保存。
 
         Returns:
             int: 1 表示登录成功，-1 表示登录失败。
+        """
+        ...
+
+    def qrcode_login(self, timeout: float = 180.0, relogin: bool = False, account_tag: str = "") -> int:
+        """打开二维码登录界面，并轮询等待用户扫码完成登录（云游戏实现）。
+
+        二维码图片保存到日志目录，等待期间按固定间隔轮询登录状态；
+        超时或中途停止时返回失败。
+
+        Args:
+            timeout: 最长等待扫码的秒数。
+            relogin: 是否忽略已保存的登录态，强制重新扫码登录。
+            account_tag: 账号标识，用于保存/恢复该账号的登录态 Cookie；留空则不保存。
+
+        Returns:
+            int: 1 表示登录成功，-1 表示登录失败或超时。
         """
         ...
 

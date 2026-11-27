@@ -178,6 +178,7 @@
     "game.launchDelay": "启动游戏后的等待延迟（秒）",
     "autologin": "是否自动登录账号",
     "relogin": "是否在登录失败后自动重新登录",
+    "loginMethod": "登录方式，0-账号密码，1-扫码登录（仅云游戏）",
     "password": "加密存储的账号密码",
     "username": "加密存储的账号用户名"
   },

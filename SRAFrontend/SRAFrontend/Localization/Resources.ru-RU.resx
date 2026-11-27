@@ -277,6 +277,18 @@
   <data name="CloudGameText" xml:space="preserve">
     <value>Облачная версия игры (экспериментально)</value>
   </data>
+  <data name="CloudGameBrowserText" xml:space="preserve">
+    <value>Браузер</value>
+  </data>
+  <data name="CloudGameBrowserPathText" xml:space="preserve">
+    <value>Путь к исполняемому файлу браузера</value>
+  </data>
+  <data name="CloudGameHeadlessText" xml:space="preserve">
+    <value>Безголовый режим браузера</value>
+  </data>
+  <data name="CloudGameMuteAudioText" xml:space="preserve">
+    <value>Без звука в браузере</value>
+  </data>
   <data name="EnableOverlayText" xml:space="preserve">
     <value>Оверлей</value>
   </data>
@@ -1568,6 +1580,15 @@
     </data>
     <data name="LaunchWaitTimeText" xml:space="preserve">
         <value>Ожидание запуска (с)</value>
+    </data>
+    <data name="LoginMethodText" xml:space="preserve">
+        <value>Способ входа</value>
+    </data>
+    <data name="LoginMethodPasswordText" xml:space="preserve">
+        <value>Логин и пароль</value>
+    </data>
+    <data name="LoginMethodQrcodeText" xml:space="preserve">
+        <value>QR-код (облачная игра)</value>
     </data>
     <data name="AutoLoginText" xml:space="preserve">
         <value>Автовход</value>

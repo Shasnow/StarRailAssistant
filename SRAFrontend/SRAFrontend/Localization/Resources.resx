@@ -277,6 +277,18 @@
     <data name="CloudGameText" xml:space="preserve">
         <value>Use StarRail Cloud Game (Experimental)</value>
     </data>
+    <data name="CloudGameBrowserText" xml:space="preserve">
+        <value>Browser</value>
+    </data>
+    <data name="CloudGameBrowserPathText" xml:space="preserve">
+        <value>Browser executable path</value>
+    </data>
+    <data name="CloudGameHeadlessText" xml:space="preserve">
+        <value>Browser headless mode</value>
+    </data>
+    <data name="CloudGameMuteAudioText" xml:space="preserve">
+        <value>Browser mute audio</value>
+    </data>
     <data name="EnableOverlayText" xml:space="preserve">
         <value>Enable Overlay</value>
     </data>
@@ -1568,6 +1580,15 @@ Please choose another folder.</value>
     </data>
     <data name="LaunchWaitTimeText" xml:space="preserve">
         <value>Launch wait time (s)</value>
+    </data>
+    <data name="LoginMethodText" xml:space="preserve">
+        <value>Login method</value>
+    </data>
+    <data name="LoginMethodPasswordText" xml:space="preserve">
+        <value>Account &amp; password</value>
+    </data>
+    <data name="LoginMethodQrcodeText" xml:space="preserve">
+        <value>QR code (cloud game)</value>
     </data>
     <data name="AutoLoginText" xml:space="preserve">
         <value>Auto login</value>

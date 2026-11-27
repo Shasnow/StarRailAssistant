@@ -578,6 +578,24 @@ public partial class SettingsPageViewModel : PageViewModel
         Settings.General.GamePathIndex = Settings.General.GamePaths.Count - 1; // 切换到新添加的路径
     }
 
+    /// <summary>选择云游戏使用的浏览器可执行文件</summary>
+    [RelayCommand]
+    private async Task SelectBrowserPath()
+    {
+        if (App.TopLevelObject is null) return;
+        var files = await App.TopLevelObject.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = Resources.CloudGameBrowserPathText,
+            AllowMultiple = false,
+            FileTypeFilter =
+            [
+                new FilePickerFileType(Resources.CloudGameBrowserText) { Patterns = ["*.exe"] }
+            ]
+        });
+        if (files.Count == 0) return;
+        Settings.General.CloudGameBrowserPath = files[0].Path.LocalPath;
+    }
+
     [RelayCommand]
     private void DetectGamePath()
     {

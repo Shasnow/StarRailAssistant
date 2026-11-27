@@ -908,6 +908,42 @@ namespace SRAFrontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Browser.
+        /// </summary>
+        public static string CloudGameBrowserText {
+            get {
+                return ResourceManager.GetString("CloudGameBrowserText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Browser executable path.
+        /// </summary>
+        public static string CloudGameBrowserPathText {
+            get {
+                return ResourceManager.GetString("CloudGameBrowserPathText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Headless mode.
+        /// </summary>
+        public static string CloudGameHeadlessText {
+            get {
+                return ResourceManager.GetString("CloudGameHeadlessText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mute audio.
+        /// </summary>
+        public static string CloudGameMuteAudioText {
+            get {
+                return ResourceManager.GetString("CloudGameMuteAudioText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No matching commands.
         /// </summary>
         public static string CommandPaletteNoResults {
@@ -2652,6 +2688,33 @@ namespace SRAFrontend.Localization {
         public static string LaunchWaitTimeText {
             get {
                 return ResourceManager.GetString("LaunchWaitTimeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Login method.
+        /// </summary>
+        public static string LoginMethodText {
+            get {
+                return ResourceManager.GetString("LoginMethodText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Account &amp; password.
+        /// </summary>
+        public static string LoginMethodPasswordText {
+            get {
+                return ResourceManager.GetString("LoginMethodPasswordText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to QR code (cloud game).
+        /// </summary>
+        public static string LoginMethodQrcodeText {
+            get {
+                return ResourceManager.GetString("LoginMethodQrcodeText", resourceCulture);
             }
         }
         

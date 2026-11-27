@@ -140,9 +140,16 @@ class StartGameTask(BaseTask):
 
     def _browser_login(self) -> int:
         """云游戏登录，由浏览器 Operator 处理"""
+        # 以配置名作为账号标识，分别记住不同账号的登录态
+        account_tag = self.config.Name
+        if self.config.StartGame.loginMethod == 1:
+            logger.info("使用扫码登录云游戏")
+            return self.operator.qrcode_login(relogin=self.config.StartGame.isReLogin,
+                                              account_tag=account_tag)
         user = encryption.decryptor(self.config.StartGame.EncryptedUsername)
         passwd = encryption.decryptor(self.config.StartGame.EncryptedPassword)
-        return self.operator.login(user, passwd, relogin=self.config.StartGame.isReLogin)
+        return self.operator.login(user, passwd, relogin=self.config.StartGame.isReLogin,
+                                   account_tag=account_tag)
 
     def _detect_login_state(self) -> LoginStatus | None:
         """检测当前登录状态，遇到隐私协议界面自动点击同意并重新检测（最多 3 次）
