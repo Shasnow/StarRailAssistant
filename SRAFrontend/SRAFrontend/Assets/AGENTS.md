@@ -64,4 +64,5 @@ manifest.json          导出时间、应用版本、系统信息、显示器参
 ## 参考
 
 - [SRA GitHub 仓库](https://github.com/Shasnow/StarRailAssistant)
+- [SRA CNB 镜像仓库](https://cnb.cool/StarRailAssistant/StarRailAssistant)
 - [SRA FAQ](https://starrailassistant.top/getting-started/faq/)
